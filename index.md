@@ -1,5 +1,27 @@
-Here you can say lots of fun things about your site.
+---
+layout: default
+---
 
-Maybe say a some things about yourself.
+<button class="toggle-button" id="theme-toggle">Toggle Dark Mode</button>
 
-Or maybe what you plan to blog about.
+<section id="welcome">
+  <h1>Welcome to My Blog</h1>
+  <p>Discover stories, thoughts, and photos from my journey.</p>
+</section>
+
+<section class="gallery">
+  <img src="/images/picture1.jpg" alt="Picture 1">
+  <img src="/images/picture2.jpg" alt="Picture 2">
+  <img src="/images/picture3.jpg" alt="Picture 3">
+  <!-- Add more images as needed -->
+</section>
+
+<script>
+  const toggleButton = document.getElementById('theme-toggle');
+  toggleButton.addEventListener('click', () => {
+    document.documentElement.setAttribute(
+      'data-theme',
+      document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+    );
+  });
+</script>
