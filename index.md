@@ -19,9 +19,7 @@ layout: default
 <script>
   const toggleButton = document.getElementById('theme-toggle');
   toggleButton.addEventListener('click', () => {
-    document.documentElement.setAttribute(
-      'data-theme',
-      document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
-    );
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
   });
 </script>
