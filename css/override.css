@@ -18,14 +18,14 @@ body {
   font-family: sans-serif;
 }
 
-/* Basic styling for the main container */
-main.page-content {
+/* Basic styling for the main container (main blog content area) */
+.main-container {
   max-width: 800px;
-  margin: auto;
-  padding: 1rem;
+  margin: 2rem;
+  margin-right: 2rem;
 }
 
-/* For your toggle button */
+/* For your toggle button (if you have one) */
 #theme-toggle {
   background: var(--background-color);
   color: var(--text-color);
@@ -34,17 +34,13 @@ main.page-content {
   padding: 0.5rem;
 }
 
-/* Example: space icons away from links */
+/* Example: space icons away from links in ULs */
 ul li i {
   margin-right: 8px;
+  color: #0073b1; /* This sets an icon color site-wide; remove if not desired */
 }
 
-/* Or change icon color globally if you want */
-ul li i {
-  color: #0073b1; /* or any color you like */
-}
-
-/* Dark container with rounded corners */
+/* Dark container with rounded corners (if used) */
 .links-section {
   background-color: #222;
   color: #fff;
@@ -54,45 +50,7 @@ ul li i {
   max-width: 300px;
 }
 
-/* Remove default UL styles for a cleaner look */
-.link-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* Each link entry is horizontally aligned */
-.link-list li {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-/* Add spacing between icon and link text */
-.link-list li i {
-  margin-right: 0.5rem;
-}
-
-/* Style the links; larger text for readability */
-.link-list li a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1.15rem;
-}
-
-/* Hover effect (optional) */
-.link-list li a:hover {
-  text-decoration: underline;
-}
-
-/* Force left alignment for main container */
-.main-container {
-  max-width: 800px;         /* or any width you prefer */
-  margin: 2rem;             /* top/left margin */
-  margin-right: 2rem;       /* keep some right margin too */
-}
-
-/* PINNED LINKS PANEL (bottom-right) */
+/* Pinned links panel (bottom-right) */
 .links-panel {
   position: fixed;
   bottom: 20px;
@@ -105,34 +63,33 @@ ul li i {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Remove bullets and spacing for the links list */
+/* Remove default UL styles for .link-list */
 .link-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* Align icons and text horizontally */
+/* Each link entry is horizontally aligned */
 .link-list li {
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
 }
 
-/* Space between icon and link text */
+/* Additional spacing between icon and link text */
 .link-list li i {
   margin-right: 8px;
 }
 
-/* Larger link text, white color */
+/* Larger link text, white color in pinned panel */
 .link-list li a {
   color: #fff;
   text-decoration: none;
   font-size: 1.1rem;
 }
 
-/* Hover effect */
+/* Hover effect for links */
 .link-list li a:hover {
   text-decoration: underline;
 }
-
