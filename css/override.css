@@ -33,3 +33,13 @@ main.page-content {
   cursor: pointer;
   padding: 0.5rem;
 }
+
+/* Example: space icons away from links */
+ul li i {
+  margin-right: 8px;
+}
+
+/* Or change icon color globally if you want */
+ul li i {
+  color: #0073b1; /* or any color you like */
+}
