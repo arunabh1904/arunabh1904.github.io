@@ -1,6 +1,6 @@
 title: "Arunabh's Blog"
 author: "arunabhmishra"
-description: "" # This will show up in places like twitter, linkedin, etc, if you share your sites url as a post.
+description: "" 
 
 # Email / Social media user names used by the minima theme:
 # All of these are optional and can be removed or commented out
@@ -8,19 +8,13 @@ email: "arunabh1904@gmail.com"
 twitter_username: "ArunabhMishra8"
 github_username: "arunabh1904"
 linkedin_username: "arunabh-mishra"
-#facebook_username: username
-#flickr_username: username
-#instagram_username: username
-#pinterest_username: username
-#youtube_username: username
-#googleplus_username: +username
 
-#########################################################################################
-######### Nothing below needs to be changed (unless you know what you're doing) #########
-#########################################################################################
 theme: "minima"
 
 rss: rss
+
+markdown: kramdown
+highlighter: rouge
 
 kramdown:
   syntax_highlighter_opts:
@@ -29,7 +23,8 @@ kramdown:
 plugins:
   - jekyll-feed
   - jekyll-sitemap
-
+  - jekyll-seo-tag
+  
 titles_from_headings:
   strip_title: true
   collections: true
@@ -40,3 +35,13 @@ defaults:
       type: post
     values:
       tags: Other
+
+# Exclude these from your production build if you want
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+
+# Optional: Set up pagination or custom config
+paginate: 5
+paginate_path: "/page:num"
