@@ -1,5 +1,8 @@
+<!-- Option 1: Use index.html as your homepage -->
+
 ---
 layout: default
+title: Home
 ---
 
 <button class="toggle-button" id="theme-toggle">Toggle Dark Mode</button>
@@ -15,6 +18,18 @@ layout: default
   <img src="/images/picture3.jpg" alt="Picture 3">
   <!-- Add more images as needed -->
 </section>
+
+<div class="posts-list">
+  {% for post in site.posts %}
+    <article class="post">
+      <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+      <p class="post-date">{{ post.date | date: "%B %d, %Y" }}</p>
+      <div class="post-excerpt">
+        {{ post.excerpt }}
+      </div>
+    </article>
+  {% endfor %}
+</div>
 
 <script>
   const toggleButton = document.getElementById('theme-toggle');
