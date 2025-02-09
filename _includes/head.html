@@ -1,25 +1,29 @@
-
+<!-- _includes/head.html -->
 <!-- Site build date: {{ "now" | date: "%FT%T%z" }} -->
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Begin SEO -->
   {% seo %}
   <!-- End SEO -->
 
-  <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
-  <link rel="stylesheet" type="text/css" href="/css/override.css">
+  <!-- Default theme CSS (Minima, etc.) -->
+  <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}" />
+  
+  <!-- Your custom override CSS -->
+  <link rel="stylesheet" href="/css/override.css" />
 
+  <!-- Feeds -->
   {% feed_meta %}
 
-  {% if jekyll.environment == 'production' and site.google_analytics -%}
-  <!-- Begin Google Analytics -->
-  {% include google-analytics.html %}
-  <!-- End Google Analytics -->
-  
-  {%- endif %}
+  <!-- Google Analytics (production check) -->
+  {% if jekyll.environment == 'production' and site.google_analytics %}
+    {% include google-analytics.html %}
+  {% endif %}
+
+  <!-- Font Awesome for icons -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -27,17 +31,15 @@
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
-  
-  <!-- Begin highlight.js support -->
-  <link rel="stylesheet" href="/js/highlightjs/styles/github.css">
+
+  <!-- Highlight.js support -->
+  <link rel="stylesheet" href="/js/highlightjs/styles/github.css" />
   <link rel="stylesheet" href="/js/highlightjs/styles/ssms.css" />
 
-  <script type="text/javascript" src="/js/highlightjs/highlight.min.js"></script>
+  <script src="/js/highlightjs/highlight.min.js"></script>
+  <script src="/js/highlightjs/languages/plaintext.min.js"></script>
+  <script src="/js/highlightjs/languages/powershell.min.js"></script>
+  <script src="/js/highlightjs/languages/tsql.min.js"></script>
 
-  <script type="text/javascript" src="/js/highlightjs/languages/plaintext.min.js"></script>
-  <script type="text/javascript" src="/js/highlightjs/languages/powershell.min.js"></script>
-  <script type="text/javascript" src="/js/highlightjs/languages/tsql.min.js"></script>
-
-  <script type="text/javascript"> hljs.highlightAll(); </script>
-  <!-- end highlight.js support -->
+  <script>hljs.highlightAll();</script>
 </head>
