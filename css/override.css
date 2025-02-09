@@ -1,3 +1,7 @@
+/* ------------------------------------------------------
+   1) LIGHT/DARK THEME VARIABLES
+   ------------------------------------------------------ */
+
 /* Light theme (default) */
 :root {
   --background-color: #ffffff;
@@ -18,14 +22,7 @@ body {
   font-family: sans-serif;
 }
 
-/* Basic styling for the main container (main blog content area) */
-.main-container {
-  max-width: 800px;
-  margin: 2rem;
-  margin-right: 2rem;
-}
-
-/* For your toggle button (if you have one) */
+/* If you have a toggle button for themes */
 #theme-toggle {
   background: var(--background-color);
   color: var(--text-color);
@@ -34,23 +31,21 @@ body {
   padding: 0.5rem;
 }
 
-/* Example: space icons away from links in ULs */
-ul li i {
-  margin-right: 8px;
-  color: #0073b1; /* This sets an icon color site-wide; remove if not desired */
+/* ------------------------------------------------------
+   2) MAIN CONTAINER (Optional if you have .main-container)
+   ------------------------------------------------------ */
+
+.main-container {
+  max-width: 800px;
+  margin: 2rem;
+  margin-right: 2rem;
 }
 
-/* Dark container with rounded corners (if used) */
-.links-section {
-  background-color: #222;
-  color: #fff;
-  padding: 1rem;
-  margin: 1rem 0;
-  border-radius: 8px;
-  max-width: 300px;
-}
+/* ------------------------------------------------------
+   3) PINNED LINKS PANEL
+   ------------------------------------------------------ */
 
-/* Pinned links panel (bottom-right) */
+/* The container that sits at bottom-right */
 .links-panel {
   position: fixed;
   bottom: 20px;
@@ -63,33 +58,79 @@ ul li i {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Remove default UL styles for .link-list */
+/* Unordered list inside the pinned panel */
 .link-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* Each link entry is horizontally aligned */
+/* Each item is displayed horizontally with an icon + text */
 .link-list li {
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
 }
 
-/* Additional spacing between icon and link text */
+/* Space between icon and text */
 .link-list li i {
   margin-right: 8px;
 }
 
-/* Larger link text, white color in pinned panel */
-.link-list li a {
-  color: #fff;
+/* ------------------------------------------------------
+   4) GLOBAL LINK STYLING (Site-wide)
+   ------------------------------------------------------ */
+
+/* All <a> tags: light blue by default, no underline */
+a {
+  color: #87CEFA;          /* light blue */
   text-decoration: none;
-  font-size: 1.1rem;
 }
 
-/* Hover effect for links */
-.link-list li a:hover {
+/* Hover state: darker blue + underline */
+a:hover {
+  color: #1E90FF;
   text-decoration: underline;
+}
+
+/* Visited links (optional) */
+a:visited {
+  color: #87CEFA;
+}
+
+/* If there's a special link style for pinned panel, 
+   you can add it. For example, if you wanted them 
+   white, you'd explicitly define it here:
+   
+   .links-panel a {
+     color: #fff;
+   }
+   .links-panel a:hover {
+     color: #ccc;
+     text-decoration: underline;
+   }
+   
+   But since you're inheriting global link color,
+   we do not override it here.
+*/
+
+/* ------------------------------------------------------
+   5) EXAMPLES OF OTHER OPTIONAL STYLES
+   ------------------------------------------------------ */
+
+/* If you use .links-section somewhere else */
+.links-section {
+  background-color: #222;
+  color: #fff;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  max-width: 300px;
+}
+
+/* Example: any icon in UL Li across the site */
+ul li i {
+  /* Currently you have color: #0073b1, but if you want
+     global link color for icons, remove or change it */
+  /* color: #0073b1; */
 }
