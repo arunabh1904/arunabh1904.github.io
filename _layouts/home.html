@@ -1,20 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   {% include head.html %}
-  <head>
-    <style>
-      /* Contact links: light blue by default, dark blue + underline on hover */
-      .contact-link {
-        color: #87CEFA;          /* light blue (use #ADD8E6 or any color you prefer) */
-        text-decoration: none;
-        font-size: 0.95rem;
-      }
-      .contact-link:hover {
-        color: #1E90FF;         /* darker blue */
-        text-decoration: underline;
-      }
-    </style>
-  </head>
   <body
     style="
       margin: 0;
@@ -24,7 +10,7 @@
       background-size: cover;
       min-height: 100vh;
       color: #fff; /* White text by default */
-      font-family: sans-serif; /* Optional: override if you prefer another font */
+      font-family: sans-serif;
     "
   >
     <!-- MAIN CONTENT in a semi-transparent container -->
@@ -32,7 +18,7 @@
       style="
         max-width: 650px;
         margin: 2rem;
-        background: rgba(0,0,0,0.0); /* semi-transparent black */
+        background: rgba(0,0,0,0.0); /* transparent or semi-transparent black? */
         border-radius: 8px;
         padding: 1.5rem;
       "
@@ -47,58 +33,36 @@
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background: rgba(0,0,0,0.7); /* darker semi-transparent for the widget */
+        background: rgba(0,0,0,0.7);
         color: #fff;
         padding: 1rem;
         border-radius: 8px;
-        width: 220px; /* fixed width for a neat widget look */
+        width: 220px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       "
+      class="links-panel"
     >
       <h2 style="margin-top: 0; font-size: 1.2rem;">Contact Me</h2>
-      <ul style="list-style: none; margin: 0; padding: 0;">
+      <ul class="link-list" style="list-style: none; margin: 0; padding: 0;">
         <!-- Email -->
         <li style="display: flex; align-items: center; margin-bottom: 1rem;">
           <i class="fas fa-envelope fa-lg" style="margin-right: 8px;"></i>
-          <a
-            href="mailto:arunabh1904@gmail.com"
-            class="contact-link"
-          >
-            Email
-          </a>
+          <a href="mailto:arunabh1904@gmail.com">Email</a>
         </li>
         <!-- GitHub -->
         <li style="display: flex; align-items: center; margin-bottom: 1rem;">
           <i class="fab fa-github fa-lg" style="margin-right: 8px;"></i>
-          <a
-            href="https://github.com/arunabh1904"
-            target="_blank"
-            class="contact-link"
-          >
-            GitHub
-          </a>
+          <a href="https://github.com/arunabh1904" target="_blank">GitHub</a>
         </li>
         <!-- LinkedIn -->
         <li style="display: flex; align-items: center; margin-bottom: 1rem;">
           <i class="fab fa-linkedin fa-lg" style="margin-right: 8px;"></i>
-          <a
-            href="https://www.linkedin.com/in/arunabh-mishra"
-            target="_blank"
-            class="contact-link"
-          >
-            LinkedIn
-          </a>
+          <a href="https://www.linkedin.com/in/arunabh-mishra" target="_blank">LinkedIn</a>
         </li>
         <!-- Twitter -->
         <li style="display: flex; align-items: center;">
           <i class="fab fa-twitter fa-lg" style="margin-right: 8px;"></i>
-          <a
-            href="https://twitter.com/ArunabhMishra8"
-            target="_blank"
-            class="contact-link"
-          >
-            Twitter
-          </a>
+          <a href="https://twitter.com/ArunabhMishra8" target="_blank">Twitter</a>
         </li>
       </ul>
     </div>
