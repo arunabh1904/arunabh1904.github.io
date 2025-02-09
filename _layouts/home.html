@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
   {% include head.html %}
+  <head>
+    <style>
+      /* Contact links: light blue by default, dark blue + underline on hover */
+      .contact-link {
+        color: #87CEFA;          /* light blue (use #ADD8E6 or any color you prefer) */
+        text-decoration: none;
+        font-size: 0.95rem;
+      }
+      .contact-link:hover {
+        color: #1E90FF;         /* darker blue */
+        text-decoration: underline;
+      }
+    </style>
+  </head>
   <body
     style="
       margin: 0;
@@ -13,11 +27,10 @@
       font-family: sans-serif; /* Optional: override if you prefer another font */
     "
   >
-
     <!-- MAIN CONTENT in a semi-transparent container -->
     <div
       style="
-        max-width: 650px;
+        max-width: 800px;
         margin: 2rem;
         background: rgba(0,0,0,0.6); /* semi-transparent black */
         border-radius: 8px;
@@ -28,7 +41,7 @@
       {{ content }}
     </div>
 
-    <!-- LINKS PANEL pinned at bottom-right -->
+    <!-- CONTACT PANEL pinned at bottom-right -->
     <div
       style="
         position: fixed;
@@ -42,16 +55,17 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       "
     >
-      <h2 style="margin-top: 0; font-size: 1.2rem;">Links</h2>
+      <h2 style="margin-top: 0; font-size: 1.2rem;">Contact Me</h2>
       <ul style="list-style: none; margin: 0; padding: 0;">
         <!-- Email -->
         <li style="display: flex; align-items: center; margin-bottom: 1rem;">
           <i class="fas fa-envelope fa-lg" style="margin-right: 8px;"></i>
           <a
             href="mailto:arunabh1904@gmail.com"
-            style="color: #fff; text-decoration: none; font-size: 0.95rem;"
-            >arunabh1904@gmail.com</a
+            class="contact-link"
           >
+            Email
+          </a>
         </li>
         <!-- GitHub -->
         <li style="display: flex; align-items: center; margin-bottom: 1rem;">
@@ -59,9 +73,10 @@
           <a
             href="https://github.com/arunabh1904"
             target="_blank"
-            style="color: #fff; text-decoration: none; font-size: 0.95rem;"
-            >arunabh1904</a
+            class="contact-link"
           >
+            GitHub
+          </a>
         </li>
         <!-- LinkedIn -->
         <li style="display: flex; align-items: center; margin-bottom: 1rem;">
@@ -69,9 +84,10 @@
           <a
             href="https://www.linkedin.com/in/arunabh-mishra"
             target="_blank"
-            style="color: #fff; text-decoration: none; font-size: 0.95rem;"
-            >arunabh-mishra</a
+            class="contact-link"
           >
+            LinkedIn
+          </a>
         </li>
         <!-- Twitter -->
         <li style="display: flex; align-items: center;">
@@ -79,12 +95,12 @@
           <a
             href="https://twitter.com/ArunabhMishra8"
             target="_blank"
-            style="color: #fff; text-decoration: none; font-size: 0.95rem;"
-            >ArunabhMishra8</a
+            class="contact-link"
           >
+            Twitter
+          </a>
         </li>
       </ul>
     </div>
-
   </body>
 </html>
