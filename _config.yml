@@ -10,9 +10,6 @@ github_username: "arunabh1904"
 linkedin_username: "arunabh-mishra"
 
 theme: "minima"
-
-rss: rss
-
 markdown: kramdown
 highlighter: rouge
 
