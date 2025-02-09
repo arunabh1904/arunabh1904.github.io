@@ -93,11 +93,6 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Visited links (optional) */
-a:visited {
-  color: #87CEFA;
-}
-
 /* If there's a special link style for pinned panel, 
    you can add it. For example, if you wanted them 
    white, you'd explicitly define it here:
