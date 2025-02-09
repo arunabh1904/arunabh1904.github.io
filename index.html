@@ -5,26 +5,19 @@ title: Home
 
 <button class="toggle-button" id="theme-toggle">Toggle Dark Mode</button>
 
-<section id="welcome">
-  <h1>Welcome to My Blog</h1>
-  <p>Discover stories, thoughts, and photos from my journey.</p>
-</section>
+<header>
+  <h1>ARUNABH.BLOG</h1>
+</header>
 
-<section class="gallery">
-  <img src="{{ site.baseurl }}/assets/images/Tetons.jpg" alt="Picture 1">
-</section>
+<article>
+  <p>Hello, I'm Arunabh and welcome to my personal space.</p>
 
-<section class="posts">
-  <h2>Blog Posts</h2>
-  <ul class="posts-list">
-    {% for post in site.posts %}
-      <li>
-        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-        <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
-      </li>
-    {% endfor %}
-  </ul>
-</section>
+  <p>I’m currently immersed in computer vision research at Zoox, where I focus on developing a wide range of models that represent driving scenes. Additionally, I lead the perception research group, where we explore state-of-the-art literature to identify and implement cutting-edge initiatives in production. Before this, I was a tech lead on the perception team at DEKA, where my team was responsible for the short-range perception and traffic light detection stacks for Roxo, the FedEx last-mile delivery robot.</p>
+
+  <p>My journey in robotics began in India, where I earned my undergraduate degree at MIT, Manipal. Discovering robotics was a serendipitous event, but choosing to focus on autonomous driving technology was intentional. I became deeply convinced of its life-saving potential, which led me to the U.S. nearly a decade ago to pursue graduate studies at the Colorado School of Mines.</p>
+
+  <p>I’m on a mission to keep building, keep learning, and eventually leave an Arunabh-sized dent in the world — just like that shooting star that blazes its trail across the sky!!</p>
+</article>
 
 <script>
   const toggleButton = document.getElementById('theme-toggle');
