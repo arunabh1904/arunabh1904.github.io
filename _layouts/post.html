@@ -1,23 +1,26 @@
+<!-- _layouts/post.html -->
 <!DOCTYPE html>
-<html lang="{{ site.lang | default: 'en-US' }}">
+<html lang="en">
   <head>
     {% include head.html %}
-    <!-- Place for any custom <head> tags or styles if needed -->
+    <link rel="stylesheet" href="/css/override.css">
+    <!-- override.css is where you can define custom styling -->
   </head>
   <body>
-    <!-- Your toggle button -->
+
+    <!-- Dark/Light Toggle Button -->
     <button id="theme-toggle" style="position: absolute; top: 10px; right: 10px;">
       Toggle Theme
     </button>
-    
-    <!-- Main content area for posts/pages -->
-    <main class="page-content" aria-label="Content">
+
+    <main class="page-content" style="max-width:800px; margin:2rem auto;">
+      <!-- Put the post title, meta, etc. if you want, or just use {{ content }} -->
       {{ content }}
     </main>
 
-    {% include footer.html %}
-    
-    <!-- Toggle script -->
+    <!-- Optional footer or anything else here -->
+
+    <!-- JavaScript for Toggle -->
     <script>
       const toggleButton = document.getElementById('theme-toggle');
       toggleButton.addEventListener('click', () => {
