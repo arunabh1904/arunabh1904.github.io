@@ -11,33 +11,6 @@ title: Home
 </article>
 
 
-<section class="links-section">
-  <h2>Links</h2>
-  <ul class="link-list">
-    <!-- Email -->
-    <li>
-      <i class="fas fa-envelope fa-2x"></i>
-      <a href="mailto:arunabh1904@gmail.com">arunabh1904@gmail.com</a>
-    </li>
-    <!-- GitHub -->
-    <li>
-      <i class="fab fa-github fa-2x"></i>
-      <a href="https://github.com/arunabh1904" target="_blank">arunabh1904</a>
-    </li>
-    <!-- LinkedIn -->
-    <li>
-      <i class="fab fa-linkedin fa-2x"></i>
-      <a href="https://www.linkedin.com/in/arunabh-mishra" target="_blank">arunabh-mishra</a>
-    </li>
-    <!-- Twitter -->
-    <li>
-      <i class="fab fa-twitter fa-2x"></i>
-      <a href="https://twitter.com/ArunabhMishra8" target="_blank">ArunabhMishra8</a>
-    </li>
-  </ul>
-</section>
-
-
 <section>
   <h2>All Posts</h2>
   <ul>
@@ -49,11 +22,3 @@ title: Home
     {% endfor %}
   </ul>
 </section>
-
-<script>
-  const toggleButton = document.getElementById('theme-toggle');
-  toggleButton.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
-  });
-</script>
