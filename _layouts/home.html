@@ -3,27 +3,22 @@
 <html lang="en">
   <head>
     {% include head.html %}
-    <!-- Any extra <head> tags or custom CSS for your homepage -->
+    <!-- Link to any custom CSS if needed -->
   </head>
-  <body style="margin:0; padding:0;">
-
-    <!-- Example: a big background image or any style you want -->
-    <header 
-      style="
-        background: url('assets/images/shootingstar.jpg') no-repeat center center; 
-        background-size: cover; 
-        height: 400px; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center;"
-    >
-      <h1 style="color: white;">ARUNABH.BLOG</h1>
-    </header>
-
-    <!-- Where the page content goes -->
-    <main style="max-width: 800px; margin: 2rem auto;">
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background: url('assets/images/shootingstar.jpg') no-repeat center center;
+      background-size: cover;
+      color: #fff; /* text color on a dark background */
+      min-height: 100vh; /* ensure the background covers the full viewport */
+    "
+  >
+    <!-- Wrap your main content in a container so it's readable -->
+    <div style="max-width: 800px; margin: 0 auto; padding: 2rem; background: rgba(0,0,0,0.5);">
+      <h1 style="margin-top: 0;">ARUNABH.BLOG</h1>
       {{ content }}
-    </main>
-
+    </div>
   </body>
 </html>
