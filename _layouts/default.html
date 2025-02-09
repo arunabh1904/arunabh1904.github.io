@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en-US' }}">
+  <head>
+    {% include head.html %}
+    <!-- Place for any custom <head> tags or styles if needed -->
+  </head>
+  <body>
+    <!-- Your toggle button -->
+    <button id="theme-toggle" style="position: absolute; top: 10px; right: 10px;">
+      Toggle Theme
+    </button>
+    
+    <!-- Main content area for posts/pages -->
+    <main class="page-content" aria-label="Content">
+      {{ content }}
+    </main>
+
+    {% include footer.html %}
+    
+    <!-- Toggle script -->
+    <script>
+      const toggleButton = document.getElementById('theme-toggle');
+      toggleButton.addEventListener('click', () => {
+        const html = document.documentElement;
+        if (html.getAttribute('data-theme') === 'dark') {
+          html.setAttribute('data-theme', 'light');
+        } else {
+          html.setAttribute('data-theme', 'dark');
+        }
+      });
+    </script>
+  </body>
+</html>
