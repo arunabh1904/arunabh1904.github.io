@@ -1,9 +1,6 @@
 title: "Arunabh's Blog"
-author: "arunabhmishra"
-description: "" 
-
-# Email / Social media user names used by the minima theme:
-# All of these are optional and can be removed or commented out
+author: "Arunabh Mishra"
+description: "A personal blog on computer vision, robotics, and more."
 email: "arunabh1904@gmail.com"
 twitter_username: "ArunabhMishra8"
 github_username: "arunabh1904"
@@ -16,29 +13,29 @@ highlighter: rouge
 kramdown:
   syntax_highlighter_opts:
     disable: true
-    
+
 plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
-  
-titles_from_headings:
-  strip_title: true
-  collections: true
+
+# Remove or comment out if you don't want H1 headings to become page titles:
+# titles_from_headings:
+#   strip_title: true
+#   collections: true
 
 defaults:
   - scope:
       path: ""
       type: post
     values:
+      layout: post
       tags: Other
 
-# Exclude these from your production build if you want
 exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
 
-# Optional: Set up pagination or custom config
 paginate: 5
 paginate_path: "/page:num"
