@@ -84,3 +84,55 @@ ul li i {
 .link-list li a:hover {
   text-decoration: underline;
 }
+
+/* Force left alignment for main container */
+.main-container {
+  max-width: 800px;         /* or any width you prefer */
+  margin: 2rem;             /* top/left margin */
+  margin-right: 2rem;       /* keep some right margin too */
+}
+
+/* PINNED LINKS PANEL (bottom-right) */
+.links-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #222;
+  color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 200px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Remove bullets and spacing for the links list */
+.link-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Align icons and text horizontally */
+.link-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Space between icon and link text */
+.link-list li i {
+  margin-right: 8px;
+}
+
+/* Larger link text, white color */
+.link-list li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+/* Hover effect */
+.link-list li a:hover {
+  text-decoration: underline;
+}
+
