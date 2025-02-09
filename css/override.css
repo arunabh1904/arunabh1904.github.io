@@ -14,8 +14,8 @@
 body {
   background-color: var(--background-color);
   color: var(--text-color);
-  margin: 0; /* remove any default margins if you want a flush layout */
-  font-family: sans-serif; /* or your choice */
+  margin: 0;
+  font-family: sans-serif;
 }
 
 /* Basic styling for the main container */
@@ -25,7 +25,7 @@ main.page-content {
   padding: 1rem;
 }
 
-/* For your toggle button, you can style more elegantly here if you want */
+/* For your toggle button */
 #theme-toggle {
   background: var(--background-color);
   color: var(--text-color);
@@ -42,4 +42,45 @@ ul li i {
 /* Or change icon color globally if you want */
 ul li i {
   color: #0073b1; /* or any color you like */
+}
+
+/* Dark container with rounded corners */
+.links-section {
+  background-color: #222;
+  color: #fff;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  max-width: 300px;
+}
+
+/* Remove default UL styles for a cleaner look */
+.link-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Each link entry is horizontally aligned */
+.link-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Add spacing between icon and link text */
+.link-list li i {
+  margin-right: 0.5rem;
+}
+
+/* Style the links; larger text for readability */
+.link-list li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.15rem;
+}
+
+/* Hover effect (optional) */
+.link-list li a:hover {
+  text-decoration: underline;
 }
