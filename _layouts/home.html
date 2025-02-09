@@ -3,7 +3,6 @@
 <html lang="en">
   <head>
     {% include head.html %}
-    <!-- Link to any custom CSS if needed -->
   </head>
   <body
     style="
@@ -11,12 +10,18 @@
       padding: 0;
       background: url('assets/images/shootingstar.jpg') no-repeat center center;
       background-size: cover;
-      color: #fff; /* text color on a dark background */
-      min-height: 100vh; /* ensure the background covers the full viewport */
+      color: #fff;
+      min-height: 100vh;
     "
   >
-    <!-- Wrap your main content in a container so it's readable -->
-    <div style="max-width: 800px; margin: 0 auto; padding: 2rem; background: rgba(0,0,0,0.5);">
+    <!-- Left-aligned container with some spacing -->
+    <div style="
+      max-width: 800px;
+      margin: 2rem;            /* margin on all sides, left included */
+      margin-right: 0;        /* override the right margin if you want no space on the right */
+      padding: 2rem;
+      background: rgba(0,0,0,0.5);
+    ">
       <h1 style="margin-top: 0;">ARUNABH.BLOG</h1>
       {{ content }}
     </div>
