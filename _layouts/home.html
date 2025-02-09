@@ -1,29 +1,37 @@
-<!-- _layouts/home.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     {% include head.html %}
+    <link rel="stylesheet" href="/css/override.css">
   </head>
-  <body
-    style="
-      margin: 0;
-      padding: 0;
-      background: url('assets/images/shootingstar.jpg') no-repeat center center;
-      background-size: cover;
-      color: #fff;
-      min-height: 100vh;
-    "
-  >
-    <!-- Left-aligned container with some spacing -->
-    <div style="
-      max-width: 800px;
-      margin: 2rem;            /* margin on all sides, left included */
-      margin-right: 0;        /* override the right margin if you want no space on the right */
-      padding: 2rem;
-      background: rgba(0,0,0,0.5);
-    ">
-      <h1 style="margin-top: 0;">ARUNABH.BLOG</h1>
+  <body>
+    <!-- LEFT SIDE: Blog Content -->
+    <div class="main-container">
+      <h1>ARUNABH.BLOG</h1>
       {{ content }}
+    </div>
+
+    <!-- RIGHT SIDE: Links pinned bottom-right -->
+    <div class="links-panel">
+      <h2>Links</h2>
+      <ul class="link-list">
+        <li>
+          <i class="fas fa-envelope fa-2x"></i>
+          <a href="mailto:arunabh1904@gmail.com">arunabh1904@gmail.com</a>
+        </li>
+        <li>
+          <i class="fab fa-github fa-2x"></i>
+          <a href="https://github.com/arunabh1904" target="_blank">arunabh1904</a>
+        </li>
+        <li>
+          <i class="fab fa-linkedin fa-2x"></i>
+          <a href="https://www.linkedin.com/in/arunabh-mishra" target="_blank">arunabh-mishra</a>
+        </li>
+        <li>
+          <i class="fab fa-twitter fa-2x"></i>
+          <a href="https://twitter.com/ArunabhMishra8" target="_blank">ArunabhMishra8</a>
+        </li>
+      </ul>
     </div>
   </body>
 </html>
