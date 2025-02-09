@@ -1,15 +1,35 @@
-body {
-  background: url('/assets/images/shootingstar.jpg') no-repeat center center fixed;
-  background-size: cover;
-  color: #ffffff; /* Ensure text is visible on a dark background */
-  font-family: Arial, sans-serif;
+/* Light theme (default) */
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
 }
 
-#content {
-  background-color: rgba(0, 0, 0, 0.5); /* Optional: semi-transparent background for content */
-  padding: 20px;
-  border-radius: 10px;
+/* Dark theme */
+:root[data-theme="dark"] {
+  --background-color: #111111;
+  --text-color: #dddddd;
+}
+
+/* Apply these vars to body and any other elements */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0; /* remove any default margins if you want a flush layout */
+  font-family: sans-serif; /* or your choice */
+}
+
+/* Basic styling for the main container */
+main.page-content {
   max-width: 800px;
   margin: auto;
-  margin-top: 5%;
+  padding: 1rem;
+}
+
+/* For your toggle button, you can style more elegantly here if you want */
+#theme-toggle {
+  background: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid var(--text-color);
+  cursor: pointer;
+  padding: 0.5rem;
 }
