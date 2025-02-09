@@ -1,34 +1,87 @@
-<!-- _layouts/home.html -->
 <!DOCTYPE html>
 <html lang="en">
   {% include head.html %}
-  <body>
-    <!-- LEFT SIDE: Blog Content -->
-    <div class="main-container">
-      <!-- Page title or logo here if you like; or you can keep it in index.html -->
-      <h1>ARUNABH.BLOG</h1>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      /* Full-page background (shooting star) */
+      background: url('/assets/images/shootingstar.jpg') no-repeat center center;
+      background-size: cover;
+      min-height: 100vh;
+      color: #fff; /* White text by default */
+      font-family: sans-serif; /* Optional: override if you prefer another font */
+    "
+  >
+
+    <!-- MAIN CONTENT in a semi-transparent container -->
+    <div
+      style="
+        max-width: 800px;
+        margin: 2rem;
+        background: rgba(0,0,0,0.6); /* semi-transparent black */
+        border-radius: 8px;
+        padding: 1.5rem;
+      "
+    >
+      <h1 style="margin-top: 0;">ARUNABH.BLOG</h1>
       {{ content }}
     </div>
 
-    <!-- RIGHT SIDE: Links pinned bottom-right -->
-    <div class="links-panel">
-      <h2>Links</h2>
-      <ul class="link-list">
-        <li>
-          <i class="fas fa-envelope fa-2x"></i>
-          <a href="mailto:arunabh1904@gmail.com">arunabh1904@gmail.com</a>
+    <!-- LINKS PANEL pinned at bottom-right -->
+    <div
+      style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0,0,0,0.7); /* darker semi-transparent for the widget */
+        color: #fff;
+        padding: 1rem;
+        border-radius: 8px;
+        width: 220px; /* fixed width for a neat widget look */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      "
+    >
+      <h2 style="margin-top: 0; font-size: 1.2rem;">Links</h2>
+      <ul style="list-style: none; margin: 0; padding: 0;">
+        <!-- Email -->
+        <li style="display: flex; align-items: center; margin-bottom: 1rem;">
+          <i class="fas fa-envelope fa-lg" style="margin-right: 8px;"></i>
+          <a
+            href="mailto:arunabh1904@gmail.com"
+            style="color: #fff; text-decoration: none; font-size: 0.95rem;"
+            >arunabh1904@gmail.com</a
+          >
         </li>
-        <li>
-          <i class="fab fa-github fa-2x"></i>
-          <a href="https://github.com/arunabh1904" target="_blank">arunabh1904</a>
+        <!-- GitHub -->
+        <li style="display: flex; align-items: center; margin-bottom: 1rem;">
+          <i class="fab fa-github fa-lg" style="margin-right: 8px;"></i>
+          <a
+            href="https://github.com/arunabh1904"
+            target="_blank"
+            style="color: #fff; text-decoration: none; font-size: 0.95rem;"
+            >arunabh1904</a
+          >
         </li>
-        <li>
-          <i class="fab fa-linkedin fa-2x"></i>
-          <a href="https://www.linkedin.com/in/arunabh-mishra" target="_blank">arunabh-mishra</a>
+        <!-- LinkedIn -->
+        <li style="display: flex; align-items: center; margin-bottom: 1rem;">
+          <i class="fab fa-linkedin fa-lg" style="margin-right: 8px;"></i>
+          <a
+            href="https://www.linkedin.com/in/arunabh-mishra"
+            target="_blank"
+            style="color: #fff; text-decoration: none; font-size: 0.95rem;"
+            >arunabh-mishra</a
+          >
         </li>
-        <li>
-          <i class="fab fa-twitter fa-2x"></i>
-          <a href="https://twitter.com/ArunabhMishra8" target="_blank">ArunabhMishra8</a>
+        <!-- Twitter -->
+        <li style="display: flex; align-items: center;">
+          <i class="fab fa-twitter fa-lg" style="margin-right: 8px;"></i>
+          <a
+            href="https://twitter.com/ArunabhMishra8"
+            target="_blank"
+            style="color: #fff; text-decoration: none; font-size: 0.95rem;"
+            >ArunabhMishra8</a
+          >
         </li>
       </ul>
     </div>
