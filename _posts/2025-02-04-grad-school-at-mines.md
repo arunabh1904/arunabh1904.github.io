@@ -2,6 +2,7 @@
 layout: post
 title: "My Journey So Far - Grad School at Mines"
 date: 2025-02-04 00:00:00 -0500
+categories: ["My Journey So Far"]
 ---
 
 # GRAD SCHOOL AT MINES
