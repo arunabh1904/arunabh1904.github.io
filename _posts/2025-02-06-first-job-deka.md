@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "First Job at DEKA"
-date: 2025-02-09 00:00:00 -0500
+date: 2025-02-06 00:00:00 -0500
 categories: ["My Journey So Far"]
 ---
 
