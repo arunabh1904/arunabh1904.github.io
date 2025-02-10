@@ -22,13 +22,26 @@ body {
   font-family: sans-serif;
 }
 
-/* If you have a toggle button for themes */
-#theme-toggle {
-  background: var(--background-color);
-  color: var(--text-color);
-  border: 1px solid var(--text-color);
+/* override.css */
+.custom-button {
+  position: absolute;
+  right: 10px;
+  padding: 0.5rem 1rem;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
   cursor: pointer;
-  padding: 0.5rem;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+/* Offset each button vertically to avoid overlap */
+#theme-toggle {
+  top: 10px;
+}
+
+#home-button {
+  top: 50px;
 }
 
 /* ------------------------------------------------------
