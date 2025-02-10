@@ -92,3 +92,8 @@ a:hover {
   color: #1E90FF;
   text-decoration: underline;
 }
+
+a:visited {
+  color: #87CEFA; /* same as your default link color */
+  text-decoration: none; /* or match whatever you do for unvisited links */
+}
