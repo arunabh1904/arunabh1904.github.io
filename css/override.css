@@ -22,30 +22,52 @@ body {
   font-family: sans-serif;
 }
 
-/* override.css */
-.custom-button {
-  position: absolute;
-  right: 10px;
-  padding: 0.5rem 1rem;
-  font-size: 16px;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  background-color: #f9f9f9;
+/* ------------------------------------------------------
+   2) Buttons
+   ------------------------------------------------------ */
+
+/* Shared icon button styling */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;           /* Adjust for desired size */
+  height: 40px;
+  border: none;
+  border-radius: 50%;    /* Curved edges */
+  background-color: #f0f0f0;
   color: #333;
+  cursor: pointer;
+  outline: none;         /* Remove outline if desired */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s, box-shadow 0.2s;
 }
 
-/* Offset each button vertically to avoid overlap */
+.icon-button:hover {
+  background-color: #e0e0e0;
+}
+
+.icon-button svg {
+  width: 20px;
+  height: 20px;
+  pointer-events: none; /* Let clicks pass through the SVG to the button */
+}
+
+/* Positioning */
 #theme-toggle {
+  position: absolute;
   top: 10px;
+  right: 50px; /* Give some space between the two buttons */
 }
 
 #home-button {
-  top: 50px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 /* ------------------------------------------------------
-   2) MAIN CONTAINER (Optional if you have .main-container)
+   3) MAIN CONTAINER (Optional if you have .main-container)
    ------------------------------------------------------ */
 
 .main-container {
@@ -55,7 +77,7 @@ body {
 }
 
 /* ------------------------------------------------------
-   3) PINNED LINKS PANEL
+   4) PINNED LINKS PANEL
    ------------------------------------------------------ */
 
 /* The container that sits at bottom-right */
@@ -91,7 +113,7 @@ body {
 }
 
 /* ------------------------------------------------------
-   4) GLOBAL LINK STYLING (Site-wide)
+   5) GLOBAL LINK STYLING (Site-wide)
    ------------------------------------------------------ */
 
 /* All <a> tags: light blue by default, no underline */
