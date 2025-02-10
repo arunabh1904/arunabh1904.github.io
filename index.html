@@ -1,3 +1,5 @@
+<!-- Place this in your home layout or index.html file -->
+
 ---
 layout: home
 title: Home
@@ -29,10 +31,24 @@ title: Home
   </p>
 </article>
 
+<!-- Section for My Journey So Far -->
 <section>
-  <h2>All Posts</h2>
+  <h2>My Journey So Far</h2>
   <ul>
-    {% for post in site.posts %}
+    {% for post in site.categories["My Journey So Far"] %}
+      <li>
+        <a href="{{ post.url }}">{{ post.title }}</a>
+        <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<!-- Section for Machine Learning Deep-Dives -->
+<section>
+  <h2>Machine Learning Deep-Dives</h2>
+  <ul>
+    {% for post in site.categories["Machine Learning Deep-Dives"] %}
       <li>
         <a href="{{ post.url }}">{{ post.title }}</a>
         <small>— {{ post.date | date: "%b %d, %Y" }}</small>
