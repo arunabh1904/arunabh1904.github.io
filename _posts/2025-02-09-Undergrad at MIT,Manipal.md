@@ -1,10 +1,11 @@
 ---
 layout: post
-title: "My Journey So Far - Undergrad in Manipal"
+title: "Undergrad at MIT, Manipal"
 date: 2025-02-09 00:00:00 -0500
+categories: ["My Journey So Far"]
 ---
 
-# UNDERGRAD IN MANIPAL
+# Undergrad at MIT, Manipal
 
 I stayed back an extra year, prepped hard, and eventually got accepted to MIT, Manipal. Although not an IIT, it has a fairly decent engineering school. I started out as a pretty average student in college. I continued to stay in my introverted shell and played even more DOTA, averaging about 6-8 hours a day. I also picked up smoking cigarettes, which is the worst habit I've ever had in my life. I skipped a lot of classes during my first and second years, and at one point, my cumulative GPA was a shocking 0.74—not out of 4, but out of 10! When I saw 0.74 written on my report card where the GPA was supposed to be, something inside me broke, but in a good way. It was a wake-up call. I started attending classes, made a few new friends, and began working really hard. I didn’t miss any classes, stayed over the summer, and put in a tremendous amount of effort. By the end of the third year, I had already raised my GPA to 7.8 from a measly 0.74. I kept pushing and finally ended up getting the highest marks in the toughest subject in the course, earning a recommendation for my grad school applications from the head of the department!
 
