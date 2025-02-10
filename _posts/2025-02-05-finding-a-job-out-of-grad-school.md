@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Finding a Job Out of Grad School"
-date: 2025-02-09 00:00:00 -0500
+date: 2025-02-05 00:00:00 -0500
 categories: ["My Journey So Far"]
 ---
 
