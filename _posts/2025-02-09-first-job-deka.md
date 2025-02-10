@@ -1,10 +1,11 @@
 ---
 layout: post
-title: "My Journey So Far - First Job at DEKA"
+title: "First Job at DEKA"
 date: 2025-02-09 00:00:00 -0500
+categories: ["My Journey So Far"]
 ---
 
-# FIRST JOB - DEKA
+# First Job at DEKA
 
 After grad school, I joined DEKA as one of the initial engineers on a project developing autonomous robots for FedEx’s last-mile delivery. While DEKA is primarily recognized for its medical devices, its venture into robotics projects provided me with a unique opportunity. Here, I transitioned from planning to specializing in robot perception using machine learning. The small, agile team at DEKA was the perfect setting for broadening my skill set, allowing me to make substantial contributions to the perception stack. I developed expertise in ML tools like PyTorch, TensorFlow, and TensorRT, along with GPU programming languages like CUDA and OpenCL, which paved the way to my dream job.
 
