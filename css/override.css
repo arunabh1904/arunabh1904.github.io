@@ -1,20 +1,16 @@
 /* ------------------------------------------------------
-   1) LIGHT/DARK THEME VARIABLES
+   1) BUTTONS
    ------------------------------------------------------ */
-
-/* Light theme (default) */
 :root {
   --background-color: #ffffff;
   --text-color: #000000;
 }
 
-/* Dark theme */
 :root[data-theme="dark"] {
   --background-color: #111111;
   --text-color: #dddddd;
 }
 
-/* Apply these vars to body and any other elements */
 body {
   background-color: var(--background-color);
   color: var(--text-color);
@@ -22,46 +18,35 @@ body {
   font-family: sans-serif;
 }
 
-/* ------------------------------------------------------
-   2) Buttons
-   ------------------------------------------------------ */
-
-/* Shared icon button styling */
-.icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;           /* Adjust for desired size */
-  height: 40px;
+/* 2) Small rounded button styling */
+.small-rounded-button {
+  position: absolute;
+  width: 100px;             /* Fixed width to keep both buttons the same size */
+  height: 40px;            /* Fixed height for uniform look */
   border: none;
-  border-radius: 50%;    /* Curved edges */
+  border-radius: 20px;     /* Curved corners */
   background-color: #f0f0f0;
   color: #333;
   cursor: pointer;
-  outline: none;         /* Remove outline if desired */
+  font-size: 14px;
+  text-align: center;
+  line-height: 40px;       /* Vertically center text */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: background-color 0.2s, box-shadow 0.2s;
+  outline: none;
 }
 
-.icon-button:hover {
+.small-rounded-button:hover {
   background-color: #e0e0e0;
 }
 
-.icon-button svg {
-  width: 20px;
-  height: 20px;
-  pointer-events: none; /* Let clicks pass through the SVG to the button */
-}
-
-/* Positioning */
+/* Position buttons on the top right, spaced out */
 #theme-toggle {
-  position: absolute;
   top: 10px;
-  right: 50px; /* Give some space between the two buttons */
+  right: 120px; /* Offset so it doesn't overlap the home button */
 }
 
 #home-button {
-  position: absolute;
   top: 10px;
   right: 10px;
 }
