@@ -55,7 +55,7 @@ body {
   padding: 1rem;
   border-radius: 8px;
   max-width: 200px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 /* Unordered list inside the pinned panel */
@@ -91,41 +91,4 @@ a {
 a:hover {
   color: #1E90FF;
   text-decoration: underline;
-}
-
-/* If there's a special link style for pinned panel, 
-   you can add it. For example, if you wanted them 
-   white, you'd explicitly define it here:
-   
-   .links-panel a {
-     color: #fff;
-   }
-   .links-panel a:hover {
-     color: #ccc;
-     text-decoration: underline;
-   }
-   
-   But since you're inheriting global link color,
-   we do not override it here.
-*/
-
-/* ------------------------------------------------------
-   5) EXAMPLES OF OTHER OPTIONAL STYLES
-   ------------------------------------------------------ */
-
-/* If you use .links-section somewhere else */
-.links-section {
-  background-color: #222;
-  color: #fff;
-  padding: 1rem;
-  margin: 1rem 0;
-  border-radius: 8px;
-  max-width: 300px;
-}
-
-/* Example: any icon in UL Li across the site */
-ul li i {
-  /* Currently you have color: #0073b1, but if you want
-     global link color for icons, remove or change it */
-  /* color: #0073b1; */
 }
