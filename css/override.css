@@ -94,6 +94,6 @@ a:hover {
 }
 
 a:visited {
-  color: #87CEFA; /* same as your default link color */
-  text-decoration: none; /* or match whatever you do for unvisited links */
+  color: #87CEFA; /* Same light blue as unvisited */
+  text-decoration: none;
 }
