@@ -94,6 +94,6 @@ a:hover {
 }
 
 a:visited {
-  color: #87CEFA; /* Same light blue as unvisited */
+  color: #87CEFA !important; /* Same light blue as unvisited */
   text-decoration: none;
 }
