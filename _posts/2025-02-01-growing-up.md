@@ -1,7 +1,8 @@
 ---
 layout: post
-title: "My Journey So Far"
+title: "Introduction"
 date: 2025-02-01 00:00:00 -0500
+categories: ["My Journey So Far"]
 ---
 
 ## Introduction
