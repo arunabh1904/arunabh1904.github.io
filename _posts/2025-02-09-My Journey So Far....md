@@ -2,6 +2,7 @@
 layout: post
 title: "My Journey So Far..."
 date: 2025-02-09 00:00:00 -0500
+categories: ["My Journey So Far"]
 ---
 
 # My Journey So Far...
