@@ -13,15 +13,17 @@
       Toggle Theme
     </button>
 
+    <!-- Button to Go Back/Home -->
+    <button id="home-button" style="position: absolute; top: 50px; right: 10px;">
+      Go Home
+    </button>
+
     <main class="page-content" style="max-width:800px; margin:2rem auto;">
-      <!-- Put the post title, meta, etc. if you want, or just use {{ content }} -->
       {{ content }}
     </main>
 
-    <!-- Optional footer or anything else here -->
-
-    <!-- JavaScript for Toggle -->
     <script>
+      // Toggle Theme
       const toggleButton = document.getElementById('theme-toggle');
       toggleButton.addEventListener('click', () => {
         const html = document.documentElement;
@@ -30,6 +32,12 @@
         } else {
           html.setAttribute('data-theme', 'dark');
         }
+      });
+
+      // Go Home
+      const homeButton = document.getElementById('home-button');
+      homeButton.addEventListener('click', () => {
+        window.location.href = '/';
       });
     </script>
   </body>
