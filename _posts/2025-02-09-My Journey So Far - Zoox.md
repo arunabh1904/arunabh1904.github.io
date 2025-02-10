@@ -1,7 +1,7 @@
 <!-- _posts/ -->
 ---
 layout: post
-title: "My Journey So Far - Zoox: High Impact"
+title: "My Journey So Far - Zoox"
 date: 2025-02-09 00:00:00 -0500
 ---
 
