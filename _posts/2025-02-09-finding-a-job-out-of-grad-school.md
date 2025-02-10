@@ -1,10 +1,11 @@
 ---
 layout: post
-title: "My Journey So Far - Finding a Job Out of Grad School"
+title: "Finding a Job Out of Grad School"
 date: 2025-02-09 00:00:00 -0500
+categories: ["My Journey So Far"]
 ---
 
-# FINDING A JOB OUT OF GRAD SCHOOL
+# Finding a Job Out of Grad School
 
 Honestly, landing your first job out of grad school in the U.S. can be challenging, especially if you're trying to find your dream job right away and you’re not from a top university. Even if you've spent your grad school years upskilling, working on relevant projects, and conducting research, it can still be tough. Here are some of the things that worked for me:
 
