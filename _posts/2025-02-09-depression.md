@@ -1,10 +1,11 @@
 ---
 layout: post
-title: "My Journey So Far - Depression"
+title: "Depression"
 date: 2025-02-09 00:00:00 -0500
+categories: ["My Journey So Far"]
 ---
 
-# DEPRESSION
+# Depression
 
 I believe it's almost more important to acknowledge the lows in life as we cherish the highs. If you introspect on the lows, you'll undoubtedly come away with many more lessons that will help you move forward. After college, I suffered through a bout of depression. It wasn't easy. While depression is becoming increasingly well-understood in India today, it wasn't widely recognized a decade ago. More than once, when I told someone I didn't feel like getting up or coming out of my room, they would say, "Just take a cold shower; you'll be fine." How I wish I could have shared my internal turmoil with them—told them my brain was on fire, I felt like screaming from the inside, and I couldn't find a way out. I want to share this experience in the hope that it might resonate with someone reading this and provide some solace that they are not the only ones feeling this way.
 
