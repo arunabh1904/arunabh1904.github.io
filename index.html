@@ -43,16 +43,18 @@ title: Home
         <li>
           <a href="{{ full_post.url }}">My Journey So Far</a>
           <small>— {{ full_post.date | date: "%b %d, %Y" }}</small>
+          <ul>
+            {% for post in journey_posts %}
+              {% unless post.title == "My Journey So Far - Full" %}
+                <li>
+                  <a href="{{ post.url }}">{{ post.title }}</a>
+                  <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+                </li>
+              {% endunless %}
+            {% endfor %}
+          </ul>
         </li>
       {% endif %}
-      {% for post in journey_posts %}
-        {% unless post.title == "My Journey So Far - Full" %}
-          <li>
-            <a href="{{ post.url }}">{{ post.title }}</a>
-            <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-          </li>
-        {% endunless %}
-      {% endfor %}
     </ul>
   </details>
 </section>
