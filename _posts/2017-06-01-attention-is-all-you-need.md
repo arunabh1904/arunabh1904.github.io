@@ -16,6 +16,8 @@ field: Natural Language Processing
 overview](https://ai.googleblog.com/2017/08/transformer-novel-neural-network.html)
 
 **Conference:** NeurIPS 2017
+![Transformer Architecture](/assets/images/attention.png)
+
 
 **Abstract in a nutshell:** The Transformer removes recurrence and convolutions, relying solely on 
 attention to join an encoder and decoder. This allows full parallelisation in training and 
