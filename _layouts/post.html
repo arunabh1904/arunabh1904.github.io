@@ -24,7 +24,12 @@
       id="music-player"
       style="display:none; position:fixed; bottom:20px; left:20px; z-index:1000;"
     >
+      <div style="margin-bottom:4px; text-align:center;">
+        <button id="choose-spotify" class="music-choice">Spotify</button>
+        <button id="choose-youtube" class="music-choice">YouTube</button>
+      </div>
       <iframe
+        id="music-iframe"
         style="border-radius:12px"
         src="https://open.spotify.com/embed/playlist/4RHYceSp9R1bHyL0dDqTuQ?utm_source=generator&theme=0"
         width="250"
@@ -70,6 +75,9 @@
 
       const musicButton = document.getElementById('music-button');
       const musicPlayer = document.getElementById('music-player');
+      const spotifyOption = document.getElementById('choose-spotify');
+      const youtubeOption = document.getElementById('choose-youtube');
+      const musicIframe = document.getElementById('music-iframe');
 
       musicButton.addEventListener('click', () => {
         if (musicPlayer.style.display === 'none') {
@@ -77,6 +85,15 @@
         } else {
           musicPlayer.style.display = 'none';
         }
+      });
+
+      spotifyOption.addEventListener('click', () => {
+        musicIframe.src =
+          'https://open.spotify.com/embed/playlist/4RHYceSp9R1bHyL0dDqTuQ?utm_source=generator&theme=0';
+      });
+
+      youtubeOption.addEventListener('click', () => {
+        musicIframe.src = 'https://www.youtube.com/embed/kGuGH_UvvxA';
       });
     </script>
   </body>
