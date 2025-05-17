@@ -59,6 +59,14 @@ body {
 #theme-toggle {
   top: 10px;
   right: 120px; /* Offset so it doesn't overlap the home button */
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  line-height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
 }
 
 #home-button {

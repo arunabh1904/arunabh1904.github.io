@@ -8,8 +8,13 @@
   </head>
   <body>
     <!-- Dark/Light Toggle Button -->
-    <button type="button" id="theme-toggle" class="small-rounded-button">
-      Light Mode
+    <button
+      type="button"
+      id="theme-toggle"
+      class="small-rounded-button"
+      aria-label="Toggle theme"
+    >
+      <i class="fas fa-sun"></i>
     </button>
 
     <!-- Button to Go Back/Home -->
@@ -30,15 +35,15 @@
       const toggleButton = document.getElementById('theme-toggle');
       const html = document.documentElement;
 
-      function updateToggleText() {
+      function updateToggleIcon() {
         if (html.getAttribute('data-theme') === 'dark') {
-          toggleButton.textContent = 'Light Mode';
+          toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
         } else {
-          toggleButton.textContent = 'Dark Mode';
+          toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
         }
       }
 
-      updateToggleText();
+      updateToggleIcon();
 
       toggleButton.addEventListener('click', () => {
         if (html.getAttribute('data-theme') === 'dark') {
@@ -46,7 +51,7 @@
         } else {
           html.setAttribute('data-theme', 'dark');
         }
-        updateToggleText();
+        updateToggleIcon();
       });
 
       // Go Home
