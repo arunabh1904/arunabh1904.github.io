@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Paper Short: Auto-Encoding Variational Bayes"
+title: "Auto-Encoding Variational Bayes"
 date: 2014-04-01 00:00:00 -0400
 categories: ["Paper Shorts"]
 ---
