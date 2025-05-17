@@ -15,6 +15,8 @@ field: Natural Language Processing
 **Project page / blog:** [Google AI Blog – "Open Sourcing BERT"](https://ai.googleblog.com/2018/11/open-sourcing-bert-state-of-art-pre.html)
 
 **Conference:** NAACL 2019
+![BERT Model](/assets/images/bert.png)
+
 
 **Summary (abstract in plain English):**
 BERT is a Transformer encoder stack with 12 layers (BERT-base) or 24 layers (BERT-large) pre-trained on the BooksCorpus and English Wikipedia (3.3B tokens).
