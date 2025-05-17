@@ -47,7 +47,11 @@ function initMusicPlayer() {
   });
 
   closePlayerBtn.addEventListener('click', () => {
-    window.close();
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage('close-music-overlay', '*');
+    } else {
+      window.close();
+    }
   });
 }
 
