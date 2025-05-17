@@ -1,0 +1,21 @@
+name: Build site
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+      - name: Install dependencies
+        run: |
+          gem install jekyll jekyll-feed jekyll-sitemap jekyll-seo-tag
+      - name: Build
+        run: jekyll build
