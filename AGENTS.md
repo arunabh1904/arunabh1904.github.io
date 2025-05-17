@@ -12,6 +12,11 @@ Update it in pull requests as new conventions are adopted.
 - `index.html` defines the home page layout and lists recent posts.
 - `archive.md` generates an archive page grouped by tag.
 
+## Setup
+- Install Ruby 3.1 and Bundler.
+- Run `bundle install` to install dependencies.
+- Use `bundle exec jekyll build` if you have a Gemfile.
+
 ## Style
 - Use two spaces for indentation in YAML, HTML, and CSS files.
 - Keep lines under 120 characters when possible.
@@ -34,4 +39,9 @@ Update it in pull requests as new conventions are adopted.
 ## Markdown
 - Use `##` for second-level headings.
 - Wrap code blocks in triple backticks with an optional language identifier.
+
+## Test workflow
+- `.github/workflows/jekyll.yml` runs on pushes to `main` and `staging` and on pull requests.
+- The job installs Jekyll and plugins using `ruby/setup-ruby`.
+- It then runs `jekyll build` to verify the site compiles.
 
