@@ -20,26 +20,6 @@
     >
       Play some music while browsing...
     </button>
-    <div
-      id="music-player"
-      style="display:none; position:fixed; bottom:20px; left:20px; z-index:1000;"
-    >
-      <div style="margin-bottom:4px; text-align:center;">
-        <button id="choose-spotify" class="music-choice">Spotify</button>
-        <button id="choose-youtube" class="music-choice">YouTube</button>
-        <button id="close-music-player" class="music-choice">Close</button>
-        <button id="toggle-music-player" class="music-choice">Minimize</button>
-      </div>
-      <iframe
-        id="music-iframe"
-        style="border-radius:12px"
-        src="https://open.spotify.com/embed/playlist/4RHYceSp9R1bHyL0dDqTuQ?utm_source=generator&theme=0"
-        width="250"
-        height="80"
-        frameborder="0"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      ></iframe>
-    </div>
     <!-- MAIN CONTENT in a semi-transparent container -->
     <div
       style="
@@ -93,6 +73,6 @@
         </li>
       </ul>
     </div>
-    <script src="/assets/js/music.js"></script>
+    <script src="/assets/js/music-launcher.js"></script>
   </body>
 </html>
