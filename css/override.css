@@ -64,6 +64,11 @@ body {
 #home-button {
   top: 10px;
   right: 10px;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  padding: 0;
+  font-size: 20px;
 }
 
 #music-button {

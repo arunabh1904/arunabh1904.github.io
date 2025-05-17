@@ -20,7 +20,7 @@ Posts use the default layout `post` and are automatically tagged via the configu
 
 ## Structure
 
-- `_layouts/` – Contains page templates. `home.html` defines the landing page layout with a full-page background and a pinned "Contact Me" panel at the bottom right. `post.html` defines post pages with light/dark theme toggling and a "Go Home" button implemented in JavaScript.
+- `_layouts/` – Contains page templates. `home.html` defines the landing page layout with a full-page background and a pinned "Contact Me" panel at the bottom right. `post.html` defines post pages with light/dark theme toggling and an arrow button that returns to the home page.
 - `_includes/` – Partial templates. `head.html` loads Font Awesome icons and Highlight.js for code syntax highlighting. `navlinks.html` and `sharelinks.html` provide previous/next navigation and social-sharing buttons respectively.
 - `css/override.css` – Custom styles, including variables for dark/light themes, styling for buttons, and a pinned links panel.
 - `index.html` – Home page content listing posts from two categories ("My Journey So Far" and "ML Deep research reports").
