@@ -62,6 +62,16 @@ body {
 #music-button {
   top: 10px;
   right: 230px;
+  width: auto;
+  padding: 0 20px;
+  background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+  color: #fff;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+#music-button:hover {
+  background: linear-gradient(45deg, #fad0c4, #ff9a9e);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
 /* ------------------------------------------------------
@@ -142,6 +152,11 @@ a:visited {
     width: 80px;
     height: 35px;
     line-height: 35px;
+    font-size: 12px;
+  }
+  #music-button {
+    width: auto;
+    padding: 0 12px;
     font-size: 12px;
   }
 }
