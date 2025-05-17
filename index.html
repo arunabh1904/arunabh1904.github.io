@@ -34,7 +34,10 @@ title: Home
   <details>
     <summary><h2>My Journey So Far</h2></summary>
     <ul>
-      {% assign journey_posts = site.categories["My Journey So Far"] | sort: "date" %}
+      {% assign journey_posts = site.categories["My Journey So Far"] %}
+      {% if journey_posts %}
+        {% assign journey_posts = journey_posts | sort: "date" %}
+      {% endif %}
       {% assign full_post = journey_posts | where: "title", "My Journey So Far - Full" | first %}
       {% if full_post %}
         <li>
@@ -59,13 +62,16 @@ title: Home
    <details>
      <summary><h2>Machine Learning Deep-Dives</h2></summary>
      <ul>
-       {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] | sort: "date" %}
-       {% for post in ml_posts %}
-         <li>
-           <a href="{{ post.url }}">{{ post.title }}</a>
-           <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-         </li>
-       {% endfor %}
+       {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] %}
+       {% if ml_posts %}
+         {% assign ml_posts = ml_posts | sort: "date" %}
+         {% for post in ml_posts %}
+           <li>
+             <a href="{{ post.url }}">{{ post.title }}</a>
+             <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+           </li>
+         {% endfor %}
+       {% endif %}
      </ul>
    </details>
  </section>
