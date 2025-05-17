@@ -228,7 +228,7 @@ td {
 }
 
 th {
-  background-color: var(--background-color);
+  background-color: var(--table-header-bg);
   font-weight: bold;
 }
 
