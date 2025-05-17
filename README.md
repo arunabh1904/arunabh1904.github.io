@@ -37,6 +37,12 @@ Assets such as images are stored in `assets/images/`.
 4. Modify `_config.yml` to change site settings like social usernames or pagination.
 5. Customize layouts or include files to alter page structure or metadata.
 
+## Staging Environment
+
+1. Create a `staging` branch from `main`.
+2. Push updates to this branch to run the workflow.
+3. Enable GitHub Pages on `staging` to preview changes.
+
 ## What to Learn Next
 
 - **Jekyll basics** – Understanding layouts, includes, front matter and Liquid templating will help you modify or expand the site.
