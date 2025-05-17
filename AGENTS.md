@@ -36,6 +36,10 @@ Update it in pull requests as new conventions are adopted.
 ## Pull requests
 - Provide a clear summary of your changes and include any build or preview steps you followed.
 
+## PR Instructions
+- Title format: `[Fix] Short description`.
+- Include a one-line summary and a "Testing Done" section.
+
 ## Markdown
 - Use `##` for second-level headings.
 - Wrap code blocks in triple backticks with an optional language identifier.
