@@ -31,7 +31,7 @@ body {
   width: 100px;             /* Fixed width to keep both buttons the same size */
   height: 40px;             /* Fixed height for uniform look */
   border: none;
-  border-radius: 20px;      /* Curved corners */
+  border-radius: 9999px;    /* Fully rounded corners */
   background-color: #f0f0f0;
   color: #333;
   cursor: pointer;
@@ -61,12 +61,12 @@ body {
   right: 120px; /* Offset so it doesn't overlap the home button */
   width: 40px;
   height: 40px;
-  border-radius: 20px;
+  border-radius: 50%;
   line-height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 18px;
+  font-size: 36px;
 }
 
 #home-button {
@@ -74,9 +74,10 @@ body {
   right: 10px;
   width: 40px;
   height: 40px;
+  border-radius: 50%;
   line-height: 40px;
   padding: 0;
-  font-size: 20px;
+  font-size: 40px;
 }
 
 #music-button {
