@@ -35,12 +35,23 @@ title: Home
     <summary><h2>My Journey So Far</h2></summary>
     <ul>
       {% assign journey_posts = site.categories["My Journey So Far"] | sort: "date" %}
-      {% for post in journey_posts %}
+      {% assign full_post = journey_posts | where: "title", "My Journey So Far - Full" | first %}
+      {% if full_post %}
         <li>
-          <a href="{{ post.url }}">{{ post.title }}</a>
-          <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+          <a href="{{ full_post.url }}">Full version</a>
+          <small>— {{ full_post.date | date: "%b %d, %Y" }}</small>
+          <ul>
+            {% for post in journey_posts %}
+              {% unless post.title == "My Journey So Far - Full" %}
+                <li>
+                  <a href="{{ post.url }}">{{ post.title }}</a>
+                  <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+                </li>
+              {% endunless %}
+            {% endfor %}
+          </ul>
         </li>
-      {% endfor %}
+      {% endif %}
     </ul>
   </details>
 </section>
