@@ -7,22 +7,37 @@ categories: ["Paper Shorts"]
 
 ## 2013 – Playing Atari with Deep Reinforcement Learning
 
-**Abstract (arXiv):** This paper introduced the Deep Q-Network (DQN), the first deep learning model to successfully learn control policies directly from high-dimensional visual input using reinforcement learning. A convolutional neural network was trained with a variant of Q-learning to play Atari 2600 video games from raw pixel inputs, outputting Q-value estimates for possible actions. No game-specific tuning was needed; the same architecture trained on seven Atari games outperformed all previous approaches on six of them and surpassed human expert scores on three games.
+**arXiv:** [1312.5602](https://arxiv.org/abs/1312.5602)
 
-**GitHub:** (Unofficial) deepmind/Atari-DQN (reimplementation)
+**GitHub:** [DeepMind-Atari-Deep-Q-Learner](https://github.com/kuz/DeepMind-Atari-Deep-Q-Learner) (unofficial re-implementation)
 
-**Project Page:** DeepMind blog – “Playing Atari with Deep RL” (2013)
+**Project page / DeepMind blog:** [Deep Reinforcement Learning](https://deepmind.com/blog/deep-reinforcement-learning)
 
-**Summary:** The DQN uses a CNN to process frames and a Q-learning objective with experience replay and target networks. By learning value estimates for pixel states, it achieved superhuman performance in several classic Atari games using only screen images and game rewards. Key innovations include using a replay memory to stabilize training and an iterative update to align the Q-network with a slowly updating target network. This work demonstrated that deep neural networks can learn complex control policies from unprocessed pixels.
+**Conference:** NIPS Deep Learning Workshop 2013 (expanded Nature version published 2015)
 
-**Novel Insights:**
-- End-to-end learning from pixels to game actions via reinforcement learning, without handcrafted features.
-- Introduced techniques (experience replay, target network) to stabilize deep RL training, enabling learning of successful policies in a high-dimensional state space.
-- Showed that increasing network depth and complexity can significantly improve performance in RL tasks previously dominated by specialized methods.
+**Summary (abstract in plain English):** The paper introduces the Deep Q-Network (DQN) — a convolutional neural network that learns, via Q-learning, to map raw Atari-2600 screen pixels directly to action values. Two key stabilisation tricks make deep RL feasible:
+1. **Experience replay:** store transitions and sample them randomly to break temporal correlations.
+2. **Target network:** hold a slowly updated copy of the Q-network to compute stable learning targets.
+Using a single CNN, the authors trained agents on seven Atari games without game-specific tweaks; the same weights and hyper-parameters generalised across titles.
 
-**Evals / Benchmarks:** DQN achieved higher scores than prior algorithms on six out of seven Atari games tested and beat human expert performance on games like Breakout and Enduro. These results were achieved with a single architecture across games, whereas previous methods required game-specific adjustments. Training required on the order of 10 million frames per game.
+**Novel insights:**
+- End-to-end pixel-to-action learning proved possible, eliminating hand-crafted state representations.
+- Replay memory and target network became standard building blocks for stabilising value-based deep RL.
+- Demonstrated that depth (three conv layers + two fully connected) can handle high-dimensional RL state spaces.
+- Kick-started a wave of research into distributional, prioritised, and double DQN variants.
 
-**Critiques:** The DQN required long training times and still struggled on games requiring long-term planning (for example Montezuma’s Revenge with sparse rewards). It could be unstable without careful hyperparameter tuning. Later research found that DQN’s replay mechanism could be improved (for instance prioritized replay) and that it overestimates some Q-values. Nonetheless, it was a landmark result in deep RL.
+**Evals / Benchmarks:**
 
-**Additional Info:** ArXiv Dec 2013. Presented at NIPS Deep Learning Workshop 2013 (full paper in Nature 2015).
+| Game (subset of 7) | DQN vs. prior SOTA | DQN vs. human expert |
+| ------------------ | ------------------ | -------------------- |
+| Breakout | +560% | Super-human |
+| Enduro | +134% | Super-human |
+| Pong | Wins 93% | Matches |
 
+Overall, DQN beat previous algorithms on 6 / 7 games and exceeded human scores on 3. Training cost: approximately 10 million frames per game (~2–4 GPU-days in 2013).
+
+**Critiques & limitations:**
+- **What I liked:** Elegant, single-architecture baseline across games. Replay and target network tricks still in use a decade later.
+- **What I didn’t like / open issues:** Sample-inefficient, unstable without careful tuning, struggles on sparse-reward titles such as Montezuma’s Revenge, and Q-value overestimation later required fixes like Double DQN and prioritized replay.
+
+**Take-home message:** DQN’s simple CNN, replay memory, and target network showed, for the first time, that deep RL could learn complex control policies directly from raw pixels, laying the foundation for the modern deep-RL toolbox.
