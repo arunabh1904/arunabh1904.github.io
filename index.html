@@ -33,7 +33,7 @@ title: Home
 <section>
   <h2>My Journey So Far</h2>
   <ul>
-    {% assign journey_posts = site.categories["My Journey So Far"] | sort: "date" %}
+    {% assign journey_posts = site.categories["My Journey So Far"] | default: [] | sort: "date" %}
     {% for post in journey_posts %}
       <li>
         <a href="{{ post.url }}">{{ post.title }}</a>
@@ -47,7 +47,7 @@ title: Home
 <section>
   <h2>Machine Learning Deep-Dives</h2>
   <ul>
-    {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] | sort: "date" %}
+    {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] | default: [] | sort: "date" %}
     {% for post in ml_posts %}
       <li>
         <a href="{{ post.url }}">{{ post.title }}</a>
