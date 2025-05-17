@@ -17,7 +17,7 @@ title: Home
   <p>
     My robotics journey began in India, where I earned my undergraduate degree at MIT, Manipal.
     Although I stumbled upon robotics somewhat by chance, choosing to focus on autonomous
-    driving technology was intentional - I believe it can transform the world by saving
+    driving technology was intentional—I believe it can transform the world by saving
     tons of lives! This conviction brought me to the U.S. nearly a decade ago for graduate
     studies at the Colorado School of Mines.
   </p>
@@ -42,13 +42,13 @@ title: Home
       {% if full_post %}
         <li>
           <a href="{{ full_post.url }}">My Journey So Far - The Full Story</a>
-          <small> - {{ full_post.date | date: "%b %d, %Y" }}</small>
+          <small>— {{ full_post.date | date: "%b %d, %Y" }}</small>
           <ul>
             {% for post in journey_posts %}
               {% unless post.title == "My Journey So Far - The Full Story" %}
                 <li>
                   <a href="{{ post.url }}">{{ post.title }}</a>
-                  <small> - {{ post.date | date: "%b %d, %Y" }}</small>
+                  <small>— {{ post.date | date: "%b %d, %Y" }}</small>
                 </li>
               {% endunless %}
             {% endfor %}
@@ -70,7 +70,7 @@ title: Home
          {% for post in ml_posts %}
            <li>
              <a href="{{ post.url }}">{{ post.title }}</a>
-             <small> - {{ post.date | date: "%b %d, %Y" }}</small>
+             <small>— {{ post.date | date: "%b %d, %Y" }}</small>
            </li>
          {% endfor %}
        {% endif %}
