@@ -1,24 +1,12 @@
-const MUSIC_VISIBLE_KEY = 'musicPlayerVisible';
 const MUSIC_SRC_KEY = 'musicPlayerSrc';
 const MUSIC_MINIMIZED_KEY = 'musicPlayerMinimized';
 
 function initMusicPlayer() {
-  const musicButton = document.getElementById('music-button');
-  const musicPlayer = document.getElementById('music-player');
   const spotifyOption = document.getElementById('choose-spotify');
   const youtubeOption = document.getElementById('choose-youtube');
   const togglePlayerBtn = document.getElementById('toggle-music-player');
   const closePlayerBtn = document.getElementById('close-music-player');
   const musicIframe = document.getElementById('music-iframe');
-
-  // Restore state from localStorage
-  if (localStorage.getItem(MUSIC_VISIBLE_KEY) === 'true') {
-    musicPlayer.style.display = 'block';
-    musicButton.style.display = 'none';
-  } else {
-    musicPlayer.style.display = 'none';
-    musicButton.style.display = 'block';
-  }
 
   const savedSrc = localStorage.getItem(MUSIC_SRC_KEY);
   if (savedSrc) {
@@ -31,18 +19,6 @@ function initMusicPlayer() {
     youtubeOption.style.display = 'none';
     togglePlayerBtn.textContent = 'Expand';
   }
-
-  musicButton.addEventListener('click', () => {
-    musicPlayer.style.display = 'block';
-    musicButton.style.display = 'none';
-    localStorage.setItem(MUSIC_VISIBLE_KEY, 'true');
-  });
-
-  closePlayerBtn.addEventListener('click', () => {
-    musicPlayer.style.display = 'none';
-    musicButton.style.display = 'block';
-    localStorage.setItem(MUSIC_VISIBLE_KEY, 'false');
-  });
 
   spotifyOption.addEventListener('click', () => {
     musicIframe.src = 'https://open.spotify.com/embed/playlist/4RHYceSp9R1bHyL0dDqTuQ?utm_source=generator&theme=0';
@@ -68,6 +44,10 @@ function initMusicPlayer() {
       togglePlayerBtn.textContent = 'Expand';
       localStorage.setItem(MUSIC_MINIMIZED_KEY, 'true');
     }
+  });
+
+  closePlayerBtn.addEventListener('click', () => {
+    window.close();
   });
 }
 
