@@ -23,6 +23,7 @@
       <div style="margin-bottom:4px; text-align:center;">
         <button id="choose-spotify" class="music-choice">Spotify</button>
         <button id="choose-youtube" class="music-choice">YouTube</button>
+        <button id="toggle-music-player" class="music-choice">Minimize</button>
       </div>
       <iframe
         id="music-iframe"
@@ -92,6 +93,7 @@
       const musicPlayer = document.getElementById('music-player');
       const spotifyOption = document.getElementById('choose-spotify');
       const youtubeOption = document.getElementById('choose-youtube');
+      const togglePlayerBtn = document.getElementById('toggle-music-player');
       const musicIframe = document.getElementById('music-iframe');
 
       musicButton.addEventListener('click', () => {
@@ -109,6 +111,20 @@
 
       youtubeOption.addEventListener('click', () => {
         musicIframe.src = 'https://www.youtube.com/embed/kGuGH_UvvxA';
+      });
+
+      togglePlayerBtn.addEventListener('click', () => {
+        if (musicIframe.style.display === 'none') {
+          musicIframe.style.display = 'block';
+          spotifyOption.style.display = 'inline-block';
+          youtubeOption.style.display = 'inline-block';
+          togglePlayerBtn.textContent = 'Minimize';
+        } else {
+          musicIframe.style.display = 'none';
+          spotifyOption.style.display = 'none';
+          youtubeOption.style.display = 'none';
+          togglePlayerBtn.textContent = 'Expand';
+        }
       });
     </script>
   </body>
