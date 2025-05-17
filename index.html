@@ -32,14 +32,23 @@ title: Home
 <!-- Section for My Journey So Far -->
 <section>
   <h2>My Journey So Far</h2>
+  {% assign journey_posts = site.categories["My Journey So Far"] | sort: "date" %}
+  {% assign full_post = journey_posts | last %}
   <ul>
-    {% assign journey_posts = site.categories["My Journey So Far"] | sort: "date" %}
-    {% for post in journey_posts %}
-      <li>
-        <a href="{{ post.url }}">{{ post.title }}</a>
-        <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-      </li>
-    {% endfor %}
+    <li>
+      <a href="{{ full_post.url }}">Full version</a>
+      <small>— {{ full_post.date | date: "%b %d, %Y" }}</small>
+      <ul>
+        {% for post in journey_posts %}
+          {% unless post.url == full_post.url %}
+          <li>
+            <a href="{{ post.url }}">{{ post.title }}</a>
+            <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+          </li>
+          {% endunless %}
+        {% endfor %}
+      </ul>
+    </li>
   </ul>
 </section>
 
