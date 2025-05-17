@@ -77,3 +77,22 @@ title: Home
      </ul>
    </details>
  </section>
+
+<!-- Section for Paper Shorts -->
+<section>
+  <details>
+    <summary><h2>Paper Shorts</h2></summary>
+    <ul>
+      {% assign paper_posts = site.categories["Paper Shorts"] %}
+      {% if paper_posts %}
+        {% assign paper_posts = paper_posts | sort: "date" %}
+        {% for post in paper_posts %}
+          <li>
+            <a href="{{ post.url }}">{{ post.title }}</a>
+            <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+  </details>
+</section>
