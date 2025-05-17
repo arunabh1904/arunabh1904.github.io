@@ -1,1 +1,14 @@
-﻿_site
+# Jekyll build files
+_site/
+.jekyll-cache/
+
+# Temporary files
+*.log
+*.tmp
+
+# OS-specific files
+.DS_Store
+
+# Editor backups
+*~
+

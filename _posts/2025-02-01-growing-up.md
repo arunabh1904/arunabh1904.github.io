@@ -16,6 +16,6 @@ I grew up in Jaipur, a city that shaped much of my early life. I lost my father 
 My schooling was mostly in Jaipur, and like many aspiring engineers, I spent three intense years in Kota preparing for the JEE. Often dubbed a **factory** ([Netflix show](https://www.netflix.com/title/81249783) / [Wiki](https://en.wikipedia.org/wiki/Kota_Factory)), Kota thrives on fierce academic competition. It’s also a breeding ground for [Girard's mimetic theory of desire](https://en.wikipedia.org/wiki/Mimetic_theory), where students emulate each other’s ambitions and anxieties. Despite my hard work, I ended up among the thousands who didn’t clear the IIT exam. At 18, the disappointment felt crushing—like I’d let everyone down after years of preparation. Even now, at 33, the memory of that failure still sends shudders down my spine.
 
 ### Takeaways
-- **Be resilient** in the face of adversity.  
-- Sometimes, **no matter how hard you try, you will fail**—and that's okay.  
+- **Be resilient** in the face of adversity.
+- Sometimes, **no matter how hard you try, you will fail**—and that's okay.
 - **It's okay to indulge** in things you like (like video games), but don’t let them consume you.
