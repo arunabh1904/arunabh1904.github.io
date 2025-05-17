@@ -38,14 +38,14 @@ title: Home
       {% if journey_posts %}
         {% assign journey_posts = journey_posts | sort: "date" %}
       {% endif %}
-      {% assign full_post = journey_posts | where: "title", "My Journey So Far - Full" | first %}
+      {% assign full_post = journey_posts | where: "title", "My Journey So Far - The Full Story" | first %}
       {% if full_post %}
         <li>
-          <a href="{{ full_post.url }}">My Journey So Far</a>
+          <a href="{{ full_post.url }}">My Journey So Far - The Full Story</a>
           <small>— {{ full_post.date | date: "%b %d, %Y" }}</small>
           <ul>
             {% for post in journey_posts %}
-              {% unless post.title == "My Journey So Far - Full" %}
+              {% unless post.title == "My Journey So Far - The Full Story" %}
                 <li>
                   <a href="{{ post.url }}">{{ post.title }}</a>
                   <small>— {{ post.date | date: "%b %d, %Y" }}</small>
