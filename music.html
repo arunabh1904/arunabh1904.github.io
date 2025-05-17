@@ -5,17 +5,20 @@
     <title>Music Player</title>
     <link rel="stylesheet" href="/css/override.css">
   </head>
-  <body style="background:#1e1e1e;color:#eee;font-family:sans-serif;margin:0;">
-    <div id="music-widget" style="text-align:center;padding:8px;">
-      <div class="music-controls" style="margin-bottom:6px;">
+  <body class="music-page">
+    <div id="music-widget">
+      <div class="music-controls">
         <button id="choose-spotify" class="music-choice">Spotify</button>
         <button id="choose-youtube" class="music-choice">YouTube</button>
         <button id="close-music-player" class="music-choice">Close</button>
       </div>
-      <iframe id="music-iframe" width="300" height="80" frameborder="0"
+      <iframe
+        id="music-iframe"
+        frameborder="0"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        style="border-radius:6px"></iframe>
+      ></iframe>
     </div>
     <script src="/assets/js/music.js"></script>
   </body>
 </html>
+
