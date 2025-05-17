@@ -1,5 +1,6 @@
 const SPOTIFY_SRC = 'https://open.spotify.com/embed/playlist/4RHYceSp9R1bHyL0dDqTuQ?utm_source=generator&theme=0';
-const YOUTUBE_SRC = 'https://www.youtube.com/embed/videoseries?list=PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI';
+// Use a single YouTube video starting at 290 seconds.
+const YOUTUBE_SRC = 'https://www.youtube.com/embed/kGuGH_UvvxA?start=290';
 const MUSIC_SRC_KEY = 'musicPlayerSrc';
 const MUSIC_MINIMIZED_KEY = 'musicPlayerMinimized';
 
