@@ -59,6 +59,11 @@ body {
   right: 10px;
 }
 
+#music-button {
+  top: 10px;
+  right: 230px;
+}
+
 /* ------------------------------------------------------
    3) MAIN CONTAINER (Optional if you have .main-container)
    ------------------------------------------------------ */

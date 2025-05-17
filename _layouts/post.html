@@ -17,6 +17,23 @@
       Go Home
     </button>
 
+    <button type="button" id="music-button" class="small-rounded-button">
+      Play some music while browsing...
+    </button>
+    <div
+      id="music-player"
+      style="display:none; position:fixed; bottom:20px; left:20px; z-index:1000;"
+    >
+      <iframe
+        style="border-radius:12px"
+        src="https://open.spotify.com/embed/playlist/4RHYceSp9R1bHyL0dDqTuQ?utm_source=generator&theme=0"
+        width="250"
+        height="80"
+        frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      ></iframe>
+    </div>
+
     <main class="page-content" style="max-width:800px; margin:2rem auto;">
       {{ content }}
     </main>
@@ -49,6 +66,17 @@
       const homeButton = document.getElementById('home-button');
       homeButton.addEventListener('click', () => {
         window.location.href = '/';
+      });
+
+      const musicButton = document.getElementById('music-button');
+      const musicPlayer = document.getElementById('music-player');
+
+      musicButton.addEventListener('click', () => {
+        if (musicPlayer.style.display === 'none') {
+          musicPlayer.style.display = 'block';
+        } else {
+          musicPlayer.style.display = 'none';
+        }
       });
     </script>
   </body>
