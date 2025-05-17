@@ -31,28 +31,32 @@ title: Home
 
 <!-- Section for My Journey So Far -->
 <section>
-  <h2>My Journey So Far</h2>
-  <ul>
-    {% assign journey_posts = site.categories["My Journey So Far"] | sort: "date" %}
-    {% for post in journey_posts %}
-      <li>
-        <a href="{{ post.url }}">{{ post.title }}</a>
-        <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-      </li>
-    {% endfor %}
-  </ul>
+  <details>
+    <summary><h2>My Journey So Far</h2></summary>
+    <ul>
+      {% assign journey_posts = site.categories["My Journey So Far"] | sort: "date" %}
+      {% for post in journey_posts %}
+        <li>
+          <a href="{{ post.url }}">{{ post.title }}</a>
+          <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </details>
 </section>
 
 <!-- Section for Machine Learning Deep-Dives -->
 <section>
-  <h2>Machine Learning Deep-Dives</h2>
-  <ul>
-    {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] | sort: "date" %}
-    {% for post in ml_posts %}
-      <li>
-        <a href="{{ post.url }}">{{ post.title }}</a>
-        <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-      </li>
-    {% endfor %}
-  </ul>
+  <details>
+    <summary><h2>Machine Learning Deep-Dives</h2></summary>
+    <ul>
+      {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] | sort: "date" %}
+      {% for post in ml_posts %}
+        <li>
+          <a href="{{ post.url }}">{{ post.title }}</a>
+          <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </details>
 </section>
