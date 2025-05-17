@@ -59,25 +59,25 @@ body {
 #theme-toggle {
   top: 10px;
   right: 120px; /* Offset so it doesn't overlap the home button */
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  line-height: 40px;
+  line-height: 48px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 36px;
+  font-size: 29px;
 }
 
 #home-button {
   top: 10px;
   right: 10px;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  line-height: 40px;
+  line-height: 48px;
   padding: 0;
-  font-size: 40px;
+  font-size: 32px;
 }
 
 #music-button {
