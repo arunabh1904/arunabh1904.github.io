@@ -1,6 +1,6 @@
 <!-- _layouts/post.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     {% include head.html %}
     <link rel="stylesheet" href="/css/override.css">
@@ -9,7 +9,7 @@
   <body>
     <!-- Dark/Light Toggle Button -->
     <button type="button" id="theme-toggle" class="small-rounded-button">
-      Toggle Theme
+      Light Mode
     </button>
 
     <!-- Button to Go Back/Home -->
@@ -24,13 +24,25 @@
     <script>
       // Toggle Theme
       const toggleButton = document.getElementById('theme-toggle');
+      const html = document.documentElement;
+
+      function updateToggleText() {
+        if (html.getAttribute('data-theme') === 'dark') {
+          toggleButton.textContent = 'Light Mode';
+        } else {
+          toggleButton.textContent = 'Dark Mode';
+        }
+      }
+
+      updateToggleText();
+
       toggleButton.addEventListener('click', () => {
-        const html = document.documentElement;
         if (html.getAttribute('data-theme') === 'dark') {
           html.setAttribute('data-theme', 'light');
         } else {
           html.setAttribute('data-theme', 'dark');
         }
+        updateToggleText();
       });
 
       // Go Home
