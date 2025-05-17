@@ -23,11 +23,12 @@ Posts use the default layout `post` and are automatically tagged via the configu
 - `_layouts/` – Contains page templates. `home.html` defines the landing page layout with a full-page background and a pinned "Contact Me" panel at the bottom right. `post.html` defines post pages with light/dark theme toggling and a "Go Home" button implemented in JavaScript.
 - `_includes/` – Partial templates. `head.html` loads Font Awesome icons and Highlight.js for code syntax highlighting. `navlinks.html` and `sharelinks.html` provide previous/next navigation and social-sharing buttons respectively.
 - `css/override.css` – Custom styles, including variables for dark/light themes, styling for buttons, and a pinned links panel.
-- `index.html` – Home page content listing posts from two categories ("My Journey So Far" and "Machine Learning Deep-Dives").
+- `index.html` – Home page content listing posts from two categories ("My Journey So Far" and "ML Deep research reports").
 - `archive.md` – Generates an archive of posts grouped by tag.
 - `_posts/` – Blog posts written in Markdown with front matter specifying layout, title, date and categories.
 
 Assets such as images are stored in `assets/images/`.
+PDFs can be added to `assets/pdfs/` and will appear in the ML Deep research reports section.
 
 ## Getting Started
 

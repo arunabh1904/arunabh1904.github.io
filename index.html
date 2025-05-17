@@ -59,10 +59,10 @@ title: Home
   </details>
 </section>
 
- <!-- Section for Machine Learning Deep-Dives -->
+ <!-- Section for ML Deep research reports -->
  <section>
    <details>
-     <summary><h2>Machine Learning Deep-Dives</h2></summary>
+     <summary><h2>ML Deep research reports</h2></summary>
      <ul>
        {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] %}
        {% if ml_posts %}
@@ -74,6 +74,13 @@ title: Home
            </li>
          {% endfor %}
        {% endif %}
+     </ul>
+     <h3>PDFs</h3>
+     <ul>
+       {% assign ml_pdfs = site.static_files | where: "extname", ".pdf" | where_exp: "f", "f.path contains '/assets/pdfs/'" %}
+       {% for file in ml_pdfs %}
+         <li><a href="{{ file.path }}">{{ file.name }}</a></li>
+       {% endfor %}
      </ul>
    </details>
  </section>
