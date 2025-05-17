@@ -90,17 +90,8 @@ title: Home
   <details>
     <summary><h2>Paper Summaries</h2></summary>
     <ul>
-      {% assign paper_posts = site.categories["Paper Shorts"] %}
-      {% if paper_posts %}
-        {% assign paper_posts = paper_posts | sort: "date" %}
-        {% for post in paper_posts %}
-          <li>
-            <a href="{{ post.url }}">{{ post.title }}</a>
-            <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-          </li>
-        {% endfor %}
-      {% endif %}
-      <li><a href="/paper_summaries.html">Organize by year or field</a></li>
+      <li><a href="/paper_summaries_year.html">Organized by Year</a></li>
+      <li><a href="/paper_summaries_field.html">Organized by Field</a></li>
     </ul>
   </details>
 </section>
