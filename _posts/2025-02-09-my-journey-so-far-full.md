@@ -27,8 +27,8 @@ I was a very introverted child, often retreating into my own world. Video games,
 My education was primarily in Jaipur, but I also spent three years in Kota preparing for the JEE. Kota is often referred to as a **factory** ([Netflix show](https://www.netflix.com/title/81249783) / [Wiki](https://en.wikipedia.org/wiki/Kota_Factory)) because of its intense academic competition. It’s a place where [Girard's mimetic theory of desire](https://en.wikipedia.org/wiki/Mimetic_theory) plays out vividly. Students imitate each other’s drive for success (as well as stress and anxiety), all trying to outdo one another. This environment can be overwhelming—especially for teenagers who aren’t emotionally equipped to handle that level of pressure. I was among the thousands of kids who couldn’t crack the IIT exam. At the time, it felt like the end of the world. The disappointment of letting down my family after years of intense preparation still sends shudders down my spine at 33. You can imagine the toll it took on my 18-year-old self.
 
 ### Takeaways
-- **Be resilient** in the face of adversity.  
-- Sometimes, **no matter how hard you try, you will fail**—and that's okay.  
+- **Be resilient** in the face of adversity.
+- Sometimes, **no matter how hard you try, you will fail**—and that's okay.
 - **It's okay to indulge** in things you like (e.g., video games), but don’t let them consume you.
 
 ## UNDERGRAD IN MANIPAL
