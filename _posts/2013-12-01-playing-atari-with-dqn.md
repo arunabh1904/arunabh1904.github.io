@@ -3,6 +3,7 @@ layout: post
 title: "Playing Atari with Deep Reinforcement Learning"
 date: 2013-12-01 00:00:00 -0500
 categories: ["Paper Shorts"]
+field: Reinforcement Learning
 ---
 
 ## 2013 – Playing Atari with Deep Reinforcement Learning
