@@ -101,11 +101,14 @@ body {
   padding: 8px 20px;
   line-height: 1.2;
   white-space: normal;
-  background: linear-gradient(135deg, #7f00ff, #e100ff);
+  background: linear-gradient(135deg, #003366, #001a33);
   color: #fff;
   font-weight: bold;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s, box-shadow 0.2s;
+}
+#music-button i {
+  margin-right: 6px;
 }
 #music-button:hover {
   transform: scale(1.05);
