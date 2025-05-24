@@ -43,14 +43,13 @@ title: Home
           <a href="{{ full_post.url }}">My Journey So Far - The Full Story</a>
           <small>— {{ full_post.date | date: "%b %d, %Y" }}</small>
           <ul class="icon-list">
-            {% for post in journey_posts %}
-              {% unless post.title == "My Journey So Far - The Full Story" %}
-                <li>
-                  <a href="{{ post.url }}">{{ post.title }}</a>
-                  <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-                </li>
-              {% endunless %}
-            {% endfor %}
+            <li><a href="{{ full_post.url }}#introduction">Introduction</a></li>
+            <li><a href="{{ full_post.url }}#undergrad">Undergrad at MIT, Manipal</a></li>
+            <li><a href="{{ full_post.url }}#depression">Depression</a></li>
+            <li><a href="{{ full_post.url }}#grad-school">Grad school at Mines</a></li>
+            <li><a href="{{ full_post.url }}#job-hunt">Finding a Job Out of Grad School</a></li>
+            <li><a href="{{ full_post.url }}#first-job">First Job at DEKA</a></li>
+            <li><a href="{{ full_post.url }}#zoox">Zoox</a></li>
           </ul>
         </li>
       {% endif %}

@@ -5,7 +5,7 @@ date: 2025-02-08 00:00:00 -0500
 categories: ["My Journey So Far"]
 ---
 
-## Introduction
+## Introduction {#introduction}
 
 In 2023, I gave [this interview](https://theinterviewportal.com/2024/01/21/perception-roboticist-interview/) where I primarily discussed how I landed my role as a robotics engineer focused on perception. But looking back, I realized that interview mostly highlighted the wins - and didn’t touch much on the many missteps and setbacks along the way. To give a more balanced view, I want to share some additional reflections on my journey so far, starting from the very beginning.
 
@@ -20,7 +20,7 @@ My schooling was mostly in Jaipur, and like many aspiring engineers, I spent thr
 - Sometimes, **no matter how hard you try, you will fail** - and that's okay.
 - **It's okay to indulge** in things you like (like video games), but don’t let them consume you.
 
-## Undergrad at MIT, Manipal
+## Undergrad at MIT, Manipal {#undergrad}
 
 I stayed back an extra year, prepped hard, and eventually got accepted to MIT, Manipal. Although not an IIT, it has a fairly decent engineering school. I started out as a pretty average student in college. I continued to stay in my introverted shell and played even more DOTA, averaging about 6-8 hours a day. I also picked up smoking cigarettes, which is the worst habit I've ever had in my life. I skipped a lot of classes during my first and second years, and at one point, my cumulative GPA was a shocking 0.74 - not out of 4, but out of 10! When I saw 0.74 written on my report card where the GPA was supposed to be, something inside me broke, but in a good way. It was a wake-up call. I started attending classes, made a few new friends, and began working really hard. I didn’t miss any classes, stayed over the summer, and put in a tremendous amount of effort. By the end of the third year, I had already raised my GPA to 7.8 from a measly 0.74. I kept pushing and finally ended up getting the highest marks in the toughest subject in the course, earning a recommendation for my grad school applications from the head of the department!
 
@@ -37,7 +37,7 @@ Nevertheless, it was a really cool concept, and a similar design is now in produ
 - **Jugaad** (resourcefulness in Hindi) is okay, as long as you don’t cheat outright!
 - **Building things that help others** brings a ton of joy.
 
-## Depression
+## Depression {#depression}
 
 I believe it's almost more important to acknowledge the lows in life as we cherish the highs. If you introspect on the lows, you'll undoubtedly come away with many more lessons that will help you move forward. After college, I suffered through a bout of depression. It wasn't easy. While depression is becoming increasingly well-understood in India today, it wasn't widely recognized a decade ago. More than once, when I told someone I didn't feel like getting up or coming out of my room, they would say, "Just take a cold shower; you'll be fine." How I wish I could have shared my internal turmoil with them - told them my brain was on fire, I felt like screaming from the inside, and I couldn't find a way out. I want to share this experience in the hope that it might resonate with someone reading this and provide some solace that they are not the only ones feeling this way.
 
@@ -64,7 +64,7 @@ The results started rolling in, and I was accepted into three different schools.
 - **Having a purpose** makes it low-effort to work hard.
 - **Always have a backup plan.**
 
-## Grad school at Mines
+## Grad school at Mines {#grad-school}
 
 In 2016, I moved to the United States to pursue a Master’s degree in Robotics at the Colorado School of Mines (CSM). CSM is a relatively small STEM school, but it had a challenging program that required significant effort to succeed. I remember feeling out of place during my first few months. Everything was new and unfamiliar - the culture, the academic environment, and even the way classes were taught. As an introvert, this adjustment period was particularly tough. Over time, however, I found my rhythm and began to genuinely enjoy learning.
 
@@ -86,7 +86,7 @@ Looking back, what worked for me was focusing on building a strong foundation in
 - **Be intentional** about what you want to get out of grad school. Tailor your coursework and experiences to align with your interests.
 - **Seek out hands-on opportunities**, like TA and RA positions, to apply your learning in practical settings.
 
-## Finding a Job Out of Grad School
+## Finding a Job Out of Grad School {#job-hunt}
 
 Honestly, landing your first job out of grad school in the U.S. can be challenging, especially if you're trying to find your dream job right away and you’re not from a top university. Even if you've spent your grad school years upskilling, working on relevant projects, and conducting research, it can still be tough. Here are some of the things that worked for me:
 
@@ -101,7 +101,7 @@ Honestly, landing your first job out of grad school in the U.S. can be challengi
 - **Career Fairs**: These can be helpful, but don’t rely on them exclusively.
 - **Honesty**: Never lie on your resume.
 
-## First Job at DEKA
+## First Job at DEKA {#first-job}
 
 Right after grad school, I landed at DEKA, joining a small, tight-knit team of engineers working on autonomous robots designed for FedEx’s last-mile deliveries. DEKA was mostly known for medical devices, so this robotics project felt like stepping into exciting new territory. Initially, I started out in planning but soon found my passion in robot perception and machine learning. It was here, within our agile, collaborative team, that I truly expanded my skills, diving deep into ML frameworks like PyTorch, TensorFlow, and TensorRT, as well as GPU programming using CUDA and OpenCL.
 
@@ -113,7 +113,7 @@ This experience turned out to be the key that opened the door to my dream job.
 
 Looking back, my time at DEKA was more than just a stepping stone in my career - it was genuinely transformative. The challenges and variety of projects didn’t just teach me technical skills; they shaped the way I approach problems and collaborate with others. Plus, I made some wonderful friends there, people I still stay in touch with today.
 
-## Zoox
+## Zoox {#zoox}
 
 Moving to Zoox, a leader in autonomous driving technology, was the realization of a long-held dream. At Zoox, I am fully immersed in computer vision research, continuously applying and expanding upon the knowledge and skills I’ve gathered throughout my academic and professional journey. I’m part of the Perception team at Zoox. Our team acts as the eyes of the robot, focusing on processing data from sensors like cameras and LIDARs to create representations that the robot uses for planning and action in the real world. These representations are typically machine-learned to generalize across different domains. My specific role involves building representations for scene semantics and agent intents, requiring a solid foundation in ML and software engineering. This includes proficiency in languages like C++, Python, and CUDA, as well as a deep understanding of the latest in computer vision research. I have picked up these skills along my journey through self-teaching, my time in grad school, and my time at DEKA.
 
