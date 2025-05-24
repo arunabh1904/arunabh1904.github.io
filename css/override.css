@@ -20,11 +20,32 @@
   --image-border-color: #ffffff;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--background-color);
   color: var(--text-color);
   margin: 0;
-  font-family: sans-serif;
+  font-family: 'Inter var', sans-serif;
+}
+
+.lead {
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+
+.icon-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.icon-list li::before {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  content: '\f054';
+  margin-right: 0.5em;
 }
 
 /* ------------------------------------------------------
