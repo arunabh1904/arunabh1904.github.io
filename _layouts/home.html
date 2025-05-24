@@ -26,6 +26,9 @@
       <i class="fas fa-music"></i>
       Play some music while browsing...
     </button>
+    <button type="button" id="theme-toggle" class="small-rounded-button">
+      <i class="fas fa-adjust"></i>
+    </button>
     <div id="music-bar"></div>
     <!-- MAIN CONTENT in a semi-transparent container -->
     <div
@@ -67,6 +70,17 @@
         </li>
       </ul>
     </div>
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const storedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', storedTheme);
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+  </script>
   <script src="/assets/js/music-launcher.js"></script>
   </body>
 </html>

@@ -102,6 +102,21 @@ code {
   font-family: "JetBrains Mono", monospace;
 }
 
+.code-block {
+  background-color: var(--code-bg-color);
+  color: var(--code-text-color);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-family: "JetBrains Mono", monospace;
+  overflow-x: auto;
+}
+
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
 /* 2) Small rounded button styling */
 .small-rounded-button {
   position: absolute;
@@ -142,6 +157,17 @@ code {
   line-height: 48px;
   padding: 0;
   font-size: 32px;
+}
+
+#theme-toggle {
+  top: 10px;
+  right: 70px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  line-height: 48px;
+  padding: 0;
+  font-size: 24px;
 }
 
 #music-button {
