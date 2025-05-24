@@ -10,182 +10,193 @@ categories: ["Revision Notes"]
 These are my personal revision notes for [CS336](https://stanford-cs336.github.io/), 
 a course on large language models taught by Percy Liang at Stanford.
 
-## Lecture 2 Notes – CS336 (Percy Liang): Tensor Fundamentals and Computation Efficiency
+# CS336 Revision Notes – Lecture 2
 
-This is the second installment in my revision notes for Percy Liang's CS336 course. Below I cover
-Tensor fundamentals, computational efficiency, and key PyTorch concepts.
+## Tensor Fundamentals & Computational Efficiency
 
-### Lecture Outline
+---
 
-1. Floating-Point DTypes
-2. Tensor Anatomy & Autograd
-3. Views vs Copies
+### Sources
+
+* Stanford **CS336 (Winter 2025)** Lecture‑2 slides/video — Percy Liang
+* [Micikevicius et al., 2018 — *Mixed Precision Training*](https://arxiv.org/abs/1710.03740)
+* [Glorot & Bengio, 2010 — *Understanding the difficulty of training deep feed‑forward neural nets*](https://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf)
+* [He et al., 2015 — *Delving deep into rectifiers*](https://arxiv.org/abs/1502.01852)
+* [Rogozhnikov, 2022 — *Einops*](https://einops.rocks/)
+
+---
+
+> **How to read:** Code first (always runnable), then an *engineering commentary* that connects practice ↔ theory. Copy‑paste to a Jupyter cell and play.
+> **Legend:** ⏱️ = run‑time concern • 🧐 = conceptual note • 📚 = pointer to paper
+
+---
+
+## Lecture Outline
+
+1. Floating‑Point DTypes
+2. Tensor Anatomy & Autograd
+3. Views vs Copies
 4. Einops for Readable Reshaping
 5. FLOPs Accounting
 6. Model FLOP Utilisation (MFU)
-7. Xavier (Glorot) Initialisation
+7. Xavier / He Initialisation
 
 ---
 
-### 1. Float Types: Which to Use and Why?
-
-Different float types balance precision, memory usage, and speed:
-
-- **float64** provides research-grade precision but is memory heavy.
-- **float32** is the default training dtype with wide library support.
-- **bfloat16** keeps the float32 exponent so models usually train well while halving memory.
-- **float16** also halves memory but can underflow or overflow in deep nets.
-- **float8_e4m3** is experimental and mainly used in specialised inference kernels.
+## 1 · Floating‑Point DTypes
 
 ```python
-import torch
-
-dtypes = {
-    "float64 (double)": torch.float64,  # high precision, mostly CPU
-    "float32": torch.float32,           # default for training
-    "bfloat16": torch.bfloat16,         # efficient on TPUs and modern GPUs
-    "float16": torch.float16,           # inference or older GPUs
-    "float8_e4m3": torch.float8_e4m3fn, # cutting-edge GPUs for inference
+"""dtype_showcase.py — Precision×Speed explorer"""
+import torch, time, math
+DTYPES = {
+    "float64": torch.float64,   # research‑grade CPU ops
+    "float32": torch.float32,   # baseline for training
+    "bfloat16": torch.bfloat16, # 8‑bit exponent, AMP‑friendly
+    "float16": torch.float16,   # legacy half, beware overflow
+    "float8_e4m3fn": torch.float8_e4m3fn, # Hopper‑class inference
 }
-
-for name, dt in dtypes.items():
-    x = torch.tensor([1.0, 2.0], dtype=dt)
-    print(f"{name:<15} | {x.element_size()} bytes")
+N = 2_000_000
+for name, dt in DTYPES.items():
+    x = torch.randn(N, device="cuda" if torch.cuda.is_available() else "cpu", dtype=dt)
+    torch.cuda.synchronize() if x.is_cuda else None
+    t0 = time.perf_counter(); y = x.square().sqrt();
+    torch.cuda.synchronize() if x.is_cuda else None
+    dt_ms = (time.perf_counter()-t0)*1e3
+    print(f"{name:<11} | {x.element_size()}\u00a0B | {dt_ms:6.2f}\u00a0ms | rel‑err {torch.norm(y-x)/torch.norm(x):.2e}")
 ```
+
+**🧐 Why care?**
+Training is bandwidth‑bound; smaller dtypes raise the *arithmetic‑to‑memory‑traffic ratio* and unlock tensor‑core instructions. `bfloat16` preserves range → no loss scaling pain, whereas `float16` **must** use dynamic scaling (see Micikevicius et al., 2018 📚). FP8 (E4M3/E5M2) is strictly *inference* today because back‑prop squares the gradient spectrum.
+
+**⏱️ Tip:** Benchmark end‑to‑end wall‑time with `torch.cuda.nvtx.range_push/pop` markers — micro‑kernels lie.
 
 ---
 
-### 2. Tensor Anatomy & Autograd
-
-A tensor is an n-dimensional array with metadata (dtype, device, layout, requires_grad). This
-metadata drives PyTorch operations.
+## 2 · Tensor Anatomy & Autograd
 
 ```python
-t = torch.randn(2, 3, 4, device="cuda", requires_grad=True)
-print(f"Tensor shape {t.shape}, dtype={t.dtype}, device={t.device}, contiguous={t.is_contiguous()}")
+"""autograd_graph.py — Inspect dynamic graph"""
+import torch, inspect
 
-# Basic PyTorch operations
-y = torch.relu(t)
-z = torch.einsum("bcd, d -> b c", t, torch.randn(4, device=t.device))
-loss = z.mean()
-loss.backward()
-print("Gradients shape:", t.grad.shape)
+t = torch.randn(2,3,4, device="cuda", requires_grad=True)
+act = torch.relu(t)
+proj = torch.randn(4,3, device="cuda")
+z = torch.einsum("bcd,dc->bc", t, proj)  # (2,3)
+loss = z.mean(); loss.backward()
+
+for n in [t, act, z, loss]:
+    print(f"{n.shape} | grad_fn={type(n.grad_fn).__name__ if n.grad_fn else None}")
 ```
+
+**🧐 Dynamic graphs**
+PyTorch records ops lazily: each tensor carries a `grad_fn` pointing to its creator. Back‑prop runs a reverse topological walk. **In‑place ops** (`tensor.add_`) mutate storage early → autograd inserts **version counters**; mismatch triggers `RuntimeError: one of the variables needed for gradient computation has been modified`.
+
+**📚 Deep dive:** See *PyTorch Autograd Engine* design note (pytorch.org/docs/stable/notes/autograd.html).
 
 ---
 
-### 3. Views vs Copies
-
-When do operations copy tensors?
-
-- **No Copy (Views):** stride-based operations, e.g., `a[:, ::2]`
-- **Forced Copy:** `.clone()`, `.contiguous()` on non-contiguous tensors, or overlapping memory ops
+## 3 · Views vs Copies
 
 ```python
-a = torch.arange(8).reshape(2, 4)
-b = a[:, ::2]        # view, no copy
-c = a.clone()        # explicit copy
-d = a.contiguous()   # copy if non-contiguous
-
-print(a.storage().data_ptr() == b.storage().data_ptr(),  # True (no copy)
-      a.storage().data_ptr() == c.storage().data_ptr(),  # False (copy)
-      a.storage().data_ptr() == d.storage().data_ptr())  # False (copy)
+"""strides_demo.py"""
+import torch; a = torch.arange(16).reshape(4,4)
+view = a.t()        # just stride swap
+clone = view.clone()# deep copy
+print("contiguous?", view.is_contiguous(), clone.is_contiguous())
+print("shared\u00a0ptr?", a.storage().data_ptr()==view.storage().data_ptr())
 ```
+
+**🧐 Strides rule everything**
+A tensor is `(data_ptr, sizes, strides)`. `is_contiguous` =  row‑major stride pattern. Transpose costs *zero* until you call a kernel that requires contiguous memory — then PyTorch allocates a fresh buffer implicitly (hidden tax). Prefer keeping the layout you train with (e.g., `[B, Seq, Heads, HeadDim]`) all the way to the matmul.
+
+**⏱️ Memory alias traps:** Overlapping views + writes ⇒ undefined behaviour. Use `torch.Tensor.as_strided` only for hacks; safety comes from `torch._C._debug_only_check_eq_storage_offset`.
 
 ---
 
-### 4. Einops for Readable Reshaping
-
-Stop guessing tensor dimensions. Use Einops for clarity:
+## 4 · Einops for Readable Reshaping
 
 ```python
-from einops import rearrange, reduce
-
-img = torch.randn(1, 3, 224, 224)  # Batch, Channel, Height, Width
+"""einops_patches.py — ViT example"""
+from einops import rearrange, reduce; import torch
+img = torch.randn(1,3,224,224)
 patches = rearrange(img, "b c (h ph) (w pw) -> b (h w) (ph pw c)", ph=16, pw=16)
-print("ViT-style patches shape:", patches.shape)
+cls_token = torch.zeros(1,1,patches.size(-1), device=patches.device)
+seq = torch.cat([cls_token, patches], dim=1) # (1,197,768)
+print(seq.shape)
 
-mean_per_patch = reduce(patches, "b n d -> b n", "mean")
-print("Mean per patch shape:", mean_per_patch.shape)
+img_recon = rearrange(seq[:,1:], "b (h w) (ph pw c) -> b c (h ph) (w pw)",
+                      h=14,w=14,ph=16,pw=16,c=3)
+assert torch.allclose(img, img_recon)
 ```
+
+**🧐 Pattern language** ([Rogozhnikov 2022] 📚) → self‑documenting shape transforms: no more `x.view(b, -1, h*w)` guesswork. Rearrange is free if the pattern is stride‑compatible; reduce lowers to efficient kernels (`mean`, `max`, custom lambda). Works across PyTorch/JAX/TF.
 
 ---
 
-### 5. FLOPs Accounting
-
-Matrix multiplication FLOPs (floating point operations) formula:
-
-\[
-\text{FLOPs} = 2 \times m \times k \times n
-\]
+## 5 · FLOPs Accounting
 
 ```python
-def matmul_flops(m, k, n):
-    return 2 * m * k * n  # forward
+"""flops_mix.py"""
+from math import prod
 
-def matmul_bwd_flops(m, k, n):
-    return 6 * m * k * n  # backward ≈ 3× forward
+def attn_flops(seq, dim):
+    # QK^T (2)*S*H*D   +  softmax (S^2)  +  AV  (2)*S*H*D
+    return 4*seq*seq*dim + seq*seq          # ignore bias, LN
 
-M, K, N = 1024, 1024, 4096
-print(f"Forward:  {(matmul_flops(M, K, N)/1e9):6.2f} GFLOPs")
-print(f"Backward: {(matmul_bwd_flops(M, K, N)/1e9):6.2f} GFLOPs")
+seq, dim = 2048, 128
+print(f"Self‑attention ≈ {attn_flops(seq,dim)/1e9:.2f}\u202fGFLOPs")
 ```
+
+**🧐 What counts?**
+Rule of thumb: GEMM ≈ 2 mnk, Conv ≈ 2 C_in C_out K² HW, Attention ≈ 4 S² D. Bias add, ReLU, LayerNorm each <1 % FLOPs for LLMs, yet can dominate **latency** if memory‑bound. FLOPs=scalar multiply‑adds; hardware vendors love quoting TFLOPs/s peak — your kernel mix rarely exceeds 60 % of that.
 
 ---
 
-### 6. MFU (Model FLOP Utilisation)
-
-Model FLOPs Utilization (MFU) measures actual performance relative to hardware peak.
+## 6 · Model FLOP Utilisation (MFU)
 
 ```python
-import time, torch
+"""mfu.py"""
+import torch, time
+from itertools import repeat
 
-def peak_flops(device):
-    p = torch.cuda.get_device_properties(device)
-    return 2 * p.multi_processor_count * p.clock_rate * 1e6 * \
-           p.max_threads_per_multi_processor  # FP32 MACs / s
-
-def mfu_demo(m=1024, k=1024, n=4096):
+def mfu(layer, reps=10):
     if not torch.cuda.is_available():
-        print("CUDA not available – skipping MFU.")
-        return
-    device = torch.device("cuda")
-    A, B = torch.randn(m, k, device=device), torch.randn(k, n, device=device)
-    flops = matmul_flops(m, k, n)
-    peak = peak_flops(device)
-
-    torch.cuda.synchronize()
-    t0 = time.perf_counter()
-    _ = A @ B
-    torch.cuda.synchronize()
-    dt = time.perf_counter() - t0
-
-    achieved = flops / dt
-    print(f"MFU = {achieved/peak:5.2%}  ({achieved/1e12:5.2f} TFLOPs)")
-
-mfu_demo()
+        return None
+    layer.cuda().eval(); inp = torch.randn(*layer.input_shape, device="cuda")
+    torch.cuda.synchronize(); t0 = time.perf_counter()
+    for _ in repeat(None, reps): layer(inp)
+    torch.cuda.synchronize(); dt = (time.perf_counter()-t0)/reps
+    return layer.flops / dt / peak_flops(torch.device("cuda"))
 ```
 
-Real-world MFU rarely hits 100% due to memory transfers and pipeline stalls.
+Build a `Layer` wrapper with `.input_shape` and `.flops` to profile each block (attention, MLP, LayerNorm) and spot under‑utilised outliers. **Roofline analysis**: if MFU ≪ 1 *and* dram_bw_util ≈ 1 → memory‑bound; otherwise launch‑bound.
 
-
-### 7. Xavier (Glorot) Initialisation
-
-Xavier initialization maintains activation variance to stabilize learning.
-
-```python
-import math
-
-def xavier_uniform_(tensor):
-    fan_in, fan_out = tensor.size(1), tensor.size(0)
-    limit = math.sqrt(6.0 / (fan_in + fan_out))
-    return torch.nn.init.uniform_(tensor, -limit, limit)
-
-linear = torch.nn.Linear(784, 256)
-xavier_uniform_(linear.weight)
-print("Xavier initialized weights std:", linear.weight.std())
-```
+Tools: `nsys profile`, `nvbench  –metrics achieved_occupancy`.
 
 ---
 
-Stay tuned for more notes!
+## 7 · Xavier / He Initialisation
+
+```python
+"""init_variance.py"""
+import torch, math
+
+def fan(t): return t.size(1), t.size(0)  # (fan_in, fan_out)
+
+def glorot(t):
+    fi, fo = fan(t); u = math.sqrt(6/(fi+fo));
+    return torch.nn.init.uniform_(t, -u, u)
+
+def kaiming(t):
+    fi, _ = fan(t); std = math.sqrt(2/fi); return torch.nn.init.normal_(t, 0, std)
+
+w = torch.empty(256,512); glorot(w); print("Glorot std", w.std().item())
+```
+
+**🧐 Variance hygiene**
+Glorot assumes `tanh` activations → keep var constant fwd & bwd. He adjusts variance ×2 for ReLU’s half‑sparsity. Transformer blocks often use **scaled residuals** (e.g., `0.1 * x + f(x)`) + *μP* parameterisation to decouple width/depth (see *OpenAI μP cookbook* 2023).
+
+**⏱️ When it matters:** matters chiefly for *very deep* networks (>200 layers) or exotic dtypes (FP8). After a few optimizer steps the spectrum is optimiser‑ruled.
+
+--------
+
