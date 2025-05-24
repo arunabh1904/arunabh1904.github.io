@@ -1,21 +1,13 @@
 <!-- _layouts/post.html -->
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
   <head>
     {% include head.html %}
     <link rel="stylesheet" href="/css/override.css">
     <!-- override.css is where you can define custom styling -->
   </head>
   <body{% if page.editor_theme %} class="editor-theme"{% endif %}>
-    <!-- Dark/Light Toggle Button -->
-    <button
-      type="button"
-      id="theme-toggle"
-      class="small-rounded-button"
-      aria-label="Toggle theme"
-    >
-      <i class="fas fa-sun"></i>
-    </button>
+
 
     <!-- Button to Go Back/Home with an arrow -->
     <button type="button" id="home-button" class="small-rounded-button">
@@ -32,43 +24,13 @@
       {{ content }}
     </main>
 
-    <script>
-      const STORAGE_KEY = 'theme';
-      const toggleButton = document.getElementById('theme-toggle');
-      const html = document.documentElement;
-
-      function applySavedTheme() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved === 'light' || saved === 'dark') {
-          html.setAttribute('data-theme', saved);
-        }
-      }
-
-      function updateToggleIcon() {
-        if (html.getAttribute('data-theme') === 'dark') {
-          toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
-        } else {
-          toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
-        }
-      }
-
-      applySavedTheme();
-      updateToggleIcon();
-
-      toggleButton.addEventListener('click', () => {
-        const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        html.setAttribute('data-theme', newTheme);
-        localStorage.setItem(STORAGE_KEY, newTheme);
-        updateToggleIcon();
-      });
-
-      // Go Home
-      const homeButton = document.getElementById('home-button');
-      homeButton.addEventListener('click', () => {
-        window.location.href = '/';
-      });
-
-    </script>
-      <script src="/assets/js/music-launcher.js"></script>
+  <script>
+    // Go Home
+    const homeButton = document.getElementById('home-button');
+    homeButton.addEventListener('click', () => {
+      window.location.href = '/';
+    });
+  </script>
+  <script src="/assets/js/music-launcher.js"></script>
     </body>
   </html>

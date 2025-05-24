@@ -3,8 +3,8 @@
    ------------------------------------------------------ */
 :root {
   --background-color: #ffffff;
-  --text-color: #000000;
-  --icon-color: #000000;
+  --text-color: #32cd32;
+  --icon-color: #32cd32;
   --bg-overlay-start: rgba(255,255,255,0.4);
   --bg-overlay-end: rgba(255,255,255,0.8);
   --table-border-color: #cccccc;
@@ -126,19 +126,6 @@ code {
   height: 100vh; /* Full viewport height; adjusts automatically with background-size: cover */
 }
 
-/* Position buttons on the top right, spaced out */
-#theme-toggle {
-  top: 10px;
-  right: 120px; /* Offset so it doesn't overlap the home button */
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  line-height: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 29px;
-}
 
 #home-button {
   top: 10px;
