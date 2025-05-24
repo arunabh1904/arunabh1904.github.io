@@ -14,10 +14,18 @@
         ),
         url('/assets/images/shootingstar.jpg') center/cover fixed;
       min-height: 100vh;
-      color: #fff; /* White text by default */
+      color: var(--text-color);
       font-family: sans-serif;
     "
   >
+    <button
+      type="button"
+      id="theme-toggle"
+      class="small-rounded-button"
+      aria-label="Toggle theme"
+    >
+      <i class="fas fa-sun"></i>
+    </button>
     <button
       type="button"
       id="music-button"
@@ -42,20 +50,7 @@
     </div>
 
     <!-- CONTACT PANEL pinned at bottom-right -->
-    <div
-      style="
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: rgba(0,0,0,0.7);
-        color: #fff;
-        padding: 1rem;
-        border-radius: 8px;
-        width: 220px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      "
-      class="links-panel"
-    >
+    <div class="links-panel">
       <h2 style="margin-top: 0; font-size: 1.2rem;">Contact Me</h2>
       <ul class="link-list" style="list-style: none; margin: 0; padding: 0;">
         <!-- Email -->
@@ -80,6 +75,36 @@
         </li>
       </ul>
     </div>
+    <script>
+      const STORAGE_KEY = 'theme';
+      const toggleButton = document.getElementById('theme-toggle');
+      const html = document.documentElement;
+
+      function applySavedTheme() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved === 'light' || saved === 'dark') {
+          html.setAttribute('data-theme', saved);
+        }
+      }
+
+      function updateToggleIcon() {
+        if (html.getAttribute('data-theme') === 'dark') {
+          toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+          toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+      }
+
+      applySavedTheme();
+      updateToggleIcon();
+
+      toggleButton.addEventListener('click', () => {
+        const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem(STORAGE_KEY, newTheme);
+        updateToggleIcon();
+      });
+    </script>
     <script src="/assets/js/music-launcher.js"></script>
   </body>
 </html>
