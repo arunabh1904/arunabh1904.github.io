@@ -31,3 +31,13 @@ title: Python Playground
 
 <p>Use <code>uv</code> locally to install additional packages and create a custom environment before bundling it with Pyodide.</p>
 
+
+## Custom packages
+
+Use [uv](https://github.com/astral-sh/uv) to add modules before bundling Pyodide:
+
+```bash
+uv pip install numpy pandas --target pyodide
+```
+
+Copy the `pyodide` directory into `assets/` so Pyodide can load the installed packages.
