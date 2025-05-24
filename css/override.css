@@ -355,7 +355,7 @@ img {
 
 /* All <a> tags: light blue by default, no underline */
 a {
-  color: #87CEFA;          /* light blue */
+  color: #7AB9E1;          /* slightly darker light blue */
   text-decoration: none;
 }
 
@@ -366,7 +366,7 @@ a:hover {
 }
 
 a:visited {
-  color: #87CEFA !important; /* Same light blue as unvisited */
+  color: #7AB9E1 !important; /* Same light blue as unvisited */
   text-decoration: none;
 }
 
