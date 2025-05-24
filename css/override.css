@@ -160,8 +160,17 @@ img {
   75% { transform: translateX(2px); }
 }
 
+@keyframes vibeColor {
+  0%, 100% {
+    background: linear-gradient(135deg, #003366, #001a33);
+  }
+  50% {
+    background: linear-gradient(135deg, #004080, #001a66);
+  }
+}
+
 .vibe {
-  animation: vibe 0.2s linear infinite;
+  animation: vibe 0.2s linear infinite, vibeColor 3s ease-in-out infinite;
 }
 #music-button i {
   margin-right: 6px;
