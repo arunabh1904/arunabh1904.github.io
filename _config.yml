@@ -17,6 +17,7 @@ plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
+  - jekyll-paginate
 
 # Remove or comment out if you don't want H1 headings to become page titles:
 # titles_from_headings:
@@ -26,7 +27,7 @@ plugins:
 defaults:
   - scope:
       path: ""
-      type: post
+      type: posts
     values:
       layout: post
       tags: Other
