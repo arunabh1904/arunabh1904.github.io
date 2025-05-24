@@ -349,6 +349,16 @@ img {
   color: var(--icon-color);
 }
 
+/* Links inside the pinned panel */
+.links-panel a {
+  color: var(--text-color);
+}
+
+.links-panel a:hover,
+.links-panel a:visited {
+  color: var(--text-color);
+}
+
 /* ------------------------------------------------------
    5) GLOBAL LINK STYLING (Site-wide)
    ------------------------------------------------------ */
