@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/css/override.css">
     <!-- override.css is where you can define custom styling -->
   </head>
-  <body>
+  <body{% if page.editor_theme %} class="editor-theme"{% endif %}>
     <!-- Dark/Light Toggle Button -->
     <button
       type="button"

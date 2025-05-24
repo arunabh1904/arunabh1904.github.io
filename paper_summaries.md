@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Paper Summaries
+editor_theme: true
 ---
 
 <ul>
