@@ -5,8 +5,8 @@
   --background-color: #ffffff;
   --text-color: #32cd32;
   --icon-color: #32cd32;
-  --bg-overlay-start: rgba(255,255,255,0.4);
-  --bg-overlay-end: rgba(255,255,255,0.8);
+  --bg-overlay-start: rgba(0, 0, 0, 0.6);
+  --bg-overlay-end: rgba(0, 20, 40, 0.9);
   --table-border-color: #cccccc;
   --table-header-bg: #f5f5f5;
   --table-row-bg-even: #fafafa;
@@ -33,8 +33,8 @@
   --music-bg-end: #7c3aed;
   --music-vibe-start: #e879f9;
   --music-vibe-end: #a78bfa;
-  --bg-overlay-start: rgba(0,0,0,0.4);
-  --bg-overlay-end: rgba(0,0,0,0.8);
+  --bg-overlay-start: rgba(0, 0, 0, 0.7);
+  --bg-overlay-end: rgba(0, 20, 40, 0.95);
 }
 
 html {
@@ -51,6 +51,12 @@ body {
 .lead {
   line-height: 1.6;
   letter-spacing: 0.02em;
+}
+
+.intro-text {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  text-align: justify;
 }
 
 .icon-list {
