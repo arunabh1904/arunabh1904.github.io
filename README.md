@@ -24,11 +24,14 @@ Posts use the default layout `post` and are automatically tagged via the configu
 - `_includes/` – Partial templates. `head.html` loads Font Awesome icons and Highlight.js for code syntax highlighting. `navlinks.html` and `sharelinks.html` provide previous/next navigation and social-sharing buttons respectively.
 - `css/override.css` – Custom styles, including variables for dark/light themes, styling for buttons, and a pinned links panel.
 - `index.html` – Home page content listing posts from two categories ("My Journey So Far" and "ML Deep research reports").
+- `paper_summaries.md` – Landing page for research paper notes, linking to pages organized by year and by field.
+- `music.html` – A pop-up music player launched via `assets/js/music.js` and `music-launcher.js`.
 - `archive.md` – Generates an archive of posts grouped by tag.
-- `_posts/` – Blog posts written in Markdown with front matter specifying layout, title, date and categories.
+- `_posts/` – Blog posts written in Markdown with front matter specifying layout, title, date and categories. Recent posts also include a "Revision Notes" section.
 
 Assets such as images are stored in `assets/images/`.
 PDFs can be added to `assets/pdfs/` and will appear in the ML Deep research reports section.
+Scripts such as the music player live in `assets/js/`.
 
 ## Getting Started
 
