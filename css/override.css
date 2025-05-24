@@ -116,54 +116,6 @@ img {
   justify-content: center;
 }
 
-/* ------------------------------------------------------
-   2a) CODE BLOCKS
-   ------------------------------------------------------ */
-pre,
-code {
-  background-color: var(--code-bg-color);
-  color: var(--code-text-color);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-family: "JetBrains Mono", monospace;
-}
-
-.code-block {
-  background-color: var(--code-bg-color);
-  color: var(--code-text-color);
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  font-family: "JetBrains Mono", monospace;
-  overflow-x: auto;
-}
-
-.code-block code {
-  background: none;
-  color: inherit;
-  padding: 0;
-}
-
-/* Rouge-generated code blocks */
-.highlight {
-  background-color: var(--code-bg-color);
-  color: var(--code-text-color);
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  overflow-x: auto;
-}
-
-.highlight pre {
-  background: none;
-  color: inherit;
-  margin: 0;
-  padding: 0;
-}
-
-.highlight code {
-  background: none;
-  color: inherit;
-  padding: 0;
-}
 
 /* 2) Small rounded button styling */
 .small-rounded-button {

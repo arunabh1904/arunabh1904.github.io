@@ -1,0 +1,17 @@
+/* _sass/_code.scss  — the one true place for code-block styling  */
+pre.highlight,
+.code-block {
+  background: #0d1117;   /* dark GitHub theme */
+  color: #c9d1d9;
+  padding: 1rem;
+  border-radius: .5rem;
+  overflow-x: auto;
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+/* Optional tweaks */
+pre.highlight code,
+.code-block code { background: none; }
+
+/* If you want line numbers later, add them here once. */
