@@ -69,6 +69,36 @@
       });
 
     </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        function linkify(headerId) {
+          const header = document.getElementById(headerId);
+          if (!header) return;
+          const list = header.nextElementSibling;
+          if (!list || !(list.tagName === 'OL' || list.tagName === 'UL')) return;
+          if (list.querySelector('a')) return;
+
+          const items = Array.from(list.children);
+          const targets = [];
+          let el = list.nextElementSibling;
+          while (el) {
+            if (/^H[1-6]$/.test(el.tagName)) targets.push(el);
+            if (targets.length === items.length) break;
+            el = el.nextElementSibling;
+          }
+
+          items.forEach((li, i) => {
+            const target = targets[i];
+            if (!target) return;
+            const text = li.textContent.trim();
+            li.innerHTML = `<a href="#${target.id}">${text}</a>`;
+          });
+        }
+
+        linkify('lecture-outline');
+        linkify('table-of-contents');
+      });
+    </script>
       <script src="/assets/js/music-launcher.js"></script>
     </body>
   </html>
