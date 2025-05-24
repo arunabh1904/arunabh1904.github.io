@@ -13,7 +13,7 @@
       aria-label="Toggle theme"
       style="top:10px; right:10px; position:absolute;"
     >
-      <i class="fas fa-moon"></i>
+      <i class="fas fa-moon moon-icon"></i>
     </button>
     <div id="music-widget">
       <div class="music-controls">
@@ -41,9 +41,9 @@
 
       function updateToggleIcon() {
         if (html.getAttribute('data-theme') === 'dark') {
-          toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+          toggleButton.innerHTML = '<i class="fas fa-sun sun-icon"></i>';
         } else {
-          toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
+          toggleButton.innerHTML = '<i class="fas fa-moon moon-icon"></i>';
         }
       }
 
