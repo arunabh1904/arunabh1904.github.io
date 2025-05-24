@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: content
 title: "Attention Is All You Need"
 date: 2017-06-01 00:00:00 -0400
 categories: ["Paper Shorts"]

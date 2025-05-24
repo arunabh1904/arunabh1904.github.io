@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
   <head>
-    {% include head.html %}          {#-- existing meta/SEO/fonts etc. --#}
-    {% include code-assets.html %}   {#-- 1-liner pulls in the code bundle --#}
+    {% include head.html %}
+    {% include code-assets.html %}
   </head>
-
   <body>
-    <button
-      type="button"
-      id="theme-toggle"
-      class="small-rounded-button"
-      aria-label="Toggle theme"
-    >
+    <button type="button" id="theme-toggle" class="small-rounded-button" aria-label="Toggle theme">
       <i class="fas fa-moon moon-icon"></i>
     </button>
-    <main class="page-content" aria-label="Content">
+    <button type="button" id="home-button" class="small-rounded-button">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <button type="button" id="music-button" class="small-rounded-button">
+      <i class="fas fa-music"></i>
+      Play some music while browsing...
+    </button>
+    <div id="music-bar"></div>
+    <main class="page-content" style="max-width:800px; margin:2rem auto;" aria-label="Content">
       {{ content }}
     </main>
     <script>
@@ -46,6 +48,12 @@
         localStorage.setItem(STORAGE_KEY, newTheme);
         updateToggleIcon();
       });
+
+      const homeButton = document.getElementById('home-button');
+      homeButton.addEventListener('click', () => {
+        window.location.href = '/';
+      });
     </script>
+    <script src="/assets/js/music-launcher.js"></script>
   </body>
 </html>

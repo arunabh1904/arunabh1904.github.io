@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: content
 title: "Generative Adversarial Networks"
 date: 2014-06-01 00:00:00 -0400
 categories: ["Paper Shorts"]

@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: content
 title: "Playing Atari with Deep Reinforcement Learning"
 date: 2013-12-01 00:00:00 -0500
 categories: ["Paper Shorts"]

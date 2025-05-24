@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: content
 title: "Percy Liang's CS336 - Revision Notes"
 date: 2025-04-01 00:00:00 -0400
 categories: ["Revision Notes"]
