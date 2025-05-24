@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: content
 title: "My Journey So Far - The Full Story"
 date: 2025-02-08 00:00:00 -0500
 categories: ["My Journey So Far"]
