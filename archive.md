@@ -1,7 +1,6 @@
 ---
 layout: page
 title: Blog Archive
-editor_theme: false
 ---
 
 {% for tag in site.tags %}
