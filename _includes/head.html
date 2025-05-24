@@ -1,13 +1,5 @@
 <!-- Default theme CSS (Minima, etc.) -->
 <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}" />
-<script>
-  (function () {
-    var saved = localStorage.getItem('theme');
-    if (saved === 'light' || saved === 'dark') {
-      document.documentElement.setAttribute('data-theme', saved);
-    }
-  })();
-</script>
 
 <!-- Feeds -->
 {% feed_meta %}
@@ -42,6 +34,4 @@
 {% if page.editor_theme %}
 <link rel="stylesheet" href="/css/editor-theme.css" />
 {% endif %}
-{% if page.layout == "editor" %}
-<link rel="stylesheet" href="{{ "/assets/css/editor-code.css" | relative_url }}">
-{% endif %}
+
