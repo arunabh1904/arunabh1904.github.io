@@ -1,0 +1,13 @@
+body.editor-theme {
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  font-family: "Courier New", Courier, monospace;
+}
+body.editor-theme a {
+  color: #569cd6;
+}
+body.editor-theme pre,
+body.editor-theme code {
+  background-color: #252526;
+  color: #d4d4d4;
+}

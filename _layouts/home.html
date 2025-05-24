@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   {% include head.html %}
-  <body
+  <body{% if page.editor_theme %} class="editor-theme"{% endif %}
     style="
       margin: 0;
       padding: 0;

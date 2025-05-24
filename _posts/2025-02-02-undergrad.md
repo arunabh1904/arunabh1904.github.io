@@ -3,6 +3,7 @@ layout: post
 title: "Undergrad at MIT, Manipal"
 date: 2025-02-02 00:00:00 -0500
 categories: ["My Journey So Far"]
+editor_theme: false
 ---
 
 # Undergrad at MIT, Manipal

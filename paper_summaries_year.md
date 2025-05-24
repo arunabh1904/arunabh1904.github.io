@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Paper Summaries by Year
+editor_theme: true
 ---
 
 {% assign paper_posts = site.categories["Paper Shorts"] %}

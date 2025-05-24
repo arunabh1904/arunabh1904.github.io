@@ -30,6 +30,7 @@ defaults:
     values:
       layout: post
       tags: Other
+      editor_theme: true
 
 exclude:
   - Gemfile

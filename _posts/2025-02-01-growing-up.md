@@ -3,6 +3,7 @@ layout: post
 title: "Introduction"
 date: 2025-02-01 00:00:00 -0500
 categories: ["My Journey So Far"]
+editor_theme: false
 ---
 
 ## Introduction
