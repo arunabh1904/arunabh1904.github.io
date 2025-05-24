@@ -3,7 +3,6 @@ layout: post
 title: "My Journey So Far - The Full Story"
 date: 2025-02-09 00:00:00 -0500
 categories: ["My Journey So Far"]
-editor_theme: false
 ---
 
 # My Journey So Far - The Full Story
