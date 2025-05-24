@@ -6,8 +6,13 @@
       margin: 0;
       padding: 0;
       /* Full-page background (shooting star) */
-      background: url('/assets/images/shootingstar.jpg') no-repeat center center;
-      background-size: cover;
+      background:
+        radial-gradient(
+          circle at 30% 30%,
+          rgba(0,0,0,.4) 0%,
+          rgba(0,0,0,.8) 70%
+        ),
+        url('/assets/images/shootingstar.jpg') center/cover fixed;
       min-height: 100vh;
       color: #fff; /* White text by default */
       font-family: sans-serif;
