@@ -129,6 +129,28 @@ code {
   padding: 0;
 }
 
+/* Rouge-generated code blocks */
+.highlight {
+  background-color: var(--code-bg-color);
+  color: var(--code-text-color);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.highlight pre {
+  background: none;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.highlight code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
 /* 2) Small rounded button styling */
 .small-rounded-button {
   position: absolute;
