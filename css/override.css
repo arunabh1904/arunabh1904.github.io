@@ -2,9 +2,9 @@
    1) BUTTONS
    ------------------------------------------------------ */
 :root {
-  --background-color: #ffffff;
-  --text-color: #32cd32;
-  --icon-color: #32cd32;
+  --background-color: #f0ead6;
+  --text-color: #000080;
+  --icon-color: #000080;
   --bg-overlay-start: rgba(0, 0, 0, 0.6);
   --bg-overlay-end: rgba(0, 20, 40, 0.9);
   --table-border-color: #cccccc;
@@ -13,6 +13,7 @@
   --image-border-color: #000000;
   --code-bg-color: #f5f5f5;
   --code-text-color: #000000;
+  --panel-bg: rgba(0, 0, 0, 0.8);
   --music-bg-start: #3b82f6;
   --music-bg-end: #0ea5e9;
   --music-vibe-start: #60a5fa;
@@ -20,19 +21,20 @@
 }
 
 :root[data-theme="light"] {
-  --background-color: #ffffff;
-  --text-color: #00008b;
-  --icon-color: #00008b;
-  --table-border-color: #00008b;
+  --background-color: #f0ead6;
+  --text-color: #000080;
+  --icon-color: #000080;
+  --table-border-color: #000080;
   --table-header-bg: #f5f5f5;
   --table-row-bg-even: #fafafa;
-  --image-border-color: #00008b;
+  --image-border-color: #000080;
   --code-bg-color: #f5f5f5;
-  --code-text-color: #00008b;
+  --code-text-color: #000080;
+  --panel-bg: rgba(255, 255, 255, 0.8);
 }
 
 :root[data-theme="dark"] {
-  --background-color: #111111;
+  --background-color: #000000;
   --text-color: #32cd32;
   --icon-color: #32cd32;
   --table-border-color: #32cd32;
@@ -47,6 +49,7 @@
   --music-vibe-end: #a78bfa;
   --bg-overlay-start: rgba(0, 0, 0, 0.7);
   --bg-overlay-end: rgba(0, 20, 40, 0.95);
+  --panel-bg: rgba(0, 0, 0, 0.8);
 }
 
 html {

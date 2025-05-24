@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
   {% include head.html %}
   <body
     style="
@@ -18,14 +18,6 @@
       font-family: sans-serif;
     "
   >
-    <button
-      type="button"
-      id="theme-toggle"
-      class="small-rounded-button"
-      aria-label="Toggle theme"
-    >
-      <i class="fas fa-moon"></i>
-    </button>
     <button
       type="button"
       id="music-button"
@@ -75,37 +67,6 @@
         </li>
       </ul>
     </div>
-    <script>
-      const STORAGE_KEY = 'theme';
-      const toggleButton = document.getElementById('theme-toggle');
-      const html = document.documentElement;
-
-      function applySavedTheme() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved === 'light' || saved === 'dark') {
-          html.setAttribute('data-theme', saved);
-        }
-      }
-
-      function updateToggleIcon() {
-        if (html.getAttribute('data-theme') === 'dark') {
-          toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
-        } else {
-          toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
-        }
-      }
-
-      applySavedTheme();
-      updateToggleIcon();
-
-      toggleButton.addEventListener('click', () => {
-        const newTheme =
-          html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        html.setAttribute('data-theme', newTheme);
-        localStorage.setItem(STORAGE_KEY, newTheme);
-        updateToggleIcon();
-      });
-    </script>
     <script src="/assets/js/music-launcher.js"></script>
   </body>
 </html>
