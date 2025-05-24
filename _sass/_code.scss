@@ -1,8 +1,8 @@
 /* _sass/_code.scss  — the one true place for code-block styling  */
 pre.highlight,
 .code-block {
-  background: #0d1117;   /* dark GitHub theme */
-  color: #c9d1d9;
+  background: var(--code-bg-color);
+  color: var(--code-text-color);
   padding: 1rem;
   border-radius: .5rem;
   overflow-x: auto;
