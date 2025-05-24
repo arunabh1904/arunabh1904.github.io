@@ -465,3 +465,12 @@ tr:nth-child(even) td {
   overflow-x: auto;
 }
 
+/* Icons for the theme toggle button */
+.sun-icon {
+  color: #ffcc00;
+}
+
+.moon-icon {
+  color: #4b5563;
+}
+
