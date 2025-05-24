@@ -91,6 +91,20 @@ img {
   border: 2px solid var(--image-border-color);
 }
 
+.float-right {
+  float: right;
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+  max-width: 45%;
+}
+
+.float-left {
+  float: left;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+  max-width: 45%;
+}
+
 .music-page {
   background: radial-gradient(circle at top left, #3a1c71, #1e1e1e);
   color: #eee;
