@@ -30,7 +30,7 @@ In a bit of a comical twist, we accidentally broke the robot just before filming
 
 Nevertheless, it was a really cool concept, and a similar design is now in production, saving lives and helping farmers harvest much more safely. This is what robotics is all about - making people's lives safer and more efficient.
 
-<img src="/assets/images/IMG_8842.jpg" alt="Areca Nut Robot" class="float-right">
+<img src="/assets/images/IMG_8842.jpg" alt="Areca Nut Robot" class="float-right" style="max-width:65%;">
 
 ### Takeaways
 - **It's never too late to start.**
@@ -47,7 +47,7 @@ After graduation, I had my heart set on pursuing a master's degree in Germany. T
 
 A month later, I was anxiously waiting for the results. Then, I received an email from my safe school. I opened it, expecting good news, only to read that I was being rejected for missing documents. To my horror, I realized I had accidentally sent the documents meant for the safe school to another university. Slowly, the rejection emails from all five universities trickled in, and the reality set in - I wasn't going to Germany.
 
-<img src="/assets/images/tuhh.png" alt="Germany Rejection" class="float-left">
+<img src="/assets/images/tuhh.png" alt="Germany Rejection" class="float-left" style="max-width:65%;">
 
 I was devastated, and it plunged me into a deep depression. For about nine months, my life became a bleak cycle: I'd get up, barely eat, play DOTA 2 in a dark room for 12 hours, smoke heavily, and then go back to sleep, only to repeat the same routine the next day. It was a dark time.
 
@@ -72,11 +72,11 @@ Before the start of the semester, I looked for on-campus opportunities to become
 
 In my second semester, I joined Dr. Petruska's lab as a research assistant. Initially, I worked on a project involving magnetic manipulation, but I quickly realized it wasn't something I was passionate about, and my lack of progress reflected that. In my free time, I spent countless hours tinkering with the Husky robot in the lab, even writing my own ROS packages to make it move. Dr. Petruska noticed my interest and transitioned me to that project. That change made all the difference. The lab became my second home, and I spent more time there than at my apartment. I focused on learning the basics and building a solid foundation in C++ programming and ROS. Curiosity was key. One funny story I remember is when we short-circuited the entire onboard compute stack and spent a couple of weeks putting it back together from scratch. It was a lot of fun and a great learning experience.
 
-<img src="/assets/images/me_in_lab.jpeg" alt="Me in Lab" class="float-right">
+<img src="/assets/images/me_in_lab.jpeg" alt="Me in Lab" class="float-right" style="max-width:65%;">
 
 The third semester at CSM was a turning point in my career. I spent a lot of time conducting independent research, programming the Husky robot for autonomous navigation in GPS-denied environments using optimal control strategies. My research collaborators and I spent countless hours covering the whiteboards in the lab with equations, then implementing them in code late into the night. I also took several robotics courses to supplement my research through projects. I got my first taste of machine learning, hand-coding backpropagation from scratch. I still remember the thrill when the loss decreased for the first time - it was exhilarating. I also built a hexapod robot and implemented SLAM using a 1D LiDAR and a basic Pixy camera. All of this gave me a solid understanding of the components needed for an autonomous robot: building a map, localizing based on that map, perceiving the environment in real time, and planning to reach the goal without collisions. Eventually, we deployed the robot inside CSM's Edgar Mine, achieving GPS-denied autonomous navigation using the MPC we developed. It was freezing inside the mine, but it was incredibly rewarding to see the robot navigate without running into things.
 
-<img src="/assets/images/hexy.jpg" alt="Hexapod Robot" class="float-left">
+<img src="/assets/images/hexy.jpg" alt="Hexapod Robot" class="float-left" style="max-width:65%;">
 
 Looking back, what worked for me was focusing on building a strong foundation in the skills I was passionate about and actively seeking out opportunities to apply those skills in practical situations. Grad school isn’t just about getting good grades - it’s about the projects you take on, the challenges you solve, and the connections you make. For students in grad school now, my advice is to take on projects that challenge you, use the resources around you (labs, professors, peers), and focus on what really excites you. That’s how you’ll make progress and open doors in the industry.
 
