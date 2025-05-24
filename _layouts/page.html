@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include head.html %}          {#-- existing meta/SEO/fonts etc. --#}
+    {% include code-assets.html %}   {#-- 1-liner pulls in the code bundle --#}
+  </head>
+
+  <body>
+    <main class="page-content" aria-label="Content">
+      {{ content }}
+    </main>
+  </body>
+</html>
