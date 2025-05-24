@@ -33,9 +33,16 @@
     </main>
 
     <script>
-      // Toggle Theme
+      const STORAGE_KEY = 'theme';
       const toggleButton = document.getElementById('theme-toggle');
       const html = document.documentElement;
+
+      function applySavedTheme() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved === 'light' || saved === 'dark') {
+          html.setAttribute('data-theme', saved);
+        }
+      }
 
       function updateToggleIcon() {
         if (html.getAttribute('data-theme') === 'dark') {
@@ -45,14 +52,13 @@
         }
       }
 
+      applySavedTheme();
       updateToggleIcon();
 
       toggleButton.addEventListener('click', () => {
-        if (html.getAttribute('data-theme') === 'dark') {
-          html.setAttribute('data-theme', 'light');
-        } else {
-          html.setAttribute('data-theme', 'dark');
-        }
+        const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem(STORAGE_KEY, newTheme);
         updateToggleIcon();
       });
 
