@@ -3,9 +3,14 @@ function initMusicLauncher() {
   const musicBar = document.getElementById('music-bar');
   if (!musicButton) return;
 
-  function startTimer() {
+  const HIDDEN_KEY = 'musicButtonHidden';
+  const SEEN_KEY = 'musicButtonSeen';
+
+  function startTimer(isFirst) {
     clearTimeout(musicButton.hideTimeout);
     clearTimeout(musicButton.vibeTimeout);
+
+    localStorage.setItem(HIDDEN_KEY, 'false');
 
     musicButton.style.display = 'block';
     if (musicBar) musicBar.style.display = 'none';
@@ -14,11 +19,14 @@ function initMusicLauncher() {
       musicButton.classList.add('vibe');
     }, 10000);
 
+    const hideDelay = isFirst ? 60000 : 15000;
+
     musicButton.hideTimeout = setTimeout(() => {
       musicButton.classList.remove('vibe');
       musicButton.style.display = 'none';
       if (musicBar) musicBar.style.display = 'block';
-    }, 15000);
+      localStorage.setItem(HIDDEN_KEY, 'true');
+    }, hideDelay);
   }
 
   musicButton.addEventListener('click', () => {
@@ -26,10 +34,20 @@ function initMusicLauncher() {
   });
 
   if (musicBar) {
-    musicBar.addEventListener('click', startTimer);
+    musicBar.addEventListener('click', () => startTimer(false));
   }
 
-  startTimer();
+  const isHidden = localStorage.getItem(HIDDEN_KEY) === 'true';
+  const isFirst = !localStorage.getItem(SEEN_KEY);
+
+  if (isHidden) {
+    musicButton.style.display = 'none';
+    if (musicBar) musicBar.style.display = 'block';
+  } else {
+    startTimer(isFirst);
+  }
+
+  if (isFirst) localStorage.setItem(SEEN_KEY, 'true');
 }
 
 document.addEventListener('DOMContentLoaded', initMusicLauncher);
