@@ -455,6 +455,16 @@ tr:nth-child(even) td {
   overflow-x: auto;
 }
 
+.run-output {
+  background-color: var(--code-bg-color);
+  color: var(--code-text-color);
+  border: 1px solid var(--table-border-color);
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  overflow-x: auto;
+}
+
 /* Icons for the theme toggle button */
 .sun-icon {
   color: #ffcc00;
