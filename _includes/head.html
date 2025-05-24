@@ -34,3 +34,6 @@
 {% if page.editor_theme %}
 <link rel="stylesheet" href="/css/editor-theme.css" />
 {% endif %}
+{% if page.layout == "editor" %}
+<link rel="stylesheet" href="{{ "/assets/css/editor-code.css" | relative_url }}">
+{% endif %}
