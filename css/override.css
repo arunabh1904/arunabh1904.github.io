@@ -8,16 +8,19 @@
   --table-header-bg: #f5f5f5;
   --table-row-bg-even: #fafafa;
   --image-border-color: #000000;
+  --code-bg-color: #f5f5f5;
+  --code-text-color: #000000;
 }
 
 :root[data-theme="dark"] {
-  /* Use a dark gray background rather than pure black */
-  --background-color: #2b2b2b;
-  --text-color: #ffffff;
-  --table-border-color: #ffffff;
-  --table-header-bg: #333333;
-  --table-row-bg-even: #2b2b2b;
-  --image-border-color: #ffffff;
+  --background-color: #000000;
+  --text-color: #ffff00;
+  --table-border-color: #ffff00;
+  --table-header-bg: #111111;
+  --table-row-bg-even: #000000;
+  --image-border-color: #ffff00;
+  --code-bg-color: #111111;
+  --code-text-color: #ffff00;
 }
 
 html {
@@ -64,6 +67,18 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ------------------------------------------------------
+   2a) CODE BLOCKS
+   ------------------------------------------------------ */
+pre,
+code {
+  background-color: var(--code-bg-color);
+  color: var(--code-text-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: "JetBrains Mono", monospace;
 }
 
 /* 2) Small rounded button styling */
