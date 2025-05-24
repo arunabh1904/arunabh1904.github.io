@@ -2,7 +2,7 @@
    1) BUTTONS
    ------------------------------------------------------ */
 :root {
-  --background-color: #f0ead6;
+  --background-color: #f8f8f8;
   --text-color: #000080;
   --icon-color: #000080;
   --bg-overlay-start: rgba(0, 0, 0, 0.6);
@@ -21,7 +21,7 @@
 }
 
 :root[data-theme="light"] {
-  --background-color: #f0ead6;
+  --background-color: #f8f8f8;
   --text-color: #000080;
   --icon-color: #000080;
   --table-border-color: #000080;
