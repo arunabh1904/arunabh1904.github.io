@@ -30,7 +30,7 @@
   --image-border-color: #000080;
   --code-bg-color: #f5f5f5;
   --code-text-color: #000080;
-  --panel-bg: rgba(255, 255, 255, 0.3);
+  --panel-bg: rgba(5, 5, 5, 0.3);
 }
 
 :root[data-theme="dark"] {
