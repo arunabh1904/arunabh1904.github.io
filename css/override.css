@@ -10,6 +10,10 @@
   --image-border-color: #000000;
   --code-bg-color: #f5f5f5;
   --code-text-color: #000000;
+  --music-bg-start: #3b82f6;
+  --music-bg-end: #0ea5e9;
+  --music-vibe-start: #60a5fa;
+  --music-vibe-end: #38bdf8;
 }
 
 :root[data-theme="dark"] {
@@ -21,6 +25,10 @@
   --image-border-color: #ffff00;
   --code-bg-color: #111111;
   --code-text-color: #ffff00;
+  --music-bg-start: #c026d3;
+  --music-bg-end: #7c3aed;
+  --music-vibe-start: #e879f9;
+  --music-vibe-end: #a78bfa;
 }
 
 html {
@@ -146,7 +154,7 @@ code {
   padding: 8px 20px;
   line-height: 1.2;
   white-space: normal;
-  background: linear-gradient(135deg, #003366, #001a33);
+  background: linear-gradient(135deg, var(--music-bg-start), var(--music-bg-end));
   color: #fff;
   font-weight: bold;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
@@ -159,7 +167,7 @@ code {
   left: 0;
   width: 6px;
   height: 50px;
-  background: linear-gradient(135deg, #003366, #001a33);
+  background: linear-gradient(135deg, var(--music-bg-start), var(--music-bg-end));
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
   transition: width 0.2s;
@@ -177,10 +185,10 @@ code {
 
 @keyframes vibeColor {
   0%, 100% {
-    background: linear-gradient(135deg, #003366, #001a33);
+    background: linear-gradient(135deg, var(--music-bg-start), var(--music-bg-end));
   }
   50% {
-    background: linear-gradient(135deg, #004080, #001a66);
+    background: linear-gradient(135deg, var(--music-vibe-start), var(--music-vibe-end));
   }
 }
 
