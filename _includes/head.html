@@ -1,5 +1,6 @@
 <!-- Default theme CSS (Minima, etc.) -->
 <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}" />
+{% unless page.static_theme %}
 <script>
   (function() {
     var saved = localStorage.getItem('theme');
@@ -8,6 +9,7 @@
     }
   })();
 </script>
+{% endunless %}
 
 <!-- Feeds -->
 {% feed_meta %}
