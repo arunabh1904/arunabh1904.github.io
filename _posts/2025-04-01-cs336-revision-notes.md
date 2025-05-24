@@ -26,13 +26,6 @@ Tensor fundamentals, computational efficiency, and key PyTorch concepts.
 7. Xavier (Glorot) Initialisation
 
 ---
-```
-  ____  ____  ___
- / ___||  _ \|_ _|
-| |    | | | || |
-| |___ | |_| || |
- \____||____/|___|
-```
 
 ### 1. Float Types: Which to Use and Why?
 
