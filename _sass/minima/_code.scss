@@ -29,3 +29,12 @@ pre.highlight .copy-btn {
   padding: 0.25rem 0.5rem;
   cursor: pointer;
 }
+
+pre.highlight .run-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 3.5rem;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
