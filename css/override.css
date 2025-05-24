@@ -13,7 +13,7 @@
   --image-border-color: #000000;
   --code-bg-color: #f5f5f5;
   --code-text-color: #000000;
-  --panel-bg: rgba(0, 0, 0, 0.8);
+  --panel-bg: rgba(0, 0, 0, 0.3);
   --music-bg-start: #3b82f6;
   --music-bg-end: #0ea5e9;
   --music-vibe-start: #60a5fa;
@@ -30,7 +30,7 @@
   --image-border-color: #000080;
   --code-bg-color: #f5f5f5;
   --code-text-color: #000080;
-  --panel-bg: rgba(255, 255, 255, 0.8);
+  --panel-bg: rgba(5, 5, 5, 0.3);
 }
 
 :root[data-theme="dark"] {
@@ -49,7 +49,7 @@
   --music-vibe-end: #a78bfa;
   --bg-overlay-start: rgba(0, 0, 0, 0.7);
   --bg-overlay-end: rgba(0, 20, 40, 0.95);
-  --panel-bg: rgba(0, 0, 0, 0.8);
+  --panel-bg: rgba(0, 0, 0, 0.3);
 }
 
 html {
