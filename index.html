@@ -102,7 +102,16 @@ editor_theme: true
   <details>
     <summary><h2>Revision notes</h2></summary>
     <ul style="margin-left: 20px;">
-      <li><a href="/revision%20notes/2025/04/01/cs336-revision-notes.html">Percy Liang's CS336 course at Stanford</a></li>
+      {% assign rev_posts = site.categories["Revision Notes"] %}
+      {% if rev_posts %}
+        {% assign rev_posts = rev_posts | sort: "date" %}
+        {% for post in rev_posts %}
+          <li>
+            <a href="{{ post.url }}">{{ post.title }}</a>
+            <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+          </li>
+        {% endfor %}
+      {% endif %}
     </ul>
   </details>
 </section>
