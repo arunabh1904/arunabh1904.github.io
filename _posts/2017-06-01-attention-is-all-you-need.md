@@ -12,43 +12,52 @@ field: Natural Language Processing
 
 **GitHub:** [tensorflow/tensor2tensor](https://github.com/tensorflow/tensor2tensor) (reference code)
 
-**Project page / blog:** [Google Research 
-overview](https://ai.googleblog.com/2017/08/transformer-novel-neural-network.html)
+**Project page / blog:**
+[Google Research overview](https://ai.googleblog.com/2017/08/transformer-novel-neural-network.html)
 
 **Conference:** NeurIPS 2017
-![Transformer Architecture](/assets/images/attention.png)
 
+The central innovation of Vaswani et al. (pp. 1–2) lies not in inventing a new operation.
+Instead it rejects recurrent and convolutional biases.
+Stacking purely attention-based blocks shortens the path between any two tokens to one step.
+This greatly improves gradient flow and enables massive parallelism,
+allowing eight P100 GPUs to reach 28.4 BLEU on English→German in only 3.5 days.
 
-**Abstract in a nutshell:** The Transformer removes recurrence and convolutions, relying solely on 
-attention to join an encoder and decoder. This allows full parallelisation in training and 
-inference while still modelling long-range dependencies. On WMT 2014 machine translation the "big" 
-version beats the prior single-model state of the art (28.4 BLEU En→De, 41.8 BLEU En→Fr) and 
-trains in 3.5 days on eight GPUs. It also generalises to tasks like English constituency parsing.
+At the heart of the architecture is the scaled attention mechanism
 
-**Novel insights:**
-- All-attention architecture proves sequence transduction does not need recurrence.
-- Multi-head self-attention attends to different positions or representation sub-spaces in parallel.
-- Sinusoidal positional encodings inject order without sequential operations.
-- Training efficiency comes from a constant-length computation path and GPU-friendly operations.
+\[
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V.
+\]
 
-**Evals / latency benchmarks:**
+The scaling by \(\sqrt{d_k}\) stabilises gradients at large hidden dimensions.
+Multi-head attention, typically eight heads with \(d_k = d_v = 64\),
+preserves information that a single head would compress.
 
-| Task / Model | BLEU / F1 | Notes |
-| ------------ | --------- | ----- |
-| WMT 14 En→De (base) | 27.3 BLEU | Comparable to prior SOTA with fewer parameters |
-| WMT 14 En→De (big) | 28.4 BLEU | > 2 BLEU over previous best single models; 3.5 days on 8 GPUs |
-| WMT 14 En→Fr (big) | 41.8 BLEU | New SOTA with same 3.5-day budget |
-| Penn Treebank parsing | 95 F1 | Demonstrates domain transfer beyond MT |
+<img src="/assets/images/attention.png" alt="Transformer" style="max-width:60%;margin:1rem auto;display:block;">
 
-**Critiques & reflections:**
-- **What we liked:** Elegant, conceptually simple architecture with strong empirical gains. Highly 
-parallelisable; huge speed-up over RNNs/CNNs on modern hardware. Spawned a vibrant ecosystem (BERT, 
-GPT, ViT, etc.).
-- **What could be better:** Quadratic memory/compute in sequence length makes very long contexts 
-costly. Needs large datasets; can underperform RNNs on tiny corpora. Original paper limited to 
-\(\leq\) 1k-token contexts, spurring efficient Transformer research.
+### Positional encoding
 
-**Take-away:** By proving that "attention is all you need," this paper redefined sequence 
-modelling, unlocked massive parallelism and laid the groundwork for today's pre-trained foundation 
-models.
+Without recurrence, positional information comes from sinusoidal encodings:
 
+\[
+\begin{aligned}
+\text{PE}(pos, 2i) &= \sin\Bigl(\frac{pos}{10000^{2i/d_{\text{model}}}}\Bigr),\\
+\text{PE}(pos, 2i+1) &= \cos\Bigl(\frac{pos}{10000^{2i/d_{\text{model}}}}\Bigr).
+\end{aligned}
+\]
+
+These fixed oscillations embed relative order and generalise to longer sequences with no extra parameters.
+
+### Efficiency and empirical results
+
+Self-attention offers a constant path length but is quadratic in sequence length.
+For translation tasks this is acceptable, and the design parallelises well on GPUs.
+The "big" model attains 41.0 BLEU on English→French, far exceeding contemporary CNN and RNN baselines.
+
+---
+
+### Ongoing challenges
+
+Memory grows quadratically with sequence length, limiting contexts beyond a few thousand tokens.
+Smaller datasets often still favour RNNs.
+Nevertheless, Transformers now underpin BERT, GPT and Vision Transformers.
