@@ -468,4 +468,8 @@ tr:nth-child(even) td {
   margin: 1rem 0;
   overflow-x: auto;
 }
+.equation-box .katex-display,
+.equation-box .katex {
+  color: var(--equation-text);
+}
 
