@@ -3,15 +3,11 @@ layout: content
 title: Revision Notes
 ---
 
-{% assign rev_posts = site.categories["Revision Notes"] %}
-{% if rev_posts %}
-  {% assign rev_posts = rev_posts | sort: "date" %}
-  <ul class="icon-list">
-  {% for post in rev_posts %}
-    <li>
-      <a href="{{ post.url }}">{{ post.title }}</a>
-      <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-    </li>
-  {% endfor %}
-  </ul>
-{% endif %}
+## CS336: Language Modeling from Scratch
+[Course website](https://stanford-cs336.github.io/spring2025/)
+
+This is probably the best intuition building language modeling course around. I'm sharing notes for each lecture here.
+
+### Lesson 2
+[Lecture 2 notes](/revision%20notes/2025/04/01/cs336-revision-notes.html)
+
