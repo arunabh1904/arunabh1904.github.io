@@ -1,7 +1,7 @@
 ---
 layout: content
 title: "Attention Mechanisms Demystified"
-date: 2025-06-01 00:00:00 -0400
+date: 2025-05-25 00:00:00 -0400
 categories: ["Ponderings"]
 ---
 
