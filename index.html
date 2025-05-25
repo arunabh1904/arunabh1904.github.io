@@ -30,14 +30,34 @@ static_theme: true
   </p>
 </article>
 
-<!-- Section for Paper Summaries -->
+<!-- Section for Arxiv notes -->
   <section class="section">
-    <h2 id="summaries"><a href="/paper_summaries_field.html">Paper Summaries</a></h2>
+    <h2 id="arxiv-notes"><a href="/paper_summaries_field.html">Arxiv notes</a></h2>
+    <p>A collection of paper summaries organized by topic.</p>
+  </section>
+
+  <!-- Section for Ponderings -->
+  <section class="section">
+    <h2 id="ponderings"><a href="/ponderings.html">Ponderings</a></h2>
+    <p>Thoughts on recurring questions.</p>
+    <ul class="icon-list">
+        {% assign ponder_posts = site.categories["Ponderings"] %}
+        {% if ponder_posts %}
+          {% assign ponder_posts = ponder_posts | sort: "date" %}
+          {% for post in ponder_posts %}
+          <li>
+            <a href="{{ post.url }}">{{ post.title }}</a>
+            <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+          </li>
+        {% endfor %}
+        {% endif %}
+    </ul>
   </section>
 
   <!-- Section for Revision notes -->
   <section class="section">
-    <h2 id="revision-notes">Revision notes</h2>
+    <h2 id="revision-notes"><a href="/revision_notes.html">Revision notes</a></h2>
+    <p>Detailed revision notes for discourse. Percy Liang's CS336 lecture notes are <a href="/2025/04/01/cs336-revision-notes.html">here</a>.</p>
     <ul class="icon-list">
         {% assign rev_posts = site.categories["Revision Notes"] %}
         {% if rev_posts %}
@@ -55,7 +75,8 @@ static_theme: true
   <!-- Section for AI generated reports -->
   <section class="section">
     <details>
-      <summary><h2 id="ml-deep">AI generated reports</h2></summary>
+      <summary><h2 id="ml-deep"><a href="/ai_generated_reports.html">AI generated reports</a></h2></summary>
+      <p>Deep research write-ups and notebook LM walk-throughs. Includes VLM deep research.</p>
       <ul class="icon-list">
         {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] %}
         {% if ml_posts %}
@@ -77,3 +98,4 @@ static_theme: true
       </ul>
     </details>
   </section>
+
