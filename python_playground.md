@@ -3,8 +3,11 @@ layout: content
 title: Python Playground
 ---
 
-<p>This page provides a simple browser-based Python interpreter powered by Pyodide.</p>
+This page previously embedded a browser-based Python interpreter. The code
+that powered it is kept below as a commented block for reference.
 
+```html
+<!--
 <div class="py-terminal">
   <textarea id="py-input" placeholder="print('hello, world')"></textarea>
   <button id="py-run" type="button">Run</button>
@@ -28,6 +31,6 @@ title: Python Playground
   }
   main();
 </script>
-
-<p>Use <code>uv</code> locally to install additional packages and create a custom environment before bundling it with Pyodide.</p>
+-->
+```
 
