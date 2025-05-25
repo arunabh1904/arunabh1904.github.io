@@ -73,13 +73,27 @@ body {
   padding-left: 0;
 }
 
-.icon-list li::before {
-  font-family: 'Font Awesome 6 Free';
-  font-weight: 900;
-  content: '\f054';
-  margin-right: 0.5em;
-  color: var(--icon-color);
+/* Style for expandable sections */
+details > summary {
+  list-style: none;
+  cursor: pointer;
 }
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details > summary::before {
+  content: '+';
+  font-weight: bold;
+  margin-right: 0.5em;
+}
+
+details[open] > summary::before {
+  content: '-';
+}
+
+
 
 /* ------------------------------------------------------
    2) IMAGE STYLING
@@ -316,7 +330,7 @@ img {
   bottom: 20px;
   right: 20px;
   background-color: var(--panel-bg);
-  color: var(--text-color);
+  color: #ffffff;
   padding: 1rem;
   border-radius: 8px;
   width: 220px;
@@ -340,17 +354,17 @@ img {
 /* Space between icon and text */
 .link-list li i {
   margin-right: 8px;
-  color: var(--icon-color);
+  color: #ffffff;
 }
 
 /* Links inside the pinned panel */
 .links-panel a {
-  color: var(--text-color);
+  color: #ffffff !important;
 }
 
 .links-panel a:hover,
 .links-panel a:visited {
-  color: var(--text-color);
+  color: #ffffff !important;
 }
 
 /* ------------------------------------------------------
