@@ -23,12 +23,25 @@
       const STORAGE_KEY = 'theme';
       const toggleButton = document.getElementById('theme-toggle');
       const html = document.documentElement;
+      const lightCss = document.getElementById('hljs-theme-light');
+      const darkCss = document.getElementById('hljs-theme-dark');
+
+      function applyHighlightTheme(theme) {
+        if (theme === 'dark') {
+          darkCss.disabled = false;
+          lightCss.disabled = true;
+        } else {
+          darkCss.disabled = true;
+          lightCss.disabled = false;
+        }
+      }
 
       function applySavedTheme() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved === 'light' || saved === 'dark') {
           html.setAttribute('data-theme', saved);
         }
+        applyHighlightTheme(html.getAttribute('data-theme'));
       }
 
       function updateToggleIcon() {
@@ -47,6 +60,7 @@
         html.setAttribute('data-theme', newTheme);
         localStorage.setItem(STORAGE_KEY, newTheme);
         updateToggleIcon();
+        applyHighlightTheme(newTheme);
       });
 
       const homeButton = document.getElementById('home-button');
