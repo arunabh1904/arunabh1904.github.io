@@ -16,7 +16,7 @@ a course on large language models taught by Percy Liang at Stanford.
 
 ---
 
-## Quick Overview (what you will learn in ~15\u202fmin)
+## Quick Overview 
 
 1. **Set-up & dtype benchmarking** – install PyTorch with the ultra-fast `uv` installer, sanity-check CUDA, and time core tensor ops across dtypes.
 2. **Numerical formats in practice** – when to reach for `bfloat16`, why `float16` needs loss-scaling, and why FP8 is inference-only (today).
