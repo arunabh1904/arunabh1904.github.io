@@ -16,7 +16,9 @@ a course on large language models taught by Percy Liang at Stanford.
 
 ---
 
-## Quick Overview 
+## Quick Overview
+
+<div class="quick-overview">
 
 1. **Set-up & dtype benchmarking** – install PyTorch with the ultra-fast `uv` installer, sanity-check CUDA, and time core tensor ops across dtypes.
 2. **Numerical formats in practice** – when to reach for `bfloat16`, why `float16` needs loss-scaling, and why FP8 is inference-only (today).
@@ -25,6 +27,8 @@ a course on large language models taught by Percy Liang at Stanford.
 5. **Einops power-moves** – ditch `.view()/.permute()` boilerplate and reshape like a pro.
 6. **Kernel arithmetic cost** – pocket FLOP calculators for GEMM, conv2d, and attention; introduction to Model FLOP Utilisation (MFU).
 7. **Initialisation hygiene** – Glorot vs. He, and when it actually matters.
+
+</div>
 
 ---
 
