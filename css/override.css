@@ -37,6 +37,8 @@
   --music-vibe-start: #7dcfff;a
   --music-vibe-end: #f7768e;
   --panel-bg: rgba(0, 0, 0, 0.3);
+  --equation-bg: #2d2d2d;
+  --equation-text: #c0caf5;
   --table-border-color: #3b3b3b;
 }
 
@@ -408,4 +410,47 @@ a:visited {
 
 .moon-icon {
   color: #4b5563;
+}
+
+/* ------------------------------------------------------
+   8) TABLE STYLING
+   ------------------------------------------------------ */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+th,
+td {
+  padding: 0.5rem;
+  border: 1px solid var(--table-border-color);
+}
+
+th {
+  background-color: var(--background-color);
+  font-weight: bold;
+  text-align: left;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* ------------------------------------------------------
+   9) EQUATION BOX
+   ------------------------------------------------------ */
+
+.equation-box {
+  background-color: var(--equation-bg);
+  color: var(--equation-text);
+  border: 1px solid var(--table-border-color);
+  padding: 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.equation-box .katex-display {
+  margin: 0;
 }
