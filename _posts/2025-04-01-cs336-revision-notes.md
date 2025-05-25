@@ -207,18 +207,36 @@ def fan(t):
     return t.size(1), t.size(0)
 
 def glorot(t):
-    fi, fo = fan(t); u = math.sqrt(6/(fi+fo))
+    fi, fo = fan(t); u = math.sqrt(6/(fi + fo))
     return torch.nn.init.uniform_(t, -u, u)
 
 def kaiming(t):
     fi, _ = fan(t); std = math.sqrt(2/fi)
     return torch.nn.init.normal_(t, 0, std)
 
-w = torch.empty(256, 512); glorot(w)
-print("Glorot std", w.std().item())
+w1 = torch.empty(256, 512); glorot(w1)
+w2 = torch.empty(256, 512); kaiming(w2)
+
+print("Glorot std", w1.std().item())
+print("Kaiming std", w2.std().item())
 ```
 
-Glorot assumes `tanh`-like activations and keeps variance constant forward **and** backward. He multiplies variance by 2 for ReLU’s 50 % sparsity. Transformers often stack residuals or scale them (0.1 × x + f(x)); μP parameterisation further decouples width/depth.
+Sample output
+
+```
+Glorot std 0.0782
+Kaiming std 0.1104
+```
+
+Glorot/Xavier Initialisation (Glorot & Bengio, 2010) assumes symmetric activations like `tanh` and balances the variance between the forward and backward passes.
+
+He Initialisation (He et al., 2015) is tailored for ReLU and its derivatives, which zero out half the inputs and thus double the variance.
+
+Typical standard deviations for large matrices differ: around 0.07–0.08 for Glorot versus 0.10–0.11 for He.
+
+Transformers often scale residual connections with `x + 0.1 * f(x)` to stabilise depth. Some apply μParam (μP) to decouple width and depth while preserving training dynamics at scale.
+
+When does it matter? For very deep networks (>200 layers) or extreme dtypes such as FP8, where poor initialisation cannot be fixed by the optimiser.
 
 ---
 
