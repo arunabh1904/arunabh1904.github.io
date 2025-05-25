@@ -1,0 +1,19 @@
+<svg width="600" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="200" fill="white" />
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#000" />
+    </marker>
+  </defs>
+  <rect x="20" y="20" width="150" height="40" fill="#d0e1f9" stroke="#000" />
+  <text x="55" y="45" font-size="14">Prompt</text>
+  <rect x="220" y="20" width="150" height="40" fill="#fce2db" stroke="#000" />
+  <text x="255" y="45" font-size="14">Policy π</text>
+  <rect x="220" y="100" width="150" height="40" fill="#f9f7d9" stroke="#000" />
+  <text x="235" y="125" font-size="14">Ref Policy π_ref</text>
+  <line x1="170" y1="40" x2="220" y2="40" stroke="#000" marker-end="url(#arrow)" />
+  <line x1="170" y1="120" x2="220" y2="120" stroke="#000" marker-end="url(#arrow)" />
+  <line x1="295" y1="60" x2="295" y2="100" stroke="#000" marker-end="url(#arrow)" />
+  <text x="310" y="85" font-size="14">log π - log π_ref</text>
+  <text x="390" y="95" font-size="14">→ BCE Loss</text>
+</svg>

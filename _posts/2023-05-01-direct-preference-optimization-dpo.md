@@ -16,6 +16,8 @@ field: Reinforcement Learning
 
 **Conference:** NeurIPS 2023 (spotlight)
 
+![DPO Workflow](/assets/images/dpo_workflow.svg)
+
 **Plain-language summary**
 Traditional RLHF first fits a reward model from ranked human preferences and then runs PPO under a KL penalty.
 DPO shows that the same KL-regularised objective admits a closed-form solution, so you can optimise the policy directly.
