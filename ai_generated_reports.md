@@ -23,12 +23,15 @@ title: AI Generated Reports
 {% assign ai_pdfs = site.static_files | where: "extname", ".pdf" | where_exp: "f", "f.path contains '/assets/pdfs/'" %}
 {% if ai_pdfs %}
   <ul class="icon-list">
-  {% for file in ai_pdfs %}
-    {% if file.name == 'VLM Research Summary.pdf' %}
-      <li><a href="{{ file.path }}">A survey of VLMs. - May 17, 2025 generated at</a></li>
-    {% else %}
-      <li><a href="{{ file.path }}">{{ file.name }}</a></li>
-    {% endif %}
-  {% endfor %}
+    {% for file in ai_pdfs %}
+      {% if file.name == 'VLM Research Summary.pdf' %}
+        <li>
+          <a href="{{ file.path }}">A survey of VLMs.</a>
+          <small>— May 17, 2025</small>
+        </li>
+      {% else %}
+        <li><a href="{{ file.path }}">{{ file.name }}</a></li>
+      {% endif %}
+    {% endfor %}
   </ul>
 {% endif %}
