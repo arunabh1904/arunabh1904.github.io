@@ -30,17 +30,17 @@
 }
 
 :root[data-theme="dark"] {
-  --background-color: #121212;
-  --text-color: #f5f5f5;
-  --icon-color: #f5f5f5;
-  --table-border-color: #f5f5f5;
-  --table-header-bg: #262626;
-  --table-row-bg-even: #202020;
-  --image-border-color: #f5f5f5;
-  --music-bg-start: #c026d3;
-  --music-bg-end: #7c3aed;
-  --music-vibe-start: #e879f9;
-  --music-vibe-end: #a78bfa;
+  --background-color: #1a1b26;
+  --text-color: #c0caf5;
+  --icon-color: #c0caf5;
+  --table-border-color: #3b4261;
+  --table-header-bg: #16161e;
+  --table-row-bg-even: #1f2335;
+  --image-border-color: #c0caf5;
+  --music-bg-start: #7aa2f7;
+  --music-bg-end: #bb9af7;
+  --music-vibe-start: #9ece6a;
+  --music-vibe-end: #f7768e;
   --bg-overlay-start: rgba(0, 0, 0, 0.7);
   --bg-overlay-end: rgba(0, 20, 40, 0.95);
   --panel-bg: rgba(0, 0, 0, 0.3);
@@ -373,18 +373,18 @@ img {
 
 /* All <a> tags: light blue by default, no underline */
 a {
-  color: #7AB9E1;          /* slightly darker light blue */
+  color: #7aa2f7;          /* tokyonight blue */
   text-decoration: none;
 }
 
 /* Hover state: darker blue + underline */
 a:hover {
-  color: #1E90FF;
+  color: #2ac3de;
   text-decoration: underline;
 }
 
 a:visited {
-  color: #7AB9E1 !important; /* Same light blue as unvisited */
+  color: #7aa2f7 !important; /* Same light blue as unvisited */
   text-decoration: none;
 }
 
