@@ -440,7 +440,7 @@ tr:nth-child(even) td {
    9) CODE BLOCKS – DARK-MODE OVERHAUL
    ------------------------------------------------------ */
 
-/* Base styles for both light and dark */
+/* Base styles for both light and dark 
 pre, code {
   font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
   font-size: 0.95rem;
@@ -454,18 +454,18 @@ pre, code {
   line-height: 1.5;
 }
 
-/* Inline code – keep it compact */
+ Inline code – keep it compact 
 code:not(pre code) {
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
 }
 
-/* Optional subtle border for block code */
+Optional subtle border for block code 
 pre {
   border: 1px solid var(--table-border-color);
 }
 
-/* Token overrides (for highlight.js / Prism themes) */
+Token overrides (for highlight.js / Prism themes) 
 .token.comment,
 .comment { color: #6a9955; }
 
@@ -478,9 +478,9 @@ pre {
 .token.function,
 .function { color: #dcdcaa; }
 
-/* Better focus outlines */
+Better focus outlines
 pre:focus,
 code:focus {
   outline: 2px dashed #2ac3de;
   outline-offset: 2px;
-}
+} */
