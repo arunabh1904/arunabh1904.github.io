@@ -21,7 +21,8 @@ The central innovation of Vaswani et al. (pp. 1–2) lies not in inventing a new
 Instead it rejects recurrent and convolutional biases.
 Stacking purely attention-based blocks shortens the path between any two tokens to one step.
 This greatly improves gradient flow and enables massive parallelism,
-allowing eight P100 GPUs to reach 28.4 BLEU on English→German in only 3.5 days.
+allowing eight P100 GPUs to reach 28.4 BLEU (Bilingual Evaluation Understudy, a translation quality score)
+on English→German in only 3.5 days.
 
 At the heart of the architecture is the scaled attention mechanism
 
