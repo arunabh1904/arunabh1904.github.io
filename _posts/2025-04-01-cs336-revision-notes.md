@@ -224,3 +224,6 @@ Glorot assumes `tanh`-like activations and keeps variance constant forward **and
 
 ## Source
 Percy Liang, **CS336 — Large Language Models**, Stanford University, Lecture 2: *Tensor Fundamentals & Computation Efficiency* (Winter 2025).
+
+## Colab notebook
+A Google Colab notebook with the code is available [here](https://colab.research.google.com/drive/1heDkWNo4DDdJn9pXYDFEyUYUHLL3M-qc?usp=sharing).
