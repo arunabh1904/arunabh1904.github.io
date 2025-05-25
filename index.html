@@ -76,7 +76,7 @@ static_theme: true
   <section class="section">
     <details>
       <summary><h2 id="ml-deep"><a href="/ai_generated_reports.html">AI generated reports</a></h2></summary>
-      <p>Deep research write-ups and notebook LM walk-throughs. Includes VLM deep research.</p>
+      <p>This section links to AI generated reports. Think audio 🎧 summaries like <a href="https://notebooklm.google.com">NotebookLM</a> or ChatGPT deep research summaries.</p>
       <ul class="icon-list">
         {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] %}
         {% if ml_posts %}
@@ -93,7 +93,11 @@ static_theme: true
       <ul class="icon-list">
         {% assign ml_pdfs = site.static_files | where: "extname", ".pdf" | where_exp: "f", "f.path contains '/assets/pdfs/'" %}
         {% for file in ml_pdfs %}
-          <li><a href="{{ file.path }}">{{ file.name }}</a></li>
+          {% if file.name == 'VLM Research Summary.pdf' %}
+            <li><a href="{{ file.path }}">A survey of VLMs. - May 17, 2025 generated at</a></li>
+          {% else %}
+            <li><a href="{{ file.path }}">{{ file.name }}</a></li>
+          {% endif %}
         {% endfor %}
       </ul>
     </details>
