@@ -32,7 +32,7 @@ Posts use the default layout `post` and are automatically tagged via the configu
 Assets such as images are stored in `assets/images/`.
 PDFs can be added to `assets/pdfs/` and will appear in the ML Deep research reports section.
 Scripts such as the music player live in `assets/js/`.
-`code-block.js` enhances code snippets with line numbers and copy buttons.
+Code blocks are styled simply using `_sass/_code.scss`.
 
 ## Getting Started
 

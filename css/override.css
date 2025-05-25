@@ -423,44 +423,6 @@ tr:nth-child(even) td {
   }
 }
 
-/* ------------------------------------------------------
-   8) PYTHON TERMINAL
-   ------------------------------------------------------ */
-.py-terminal {
-  padding: 1rem;
-  border-radius: 8px;
-  font-family: monospace;
-}
-
-.py-terminal textarea {
-  width: 100%;
-  height: 150px;
-  border: 1px solid var(--table-border-color);
-  border-radius: 4px;
-  padding: 0.5rem;
-  font-family: monospace;
-}
-
-.py-terminal button {
-  margin-top: 0.5rem;
-  padding: 0.4rem 0.8rem;
-}
-
-
-.py-terminal pre {
-  border-radius: 4px;
-  padding: 0.5rem;
-  margin-top: 0.5rem;
-  overflow-x: auto;
-}
-
-
-.run-output {
-  border-radius: 4px;
-  padding: 0.5rem;
-  margin-top: 0.5rem;
-  overflow-x: auto;
-}
 
 /* Icons for the theme toggle button */
 .sun-icon {
