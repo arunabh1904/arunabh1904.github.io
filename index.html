@@ -33,13 +33,13 @@ static_theme: true
 <!-- Section for Arxiv notes -->
   <section class="section">
     <h2 id="arxiv-notes"><a href="/paper_summaries_field.html">Arxiv notes</a></h2>
-    <p>A collection of paper summaries organized by topic.</p>
+    <p>A collection of paper summaries of the papers I have perused over the years - organized by broad research interests.</p>
   </section>
 
   <!-- Section for Ponderings -->
   <section class="section">
     <h2 id="ponderings"><a href="/ponderings.html">Ponderings</a></h2>
-    <p>Thoughts on recurring questions.</p>
+    <p>My attempt at jotting down some notes on things I find myself keep coming come back to.</p>
     <ul class="icon-list">
         {% assign ponder_posts = site.categories["Ponderings"] %}
         {% if ponder_posts %}
@@ -57,16 +57,18 @@ static_theme: true
   <!-- Section for Revision notes -->
   <section class="section">
     <h2 id="revision-notes"><a href="/revision_notes.html">Revision notes</a></h2>
-    <p>Detailed revision notes for discourse. Percy Liang's CS336 lecture notes are <a href="/2025/04/01/cs336-revision-notes.html">here</a>.</p>
+    <p>Detailed revision notes for discourse found on the internet.</p>
     <ul class="icon-list">
         {% assign rev_posts = site.categories["Revision Notes"] %}
         {% if rev_posts %}
-          {% assign rev_posts = rev_posts | sort: "date" %}
+        {% assign rev_posts = rev_posts | sort: "date" %}
           {% for post in rev_posts %}
+          {% unless post.slug == "cs336-revision-notes" %}
           <li>
             <a href="{{ post.url }}">{{ post.title }}</a>
             <small>— {{ post.date | date: "%b %d, %Y" }}</small>
           </li>
+          {% endunless %}
         {% endfor %}
         {% endif %}
     </ul>
@@ -88,17 +90,6 @@ static_theme: true
             </li>
           {% endfor %}
         {% endif %}
-      </ul>
-      <h3>PDFs</h3>
-      <ul class="icon-list">
-        {% assign ml_pdfs = site.static_files | where: "extname", ".pdf" | where_exp: "f", "f.path contains '/assets/pdfs/'" %}
-        {% for file in ml_pdfs %}
-          {% if file.name == 'VLM Research Summary.pdf' %}
-            <li><a href="{{ file.path }}">A survey of VLMs. - May 17, 2025 generated at</a></li>
-          {% else %}
-            <li><a href="{{ file.path }}">{{ file.name }}</a></li>
-          {% endif %}
-        {% endfor %}
       </ul>
     </details>
   </section>
