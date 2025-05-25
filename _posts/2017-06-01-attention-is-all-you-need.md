@@ -25,9 +25,11 @@ allowing eight P100 GPUs to reach 28.4 BLEU on English→German in only 3.5 days
 
 At the heart of the architecture is the scaled attention mechanism
 
+<div class="equation-box">
 \[
 \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V.
 \]
+</div>
 
 The scaling by \(\sqrt{d_k}\) stabilises gradients at large hidden dimensions.
 Multi-head attention, typically eight heads with \(d_k = d_v = 64\),
@@ -39,12 +41,14 @@ preserves information that a single head would compress.
 
 Without recurrence, positional information comes from sinusoidal encodings:
 
+<div class="equation-box">
 \[
 \begin{aligned}
 \text{PE}(pos, 2i) &= \sin\Bigl(\frac{pos}{10000^{2i/d_{\text{model}}}}\Bigr),\\
 \text{PE}(pos, 2i+1) &= \cos\Bigl(\frac{pos}{10000^{2i/d_{\text{model}}}}\Bigr).
 \end{aligned}
 \]
+</div>
 
 These fixed oscillations embed relative order and generalise to longer sequences with no extra parameters.
 

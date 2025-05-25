@@ -23,6 +23,7 @@ Update it in pull requests as new conventions are adopted.
 - End files with a single newline.
 - Write comments as full sentences and end them with a period.
 - Wrap standalone math in `<div class="equation-box">` to use the equation style.
+- Enclose every displayed equation within this equation box template.
 
 ## Local workflow
 - Run `jekyll build` to verify the site compiles before committing changes that affect the structure or content.
