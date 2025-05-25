@@ -5,7 +5,7 @@ date: 2025-06-01 00:00:00 -0400
 categories: ["Ponderings"]
 ---
 
-## Attention Mechanisms Demystified: An Expert's Deep Dive into Q, K, V, and Self-Attention
+## 2025 – Attention Mechanisms Demystified: An Expert's Deep Dive into Q, K, V, and Self-Attention
 
 Attention mechanisms are a foundational innovation in modern machine learning, significantly enhancing models' capability to selectively process information relevant to their tasks. Originating in neural machine translation, attention provides a dynamic method for information aggregation, crucially influencing fields ranging from natural language processing (NLP) to computer vision. This post comprehensively elucidates the intricate mechanics of attention, clearly defining queries (Q), keys (K), and values (V), and progressively building from general attention to self- and cross-attention.
 
