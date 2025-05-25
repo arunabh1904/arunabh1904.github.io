@@ -140,6 +140,11 @@ img:not(.float-right):not(.float-left) {
   margin: 1rem auto;
 }
 
+/* Slightly dim images in dark mode. */
+:root[data-theme="dark"] img {
+  filter: brightness(0.85);
+}
+
 .float-right {
   float: right;
   margin-left: 1rem;
