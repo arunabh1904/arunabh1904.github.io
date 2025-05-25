@@ -37,9 +37,8 @@ static_theme: true
 
   <!-- Section for Revision notes -->
   <section>
-    <details class="no-icon">
-      <summary><h2 id="revision-notes">Revision notes</h2></summary>
-      <ul class="icon-list" style="margin-left: 20px;">
+    <h2 id="revision-notes">Revision notes</h2>
+    <ul class="icon-list" style="margin-left: 20px;">
         {% assign rev_posts = site.categories["Revision Notes"] %}
         {% if rev_posts %}
           {% assign rev_posts = rev_posts | sort: "date" %}
@@ -50,8 +49,7 @@ static_theme: true
           </li>
         {% endfor %}
         {% endif %}
-      </ul>
-    </details>
+    </ul>
   </section>
 
   <!-- Section for AI generated reports -->
