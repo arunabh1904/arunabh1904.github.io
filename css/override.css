@@ -107,6 +107,13 @@ details.no-icon[open] > summary::before {
    ------------------------------------------------------ */
 img {
   border: 2px solid var(--image-border-color);
+  max-width: 100%;
+  height: auto;
+}
+
+img:not(.float-right):not(.float-left) {
+  display: block;
+  margin: 1rem auto;
 }
 
 .float-right {
