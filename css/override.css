@@ -401,7 +401,7 @@ img:not(.float-right):not(.float-left) {
 
 /* All <a> tags: light blue by default, no underline */
 a {
-  color: #7aa2f7;          /* tokyonight blue */
+  color: #9bbcff;          /* Lighter blue for unvisited links. */
   text-decoration: none;
 }
 
@@ -412,7 +412,7 @@ a:hover {
 }
 
 a:visited {
-  color: #7aa2f7 !important; /* Same light blue as unvisited */
+  color: #7aa2f7 !important; /* Slightly darker for visited links. */
   text-decoration: none;
 }
 
