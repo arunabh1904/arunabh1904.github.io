@@ -40,24 +40,12 @@ static_theme: true
   <section class="section">
     <h2 id="ponderings"><a href="/ponderings.html">Ponderings</a></h2>
     <p>My attempt at jotting down some notes on things I find myself keep coming come back to.</p>
-    <ul class="icon-list">
-        {% assign ponder_posts = site.categories["Ponderings"] %}
-        {% if ponder_posts %}
-          {% assign ponder_posts = ponder_posts | sort: "date" %}
-          {% for post in ponder_posts %}
-          <li>
-            <a href="{{ post.url }}">{{ post.title }}</a>
-            <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-          </li>
-        {% endfor %}
-        {% endif %}
-    </ul>
   </section>
 
   <!-- Section for Revision notes -->
   <section class="section">
     <h2 id="revision-notes"><a href="/revision_notes.html">Revision notes</a></h2>
-    <p>Detailed revision notes for discourse found on the internet.</p>
+    <p>Detailed revision notes for long form discourse found on the internet.</p>
     <ul class="icon-list">
         {% assign rev_posts = site.categories["Revision Notes"] %}
         {% if rev_posts %}
@@ -77,12 +65,7 @@ static_theme: true
   <!-- Section for AI generated reports -->
   <section class="section">
     <h2 id="ml-deep"><a href="/ai_generated_reports.html">AI generated reports</a></h2>
-    <p>This section links to AI generated reports.
-      Think audio 🎧 summaries like
-      <a href="https://notebooklm.google.com">NotebookLM</a> or text summaries from
-      tools like 🤖 ChatGPT
-      <a href="https://openai.com/index/introducing-deep-research/">deep research</a>.
-    </p>
+    <p>Some audio or text AI generated reports.</p>
     <ul class="icon-list">
       {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] %}
       {% if ml_posts %}
