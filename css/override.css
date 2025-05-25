@@ -16,6 +16,8 @@
   --music-vibe-start: #60a5fa;
   --music-vibe-end: #38bdf8;
   --table-border-color: #cccccc;
+  --table-header-bg: #e8e8ff;
+  --table-row-alt-bg: rgba(0, 0, 0, 0.05);
 }
 
 :root[data-theme="light"] {
@@ -25,6 +27,8 @@
   --image-border-color: #000080;
   --panel-bg: rgba(5, 5, 5, 0.3);
   --table-border-color: #cccccc;
+  --table-header-bg: #e8e8ff;
+  --table-row-alt-bg: rgba(0, 0, 0, 0.05);
 }
 
 :root[data-theme="dark"] {
@@ -40,6 +44,8 @@
   --equation-bg: #2d2d2d;
   --equation-text: #c0caf5;
   --table-border-color: #3b3b3b;
+  --table-header-bg: #2d2d2d;
+  --table-row-alt-bg: rgba(255, 255, 255, 0.05);
 }
 
 html {
@@ -420,6 +426,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1.5rem;
+  border: 2px solid var(--table-border-color);
 }
 
 th,
@@ -429,13 +436,13 @@ td {
 }
 
 th {
-  background-color: var(--background-color);
+  background-color: var(--table-header-bg);
   font-weight: bold;
   text-align: left;
 }
 
 tbody tr:nth-child(odd) {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: var(--table-row-alt-bg);
 }
 
 /* ------------------------------------------------------
