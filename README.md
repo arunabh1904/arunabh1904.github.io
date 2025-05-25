@@ -21,7 +21,7 @@ Posts use the default layout `post` and are automatically tagged via the configu
 ## Structure
 
 - `_layouts/` – Contains page templates. `home.html` defines the landing page layout with a full-page background and a pinned "Contact Me" panel at the bottom right. `post.html` defines post pages with light/dark theme toggling and an arrow button that returns to the home page.
-- `_includes/` – Partial templates. `head.html` loads fonts and metadata. Code syntax highlighting is handled globally via `_includes/code-assets.html`; update that file to change the theme or version. `navlinks.html` and `sharelinks.html` provide previous/next navigation and social-sharing buttons respectively.
+- `_includes/` – Partial templates. `head.html` loads fonts and metadata. Code syntax highlighting is handled globally via `_includes/code-assets.html` (currently using the *Pojoaque* theme); update that file to change the version or theme. `navlinks.html` and `sharelinks.html` provide previous/next navigation and social-sharing buttons respectively.
 - `css/override.css` – Custom styles, including variables for dark/light themes, styling for buttons, and a pinned links panel.
 - `index.html` – Home page content listing posts from two categories ("My Journey So Far" and "ML Deep research reports").
 - `paper_summaries.md` – Landing page for research paper notes, linking to pages organized by year and by field.
