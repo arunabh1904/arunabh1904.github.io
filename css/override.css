@@ -380,7 +380,7 @@ a:visited {
    6) TABLE STYLING
    ------------------------------------------------------ */
 
-table {
+/* table {
   border-collapse: collapse;
   width: 100%;
   color: var(--text-color);
@@ -400,7 +400,7 @@ th {
 
 tr:nth-child(even) td {
   background-color: var(--table-row-bg-even);
-}
+} */
 
 /* ------------------------------------------------------
    7) RESPONSIVE ADJUSTMENTS
