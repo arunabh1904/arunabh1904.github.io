@@ -61,12 +61,14 @@ static_theme: true
     <ul class="icon-list">
         {% assign rev_posts = site.categories["Revision Notes"] %}
         {% if rev_posts %}
-          {% assign rev_posts = rev_posts | sort: "date" %}
+        {% assign rev_posts = rev_posts | sort: "date" %}
           {% for post in rev_posts %}
+          {% unless post.slug == "cs336-revision-notes" %}
           <li>
             <a href="{{ post.url }}">{{ post.title }}</a>
             <small>— {{ post.date | date: "%b %d, %Y" }}</small>
           </li>
+          {% endunless %}
         {% endfor %}
         {% endif %}
     </ul>
@@ -76,7 +78,6 @@ static_theme: true
   <section class="section">
     <details>
       <summary><h2 id="ml-deep"><a href="/ai_generated_reports.html">AI generated reports</a></h2></summary>
-      <p>Deep research write-ups and notebook LM walk-throughs. Includes VLM deep research.</p>
       <ul class="icon-list">
         {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] %}
         {% if ml_posts %}
@@ -88,13 +89,6 @@ static_theme: true
             </li>
           {% endfor %}
         {% endif %}
-      </ul>
-      <h3>PDFs</h3>
-      <ul class="icon-list">
-        {% assign ml_pdfs = site.static_files | where: "extname", ".pdf" | where_exp: "f", "f.path contains '/assets/pdfs/'" %}
-        {% for file in ml_pdfs %}
-          <li><a href="{{ file.path }}">{{ file.name }}</a></li>
-        {% endfor %}
       </ul>
     </details>
   </section>
