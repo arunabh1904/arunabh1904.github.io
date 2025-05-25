@@ -24,8 +24,6 @@
   --icon-color: #000080;
   --image-border-color: #000080;
   --panel-bg: rgba(5, 5, 5, 0.3);
-  --equation-bg: #ffffff;
-  --equation-text: #000000;
   --table-border-color: #cccccc;
 }
 
@@ -36,7 +34,7 @@
   --image-border-color: #c0caf5;
   --music-bg-start: #7aa2f7;
   --music-bg-end: #bb9af7;
-  --music-vibe-start: #7dcfff;
+  --music-vibe-start: #7dcfff;a
   --music-vibe-end: #f7768e;
   --panel-bg: rgba(0, 0, 0, 0.3);
   --table-border-color: #3b3b3b;
@@ -380,7 +378,7 @@ a:visited {
 }
 
 /* ------------------------------------------------------
-   7) RESPONSIVE ADJUSTMENTS
+   6) RESPONSIVE ADJUSTMENTS
    ------------------------------------------------------ */
 
 @media (max-width: 768px) {
