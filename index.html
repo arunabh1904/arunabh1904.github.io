@@ -76,25 +76,23 @@ static_theme: true
 
   <!-- Section for AI generated reports -->
   <section class="section">
-    <details>
-      <summary><h2 id="ml-deep"><a href="/ai_generated_reports.html">AI generated reports</a></h2></summary>
-      <p>This section links to AI generated reports.
-        Think audio 🎧 summaries like
-        <a href="https://notebooklm.google.com">NotebookLM</a> or ChatGPT 🤖
-        <a href="/ai_generated_reports.html#deep-research-summaries">deep research docs</a>.
-      </p>
-      <ul class="icon-list">
-        {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] %}
-        {% if ml_posts %}
-          {% assign ml_posts = ml_posts | sort: "date" %}
-          {% for post in ml_posts %}
-            <li>
-              <a href="{{ post.url }}">{{ post.title }}</a>
-              <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-            </li>
-          {% endfor %}
-        {% endif %}
-      </ul>
-    </details>
+    <h2 id="ml-deep"><a href="/ai_generated_reports.html">AI generated reports</a></h2>
+    <p>This section links to AI generated reports.
+      Think audio 🎧 summaries like
+      <a href="https://notebooklm.google.com">NotebookLM</a> or ChatGPT 🤖
+      <a href="/ai_generated_reports.html#deep-research-summaries">deep research docs</a>.
+    </p>
+    <ul class="icon-list">
+      {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] %}
+      {% if ml_posts %}
+        {% assign ml_posts = ml_posts | sort: "date" %}
+        {% for post in ml_posts %}
+          <li>
+            <a href="{{ post.url }}">{{ post.title }}</a>
+            <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
   </section>
 
