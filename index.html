@@ -30,57 +30,52 @@ static_theme: true
   </p>
 </article>
 
-  <!-- Section for AI generated reports -->
-  <section>
-    <details>
-      <summary><h2 id="ml-deep">AI generated reports</h2></summary>
-     <ul class="icon-list">
-       {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] %}
-       {% if ml_posts %}
-         {% assign ml_posts = ml_posts | sort: "date" %}
-         {% for post in ml_posts %}
-           <li>
-             <a href="{{ post.url }}">{{ post.title }}</a>
-             <small>— {{ post.date | date: "%b %d, %Y" }}</small>
-           </li>
-         {% endfor %}
-       {% endif %}
-     </ul>
-     <h3>PDFs</h3>
-     <ul class="icon-list">
-       {% assign ml_pdfs = site.static_files | where: "extname", ".pdf" | where_exp: "f", "f.path contains '/assets/pdfs/'" %}
-       {% for file in ml_pdfs %}
-         <li><a href="{{ file.path }}">{{ file.name }}</a></li>
-       {% endfor %}
-     </ul>
-   </details>
- </section>
-
 <!-- Section for Paper Summaries -->
-<section>
-  <details>
-    <summary><h2 id="summaries">Paper Summaries</h2></summary>
-    <ul class="icon-list">
-      <li><a href="/paper_summaries_field.html">Organized by Field</a></li>
-    </ul>
-  </details>
-</section>
+  <section>
+    <h2 id="summaries"><a href="/paper_summaries_field.html">Paper Summaries</a></h2>
+  </section>
 
-<!-- Section for Revision notes -->
-<section>
-  <details>
-    <summary><h2 id="revision-notes">Revision notes</h2></summary>
-    <ul class="icon-list" style="margin-left: 20px;">
-      {% assign rev_posts = site.categories["Revision Notes"] %}
-      {% if rev_posts %}
-        {% assign rev_posts = rev_posts | sort: "date" %}
-        {% for post in rev_posts %}
+  <!-- Section for Revision notes -->
+  <section>
+    <details class="no-icon">
+      <summary><h2 id="revision-notes">Revision notes</h2></summary>
+      <ul class="icon-list" style="margin-left: 20px;">
+        {% assign rev_posts = site.categories["Revision Notes"] %}
+        {% if rev_posts %}
+          {% assign rev_posts = rev_posts | sort: "date" %}
+          {% for post in rev_posts %}
           <li>
             <a href="{{ post.url }}">{{ post.title }}</a>
             <small>— {{ post.date | date: "%b %d, %Y" }}</small>
           </li>
         {% endfor %}
-      {% endif %}
-    </ul>
-  </details>
-</section>
+        {% endif %}
+      </ul>
+    </details>
+  </section>
+
+  <!-- Section for AI generated reports -->
+  <section>
+    <details>
+      <summary><h2 id="ml-deep">AI generated reports</h2></summary>
+      <ul class="icon-list">
+        {% assign ml_posts = site.categories["Machine Learning Deep-Dives"] %}
+        {% if ml_posts %}
+          {% assign ml_posts = ml_posts | sort: "date" %}
+          {% for post in ml_posts %}
+            <li>
+              <a href="{{ post.url }}">{{ post.title }}</a>
+              <small>— {{ post.date | date: "%b %d, %Y" }}</small>
+            </li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+      <h3>PDFs</h3>
+      <ul class="icon-list">
+        {% assign ml_pdfs = site.static_files | where: "extname", ".pdf" | where_exp: "f", "f.path contains '/assets/pdfs/'" %}
+        {% for file in ml_pdfs %}
+          <li><a href="{{ file.path }}">{{ file.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </details>
+  </section>
