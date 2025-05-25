@@ -46,8 +46,18 @@
   src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   integrity="sha384-KAbFlcI74JdCRDM98qNFVmWX5nL6pMBiGjVZ6ljbDSBxJ1FMz7bK2rsque57RZ63"
   crossorigin="anonymous"
-  onload="renderMathInElement(document.body);"
 ></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '\\(', right: '\\)', display: false},
+        {left: '\\[', right: '\\]', display: true}
+      ]
+    });
+  });
+</script>
 
 <!-- Variable font preload -->
 <link
