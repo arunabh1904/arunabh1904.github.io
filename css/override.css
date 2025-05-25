@@ -52,6 +52,21 @@
   --equation-text: #ffffff;
 }
 
+:root[data-theme="green"] {
+  --background-color: #000000;
+  --text-color: #00ff00;
+  --icon-color: #00ff00;
+  --table-border-color: #00ff00;
+  --table-header-bg: #001b00;
+  --table-row-bg-even: #002b00;
+  --image-border-color: #00ff00;
+  --bg-overlay-start: rgba(0, 50, 0, 0.7);
+  --bg-overlay-end: rgba(0, 75, 0, 0.95);
+  --panel-bg: rgba(0, 50, 0, 0.3);
+  --equation-bg: #000000;
+  --equation-text: #00ff00;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -175,6 +190,14 @@ img {
   justify-content: center;
   align-items: center;
   font-size: 18px;
+}
+
+#theme-select {
+  position: absolute;
+  top: 10px;
+  right: 120px;
+  height: 40px;
+  border-radius: 20px;
 }
 
 
