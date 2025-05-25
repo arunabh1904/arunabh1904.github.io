@@ -535,3 +535,22 @@ pre {
 .section:last-child {
   border-bottom: none;
 }
+
+/* ------------------------------------------------------
+   Home page overrides
+   ------------------------------------------------------ */
+
+.home-page {
+  --text-color: #f0ead6;
+  color: var(--text-color);
+}
+
+.home-page a,
+.home-page a:visited {
+  color: var(--text-color);
+}
+
+.home-page a:hover {
+  color: var(--text-color);
+  text-decoration: underline;
+}
