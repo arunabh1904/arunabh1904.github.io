@@ -20,13 +20,12 @@ a course on large language models taught by Percy Liang at Stanford.
 
 <div class="quick-overview">
 
-1. **Set-up & dtype benchmarking** – install PyTorch with the ultra-fast `uv` installer, sanity-check CUDA, and time core tensor ops across dtypes.
-2. **Numerical formats in practice** – when to reach for `bfloat16`, why `float16` needs loss-scaling, and why FP8 is inference-only (today).
-3. **Autograd & the computation graph** – inspect `grad_fn` chains to demystify backward mode.
-4. **Memory layout & views** – strides, contiguity, and why a hidden copy sometimes burns you.
-5. **Einops power-moves** – ditch `.view()/.permute()` boilerplate and reshape like a pro.
-6. **Kernel arithmetic cost** – pocket FLOP calculators for GEMM, conv2d, and attention; introduction to Model FLOP Utilisation (MFU).
-7. **Initialisation hygiene** – Glorot vs. He, and when it actually matters.
+Set up PyTorch with the lightning-fast `uv` installer and benchmark tensor operations across dtypes.
+Compare numerical formats from `bfloat16` to FP8.
+Trace computation graphs with `grad_fn` to understand autograd.
+Watch memory layout to avoid hidden copies and use Einops for clean reshaping.
+Use quick FLOP rules to gauge GEMM, convolution, and attention efficiency.
+Then pick Glorot or He initialisation according to your activation.
 
 </div>
 
