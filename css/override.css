@@ -16,6 +16,8 @@
   --music-bg-end: #0ea5e9;
   --music-vibe-start: #60a5fa;
   --music-vibe-end: #38bdf8;
+  --equation-bg: #ffffff;
+  --equation-text: #000000;
 }
 
 :root[data-theme="light"] {
@@ -27,6 +29,8 @@
   --table-row-bg-even: #fafafa;
   --image-border-color: #000080;
   --panel-bg: rgba(5, 5, 5, 0.3);
+  --equation-bg: #ffffff;
+  --equation-text: #000000;
 }
 
 :root[data-theme="dark"] {
@@ -44,6 +48,8 @@
   --bg-overlay-start: rgba(0, 0, 0, 0.7);
   --bg-overlay-end: rgba(0, 20, 40, 0.95);
   --panel-bg: rgba(0, 0, 0, 0.3);
+  --equation-bg: #000000;
+  --equation-text: #ffffff;
 }
 
 html {
@@ -445,5 +451,17 @@ tr:nth-child(even) td {
 
 .moon-icon {
   color: #4b5563;
+}
+
+/* ------------------------------------------------------
+   8) EQUATION BOX
+   ------------------------------------------------------ */
+.equation-box {
+  background-color: var(--equation-bg);
+  color: var(--equation-text);
+  border: 1px solid var(--equation-text);
+  padding: 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
 }
 
