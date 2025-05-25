@@ -15,6 +15,9 @@
   --music-bg-end: #0ea5e9;
   --music-vibe-start: #60a5fa;
   --music-vibe-end: #38bdf8;
+  --code-bg: #f5f5f5;
+  --code-text: #1a1a1a;
+  --table-border-color: #cccccc;
 }
 
 :root[data-theme="light"] {
@@ -25,6 +28,9 @@
   --panel-bg: rgba(5, 5, 5, 0.3);
   --equation-bg: #ffffff;
   --equation-text: #000000;
+  --code-bg: #f5f5f5;
+  --code-text: #1a1a1a;
+  --table-border-color: #cccccc;
 }
 
 :root[data-theme="dark"] {
@@ -37,6 +43,9 @@
   --music-vibe-start: #7dcfff;
   --music-vibe-end: #f7768e;
   --panel-bg: rgba(0, 0, 0, 0.3);
+  --code-bg: #2d2d2d;
+  --code-text: #e0e0e0;
+  --table-border-color: #3b3b3b;
 }
 
 html {
@@ -463,6 +472,7 @@ code:not(pre code) {
 Optional subtle border for block code 
 pre {
   border: 1px solid var(--table-border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 Token overrides (for highlight.js / Prism themes) 
