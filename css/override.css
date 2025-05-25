@@ -114,6 +114,11 @@ details[open] > summary::before {
   content: '-';
 }
 
+details.no-icon > summary::before,
+details.no-icon[open] > summary::before {
+  content: none;
+}
+
 
 
 /* ------------------------------------------------------
