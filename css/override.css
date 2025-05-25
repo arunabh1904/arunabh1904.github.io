@@ -522,6 +522,7 @@ code {
   padding: 4px 8px;
   border-radius: 4px;
   border: 1px solid var(--code-border-color);
+  font-size: 15px;
 }
 
 pre {
@@ -529,6 +530,7 @@ pre {
   padding: 16px;
   border-radius: 8px;
   overflow-x: auto;
+  font-size: 15px;
 }
 
 .section {
