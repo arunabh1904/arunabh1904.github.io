@@ -16,6 +16,8 @@ field: Alignment
 
 **Conference:** NeurIPS 2022 (spotlight)
 
+![RLHF Pipeline](/assets/images/DQN Atari RLHF.png)
+
 **Plain-language abstract**
 Large GPT-3 models were impressive, but they often ignored or misunderstood user instructions. The authors show that reinforcement learning from human feedback (RLHF) can align a language model with user intent. The process involves supervised fine-tuning on human-written demonstrations, training a reward model from ranked outputs, and then policy optimisation with PPO while penalising divergence from the supervised model. Even a 1.3&nbsp;B parameter InstructGPT matches or beats the 175&nbsp;B GPT-3 on real prompts and reduces toxicity and hallucination.
 
