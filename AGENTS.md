@@ -22,6 +22,7 @@ Update it in pull requests as new conventions are adopted.
 - Keep lines under 120 characters when possible.
 - End files with a single newline.
 - Write comments as full sentences and end them with a period.
+- Wrap standalone math in `<div class="equation-box">` to use the equation style.
 
 ## Local workflow
 - Run `jekyll build` to verify the site compiles before committing changes that affect the structure or content.
