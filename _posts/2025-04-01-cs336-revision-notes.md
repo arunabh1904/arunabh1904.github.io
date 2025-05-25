@@ -18,16 +18,12 @@ a course on large language models taught by Percy Liang at Stanford.
 
 ## Quick Overview
 
-<div class="quick-overview">
-
 Set up PyTorch with the lightning-fast `uv` installer and benchmark tensor operations across dtypes.
 Compare numerical formats from `bfloat16` to FP8.
 Trace computation graphs with `grad_fn` to understand autograd.
 Watch memory layout to avoid hidden copies and use Einops for clean reshaping.
 Use quick FLOP rules to gauge GEMM, convolution, and attention efficiency.
 Then pick Glorot or He initialisation according to your activation.
-
-</div>
 
 ---
 
