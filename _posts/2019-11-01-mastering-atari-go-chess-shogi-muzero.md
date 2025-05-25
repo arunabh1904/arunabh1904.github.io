@@ -16,6 +16,8 @@ field: Reinforcement Learning
 
 **Journal / Conference:** Nature 2020 (pre-print Nov 2019)
 
+![MuZero Architecture](/assets/images/muzero.png)
+
 **Summary of the paper**
 MuZero unifies model-free and model-based reinforcement learning. It learns three networks—representation,
 dynamics and prediction—that act as a latent simulator. The dynamics network rolls the hidden state forward

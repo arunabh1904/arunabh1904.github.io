@@ -16,6 +16,8 @@ field: Computer Vision
 
 **Conference:** ICLR 2021
 
+![Vision Transformer](/assets/images/Vision Transformer VIT.png)
+
 **Summary (abstract in plain English):** ViT slices an image into 16×16 patches, flattens them, adds a learnable positional embedding and a [CLS] token, then processes the sequence with a Transformer encoder. When pre-trained on very large datasets and fine-tuned, ViT matches or exceeds leading CNNs while using fewer training FLOPs.
 
 **Novel insights:**

@@ -16,6 +16,8 @@ field: Reinforcement Learning
 
 **Conference:** NIPS Deep Learning Workshop 2013 (expanded Nature version published 2015)
 
+![DQN Agent](/assets/images/DQN Atari Reinforcement Learning Summaries.png)
+
 **Summary (abstract in plain English):** The paper introduces the Deep Q-Network (DQN) — a convolutional neural network that learns, via Q-learning, to map raw Atari-2600 screen pixels directly to action values. Two key stabilisation tricks make deep RL feasible:
 1. **Experience replay:** store transitions and sample them randomly to break temporal correlations.
 2. **Target network:** hold a slowly updated copy of the Q-network to compute stable learning targets.
