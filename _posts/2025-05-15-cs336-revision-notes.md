@@ -35,7 +35,7 @@ Audited 3 packages in 100 ms
 Install runtime: 2.37 s
 ```
 
-We use **uv** because it is a Rust-based drop-in replacement for `pip` that resolves, builds, and installs wheels in parallel — typically **4–6× faster** than classic `pip` on large scientific stacks.
+We use `uv` because it is a Rust-based drop-in replacement for `pip` that resolves, builds, and installs wheels in parallel — typically **4–6× faster** than pip on large scientific stacks.
 
 ---
 
@@ -75,7 +75,7 @@ bfloat16    | 2 B |  11.55 ms | rel-err 1.41e+00
 float16     | 2 B |  36.21 ms | rel-err 1.41e+00
 ```
 
-Training is usually **bandwidth-bound**; halving the element size doubles the compute-to-memory-traffic ratio and can switch kernels onto tensor-cores. `bfloat16` keeps the 8-bit exponent of FP32 so you almost never need loss scaling, while `float16` often does. FP8 (E4M3/E5M2) is bleeding-edge and **strictly inference** for now – back-prop squares gradients and wrecks its tiny dynamic range.
+Training is usually **bandwidth-bound**; halving the element size doubles the compute-to-memory-traffic ratio and can switch kernels onto tensor-cores. `float64` is the original high precision variant typically used for CPU Ops. `float32` is the default setting for training deep learning models. `float16` and `bfloat16` are both half precision variants but, bfloat16 keeps the 8-bit exponent of FP32 so you almost never need loss scaling, while float16 often does. `FP8 (E4M3/E5M2)` is bleeding-edge and **strictly inference** for now – back-prop squares gradients and wrecks its tiny dynamic range. There are also `FP4` variants enabled by blackwell GPUs. 
 
 ---
 
