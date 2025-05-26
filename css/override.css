@@ -442,6 +442,17 @@ a:visited {
     font-size: 12px;
     line-height: 1.2;
   }
+  body {
+    font-size: 16px;
+  }
+  .main-container {
+    margin: 1rem;
+  }
+  .links-panel {
+    left: 10px;
+    right: 10px;
+    width: auto;
+  }
 }
 
 
