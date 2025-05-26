@@ -13,12 +13,7 @@ categories: ["Revision Notes"]
 
 ## Quick Overview
 
-Set up PyTorch with the lightning-fast `uv` installer and benchmark tensor operations across dtypes.
-Compare numerical formats from `bfloat16` to FP8.
-Trace computation graphs with `grad_fn` to understand autograd.
-Watch memory layout to avoid hidden copies and use Einops for clean reshaping.
-Use quick FLOP rules to gauge GEMM, convolution, and attention efficiency.
-Then pick Glorot or He initialisation according to your activation.
+This lecture discusses different data types and guides you on when each should be used, provides a clear mental model of computational structures, briefly covers tensor reshaping with Einops, and introduces computational efficiency metrics and initialization strategies.
 
 ---
 
@@ -135,35 +130,33 @@ share underlying storage? True
 
 ---
 
-## 5 · Einops quick demo
+## 5 · Clean Tensor Manipulations with Einops
+
+Einops is a library that provides a concise and intuitive syntax for tensor manipulations such as reshaping, permuting, and reducing tensors. It enhances code readability and helps avoid errors associated with manual indexing and reshaping operations.
 
 ```python
 from einops import rearrange, reduce, repeat
-import torch
 
-# (1) Permute: NHWC \u2192 NCHW
-x_nhwc = torch.randn(2, 224, 224, 3)
-x_nchw = rearrange(x_nhwc, "b h w c -> b c h w")
+x = torch.randn(2, 224, 224, 3)
 
-# (2) Flatten spatial grid
+x_nchw = rearrange(x, "b h w c -> b c h w")
 seq = rearrange(x_nchw, "b c h w -> b (h w) c")
-
-# (3) Unflatten
-img = rearrange(seq, "b (h w) c -> b c h w", h=224)
-
-# (4) Reduce: GAP
-pooled = reduce(x_nchw, "b c h w -> b c", "mean")
-
-# (5) Broadcast an embedding across a grid
-emb = torch.randn(2, 64)
-emb_map = repeat(emb, "b d -> b d h w", h=7, w=7)
+x_reconstructed = rearrange(seq, "b (h w) c -> b c h w", h=224)
+gap = reduce(x_nchw, "b c h w -> b c", "mean")
+emb_map = repeat(torch.randn(2, 64), "b d -> b d h w", h=7, w=7)
 ```
 
-Einops manipulates **only metadata** when strides allow. No hidden copies, no wasted bandwidth.
+Benefit: Einops manipulates only metadata when strides allow, enabling intuitive, safe reshaping without unintended copies, thus avoiding unnecessary bandwidth usage.
 
 ---
 
-## 6 · Kernel FLOP calculators
+## 6 · Tracking computational efficiency
+
+FLOPs (Floating Point Operations per Second) measure computational efficiency. Model FLOP Utilization (MFU) is the ratio of actual FLOPs achieved by the hardware to its theoretical maximum, typically less than 1 due to overheads like memory latency, kernel launch overheads, and suboptimal hardware utilization.
+
+<div class="equation-box">
+MFU = \frac{\text{achieved FLOPs}}{\text{theoretical FLOPs}}
+</div>
 
 ```python
 from math import prod
@@ -177,9 +170,6 @@ def conv2d_flops(c_in:int, c_out:int, k:int, h:int, w:int):
 def attn_flops(seq:int, dim:int):
     return 4*seq*seq*dim + seq*seq
 
-print(f"Self-attention (2048 tokens, 128-d) \u2248 {attn_flops(2048,128)/1e9:.2f} GFLOPs")
-print(f"GEMM 64\u00d74096\u00d74096 \u2248 {gemm_flops(64,4096,4096)/1e9:.2f} GFLOPs")
-print(f"Conv2d 3\u00d73 (B32, 64\u2192128, 56\u00b2) \u2248 {conv2d_flops(64,128,3,56,56)/1e9:.2f} GFLOPs")
 ```
 
 | Kernel         | Rule-of-thumb FLOPs               |
