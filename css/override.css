@@ -449,9 +449,12 @@ a:visited {
     margin: 1rem;
   }
   .links-panel {
-    left: 10px;
-    right: 10px;
+    position: static;
+    left: auto;
+    right: auto;
     width: auto;
+    margin-top: 1rem;
+    box-shadow: none;
   }
 }
 
