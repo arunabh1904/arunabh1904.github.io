@@ -155,7 +155,9 @@ Benefit: Einops manipulates only metadata when strides allow, enabling intuitive
 FLOPs (Floating Point Operations per Second) measure computational efficiency. Model FLOP Utilization (MFU) is the ratio of actual FLOPs achieved by the hardware to its theoretical maximum, typically less than 1 due to overheads like memory latency, kernel launch overheads, and suboptimal hardware utilization.
 
 <div class="equation-box">
+\[
 MFU = \frac{\text{achieved FLOPs}}{\text{theoretical FLOPs}}
+\]
 </div>
 
 ```python
