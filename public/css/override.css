@@ -752,6 +752,18 @@ pre {
   font-size: 13px;
 }
 
+pre code {
+  display: block;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  font-size: inherit;
+  line-height: 1.7;
+  white-space: pre;
+}
+
 :root[data-theme="dark"] code,
 :root[data-theme="dark"] pre {
   background:
@@ -762,6 +774,13 @@ pre {
 :root[data-theme="dark"] pre {
   border: 1px solid rgba(255, 228, 92, 0.2);
   box-shadow: inset 0 0 0 1px rgba(255, 228, 92, 0.04);
+}
+
+:root[data-theme="dark"] pre code,
+:root[data-theme="dark"] pre code span {
+  background: transparent !important;
+  color: inherit;
+  text-shadow: none;
 }
 
 .section {
