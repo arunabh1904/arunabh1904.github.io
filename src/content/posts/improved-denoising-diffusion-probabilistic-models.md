@@ -23,7 +23,7 @@ summary: 2021 – Improved Denoising Diffusion Probabilistic Models (ID DPM)
 Nichol and Dhariwal revisit DDPMs with three upgrades that lift both likelihood and sample quality while
 reducing sampling cost.
 
-- Learn the reverse-process variance \(\Sigma_\theta\) instead of keeping it fixed.
+- Learn the reverse-process variance $\Sigma_\theta$ instead of keeping it fixed.
 - Optimise a hybrid objective: half ELBO, half simple noise-prediction loss.
 - Use a cosine noise schedule with importance-weighted loss terms for stable gradients.
 
@@ -63,7 +63,7 @@ def iddpm_loss(model, x0, timesteps, betas, logvar_schedule):
     kl = 0.5 * (torch.exp(-logvar_hat) * (noise ** 2) + logvar_hat).mean()
     return 0.5 * (mse + kl)
 ```
-Switching to the cosine \(\beta_t\) schedule from the appendix further sharpens FID at low step counts.
+Switching to the cosine $\beta_t$ schedule from the appendix further sharpens FID at low step counts.
 
 **Critiques**
 - **What shines:** Simple, drop-in upgrades that became the default for Stable Diffusion and DALLE‑2.

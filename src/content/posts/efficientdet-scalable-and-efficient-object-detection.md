@@ -21,7 +21,7 @@ summary: '2020 – EfficientDet: Scalable and Efficient Object Detection'
 
 **Conference:** CVPR 2020
 
-**Summary (abstract in plain English):** EfficientDet revisits object-detector design under tight efficiency constraints. Building on EfficientNet backbones, the authors introduce Bi-directional Feature Pyramid Networks (BiFPN) for fast, weighted multi-scale fusion and a compound-scaling rule that grows depth, width and input resolution of all detector components with a single coefficient \(\phi\). This yields the D0→D7 family, each tuned to a specific FLOP or latency budget while sharing the same architecture and training recipe.
+**Summary (abstract in plain English):** EfficientDet revisits object-detector design under tight efficiency constraints. Building on EfficientNet backbones, the authors introduce Bi-directional Feature Pyramid Networks (BiFPN) for fast, weighted multi-scale fusion and a compound-scaling rule that grows depth, width and input resolution of all detector components with a single coefficient $\phi$. This yields the D0→D7 family, each tuned to a specific FLOP or latency budget while sharing the same architecture and training recipe.
 
 **Novel insights:**
 - Weighted BiFPN learns per-edge weights so the network can emphasise informative paths with little overhead.

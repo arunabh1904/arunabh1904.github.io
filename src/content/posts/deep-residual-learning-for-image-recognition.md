@@ -19,10 +19,10 @@ summary: 2015 – Deep Residual Learning for Image Recognition
 
 **Conference:** CVPR 2016 (1st place ILSVRC 2015 classifier)
 
-**Summary (abstract in plain English):** ResNet reframes a layer’s objective from learning an outright mapping \(H(x)\) to learning a residual \(F(x)=H(x)-x\), then adding back the identity shortcut: \(H(x)=F(x)+x\). These identity “highways” let gradients flow through 152-layer nets without vanishing, so extremely deep models become easier to optimise and more accurate. Despite being eight times deeper than VGG-19, a ResNet-152 is 38 % cheaper in FLOPs thanks to the 1×1–3×3–1×1 bottleneck design. An ensemble of ResNets (50–152 layers) achieved 3.57 % top‑5 error on ImageNet, winning ILSVRC 2015.
+**Summary (abstract in plain English):** ResNet reframes a layer’s objective from learning an outright mapping $H(x)$ to learning a residual $F(x)=H(x)-x$, then adding back the identity shortcut: $H(x)=F(x)+x$. These identity “highways” let gradients flow through 152-layer nets without vanishing, so extremely deep models become easier to optimise and more accurate. Despite being eight times deeper than VGG-19, a ResNet-152 is 38 % cheaper in FLOPs thanks to the 1×1–3×3–1×1 bottleneck design. An ensemble of ResNets (50–152 layers) achieved 3.57 % top‑5 error on ImageNet, winning ILSVRC 2015.
 
 **Novel insights:**
-- **Residual vs. direct mapping:** if the identity mapping is optimal, a residual block can simply drive \(F(x) \rightarrow 0\), dodging the degradation that afflicts plain deep nets.
+- **Residual vs. direct mapping:** if the identity mapping is optimal, a residual block can simply drive $F(x) \rightarrow 0$, dodging the degradation that afflicts plain deep nets.
 - **Cost-free identity shortcuts** give gradient highways without adding parameters or inference cost.
 - **Depth with efficiency:** bottleneck blocks cut computation so a 152-layer ResNet needs 11.3 GFLOPs vs. VGG‑19’s 19.6 GFLOPs while being far deeper.
 
