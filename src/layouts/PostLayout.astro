@@ -25,7 +25,7 @@ const {
 <BaseLayout title={title} description={description}>
   <PageControls showHomeButton={true} />
   <MusicLauncher />
-  <main class="page-content" style="max-width:800px; margin:2rem auto;" aria-label="Content">
+  <main class="page-content page-content--narrow" aria-label="Content">
     <slot />
     {showNavigation && <PostNavigation previous={previous} next={next} />}
   </main>

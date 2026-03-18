@@ -2,8 +2,7 @@
 import PostLayout from '../layouts/PostLayout.astro';
 import { getAllPosts, groupPostsByTag } from '../lib/content';
 
-const posts = await getAllPosts();
-const grouped = groupPostsByTag(posts);
+const grouped = groupPostsByTag(await getAllPosts());
 ---
 
 <PostLayout title="Blog Archive">

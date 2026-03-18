@@ -1,6 +1,6 @@
 ---
-import MusicLauncher from '../components/MusicLauncher.astro';
 import LinksPanel from '../components/LinksPanel.astro';
+import MusicLauncher from '../components/MusicLauncher.astro';
 import PageControls from '../components/PageControls.astro';
 import BaseLayout from './BaseLayout.astro';
 
@@ -16,12 +16,11 @@ const { title, description } = Astro.props;
   title={title}
   description={description}
   pageClass="home-page"
-  bodyStyle={`margin: 0; padding: 0; min-height: 100vh;`}
 >
   <PageControls />
   <MusicLauncher />
   <div class="home-content-shell">
-    <h1 style="margin-top: 0;">Arunabh.BLOG</h1>
+    <h1 class="home-title">Arunabh.BLOG</h1>
     <slot />
   </div>
   <LinksPanel />

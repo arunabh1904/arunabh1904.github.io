@@ -13,9 +13,12 @@ Personal blog rebuilt with Astro, MDX, and light React islands for interactive c
 ## Commands
 
 ```bash
-npm install
+nvm use
+npm ci
+npm run validate
+npm run build
+npm run verify:build
 npm run dev
-npm run ci
 ```
 
 ## Notes
@@ -24,3 +27,4 @@ npm run ci
 - Content lives in `src/content/posts`.
 - Static assets live in `public/assets`.
 - Build verification checks both critical pages and migrated post routes.
+- `.nvmrc` pins the Node version used by local development and GitHub Actions.
