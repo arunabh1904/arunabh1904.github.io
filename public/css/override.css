@@ -7,70 +7,72 @@
 }
 :root {
   --font-body: "Rajdhani", sans-serif;
+  --font-reading: "IBM Plex Sans", sans-serif;
   --font-heading: "Orbitron", sans-serif;
   --font-mono: "Roboto Mono", monospace;
-  --background-color: #fbf7e8;
-  --background-secondary: #f4ead0;
-  --text-color: #302606;
-  --text-secondary-color: #726239;
-  --accent-color: #b98500;
-  --icon-color: #b98500;
-  --image-border-color: #c69718;
-  --code-border-color: rgba(165, 122, 18, 0.28);
-  --panel-bg: rgba(255, 248, 224, 0.82);
-  --music-bg-start: #e5b420;
-  --music-bg-end: #ffe58c;
-  --music-vibe-start: #fff0b2;
-  --music-vibe-end: #e19c00;
-  --table-border-color: rgba(170, 131, 31, 0.28);
-  --table-header-bg: rgba(255, 229, 140, 0.26);
-  --table-row-alt-bg: rgba(185, 133, 0, 0.06);
-  --button-bg: rgba(255, 250, 234, 0.92);
-  --button-bg-hover: rgba(255, 246, 214, 0.98);
-  --button-border: rgba(181, 132, 10, 0.24);
-  --button-shadow: 0 0 0 1px rgba(185, 133, 0, 0.08), 0 14px 34px rgba(109, 86, 20, 0.12);
-  --button-shadow-hover: 0 0 0 1px rgba(185, 133, 0, 0.15), 0 18px 38px rgba(109, 86, 20, 0.18);
-  --equation-bg: rgba(255, 248, 227, 0.88);
-  --equation-text: #302606;
+  --background-color: #fcf8ee;
+  --background-secondary: #f6ecd8;
+  --text-color: #352a0a;
+  --text-secondary-color: #6d6243;
+  --accent-color: #a97800;
+  --icon-color: #a97800;
+  --image-border-color: #c69a2b;
+  --code-border-color: rgba(169, 120, 0, 0.2);
+  --panel-bg: rgba(255, 250, 237, 0.84);
+  --music-bg-start: #ddb245;
+  --music-bg-end: #f7dfa0;
+  --music-vibe-start: #fff3c8;
+  --music-vibe-end: #d8971e;
+  --table-border-color: rgba(169, 120, 0, 0.22);
+  --table-header-bg: rgba(246, 211, 121, 0.2);
+  --table-row-alt-bg: rgba(169, 120, 0, 0.045);
+  --button-bg: rgba(255, 252, 242, 0.94);
+  --button-bg-hover: rgba(254, 248, 226, 0.98);
+  --button-border: rgba(169, 120, 0, 0.18);
+  --button-shadow: 0 0 0 1px rgba(169, 120, 0, 0.06), 0 14px 34px rgba(110, 84, 18, 0.1);
+  --button-shadow-hover: 0 0 0 1px rgba(169, 120, 0, 0.1), 0 18px 38px rgba(110, 84, 18, 0.14);
+  --equation-bg: rgba(255, 250, 239, 0.9);
+  --equation-text: #352a0a;
   --home-overlay:
-    linear-gradient(135deg, rgba(251, 247, 232, 0.74), rgba(247, 234, 198, 0.68)),
-    radial-gradient(circle at top right, rgba(240, 194, 64, 0.18), transparent 32%),
-    linear-gradient(rgba(201, 157, 44, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201, 157, 44, 0.12) 1px, transparent 1px);
-  --home-text: #231b00;
-  --home-panel-bg: linear-gradient(145deg, rgba(255, 251, 241, 0.88), rgba(247, 234, 197, 0.82));
+    linear-gradient(135deg, rgba(252, 248, 238, 0.76), rgba(247, 236, 210, 0.68)),
+    radial-gradient(circle at top right, rgba(232, 185, 68, 0.14), transparent 34%),
+    linear-gradient(rgba(195, 151, 43, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(195, 151, 43, 0.1) 1px, transparent 1px);
+  --home-text: #2a2107;
+  --home-panel-bg: linear-gradient(145deg, rgba(255, 252, 244, 0.9), rgba(248, 237, 211, 0.8));
 }
 
 :root[data-theme="light"] {
   --font-body: "Rajdhani", sans-serif;
+  --font-reading: "IBM Plex Sans", sans-serif;
   --font-heading: "Orbitron", sans-serif;
   --font-mono: "Roboto Mono", monospace;
-  --background-color: #fbf7e8;
-  --background-secondary: #f4ead0;
-  --text-color: #302606;
-  --text-secondary-color: #726239;
-  --accent-color: #b98500;
-  --icon-color: #b98500;
-  --image-border-color: #c69718;
-  --code-border-color: rgba(165, 122, 18, 0.28);
-  --panel-bg: rgba(255, 248, 224, 0.82);
-  --equation-bg: rgba(255, 248, 227, 0.88);
-  --equation-text: #302606;
-  --table-border-color: rgba(170, 131, 31, 0.28);
-  --table-header-bg: rgba(255, 229, 140, 0.26);
-  --table-row-alt-bg: rgba(185, 133, 0, 0.06);
-  --button-bg: rgba(255, 250, 234, 0.92);
-  --button-bg-hover: rgba(255, 246, 214, 0.98);
-  --button-border: rgba(181, 132, 10, 0.24);
-  --button-shadow: 0 0 0 1px rgba(185, 133, 0, 0.08), 0 14px 34px rgba(109, 86, 20, 0.12);
-  --button-shadow-hover: 0 0 0 1px rgba(185, 133, 0, 0.15), 0 18px 38px rgba(109, 86, 20, 0.18);
+  --background-color: #fcf8ee;
+  --background-secondary: #f6ecd8;
+  --text-color: #352a0a;
+  --text-secondary-color: #6d6243;
+  --accent-color: #a97800;
+  --icon-color: #a97800;
+  --image-border-color: #c69a2b;
+  --code-border-color: rgba(169, 120, 0, 0.2);
+  --panel-bg: rgba(255, 250, 237, 0.84);
+  --equation-bg: rgba(255, 250, 239, 0.9);
+  --equation-text: #352a0a;
+  --table-border-color: rgba(169, 120, 0, 0.22);
+  --table-header-bg: rgba(246, 211, 121, 0.2);
+  --table-row-alt-bg: rgba(169, 120, 0, 0.045);
+  --button-bg: rgba(255, 252, 242, 0.94);
+  --button-bg-hover: rgba(254, 248, 226, 0.98);
+  --button-border: rgba(169, 120, 0, 0.18);
+  --button-shadow: 0 0 0 1px rgba(169, 120, 0, 0.06), 0 14px 34px rgba(110, 84, 18, 0.1);
+  --button-shadow-hover: 0 0 0 1px rgba(169, 120, 0, 0.1), 0 18px 38px rgba(110, 84, 18, 0.14);
   --home-overlay:
-    linear-gradient(135deg, rgba(251, 247, 232, 0.74), rgba(247, 234, 198, 0.68)),
-    radial-gradient(circle at top right, rgba(240, 194, 64, 0.18), transparent 32%),
-    linear-gradient(rgba(201, 157, 44, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201, 157, 44, 0.12) 1px, transparent 1px);
-  --home-text: #231b00;
-  --home-panel-bg: linear-gradient(145deg, rgba(255, 251, 241, 0.88), rgba(247, 234, 197, 0.82));
+    linear-gradient(135deg, rgba(252, 248, 238, 0.76), rgba(247, 236, 210, 0.68)),
+    radial-gradient(circle at top right, rgba(232, 185, 68, 0.14), transparent 34%),
+    linear-gradient(rgba(195, 151, 43, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(195, 151, 43, 0.1) 1px, transparent 1px);
+  --home-text: #2a2107;
+  --home-panel-bg: linear-gradient(145deg, rgba(255, 252, 244, 0.9), rgba(248, 237, 211, 0.8));
 }
 
 :root[data-theme="dark"] {
@@ -124,8 +126,8 @@ body {
 
 :root[data-theme="light"] body {
   background-image:
-    radial-gradient(circle at top, rgba(233, 183, 31, 0.1), transparent 36%),
-    linear-gradient(180deg, rgba(255, 243, 205, 0.55), transparent 20%);
+    radial-gradient(circle at top, rgba(214, 163, 33, 0.08), transparent 36%),
+    linear-gradient(180deg, rgba(255, 246, 221, 0.5), transparent 22%);
 }
 
 :root[data-theme="dark"] body {
@@ -182,6 +184,14 @@ body.home-page small {
 .lead {
   line-height: 1.6;
   letter-spacing: 0.02em;
+}
+
+.page-content p,
+.page-content li,
+.page-content blockquote,
+.page-content td,
+.page-content th {
+  font-family: var(--font-reading);
 }
 
 .intro-text {
@@ -777,9 +787,9 @@ h3 {
 :root[data-theme="light"] h1,
 :root[data-theme="light"] h2,
 :root[data-theme="light"] h3 {
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  text-shadow: 0 0 12px rgba(221, 176, 53, 0.12);
+  text-shadow: 0 0 10px rgba(221, 176, 53, 0.08);
 }
 
 :root[data-theme="dark"] h1,
@@ -915,9 +925,9 @@ pre code {
 }
 
 :root[data-theme="light"] .lead {
-  color: #4d3900;
+  color: #4a390f;
   font-size: 1.1rem;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
 }
 
 :root[data-theme="light"] .intro-text,
