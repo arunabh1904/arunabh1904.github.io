@@ -783,19 +783,6 @@ tbody tr:nth-child(odd) {
    9) EQUATION BOX
    ------------------------------------------------------ */
 
-.equation-box {
-  background-color: var(--equation-bg);
-  color: var(--equation-text);
-  border: 1px solid var(--table-border-color);
-  padding: 1rem;
-  margin: 1rem 0;
-  overflow-x: auto;
-}
-
-.equation-box .katex-display {
-  margin: 0;
-}
-
 .katex-display {
   display: block;
   width: 100%;
@@ -826,18 +813,6 @@ tbody tr:nth-child(odd) {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-.katex-display::before {
-  content: "Equation";
-  display: block;
-  margin-bottom: 0.8rem;
-  font-family: var(--font-heading);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-secondary-color);
 }
 
 .katex-display .katex-html {
