@@ -104,6 +104,7 @@
   --button-shadow-hover: 0 0 0 1px rgba(255, 228, 92, 0.2), 0 18px 38px rgba(0, 0, 0, 0.58);
   --code-block-bg-dark: linear-gradient(145deg, rgba(20, 20, 20, 0.98), rgba(10, 10, 10, 0.99));
   --code-block-text-dark: #fff4b8;
+  --code-block-token-dark: #ffe98a;
   --code-block-border-dark: rgba(255, 228, 92, 0.3);
   --code-block-filter-dark: brightness(1.42) saturate(1.35) contrast(1.12);
   --home-overlay:
@@ -898,7 +899,8 @@ pre code {
 
 :root[data-theme="dark"] pre code span,
 :root[data-theme="dark"] pre code span[style] {
-  filter: var(--code-block-filter-dark);
+  color: var(--code-block-token-dark) !important;
+  filter: none;
 }
 
 .section {
