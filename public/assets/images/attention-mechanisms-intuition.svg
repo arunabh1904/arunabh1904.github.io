@@ -85,10 +85,13 @@
   <text x="500" y="356" fill="#312e81" font-family="Roboto Mono, monospace" font-size="24" font-weight="500">
     animal
   </text>
-  <text x="500" y="386" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18">
-    key: animate noun, plausible thing that can be tired
+  <text x="500" y="384" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
+    key: animate noun, plausible
   </text>
-  <rect x="718" y="336" width="184" height="60" rx="18" fill="url(#valueFill)" stroke="#22c55e" stroke-width="2" />
+  <text x="500" y="406" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
+    antecedent for "too tired"
+  </text>
+  <rect x="726" y="336" width="176" height="60" rx="18" fill="url(#valueFill)" stroke="#22c55e" stroke-width="2" />
   <text x="810" y="374" text-anchor="middle" fill="#166534" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20" font-weight="600">
     value: entity meaning
   </text>
@@ -97,10 +100,13 @@
   <text x="500" y="490" fill="#312e81" font-family="Roboto Mono, monospace" font-size="24" font-weight="500">
     street
   </text>
-  <text x="500" y="520" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18">
-    key: location, weak semantic fit for "too tired"
+  <text x="500" y="518" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
+    key: location cue, weak match
   </text>
-  <rect x="718" y="470" width="184" height="60" rx="18" fill="url(#valueFill)" stroke="#22c55e" stroke-width="2" />
+  <text x="500" y="540" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
+    for explaining "too tired"
+  </text>
+  <rect x="726" y="470" width="176" height="60" rx="18" fill="url(#valueFill)" stroke="#22c55e" stroke-width="2" />
   <text x="810" y="508" text-anchor="middle" fill="#166534" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20" font-weight="600">
     value: scene detail
   </text>
@@ -109,10 +115,13 @@
   <text x="500" y="624" fill="#312e81" font-family="Roboto Mono, monospace" font-size="24" font-weight="500">
     tired
   </text>
-  <text x="500" y="654" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18">
-    key: causal clue explaining why the event happened
+  <text x="500" y="652" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
+    key: causal clue that helps
   </text>
-  <rect x="718" y="604" width="184" height="60" rx="18" fill="url(#valueFill)" stroke="#22c55e" stroke-width="2" />
+  <text x="500" y="674" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
+    explain why it happened
+  </text>
+  <rect x="726" y="604" width="176" height="60" rx="18" fill="url(#valueFill)" stroke="#22c55e" stroke-width="2" />
   <text x="810" y="642" text-anchor="middle" fill="#166534" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20" font-weight="600">
     value: fatigue signal
   </text>
@@ -121,14 +130,17 @@
   <path d="M 344 500 C 404 510, 420 510, 458 504" fill="none" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round" marker-end="url(#arrowSoft)" opacity="0.9" />
   <path d="M 344 520 C 398 570, 420 610, 458 640" fill="none" stroke="#0f766e" stroke-width="5" stroke-linecap="round" marker-end="url(#arrowSoft)" opacity="0.8" />
 
-  <text x="380" y="382" fill="#1d4ed8" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20" font-weight="600">
-    weight 0.72
+  <rect x="348" y="354" width="82" height="28" rx="14" fill="#f8fbff" opacity="0.96" />
+  <text x="389" y="373" text-anchor="middle" fill="#1d4ed8" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16" font-weight="700">
+    w = 0.72
   </text>
-  <text x="382" y="494" fill="#64748b" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18" font-weight="600">
-    weight 0.08
+  <rect x="348" y="481" width="82" height="28" rx="14" fill="#f8fbff" opacity="0.96" />
+  <text x="389" y="500" text-anchor="middle" fill="#64748b" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16" font-weight="700">
+    w = 0.08
   </text>
-  <text x="378" y="610" fill="#0f766e" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18" font-weight="600">
-    weight 0.20
+  <rect x="348" y="609" width="82" height="28" rx="14" fill="#f8fbff" opacity="0.96" />
+  <text x="389" y="628" text-anchor="middle" fill="#0f766e" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16" font-weight="700">
+    w = 0.20
   </text>
 
   <rect x="1012" y="210" width="300" height="470" rx="28" fill="#f8fbff" stroke="#c8d7e7" stroke-width="2" />
