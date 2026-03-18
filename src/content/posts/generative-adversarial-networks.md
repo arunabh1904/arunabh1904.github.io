@@ -21,11 +21,11 @@ summary: 2014 – Generative Adversarial Networks
 
 **Summary (abstract in plain English):**
 GANs formulate generative modelling as a game between two neural networks.
-A generator \(G\) transforms random noise into synthetic samples, while a
- discriminator \(D\) learns to distinguish real data from fakes.
-Training alternates between improving \(D\) to classify correctly and
-adjusting \(G\) to fool \(D\).
-At equilibrium, \(G\) replicates the true data distribution and \(D\) outputs
+A generator $G$ transforms random noise into synthetic samples, while a
+ discriminator $D$ learns to distinguish real data from fakes.
+Training alternates between improving $D$ to classify correctly and
+adjusting $G$ to fool $D$.
+At equilibrium, $G$ replicates the true data distribution and $D$ outputs
 0.5 everywhere.
 Initial experiments with multilayer perceptrons produced realistic MNIST
  digits without needing explicit likelihoods.

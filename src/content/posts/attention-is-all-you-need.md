@@ -49,9 +49,9 @@ def scaled_dot_product_attention(
     return output, weights
 ```
 
-The scaling by \(\sqrt{d_k}\) keeps the logits numerically stable as \(d_k\) grows.
-The additive mask inserts \(-\infty\) so the softmax cleanly ignores blocked positions.
-Multi-head attention, typically eight heads with \(d_k = d_v = 64\),
+The scaling by $\sqrt{d_k}$ keeps the logits numerically stable as $d_k$ grows.
+The additive mask inserts $-\infty$ so the softmax cleanly ignores blocked positions.
+Multi-head attention, typically eight heads with $d_k = d_v = 64$,
 preserves information that a single head would compress.
 
 <img src="/assets/images/attention.png" alt="Transformer" style="max-width:60%;margin:1rem auto;display:block;">

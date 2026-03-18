@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import fg from 'fast-glob';
 import { describe, expect, it } from 'vitest';
 import {
   groupPostsByField,
@@ -13,6 +14,7 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
 const manifestPath = path.join(projectRoot, 'src', 'content', 'migration-manifest.json');
+const postsDir = path.join(projectRoot, 'src', 'content', 'posts');
 
 type ManifestEntry = {
   legacyPath: string;
@@ -64,6 +66,28 @@ describe('migration manifest', () => {
         'my-journey',
       ]),
     );
+  });
+});
+
+describe('markdown authoring', () => {
+  it('uses remark-math compatible delimiters in posts', async () => {
+    const postFiles = await fg('**/*.{md,mdx}', {
+      cwd: postsDir,
+      absolute: true,
+    });
+
+    const offenders: string[] = [];
+    for (const filePath of postFiles) {
+      const source = await readFile(filePath, 'utf8');
+      if (/\\\(|\\\)|\\\[|\\\]/.test(source)) {
+        offenders.push(path.relative(projectRoot, filePath));
+      }
+    }
+
+    expect(
+      offenders,
+      'Use $...$ or $$...$$ instead of \\(...\\) or \\[...\\] in markdown posts.',
+    ).toEqual([]);
   });
 });
 

@@ -24,11 +24,11 @@ summary: 2019 – EfficientNet — Rethinking Model Scaling for ConvNets
 **Summary (abstract in plain English):**
 Standard CNNs tend to grow along a single axis: make them deeper, wider or feed higher-resolution images.
 Tan and Le show that such unbalanced scaling leaves accuracy on the table.
-They first search for a mobile-sized baseline (B0) then scale depth, width and resolution together using a single factor \(\phi\).
+They first search for a mobile-sized baseline (B0) then scale depth, width and resolution together using a single factor $\phi$.
 The compound rule keeps FLOPs roughly constant while delivering much better accuracy–efficiency trade-offs.
 
 **Novel insights:**
-- Compound scaling jointly tunes depth \(\alpha^\phi\), width \(\beta^\phi\) and resolution \(\gamma^\phi\) for better performance.
+- Compound scaling jointly tunes depth $\alpha^\phi$, width $\beta^\phi$ and resolution $\gamma^\phi$ for better performance.
 - One NAS-derived micro-architecture (B0) can be stretched analytically into a full B1–B7 family.
 - B1 matches ResNet-152 with 27× fewer FLOPs, while B7 tops ImageNet using a fraction of prior NAS parameters.
 

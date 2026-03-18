@@ -22,7 +22,7 @@ summary: 2014 – Auto-Encoding Variational Bayes
 **Summary (abstract in plain English):**
 Kingma and Welling propose training deep generative models with continuous latent variables by
 optimising a reparameterised evidence lower bound (ELBO) using standard stochastic gradient descent.
-An encoder \(q_\phi(z \mid x)\) approximates the true posterior, while a decoder \(p_\theta(x \mid z)\)
+An encoder $q_\phi(z \mid x)$ approximates the true posterior, while a decoder $p_\theta(x \mid z)$
 reconstructs observations. The reparameterisation trick makes the stochastic nodes differentiable,
 enabling efficient gradient learning.
 
@@ -31,11 +31,11 @@ enabling efficient gradient learning.
 - Recognition networks fuse amortised inference with deep learning, making variational Bayes practical
   at scale.
 - Established VAEs as a general-purpose unsupervised representation learner, inspiring variants such as
-  \(\beta\)-VAE, conditional VAEs, and flow-based models.
+  $\beta$-VAE, conditional VAEs, and flow-based models.
 
 **Evals / Latency benchmarks:**
 
-| Dataset | Latent dim | \(-\log p(x)\) ↓ (nats) | Notes |
+| Dataset | Latent dim | $-\log p(x)$ ↓ (nats) | Notes |
 | ------- | ---------- | ---------------------- | ----- |
 | Binarised MNIST | 30 | ≈ 88 nats (ELBO estimate) | Competed closely with deep latent-Gaussian models |
 | Frey Faces | 2 | Smooth latent manifold | Visually coherent reconstructions |

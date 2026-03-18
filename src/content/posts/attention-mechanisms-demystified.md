@@ -35,17 +35,17 @@ It scores candidate sources using keys, then mixes their values into a new repre
 
 The entire mechanism is summarized by a single expression:
 
-\[
+$$
 \operatorname{Attention}(Q, K, V)
 =
 \operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
-\]
+$$
 
 This looks abstract at first, but each term has a clean interpretation:
 
-- \(QK^\top\) computes compatibility scores between what each token is looking for and what every other token advertises.
-- The softmax turns those scores into a probability distribution, so each row becomes a set of attention weights that sum to \(1\).
-- Multiplying by \(V\) produces a weighted combination of the returned content.
+- $QK^\top$ computes compatibility scores between what each token is looking for and what every other token advertises.
+- The softmax turns those scores into a probability distribution, so each row becomes a set of attention weights that sum to $1$.
+- Multiplying by $V$ produces a weighted combination of the returned content.
 
 The most important conceptual point is this:
 **attention weights choose where to look; values determine what information is retrieved.**
@@ -114,21 +114,21 @@ the current token emits a query,
 scores every candidate key,
 and then mixes the returned values into a contextualized representation.*
 
-### Why the scaling term \(\sqrt{d_k}\) matters
+### Why the scaling term $\sqrt{d_k}$ matters
 
-The division by \(\sqrt{d_k}\) is not a cosmetic trick.
+The division by $\sqrt{d_k}$ is not a cosmetic trick.
 It keeps the softmax in a regime where learning remains stable.
 
 Here is the intuition.
-If query and key vectors have dimension \(d_k\),
-their dot product tends to grow in magnitude as \(d_k\) increases.
+If query and key vectors have dimension $d_k$,
+their dot product tends to grow in magnitude as $d_k$ increases.
 Without scaling, those scores can become very large,
 which makes the softmax extremely sharp.
 When that happens, one position wins too early,
 the distribution loses useful entropy,
 and gradients become small or brittle.
 
-Dividing by \(\sqrt{d_k}\) acts like a temperature control.
+Dividing by $\sqrt{d_k}$ acts like a temperature control.
 It prevents the model from becoming prematurely overconfident,
 especially during training,
 and lets the network compare candidates without collapsing into a near one-hot choice too soon.
@@ -136,27 +136,27 @@ and lets the network compare candidates without collapsing into a near one-hot c
 ### Self-attention: every token rewrites itself using the whole sequence
 
 In self-attention, the same sequence provides the queries, keys, and values.
-If the input token matrix is \(X \in \mathbb{R}^{n \times d_{\text{model}}}\),
+If the input token matrix is $X \in \mathbb{R}^{n \times d_{\text{model}}}$,
 the model computes
 
-\[
+$$
 Q = XW^Q,\qquad
 K = XW^K,\qquad
 V = XW^V
-\]
+$$
 
 and then
 
-\[
+$$
 A = \operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right),
 \qquad
 Y = AV
-\]
+$$
 
 where:
 
-- each row of \(A\) tells us **where one token looks**,
-- each row of \(Y\) is the **rewritten version of that token after gathering context**.
+- each row of $A$ tells us **where one token looks**,
+- each row of $Y$ is the **rewritten version of that token after gathering context**.
 
 This is the deepest intuition behind self-attention:
 **a token does not keep a fixed meaning as it moves upward through the network.**
@@ -185,7 +185,7 @@ But language contains many kinds of relationships at once:
 - long-range topic continuity.
 
 Multi-head attention addresses this by learning multiple sets of projections.
-Each head gets its own \(W^Q\), \(W^K\), and \(W^V\),
+Each head gets its own $W^Q$, $W^K$, and $W^V$,
 so each head can build a different compatibility function over the same sequence.
 
 This is often explained as "different heads specialize in different things."

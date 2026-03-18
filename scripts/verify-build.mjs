@@ -37,6 +37,22 @@ async function main() {
     assertExists(path.join(distDir, relativePath));
   }
 
+  const attentionPagePath = path.join(
+    distDir,
+    'ponderings',
+    '2025',
+    '05',
+    '25',
+    'attention-mechanisms-demystified.html',
+  );
+  const attentionHtml = await readFile(attentionPagePath, 'utf8');
+  if (!attentionHtml.includes('katex-display')) {
+    throw new Error('Expected the attention mechanisms post to contain rendered KaTeX output.');
+  }
+  if (attentionHtml.includes('<h1 id="operatornameattentionq-k-v">[')) {
+    throw new Error('Attention mechanisms post still contains raw markdown-mangled math output.');
+  }
+
   console.log(`Verified ${criticalPages.length} critical pages and ${manifest.length} post routes.`);
 }
 
