@@ -26,7 +26,7 @@ const themeStylesheetHref = '/css/override.css?v=20260318-cyberpunk-restore-1';
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/feed.xml" />
     <title>{pageTitle}</title>
     <script is:inline>
-      {`(() => {
+      (() => {
         const saved = localStorage.getItem('theme');
         const theme =
           saved === 'light' || saved === 'dark'
@@ -35,7 +35,7 @@ const themeStylesheetHref = '/css/override.css?v=20260318-cyberpunk-restore-1';
               ? 'dark'
               : 'light';
         document.documentElement.setAttribute('data-theme', theme);
-      })();`}
+      })();
     </script>
     <link
       rel="stylesheet"
@@ -73,7 +73,7 @@ const themeStylesheetHref = '/css/override.css?v=20260318-cyberpunk-restore-1';
     <slot />
     <script is:inline src="/assets/js/site-controls.js"></script>
     <script is:inline>
-      {`document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', () => {
         if (typeof renderMathInElement !== 'function') {
           return;
         }
@@ -81,14 +81,14 @@ const themeStylesheetHref = '/css/override.css?v=20260318-cyberpunk-restore-1';
         renderMathInElement(document.body, {
           delimiters: [
             { left: '$$', right: '$$', display: true },
-            { left: '\\\\[', right: '\\\\]', display: true },
+            { left: '\\[', right: '\\]', display: true },
             { left: '$', right: '$', display: false },
-            { left: '\\\\(', right: '\\\\)', display: false },
+            { left: '\\(', right: '\\)', display: false },
           ],
           ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
           throwOnError: false,
         });
-      });`}
+      });
     </script>
   </body>
 </html>
