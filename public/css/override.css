@@ -23,6 +23,8 @@
   --music-bg-end: #b7ceff;
   --music-vibe-start: #d8e5ff;
   --music-vibe-end: #4b79e6;
+  --equation-border-color: rgba(53, 109, 255, 0.18);
+  --equation-shadow: 0 18px 40px rgba(53, 85, 150, 0.12);
   --table-border-color: rgba(53, 109, 255, 0.18);
   --table-header-bg: rgba(146, 178, 255, 0.18);
   --table-row-alt-bg: rgba(53, 109, 255, 0.04);
@@ -58,6 +60,8 @@
   --panel-bg: rgba(245, 249, 255, 0.84);
   --equation-bg: rgba(247, 250, 255, 0.9);
   --equation-text: #10213f;
+  --equation-border-color: rgba(53, 109, 255, 0.18);
+  --equation-shadow: 0 18px 40px rgba(53, 85, 150, 0.12);
   --table-border-color: rgba(53, 109, 255, 0.18);
   --table-header-bg: rgba(146, 178, 255, 0.18);
   --table-row-alt-bg: rgba(53, 109, 255, 0.04);
@@ -94,6 +98,8 @@
   --panel-bg: rgba(16, 16, 16, 0.84);
   --equation-bg: #0f0f0f;
   --equation-text: #f6e7a6;
+  --equation-border-color: rgba(255, 228, 92, 0.28);
+  --equation-shadow: 0 22px 42px rgba(0, 0, 0, 0.48);
   --table-border-color: rgba(255, 228, 92, 0.3);
   --table-header-bg: rgba(255, 228, 92, 0.09);
   --table-row-alt-bg: rgba(255, 228, 92, 0.04);
@@ -788,6 +794,42 @@ tbody tr:nth-child(odd) {
 
 .equation-box .katex-display {
   margin: 0;
+}
+
+.katex-display {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  border: 1px solid var(--equation-border-color);
+  border-radius: 18px;
+  background: var(--equation-bg);
+  box-shadow: var(--equation-shadow);
+}
+
+.katex-display > .katex {
+  color: var(--equation-text);
+  font-size: 1.08em;
+}
+
+.katex-display::before {
+  content: "Equation";
+  display: block;
+  margin-bottom: 0.8rem;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-secondary-color);
+}
+
+.katex-display .katex-html {
+  padding-bottom: 0.05rem;
+}
+
+.katex-error {
+  color: #ff6b6b;
+  font-weight: 600;
 }
 
 /* ------------------------------------------------------

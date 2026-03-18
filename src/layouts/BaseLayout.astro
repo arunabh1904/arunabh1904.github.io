@@ -43,6 +43,18 @@ const themeStylesheetHref = '/css/override.css?v=20260318-cyberpunk-restore-1';
       integrity="sha384-CErX1DK4Fk6gXV8zvfuTQDXyP/d9vywgqbiZ9erjRzCQXDpUe1koRaSPjqH9fHYC"
       crossorigin="anonymous"
     />
+    <script
+      is:inline
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      is:inline
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+      crossorigin="anonymous"
+    ></script>
     <link
       rel="preload"
       href="https://rsms.me/inter/font-files/InterVariable.woff2"
@@ -60,5 +72,23 @@ const themeStylesheetHref = '/css/override.css?v=20260318-cyberpunk-restore-1';
   <body class={pageClass}>
     <slot />
     <script is:inline src="/assets/js/site-controls.js"></script>
+    <script is:inline>
+      {`document.addEventListener('DOMContentLoaded', () => {
+        if (typeof renderMathInElement !== 'function') {
+          return;
+        }
+
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '\\\\[', right: '\\\\]', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\\\(', right: '\\\\)', display: false },
+          ],
+          ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          throwOnError: false,
+        });
+      });`}
+    </script>
   </body>
 </html>
