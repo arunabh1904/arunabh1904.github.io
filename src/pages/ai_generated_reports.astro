@@ -1,0 +1,23 @@
+---
+import PostLayout from '../layouts/PostLayout.astro';
+import PostList from '../components/PostList.astro';
+import { getPostsBySection } from '../lib/content';
+import { PDF_REPORTS } from '../lib/site';
+
+const posts = await getPostsBySection('ai-generated-reports', 'asc');
+---
+
+<PostLayout title="AI Generated Reports">
+  <h2>Audio summaries</h2>
+  {posts.length > 0 ? <PostList posts={posts} /> : <p>No audio summaries yet.</p>}
+
+  <h2>Deep research summaries</h2>
+  <ul class="icon-list">
+    {PDF_REPORTS.map((report) => (
+      <li>
+        <a href={report.href}>{report.label}</a>
+        <small>— {report.dateLabel}</small>
+      </li>
+    ))}
+  </ul>
+</PostLayout>

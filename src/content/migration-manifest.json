@@ -1,0 +1,186 @@
+[
+  {
+    "title": "My Journey So Far - The Full Story",
+    "section": "my-journey",
+    "postSlug": "my-journey-so-far-full-story",
+    "legacyPath": "/my journey so far/2025/02/08/my-journey-so-far-full-story.html",
+    "date": "2025-02-08T05:00:00.000Z",
+    "field": null
+  },
+  {
+    "title": "Playing Atari with Deep Reinforcement Learning",
+    "section": "paper-shorts",
+    "postSlug": "playing-atari-with-dqn",
+    "legacyPath": "/paper shorts/2013/12/01/playing-atari-with-dqn.html",
+    "date": "2013-12-01T05:00:00.000Z",
+    "field": "Reinforcement Learning"
+  },
+  {
+    "title": "Auto-Encoding Variational Bayes",
+    "section": "paper-shorts",
+    "postSlug": "auto-encoding-variational-bayes",
+    "legacyPath": "/paper shorts/2014/04/01/auto-encoding-variational-bayes.html",
+    "date": "2014-04-01T04:00:00.000Z",
+    "field": "Variational Inference"
+  },
+  {
+    "title": "Generative Adversarial Networks",
+    "section": "paper-shorts",
+    "postSlug": "generative-adversarial-networks",
+    "legacyPath": "/paper shorts/2014/06/01/generative-adversarial-networks.html",
+    "date": "2014-06-01T04:00:00.000Z",
+    "field": "Generative Models"
+  },
+  {
+    "title": "Sequence to Sequence Learning with Neural Networks",
+    "section": "paper-shorts",
+    "postSlug": "sequence-to-sequence-learning-with-neural-networks",
+    "legacyPath": "/paper shorts/2014/09/01/sequence-to-sequence-learning-with-neural-networks.html",
+    "date": "2014-09-01T04:00:00.000Z",
+    "field": "Natural Language Processing"
+  },
+  {
+    "title": "Deep Residual Learning for Image Recognition",
+    "section": "paper-shorts",
+    "postSlug": "deep-residual-learning-for-image-recognition",
+    "legacyPath": "/paper shorts/2015/12/01/deep-residual-learning-for-image-recognition.html",
+    "date": "2015-12-01T05:00:00.000Z",
+    "field": "Computer Vision"
+  },
+  {
+    "title": "Attention Is All You Need",
+    "section": "paper-shorts",
+    "postSlug": "attention-is-all-you-need",
+    "legacyPath": "/paper shorts/2017/06/01/attention-is-all-you-need.html",
+    "date": "2017-06-01T04:00:00.000Z",
+    "field": "Natural Language Processing"
+  },
+  {
+    "title": "Proximal Policy Optimization Algorithms (PPO)",
+    "section": "paper-shorts",
+    "postSlug": "proximal-policy-optimization-ppo",
+    "legacyPath": "/paper shorts/2017/07/01/proximal-policy-optimization-ppo.html",
+    "date": "2017-07-01T04:00:00.000Z",
+    "field": "Reinforcement Learning"
+  },
+  {
+    "title": "EfficientNet — Rethinking Model Scaling for ConvNets",
+    "section": "paper-shorts",
+    "postSlug": "efficientnet-rethinking-model-scaling-for-convnets",
+    "legacyPath": "/paper shorts/2019/05/01/efficientnet-rethinking-model-scaling-for-convnets.html",
+    "date": "2019-05-01T04:00:00.000Z",
+    "field": "Computer Vision"
+  },
+  {
+    "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+    "section": "paper-shorts",
+    "postSlug": "bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding",
+    "legacyPath": "/paper shorts/2019/06/01/bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding.html",
+    "date": "2019-06-01T04:00:00.000Z",
+    "field": "Natural Language Processing"
+  },
+  {
+    "title": "Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model",
+    "section": "paper-shorts",
+    "postSlug": "mastering-atari-go-chess-shogi-muzero",
+    "legacyPath": "/paper shorts/2019/11/01/mastering-atari-go-chess-shogi-muzero.html",
+    "date": "2019-11-01T05:00:00.000Z",
+    "field": "Reinforcement Learning"
+  },
+  {
+    "title": "EfficientDet: Scalable and Efficient Object Detection",
+    "section": "paper-shorts",
+    "postSlug": "efficientdet-scalable-and-efficient-object-detection",
+    "legacyPath": "/paper shorts/2020/04/01/efficientdet-scalable-and-efficient-object-detection.html",
+    "date": "2020-04-01T04:00:00.000Z",
+    "field": "Computer Vision"
+  },
+  {
+    "title": "Language Models are Few-Shot Learners",
+    "section": "paper-shorts",
+    "postSlug": "language-models-are-few-shot-learners",
+    "legacyPath": "/paper shorts/2020/05/01/language-models-are-few-shot-learners.html",
+    "date": "2020-05-01T04:00:00.000Z",
+    "field": "Natural Language Processing"
+  },
+  {
+    "title": "Denoising Diffusion Probabilistic Models",
+    "section": "paper-shorts",
+    "postSlug": "denoising-diffusion-probabilistic-models",
+    "legacyPath": "/paper shorts/2020/06/01/denoising-diffusion-probabilistic-models.html",
+    "date": "2020-06-01T04:00:00.000Z",
+    "field": "Generative Models"
+  },
+  {
+    "title": "An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale",
+    "section": "paper-shorts",
+    "postSlug": "an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale",
+    "legacyPath": "/paper shorts/2020/10/01/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale.html",
+    "date": "2020-10-01T04:00:00.000Z",
+    "field": "Computer Vision"
+  },
+  {
+    "title": "Learning Transferable Visual Models From Natural Language Supervision",
+    "section": "paper-shorts",
+    "postSlug": "learning-transferable-visual-models-from-natural-language-supervision",
+    "legacyPath": "/paper shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html",
+    "date": "2021-03-01T04:00:00.000Z",
+    "field": "Computer Vision"
+  },
+  {
+    "title": "Improved Denoising Diffusion Probabilistic Models",
+    "section": "paper-shorts",
+    "postSlug": "improved-denoising-diffusion-probabilistic-models",
+    "legacyPath": "/paper shorts/2021/06/01/improved-denoising-diffusion-probabilistic-models.html",
+    "date": "2021-06-01T04:00:00.000Z",
+    "field": "Generative Models"
+  },
+  {
+    "title": "Training Language Models to Follow Instructions with Human Feedback",
+    "section": "paper-shorts",
+    "postSlug": "training-language-models-to-follow-instructions-with-human-feedback",
+    "legacyPath": "/paper shorts/2022/02/28/training-language-models-to-follow-instructions-with-human-feedback.html",
+    "date": "2022-03-01T04:00:00.000Z",
+    "field": "Alignment"
+  },
+  {
+    "title": "Direct Preference Optimization",
+    "section": "paper-shorts",
+    "postSlug": "direct-preference-optimization-dpo",
+    "legacyPath": "/paper shorts/2023/05/01/direct-preference-optimization-dpo.html",
+    "date": "2023-05-01T04:00:00.000Z",
+    "field": "Reinforcement Learning"
+  },
+  {
+    "title": "Sigmoid Loss for Language-Image Pre-Training (SigLIP)",
+    "section": "paper-shorts",
+    "postSlug": "sigmoid-loss-for-language-image-pre-training-siglip",
+    "legacyPath": "/paper shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html",
+    "date": "2023-10-01T04:00:00.000Z",
+    "field": "Computer Vision"
+  },
+  {
+    "title": "Attention Mechanisms Demystified",
+    "section": "ponderings",
+    "postSlug": "attention-mechanisms-demystified",
+    "legacyPath": "/ponderings/2025/05/25/attention-mechanisms-demystified.html",
+    "date": "2025-05-25T04:00:00.000Z",
+    "field": null
+  },
+  {
+    "title": "Lecture 2",
+    "section": "revision-notes",
+    "postSlug": "cs336-revision-notes",
+    "legacyPath": "/revision notes/2025/05/15/cs336-revision-notes.html",
+    "date": "2025-05-15T04:00:00.000Z",
+    "field": null
+  },
+  {
+    "title": "Lecture 3",
+    "section": "revision-notes",
+    "postSlug": "cs336-lecture-3",
+    "legacyPath": "/revision notes/2025/05/22/cs336-lecture-3.html",
+    "date": "2025-05-22T04:00:00.000Z",
+    "field": null
+  }
+]

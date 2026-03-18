@@ -1,0 +1,28 @@
+---
+import PostLayout from '../layouts/PostLayout.astro';
+import { getPostsByField } from '../lib/content';
+
+const fields = await getPostsByField();
+---
+
+<PostLayout title="Paper Summaries by Field">
+  {fields.map(({ field, items }) => (
+    <>
+      <h2>{field}</h2>
+      <ul>
+        {items.map((post) => (
+          <li>
+            <a href={post.data.legacyPath}>{post.data.title}</a>
+            <small>
+              — {post.data.date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: '2-digit',
+                year: 'numeric',
+              })}
+            </small>
+          </li>
+        ))}
+      </ul>
+    </>
+  ))}
+</PostLayout>

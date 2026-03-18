@@ -1,0 +1,17 @@
+---
+import { CONTACT_LINKS } from '../lib/site';
+---
+
+<div class="links-panel">
+  <h2 style="margin-top: 0; font-size: 1.2rem;">Contact Me</h2>
+  <ul class="link-list" style="list-style: none; margin: 0; padding: 0;">
+    {CONTACT_LINKS.map((link) => (
+      <li style="display: flex; align-items: center; margin-bottom: 1rem;">
+        <i class={link.iconClass} style="margin-right: 8px;"></i>
+        <a href={link.href} target={link.href.startsWith('mailto:') ? undefined : '_blank'}>
+          {link.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>

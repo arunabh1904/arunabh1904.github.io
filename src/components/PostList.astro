@@ -1,0 +1,26 @@
+---
+import type { PostEntry } from '../lib/content';
+
+interface Props {
+  posts: PostEntry[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ul class="icon-list">
+  {posts.map((post) => (
+    <li>
+      <a href={post.data.legacyPath}>{post.data.title}</a>
+      <small>
+        — {
+          post.data.date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+          })
+        }
+      </small>
+    </li>
+  ))}
+</ul>

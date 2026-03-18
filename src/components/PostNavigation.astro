@@ -1,0 +1,37 @@
+---
+import type { PostEntry } from '../lib/content';
+
+interface Props {
+  previous?: PostEntry;
+  next?: PostEntry;
+}
+
+const { previous, next } = Astro.props;
+const archiveHref = '/archive.html';
+---
+
+<hr />
+<div class="post_navi">
+  <a
+    class="post_navi-item nav_prev"
+    href={previous ? previous.data.legacyPath : archiveHref}
+    title={previous ? previous.data.title : 'Blog Archive'}
+  >
+    <div class="post_navi-arrow">&lt;</div>
+    <div class="post_navi-label">{previous ? 'Previous Post' : 'Blog Archive'}</div>
+    <div>
+      <span>{previous ? previous.data.title : 'Archive of all previous blog posts'}</span>
+    </div>
+  </a>
+  <a
+    class="post_navi-item nav_next"
+    href={next ? next.data.legacyPath : archiveHref}
+    title={next ? next.data.title : 'Blog Archive'}
+  >
+    <div class="post_navi-arrow">&gt;</div>
+    <div class="post_navi-label">{next ? 'Next Post' : 'Blog Archive'}</div>
+    <div>
+      <span>{next ? next.data.title : 'Archive of all previous blog posts'}</span>
+    </div>
+  </a>
+</div>

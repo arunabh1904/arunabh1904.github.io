@@ -1,58 +1,26 @@
-# Personal Jekyll Blog
+# arunabh1904.github.io
 
-This repository contains the source for a static website built with [Jekyll](https://jekyllrb.com). The site uses the Minima theme with custom CSS for dark/light mode and some JavaScript to add navigation features.
+Personal blog rebuilt with Astro, MDX, and light React islands for interactive components.
 
-## Repository Overview
+## Stack
 
-Site settings and metadata (author, description, theme and plugins) are configured in `_config.yml`:
+- Astro
+- MDX
+- React islands
+- Vitest
+- GitHub Actions CI
 
+## Commands
+
+```bash
+npm install
+npm run dev
+npm run ci
 ```
-author: "Arunabh Mishra"
-description: "A personal blog on computer vision, robotics, and more."
-theme: "minima"
-plugins:
-  - jekyll-feed
-  - jekyll-sitemap
-  - jekyll-seo-tag
-```
 
-Posts use the default layout `post` and are automatically tagged via the configuration’s `defaults` section. The site excludes build files and paginates posts in sets of five.
+## Notes
 
-## Structure
-
-- `_layouts/` – Contains page templates. `home.html` defines the landing page layout with a full-page background and a pinned "Contact Me" panel at the bottom right. `post.html` defines post pages with light/dark theme toggling and an arrow button that returns to the home page.
-- `_includes/` – Partial templates. `head.html` loads fonts and metadata. Code syntax highlighting is handled globally via `_includes/code-assets.html` (currently using the *Pojoaque* theme); update that file to change the version or theme. `navlinks.html` and `sharelinks.html` provide previous/next navigation and social-sharing buttons respectively.
-- `css/override.css` – Custom styles, including variables for dark/light themes, styling for buttons, and a pinned links panel.
-- `index.html` – Home page content listing posts from two categories ("My Journey So Far" and "ML Deep research reports").
-- `paper_summaries.md` – Landing page for research paper notes, linking to pages organized by year and by field.
-- `music.html` – A pop-up music player launched via `assets/js/music.js` and `music-launcher.js`.
-- `archive.md` – Generates an archive of posts grouped by tag.
-- `_posts/` – Blog posts written in Markdown with front matter specifying layout, title, date and categories. Recent posts also include a "Revision Notes" section.
-
-Assets such as images are stored in `assets/images/`.
-PDFs can be added to `assets/pdfs/` and will appear in the ML Deep research reports section.
-Scripts such as the music player live in `assets/js/`.
-Code blocks are styled simply using `_sass/_code.scss`.
-
-## Getting Started
-
-1. Install Jekyll and dependencies (Ruby, Bundler) if you want to build locally.
-2. Run `jekyll serve` from the repository root to start a local server.
-3. Posts are created in `_posts/` following the `YYYY-MM-DD-title.md` naming scheme and include front matter (layout, title, date, categories).
-4. Modify `_config.yml` to change site settings like social usernames or pagination.
-5. Customize layouts or include files to alter page structure or metadata.
-
-## Staging Environment
-
-1. Create a `staging` branch from `main`.
-2. Push updates to this branch to run the workflow.
-3. Enable GitHub Pages on `staging` to preview changes.
-
-## What to Learn Next
-
-- **Jekyll basics** – Understanding layouts, includes, front matter and Liquid templating will help you modify or expand the site.
-- **Custom styling** – Explore how `css/override.css` interacts with the Minima theme to provide dark mode and responsive elements.
-- **Writing and organizing posts** – Posts can be grouped by categories or tags; see how `index.html` and `archive.md` loop over categories.
-- **GitHub Pages** – If hosting on GitHub, familiarize yourself with its Jekyll integration, which can build the site automatically.
-
-This README adapts the repository overview from a conversation with the repository maintainers to help new contributors quickly understand the project.
+- Legacy post URLs from the previous Jekyll blog are preserved.
+- Content lives in `src/content/posts`.
+- Static assets live in `public/assets`.
+- Build verification checks both critical pages and migrated post routes.

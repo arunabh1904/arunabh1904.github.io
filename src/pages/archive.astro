@@ -1,0 +1,26 @@
+---
+import PostLayout from '../layouts/PostLayout.astro';
+import { getAllPosts, groupPostsByTag } from '../lib/content';
+
+const posts = await getAllPosts();
+const grouped = groupPostsByTag(posts);
+---
+
+<PostLayout title="Blog Archive">
+  {grouped.map(({ tag, items }) => (
+    <>
+      <h3>{tag}</h3>
+      <ul>
+        {items.map((post) => (
+          <li>
+            <a href={post.data.legacyPath}>
+              {post.data.date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} -
+              {' '}
+              {post.data.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </>
+  ))}
+</PostLayout>

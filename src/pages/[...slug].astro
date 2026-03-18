@@ -1,0 +1,39 @@
+---
+import { getCollection, render } from 'astro:content';
+import PostLayout from '../layouts/PostLayout.astro';
+import { sortPostsAscending, trimLeadingSlash, type PostEntry } from '../lib/content';
+
+export async function getStaticPaths() {
+  const posts = sortPostsAscending(await getCollection('posts'));
+
+  return posts.map((entry, index) => ({
+    params: {
+      slug: trimLeadingSlash(entry.data.legacyPath).replace(/\.html$/, ''),
+    },
+    props: {
+      entry,
+      previous: posts[index - 1] ?? undefined,
+      next: posts[index + 1] ?? undefined,
+    },
+  }));
+}
+
+interface Props {
+  entry: PostEntry;
+  previous?: PostEntry;
+  next?: PostEntry;
+}
+
+const { entry, previous, next } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<PostLayout
+  title={entry.data.title}
+  description={entry.data.summary}
+  previous={previous}
+  next={next}
+  showNavigation={true}
+>
+  <Content />
+</PostLayout>
