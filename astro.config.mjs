@@ -34,7 +34,7 @@ export default defineConfig({
     shikiConfig: {
       themes: {
         light: 'github-light',
-        dark: 'one-dark-pro',
+        dark: 'github-dark',
       },
       wrap: true,
     },
