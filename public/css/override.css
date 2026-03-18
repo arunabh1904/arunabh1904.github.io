@@ -104,9 +104,7 @@
   --button-shadow-hover: 0 0 0 1px rgba(255, 228, 92, 0.2), 0 18px 38px rgba(0, 0, 0, 0.58);
   --code-block-bg-dark: linear-gradient(145deg, rgba(20, 20, 20, 0.98), rgba(10, 10, 10, 0.99));
   --code-block-text-dark: #fff4b8;
-  --code-block-token-dark: #ffe98a;
   --code-block-border-dark: rgba(255, 228, 92, 0.3);
-  --code-block-filter-dark: brightness(1.42) saturate(1.35) contrast(1.12);
   --home-overlay:
     linear-gradient(135deg, rgba(0, 0, 0, 0.82), rgba(20, 16, 0, 0.74)),
     radial-gradient(circle at top right, rgba(255, 228, 92, 0.14), transparent 30%),
@@ -884,6 +882,11 @@ pre code {
     0 12px 30px rgba(0, 0, 0, 0.24);
 }
 
+:root[data-theme="dark"] pre.astro-code {
+  background-color: var(--shiki-dark-bg) !important;
+  color: var(--shiki-dark) !important;
+}
+
 :root[data-theme="dark"] pre code,
 :root[data-theme="dark"] pre code span,
 :root[data-theme="dark"] pre code span[style] {
@@ -894,13 +897,11 @@ pre code {
 }
 
 :root[data-theme="dark"] pre code {
-  color: var(--code-block-text-dark);
+  color: var(--shiki-dark, var(--code-block-text-dark));
 }
 
-:root[data-theme="dark"] pre code span,
 :root[data-theme="dark"] pre code span[style] {
-  color: var(--code-block-token-dark) !important;
-  filter: none;
+  color: var(--shiki-dark) !important;
 }
 
 .section {
