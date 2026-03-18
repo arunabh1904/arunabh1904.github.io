@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 import { CONTACT_LINKS } from '../lib/site';
 ---
 
@@ -7,7 +8,7 @@ import { CONTACT_LINKS } from '../lib/site';
   <ul class="link-list" style="list-style: none; margin: 0; padding: 0;">
     {CONTACT_LINKS.map((link) => (
       <li style="display: flex; align-items: center; margin-bottom: 1rem;">
-        <i class={link.iconClass} style="margin-right: 8px;"></i>
+        <Icon name={link.iconName} class="contact-icon" />
         <a href={link.href} target={link.href.startsWith('mailto:') ? undefined : '_blank'}>
           {link.label}
         </a>

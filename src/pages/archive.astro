@@ -1,6 +1,6 @@
 ---
 import PostLayout from '../layouts/PostLayout.astro';
-import { getAllPosts, groupPostsByTag } from '../lib/content';
+import { formatMonthYear, getAllPosts, groupPostsByTag } from '../lib/content';
 
 const posts = await getAllPosts();
 const grouped = groupPostsByTag(posts);
@@ -14,9 +14,7 @@ const grouped = groupPostsByTag(posts);
         {items.map((post) => (
           <li>
             <a href={post.data.legacyPath}>
-              {post.data.date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} -
-              {' '}
-              {post.data.title}
+              {formatMonthYear(post.data.date)} - {post.data.title}
             </a>
           </li>
         ))}

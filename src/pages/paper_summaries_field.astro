@@ -1,6 +1,7 @@
 ---
+import LinkList from '../components/LinkList.astro';
 import PostLayout from '../layouts/PostLayout.astro';
-import { getPostsByField } from '../lib/content';
+import { formatShortDate, getPostsByField } from '../lib/content';
 
 const fields = await getPostsByField();
 ---
@@ -9,20 +10,14 @@ const fields = await getPostsByField();
   {fields.map(({ field, items }) => (
     <>
       <h2>{field}</h2>
-      <ul>
-        {items.map((post) => (
-          <li>
-            <a href={post.data.legacyPath}>{post.data.title}</a>
-            <small>
-              — {post.data.date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: '2-digit',
-                year: 'numeric',
-              })}
-            </small>
-          </li>
-        ))}
-      </ul>
+      <LinkList
+        items={items.map((post) => ({
+          href: post.data.legacyPath,
+          label: post.data.title,
+          meta: formatShortDate(post.data.date),
+        }))}
+        class="icon-list"
+      />
     </>
   ))}
 </PostLayout>

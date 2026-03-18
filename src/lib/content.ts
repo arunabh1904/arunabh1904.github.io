@@ -3,6 +3,21 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 export type PostEntry = CollectionEntry<'posts'>;
 export type Section = PostEntry['data']['section'];
 
+export function formatShortDate(date: Date) {
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  });
+}
+
+export function formatMonthYear(date: Date) {
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 export function sortPostsAscending(posts: PostEntry[]) {
   return [...posts].sort(
     (left, right) => left.data.date.getTime() - right.data.date.getTime(),

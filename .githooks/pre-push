@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -eu
+
+repo_root="$(git rev-parse --show-toplevel)"
+
+if command -v npm >/dev/null 2>&1; then
+  npm_bin="$(command -v npm)"
+else
+  npm_bin=""
+  for candidate in \
+    "$repo_root/../.local/node-current/bin/npm" \
+    "$HOME/.local/node-current/bin/npm" \
+    "$HOME/.volta/bin/npm" \
+    "/opt/homebrew/bin/npm" \
+    "/usr/local/bin/npm"
+  do
+    if [ -x "$candidate" ]; then
+      npm_bin="$candidate"
+      break
+    fi
+  done
+fi
+
+if [ -z "$npm_bin" ]; then
+  printf '%s\n' 'Unable to find npm for pre-push checks.' >&2
+  exit 1
+fi
+
+printf '%s\n' 'Running CI checks before push...'
+"$npm_bin" run ci

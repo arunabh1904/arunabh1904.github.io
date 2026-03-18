@@ -4,7 +4,6 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../lib/site';
 interface Props {
   title: string;
   description?: string;
-  staticTheme?: boolean;
   pageClass?: string;
   bodyStyle?: string;
 }
@@ -12,7 +11,6 @@ interface Props {
 const {
   title,
   description = SITE_DESCRIPTION,
-  staticTheme = false,
   pageClass = '',
   bodyStyle = '',
 } = Astro.props;
@@ -22,7 +20,6 @@ const canonicalUrl = Astro.site
   ? new URL(Astro.url.pathname, Astro.site).toString()
   : Astro.url.toString();
 ---
-
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
   <head>
@@ -32,23 +29,18 @@ const canonicalUrl = Astro.site
     <link rel="canonical" href={canonicalUrl} />
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/feed.xml" />
     <title>{pageTitle}</title>
-    {!staticTheme && (
-      <script is:inline>
-        {`(() => {
-          const saved = localStorage.getItem('theme');
-          if (saved === 'light' || saved === 'dark') {
-            document.documentElement.setAttribute('data-theme', saved);
-          }
-        })();`}
-      </script>
-    )}
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-      integrity="sha512-ac7VU+So8QGeqzsaT6JZijv8I1MInE4x9NnY5KFSgptSZlPqqJldT+zgrfjIrXcLoB8WY/cHZ9faffV9IWLtmg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+    <script is:inline>
+      {`(() => {
+        const saved = localStorage.getItem('theme');
+        const theme =
+          saved === 'light' || saved === 'dark'
+            ? saved
+            : window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+      })();`}
+    </script>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
@@ -98,5 +90,29 @@ const canonicalUrl = Astro.site
   </head>
   <body class={pageClass} style={bodyStyle}>
     <slot />
+    <script is:inline>
+      {`(() => {
+        const STORAGE_KEY = 'theme';
+        const html = document.documentElement;
+
+        const applyTheme = (theme) => {
+          html.setAttribute('data-theme', theme);
+          localStorage.setItem(STORAGE_KEY, theme);
+        };
+
+        document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+          button.addEventListener('click', () => {
+            const nextTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            applyTheme(nextTheme);
+          });
+        });
+
+        document.querySelectorAll('[data-home-button]').forEach((button) => {
+          button.addEventListener('click', () => {
+            window.location.href = '/';
+          });
+        });
+      })();`}
+    </script>
   </body>
 </html>

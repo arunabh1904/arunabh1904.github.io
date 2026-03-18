@@ -1,26 +1,18 @@
 ---
 import type { PostEntry } from '../lib/content';
+import { formatShortDate } from '../lib/content';
+import LinkList from './LinkList.astro';
 
 interface Props {
   posts: PostEntry[];
 }
 
 const { posts } = Astro.props;
+const items = posts.map((post) => ({
+  href: post.data.legacyPath,
+  label: post.data.title,
+  meta: formatShortDate(post.data.date),
+}));
 ---
 
-<ul class="icon-list">
-  {posts.map((post) => (
-    <li>
-      <a href={post.data.legacyPath}>{post.data.title}</a>
-      <small>
-        — {
-          post.data.date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: '2-digit',
-            year: 'numeric',
-          })
-        }
-      </small>
-    </li>
-  ))}
-</ul>
+<LinkList items={items} />

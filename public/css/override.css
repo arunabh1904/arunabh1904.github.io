@@ -7,11 +7,14 @@
 }
 :root {
   --background-color: #f8f8f8;
+  --background-secondary: #eef2ff;
   --text-color: #000080;
+  --text-secondary-color: #2c3e8f;
+  --accent-color: #7da2ff;
   --icon-color: #000080;
   --image-border-color: #000000;
   --code-border-color: #000000;
-  --panel-bg: rgba(0, 0, 0, 0.3);
+  --panel-bg: rgba(8, 19, 79, 0.22);
   --music-bg-start: #3b82f6;
   --music-bg-end: #0ea5e9;
   --music-vibe-start: #60a5fa;
@@ -19,18 +22,37 @@
   --table-border-color: #cccccc;
   --table-header-bg: #e8e8ff;
   --table-row-alt-bg: rgba(0, 0, 0, 0.05);
+  --button-bg: rgba(255, 255, 255, 0.9);
+  --button-bg-hover: rgba(248, 250, 255, 0.98);
+  --button-border: rgba(16, 24, 40, 0.08);
+  --button-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
+  --button-shadow-hover: 0 14px 32px rgba(15, 23, 42, 0.18);
+  --home-overlay: linear-gradient(135deg, rgba(248, 249, 255, 0.82), rgba(235, 240, 255, 0.58));
+  --home-text: #0d1b6f;
+  --home-panel-bg: rgba(255, 255, 255, 0.12);
 }
 
 :root[data-theme="light"] {
   --background-color: #f8f8f8;
+  --background-secondary: #eef2ff;
   --text-color: #000080;
+  --text-secondary-color: #2c3e8f;
+  --accent-color: #7da2ff;
   --icon-color: #000080;
   --image-border-color: #000080;
   --code-border-color: #000000;
-  --panel-bg: rgba(5, 5, 5, 0.3);
+  --panel-bg: rgba(8, 19, 79, 0.22);
   --table-border-color: #cccccc;
   --table-header-bg: #e8e8ff;
   --table-row-alt-bg: rgba(0, 0, 0, 0.05);
+  --button-bg: rgba(255, 255, 255, 0.9);
+  --button-bg-hover: rgba(248, 250, 255, 0.98);
+  --button-border: rgba(16, 24, 40, 0.08);
+  --button-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
+  --button-shadow-hover: 0 14px 32px rgba(15, 23, 42, 0.18);
+  --home-overlay: linear-gradient(135deg, rgba(248, 249, 255, 0.82), rgba(235, 240, 255, 0.58));
+  --home-text: #0d1b6f;
+  --home-panel-bg: rgba(255, 255, 255, 0.12);
 }
 
 :root[data-theme="dark"] {
@@ -38,20 +60,28 @@
   --background-secondary: #1E1E1E;
   --text-color: #E0E0E0;
   --text-secondary-color: #A3A3A3;
-  --accent-color: #5E81AC;
+  --accent-color: #7aa2f7;
   --icon-color: #E0E0E0;
   --image-border-color: #E0E0E0;
   --code-border-color: #FFFFFF;
   --music-bg-start: #7aa2f7;
   --music-bg-end: #bb9af7;
-  --music-vibe-start: #7dcfff;a
+  --music-vibe-start: #7dcfff;
   --music-vibe-end: #f7768e;
-  --panel-bg: rgba(0, 0, 0, 0.3);
+  --panel-bg: rgba(6, 10, 24, 0.7);
   --equation-bg: #1E1E1E;
   --equation-text: #E0E0E0;
   --table-border-color: #3b3b3b;
   --table-header-bg: #1E1E1E;
   --table-row-alt-bg: rgba(255, 255, 255, 0.05);
+  --button-bg: rgba(23, 27, 39, 0.88);
+  --button-bg-hover: rgba(30, 36, 52, 0.96);
+  --button-border: rgba(255, 255, 255, 0.08);
+  --button-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  --button-shadow-hover: 0 16px 34px rgba(0, 0, 0, 0.46);
+  --home-overlay: linear-gradient(135deg, rgba(2, 6, 23, 0.7), rgba(8, 15, 36, 0.82));
+  --home-text: #f2f4ff;
+  --home-panel-bg: rgba(4, 10, 26, 0.26);
 }
 
 html {
@@ -64,6 +94,36 @@ body {
   margin: 0;
   font-family: "IBM Plex Sans", sans-serif;
   line-height: 1.6;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body.home-page {
+  background:
+    var(--home-overlay),
+    url('/assets/images/shootingstar.jpg') center/cover fixed;
+  color: var(--home-text);
+}
+
+body.home-page h1,
+body.home-page h2,
+body.home-page h3,
+body.home-page p,
+body.home-page li,
+body.home-page small {
+  color: inherit;
+}
+
+.home-content-shell {
+  max-width: 650px;
+  margin: 2rem;
+  padding: 1.5rem;
+  border-radius: 24px;
+  background: var(--home-panel-bg);
+  backdrop-filter: blur(4px);
+}
+
+.page-content {
+  padding: 5.75rem 1.5rem 2.5rem;
 }
 
 .lead {
@@ -160,8 +220,10 @@ img:not(.float-right):not(.float-left) {
 }
 
 .music-page {
-  background: radial-gradient(circle at top left, #3a1c71, #1e1e1e);
-  color: #eee;
+  background:
+    radial-gradient(circle at top left, rgba(67, 97, 238, 0.18), transparent 32%),
+    linear-gradient(160deg, var(--background-color), var(--background-secondary));
+  color: var(--text-color);
   font-family: "IBM Plex Sans", sans-serif;
   margin: 0;
   height: 100vh;
@@ -173,24 +235,38 @@ img:not(.float-right):not(.float-left) {
 
 /* 2) Small rounded button styling */
 .small-rounded-button {
-  position: absolute;
-  width: 100px;            
-  height: 40px;           
-  border: none;
-  border-radius: 999px;  
-  background-color: #f0f0f0;
+  position: fixed;
+  width: 100px;
+  height: 40px;
+  border: 1px solid var(--button-border);
+  border-radius: 999px;
+  background-color: var(--button-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   color: var(--icon-color);
   cursor: pointer;
   font-size: 14px;
   text-align: center;
-  line-height: 40px;        /* Vertically center text */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s, box-shadow 0.2s;
+  line-height: 40px;
+  box-shadow: var(--button-shadow);
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    color 0.2s ease;
   outline: none;
+  z-index: 20;
 }
 
 .small-rounded-button:hover {
-  background-color: #e0e0e0;
+  background-color: var(--button-bg-hover);
+  box-shadow: var(--button-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.small-rounded-button:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 3px;
 }
 
 /* Hero section for the title page */
@@ -203,28 +279,56 @@ img:not(.float-right):not(.float-left) {
 
 
 #home-button {
-  top: 10px;
-  right: 10px;
-  width: 48px;
-  height: 48px;
+  top: 28px;
+  right: 28px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  line-height: 48px;
+  line-height: 56px;
   padding: 0;
   font-size: 32px;
 }
 
 #theme-toggle {
-  top: 10px;
-  right: 70px;
-  width: 48px;
-  height: 48px;
+  top: 28px;
+  right: 96px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  line-height: 48px;
+  line-height: 56px;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0;
   font-size: 24px;
+}
+
+.icon-only-button {
+  justify-content: center;
+}
+
+.button-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.theme-icon {
+  position: absolute;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+:root[data-theme="light"] .theme-icon-sun,
+:root[data-theme="dark"] .theme-icon-moon {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+:root[data-theme="light"] .theme-icon-moon,
+:root[data-theme="dark"] .theme-icon-sun {
+  opacity: 1;
+  transform: scale(1);
 }
 
 #music-button {
@@ -278,8 +382,13 @@ img:not(.float-right):not(.float-left) {
 .vibe {
   animation: vibe 0.2s linear infinite, vibeColor 3s ease-in-out infinite;
 }
-#music-button i {
-  margin-right: 6px;
+.music-button-icon {
+  margin-right: 10px;
+}
+
+#music-button svg {
+  width: 20px;
+  height: 20px;
 }
 #music-button:hover {
   transform: scale(1.05);
@@ -288,9 +397,11 @@ img:not(.float-right):not(.float-left) {
 
 #music-widget {
   text-align: center;
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  background-color: var(--button-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 20px;
+  box-shadow: var(--button-shadow);
+  color: var(--text-color);
   padding: 16px;
   width: 320px;
   margin: auto;
@@ -385,9 +496,12 @@ img:not(.float-right):not(.float-left) {
 }
 
 /* Space between icon and text */
-.link-list li i {
-  margin-right: 8px;
+.contact-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
   color: #ffffff;
+  flex-shrink: 0;
 }
 
 /* Links inside the pinned panel */
@@ -406,7 +520,7 @@ img:not(.float-right):not(.float-left) {
 
 /* All <a> tags: light blue by default, no underline */
 a {
-  color: #9bbcff;          /* Lighter blue for unvisited links. */
+  color: #7d9dff;
   text-decoration: none;
 }
 
@@ -435,6 +549,19 @@ a:visited {
     line-height: 35px;
     font-size: 12px;
   }
+  #theme-toggle,
+  #home-button {
+    top: 18px;
+    width: 48px;
+    height: 48px;
+    line-height: 48px;
+  }
+  #theme-toggle {
+    right: 74px;
+  }
+  #home-button {
+    right: 18px;
+  }
   #music-button {
     width: auto;
     max-width: 200px;
@@ -444,6 +571,13 @@ a:visited {
   }
   body {
     font-size: 16px;
+  }
+  .home-content-shell {
+    margin: 1rem;
+    padding: 1.25rem;
+  }
+  .page-content {
+    padding: 5rem 1rem 2rem;
   }
   .main-container {
     margin: 1rem;
@@ -456,16 +590,6 @@ a:visited {
     margin-top: 1rem;
     box-shadow: none;
   }
-}
-
-
-/* Icons for the theme toggle button */
-.sun-icon {
-  color: #ffcc00;
-}
-
-.moon-icon {
-  color: #4b5563;
 }
 
 /* ------------------------------------------------------

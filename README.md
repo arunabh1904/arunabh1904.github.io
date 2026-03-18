@@ -24,3 +24,10 @@ npm run ci
 - Content lives in `src/content/posts`.
 - Static assets live in `public/assets`.
 - Build verification checks both critical pages and migrated post routes.
+
+## Structure
+
+- `src/layouts` contains the shared page shells.
+- `src/components` contains reusable UI building blocks.
+- `src/lib/content.ts` contains shared post querying and date formatting helpers.
+- `src/pages/[...slug].astro` renders migrated post routes from content frontmatter.

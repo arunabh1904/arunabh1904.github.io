@@ -1,0 +1,23 @@
+---
+interface LinkListItem {
+  href: string;
+  label: string;
+  meta?: string;
+}
+
+interface Props {
+  items: readonly LinkListItem[];
+  class?: string;
+}
+
+const { items, class: className = 'icon-list' } = Astro.props;
+---
+
+<ul class={className}>
+  {items.map((item) => (
+    <li>
+      <a href={item.href}>{item.label}</a>
+      {item.meta && <small>— {item.meta}</small>}
+    </li>
+  ))}
+</ul>
