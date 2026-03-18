@@ -797,6 +797,9 @@ tbody tr:nth-child(odd) {
 }
 
 .katex-display {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   margin: 1.75rem 0;
   padding: 1.25rem 1.5rem;
   overflow-x: auto;
@@ -804,11 +807,25 @@ tbody tr:nth-child(odd) {
   border-radius: 18px;
   background: var(--equation-bg);
   box-shadow: var(--equation-shadow);
+  text-align: center;
 }
 
 .katex-display > .katex {
+  display: block;
   color: var(--equation-text);
   font-size: 1.08em;
+}
+
+.katex .katex-mathml {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .katex-display::before {
