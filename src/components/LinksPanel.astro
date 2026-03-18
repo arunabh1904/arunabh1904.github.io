@@ -4,12 +4,16 @@ import { CONTACT_LINKS } from '../lib/site';
 ---
 
 <div class="links-panel">
-  <h2 style="margin-top: 0; font-size: 1.2rem;">Contact Me</h2>
-  <ul class="link-list" style="list-style: none; margin: 0; padding: 0;">
+  <h2 class="links-panel__title">Contact Me</h2>
+  <ul class="link-list">
     {CONTACT_LINKS.map((link) => (
-      <li style="display: flex; align-items: center; margin-bottom: 1rem;">
+      <li>
         <Icon name={link.iconName} class="contact-icon" />
-        <a href={link.href} target={link.href.startsWith('mailto:') ? undefined : '_blank'}>
+        <a
+          href={link.href}
+          target={link.href.startsWith('mailto:') ? undefined : '_blank'}
+          rel={link.href.startsWith('mailto:') ? undefined : 'noreferrer'}
+        >
           {link.label}
         </a>
       </li>

@@ -1,14 +1,14 @@
 ---
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../layouts/PostLayout.astro';
-import { sortPostsAscending, trimLeadingSlash, type PostEntry } from '../lib/content';
+import { sortPostsAscending, toStaticPostSlug, type PostEntry } from '../lib/content';
 
 export async function getStaticPaths() {
   const posts = sortPostsAscending(await getCollection('posts'));
 
   return posts.map((entry, index) => ({
     params: {
-      slug: trimLeadingSlash(entry.data.legacyPath).replace(/\.html$/, ''),
+      slug: toStaticPostSlug(entry.data.legacyPath),
     },
     props: {
       entry,

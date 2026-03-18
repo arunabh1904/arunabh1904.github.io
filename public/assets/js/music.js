@@ -9,9 +9,12 @@ function initMusicPlayer() {
   const closePlayerBtn = document.getElementById('close-music-player');
   const musicIframe = document.getElementById('music-iframe');
 
+  if (!spotifyOption || !youtubeOption || !closePlayerBtn || !musicIframe) {
+    return;
+  }
+
   const savedSrc = localStorage.getItem(MUSIC_SRC_KEY);
   musicIframe.src = savedSrc || SPOTIFY_SRC;
-
 
   spotifyOption.addEventListener('click', () => {
     musicIframe.src = SPOTIFY_SRC;
@@ -22,7 +25,6 @@ function initMusicPlayer() {
     musicIframe.src = YOUTUBE_SRC;
     localStorage.setItem(MUSIC_SRC_KEY, YOUTUBE_SRC);
   });
-
 
   closePlayerBtn.addEventListener('click', () => {
     if (window.parent && window.parent !== window) {

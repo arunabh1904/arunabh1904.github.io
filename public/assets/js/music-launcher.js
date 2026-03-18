@@ -5,23 +5,25 @@ function initMusicLauncher() {
 
   const HIDDEN_KEY = 'musicButtonHidden';
   const SEEN_KEY = 'musicButtonSeen';
+  let hideTimeoutId;
+  let vibeTimeoutId;
 
   function startTimer(isFirst) {
-    clearTimeout(musicButton.hideTimeout);
-    clearTimeout(musicButton.vibeTimeout);
+    clearTimeout(hideTimeoutId);
+    clearTimeout(vibeTimeoutId);
 
     localStorage.setItem(HIDDEN_KEY, 'false');
 
     musicButton.style.display = 'block';
     if (musicBar) musicBar.style.display = 'none';
 
-    musicButton.vibeTimeout = setTimeout(() => {
+    vibeTimeoutId = setTimeout(() => {
       musicButton.classList.add('vibe');
     }, 10000);
 
     const hideDelay = isFirst ? 60000 : 15000;
 
-    musicButton.hideTimeout = setTimeout(() => {
+    hideTimeoutId = setTimeout(() => {
       musicButton.classList.remove('vibe');
       musicButton.style.display = 'none';
       if (musicBar) musicBar.style.display = 'block';
