@@ -1,0 +1,159 @@
+---
+interface Props {
+  name:
+    | 'sun'
+    | 'moon'
+    | 'arrow-left'
+    | 'music'
+    | 'email'
+    | 'github'
+    | 'linkedin'
+    | 'x';
+  class?: string;
+  decorative?: boolean;
+  title?: string;
+}
+
+const { name, class: className = '', decorative = true, title } = Astro.props;
+---
+
+{name === 'sun' && (
+  <svg
+    class={className}
+    viewBox="0 0 24 24"
+    aria-hidden={decorative ? 'true' : undefined}
+    aria-label={!decorative ? title : undefined}
+    role="img"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="1.8"
+  >
+    {!decorative && title && <title>{title}</title>}
+    <circle cx="12" cy="12" r="4.25"></circle>
+    <path d="M12 2.5v2.5"></path>
+    <path d="M12 19v2.5"></path>
+    <path d="M21.5 12H19"></path>
+    <path d="M5 12H2.5"></path>
+    <path d="M18.72 5.28l-1.77 1.77"></path>
+    <path d="M7.05 16.95l-1.77 1.77"></path>
+    <path d="M18.72 18.72l-1.77-1.77"></path>
+    <path d="M7.05 7.05L5.28 5.28"></path>
+  </svg>
+)}
+
+{name === 'moon' && (
+  <svg
+    class={className}
+    viewBox="0 0 24 24"
+    aria-hidden={decorative ? 'true' : undefined}
+    aria-label={!decorative ? title : undefined}
+    role="img"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="1.8"
+  >
+    {!decorative && title && <title>{title}</title>}
+    <path d="M20.5 14.2A8.7 8.7 0 1 1 9.8 3.5a7.1 7.1 0 0 0 10.7 10.7Z"></path>
+  </svg>
+)}
+
+{name === 'arrow-left' && (
+  <svg
+    class={className}
+    viewBox="0 0 24 24"
+    aria-hidden={decorative ? 'true' : undefined}
+    aria-label={!decorative ? title : undefined}
+    role="img"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="1.9"
+  >
+    {!decorative && title && <title>{title}</title>}
+    <path d="M15.5 5.5 9 12l6.5 6.5"></path>
+  </svg>
+)}
+
+{name === 'music' && (
+  <svg
+    class={className}
+    viewBox="0 0 24 24"
+    aria-hidden={decorative ? 'true' : undefined}
+    aria-label={!decorative ? title : undefined}
+    role="img"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="1.8"
+  >
+    {!decorative && title && <title>{title}</title>}
+    <path d="M15 4v10.25a2.75 2.75 0 1 1-1.75-2.58V6.05l7-1.55v7.75a2.75 2.75 0 1 1-1.75-2.58V4.9L15 5.7"></path>
+  </svg>
+)}
+
+{name === 'email' && (
+  <svg
+    class={className}
+    viewBox="0 0 24 24"
+    aria-hidden={decorative ? 'true' : undefined}
+    aria-label={!decorative ? title : undefined}
+    role="img"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="1.8"
+  >
+    {!decorative && title && <title>{title}</title>}
+    <rect x="3" y="5.5" width="18" height="13" rx="2"></rect>
+    <path d="m4.5 7 7.5 6 7.5-6"></path>
+  </svg>
+)}
+
+{name === 'github' && (
+  <svg
+    class={className}
+    viewBox="0 0 24 24"
+    aria-hidden={decorative ? 'true' : undefined}
+    aria-label={!decorative ? title : undefined}
+    role="img"
+    fill="currentColor"
+  >
+    {!decorative && title && <title>{title}</title>}
+    <path d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.76-.24.76-.54v-2.08c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.7 1.14 1.7 1.14.99 1.7 2.61 1.2 3.25.92.1-.72.39-1.2.7-1.47-2.47-.28-5.07-1.24-5.07-5.5 0-1.22.43-2.2 1.14-2.98-.11-.28-.49-1.4.11-2.92 0 0 .94-.3 3.08 1.14a10.65 10.65 0 0 1 5.6 0c2.13-1.44 3.07-1.14 3.07-1.14.6 1.52.22 2.64.11 2.92.71.78 1.14 1.76 1.14 2.98 0 4.27-2.61 5.21-5.09 5.49.4.35.76 1.05.76 2.13v3.15c0 .3.2.65.77.54A11.25 11.25 0 0 0 12 .75Z"></path>
+  </svg>
+)}
+
+{name === 'linkedin' && (
+  <svg
+    class={className}
+    viewBox="0 0 24 24"
+    aria-hidden={decorative ? 'true' : undefined}
+    aria-label={!decorative ? title : undefined}
+    role="img"
+    fill="currentColor"
+  >
+    {!decorative && title && <title>{title}</title>}
+    <path d="M4.98 3.5a1.73 1.73 0 1 1 0 3.46 1.73 1.73 0 0 1 0-3.46ZM3.5 8.25h2.96v12.25H3.5ZM10.02 8.25h2.84v1.67h.04c.4-.75 1.36-1.92 3.14-1.92 3.35 0 3.96 2.2 3.96 5.06v7.44h-2.96v-6.6c0-1.57-.03-3.58-2.18-3.58-2.18 0-2.51 1.7-2.51 3.46v6.72h-2.96Z"></path>
+  </svg>
+)}
+
+{name === 'x' && (
+  <svg
+    class={className}
+    viewBox="0 0 24 24"
+    aria-hidden={decorative ? 'true' : undefined}
+    aria-label={!decorative ? title : undefined}
+    role="img"
+    fill="currentColor"
+  >
+    {!decorative && title && <title>{title}</title>}
+    <path d="M18.9 3.75h2.88l-6.29 7.18 7.4 9.32h-5.79l-4.53-5.64-4.94 5.64H4.75l6.73-7.69L4.38 3.75h5.94l4.09 5.2 4.49-5.2Zm-1.01 14.77h1.6L9.45 5.39H7.74Z"></path>
+  </svg>
+)}

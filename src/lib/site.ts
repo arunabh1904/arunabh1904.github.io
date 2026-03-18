@@ -3,17 +3,17 @@ export const SITE_DESCRIPTION =
   'A personal blog on computer vision, robotics, and more.';
 
 export const CONTACT_LINKS = [
-  { href: 'mailto:arunabh1904@gmail.com', iconClass: 'fas fa-envelope fa-lg', label: 'Email' },
-  { href: 'https://github.com/arunabh1904', iconClass: 'fab fa-github fa-lg', label: 'GitHub' },
+  { href: 'mailto:arunabh1904@gmail.com', iconName: 'email', label: 'Email' },
+  { href: 'https://github.com/arunabh1904', iconName: 'github', label: 'GitHub' },
   {
     href: 'https://www.linkedin.com/in/arunabh-mishra',
-    iconClass: 'fab fa-linkedin fa-lg',
+    iconName: 'linkedin',
     label: 'LinkedIn',
   },
   {
     href: 'https://twitter.com/ArunabhMishra8',
-    iconClass: 'fab fa-twitter fa-lg',
-    label: 'Twitter',
+    iconName: 'x',
+    label: 'X',
   },
 ] as const;
 
