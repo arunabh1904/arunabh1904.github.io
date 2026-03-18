@@ -1,0 +1,32 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  showHomeButton?: boolean;
+}
+
+const { showHomeButton = false } = Astro.props;
+---
+
+<button
+  type="button"
+  id="theme-toggle"
+  class="small-rounded-button icon-only-button"
+  aria-label="Toggle theme"
+  data-theme-toggle
+>
+  <Icon name="moon" class="button-icon theme-icon theme-icon-moon" />
+  <Icon name="sun" class="button-icon theme-icon theme-icon-sun" />
+</button>
+
+{showHomeButton && (
+  <button
+    type="button"
+    id="home-button"
+    class="small-rounded-button icon-only-button"
+    aria-label="Go home"
+    data-home-button
+  >
+    <Icon name="arrow-left" class="button-icon" />
+  </button>
+)}
