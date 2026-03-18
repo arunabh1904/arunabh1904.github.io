@@ -148,7 +148,7 @@ body {
 body.home-page {
   background:
     var(--home-overlay),
-    url('/assets/images/shootingstar.jpg') center/cover fixed;
+    url('/assets/images/shootingstar.jpg') right center / cover fixed;
   color: var(--home-text);
   min-height: 100vh;
 }
@@ -162,10 +162,18 @@ body.home-page small {
   color: inherit;
 }
 
+.home-stage {
+  min-height: 100vh;
+  padding: clamp(1rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2rem) clamp(1.5rem, 3vw, 2.5rem);
+  box-sizing: border-box;
+}
+
 .home-content-shell {
-  max-width: 650px;
-  margin: 2rem;
-  padding: 1.5rem;
+  width: min(100%, 74rem);
+  max-width: 74rem;
+  margin: 0;
+  padding: clamp(1.5rem, 2vw + 1rem, 2.5rem);
+  box-sizing: border-box;
   border-radius: 24px;
   background: var(--home-panel-bg);
   backdrop-filter: blur(4px);
@@ -198,6 +206,10 @@ body.home-page small {
 
 .home-title {
   margin-top: 0;
+}
+
+.home-content-shell > article {
+  max-width: 74ch;
 }
 
 .lead {
@@ -596,6 +608,12 @@ img:not(.float-right):not(.float-left) {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
+@media (min-width: 1100px) {
+  .home-stage {
+    padding-right: clamp(17rem, 20vw, 20rem);
+  }
+}
+
 :root[data-theme="light"] .links-panel {
   border: 1px solid rgba(53, 109, 255, 0.16);
   border-radius: 18px;
@@ -733,7 +751,6 @@ a:visited {
     font-size: 16px;
   }
   .home-content-shell {
-    margin: 1rem;
     padding: 1.25rem;
   }
   .page-content {
@@ -749,6 +766,22 @@ a:visited {
     width: auto;
     margin-top: 1rem;
     box-shadow: none;
+  }
+}
+
+@media (max-width: 1099px) {
+  body.home-page {
+    background:
+      var(--home-overlay),
+      url('/assets/images/shootingstar.jpg') center top / cover no-repeat;
+  }
+
+  .links-panel {
+    position: static;
+    right: auto;
+    bottom: auto;
+    width: min(100%, 220px);
+    margin-top: 1rem;
   }
 }
 

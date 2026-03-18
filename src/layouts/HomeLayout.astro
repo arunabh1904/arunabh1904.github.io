@@ -19,9 +19,11 @@ const { title, description } = Astro.props;
 >
   <PageControls />
   <MusicLauncher />
-  <div class="home-content-shell">
-    <h1 class="home-title">Arunabh.BLOG</h1>
-    <slot />
-  </div>
-  <LinksPanel />
+  <main class="home-stage">
+    <div class="home-content-shell">
+      <h1 class="home-title">Arunabh.BLOG</h1>
+      <slot />
+    </div>
+    <LinksPanel />
+  </main>
 </BaseLayout>
