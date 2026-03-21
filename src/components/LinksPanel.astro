@@ -1,22 +1,44 @@
 ---
 import Icon from './Icon.astro';
 import { CONTACT_LINKS } from '../lib/site';
+
+const QUICK_LINKS = [
+  { href: '/paper_summaries_field.html', label: 'Arxiv Notes' },
+  { href: '/ponderings.html', label: 'Ponderings' },
+  { href: '/revision_notes.html', label: 'Revision Notes' },
+  { href: '/ai_generated_reports.html', label: 'AI Reports' },
+] as const;
 ---
 
-<div class="links-panel">
-  <h2 class="links-panel__title">Contact Me</h2>
-  <ul class="link-list">
-    {CONTACT_LINKS.map((link) => (
-      <li>
-        <Icon name={link.iconName} class="contact-icon" />
-        <a
-          href={link.href}
-          target={link.href.startsWith('mailto:') ? undefined : '_blank'}
-          rel={link.href.startsWith('mailto:') ? undefined : 'noreferrer'}
-        >
-          {link.label}
-        </a>
-      </li>
-    ))}
-  </ul>
+<div class="links-panel-stack">
+  <section class="links-panel">
+    <p class="links-panel__eyebrow">Connect</p>
+    <h2 class="links-panel__title">Contact Me</h2>
+    <ul class="link-list">
+      {CONTACT_LINKS.map((link) => (
+        <li>
+          <Icon name={link.iconName} class="contact-icon" />
+          <a
+            href={link.href}
+            target={link.href.startsWith('mailto:') ? undefined : '_blank'}
+            rel={link.href.startsWith('mailto:') ? undefined : 'noreferrer'}
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="links-panel links-panel--secondary">
+    <p class="links-panel__eyebrow">Browse</p>
+    <h2 class="links-panel__title">Quick Access</h2>
+    <ul class="link-list link-list--compact">
+      {QUICK_LINKS.map((link) => (
+        <li>
+          <a href={link.href}>{link.label}</a>
+        </li>
+      ))}
+    </ul>
+  </section>
 </div>
