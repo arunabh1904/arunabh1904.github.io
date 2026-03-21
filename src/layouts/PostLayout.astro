@@ -1,5 +1,4 @@
 ---
-import MusicLauncher from '../components/MusicLauncher.astro';
 import PageControls from '../components/PageControls.astro';
 import PostNavigation from '../components/PostNavigation.astro';
 import type { PostEntry } from '../lib/content';
@@ -24,7 +23,6 @@ const {
 
 <BaseLayout title={title} description={description}>
   <PageControls showHomeButton={true} />
-  <MusicLauncher />
   <main class="page-content page-content--narrow" aria-label="Content">
     <slot />
     {showNavigation && <PostNavigation previous={previous} next={next} />}

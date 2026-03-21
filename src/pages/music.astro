@@ -4,15 +4,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Music Player" pageClass="music-page">
-  <PageControls />
+  <PageControls showMusicButton={false} />
   <div id="music-widget">
     <div class="music-controls">
-      <button id="choose-spotify" class="music-choice">Spotify</button>
-      <button id="choose-youtube" class="music-choice">YouTube</button>
-      <button id="close-music-player" class="music-choice">Close</button>
+      <button id="choose-spotify" class="music-choice" type="button">Spotify</button>
+      <button id="choose-youtube" class="music-choice" type="button">YouTube</button>
+      <button id="close-music-player" class="music-choice" type="button">Close</button>
     </div>
     <iframe
       id="music-iframe"
+      title="Music player"
       style="border:0;"
       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
     ></iframe>
