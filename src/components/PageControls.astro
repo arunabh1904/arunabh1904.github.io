@@ -3,30 +3,53 @@ import Icon from './Icon.astro';
 
 interface Props {
   showHomeButton?: boolean;
+  showMusicButton?: boolean;
 }
 
-const { showHomeButton = false } = Astro.props;
+const { showHomeButton = false, showMusicButton = true } = Astro.props;
 ---
 
-<button
-  type="button"
-  id="theme-toggle"
-  class="small-rounded-button icon-only-button"
-  aria-label="Toggle theme"
-  data-theme-toggle
->
-  <Icon name="moon" class="button-icon theme-icon theme-icon-moon" />
-  <Icon name="sun" class="button-icon theme-icon theme-icon-sun" />
-</button>
-
-{showHomeButton && (
+<div class="page-controls" data-page-controls>
+  {showMusicButton && (
+    <div class="page-controls__item page-controls__item--music" data-music-control>
+      <button
+        type="button"
+        class="small-rounded-button icon-only-button page-controls__button page-controls__button--music"
+        aria-label="Open music menu"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        data-music-menu-toggle
+      >
+        <Icon name="music" class="button-icon" />
+      </button>
+      <div class="music-menu" data-music-menu role="menu" aria-label="Choose music provider" hidden>
+        <button type="button" class="music-menu__item" data-music-provider="spotify" role="menuitem">
+          Spotify
+        </button>
+        <button type="button" class="music-menu__item" data-music-provider="youtube" role="menuitem">
+          YouTube
+        </button>
+      </div>
+    </div>
+  )}
   <button
     type="button"
-    id="home-button"
-    class="small-rounded-button icon-only-button"
-    aria-label="Go home"
-    data-home-button
+    class="small-rounded-button icon-only-button page-controls__button page-controls__button--theme"
+    aria-label="Toggle theme"
+    data-theme-toggle
   >
-    <Icon name="arrow-left" class="button-icon" />
+    <Icon name="moon" class="button-icon theme-icon theme-icon-moon" />
+    <Icon name="sun" class="button-icon theme-icon theme-icon-sun" />
   </button>
-)}
+
+  {showHomeButton && (
+    <button
+      type="button"
+      class="small-rounded-button icon-only-button page-controls__button page-controls__button--home"
+      aria-label="Go home"
+      data-home-button
+    >
+      <Icon name="arrow-left" class="button-icon" />
+    </button>
+  )}
+</div>
