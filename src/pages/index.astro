@@ -9,7 +9,6 @@ const revisionPosts = (await getPostsBySection('revision-notes', 'desc')).filter
 const ponderingPosts = await getPostsBySection('ponderings', 'desc');
 const aiPosts = await getPostsBySection('ai-generated-reports', 'desc');
 
-const storyHref = '/my journey so far/2025/02/08/my-journey-so-far-full-story.html';
 const totalEntries =
   paperPosts.length + ponderingPosts.length + revisionPosts.length + aiPosts.length;
 
@@ -69,6 +68,39 @@ const recentShelves = [
   },
 ] as const;
 
+const timelineEntries = [
+  {
+    years: '2010 - 2014',
+    title: 'MIT, Manipal',
+    summary:
+      'I studied Mechatronics Engineering at MIT, Manipal, where I fell in love with robotics through hands-on projects. For my thesis, my team built an areca-nut harvesting robot that could climb tall trees and help make a dangerous job safer for farmers.',
+  },
+  {
+    years: '2015',
+    title: 'Reset And Recommit',
+    summary:
+      'A difficult year became a turning point. After setbacks and a period of depression, I found a clearer sense of purpose, strengthened my technical foundations, and decided to pursue robotics graduate school in the United States.',
+  },
+  {
+    years: '2016 - 2018',
+    title: 'Colorado School Of Mines',
+    summary:
+      'I completed my graduate degree in Mechanical Engineering with a robotics specialization at the Colorado School of Mines. At the M3 Robotics Lab, I worked on robots for GPS-denied navigation, built a novel MPC-based autonomy stack, and learned to integrate a wide range of sensors and robotic systems.',
+  },
+  {
+    years: '2018 - 2022',
+    title: 'DEKA',
+    summary:
+      'At DEKA, I led part of the perception stack for last-mile autonomous robots. My work ranged from training and deploying real-time computer vision models to writing CUDA kernels and porting major parts of the stack to OpenCL and OpenVINO.',
+  },
+  {
+    years: '2022 - 2026',
+    title: 'Zoox',
+    summary:
+      'At Zoox, I have focused on computer vision research for autonomous navigation, building learned representations that encode scene semantics and support downstream planning. I currently lead efforts on a generalized scene embedding designed to scale across diverse driving contexts.',
+  },
+] as const;
+
 const formatDate = (date: Date) =>
   date.toLocaleDateString('en-US', {
     month: 'short',
@@ -77,25 +109,24 @@ const formatDate = (date: Date) =>
   });
 ---
 
-<HomeLayout title="Home">
+<HomeLayout title="Home" timelineEntries={timelineEntries}>
   <section class="home-hero" id="top">
     <div class="home-hero__bar">
       <p class="home-kicker">Arunabh.BLOG</p>
-      <nav class="home-command-bar" aria-label="Homepage sections">
-        <a href="#about">/about</a>
-        <a href="#collections">/collections</a>
-        <a href="#latest">/latest</a>
-      </nav>
     </div>
 
     <div class="home-hero__content">
       <div class="home-hero__copy">
         <h1 class="home-title">Arunabh.BLOG</h1>
-        <p class="lead">Hello, I'm Arunabh, and welcome to my personal space.</p>
-        <div class="home-actions">
-          <a class="home-action home-action--primary" href={storyHref}>Read the full story</a>
-          <a class="home-action" href="/paper_summaries_field.html">Browse Arxiv Notes</a>
-        </div>
+        <p class="lead">
+          I work on computer vision and robotics for autonomous systems, and this is where I write
+          about the ideas, papers, and experiences that have shaped that journey.
+        </p>
+        <nav class="home-command-bar home-command-bar--hero" aria-label="Homepage sections">
+          <a href="#about">/about</a>
+          <a href="#collections">/collections</a>
+          <a href="#latest">/latest</a>
+        </nav>
       </div>
 
       <div class="home-meta-panel" aria-label="Site overview">
@@ -119,25 +150,24 @@ const formatDate = (date: Date) =>
     <article class="home-panel home-panel--story">
       <p class="home-panel__eyebrow">About</p>
       <p class="intro-text">
-        I currently work in computer vision research at Zoox developing models to interpret driving
-        scenes. I also organize the perception research group at Zoox, where we explore
-        state-of-the-art research and bring promising ideas into production. Previously, I led part
-        of the perception team at DEKA, focusing on short-range perception and traffic light
-        detection for Roxo, FedEx's last-mile delivery robot.
+        I currently work in computer vision research at Zoox, where I build learned
+        representations for autonomous driving scenes and help shape research directions for
+        perception. Before that, I led parts of the perception stack at DEKA for Roxo, FedEx&apos;s
+        last-mile delivery robot, with a focus on short-range perception and traffic-light
+        understanding.
       </p>
 
       <p class="intro-text">
-        My robotics journey began in India, where I earned my undergraduate degree at MIT, Manipal.
-        Although I stumbled upon robotics somewhat by chance, choosing to focus on autonomous
-        driving technology was intentional; I believe it can transform the world by saving tons of
-        lives! This conviction brought me to the U.S. nearly a decade ago for graduate studies at
-        the Colorado School of Mines.
+        My path into robotics started in India during my undergraduate years at MIT, Manipal, where
+        building projects made the field feel instantly alive. That early fascination grew into a
+        deliberate commitment to autonomous systems and eventually brought me to the United States
+        for graduate school at the Colorado School of Mines.
       </p>
 
       <p class="intro-text">
-        I'm driven to keep building and keep learning. Like a shooting star blazing across the sky,
-        I hope to leave my own "Arunabh-sized" dent in the world!
-        <a href={storyHref}>Read the full story.</a>
+        I care deeply about building systems that make the physical world safer, more capable, and
+        easier to navigate. This site is part notebook, part archive, and part ongoing conversation
+        with the work I want to keep doing.
       </p>
     </article>
 

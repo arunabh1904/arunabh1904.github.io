@@ -2,13 +2,19 @@
 import LinksPanel from '../components/LinksPanel.astro';
 import PageControls from '../components/PageControls.astro';
 import BaseLayout from './BaseLayout.astro';
+import TimelinePanel from '../components/TimelinePanel.astro';
 
 interface Props {
   title: string;
   description?: string;
+  timelineEntries?: readonly {
+    years: string;
+    title: string;
+    summary: string;
+  }[];
 }
 
-const { title, description } = Astro.props;
+const { title, description, timelineEntries = [] } = Astro.props;
 ---
 
 <BaseLayout
@@ -22,6 +28,9 @@ const { title, description } = Astro.props;
       <div class="home-content-shell">
         <slot />
       </div>
+      <aside class="home-timeline-rail">
+        <TimelinePanel entries={timelineEntries} />
+      </aside>
       <aside class="home-sidebar">
         <LinksPanel />
       </aside>
