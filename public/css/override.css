@@ -1154,7 +1154,7 @@ body.home-page {
   width: min(100%, 88rem);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 18.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 18rem) 16rem;
   gap: 1.25rem;
   align-items: start;
 }
@@ -1173,14 +1173,20 @@ body.home-page {
   gap: 1.25rem;
 }
 
-.home-sidebar {
+.home-timeline-rail {
   position: sticky;
   top: 5.25rem;
+  align-self: start;
+}
+
+.home-sidebar {
+  align-self: start;
 }
 
 .home-hero,
 .home-panel,
-.links-panel {
+.links-panel,
+.timeline-panel {
   position: relative;
   overflow: hidden;
   border-radius: 28px;
@@ -1193,7 +1199,8 @@ body.home-page {
 
 .home-hero::before,
 .home-panel::before,
-.links-panel::before {
+.links-panel::before,
+.timeline-panel::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -1204,7 +1211,7 @@ body.home-page {
 .home-hero,
 .home-panel,
 .links-panel,
-.links-panel-stack,
+.timeline-panel,
 .home-story-grid,
 .home-collection-grid,
 .home-shelf-grid {
@@ -1226,12 +1233,13 @@ body.home-page {
 
 .home-hero__bar {
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .home-kicker,
 .home-panel__eyebrow,
 .links-panel__eyebrow,
+.timeline-panel__eyebrow,
 .home-collection-card__command,
 .home-collection-card__count,
 .home-meta-panel__label,
@@ -1246,6 +1254,7 @@ body.home-page {
 .home-kicker,
 .home-panel__eyebrow,
 .links-panel__eyebrow,
+.timeline-panel__eyebrow,
 .home-meta-panel__label {
   color: var(--home-shell-accent);
 }
@@ -1277,6 +1286,10 @@ body.home-page {
   letter-spacing: 0.08em;
 }
 
+.home-command-bar--hero {
+  margin-top: 1.4rem;
+}
+
 .home-command-bar a:hover,
 .home-action:hover {
   background: var(--home-shell-accent-soft);
@@ -1297,7 +1310,9 @@ body.home-page {
 .home-collection-card h3,
 .home-shelf__header h3,
 .home-panel--footer-note h2,
-.links-panel__title {
+.links-panel__title,
+.timeline-panel__title,
+.timeline-item h3 {
   margin: 0;
   font-family: var(--font-reading);
   font-weight: 500;
@@ -1345,7 +1360,8 @@ body.home-page {
 .home-meta-panel {
   display: grid;
   gap: 0.8rem;
-  width: min(100%, 18rem);
+  width: min(100%, 16rem);
+  margin-right: 1rem;
 }
 
 .home-meta-panel__item,
@@ -1538,12 +1554,8 @@ body.home-page {
   margin-bottom: 0.3rem;
 }
 
-.links-panel-stack {
-  display: grid;
-  gap: 1rem;
-}
-
-.links-panel {
+.links-panel,
+.timeline-panel {
   position: relative;
   right: auto;
   bottom: auto;
@@ -1552,10 +1564,74 @@ body.home-page {
   color: inherit;
 }
 
-.links-panel__title {
+.links-panel__title,
+.timeline-panel__title {
   margin-top: 0.35rem;
   margin-bottom: 0.85rem;
   font-size: 1.45rem;
+}
+
+.timeline-panel {
+  min-height: calc(100vh - 5.25rem);
+}
+
+.timeline-list {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem 0 0.35rem 1.4rem;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.timeline-list::before {
+  content: "";
+  position: absolute;
+  top: 0.55rem;
+  bottom: 0.55rem;
+  left: 0.3rem;
+  width: 1px;
+  background:
+    linear-gradient(180deg, transparent, var(--home-shell-accent) 10%, var(--home-shell-accent) 90%, transparent);
+  opacity: 0.8;
+}
+
+.timeline-item {
+  position: relative;
+  padding: 0.15rem 0 0.2rem;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  top: 0.38rem;
+  left: -1.4rem;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--home-shell-border);
+  background: radial-gradient(circle at 35% 35%, #ffffff, var(--home-shell-accent));
+  box-shadow: 0 0 0 6px var(--home-shell-accent-soft);
+}
+
+.timeline-item__years {
+  margin: 0 0 0.3rem;
+  color: var(--home-shell-accent);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.timeline-item h3 {
+  margin-bottom: 0.45rem;
+  font-size: 1.02rem;
+}
+
+.timeline-item p:last-child {
+  margin: 0;
+  color: var(--home-shell-muted);
+  line-height: 1.65;
 }
 
 .link-list {
@@ -1599,6 +1675,7 @@ body.home-page {
     grid-template-columns: 1fr;
   }
 
+  .home-timeline-rail,
   .home-sidebar {
     position: static;
   }
@@ -1615,6 +1692,10 @@ body.home-page {
   .links-panel {
     margin-top: 0;
     box-shadow: var(--home-shell-shadow);
+  }
+
+  .timeline-panel {
+    min-height: auto;
   }
 }
 
