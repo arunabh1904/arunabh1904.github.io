@@ -14,7 +14,8 @@ const postsDir = path.join(projectRoot, 'src', 'content', 'posts');
 const criticalPages = [
   'index.html',
   'archive.html',
-  'ponderings.html',
+  'blog.html',
+  'build_intuition.html',
   'revision_notes.html',
   'ai_generated_reports.html',
   'paper_summaries.html',
@@ -66,7 +67,7 @@ async function main() {
 
   const attentionPagePath = path.join(
     distDir,
-    'ponderings',
+    'build intuition',
     '2025',
     '05',
     '25',

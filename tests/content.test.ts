@@ -61,9 +61,9 @@ describe('migration manifest', () => {
     expect(sections).toEqual(
       new Set([
         'paper-shorts',
-        'ponderings',
+        'blog',
+        'build-intuition',
         'revision-notes',
-        'my-journey',
       ]),
     );
   });

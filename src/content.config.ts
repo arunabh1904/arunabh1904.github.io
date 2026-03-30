@@ -12,10 +12,10 @@ const posts = defineCollection({
     date: z.coerce.date(),
     section: z.enum([
       'paper-shorts',
-      'ponderings',
+      'blog',
+      'build-intuition',
       'revision-notes',
       'ai-generated-reports',
-      'my-journey',
     ]),
     postSlug: z.string(),
     legacyPath: z.string(),

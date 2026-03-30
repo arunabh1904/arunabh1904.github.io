@@ -1,9 +1,9 @@
 ---
 title: My Journey So Far - The Full Story
 date: '2025-02-08T05:00:00.000Z'
-section: my-journey
+section: blog
 postSlug: my-journey-so-far-full-story
-legacyPath: /my journey so far/2025/02/08/my-journey-so-far-full-story.html
+legacyPath: /blog/2025/02/08/my-journey-so-far-full-story.html
 tags:
   - Other
 summary: >-

@@ -6,11 +6,16 @@ const paperPosts = await getPostsBySection('paper-shorts', 'desc');
 const revisionPosts = (await getPostsBySection('revision-notes', 'desc')).filter(
   (post) => post.data.postSlug !== 'cs336-revision-notes',
 );
-const ponderingPosts = await getPostsBySection('ponderings', 'desc');
+const blogPosts = await getPostsBySection('blog', 'desc');
+const buildIntuitionPosts = await getPostsBySection('build-intuition', 'desc');
 const aiPosts = await getPostsBySection('ai-generated-reports', 'desc');
 
 const totalEntries =
-  paperPosts.length + ponderingPosts.length + revisionPosts.length + aiPosts.length;
+  paperPosts.length +
+  blogPosts.length +
+  buildIntuitionPosts.length +
+  revisionPosts.length +
+  aiPosts.length;
 
 const sectionCards = [
   {
@@ -22,12 +27,20 @@ const sectionCards = [
     count: paperPosts.length,
   },
   {
-    id: 'ponderings',
-    href: '/ponderings.html',
-    command: 'ponderings',
-    title: 'Ponderings',
-    description: 'Notes on topics I find myself revisiting.',
-    count: ponderingPosts.length,
+    id: 'blog',
+    href: '/blog.html',
+    command: 'blog',
+    title: 'Blog',
+    description: 'Longer reflections on research, work, and the path so far.',
+    count: blogPosts.length,
+  },
+  {
+    id: 'build-intuition',
+    href: '/build_intuition.html',
+    command: 'build-intuition',
+    title: 'Build Intuition',
+    description: 'Intuition-first explainers for foundational ideas worth understanding deeply.',
+    count: buildIntuitionPosts.length,
   },
   {
     id: 'revision-notes',
@@ -55,10 +68,16 @@ const recentShelves = [
     emptyMessage: 'New research notes will show up here.',
   },
   {
-    title: 'Ponderings',
-    href: '/ponderings.html',
-    posts: ponderingPosts.slice(0, 3),
-    emptyMessage: 'Ponderings will show up here.',
+    title: 'Blog',
+    href: '/blog.html',
+    posts: blogPosts.slice(0, 3),
+    emptyMessage: 'Blog posts will show up here.',
+  },
+  {
+    title: 'Build Intuition',
+    href: '/build_intuition.html',
+    posts: buildIntuitionPosts.slice(0, 3),
+    emptyMessage: 'Intuition-first explainers will show up here.',
   },
   {
     title: 'Revision Notes',
@@ -131,7 +150,7 @@ const formatDate = (date: Date) =>
       <div class="home-meta-panel" aria-label="Site overview">
         <div class="home-meta-panel__item">
           <span class="home-meta-panel__label">Sections</span>
-          <strong>04</strong>
+          <strong>05</strong>
         </div>
         <div class="home-meta-panel__item">
           <span class="home-meta-panel__label">Entries</span>
@@ -139,7 +158,7 @@ const formatDate = (date: Date) =>
         </div>
         <div class="home-meta-panel__item">
           <span class="home-meta-panel__label">Latest Paths</span>
-          <p>/paper_summaries_field.html /ponderings.html /revision_notes.html</p>
+          <p>/paper_summaries_field.html /blog.html /build_intuition.html /revision_notes.html</p>
         </div>
       </div>
     </div>

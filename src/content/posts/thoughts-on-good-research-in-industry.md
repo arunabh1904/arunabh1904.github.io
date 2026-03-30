@@ -1,9 +1,9 @@
 ---
 title: Thoughts on Good Research in Industry
 date: '2026-03-22T04:00:00.000Z'
-section: ponderings
+section: blog
 postSlug: thoughts-on-good-research-in-industry
-legacyPath: /ponderings/2026/03/22/thoughts-on-good-research-in-industry.html
+legacyPath: /blog/2026/03/22/thoughts-on-good-research-in-industry.html
 tags:
   - Research
   - Career
