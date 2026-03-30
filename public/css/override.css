@@ -895,6 +895,28 @@ a:visited {
   }
 }
 
+@media (min-width: 900px) and (max-width: 1099px) {
+  .page-layout {
+    grid-template-columns: minmax(0, 1fr) 16rem;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .page-content--narrow {
+    width: 100%;
+    margin: 2rem 0;
+  }
+
+  .sections-nav__inner {
+    position: sticky;
+    top: 6.25rem;
+  }
+
+  .sections-nav {
+    margin-top: 7.75rem;
+  }
+}
+
 @media (min-width: 1100px) {
   .page-layout {
     grid-template-columns: minmax(0, 1fr) 16rem;
