@@ -64,26 +64,37 @@ const recentShelves = [
   {
     title: 'Arxiv Notes',
     href: '/paper_summaries_field.html',
-    posts: paperPosts.slice(0, 3),
+    summary: 'Summaries of research papers organized by broad interests.',
+    posts: paperPosts.slice(0, 2),
     emptyMessage: 'New research notes will show up here.',
   },
   {
     title: 'Blog',
     href: '/blog.html',
-    posts: blogPosts.slice(0, 3),
+    summary: 'Longer reflections on research, work, and the path so far.',
+    posts: blogPosts.slice(0, 2),
     emptyMessage: 'Blog posts will show up here.',
   },
   {
     title: 'Build Intuition',
     href: '/build_intuition.html',
-    posts: buildIntuitionPosts.slice(0, 3),
+    summary: 'Intuition-first explainers for foundational ideas worth understanding deeply.',
+    posts: buildIntuitionPosts.slice(0, 2),
     emptyMessage: 'Intuition-first explainers will show up here.',
   },
   {
     title: 'Revision Notes',
     href: '/revision_notes.html',
-    posts: revisionPosts.slice(0, 3),
+    summary: 'Detailed revision notes from long-form content online.',
+    posts: revisionPosts.slice(0, 2),
     emptyMessage: 'Revision notes will show up here.',
+  },
+  {
+    title: 'AI Generated Reports',
+    href: '/ai_generated_reports.html',
+    summary: 'Audio or text reports created by AI.',
+    posts: aiPosts.slice(0, 2),
+    emptyMessage: 'This section is ready for future reports.',
   },
 ] as const;
 
@@ -199,16 +210,25 @@ const formatDate = (date: Date) =>
   </section>
 
   <section class="home-shelves" id="latest">
-    <div class="home-section-heading">
+    <article class="home-panel home-panel--section-intro">
       <p class="home-panel__eyebrow">Latest</p>
-      <h2>Recent entries</h2>
-    </div>
+      <div class="home-section-heading">
+        <h2>Recent entries</h2>
+        <p>
+          A quick scan of the newest writing across the site. Each panel links out to the section
+          and highlights the two most recent posts.
+        </p>
+      </div>
+    </article>
 
     <div class="home-shelf-grid">
       {recentShelves.map((shelf) => (
         <article class="home-panel home-panel--shelf">
           <div class="home-shelf__header">
-            <h3>{shelf.title}</h3>
+            <div class="home-shelf__title-block">
+              <h3>{shelf.title}</h3>
+              <p>{shelf.summary}</p>
+            </div>
             <a href={shelf.href}>View all</a>
           </div>
 
@@ -227,25 +247,5 @@ const formatDate = (date: Date) =>
         </article>
       ))}
     </div>
-  </section>
-
-  <section class="home-panel home-panel--footer-note">
-    <div class="home-shelf__header">
-      <h2>AI Generated Reports</h2>
-      <a href="/ai_generated_reports.html">Open section</a>
-    </div>
-    <p>Audio or text reports created by AI.</p>
-    {aiPosts.length > 0 ? (
-      <ul class="home-post-list">
-        {aiPosts.slice(0, 3).map((post) => (
-          <li>
-            <a href={post.data.legacyPath}>{post.data.title}</a>
-            <small>{formatDate(post.data.date)}</small>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p class="home-empty-state">This section is ready for future reports.</p>
-    )}
   </section>
 </HomeLayout>
