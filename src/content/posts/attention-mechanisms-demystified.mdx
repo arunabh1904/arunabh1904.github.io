@@ -11,6 +11,9 @@ summary: >-
   multi-head attention, and cross-attention, with equations, examples, and
   visual explanations.
 ---
+import PythonPlayground from '../../components/PythonPlayground';
+import { attentionMechanismsPlayground } from '../../lib/python-playground-examples';
+
 ## 2025 - Attention Mechanisms Demystified: Building Intuition for Q, K, V, and Self-Attention
 
 Attention is easiest to understand as **learned information routing**.
@@ -171,6 +174,12 @@ self-attention is usually **causal**:
 future positions are masked out so a token can only attend to earlier tokens.
 The mechanism stays the same;
 the model is simply forbidden from looking ahead.
+
+To make that less abstract, here is a tiny runnable attention example.
+The default snippet uses a query representing the pronoun-like token and three candidate source tokens.
+Run it once, then step through the guided trace to see the raw scores, softmax weights, and final mixed value vector.
+
+<PythonPlayground client:visible {...attentionMechanismsPlayground} />
 
 ### Multi-head attention: one mechanism, many simultaneous views
 

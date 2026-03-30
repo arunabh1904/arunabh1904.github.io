@@ -9,6 +9,9 @@ tags:
 field: Natural Language Processing
 summary: 2017 – Attention Is All You Need
 ---
+import PythonPlayground from '../../components/PythonPlayground';
+import { attentionIsAllYouNeedPlayground } from '../../lib/python-playground-examples';
+
 ## 2017 – Attention Is All You Need
 
 **arXiv:** [1706.03762](https://arxiv.org/abs/1706.03762)
@@ -54,7 +57,13 @@ The additive mask inserts $-\infty$ so the softmax cleanly ignores blocked posit
 Multi-head attention, typically eight heads with $d_k = d_v = 64$,
 preserves information that a single head would compress.
 
-<img src="/assets/images/attention.png" alt="Transformer" style="max-width:60%;margin:1rem auto;display:block;">
+The paper’s core math lands more quickly when you can poke at small numbers yourself.
+This playground gives you a toy scaled-dot-product attention computation plus a positional-encoding helper.
+Run the default code first, then change the query or the position index and watch how the values shift.
+
+<PythonPlayground client:visible {...attentionIsAllYouNeedPlayground} />
+
+<img src="/assets/images/attention.png" alt="Transformer" style="max-width:60%;margin:1rem auto;display:block;" />
 
 ### Positional encoding
 
