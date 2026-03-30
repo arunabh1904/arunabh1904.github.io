@@ -9,6 +9,9 @@ tags:
 field: Reinforcement Learning
 summary: 2017 – Proximal Policy Optimization Algorithms (PPO)
 ---
+import PythonPlayground from '../../components/PythonPlayground';
+import { ppoPlayground } from '../../lib/python-playground-examples';
+
 ## 2017 – Proximal Policy Optimization Algorithms (PPO)
 
 **arXiv:** [1707.06347](https://arxiv.org/abs/1707.06347)
@@ -59,4 +62,8 @@ def ppo_clip_loss(policy, old_logp, obs, act, adv, clip_eps=0.2):
 ```
 Run several epochs of Adam on batches of rollout data, add a small value-function loss and entropy bonus, and you have a working PPO agent in about 50 lines. This simplicity is why PPO became the "hello world" of modern deep RL.
 
+The important part to internalize is not the `torch` syntax but the numbers PPO refuses to trust.
+This tiny terminal lets you vary the log-probabilities, advantage, and clipping threshold while the walkthrough shows exactly when the unclipped objective gets cut back.
+
+<PythonPlayground client:visible {...ppoPlayground} />
 

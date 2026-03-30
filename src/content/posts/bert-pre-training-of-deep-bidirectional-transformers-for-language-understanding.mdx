@@ -16,6 +16,9 @@ summary: >-
   2019 – BERT: Pre-training of Deep Bidirectional Transformers for Language
   Understanding
 ---
+import PythonPlayground from '../../components/PythonPlayground';
+import { bertPlayground } from '../../lib/python-playground-examples';
+
 ## 2019 – BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
 
 **arXiv:** [1810.04805](https://arxiv.org/abs/1810.04805)  
@@ -74,6 +77,11 @@ TL;DR A 12-layer (base) or 24-layer (large) Transformer encoder, pre-trained on 
 
 The `mask_tokens` function corrupts 15 % of input pieces at random, forcing the network to infer each blank from both left and right context. This made BERT genuinely bidirectional, unlike GPT-1’s left-to-right guessing game or ELMo’s shallow concatenation of two one-directional RNNs.
 
+This browser-side toy version strips away the `torch` machinery and focuses on the bookkeeping that matters.
+Run it once, then walk through the traced values to see exactly which positions become labels, how the masked input is formed, and how the model head maps predictions back to the hidden originals.
+
+<PythonPlayground client:visible {...bertPlayground} />
+
 ### Next-Sentence Prediction (NSP)
 
 `make_sentence_pairs` creates 50 % real A→B pairs and 50 % mismatches. The classifier sitting on `[CLS]` learns discourse-level coherence. Later work (RoBERTa) showed you can ditch NSP without hurting accuracy, but the idea seeded a huge body of inter-sentence objectives (e.g. sentence embedding models, dense retrieval).
@@ -112,4 +120,3 @@ Training cost: ~4 days on 16 TPU v3 chips; a single downstream fine-tune (e.g. Q
 ## Looking Forward
 
 BERT’s recipe is a floor, not a ceiling. Better corruption schemes (SpanBERT, DeBERTa’s disentangled masks), cheaper compressors (DistilBERT, TinyBERT), and smarter attention (Longformer, FlashAttention) all stand on its shoulders. Yet the two short snippets at the top remain the intellectual core: mask some tokens, test sentence order, back-propagate, repeat. That elegance is why BERT is still worth teaching in 2025.
-

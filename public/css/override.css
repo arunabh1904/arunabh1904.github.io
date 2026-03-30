@@ -1859,3 +1859,287 @@ body.home-page {
     width: 100%;
   }
 }
+
+.python-playground {
+  margin: 2rem 0;
+  padding: 1.35rem;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(12, 20, 40, 0.97), rgba(8, 14, 28, 0.99));
+  border: 1px solid rgba(118, 169, 255, 0.18);
+  box-shadow: 0 24px 48px rgba(7, 20, 48, 0.2);
+  color: #dff0ff;
+}
+
+:root[data-theme="dark"] .python-playground {
+  background:
+    linear-gradient(180deg, rgba(10, 10, 10, 0.98), rgba(18, 15, 3, 0.98));
+  border-color: rgba(255, 228, 92, 0.22);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+  color: #fff7cf;
+}
+
+.python-playground h3,
+.python-playground h4,
+.python-playground p,
+.python-playground code,
+.python-playground button,
+.python-playground textarea,
+.python-playground pre {
+  font-family: var(--font-mono);
+}
+
+.python-playground__header,
+.python-playground__walkthrough-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.python-playground__eyebrow {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  color: #7fc5ff;
+}
+
+:root[data-theme="dark"] .python-playground__eyebrow {
+  color: #ffe45c;
+}
+
+.python-playground__header h3,
+.python-playground__walkthrough-header h4 {
+  margin: 0;
+}
+
+.python-playground__status,
+.python-playground__walkthrough-header > p,
+.python-playground__sample-description,
+.python-playground__notes,
+.python-playground__walkthrough-note {
+  color: rgba(223, 240, 255, 0.82);
+}
+
+:root[data-theme="dark"] .python-playground__status,
+:root[data-theme="dark"] .python-playground__walkthrough-header > p,
+:root[data-theme="dark"] .python-playground__sample-description,
+:root[data-theme="dark"] .python-playground__notes,
+:root[data-theme="dark"] .python-playground__walkthrough-note {
+  color: rgba(255, 247, 207, 0.82);
+}
+
+.python-playground__status {
+  margin: 0;
+  max-width: 22rem;
+  font-size: 0.85rem;
+}
+
+.python-playground__status--ready {
+  color: #86f7c0;
+}
+
+.python-playground__status--error {
+  color: #ff8e8e;
+}
+
+.python-playground__samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 1rem 0 0.75rem;
+}
+
+.python-playground__samples button,
+.python-playground__actions button,
+.python-playground__walkthrough-actions button {
+  appearance: none;
+  border: 1px solid rgba(127, 197, 255, 0.25);
+  background: rgba(15, 30, 58, 0.72);
+  color: inherit;
+  padding: 0.65rem 0.95rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+:root[data-theme="dark"] .python-playground__samples button,
+:root[data-theme="dark"] .python-playground__actions button,
+:root[data-theme="dark"] .python-playground__walkthrough-actions button {
+  border-color: rgba(255, 228, 92, 0.24);
+  background: rgba(35, 28, 2, 0.72);
+}
+
+.python-playground__samples button:hover,
+.python-playground__actions button:hover,
+.python-playground__walkthrough-actions button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(127, 197, 255, 0.52);
+}
+
+:root[data-theme="dark"] .python-playground__samples button:hover,
+:root[data-theme="dark"] .python-playground__actions button:hover,
+:root[data-theme="dark"] .python-playground__walkthrough-actions button:hover {
+  border-color: rgba(255, 228, 92, 0.5);
+}
+
+.python-playground__samples button.is-active {
+  background: rgba(38, 84, 165, 0.86);
+  border-color: rgba(151, 208, 255, 0.6);
+}
+
+:root[data-theme="dark"] .python-playground__samples button.is-active {
+  background: rgba(91, 73, 5, 0.86);
+  border-color: rgba(255, 228, 92, 0.55);
+}
+
+.python-playground__samples button:disabled,
+.python-playground__actions button:disabled,
+.python-playground__walkthrough-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.python-playground__terminal,
+.python-playground__walkthrough {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(127, 197, 255, 0.16);
+  background: rgba(5, 15, 30, 0.65);
+}
+
+:root[data-theme="dark"] .python-playground__terminal,
+:root[data-theme="dark"] .python-playground__walkthrough {
+  border-color: rgba(255, 228, 92, 0.18);
+  background: rgba(12, 10, 2, 0.72);
+}
+
+.python-playground__promptbar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+}
+
+.python-playground__dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: #ff7c7c;
+}
+
+.python-playground__dot:nth-child(2) {
+  background: #ffd76e;
+}
+
+.python-playground__dot:nth-child(3) {
+  background: #81f0b0;
+}
+
+.python-playground__prompt {
+  margin-left: 0.4rem;
+  color: rgba(223, 240, 255, 0.7);
+}
+
+:root[data-theme="dark"] .python-playground__prompt {
+  color: rgba(255, 247, 207, 0.7);
+}
+
+.python-playground__editor-label {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-size: 0.84rem;
+}
+
+.python-playground__editor {
+  width: 100%;
+  min-height: 22rem;
+  resize: vertical;
+  box-sizing: border-box;
+  border-radius: 16px;
+  border: 1px solid rgba(127, 197, 255, 0.18);
+  background: rgba(3, 10, 20, 0.82);
+  color: inherit;
+  padding: 1rem;
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+:root[data-theme="dark"] .python-playground__editor {
+  border-color: rgba(255, 228, 92, 0.2);
+  background: rgba(7, 7, 7, 0.9);
+}
+
+.python-playground__actions,
+.python-playground__walkthrough-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+.python-playground__output {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.python-playground__output > div,
+.python-playground__variable-card {
+  border-radius: 16px;
+  border: 1px solid rgba(127, 197, 255, 0.14);
+  background: rgba(2, 9, 18, 0.72);
+  padding: 0.9rem;
+}
+
+:root[data-theme="dark"] .python-playground__output > div,
+:root[data-theme="dark"] .python-playground__variable-card {
+  border-color: rgba(255, 228, 92, 0.16);
+  background: rgba(8, 8, 8, 0.78);
+}
+
+.python-playground__output p,
+.python-playground__variable-card p {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.python-playground__output pre,
+.python-playground__variable-card code {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.python-playground__variables {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.python-playground__notes {
+  margin-bottom: 0;
+}
+
+@media (max-width: 820px) {
+  .python-playground__header,
+  .python-playground__walkthrough-header,
+  .python-playground__output,
+  .python-playground__variables {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .python-playground__output,
+  .python-playground__variables {
+    display: grid;
+  }
+}
