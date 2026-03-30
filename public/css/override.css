@@ -1297,12 +1297,16 @@ body.home-page {
 }
 
 .home-hero__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(13.5rem, 15rem);
+  gap: 1.5rem;
   align-items: stretch;
 }
 
 .home-hero__copy {
   flex: 1 1 auto;
   min-width: 0;
+  padding-right: 0.5rem;
 }
 
 .home-title,
@@ -1322,8 +1326,10 @@ body.home-page {
 
 .home-title {
   margin-bottom: 0.75rem;
-  font-size: clamp(2.5rem, 5vw, 4.4rem);
+  max-width: 8.4ch;
+  font-size: clamp(2.7rem, 4.5vw, 4rem);
   line-height: 0.92;
+  text-wrap: balance;
 }
 
 .lead,
@@ -1360,8 +1366,8 @@ body.home-page {
 .home-meta-panel {
   display: grid;
   gap: 0.8rem;
-  width: min(100%, 16rem);
-  margin-right: 1rem;
+  width: 100%;
+  margin-right: 0;
 }
 
 .home-meta-panel__item,
