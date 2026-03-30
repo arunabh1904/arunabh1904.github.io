@@ -10,3 +10,9 @@
 
 - If you update the KaTeX CDN URL or version in `src/layouts/BaseLayout.astro`, update the stylesheet SRI hash too.
 - A bad KaTeX CSS integrity hash causes browsers to reject the stylesheet, which makes equations render as a broken mix of MathML and visible KaTeX HTML.
+
+## Post Images
+
+- Prefer post diagrams that are immediately grokkable at a glance: minimal text, minimal visual noise, and one clear idea per image.
+- Favor simple hand-drawn or sketch-style visuals with clean black strokes, lots of whitespace, and restrained color accents, similar to an Excalidraw-style explainer.
+- For animated explanatory visuals, keep motion subtle and instructional rather than flashy. The animation should make the concept easier to follow, not add decoration.

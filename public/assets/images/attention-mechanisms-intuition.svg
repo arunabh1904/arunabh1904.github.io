@@ -1,192 +1,76 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
   <title id="title">Attention as differentiable lookup</title>
-  <desc id="desc">A diagram showing a query from the token it matching the keys for animal, street, and tired, then mixing their values into a contextualized output representation.</desc>
+  <desc id="desc">A minimal sketch-style diagram showing the token it querying animal, street, and tired, then mixing the useful values into a new meaning.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f8fbff" />
-      <stop offset="100%" stop-color="#eef4fb" />
-    </linearGradient>
-    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="100%" stop-color="#f9fbfe" />
-    </linearGradient>
-    <linearGradient id="queryFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dbeafe" />
-      <stop offset="100%" stop-color="#bfdbfe" />
-    </linearGradient>
-    <linearGradient id="memoryFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#eef2ff" />
-      <stop offset="100%" stop-color="#e0e7ff" />
-    </linearGradient>
-    <linearGradient id="valueFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#dcfce7" />
-      <stop offset="100%" stop-color="#bbf7d0" />
-    </linearGradient>
-    <linearGradient id="outputFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fef3c7" />
-      <stop offset="100%" stop-color="#fde68a" />
-    </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.08" />
-    </filter>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb" />
-    </marker>
-    <marker id="arrowSoft" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+    <style>
+      .ink { stroke: #222222; stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .ink-soft { stroke: #222222; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .label { fill: #222222; font-family: "Comic Sans MS", "Chalkboard SE", "Marker Felt", cursive, sans-serif; }
+      .title { font-size: 42px; font-weight: 700; }
+      .subtitle { font-size: 24px; }
+      .boxtext { font-size: 28px; font-weight: 700; }
+      .small { font-size: 24px; }
+      .tiny { font-size: 22px; }
+      .good { fill: #baf3bd; stroke: #222222; stroke-width: 4; }
+      .soft { fill: #ebf9ee; stroke: #222222; stroke-width: 4; }
+      .bad { fill: #ffffff; stroke: #222222; stroke-width: 4; }
+      .pill { fill: #ffffff; stroke: #222222; stroke-width: 4; }
+      .note { fill: #f6f6f4; stroke: #222222; stroke-width: 4; }
+    </style>
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 12 6 L 0 12" fill="none" stroke="#222222" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
     </marker>
   </defs>
 
-  <rect width="1400" height="900" fill="url(#bg)" />
-  <rect x="34" y="34" width="1332" height="832" rx="34" fill="url(#panel)" stroke="#dbe6f3" stroke-width="2" />
+  <rect width="1400" height="900" fill="#fcfcfa" />
 
-  <text x="80" y="105" fill="#0f172a" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="700">
-    Attention as differentiable lookup
-  </text>
-  <text x="80" y="145" fill="#475569" font-family="IBM Plex Sans, Arial, sans-serif" font-size="23">
-    The current token emits a query, scores candidate keys, then mixes their values into a new contextual representation.
-  </text>
+  <text x="84" y="92" class="label title">Attention = look up what matters</text>
+  <text x="84" y="132" class="label subtitle">Simple version: the token "it" asks who matters most, then mixes the useful info back in.</text>
 
-  <rect x="76" y="210" width="300" height="470" rx="28" fill="#f8fbff" stroke="#c8d7e7" stroke-width="2" />
-  <text x="108" y="258" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">
-    Current token
-  </text>
-  <text x="108" y="294" fill="#64748b" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20">
-    Sentence fragment:
-  </text>
-  <rect x="108" y="320" width="190" height="64" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
-  <text x="203" y="362" text-anchor="middle" fill="#0f172a" font-family="Roboto Mono, monospace" font-size="28" font-weight="500">
-    it
-  </text>
+  <rect x="120" y="262" width="210" height="88" rx="20" class="pill" />
+  <text x="225" y="318" text-anchor="middle" class="label boxtext">token: it</text>
 
-  <rect x="108" y="418" width="236" height="156" rx="22" fill="url(#queryFill)" stroke="#60a5fa" stroke-width="2.5" filter="url(#shadow)" />
-  <text x="136" y="458" fill="#1d4ed8" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">
-    Query q
-  </text>
-  <text x="136" y="494" fill="#1e3a8a" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20">
-    What antecedent fits here?
-  </text>
-  <text x="136" y="526" fill="#1e3a8a" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20">
-    What explains "too tired"?
-  </text>
-  <text x="136" y="558" fill="#1e3a8a" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20">
-    Which prior token matters now?
-  </text>
+  <rect x="120" y="392" width="250" height="94" rx="22" class="note" />
+  <text x="245" y="448" text-anchor="middle" class="label boxtext">query</text>
+  <text x="245" y="478" text-anchor="middle" class="label tiny">"who does it refer to?"</text>
 
-  <rect x="430" y="190" width="540" height="520" rx="28" fill="#f8fbff" stroke="#c8d7e7" stroke-width="2" />
-  <text x="460" y="238" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">
-    Candidate memory slots
-  </text>
-  <text x="460" y="274" fill="#64748b" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20">
-    Each token advertises a key and carries a value.
-  </text>
+  <path d="M 330 308 C 420 250, 470 220, 560 200" class="ink" marker-end="url(#arrow)" />
+  <path d="M 330 308 C 430 308, 470 308, 560 308" class="ink" marker-end="url(#arrow)" />
+  <path d="M 330 308 C 420 366, 470 394, 560 416" class="ink-soft" marker-end="url(#arrow)" stroke-dasharray="10 12" />
 
-  <rect x="466" y="320" width="468" height="98" rx="24" fill="url(#memoryFill)" stroke="#818cf8" stroke-width="2.5" filter="url(#shadow)" />
-  <text x="500" y="356" fill="#312e81" font-family="Roboto Mono, monospace" font-size="24" font-weight="500">
-    animal
-  </text>
-  <text x="500" y="384" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
-    key: animate noun, plausible
-  </text>
-  <text x="500" y="406" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
-    antecedent for "too tired"
-  </text>
-  <rect x="726" y="336" width="176" height="60" rx="18" fill="url(#valueFill)" stroke="#22c55e" stroke-width="2" />
-  <text x="810" y="374" text-anchor="middle" fill="#166534" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20" font-weight="600">
-    value: entity meaning
-  </text>
+  <text x="440" y="222" class="label small">high match</text>
+  <text x="446" y="290" class="label small">highest match</text>
+  <text x="446" y="402" class="label small">small match</text>
 
-  <rect x="466" y="454" width="468" height="98" rx="24" fill="url(#memoryFill)" stroke="#818cf8" stroke-width="2" />
-  <text x="500" y="490" fill="#312e81" font-family="Roboto Mono, monospace" font-size="24" font-weight="500">
-    street
-  </text>
-  <text x="500" y="518" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
-    key: location cue, weak match
-  </text>
-  <text x="500" y="540" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
-    for explaining "too tired"
-  </text>
-  <rect x="726" y="470" width="176" height="60" rx="18" fill="url(#valueFill)" stroke="#22c55e" stroke-width="2" />
-  <text x="810" y="508" text-anchor="middle" fill="#166534" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20" font-weight="600">
-    value: scene detail
-  </text>
+  <circle cx="620" cy="196" r="34" class="soft" />
+  <text x="690" y="206" class="label boxtext">tired</text>
+  <text x="690" y="238" class="label tiny">useful clue</text>
+  <text x="645" y="210" class="label boxtext" fill="#2f9e44"> </text>
+  <path d="M 737 185 l 16 16 l 28 -38" stroke="#2f9e44" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" />
 
-  <rect x="466" y="588" width="468" height="98" rx="24" fill="url(#memoryFill)" stroke="#818cf8" stroke-width="2" />
-  <text x="500" y="624" fill="#312e81" font-family="Roboto Mono, monospace" font-size="24" font-weight="500">
-    tired
-  </text>
-  <text x="500" y="652" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
-    key: causal clue that helps
-  </text>
-  <text x="500" y="674" fill="#4338ca" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
-    explain why it happened
-  </text>
-  <rect x="726" y="604" width="176" height="60" rx="18" fill="url(#valueFill)" stroke="#22c55e" stroke-width="2" />
-  <text x="810" y="642" text-anchor="middle" fill="#166534" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20" font-weight="600">
-    value: fatigue signal
-  </text>
+  <circle cx="620" cy="308" r="34" class="good" />
+  <text x="690" y="318" class="label boxtext">animal</text>
+  <text x="690" y="350" class="label tiny">best antecedent</text>
+  <path d="M 737 297 l 16 16 l 28 -38" stroke="#2f9e44" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" />
 
-  <path d="M 344 496 C 404 468, 420 400, 458 368" fill="none" stroke="#2563eb" stroke-width="7" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.95" />
-  <path d="M 344 500 C 404 510, 420 510, 458 504" fill="none" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round" marker-end="url(#arrowSoft)" opacity="0.9" />
-  <path d="M 344 520 C 398 570, 420 610, 458 640" fill="none" stroke="#0f766e" stroke-width="5" stroke-linecap="round" marker-end="url(#arrowSoft)" opacity="0.8" />
+  <circle cx="620" cy="420" r="34" class="bad" />
+  <text x="690" y="430" class="label boxtext">street</text>
+  <text x="690" y="462" class="label tiny">weak fit</text>
+  <path d="M 741 397 l 30 42 M 771 397 l -30 42" stroke="#e03131" stroke-width="8" fill="none" stroke-linecap="round" />
 
-  <rect x="348" y="354" width="82" height="28" rx="14" fill="#f8fbff" opacity="0.96" />
-  <text x="389" y="373" text-anchor="middle" fill="#1d4ed8" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16" font-weight="700">
-    w = 0.72
-  </text>
-  <rect x="348" y="481" width="82" height="28" rx="14" fill="#f8fbff" opacity="0.96" />
-  <text x="389" y="500" text-anchor="middle" fill="#64748b" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16" font-weight="700">
-    w = 0.08
-  </text>
-  <rect x="348" y="609" width="82" height="28" rx="14" fill="#f8fbff" opacity="0.96" />
-  <text x="389" y="628" text-anchor="middle" fill="#0f766e" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16" font-weight="700">
-    w = 0.20
-  </text>
+  <text x="160" y="610" class="label title">Keys choose where to look</text>
+  <text x="160" y="650" class="label subtitle">Values choose what comes back</text>
 
-  <rect x="1012" y="210" width="300" height="470" rx="28" fill="#f8fbff" stroke="#c8d7e7" stroke-width="2" />
-  <text x="1046" y="258" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">
-    Weighted output
-  </text>
-  <text x="1046" y="294" fill="#64748b" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20">
-    Mix returned values into a new vector.
-  </text>
+  <path d="M 850 210 C 930 240, 966 274, 1028 324" class="ink" marker-end="url(#arrow)" />
+  <path d="M 850 318 C 942 320, 980 336, 1028 356" class="ink" marker-end="url(#arrow)" />
+  <path d="M 850 430 C 936 410, 972 400, 1028 382" class="ink-soft" marker-end="url(#arrow)" stroke-dasharray="10 12" />
 
-  <rect x="1046" y="330" width="232" height="168" rx="24" fill="url(#outputFill)" stroke="#f59e0b" stroke-width="2.5" filter="url(#shadow)" />
-  <text x="1076" y="374" fill="#92400e" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">
-    Contextualized "it"
-  </text>
-  <text x="1076" y="412" fill="#78350f" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20">
-    Refers mostly to
-  </text>
-  <text x="1076" y="442" fill="#78350f" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20">
-    the animal, while also
-  </text>
-  <text x="1076" y="472" fill="#78350f" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20">
-    absorbing the causal
-  </text>
-  <text x="1076" y="502" fill="#78350f" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20">
-    clue from tired.
-  </text>
+  <rect x="1036" y="250" width="264" height="214" rx="26" class="note" />
+  <text x="1168" y="308" text-anchor="middle" class="label boxtext">new meaning of "it"</text>
+  <text x="1168" y="356" text-anchor="middle" class="label small">mostly animal</text>
+  <text x="1168" y="392" text-anchor="middle" class="label small">+ some tired</text>
+  <text x="1168" y="428" text-anchor="middle" class="label small">+ almost no street</text>
 
-  <text x="1048" y="560" fill="#0f172a" font-family="Roboto Mono, monospace" font-size="20">
-    0.72 v_animal
-  </text>
-  <text x="1048" y="592" fill="#0f172a" font-family="Roboto Mono, monospace" font-size="20">
-    + 0.08 v_street
-  </text>
-  <text x="1048" y="624" fill="#0f172a" font-family="Roboto Mono, monospace" font-size="20">
-    + 0.20 v_tired
-  </text>
-
-  <path d="M 934 368 C 980 368, 992 374, 1038 386" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" marker-end="url(#arrowSoft)" />
-  <path d="M 934 504 C 978 504, 994 476, 1038 456" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowSoft)" opacity="0.7" />
-  <path d="M 934 638 C 978 638, 994 560, 1038 528" fill="none" stroke="#16a34a" stroke-width="3.5" stroke-linecap="round" marker-end="url(#arrowSoft)" opacity="0.8" />
-
-  <rect x="76" y="732" width="1236" height="96" rx="24" fill="#0f172a" opacity="0.95" />
-  <text x="112" y="780" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">
-    Deep intuition
-  </text>
-  <text x="112" y="812" fill="#cbd5e1" font-family="IBM Plex Sans, Arial, sans-serif" font-size="22">
-    Keys decide where to look. Values decide what comes back. The output is a new representation, not a copied token.
-  </text>
+  <text x="972" y="560" class="label title">Not a hard pointer</text>
+  <text x="972" y="600" class="label subtitle">It is a weighted mix of useful signals.</text>
 </svg>
