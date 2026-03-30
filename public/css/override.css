@@ -1295,7 +1295,7 @@ body.home-page {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(15rem, 18rem) 16rem;
   gap: 1.25rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .home-content-shell {
@@ -1310,12 +1310,12 @@ body.home-page {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  align-self: start;
 }
 
 .home-timeline-rail {
-  position: sticky;
-  top: 5.25rem;
-  align-self: start;
+  position: relative;
+  align-self: stretch;
 }
 
 .home-sidebar {
@@ -1718,7 +1718,8 @@ body.home-page {
 }
 
 .timeline-panel {
-  min-height: calc(100vh - 5.25rem);
+  height: 100%;
+  min-height: 100%;
 }
 
 .timeline-list {
@@ -1841,6 +1842,7 @@ body.home-page {
   }
 
   .timeline-panel {
+    height: auto;
     min-height: auto;
   }
 }
