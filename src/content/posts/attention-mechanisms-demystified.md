@@ -1,9 +1,9 @@
 ---
 title: Attention Mechanisms Demystified
 date: '2025-05-25T04:00:00.000Z'
-section: ponderings
+section: build-intuition
 postSlug: attention-mechanisms-demystified
-legacyPath: /ponderings/2025/05/25/attention-mechanisms-demystified.html
+legacyPath: /build intuition/2025/05/25/attention-mechanisms-demystified.html
 tags:
   - Other
 summary: >-

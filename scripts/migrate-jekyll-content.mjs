@@ -12,10 +12,11 @@ const sourceRoot = process.env.JEKYLL_SOURCE
 
 const sectionByCategory = {
   'Paper Shorts': 'paper-shorts',
-  Ponderings: 'ponderings',
+  Ponderings: 'blog',
+  'Build Intuition': 'build-intuition',
   'Revision Notes': 'revision-notes',
   'Machine Learning Deep-Dives': 'ai-generated-reports',
-  'My Journey So Far': 'my-journey',
+  'My Journey So Far': 'blog',
 };
 
 function deriveSummary(content) {

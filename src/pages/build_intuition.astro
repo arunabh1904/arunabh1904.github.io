@@ -3,9 +3,9 @@ import PostLayout from '../layouts/PostLayout.astro';
 import PostList from '../components/PostList.astro';
 import { getPostsBySection } from '../lib/content';
 
-const posts = await getPostsBySection('ponderings', 'asc');
+const posts = await getPostsBySection('build-intuition', 'asc');
 ---
 
-<PostLayout title="Ponderings">
+<PostLayout title="Build Intuition">
   <PostList posts={posts} />
 </PostLayout>

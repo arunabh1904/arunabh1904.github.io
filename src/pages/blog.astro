@@ -1,0 +1,11 @@
+---
+import PostLayout from '../layouts/PostLayout.astro';
+import PostList from '../components/PostList.astro';
+import { getPostsBySection } from '../lib/content';
+
+const posts = await getPostsBySection('blog', 'asc');
+---
+
+<PostLayout title="Blog">
+  <PostList posts={posts} />
+</PostLayout>

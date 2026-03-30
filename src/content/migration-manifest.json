@@ -1,9 +1,9 @@
 [
   {
     "title": "My Journey So Far - The Full Story",
-    "section": "my-journey",
+    "section": "blog",
     "postSlug": "my-journey-so-far-full-story",
-    "legacyPath": "/my journey so far/2025/02/08/my-journey-so-far-full-story.html",
+    "legacyPath": "/blog/2025/02/08/my-journey-so-far-full-story.html",
     "date": "2025-02-08T05:00:00.000Z",
     "field": null
   },
@@ -161,9 +161,9 @@
   },
   {
     "title": "Attention Mechanisms Demystified",
-    "section": "ponderings",
+    "section": "build-intuition",
     "postSlug": "attention-mechanisms-demystified",
-    "legacyPath": "/ponderings/2025/05/25/attention-mechanisms-demystified.html",
+    "legacyPath": "/build intuition/2025/05/25/attention-mechanisms-demystified.html",
     "date": "2025-05-25T04:00:00.000Z",
     "field": null
   },
