@@ -23,8 +23,16 @@ const {
 
 <BaseLayout title={title} description={description}>
   <PageControls showHomeButton={true} />
-  <main class="page-content page-content--narrow" aria-label="Content">
-    <slot />
-    {showNavigation && <PostNavigation previous={previous} next={next} />}
-  </main>
+  <div class="page-layout">
+    <main class="page-content page-content--narrow" aria-label="Content" data-sections-root>
+      <slot />
+      {showNavigation && <PostNavigation previous={previous} next={next} />}
+    </main>
+    <aside class="sections-nav" aria-label="Sections" data-sections-nav hidden>
+      <div class="sections-nav__inner">
+        <p class="sections-nav__eyebrow">Sections</p>
+        <nav class="sections-nav__links" data-sections-list></nav>
+      </div>
+    </aside>
+  </div>
 </BaseLayout>
