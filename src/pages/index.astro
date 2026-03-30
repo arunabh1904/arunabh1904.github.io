@@ -124,7 +124,6 @@ const formatDate = (date: Date) =>
         </p>
         <nav class="home-command-bar home-command-bar--hero" aria-label="Homepage sections">
           <a href="#about">/about</a>
-          <a href="#collections">/collections</a>
           <a href="#latest">/latest</a>
         </nav>
       </div>
@@ -182,26 +181,6 @@ const formatDate = (date: Date) =>
         ))}
       </ul>
     </article>
-  </section>
-
-  <section class="home-library" id="collections">
-    <div class="home-section-heading">
-      <p class="home-panel__eyebrow">Collections</p>
-      <h2>Browse by section</h2>
-    </div>
-
-    <div class="home-collection-grid">
-      {sectionCards.map((section) => (
-        <a class="home-collection-card" id={section.id} href={section.href}>
-          <div class="home-collection-card__head">
-            <span class="home-collection-card__command">/{section.command}</span>
-            <span class="home-collection-card__count">{section.count}</span>
-          </div>
-          <h3>{section.title}</h3>
-          <p>{section.description}</p>
-        </a>
-      ))}
-    </div>
   </section>
 
   <section class="home-shelves" id="latest">
