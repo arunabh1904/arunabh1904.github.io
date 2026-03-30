@@ -204,6 +204,7 @@ body.home-page small {
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
 }
 
 .page-content--narrow {
@@ -211,13 +212,7 @@ body.home-page small {
   margin: 2rem auto;
 }
 
-.sections-nav {
-  display: none;
-}
-
 .sections-nav__inner {
-  position: sticky;
-  top: 6.25rem;
   padding: 1rem 1rem 1.1rem;
   border-radius: 22px;
   background: var(--panel-bg);
@@ -858,6 +853,9 @@ a:visited {
   .page-layout {
     width: 100%;
   }
+  .sections-nav {
+    margin: 0 1rem 1.25rem;
+  }
   .main-container {
     margin: 1rem;
   }
@@ -909,8 +907,12 @@ a:visited {
     margin: 2rem 0;
   }
 
-  .sections-nav:not([hidden]) {
-    display: block;
+  .sections-nav__inner {
+    position: sticky;
+    top: 6.25rem;
+  }
+
+  .sections-nav {
     margin-top: 7.75rem;
   }
 }
