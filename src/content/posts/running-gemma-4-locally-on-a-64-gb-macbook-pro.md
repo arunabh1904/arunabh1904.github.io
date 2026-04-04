@@ -72,6 +72,18 @@ The output task was intentionally boring and deterministic: read background text
 
 One important caveat: this is a fastest-practical-path comparison, not a perfect same-weights lab setup. I used the most direct current artifact for each runtime. That means the `E2B` comparison is not perfectly apples-to-apples: official `llama.cpp` GGUF for `E2B` is `Q8_0`, while the MLX and Ollama paths use 4-bit artifacts.
 
+## Special Things I Had To Do
+
+A few benchmark details ended up mattering more than I expected:
+
+- I disabled Gemma's thinking mode anywhere I could, because otherwise you are partly benchmarking extra reasoning tokens instead of raw runtime behavior.
+- I kept the benchmark text-only, which meant running `llama.cpp` without a multimodal projector. That was the cleanest way to measure prompt processing and decode speed instead of image overhead.
+- I used a boring deterministic output task and pinned temperature to `0`. That made throughput differences much easier to trust.
+- I split the test into short and long prompts on purpose. A runtime can look fine at `512` tokens and then feel much worse once prompt processing climbs into the `8K` range.
+- I tried Ollama with native `gemma4:*` tags, not a hacked local import path. I wanted Ollama to get the fairest possible shot before concluding that the current M5 experience is broken.
+
+None of those are exotic tricks, but they were the difference between "the model runs" and "I actually believe this comparison."
+
 ## What The Benchmarks Say
 
 I came into this expecting `llama.cpp` to win on raw speed.
