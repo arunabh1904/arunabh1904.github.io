@@ -158,6 +158,8 @@ If I cared about the fastest usable runtime on this machine, the answer is no lo
 2. `llama.cpp` second
 3. `Ollama` later, once the M5 Metal breakage is fixed
 
+And if you do not just want a terminal workflow, this also maps cleanly to a tiny local browser chat app. Both `MLX` and `llama.cpp` are perfectly reasonable backends if what you really want is just to serve Gemma locally and talk to it.
+
 That is a more opinionated answer than I expected going in, but it feels much less hand-wavy now.
 
 And honestly, that was the point of running the benchmarks in the first place.
