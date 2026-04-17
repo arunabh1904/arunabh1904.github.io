@@ -952,4 +952,83 @@ print(temperature_scaled_probs(sample_logits, sample_temperature))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Classification', 'Calibration'],
   },
+  {
+    id: 'sinusoidal-positional-encoding',
+    order: 10,
+    title: 'Sinusoidal positional encoding',
+    difficulty: 'Medium',
+    summary:
+      'Build the classic sine-and-cosine positional encoding matrix with one frequency pair per even/odd column pair.',
+    prompt: [
+      'Write `sinusoidal_positional_encoding(length, dim)` so it returns a `(length, dim)` array of sinusoidal positional encodings.',
+      'Use the standard Transformer formulas: even columns use `sin(pos / 10000^(2k/dim))` and odd columns use `cos(pos / 10000^(2k/dim))`. If `dim` is odd, the final column should use the even-column formula for its slot.',
+    ],
+    signature: `def sinusoidal_positional_encoding(length, dim):
+    ...`,
+    requirements: [
+      '`length` is a positive integer.',
+      '`dim` is a positive integer.',
+      'Return an array of shape `(length, dim)`.',
+      'For even columns `2k`, use `sin(pos / 10000^(2k/dim))`.',
+      'For odd columns `2k+1`, use `cos(pos / 10000^(2k/dim))`.',
+      'Raise `ValueError` on invalid input.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: ['length = 3', 'dim = 4'],
+        result:
+          '[[0.0, 1.0, 0.0, 1.0], [0.84147, 0.54030, 0.01000, 0.99995], [0.90930, -0.41615, 0.02000, 0.99980]]',
+      },
+      {
+        label: 'Example 2',
+        lines: ['length = 2', 'dim = 3'],
+        result: '[[0.0, 1.0, 0.0], [0.84147, 0.54030, 0.00215]]',
+      },
+    ],
+    hint: [
+      'Build a column index vector `0..dim-1`, then reuse the same frequency for each even/odd pair.',
+      'Broadcast a position vector of shape `(length, 1)` against the per-column frequency vector.',
+      'Fill even columns with `np.sin` and odd columns with `np.cos` after computing the shared angles.',
+      'If `dim` is odd, the last column still belongs to the even-column branch.',
+    ],
+    solutionNotes: [
+      'Sinusoidal positional encoding is just a deterministic lookup table: each position gets a vector of sines and cosines at frequencies that decay geometrically across the embedding dimension.',
+      'The implementation is compact if you compute one denominator per column pair and then broadcast positions across those frequencies. That also makes the odd-dimension case work naturally, because the final column is just the next even slot.',
+    ],
+    solutionCode: `import numpy as np
+
+def sinusoidal_positional_encoding(length, dim):
+    if isinstance(length, bool) or not isinstance(length, (int, np.integer)):
+        raise ValueError("length must be a positive integer")
+    if isinstance(dim, bool) or not isinstance(dim, (int, np.integer)):
+        raise ValueError("dim must be a positive integer")
+    if length <= 0 or dim <= 0:
+        raise ValueError("length and dim must be positive integers")
+
+    positions = np.arange(length, dtype=np.float64)[:, None]
+    column_indices = np.arange(dim)
+    even_indices = 2 * (column_indices // 2)
+    angle_rates = np.power(10000.0, even_indices / dim)
+    angles = positions / angle_rates
+
+    encoding = np.empty((length, dim), dtype=np.float64)
+    encoding[:, 0::2] = np.sin(angles[:, 0::2])
+    encoding[:, 1::2] = np.cos(angles[:, 1::2])
+    return encoding`,
+    starterCode: `import numpy as np
+
+def sinusoidal_positional_encoding(length, dim):
+    # TODO:
+    # 1. Validate that length and dim are positive integers.
+    # 2. Build the sinusoidal table with the standard even/odd formulas.
+    raise NotImplementedError("Implement sinusoidal_positional_encoding")
+
+sample_length = 4
+sample_dim = 5
+
+print(sinusoidal_positional_encoding(sample_length, sample_dim))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Sequence Modeling', 'Embeddings'],
+  },
 ] as const;
