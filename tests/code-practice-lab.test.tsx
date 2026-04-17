@@ -45,6 +45,11 @@ describe('CodePracticeLab', () => {
   beforeEach(() => {
     (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT =
       true;
+    globalThis.ResizeObserver = class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
     globalThis.IntersectionObserver = class {
       private callback: IntersectionObserverCallback;
       readonly root = null;
@@ -89,11 +94,17 @@ describe('CodePracticeLab', () => {
     });
   }
 
-  async function render() {
+  async function render(problem: CodePracticeProblem = testProblem) {
     await act(async () => {
-      root.render(<CodePracticeLab problem={testProblem} />);
+      root.render(<CodePracticeLab problem={problem} />);
     });
     await flushAsyncWork();
+  }
+
+  function getEditor() {
+    const editor = container.querySelector('.cm-editor');
+    expect(editor).not.toBeNull();
+    return editor as HTMLElement;
   }
 
   it('reveals the hint and solution only after the user clicks', async () => {
@@ -142,5 +153,17 @@ describe('CodePracticeLab', () => {
 
     expect(loadPackage).toHaveBeenCalledWith(['numpy']);
     expect(container.textContent).toContain('0.41703');
+  });
+
+  it('renders a CodeMirror editor with the starter code', async () => {
+    loadPyodideRuntime.mockResolvedValueOnce({
+      runPythonAsync: vi.fn(),
+    });
+
+    await render();
+
+    const editor = getEditor();
+    expect(editor.textContent).toContain('print("starter")');
+    expect(container.textContent).toContain('Cmd/Ctrl + /');
   });
 });
