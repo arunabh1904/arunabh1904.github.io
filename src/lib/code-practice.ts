@@ -1230,4 +1230,96 @@ print(patchify(sample_images, patch_size=2))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Computer Vision', 'Patch Embeddings'],
   },
+  {
+    id: 'rope-rotary-positional-embedding',
+    order: 13,
+    title: 'RoPE (Rotary Positional Embedding)',
+    difficulty: 'Medium',
+    summary:
+      'Apply rotary positional embeddings across the last dimension of a batched attention tensor.',
+    prompt: [
+      'Implement rotary positional embeddings for a tensor of shape `(B, T, H, D)`, where `D` is even.',
+      'Apply RoPE across the last dimension and return a tensor with the same shape. Treat the position as the `T` axis and rotate each adjacent pair of features with the standard `sin`/`cos` frequencies.',
+    ],
+    signature: `def apply_rope(x):
+    ...`,
+    requirements: [
+      '`x` has shape `(B, T, H, D)`.',
+      '`D` must be even.',
+      'Return a tensor with the same shape as `x`.',
+      'Apply RoPE across the last dimension.',
+      'Raise `ValueError` on invalid input.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: [
+          'x = [[[[1.0, 0.0, 1.0, 0.0]], [[1.0, 0.0, 1.0, 0.0]]]]',
+        ],
+        result:
+          '[[[[1.0, 0.0, 1.0, 0.0]], [[0.54030, 0.84147, 0.99995, 0.01000]]]]',
+      },
+      {
+        label: 'Example 2',
+        lines: ['x = [[[[1.0, 0.0]], [[0.0, 1.0]]]]'],
+        result: '[[[[1.0, 0.0]], [[-0.84147, 0.54030]]]]',
+      },
+    ],
+    hint: [
+      'Split the last dimension into even and odd coordinates, then rotate each pair together.',
+      'Build position-dependent angles from the `T` index and a frequency vector derived from the pair index.',
+      'Broadcast the `sin` and `cos` tables over batch and head dimensions.',
+      'A helper like `rotate_half` can make the final formula easier to read.',
+    ],
+    solutionNotes: [
+      'RoPE treats each adjacent pair of channels as a 2D vector and rotates it by an angle that depends on the token position. That preserves the vector norm while injecting relative position information into attention.',
+      'The implementation is cleanest when you precompute one sine/cosine table per token position and frequency pair, then combine it with the input using the standard `rotate_half` pattern.',
+    ],
+    solutionCode: `import numpy as np
+
+def apply_rope(x):
+    x = np.asarray(x, dtype=np.float64)
+
+    if x.ndim != 4:
+        raise ValueError("x must have shape (B, T, H, D)")
+    if np.any(np.array(x.shape) <= 0):
+        raise ValueError("x must have positive dimensions")
+    if x.shape[-1] % 2 != 0:
+        raise ValueError("D must be even")
+
+    batch_size, seq_len, num_heads, dim = x.shape
+    half_dim = dim // 2
+
+    positions = np.arange(seq_len, dtype=np.float64)[:, None]
+    pair_indices = np.arange(half_dim, dtype=np.float64)
+    inv_freq = 1.0 / np.power(10000.0, (2.0 * pair_indices) / dim)
+    angles = positions * inv_freq[None, :]
+
+    sin = np.sin(angles)[None, :, None, :]
+    cos = np.cos(angles)[None, :, None, :]
+
+    x_even = x[..., 0::2]
+    x_odd = x[..., 1::2]
+
+    out = np.empty_like(x)
+    out[..., 0::2] = x_even * cos - x_odd * sin
+    out[..., 1::2] = x_even * sin + x_odd * cos
+    return out`,
+    starterCode: `import numpy as np
+
+def apply_rope(x):
+    x = np.asarray(x)
+
+    # TODO:
+    # 1. Validate the tensor shape and check that D is even.
+    # 2. Build the RoPE sine/cosine tables and rotate each feature pair.
+    raise NotImplementedError("Implement apply_rope")
+
+sample_x = np.array([
+    [[[1.0, 0.0, 1.0, 0.0]], [[1.0, 0.0, 1.0, 0.0]]]
+])
+print(apply_rope(sample_x))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Attention', 'Transformers'],
+  },
 ] as const;
