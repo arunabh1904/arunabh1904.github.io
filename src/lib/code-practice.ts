@@ -1140,4 +1140,94 @@ print(unpatchify(sample_patches, sample_image_shape, patch_size=2))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Computer Vision', 'Transformers'],
   },
+  {
+    id: '2d-patchify-for-images',
+    order: 12,
+    title: '2D patchify for images',
+    difficulty: 'Medium',
+    summary:
+      'Split batched images into row-major flattened patch tokens for Vision Transformer style models.',
+    prompt: [
+      'Write `patchify(images, patch_size)` so it converts a batch of images into flattened patch tokens.',
+      'Assume patches are ordered row-major over the image grid. Validate the inputs, then return an array of shape `(B, N, C * P * P)` where `N = (H // P) * (W // P)`.',
+    ],
+    signature: `def patchify(images, patch_size):
+    ...`,
+    requirements: [
+      '`images` has shape `(B, C, H, W)`.',
+      '`patch_size` is a positive integer `P`.',
+      'Assume `H` and `W` are divisible by `P`.',
+      'Return an array of shape `(B, N, C * P * P)` where `N = (H // P) * (W // P)`.',
+      'Patches should be ordered row-major over the image grid.',
+      'Raise `ValueError` on invalid input.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: [
+          'images = [[[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]]]',
+          'patch_size = 2',
+        ],
+        result:
+          '[[[1, 2, 5, 6], [3, 4, 7, 8], [9, 10, 13, 14], [11, 12, 15, 16]]]',
+      },
+      {
+        label: 'Example 2',
+        lines: [
+          'images = [[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]]',
+          'patch_size = 1',
+        ],
+        result: '[[[1, 5], [2, 6], [3, 7], [4, 8]]]',
+      },
+    ],
+    hint: [
+      'Split the height and width into patch-grid and within-patch axes with `reshape`.',
+      'Transpose to move the grid axes before the channel and patch-pixel axes.',
+      'Flatten the patch grid into `N = (H // P) * (W // P)` after the transpose.',
+      'Validate that `patch_size` is positive and divides both spatial dimensions.',
+    ],
+    solutionNotes: [
+      'The core trick is to expose the image grid as `(H // P, P, W // P, P)` so the patch structure becomes explicit.',
+      'A reshape followed by a transpose keeps row-major patch order and makes the final flattening straightforward.',
+    ],
+    solutionCode: `import numpy as np
+
+def patchify(images, patch_size):
+    images = np.asarray(images)
+
+    if images.ndim != 4:
+        raise ValueError("images must have shape (B, C, H, W)")
+    if isinstance(patch_size, bool) or not isinstance(patch_size, (int, np.integer)):
+        raise ValueError("patch_size must be a positive integer")
+    if patch_size <= 0:
+        raise ValueError("patch_size must be a positive integer")
+
+    batch_size, channels, height, width = images.shape
+    if channels <= 0 or height <= 0 or width <= 0:
+        raise ValueError("images must have positive channel and spatial dimensions")
+    if height % patch_size != 0 or width % patch_size != 0:
+        raise ValueError("image dimensions must be divisible by patch_size")
+
+    grid_h = height // patch_size
+    grid_w = width // patch_size
+    reshaped = images.reshape(batch_size, channels, grid_h, patch_size, grid_w, patch_size)
+    patches = reshaped.transpose(0, 2, 4, 1, 3, 5)
+    return patches.reshape(batch_size, grid_h * grid_w, channels * patch_size * patch_size)`,
+    starterCode: `import numpy as np
+
+def patchify(images, patch_size):
+    images = np.asarray(images)
+
+    # TODO:
+    # 1. Validate the tensor shape and patch_size.
+    # 2. Reshape and transpose the image grid into flattened patch tokens.
+    raise NotImplementedError("Implement patchify")
+
+sample_images = np.array([
+    [[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]]
+])
+print(patchify(sample_images, patch_size=2))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Computer Vision', 'Patch Embeddings'],
+  },
 ] as const;
