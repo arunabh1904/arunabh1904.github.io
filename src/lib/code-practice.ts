@@ -1322,4 +1322,140 @@ print(apply_rope(sample_x))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Attention', 'Transformers'],
   },
+  {
+    id: 'scaled-dot-product-self-attention',
+    order: 14,
+    title: 'Scaled dot-product self-attention',
+    difficulty: 'Hard',
+    summary:
+      'Compute single-call multi-head self-attention with scaled dot-product scores, optional masking, and an output projection.',
+    prompt: [
+      'Implement single-call multi-head self-attention for a tensor of shape `(B, T, D_model)`.',
+      'Project the input into query, key, and value spaces, split into `num_heads` heads, apply scaled dot-product attention with an optional mask, then project the concatenated heads back to `(B, T, D_model)`.',
+    ],
+    signature: `def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    ...`,
+    requirements: [
+      '`x` has shape `(B, T, D_model)`.',
+      'Projection matrices `W_q`, `W_k`, `W_v`, and `W_o` all have shape `(D_model, D_model)`.',
+      '`num_heads` divides `D_model`.',
+      '`mask`, if provided, is broadcastable to `(B, H, T, T)` and contains `1` for allowed positions and `0` for blocked positions.',
+      'Return an output of shape `(B, T, D_model)`.',
+      'Raise `ValueError` on invalid input.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: [
+          'x = [[[1.0, 0.0], [0.0, 1.0]]]',
+          'W_q = W_k = W_v = W_o = [[1.0, 0.0], [0.0, 1.0]]',
+          'num_heads = 1',
+        ],
+        result: '[[[0.66976, 0.33024], [0.33024, 0.66976]]]',
+      },
+      {
+        label: 'Example 2',
+        lines: [
+          'x = [[[1.0, 0.0], [0.0, 1.0]]]',
+          'W_q = W_k = W_v = W_o = [[1.0, 0.0], [0.0, 1.0]]',
+          'num_heads = 1',
+          'mask = [[[1, 0], [1, 1]]]',
+        ],
+        result: '[[[1.0, 0.0], [0.33024, 0.66976]]]',
+      },
+    ],
+    hint: [
+      'Reshape the projected tensors into `(B, H, T, D_head)` before computing attention scores.',
+      'Use the scaled dot-product formula `Q K^T / sqrt(D_head)` and a numerically stable softmax over the last axis.',
+      'If a mask is provided, broadcast it to the score tensor and zero out blocked positions before softmax.',
+      'After attention, transpose the heads back and concatenate them before the final output projection.',
+    ],
+    solutionNotes: [
+      'The workflow is the standard Transformer block: project to queries, keys, and values; split the channel dimension into heads; compute masked scaled dot-product attention; then merge the heads and apply the output projection.',
+      'Broadcasted masking and a stable softmax are the two details that make the implementation robust. The mask keeps blocked positions from contributing, while the final projection preserves the original model width.',
+    ],
+    solutionCode: `import numpy as np
+
+def _stable_softmax(logits):
+    logits = np.asarray(logits, dtype=np.float64)
+    max_logits = np.max(logits, axis=-1, keepdims=True)
+    max_logits = np.where(np.isfinite(max_logits), max_logits, 0.0)
+    shifted = logits - max_logits
+    exp_shifted = np.exp(shifted)
+    exp_shifted = np.where(np.isfinite(logits), exp_shifted, 0.0)
+    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
+    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+
+
+def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    x = np.asarray(x, dtype=np.float64)
+    W_q = np.asarray(W_q, dtype=np.float64)
+    W_k = np.asarray(W_k, dtype=np.float64)
+    W_v = np.asarray(W_v, dtype=np.float64)
+    W_o = np.asarray(W_o, dtype=np.float64)
+
+    if x.ndim != 3:
+        raise ValueError("x must have shape (B, T, D_model)")
+    if np.any(np.array(x.shape) <= 0):
+        raise ValueError("x must have positive dimensions")
+    if isinstance(num_heads, bool) or not isinstance(num_heads, (int, np.integer)):
+        raise ValueError("num_heads must be a positive integer")
+    if num_heads <= 0:
+        raise ValueError("num_heads must be a positive integer")
+
+    batch_size, seq_len, model_dim = x.shape
+    if model_dim % num_heads != 0:
+        raise ValueError("num_heads must divide D_model")
+
+    for matrix, name in ((W_q, "W_q"), (W_k, "W_k"), (W_v, "W_v"), (W_o, "W_o")):
+        if matrix.ndim != 2 or matrix.shape != (model_dim, model_dim):
+            raise ValueError(f"{name} must have shape (D_model, D_model)")
+
+    head_dim = model_dim // num_heads
+
+    q = x @ W_q
+    k = x @ W_k
+    v = x @ W_v
+
+    q = q.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)
+    k = k.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)
+    v = v.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)
+
+    scores = np.matmul(q, np.swapaxes(k, -1, -2)) / np.sqrt(head_dim)
+
+    if mask is not None:
+        mask_arr = np.asarray(mask)
+        try:
+            mask_broadcast = np.broadcast_to(mask_arr, scores.shape)
+        except ValueError as exc:
+            raise ValueError("mask must be broadcastable to (B, H, T, T)") from exc
+        if not np.all((mask_broadcast == 0) | (mask_broadcast == 1)):
+            raise ValueError("mask must contain only 0 and 1 values")
+        scores = np.where(mask_broadcast.astype(bool), scores, -np.inf)
+
+    attn = _stable_softmax(scores)
+    context = np.matmul(attn, v)
+    context = context.transpose(0, 2, 1, 3).reshape(batch_size, seq_len, model_dim)
+    return context @ W_o`,
+    starterCode: `import numpy as np
+
+def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    x = np.asarray(x)
+    W_q = np.asarray(W_q)
+    W_k = np.asarray(W_k)
+    W_v = np.asarray(W_v)
+    W_o = np.asarray(W_o)
+
+    # TODO:
+    # 1. Validate shapes and make sure num_heads divides D_model.
+    # 2. Project x into q/k/v, split into heads, apply masked attention, and combine the heads.
+    raise NotImplementedError("Implement self_attention")
+
+sample_x = np.array([[[1.0, 0.0], [0.0, 1.0]]])
+sample_w = np.array([[1.0, 0.0], [0.0, 1.0]])
+
+print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads=1))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Attention', 'Transformers'],
+  },
 ] as const;
