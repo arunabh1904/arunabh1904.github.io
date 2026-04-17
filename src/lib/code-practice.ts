@@ -22,6 +22,18 @@ export interface CodePracticeProblem {
   tags?: readonly string[];
 }
 
+export const CODE_PRACTICE_SECTION_SUMMARY =
+  'Interview-style Python problems with runnable starter code, hints, and hidden solutions.';
+
+export function getCodePracticeProblemPath(problem: Pick<CodePracticeProblem, 'id'> | string) {
+  const problemId = typeof problem === 'string' ? problem : problem.id;
+  return `/code/${problemId}.html`;
+}
+
+export function getCodePracticeProblemById(problemId: string) {
+  return codePracticeProblems.find((problem) => problem.id === problemId);
+}
+
 export const codePracticeProblems: readonly CodePracticeProblem[] = [
   {
     id: 'stable-softmax-cross-entropy',

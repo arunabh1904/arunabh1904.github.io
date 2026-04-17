@@ -91,7 +91,7 @@ describe('CodePracticeLab', () => {
 
   async function render() {
     await act(async () => {
-      root.render(<CodePracticeLab problems={[testProblem]} />);
+      root.render(<CodePracticeLab problem={testProblem} />);
     });
     await flushAsyncWork();
   }
@@ -103,13 +103,14 @@ describe('CodePracticeLab', () => {
 
     await render();
 
-    expect(container.textContent).toContain('Problem 1: Stable softmax cross-entropy');
+    expect(container.textContent).toContain('Problem 01');
+    expect(container.textContent).toContain('Stable softmax cross-entropy');
     expect(container.textContent).not.toContain('Subtract the row max first.');
     expect(container.textContent).not.toContain('print("solution")');
 
     const buttons = Array.from(container.querySelectorAll('button'));
-    const hintButton = buttons.find((button) => button.textContent === 'Show hint');
-    const solutionButton = buttons.find((button) => button.textContent === 'Reveal solution');
+    const hintButton = buttons.find((button) => button.textContent === 'Hint');
+    const solutionButton = buttons.find((button) => button.textContent === 'Solution');
 
     await act(async () => {
       hintButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));

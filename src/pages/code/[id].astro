@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageControls from '../../components/PageControls.astro';
+import CodePracticeLab from '../../components/CodePracticeLab';
+import type { CodePracticeProblem } from '../../lib/code-practice';
+import { codePracticeProblems } from '../../lib/code-practice';
+
+export function getStaticPaths() {
+  return codePracticeProblems.map((problem) => ({
+    params: { id: problem.id },
+    props: { problem },
+  }));
+}
+
+interface Props {
+  problem: CodePracticeProblem;
+}
+
+const { problem } = Astro.props;
+---
+
+<BaseLayout title={problem.title} description={problem.summary}>
+  <PageControls showHomeButton={true} />
+  <main class="code-problem-page" aria-label={`${problem.title} interview practice`}>
+    <div class="code-problem-page__shell">
+      <p class="code-problem-page__back-link">
+        <a href="/code.html">All problems</a>
+        <span>/</span>
+        <span>{`Problem ${String(problem.order).padStart(2, '0')}`}</span>
+      </p>
+
+      <CodePracticeLab client:visible problem={problem} />
+    </div>
+  </main>
+</BaseLayout>

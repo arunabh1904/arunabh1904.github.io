@@ -1,7 +1,7 @@
 ---
 import HomeLayout from '../layouts/HomeLayout.astro';
 import { getPostsBySection } from '../lib/content';
-import { codePracticeProblems } from '../lib/code-practice';
+import { CODE_PRACTICE_SECTION_SUMMARY, codePracticeProblems } from '../lib/code-practice';
 
 const paperPosts = await getPostsBySection('paper-shorts', 'desc');
 const revisionPosts = (await getPostsBySection('revision-notes', 'desc')).filter(
@@ -65,7 +65,7 @@ const sectionCards = [
     href: '/code.html',
     command: 'code',
     title: 'Code',
-    description: 'Interview-style Python practice problems with hints, hidden solutions, and a runnable editor.',
+    description: CODE_PRACTICE_SECTION_SUMMARY,
     count: codePracticeProblems.length,
   },
 ] as const;
