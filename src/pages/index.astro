@@ -1,6 +1,8 @@
 ---
 import HomeLayout from '../layouts/HomeLayout.astro';
 import { getPostsBySection } from '../lib/content';
+import CodePracticeLab from '../components/CodePracticeLab';
+import { codePracticeProblems } from '../lib/code-practice';
 
 const paperPosts = await getPostsBySection('paper-shorts', 'desc');
 const revisionPosts = (await getPostsBySection('revision-notes', 'desc')).filter(
@@ -15,7 +17,8 @@ const totalEntries =
   blogPosts.length +
   buildIntuitionPosts.length +
   revisionPosts.length +
-  aiPosts.length;
+  aiPosts.length +
+  codePracticeProblems.length;
 
 const sectionCards = [
   {
@@ -57,6 +60,14 @@ const sectionCards = [
     title: 'AI Generated Reports',
     description: 'Audio or text reports created by AI.',
     count: aiPosts.length,
+  },
+  {
+    id: 'code',
+    href: '#code',
+    command: 'code',
+    title: 'Code',
+    description: 'Interview-style Python practice problems with hints, hidden solutions, and a runnable editor.',
+    count: codePracticeProblems.length,
   },
 ] as const;
 
@@ -155,13 +166,14 @@ const formatDate = (date: Date) =>
         <nav class="home-command-bar home-command-bar--hero" aria-label="Homepage sections">
           <a href="#about">/about</a>
           <a href="#latest">/latest</a>
+          <a href="#code">/code</a>
         </nav>
       </div>
 
       <div class="home-meta-panel" aria-label="Site overview">
         <div class="home-meta-panel__item">
           <span class="home-meta-panel__label">Sections</span>
-          <strong>05</strong>
+          <strong>{String(sectionCards.length).padStart(2, '0')}</strong>
         </div>
         <div class="home-meta-panel__item">
           <span class="home-meta-panel__label">Entries</span>
@@ -247,5 +259,21 @@ const formatDate = (date: Date) =>
         </article>
       ))}
     </div>
+  </section>
+
+  <section class="home-code-lab" id="code">
+    <article class="home-panel home-panel--section-intro">
+      <p class="home-panel__eyebrow">Code</p>
+      <div class="home-section-heading">
+        <h2>Interview practice lab</h2>
+        <p>
+          A reusable coding area for interview prep. Each problem includes the prompt, a runnable
+          Python workspace, a hint you can reveal when you need it, and a hidden solution you can
+          inspect after you take a pass yourself.
+        </p>
+      </div>
+    </article>
+
+    <CodePracticeLab client:visible problems={codePracticeProblems} />
   </section>
 </HomeLayout>

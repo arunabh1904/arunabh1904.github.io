@@ -2,6 +2,7 @@ const PYODIDE_INDEX_URL = 'https://cdn.jsdelivr.net/pyodide/v0.28.3/full/';
 const PYODIDE_SCRIPT_SRC = `${PYODIDE_INDEX_URL}pyodide.js`;
 
 export interface PyodideRuntime {
+  loadPackage?: (packages: string | string[]) => Promise<void>;
   runPythonAsync(code: string): Promise<unknown>;
 }
 

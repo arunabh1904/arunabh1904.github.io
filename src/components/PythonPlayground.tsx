@@ -2,51 +2,7 @@ import React, { startTransition, useEffect, useRef, useState } from 'react';
 import { loadPyodideRuntime } from '../lib/pyodide-loader';
 import type { PyodideRuntime } from '../lib/pyodide-loader';
 import type { PythonPlaygroundProps } from '../lib/python-playground';
-
-const EXECUTION_PREFIX = `
-import contextlib
-import io
-import traceback
-`;
-
-function escapePythonTripleQuotedString(source: string) {
-  return source.replace(/\\/g, '\\\\').replace(/"""/g, '\\"""');
-}
-
-async function runCode(runtime: PyodideRuntime, code: string) {
-  const escapedCode = escapePythonTripleQuotedString(code);
-  const result = await runtime.runPythonAsync(`
-${EXECUTION_PREFIX}
-_stdout_buffer = io.StringIO()
-_stderr_buffer = io.StringIO()
-_execution_result = None
-
-with contextlib.redirect_stdout(_stdout_buffer), contextlib.redirect_stderr(_stderr_buffer):
-    try:
-        exec("""${escapedCode}""", {})
-    except Exception:
-        traceback.print_exc()
-
-(_stdout_buffer.getvalue(), _stderr_buffer.getvalue())
-`);
-
-  const normalizedResult =
-    typeof result === 'object' &&
-    result !== null &&
-    'toJs' in result &&
-    typeof result.toJs === 'function'
-      ? result.toJs()
-      : result;
-
-  if (!Array.isArray(normalizedResult)) {
-    return { stdout: '', stderr: 'Unexpected result returned from Python runtime.' };
-  }
-
-  return {
-    stdout: String(normalizedResult[0] ?? ''),
-    stderr: String(normalizedResult[1] ?? ''),
-  };
-}
+import { runPythonSnippet } from '../lib/python-runner';
 
 export default function PythonPlayground({
   title,
@@ -148,7 +104,7 @@ export default function PythonPlayground({
     setErrorOutput('');
 
     try {
-      const result = await runCode(runtimeRef.current, code);
+      const result = await runPythonSnippet(runtimeRef.current, code);
       startTransition(() => {
         setOutput(result.stdout.trimEnd());
         setErrorOutput(result.stderr.trimEnd());
