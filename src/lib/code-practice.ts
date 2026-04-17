@@ -662,4 +662,103 @@ print(top_k_accuracy(sample_logits, sample_labels, k=1))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Classification', 'Metrics'],
   },
+  {
+    id: 'iou-matrix',
+    order: 7,
+    title: 'IoU matrix',
+    difficulty: 'Medium',
+    summary:
+      'Compute a pairwise intersection-over-union matrix between two sets of bounding boxes.',
+    prompt: [
+      'Write `box_iou_matrix(boxes1, boxes2)` so it returns the pairwise IoU between every box in `boxes1` and every box in `boxes2`.',
+      'Treat this like an interview question: validate the shapes, use a vectorized implementation, and raise `ValueError` for malformed boxes.',
+    ],
+    signature: `def box_iou_matrix(boxes1, boxes2):
+    ...`,
+    requirements: [
+      '`boxes1` is an `(N, 4)` array or list.',
+      '`boxes2` is an `(M, 4)` array or list.',
+      'Each box is in `[x1, y1, x2, y2]` format.',
+      'Return an `(N, M)` matrix of IoU values.',
+      'Raise `ValueError` for invalid boxes or invalid shapes.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: [
+          'boxes1 = [[0, 0, 2, 2], [0, 0, 1, 1]]',
+          'boxes2 = [[1, 1, 3, 3], [0, 0, 2, 2]]',
+        ],
+        result: '[[0.14286, 1.0], [0.0, 0.25]]',
+      },
+      {
+        label: 'Example 2',
+        lines: ['boxes1 = [[0, 0, 0, 1]]', 'boxes2 = [[0, 0, 1, 1]]'],
+        result: '[[0.0]]',
+      },
+    ],
+    hint: [
+      'Broadcast `boxes1` against `boxes2` to compute the overlap corners in one shot.',
+      'Intersection width and height should be clamped at `0.0` so non-overlapping boxes contribute zero area.',
+      'Compute areas once, then divide intersection by union with a zero-safe `np.divide`.',
+      'Validate that each box has `x2 >= x1` and `y2 >= y1` before computing anything else.',
+    ],
+    solutionNotes: [
+      'The main trick is to form all pairwise overlap rectangles with broadcasting, then compute intersection areas, box areas, and union areas from those tensors.',
+      'Once the pairwise union is known, `np.divide` with a zero-filled output array keeps the implementation numerically stable and handles degenerate boxes cleanly.',
+    ],
+    solutionCode: `import numpy as np
+
+def _validate_boxes(boxes, name):
+    boxes = np.asarray(boxes, dtype=np.float64)
+
+    if boxes.ndim != 2 or boxes.shape[1] != 4:
+        raise ValueError(f"{name} must have shape (N, 4)")
+    if np.any(boxes[:, 2] < boxes[:, 0]) or np.any(boxes[:, 3] < boxes[:, 1]):
+        raise ValueError(f"{name} contains invalid boxes")
+
+    return boxes
+
+
+def box_iou_matrix(boxes1, boxes2):
+    boxes1 = _validate_boxes(boxes1, "boxes1")
+    boxes2 = _validate_boxes(boxes2, "boxes2")
+
+    x1 = np.maximum(boxes1[:, None, 0], boxes2[None, :, 0])
+    y1 = np.maximum(boxes1[:, None, 1], boxes2[None, :, 1])
+    x2 = np.minimum(boxes1[:, None, 2], boxes2[None, :, 2])
+    y2 = np.minimum(boxes1[:, None, 3], boxes2[None, :, 3])
+
+    inter_w = np.maximum(0.0, x2 - x1)
+    inter_h = np.maximum(0.0, y2 - y1)
+    inter_area = inter_w * inter_h
+
+    area1 = (boxes1[:, 2] - boxes1[:, 0]) * (boxes1[:, 3] - boxes1[:, 1])
+    area2 = (boxes2[:, 2] - boxes2[:, 0]) * (boxes2[:, 3] - boxes2[:, 1])
+    union = area1[:, None] + area2[None, :] - inter_area
+
+    return np.divide(
+        inter_area,
+        union,
+        out=np.zeros_like(inter_area),
+        where=union > 0,
+    )`,
+    starterCode: `import numpy as np
+
+def box_iou_matrix(boxes1, boxes2):
+    boxes1 = np.asarray(boxes1)
+    boxes2 = np.asarray(boxes2)
+
+    # TODO:
+    # 1. Validate the shapes and reject malformed boxes.
+    # 2. Compute the pairwise intersection, union, and IoU matrices.
+    raise NotImplementedError("Implement box_iou_matrix")
+
+sample_boxes1 = np.array([[0, 0, 2, 2], [0, 0, 1, 1]])
+sample_boxes2 = np.array([[1, 1, 3, 3], [0, 0, 2, 2]])
+
+print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Computer Vision', 'Bounding Boxes'],
+  },
 ] as const;
