@@ -565,4 +565,101 @@ print(pairwise_cosine_similarity(sample_x, sample_y))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Linear Algebra', 'Vectorization'],
   },
+  {
+    id: 'top-k-accuracy',
+    order: 6,
+    title: 'Top-k accuracy',
+    difficulty: 'Easy',
+    summary:
+      'Compute the fraction of examples whose true label appears among the top k logits in each row.',
+    prompt: [
+      'Write `top_k_accuracy(logits, labels, k)` so it returns the fraction of examples where the true label is among the top `k` logits.',
+      'Treat this like an interview question: validate the inputs, use NumPy for the ranking logic, and accept NumPy’s default ordering behavior when scores tie.',
+    ],
+    signature: `def top_k_accuracy(logits, labels, k):
+    ...`,
+    requirements: [
+      '`logits` is a 2D array or list of shape `(N, C)`.',
+      '`labels` is a 1D array or list of shape `(N,)` with integer class ids.',
+      '`k` is a positive integer.',
+      'Return the fraction of examples whose true label is in the top `k` logits for that row.',
+      'Raise `ValueError` on invalid inputs.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: [
+          'logits = [[0.1, 0.9, 0.2], [3.0, 1.0, 2.0]]',
+          'labels = [1, 2]',
+          'k = 1',
+        ],
+        result: '0.5',
+      },
+      {
+        label: 'Example 2',
+        lines: [
+          'logits = [[0.1, 0.9, 0.2], [3.0, 1.0, 2.0]]',
+          'labels = [1, 2]',
+          'k = 2',
+        ],
+        result: '1.0',
+      },
+    ],
+    hint: [
+      'Sort each row in descending order and take the first `k` class indices.',
+      'A vectorized comparison against `labels[:, None]` makes it easy to test membership in the top-k set.',
+      'Use `np.mean` on the boolean correctness mask to turn per-example hits into a fraction.',
+      'Validate that `logits` is 2D, `labels` is 1D, the batch sizes match, the labels are in range, and `k` is positive.',
+    ],
+    solutionNotes: [
+      'The implementation is straightforward once the inputs are validated: rank each row from largest to smallest, take the first `k` class ids, and check whether the true label appears in that slice.',
+      'Because the check is fully vectorized, the result is a simple mean over a boolean mask, which keeps the code short and easy to read.',
+    ],
+    solutionCode: `import numpy as np
+
+def top_k_accuracy(logits, labels, k):
+    logits = np.asarray(logits, dtype=np.float64)
+    labels = np.asarray(labels)
+
+    if logits.ndim != 2:
+        raise ValueError("logits must be a 2D array of shape (N, C)")
+    if labels.ndim != 1:
+        raise ValueError("labels must be a 1D array of shape (N,)")
+    if logits.shape[0] == 0:
+        raise ValueError("logits must contain at least one sample")
+    if logits.shape[1] == 0:
+        raise ValueError("logits must contain at least one class")
+    if labels.shape[0] != logits.shape[0]:
+        raise ValueError("labels must have the same batch size as logits")
+    if isinstance(k, bool) or not isinstance(k, (int, np.integer)):
+        raise ValueError("k must be a positive integer")
+    if k <= 0:
+        raise ValueError("k must be a positive integer")
+    if not np.issubdtype(labels.dtype, np.integer):
+        raise ValueError("labels must contain integer class ids")
+    if np.any(labels < 0) or np.any(labels >= logits.shape[1]):
+        raise ValueError("labels contain out-of-range class ids")
+
+    top_k = min(int(k), logits.shape[1])
+    ranked = np.argsort(-logits, axis=1)[:, :top_k]
+    hits = np.any(ranked == labels[:, None], axis=1)
+    return float(np.mean(hits))`,
+    starterCode: `import numpy as np
+
+def top_k_accuracy(logits, labels, k):
+    logits = np.asarray(logits)
+    labels = np.asarray(labels)
+
+    # TODO:
+    # 1. Validate shapes, label values, and that k is positive.
+    # 2. Rank each row of logits and check whether the true label appears in the top k.
+    raise NotImplementedError("Implement top_k_accuracy")
+
+sample_logits = np.array([[0.1, 0.9, 0.2], [3.0, 1.0, 2.0]])
+sample_labels = np.array([1, 2])
+
+print(top_k_accuracy(sample_logits, sample_labels, k=1))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Classification', 'Metrics'],
+  },
 ] as const;
