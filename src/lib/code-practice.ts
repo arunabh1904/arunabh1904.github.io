@@ -864,4 +864,92 @@ print(nearest_centroid_predict(sample_train_X, sample_train_y, sample_test_X))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Classification', 'Centroids'],
   },
+  {
+    id: 'temperature-scaling-of-logits',
+    order: 9,
+    title: 'Temperature scaling of logits',
+    difficulty: 'Medium',
+    summary:
+      'Convert logits into numerically stable softmax probabilities after dividing by a positive temperature.',
+    prompt: [
+      'Write `temperature_scaled_probs(logits, temperature)` so it returns softmax probabilities after scaling `logits` by `temperature`.',
+      'Use a numerically stable implementation, validate the inputs, and make sure each row of the output sums to `1`.',
+    ],
+    signature: `def temperature_scaled_probs(logits, temperature):
+    ...`,
+    requirements: [
+      '`logits` is an `(N, C)` array or list.',
+      '`temperature` is a positive float.',
+      'Return an `(N, C)` array of probabilities.',
+      'Divide logits by `temperature` before applying softmax.',
+      'Use a numerically stable implementation.',
+      'Raise `ValueError` for invalid inputs.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: ['logits = [[1000.0, 1001.0, 1002.0]]', 'temperature = 1.0'],
+        result: '[[0.09003, 0.24473, 0.66524]]',
+      },
+      {
+        label: 'Example 2',
+        lines: [
+          'logits = [[2.0, 0.0], [1.0, 1.0]]',
+          'temperature = 2.0',
+        ],
+        result: '[[0.73106, 0.26894], [0.5, 0.5]]',
+      },
+    ],
+    hint: [
+      'Divide the logits by the temperature before you do anything else.',
+      'Subtract the maximum value in each row before exponentiating to keep the softmax stable.',
+      'Normalize with the row-wise sum and rely on broadcasting for the final division.',
+      'Reject non-2D logits and any temperature that is not a positive scalar.',
+    ],
+    solutionNotes: [
+      'Temperature scaling is just softmax on the logits after rescaling them by a positive constant. The key implementation detail is to subtract the row maximum after scaling so the exponentials never blow up.',
+      'Once the shifted logits are exponentiated, each row is normalized by its own sum, which gives a valid probability distribution that still sums to `1`.',
+    ],
+    solutionCode: `import numpy as np
+
+def temperature_scaled_probs(logits, temperature):
+    logits = np.asarray(logits, dtype=np.float64)
+
+    if isinstance(temperature, (bool, np.bool_)):
+        raise ValueError("temperature must be a positive float")
+    try:
+        temperature = float(temperature)
+    except (TypeError, ValueError):
+        raise ValueError("temperature must be a positive float")
+
+    if logits.ndim != 2:
+        raise ValueError("logits must be a 2D array of shape (N, C)")
+    if logits.shape[0] == 0:
+        raise ValueError("logits must contain at least one sample")
+    if logits.shape[1] == 0:
+        raise ValueError("logits must contain at least one class")
+    if not np.isfinite(temperature) or temperature <= 0:
+        raise ValueError("temperature must be a positive float")
+
+    scaled_logits = logits / temperature
+    shifted = scaled_logits - np.max(scaled_logits, axis=1, keepdims=True)
+    exp_shifted = np.exp(shifted)
+    return exp_shifted / np.sum(exp_shifted, axis=1, keepdims=True)`,
+    starterCode: `import numpy as np
+
+def temperature_scaled_probs(logits, temperature):
+    logits = np.asarray(logits)
+
+    # TODO:
+    # 1. Validate that logits is 2D and temperature is a positive scalar.
+    # 2. Divide by temperature, apply a numerically stable softmax, and return probabilities.
+    raise NotImplementedError("Implement temperature_scaled_probs")
+
+sample_logits = np.array([[1000.0, 1001.0, 1002.0]])
+sample_temperature = 1.0
+
+print(temperature_scaled_probs(sample_logits, sample_temperature))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Classification', 'Calibration'],
+  },
 ] as const;
