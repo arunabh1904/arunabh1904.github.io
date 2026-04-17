@@ -2178,6 +2178,356 @@ body.home-page {
   margin-bottom: 0;
 }
 
+.home-code-lab {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.code-practice-lab {
+  display: grid;
+  gap: 1rem;
+}
+
+.code-practice-lab h3,
+.code-practice-lab h4,
+.code-practice-lab p,
+.code-practice-lab li,
+.code-practice-lab button,
+.code-practice-lab textarea,
+.code-practice-lab code,
+.code-practice-lab pre,
+.code-practice-lab label,
+.code-practice-lab span,
+.code-practice-lab strong {
+  font-family: var(--font-mono);
+}
+
+.code-practice-lab__problem-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.code-practice-lab__problem-strip button,
+.code-practice-lab__reveal-actions button,
+.code-practice-lab__actions button {
+  appearance: none;
+  border: 1px solid rgba(127, 197, 255, 0.25);
+  background: rgba(9, 21, 44, 0.78);
+  color: #dff0ff;
+  padding: 0.8rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease;
+}
+
+:root[data-theme="dark"] .code-practice-lab__problem-strip button,
+:root[data-theme="dark"] .code-practice-lab__reveal-actions button,
+:root[data-theme="dark"] .code-practice-lab__actions button {
+  border-color: rgba(255, 228, 92, 0.24);
+  background: rgba(22, 18, 2, 0.82);
+  color: #fff7cf;
+}
+
+.code-practice-lab__problem-strip button:hover,
+.code-practice-lab__reveal-actions button:hover,
+.code-practice-lab__actions button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(127, 197, 255, 0.55);
+}
+
+:root[data-theme="dark"] .code-practice-lab__problem-strip button:hover,
+:root[data-theme="dark"] .code-practice-lab__reveal-actions button:hover,
+:root[data-theme="dark"] .code-practice-lab__actions button:hover {
+  border-color: rgba(255, 228, 92, 0.52);
+}
+
+.code-practice-lab__problem-strip button.is-active {
+  background: rgba(38, 84, 165, 0.9);
+  border-color: rgba(151, 208, 255, 0.7);
+}
+
+:root[data-theme="dark"] .code-practice-lab__problem-strip button.is-active {
+  background: rgba(96, 76, 8, 0.92);
+  border-color: rgba(255, 228, 92, 0.58);
+}
+
+.code-practice-lab__problem-strip button span,
+.code-practice-lab__problem-strip button strong {
+  display: block;
+}
+
+.code-practice-lab__problem-strip button span {
+  margin-bottom: 0.2rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.78;
+}
+
+.code-practice-lab__workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+  gap: 1rem;
+}
+
+.code-practice-lab__panel {
+  padding: 1.25rem;
+  border-radius: 24px;
+  border: 1px solid rgba(118, 169, 255, 0.18);
+  background:
+    linear-gradient(180deg, rgba(12, 20, 40, 0.98), rgba(7, 13, 26, 0.99));
+  box-shadow: 0 24px 48px rgba(7, 20, 48, 0.24);
+  color: #dff0ff;
+}
+
+:root[data-theme="dark"] .code-practice-lab__panel {
+  border-color: rgba(255, 228, 92, 0.2);
+  background:
+    linear-gradient(180deg, rgba(10, 10, 10, 0.98), rgba(19, 16, 4, 0.98));
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.46);
+  color: #fff7cf;
+}
+
+.code-practice-lab__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.code-practice-lab__header h3,
+.code-practice-lab__header h4 {
+  margin: 0;
+}
+
+.code-practice-lab__eyebrow {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  color: #7fc5ff;
+}
+
+:root[data-theme="dark"] .code-practice-lab__eyebrow {
+  color: #ffe45c;
+}
+
+.code-practice-lab__summary,
+.code-practice-lab__copy p,
+.code-practice-lab__runtime-note,
+.code-practice-lab__status {
+  color: rgba(223, 240, 255, 0.84);
+}
+
+:root[data-theme="dark"] .code-practice-lab__summary,
+:root[data-theme="dark"] .code-practice-lab__copy p,
+:root[data-theme="dark"] .code-practice-lab__runtime-note,
+:root[data-theme="dark"] .code-practice-lab__status {
+  color: rgba(255, 247, 207, 0.84);
+}
+
+.code-practice-lab__summary {
+  margin: 0.45rem 0 0;
+  line-height: 1.55;
+}
+
+.code-practice-lab__difficulty {
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(127, 197, 255, 0.22);
+  background: rgba(18, 37, 68, 0.82);
+  white-space: nowrap;
+}
+
+:root[data-theme="dark"] .code-practice-lab__difficulty {
+  border-color: rgba(255, 228, 92, 0.2);
+  background: rgba(35, 28, 2, 0.78);
+}
+
+.code-practice-lab__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.code-practice-lab__tags span {
+  padding: 0.32rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(127, 197, 255, 0.1);
+  border: 1px solid rgba(127, 197, 255, 0.16);
+  font-size: 0.8rem;
+}
+
+:root[data-theme="dark"] .code-practice-lab__tags span {
+  background: rgba(255, 228, 92, 0.08);
+  border-color: rgba(255, 228, 92, 0.16);
+}
+
+.code-practice-lab__copy {
+  margin-top: 1rem;
+}
+
+.code-practice-lab__copy p {
+  margin: 0 0 0.9rem;
+  line-height: 1.65;
+}
+
+.code-practice-lab__block,
+.code-practice-lab__reveal-panel,
+.code-practice-lab__output > div {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(127, 197, 255, 0.16);
+  background: rgba(4, 14, 28, 0.72);
+}
+
+:root[data-theme="dark"] .code-practice-lab__block,
+:root[data-theme="dark"] .code-practice-lab__reveal-panel,
+:root[data-theme="dark"] .code-practice-lab__output > div {
+  border-color: rgba(255, 228, 92, 0.16);
+  background: rgba(11, 10, 2, 0.78);
+}
+
+.code-practice-lab__section-label,
+.code-practice-lab__example p,
+.code-practice-lab__output p {
+  margin: 0 0 0.7rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.code-practice-lab__block pre,
+.code-practice-lab__example pre,
+.code-practice-lab__reveal-panel pre,
+.code-practice-lab__output pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.code-practice-lab__list {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.code-practice-lab__examples {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.code-practice-lab__example {
+  padding: 0.9rem;
+  border-radius: 16px;
+  border: 1px solid rgba(127, 197, 255, 0.14);
+  background: rgba(2, 9, 18, 0.68);
+}
+
+:root[data-theme="dark"] .code-practice-lab__example {
+  border-color: rgba(255, 228, 92, 0.14);
+  background: rgba(8, 8, 8, 0.72);
+}
+
+.code-practice-lab__reveal-actions,
+.code-practice-lab__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.code-practice-lab__status--ready {
+  color: #86f7c0;
+}
+
+.code-practice-lab__status--error {
+  color: #ff8e8e;
+}
+
+.code-practice-lab__runtime-note {
+  margin: 0.85rem 0 0;
+  line-height: 1.55;
+}
+
+.code-practice-lab__promptbar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.code-practice-lab__dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: #ff7c7c;
+}
+
+.code-practice-lab__dot:nth-child(2) {
+  background: #ffd76e;
+}
+
+.code-practice-lab__dot:nth-child(3) {
+  background: #81f0b0;
+}
+
+.code-practice-lab__prompt {
+  margin-left: 0.4rem;
+  color: rgba(223, 240, 255, 0.72);
+}
+
+:root[data-theme="dark"] .code-practice-lab__prompt {
+  color: rgba(255, 247, 207, 0.72);
+}
+
+.code-practice-lab__editor-label {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-size: 0.84rem;
+}
+
+.code-practice-lab__editor {
+  width: 100%;
+  min-height: 24rem;
+  resize: vertical;
+  box-sizing: border-box;
+  border-radius: 16px;
+  border: 1px solid rgba(127, 197, 255, 0.18);
+  background: rgba(3, 10, 20, 0.84);
+  color: inherit;
+  padding: 1rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+:root[data-theme="dark"] .code-practice-lab__editor {
+  border-color: rgba(255, 228, 92, 0.2);
+  background: rgba(7, 7, 7, 0.9);
+}
+
+.code-practice-lab__actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.code-practice-lab__output {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
 @media (max-width: 820px) {
   .python-playground__header,
   .python-playground__walkthrough-header,
@@ -2189,6 +2539,17 @@ body.home-page {
 
   .python-playground__output,
   .python-playground__variables {
+    display: grid;
+  }
+
+  .code-practice-lab__workspace,
+  .code-practice-lab__header,
+  .code-practice-lab__output {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .code-practice-lab__output {
     display: grid;
   }
 }
