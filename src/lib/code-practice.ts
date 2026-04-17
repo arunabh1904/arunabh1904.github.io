@@ -761,4 +761,107 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Computer Vision', 'Bounding Boxes'],
   },
+  {
+    id: 'nearest-centroid-classifier',
+    order: 8,
+    title: 'Nearest centroid classifier',
+    difficulty: 'Easy',
+    summary:
+      'Compute one centroid per class and predict each test point by the nearest Euclidean centroid.',
+    prompt: [
+      'Write `nearest_centroid_predict(train_X, train_y, test_X)` so it returns a 1D array of predicted class labels for `test_X`.',
+      'Compute one centroid per class from `train_X`, then classify each test point by the nearest centroid using Euclidean distance. If distances tie, choose the smaller class label.',
+    ],
+    signature: `def nearest_centroid_predict(train_X, train_y, test_X):
+    ...`,
+    requirements: [
+      '`train_X` is an `(N, D)` array or list.',
+      '`train_y` is a 1D array or list of length `N` containing class labels.',
+      '`test_X` is an `(M, D)` array or list.',
+      'Return predictions as a 1D array.',
+      'If distances tie, choose the smaller class label.',
+      'Raise `ValueError` for invalid shapes or invalid labels.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: [
+          'train_X = [[0.0], [2.0], [10.0], [12.0]]',
+          'train_y = [0, 0, 1, 1]',
+          'test_X = [[0.0], [6.0], [12.0]]',
+        ],
+        result: '[0, 0, 1]',
+      },
+      {
+        label: 'Example 2',
+        lines: [
+          'train_X = [[1, 0], [0, 1], [3, 3], [4, 4], [10, 10]]',
+          'train_y = [0, 0, 1, 1, 2]',
+          'test_X = [[1, 1], [9, 9]]',
+        ],
+        result: '[0, 2]',
+      },
+    ],
+    hint: [
+      'Group `train_X` by label, then take the mean of each group to form the centroids.',
+      'Sort the unique labels so that ties fall to the smaller class label when you take an argmin.',
+      'Broadcast `test_X` against the centroid matrix to compute all distances at once.',
+      'Use squared Euclidean distance to avoid an unnecessary square root.',
+    ],
+    solutionNotes: [
+      'The nearest-centroid rule compresses each class into its mean feature vector, then assigns each test point to the closest mean.',
+      'Squared Euclidean distance preserves the same ordering as Euclidean distance, and keeping the class labels sorted makes the tie-breaking rule deterministic.',
+    ],
+    solutionCode: `import numpy as np
+
+def nearest_centroid_predict(train_X, train_y, test_X):
+    train_X = np.asarray(train_X, dtype=np.float64)
+    train_y = np.asarray(train_y)
+    test_X = np.asarray(test_X, dtype=np.float64)
+
+    if train_X.ndim != 2:
+        raise ValueError("train_X must be a 2D array of shape (N, D)")
+    if train_y.ndim != 1:
+        raise ValueError("train_y must be a 1D array of shape (N,)")
+    if test_X.ndim != 2:
+        raise ValueError("test_X must be a 2D array of shape (M, D)")
+    if train_X.shape[0] == 0:
+        raise ValueError("train_X must contain at least one sample")
+    if train_X.shape[0] != train_y.shape[0]:
+        raise ValueError("train_X and train_y must have the same number of samples")
+    if train_X.shape[1] != test_X.shape[1]:
+        raise ValueError("train_X and test_X must have the same feature dimension")
+    if not np.issubdtype(train_y.dtype, np.integer):
+        raise ValueError("train_y must contain integer class labels")
+
+    labels = np.unique(train_y)
+    if labels.size == 0:
+        raise ValueError("train_y must contain at least one class")
+
+    centroids = np.vstack([train_X[train_y == label].mean(axis=0) for label in labels])
+    deltas = test_X[:, None, :] - centroids[None, :, :]
+    squared_distances = np.sum(deltas * deltas, axis=2)
+    nearest_indices = np.argmin(squared_distances, axis=1)
+    return labels[nearest_indices]`,
+    starterCode: `import numpy as np
+
+def nearest_centroid_predict(train_X, train_y, test_X):
+    train_X = np.asarray(train_X)
+    train_y = np.asarray(train_y)
+    test_X = np.asarray(test_X)
+
+    # TODO:
+    # 1. Validate the shapes and labels.
+    # 2. Compute one centroid per class from train_X.
+    # 3. Predict each test point by the nearest centroid.
+    raise NotImplementedError("Implement nearest_centroid_predict")
+
+sample_train_X = np.array([[0.0], [2.0], [10.0], [12.0]])
+sample_train_y = np.array([0, 0, 1, 1])
+sample_test_X = np.array([[0.0], [6.0], [12.0]])
+
+print(nearest_centroid_predict(sample_train_X, sample_train_y, sample_test_X))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Classification', 'Centroids'],
+  },
 ] as const;
