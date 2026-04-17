@@ -1605,4 +1605,174 @@ print(cross_attention(sample_query, sample_context, sample_w, sample_w, sample_w
     packages: ['numpy'],
     tags: ['NumPy', 'Attention', 'Transformers'],
   },
+  {
+    id: 'manual-backprop-for-a-2-layer-mlp',
+    order: 16,
+    title: 'Manual backprop for a 2-layer MLP',
+    difficulty: 'Hard',
+    summary:
+      'Compute the loss and parameter gradients for a 2-layer ReLU MLP with softmax cross-entropy.',
+    prompt: [
+      'Implement forward and backward for a 2-layer MLP with one hidden ReLU layer.',
+      'Given inputs `X`, labels `y`, and parameters `W1`, `b1`, `W2`, and `b2`, compute the mean softmax cross-entropy loss and the gradients for all four parameters.',
+    ],
+    signature: `def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
+    ...`,
+    requirements: [
+      '`X` has shape `(N, D_in)`.',
+      '`y` has shape `(N,)` and contains integer class labels in the range `[0, C)`.',
+      '`W1` has shape `(D_in, H)` and `b1` has shape `(H,)`.',
+      '`W2` has shape `(H, C)` and `b2` has shape `(C,)`.',
+      'Return the mean softmax cross-entropy loss and a dictionary with `dW1`, `db1`, `dW2`, and `db2`.',
+      'Raise `ValueError` on invalid input.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: [
+          'X = [[1.0, 2.0]]',
+          'y = [1]',
+          'W1 = [[1.0, 0.0], [0.0, 1.0]]',
+          'b1 = [0.0, 0.0]',
+          'W2 = [[1.0, 0.0], [0.0, 1.0]]',
+          'b2 = [0.0, 0.0]',
+        ],
+        result: `{
+  "loss": 0.31326,
+  "dW1": [[0.26894, -0.26894], [0.53788, -0.53788]],
+  "db1": [0.26894, -0.26894],
+  "dW2": [[0.26894, -0.26894], [0.53788, -0.53788]],
+  "db2": [0.26894, -0.26894]
+}`,
+      },
+      {
+        label: 'Example 2',
+        lines: [
+          'X = [[1.0, 0.0], [0.0, 1.0]]',
+          'y = [0, 1]',
+          'W1 = [[1.0, 0.0], [0.0, 1.0]]',
+          'b1 = [1.0, 1.0]',
+          'W2 = [[1.0, 0.0], [0.0, 1.0]]',
+          'b2 = [0.0, 0.0]',
+        ],
+        result: `{
+  "loss": 0.31326,
+  "dW1": [[-0.13447, 0.13447], [0.13447, -0.13447]],
+  "db1": [0.0, 0.0],
+  "dW2": [[-0.13447, 0.13447], [0.13447, -0.13447]],
+  "db2": [0.0, 0.0]
+}`,
+      },
+    ],
+    hint: [
+      'Cache the hidden pre-activations so you can apply the ReLU derivative during backprop.',
+      'For softmax cross-entropy, the gradient with respect to the logits is `probs - one_hot(y)`, averaged over the batch.',
+      'Backpropagate from the output layer into the hidden layer before multiplying by the ReLU mask.',
+      'Return the gradients in a dictionary so the caller can inspect each parameter separately.',
+    ],
+    solutionNotes: [
+      'The forward pass is just affine, ReLU, affine, and mean softmax cross-entropy. Once you have the probabilities, the gradient of the loss with respect to the logits is the usual `probs - one_hot` term divided by the batch size.',
+      'From there, the remaining gradients follow by the chain rule: the second affine layer gives `dW2` and `db2`, and the upstream gradient passes through the ReLU mask before producing `dW1` and `db1`.',
+    ],
+    solutionCode: `import numpy as np
+
+def _stable_softmax(logits):
+    logits = np.asarray(logits, dtype=np.float64)
+    max_logits = np.max(logits, axis=-1, keepdims=True)
+    shifted = logits - max_logits
+    exp_shifted = np.exp(shifted)
+    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
+    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+
+
+def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
+    X = np.asarray(X, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64)
+    W1 = np.asarray(W1, dtype=np.float64)
+    b1 = np.asarray(b1, dtype=np.float64)
+    W2 = np.asarray(W2, dtype=np.float64)
+    b2 = np.asarray(b2, dtype=np.float64)
+
+    if X.ndim != 2:
+        raise ValueError("X must have shape (N, D_in)")
+    if np.any(np.array(X.shape) <= 0):
+        raise ValueError("X must have positive dimensions")
+    if y.ndim != 1:
+        raise ValueError("y must have shape (N,)")
+    if y.shape[0] != X.shape[0]:
+        raise ValueError("X and y must have the same batch size")
+    if not np.all(np.isfinite(y)) or not np.allclose(y, np.round(y)):
+        raise ValueError("y must contain integer class labels")
+    y = np.round(y).astype(np.int64)
+
+    input_dim = X.shape[1]
+    if W1.ndim != 2 or W1.shape[0] != input_dim:
+        raise ValueError("W1 must have shape (D_in, H)")
+    hidden_dim = W1.shape[1]
+    if hidden_dim <= 0:
+        raise ValueError("W1 must have positive dimensions")
+    if b1.ndim != 1 or b1.shape[0] != hidden_dim:
+        raise ValueError("b1 must have shape (H,)")
+    if W2.ndim != 2 or W2.shape[0] != hidden_dim:
+        raise ValueError("W2 must have shape (H, C)")
+    num_classes = W2.shape[1]
+    if num_classes <= 0:
+        raise ValueError("W2 must have positive dimensions")
+    if b2.ndim != 1 or b2.shape[0] != num_classes:
+        raise ValueError("b2 must have shape (C,)")
+    if np.any((y < 0) | (y >= num_classes)):
+        raise ValueError("y contains labels outside the valid range")
+
+    z1 = X @ W1 + b1
+    h = np.maximum(z1, 0.0)
+    logits = h @ W2 + b2
+    probs = _stable_softmax(logits)
+
+    batch_size = X.shape[0]
+    loss = -np.log(probs[np.arange(batch_size), y]).mean()
+
+    dlogits = probs.copy()
+    dlogits[np.arange(batch_size), y] -= 1.0
+    dlogits /= batch_size
+
+    dW2 = h.T @ dlogits
+    db2 = dlogits.sum(axis=0)
+    dh = dlogits @ W2.T
+    dz1 = dh * (z1 > 0)
+    dW1 = X.T @ dz1
+    db1 = dz1.sum(axis=0)
+
+    return {
+        "loss": float(loss),
+        "dW1": dW1,
+        "db1": db1,
+        "dW2": dW2,
+        "db2": db2,
+    }`,
+    starterCode: `import numpy as np
+
+def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
+    X = np.asarray(X)
+    y = np.asarray(y)
+    W1 = np.asarray(W1)
+    b1 = np.asarray(b1)
+    W2 = np.asarray(W2)
+    b2 = np.asarray(b2)
+
+    # TODO:
+    # 1. Validate shapes and label ranges.
+    # 2. Run the forward pass, compute the softmax cross-entropy loss, and backpropagate gradients.
+    raise NotImplementedError("Implement mlp_loss_and_grads")
+
+sample_X = np.array([[1.0, 2.0]])
+sample_y = np.array([1])
+sample_W1 = np.array([[1.0, 0.0], [0.0, 1.0]])
+sample_b1 = np.array([0.0, 0.0])
+sample_W2 = np.array([[1.0, 0.0], [0.0, 1.0]])
+sample_b2 = np.array([0.0, 0.0])
+
+print(mlp_loss_and_grads(sample_X, sample_y, sample_W1, sample_b1, sample_W2, sample_b2))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Backpropagation', 'Neural Networks'],
+  },
 ] as const;
