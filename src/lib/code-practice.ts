@@ -1458,4 +1458,151 @@ print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads
     packages: ['numpy'],
     tags: ['NumPy', 'Attention', 'Transformers'],
   },
+  {
+    id: 'cross-attention',
+    order: 15,
+    title: 'Cross-attention',
+    difficulty: 'Hard',
+    summary:
+      'Compute multi-head cross-attention from a query sequence and a separate context sequence, with scaled dot-product scores and an output projection.',
+    prompt: [
+      'Implement multi-head cross-attention for a query tensor and a separate context tensor.',
+      'Project the query sequence into queries, project the context sequence into keys and values, split into heads, apply scaled dot-product attention with an optional mask, then project the concatenated heads back to `(B, Tq, D_model)`.',
+    ],
+    signature: `def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    ...`,
+    requirements: [
+      '`query_x` has shape `(B, Tq, D_model)`.',
+      '`context_x` has shape `(B, Tk, D_model)`.',
+      'Projection matrices `W_q`, `W_k`, `W_v`, and `W_o` all have shape `(D_model, D_model)`.',
+      '`num_heads` divides `D_model`.',
+      '`mask`, if provided, is broadcastable to `(B, H, Tq, Tk)` and contains `1` for allowed positions and `0` for blocked positions.',
+      'Return an output of shape `(B, Tq, D_model)`.',
+      'Raise `ValueError` on invalid input.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: [
+          'query_x = [[[1.0, 0.0]]]',
+          'context_x = [[[1.0, 0.0], [0.0, 1.0]]]',
+          'W_q = W_k = W_v = W_o = [[1.0, 0.0], [0.0, 1.0]]',
+          'num_heads = 1',
+        ],
+        result: '[[[0.66976, 0.33024]]]',
+      },
+      {
+        label: 'Example 2',
+        lines: [
+          'query_x = [[[1.0, 0.0], [0.0, 1.0]]]',
+          'context_x = [[[1.0, 0.0], [0.0, 1.0]]]',
+          'W_q = W_k = W_v = W_o = [[1.0, 0.0], [0.0, 1.0]]',
+          'num_heads = 1',
+          'mask = [[[1, 0], [1, 1]]]',
+        ],
+        result: '[[[1.0, 0.0], [0.33024, 0.66976]]]',
+      },
+    ],
+    hint: [
+      'The only difference from self-attention is that queries come from `query_x`, while keys and values come from `context_x`.',
+      'Reshape the projected tensors into `(B, H, Tq, D_head)` for queries and `(B, H, Tk, D_head)` for keys and values.',
+      'Use the scaled dot-product formula `Q K^T / sqrt(D_head)` and a numerically stable softmax over the last axis.',
+      'If a mask is provided, broadcast it to the score tensor and zero out blocked positions before softmax.',
+    ],
+    solutionNotes: [
+      'Cross-attention is the same attention primitive as self-attention, except the query tokens and the key/value tokens come from different inputs. That makes it the right building block when one sequence needs to read information from another.',
+      'The implementation follows the usual Transformer recipe: project queries, keys, and values; split channels into heads; compute masked scaled dot-product attention; then merge the heads and apply the output projection.',
+    ],
+    solutionCode: `import numpy as np
+
+def _stable_softmax(logits):
+    logits = np.asarray(logits, dtype=np.float64)
+    max_logits = np.max(logits, axis=-1, keepdims=True)
+    max_logits = np.where(np.isfinite(max_logits), max_logits, 0.0)
+    shifted = logits - max_logits
+    exp_shifted = np.exp(shifted)
+    exp_shifted = np.where(np.isfinite(logits), exp_shifted, 0.0)
+    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
+    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+
+
+def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    query_x = np.asarray(query_x, dtype=np.float64)
+    context_x = np.asarray(context_x, dtype=np.float64)
+    W_q = np.asarray(W_q, dtype=np.float64)
+    W_k = np.asarray(W_k, dtype=np.float64)
+    W_v = np.asarray(W_v, dtype=np.float64)
+    W_o = np.asarray(W_o, dtype=np.float64)
+
+    if query_x.ndim != 3 or context_x.ndim != 3:
+        raise ValueError("query_x and context_x must have shape (B, T, D_model)")
+    if np.any(np.array(query_x.shape) <= 0) or np.any(np.array(context_x.shape) <= 0):
+        raise ValueError("inputs must have positive dimensions")
+    if query_x.shape[0] != context_x.shape[0]:
+        raise ValueError("query_x and context_x must have the same batch size")
+    if query_x.shape[2] != context_x.shape[2]:
+        raise ValueError("query_x and context_x must have the same model dimension")
+    if isinstance(num_heads, bool) or not isinstance(num_heads, (int, np.integer)):
+        raise ValueError("num_heads must be a positive integer")
+    if num_heads <= 0:
+        raise ValueError("num_heads must be a positive integer")
+
+    batch_size, query_len, model_dim = query_x.shape
+    context_len = context_x.shape[1]
+    if model_dim % num_heads != 0:
+        raise ValueError("num_heads must divide D_model")
+
+    for matrix, name in ((W_q, "W_q"), (W_k, "W_k"), (W_v, "W_v"), (W_o, "W_o")):
+        if matrix.ndim != 2 or matrix.shape != (model_dim, model_dim):
+            raise ValueError(f"{name} must have shape (D_model, D_model)")
+
+    head_dim = model_dim // num_heads
+
+    q = query_x @ W_q
+    k = context_x @ W_k
+    v = context_x @ W_v
+
+    q = q.reshape(batch_size, query_len, num_heads, head_dim).transpose(0, 2, 1, 3)
+    k = k.reshape(batch_size, context_len, num_heads, head_dim).transpose(0, 2, 1, 3)
+    v = v.reshape(batch_size, context_len, num_heads, head_dim).transpose(0, 2, 1, 3)
+
+    scores = np.matmul(q, np.swapaxes(k, -1, -2)) / np.sqrt(head_dim)
+
+    if mask is not None:
+        mask_arr = np.asarray(mask)
+        try:
+            mask_broadcast = np.broadcast_to(mask_arr, scores.shape)
+        except ValueError as exc:
+            raise ValueError("mask must be broadcastable to (B, H, Tq, Tk)") from exc
+        if not np.all((mask_broadcast == 0) | (mask_broadcast == 1)):
+            raise ValueError("mask must contain only 0 and 1 values")
+        scores = np.where(mask_broadcast.astype(bool), scores, -np.inf)
+
+    attn = _stable_softmax(scores)
+    context = np.matmul(attn, v)
+    context = context.transpose(0, 2, 1, 3).reshape(batch_size, query_len, model_dim)
+    return context @ W_o`,
+    starterCode: `import numpy as np
+
+def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    query_x = np.asarray(query_x)
+    context_x = np.asarray(context_x)
+    W_q = np.asarray(W_q)
+    W_k = np.asarray(W_k)
+    W_v = np.asarray(W_v)
+    W_o = np.asarray(W_o)
+
+    # TODO:
+    # 1. Validate the shapes and make sure num_heads divides D_model.
+    # 2. Project query_x into q, context_x into k/v, apply masked attention, and combine the heads.
+    raise NotImplementedError("Implement cross_attention")
+
+sample_query = np.array([[[1.0, 0.0]]])
+sample_context = np.array([[[1.0, 0.0], [0.0, 1.0]]])
+sample_w = np.array([[1.0, 0.0], [0.0, 1.0]])
+
+print(cross_attention(sample_query, sample_context, sample_w, sample_w, sample_w, sample_w, num_heads=1))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Attention', 'Transformers'],
+  },
 ] as const;
