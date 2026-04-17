@@ -72,42 +72,35 @@ export const codePracticeProblems: readonly CodePracticeProblem[] = [
       'The stable trick is to shift each row by its maximum value before applying `exp`, which preserves the softmax probabilities while avoiding overflow.',
       'Once shifted, the mean cross-entropy is just the average of `log(sum(exp(shifted))) - shifted[row, label]` across the batch.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for vectorized array operations.
 
-def softmax_cross_entropy(logits, labels):
-    logits = np.asarray(logits, dtype=np.float64)
-    labels = np.asarray(labels)
+def softmax_cross_entropy(logits, labels):  # Define the batch softmax cross-entropy helper.
+    logits = np.asarray(logits, dtype=np.float64)  # Convert logits to a floating-point NumPy array.
+    labels = np.asarray(labels)  # Convert labels to a NumPy array for validation and indexing.
 
-    if logits.ndim != 2:
+    if logits.ndim != 2:  # Reject anything that is not a matrix of shape (N, C).
         raise ValueError("logits must be a 2D array of shape (N, C)")
-    if labels.ndim != 1:
+    if labels.ndim != 1:  # Reject labels that are not a flat vector.
         raise ValueError("labels must be a 1D array of shape (N,)")
 
-    batch_size, num_classes = logits.shape
-    if batch_size == 0:
+    batch_size, num_classes = logits.shape  # Unpack the batch size and class count.
+    if batch_size == 0:  # Require at least one sample so the mean is defined.
         raise ValueError("logits must contain at least one sample")
-    if num_classes == 0:
+    if num_classes == 0:  # Require at least one class so classification is meaningful.
         raise ValueError("logits must contain at least one class")
-    if labels.shape[0] != batch_size:
+    if labels.shape[0] != batch_size:  # Enforce one label per example.
         raise ValueError("labels must have the same batch size as logits")
-    if not np.issubdtype(labels.dtype, np.integer):
+    if not np.issubdtype(labels.dtype, np.integer):  # Require integer class ids.
         raise ValueError("labels must contain integer class ids")
-    if np.any(labels < 0) or np.any(labels >= num_classes):
+    if np.any(labels < 0) or np.any(labels >= num_classes):  # Reject labels outside the valid class range.
         raise ValueError("labels contain out-of-range class ids")
 
-    # Numerical stability trick: subtract per-row max before exponentiating
-    shifted = logits - np.max(logits, axis=1, keepdims=True)
+    shifted = logits - np.max(logits, axis=1, keepdims=True)  # Shift each row by its max for numerical stability.
+    logsumexp = np.log(np.sum(np.exp(shifted), axis=1))  # Compute log(sum(exp(.))) on the stabilized logits.
+    correct_class_logits = shifted[np.arange(batch_size), labels]  # Pick the shifted logit for the true class in each row.
+    losses = logsumexp - correct_class_logits  # Convert each row into its cross-entropy loss.
 
-    # log(sum(exp(logits))) computed in a stable way
-    logsumexp = np.log(np.sum(np.exp(shifted), axis=1))
-
-    # Gather the logit for the correct class for each example
-    correct_class_logits = shifted[np.arange(batch_size), labels]
-
-    # Cross-entropy loss per example
-    losses = logsumexp - correct_class_logits
-
-    return float(np.mean(losses))`,
+    return float(np.mean(losses))  # Average the per-example losses and return a plain Python float.`,
     starterCode: `import numpy as np
 
 def softmax_cross_entropy(logits, labels):
@@ -178,10 +171,10 @@ print(f"{softmax_cross_entropy(sample_logits, sample_labels):.5f}")`,
       'The clean approach is greedy: sort indices by descending score with index-based tie-breaking, repeatedly keep the first remaining box, and compare it against the rest.',
       'Using a vectorized IoU helper lets the loop filter the remaining candidates in one shot while still keeping the implementation short and readable.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy so we can do vectorized box math.
 
-def compute_iou(box, boxes):
-    """
+def compute_iou(box, boxes):  # Define a helper that compares one box against many boxes.
+    """  # Start the helper docstring.
     Compute IoU between one box and many boxes.
 
     Args:
@@ -190,30 +183,26 @@ def compute_iou(box, boxes):
 
     Returns:
         np.ndarray of shape (M,)
-    """
-    # Compute the overlap rectangle by clamping the corners.
-    x1 = np.maximum(box[0], boxes[:, 0])
-    y1 = np.maximum(box[1], boxes[:, 1])
-    x2 = np.minimum(box[2], boxes[:, 2])
-    y2 = np.minimum(box[3], boxes[:, 3])
+    """  # End the helper docstring.
+    x1 = np.maximum(box[0], boxes[:, 0])  # Find the left edge of each overlap rectangle.
+    y1 = np.maximum(box[1], boxes[:, 1])  # Find the top edge of each overlap rectangle.
+    x2 = np.minimum(box[2], boxes[:, 2])  # Find the right edge of each overlap rectangle.
+    y2 = np.minimum(box[3], boxes[:, 3])  # Find the bottom edge of each overlap rectangle.
 
-    # Negative widths or heights mean there is no overlap.
-    inter_w = np.maximum(0.0, x2 - x1)
-    inter_h = np.maximum(0.0, y2 - y1)
-    inter_area = inter_w * inter_h
+    inter_w = np.maximum(0.0, x2 - x1)  # Clamp negative widths to zero when boxes do not overlap.
+    inter_h = np.maximum(0.0, y2 - y1)  # Clamp negative heights to zero when boxes do not overlap.
+    inter_area = inter_w * inter_h  # Multiply width and height to get the intersection area.
 
-    # Area of the reference box and each candidate box.
-    box_area = (box[2] - box[0]) * (box[3] - box[1])
-    boxes_area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+    box_area = (box[2] - box[0]) * (box[3] - box[1])  # Compute the area of the reference box.
+    boxes_area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])  # Compute areas for all candidate boxes.
 
-    # IoU is intersection divided by union; guard against zero union.
-    union = box_area + boxes_area - inter_area
-    iou = np.where(union > 0.0, inter_area / union, 0.0)
-    return iou
+    union = box_area + boxes_area - inter_area  # Compute union as area_a + area_b - intersection.
+    iou = np.where(union > 0.0, inter_area / union, 0.0)  # Divide safely and return 0.0 when union is zero.
+    return iou  # Return the IoU values for every candidate box.
 
 
-def nms(boxes, scores, iou_threshold):
-    """
+def nms(boxes, scores, iou_threshold):  # Define the main non-maximum suppression routine.
+    """  # Start the function docstring.
     Perform non-maximum suppression.
 
     Args:
@@ -223,44 +212,40 @@ def nms(boxes, scores, iou_threshold):
 
     Returns:
         list[int]: selected indices in the order they are kept
-    """
-    boxes = np.asarray(boxes, dtype=np.float64)
-    scores = np.asarray(scores, dtype=np.float64)
+    """  # End the function docstring.
+    boxes = np.asarray(boxes, dtype=np.float64)  # Convert boxes to floating-point NumPy arrays.
+    scores = np.asarray(scores, dtype=np.float64)  # Convert scores to floating-point NumPy arrays.
 
-    if boxes.ndim != 2 or boxes.shape[1] != 4:
+    if boxes.ndim != 2 or boxes.shape[1] != 4:  # Require a matrix with four coordinates per box.
         raise ValueError("boxes must have shape (N, 4)")
-    if scores.ndim != 1 or scores.shape[0] != boxes.shape[0]:
+    if scores.ndim != 1 or scores.shape[0] != boxes.shape[0]:  # Require one score per box.
         raise ValueError("scores must have shape (N,)")
-    if not (0.0 <= iou_threshold <= 1.0):
+    if not (0.0 <= iou_threshold <= 1.0):  # Keep the threshold in the conventional IoU range.
         raise ValueError("iou_threshold must be in [0, 1]")
 
-    # Reject malformed boxes before running the suppression loop.
-    if np.any(boxes[:, 2] < boxes[:, 0]) or np.any(boxes[:, 3] < boxes[:, 1]):
+    if np.any(boxes[:, 2] < boxes[:, 0]) or np.any(boxes[:, 3] < boxes[:, 1]):  # Reject boxes with inverted corners.
         raise ValueError("invalid boxes detected")
 
-    n = boxes.shape[0]
-    if n == 0:
+    n = boxes.shape[0]  # Store the total number of boxes.
+    if n == 0:  # Return early when there is nothing to suppress.
         return []
 
-    # Sort by descending score, then by smaller original index on ties.
-    order = sorted(range(n), key=lambda i: (-scores[i], i))
-    keep = []
+    order = sorted(range(n), key=lambda i: (-scores[i], i))  # Sort by score descending, then index ascending.
+    keep = []  # Accumulate the indices that survive suppression.
 
-    while order:
-        current = order[0]
-        keep.append(current)
+    while order:  # Keep processing until no candidates remain.
+        current = order[0]  # Take the best remaining box.
+        keep.append(current)  # Record it as selected.
 
-        if len(order) == 1:
+        if len(order) == 1:  # Stop when that was the last box.
             break
 
-        remaining = np.array(order[1:], dtype=int)
-        ious = compute_iou(boxes[current], boxes[remaining])
+        remaining = np.array(order[1:], dtype=int)  # Convert the remaining candidate indices into a NumPy array.
+        ious = compute_iou(boxes[current], boxes[remaining])  # Compute overlap against all remaining boxes at once.
+        survivors = remaining[ious <= iou_threshold]  # Keep only boxes whose IoU is not strictly above the threshold.
+        order = survivors.tolist()  # Convert back to a Python list for the next loop iteration.
 
-        # Keep only boxes whose overlap is not strictly above the threshold.
-        survivors = remaining[ious <= iou_threshold]
-        order = survivors.tolist()
-
-    return keep`,
+    return keep  # Return the selected box indices in keep order.`,
     starterCode: `import numpy as np
 
 def nms(boxes, scores, iou_threshold):
@@ -324,32 +309,32 @@ print(nms(sample_boxes, sample_scores, iou_threshold=0.3))`,
       'The problem is really two masks multiplied together: the causal rule (`j <= i`) and the per-example validity rule (`i, j < seq_len[b]`).',
       'Broadcasting a single lower-triangular template against a batch-wise validity mask gives the full `(B, T, T)` answer without explicit Python loops.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for mask construction and broadcasting.
 
-def make_causal_attention_mask(seq_lens, max_len=None):
-    seq_lens = np.asarray(seq_lens)
+def make_causal_attention_mask(seq_lens, max_len=None):  # Define the batch causal mask builder.
+    seq_lens = np.asarray(seq_lens)  # Convert the sequence lengths into a NumPy array.
 
-    if seq_lens.ndim != 1:
+    if seq_lens.ndim != 1:  # Require a flat list of lengths.
         raise ValueError("seq_lens must be a 1D array")
-    if seq_lens.size == 0:
+    if seq_lens.size == 0:  # Disallow empty batches.
         raise ValueError("seq_lens must not be empty")
-    if not np.issubdtype(seq_lens.dtype, np.integer):
+    if not np.issubdtype(seq_lens.dtype, np.integer):  # Require integer lengths.
         raise ValueError("seq_lens must contain integers")
-    if np.any(seq_lens < 0):
+    if np.any(seq_lens < 0):  # Reject negative sequence lengths.
         raise ValueError("seq_lens must be non-negative")
 
-    T = int(seq_lens.max())
-    if max_len is not None:
-        if isinstance(max_len, bool) or not isinstance(max_len, (int, np.integer)):
+    T = int(seq_lens.max())  # Start with the longest valid sequence length.
+    if max_len is not None:  # Allow the caller to force a wider mask.
+        if isinstance(max_len, bool) or not isinstance(max_len, (int, np.integer)):  # Reject non-integer max_len values.
             raise ValueError("max_len must be an integer or None")
-        if max_len < 0:
+        if max_len < 0:  # Disallow negative padding lengths.
             raise ValueError("max_len must be non-negative")
-        T = max(T, int(max_len))
+        T = max(T, int(max_len))  # Use whichever length is larger.
 
-    valid = np.arange(T) < seq_lens[:, None]
-    causal = np.tri(T, dtype=np.int64)
-    mask = causal[None, :, :] * valid[:, :, None] * valid[:, None, :]
-    return mask.astype(np.int64)`,
+    valid = np.arange(T) < seq_lens[:, None]  # Mark positions that fall inside each example's valid length.
+    causal = np.tri(T, dtype=np.int64)  # Build the lower-triangular causal template once.
+    mask = causal[None, :, :] * valid[:, :, None] * valid[:, None, :]  # Zero out padded rows and columns per batch element.
+    return mask.astype(np.int64)  # Return an integer mask as requested.`,
     starterCode: `import numpy as np
 
 def make_causal_attention_mask(seq_lens, max_len=None):
@@ -409,56 +394,56 @@ print(make_causal_attention_mask(sample_seq_lens, max_len=4))`,
       'This is mostly a confusion-matrix exercise: once the four counts are correct, the derived metrics are straightforward ratios.',
       'The subtle part is the edge handling. Returning `0.0` for undefined metrics keeps the function predictable when there are no predicted positives or no actual positives.',
     ],
-    solutionCode: `def _coerce_binary_labels(values, name):
-    if isinstance(values, (str, bytes)):
+    solutionCode: `def _coerce_binary_labels(values, name):  # Normalize and validate a binary label sequence.
+    if isinstance(values, (str, bytes)):  # Reject strings because they are not label sequences.
         raise ValueError(f"{name} must be a 1D sequence of binary labels")
 
-    try:
+    try:  # Try to materialize the input as a list so we can inspect every element.
         items = list(values)
-    except TypeError as exc:
+    except TypeError as exc:  # Convert non-iterables into a clean validation error.
         raise ValueError(f"{name} must be a 1D sequence of binary labels") from exc
 
-    if not items:
+    if not items:  # Disallow empty inputs because the metrics would be undefined.
         raise ValueError(f"{name} must not be empty")
 
-    for item in items:
-        if hasattr(item, "__iter__") and not isinstance(item, (str, bytes)):
+    for item in items:  # Inspect each item for shape and label validity.
+        if hasattr(item, "__iter__") and not isinstance(item, (str, bytes)):  # Reject nested sequences.
             raise ValueError(f"{name} must be one-dimensional")
-        if item not in (0, 1):
+        if item not in (0, 1):  # Only binary class labels are allowed.
             raise ValueError(f"{name} must contain only 0 and 1")
 
-    return items
+    return items  # Return the validated flat list of binary labels.
 
 
-def binary_classification_metrics(y_true, y_pred):
-    y_true = _coerce_binary_labels(y_true, "y_true")
-    y_pred = _coerce_binary_labels(y_pred, "y_pred")
+def binary_classification_metrics(y_true, y_pred):  # Define the metric computation entry point.
+    y_true = _coerce_binary_labels(y_true, "y_true")  # Validate and normalize the ground-truth labels.
+    y_pred = _coerce_binary_labels(y_pred, "y_pred")  # Validate and normalize the predicted labels.
 
-    if len(y_true) != len(y_pred):
+    if len(y_true) != len(y_pred):  # Require the two sequences to be aligned sample by sample.
         raise ValueError("y_true and y_pred must have the same length")
 
-    tp = tn = fp = fn = 0
-    for truth, pred in zip(y_true, y_pred):
-        if truth == 1 and pred == 1:
+    tp = tn = fp = fn = 0  # Initialize the four confusion-matrix counts.
+    for truth, pred in zip(y_true, y_pred):  # Walk through paired labels once.
+        if truth == 1 and pred == 1:  # Count true positives.
             tp += 1
-        elif truth == 0 and pred == 0:
+        elif truth == 0 and pred == 0:  # Count true negatives.
             tn += 1
-        elif truth == 0 and pred == 1:
+        elif truth == 0 and pred == 1:  # Count false positives.
             fp += 1
-        else:
+        else:  # The remaining case is a false negative.
             fn += 1
 
-    total = len(y_true)
-    precision_den = tp + fp
-    recall_den = tp + fn
+    total = len(y_true)  # Store the number of evaluated examples.
+    precision_den = tp + fp  # Precision divides by predicted positives.
+    recall_den = tp + fn  # Recall divides by actual positives.
 
-    precision = tp / precision_den if precision_den else 0.0
-    recall = tp / recall_den if recall_den else 0.0
-    f1_den = precision + recall
-    f1 = (2.0 * precision * recall / f1_den) if f1_den else 0.0
-    accuracy = (tp + tn) / total
+    precision = tp / precision_den if precision_den else 0.0  # Return 0.0 when precision is undefined.
+    recall = tp / recall_den if recall_den else 0.0  # Return 0.0 when recall is undefined.
+    f1_den = precision + recall  # F1 is based on the harmonic mean of precision and recall.
+    f1 = (2.0 * precision * recall / f1_den) if f1_den else 0.0  # Return 0.0 when both are zero.
+    accuracy = (tp + tn) / total  # Accuracy is the fraction of correct predictions.
 
-    return {
+    return {  # Package all counts and metrics into a dictionary.
         "tp": tp,
         "tn": tn,
         "fp": fp,
@@ -523,25 +508,25 @@ print(binary_classification_metrics(sample_true, sample_pred))`,
       'Cosine similarity is just a dot product divided by the product of L2 norms. Once the row norms are in hand, the whole pairwise matrix can be computed with broadcasting.',
       'The key edge case is a zero vector: its norm is zero, so any similarity involving that row is undefined. Filling those positions with `0.0` keeps the result stable and matches the prompt.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for vectorized linear algebra.
 
-def pairwise_cosine_similarity(x, y):
-    x = np.asarray(x, dtype=np.float64)
-    y = np.asarray(y, dtype=np.float64)
+def pairwise_cosine_similarity(x, y):  # Define the pairwise cosine similarity function.
+    x = np.asarray(x, dtype=np.float64)  # Convert x to a floating-point matrix.
+    y = np.asarray(y, dtype=np.float64)  # Convert y to a floating-point matrix.
 
-    if x.ndim != 2 or y.ndim != 2:
+    if x.ndim != 2 or y.ndim != 2:  # Require both inputs to be matrices.
         raise ValueError("x and y must be 2D arrays")
-    if x.shape[1] != y.shape[1]:
+    if x.shape[1] != y.shape[1]:  # Require the same feature dimension on both sides.
         raise ValueError("x and y must have the same feature dimension")
-    if x.shape[1] == 0:
+    if x.shape[1] == 0:  # Disallow empty feature vectors.
         raise ValueError("feature dimension must be positive")
 
-    x_norms = np.linalg.norm(x, axis=1)
-    y_norms = np.linalg.norm(y, axis=1)
-    similarities = x @ y.T
-    denominator = x_norms[:, None] * y_norms[None, :]
+    x_norms = np.linalg.norm(x, axis=1)  # Compute the norm of each row in x.
+    y_norms = np.linalg.norm(y, axis=1)  # Compute the norm of each row in y.
+    similarities = x @ y.T  # Compute all pairwise dot products at once.
+    denominator = x_norms[:, None] * y_norms[None, :]  # Broadcast the norm product into an (N, M) denominator.
 
-    return np.divide(
+    return np.divide(  # Divide safely so zero-norm rows produce zeros instead of warnings.
         similarities,
         denominator,
         out=np.zeros_like(similarities),
@@ -615,35 +600,35 @@ print(pairwise_cosine_similarity(sample_x, sample_y))`,
       'The implementation is straightforward once the inputs are validated: rank each row from largest to smallest, take the first `k` class ids, and check whether the true label appears in that slice.',
       'Because the check is fully vectorized, the result is a simple mean over a boolean mask, which keeps the code short and easy to read.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for sorting and vectorized comparisons.
 
-def top_k_accuracy(logits, labels, k):
-    logits = np.asarray(logits, dtype=np.float64)
-    labels = np.asarray(labels)
+def top_k_accuracy(logits, labels, k):  # Define the top-k accuracy routine.
+    logits = np.asarray(logits, dtype=np.float64)  # Convert logits to a floating-point matrix.
+    labels = np.asarray(labels)  # Convert labels to a NumPy array for validation.
 
-    if logits.ndim != 2:
+    if logits.ndim != 2:  # Require a 2D logit matrix.
         raise ValueError("logits must be a 2D array of shape (N, C)")
-    if labels.ndim != 1:
+    if labels.ndim != 1:  # Require a flat label vector.
         raise ValueError("labels must be a 1D array of shape (N,)")
-    if logits.shape[0] == 0:
+    if logits.shape[0] == 0:  # Require at least one example.
         raise ValueError("logits must contain at least one sample")
-    if logits.shape[1] == 0:
+    if logits.shape[1] == 0:  # Require at least one class.
         raise ValueError("logits must contain at least one class")
-    if labels.shape[0] != logits.shape[0]:
+    if labels.shape[0] != logits.shape[0]:  # Require aligned batch sizes.
         raise ValueError("labels must have the same batch size as logits")
-    if isinstance(k, bool) or not isinstance(k, (int, np.integer)):
+    if isinstance(k, bool) or not isinstance(k, (int, np.integer)):  # Reject non-integer k values.
         raise ValueError("k must be a positive integer")
-    if k <= 0:
+    if k <= 0:  # Require k to be positive.
         raise ValueError("k must be a positive integer")
-    if not np.issubdtype(labels.dtype, np.integer):
+    if not np.issubdtype(labels.dtype, np.integer):  # Require integer class ids.
         raise ValueError("labels must contain integer class ids")
-    if np.any(labels < 0) or np.any(labels >= logits.shape[1]):
+    if np.any(labels < 0) or np.any(labels >= logits.shape[1]):  # Reject labels outside the valid class range.
         raise ValueError("labels contain out-of-range class ids")
 
-    top_k = min(int(k), logits.shape[1])
-    ranked = np.argsort(-logits, axis=1)[:, :top_k]
-    hits = np.any(ranked == labels[:, None], axis=1)
-    return float(np.mean(hits))`,
+    top_k = min(int(k), logits.shape[1])  # Clamp k so it never exceeds the number of classes.
+    ranked = np.argsort(-logits, axis=1)[:, :top_k]  # Take the top-k class indices per row.
+    hits = np.any(ranked == labels[:, None], axis=1)  # Check whether the true label appears in each top-k set.
+    return float(np.mean(hits))  # Convert the boolean hit rate into a Python float.`,
     starterCode: `import numpy as np
 
 def top_k_accuracy(logits, labels, k):
@@ -707,37 +692,37 @@ print(top_k_accuracy(sample_logits, sample_labels, k=1))`,
       'The main trick is to form all pairwise overlap rectangles with broadcasting, then compute intersection areas, box areas, and union areas from those tensors.',
       'Once the pairwise union is known, `np.divide` with a zero-filled output array keeps the implementation numerically stable and handles degenerate boxes cleanly.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy so we can broadcast box coordinates.
 
-def _validate_boxes(boxes, name):
-    boxes = np.asarray(boxes, dtype=np.float64)
+def _validate_boxes(boxes, name):  # Define a helper that validates box arrays.
+    boxes = np.asarray(boxes, dtype=np.float64)  # Convert boxes to a floating-point matrix.
 
-    if boxes.ndim != 2 or boxes.shape[1] != 4:
+    if boxes.ndim != 2 or boxes.shape[1] != 4:  # Require one row per box with four coordinates.
         raise ValueError(f"{name} must have shape (N, 4)")
-    if np.any(boxes[:, 2] < boxes[:, 0]) or np.any(boxes[:, 3] < boxes[:, 1]):
+    if np.any(boxes[:, 2] < boxes[:, 0]) or np.any(boxes[:, 3] < boxes[:, 1]):  # Reject inverted boxes.
         raise ValueError(f"{name} contains invalid boxes")
 
-    return boxes
+    return boxes  # Return the validated box matrix.
 
 
-def box_iou_matrix(boxes1, boxes2):
-    boxes1 = _validate_boxes(boxes1, "boxes1")
-    boxes2 = _validate_boxes(boxes2, "boxes2")
+def box_iou_matrix(boxes1, boxes2):  # Define the pairwise IoU matrix function.
+    boxes1 = _validate_boxes(boxes1, "boxes1")  # Validate the first box set.
+    boxes2 = _validate_boxes(boxes2, "boxes2")  # Validate the second box set.
 
-    x1 = np.maximum(boxes1[:, None, 0], boxes2[None, :, 0])
-    y1 = np.maximum(boxes1[:, None, 1], boxes2[None, :, 1])
-    x2 = np.minimum(boxes1[:, None, 2], boxes2[None, :, 2])
-    y2 = np.minimum(boxes1[:, None, 3], boxes2[None, :, 3])
+    x1 = np.maximum(boxes1[:, None, 0], boxes2[None, :, 0])  # Compute the left edge of every pairwise overlap.
+    y1 = np.maximum(boxes1[:, None, 1], boxes2[None, :, 1])  # Compute the top edge of every pairwise overlap.
+    x2 = np.minimum(boxes1[:, None, 2], boxes2[None, :, 2])  # Compute the right edge of every pairwise overlap.
+    y2 = np.minimum(boxes1[:, None, 3], boxes2[None, :, 3])  # Compute the bottom edge of every pairwise overlap.
 
-    inter_w = np.maximum(0.0, x2 - x1)
-    inter_h = np.maximum(0.0, y2 - y1)
-    inter_area = inter_w * inter_h
+    inter_w = np.maximum(0.0, x2 - x1)  # Clamp negative overlap widths to zero.
+    inter_h = np.maximum(0.0, y2 - y1)  # Clamp negative overlap heights to zero.
+    inter_area = inter_w * inter_h  # Multiply width and height to get pairwise intersection areas.
 
-    area1 = (boxes1[:, 2] - boxes1[:, 0]) * (boxes1[:, 3] - boxes1[:, 1])
-    area2 = (boxes2[:, 2] - boxes2[:, 0]) * (boxes2[:, 3] - boxes2[:, 1])
-    union = area1[:, None] + area2[None, :] - inter_area
+    area1 = (boxes1[:, 2] - boxes1[:, 0]) * (boxes1[:, 3] - boxes1[:, 1])  # Compute areas for boxes1.
+    area2 = (boxes2[:, 2] - boxes2[:, 0]) * (boxes2[:, 3] - boxes2[:, 1])  # Compute areas for boxes2.
+    union = area1[:, None] + area2[None, :] - inter_area  # Compute pairwise unions from areas and intersections.
 
-    return np.divide(
+    return np.divide(  # Divide safely so degenerate pairs fall back to zero.
         inter_area,
         union,
         out=np.zeros_like(inter_area),
@@ -812,37 +797,37 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
       'The nearest-centroid rule compresses each class into its mean feature vector, then assigns each test point to the closest mean.',
       'Squared Euclidean distance preserves the same ordering as Euclidean distance, and keeping the class labels sorted makes the tie-breaking rule deterministic.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for centroid computation and distance math.
 
-def nearest_centroid_predict(train_X, train_y, test_X):
-    train_X = np.asarray(train_X, dtype=np.float64)
-    train_y = np.asarray(train_y)
-    test_X = np.asarray(test_X, dtype=np.float64)
+def nearest_centroid_predict(train_X, train_y, test_X):  # Define the nearest-centroid classifier.
+    train_X = np.asarray(train_X, dtype=np.float64)  # Convert training features to floating-point arrays.
+    train_y = np.asarray(train_y)  # Convert training labels to a NumPy array.
+    test_X = np.asarray(test_X, dtype=np.float64)  # Convert test features to floating-point arrays.
 
-    if train_X.ndim != 2:
+    if train_X.ndim != 2:  # Require a 2D training feature matrix.
         raise ValueError("train_X must be a 2D array of shape (N, D)")
-    if train_y.ndim != 1:
+    if train_y.ndim != 1:  # Require a 1D label vector.
         raise ValueError("train_y must be a 1D array of shape (N,)")
-    if test_X.ndim != 2:
+    if test_X.ndim != 2:  # Require a 2D test feature matrix.
         raise ValueError("test_X must be a 2D array of shape (M, D)")
-    if train_X.shape[0] == 0:
+    if train_X.shape[0] == 0:  # Require at least one training sample.
         raise ValueError("train_X must contain at least one sample")
-    if train_X.shape[0] != train_y.shape[0]:
+    if train_X.shape[0] != train_y.shape[0]:  # Require one label per training sample.
         raise ValueError("train_X and train_y must have the same number of samples")
-    if train_X.shape[1] != test_X.shape[1]:
+    if train_X.shape[1] != test_X.shape[1]:  # Require matching feature dimensions.
         raise ValueError("train_X and test_X must have the same feature dimension")
-    if not np.issubdtype(train_y.dtype, np.integer):
+    if not np.issubdtype(train_y.dtype, np.integer):  # Require integer class labels.
         raise ValueError("train_y must contain integer class labels")
 
-    labels = np.unique(train_y)
-    if labels.size == 0:
+    labels = np.unique(train_y)  # Sort the unique labels so ties resolve toward smaller labels.
+    if labels.size == 0:  # Require at least one class in the training labels.
         raise ValueError("train_y must contain at least one class")
 
-    centroids = np.vstack([train_X[train_y == label].mean(axis=0) for label in labels])
-    deltas = test_X[:, None, :] - centroids[None, :, :]
-    squared_distances = np.sum(deltas * deltas, axis=2)
-    nearest_indices = np.argmin(squared_distances, axis=1)
-    return labels[nearest_indices]`,
+    centroids = np.vstack([train_X[train_y == label].mean(axis=0) for label in labels])  # Compute one centroid per class.
+    deltas = test_X[:, None, :] - centroids[None, :, :]  # Broadcast test points against all centroids.
+    squared_distances = np.sum(deltas * deltas, axis=2)  # Use squared Euclidean distance to avoid a square root.
+    nearest_indices = np.argmin(squared_distances, axis=1)  # Pick the nearest centroid for each test point.
+    return labels[nearest_indices]  # Map centroid indices back to class labels.`,
     starterCode: `import numpy as np
 
 def nearest_centroid_predict(train_X, train_y, test_X):
@@ -910,31 +895,31 @@ print(nearest_centroid_predict(sample_train_X, sample_train_y, sample_test_X))`,
       'Temperature scaling is just softmax on the logits after rescaling them by a positive constant. The key implementation detail is to subtract the row maximum after scaling so the exponentials never blow up.',
       'Once the shifted logits are exponentiated, each row is normalized by its own sum, which gives a valid probability distribution that still sums to `1`.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for stable softmax math.
 
-def temperature_scaled_probs(logits, temperature):
-    logits = np.asarray(logits, dtype=np.float64)
+def temperature_scaled_probs(logits, temperature):  # Define the temperature-scaled softmax helper.
+    logits = np.asarray(logits, dtype=np.float64)  # Convert logits to a floating-point matrix.
 
-    if isinstance(temperature, (bool, np.bool_)):
+    if isinstance(temperature, (bool, np.bool_)):  # Reject booleans, which are not meaningful temperatures.
         raise ValueError("temperature must be a positive float")
-    try:
+    try:  # Try to coerce the temperature to a Python float.
         temperature = float(temperature)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError):  # Convert invalid scalars into a clean validation error.
         raise ValueError("temperature must be a positive float")
 
-    if logits.ndim != 2:
+    if logits.ndim != 2:  # Require a 2D matrix of logits.
         raise ValueError("logits must be a 2D array of shape (N, C)")
-    if logits.shape[0] == 0:
+    if logits.shape[0] == 0:  # Require at least one row.
         raise ValueError("logits must contain at least one sample")
-    if logits.shape[1] == 0:
+    if logits.shape[1] == 0:  # Require at least one class.
         raise ValueError("logits must contain at least one class")
-    if not np.isfinite(temperature) or temperature <= 0:
+    if not np.isfinite(temperature) or temperature <= 0:  # Require a finite positive temperature.
         raise ValueError("temperature must be a positive float")
 
-    scaled_logits = logits / temperature
-    shifted = scaled_logits - np.max(scaled_logits, axis=1, keepdims=True)
-    exp_shifted = np.exp(shifted)
-    return exp_shifted / np.sum(exp_shifted, axis=1, keepdims=True)`,
+    scaled_logits = logits / temperature  # Rescale the logits before softmax.
+    shifted = scaled_logits - np.max(scaled_logits, axis=1, keepdims=True)  # Stabilize by removing each row max.
+    exp_shifted = np.exp(shifted)  # Exponentiate the shifted logits.
+    return exp_shifted / np.sum(exp_shifted, axis=1, keepdims=True)  # Normalize each row into probabilities.`,
     starterCode: `import numpy as np
 
 def temperature_scaled_probs(logits, temperature):
@@ -996,26 +981,26 @@ print(temperature_scaled_probs(sample_logits, sample_temperature))`,
       'Sinusoidal positional encoding is just a deterministic lookup table: each position gets a vector of sines and cosines at frequencies that decay geometrically across the embedding dimension.',
       'The implementation is compact if you compute one denominator per column pair and then broadcast positions across those frequencies. That also makes the odd-dimension case work naturally, because the final column is just the next even slot.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for vectorized trigonometry and indexing.
 
-def sinusoidal_positional_encoding(length, dim):
-    if isinstance(length, bool) or not isinstance(length, (int, np.integer)):
+def sinusoidal_positional_encoding(length, dim):  # Define the classic Transformer position embedding table.
+    if isinstance(length, bool) or not isinstance(length, (int, np.integer)):  # Reject non-integer or boolean lengths.
         raise ValueError("length must be a positive integer")
-    if isinstance(dim, bool) or not isinstance(dim, (int, np.integer)):
+    if isinstance(dim, bool) or not isinstance(dim, (int, np.integer)):  # Reject non-integer or boolean dimensions.
         raise ValueError("dim must be a positive integer")
-    if length <= 0 or dim <= 0:
+    if length <= 0 or dim <= 0:  # Require positive sizes.
         raise ValueError("length and dim must be positive integers")
 
-    positions = np.arange(length, dtype=np.float64)[:, None]
-    column_indices = np.arange(dim)
-    even_indices = 2 * (column_indices // 2)
-    angle_rates = np.power(10000.0, even_indices / dim)
-    angles = positions / angle_rates
+    positions = np.arange(length, dtype=np.float64)[:, None]  # Build the column vector of token positions.
+    column_indices = np.arange(dim)  # Build the feature-column indices.
+    even_indices = 2 * (column_indices // 2)  # Reuse the same frequency for each even/odd pair.
+    angle_rates = np.power(10000.0, even_indices / dim)  # Compute the denominator for each column.
+    angles = positions / angle_rates  # Broadcast positions against the per-column rates.
 
-    encoding = np.empty((length, dim), dtype=np.float64)
-    encoding[:, 0::2] = np.sin(angles[:, 0::2])
-    encoding[:, 1::2] = np.cos(angles[:, 1::2])
-    return encoding`,
+    encoding = np.empty((length, dim), dtype=np.float64)  # Allocate the output table.
+    encoding[:, 0::2] = np.sin(angles[:, 0::2])  # Fill even columns with sine values.
+    encoding[:, 1::2] = np.cos(angles[:, 1::2])  # Fill odd columns with cosine values.
+    return encoding  # Return the completed positional encoding matrix.`,
     starterCode: `import numpy as np
 
 def sinusoidal_positional_encoding(length, dim):
@@ -1083,43 +1068,43 @@ print(sinusoidal_positional_encoding(sample_length, sample_dim))`,
       'This problem is the inverse of patch extraction: each flattened patch vector is first reshaped into `(C, P, P)`, then the patch grid is placed back into its `(H / P, W / P)` spatial layout.',
       'A reshape followed by a transpose is enough to undo the flattening as long as the patch order is row-major and the image dimensions divide evenly by the patch size.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for the reshape and transpose steps.
 
-def unpatchify(patches, image_shape, patch_size):
-    patches = np.asarray(patches)
-    image_shape = np.asarray(image_shape)
+def unpatchify(patches, image_shape, patch_size):  # Define the inverse patch reconstruction routine.
+    patches = np.asarray(patches)  # Convert the patch tensor to a NumPy array.
+    image_shape = np.asarray(image_shape)  # Convert the image shape tuple into an array for validation.
 
-    if patches.ndim != 3:
+    if patches.ndim != 3:  # Require a batch of patch sequences.
         raise ValueError("patches must have shape (B, N, C * P * P)")
-    if image_shape.ndim != 1 or image_shape.size != 3:
+    if image_shape.ndim != 1 or image_shape.size != 3:  # Require exactly three image shape values.
         raise ValueError("image_shape must have shape (3,)")
-    if not np.issubdtype(image_shape.dtype, np.integer):
+    if not np.issubdtype(image_shape.dtype, np.integer):  # Require integer shape metadata.
         raise ValueError("image_shape must contain integers")
-    if isinstance(patch_size, bool) or not isinstance(patch_size, (int, np.integer)):
+    if isinstance(patch_size, bool) or not isinstance(patch_size, (int, np.integer)):  # Reject non-integer patch sizes.
         raise ValueError("patch_size must be a positive integer")
-    if patch_size <= 0:
+    if patch_size <= 0:  # Require a positive patch size.
         raise ValueError("patch_size must be a positive integer")
 
-    C, H, W = (int(value) for value in image_shape)
-    if C <= 0 or H <= 0 or W <= 0:
+    C, H, W = (int(value) for value in image_shape)  # Unpack the channel, height, and width.
+    if C <= 0 or H <= 0 or W <= 0:  # Require positive image dimensions.
         raise ValueError("image_shape must contain positive integers")
-    if H % patch_size != 0 or W % patch_size != 0:
+    if H % patch_size != 0 or W % patch_size != 0:  # Require the spatial dimensions to divide evenly into patches.
         raise ValueError("image dimensions must be divisible by patch_size")
 
-    grid_h = H // patch_size
-    grid_w = W // patch_size
-    expected_num_patches = grid_h * grid_w
-    expected_patch_dim = C * patch_size * patch_size
+    grid_h = H // patch_size  # Compute the number of patch rows.
+    grid_w = W // patch_size  # Compute the number of patch columns.
+    expected_num_patches = grid_h * grid_w  # Compute the total patch count per image.
+    expected_patch_dim = C * patch_size * patch_size  # Compute the flattened size of one patch.
 
-    if patches.shape[1] != expected_num_patches:
+    if patches.shape[1] != expected_num_patches:  # Require the patch count to match the image grid.
         raise ValueError("patch count does not match image_shape and patch_size")
-    if patches.shape[2] != expected_patch_dim:
+    if patches.shape[2] != expected_patch_dim:  # Require each flattened patch to have the expected size.
         raise ValueError("patch dimension does not match image_shape and patch_size")
 
-    batch_size = patches.shape[0]
-    reshaped = patches.reshape(batch_size, grid_h, grid_w, C, patch_size, patch_size)
-    reconstructed = reshaped.transpose(0, 3, 1, 4, 2, 5)
-    return reconstructed.reshape(batch_size, C, H, W)`,
+    batch_size = patches.shape[0]  # Store the batch size for reshaping.
+    reshaped = patches.reshape(batch_size, grid_h, grid_w, C, patch_size, patch_size)  # Recover the patch grid and patch pixels.
+    reconstructed = reshaped.transpose(0, 3, 1, 4, 2, 5)  # Interleave patch-grid axes with within-patch axes.
+    return reconstructed.reshape(batch_size, C, H, W)  # Collapse everything back into image tensors.`,
     starterCode: `import numpy as np
 
 def unpatchify(patches, image_shape, patch_size):
@@ -1190,29 +1175,29 @@ print(unpatchify(sample_patches, sample_image_shape, patch_size=2))`,
       'The core trick is to expose the image grid as `(H // P, P, W // P, P)` so the patch structure becomes explicit.',
       'A reshape followed by a transpose keeps row-major patch order and makes the final flattening straightforward.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for patch reshaping and transposition.
 
-def patchify(images, patch_size):
-    images = np.asarray(images)
+def patchify(images, patch_size):  # Define the patch extraction routine.
+    images = np.asarray(images)  # Convert the input image batch to a NumPy array.
 
-    if images.ndim != 4:
+    if images.ndim != 4:  # Require a batch tensor with channel and spatial dimensions.
         raise ValueError("images must have shape (B, C, H, W)")
-    if isinstance(patch_size, bool) or not isinstance(patch_size, (int, np.integer)):
+    if isinstance(patch_size, bool) or not isinstance(patch_size, (int, np.integer)):  # Reject non-integer patch sizes.
         raise ValueError("patch_size must be a positive integer")
-    if patch_size <= 0:
+    if patch_size <= 0:  # Require a positive patch size.
         raise ValueError("patch_size must be a positive integer")
 
-    batch_size, channels, height, width = images.shape
-    if channels <= 0 or height <= 0 or width <= 0:
+    batch_size, channels, height, width = images.shape  # Unpack the image batch dimensions.
+    if channels <= 0 or height <= 0 or width <= 0:  # Require positive channel and spatial sizes.
         raise ValueError("images must have positive channel and spatial dimensions")
-    if height % patch_size != 0 or width % patch_size != 0:
+    if height % patch_size != 0 or width % patch_size != 0:  # Require the image to divide evenly into patches.
         raise ValueError("image dimensions must be divisible by patch_size")
 
-    grid_h = height // patch_size
-    grid_w = width // patch_size
-    reshaped = images.reshape(batch_size, channels, grid_h, patch_size, grid_w, patch_size)
-    patches = reshaped.transpose(0, 2, 4, 1, 3, 5)
-    return patches.reshape(batch_size, grid_h * grid_w, channels * patch_size * patch_size)`,
+    grid_h = height // patch_size  # Compute the number of patch rows.
+    grid_w = width // patch_size  # Compute the number of patch columns.
+    reshaped = images.reshape(batch_size, channels, grid_h, patch_size, grid_w, patch_size)  # Expose the patch grid explicitly.
+    patches = reshaped.transpose(0, 2, 4, 1, 3, 5)  # Move the grid axes ahead of the channel and pixel axes.
+    return patches.reshape(batch_size, grid_h * grid_w, channels * patch_size * patch_size)  # Flatten each patch into a token.`,
     starterCode: `import numpy as np
 
 def patchify(images, patch_size):
@@ -1275,36 +1260,36 @@ print(patchify(sample_images, patch_size=2))`,
       'RoPE treats each adjacent pair of channels as a 2D vector and rotates it by an angle that depends on the token position. That preserves the vector norm while injecting relative position information into attention.',
       'The implementation is cleanest when you precompute one sine/cosine table per token position and frequency pair, then combine it with the input using the standard `rotate_half` pattern.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for rotary embedding math.
 
-def apply_rope(x):
-    x = np.asarray(x, dtype=np.float64)
+def apply_rope(x):  # Define the rotary positional embedding transform.
+    x = np.asarray(x, dtype=np.float64)  # Convert the input tensor to floating-point values.
 
-    if x.ndim != 4:
+    if x.ndim != 4:  # Require the expected (B, T, H, D) tensor layout.
         raise ValueError("x must have shape (B, T, H, D)")
-    if np.any(np.array(x.shape) <= 0):
+    if np.any(np.array(x.shape) <= 0):  # Require all dimensions to be positive.
         raise ValueError("x must have positive dimensions")
-    if x.shape[-1] % 2 != 0:
+    if x.shape[-1] % 2 != 0:  # Require an even feature dimension so pairs can be rotated.
         raise ValueError("D must be even")
 
-    batch_size, seq_len, num_heads, dim = x.shape
-    half_dim = dim // 2
+    batch_size, seq_len, num_heads, dim = x.shape  # Unpack the tensor dimensions.
+    half_dim = dim // 2  # Count the number of even/odd feature pairs.
 
-    positions = np.arange(seq_len, dtype=np.float64)[:, None]
-    pair_indices = np.arange(half_dim, dtype=np.float64)
-    inv_freq = 1.0 / np.power(10000.0, (2.0 * pair_indices) / dim)
-    angles = positions * inv_freq[None, :]
+    positions = np.arange(seq_len, dtype=np.float64)[:, None]  # Build the sequence-position axis.
+    pair_indices = np.arange(half_dim, dtype=np.float64)  # Build the index for each feature pair.
+    inv_freq = 1.0 / np.power(10000.0, (2.0 * pair_indices) / dim)  # Compute the RoPE inverse frequencies.
+    angles = positions * inv_freq[None, :]  # Turn positions and frequencies into rotation angles.
 
-    sin = np.sin(angles)[None, :, None, :]
-    cos = np.cos(angles)[None, :, None, :]
+    sin = np.sin(angles)[None, :, None, :]  # Broadcast sine values over batch and head dimensions.
+    cos = np.cos(angles)[None, :, None, :]  # Broadcast cosine values over batch and head dimensions.
 
-    x_even = x[..., 0::2]
-    x_odd = x[..., 1::2]
+    x_even = x[..., 0::2]  # Select the even coordinates from each feature pair.
+    x_odd = x[..., 1::2]  # Select the odd coordinates from each feature pair.
 
-    out = np.empty_like(x)
-    out[..., 0::2] = x_even * cos - x_odd * sin
-    out[..., 1::2] = x_even * sin + x_odd * cos
-    return out`,
+    out = np.empty_like(x)  # Allocate the output tensor.
+    out[..., 0::2] = x_even * cos - x_odd * sin  # Rotate the even coordinates.
+    out[..., 1::2] = x_even * sin + x_odd * cos  # Rotate the odd coordinates.
+    return out  # Return the rotated tensor with the same shape as the input.`,
     starterCode: `import numpy as np
 
 def apply_rope(x):
@@ -1374,69 +1359,69 @@ print(apply_rope(sample_x))`,
       'The workflow is the standard Transformer block: project to queries, keys, and values; split the channel dimension into heads; compute masked scaled dot-product attention; then merge the heads and apply the output projection.',
       'Broadcasted masking and a stable softmax are the two details that make the implementation robust. The mask keeps blocked positions from contributing, while the final projection preserves the original model width.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for projection, masking, and attention math.
 
-def _stable_softmax(logits):
-    logits = np.asarray(logits, dtype=np.float64)
-    max_logits = np.max(logits, axis=-1, keepdims=True)
-    max_logits = np.where(np.isfinite(max_logits), max_logits, 0.0)
-    shifted = logits - max_logits
-    exp_shifted = np.exp(shifted)
-    exp_shifted = np.where(np.isfinite(logits), exp_shifted, 0.0)
-    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
-    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+def _stable_softmax(logits):  # Define a numerically stable softmax helper.
+    logits = np.asarray(logits, dtype=np.float64)  # Convert the logits to floating-point values.
+    max_logits = np.max(logits, axis=-1, keepdims=True)  # Find the maximum score in each row.
+    max_logits = np.where(np.isfinite(max_logits), max_logits, 0.0)  # Replace non-finite maxima with zero.
+    shifted = logits - max_logits  # Shift the scores so the largest value becomes zero.
+    exp_shifted = np.exp(shifted)  # Exponentiate the shifted scores.
+    exp_shifted = np.where(np.isfinite(logits), exp_shifted, 0.0)  # Zero out any entries that were non-finite.
+    denom = np.sum(exp_shifted, axis=-1, keepdims=True)  # Sum the exponentials row by row.
+    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)  # Normalize safely.
 
 
-def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
-    x = np.asarray(x, dtype=np.float64)
-    W_q = np.asarray(W_q, dtype=np.float64)
-    W_k = np.asarray(W_k, dtype=np.float64)
-    W_v = np.asarray(W_v, dtype=np.float64)
-    W_o = np.asarray(W_o, dtype=np.float64)
+def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):  # Define the multi-head self-attention block.
+    x = np.asarray(x, dtype=np.float64)  # Convert the input sequence to floating-point values.
+    W_q = np.asarray(W_q, dtype=np.float64)  # Convert the query projection matrix.
+    W_k = np.asarray(W_k, dtype=np.float64)  # Convert the key projection matrix.
+    W_v = np.asarray(W_v, dtype=np.float64)  # Convert the value projection matrix.
+    W_o = np.asarray(W_o, dtype=np.float64)  # Convert the output projection matrix.
 
-    if x.ndim != 3:
+    if x.ndim != 3:  # Require the standard (B, T, D_model) shape.
         raise ValueError("x must have shape (B, T, D_model)")
-    if np.any(np.array(x.shape) <= 0):
+    if np.any(np.array(x.shape) <= 0):  # Require every dimension to be positive.
         raise ValueError("x must have positive dimensions")
-    if isinstance(num_heads, bool) or not isinstance(num_heads, (int, np.integer)):
+    if isinstance(num_heads, bool) or not isinstance(num_heads, (int, np.integer)):  # Reject invalid head counts.
         raise ValueError("num_heads must be a positive integer")
-    if num_heads <= 0:
+    if num_heads <= 0:  # Require at least one attention head.
         raise ValueError("num_heads must be a positive integer")
 
-    batch_size, seq_len, model_dim = x.shape
-    if model_dim % num_heads != 0:
+    batch_size, seq_len, model_dim = x.shape  # Unpack the batch, token, and model dimensions.
+    if model_dim % num_heads != 0:  # Require the model width to split evenly across heads.
         raise ValueError("num_heads must divide D_model")
 
-    for matrix, name in ((W_q, "W_q"), (W_k, "W_k"), (W_v, "W_v"), (W_o, "W_o")):
-        if matrix.ndim != 2 or matrix.shape != (model_dim, model_dim):
+    for matrix, name in ((W_q, "W_q"), (W_k, "W_k"), (W_v, "W_v"), (W_o, "W_o")):  # Validate all projection matrices.
+        if matrix.ndim != 2 or matrix.shape != (model_dim, model_dim):  # Require square matrices of the model width.
             raise ValueError(f"{name} must have shape (D_model, D_model)")
 
-    head_dim = model_dim // num_heads
+    head_dim = model_dim // num_heads  # Compute the per-head feature width.
 
-    q = x @ W_q
-    k = x @ W_k
-    v = x @ W_v
+    q = x @ W_q  # Project the input into queries.
+    k = x @ W_k  # Project the input into keys.
+    v = x @ W_v  # Project the input into values.
 
-    q = q.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)
-    k = k.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)
-    v = v.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)
+    q = q.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)  # Split queries into heads.
+    k = k.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)  # Split keys into heads.
+    v = v.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)  # Split values into heads.
 
-    scores = np.matmul(q, np.swapaxes(k, -1, -2)) / np.sqrt(head_dim)
+    scores = np.matmul(q, np.swapaxes(k, -1, -2)) / np.sqrt(head_dim)  # Compute scaled dot-product attention scores.
 
-    if mask is not None:
-        mask_arr = np.asarray(mask)
-        try:
+    if mask is not None:  # Apply an optional attention mask if provided.
+        mask_arr = np.asarray(mask)  # Convert the mask to a NumPy array.
+        try:  # Try to broadcast the mask to the score tensor.
             mask_broadcast = np.broadcast_to(mask_arr, scores.shape)
-        except ValueError as exc:
+        except ValueError as exc:  # Recast broadcast failures as validation errors.
             raise ValueError("mask must be broadcastable to (B, H, T, T)") from exc
-        if not np.all((mask_broadcast == 0) | (mask_broadcast == 1)):
+        if not np.all((mask_broadcast == 0) | (mask_broadcast == 1)):  # Require binary mask values.
             raise ValueError("mask must contain only 0 and 1 values")
-        scores = np.where(mask_broadcast.astype(bool), scores, -np.inf)
+        scores = np.where(mask_broadcast.astype(bool), scores, -np.inf)  # Block masked positions before softmax.
 
-    attn = _stable_softmax(scores)
-    context = np.matmul(attn, v)
-    context = context.transpose(0, 2, 1, 3).reshape(batch_size, seq_len, model_dim)
-    return context @ W_o`,
+    attn = _stable_softmax(scores)  # Convert scores into attention weights.
+    context = np.matmul(attn, v)  # Weight the values by the attention distribution.
+    context = context.transpose(0, 2, 1, 3).reshape(batch_size, seq_len, model_dim)  # Recombine the heads.
+    return context @ W_o  # Apply the final output projection.`,
     starterCode: `import numpy as np
 
 def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
@@ -1513,75 +1498,75 @@ print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads
       'Cross-attention is the same attention primitive as self-attention, except the query tokens and the key/value tokens come from different inputs. That makes it the right building block when one sequence needs to read information from another.',
       'The implementation follows the usual Transformer recipe: project queries, keys, and values; split channels into heads; compute masked scaled dot-product attention; then merge the heads and apply the output projection.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for cross-attention math.
 
-def _stable_softmax(logits):
-    logits = np.asarray(logits, dtype=np.float64)
-    max_logits = np.max(logits, axis=-1, keepdims=True)
-    max_logits = np.where(np.isfinite(max_logits), max_logits, 0.0)
-    shifted = logits - max_logits
-    exp_shifted = np.exp(shifted)
-    exp_shifted = np.where(np.isfinite(logits), exp_shifted, 0.0)
-    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
-    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+def _stable_softmax(logits):  # Define a numerically stable softmax helper.
+    logits = np.asarray(logits, dtype=np.float64)  # Convert logits to floating-point values.
+    max_logits = np.max(logits, axis=-1, keepdims=True)  # Find the max score in each row.
+    max_logits = np.where(np.isfinite(max_logits), max_logits, 0.0)  # Replace non-finite maxima with zero.
+    shifted = logits - max_logits  # Shift the logits before exponentiating.
+    exp_shifted = np.exp(shifted)  # Exponentiate the shifted logits.
+    exp_shifted = np.where(np.isfinite(logits), exp_shifted, 0.0)  # Clear out non-finite positions.
+    denom = np.sum(exp_shifted, axis=-1, keepdims=True)  # Sum each softmax row.
+    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)  # Normalize safely.
 
 
-def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):
-    query_x = np.asarray(query_x, dtype=np.float64)
-    context_x = np.asarray(context_x, dtype=np.float64)
-    W_q = np.asarray(W_q, dtype=np.float64)
-    W_k = np.asarray(W_k, dtype=np.float64)
-    W_v = np.asarray(W_v, dtype=np.float64)
-    W_o = np.asarray(W_o, dtype=np.float64)
+def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):  # Define the cross-attention block.
+    query_x = np.asarray(query_x, dtype=np.float64)  # Convert query inputs to floating-point values.
+    context_x = np.asarray(context_x, dtype=np.float64)  # Convert context inputs to floating-point values.
+    W_q = np.asarray(W_q, dtype=np.float64)  # Convert the query projection matrix.
+    W_k = np.asarray(W_k, dtype=np.float64)  # Convert the key projection matrix.
+    W_v = np.asarray(W_v, dtype=np.float64)  # Convert the value projection matrix.
+    W_o = np.asarray(W_o, dtype=np.float64)  # Convert the output projection matrix.
 
-    if query_x.ndim != 3 or context_x.ndim != 3:
+    if query_x.ndim != 3 or context_x.ndim != 3:  # Require both inputs to be batched sequence tensors.
         raise ValueError("query_x and context_x must have shape (B, T, D_model)")
-    if np.any(np.array(query_x.shape) <= 0) or np.any(np.array(context_x.shape) <= 0):
+    if np.any(np.array(query_x.shape) <= 0) or np.any(np.array(context_x.shape) <= 0):  # Require positive dimensions.
         raise ValueError("inputs must have positive dimensions")
-    if query_x.shape[0] != context_x.shape[0]:
+    if query_x.shape[0] != context_x.shape[0]:  # Require a shared batch size.
         raise ValueError("query_x and context_x must have the same batch size")
-    if query_x.shape[2] != context_x.shape[2]:
+    if query_x.shape[2] != context_x.shape[2]:  # Require a shared model width.
         raise ValueError("query_x and context_x must have the same model dimension")
-    if isinstance(num_heads, bool) or not isinstance(num_heads, (int, np.integer)):
+    if isinstance(num_heads, bool) or not isinstance(num_heads, (int, np.integer)):  # Reject invalid head counts.
         raise ValueError("num_heads must be a positive integer")
-    if num_heads <= 0:
+    if num_heads <= 0:  # Require at least one head.
         raise ValueError("num_heads must be a positive integer")
 
-    batch_size, query_len, model_dim = query_x.shape
-    context_len = context_x.shape[1]
-    if model_dim % num_heads != 0:
+    batch_size, query_len, model_dim = query_x.shape  # Unpack the query tensor dimensions.
+    context_len = context_x.shape[1]  # Store the context sequence length.
+    if model_dim % num_heads != 0:  # Require the model width to split evenly across heads.
         raise ValueError("num_heads must divide D_model")
 
-    for matrix, name in ((W_q, "W_q"), (W_k, "W_k"), (W_v, "W_v"), (W_o, "W_o")):
-        if matrix.ndim != 2 or matrix.shape != (model_dim, model_dim):
+    for matrix, name in ((W_q, "W_q"), (W_k, "W_k"), (W_v, "W_v"), (W_o, "W_o")):  # Validate all projection matrices.
+        if matrix.ndim != 2 or matrix.shape != (model_dim, model_dim):  # Require square matrices of model width.
             raise ValueError(f"{name} must have shape (D_model, D_model)")
 
-    head_dim = model_dim // num_heads
+    head_dim = model_dim // num_heads  # Compute the per-head feature width.
 
-    q = query_x @ W_q
-    k = context_x @ W_k
-    v = context_x @ W_v
+    q = query_x @ W_q  # Project the query sequence into query vectors.
+    k = context_x @ W_k  # Project the context sequence into key vectors.
+    v = context_x @ W_v  # Project the context sequence into value vectors.
 
-    q = q.reshape(batch_size, query_len, num_heads, head_dim).transpose(0, 2, 1, 3)
-    k = k.reshape(batch_size, context_len, num_heads, head_dim).transpose(0, 2, 1, 3)
-    v = v.reshape(batch_size, context_len, num_heads, head_dim).transpose(0, 2, 1, 3)
+    q = q.reshape(batch_size, query_len, num_heads, head_dim).transpose(0, 2, 1, 3)  # Split queries into heads.
+    k = k.reshape(batch_size, context_len, num_heads, head_dim).transpose(0, 2, 1, 3)  # Split keys into heads.
+    v = v.reshape(batch_size, context_len, num_heads, head_dim).transpose(0, 2, 1, 3)  # Split values into heads.
 
-    scores = np.matmul(q, np.swapaxes(k, -1, -2)) / np.sqrt(head_dim)
+    scores = np.matmul(q, np.swapaxes(k, -1, -2)) / np.sqrt(head_dim)  # Compute scaled dot-product attention scores.
 
-    if mask is not None:
-        mask_arr = np.asarray(mask)
-        try:
+    if mask is not None:  # Apply an optional mask if the caller supplied one.
+        mask_arr = np.asarray(mask)  # Convert the mask to a NumPy array.
+        try:  # Try to broadcast the mask to the score tensor.
             mask_broadcast = np.broadcast_to(mask_arr, scores.shape)
-        except ValueError as exc:
+        except ValueError as exc:  # Recast broadcast failures as validation errors.
             raise ValueError("mask must be broadcastable to (B, H, Tq, Tk)") from exc
-        if not np.all((mask_broadcast == 0) | (mask_broadcast == 1)):
+        if not np.all((mask_broadcast == 0) | (mask_broadcast == 1)):  # Require binary mask values.
             raise ValueError("mask must contain only 0 and 1 values")
-        scores = np.where(mask_broadcast.astype(bool), scores, -np.inf)
+        scores = np.where(mask_broadcast.astype(bool), scores, -np.inf)  # Block masked positions before softmax.
 
-    attn = _stable_softmax(scores)
-    context = np.matmul(attn, v)
-    context = context.transpose(0, 2, 1, 3).reshape(batch_size, query_len, model_dim)
-    return context @ W_o`,
+    attn = _stable_softmax(scores)  # Turn scores into attention weights.
+    context = np.matmul(attn, v)  # Apply the weights to the value vectors.
+    context = context.transpose(0, 2, 1, 3).reshape(batch_size, query_len, model_dim)  # Merge heads back into the model width.
+    return context @ W_o  # Apply the output projection.`,
     starterCode: `import numpy as np
 
 def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):
@@ -1674,75 +1659,75 @@ print(cross_attention(sample_query, sample_context, sample_w, sample_w, sample_w
       'The forward pass is just affine, ReLU, affine, and mean softmax cross-entropy. Once you have the probabilities, the gradient of the loss with respect to the logits is the usual `probs - one_hot` term divided by the batch size.',
       'From there, the remaining gradients follow by the chain rule: the second affine layer gives `dW2` and `db2`, and the upstream gradient passes through the ReLU mask before producing `dW1` and `db1`.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for the forward and backward passes.
 
-def _stable_softmax(logits):
-    logits = np.asarray(logits, dtype=np.float64)
-    max_logits = np.max(logits, axis=-1, keepdims=True)
-    shifted = logits - max_logits
-    exp_shifted = np.exp(shifted)
-    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
-    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+def _stable_softmax(logits):  # Define a numerically stable softmax helper.
+    logits = np.asarray(logits, dtype=np.float64)  # Convert the logits to floating-point values.
+    max_logits = np.max(logits, axis=-1, keepdims=True)  # Find the row-wise maximum.
+    shifted = logits - max_logits  # Shift scores so the largest value in each row is zero.
+    exp_shifted = np.exp(shifted)  # Exponentiate the shifted scores.
+    denom = np.sum(exp_shifted, axis=-1, keepdims=True)  # Sum the exponentials row by row.
+    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)  # Normalize safely.
 
 
-def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
-    X = np.asarray(X, dtype=np.float64)
-    y = np.asarray(y, dtype=np.float64)
-    W1 = np.asarray(W1, dtype=np.float64)
-    b1 = np.asarray(b1, dtype=np.float64)
-    W2 = np.asarray(W2, dtype=np.float64)
-    b2 = np.asarray(b2, dtype=np.float64)
+def mlp_loss_and_grads(X, y, W1, b1, W2, b2):  # Define the 2-layer MLP loss and gradient function.
+    X = np.asarray(X, dtype=np.float64)  # Convert inputs to floating-point arrays.
+    y = np.asarray(y, dtype=np.float64)  # Convert labels to floating-point arrays for validation.
+    W1 = np.asarray(W1, dtype=np.float64)  # Convert the first layer weights.
+    b1 = np.asarray(b1, dtype=np.float64)  # Convert the first layer bias.
+    W2 = np.asarray(W2, dtype=np.float64)  # Convert the second layer weights.
+    b2 = np.asarray(b2, dtype=np.float64)  # Convert the second layer bias.
 
-    if X.ndim != 2:
+    if X.ndim != 2:  # Require a 2D input matrix.
         raise ValueError("X must have shape (N, D_in)")
-    if np.any(np.array(X.shape) <= 0):
+    if np.any(np.array(X.shape) <= 0):  # Require positive dimensions.
         raise ValueError("X must have positive dimensions")
-    if y.ndim != 1:
+    if y.ndim != 1:  # Require a flat label vector.
         raise ValueError("y must have shape (N,)")
-    if y.shape[0] != X.shape[0]:
+    if y.shape[0] != X.shape[0]:  # Require one label per example.
         raise ValueError("X and y must have the same batch size")
-    if not np.all(np.isfinite(y)) or not np.allclose(y, np.round(y)):
+    if not np.all(np.isfinite(y)) or not np.allclose(y, np.round(y)):  # Require integer-like class ids.
         raise ValueError("y must contain integer class labels")
-    y = np.round(y).astype(np.int64)
+    y = np.round(y).astype(np.int64)  # Convert the validated labels to integers.
 
-    input_dim = X.shape[1]
-    if W1.ndim != 2 or W1.shape[0] != input_dim:
+    input_dim = X.shape[1]  # Store the input feature width.
+    if W1.ndim != 2 or W1.shape[0] != input_dim:  # Require W1 to match the input width.
         raise ValueError("W1 must have shape (D_in, H)")
-    hidden_dim = W1.shape[1]
-    if hidden_dim <= 0:
+    hidden_dim = W1.shape[1]  # Store the hidden width.
+    if hidden_dim <= 0:  # Require a positive hidden size.
         raise ValueError("W1 must have positive dimensions")
-    if b1.ndim != 1 or b1.shape[0] != hidden_dim:
+    if b1.ndim != 1 or b1.shape[0] != hidden_dim:  # Require b1 to match the hidden width.
         raise ValueError("b1 must have shape (H,)")
-    if W2.ndim != 2 or W2.shape[0] != hidden_dim:
+    if W2.ndim != 2 or W2.shape[0] != hidden_dim:  # Require W2 to start from the hidden width.
         raise ValueError("W2 must have shape (H, C)")
-    num_classes = W2.shape[1]
-    if num_classes <= 0:
+    num_classes = W2.shape[1]  # Store the output class count.
+    if num_classes <= 0:  # Require at least one output class.
         raise ValueError("W2 must have positive dimensions")
-    if b2.ndim != 1 or b2.shape[0] != num_classes:
+    if b2.ndim != 1 or b2.shape[0] != num_classes:  # Require b2 to match the class count.
         raise ValueError("b2 must have shape (C,)")
-    if np.any((y < 0) | (y >= num_classes)):
+    if np.any((y < 0) | (y >= num_classes)):  # Ensure every label is in range.
         raise ValueError("y contains labels outside the valid range")
 
-    z1 = X @ W1 + b1
-    h = np.maximum(z1, 0.0)
-    logits = h @ W2 + b2
-    probs = _stable_softmax(logits)
+    z1 = X @ W1 + b1  # Compute the hidden pre-activations.
+    h = np.maximum(z1, 0.0)  # Apply the ReLU nonlinearity.
+    logits = h @ W2 + b2  # Compute the output logits.
+    probs = _stable_softmax(logits)  # Turn logits into probabilities.
 
-    batch_size = X.shape[0]
-    loss = -np.log(probs[np.arange(batch_size), y]).mean()
+    batch_size = X.shape[0]  # Store the batch size for averaging.
+    loss = -np.log(probs[np.arange(batch_size), y]).mean()  # Compute the mean softmax cross-entropy.
 
-    dlogits = probs.copy()
-    dlogits[np.arange(batch_size), y] -= 1.0
-    dlogits /= batch_size
+    dlogits = probs.copy()  # Start the gradient at the output probabilities.
+    dlogits[np.arange(batch_size), y] -= 1.0  # Subtract one on the true class for each row.
+    dlogits /= batch_size  # Average the gradient over the batch.
 
-    dW2 = h.T @ dlogits
-    db2 = dlogits.sum(axis=0)
-    dh = dlogits @ W2.T
-    dz1 = dh * (z1 > 0)
-    dW1 = X.T @ dz1
-    db1 = dz1.sum(axis=0)
+    dW2 = h.T @ dlogits  # Backpropagate into the second layer weights.
+    db2 = dlogits.sum(axis=0)  # Sum the output gradient over the batch for the bias.
+    dh = dlogits @ W2.T  # Backpropagate into the hidden activations.
+    dz1 = dh * (z1 > 0)  # Apply the ReLU derivative to the hidden pre-activations.
+    dW1 = X.T @ dz1  # Backpropagate into the first layer weights.
+    db1 = dz1.sum(axis=0)  # Sum the hidden gradient over the batch for the bias.
 
-    return {
+    return {  # Return the loss and each parameter gradient in a dictionary.
         "loss": float(loss),
         "dW1": dW1,
         "db1": db1,
@@ -1846,75 +1831,75 @@ loss = mean softmax cross-entropy(logits, y)`,
       'The forward pass is affine, ReLU, affine, and mean softmax cross-entropy. Once you have the probabilities, the gradient of the loss with respect to the logits is the usual `probs - one_hot` term divided by the batch size.',
       'From there, the remaining gradients follow by the chain rule: the second affine layer gives `dW2` and `db2`, and the upstream gradient passes through the ReLU mask before producing `dW1` and `db1`.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `import numpy as np  # Import NumPy for the forward and backward pass.
 
-def _stable_softmax(logits):
-    logits = np.asarray(logits, dtype=np.float64)
-    max_logits = np.max(logits, axis=-1, keepdims=True)
-    shifted = logits - max_logits
-    exp_shifted = np.exp(shifted)
-    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
-    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+def _stable_softmax(logits):  # Define a numerically stable softmax helper.
+    logits = np.asarray(logits, dtype=np.float64)  # Convert logits to floating-point values.
+    max_logits = np.max(logits, axis=-1, keepdims=True)  # Find the row-wise maximum.
+    shifted = logits - max_logits  # Shift each row so the largest value becomes zero.
+    exp_shifted = np.exp(shifted)  # Exponentiate the shifted logits.
+    denom = np.sum(exp_shifted, axis=-1, keepdims=True)  # Sum the exponentials row by row.
+    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)  # Normalize safely.
 
 
-def mlp_forward_backward(X, y, W1, b1, W2, b2):
-    X = np.asarray(X, dtype=np.float64)
-    y = np.asarray(y, dtype=np.float64)
-    W1 = np.asarray(W1, dtype=np.float64)
-    b1 = np.asarray(b1, dtype=np.float64)
-    W2 = np.asarray(W2, dtype=np.float64)
-    b2 = np.asarray(b2, dtype=np.float64)
+def mlp_forward_backward(X, y, W1, b1, W2, b2):  # Define the classic MLP loss and gradient function.
+    X = np.asarray(X, dtype=np.float64)  # Convert inputs to floating-point arrays.
+    y = np.asarray(y, dtype=np.float64)  # Convert labels to floating-point arrays for validation.
+    W1 = np.asarray(W1, dtype=np.float64)  # Convert the first layer weights.
+    b1 = np.asarray(b1, dtype=np.float64)  # Convert the first layer bias.
+    W2 = np.asarray(W2, dtype=np.float64)  # Convert the second layer weights.
+    b2 = np.asarray(b2, dtype=np.float64)  # Convert the second layer bias.
 
-    if X.ndim != 2:
+    if X.ndim != 2:  # Require a 2D input matrix.
         raise ValueError("X must have shape (N, D_in)")
-    if np.any(np.array(X.shape) <= 0):
+    if np.any(np.array(X.shape) <= 0):  # Require positive dimensions.
         raise ValueError("X must have positive dimensions")
-    if y.ndim != 1:
+    if y.ndim != 1:  # Require a flat label vector.
         raise ValueError("y must have shape (N,)")
-    if y.shape[0] != X.shape[0]:
+    if y.shape[0] != X.shape[0]:  # Require one label per example.
         raise ValueError("X and y must have the same batch size")
-    if not np.all(np.isfinite(y)) or not np.allclose(y, np.round(y)):
+    if not np.all(np.isfinite(y)) or not np.allclose(y, np.round(y)):  # Require integer-like class labels.
         raise ValueError("y must contain integer class labels")
-    y = np.round(y).astype(np.int64)
+    y = np.round(y).astype(np.int64)  # Convert the validated labels to integers.
 
-    input_dim = X.shape[1]
-    if W1.ndim != 2 or W1.shape[0] != input_dim:
+    input_dim = X.shape[1]  # Store the input feature width.
+    if W1.ndim != 2 or W1.shape[0] != input_dim:  # Require W1 to match the input width.
         raise ValueError("W1 must have shape (D_in, H)")
-    hidden_dim = W1.shape[1]
-    if hidden_dim <= 0:
+    hidden_dim = W1.shape[1]  # Store the hidden width.
+    if hidden_dim <= 0:  # Require a positive hidden size.
         raise ValueError("W1 must have positive dimensions")
-    if b1.ndim != 1 or b1.shape[0] != hidden_dim:
+    if b1.ndim != 1 or b1.shape[0] != hidden_dim:  # Require b1 to match the hidden width.
         raise ValueError("b1 must have shape (H,)")
-    if W2.ndim != 2 or W2.shape[0] != hidden_dim:
+    if W2.ndim != 2 or W2.shape[0] != hidden_dim:  # Require W2 to match the hidden width.
         raise ValueError("W2 must have shape (H, C)")
-    num_classes = W2.shape[1]
-    if num_classes <= 0:
+    num_classes = W2.shape[1]  # Store the number of classes.
+    if num_classes <= 0:  # Require at least one class.
         raise ValueError("W2 must have positive dimensions")
-    if b2.ndim != 1 or b2.shape[0] != num_classes:
+    if b2.ndim != 1 or b2.shape[0] != num_classes:  # Require b2 to match the class count.
         raise ValueError("b2 must have shape (C,)")
-    if np.any((y < 0) | (y >= num_classes)):
+    if np.any((y < 0) | (y >= num_classes)):  # Ensure every label falls within the valid class range.
         raise ValueError("y contains labels outside the valid range")
 
-    hidden_pre = X @ W1 + b1
-    hidden = np.maximum(hidden_pre, 0.0)
-    logits = hidden @ W2 + b2
-    probs = _stable_softmax(logits)
+    hidden_pre = X @ W1 + b1  # Compute the hidden pre-activation values.
+    hidden = np.maximum(hidden_pre, 0.0)  # Apply ReLU to get the hidden activations.
+    logits = hidden @ W2 + b2  # Compute the output logits.
+    probs = _stable_softmax(logits)  # Turn logits into class probabilities.
 
-    batch_size = X.shape[0]
-    loss = -np.log(probs[np.arange(batch_size), y]).mean()
+    batch_size = X.shape[0]  # Store the batch size for averaging.
+    loss = -np.log(probs[np.arange(batch_size), y]).mean()  # Compute the mean softmax cross-entropy.
 
-    dlogits = probs.copy()
-    dlogits[np.arange(batch_size), y] -= 1.0
-    dlogits /= batch_size
+    dlogits = probs.copy()  # Start the gradient from the softmax probabilities.
+    dlogits[np.arange(batch_size), y] -= 1.0  # Subtract one on the true class for each sample.
+    dlogits /= batch_size  # Average the output gradient over the batch.
 
-    dW2 = hidden.T @ dlogits
-    db2 = dlogits.sum(axis=0)
-    dhidden = dlogits @ W2.T
-    dhidden_pre = dhidden * (hidden_pre > 0)
-    dW1 = X.T @ dhidden_pre
-    db1 = dhidden_pre.sum(axis=0)
+    dW2 = hidden.T @ dlogits  # Backpropagate into the second layer weights.
+    db2 = dlogits.sum(axis=0)  # Sum the output gradient over the batch for the bias.
+    dhidden = dlogits @ W2.T  # Backpropagate into the hidden activations.
+    dhidden_pre = dhidden * (hidden_pre > 0)  # Apply the ReLU derivative to the hidden pre-activations.
+    dW1 = X.T @ dhidden_pre  # Backpropagate into the first layer weights.
+    db1 = dhidden_pre.sum(axis=0)  # Sum the hidden gradient over the batch for the bias.
 
-    return {
+    return {  # Return the loss and gradients in a dictionary.
         "loss": float(loss),
         "dW1": dW1,
         "db1": db1,
