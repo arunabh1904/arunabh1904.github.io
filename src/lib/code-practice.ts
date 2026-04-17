@@ -481,4 +481,88 @@ sample_pred = [1, 0, 0, 1]
 print(binary_classification_metrics(sample_true, sample_pred))`,
     tags: ['Classification', 'Metrics', 'Confusion Matrix'],
   },
+  {
+    id: 'pairwise-cosine-similarity',
+    order: 5,
+    title: 'Pairwise cosine similarity',
+    difficulty: 'Easy',
+    summary:
+      'Compute an (N, M) cosine-similarity matrix between two batches of vectors with zero-norm safeguards.',
+    prompt: [
+      'Write `pairwise_cosine_similarity(x, y)` so it returns the pairwise cosine similarity between every row of `x` and every row of `y`.',
+      'Treat this like an interview question: validate the shapes, use a vectorized implementation, and make sure rows with zero norm produce `0.0` similarities instead of `nan` or `inf`.',
+    ],
+    signature: `def pairwise_cosine_similarity(x, y):
+    ...`,
+    requirements: [
+      '`x` is a 2D array or list with shape `(N, D)`.',
+      '`y` is a 2D array or list with shape `(M, D)`.',
+      'Return an `(N, M)` matrix of cosine similarities.',
+      'If any row in either input has zero norm, all similarities involving that row must be `0.0`.',
+      'Raise `ValueError` on invalid shapes.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: ['x = [[1, 0], [0, 0]]', 'y = [[1, 0], [1, 1]]'],
+        result: '[[1.0, 0.70711], [0.0, 0.0]]',
+      },
+      {
+        label: 'Example 2',
+        lines: ['x = [[0, 1]]', 'y = [[0, 0], [0, 1]]'],
+        result: '[[0.0, 1.0]]',
+      },
+    ],
+    hint: [
+      'Compute the numerator with `x @ y.T`.',
+      'Compute row norms once, then broadcast them into an `(N, M)` denominator.',
+      'Use `np.divide(..., where=denominator != 0)` so zero-norm rows become `0.0` instead of raising warnings.',
+      'Validate that both inputs are 2D and share the same feature dimension before doing any math.',
+    ],
+    solutionNotes: [
+      'Cosine similarity is just a dot product divided by the product of L2 norms. Once the row norms are in hand, the whole pairwise matrix can be computed with broadcasting.',
+      'The key edge case is a zero vector: its norm is zero, so any similarity involving that row is undefined. Filling those positions with `0.0` keeps the result stable and matches the prompt.',
+    ],
+    solutionCode: `import numpy as np
+
+def pairwise_cosine_similarity(x, y):
+    x = np.asarray(x, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64)
+
+    if x.ndim != 2 or y.ndim != 2:
+        raise ValueError("x and y must be 2D arrays")
+    if x.shape[1] != y.shape[1]:
+        raise ValueError("x and y must have the same feature dimension")
+    if x.shape[1] == 0:
+        raise ValueError("feature dimension must be positive")
+
+    x_norms = np.linalg.norm(x, axis=1)
+    y_norms = np.linalg.norm(y, axis=1)
+    similarities = x @ y.T
+    denominator = x_norms[:, None] * y_norms[None, :]
+
+    return np.divide(
+        similarities,
+        denominator,
+        out=np.zeros_like(similarities),
+        where=denominator != 0,
+    )`,
+    starterCode: `import numpy as np
+
+def pairwise_cosine_similarity(x, y):
+    x = np.asarray(x)
+    y = np.asarray(y)
+
+    # TODO:
+    # 1. Validate that x and y are 2D and share the same feature dimension.
+    # 2. Compute pairwise cosine similarities with zero-norm rows mapped to 0.0.
+    raise NotImplementedError("Implement pairwise_cosine_similarity")
+
+sample_x = np.array([[1.0, 0.0], [0.0, 0.0]])
+sample_y = np.array([[1.0, 0.0], [1.0, 1.0]])
+
+print(pairwise_cosine_similarity(sample_x, sample_y))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Linear Algebra', 'Vectorization'],
+  },
 ] as const;
