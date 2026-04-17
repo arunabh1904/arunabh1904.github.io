@@ -1913,4 +1913,170 @@ print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, 
     packages: ['numpy'],
     tags: ['NumPy', 'Backpropagation', 'Neural Networks'],
   },
+  {
+    id: 'simple-n-gram-language-model',
+    order: 18,
+    title: 'Simple n-gram language model',
+    difficulty: 'Medium',
+    summary:
+      'Build a tiny backoff n-gram model that learns token counts, returns next-token probabilities, and samples autoregressively.',
+    prompt: [
+      'Implement a simple n-gram language model class with `__init__`, `fit`, `next_token_probs`, and `generate` methods.',
+      'Train on a list of tokens, return next-token probability distributions from observed counts, sample autoregressively, and back off gracefully when a context has not been seen before.',
+    ],
+    signature: `class NGramModel:
+    def __init__(self, n):
+        ...
+
+    def fit(self, tokens):
+        ...
+
+    def next_token_probs(self, context):
+        ...
+
+    def generate(self, max_tokens, seed=None):
+        ...`,
+    requirements: [
+      '`n` is an integer with `n >= 1`.',
+      '`fit(tokens)` trains on a 1D list of tokens, where each token is a string or int.',
+      'Store the observed counts needed to answer next-token queries for orders up to `n`.',
+      '`next_token_probs(context)` returns a dictionary mapping candidate next tokens to probabilities that sum to `1.0`.',
+      'If a context is unseen, back off to progressively shorter suffixes until a seen context is found.',
+      '`generate(max_tokens, seed=None)` samples up to `max_tokens` tokens autoregressively.',
+      'Sampling must be deterministic when `seed` is provided.',
+      'Raise `ValueError` on invalid inputs.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: [
+          'model = NGramModel(2)',
+          'model.fit(["a", "b", "a", "c"])',
+          'model.next_token_probs(["a"])',
+        ],
+        result: `{'b': 0.5, 'c': 0.5}`,
+      },
+      {
+        label: 'Example 2',
+        lines: [
+          'model = NGramModel(2)',
+          'model.fit(["a", "b", "a", "c"])',
+          'model.next_token_probs(["z"])',
+          'model.generate(5, seed=4)',
+        ],
+        result: `backoff probs = {'a': 0.5, 'b': 0.25, 'c': 0.25}
+generated = ['a', 'b', 'a', 'b', 'a']`,
+      },
+    ],
+    hint: [
+      'A dictionary keyed by context tuples works for both string and integer tokens.',
+      'During training, update counts for every suffix length from `0` up to `n - 1`, not just the longest context.',
+      'To back off gracefully, keep shortening the context suffix until you find a context with observed counts.',
+      'Use a dedicated seeded RNG inside `generate` so sampling is repeatable without touching global random state.',
+    ],
+    solutionNotes: [
+      'The simplest clean design is to treat each context as a tuple and map it to a counter of next-token counts. While fitting, update every available suffix length for each position, which gives you unigram counts, bigram counts, and so on up to order `n` in one pass.',
+      'At inference time, truncate the supplied context to at most `n - 1` tokens and repeatedly back off to shorter suffixes until a seen context appears. Normalizing the matching counter gives the probability distribution, and `generate` can repeatedly sample from that distribution with a local `random.Random(seed)` instance for deterministic behavior.',
+    ],
+    solutionCode: `from collections import Counter, defaultdict
+import random
+
+def _coerce_tokens(values, name):
+    if isinstance(values, (str, bytes)):
+        raise ValueError(f"{name} must be a sequence of string or int tokens")
+
+    try:
+        items = list(values)
+    except TypeError as exc:
+        raise ValueError(f"{name} must be a sequence of string or int tokens") from exc
+
+    for token in items:
+        if isinstance(token, bool) or not isinstance(token, (str, int)):
+            raise ValueError(f"{name} must contain only string or int tokens")
+
+    return items
+
+class NGramModel:
+    def __init__(self, n):
+        if isinstance(n, bool) or not isinstance(n, int) or n < 1:
+            raise ValueError("n must be an integer >= 1")
+        self.n = n
+        self.counts = defaultdict(Counter)
+
+    def fit(self, tokens):
+        tokens = _coerce_tokens(tokens, "tokens")
+        self.counts = defaultdict(Counter)
+
+        for i, token in enumerate(tokens):
+            max_context_len = min(self.n - 1, i)
+            for context_len in range(max_context_len + 1):
+                context = tuple(tokens[i - context_len:i]) if context_len else ()
+                self.counts[context][token] += 1
+
+        return self
+
+    def next_token_probs(self, context):
+        context = _coerce_tokens(context, "context")
+        max_context_len = min(len(context), self.n - 1)
+
+        for context_len in range(max_context_len, -1, -1):
+            key = tuple(context[-context_len:]) if context_len else ()
+            counts = self.counts.get(key)
+            if counts:
+                total = sum(counts.values())
+                return {token: count / total for token, count in counts.items()}
+
+        return {}
+
+    def generate(self, max_tokens, seed=None):
+        if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens < 0:
+            raise ValueError("max_tokens must be a non-negative integer")
+        if seed is not None and (isinstance(seed, bool) or not isinstance(seed, int)):
+            raise ValueError("seed must be an integer or None")
+
+        rng = random.Random(seed)
+        generated = []
+
+        for _ in range(max_tokens):
+            probs = self.next_token_probs(generated)
+            if not probs:
+                break
+            tokens = list(probs.keys())
+            weights = list(probs.values())
+            next_token = rng.choices(tokens, weights=weights, k=1)[0]
+            generated.append(next_token)
+
+        return generated`,
+    starterCode: `class NGramModel:
+    def __init__(self, n):
+        # TODO:
+        # 1. Validate that n >= 1.
+        # 2. Initialize the data structures that will store n-gram counts.
+        raise NotImplementedError("Implement __init__")
+
+    def fit(self, tokens):
+        # TODO:
+        # 1. Validate the token list.
+        # 2. Update the observed counts for each context suffix up to length n - 1.
+        raise NotImplementedError("Implement fit")
+
+    def next_token_probs(self, context):
+        # TODO:
+        # 1. Truncate the context to the last n - 1 tokens.
+        # 2. Back off to shorter suffixes until you find observed counts.
+        # 3. Normalize the counts into probabilities.
+        raise NotImplementedError("Implement next_token_probs")
+
+    def generate(self, max_tokens, seed=None):
+        # TODO:
+        # 1. Seed a local RNG when seed is provided.
+        # 2. Sample tokens autoregressively from next_token_probs.
+        raise NotImplementedError("Implement generate")
+
+model = NGramModel(2)
+model.fit(["a", "b", "a", "c"])
+print(model.next_token_probs(["a"]))
+print(model.generate(5, seed=4))`,
+    tags: ['Language Models', 'Probability', 'Hash Maps'],
+  },
 ] as const;
