@@ -95,9 +95,16 @@ def softmax_cross_entropy(logits, labels):
     if np.any(labels < 0) or np.any(labels >= num_classes):
         raise ValueError("labels contain out-of-range class ids")
 
+    # Numerical stability trick: subtract per-row max before exponentiating
     shifted = logits - np.max(logits, axis=1, keepdims=True)
+
+    # log(sum(exp(logits))) computed in a stable way
     logsumexp = np.log(np.sum(np.exp(shifted), axis=1))
+
+    # Gather the logit for the correct class for each example
     correct_class_logits = shifted[np.arange(batch_size), labels]
+
+    # Cross-entropy loss per example
     losses = logsumexp - correct_class_logits
 
     return float(np.mean(losses))`,
