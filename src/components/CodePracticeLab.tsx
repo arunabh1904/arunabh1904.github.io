@@ -1,6 +1,13 @@
 import React, { startTransition, useEffect, useRef, useState } from 'react';
+import CodeMirror from '@uiw/react-codemirror';
+import { githubDark, githubLight } from '@uiw/codemirror-theme-github';
 import { loadPyodideRuntime } from '../lib/pyodide-loader';
 import type { PyodideRuntime } from '../lib/pyodide-loader';
+import {
+  codeEditorExtensions,
+  createCodeEditorThemeObserver,
+  getCodeEditorThemeName,
+} from '../lib/code-editor';
 import { runPythonSnippet } from '../lib/python-runner';
 import type { CodePracticeProblem } from '../lib/code-practice';
 
@@ -46,6 +53,11 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
     'Python runtime will load when this lab scrolls into view.',
   );
   const [isRunning, setIsRunning] = useState(false);
+  const [editorTheme, setEditorTheme] = useState(() =>
+    getCodeEditorThemeName(
+      typeof document === 'undefined' ? 'light' : document.documentElement.getAttribute('data-theme'),
+    ),
+  );
 
   useEffect(() => {
     setCode(problem.starterCode);
@@ -129,7 +141,18 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
     };
   }, []);
 
+  useEffect(() => {
+    setEditorTheme(
+      getCodeEditorThemeName(
+        typeof document === 'undefined' ? 'light' : document.documentElement.getAttribute('data-theme'),
+      ),
+    );
+
+    return createCodeEditorThemeObserver(setEditorTheme);
+  }, []);
+
   const editorId = `${problem.id}-editor`;
+  const editorThemeExtension = editorTheme === 'dark' ? githubDark : githubLight;
 
   async function handleRun() {
     if (!runtimeRef.current) {
@@ -292,13 +315,24 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
         <label className="code-practice-lab__editor-label" htmlFor={editorId}>
           Editable starter code
         </label>
-        <textarea
-          id={editorId}
-          className="code-practice-lab__editor"
-          spellCheck={false}
-          value={code}
-          onChange={(event) => setCode(event.target.value)}
-        />
+        <p className="code-practice-lab__editor-help">
+          `Tab` indents, `Shift+Tab` outdents, and `Cmd/Ctrl + /` toggles comments.
+        </p>
+        <div className="code-practice-lab__editor-shell">
+          <CodeMirror
+            id={editorId}
+            className="code-practice-lab__editor"
+            aria-label="Editable starter code"
+            basicSetup={false}
+            extensions={codeEditorExtensions}
+            theme={editorThemeExtension}
+            height="34rem"
+            editable
+            indentWithTab={false}
+            value={code}
+            onChange={(value) => setCode(value)}
+          />
+        </div>
 
         <div className="code-practice-lab__actions">
           <button type="button" onClick={() => void handleRun()} disabled={status !== 'ready' || isRunning}>

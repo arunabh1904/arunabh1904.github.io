@@ -2265,6 +2265,12 @@ body.home-page {
 .code-practice-lab__title-block h1,
 .code-practice-lab__header h2 {
   margin: 0;
+  color: #f5fbff;
+}
+
+:root[data-theme="dark"] .code-practice-lab__title-block h1,
+:root[data-theme="dark"] .code-practice-lab__header h2 {
+  color: #fff7cf;
 }
 
 .code-practice-lab__eyebrow {
@@ -2287,7 +2293,7 @@ body.home-page {
 .code-practice-lab__copy p,
 .code-practice-lab__runtime-note,
 .code-practice-lab__status {
-  color: rgba(223, 240, 255, 0.84);
+  color: rgba(235, 246, 255, 0.9);
 }
 
 :root[data-theme="dark"] .code-practice-lab__summary,
@@ -2309,6 +2315,7 @@ body.home-page {
   border: 1px solid rgba(127, 197, 255, 0.22);
   background: rgba(18, 37, 68, 0.82);
   white-space: nowrap;
+  color: #eff8ff;
 }
 
 :root[data-theme="dark"] .code-practice-lab__difficulty {
@@ -2383,8 +2390,16 @@ body.home-page {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
+  color: #8fd2ff;
 }
 
+:root[data-theme="dark"] .code-practice-lab__section-label,
+:root[data-theme="dark"] .code-practice-lab__example p,
+:root[data-theme="dark"] .code-practice-lab__output p {
+  color: #ffe45c;
+}
+
+.code-practice-lab__list,
 .code-practice-lab__spec-card pre,
 .code-practice-lab__example pre,
 .code-practice-lab__solution-panel pre,
@@ -2392,6 +2407,15 @@ body.home-page {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
+  color: #edf8ff;
+}
+
+:root[data-theme="dark"] .code-practice-lab__list,
+:root[data-theme="dark"] .code-practice-lab__spec-card pre,
+:root[data-theme="dark"] .code-practice-lab__example pre,
+:root[data-theme="dark"] .code-practice-lab__solution-panel pre,
+:root[data-theme="dark"] .code-practice-lab__output pre {
+  color: #fff7cf;
 }
 
 .code-practice-lab__list {
@@ -2463,7 +2487,7 @@ body.home-page {
 
 .code-practice-lab__prompt {
   margin-left: 0.4rem;
-  color: rgba(223, 240, 255, 0.72);
+  color: rgba(223, 240, 255, 0.84);
 }
 
 :root[data-theme="dark"] .code-practice-lab__prompt {
@@ -2474,25 +2498,98 @@ body.home-page {
   display: block;
   margin-bottom: 0.6rem;
   font-size: 0.84rem;
+  color: #dff0ff;
+}
+
+.code-practice-lab__editor-help {
+  margin: 0 0 0.8rem;
+  color: rgba(223, 240, 255, 0.72);
+  font-size: 0.8rem;
+}
+
+:root[data-theme="dark"] .code-practice-lab__editor-help {
+  color: rgba(255, 247, 207, 0.72);
+}
+
+.code-practice-lab__editor-shell {
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(127, 197, 255, 0.18);
+  background: rgba(3, 10, 20, 0.84);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:root[data-theme="dark"] .code-practice-lab__editor-shell {
+  border-color: rgba(255, 228, 92, 0.2);
+  background: rgba(7, 7, 7, 0.9);
 }
 
 .code-practice-lab__editor {
-  width: 100%;
-  min-height: 34rem;
-  resize: vertical;
-  box-sizing: border-box;
-  border-radius: 16px;
-  border: 1px solid rgba(127, 197, 255, 0.18);
-  background: rgba(3, 10, 20, 0.84);
-  color: inherit;
-  padding: 1rem;
-  line-height: 1.6;
   font-size: 0.95rem;
 }
 
-:root[data-theme="dark"] .code-practice-lab__editor {
-  border-color: rgba(255, 228, 92, 0.2);
-  background: rgba(7, 7, 7, 0.9);
+.code-practice-lab__editor .cm-editor {
+  min-height: 34rem;
+  background: transparent;
+}
+
+.code-practice-lab__editor .cm-editor.cm-focused {
+  outline: none;
+}
+
+.code-practice-lab__editor .cm-scroller {
+  min-height: 34rem;
+  overflow: auto;
+  font-family: var(--font-mono);
+  line-height: 1.6;
+}
+
+.code-practice-lab__editor .cm-content,
+.code-practice-lab__editor .cm-gutter {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.code-practice-lab__editor .cm-content {
+  padding-left: 0.35rem;
+  caret-color: currentColor;
+}
+
+.code-practice-lab__editor .cm-gutters {
+  border-right: 1px solid rgba(127, 197, 255, 0.12);
+  background: rgba(8, 18, 35, 0.52);
+}
+
+:root[data-theme="dark"] .code-practice-lab__editor .cm-gutters {
+  border-right-color: rgba(255, 228, 92, 0.12);
+  background: rgba(20, 18, 7, 0.58);
+}
+
+.code-practice-lab__editor .cm-lineNumbers .cm-gutterElement {
+  padding-left: 0.75rem;
+  padding-right: 0.65rem;
+}
+
+.code-practice-lab__editor .cm-activeLine,
+.code-practice-lab__editor .cm-activeLineGutter {
+  background: rgba(127, 197, 255, 0.08);
+}
+
+:root[data-theme="dark"] .code-practice-lab__editor .cm-activeLine,
+:root[data-theme="dark"] .code-practice-lab__editor .cm-activeLineGutter {
+  background: rgba(255, 228, 92, 0.08);
+}
+
+.code-practice-lab__editor .cm-selectionBackground,
+.code-practice-lab__editor.cm-focused .cm-selectionBackground,
+.code-practice-lab__editor .cm-content ::selection {
+  background: rgba(127, 197, 255, 0.24);
+}
+
+:root[data-theme="dark"] .code-practice-lab__editor .cm-selectionBackground,
+:root[data-theme="dark"] .code-practice-lab__editor.cm-focused .cm-selectionBackground,
+:root[data-theme="dark"] .code-practice-lab__editor .cm-content ::selection {
+  background: rgba(255, 228, 92, 0.2);
 }
 
 .code-practice-lab__actions button:disabled {
