@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageControls from '../components/PageControls.astro';
+import CodePracticeLab from '../components/CodePracticeLab';
+import { codePracticeProblems } from '../lib/code-practice';
+---
+
+<BaseLayout
+  title="Code"
+  description="A dedicated interview-practice section with runnable Python problems, hints, and hidden solutions."
+>
+  <PageControls showHomeButton={true} />
+  <div class="page-layout">
+    <main class="page-content code-page" aria-label="Code interview practice">
+      <section class="code-page__intro">
+        <p class="code-page__eyebrow">Code</p>
+        <h1>Interview practice lab</h1>
+        <p>
+          A dedicated space for interview-style Python problems. Each problem comes with the prompt,
+          a runnable workspace, a hint you can reveal when you want a nudge, and a hidden solution
+          you can inspect after taking your own pass.
+        </p>
+        <p>
+          The template is reusable, so new problems can be added without changing the UI. Right now
+          the page starts with a numerically stable softmax cross-entropy problem and is ready to
+          grow from there.
+        </p>
+      </section>
+
+      <CodePracticeLab client:visible problems={codePracticeProblems} />
+    </main>
+  </div>
+</BaseLayout>
