@@ -285,4 +285,84 @@ print(nms(sample_boxes, sample_scores, iou_threshold=0.3))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Computer Vision', 'Greedy'],
   },
+  {
+    id: 'causal-attention-mask',
+    order: 3,
+    title: 'Causal attention mask',
+    difficulty: 'Easy',
+    summary:
+      'Build a batch of lower-triangular attention masks from per-example sequence lengths, with optional padding to a shared width.',
+    prompt: [
+      'Write `make_causal_attention_mask(seq_lens, max_len=None)` to build a batch of causal attention masks.',
+      'Each example gets its own valid length. Positions outside that valid length must stay `0`, while valid positions should form a lower-triangular mask where token `i` can attend to itself and earlier tokens only.',
+    ],
+    signature: `def make_causal_attention_mask(seq_lens, max_len=None):
+    ...`,
+    requirements: [
+      '`seq_lens` is a 1D list or NumPy array of length `B`.',
+      'Each entry is the valid sequence length for one example.',
+      'Return a mask of shape `(B, T, T)` where `T = max(max(seq_lens), max_len if given)`.',
+      '`mask[b, i, j] == 1` iff `i < seq_lens[b]`, `j < seq_lens[b]`, and `j <= i`.',
+      'Otherwise the entry must be `0`.',
+      'Raise `ValueError` on invalid input.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['seq_lens = [3, 1]'],
+        result:
+          '[[[1, 0, 0], [1, 1, 0], [1, 1, 1]], [[1, 0, 0], [0, 0, 0], [0, 0, 0]]]',
+      },
+    ],
+    hint: [
+      'Use `np.tri(T, dtype=np.int64)` or `np.tril` to build the causal lower triangle once.',
+      'Create a `(B, T)` validity mask from `seq_lens`, then broadcast it across rows and columns.',
+      'Multiply the causal triangle by the validity masks so padded rows and columns stay zero.',
+      'Validate the rank of `seq_lens`, integer lengths, non-negative values, and `max_len` when it is provided.',
+    ],
+    solutionNotes: [
+      'The problem is really two masks multiplied together: the causal rule (`j <= i`) and the per-example validity rule (`i, j < seq_len[b]`).',
+      'Broadcasting a single lower-triangular template against a batch-wise validity mask gives the full `(B, T, T)` answer without explicit Python loops.',
+    ],
+    solutionCode: `import numpy as np
+
+def make_causal_attention_mask(seq_lens, max_len=None):
+    seq_lens = np.asarray(seq_lens)
+
+    if seq_lens.ndim != 1:
+        raise ValueError("seq_lens must be a 1D array")
+    if seq_lens.size == 0:
+        raise ValueError("seq_lens must not be empty")
+    if not np.issubdtype(seq_lens.dtype, np.integer):
+        raise ValueError("seq_lens must contain integers")
+    if np.any(seq_lens < 0):
+        raise ValueError("seq_lens must be non-negative")
+
+    T = int(seq_lens.max())
+    if max_len is not None:
+        if isinstance(max_len, bool) or not isinstance(max_len, (int, np.integer)):
+            raise ValueError("max_len must be an integer or None")
+        if max_len < 0:
+            raise ValueError("max_len must be non-negative")
+        T = max(T, int(max_len))
+
+    valid = np.arange(T) < seq_lens[:, None]
+    causal = np.tri(T, dtype=np.int64)
+    mask = causal[None, :, :] * valid[:, :, None] * valid[:, None, :]
+    return mask.astype(np.int64)`,
+    starterCode: `import numpy as np
+
+def make_causal_attention_mask(seq_lens, max_len=None):
+    seq_lens = np.asarray(seq_lens)
+
+    # TODO:
+    # 1. Validate the input shape and sequence lengths.
+    # 2. Build a causal lower-triangular mask for each batch element.
+    raise NotImplementedError("Implement make_causal_attention_mask")
+
+sample_seq_lens = np.array([3, 1])
+print(make_causal_attention_mask(sample_seq_lens, max_len=4))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Attention Masks', 'Sequence Modeling'],
+  },
 ] as const;
