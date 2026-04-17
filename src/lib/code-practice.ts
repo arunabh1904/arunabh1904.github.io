@@ -365,4 +365,120 @@ print(make_causal_attention_mask(sample_seq_lens, max_len=4))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Attention Masks', 'Sequence Modeling'],
   },
+  {
+    id: 'binary-classification-metrics',
+    order: 4,
+    title: 'Binary classification metrics',
+    difficulty: 'Easy',
+    summary:
+      'Compute confusion-matrix counts and common binary classification metrics with zero-division safeguards.',
+    prompt: [
+      'Write `binary_classification_metrics(y_true, y_pred)` so it returns the confusion-matrix counts and derived metrics for a binary classifier.',
+      'Treat `y_true` and `y_pred` as equal-length 1D collections of binary labels. Validate the inputs, and make sure any metric with a zero denominator returns `0.0` instead of failing.',
+    ],
+    signature: `def binary_classification_metrics(y_true, y_pred):
+    ...`,
+    requirements: [
+      '`y_true` and `y_pred` are equal-length 1D arrays or lists containing only `0` and `1`.',
+      'Return a dictionary with keys `tp`, `tn`, `fp`, `fn`, `precision`, `recall`, `f1`, and `accuracy`.',
+      '`precision`, `recall`, `f1`, and `accuracy` should be floats.',
+      'If a denominator is zero, return `0.0` for that metric.',
+      'Raise `ValueError` on invalid inputs.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: ['y_true = [1, 0, 1, 0]', 'y_pred = [1, 0, 0, 1]'],
+        result:
+          `{'tp': 1, 'tn': 1, 'fp': 1, 'fn': 1, 'precision': 0.5, 'recall': 0.5, 'f1': 0.5, 'accuracy': 0.5}`,
+      },
+      {
+        label: 'Example 2',
+        lines: ['y_true = [0, 0]', 'y_pred = [0, 0]'],
+        result:
+          `{'tp': 0, 'tn': 2, 'fp': 0, 'fn': 0, 'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'accuracy': 1.0}`,
+      },
+    ],
+    hint: [
+      'Count `tp`, `tn`, `fp`, and `fn` in one pass over paired labels.',
+      'Precision and recall each have their own denominator; guard each one separately.',
+      'Compute `f1` from precision and recall, but return `0.0` if both are zero.',
+      'Validate that both inputs are 1D, the same length, non-empty, and restricted to `0` or `1`.',
+    ],
+    solutionNotes: [
+      'This is mostly a confusion-matrix exercise: once the four counts are correct, the derived metrics are straightforward ratios.',
+      'The subtle part is the edge handling. Returning `0.0` for undefined metrics keeps the function predictable when there are no predicted positives or no actual positives.',
+    ],
+    solutionCode: `def _coerce_binary_labels(values, name):
+    if isinstance(values, (str, bytes)):
+        raise ValueError(f"{name} must be a 1D sequence of binary labels")
+
+    try:
+        items = list(values)
+    except TypeError as exc:
+        raise ValueError(f"{name} must be a 1D sequence of binary labels") from exc
+
+    if not items:
+        raise ValueError(f"{name} must not be empty")
+
+    for item in items:
+        if hasattr(item, "__iter__") and not isinstance(item, (str, bytes)):
+            raise ValueError(f"{name} must be one-dimensional")
+        if item not in (0, 1):
+            raise ValueError(f"{name} must contain only 0 and 1")
+
+    return items
+
+
+def binary_classification_metrics(y_true, y_pred):
+    y_true = _coerce_binary_labels(y_true, "y_true")
+    y_pred = _coerce_binary_labels(y_pred, "y_pred")
+
+    if len(y_true) != len(y_pred):
+        raise ValueError("y_true and y_pred must have the same length")
+
+    tp = tn = fp = fn = 0
+    for truth, pred in zip(y_true, y_pred):
+        if truth == 1 and pred == 1:
+            tp += 1
+        elif truth == 0 and pred == 0:
+            tn += 1
+        elif truth == 0 and pred == 1:
+            fp += 1
+        else:
+            fn += 1
+
+    total = len(y_true)
+    precision_den = tp + fp
+    recall_den = tp + fn
+
+    precision = tp / precision_den if precision_den else 0.0
+    recall = tp / recall_den if recall_den else 0.0
+    f1_den = precision + recall
+    f1 = (2.0 * precision * recall / f1_den) if f1_den else 0.0
+    accuracy = (tp + tn) / total
+
+    return {
+        "tp": tp,
+        "tn": tn,
+        "fp": fp,
+        "fn": fn,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "accuracy": accuracy,
+    }`,
+    starterCode: `def binary_classification_metrics(y_true, y_pred):
+    # TODO:
+    # 1. Validate the inputs.
+    # 2. Count tp, tn, fp, and fn.
+    # 3. Compute precision, recall, f1, and accuracy with zero-division guards.
+    raise NotImplementedError("Implement binary_classification_metrics")
+
+sample_true = [1, 0, 1, 0]
+sample_pred = [1, 0, 0, 1]
+
+print(binary_classification_metrics(sample_true, sample_pred))`,
+    tags: ['Classification', 'Metrics', 'Confusion Matrix'],
+  },
 ] as const;
