@@ -1031,4 +1031,113 @@ print(sinusoidal_positional_encoding(sample_length, sample_dim))`,
     packages: ['numpy'],
     tags: ['NumPy', 'Sequence Modeling', 'Embeddings'],
   },
+  {
+    id: 'unpatchify-back-to-image',
+    order: 11,
+    title: 'Unpatchify back to image',
+    difficulty: 'Medium',
+    summary:
+      'Reconstruct batched images from flattened patch vectors using row-major patch order.',
+    prompt: [
+      'Write `unpatchify(patches, image_shape, patch_size)` so it reconstructs and returns a batch of images from flattened patch tokens.',
+      'Assume the patches are in row-major order across the image grid. Validate the inputs, then reshape the patch tensor back into `(B, C, H, W)`.',
+    ],
+    signature: `def unpatchify(patches, image_shape, patch_size):
+    ...`,
+    requirements: [
+      '`patches` has shape `(B, N, C * P * P)`.',
+      '`image_shape` is `(C, H, W)`.',
+      '`patch_size` is `P`.',
+      'Reconstruct and return shape `(B, C, H, W)`.',
+      'Assume patches are in row-major order.',
+      'Raise `ValueError` on invalid input.',
+    ],
+    examples: [
+      {
+        label: 'Example 1',
+        lines: [
+          'patches = [[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]]',
+          'image_shape = (1, 4, 4)',
+          'patch_size = 2',
+        ],
+        result:
+          '[[[[1, 2, 5, 6], [3, 4, 7, 8], [9, 10, 13, 14], [11, 12, 15, 16]]]]',
+      },
+      {
+        label: 'Example 2',
+        lines: [
+          'patches = [[[1], [2], [3], [4]], [[5], [6], [7], [8]]]',
+          'image_shape = (1, 2, 2)',
+          'patch_size = 1',
+        ],
+        result: '[[[[1, 2], [3, 4]]], [[[5, 6], [7, 8]]]]',
+      },
+    ],
+    hint: [
+      'Check that the image height and width are divisible by `patch_size`.',
+      'The number of patches should be `(H / P) * (W / P)` and each patch should have `C * P * P` values.',
+      'Reshape the patches into a 6D tensor, then transpose axes to interleave the patch grid and patch pixels.',
+      'The row-major assumption means the patch index should map to `(row, column)` in standard nested-loop order.',
+    ],
+    solutionNotes: [
+      'This problem is the inverse of patch extraction: each flattened patch vector is first reshaped into `(C, P, P)`, then the patch grid is placed back into its `(H / P, W / P)` spatial layout.',
+      'A reshape followed by a transpose is enough to undo the flattening as long as the patch order is row-major and the image dimensions divide evenly by the patch size.',
+    ],
+    solutionCode: `import numpy as np
+
+def unpatchify(patches, image_shape, patch_size):
+    patches = np.asarray(patches)
+    image_shape = np.asarray(image_shape)
+
+    if patches.ndim != 3:
+        raise ValueError("patches must have shape (B, N, C * P * P)")
+    if image_shape.ndim != 1 or image_shape.size != 3:
+        raise ValueError("image_shape must have shape (3,)")
+    if not np.issubdtype(image_shape.dtype, np.integer):
+        raise ValueError("image_shape must contain integers")
+    if isinstance(patch_size, bool) or not isinstance(patch_size, (int, np.integer)):
+        raise ValueError("patch_size must be a positive integer")
+    if patch_size <= 0:
+        raise ValueError("patch_size must be a positive integer")
+
+    C, H, W = (int(value) for value in image_shape)
+    if C <= 0 or H <= 0 or W <= 0:
+        raise ValueError("image_shape must contain positive integers")
+    if H % patch_size != 0 or W % patch_size != 0:
+        raise ValueError("image dimensions must be divisible by patch_size")
+
+    grid_h = H // patch_size
+    grid_w = W // patch_size
+    expected_num_patches = grid_h * grid_w
+    expected_patch_dim = C * patch_size * patch_size
+
+    if patches.shape[1] != expected_num_patches:
+        raise ValueError("patch count does not match image_shape and patch_size")
+    if patches.shape[2] != expected_patch_dim:
+        raise ValueError("patch dimension does not match image_shape and patch_size")
+
+    batch_size = patches.shape[0]
+    reshaped = patches.reshape(batch_size, grid_h, grid_w, C, patch_size, patch_size)
+    reconstructed = reshaped.transpose(0, 3, 1, 4, 2, 5)
+    return reconstructed.reshape(batch_size, C, H, W)`,
+    starterCode: `import numpy as np
+
+def unpatchify(patches, image_shape, patch_size):
+    patches = np.asarray(patches)
+    image_shape = np.asarray(image_shape)
+
+    # TODO:
+    # 1. Validate the tensor shapes and patch_size.
+    # 2. Reshape and transpose the patch grid back into (B, C, H, W).
+    raise NotImplementedError("Implement unpatchify")
+
+sample_patches = np.array([
+    [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+])
+sample_image_shape = (1, 4, 4)
+
+print(unpatchify(sample_patches, sample_image_shape, patch_size=2))`,
+    packages: ['numpy'],
+    tags: ['NumPy', 'Computer Vision', 'Transformers'],
+  },
 ] as const;
