@@ -2010,6 +2010,7 @@ class NGramModel:
         for i, token in enumerate(tokens):
             max_context_len = min(self.n - 1, i)
             for context_len in range(max_context_len + 1):
+                # Counting every available suffix here gives unigram through n-gram statistics in one pass.
                 context = tuple(tokens[i - context_len:i]) if context_len else ()
                 self.counts[context][token] += 1
 
@@ -2020,6 +2021,7 @@ class NGramModel:
         max_context_len = min(len(context), self.n - 1)
 
         for context_len in range(max_context_len, -1, -1):
+            # Back off from the longest suffix toward the empty context until we find observed counts.
             key = tuple(context[-context_len:]) if context_len else ()
             counts = self.counts.get(key)
             if counts:
@@ -2041,6 +2043,7 @@ class NGramModel:
             probs = self.next_token_probs(generated)
             if not probs:
                 break
+            # Sampling from the already-generated tokens makes generation autoregressive.
             tokens = list(probs.keys())
             weights = list(probs.values())
             next_token = rng.choices(tokens, weights=weights, k=1)[0]
