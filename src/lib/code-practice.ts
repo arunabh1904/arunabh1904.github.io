@@ -1919,10 +1919,11 @@ print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, 
     title: 'Simple n-gram language model',
     difficulty: 'Medium',
     summary:
-      'Build a tiny backoff n-gram model that learns token counts, returns next-token probabilities, and samples autoregressively.',
+      'Build a tiny backoff n-gram model that learns token counts, then fit it on a real corpus slice such as Tiny Shakespeare.',
     prompt: [
       'Implement a simple n-gram language model class with `__init__`, `fit`, `next_token_probs`, and `generate` methods.',
       'Train on a list of tokens, return next-token probability distributions from observed counts, sample autoregressively, and back off gracefully when a context has not been seen before.',
+      'Use the provided Tiny Shakespeare loader to pull in real text, tokenize it, and build the model from more than a hand-written toy sequence.',
     ],
     signature: `class NGramModel:
     def __init__(self, n):
@@ -1939,6 +1940,7 @@ print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, 
     requirements: [
       '`n` is an integer with `n >= 1`.',
       '`fit(tokens)` trains on a 1D list of tokens, where each token is a string or int.',
+      'The same `fit(tokens)` method should work for toy token lists and for tokens derived from a real text corpus.',
       'Store the observed counts needed to answer next-token queries for orders up to `n`.',
       '`next_token_probs(context)` returns a dictionary mapping candidate next tokens to probabilities that sum to `1.0`.',
       'If a context is unseen, back off to progressively shorter suffixes until a seen context is found.',
@@ -1967,19 +1969,69 @@ print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, 
         result: `backoff probs = {'a': 0.5, 'b': 0.25, 'c': 0.25}
 generated = ['a', 'b', 'a', 'b', 'a']`,
       },
+      {
+        label: 'Example 3',
+        lines: [
+          'text = load_tiny_shakespeare(max_chars=4000)',
+          'tokens = tokenize_words(text)',
+          'model = NGramModel(3)',
+          'model.fit(tokens)',
+          'model.next_token_probs(["Before", "we"])',
+        ],
+        result: `{'proceed': 1.0}`,
+      },
     ],
     hint: [
       'A dictionary keyed by context tuples works for both string and integer tokens.',
       'During training, update counts for every suffix length from `0` up to `n - 1`, not just the longest context.',
       'To back off gracefully, keep shortening the context suffix until you find a context with observed counts.',
       'Use a dedicated seeded RNG inside `generate` so sampling is repeatable without touching global random state.',
+      'Keep corpus loading and tokenization outside the class so the n-gram model stays reusable for any token source.',
     ],
     solutionNotes: [
       'The simplest clean design is to treat each context as a tuple and map it to a counter of next-token counts. While fitting, update every available suffix length for each position, which gives you unigram counts, bigram counts, and so on up to order `n` in one pass.',
       'At inference time, truncate the supplied context to at most `n - 1` tokens and repeatedly back off to shorter suffixes until a seen context appears. Normalizing the matching counter gives the probability distribution, and `generate` can repeatedly sample from that distribution with a local `random.Random(seed)` instance for deterministic behavior.',
+      'Because `fit` only cares about tokens, a tiny helper can load a slice of Tiny Shakespeare, split it into word tokens, and pass those tokens directly into the same model implementation.',
     ],
     solutionCode: `from collections import Counter, defaultdict
 import random
+
+TINY_SHAKESPEARE_PATH = "/datasets/tiny-shakespeare.txt"
+TINY_SHAKESPEARE_URL = (
+    "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
+)
+TINY_SHAKESPEARE_FALLBACK = """First Citizen: Before we proceed any further, hear me speak.
+All: Speak, speak.
+First Citizen: You are all resolved rather to die than to famish?
+All: Resolved. resolved.
+First Citizen: First, you know Caius Marcius is chief enemy to the people.
+All: We know't, we know't.
+"""
+
+def load_tiny_shakespeare(max_chars=12000):
+    if isinstance(max_chars, bool) or not isinstance(max_chars, int) or max_chars <= 0:
+        raise ValueError("max_chars must be a positive integer")
+
+    try:
+        from pyodide.http import open_url
+
+        text = open_url(TINY_SHAKESPEARE_PATH).read()
+    except Exception:
+        try:
+            from urllib.request import urlopen
+
+            with urlopen(TINY_SHAKESPEARE_URL, timeout=10) as response:
+                text = response.read().decode("utf-8")
+        except Exception:
+            text = TINY_SHAKESPEARE_FALLBACK
+
+    return text[:max_chars]
+
+def tokenize_words(text):
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("text must be a non-empty string")
+
+    return text.split()
 
 def _coerce_tokens(values, name):
     if isinstance(values, (str, bytes)):
@@ -2049,8 +2101,70 @@ class NGramModel:
             next_token = rng.choices(tokens, weights=weights, k=1)[0]
             generated.append(next_token)
 
-        return generated`,
-    starterCode: `class NGramModel:
+        return generated
+
+text = load_tiny_shakespeare(max_chars=12000)
+tokens = tokenize_words(text)
+
+model = NGramModel(3)
+model.fit(tokens)
+
+print(f"loaded {len(tokens)} tokens")
+print(model.next_token_probs(["Before", "we"]))
+print(" ".join(model.generate(12, seed=7)))`,
+    starterCode: `TINY_SHAKESPEARE_PATH = "/datasets/tiny-shakespeare.txt"
+TINY_SHAKESPEARE_URL = (
+    "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
+)
+TINY_SHAKESPEARE_FALLBACK = """First Citizen: Before we proceed any further, hear me speak.
+All: Speak, speak.
+First Citizen: You are all resolved rather to die than to famish?
+All: Resolved. resolved.
+First Citizen: First, you know Caius Marcius is chief enemy to the people.
+All: We know't, we know't.
+"""
+
+def load_tiny_shakespeare(max_chars=12000):
+    if isinstance(max_chars, bool) or not isinstance(max_chars, int) or max_chars <= 0:
+        raise ValueError("max_chars must be a positive integer")
+
+    try:
+        from pyodide.http import open_url
+
+        text = open_url(TINY_SHAKESPEARE_PATH).read()
+    except Exception:
+        try:
+            from urllib.request import urlopen
+
+            with urlopen(TINY_SHAKESPEARE_URL, timeout=10) as response:
+                text = response.read().decode("utf-8")
+        except Exception:
+            text = TINY_SHAKESPEARE_FALLBACK
+
+    return text[:max_chars]
+
+def tokenize_words(text):
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("text must be a non-empty string")
+
+    return text.split()
+
+def _coerce_tokens(values, name):
+    if isinstance(values, (str, bytes)):
+        raise ValueError(f"{name} must be a sequence of string or int tokens")
+
+    try:
+        items = list(values)
+    except TypeError as exc:
+        raise ValueError(f"{name} must be a sequence of string or int tokens") from exc
+
+    for token in items:
+        if isinstance(token, bool) or not isinstance(token, (str, int)):
+            raise ValueError(f"{name} must contain only string or int tokens")
+
+    return items
+
+class NGramModel:
     def __init__(self, n):
         # TODO:
         # 1. Validate that n >= 1.
@@ -2076,10 +2190,15 @@ class NGramModel:
         # 2. Sample tokens autoregressively from next_token_probs.
         raise NotImplementedError("Implement generate")
 
-model = NGramModel(2)
-model.fit(["a", "b", "a", "c"])
-print(model.next_token_probs(["a"]))
-print(model.generate(5, seed=4))`,
+text = load_tiny_shakespeare(max_chars=12000)
+tokens = tokenize_words(text)
+
+model = NGramModel(3)
+model.fit(tokens)
+
+print(f"loaded {len(tokens)} tokens")
+print(model.next_token_probs(["Before", "we"]))
+print(" ".join(model.generate(12, seed=7)))`,
     tags: ['Language Models', 'Probability', 'Hash Maps'],
   },
 ] as const;
