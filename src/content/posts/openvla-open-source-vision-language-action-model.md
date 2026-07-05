@@ -19,6 +19,21 @@ summary: OpenVLA released a 7B open robot policy trained on 970k real robot demo
 
 The open release matters: checkpoints, code, and fine-tuning recipes make generalist robot policies easier to study and adapt.
 
+![Vision-language-action stack schematic](/assets/images/robot-vla-stack-schematic.svg)
+
+**What to look at:**
+- The visual encoder fuses SigLIP and DINOv2 features.
+- The policy is trained on Open X-Embodiment robot demonstrations.
+- The open checkpoints and fine-tuning notebooks are core artifacts.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Scale | 7B VLA | Large enough to reuse language-model priors. |
+| Data | 970k robot demonstrations | Gives the model cross-embodiment behavior. |
+| Artifact | Open code/checkpoints | Makes generalist robot policies inspectable. |
+
 **Why it mattered:** OpenVLA made the VLA recipe concrete and public. It also showed that Internet-scale vision-language pretraining can combine with robot demonstration data to produce transferable manipulation policies.
 
 **Take-home message:** OpenVLA is the CLIP-to-actions moment: visual-language representations become a starting point for robot control.

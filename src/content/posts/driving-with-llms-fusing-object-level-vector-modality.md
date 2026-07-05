@@ -19,6 +19,21 @@ summary: Driving with LLMs fed object-level vector scene state into language mod
 
 The bet is that language models may reason better when perception has already converted pixels into meaningful objects, positions, and relationships.
 
+![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+
+**What to look at:**
+- Object-level vectors are the multimodal interface, not raw pixels.
+- The language model reasons over structured actors and relations.
+- The main value is explainable decisions from a cleaner scene representation.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Input | Object vectors | Structured state reduces visual ambiguity. |
+| Task | Driving QA and action generation | Tests scene interpretation and decisions. |
+| Tradeoff | Depends on upstream perception | Bad object state still misleads the LLM. |
+
 **Why it mattered:** The paper made object-centric driving language models a serious baseline. It also clarified a recurring theme in autonomy: sometimes the right multimodal interface is not raw pixels, but structured state.
 
 **Take-home message:** For safety-critical planning, language can be useful if it is grounded in the right representation. Object vectors give the LLM a cleaner substrate than raw visual impressions.

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">Driving VLM loop</title>
+  <desc id="desc">A schematic showing sensors and structured scene state feeding a VLM reasoning module, then planning and control, with safety benchmarks auditing grounding and trust.</desc>
+  <rect width="960" height="360" rx="24" fill="#0b1014"/>
+  <g fill="none" stroke="#8fd0ff" stroke-width="2">
+    <rect x="46" y="86" width="170" height="86" rx="14"/>
+    <rect x="46" y="206" width="170" height="86" rx="14"/>
+    <rect x="304" y="92" width="190" height="190" rx="14"/>
+    <rect x="592" y="78" width="150" height="92" rx="14"/>
+    <rect x="592" y="206" width="150" height="92" rx="14"/>
+    <rect x="794" y="118" width="118" height="122" rx="14"/>
+  </g>
+  <g fill="#d8f0ff" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+    <text x="78" y="124" font-size="21">cameras</text>
+    <text x="78" y="152" font-size="21">maps</text>
+    <text x="78" y="244" font-size="21">objects</text>
+    <text x="78" y="272" font-size="21">rules</text>
+    <text x="340" y="146" font-size="22">VLM / LLM</text>
+    <text x="340" y="180" font-size="22">reasoning</text>
+    <text x="340" y="226" font-size="17">explain, rank,</text>
+    <text x="340" y="250" font-size="17">or teach planner</text>
+    <text x="624" y="116" font-size="21">planner</text>
+    <text x="624" y="144" font-size="21">intent</text>
+    <text x="624" y="244" font-size="21">control</text>
+    <text x="624" y="272" font-size="21">loop</text>
+    <text x="818" y="164" font-size="18">trust</text>
+    <text x="818" y="192" font-size="18">bench</text>
+  </g>
+  <g stroke="#8fd0ff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M224 128 H292"/>
+    <path d="M224 252 H292"/>
+    <path d="M502 142 H580"/>
+    <path d="M502 252 H580"/>
+    <path d="M750 124 H786"/>
+    <path d="M750 252 H786"/>
+    <path d="M282 118 L296 128 L282 138"/>
+    <path d="M282 242 L296 252 L282 262"/>
+    <path d="M570 132 L584 142 L570 152"/>
+    <path d="M570 242 L584 252 L570 262"/>
+    <path d="M776 114 L790 124 L776 134"/>
+    <path d="M776 242 L790 252 L776 262"/>
+  </g>
+  <g fill="#a8c0cc" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+    <text x="46" y="44">Driving pattern: language helps with semantics, but safety depends on grounding, latency, and control boundaries.</text>
+    <text x="304" y="320">GPT-Driver / DriveVLM / EMMA / SENNA: different placements for the reasoning module</text>
+  </g>
+</svg>

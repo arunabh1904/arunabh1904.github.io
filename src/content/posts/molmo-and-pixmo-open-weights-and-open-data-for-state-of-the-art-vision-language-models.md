@@ -19,6 +19,21 @@ summary: Molmo argued that high-quality open multimodal data can matter more tha
 
 This matters because many VLMs are hard to inspect. Molmo makes the data story more visible, which makes the model easier to study and reuse.
 
+![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+
+**What to look at:**
+- PixMo data quality is the main mechanism: detailed human captions and pointing supervision.
+- Open weights plus open data make the model easier to audit than closed VLMs.
+- The interesting comparison is data quality versus raw data quantity.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Data | PixMo collection | Rich captions and pointing supervision improve grounding. |
+| Openness | Open weights and data | Makes the training story inspectable. |
+| Signal | Small models compete strongly | Suggests annotation quality can substitute for some scale. |
+
 **Why it mattered:** The paper strengthened the case that VLM progress is not just architecture scale. Annotation style, spatial grounding, and openness can move the frontier too.
 
 **Take-home message:** For multimodal models, the caption is part of the architecture. Better supervision changes what the model can see.

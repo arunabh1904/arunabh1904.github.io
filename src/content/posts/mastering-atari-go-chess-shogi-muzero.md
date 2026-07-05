@@ -26,9 +26,12 @@ summary: MuZero learned just enough model dynamics to plan with MCTS, without re
 The important design choice is what MuZero chooses not to model. It predicts only the quantities needed for planning, not future pixels or full board states. That makes one architecture work across Go, chess, shogi, and 57 Atari games, with MCTS continually producing stronger targets for the networks to imitate.
 
 **Evals / Benchmarks**
-- **Atari-57** – mean human-normalised score exceeds 1000%, surpassing prior agents.
-- **Go (19×19)** – achieves AlphaZero-level Elo ratings.
-- **Chess / Shogi** – matches AlphaZero with fewer training games.
+
+| Setting | Signal | Why it matters |
+| ------- | ------ | -------------- |
+| Atari-57 | Mean human-normalized score exceeds 1000% | Shows the learned latent model works beyond perfect-information board games. |
+| Go 19x19 | Achieves AlphaZero-level Elo ratings | Matches a search-based expert system without hand-coded game rules. |
+| Chess / Shogi | Matches AlphaZero with fewer training games | Tests whether the same model-based planning recipe transfers across rule systems. |
 
 **Critiques & limitations:** MuZero is elegant because it preserves the strength of search without requiring explicit rules. The cost is large. Training used enormous compute, inference requires MCTS, and the learned dynamics remain hard to interpret: the model plans well, but it is not obvious what environment structure it has actually learned.
 

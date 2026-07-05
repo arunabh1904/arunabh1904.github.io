@@ -17,6 +17,21 @@ summary: IDKB tested whether vision-language models know explicit driving rules,
 
 The result is a useful warning: a model may recognize cars and pedestrians but still fail rule-based reasoning that every licensed human driver is expected to know.
 
+![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+
+**What to look at:**
+- IDKB focuses on explicit driving rules and written-test knowledge.
+- The benchmark includes handbooks, exams, and scenario QA.
+- Fine-tuning gains show that general VLM pretraining does not guarantee domain rules.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Dataset | 1M+ driving knowledge items | Covers rules, exams, and applied scenarios. |
+| Evaluation | 15 LVLMs | Tests whether general models know driving theory. |
+| Main failure | Missing specialized rule knowledge | Perception alone is not driving competence. |
+
 **Why it mattered:** Driving competence is not only perception. It is perception plus rule knowledge plus judgment under context.
 
 **Take-home message:** Autonomous driving VLMs need a written test as well as a road test.

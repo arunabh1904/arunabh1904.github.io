@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">Vision-language-action stack</title>
+  <desc id="desc">A schematic showing visual observations and language instructions feeding a VLA policy, action tokenization or diffusion control, and a robot acting in the world.</desc>
+  <rect width="960" height="360" rx="24" fill="#111014"/>
+  <g fill="none" stroke="#d4b4ff" stroke-width="2">
+    <rect x="52" y="76" width="176" height="86" rx="14"/>
+    <rect x="52" y="206" width="176" height="86" rx="14"/>
+    <rect x="318" y="86" width="198" height="196" rx="14"/>
+    <rect x="612" y="76" width="162" height="86" rx="14"/>
+    <rect x="612" y="206" width="162" height="86" rx="14"/>
+    <circle cx="856" cy="182" r="58"/>
+  </g>
+  <g fill="#efe0ff" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+    <text x="86" y="114" font-size="21">image</text>
+    <text x="86" y="142" font-size="21">stream</text>
+    <text x="86" y="244" font-size="21">language</text>
+    <text x="86" y="272" font-size="21">goal</text>
+    <text x="356" y="140" font-size="22">VLA policy</text>
+    <text x="356" y="176" font-size="17">vision + language</text>
+    <text x="356" y="202" font-size="17">+ embodiment data</text>
+    <text x="640" y="116" font-size="20">action</text>
+    <text x="640" y="144" font-size="20">tokens</text>
+    <text x="640" y="244" font-size="20">diffusion</text>
+    <text x="640" y="272" font-size="20">control</text>
+    <text x="824" y="178" font-size="19">robot</text>
+    <text x="824" y="206" font-size="19">world</text>
+  </g>
+  <g stroke="#d4b4ff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M236 120 H306"/>
+    <path d="M236 250 H306"/>
+    <path d="M524 120 H600"/>
+    <path d="M524 250 H600"/>
+    <path d="M782 120 C820 126 836 142 846 158"/>
+    <path d="M782 250 C820 244 836 224 846 206"/>
+    <path d="M296 110 L310 120 L296 130"/>
+    <path d="M296 240 L310 250 L296 260"/>
+    <path d="M590 110 L604 120 L590 130"/>
+    <path d="M590 240 L604 250 L590 260"/>
+  </g>
+  <g fill="#c6b3da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+    <text x="52" y="44">VLA pattern: visual-language understanding becomes useful only after it can produce valid actions.</text>
+    <text x="318" y="320">Pi0 / FAST / OpenVLA / DexVLA: different answers to action representation and control</text>
+  </g>
+</svg>

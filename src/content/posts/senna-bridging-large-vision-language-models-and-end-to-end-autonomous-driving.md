@@ -17,6 +17,21 @@ summary: SENNA split driving into high-level language planning and low-level tra
 
 This makes the language layer inspectable. A planner can say what it intends to do before the control module turns that intent into geometry.
 
+![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+
+**What to look at:**
+- Senna-VLM produces high-level textual plans.
+- Senna-E2E turns those plans into precise trajectories.
+- The interface is inspectable and potentially editable.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Decomposition | Language plan plus control module | Separates semantic intent from numeric control. |
+| Training | Planning-oriented QA and curriculum | Tunes the VLM for traffic decisions. |
+| Caveat | Language plan is not a guarantee | Control still needs safety validation. |
+
 **Why it mattered:** SENNA captures a useful decomposition for safety-critical systems: use language for semantic planning, but keep numeric control in a component designed for precision.
 
 **Take-home message:** The most useful VLM in a driving stack may be the one that thinks out loud at the right abstraction level.

@@ -19,6 +19,21 @@ summary: DeepSeek-VL2 combined dynamic high-resolution tiling with sparse MoE la
 
 The result is especially relevant for OCR, documents, tables, charts, and visual grounding, where resizing or compressing the image too aggressively destroys the answer.
 
+![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+
+**What to look at:**
+- Dynamic tiling keeps high-resolution images readable.
+- Sparse MoE language modeling keeps active parameters lower than total parameters.
+- Document, chart, table, and OCR tasks are the main evidence surface.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Vision | Dynamic tiling | Keeps details from high-res and odd-aspect images. |
+| Language | DeepSeekMoE with latent attention | Improves inference efficiency for a large-capacity model. |
+| Best fit | OCR and documents | Text-heavy visual tasks expose the benefit. |
+
 **Why it mattered:** It is a practical answer to the "large but usable" problem. The model can have broad capacity without paying dense-model cost on every token.
 
 **Take-home message:** High-resolution vision and efficient language modeling have to be designed together; otherwise document VLMs either miss details or become too expensive.

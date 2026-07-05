@@ -19,6 +19,21 @@ summary: EMMA represented driving inputs and outputs as language tokens so one m
 
 The striking design choice is to represent many non-sensor inputs and outputs as text. That lets the model reuse the structure and world knowledge of a multimodal language model while training across several driving tasks.
 
+![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+
+**What to look at:**
+- Inputs and outputs are represented in a language-like space.
+- Planning, perception objects, and road graph elements are trained together.
+- The limitations section matters: camera-only, limited frames, heavy compute.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Model role | Generalist driving model | One multimodal model handles several driving outputs. |
+| Output format | Text-encoded trajectories and objects | Lets prompts select task-specific outputs. |
+| Caveat | Limited temporal and 3D sensing | Promising architecture, not a complete AV stack. |
+
 **Why it mattered:** EMMA is a strong example of the generalist-model thesis entering autonomous driving: one model, many outputs, shared representations.
 
 **Take-home message:** Language can be a unifying interface for driving tasks, but EMMA also makes the costs obvious: limited temporal context, no full 3D sensor stack, and heavy compute.
