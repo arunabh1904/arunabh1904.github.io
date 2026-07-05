@@ -11,15 +11,12 @@ const itemCountLabel = `${READING_LIST_ITEMS.length} ${
 <PostLayout title="Reading List" showSectionsNav={false}>
   <SectionHeader
     eyebrow="Reading List"
-    title="Good things to read"
-    description="External essays, posts, and references worth keeping close."
+    title="External references"
+    description="Essays, blogs, and references worth returning to, with one reason to read each."
     meta={itemCountLabel}
   />
 
   <section class="resource-list">
-    <div class="resource-list__header">
-      <h2>Saved links</h2>
-    </div>
     <ul>
       {READING_LIST_ITEMS.map((item) => (
         <li>

@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2014/04/01/auto-encoding-variational-bayes.html
 tags:
   - Other
 field: Variational Inference
-summary: 2014 – Auto-Encoding Variational Bayes
+summary: VAEs made latent-variable models trainable with SGD by turning stochastic sampling into a differentiable reparameterized path.
 ---
 ## 2014 – Auto-Encoding Variational Bayes
 

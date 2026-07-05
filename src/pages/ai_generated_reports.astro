@@ -13,24 +13,24 @@ const reportCount = posts.length + PDF_REPORTS.length;
   <SectionHeader
     eyebrow="AI Reports"
     title="Generated research summaries"
-    description="Audio and text reports made with AI assistance, kept separate from hand-written notes."
+    description="AI-generated reports kept separate from hand-written notes."
     meta={`${reportCount} reports`}
   />
 
   <section class="section-index-group">
     <h2>Audio summaries</h2>
-  {posts.length > 0 ? <PostList posts={posts} /> : <p>No audio summaries yet.</p>}
+    {posts.length > 0 ? <PostList posts={posts} /> : <p>No audio summaries yet.</p>}
   </section>
 
   <section class="section-index-group">
     <h2>Deep research summaries</h2>
-  <ul class="post-list">
-    {PDF_REPORTS.map((report) => (
-      <li>
-        <a href={report.href}>{report.label}</a>
-        <small>{report.dateLabel}</small>
-      </li>
-    ))}
-  </ul>
+    <ul class="post-list">
+      {PDF_REPORTS.map((report) => (
+        <li>
+          <a href={report.href}>{report.label}</a>
+          <small>{report.dateLabel}</small>
+        </li>
+      ))}
+    </ul>
   </section>
 </PostLayout>

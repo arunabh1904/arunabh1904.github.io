@@ -7,19 +7,9 @@ legacyPath: /blog/2025/02/08/my-journey-so-far-full-story.html
 tags:
   - Other
 summary: >-
-  Index - Introduction - Growing Up - Undergrad at MIT, Manipal - Depression -
-  Grad school at Mines - Finding a Job Out of Grad School - First Job at DEKA -
-  Zoox
+  A personal account of finding robotics through setbacks, project work,
+  graduate school, DEKA, and Zoox.
 ---
-## Index
-- [Introduction](#introduction)
-- [Growing Up](#growing-up)
-- [Undergrad at MIT, Manipal](#undergrad-at-mit-manipal)
-- [Depression](#depression)
-- [Grad school at Mines](#grad-school-at-mines)
-- [Finding a Job Out of Grad School](#finding-a-job-out-of-grad-school)
-- [First Job at DEKA](#first-job-at-deka)
-- [Zoox](#zoox)
 
 ## Introduction
 
@@ -31,7 +21,7 @@ I grew up in Jaipur, a city that shaped much of my early life. I lost my father 
 
 Most of my schooling was in Jaipur, and like many aspiring engineers, I spent three intense years in Kota preparing for the JEE. Kota is often described as a **factory** ([Netflix show](https://www.netflix.com/title/81249783) / [Wiki](https://en.wikipedia.org/wiki/Kota_Factory)), and that description is not far off. The city runs on academic competition. It is also a perfect breeding ground for [Girard's mimetic theory of desire](https://en.wikipedia.org/wiki/Mimetic_theory), where students absorb each other's ambitions and anxieties until it becomes hard to tell what you actually want. Despite working hard, I did not clear the IIT exam. At 18, that failure felt crushing, like I had let everyone down after years of preparation. Even now, at 33, the memory still makes my body tense up.
 
-### Takeaways
+### What that period taught me
 - **Be resilient** in the face of adversity.
 - Sometimes, **no matter how hard you try, you will fail** - and that's okay.
 - **It's okay to indulge** in things you like (like video games), but don’t let them consume you.
@@ -50,7 +40,7 @@ Even with that ridiculous ending, the concept was real. A similar design is now 
 
 <img src="/assets/images/IMG_8842.jpg" alt="Areca Nut Robot" class="float-right" style="max-width:65%;">
 
-### Takeaways
+### What undergrad changed
 - **It's never too late to start.**
 - **Jugaad** (resourcefulness in Hindi) is okay, as long as you don’t cheat outright!
 - **Building things that help others** brings a ton of joy.
@@ -77,7 +67,7 @@ Those experiences helped me find a purpose and clarify what I wanted to work on.
 
 The results started rolling in, and I was accepted into three different schools. I still remember rereading the first acceptance email about five times, in disbelief that I had actually been accepted! With newfound clarity and excitement, I packed my bags and headed to the U.S. for grad school, ready to start a new chapter as a robotics graduate student at the Colorado School of Mines!
 
-### Takeaways
+### What the reset clarified
 - **Depression can be scary.**
 - **Having a purpose** makes it low-effort to work hard.
 - **Always have a backup plan.**
@@ -98,7 +88,7 @@ The third semester at CSM was a turning point in my career. I spent a lot of tim
 
 Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grad school is not just about grades. It is about the projects you take on, the challenges you solve, and the people you learn from. For students in grad school now, my advice is simple: take on projects that stretch you, use the resources around you, and follow the problems that genuinely excite you. That is how progress starts to compound.
 
-### Takeaways
+### What Mines taught me
 - **Focus on building a strong foundation** in the areas that excite you.
 - **It's okay to feel out of place** in the beginning. Navigating many changes at once can be overwhelming, but it's part of the process.
 - **Be intentional** about what you want to get out of grad school. Tailor your coursework and experiences to align with your interests.

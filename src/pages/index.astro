@@ -27,7 +27,7 @@ const sectionCards = [
     href: '/paper_summaries_field.html',
     command: 'arxiv-notes',
     title: 'Arxiv Notes',
-    description: 'Research-paper notes grouped by the ideas they connect to.',
+    description: 'Paper notes that track the contribution, tradeoff, and lasting idea.',
     count: paperPosts.length,
   },
   {
@@ -35,7 +35,7 @@ const sectionCards = [
     href: '/blog.html',
     command: 'blog',
     title: 'Blog',
-    description: 'Longer reflections on research, work, and the path here.',
+    description: 'Essays on research practice, local models, robotics, and career lessons.',
     count: blogPosts.length,
   },
   {
@@ -43,7 +43,7 @@ const sectionCards = [
     href: '/build_intuition.html',
     command: 'build-intuition',
     title: 'Build Intuition',
-    description: 'Intuition-first explainers for ideas worth really understanding.',
+    description: 'Concept-first walkthroughs for mechanisms that reward slow understanding.',
     count: buildIntuitionPosts.length,
   },
   {
@@ -51,7 +51,7 @@ const sectionCards = [
     href: '/revision_notes.html',
     command: 'revision-notes',
     title: 'Revision Notes',
-    description: 'Study notes distilled from lectures, courses, and longer material.',
+    description: 'Course notes and implementation details kept for later review.',
     count: revisionPosts.length,
   },
   {
@@ -59,7 +59,7 @@ const sectionCards = [
     href: '/ai_generated_reports.html',
     command: 'ai-reports',
     title: 'AI Generated Reports',
-    description: 'Audio and text reports produced with AI assistance.',
+    description: 'Generated summaries kept separate from hand-written notes.',
     count: aiPosts.length,
   },
   {
@@ -67,7 +67,7 @@ const sectionCards = [
     href: '/reading_list.html',
     command: 'reading-list',
     title: 'Reading List',
-    description: 'External essays, posts, and references worth keeping close.',
+    description: 'External writing worth returning to, with one reason to read each link.',
     count: READING_LIST_ITEMS.length,
   },
   {
@@ -84,37 +84,37 @@ const recentShelves = [
   {
     title: 'Arxiv Notes',
     href: '/paper_summaries_field.html',
-    summary: 'Research-paper notes grouped by the ideas they connect to.',
+    summary: 'Paper notes that track the contribution, tradeoff, and lasting idea.',
     posts: paperPosts.slice(0, 2),
-    emptyMessage: 'New research notes will show up here.',
+    emptyMessage: 'No paper notes yet.',
   },
   {
     title: 'Blog',
     href: '/blog.html',
-    summary: 'Longer reflections on research, work, and the path here.',
+    summary: 'Essays on research practice, local models, robotics, and career lessons.',
     posts: blogPosts.slice(0, 2),
-    emptyMessage: 'Blog posts will show up here.',
+    emptyMessage: 'No essays yet.',
   },
   {
     title: 'Build Intuition',
     href: '/build_intuition.html',
-    summary: 'Intuition-first explainers for ideas worth really understanding.',
+    summary: 'Concept-first walkthroughs for mechanisms that reward slow understanding.',
     posts: buildIntuitionPosts.slice(0, 2),
-    emptyMessage: 'Intuition-first explainers will show up here.',
+    emptyMessage: 'No explainers yet.',
   },
   {
     title: 'Revision Notes',
     href: '/revision_notes.html',
-    summary: 'Study notes distilled from lectures, courses, and longer material.',
+    summary: 'Course notes and implementation details kept for later review.',
     posts: revisionPosts.slice(0, 2),
-    emptyMessage: 'Revision notes will show up here.',
+    emptyMessage: 'No revision notes yet.',
   },
   {
     title: 'AI Generated Reports',
     href: '/ai_generated_reports.html',
-    summary: 'Audio and text reports produced with AI assistance.',
+    summary: 'Generated summaries kept separate from hand-written notes.',
     posts: aiPosts.slice(0, 2),
-    emptyMessage: 'This section is ready for future reports.',
+    emptyMessage: 'No generated reports yet.',
   },
 ] as const;
 
@@ -170,8 +170,8 @@ const formatDate = (date: Date) =>
       <div class="home-hero__copy">
         <h1 class="home-title">ARUNABH.BLOG</h1>
         <p class="lead">
-          I work on computer vision and robotics for autonomous systems. This is where I write
-          about the ideas, papers, and experiences that have shaped the path.
+          I work on computer vision and robotics for autonomous systems. This site is where I keep
+          the research notes, implementation records, and personal essays I expect to reuse.
         </p>
         <nav class="home-command-bar home-command-bar--hero" aria-label="Homepage sections">
           <a href="#about">/about</a>
@@ -201,23 +201,20 @@ const formatDate = (date: Date) =>
         <h2>What this site is</h2>
       </div>
       <p class="intro-text">
-        I work in computer vision research at Zoox, building learned representations for autonomous
-        driving scenes and helping shape perception research. Before that, I led parts of the
-        perception stack at DEKA for Roxo, FedEx&apos;s last-mile delivery robot, with a focus on
-        short-range perception and traffic-light understanding.
+        I work in computer vision research at Zoox, where I build learned representations for
+        autonomous driving scenes. Before that, I led parts of the perception stack at DEKA for
+        Roxo, FedEx&apos;s last-mile delivery robot, focused on short-range perception and
+        traffic-light understanding.
       </p>
 
       <p class="intro-text">
-        My path into robotics started in India during my undergraduate years at MIT, Manipal, where
-        building projects made the field feel alive. That early fascination became a deliberate
-        commitment to autonomous systems and eventually brought me to the United States for graduate
-        school at the Colorado School of Mines.
+        Robotics started as undergraduate project work at MIT, Manipal, then became a deliberate
+        commitment to autonomy during graduate school at the Colorado School of Mines.
       </p>
 
       <p class="intro-text">
-        I care deeply about building systems that make the physical world safer, more capable, and
-        easier to navigate. This site is part notebook, part archive, and part ongoing conversation
-        with the work I want to keep doing.
+        The throughline is systems that make the physical world safer and easier to navigate. The
+        site is a working archive for that throughline.
       </p>
     </article>
 
@@ -247,8 +244,7 @@ const formatDate = (date: Date) =>
       <p class="home-panel__eyebrow">Latest</p>
       <h2>Recent entries</h2>
       <p>
-        A quick scan of the newest writing across the site. Each panel links out to the section
-        and highlights the two most recent posts.
+        The newest hand-written entries across the site, grouped by the kind of work they do.
       </p>
     </div>
 

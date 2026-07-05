@@ -1,6 +1,6 @@
 export const SITE_TITLE = 'Arunabh.BLOG';
 export const SITE_DESCRIPTION =
-  'Notes on computer vision, robotics, research, and local AI systems.';
+  'Research notes, implementation records, and essays on computer vision, robotics, and local AI systems.';
 
 export const CONTACT_LINKS = [
   { href: 'mailto:arunabh1904@gmail.com', iconName: 'email', label: 'Email' },

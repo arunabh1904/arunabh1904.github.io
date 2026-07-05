@@ -9,7 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: Natural Language Processing
-summary: 2014 – Sequence to Sequence Learning with Neural Networks
+summary: Seq2seq made encoder-decoder neural translation practical before attention became the default alignment mechanism.
 ---
 ## 2014 – Sequence to Sequence Learning with Neural Networks
 

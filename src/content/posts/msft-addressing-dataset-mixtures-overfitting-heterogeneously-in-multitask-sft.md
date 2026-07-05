@@ -9,7 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: Alignment
-summary: '2026 – mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT'
+summary: mSFT adapts multitask fine-tuning mixtures by tracking which datasets overfit at different rates.
 ---
 ## 2026 – mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT
 

@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2015/12/01/deep-residual-learning-for-image-recognitio
 tags:
   - Other
 field: Computer Vision
-summary: 2015 – Deep Residual Learning for Image Recognition
+summary: ResNet made very deep CNNs practical by learning residual updates and carrying gradients through identity shortcuts.
 ---
 ## 2015 – Deep Residual Learning for Image Recognition
 
@@ -61,4 +61,3 @@ class MiniResidual(nn.Module):
 ```
 
 **Take-home message:** ResNet's core idea is almost comically simple: add the identity back. That shortcut reshaped deep-learning practice, and today almost every high-performance architecture inherits some version of its skip-connection logic.
-

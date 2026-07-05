@@ -9,7 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: Generative Models
-summary: 2021 – Improved Denoising Diffusion Probabilistic Models (ID DPM)
+summary: Improved DDPM tightened diffusion likelihoods and made sampling faster by learning reverse-process variance.
 ---
 ## 2021 – Improved Denoising Diffusion Probabilistic Models (ID DPM)
 
