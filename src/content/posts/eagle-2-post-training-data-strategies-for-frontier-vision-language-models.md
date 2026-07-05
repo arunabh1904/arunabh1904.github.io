@@ -19,7 +19,8 @@ summary: Eagle 2 made the post-training data recipe the main contribution, showi
 
 The main lesson is that strong VLMs are not just pretrained once and then lightly tuned. Their behavior is shaped by a careful curriculum of visual tasks and response styles.
 
-![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+![Figure 1: Overview of Eagle2-9B’s result across different multimodal benchmarks, in comparison to state-of-the-art open-source and commercial frontier models from Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models](/assets/images/eagle-2-post-training-data-strategies-for-frontier-vision-language-models-paper-figure.png)
+_Figure 1: Overview of Eagle2-9B’s result across different multimodal benchmarks, in comparison to state-of-the-art open-source and commercial frontier models. From the [Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models paper](https://arxiv.org/abs/2501.14818), via arXiv HTML._
 
 **What to look at:**
 - Post-training data strategy is the primary contribution.

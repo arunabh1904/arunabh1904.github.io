@@ -19,7 +19,8 @@ summary: InternVL 2.5 scaled open multimodal models with better data, training s
 
 The paper is useful because it studies several axes together: vision encoder size, language model size, dataset size, and chain-of-thought style inference. The story is not "just scale everything"; it is that scaling only pays off when the data and training recipe stay balanced.
 
-![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+![Figure 1: Performance of various MLLMs on the OpenCompass leaderboard from InternVL 2.5: Expanding Performance Boundaries of Open-Source Multimodal Models](/assets/images/internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models-paper-figure.png)
+_Figure 1: Performance of various MLLMs on the OpenCompass leaderboard. From the [InternVL 2.5: Expanding Performance Boundaries of Open-Source Multimodal Models paper](https://arxiv.org/abs/2412.05271), via arXiv HTML._
 
 **What to look at:**
 - Progressive scaling across vision encoder, LLM, data size, and inference settings.

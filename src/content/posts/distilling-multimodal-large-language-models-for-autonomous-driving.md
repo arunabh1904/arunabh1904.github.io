@@ -17,7 +17,8 @@ summary: DIMA used a large multimodal driving model as a teacher, distilling its
 
 The result is a model that keeps more of the teacher's traffic knowledge while avoiding a full LLM in the runtime loop.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure from DiMA: long-tail and zero-shot driving scenarios compared against prior planners](/assets/images/distilling-multimodal-large-language-models-for-autonomous-driving-paper-figure.png)
+_Source figure from the [DiMA paper](https://arxiv.org/abs/2501.09757), via arXiv HTML._
 
 **What to look at:**
 - A large multimodal planner is used as an offline teacher.

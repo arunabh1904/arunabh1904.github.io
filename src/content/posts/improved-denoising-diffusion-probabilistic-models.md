@@ -19,6 +19,9 @@ summary: Improved DDPM tightened diffusion likelihoods and made sampling faster 
 
 **Conference:** ICML 2021
 
+![Figure 3 from Improved DDPM: linear and cosine noise schedules preserve signal at different rates](/assets/images/improved-ddpm-paper-figure-3-noise-schedule.png)
+_Figure 3 from the [Improved DDPM paper](https://arxiv.org/abs/2102.09672), via ar5iv._
+
 **Plain-language summary:** Nichol and Dhariwal made DDPMs faster and stronger without changing the basic denoising story. They learn the reverse-process variance $\Sigma_\theta$ instead of keeping it fixed, optimize a hybrid objective that mixes ELBO terms with the simple noise-prediction loss, and use a cosine noise schedule with importance-weighted terms for stabler gradients.
 
 Those changes let the sampler take larger steps through noise space. Denoising drops from 1000 steps to roughly 50-250 with little FID loss, while log-likelihoods reach parity with autoregressive models on ImageNet-64. The paper also makes a useful empirical claim: bigger UNets and more compute improve bits-per-dim and FID in a predictable scaling-law-like way.

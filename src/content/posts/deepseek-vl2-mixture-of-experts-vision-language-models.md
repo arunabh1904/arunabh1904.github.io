@@ -19,7 +19,8 @@ summary: DeepSeek-VL2 combined dynamic high-resolution tiling with sparse MoE la
 
 The result is especially relevant for OCR, documents, tables, charts, and visual grounding, where resizing or compressing the image too aggressively destroys the answer.
 
-![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+![Figure 1 from DeepSeek-VL2: average performance versus activated parameters](/assets/images/deepseek-vl2-mixture-of-experts-vision-language-models-paper-figure.png)
+_Figure 1 from the [DeepSeek-VL2 paper](https://arxiv.org/abs/2412.10302), via arXiv HTML._
 
 **What to look at:**
 - Dynamic tiling keeps high-resolution images readable.

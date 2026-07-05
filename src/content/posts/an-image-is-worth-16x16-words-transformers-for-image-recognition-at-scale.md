@@ -21,7 +21,8 @@ summary: ViT showed that patchified images and standard Transformer encoders can
 
 **Conference:** ICLR 2021
 
-![Vision Transformer](/assets/images/Vision Transformer VIT.png)
+![Figure 1: Model overview from An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale](/assets/images/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale-paper-figure.png)
+_Figure 1: Model overview. From the [An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale paper](https://arxiv.org/abs/2010.11929), via arXiv HTML._
 
 **Summary:** ViT treats an image like a sequence. It slices the image into 16x16 patches, projects each patch into an embedding, adds positional embeddings and a `[CLS]` token, then feeds the sequence into a standard Transformer encoder. With enough pre-training data, that plain architecture matches or exceeds leading CNNs while using fewer training FLOPs.
 

@@ -19,7 +19,8 @@ summary: Qwen2-VL made resolution and video length more flexible by letting visu
 
 The model family also handles images and video with a shared multimodal position encoding, making it useful for OCR-heavy tasks, documents, visual reasoning, and longer temporal inputs.
 
-![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+![Figure 1: Qwen2-VL capabilities: Multilingual image text understanding, code/math reasoning, video analysis, live chat, agent potential, and more from Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-paper-figure.jpg)
+_Figure 1: Qwen2-VL capabilities: Multilingual image text understanding, code/math reasoning, video analysis, live chat, agent potential, and more. From the [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution paper](https://arxiv.org/abs/2409.12191), via arXiv HTML._
 
 **What to look at:**
 - Naive dynamic resolution makes visual token count follow the input rather than a fixed resize.

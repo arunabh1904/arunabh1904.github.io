@@ -19,6 +19,9 @@ summary: ResNet made very deep CNNs practical by learning residual updates and c
 
 **Conference:** CVPR 2016 (1st place ILSVRC 2015 classifier)
 
+![Residual block schematic](/assets/images/resnet.png)
+_Residual-block diagram from the ResNet paper/project materials._
+
 **Summary:** ResNet made depth easier to optimize by changing what each block has to learn. Instead of learning a direct mapping $H(x)$, a residual block learns $F(x)=H(x)-x$ and adds the input back through an identity shortcut: $H(x)=F(x)+x$. If the best transformation is close to identity, the block can push $F(x)$ toward zero rather than forcing a stack of layers to relearn the input.
 
 Those shortcuts act like gradient highways without adding parameters or inference cost. They let the authors train 152-layer networks that were both deeper and more accurate than plain CNNs. Bottleneck blocks, built from 1x1, 3x3, and 1x1 convolutions, kept the compute manageable: ResNet-152 was far deeper than VGG-19 while using fewer FLOPs. An ensemble of ResNets achieved 3.57% top-5 error on ImageNet and won ILSVRC 2015.

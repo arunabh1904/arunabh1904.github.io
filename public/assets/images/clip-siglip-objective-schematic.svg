@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="340" viewBox="0 0 960 340" role="img" aria-labelledby="title desc">
+  <title id="title">CLIP and SigLIP objective schematic</title>
+  <desc id="desc">A diagram showing image and text encoders producing a similarity matrix, with CLIP using softmax contrastive learning and SigLIP using independent sigmoid pair losses.</desc>
+  <rect width="960" height="340" rx="24" fill="#10120f"/>
+  <g fill="none" stroke="#f4df6a" stroke-width="2">
+    <rect x="52" y="72" width="170" height="76" rx="14"/>
+    <rect x="52" y="194" width="170" height="76" rx="14"/>
+    <rect x="334" y="98" width="170" height="144" rx="14"/>
+    <rect x="614" y="72" width="254" height="76" rx="14"/>
+    <rect x="614" y="194" width="254" height="76" rx="14"/>
+  </g>
+  <g fill="#fff2a8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+    <text x="86" y="118" font-size="22">images</text>
+    <text x="82" y="240" font-size="22">captions</text>
+    <text x="374" y="150" font-size="22">similarity</text>
+    <text x="390" y="182" font-size="22">matrix</text>
+    <text x="654" y="118" font-size="21">CLIP: softmax rows</text>
+    <text x="642" y="240" font-size="21">SigLIP: pair BCE</text>
+  </g>
+  <g stroke="#f4df6a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M232 110 H322"/>
+    <path d="M232 232 H322"/>
+    <path d="M514 134 H602"/>
+    <path d="M514 206 H602"/>
+    <path d="M312 100 L326 110 L312 120"/>
+    <path d="M312 222 L326 232 L312 242"/>
+    <path d="M592 124 L606 134 L592 144"/>
+    <path d="M592 196 L606 206 L592 216"/>
+  </g>
+  <text x="52" y="44" fill="#c9c08a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">Both learn image-text alignment; SigLIP changes the normalization into independent binary decisions.</text>
+</svg>

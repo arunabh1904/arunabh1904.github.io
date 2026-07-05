@@ -17,7 +17,8 @@ summary: AsyncDriver separated slow LLM reasoning from fast motion planning so s
 
 Those instructions can guide the planner through complex or ambiguous situations without requiring the LLM to produce every control update.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure 2: Overview of our proposed AsyncDriver framework from AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving](/assets/images/asyncdriver-asynchronous-llm-enhanced-planner-for-autonomous-driving-paper-figure.png)
+_Figure 2: Overview of our proposed AsyncDriver framework. From the [AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving paper](https://arxiv.org/abs/2406.14556), via arXiv HTML._
 
 **What to look at:**
 - The key design is two clocks: fast planner, slow LLM.

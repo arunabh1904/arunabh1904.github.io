@@ -19,7 +19,8 @@ summary: Molmo argued that high-quality open multimodal data can matter more tha
 
 This matters because many VLMs are hard to inspect. Molmo makes the data story more visible, which makes the model easier to study and reuse.
 
-![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+![Figure 1: Datasets in PixMo (left) and the capabilities they enable in Molmo (right) from Molmo and PixMo: Open Weights and Open Data for State-of-the-Art Vision-Language Models](/assets/images/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models-paper-figure.png)
+_Figure 1: Datasets in PixMo (left) and the capabilities they enable in Molmo (right). From the [Molmo and PixMo: Open Weights and Open Data for State-of-the-Art Vision-Language Models paper](https://arxiv.org/abs/2409.17146), via arXiv HTML._
 
 **What to look at:**
 - PixMo data quality is the main mechanism: detailed human captions and pointing supervision.

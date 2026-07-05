@@ -19,7 +19,8 @@ summary: GANs framed generation as a two-player game between a generator and dis
 
 **Conference:** NIPS 2014
 
-![GAN generator discriminator game](/assets/images/gan-game-schematic.svg)
+![Figure 1 from GAN: generator samples move through latent space while the discriminator separates real and generated data](/assets/images/generative-adversarial-networks-paper-figure.png)
+_Figure 1 from the [GAN paper](https://arxiv.org/abs/1406.2661), via arXiv HTML._
 
 **Summary:** GANs turn generative modelling into a contest. A generator $G$ maps random noise into synthetic samples, while a discriminator $D$ learns to tell real data from generated data. Training alternates between making $D$ better at the classification problem and making $G$ better at fooling $D$.
 

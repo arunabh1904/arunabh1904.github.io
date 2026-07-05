@@ -20,7 +20,8 @@ summary: Seq2seq made encoder-decoder neural translation practical before attent
 **Project page / blog:** [Google Research Blog – "A neural network for machine translation"](https://research.googleblog.com/2014/12/a-neural-network-for-machine-translation.html)
 
 **Conference:** NeurIPS 2014
-![Seq2Seq Architecture](/assets/images/seq2seq.png)
+![Figure 1: Our model reads an input sentence “ABC” and produces “WXYZ” as the output sentence from Sequence to Sequence Learning with Neural Networks](/assets/images/sequence-to-sequence-learning-with-neural-networks-paper-figure.png)
+_Figure 1: Our model reads an input sentence “ABC” and produces “WXYZ” as the output sentence. From the [Sequence to Sequence Learning with Neural Networks paper](https://arxiv.org/abs/1409.3215), via arXiv HTML._
 
 
 **Summary:** Sutskever et al. showed that translation could be treated as a general sequence-to-sequence problem. A multi-layer LSTM encodes the source sentence into a single vector, and a second LSTM decodes that vector into the target sentence one token at a time. Trained only on parallel text, a 4-layer model reached 34.8 BLEU on WMT'14 English to French, beating a strong phrase-based SMT baseline. Ensembles and SMT reranking pushed the score to 36.5.

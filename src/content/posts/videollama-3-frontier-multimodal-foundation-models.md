@@ -19,7 +19,8 @@ summary: VideoLLaMA 3 showed that strong image understanding can be the foundati
 
 The key claim is that high-quality image-text learning carries a lot of the load for video. Video data still matters, but the model does not need to learn all semantics from video clips alone.
 
-![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+![Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced image/video MLLM on various representative benchmarks from VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](/assets/images/videollama-3-frontier-multimodal-foundation-models-paper-figure.png)
+_Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced image/video MLLM on various representative benchmarks. From the [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding paper](https://arxiv.org/abs/2501.13106), via arXiv HTML._
 
 **What to look at:**
 - High-quality image-text alignment is treated as the foundation for video.

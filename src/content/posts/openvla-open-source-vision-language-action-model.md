@@ -19,7 +19,8 @@ summary: OpenVLA released a 7B open robot policy trained on 970k real robot demo
 
 The open release matters: checkpoints, code, and fine-tuning recipes make generalist robot policies easier to study and adapt.
 
-![Vision-language-action stack schematic](/assets/images/robot-vla-stack-schematic.svg)
+![Figure 1: OpenVLA model architecture from OpenVLA: An Open-Source Vision-Language-Action Model](/assets/images/openvla-open-source-vision-language-action-model-paper-figure.png)
+_Figure 1: OpenVLA model architecture. From the [OpenVLA: An Open-Source Vision-Language-Action Model paper](https://arxiv.org/abs/2406.09246), via arXiv HTML._
 
 **What to look at:**
 - The visual encoder fuses SigLIP and DINOv2 features.

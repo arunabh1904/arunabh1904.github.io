@@ -19,7 +19,8 @@ summary: EMMA represented driving inputs and outputs as language tokens so one m
 
 The striking design choice is to represent many non-sensor inputs and outputs as text. That lets the model reuse the structure and world knowledge of a multimodal language model while training across several driving tasks.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure 1: EMMA overview diagram from EMMA: End-to-End Multimodal Model for Autonomous Driving](/assets/images/emma-end-to-end-multimodal-model-for-autonomous-driving-paper-figure.png)
+_Figure 1: EMMA overview diagram. From the [EMMA: End-to-End Multimodal Model for Autonomous Driving paper](https://arxiv.org/abs/2410.23262), via arXiv HTML._
 
 **What to look at:**
 - Inputs and outputs are represented in a language-like space.

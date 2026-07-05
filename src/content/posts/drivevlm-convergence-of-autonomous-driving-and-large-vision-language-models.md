@@ -17,7 +17,8 @@ summary: DriveVLM combined VLM reasoning with hierarchical planning, then paired
 
 That hybrid design is the interesting part. The VLM contributes semantic reasoning about rare or complex situations; the conventional stack keeps the control loop more grounded.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure 1: DriveVLM and DriveVLM-Dual model pipelines from DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models](/assets/images/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models-paper-figure.png)
+_Figure 1: DriveVLM and DriveVLM-Dual model pipelines. From the [DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models paper](https://arxiv.org/abs/2402.12289), via arXiv HTML._
 
 **What to look at:**
 - Hierarchical VLM reasoning is split into scene description, analysis, and planning.

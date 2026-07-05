@@ -17,7 +17,8 @@ summary: TOD3Cap asked driving models to detect outdoor 3D objects and caption t
 
 That is harder than standard object detection because it requires attributes, context, and grounded descriptions, not just boxes and class IDs.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure 1: We introduce the task of 3D dense captioning in outdoor scenes (right) from TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes](/assets/images/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes-paper-figure.png)
+_Figure 1: We introduce the task of 3D dense captioning in outdoor scenes (right). From the [TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes paper](https://arxiv.org/abs/2403.19589), via arXiv HTML._
 
 **What to look at:**
 - The task combines 3D localization with object-level captions.

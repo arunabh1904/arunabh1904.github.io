@@ -21,6 +21,9 @@ summary: CLIP used image-text contrastive training to make visual representation
 
 **Conference:** Released as a tech report; widely cited (ICML 2021 oral-style spotlight)
 
+![Figure 1 from CLIP: contrastive language-image pre-training and zero-shot transfer](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
+_Figure 1 from the [CLIP paper](https://arxiv.org/abs/2103.00020), via ar5iv._
+
 **Plain-language summary:** CLIP trains vision through language. It pairs an image encoder with a text Transformer and learns from 400M web image-caption pairs by pulling matching image/text embeddings together and pushing mismatches apart. After pre-training, classification becomes a prompt comparison problem: embed the image, embed candidate labels such as "a photo of a tiger", and choose the closest text embedding.
 
 That framing replaced fixed softmax heads with natural-language supervision. One model could perform zero-shot classification across many datasets, and prompt wording became part of the evaluation surface. The same shared embedding space also made text-guided image search and generation feel natural.

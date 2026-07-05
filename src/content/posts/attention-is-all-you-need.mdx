@@ -23,6 +23,9 @@ import { attentionIsAllYouNeedPlayground } from '../../lib/python-playground-exa
 
 **Conference:** NeurIPS 2017
 
+![Figure 1: The Transformer - model architecture from Attention Is All You Need](/assets/images/attention-is-all-you-need-paper-figure.png)
+_Figure 1: The Transformer - model architecture. From the [Attention Is All You Need paper](https://arxiv.org/abs/1706.03762), via arXiv HTML._
+
 The Transformer did not win by inventing attention from scratch. Its sharper move was to remove recurrence and convolution from sequence modelling and ask whether stacked attention blocks were enough. In that architecture, any token can attend to any other token in one step, which shortens gradient paths and makes training highly parallel. Eight P100 GPUs reached 28.4 BLEU on English to German in 3.5 days, a practical result that mattered as much as the modeling idea.
 
 At the heart of the architecture is the scaled attention mechanism:

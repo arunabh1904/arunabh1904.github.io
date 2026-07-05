@@ -19,7 +19,8 @@ summary: DQN combined Q-learning, replay, and target networks to make pixel-base
 
 **Conference:** NIPS Deep Learning Workshop 2013 (expanded Nature version published 2015)
 
-![DQN Agent](/assets/images/DQN Atari Reinforcement Learning Summaries.png)
+![Figure 1 provides sample screenshots from five of the games used for training from Playing Atari with Deep Reinforcement Learning](/assets/images/playing-atari-with-dqn-paper-figure.png)
+_Figure 1 provides sample screenshots from five of the games used for training. From the [Playing Atari with Deep Reinforcement Learning paper](https://arxiv.org/abs/1312.5602), via arXiv HTML._
 
 **Summary:** DQN made a blunt claim feel plausible: a single neural network could learn control policies directly from Atari pixels, without hand-built state features for each game. The model was a convolutional Q-network trained from raw Atari-2600 frames, and two stabilisation tricks kept the learning problem from collapsing:
 
