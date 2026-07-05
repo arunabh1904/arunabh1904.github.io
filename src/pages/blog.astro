@@ -1,18 +1,11 @@
 ---
 import PostLayout from '../layouts/PostLayout.astro';
 import PostList from '../components/PostList.astro';
-import SectionHeader from '../components/SectionHeader.astro';
 import { getPostsBySection } from '../lib/content';
 
 const posts = await getPostsBySection('blog', 'desc');
 ---
 
 <PostLayout title="Blog" showSectionsNav={false}>
-  <SectionHeader
-    eyebrow="Blog"
-    title="Longer reflections"
-    description="Notes on research, engineering work, local models, and the path through robotics."
-    meta={`${posts.length} entries`}
-  />
   <PostList posts={posts} />
 </PostLayout>
