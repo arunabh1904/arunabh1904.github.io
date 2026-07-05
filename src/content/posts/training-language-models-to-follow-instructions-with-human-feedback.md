@@ -25,15 +25,9 @@ summary: >-
 
 ![RLHF Pipeline](/assets/images/DQN Atari RLHF.png)
 
-**Plain-language abstract**
-Large GPT-3 models were impressive, but they often ignored or misunderstood user instructions. The authors show that reinforcement learning from human feedback (RLHF) can align a language model with user intent. The process involves supervised fine-tuning on human-written demonstrations, training a reward model from ranked outputs, and then policy optimisation with PPO while penalising divergence from the supervised model. Even a 1.3&nbsp;B parameter InstructGPT matches or beats the 175&nbsp;B GPT-3 on real prompts and reduces toxicity and hallucination.
+**Plain-language abstract:** GPT-3 could generate impressive text, but it often missed what users actually asked for. InstructGPT showed that reinforcement learning from human feedback could move a language model toward user intent. The pipeline has three stages: supervised fine-tuning on human demonstrations, reward-model training from ranked outputs, and PPO policy optimization with a KL penalty that keeps the model close to the supervised baseline.
 
-**Novel insights**
-- RLHF pipeline crystalised: SFT ➔ RM ➔ PPO became the de-facto recipe for alignment.
-- Human preference beats scale: a 1.3&nbsp;B RLHF model is preferred to the 175&nbsp;B GPT-3 on customer prompts.
-- 3&nbsp;H framing (helpfulness, honesty, harmlessness) guides evaluation.
-- KL penalty prevents reward hacking while allowing large behavioural shifts.
-- Provided rigorous alignment evaluation, inspiring red-teaming and scalable oversight.
+The striking result is that preference data can beat scale for instruction following. A 1.3B-parameter InstructGPT model was preferred to the 175B GPT-3 on real customer prompts, while also reducing toxicity and hallucination. The paper also helped crystallize the helpfulness, honesty, and harmlessness framing that shaped later alignment evaluations.
 
 **Evals / Benchmarks**
 
@@ -44,7 +38,7 @@ Large GPT-3 models were impressive, but they often ignored or misunderstood user
 | RealToxicityPrompts (toxicity ↓) | 6.6&nbsp;% | 4.9&nbsp;% | 4.6&nbsp;% |
 | Academic NLP (avg.) | 70.0 | 69.2&nbsp;(-0.8) | 70.3&nbsp;(+0.3) |
 
-Key takeaway: alignment gains come without sacrificing standard benchmark scores.
+The key result is that alignment gains did not require sacrificing standard benchmark scores.
 
 **Tiny RLHF-style PPO loop (PyTorch-like pseudocode)**
 ```python
@@ -72,12 +66,7 @@ for step in range(num_updates):
 ```
 A reference policy (the frozen supervised model) keeps the RL step from drifting too far.
 
-**Critiques**
-- **What we liked:** Clear pipeline, quality beats size, reduced toxicity, open-source ecosystem.
-- **Limitations / open questions:** Costly human effort and compute,
-  reward models can be gamed, alignment is narrow.
+**Critiques:** The pipeline is clear, and the quality-over-size result is still important. But RLHF is expensive in both human labor and compute, reward models can be gamed, and the alignment target is narrow: a model can become better at satisfying raters without becoming robustly truthful or safe in every setting.
 
 **Why it matters**
-RLHF transformed large language models from clever autocomplete into instruction-following assistants,
- laying the groundwork for ChatGPT, GPT-4 and beyond.
-
+RLHF transformed large language models from clever autocomplete systems into instruction-following assistants, laying the groundwork for ChatGPT, GPT-4, and beyond.

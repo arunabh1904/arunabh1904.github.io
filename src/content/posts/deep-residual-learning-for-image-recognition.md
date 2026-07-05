@@ -19,12 +19,11 @@ summary: 2015 – Deep Residual Learning for Image Recognition
 
 **Conference:** CVPR 2016 (1st place ILSVRC 2015 classifier)
 
-**Summary (abstract in plain English):** ResNet reframes a layer’s objective from learning an outright mapping $H(x)$ to learning a residual $F(x)=H(x)-x$, then adding back the identity shortcut: $H(x)=F(x)+x$. These identity “highways” let gradients flow through 152-layer nets without vanishing, so extremely deep models become easier to optimise and more accurate. Despite being eight times deeper than VGG-19, a ResNet-152 is 38 % cheaper in FLOPs thanks to the 1×1–3×3–1×1 bottleneck design. An ensemble of ResNets (50–152 layers) achieved 3.57 % top‑5 error on ImageNet, winning ILSVRC 2015.
+**Summary:** ResNet made depth easier to optimize by changing what each block has to learn. Instead of learning a direct mapping $H(x)$, a residual block learns $F(x)=H(x)-x$ and adds the input back through an identity shortcut: $H(x)=F(x)+x$. If the best transformation is close to identity, the block can push $F(x)$ toward zero rather than forcing a stack of layers to relearn the input.
 
-**Novel insights:**
-- **Residual vs. direct mapping:** if the identity mapping is optimal, a residual block can simply drive $F(x) \rightarrow 0$, dodging the degradation that afflicts plain deep nets.
-- **Cost-free identity shortcuts** give gradient highways without adding parameters or inference cost.
-- **Depth with efficiency:** bottleneck blocks cut computation so a 152-layer ResNet needs 11.3 GFLOPs vs. VGG‑19’s 19.6 GFLOPs while being far deeper.
+Those shortcuts act like gradient highways without adding parameters or inference cost. They let the authors train 152-layer networks that were both deeper and more accurate than plain CNNs. Bottleneck blocks, built from 1x1, 3x3, and 1x1 convolutions, kept the compute manageable: ResNet-152 was far deeper than VGG-19 while using fewer FLOPs. An ensemble of ResNets achieved 3.57% top-5 error on ImageNet and won ILSVRC 2015.
+
+**Why it mattered:** The residual connection is a tiny architectural change with huge practical reach. It fixed the degradation problem in very deep CNNs, transferred well to detection and segmentation, and later became part of the default design vocabulary for modern deep networks, including Transformers.
 
 **Evals / Benchmarks:**
 
@@ -34,11 +33,9 @@ summary: 2015 – Deep Residual Learning for Image Recognition
 | ResNet‑152 | 60 M | 11.3 GF | 4.49 % | single-crop |
 | Ensemble (6 nets) | — | — | 3.57 % | ILSVRC 2015 winner |
 
-Transfer: ResNet‑101 backbones set SOTA on ImageNet detection, localization and MS‑COCO detection/segmentation in 2015.
+Transfer mattered as much as classification. ResNet-101 backbones set state of the art on ImageNet detection, localization, and MS-COCO detection and segmentation in 2015.
 
-**Critiques & limitations:**
-- **What I liked:** Elegant, minimal change with giant practical impact; the residual idea is now standard in CV and NLP. Thorough ablations showed depth degradation and its cure convincingly. Demonstrated excellent transfer across many vision tasks.
-- **What I didn’t like / open issues:** Block variants (identity vs. projection, BN/ReLU order) needed later clarification (ResNet v2, Pre‑Act). The paper focused on accuracy without real-time latency or energy numbers. Training 100–150‑layer nets is still heavy for small datasets and lighter regimes lack guidance.
+**Critiques & limitations:** ResNet is compelling because the intervention is so small: add the identity back, then let depth do useful work. The ablations make the degradation problem and its cure clear. The paper is less helpful on deployment tradeoffs, such as latency and energy, and later work had to clarify block variants such as projection shortcuts, BN/ReLU order, and pre-activation. Training 100-layer models also remains heavy when the dataset or compute budget is small.
 
 ```python
 import torch
@@ -63,6 +60,5 @@ class MiniResidual(nn.Module):
         return F.relu(out)
 ```
 
-**Take-home message:** ResNet’s single idea—“just add the identity back”—re‑shaped deep-learning practice: today virtually every high-performance network, from CNNs to Transformers, inherits its skip-connection DNA.
-
+**Take-home message:** ResNet's core idea is almost comically simple: add the identity back. That shortcut reshaped deep-learning practice, and today almost every high-performance architecture inherits some version of its skip-connection logic.
 

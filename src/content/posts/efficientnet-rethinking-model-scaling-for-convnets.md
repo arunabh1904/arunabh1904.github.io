@@ -21,16 +21,11 @@ summary: 2019 – EfficientNet — Rethinking Model Scaling for ConvNets
 
 **Conference:** ICML 2019
 
-**Summary (abstract in plain English):**
-Standard CNNs tend to grow along a single axis: make them deeper, wider or feed higher-resolution images.
-Tan and Le show that such unbalanced scaling leaves accuracy on the table.
-They first search for a mobile-sized baseline (B0) then scale depth, width and resolution together using a single factor $\phi$.
-The compound rule keeps FLOPs roughly constant while delivering much better accuracy–efficiency trade-offs.
+**Summary:** EfficientNet argues that model scaling should be balanced, not improvised one axis at a time. Standard CNNs often grow by becoming deeper, wider, or by consuming higher-resolution images. Tan and Le show that scaling only one dimension leaves accuracy and efficiency on the table.
 
-**Novel insights:**
-- Compound scaling jointly tunes depth $\alpha^\phi$, width $\beta^\phi$ and resolution $\gamma^\phi$ for better performance.
-- One NAS-derived micro-architecture (B0) can be stretched analytically into a full B1–B7 family.
-- B1 matches ResNet-152 with 27× fewer FLOPs, while B7 tops ImageNet using a fraction of prior NAS parameters.
+Their recipe starts with a mobile-sized architecture found by neural architecture search, EfficientNet-B0. From there, a single compound factor $\phi$ scales depth $\alpha^\phi$, width $\beta^\phi$, and resolution $\gamma^\phi$ together. That rule turns one searched micro-architecture into the B1-B7 family while keeping the accuracy-to-compute tradeoff unusually strong.
+
+**Why it mattered:** EfficientNet made scaling feel like a design problem rather than a brute-force contest. B1 roughly matched ResNet-152 with 27x fewer FLOPs, while B7 topped ImageNet with a fraction of the parameters used by earlier NAS-heavy models.
 
 **Evals / Latency benchmarks:**
 
@@ -41,16 +36,11 @@ The compound rule keeps FLOPs roughly constant while delivering much better accu
 | EfficientNet-B4 | 19 M | 4.2 B | 83.0 % | Beats NASNet-A (331×48) with 7× fewer FLOPs |
 | EfficientNet-B7 | 66 M | 37 B | 84.3 % | 8.4× smaller & 6.1× faster than GPipe-NASNet |
 
-Training uses 600 epochs on ImageNet with AutoAugment and dropout.
-Inference on TPU-v3 shows B0–B3 running in real time on modern mobile GPUs.
+The reported training recipe uses 600 epochs on ImageNet with AutoAugment and dropout. On TPU-v3 and mobile-oriented hardware, the smaller B0-B3 models run in real time, which is part of why the family became popular outside leaderboard settings.
 
-**Critiques & limitations:**
-- **What I liked:** Simple scaling formula practitioners can reuse.
-- **Limitations:** Optimised mainly for classification; detection or segmentation need extra tuning.
-  Training B0 requires expensive NAS and heavy data augmentation.
+**Critiques & limitations:** The compound scaling formula is easy to reuse, but the clean story depends on a strong searched baseline and a heavy training recipe. The paper is mainly optimized for classification; detection and segmentation need extra tuning. EfficientNet also makes clear that "efficient" can mean fewer FLOPs at inference while still requiring expensive architecture search and long training runs.
 
-**Take-home message:**
-EfficientNet's compound scaling still guides modern network design—how you scale often matters more than how big you scale.
+**Take-home message:** EfficientNet's lasting lesson is that how you scale can matter more than how much you scale. Balanced depth, width, and resolution gave CNNs a better accuracy-efficiency frontier.
 
 ### MBConv layers in PyTorch
 

@@ -19,13 +19,9 @@ summary: 2020 – Language Models are Few-Shot Learners (GPT-3)
 
 **Conference:** NeurIPS 2020 (oral)
 
-**Plain-language abstract**
-GPT-3 is an autoregressive Transformer 175 billion parameters strong—around ten times larger than any dense model before it. Trained on roughly 500 billion tokens of Internet text, it showed that scaling a vanilla decoder unlocks in-context learning: at test time users embed a task description plus a few demonstrations in the prompt and the frozen model performs the task with no gradient updates. Across more than twenty-five benchmarks spanning translation, QA, cloze, reasoning and arithmetic, GPT-3's zero-, one- and few-shot scores often match or surpass fine-tuned systems.
+**Plain-language abstract:** GPT-3 made scale itself feel like a new interface. It is a 175B-parameter autoregressive Transformer, roughly ten times larger than prior dense language models, trained on about 500B tokens of internet text. At test time, users can put a task description and a few examples in the prompt, and the frozen model often performs the task without gradient updates.
 
-**Novel insights**
-- Compound scaling hypothesis: performance in the no-fine-tune regime rises smoothly with parameter count and data, with "emergent" jumps beyond about ten billion parameters.
-- Prompt-programming paradigm: the model acts as a general purpose text interpreter; tasks are "programmed" via natural-language examples instead of SGD.
-- General knowledge in one network: without supervised tuning GPT-3 writes news blurbs rated fifty percent human-like and solves SAT analogies above the average college applicant.
+The paper's central claim is that no-fine-tune performance improves smoothly with model size, data, and compute, with some capabilities appearing more sharply beyond roughly ten billion parameters. It also made prompt programming feel real: instead of creating a dataset and fine-tuning, users could steer one general-purpose model with natural-language examples.
 
 **Evals / Latency benchmarks**
 
@@ -38,12 +34,9 @@ GPT-3 is an autoregressive Transformer 175 billion parameters strong—around te
 
 Inference speed at a 2048-token context is about 0.4 seconds on an A100-80&nbsp;GB GPU. Memory footprint is roughly 350&nbsp;GB, necessitating model-parallel serving.
 
-**Critiques & discussion**
-- **What I liked:** Minimalist recipe; scaling plus a standard decoder stack yields new capabilities. Introduced few-shot prompting that changed how we interact with LMs. Empirical proof of the scaling hypothesis that inspired later LLMs. Sparked an ecosystem via the OpenAI API.
-- **What I didn't like:** Resource heavy—training requires around three hundred sextillion FLOPs so only megascale labs can replicate. Bias and toxicity persist and can amplify stereotypes. Reasoning remains brittle on multi-step logic. Weights are closed, hampering full scientific scrutiny.
+**Critiques & discussion:** The minimalist recipe is the point: scale a standard decoder stack and new behaviors appear. Few-shot prompting changed how people interact with language models and helped launch the API-first LLM ecosystem. The costs are just as central. Training required enormous compute, replication was limited to megascale labs, bias and toxicity remained visible, multi-step reasoning was brittle, and closed weights made full scientific scrutiny difficult.
 
-**Take-home message**
-GPT-3's debut was a paradigm shift: sheer size and data delivered a single model that could tackle an unprecedented breadth of NLP tasks with clever prompting alone.
+**Take-home message:** GPT-3 shifted the field from task-specific models toward general models steered by prompts. Its breadth came from scale, and its limitations showed what scale alone could not yet solve.
 
 ### Few-shot prompt example
 ```python

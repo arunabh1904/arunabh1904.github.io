@@ -25,7 +25,7 @@ const sectionCards = [
     href: '/paper_summaries_field.html',
     command: 'arxiv-notes',
     title: 'Arxiv Notes',
-    description: 'Summaries of research papers organized by broad interests.',
+    description: 'Research-paper notes grouped by the ideas they connect to.',
     count: paperPosts.length,
   },
   {
@@ -33,7 +33,7 @@ const sectionCards = [
     href: '/blog.html',
     command: 'blog',
     title: 'Blog',
-    description: 'Longer reflections on research, work, and the path so far.',
+    description: 'Longer reflections on research, work, and the path here.',
     count: blogPosts.length,
   },
   {
@@ -41,7 +41,7 @@ const sectionCards = [
     href: '/build_intuition.html',
     command: 'build-intuition',
     title: 'Build Intuition',
-    description: 'Intuition-first explainers for foundational ideas worth understanding deeply.',
+    description: 'Intuition-first explainers for ideas worth really understanding.',
     count: buildIntuitionPosts.length,
   },
   {
@@ -49,7 +49,7 @@ const sectionCards = [
     href: '/revision_notes.html',
     command: 'revision-notes',
     title: 'Revision Notes',
-    description: 'Detailed revision notes from long-form content online.',
+    description: 'Study notes distilled from lectures, courses, and longer material.',
     count: revisionPosts.length,
   },
   {
@@ -57,7 +57,7 @@ const sectionCards = [
     href: '/ai_generated_reports.html',
     command: 'ai-reports',
     title: 'AI Generated Reports',
-    description: 'Audio or text reports created by AI.',
+    description: 'Audio and text reports produced with AI assistance.',
     count: aiPosts.length,
   },
   {
@@ -74,35 +74,35 @@ const recentShelves = [
   {
     title: 'Arxiv Notes',
     href: '/paper_summaries_field.html',
-    summary: 'Summaries of research papers organized by broad interests.',
+    summary: 'Research-paper notes grouped by the ideas they connect to.',
     posts: paperPosts.slice(0, 2),
     emptyMessage: 'New research notes will show up here.',
   },
   {
     title: 'Blog',
     href: '/blog.html',
-    summary: 'Longer reflections on research, work, and the path so far.',
+    summary: 'Longer reflections on research, work, and the path here.',
     posts: blogPosts.slice(0, 2),
     emptyMessage: 'Blog posts will show up here.',
   },
   {
     title: 'Build Intuition',
     href: '/build_intuition.html',
-    summary: 'Intuition-first explainers for foundational ideas worth understanding deeply.',
+    summary: 'Intuition-first explainers for ideas worth really understanding.',
     posts: buildIntuitionPosts.slice(0, 2),
     emptyMessage: 'Intuition-first explainers will show up here.',
   },
   {
     title: 'Revision Notes',
     href: '/revision_notes.html',
-    summary: 'Detailed revision notes from long-form content online.',
+    summary: 'Study notes distilled from lectures, courses, and longer material.',
     posts: revisionPosts.slice(0, 2),
     emptyMessage: 'Revision notes will show up here.',
   },
   {
     title: 'AI Generated Reports',
     href: '/ai_generated_reports.html',
-    summary: 'Audio or text reports created by AI.',
+    summary: 'Audio and text reports produced with AI assistance.',
     posts: aiPosts.slice(0, 2),
     emptyMessage: 'This section is ready for future reports.',
   },
@@ -113,31 +113,31 @@ const timelineEntries = [
     years: '2010 - 2014',
     title: 'MIT, Manipal',
     summary:
-      'I studied Mechatronics Engineering at MIT, Manipal, where I fell in love with robotics through hands-on projects. For my thesis, my team built an areca-nut harvesting robot that could climb tall trees and help make a dangerous job safer for farmers.',
+      'I studied Mechatronics Engineering at MIT, Manipal, where hands-on projects made robotics feel real. For my thesis, my team built an areca-nut harvesting robot that climbed tall trees and aimed to make a dangerous job safer for farmers.',
   },
   {
     years: '2015',
     title: 'Reset And Recommit',
     summary:
-      'A difficult year became a turning point. After setbacks and a period of depression, I found a clearer sense of purpose, strengthened my technical foundations, and decided to pursue robotics graduate school in the United States.',
+      'A difficult year became a turning point. After setbacks and a period of depression, I found a clearer sense of purpose, rebuilt my technical foundation, and decided to pursue robotics graduate school in the United States.',
   },
   {
     years: '2016 - 2018',
     title: 'Colorado School Of Mines',
     summary:
-      'I completed my graduate degree in Mechanical Engineering with a robotics specialization at the Colorado School of Mines. At the M3 Robotics Lab, I worked on robots for GPS-denied navigation, built a novel MPC-based autonomy stack, and learned to integrate a wide range of sensors and robotic systems.',
+      'I completed a graduate degree in Mechanical Engineering with a robotics specialization at the Colorado School of Mines. At the M3 Robotics Lab, I worked on GPS-denied navigation, built an MPC-based autonomy stack, and learned how sensors, controls, and software come together on real robots.',
   },
   {
     years: '2018 - 2022',
     title: 'DEKA',
     summary:
-      'At DEKA, I led part of the perception stack for last-mile autonomous robots. My work ranged from training and deploying real-time computer vision models to writing CUDA kernels and porting major parts of the stack to OpenCL and OpenVINO.',
+      'At DEKA, I led part of the perception stack for last-mile autonomous robots. The work ranged from training real-time computer vision models to writing CUDA kernels and porting major parts of the stack to OpenCL and OpenVINO.',
   },
   {
     years: '2022 - 2026',
     title: 'Zoox',
     summary:
-      'At Zoox, I have focused on computer vision research for autonomous navigation, building learned representations that encode scene semantics and support downstream planning. I currently lead efforts on a generalized scene embedding designed to scale across diverse driving contexts.',
+      'At Zoox, I focus on computer vision research for autonomous navigation, building learned representations that encode scene semantics and support downstream planning. I currently lead work on a generalized scene embedding designed to scale across diverse driving contexts.',
   },
 ] as const;
 
@@ -159,8 +159,8 @@ const formatDate = (date: Date) =>
       <div class="home-hero__copy">
         <h1 class="home-title">Arunabh.BLOG</h1>
         <p class="lead">
-          I work on computer vision and robotics for autonomous systems, and this is where I write
-          about the ideas, papers, and experiences that have shaped that journey.
+          I work on computer vision and robotics for autonomous systems. This is where I write
+          about the ideas, papers, and experiences that have shaped the path.
         </p>
         <nav class="home-command-bar home-command-bar--hero" aria-label="Homepage sections">
           <a href="#about">/about</a>
@@ -186,18 +186,17 @@ const formatDate = (date: Date) =>
     <article class="home-panel home-panel--story">
       <p class="home-panel__eyebrow">About</p>
       <p class="intro-text">
-        I currently work in computer vision research at Zoox, where I build learned
-        representations for autonomous driving scenes and help shape research directions for
-        perception. Before that, I led parts of the perception stack at DEKA for Roxo, FedEx&apos;s
-        last-mile delivery robot, with a focus on short-range perception and traffic-light
-        understanding.
+        I work in computer vision research at Zoox, building learned representations for autonomous
+        driving scenes and helping shape perception research. Before that, I led parts of the
+        perception stack at DEKA for Roxo, FedEx&apos;s last-mile delivery robot, with a focus on
+        short-range perception and traffic-light understanding.
       </p>
 
       <p class="intro-text">
         My path into robotics started in India during my undergraduate years at MIT, Manipal, where
-        building projects made the field feel instantly alive. That early fascination grew into a
-        deliberate commitment to autonomous systems and eventually brought me to the United States
-        for graduate school at the Colorado School of Mines.
+        building projects made the field feel alive. That early fascination became a deliberate
+        commitment to autonomous systems and eventually brought me to the United States for graduate
+        school at the Colorado School of Mines.
       </p>
 
       <p class="intro-text">
@@ -226,8 +225,8 @@ const formatDate = (date: Date) =>
       <div class="home-section-heading">
         <h2>Recent entries</h2>
         <p>
-          A quick scan of the newest writing across the site. Each panel links out to the section
-          and highlights the two most recent posts.
+          A quick scan of the newest writing across the site, with each panel linking to its full
+          section.
         </p>
       </div>
     </article>

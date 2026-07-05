@@ -21,12 +21,9 @@ summary: '2020 – EfficientDet: Scalable and Efficient Object Detection'
 
 **Conference:** CVPR 2020
 
-**Summary (abstract in plain English):** EfficientDet revisits object-detector design under tight efficiency constraints. Building on EfficientNet backbones, the authors introduce Bi-directional Feature Pyramid Networks (BiFPN) for fast, weighted multi-scale fusion and a compound-scaling rule that grows depth, width and input resolution of all detector components with a single coefficient $\phi$. This yields the D0→D7 family, each tuned to a specific FLOP or latency budget while sharing the same architecture and training recipe.
+**Summary:** EfficientDet asks the same question for object detection that EfficientNet asked for classification: how far can careful scaling take a CNN family? The authors build on EfficientNet backbones, add a Bi-directional Feature Pyramid Network (BiFPN) for fast multi-scale feature fusion, and scale the entire detector with one coefficient $\phi$.
 
-**Novel insights:**
-- Weighted BiFPN learns per-edge weights so the network can emphasise informative paths with little overhead.
-- Compound scaling extends EfficientNet's idea to the whole detector stack for smoother accuracy–efficiency trade-offs.
-- One recipe fits many regimes, providing SOTA from 2.5 B FLOPs (D0) up to 325 B FLOPs (D7).
+BiFPN is the key detector-specific piece. It learns lightweight per-edge weights, so the network can emphasize useful feature paths instead of relying on hand-designed merge heuristics. Compound scaling then grows depth, width, and input resolution across the backbone, feature network, and prediction heads. The result is the D0-D7 family, where each model shares one recipe but targets a different FLOP and latency budget.
 
 **Evals / Latency benchmarks (COCO test-dev, single scale):**
 
@@ -41,9 +38,6 @@ Compared with its contemporaries, D0 matches YOLOv3 accuracy with 28× fewer FLO
 
 †Latency measured on Titan V GPU and single-thread Xeon CPU in the paper's ablation study.
 
-**Critiques & limitations:**
-- **What I liked:** Elegant BiFPN delivers accuracy and speed without manual feature-merge heuristics. Compound scaling supplies a ready-made detector suite for any device class. Strong AP-per-FLOP repositioned CNN detectors on the Pareto frontier. Open-sourced code and weights accelerated community adoption.
-- **Limitations:** Anchor-based pipeline with focal loss remains complex next to modern anchor-free methods. Dependence on EfficientNet backbones means newer backbones need extra tuning. Transformers now surpass its top-end accuracy at very large budgets. Weighted edges can complicate some inference runtimes.
+**Critiques & limitations:** EfficientDet's strength is its AP-per-FLOP story. BiFPN removes a lot of manual feature-fusion guesswork, and compound scaling gives practitioners a ready-made detector suite for different devices. The pipeline is still anchor-based and more complex than many modern anchor-free detectors. It also depends heavily on EfficientNet backbones, and transformer-based detectors now surpass its top-end accuracy at very large budgets.
 
 **Take-home message:** EfficientDet showed that scaling every part of the detector matters as much as making it big. Thoughtful feature fusion and end-to-end scaling unlocked large gains in speed and accuracy and continue to influence modern detection pipelines.
-

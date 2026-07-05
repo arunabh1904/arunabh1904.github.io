@@ -19,22 +19,9 @@ summary: 2021 – Improved Denoising Diffusion Probabilistic Models (ID DPM)
 
 **Conference:** ICML 2021
 
-**Plain-language summary**
-Nichol and Dhariwal revisit DDPMs with three upgrades that lift both likelihood and sample quality while
-reducing sampling cost.
+**Plain-language summary:** Nichol and Dhariwal made DDPMs faster and stronger without changing the basic denoising story. They learn the reverse-process variance $\Sigma_\theta$ instead of keeping it fixed, optimize a hybrid objective that mixes ELBO terms with the simple noise-prediction loss, and use a cosine noise schedule with importance-weighted terms for stabler gradients.
 
-- Learn the reverse-process variance $\Sigma_\theta$ instead of keeping it fixed.
-- Optimise a hybrid objective: half ELBO, half simple noise-prediction loss.
-- Use a cosine noise schedule with importance-weighted loss terms for stable gradients.
-
-These tweaks cut denoising from 1000 steps to around 50–250 with minimal FID drop and push
-log-likelihoods to parity with autoregressive models on ImageNet-64.
-
-**Novel insights**
-- Variance learning enables larger strides through noise space for faster sampling.
-- The hybrid loss reduces gradient noise and improves NLL and FID.
-- Diffusion models show higher recall than GANs at similar fidelity.
-- Scaling laws hold: bigger UNets and more compute steadily improve bits-per-dim and FID.
+Those changes let the sampler take larger steps through noise space. Denoising drops from 1000 steps to roughly 50-250 with little FID loss, while log-likelihoods reach parity with autoregressive models on ImageNet-64. The paper also makes a useful empirical claim: bigger UNets and more compute improve bits-per-dim and FID in a predictable scaling-law-like way.
 
 **Key results**
 
@@ -45,8 +32,7 @@ log-likelihoods to parity with autoregressive models on ImageNet-64.
 | ImageNet 64² (class-cond.) | 250 | 2.92 | — | 3.57 |
 | ImageNet 64² (BigGAN-deep, 100M params) | 1 | 4.06 | — | — |
 
-Take-away: ID DPM matches or beats GANs while requiring ten times fewer network evaluations than vanilla
-DDPM.
+The key result is speed without giving up quality: ID DPM matches or beats GANs while requiring about ten times fewer network evaluations than vanilla DDPM.
 
 **Tiny PyTorch snippet – hybrid loss and learned variance**
 ```python
@@ -65,11 +51,6 @@ def iddpm_loss(model, x0, timesteps, betas, logvar_schedule):
 ```
 Switching to the cosine $\beta_t$ schedule from the appendix further sharpens FID at low step counts.
 
-**Critiques**
-- **What shines:** Simple, drop-in upgrades that became the default for Stable Diffusion and DALLE‑2.
-- **Caveats:** Sampling still needs over 50 UNet passes and large models remain memory heavy.
-- Classifier guidance can introduce bias; classifier‑free approaches address this later.
+**Critiques:** The upgrades are attractive because they are almost drop-in: learn variance, adjust the objective, improve the schedule. They became part of the practical diffusion toolbox used by later systems. Sampling still needs dozens of UNet passes, large models remain memory-heavy, and classifier guidance can introduce bias, which later classifier-free methods address more cleanly.
 
-ID DPM turned diffusion from a slow curiosity into a practical generator, paving the way for fast samplers and
-classifier-free guidance.
-
+**Take-home message:** ID DPM turned diffusion from a slow curiosity into a practical generator, paving the way for fast samplers and classifier-free guidance.

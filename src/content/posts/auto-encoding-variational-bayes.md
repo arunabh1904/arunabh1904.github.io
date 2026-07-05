@@ -19,19 +19,11 @@ summary: 2014 – Auto-Encoding Variational Bayes
 
 **Conference:** ICLR 2014
 
-**Summary (abstract in plain English):**
-Kingma and Welling propose training deep generative models with continuous latent variables by
-optimising a reparameterised evidence lower bound (ELBO) using standard stochastic gradient descent.
-An encoder $q_\phi(z \mid x)$ approximates the true posterior, while a decoder $p_\theta(x \mid z)$
-reconstructs observations. The reparameterisation trick makes the stochastic nodes differentiable,
-enabling efficient gradient learning.
+**Summary:** Kingma and Welling made variational inference feel like ordinary neural-network training. Their variational autoencoder pairs an encoder $q_\phi(z \mid x)$, which approximates the posterior over latent variables, with a decoder $p_\theta(x \mid z)$, which reconstructs observations from those latents. The key move is the reparameterisation trick: instead of sampling $z$ in a way that blocks gradients, sample fixed noise and transform it through differentiable parameters.
 
-**Novel insights:**
-- Reparameterisation turns Monte Carlo gradients into low-variance, back-propagation-friendly estimates.
-- Recognition networks fuse amortised inference with deep learning, making variational Bayes practical
-  at scale.
-- Established VAEs as a general-purpose unsupervised representation learner, inspiring variants such as
-  $\beta$-VAE, conditional VAEs, and flow-based models.
+That trick turns Monte Carlo estimates of the evidence lower bound (ELBO) into low-variance gradients that work with standard stochastic gradient descent. The paper also made amortised inference practical at scale: the encoder learns to predict posterior parameters directly, rather than solving a separate inference problem for every datapoint.
+
+**Why it mattered:** VAEs gave deep generative modelling a stable likelihood-based recipe. They did not produce the sharpest samples, but they made latent-variable models trainable, inspectable, and useful for representation learning. Later work such as $\beta$-VAE, conditional VAEs, and flow-based models all build on this basic encoder-decoder view of probabilistic inference.
 
 **Evals / Latency benchmarks:**
 
@@ -40,17 +32,8 @@ enabling efficient gradient learning.
 | Binarised MNIST | 30 | ≈ 88 nats (ELBO estimate) | Competed closely with deep latent-Gaussian models |
 | Frey Faces | 2 | Smooth latent manifold | Visually coherent reconstructions |
 
-Training cost: minutes per epoch on MNIST using a single GPU in 2013; linear in dataset size thanks to
-SGD mini-batches. Optimisation is a single-objective loop, so wall-clock time is dominated by forward
-and backward passes.
+Training cost was modest for the original experiments: minutes per epoch on MNIST using a single GPU in 2013. Because the method uses SGD mini-batches and one objective, wall-clock time mostly comes down to ordinary forward and backward passes.
 
-**Critiques & limitations:**
-- **What works well:** Stable likelihood-based training with no mode collapse. Latent space enables
-  interpolation and arithmetic.
-- **Limitations:** Gaussian priors and posteriors can under-fit complex data; ELBO is only a lower bound,
-  so the gap to true likelihood may be large.
+**Critiques & limitations:** The strength of VAEs is stability: training has a clear objective, avoids GAN-style mode collapse, and produces a latent space that supports interpolation. The tradeoff is expressiveness. Simple Gaussian priors and posteriors can underfit complex data, and the ELBO is only a lower bound, so a good training objective does not guarantee a tight estimate of true likelihood.
 
-**Take-home message:**
-Auto-Encoding Variational Bayes introduced the reparameterisation trick and amortised variational
-inference, providing a scalable recipe for deep generative modelling that remains a cornerstone of
-probabilistic machine learning.
+**Take-home message:** Auto-Encoding Variational Bayes turned variational inference into a scalable deep-learning procedure. The reparameterisation trick is the small mathematical hinge that made the whole recipe practical.

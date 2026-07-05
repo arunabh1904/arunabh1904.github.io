@@ -13,11 +13,11 @@ summary: >-
 ---
 # Running Gemma 4 locally on a 64 GB MacBook Pro
 
-I wanted the answer to a very specific question: on a 64 GB M5 Max MacBook Pro, what is the best Gemma 4 model I can run locally, and what is the fastest way to run it?
+I wanted to answer a specific question: on a 64 GB M5 Max MacBook Pro, what is the best Gemma 4 model I can run locally, and what is the fastest way to run it?
 
 The model answer stayed simple.
 
-The runtime answer got much more interesting once I stopped guessing and actually benchmarked it.
+The runtime answer got more interesting once I stopped guessing and benchmarked it.
 
 The short version, as of April 4, 2026:
 
@@ -38,7 +38,7 @@ So on a 64 GB machine, all four models are realistic local targets, including th
 - `Gemma 4 26B A4B`
 - `Gemma 4 31B`
 
-The `26B A4B` model is the more interesting one for everyday laptop use. It is MoE, so only `4B` parameters are active per generated token, even though the full model still has to be resident in memory. The `31B` model is the strongest dense option that still makes sense on this machine. Google also lists `128K` context for the small models and `256K` context for the larger ones, which is great capability-wise, but not remotely free from a latency perspective ([Google docs](https://ai.google.dev/gemma/docs/core), [Gemma 4 31B card](https://huggingface.co/google/gemma-4-31B-it)).
+The `26B A4B` model is the more interesting everyday laptop option. It is MoE, so only `4B` parameters are active per generated token, even though the full model still has to sit in memory. The `31B` model is the strongest dense option that still makes sense on this machine. Google also lists `128K` context for the small models and `256K` context for the larger ones, which is powerful but not remotely free from a latency perspective ([Google docs](https://ai.google.dev/gemma/docs/core), [Gemma 4 31B card](https://huggingface.co/google/gemma-4-31B-it)).
 
 So my view did not really change here:
 
@@ -74,7 +74,7 @@ One important caveat: this is a fastest-practical-path comparison, not a perfect
 
 ## Special Things I Had To Do
 
-A few benchmark details ended up mattering more than I expected:
+A few benchmark details mattered more than I expected:
 
 - I disabled Gemma's thinking mode anywhere I could, because otherwise you are partly benchmarking extra reasoning tokens instead of raw runtime behavior.
 - I kept the benchmark text-only, which meant running `llama.cpp` without a multimodal projector. That was the cleanest way to measure prompt processing and decode speed instead of image overhead.
@@ -127,13 +127,11 @@ The pattern is pretty clear:
 - On longer prompts, MLX is still more comfortable because time to first token is substantially lower.
 - The difference between "weights fit" and "this feels good to use" becomes real very quickly once prompt length goes up.
 
-That last point matters more than people usually admit. Decode speed often holds up decently. What really starts to hurt is prompt processing and time to first token.
+That last point matters more than people usually admit. Decode speed often holds up decently; prompt processing and time to first token are what start to hurt.
 
 ## Ollama, Right Now
 
-I wanted a clean Ollama column here.
-
-I could not get one.
+I wanted a clean Ollama column here. I could not get one.
 
 On this exact machine, using current native Gemma 4 tags like `gemma4:e2b-it-q4_K_M`, Ollama `0.20.2` failed before first token with a Metal backend compilation error and returned HTTP `500` from `/api/generate`. The key error was the same `bfloat` vs `half` cooperative tensor mismatch in Metal Performance Primitives that other Apple M5 users have reported upstream ([issue #13460](https://github.com/ollama/ollama/issues/13460), [issue #14432](https://github.com/ollama/ollama/issues/14432), [issue #13867](https://github.com/ollama/ollama/issues/13867)).
 
@@ -158,8 +156,6 @@ If I cared about the fastest usable runtime on this machine, the answer is no lo
 2. `llama.cpp` second
 3. `Ollama` later, once the M5 Metal breakage is fixed
 
-And if you do not just want a terminal workflow, this also maps cleanly to a tiny local browser chat app. Both `MLX` and `llama.cpp` are perfectly reasonable backends if what you really want is just to serve Gemma locally and talk to it.
+If you do not want a terminal workflow, this also maps cleanly to a tiny local browser chat app. Both `MLX` and `llama.cpp` are reasonable backends if the goal is simply to serve Gemma locally and talk to it.
 
-That is a more opinionated answer than I expected going in, but it feels much less hand-wavy now.
-
-And honestly, that was the point of running the benchmarks in the first place.
+That is a more opinionated answer than I expected going in, but it feels much less hand-wavy now. That was the point of running the benchmarks in the first place.

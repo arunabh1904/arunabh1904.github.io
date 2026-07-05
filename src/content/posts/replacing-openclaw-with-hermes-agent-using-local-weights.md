@@ -15,7 +15,7 @@ summary: >-
 ---
 # Replacing OpenClaw with Hermes Agent using local weights
 
-I wanted a pretty specific outcome: stop using OpenClaw, switch over to [Hermes Agent](https://github.com/nousresearch/hermes-agent), and keep the whole thing local.
+I wanted a specific outcome: stop using OpenClaw, switch to [Hermes Agent](https://github.com/nousresearch/hermes-agent), and keep the whole thing local.
 
 Not "local except for the model."
 
@@ -26,7 +26,7 @@ That meant two constraints:
 1. I did not want to fall back to OpenRouter, Anthropic, or anything else cloud-hosted.
 2. I only wanted to use model artifacts that were already on disk.
 
-On this machine, the artifacts I could verify quickly were my local Gemma ones, so that is the path I ended up getting working end to end. I did not see my Qwen artifacts in the usual local cache locations during setup, but the same `llama.cpp` pattern should apply to local Qwen GGUFs too.
+On this machine, the artifacts I could verify quickly were local Gemma GGUFs, so that is the path I got working end to end. I did not see my Qwen artifacts in the usual cache locations during setup, but the same `llama.cpp` pattern should apply to local Qwen GGUFs too.
 
 ## Why I wanted Hermes instead
 
@@ -39,7 +39,7 @@ Hermes is a much more opinionated agent shell than a bare local chat loop. It ha
 - skills
 - multiple provider backends
 
-What I liked immediately is that Hermes does not force one inference path. It is perfectly happy with hosted providers, but it also lets me point it at any OpenAI-compatible local endpoint. That makes it much easier to keep the agent framework and swap the model runtime underneath it.
+Hermes does not force one inference path. It works with hosted providers, but it can also point at any OpenAI-compatible local endpoint. That separation makes it much easier to keep the agent framework while swapping the model runtime underneath it.
 
 That separation ended up mattering a lot.
 
@@ -61,7 +61,7 @@ That bootstrapped:
 
 So far, so good.
 
-The real question was: what local model server should Hermes talk to?
+The real question was what local model server Hermes should talk to.
 
 ## Ollama was the obvious first try, but it was the wrong one here
 
@@ -76,7 +76,7 @@ That was the key realization:
 - Hermes was not the problem.
 - My local model server choice was the problem.
 
-Once I stopped treating those two things as the same layer, the path got much cleaner.
+Once I stopped treating those two things as the same layer, the path got cleaner.
 
 ## What actually worked: `llama-server` plus an existing Gemma GGUF
 
@@ -86,9 +86,7 @@ The machine already had local Gemma GGUF artifacts in the Hugging Face cache, in
 ~/.cache/huggingface/hub/models--ggml-org--gemma-4-E4B-it-GGUF/...
 ```
 
-And `llama-server` was already installed via Homebrew.
-
-That turned out to be the cleanest fully local setup.
+`llama-server` was already installed via Homebrew, and it turned out to be the cleanest fully local setup.
 
 I started `llama-server` directly against the cached GGUF:
 
@@ -116,7 +114,7 @@ Once that server was up, it exposed the OpenAI-compatible endpoint Hermes wanted
 http://127.0.0.1:18080/v1
 ```
 
-That was the turning point.
+That was the turning point: Hermes could stay as the agent shell, and `llama.cpp` could do the local serving.
 
 ## The Hermes config I ended up using
 
@@ -151,9 +149,7 @@ And it returned:
 READY
 ```
 
-That was enough.
-
-At that point Hermes was no longer "installed." It was actually running, locally, against weights that were already on disk.
+That was enough. At that point Hermes was no longer merely installed; it was running locally against weights that were already on disk.
 
 ## What I would do next
 
@@ -169,6 +165,4 @@ The important part is that the architecture is now right:
 - `llama.cpp` for the local serving layer
 - existing local weights for inference
 
-That is a much cleaner split than trying to make one tool do all three jobs at once.
-
-And honestly, that was the real unlock here.
+That split is cleaner than trying to make one tool do all three jobs at once. That was the real unlock here.
