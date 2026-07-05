@@ -1,0 +1,38 @@
+---
+import SectionHeader from '../components/SectionHeader.astro';
+import PostLayout from '../layouts/PostLayout.astro';
+import { READING_LIST_ITEMS } from '../lib/reading-list';
+
+const itemCountLabel = `${READING_LIST_ITEMS.length} ${
+  READING_LIST_ITEMS.length === 1 ? 'item' : 'items'
+}`;
+---
+
+<PostLayout title="Reading List" showSectionsNav={false}>
+  <SectionHeader
+    eyebrow="Reading List"
+    title="Good things to read"
+    description="External essays, posts, and references worth keeping close."
+    meta={itemCountLabel}
+  />
+
+  <section class="resource-list">
+    <div class="resource-list__header">
+      <h2>Saved links</h2>
+    </div>
+    <ul>
+      {READING_LIST_ITEMS.map((item) => (
+        <li>
+          <div>
+            <strong>{item.title}</strong>
+            <p>{item.summary}</p>
+            <small>{item.author} / {item.dateLabel}</small>
+          </div>
+          <span>
+            <a href={item.href}>Read</a>
+          </span>
+        </li>
+      ))}
+    </ul>
+  </section>
+</PostLayout>
