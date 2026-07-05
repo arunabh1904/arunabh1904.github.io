@@ -22,14 +22,9 @@ import { ppoPlayground } from '../../lib/python-playground-examples';
 
 **Conference:** Not formally peer-reviewed; influential tech report later presented at ICML workshops and widely adopted.
 
-**Summary of the abstract**
-PPO is a family of first-order policy-gradient methods that balances the stability of Trust-Region Policy Optimization (TRPO) with the simplicity of REINFORCE. Instead of a hard KL trust region, PPO uses a clipped surrogate objective (or an adaptive KL penalty) to keep updates within a reliable neighbourhood while allowing multiple epochs of SGD per on-policy batch. On Atari and MuJoCo benchmarks, PPO matches or beats TRPO with better wall-clock time and sample efficiency.
+**Summary:** PPO keeps the spirit of Trust-Region Policy Optimization while dropping much of its machinery. TRPO uses a hard KL trust region to prevent policy updates from moving too far. PPO replaces that constraint with a clipped surrogate objective, or sometimes an adaptive KL penalty, so ordinary backprop and Adam can do the work.
 
-**Novel insights**
-- **Clipped likelihood ratio:** Caps the policy ratio $r = \pi_\theta/\pi_{\text{old}}$ at $1\pm\epsilon$ to avoid destructive updates.
-- **Multiple epochs per batch:** Safely reuses on-policy rollouts for several SGD passes.
-- **Simpler than TRPO:** No Hessian-vector products or conjugate gradients—just back-prop and Adam.
-- **Versatility:** Works in both discrete (Atari) and continuous (MuJoCo) control; became the default algorithm for RLHF pipelines.
+The clipped objective caps the policy ratio $r = \pi_\theta/\pi_{\text{old}}$ at $1 \pm \epsilon$. When an update would make the new policy trust a good action too aggressively, or abandon a bad action too aggressively, the objective stops rewarding that extra movement. That small heuristic lets PPO reuse on-policy rollouts for several SGD epochs while staying stable enough for Atari, MuJoCo, and later RLHF pipelines.
 
 **Evals / Benchmarks**
 
@@ -39,7 +34,7 @@ PPO is a family of first-order policy-gradient methods that balances the stabili
 | Atari Pong | Mean score | +20.7 | 19.8 | 18.3 | 50 M frames |
 | Wall-clock | Time to 2000 reward (Ant-v1) | 2 h | 5 h | 3 h | NVIDIA K40 GPU |
 
-PPO consistently strikes a balance between performance, simplicity and compute budget among on-policy algorithms of its era.
+Across these benchmarks, PPO hit a useful middle ground: close to TRPO-level stability, much simpler implementation, and better wall-clock behavior for the on-policy algorithms of its era.
 
 **Critiques**
 | What works well | Limitations / open questions |
@@ -62,8 +57,6 @@ def ppo_clip_loss(policy, old_logp, obs, act, adv, clip_eps=0.2):
 ```
 Run several epochs of Adam on batches of rollout data, add a small value-function loss and entropy bonus, and you have a working PPO agent in about 50 lines. This simplicity is why PPO became the "hello world" of modern deep RL.
 
-The important part to internalize is not the `torch` syntax but the numbers PPO refuses to trust.
-This tiny terminal lets you vary the log-probabilities, advantage, and clipping threshold while the walkthrough shows exactly when the unclipped objective gets cut back.
+The important part to internalize is not the `torch` syntax; it is the update size PPO refuses to trust. This tiny terminal lets you vary the log-probabilities, advantage, and clipping threshold while the walkthrough shows exactly when the unclipped objective gets cut back.
 
 <PythonPlayground client:visible {...ppoPlayground} />
-

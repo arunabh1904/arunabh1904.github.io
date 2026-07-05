@@ -19,41 +19,14 @@ summary: 2014 – Generative Adversarial Networks
 
 **Conference:** NIPS 2014
 
-**Summary (abstract in plain English):**
-GANs formulate generative modelling as a game between two neural networks.
-A generator $G$ transforms random noise into synthetic samples, while a
- discriminator $D$ learns to distinguish real data from fakes.
-Training alternates between improving $D$ to classify correctly and
-adjusting $G$ to fool $D$.
-At equilibrium, $G$ replicates the true data distribution and $D$ outputs
-0.5 everywhere.
-Initial experiments with multilayer perceptrons produced realistic MNIST
- digits without needing explicit likelihoods.
+**Summary:** GANs turn generative modelling into a contest. A generator $G$ maps random noise into synthetic samples, while a discriminator $D$ learns to tell real data from generated data. Training alternates between making $D$ better at the classification problem and making $G$ better at fooling $D$.
 
-**Novel insights:**
-- Adversarial training recasts density estimation as a differentiable,
-  game-theoretic contest rather than maximising likelihood.
-- With infinite capacity and optimal play, the generator converges to the
-  data distribution and the discriminator becomes maximally uncertain.
-- Direct pixel-space feedback avoids the blurriness common in VAEs of the time.
+The paper's central promise is elegant: with enough capacity and ideal optimization, the generator recovers the true data distribution and the discriminator becomes maximally uncertain, outputting 0.5 everywhere. That framing recasts density estimation as a differentiable game rather than an explicit likelihood problem. It also gives the generator direct feedback in pixel space, which helped avoid some of the blurry samples associated with early likelihood-based models.
 
-**Evals / Latency benchmarks:**
-- Only qualitative results on MNIST and small CIFAR-like images were
-  reported. No likelihood metrics appeared in the paper.
-- Training a small model on a single GPU (K20Xm) took minutes; larger
-  datasets like ImageNet were tackled in later work.
-- The paper eventually motivated metrics such as Inception Score and FID,
-  though they were developed later.
+**Why it mattered:** The first experiments were small, mostly multilayer perceptrons on MNIST-like data, but the idea opened a much larger path. GANs made high-quality sample generation feel less like approximate density estimation and more like learned counterfeiting.
 
-**Critiques & limitations:**
-- **What works well:** Elegant formulation that opened a broad research area
-  across image synthesis, style transfer and more.
-- **Limitations:** Optimisation is fragile and can diverge. Generators often
-  collapse to limited modes, and discriminators can saturate, providing
-  poor gradients. Many variants such as Wasserstein-GAN and gradient
-  penalties were invented to address these issues.
+**Evals / Latency benchmarks:** The original paper reports qualitative results on MNIST and small CIFAR-like images, not likelihood metrics. A small model on a single K20Xm GPU trained in minutes; ImageNet-scale synthesis came later. The evaluation gap is part of the legacy: GANs eventually pushed the community toward sample-quality metrics such as Inception Score and FID.
 
-**Take-home message:**
-Generative Adversarial Networks introduced adversarial training as a powerful,
-but unstable, approach to generative modelling, inspiring a decade of
-research into more robust GAN objectives and architectures.
+**Critiques & limitations:** The formulation is beautiful, but the optimization is fragile. Training can diverge, generators can collapse to a small set of modes, and discriminators can saturate until the generator receives weak gradients. Much of the later GAN literature, including Wasserstein GANs and gradient penalties, is really a response to those failure modes.
+
+**Take-home message:** GANs introduced adversarial training as a powerful but unstable route to generative modelling. The paper's impact comes from both sides of that sentence: the samples were exciting, and the instability became an entire research program.

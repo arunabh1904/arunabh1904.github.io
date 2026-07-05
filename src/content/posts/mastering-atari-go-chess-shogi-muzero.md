@@ -23,28 +23,15 @@ summary: >-
 
 ![MuZero Architecture](/assets/images/muzero.png)
 
-**Summary of the paper**
-MuZero unifies model-free and model-based reinforcement learning. It learns three networks—representation,
-dynamics and prediction—that act as a latent simulator. The dynamics network rolls the hidden state forward
-while the prediction head outputs policy, value and reward. These learned summaries drive Monte Carlo Tree
-Search so MuZero plans effectively without knowing the environment rules.
+**Summary:** MuZero combines search with a learned model, but it does not try to reconstruct the full environment. Instead, it learns three networks: a representation network that maps observations into hidden states, a dynamics network that rolls those hidden states forward, and a prediction network that outputs policy, value, and reward. Those learned summaries feed Monte Carlo Tree Search, letting the agent plan without hand-coded game rules.
 
-**Novel insights**
-- Planning-focused latent model predicts only reward, value and policy, avoiding full observation reconstruction.
-- Identical architecture masters Go, chess, shogi and 57 Atari games purely from interaction.
-- MCTS provides improved targets that bootstrap network training.
-- Robust hyper-parameters remain unchanged across domains.
+The important design choice is what MuZero chooses not to model. It predicts only the quantities needed for planning, not future pixels or full board states. That makes one architecture work across Go, chess, shogi, and 57 Atari games, with MCTS continually producing stronger targets for the networks to imitate.
 
 **Evals / Benchmarks**
 - **Atari-57** – mean human-normalised score exceeds 1000%, surpassing prior agents.
 - **Go (19×19)** – achieves AlphaZero-level Elo ratings.
 - **Chess / Shogi** – matches AlphaZero with fewer training games.
 
-**Critiques & limitations**
-- **What works well:** Elegant integration of search and learning; removes the need for hand-coded rules.
-- **Limitations:** Training requires hundreds of TPUs and inference needs an MCTS, adding latency.
-- Learned dynamics remain opaque; true environment structure is unclear.
+**Critiques & limitations:** MuZero is elegant because it preserves the strength of search without requiring explicit rules. The cost is large. Training used enormous compute, inference requires MCTS, and the learned dynamics remain hard to interpret: the model plans well, but it is not obvious what environment structure it has actually learned.
 
-**Take-home message**
-MuZero shows that a learned model can power effective planning across diverse domains without explicit rules,
-though at significant computational cost.
+**Take-home message:** MuZero showed that learned latent models can support serious planning across very different domains. It replaced hand-coded rules with learned prediction, but it paid for that generality with compute and search latency.

@@ -23,14 +23,9 @@ summary: >-
 
 **Conference:** Released as a tech report; widely cited (ICML 2021 oral-style spotlight)
 
-**Plain-language summary**
-CLIP pairs an image encoder (ResNet-50/101 or ViT-B/32) with a text Transformer and trains them contrastively on 400&nbsp;M image–caption pairs scraped from the web. The model maximises cosine similarity for matching pairs and minimises it for mismatches. After pre-training, vision tasks become prompt engineering exercises: supply category names like "a photo of a tiger" and CLIP performs zero-shot classification by picking the text whose embedding is closest to the image embedding.
+**Plain-language summary:** CLIP trains vision through language. It pairs an image encoder with a text Transformer and learns from 400M web image-caption pairs by pulling matching image/text embeddings together and pushing mismatches apart. After pre-training, classification becomes a prompt comparison problem: embed the image, embed candidate labels such as "a photo of a tiger", and choose the closest text embedding.
 
-**Novel insights**
-- Contrastive language–image pre-training scales GPT-style supervision to vision.
-- Zero-shot prompting replaces hard-coded softmax heads, enabling one model for many datasets.
-- Prompt engineering matters: templated phrases boost accuracy by roughly two points.
-- Multimodal embeddings enable text-guided search and generation.
+That framing replaced fixed softmax heads with natural-language supervision. One model could perform zero-shot classification across many datasets, and prompt wording became part of the evaluation surface. The same shared embedding space also made text-guided image search and generation feel natural.
 
 **Evals / Benchmarks**
 
@@ -66,9 +61,6 @@ pred = labels[probs.argmax()]
 print("Predicted class:", pred)
 ```
 
-**Critiques**
-- **What I liked:** Elegant bridge between vision and language that spawned today's multimodal ecosystem. One model handles many tasks out of the box.
-- **What I didn't like / open issues:** Heavy compute and proprietary dataset; sensitive to prompt wording; fairness concerns mirror web-scale data.
+**Critiques:** CLIP is one of the cleanest bridges between vision and language: one embedding space, many tasks, no dataset-specific classifier head. The weaknesses follow from the same design. Training depends on heavy compute and a proprietary web-scale dataset, zero-shot accuracy can be sensitive to prompt wording, and fairness problems mirror the data scraped from the web.
 
-CLIP showed that natural-language supervision alone can endow vision models with rich, transferable semantics.
-
+**Take-home message:** CLIP showed that natural-language supervision can give vision models rich, transferable semantics. It helped turn multimodal learning from a niche setup into a default way to build open-vocabulary systems.

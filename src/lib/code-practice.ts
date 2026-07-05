@@ -23,7 +23,7 @@ export interface CodePracticeProblem {
 }
 
 export const CODE_PRACTICE_SECTION_SUMMARY =
-  'Interview-style Python problems with runnable starter code, hints, and hidden solutions.';
+  'Interview-style Python problems with runnable starter code, focused hints, and hidden solutions.';
 
 export function getCodePracticeProblemPath(problem: Pick<CodePracticeProblem, 'id'> | string) {
   const problemId = typeof problem === 'string' ? problem : problem.id;

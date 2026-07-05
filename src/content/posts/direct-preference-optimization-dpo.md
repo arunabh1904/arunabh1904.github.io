@@ -23,15 +23,9 @@ summary: >-
 
 ![DPO Workflow](/assets/images/dpo_workflow.svg)
 
-**Plain-language summary**
-Traditional RLHF first fits a reward model from ranked human preferences and then runs PPO under a KL penalty.
-DPO shows that the same KL-regularised objective admits a closed-form solution, so you can optimise the policy directly.
-This turns alignment into a supervised task: one pass over each preference pair with a binary-cross-entropy loss.
+**Plain-language summary:** DPO removes the reinforcement learning loop from preference tuning. Traditional RLHF fits a reward model from ranked human preferences, then uses PPO under a KL penalty to update the policy. DPO shows that the same KL-regularized objective has a closed-form relationship between reward and policy under the Bradley-Terry preference model, so the policy can be optimized directly.
 
-**Novel insights**
-- Closed-form link between reward and policy under the Bradley–Terry model.
-- Eliminates explicit reward networks or on-policy sampling.
-- Training is stable and scales like standard SFT.
+That turns alignment into a supervised contrastive classification task over preference pairs. There is no explicit reward network, no on-policy sampling loop, and no PPO stability tax. Training looks much closer to standard supervised fine-tuning.
 
 **Evals / Benchmarks**
 
@@ -57,6 +51,4 @@ def dpo_loss(policy, ref_policy, batch, beta=0.1):
     return F.binary_cross_entropy_with_logits(logits, torch.ones_like(logits))
 ```
 
-**Take-home message**
-DPO reduces alignment to a contrastive classification loss.
-With no reward model or RL loop, it matches or beats PPO while being much cheaper to train.
+**Take-home message:** DPO reduces preference optimization to a contrastive classification loss. By removing the reward model and RL loop, it matches or beats PPO while being much cheaper and easier to train.

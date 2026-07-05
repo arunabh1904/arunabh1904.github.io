@@ -13,11 +13,11 @@ summary: >-
 ---
 # Running Qwen 3.5 and Qwen 3 locally on a 64 GB MacBook Pro
 
-I wanted the answer to a practical question: on a `64 GB` M5 Max MacBook Pro, which Qwen models can I actually run locally, and which ones still feel good once prompt length stops being toy-sized?
+I wanted to answer a practical question: on a `64 GB` M5 Max MacBook Pro, which Qwen models can I actually run locally, and which ones still feel good once prompt length stops being toy-sized?
 
 The answer was partly about model size.
 
-It was also about runtime choice, prompt length, and a few very boring setup details that matter a lot more than people usually admit.
+It was also about runtime choice, prompt length, and a few boring setup details that matter more than people usually admit.
 
 One important scope note up front, as of April 4, 2026:
 
@@ -35,7 +35,7 @@ The short version so far:
 
 ## What fits
 
-Qwen's current open model lineup matters here because it immediately narrows the realistic local targets.
+Qwen's current open model lineup immediately narrows the realistic local targets.
 
 On the official [Qwen organization page](https://huggingface.co/Qwen), the newest open local families I found were `Qwen 3.5` and `Qwen 3`, along with the very large `Qwen3.5-122B-A10B`, `Qwen3.5-397B-A17B`, and `Qwen3-235B-A22B` variants that are not sensible first bets for a `64 GB` laptop. So I excluded those from the benchmark matrix and focused on the sizes that have a real chance of being pleasant locally.
 
@@ -94,11 +94,11 @@ A few details ended up mattering more than I expected:
 - I used official Qwen GGUF releases for `Qwen 3`, but for `Qwen 3.5` I fell back to pinned community `Q4_K_M` GGUFs because I did not find an official `Qwen 3.5` GGUF release on the Qwen organization page.
 - I had to disable Hugging Face Xet downloads on this machine for some official Qwen artifacts, because otherwise a few of the larger MLX downloads would stall on incomplete blobs.
 
-None of that is especially glamorous, but all of it changes whether local benchmarking feels straightforward or mysteriously flaky.
+None of that is glamorous, but all of it changes whether local benchmarking feels straightforward or mysteriously flaky.
 
 ## What The Benchmarks Say
 
-The first finished runs already made one thing clear: `4B` Qwen is not just workable on this machine, it is genuinely pleasant.
+The first finished runs made one thing clear: `4B` Qwen is not just workable on this machine; it is genuinely pleasant.
 
 `Qwen 3 4B` came out ahead of `Qwen 3.5 4B` in my current MLX setup on both memory footprint and long-prompt responsiveness. The short-prompt throughput story was closer, but even there `Qwen 3 4B` had the better decode speed.
 
@@ -106,7 +106,7 @@ The first bigger model result, `Qwen 3.5 9B`, is useful because it shows where t
 
 `Qwen 3 14B` pushes that trend further. It still fits comfortably in memory on this machine, but the performance profile changes category: short prompts are still fine, while long prompts become a patience test compared with the 4B models.
 
-The cross-runtime results also sharpened the runtime recommendation. On `Qwen 3.5 9B`, `MLX` beat `llama.cpp` on both suites by a healthy margin, especially once prompt length hit the `8K` range. On `Qwen 3 14B`, the short prompt was much closer, but MLX still pulled ahead clearly on the long prompt where prompt processing dominates the experience.
+The cross-runtime results sharpened the runtime recommendation. On `Qwen 3.5 9B`, `MLX` beat `llama.cpp` on both suites by a healthy margin, especially once prompt length hit the `8K` range. On `Qwen 3 14B`, the short prompt was much closer, but MLX still pulled ahead on the long prompt where prompt processing dominates the experience.
 
 ### Short Suite
 
@@ -149,6 +149,4 @@ Right now, my practical recommendation is simple:
 3. Keep `Qwen 3.5 9B` in the mix if you specifically care about the 3.5 family behavior and do not mind the extra latency and memory overhead.
 4. Prefer `MLX` first on this Mac unless a specific `llama.cpp` model artifact or integration path gives you a reason to switch.
 
-That answer is opinionated, but it is also much less hand-wavy now.
-
-It comes from actually running the models on this machine instead of guessing from parameter counts or release notes.
+That answer is opinionated, but it is much less hand-wavy now. It comes from running the models on this machine instead of guessing from parameter counts or release notes.

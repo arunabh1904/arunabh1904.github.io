@@ -25,13 +25,9 @@ summary: >-
 
 ![Vision Transformer](/assets/images/Vision Transformer VIT.png)
 
-**Summary (abstract in plain English):** ViT slices an image into 16×16 patches, flattens them, adds a learnable positional embedding and a [CLS] token, then processes the sequence with a Transformer encoder. When pre-trained on very large datasets and fine-tuned, ViT matches or exceeds leading CNNs while using fewer training FLOPs.
+**Summary:** ViT treats an image like a sequence. It slices the image into 16x16 patches, projects each patch into an embedding, adds positional embeddings and a `[CLS]` token, then feeds the sequence into a standard Transformer encoder. With enough pre-training data, that plain architecture matches or exceeds leading CNNs while using fewer training FLOPs.
 
-**Novel insights:**
-- Images become token sequences by patchifying into 16×16 windows and projecting each to an embedding.
-- A learnable [CLS] token aggregates global information for classification.
-- With over 100 M images, ViT learns locality and translation invariance without convolutions.
-- Smaller models trained on massive data outperform larger networks trained on limited data.
+The surprising part is not the patch trick by itself. It is that locality and translation invariance can emerge from data rather than being hard-coded through convolutions. ViT performs poorly when trained from scratch on smaller datasets, but with more than 100M images it becomes a strong visual backbone.
 
 **Evals / latency benchmarks:**
 
@@ -68,8 +64,6 @@ class PatchEmbed(nn.Module):
         return x + self.pos_embed
 ```
 
-**Critiques & limitations:**
-- **What I liked:** Simple architecture unifies vision and NLP research. Patch-based tokens allow standard Transformers to handle images.
-- **Limitations:** Vanilla ViT needs huge datasets like JFT-300M. Quadratic attention cost hampers very high resolutions and dense prediction tasks.
+**Critiques & limitations:** ViT's appeal is its plainness: patchify the image and reuse the Transformer stack. That simplicity helped unify vision and NLP research. The cost is data hunger. Vanilla ViT needs huge pre-training datasets such as JFT-300M, and quadratic attention makes very high resolutions and dense prediction tasks expensive.
 
-**Take-home message:** With sufficient data, a plain Transformer rivaled and sometimes beat convolutional backbones on image classification, inspiring numerous efficient and scaled-up vision models.
+**Take-home message:** With enough data, a plain Transformer can rival convolutional backbones for image classification. ViT did not make convolutions obsolete overnight, but it made attention-first vision models credible.

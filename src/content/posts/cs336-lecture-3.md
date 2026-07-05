@@ -16,28 +16,28 @@ summary: CS336 Lecture 3 — LLM Architecture & Training Stability
 
 ## Quick Overview
 
-This lecture surveys architectural choices in modern large language models and explores techniques that stabilize training. It contrasts earlier Transformer variants with lessons from recent LLMs.
+This lecture surveys architecture choices in modern large language models and the tricks that keep training stable. The useful lens is comparative: what changed from earlier Transformers, and which choices survived in recent LLMs?
 
 ---
 
 ## Normalization Techniques
 
-- RMSNorm has largely replaced LayerNorm thanks to lower memory use and similar performance. It omits mean adjustment and bias terms.
-- Pre-norm application before each block improves gradient flow and prevents loss spikes. Some models place an extra norm after the block as well.
-- Bias terms are often removed from linear layers, which empirically helps large networks train more reliably.
+- RMSNorm has largely replaced LayerNorm because it uses less memory while delivering similar performance. It omits mean adjustment and bias terms.
+- Applying normalization before each block improves gradient flow and helps prevent loss spikes. Some models add an extra norm after the block as well.
+- Large networks often drop bias terms from linear layers because the simpler parameterization trains reliably.
 
 ## Activation Functions and MLPs
 
 - Modern models favor gated linear units such as SwiGLU or GeGLU over ReLU or GELU.
-- GLUs gate the first linear layer's output elementwise, consistently outperforming non-gated activations.
+- GLUs gate the first linear layer's output elementwise, which consistently improves over non-gated activations.
 
 ## Serial vs. Parallel Layers
 
-- Most architectures keep the classic attention-then-MLP order. A few compute them in parallel for GPU efficiency, but serial layers remain more expressive.
+- Most architectures keep the classic attention-then-MLP order. A few compute both branches in parallel for GPU efficiency, but serial layers remain more expressive.
 
 ## Position Embeddings
 
-- Rotary Position Embeddings (RoPE) have become standard. They rotate queries and keys within the attention module to encode relative positions.
+- Rotary Position Embeddings (RoPE) have become standard. They rotate queries and keys inside attention so relative position is built into the dot product.
 
 ## Hyperparameter Guidelines
 
@@ -54,7 +54,7 @@ This lecture surveys architectural choices in modern large language models and e
 
 ## Attention Variations for Inference
 
-- Multi-Query (MQA) and Grouped-Query Attention (GQA) reduce key/value cache size by sharing keys and values across heads, greatly speeding generation.
+- Multi-Query Attention (MQA) and Grouped-Query Attention (GQA) reduce key/value cache size by sharing keys and values across heads, which speeds up generation.
 
 ## Long Context Handling
 
@@ -68,4 +68,3 @@ Percy Liang, **CS336 — Large Language Models**, Stanford University, Lecture 3
 
 - [Recording](https://www.youtube.com/watch?v=ptFiH_bHnJw)
 - [Slides](https://github.com/stanford-cs336/spring2024-lectures/blob/main/nonexecutable/Lecture%203%20-%20architecture.pdf)
-

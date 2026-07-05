@@ -67,7 +67,7 @@ def make_sentence_pairs(docs: Iterable[str], ratio: float = 0.5
 
 ### BERT, Six Years On: What Still Matters
 
-TL;DR A 12-layer (base) or 24-layer (large) Transformer encoder, pre-trained on 3.3 B tokens with the two code snippets above, still underpins half the NLP landscape.
+BERT's recipe is simple enough to summarize and strong enough to keep reappearing: pre-train a Transformer encoder on large text corpora, then fine-tune the same backbone for many downstream tasks. The base model has 12 layers, the large model has 24, and both were trained on roughly 3.3B tokens.
 
 ---
 
@@ -75,16 +75,15 @@ TL;DR A 12-layer (base) or 24-layer (large) Transformer encoder, pre-trained on 
 
 ### Masked-Language Modelling (MLM)
 
-The `mask_tokens` function corrupts 15 % of input pieces at random, forcing the network to infer each blank from both left and right context. This made BERT genuinely bidirectional, unlike GPT-1’s left-to-right guessing game or ELMo’s shallow concatenation of two one-directional RNNs.
+The `mask_tokens` function corrupts 15% of input pieces at random, forcing the network to infer each blank from both left and right context. This made BERT genuinely bidirectional, unlike GPT-1's left-to-right objective or ELMo's concatenation of two one-directional RNNs.
 
-This browser-side toy version strips away the `torch` machinery and focuses on the bookkeeping that matters.
-Run it once, then walk through the traced values to see exactly which positions become labels, how the masked input is formed, and how the model head maps predictions back to the hidden originals.
+This browser-side toy version strips away the `torch` machinery and focuses on the bookkeeping that matters. Run it once, then walk through the traced values to see which positions become labels, how the masked input is formed, and how the model head maps predictions back to the hidden originals.
 
 <PythonPlayground client:visible {...bertPlayground} />
 
 ### Next-Sentence Prediction (NSP)
 
-`make_sentence_pairs` creates 50 % real A→B pairs and 50 % mismatches. The classifier sitting on `[CLS]` learns discourse-level coherence. Later work (RoBERTa) showed you can ditch NSP without hurting accuracy, but the idea seeded a huge body of inter-sentence objectives (e.g. sentence embedding models, dense retrieval).
+`make_sentence_pairs` creates 50% real A to B pairs and 50% mismatches. The classifier sitting on `[CLS]` learns a discourse-level coherence signal. Later work, especially RoBERTa, showed that NSP was not necessary for strong accuracy, but the idea still seeded a large family of inter-sentence objectives for sentence embeddings and dense retrieval.
 
 ---
 
@@ -102,21 +101,17 @@ Training cost: ~4 days on 16 TPU v3 chips; a single downstream fine-tune (e.g. Q
 ---
 
 ## Why BERT Hit Hard
-1. True bidirectionality — MLM beat GPT-style causal masks by reading the whole sentence at once.
-2. One backbone, many heads — QA, NLI, NER, sentiment: swap a task head, fine-tune end-to-end, done.
-3. `[CLS]` + segment embeddings — became the default recipe for pairwise classification and retrieval.
-4. Open weights & code — bootstrapped an ecosystem of tweaked replicas (RoBERTa, ALBERT, DistilBERT, etc.).
+
+BERT combined four things at the right time. Masked-language modeling gave the encoder access to both left and right context. A single backbone could support QA, NLI, NER, and sentiment by swapping a task head and fine-tuning end to end. `[CLS]` and segment embeddings gave pairwise classification and retrieval a default recipe. Open weights and code turned the paper from a result into an ecosystem, leading quickly to RoBERTa, ALBERT, DistilBERT, and many domain-specific variants.
 
 ---
 
 ## Where It Falls Short
-- Compute-hungry — four-day TPU bills were eye-watering in 2018; still non-trivial today.
-- NSP flop — later ablations showed it adds little; many modern variants drop it.
-- 512-token ceiling and quadratic attention — hopeless on long documents without hacks.
-- Static knowledge — BERT knows nothing after late 2018; domain adaptation or continual learning is required.
+
+BERT was compute-hungry in 2018 and still non-trivial to reproduce casually. NSP did not age well; later ablations showed that many variants can drop it. The 512-token limit and quadratic attention make long documents awkward without architectural changes. BERT also has static knowledge, so domain adaptation or continual learning is required when the world or target domain moves.
 
 ---
 
 ## Looking Forward
 
-BERT’s recipe is a floor, not a ceiling. Better corruption schemes (SpanBERT, DeBERTa’s disentangled masks), cheaper compressors (DistilBERT, TinyBERT), and smarter attention (Longformer, FlashAttention) all stand on its shoulders. Yet the two short snippets at the top remain the intellectual core: mask some tokens, test sentence order, back-propagate, repeat. That elegance is why BERT is still worth teaching in 2025.
+BERT's recipe became a floor, not a ceiling. Better corruption schemes, cheaper compressors, and longer-context attention methods all stand on top of the same basic idea: mask some tokens, optionally test sentence order, backpropagate, and reuse the encoder everywhere. That elegance is why BERT is still worth teaching.

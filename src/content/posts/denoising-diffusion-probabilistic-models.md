@@ -21,17 +21,11 @@ summary: 2020 – Denoising Diffusion Probabilistic Models (DDPM)
 
 **Conference:** NeurIPS 2020
 
-**Plain-language abstract**  
-DDPMs define a forward Markov chain that gradually corrupts real data into near-isotropic Gaussian noise and a
-learned reverse chain (parameterised by a UNet) that denoises step-by-step. Training minimises a weighted MSE
-between the network’s noise prediction ε̂ and the actual noise ε. With 1000 denoising steps, DDPM achieved FID 3.17
-and IS 9.46 on CIFAR-10, matching StyleGAN-v2 without adversarial training.
+**Plain-language abstract:** DDPMs generate data by learning to reverse noise. The forward process gradually corrupts real examples into near-isotropic Gaussian noise. The learned reverse process, usually parameterized by a UNet, removes that noise step by step. Training asks the model to predict the noise $\hat{\epsilon}$ that was added at each timestep, then minimizes a weighted MSE against the true noise $\epsilon$.
 
-**Deep-dive insights**
-- Noise-conditioning as score matching links DDPMs to score-based SDE models.
-- Learning the reverse-process variance (“Improved DDPM”) cuts sampling to around 50 steps.
-- Classifier or classifier-free guidance steers generation for class or text conditioning.
-- Optimising a tractable ELBO yields good likelihoods alongside crisp samples.
+The payoff is stability. With 1000 denoising steps, DDPM reached FID 3.17 and IS 9.46 on CIFAR-10, matching StyleGAN-v2 without adversarial training. The framework also connects noise-conditioned denoising to score matching and score-based SDE models, giving diffusion a strong probabilistic interpretation rather than just a good sample generator.
+
+**Why it mattered:** Diffusion models made high-quality generation feel less fragile than GAN training. Later improvements, including learned reverse-process variance, faster samplers, and classifier-free guidance, turned the original slow denoising loop into the foundation for modern text-to-image systems.
 
 **Benchmarks**
 
@@ -72,12 +66,6 @@ def p_sample_loop(model, shape, betas, sqrt_recip_alphas,
     return x_t
 ```
 
-**Critiques & open questions**
-- **Strengths:** Stable training, no mode collapse, tractable likelihood.
-- **Limitations:** Sampling requires many UNet passes; training is compute heavy.
+**Critiques & open questions:** DDPMs train stably, avoid mode collapse, and provide a tractable likelihood story. The cost is sampling speed. A naive sampler needs many UNet passes, and training remains compute-heavy even when optimization is well behaved.
 
-**Take-home message**  
-DDPM reframed generative modelling around gradual noise erosion and learned denoising.
-Variance learning and improved samplers brought diffusion models from curiosity to the engines powering
-modern text-to-image systems.
-
+**Take-home message:** DDPM reframed generative modelling around gradual noise erosion and learned denoising. Once variance learning and faster samplers arrived, diffusion moved from elegant curiosity to practical engine.

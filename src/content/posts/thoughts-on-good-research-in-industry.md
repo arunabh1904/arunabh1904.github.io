@@ -13,7 +13,7 @@ summary: >-
 ---
 # Thoughts on Good Research in Industry
 
-Came across [this amazing post](https://emerge-lab.github.io/papers/an-unsolicited-guide-to-good-research.pdf) from [Eugene Vinitsky](https://www.eugenevinitsky.com/) recently, and it stayed with me longer than I expected. Eugene leads the [EMERGE Lab](https://emerge-lab.github.io/), and while the piece is framed as advice for doing good research, a lot of it applies just as well to research in industry. The constraints are different. The timelines are tighter. The work is usually tangled up with engineering, product, and organizational reality. But the underlying questions are the same. How do you develop taste? How do you work rigorously without getting lost in process? How do you collaborate in a way that compounds?
+I came across [this post](https://emerge-lab.github.io/papers/an-unsolicited-guide-to-good-research.pdf) from [Eugene Vinitsky](https://www.eugenevinitsky.com/) recently, and it stayed with me longer than I expected. Eugene leads the [EMERGE Lab](https://emerge-lab.github.io/), and while the piece is framed as advice for doing good research, a lot of it applies just as well to research in industry. The constraints are different. The timelines are tighter. The work is tangled up with engineering, product, and organizational reality. But the underlying questions are the same: How do you develop taste? How do you work rigorously without getting lost in process? How do you collaborate in a way that compounds?
 
 What I liked most about the piece is that it treats research less like a sequence of heroic breakthroughs and more like a craft. A lot of the job is not just having good ideas. It is learning how to see clearly, choose well, and keep moving.
 
@@ -21,15 +21,15 @@ What I liked most about the piece is that it treats research less like a sequenc
 
 One of the hardest parts of becoming a researcher is building a point of view. There is far too much literature for anyone to keep up with all of it, and genuinely important work is much rarer than the volume of papers would suggest. Early on, that can feel overwhelming. Over time, though, you get better at compressing the field. You learn which ideas are foundational, which are incremental, and which are mostly noise.
 
-That, to me, is research taste. It is the ability to tell what matters. Not all papers are written equal, and not all trends deserve attention. A practical shortcut is to find researchers and labs with consistently strong work and follow them closely. Over time, that helps build the instinct to separate signal from fashion.
+That, to me, is research taste: the ability to tell what matters. Not all papers are written equal, and not all trends deserve attention. A practical shortcut is to find researchers and labs with consistently strong work and follow them closely. Over time, that habit builds the instinct to separate signal from fashion.
 
 This is also why virality-based social media feels so flattening. It pushes everyone toward the same visible opinions. But real taste develops more slowly. It comes from sustained exposure, independent judgment, and enough experience to recognize depth when it shows up.
 
 ## Work that pulls you forward
 
-The best work usually has some element of play in it. Not because it is easy, but because it feels intrinsically interesting. There should be some part of the problem that keeps pulling you back even when nobody is asking you to care. Research is too hard to sustain on discipline alone.
+The best work usually has some element of play in it. Not because it is easy, but because it is intrinsically interesting. Some part of the problem should keep pulling you back even when nobody is asking you to care. Research is too hard to sustain on discipline alone.
 
-At the same time, the work should stretch you. The most meaningful progress often happens when you are operating just beyond your comfort zone. Not overwhelmed, but not comfortable either. That slight tension is often where growth happens.
+At the same time, the work should stretch you. The most meaningful progress often happens just beyond your comfort zone: not overwhelmed, but not comfortable either. That slight tension is where growth tends to happen.
 
 ## Collaboration as leverage
 
@@ -45,7 +45,7 @@ ML is an empirical science, so rigor in experimentation is not optional. Every e
 
 Good documentation is part of that rigor. Future you will need to know what you tried, what changed, and what actually worked. For me, a weekly log strikes the right balance. It is enough structure to keep track of progress without becoming a chore. It also creates a natural moment to reflect. Over time, those notes become useful for collaboration, presentations, and performance reviews. The same goes for a brag document. It may sound awkward, but it is often the easiest way to avoid forgetting the work you are genuinely proud of.
 
-Showing your work matters too, but only if it is legible. When presenting, the goal should not be to maximize detail. It should be to maximize understanding. There is a big difference between proving you did the work and helping someone else understand it.
+Showing your work matters too, but only if it is legible. When presenting, the goal is not to maximize detail. It is to maximize understanding. There is a big difference between proving you did the work and helping someone else understand it.
 
 ## Throughput matters too
 
@@ -53,4 +53,4 @@ There is also a practical side to all of this. If you have access to compute, us
 
 What resonates with me most about Eugene's post is that it makes research feel like something you can get better at deliberately. Build taste. Stay unblocked. Run careful experiments. Document what you learn. Communicate clearly. Keep moving.
 
-That is a less romantic view of research, but probably a more useful one. And in industry especially, it feels closer to the truth.
+That is a less romantic view of research, but probably a more useful one. In industry especially, it feels closer to the truth.

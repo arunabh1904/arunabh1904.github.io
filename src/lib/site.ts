@@ -1,6 +1,6 @@
 export const SITE_TITLE = 'Arunabh.BLOG';
 export const SITE_DESCRIPTION =
-  'A personal blog on computer vision, robotics, and more.';
+  'Notes on computer vision, robotics, research, and local AI systems.';
 
 export const CONTACT_LINKS = [
   { href: 'mailto:arunabh1904@gmail.com', iconName: 'email', label: 'Email' },
@@ -20,7 +20,7 @@ export const CONTACT_LINKS = [
 export const PDF_REPORTS = [
   {
     href: '/assets/pdfs/VLM Research Summary.pdf',
-    label: 'A survey of VLMs.',
+    label: 'A survey of VLMs',
     dateLabel: 'May 17, 2025',
   },
 ] as const;

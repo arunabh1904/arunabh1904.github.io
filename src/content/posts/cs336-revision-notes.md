@@ -16,7 +16,7 @@ summary: CS336 Lecture 2 — Tensor Fundamentals & Computation Efficiency
 
 ## Quick Overview
 
-This lecture discusses different data types and guides you on when each should be used, provides a clear mental model of computational structures, briefly covers tensor reshaping with Einops, and introduces computational efficiency metrics and initialization strategies.
+This lecture covers dtype tradeoffs, tensor memory layout, Einops reshaping, computational-efficiency metrics, and initialization strategies. The throughline is practical: understand what the hardware is actually moving and computing.
 
 ---
 
@@ -78,7 +78,7 @@ bfloat16    | 2 B |  11.55 ms | rel-err 1.41e+00
 float16     | 2 B |  36.21 ms | rel-err 1.41e+00
 ```
 
-Training is usually **bandwidth-bound**; halving the element size doubles the compute-to-memory-traffic ratio and can switch kernels onto tensor-cores. `float64` is the original high precision variant typically used for CPU Ops. `float32` is the default setting for training deep learning models. `float16` and `bfloat16` are both half precision variants but, bfloat16 keeps the 8-bit exponent of FP32 so you almost never need loss scaling, while float16 often does. `FP8 (E4M3/E5M2)` is bleeding-edge and **strictly inference** for now – back-prop squares gradients and wrecks its tiny dynamic range. There are also `FP4` variants enabled by blackwell GPUs. 
+Training is usually **bandwidth-bound**. Halving element size improves the compute-to-memory-traffic ratio and can move kernels onto tensor cores. `float64` is the high-precision variant typically used for CPU-heavy numerical work. `float32` remains the default for many deep-learning training paths. `float16` and `bfloat16` are both half-precision formats, but `bfloat16` keeps the 8-bit exponent of FP32, so it usually avoids loss scaling while `float16` often needs it. `FP8 (E4M3/E5M2)` is still mostly an inference-focused format here because backpropagation stresses its tiny dynamic range. Blackwell GPUs also introduce `FP4` variants.
 
 ---
 
@@ -106,7 +106,7 @@ for n in [t, act, z, loss]:
 ()        | grad_fn=MeanBackward0
 ```
 
-The `grad_fn` field lets you walk the dynamic computation graph **without** external tools — perfect for debugging odd gradients.
+The `grad_fn` field lets you inspect the dynamic computation graph **without** external tools, which is useful when gradients look wrong.
 
 ---
 
@@ -129,13 +129,13 @@ contiguous? view=False  clone=False
 share underlying storage? True
 ```
 
-**Strides rule everything.** A tensor is `(data_ptr, sizes, strides)`. Transpose costs 0 B until you hit a kernel that needs contiguous memory — then PyTorch silently allocates a fresh buffer. Keep one consistent layout (e.g. `[B, Seq, Heads, Dim]`) through your pipeline.
+**Strides rule everything.** A tensor is `(data_ptr, sizes, strides)`. Transpose costs 0 B until a kernel needs contiguous memory; then PyTorch silently allocates a fresh buffer. Keep one consistent layout, such as `[B, Seq, Heads, Dim]`, through the pipeline.
 
 ---
 
 ## 5 · Clean Tensor Manipulations with Einops
 
-Einops is a library that provides a concise and intuitive syntax for tensor manipulations such as reshaping, permuting, and reducing tensors. It enhances code readability and helps avoid errors associated with manual indexing and reshaping operations.
+Einops gives tensor reshaping, permutation, and reduction a compact syntax. The practical benefit is readability: it is much harder to hide a dimension-ordering bug inside a named pattern than inside manual indexing.
 
 ```python
 from einops import rearrange, reduce, repeat
@@ -149,13 +149,13 @@ gap = reduce(x_nchw, "b c h w -> b c", "mean")
 emb_map = repeat(torch.randn(2, 64), "b d -> b d h w", h=7, w=7)
 ```
 
-Benefit: Einops manipulates only metadata when strides allow, enabling intuitive, safe reshaping without unintended copies, thus avoiding unnecessary bandwidth usage.
+When strides allow it, Einops changes only metadata. That gives you safer reshaping without unnecessary memory traffic.
 
 ---
 
 ## 6 · Tracking computational efficiency
 
-FLOPs (Floating Point Operations per Second) measure computational efficiency. Model FLOP Utilization (MFU) is the ratio of actual FLOPs achieved by the hardware to its theoretical maximum, typically less than 1 due to overheads like memory latency, kernel launch overheads, and suboptimal hardware utilization.
+FLOPs describe the arithmetic work. Model FLOP Utilization (MFU) compares the FLOPs a model actually achieves to the hardware's theoretical maximum. MFU is usually below 1 because memory latency, kernel launch overhead, and imperfect hardware utilization all get in the way.
 
 $$
 MFU = \frac{\text{achieved FLOPs}}{\text{theoretical FLOPs}}
@@ -181,7 +181,7 @@ def attn_flops(seq:int, dim:int):
 | Conv2d         | `2·C_in·C_out·K²·H_out·W_out`     |
 | Self-Attention | `4·S²·D`                          |
 
-Bias, ReLU, and LayerNorm are <1 % of an LLM’s FLOPs yet can dominate latency if launch overhead or memory stalls bite.
+Bias, ReLU, and LayerNorm are often less than 1% of an LLM's FLOPs, but they can still dominate latency when launch overhead or memory stalls bite.
 
 ---
 
@@ -215,15 +215,15 @@ Glorot std 0.0782
 Kaiming std 0.1104
 ```
 
-Glorot/Xavier Initialisation (Glorot & Bengio, 2010) assumes symmetric activations like `tanh` and balances the variance between the forward and backward passes.
+Glorot/Xavier Initialisation (Glorot & Bengio, 2010) assumes symmetric activations like `tanh` and balances variance between the forward and backward passes.
 
-He Initialisation (He et al., 2015) is tailored for ReLU and its derivatives, which zero out half the inputs and thus double the variance.
+He Initialisation (He et al., 2015) is tailored for ReLU-style activations, which zero out about half the inputs and therefore need a larger variance.
 
 Typical standard deviations for large matrices differ: around 0.07–0.08 for Glorot versus 0.10–0.11 for He.
 
 Transformers often scale residual connections with `x + 0.1 * f(x)` to stabilise depth. Some apply μParam (μP) to decouple width and depth while preserving training dynamics at scale.
 
-When does it matter? For very deep networks (>200 layers) or extreme dtypes such as FP8, where poor initialisation cannot be fixed by the optimiser.
+Initialization matters most for very deep networks or extreme dtypes such as FP8, where the optimizer cannot easily rescue bad early signal flow.
 
 ---
 
