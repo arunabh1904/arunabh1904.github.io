@@ -16,11 +16,3 @@ export const CONTACT_LINKS = [
     label: 'X',
   },
 ] as const;
-
-export const PDF_REPORTS = [
-  {
-    href: '/assets/pdfs/VLM Research Summary.pdf',
-    label: 'A survey of VLMs',
-    dateLabel: 'May 17, 2025',
-  },
-] as const;

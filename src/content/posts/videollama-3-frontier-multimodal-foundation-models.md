@@ -1,0 +1,24 @@
+---
+title: 'VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding'
+date: '2025-01-01T05:00:00.000Z'
+section: paper-shorts
+postSlug: videollama-3-frontier-multimodal-foundation-models
+legacyPath: /paper shorts/2025/01/01/videollama-3-frontier-multimodal-foundation-models.html
+tags:
+  - Other
+field: Vision-Language Models
+summary: VideoLLaMA 3 showed that strong image understanding can be the foundation for efficient video understanding.
+---
+## 2025 - VideoLLaMA 3
+
+**arXiv:** [2501.13106](https://arxiv.org/abs/2501.13106)
+
+**GitHub:** [DAMO-NLP-SG/VideoLLaMA3](https://github.com/DAMO-NLP-SG/VideoLLaMA3)
+
+**Plain-language summary:** VideoLLaMA 3 takes a vision-centric route to image and video understanding. It first adapts the vision encoder for variable-resolution images, aligns image-text data at scale, then adds video-specific training and token merging for temporal inputs.
+
+The key claim is that high-quality image-text learning carries a lot of the load for video. Video data still matters, but the model does not need to learn all semantics from video clips alone.
+
+**Why it mattered:** It connects the image VLM and video VLM stories. If static visual grounding is strong, video becomes a temporal extension rather than a separate world.
+
+**Take-home message:** Video VLMs are constrained by visual token budgets. Good image features plus careful temporal compression are the practical path.

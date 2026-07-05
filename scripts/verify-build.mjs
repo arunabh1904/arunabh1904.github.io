@@ -17,7 +17,6 @@ const criticalPages = [
   'blog.html',
   'build_intuition.html',
   'revision_notes.html',
-  'ai_generated_reports.html',
   'paper_summaries.html',
   'paper_summaries_field.html',
   'music.html',
