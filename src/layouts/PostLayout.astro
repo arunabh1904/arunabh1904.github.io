@@ -10,6 +10,7 @@ interface Props {
   previous?: PostEntry;
   next?: PostEntry;
   showNavigation?: boolean;
+  showSectionsNav?: boolean;
 }
 
 const {
@@ -18,21 +19,26 @@ const {
   previous,
   next,
   showNavigation = false,
+  showSectionsNav = true,
 } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
   <PageControls showHomeButton={true} />
-  <div class="page-layout">
+  <div class={`page-layout${showSectionsNav ? '' : ' page-layout--centered'}`}>
     <main class="page-content page-content--narrow" aria-label="Content" data-sections-root>
       <slot />
       {showNavigation && <PostNavigation previous={previous} next={next} />}
     </main>
-    <aside class="sections-nav" aria-label="Sections" data-sections-nav hidden>
-      <div class="sections-nav__inner">
-        <p class="sections-nav__eyebrow">Sections</p>
-        <nav class="sections-nav__links" data-sections-list></nav>
-      </div>
-    </aside>
+    {
+      showSectionsNav && (
+        <aside class="sections-nav" aria-label="Sections" data-sections-nav hidden>
+          <div class="sections-nav__inner">
+            <p class="sections-nav__eyebrow">Sections</p>
+            <nav class="sections-nav__links" data-sections-list></nav>
+          </div>
+        </aside>
+      )
+    }
   </div>
 </BaseLayout>

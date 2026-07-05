@@ -153,11 +153,12 @@ const formatDate = (date: Date) =>
   <section class="home-hero" id="top">
     <div class="home-hero__bar">
       <p class="home-kicker">Arunabh.BLOG</p>
+      <p class="home-hero__context">Computer vision / robotics / notes</p>
     </div>
 
     <div class="home-hero__content">
       <div class="home-hero__copy">
-        <h1 class="home-title">Arunabh.BLOG</h1>
+        <h1 class="home-title">ARUNABH.BLOG</h1>
         <p class="lead">
           I work on computer vision and robotics for autonomous systems. This is where I write
           about the ideas, papers, and experiences that have shaped the path.
@@ -169,22 +170,25 @@ const formatDate = (date: Date) =>
         </nav>
       </div>
 
-      <div class="home-meta-panel" aria-label="Site overview">
-        <div class="home-meta-panel__item">
-          <span class="home-meta-panel__label">Sections</span>
-          <strong>{String(sectionCards.length).padStart(2, '0')}</strong>
+      <dl class="home-stat-list" aria-label="Site overview">
+        <div>
+          <dt>Sections</dt>
+          <dd>{String(sectionCards.length).padStart(2, '0')}</dd>
         </div>
-        <div class="home-meta-panel__item">
-          <span class="home-meta-panel__label">Entries</span>
-          <strong>{totalEntries}</strong>
+        <div>
+          <dt>Entries</dt>
+          <dd>{totalEntries}</dd>
         </div>
-      </div>
+      </dl>
     </div>
   </section>
 
   <section class="home-story-grid" id="about">
     <article class="home-panel home-panel--story">
-      <p class="home-panel__eyebrow">About</p>
+      <div class="home-panel__heading">
+        <p class="home-panel__eyebrow">About</p>
+        <h2>What this site is</h2>
+      </div>
       <p class="intro-text">
         I work in computer vision research at Zoox, building learned representations for autonomous
         driving scenes and helping shape perception research. Before that, I led parts of the
@@ -206,13 +210,21 @@ const formatDate = (date: Date) =>
       </p>
     </article>
 
-    <article class="home-panel home-panel--map">
-      <p class="home-panel__eyebrow">Sections</p>
+    <article class="home-panel home-panel--map" id="sections">
+      <div class="home-panel__heading">
+        <p class="home-panel__eyebrow">Start here</p>
+        <h2>Reading paths</h2>
+      </div>
       <ul class="home-section-map">
         {sectionCards.map((section) => (
           <li>
-            <a href={section.href}>{section.title}</a>
-            <p>{section.description}</p>
+            <a href={section.href}>
+              <span>
+                <strong>{section.title}</strong>
+                <small>{section.description}</small>
+              </span>
+              <em>{section.count}</em>
+            </a>
           </li>
         ))}
       </ul>
@@ -220,16 +232,14 @@ const formatDate = (date: Date) =>
   </section>
 
   <section class="home-shelves" id="latest">
-    <article class="home-panel home-panel--section-intro">
+    <div class="home-section-heading">
       <p class="home-panel__eyebrow">Latest</p>
-      <div class="home-section-heading">
-        <h2>Recent entries</h2>
-        <p>
-          A quick scan of the newest writing across the site, with each panel linking to its full
-          section.
-        </p>
-      </div>
-    </article>
+      <h2>Recent entries</h2>
+      <p>
+        A quick scan of the newest writing across the site. Each panel links out to the section
+        and highlights the two most recent posts.
+      </p>
+    </div>
 
     <div class="home-shelf-grid">
       {recentShelves.map((shelf) => (

@@ -1,16 +1,24 @@
 ---
 import PostList from '../components/PostList.astro';
+import SectionHeader from '../components/SectionHeader.astro';
 import PostLayout from '../layouts/PostLayout.astro';
 import { getPostsByField } from '../lib/content';
 
 const fields = await getPostsByField();
+const paperCount = fields.reduce((count, field) => count + field.items.length, 0);
 ---
 
-<PostLayout title="Paper Summaries by Field">
+<PostLayout title="Paper Summaries by Field" showSectionsNav={false}>
+  <SectionHeader
+    eyebrow="Arxiv Notes"
+    title="Paper summaries by field"
+    description="Research-paper notes grouped by the ideas and systems they connect to."
+    meta={`${paperCount} entries`}
+  />
   {fields.map(({ field, items }) => (
-    <>
+    <section class="section-index-group">
       <h2>{field}</h2>
       <PostList posts={items} />
-    </>
+    </section>
   ))}
 </PostLayout>
