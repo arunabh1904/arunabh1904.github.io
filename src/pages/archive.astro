@@ -1,25 +1,32 @@
 ---
 import PostLayout from '../layouts/PostLayout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
 import { getAllPosts, groupPostsByTag } from '../lib/content';
 
-const grouped = groupPostsByTag(await getAllPosts());
+const posts = await getAllPosts();
+const grouped = groupPostsByTag(posts);
 ---
 
-<PostLayout title="Blog Archive">
+<PostLayout title="Blog Archive" showSectionsNav={false}>
+  <SectionHeader
+    eyebrow="Archive"
+    title="All writing by tag"
+    description="A compact index for jumping across research notes, essays, explainers, and revision material."
+    meta={`${posts.length} entries`}
+  />
   {grouped.map(({ tag, items }) => (
-    <>
+    <section class="section-index-group">
       <h3>{tag}</h3>
-      <ul>
+      <ul class="archive-list">
         {items.map((post) => (
           <li>
             <a href={post.data.legacyPath}>
-              {post.data.date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} -
-              {' '}
-              {post.data.title}
+              <span>{post.data.title}</span>
+              <small>{post.data.date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</small>
             </a>
           </li>
         ))}
       </ul>
-    </>
+    </section>
   ))}
 </PostLayout>

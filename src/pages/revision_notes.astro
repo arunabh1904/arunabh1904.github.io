@@ -1,32 +1,44 @@
 ---
 import PostLayout from '../layouts/PostLayout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
 ---
 
-<PostLayout title="Revision Notes">
-  <h2>CS336: Language Modeling from Scratch</h2>
-  <p><a href="https://stanford-cs336.github.io/spring2025/">Course website</a></p>
-  <p>
-    This is one of the best intuition-building language modeling courses I have found. I am
-    collecting my lecture notes here as I work through it.
-  </p>
-  <ul>
-    <li>
-      Lesson 2 -
-      <a href="/revision notes/2025/05/15/cs336-revision-notes.html">My notes</a>
-      {' / '}
-      <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">YouTube</a>
-      {' / '}
-      <a href="https://stanford-cs336.github.io/spring2025/lectures/2">Course material</a>
-    </li>
-    <li>
-      Lesson 3 -
-      <a href="/revision notes/2025/05/22/cs336-lecture-3.html">My notes</a>
-      {' / '}
-      <a href="https://www.youtube.com/watch?v=ptFiH_bHnJw">YouTube</a>
-      {' / '}
-      <a href="https://github.com/stanford-cs336/spring2024-lectures/blob/main/nonexecutable/Lecture%203%20-%20architecture.pdf"
-        >Slides</a
-      >
-    </li>
-  </ul>
+<PostLayout title="Revision Notes" showSectionsNav={false}>
+  <SectionHeader
+    eyebrow="Revision Notes"
+    title="CS336: Language Modeling from Scratch"
+    description="Lecture notes and course references for one of the strongest intuition-building language modeling courses around."
+    meta="2 lessons"
+  />
+
+  <section class="resource-list">
+    <div class="resource-list__header">
+      <h2>Course links</h2>
+      <a href="https://stanford-cs336.github.io/spring2025/">Course website</a>
+    </div>
+    <ul>
+      <li>
+        <div>
+          <strong>Lesson 2</strong>
+          <p>Tokenization and model-building foundations.</p>
+        </div>
+        <span>
+          <a href="/revision notes/2025/05/15/cs336-revision-notes.html">My notes</a>
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">YouTube</a>
+          <a href="https://stanford-cs336.github.io/spring2025/lectures/2">Material</a>
+        </span>
+      </li>
+      <li>
+        <div>
+          <strong>Lesson 3</strong>
+          <p>Architecture notes and transformer implementation details.</p>
+        </div>
+        <span>
+          <a href="/revision notes/2025/05/22/cs336-lecture-3.html">My notes</a>
+          <a href="https://www.youtube.com/watch?v=ptFiH_bHnJw">YouTube</a>
+          <a href="https://github.com/stanford-cs336/spring2024-lectures/blob/main/nonexecutable/Lecture%203%20-%20architecture.pdf">Slides</a>
+        </span>
+      </li>
+    </ul>
+  </section>
 </PostLayout>

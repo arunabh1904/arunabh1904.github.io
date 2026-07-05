@@ -28,10 +28,8 @@ const { title, description, timelineEntries = [] } = Astro.props;
       <div class="home-content-shell">
         <slot />
       </div>
-      <aside class="home-timeline-rail">
+      <aside class="home-aside">
         <TimelinePanel entries={timelineEntries} />
-      </aside>
-      <aside class="home-sidebar">
         <LinksPanel />
       </aside>
     </div>

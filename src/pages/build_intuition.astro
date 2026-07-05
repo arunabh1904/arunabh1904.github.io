@@ -1,11 +1,18 @@
 ---
 import PostLayout from '../layouts/PostLayout.astro';
 import PostList from '../components/PostList.astro';
+import SectionHeader from '../components/SectionHeader.astro';
 import { getPostsBySection } from '../lib/content';
 
-const posts = await getPostsBySection('build-intuition', 'asc');
+const posts = await getPostsBySection('build-intuition', 'desc');
 ---
 
-<PostLayout title="Build Intuition">
+<PostLayout title="Build Intuition" showSectionsNav={false}>
+  <SectionHeader
+    eyebrow="Build Intuition"
+    title="Intuition-first explainers"
+    description="Conceptual walkthroughs that prioritize the shape of an idea before the implementation details."
+    meta={`${posts.length} entries`}
+  />
   <PostList posts={posts} />
 </PostLayout>

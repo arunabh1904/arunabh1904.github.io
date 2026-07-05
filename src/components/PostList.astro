@@ -8,12 +8,12 @@ interface Props {
 const { posts } = Astro.props;
 ---
 
-<ul class="icon-list">
+<ul class="post-list">
   {posts.map((post) => (
     <li>
       <a href={post.data.legacyPath}>{post.data.title}</a>
       <small>
-        — {
+        {
           post.data.date.toLocaleDateString('en-US', {
             month: 'short',
             day: '2-digit',
@@ -21,6 +21,7 @@ const { posts } = Astro.props;
           })
         }
       </small>
+      {post.data.summary && <p>{post.data.summary}</p>}
     </li>
   ))}
 </ul>
