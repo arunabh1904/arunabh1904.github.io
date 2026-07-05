@@ -21,6 +21,9 @@ summary: SigLIP replaced softmax contrastive normalization with independent sigm
 
 **Conference:** ICCV 2023 (oral)
 
+![CLIP and SigLIP objective schematic](/assets/images/clip-siglip-objective-schematic.svg)
+_Local explainer diagram; the SigLIP paper's ar5iv conversion does not expose useful source figures._
+
 **Plain-language abstract:** SigLIP changes one important piece of CLIP: the loss. Instead of a softmax contrastive objective over the batch, it uses per-pair sigmoid binary cross-entropy. That decouples training quality from very large batch sizes and makes strong language-image pre-training possible with fewer devices.
 
 The result is surprisingly practical. A ViT-L/256 trained for two days on four TPUs reaches 84.5% ImageNet zero-shot accuracy. The paper also shows that returns diminish beyond about 32k images per batch, and that the objective works well with Locked-image Tuning, where the vision encoder is frozen and the text side adapts.

@@ -17,7 +17,8 @@ summary: SENNA split driving into high-level language planning and low-level tra
 
 This makes the language layer inspectable. A planner can say what it intends to do before the control module turns that intent into geometry.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure 1: Previous methods plan trajectories without a decision-making step, making model learning difficult from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-paper-figure.png)
+_Figure 1: Previous methods plan trajectories without a decision-making step, making model learning difficult. From the [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving paper](https://arxiv.org/abs/2410.22313), via arXiv HTML._
 
 **What to look at:**
 - Senna-VLM produces high-level textual plans.

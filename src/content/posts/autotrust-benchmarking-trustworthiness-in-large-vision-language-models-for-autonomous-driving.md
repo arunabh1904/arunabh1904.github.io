@@ -17,7 +17,8 @@ summary: AutoTrust evaluated driving VLMs across hallucination, safety, robustne
 
 That means questions can test whether a model hallucinates, gives unsafe advice, leaks sensitive information, breaks under perturbations, or behaves inconsistently across groups and regions.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure 1 from AutoTrust: benchmark overview for DriveVLM trustworthiness](/assets/images/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driv-paper-figure.png)
+_Figure 1 from the [AutoTrust paper](https://arxiv.org/abs/2412.15206), via arXiv HTML._
 
 **What to look at:**
 - Trustworthiness is split into truthfulness, safety, robustness, privacy, and fairness.

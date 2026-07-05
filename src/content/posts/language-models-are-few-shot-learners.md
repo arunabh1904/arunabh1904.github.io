@@ -19,6 +19,9 @@ summary: GPT-3 showed that scale can turn language models into few-shot learners
 
 **Conference:** NeurIPS 2020 (oral)
 
+![Figure 2.1 from GPT-3: zero-shot, one-shot, few-shot, and fine-tuning evaluation strategies](/assets/images/gpt3-paper-figure-2-1-eval-strategies.png)
+_Figure 2.1 from the [GPT-3 paper](https://arxiv.org/abs/2005.14165), via ar5iv._
+
 **Plain-language abstract:** GPT-3 made scale itself feel like a new interface. It is a 175B-parameter autoregressive Transformer, roughly ten times larger than prior dense language models, trained on about 500B tokens of internet text. At test time, users can put a task description and a few examples in the prompt, and the frozen model often performs the task without gradient updates.
 
 The paper's central claim is that no-fine-tune performance improves smoothly with model size, data, and compute, with some capabilities appearing more sharply beyond roughly ten billion parameters. It also made prompt programming feel real: instead of creating a dataset and fine-tuning, users could steer one general-purpose model with natural-language examples.

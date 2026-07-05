@@ -21,7 +21,8 @@ summary: InstructGPT showed that human preference data can make smaller language
 
 **Conference:** NeurIPS 2022 (spotlight)
 
-![RLHF Pipeline](/assets/images/DQN Atari RLHF.png)
+![Figure 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model from Training Language Models to Follow Instructions with Human Feedback](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-paper-figure.png)
+_Figure 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model. From the [Training Language Models to Follow Instructions with Human Feedback paper](https://arxiv.org/abs/2203.02155), via arXiv HTML._
 
 **Plain-language abstract:** GPT-3 could generate impressive text, but it often missed what users actually asked for. InstructGPT showed that reinforcement learning from human feedback could move a language model toward user intent. The pipeline has three stages: supervised fine-tuning on human demonstrations, reward-model training from ranked outputs, and PPO policy optimization with a KL penalty that keeps the model close to the supervised baseline.
 

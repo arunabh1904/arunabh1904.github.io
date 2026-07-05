@@ -19,7 +19,8 @@ summary: MuZero learned just enough model dynamics to plan with MCTS, without re
 
 **Journal / Conference:** Nature 2020 (pre-print Nov 2019)
 
-![MuZero Architecture](/assets/images/muzero.png)
+![Figure 1: Planning, acting, and training with a learned model from Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model](/assets/images/mastering-atari-go-chess-shogi-muzero-paper-figure.png)
+_Figure 1: Planning, acting, and training with a learned model. From the [Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model paper](https://arxiv.org/abs/1911.08265), via arXiv HTML._
 
 **Summary:** MuZero combines search with a learned model, but it does not try to reconstruct the full environment. Instead, it learns three networks: a representation network that maps observations into hidden states, a dynamics network that rolls those hidden states forward, and a prediction network that outputs policy, value, and reward. Those learned summaries feed Monte Carlo Tree Search, letting the agent plan without hand-coded game rules.
 

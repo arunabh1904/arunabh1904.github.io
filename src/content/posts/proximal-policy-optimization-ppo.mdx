@@ -22,6 +22,9 @@ import { ppoPlayground } from '../../lib/python-playground-examples';
 
 **Conference:** Not formally peer-reviewed; influential tech report later presented at ICML workshops and widely adopted.
 
+![PPO clipped objective schematic](/assets/images/ppo-clipped-objective-schematic.svg)
+_Local explainer diagram; the PPO paper does not expose a useful source figure through ar5iv._
+
 **Summary:** PPO keeps the spirit of Trust-Region Policy Optimization while dropping much of its machinery. TRPO uses a hard KL trust region to prevent policy updates from moving too far. PPO replaces that constraint with a clipped surrogate objective, or sometimes an adaptive KL penalty, so ordinary backprop and Adam can do the work.
 
 The clipped objective caps the policy ratio $r = \pi_\theta/\pi_{\text{old}}$ at $1 \pm \epsilon$. When an update would make the new policy trust a good action too aggressively, or abandon a bad action too aggressively, the objective stops rewarding that extra movement. That small heuristic lets PPO reuse on-policy rollouts for several SGD epochs while staying stable enough for Atari, MuJoCo, and later RLHF pipelines.

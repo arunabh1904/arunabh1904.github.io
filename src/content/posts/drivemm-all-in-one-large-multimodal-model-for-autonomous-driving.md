@@ -17,7 +17,8 @@ summary: DriveMM trained one multimodal transformer across perception, predictio
 
 The system takes multi-view driving imagery and produces a unified token sequence that can be decoded into task-specific outputs.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure 1: RoboTron-Drive achieves SOTA in both general capabilities and generalization ability from DriveMM: All-in-One Large Multimodal Model for Autonomous Driving](/assets/images/drivemm-all-in-one-large-multimodal-model-for-autonomous-driving-paper-figure.jpg)
+_Figure 1: RoboTron-Drive achieves SOTA in both general capabilities and generalization ability. From the [DriveMM: All-in-One Large Multimodal Model for Autonomous Driving paper](https://arxiv.org/abs/2412.07689), via arXiv HTML._
 
 **What to look at:**
 - One transformer is trained across perception, prediction, and planning tasks.

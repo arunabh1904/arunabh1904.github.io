@@ -19,6 +19,9 @@ summary: VAEs made latent-variable models trainable with SGD by turning stochast
 
 **Conference:** ICLR 2014
 
+![Figure from Auto-Encoding Variational Bayes: AEVB improves the variational lower bound over wake-sleep](/assets/images/vae-paper-figure-1.png)
+_Figure from the [AEVB paper](https://arxiv.org/abs/1312.6114), via ar5iv._
+
 **Summary:** Kingma and Welling made variational inference feel like ordinary neural-network training. Their variational autoencoder pairs an encoder $q_\phi(z \mid x)$, which approximates the posterior over latent variables, with a decoder $p_\theta(x \mid z)$, which reconstructs observations from those latents. The key move is the reparameterisation trick: instead of sampling $z$ in a way that blocks gradients, sample fixed noise and transform it through differentiable parameters.
 
 That trick turns Monte Carlo estimates of the evidence lower bound (ELBO) into low-variance gradients that work with standard stochastic gradient descent. The paper also made amortised inference practical at scale: the encoder learns to predict posterior parameters directly, rather than solving a separate inference problem for every datapoint.

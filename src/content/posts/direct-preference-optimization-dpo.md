@@ -19,7 +19,8 @@ summary: DPO replaced explicit reward modeling and PPO with a direct preference 
 
 **Conference:** NeurIPS 2023 (spotlight)
 
-![DPO Workflow](/assets/images/dpo_workflow.svg)
+![Figure 1: DPO optimizes for human preferences while avoiding reinforcement learning from Direct Preference Optimization](/assets/images/direct-preference-optimization-dpo-paper-figure.png)
+_Figure 1: DPO optimizes for human preferences while avoiding reinforcement learning. From the [Direct Preference Optimization paper](https://arxiv.org/abs/2305.18290), via arXiv HTML._
 
 **Plain-language summary:** DPO removes the reinforcement learning loop from preference tuning. Traditional RLHF fits a reward model from ranked human preferences, then uses PPO under a KL penalty to update the policy. DPO shows that the same KL-regularized objective has a closed-form relationship between reward and policy under the Bradley-Terry preference model, so the policy can be optimized directly.
 

@@ -19,7 +19,8 @@ summary: GPT-Driver reframed motion planning as language modeling over scene tok
 
 This is not a deployable AV stack by itself. It is a useful probe: language models can absorb structured scene descriptions and generate plausible plans, but latency, grounding, and closed-loop reliability remain hard.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure 1: Overview of GPT-Driver from GPT-Driver: Learning to Drive with GPT](/assets/images/gpt-driver-learning-to-drive-with-gpt-paper-figure.png)
+_Figure 1: Overview of GPT-Driver. From the [GPT-Driver: Learning to Drive with GPT paper](https://arxiv.org/abs/2310.01415), via arXiv HTML._
 
 **What to look at:**
 - Driving scene state is serialized into language tokens.

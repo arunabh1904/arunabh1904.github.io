@@ -17,7 +17,8 @@ summary: Cambrian-1 treated VLM design as a vision problem first, systematically
 
 The paper tests many vision encoders and introduces a Spatial Vision Aggregator to preserve richer visual information before it reaches the language model.
 
-![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+![Figure 8 from Cambrian-1: Spatial Vision Aggregator connects multiple vision encoders to the LLM](/assets/images/cambrian-1-paper-figure-8-sva.png)
+_Figure 8 from the [Cambrian-1 paper](https://arxiv.org/abs/2406.16860), cropped from the arXiv PDF._
 
 **What to look at:**
 - Vision encoder choice and connector design are treated as first-order variables.

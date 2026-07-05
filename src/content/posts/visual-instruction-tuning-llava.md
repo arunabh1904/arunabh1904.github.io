@@ -19,7 +19,8 @@ summary: LLaVA showed that a frozen vision encoder, an LLM, and synthetic instru
 
 That made image understanding feel like chat. A model could describe an image, answer questions, and follow open-ended visual instructions instead of only producing class labels or retrieval scores.
 
-![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+![Figure 1: LLaVA network architecture from Visual Instruction Tuning (LLaVA)](/assets/images/visual-instruction-tuning-llava-paper-figure.png)
+_Figure 1: LLaVA network architecture. From the [Visual Instruction Tuning (LLaVA) paper](https://arxiv.org/abs/2304.08485), via arXiv HTML._
 
 **What to look at:**
 - CLIP image encoder plus Vicuna language model joined by a learned projection layer.

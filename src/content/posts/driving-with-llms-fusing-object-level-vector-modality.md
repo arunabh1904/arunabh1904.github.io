@@ -19,7 +19,8 @@ summary: Driving with LLMs fed object-level vector scene state into language mod
 
 The bet is that language models may reason better when perception has already converted pixels into meaningful objects, positions, and relationships.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure from Driving with LLMs: object-level vector modality feeds a Vector-Former and LLM control loop](/assets/images/driving-with-llms-fusing-object-level-vector-modality-paper-figure.png)
+_Source figure from the [Driving with LLMs paper](https://arxiv.org/abs/2310.01957), via arXiv HTML._
 
 **What to look at:**
 - Object-level vectors are the multimodal interface, not raw pixels.

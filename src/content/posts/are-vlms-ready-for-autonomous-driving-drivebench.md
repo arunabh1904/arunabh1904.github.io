@@ -17,7 +17,8 @@ summary: DriveBench tested whether VLM driving answers are visually grounded or 
 
 The important finding is uncomfortable: models can give confident and plausible answers without grounding them in the visual input. Corruptions expose this because the answer often should change when the evidence changes.
 
-![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+![Figure 1 from DriveBench: benchmark overview across perception, prediction, behavior, and planning](/assets/images/drivebench-paper-figure-1-overview.png)
+_Figure 1 from the [DriveBench paper](https://arxiv.org/abs/2501.04003), cropped from the arXiv PDF._
 
 **What to look at:**
 - DriveBench compares clean, corrupted, and text-only conditions.
