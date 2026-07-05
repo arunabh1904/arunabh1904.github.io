@@ -19,6 +19,21 @@ summary: Eagle 2 made the post-training data recipe the main contribution, showi
 
 The main lesson is that strong VLMs are not just pretrained once and then lightly tuned. Their behavior is shaped by a careful curriculum of visual tasks and response styles.
 
+![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+
+**What to look at:**
+- Post-training data strategy is the primary contribution.
+- The paper is useful because it exposes data mixture choices normally hidden in model releases.
+- Benchmarks should be read as evidence for the recipe, not only for the final checkpoint.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Main lever | Post-training data mixture | Turns a general VLM into a benchmark-strong assistant. |
+| Transparency | Recipe-focused release | Documents data strategy instead of only final weights. |
+| Scale signal | Eagle2-9B competitive with larger models | Suggests curation can buy efficiency. |
+
 **Why it mattered:** Eagle 2 is valuable because it makes the data engineering visible. That helps turn VLM building from folklore into something closer to an inspectable recipe.
 
 **Take-home message:** Post-training is where a general multimodal model becomes useful. The data mixture is a control surface.

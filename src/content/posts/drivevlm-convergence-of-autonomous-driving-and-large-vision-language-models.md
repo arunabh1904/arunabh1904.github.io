@@ -17,6 +17,21 @@ summary: DriveVLM combined VLM reasoning with hierarchical planning, then paired
 
 That hybrid design is the interesting part. The VLM contributes semantic reasoning about rare or complex situations; the conventional stack keeps the control loop more grounded.
 
+![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+
+**What to look at:**
+- Hierarchical VLM reasoning is split into scene description, analysis, and planning.
+- DriveVLM-Dual keeps a traditional stack around the VLM to recover spatial precision.
+- Real-time and geometry limits are the main deployment pressure.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Architecture | VLM plus hierarchical planning | Uses language to decompose complex scenes. |
+| Hybrid variant | DriveVLM-Dual | Combines VLM semantics with conventional driving modules. |
+| Evidence | nuScenes, SUP-AD, vehicle deployment | Tests both public and production-style settings. |
+
 **Why it mattered:** DriveVLM captures the field's tension clearly: VLMs are useful for understanding and explanation, but driving still needs precise geometry and real-time behavior.
 
 **Take-home message:** The near-term role for VLMs in driving may be as semantic planners and critics, not as the only system between sensors and steering.

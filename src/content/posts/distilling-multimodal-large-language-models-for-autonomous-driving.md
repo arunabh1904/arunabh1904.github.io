@@ -17,6 +17,21 @@ summary: DIMA used a large multimodal driving model as a teacher, distilling its
 
 The result is a model that keeps more of the teacher's traffic knowledge while avoiding a full LLM in the runtime loop.
 
+![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+
+**What to look at:**
+- A large multimodal planner is used as an offline teacher.
+- The runtime model is a smaller vision-based student.
+- This is mainly about latency and deployability.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Teacher | Multimodal LLM planner | Provides richer traffic reasoning during training. |
+| Student | Vision-only planner | Keeps inference cheaper and faster. |
+| Reported signal | Lower trajectory error and collisions | Measures whether distilled reasoning survives compression. |
+
 **Why it mattered:** Distillation is a plausible path from impressive VLM demos to deployable autonomy components. The expensive model teaches; the small model acts.
 
 **Take-home message:** LLMs may enter driving stacks indirectly, as offline teachers that shape compact planners.

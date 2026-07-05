@@ -17,6 +17,21 @@ summary: DriveMM trained one multimodal transformer across perception, predictio
 
 The system takes multi-view driving imagery and produces a unified token sequence that can be decoded into task-specific outputs.
 
+![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+
+**What to look at:**
+- One transformer is trained across perception, prediction, and planning tasks.
+- Curriculum learning moves from visual comprehension toward harder driving outputs.
+- Zero-shot transfer is the evidence to inspect.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Training | Driving curriculum | Stages task difficulty for a generalist model. |
+| Inputs | Multi-view driving imagery | Matches surround-camera AV settings. |
+| Evidence | Multiple public benchmarks | Tests whether one model can replace specialists. |
+
 **Why it mattered:** DriveMM pushed against the assumption that every driving subproblem needs a separate specialized network. The paper asks whether shared multimodal representations can support the full stack.
 
 **Take-home message:** End-to-end driving models are becoming multitask foundation models. The hard question is not only performance, but whether shared training improves closed-loop reliability.

@@ -17,6 +17,21 @@ summary: AutoTrust evaluated driving VLMs across hallucination, safety, robustne
 
 That means questions can test whether a model hallucinates, gives unsafe advice, leaks sensitive information, breaks under perturbations, or behaves inconsistently across groups and regions.
 
+![Driving VLM loop schematic](/assets/images/driving-vlm-loop-schematic.svg)
+
+**What to look at:**
+- Trustworthiness is split into truthfulness, safety, robustness, privacy, and fairness.
+- The benchmark includes adversarial and sensitive-information probes.
+- A driving-specialized model can still be less trustworthy than a general model.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Dataset | 10k scenes / 18k queries | Designed around trust dimensions. |
+| Axes | Truthfulness, safety, robustness, privacy, fairness | Evaluates more than accuracy. |
+| Main finding | Hidden unsafe behaviors | Capability can improve while trust still lags. |
+
 **Why it mattered:** Trustworthiness is not one metric. A model can improve on standard driving QA while still becoming less safe or less private.
 
 **Take-home message:** Driving VLM evaluation needs adversarial and ethical dimensions baked in from the start. Accuracy alone is too small a target.

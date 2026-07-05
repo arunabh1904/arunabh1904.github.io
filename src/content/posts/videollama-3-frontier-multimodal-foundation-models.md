@@ -19,6 +19,21 @@ summary: VideoLLaMA 3 showed that strong image understanding can be the foundati
 
 The key claim is that high-quality image-text learning carries a lot of the load for video. Video data still matters, but the model does not need to learn all semantics from video clips alone.
 
+![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+
+**What to look at:**
+- High-quality image-text alignment is treated as the foundation for video.
+- Variable-resolution visual encoding helps preserve image detail.
+- Token merging makes longer video contexts cheaper.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Training stages | Image alignment then video tuning | Uses image semantics before temporal specialization. |
+| Efficiency | Dynamic token merging | Compresses redundant visual tokens across frames. |
+| Evidence | Image and video benchmarks | Checks whether video gains preserve image understanding. |
+
 **Why it mattered:** It connects the image VLM and video VLM stories. If static visual grounding is strong, video becomes a temporal extension rather than a separate world.
 
 **Take-home message:** Video VLMs are constrained by visual token budgets. Good image features plus careful temporal compression are the practical path.

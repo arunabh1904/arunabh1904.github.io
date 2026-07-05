@@ -19,6 +19,21 @@ summary: Pi0 used a VLM backbone and flow matching to turn visual-language conte
 
 The paper adds an action generation mechanism based on flow matching, allowing the model to map images and language instructions into robot trajectories across tasks.
 
+![Vision-language-action stack schematic](/assets/images/robot-vla-stack-schematic.svg)
+
+**What to look at:**
+- A pretrained VLM backbone is adapted to output continuous robot actions.
+- Flow matching is the action-generation mechanism.
+- The model tests whether a generalist policy can transfer across tasks and embodiments.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Input | Images plus language goals | Uses VLM semantics for robot context. |
+| Output | Continuous actions | Requires smooth control, not text. |
+| Mechanism | Flow matching | Models action trajectories for dexterous behavior. |
+
 **Why it mattered:** Pi0 is part of the shift from models that understand scenes to models that act in them. It treats robot control as a foundation-model problem rather than a collection of isolated policies.
 
 **Take-home message:** Embodied VLMs need an action head that respects physics. Language understanding is useful, but control requires smooth continuous outputs.

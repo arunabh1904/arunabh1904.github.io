@@ -17,6 +17,21 @@ summary: DexVLA paired VLM reasoning with a diffusion policy expert for long-hor
 
 This hybrid design is useful for dexterous, long-horizon tasks where pure language-model action generation may be too coarse and pure diffusion may lack semantic planning.
 
+![Vision-language-action stack schematic](/assets/images/robot-vla-stack-schematic.svg)
+
+**What to look at:**
+- The VLM handles high-level reasoning tokens and action guidance.
+- A diffusion policy expert generates continuous low-level actions.
+- The curriculum separates general motor skill, embodiment adaptation, and task tuning.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Architecture | VLM plus diffusion expert | Splits planning from precise control. |
+| Training | Three-stage embodied curriculum | Moves from general motor skills to task specialization. |
+| Best fit | Dexterous long-horizon tasks | Where pure VLM action output is too coarse. |
+
 **Why it mattered:** DexVLA shows how robotics can borrow from both sides of modern AI: language models for task structure and diffusion models for continuous trajectory generation.
 
 **Take-home message:** The strongest robot policies may be coordinated systems, not monoliths. Let the VLM plan; let the control expert execute.

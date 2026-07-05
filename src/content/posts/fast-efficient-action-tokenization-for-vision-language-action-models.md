@@ -17,6 +17,21 @@ summary: FAST compressed robot action trajectories into tokens so autoregressive
 
 That enables autoregressive VLA models to train on complex manipulation trajectories without sequence lengths exploding.
 
+![Vision-language-action stack schematic](/assets/images/robot-vla-stack-schematic.svg)
+
+**What to look at:**
+- FAST compresses dense action trajectories into discrete tokens.
+- The goal is autoregressive VLA training without huge action sequences.
+- This is an action-representation paper more than a new robot brain.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Problem | High-frequency continuous actions | Naive tokenization makes sequences too long. |
+| Method | Time-series compression | Creates compact action tokens. |
+| Signal | Faster VLA training | Makes autoregressive robot policies more practical. |
+
 **Why it mattered:** Action representation is one of the hidden make-or-break details in robot foundation models. If actions are tokenized poorly, the model wastes capacity on formatting instead of behavior.
 
 **Take-home message:** Robotics needs its own tokenization work. The action vocabulary matters as much as the text vocabulary.

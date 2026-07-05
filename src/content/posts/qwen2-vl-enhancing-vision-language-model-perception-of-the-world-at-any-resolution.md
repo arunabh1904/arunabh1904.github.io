@@ -19,6 +19,21 @@ summary: Qwen2-VL made resolution and video length more flexible by letting visu
 
 The model family also handles images and video with a shared multimodal position encoding, making it useful for OCR-heavy tasks, documents, visual reasoning, and longer temporal inputs.
 
+![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+
+**What to look at:**
+- Naive dynamic resolution makes visual token count follow the input rather than a fixed resize.
+- Multimodal RoPE supports images and video in one positional scheme.
+- OCR, documents, and long-video tasks are the best places to look for the payoff.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Resolution | Dynamic visual tokens | Preserves small text and high-resolution detail. |
+| Modalities | Image plus video | One model handles static and temporal inputs. |
+| Artifact | Qwen2-VL docs/project | Useful for OCR-heavy and multilingual multimodal tasks. |
+
 **Why it mattered:** Resolution is not cosmetic. If a model cannot preserve the evidence, the language model hallucinates around it. Qwen2-VL showed that flexible tokenization can make generalist VLMs much more usable.
 
 **Take-home message:** VLMs need adaptive visual bandwidth. A receipt, a street scene, and a video clip should not all be squeezed through the same fixed visual bottleneck.

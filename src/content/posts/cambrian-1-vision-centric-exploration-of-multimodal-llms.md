@@ -17,6 +17,21 @@ summary: Cambrian-1 treated VLM design as a vision problem first, systematically
 
 The paper tests many vision encoders and introduces a Spatial Vision Aggregator to preserve richer visual information before it reaches the language model.
 
+![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+
+**What to look at:**
+- Vision encoder choice and connector design are treated as first-order variables.
+- Spatial Vision Aggregator preserves high-resolution features before the LLM sees them.
+- CV-Bench is useful because it stresses visual evidence rather than language priors.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Design axis | 20+ vision encoders tested | Shows visual backbone choice changes downstream VLM behavior. |
+| Connector | Spatial Vision Aggregator | Keeps more local visual evidence for the LLM. |
+| Benchmark | CV-Bench | Evaluates vision-centric reasoning failures. |
+
 **Why it mattered:** A lot of VLM work implicitly assumes the LLM is the hard part. Cambrian-1 pushes back: the quality of the visual representation and connector can decide whether the language model is reasoning over evidence or filling gaps from priors.
 
 **Take-home message:** Better multimodal models are not only bigger language models. They also need better visual plumbing.

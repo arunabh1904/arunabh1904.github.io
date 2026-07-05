@@ -19,6 +19,21 @@ summary: LLaVA showed that a frozen vision encoder, an LLM, and synthetic instru
 
 That made image understanding feel like chat. A model could describe an image, answer questions, and follow open-ended visual instructions instead of only producing class labels or retrieval scores.
 
+![Vision-language model stack schematic](/assets/images/vlm-stack-schematic.svg)
+
+**What to look at:**
+- CLIP image encoder plus Vicuna language model joined by a learned projection layer.
+- GPT-4-generated visual instruction data is the enabling data trick, not a new visual backbone.
+- Use ScienceQA/chat behavior as a signal, but remember this is still synthetic-instruction tuning.
+
+**Evals / Benchmarks / Artifacts:**
+
+| Signal | Detail | Why it matters |
+| ------ | ------ | -------------- |
+| Interface | Image-to-chat assistant | Turns visual representations into dialogue. |
+| Training signal | Visual instruction tuning | Synthetic QA data teaches the model how to answer about images. |
+| Artifact | Project page and code | The LLaVA recipe became a common open baseline. |
+
 **Why it mattered:** LLaVA made the VLM stack modular: vision encoder, projector, LLM, instruction data. That template became the default starting point for many open multimodal assistants.
 
 **Take-home message:** The jump from CLIP to LLaVA is the jump from representation to interface. Once vision features were wired into an instruction-tuned LLM, VLMs became conversational systems.

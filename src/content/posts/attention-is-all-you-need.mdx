@@ -86,6 +86,12 @@ These fixed oscillations encode position without recurrence and extrapolate to l
 
 Self-attention gives every pair of tokens a constant-length path, but it pays for that access with quadratic memory and compute in sequence length. For machine translation, the tradeoff was worth it: the model parallelized well on GPUs, and the "big" Transformer reached 41.0 BLEU on English to French, far ahead of contemporary CNN and RNN baselines.
 
+| Setting | Result | Why it matters |
+| ------- | ------ | -------------- |
+| WMT 2014 English-German | 28.4 BLEU | Beat strong recurrent and convolutional baselines with a fully attention-based model. |
+| WMT 2014 English-French | 41.0 BLEU | Showed the architecture scaled to a larger translation benchmark. |
+| Training cost | 8 P100 GPUs for 3.5 days on English-German | Parallelism was part of the paper's practical impact, not just the accuracy. |
+
 ---
 
 ### Ongoing challenges
