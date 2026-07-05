@@ -10,14 +10,12 @@ const revisionPosts = (await getPostsBySection('revision-notes', 'desc')).filter
 );
 const blogPosts = await getPostsBySection('blog', 'desc');
 const buildIntuitionPosts = await getPostsBySection('build-intuition', 'desc');
-const aiPosts = await getPostsBySection('ai-generated-reports', 'desc');
 
 const totalEntries =
   paperPosts.length +
   blogPosts.length +
   buildIntuitionPosts.length +
   revisionPosts.length +
-  aiPosts.length +
   READING_LIST_ITEMS.length +
   codePracticeProblems.length;
 
@@ -53,14 +51,6 @@ const sectionCards = [
     title: 'Revision Notes',
     description: 'Course notes and implementation details kept for later review.',
     count: revisionPosts.length,
-  },
-  {
-    id: 'ai-generated-reports',
-    href: '/ai_generated_reports.html',
-    command: 'ai-reports',
-    title: 'AI Generated Reports',
-    description: 'Generated summaries kept separate from hand-written notes.',
-    count: aiPosts.length,
   },
   {
     id: 'reading-list',
@@ -108,13 +98,6 @@ const recentShelves = [
     summary: 'Course notes and implementation details kept for later review.',
     posts: revisionPosts.slice(0, 2),
     emptyMessage: 'No revision notes yet.',
-  },
-  {
-    title: 'AI Generated Reports',
-    href: '/ai_generated_reports.html',
-    summary: 'Generated summaries kept separate from hand-written notes.',
-    posts: aiPosts.slice(0, 2),
-    emptyMessage: 'No generated reports yet.',
   },
 ] as const;
 

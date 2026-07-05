@@ -15,7 +15,6 @@ const posts = defineCollection({
       'blog',
       'build-intuition',
       'revision-notes',
-      'ai-generated-reports',
     ]),
     postSlug: z.string(),
     legacyPath: z.string(),

@@ -15,7 +15,7 @@ const sectionByCategory = {
   Ponderings: 'blog',
   'Build Intuition': 'build-intuition',
   'Revision Notes': 'revision-notes',
-  'Machine Learning Deep-Dives': 'ai-generated-reports',
+  'Machine Learning Deep-Dives': 'blog',
   'My Journey So Far': 'blog',
 };
 

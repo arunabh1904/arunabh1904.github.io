@@ -1,0 +1,24 @@
+---
+title: Visual Instruction Tuning (LLaVA)
+date: '2023-04-01T04:00:00.000Z'
+section: paper-shorts
+postSlug: visual-instruction-tuning-llava
+legacyPath: /paper shorts/2023/04/01/visual-instruction-tuning-llava.html
+tags:
+  - Other
+field: Vision-Language Models
+summary: LLaVA showed that a frozen vision encoder, an LLM, and synthetic instruction data could produce a useful open multimodal assistant.
+---
+## 2023 - Visual Instruction Tuning (LLaVA)
+
+**arXiv:** [2304.08485](https://arxiv.org/abs/2304.08485)
+
+**Project:** [llava-vl.github.io](https://llava-vl.github.io/)
+
+**Plain-language summary:** LLaVA connects a CLIP-style visual encoder to Vicuna with a learned projection layer, then teaches the combined model to answer image-conditioned instructions. The important move is not a new vision backbone. It is the recipe: use GPT-4 to turn image captions and boxes into instruction-following conversations, then fine-tune the multimodal model on that data.
+
+That made image understanding feel like chat. A model could describe an image, answer questions, and follow open-ended visual instructions instead of only producing class labels or retrieval scores.
+
+**Why it mattered:** LLaVA made the VLM stack modular: vision encoder, projector, LLM, instruction data. That template became the default starting point for many open multimodal assistants.
+
+**Take-home message:** The jump from CLIP to LLaVA is the jump from representation to interface. Once vision features were wired into an instruction-tuned LLM, VLMs became conversational systems.
