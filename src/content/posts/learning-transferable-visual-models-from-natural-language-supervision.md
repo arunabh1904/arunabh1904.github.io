@@ -9,9 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: Computer Vision
-summary: >-
-  2021 – Learning Transferable Visual Models From Natural Language Supervision
-  (CLIP)
+summary: CLIP used image-text contrastive training to make visual representations transfer through natural-language prompts.
 ---
 ## 2021 – Learning Transferable Visual Models From Natural Language Supervision (CLIP)
 

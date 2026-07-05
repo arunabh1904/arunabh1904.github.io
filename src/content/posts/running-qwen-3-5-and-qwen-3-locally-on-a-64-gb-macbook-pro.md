@@ -13,11 +13,7 @@ summary: >-
 ---
 # Running Qwen 3.5 and Qwen 3 locally on a 64 GB MacBook Pro
 
-I wanted to answer a practical question: on a `64 GB` M5 Max MacBook Pro, which Qwen models can I actually run locally, and which ones still feel good once prompt length stops being toy-sized?
-
-The answer was partly about model size.
-
-It was also about runtime choice, prompt length, and a few boring setup details that matter more than people usually admit.
+I wanted one practical answer: on a `64 GB` M5 Max MacBook Pro, which Qwen models are pleasant locally once prompt length stops being toy-sized?
 
 One important scope note up front, as of April 4, 2026:
 
@@ -55,7 +51,7 @@ The two big family-level differences that matter for local use are:
 - [`Qwen 3.5`](https://huggingface.co/Qwen/Qwen3.5-9B) defaults to thinking mode and exposes a `262,144` token default context window, so if you do not explicitly disable thinking you are partly benchmarking chain-of-thought overhead instead of plain inference behavior.
 - [`Qwen 3`](https://huggingface.co/Qwen/Qwen3-14B-GGUF) supports both thinking and non-thinking modes in the same model, and the official GGUF releases make `llama.cpp` comparisons much easier for that family.
 
-## How I benchmarked it
+## Benchmark setup
 
 I ran everything on:
 
@@ -75,7 +71,7 @@ I used the same two text-only suites as the Gemma post:
 - Short suite: `512` input tokens, `192` output tokens
 - Long suite: `8192` input tokens, `96` output tokens
 
-The task was intentionally boring and deterministic: read repeated background text, then emit exactly twelve numbered factual lines. Temperature was pinned to `0`, and I recorded:
+The task was intentionally boring and deterministic: read repeated background text, then emit exactly twelve numbered factual lines. Temperature was `0`. I recorded:
 
 - Time to first token
 - Decode tokens per second
@@ -84,17 +80,15 @@ The task was intentionally boring and deterministic: read repeated background te
 
 I also kept the app and the benchmark harness text-only for this pass. No images, no multimodal prompts, and no hidden reasoning tokens if I could turn them off.
 
-## Special Things I Had To Do
+## Controls that mattered
 
-A few details ended up mattering more than I expected:
+These details kept the benchmark from measuring hidden work:
 
 - I forced `Qwen 3.5` into non-thinking mode anywhere I could. Otherwise the benchmark stops being about raw runtime behavior.
 - I kept the local chat app text-only even though `Qwen 3.5` ships as an image-text model family. I wanted clean text-generation comparisons first.
 - `Qwen 3.5` on MLX still needed `torch` and `torchvision` installed in this environment because the processor stack came in through `mlx-vlm`.
 - I used official Qwen GGUF releases for `Qwen 3`, but for `Qwen 3.5` I fell back to pinned community `Q4_K_M` GGUFs because I did not find an official `Qwen 3.5` GGUF release on the Qwen organization page.
-- I had to disable Hugging Face Xet downloads on this machine for some official Qwen artifacts, because otherwise a few of the larger MLX downloads would stall on incomplete blobs.
-
-None of that is glamorous, but all of it changes whether local benchmarking feels straightforward or mysteriously flaky.
+- I had to disable Hugging Face Xet downloads for some official Qwen artifacts because a few larger MLX downloads stalled on incomplete blobs.
 
 ## What The Benchmarks Say
 
@@ -130,15 +124,15 @@ The cross-runtime results sharpened the runtime recommendation. On `Qwen 3.5 9B`
 | `Qwen 3.5 9B` | MLX | `mlx-community/Qwen3.5-9B-MLX-4bit` | `2894 ms` | `92.66` | `24.53` | `8.39 GB` |
 | `Qwen 3 4B` | MLX | `mlx-community/Qwen3-4B-4bit` | `1742 ms` | `127.76` | `38.41` | `4.24 GB` |
 
-Even from this first slice, the pattern is useful:
+The pattern:
 
 - `Qwen 3 4B` is the better low-friction local baseline on this machine.
 - `Qwen 3.5 4B` is still very usable, but it carries more memory overhead in my current MLX path.
 - `Qwen 3.5 9B` still looks laptop-friendly, but it is where the latency tradeoff starts feeling materially different from the tiny models.
 - `Qwen 3.5 9B` also gave the first real runtime verdict: on this hardware, `MLX` was materially better than `llama.cpp`.
 - `Qwen 3 14B` looks like the first genuinely stronger dense option that still feels reasonable to keep around locally, but it is no longer fast in the same way.
-- `Qwen 3 14B` makes the runtime story more specific: `llama.cpp` is competitive on the short prompt, but MLX is still the better default once prompts get long.
-- Long-prompt behavior matters a lot more than short-prompt decode speed if you care about whether a local model actually feels snappy.
+- `Qwen 3 14B` makes the runtime story specific: `llama.cpp` is competitive on the short prompt, but MLX is still the better default once prompts get long.
+- Long-prompt behavior matters more than short-prompt decode speed if you care about whether a local model feels snappy.
 
 ## What I Would Actually Use
 
@@ -149,4 +143,4 @@ Right now, my practical recommendation is simple:
 3. Keep `Qwen 3.5 9B` in the mix if you specifically care about the 3.5 family behavior and do not mind the extra latency and memory overhead.
 4. Prefer `MLX` first on this Mac unless a specific `llama.cpp` model artifact or integration path gives you a reason to switch.
 
-That answer is opinionated, but it is much less hand-wavy now. It comes from running the models on this machine instead of guessing from parameter counts or release notes.
+That answer comes from this machine, not parameter counts or release notes.

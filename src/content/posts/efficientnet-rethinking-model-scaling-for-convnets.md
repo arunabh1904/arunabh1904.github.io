@@ -9,7 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: Computer Vision
-summary: 2019 – EfficientNet — Rethinking Model Scaling for ConvNets
+summary: EfficientNet made CNN scaling more systematic by growing depth, width, and resolution together under a compute budget.
 ---
 ## 2019 – EfficientNet — Rethinking Model Scaling for ConvNets
 

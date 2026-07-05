@@ -15,13 +15,7 @@ summary: >-
 ---
 # Replacing OpenClaw with Hermes Agent using local weights
 
-I wanted a specific outcome: stop using OpenClaw, switch to [Hermes Agent](https://github.com/nousresearch/hermes-agent), and keep the whole thing local.
-
-Not "local except for the model."
-
-Actually local.
-
-That meant two constraints:
+I wanted a specific outcome: replace OpenClaw with [Hermes Agent](https://github.com/nousresearch/hermes-agent) while keeping inference fully local. That meant two constraints:
 
 1. I did not want to fall back to OpenRouter, Anthropic, or anything else cloud-hosted.
 2. I only wanted to use model artifacts that were already on disk.
@@ -39,13 +33,11 @@ Hermes is a much more opinionated agent shell than a bare local chat loop. It ha
 - skills
 - multiple provider backends
 
-Hermes does not force one inference path. It works with hosted providers, but it can also point at any OpenAI-compatible local endpoint. That separation makes it much easier to keep the agent framework while swapping the model runtime underneath it.
-
-That separation ended up mattering a lot.
+Hermes does not force one inference path. It works with hosted providers, but it can also point at any OpenAI-compatible local endpoint. That separation let the agent framework stay fixed while the model runtime changed underneath it.
 
 ## The install itself was easy
 
-The Hermes install was not the hard part. This worked fine:
+The Hermes install was not the hard part:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup
@@ -59,24 +51,15 @@ That bootstrapped:
 - the `hermes` CLI symlink in `~/.local/bin`
 - the default config in `~/.hermes/config.yaml`
 
-So far, so good.
-
 The real question was what local model server Hermes should talk to.
 
 ## Ollama was the obvious first try, but it was the wrong one here
 
 Since I already had Ollama installed and local Gemma tags visible, I tried the most obvious route first.
 
-That looked promising for about five minutes.
-
 Hermes could see the local endpoint. Ollama listed local Gemma models. But actual inference failed with HTTP `500` during model load on this Apple Silicon setup. In other words, the Hermes install was fine, but the runtime below it was not stable enough for the job.
 
-That was the key realization:
-
-- Hermes was not the problem.
-- My local model server choice was the problem.
-
-Once I stopped treating those two things as the same layer, the path got cleaner.
+The key realization: Hermes was not the problem. My local model server choice was.
 
 ## What actually worked: `llama-server` plus an existing Gemma GGUF
 
@@ -114,7 +97,7 @@ Once that server was up, it exposed the OpenAI-compatible endpoint Hermes wanted
 http://127.0.0.1:18080/v1
 ```
 
-That was the turning point: Hermes could stay as the agent shell, and `llama.cpp` could do the local serving.
+That split worked: Hermes stayed as the agent shell, and `llama.cpp` handled local serving.
 
 ## The Hermes config I ended up using
 
@@ -149,7 +132,7 @@ And it returned:
 READY
 ```
 
-That was enough. At that point Hermes was no longer merely installed; it was running locally against weights that were already on disk.
+That was enough proof: Hermes was running locally against weights already on disk.
 
 ## What I would do next
 
@@ -159,10 +142,10 @@ This setup is already useful, but there are a few obvious next steps:
 - point Hermes at a stronger local model if I want better tool-use quality
 - wire in the local Qwen artifacts the same way, once I decide which exact GGUF or local server path I want to standardize on
 
-The important part is that the architecture is now right:
+The architecture is now clean:
 
 - Hermes for the agent layer
 - `llama.cpp` for the local serving layer
 - existing local weights for inference
 
-That split is cleaner than trying to make one tool do all three jobs at once. That was the real unlock here.
+That split is cleaner than asking one tool to own the agent layer, serving layer, and model artifacts at once.

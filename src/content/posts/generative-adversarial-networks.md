@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2014/06/01/generative-adversarial-networks.html
 tags:
   - Other
 field: Generative Models
-summary: 2014 – Generative Adversarial Networks
+summary: GANs framed generation as a two-player game between a generator and discriminator, producing sharp samples without explicit likelihoods.
 ---
 ## 2014 – Generative Adversarial Networks
 

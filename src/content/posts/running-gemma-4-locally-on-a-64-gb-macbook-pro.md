@@ -13,11 +13,7 @@ summary: >-
 ---
 # Running Gemma 4 locally on a 64 GB MacBook Pro
 
-I wanted to answer a specific question: on a 64 GB M5 Max MacBook Pro, what is the best Gemma 4 model I can run locally, and what is the fastest way to run it?
-
-The model answer stayed simple.
-
-The runtime answer got more interesting once I stopped guessing and benchmarked it.
+I wanted one concrete answer: on a 64 GB M5 Max MacBook Pro, which Gemma 4 model should I actually run locally, and through which runtime?
 
 The short version, as of April 4, 2026:
 
@@ -26,8 +22,6 @@ The short version, as of April 4, 2026:
 - Fastest usable runtime I tested on this machine: `MLX`
 - Most direct low-level path: `llama.cpp`
 - Current Ollama status for Gemma 4 on this machine: it crashes before first token
-
-That last one surprised me the most.
 
 ## What fits
 
@@ -40,12 +34,12 @@ So on a 64 GB machine, all four models are realistic local targets, including th
 
 The `26B A4B` model is the more interesting everyday laptop option. It is MoE, so only `4B` parameters are active per generated token, even though the full model still has to sit in memory. The `31B` model is the strongest dense option that still makes sense on this machine. Google also lists `128K` context for the small models and `256K` context for the larger ones, which is powerful but not remotely free from a latency perspective ([Google docs](https://ai.google.dev/gemma/docs/core), [Gemma 4 31B card](https://huggingface.co/google/gemma-4-31B-it)).
 
-So my view did not really change here:
+My model recommendation is simple:
 
 - If you want the best Gemma 4 model that comfortably fits, start with `31B`.
 - If you want the model I would actually pay the most attention to for daily use, it is `26B A4B`.
 
-## How I benchmarked it
+## Benchmark setup
 
 I ran everything on:
 
@@ -64,7 +58,7 @@ I used two text-only suites so the results would reflect inference behavior rath
 - Short suite: `512` input tokens, `192` output tokens
 - Long suite: `8192` input tokens, `96` output tokens
 
-The output task was intentionally boring and deterministic: read background text, then print numbered lines. Temperature was pinned to `0`, and I measured:
+The output task was intentionally boring and deterministic: read background text, then print numbered lines. Temperature was `0`. I measured:
 
 - Time to first token
 - Decode tokens per second
@@ -72,17 +66,15 @@ The output task was intentionally boring and deterministic: read background text
 
 One important caveat: this is a fastest-practical-path comparison, not a perfect same-weights lab setup. I used the most direct current artifact for each runtime. That means the `E2B` comparison is not perfectly apples-to-apples: official `llama.cpp` GGUF for `E2B` is `Q8_0`, while the MLX and Ollama paths use 4-bit artifacts.
 
-## Special Things I Had To Do
+## Controls that mattered
 
-A few benchmark details mattered more than I expected:
+These details kept the comparison about runtime behavior rather than hidden work:
 
 - I disabled Gemma's thinking mode anywhere I could, because otherwise you are partly benchmarking extra reasoning tokens instead of raw runtime behavior.
 - I kept the benchmark text-only, which meant running `llama.cpp` without a multimodal projector. That was the cleanest way to measure prompt processing and decode speed instead of image overhead.
 - I used a boring deterministic output task and pinned temperature to `0`. That made throughput differences much easier to trust.
 - I split the test into short and long prompts on purpose. A runtime can look fine at `512` tokens and then feel much worse once prompt processing climbs into the `8K` range.
-- I tried Ollama with native `gemma4:*` tags, not a hacked local import path. I wanted Ollama to get the fairest possible shot before concluding that the current M5 experience is broken.
-
-None of those are exotic tricks, but they were the difference between "the model runs" and "I actually believe this comparison."
+- I tried Ollama with native `gemma4:*` tags, not a hacked local import path, so the Ollama result reflects the current easy path.
 
 ## What The Benchmarks Say
 
@@ -118,16 +110,14 @@ For the smaller models, MLX was clearly faster on this M5 Max. For `26B A4B`, th
 | `31B` | MLX | `mlx-community/gemma-4-31b-it-4bit` | `13501 ms` | `23.73` | `5.47` |
 | `31B` | llama.cpp | `ggml-org` `Q4_K_M` GGUF | `24164 ms` | `20.72` | `3.33` |
 
-The pattern is pretty clear:
+The pattern:
 
 - MLX is winning the small-model tests by a healthy margin.
 - `26B A4B` is much closer on short prompts than I expected.
 - `31B` is a meaningful step down in responsiveness compared with `26B A4B`, even though it still fits comfortably in memory.
 - `31B` also stops being a close runtime contest: MLX is simply better behaved there on this machine.
 - On longer prompts, MLX is still more comfortable because time to first token is substantially lower.
-- The difference between "weights fit" and "this feels good to use" becomes real very quickly once prompt length goes up.
-
-That last point matters more than people usually admit. Decode speed often holds up decently; prompt processing and time to first token are what start to hurt.
+- The difference between "weights fit" and "this feels good to use" shows up quickly once prompt length grows; TTFT hurts before decode speed does.
 
 ## Ollama, Right Now
 
@@ -156,6 +146,4 @@ If I cared about the fastest usable runtime on this machine, the answer is no lo
 2. `llama.cpp` second
 3. `Ollama` later, once the M5 Metal breakage is fixed
 
-If you do not want a terminal workflow, this also maps cleanly to a tiny local browser chat app. Both `MLX` and `llama.cpp` are reasonable backends if the goal is simply to serve Gemma locally and talk to it.
-
-That is a more opinionated answer than I expected going in, but it feels much less hand-wavy now. That was the point of running the benchmarks in the first place.
+If you do not want a terminal workflow, this maps cleanly to a tiny local browser chat app. Both `MLX` and `llama.cpp` are reasonable backends if the goal is simply to serve Gemma locally and talk to it.

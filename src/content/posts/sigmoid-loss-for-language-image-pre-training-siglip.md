@@ -9,7 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: Computer Vision
-summary: 2023 – Sigmoid Loss for Language-Image Pre-Training (SigLIP)
+summary: SigLIP replaced softmax contrastive normalization with independent sigmoid losses, simplifying large-batch image-text training.
 ---
 ## 2023 – Sigmoid Loss for Language-Image Pre-Training (SigLIP)
 
