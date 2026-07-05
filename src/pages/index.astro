@@ -2,6 +2,7 @@
 import HomeLayout from '../layouts/HomeLayout.astro';
 import { getPostsBySection } from '../lib/content';
 import { CODE_PRACTICE_SECTION_SUMMARY, codePracticeProblems } from '../lib/code-practice';
+import { READING_LIST_ITEMS } from '../lib/reading-list';
 
 const paperPosts = await getPostsBySection('paper-shorts', 'desc');
 const revisionPosts = (await getPostsBySection('revision-notes', 'desc')).filter(
@@ -17,6 +18,7 @@ const totalEntries =
   buildIntuitionPosts.length +
   revisionPosts.length +
   aiPosts.length +
+  READING_LIST_ITEMS.length +
   codePracticeProblems.length;
 
 const sectionCards = [
@@ -59,6 +61,14 @@ const sectionCards = [
     title: 'AI Generated Reports',
     description: 'Audio and text reports produced with AI assistance.',
     count: aiPosts.length,
+  },
+  {
+    id: 'reading-list',
+    href: '/reading_list.html',
+    command: 'reading-list',
+    title: 'Reading List',
+    description: 'External essays, posts, and references worth keeping close.',
+    count: READING_LIST_ITEMS.length,
   },
   {
     id: 'code',
@@ -166,6 +176,7 @@ const formatDate = (date: Date) =>
         <nav class="home-command-bar home-command-bar--hero" aria-label="Homepage sections">
           <a href="#about">/about</a>
           <a href="#latest">/latest</a>
+          <a href="/reading_list.html">/reading</a>
           <a href="/code.html">/code</a>
         </nav>
       </div>

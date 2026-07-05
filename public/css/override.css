@@ -1183,6 +1183,14 @@ h3,
   color: var(--text-secondary-color);
 }
 
+.resource-list small {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--text-secondary-color);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
 .resource-list span {
   display: flex;
   flex-wrap: wrap;

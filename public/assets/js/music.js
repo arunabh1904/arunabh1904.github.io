@@ -1,6 +1,6 @@
 const SPOTIFY_SRC =
   'https://open.spotify.com/embed/playlist/4RHYceSp9R1bHyL0dDqTuQ?utm_source=generator&theme=0';
-const YOUTUBE_VIDEO_IDS = ['kGuGH_UvvxA', 'z8Dz-IFFFY4'];
+const YOUTUBE_VIDEO_IDS = ['kGuGH_UvvxA', 'z8Dz-IFFFY4', 'tRsQsTMvPNg'];
 const YOUTUBE_SRC = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_IDS[0]}?playlist=${YOUTUBE_VIDEO_IDS
   .slice(1)
   .join(',')}&rel=0`;
