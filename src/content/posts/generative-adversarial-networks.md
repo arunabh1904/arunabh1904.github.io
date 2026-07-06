@@ -19,6 +19,10 @@ summary: GANs framed generation as a two-player game between a generator and dis
 
 **Conference:** NIPS 2014
 
+## Paper map
+
+GANs train a generator and discriminator in a minimax game. The discriminator learns to distinguish real data from generated samples; the generator learns to make samples that fool the discriminator. In the idealized infinite-capacity case, the game reaches the data distribution and the discriminator cannot do better than chance. The practical appeal is that sampling is direct: no Markov chain, no explicit likelihood, and ordinary backpropagation through neural networks. The original experiments use small image datasets and qualitative samples, so the evidence is much weaker than later GAN work. The main caveats are training instability, mode collapse, and the absence of a likelihood metric. The lasting idea is adversarial learning as a generative modeling objective.
+
 ![Figure 1 from GAN: generator samples move through latent space while the discriminator separates real and generated data](/assets/images/generative-adversarial-networks-paper-figure.png)
 _Figure 1 from the [GAN paper](https://arxiv.org/abs/1406.2661), via arXiv HTML._
 

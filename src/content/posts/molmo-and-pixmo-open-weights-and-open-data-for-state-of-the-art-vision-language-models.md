@@ -19,6 +19,10 @@ summary: Molmo argued that high-quality open multimodal data can matter more tha
 
 This matters because many VLMs are hard to inspect. Molmo makes the data story more visible, which makes the model easier to study and reuse.
 
+## Paper map
+
+Molmo is the model family and PixMo is the open data recipe behind it. The paper argues that high-quality, inspectable multimodal data can make open VLMs competitive. PixMo includes dense captions, pointing and grounding supervision, and related annotations that teach localization and visual description. Molmo uses that data to build open-weight models with strong visual understanding. The caveat is that openness does not remove data collection cost or annotation bias; it makes those choices auditable. The lasting idea is that data quality and transparency can substitute for some closed-model scale.
+
 ![Figure 1: Datasets in PixMo (left) and the capabilities they enable in Molmo (right) from Molmo and PixMo: Open Weights and Open Data for State-of-the-Art Vision-Language Models](/assets/images/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models-paper-figure.png)
 _Figure 1: Datasets in PixMo (left) and the capabilities they enable in Molmo (right). From the [Molmo and PixMo: Open Weights and Open Data for State-of-the-Art Vision-Language Models paper](https://arxiv.org/abs/2409.17146), via arXiv HTML._
 

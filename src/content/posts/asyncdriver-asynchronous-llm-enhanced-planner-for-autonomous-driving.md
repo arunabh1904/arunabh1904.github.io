@@ -17,6 +17,10 @@ summary: AsyncDriver separated slow LLM reasoning from fast motion planning so s
 
 Those instructions can guide the planner through complex or ambiguous situations without requiring the LLM to produce every control update.
 
+## Paper map
+
+AsyncDriver uses an LLM as a high-level driving advisor without putting that LLM directly in the synchronous planning loop. The planner keeps generating trajectories while the language model asynchronously contributes scene reasoning or strategic guidance. This design tries to preserve real-time control while still benefiting from language-level interpretation of traffic context. The key tradeoff is staleness: asynchronous advice can reduce latency, but the system must know when guidance no longer matches the current scene. The paper matters as a pattern for using foundation models near safety-critical loops instead of making every control update wait on them.
+
 ![Figure 2: Overview of our proposed AsyncDriver framework from AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving](/assets/images/asyncdriver-asynchronous-llm-enhanced-planner-for-autonomous-driving-paper-figure.png)
 _Figure 2: Overview of our proposed AsyncDriver framework. From the [AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving paper](https://arxiv.org/abs/2406.14556), via arXiv HTML._
 

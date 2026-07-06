@@ -19,6 +19,10 @@ summary: Pi0 used a VLM backbone and flow matching to turn visual-language conte
 
 The paper adds an action generation mechanism based on flow matching, allowing the model to map images and language instructions into robot trajectories across tasks.
 
+## Paper map
+
+Pi0 connects a pretrained vision-language backbone to continuous robot control through an action model trained with flow matching. The VLM supplies semantic grounding from images and language, while the flow action head models smooth trajectories. Training spans multiple robot embodiments, including single-arm, dual-arm, and mobile manipulation settings. The evaluation emphasizes language-prompted generalist behavior and dexterous tasks. The key caveat is data and robustness: broad robot policies need diverse demonstrations and careful safety validation under distribution shift.
+
 ![Figure 2 from pi0: a mobile manipulator follows a natural-language instruction to fold laundry](/assets/images/pi0-vision-language-action-flow-model-for-general-robot-control-paper-figure.jpeg)
 _Figure 2 from the [pi0 paper](https://arxiv.org/abs/2410.24164), via arXiv HTML._
 

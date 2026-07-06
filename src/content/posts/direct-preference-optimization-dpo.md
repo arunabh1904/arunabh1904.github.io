@@ -19,6 +19,10 @@ summary: DPO replaced explicit reward modeling and PPO with a direct preference 
 
 **Conference:** NeurIPS 2023 (spotlight)
 
+## Paper map
+
+DPO turns preference optimization into a supervised classification-style objective and removes the explicit reward model plus RL loop used in RLHF. Starting from a reference policy and preference pairs, the derivation shows that the optimal policy under a KL-constrained reward objective can be written directly in terms of preference likelihoods. Training then increases the log-probability gap between chosen and rejected responses while keeping the policy near the reference model through the implicit KL term. The empirical case compares against PPO-style RLHF on summarization, dialogue, and instruction-following style tasks. The caveat is that DPO inherits the preference dataset's coverage and quality; it is simpler than RLHF, but not a replacement for good preference data or careful safety evaluation.
+
 ![Figure 1: DPO optimizes for human preferences while avoiding reinforcement learning from Direct Preference Optimization](/assets/images/direct-preference-optimization-dpo-paper-figure.png)
 _Figure 1: DPO optimizes for human preferences while avoiding reinforcement learning. From the [Direct Preference Optimization paper](https://arxiv.org/abs/2305.18290), via arXiv HTML._
 
