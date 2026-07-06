@@ -1355,7 +1355,6 @@ body.home-page small {
   z-index: 1;
 }
 
-.home-hero__bar,
 .home-hero__content,
 .home-shelf__header {
   display: flex;
@@ -1363,16 +1362,6 @@ body.home-page small {
   gap: 0.85rem;
 }
 
-.home-hero__bar {
-  align-items: center;
-  margin-bottom: 0.8rem;
-}
-
-.home-kicker,
-.home-hero__context,
-.home-panel__eyebrow,
-.links-panel__eyebrow,
-.timeline-panel__eyebrow,
 .home-stat-list dt,
 .home-post-list small {
   margin: 0;
@@ -1382,16 +1371,8 @@ body.home-page small {
   text-transform: uppercase;
 }
 
-.home-kicker,
-.home-panel__eyebrow,
-.links-panel__eyebrow,
-.timeline-panel__eyebrow,
 .home-stat-list dt {
   color: var(--home-shell-accent);
-}
-
-.home-hero__context {
-  color: var(--home-shell-muted);
 }
 
 .home-hero__content {
@@ -1508,6 +1489,8 @@ body.home-page small {
   display: grid;
   gap: 0.25rem;
   margin-bottom: 0.85rem;
+  font-size: clamp(1.55rem, 2.2vw, 2rem);
+  line-height: 1.08;
 }
 
 .home-panel__heading h2 {
