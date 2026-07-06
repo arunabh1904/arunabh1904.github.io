@@ -144,11 +144,6 @@ const formatDate = (date: Date) =>
 
 <HomeLayout title="Home" timelineEntries={timelineEntries}>
   <section class="home-hero" id="top">
-    <div class="home-hero__bar">
-      <p class="home-kicker">Arunabh.BLOG</p>
-      <p class="home-hero__context">Computer vision / robotics / notes</p>
-    </div>
-
     <div class="home-hero__content">
       <div class="home-hero__copy">
         <h1 class="home-title">ARUNABH.BLOG</h1>
@@ -178,10 +173,9 @@ const formatDate = (date: Date) =>
   </section>
 
   <section class="home-story-grid" id="about">
-    <article class="home-panel home-panel--story">
+    <article class="home-panel home-panel--story" aria-labelledby="about-title">
       <div class="home-panel__heading">
-        <p class="home-panel__eyebrow">About</p>
-        <h2>What this site is</h2>
+        <h2 id="about-title">About me</h2>
       </div>
       <p class="intro-text">
         I work in computer vision research at Zoox, where I build learned representations for
@@ -201,10 +195,9 @@ const formatDate = (date: Date) =>
       </p>
     </article>
 
-    <article class="home-panel home-panel--map" id="sections">
+    <article class="home-panel home-panel--map" id="sections" aria-labelledby="sections-title">
       <div class="home-panel__heading">
-        <p class="home-panel__eyebrow">Start here</p>
-        <h2>Reading paths</h2>
+        <h2 id="sections-title">Writing and notes</h2>
       </div>
       <ul class="home-section-map">
         {sectionCards.map((section) => (
@@ -224,8 +217,7 @@ const formatDate = (date: Date) =>
 
   <section class="home-shelves" id="latest">
     <div class="home-section-heading">
-      <p class="home-panel__eyebrow">Latest</p>
-      <h2>Recent entries</h2>
+      <h2>Latest writing</h2>
       <p>
         The newest hand-written entries across the site, grouped by the kind of work they do.
       </p>
