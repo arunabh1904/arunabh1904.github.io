@@ -19,6 +19,10 @@ summary: GPT-3 showed that scale can turn language models into few-shot learners
 
 **Conference:** NeurIPS 2020 (oral)
 
+## Paper map
+
+GPT-3 tests whether scale can turn next-token pretraining into in-context learning. The model is a 175B-parameter autoregressive Transformer trained on a large mixed text corpus, then evaluated with zero-shot, one-shot, and few-shot prompts instead of task-specific fine-tuning. The paper's core evidence is broad: language modeling, translation, QA, cloze tasks, reasoning-style benchmarks, and synthetic tasks. Performance improves predictably with scale, and few-shot prompting sometimes approaches fine-tuned systems. The caveats are equally central: high compute cost, bias and toxicity inherited from web data, brittle reasoning, and weak performance on some tasks. The lasting idea is that prompts can become the task interface for a general pretrained model.
+
 ![Figure 2.1 from GPT-3: zero-shot, one-shot, few-shot, and fine-tuning evaluation strategies](/assets/images/gpt3-paper-figure-2-1-eval-strategies.png)
 _Figure 2.1 from the [GPT-3 paper](https://arxiv.org/abs/2005.14165), via ar5iv._
 

@@ -21,6 +21,10 @@ summary: InstructGPT showed that human preference data can make smaller language
 
 **Conference:** NeurIPS 2022 (spotlight)
 
+## Paper map
+
+InstructGPT aligns GPT-3-style models to user intent through supervised demonstrations and preference-based reinforcement learning. The pipeline first fine-tunes on labeler-written ideal responses, then trains a reward model from ranked model outputs, then optimizes the policy with PPO against that reward while controlling drift from the supervised model. The central result is that smaller InstructGPT models can be preferred over much larger base GPT-3 models on real API prompts. The paper also measures truthfulness, toxicity, and academic NLP performance to check side effects. The caveat is that RLHF optimizes for labeler preference under a specific prompt distribution, so reward-model errors and preference coverage matter. The lasting idea is instruction following as an alignment target, not just scale.
+
 ![Figure 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model from Training Language Models to Follow Instructions with Human Feedback](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-paper-figure.png)
 _Figure 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model. From the [Training Language Models to Follow Instructions with Human Feedback paper](https://arxiv.org/abs/2203.02155), via arXiv HTML._
 

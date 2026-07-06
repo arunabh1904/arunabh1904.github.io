@@ -21,6 +21,10 @@ summary: DDPMs turned generation into learned denoising, trading slow sampling f
 
 **Conference:** NeurIPS 2020
 
+## Paper map
+
+DDPM frames generation as learning to reverse a gradual noising process. The forward chain adds Gaussian noise until data becomes nearly pure noise; the reverse model learns denoising transitions that reconstruct samples step by step. The training objective can be written as a variational bound, but the practical loss predicts noise and connects to denoising score matching. The paper's evidence is high-quality image synthesis on CIFAR-10 and LSUN, with strong FID and a useful progressive decompression interpretation. The main cost is sampling: generation requires many sequential denoising steps, making early DDPMs slower than GANs. The lasting idea is that likelihood-based latent-variable models can produce strong samples when trained as iterative denoisers.
+
 ![Figure 2 from DDPM: the directed graphical model for forward noising and learned reverse denoising](/assets/images/ddpm-paper-figure-2-graphical-model.png)
 _Figure 2 from the [DDPM paper](https://arxiv.org/abs/2006.11239), via ar5iv._
 

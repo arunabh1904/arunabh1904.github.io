@@ -22,6 +22,10 @@ import { ppoPlayground } from '../../lib/python-playground-examples';
 
 **Conference:** Not formally peer-reviewed; influential tech report later presented at ICML workshops and widely adopted.
 
+## Paper map
+
+PPO is a practical policy-gradient method that reuses fresh rollout data for several minibatch epochs without letting the policy move too far. The clipped objective compares the new policy probability ratio to the old one and limits the incentive when the update exceeds an epsilon band. This approximates the trust-region spirit of TRPO while avoiding second-order optimization and conjugate-gradient machinery. The paper evaluates continuous-control and Atari tasks, where PPO gives a strong balance of simplicity, stability, and sample efficiency among online policy-gradient methods. The caveats are that clipping is heuristic, performance depends on advantage estimation and reward scaling, and the method still needs new on-policy data after each update cycle.
+
 ![PPO clipped objective schematic](/assets/images/ppo-clipped-objective-schematic.svg)
 _Local explainer diagram; the PPO paper does not expose a useful source figure through ar5iv._
 

@@ -17,6 +17,10 @@ summary: SENNA split driving into high-level language planning and low-level tra
 
 This makes the language layer inspectable. A planner can say what it intends to do before the control module turns that intent into geometry.
 
+## Paper map
+
+SENNA separates driving into a VLM-based decision layer and an end-to-end trajectory layer. Senna-VLM produces structured scene understanding, decisions, and explanations; Senna-E2E turns those semantics into planning outputs. Training uses staged pretraining and driving-specific instruction data so the language model learns traffic context rather than generic image chat. The paper's value is making the semantic decision step explicit. The caveat is that language plans are not safety guarantees: downstream control still has to handle geometry, timing, and uncertainty.
+
 ![Figure 1: Previous methods plan trajectories without a decision-making step, making model learning difficult from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-paper-figure.png)
 _Figure 1: Previous methods plan trajectories without a decision-making step, making model learning difficult. From the [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving paper](https://arxiv.org/abs/2410.22313), via arXiv HTML._
 

@@ -17,6 +17,10 @@ summary: TOD3Cap asked driving models to detect outdoor 3D objects and caption t
 
 That is harder than standard object detection because it requires attributes, context, and grounded descriptions, not just boxes and class IDs.
 
+## Paper map
+
+TOD3Cap introduces outdoor 3D dense captioning: localize objects in 3D scenes and generate grounded descriptions for them. The dataset contains 850 scenes, 64.3k objects, and 2.3M captions, making it much larger and more driving-relevant than small indoor captioning setups. The task requires geometry, object detection, and language generation together. It matters for autonomous driving because planners and assistants need grounded object descriptions, not just boxes. The caveat is evaluation: a fluent caption can still miss safety-critical geometry.
+
 ![Figure 1: We introduce the task of 3D dense captioning in outdoor scenes (right) from TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes](/assets/images/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes-paper-figure.png)
 _Figure 1: We introduce the task of 3D dense captioning in outdoor scenes (right). From the [TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes paper](https://arxiv.org/abs/2403.19589), via arXiv HTML._
 

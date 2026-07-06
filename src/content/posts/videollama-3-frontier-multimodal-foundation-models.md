@@ -19,6 +19,10 @@ summary: VideoLLaMA 3 showed that strong image understanding can be the foundati
 
 The key claim is that high-quality image-text learning carries a lot of the load for video. Video data still matters, but the model does not need to learn all semantics from video clips alone.
 
+## Paper map
+
+VideoLLaMA 3 is a vision-centric model for image and video understanding. Its training recipe treats high-quality image-text data as the base for video capability, then adds video-specific tuning instead of treating video as a separate problem. The framework also uses visual-token efficiency techniques so longer videos do not overwhelm the language context. The evidence compares image and video benchmarks against prior MLLMs. The caveat is that benchmark videos are still cleaner and shorter than many real temporal reasoning tasks. The takeaway is that video MLLMs need both temporal data and strong visual representation design.
+
 ![Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced image/video MLLM on various representative benchmarks from VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](/assets/images/videollama-3-frontier-multimodal-foundation-models-paper-figure.png)
 _Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced image/video MLLM on various representative benchmarks. From the [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding paper](https://arxiv.org/abs/2501.13106), via arXiv HTML._
 

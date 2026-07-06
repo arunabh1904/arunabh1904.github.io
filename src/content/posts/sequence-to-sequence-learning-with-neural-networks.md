@@ -20,6 +20,11 @@ summary: Seq2seq made encoder-decoder neural translation practical before attent
 **Project page / blog:** [Google Research Blog – "A neural network for machine translation"](https://research.googleblog.com/2014/12/a-neural-network-for-machine-translation.html)
 
 **Conference:** NeurIPS 2014
+
+## Paper map
+
+This paper shows that a neural network can map variable-length input sequences to variable-length output sequences with an encoder-decoder LSTM. The encoder reads the source sentence into a fixed vector; the decoder generates the target sentence from that vector. A crucial trick is reversing the source sentence, which shortens the effective dependency path between corresponding source and target words. The main evidence is WMT 2014 English-French translation, where a deep LSTM achieves strong BLEU and improves an SMT system through reranking. The caveat is the fixed-vector bottleneck: long or information-dense inputs strain the representation, which later attention mechanisms addressed. The lasting idea is end-to-end sequence transduction with learned representations.
+
 ![Figure 1: Our model reads an input sentence “ABC” and produces “WXYZ” as the output sentence from Sequence to Sequence Learning with Neural Networks](/assets/images/sequence-to-sequence-learning-with-neural-networks-paper-figure.png)
 _Figure 1: Our model reads an input sentence “ABC” and produces “WXYZ” as the output sentence. From the [Sequence to Sequence Learning with Neural Networks paper](https://arxiv.org/abs/1409.3215), via arXiv HTML._
 
