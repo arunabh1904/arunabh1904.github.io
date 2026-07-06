@@ -1,24 +1,144 @@
 ---
-import PostList from '../components/PostList.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import PostLayout from '../layouts/PostLayout.astro';
 import { getPostsByField } from '../lib/content';
 
 const fields = await getPostsByField();
 const paperCount = fields.reduce((count, field) => count + field.items.length, 0);
+
+const toFieldId = (field: string) =>
+  `field-${field
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')}`;
+
+const pluralize = (count: number, singular: string, plural = `${singular}s`) =>
+  `${count} ${count === 1 ? singular : plural}`;
+
+const fieldGroups = fields.map(({ field, items }) => {
+  const years = items.map((item) => item.data.date.getFullYear());
+  const startYear = Math.min(...years);
+  const endYear = Math.max(...years);
+  const dateRange = startYear === endYear ? `${startYear}` : `${startYear} - ${endYear}`;
+
+  return {
+    field,
+    id: toFieldId(field),
+    items,
+    count: items.length,
+    dateRange,
+  };
+});
 ---
 
 <PostLayout title="Paper Summaries by Field" showSectionsNav={false}>
-  <SectionHeader
-    eyebrow="Arxiv Notes"
-    title="Paper summaries by field"
-    description="Paper notes grouped by field, each focused on the contribution, tradeoff, and lasting idea."
-    meta={`${paperCount} entries`}
-  />
-  {fields.map(({ field, items }) => (
-    <section class="section-index-group">
-      <h2>{field}</h2>
-      <PostList posts={items} />
-    </section>
-  ))}
+  <div class="paper-field-page">
+    <SectionHeader
+      eyebrow="Arxiv Notes"
+      title="Paper summaries by field"
+      description="Paper notes grouped by field, each focused on the contribution, tradeoff, and lasting idea."
+      meta={`${paperCount} entries`}
+    />
+
+    <nav class="field-overview" aria-label="Paper fields">
+      <div class="field-overview__header">
+        <h2>Fields</h2>
+        <span>{pluralize(fieldGroups.length, 'group')}</span>
+      </div>
+      <div class="field-overview__grid">
+        {fieldGroups.map(({ field, id, count, dateRange }) => (
+          <a class="field-overview-card" href={`#${id}`}>
+            <span class="field-overview-card__name">{field}</span>
+            <span class="field-overview-card__meta">
+              {pluralize(count, 'paper')} / {dateRange}
+            </span>
+          </a>
+        ))}
+      </div>
+    </nav>
+
+    <div class="paper-field-actions" aria-label="Field display controls">
+      <button type="button" data-paper-fields-expand>Expand all</button>
+      <button type="button" data-paper-fields-collapse>Collapse all</button>
+    </div>
+
+    <div class="paper-field-groups">
+      {fieldGroups.map(({ field, id, items, count, dateRange }) => (
+        <details class="paper-field-group" id={id}>
+          <summary>
+            <span class="paper-field-group__title">{field}</span>
+            <span class="paper-field-group__meta">
+              {pluralize(count, 'paper')} / {dateRange}
+            </span>
+          </summary>
+          <ul class="paper-field-list">
+            {items.map((post) => (
+              <li>
+                <a href={post.data.legacyPath}>{post.data.title}</a>
+                <time datetime={post.data.date.toISOString()}>
+                  {
+                    post.data.date.toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: '2-digit',
+                      year: 'numeric',
+                    })
+                  }
+                </time>
+                {post.data.summary && <p>{post.data.summary}</p>}
+              </li>
+            ))}
+          </ul>
+        </details>
+      ))}
+    </div>
+  </div>
+
+  <script is:inline>
+    (() => {
+      const groups = Array.from(document.querySelectorAll('.paper-field-group'));
+      const expandButton = document.querySelector('[data-paper-fields-expand]');
+      const collapseButton = document.querySelector('[data-paper-fields-collapse]');
+
+      const openGroupFromHash = () => {
+        const id = window.location.hash.slice(1);
+        if (!id) {
+          return;
+        }
+
+        const target = document.getElementById(id);
+        if (target instanceof HTMLDetailsElement) {
+          target.open = true;
+        }
+      };
+
+      expandButton?.addEventListener('click', () => {
+        groups.forEach((group) => {
+          if (group instanceof HTMLDetailsElement) {
+            group.open = true;
+          }
+        });
+      });
+
+      collapseButton?.addEventListener('click', () => {
+        groups.forEach((group) => {
+          if (group instanceof HTMLDetailsElement) {
+            group.open = false;
+          }
+        });
+      });
+
+      document.querySelectorAll('.field-overview-card').forEach((link) => {
+        link.addEventListener('click', () => {
+          const id = link.getAttribute('href')?.slice(1);
+          const target = id ? document.getElementById(id) : null;
+          if (target instanceof HTMLDetailsElement) {
+            target.open = true;
+          }
+        });
+      });
+
+      window.addEventListener('hashchange', openGroupFromHash);
+      openGroupFromHash();
+    })();
+  </script>
 </PostLayout>
