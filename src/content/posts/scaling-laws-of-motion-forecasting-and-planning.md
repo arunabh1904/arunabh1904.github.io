@@ -19,7 +19,7 @@ summary: This Waymo technical report studies how autoregressive motion forecasti
 
 The result is encouraging for foundation-model-style autonomy: training loss, open-loop metrics, and even closed-loop metrics improve with scale. The paper also makes the resource tradeoff explicit instead of treating model size as the only knob.
 
-## Paper map
+## Paper Insights
 
 The problem is scaling strategy for joint motion forecasting and planning. The study uses a 500 thousand hour driving dataset and fits empirical scaling laws over total training compute. It also studies compute-optimal allocation between model parameters and training data, inference-time compute through sampling and clustering, and the value of training on logged behavior from other agents.
 

@@ -17,7 +17,7 @@ summary: AutoTrust evaluated driving VLMs across hallucination, safety, robustne
 
 That means questions can test whether a model hallucinates, gives unsafe advice, leaks sensitive information, breaks under perturbations, or behaves inconsistently across groups and regions.
 
-## Paper map
+## Paper Insights
 
 AutoTrust reframes driving VLM evaluation around trustworthiness. It tests truthfulness, safety, robustness, privacy, and fairness over more than 10k scenes and 18k queries. The benchmark is designed to expose hallucination, unsafe advice, sensitive-information leakage, adversarial brittleness, and unfair or inconsistent behavior across driving contexts. One important finding is that driving specialization does not automatically improve trustworthiness; general VLMs can outperform specialist driving models on some axes. The limitation is that VQA-style trust tests still do not replace closed-loop validation, but they reveal failures ordinary accuracy benchmarks miss.
 

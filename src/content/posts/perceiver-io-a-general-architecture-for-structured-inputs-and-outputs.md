@@ -19,7 +19,7 @@ summary: Perceiver IO uses latent bottleneck cross-attention plus output queries
 
 This belongs in a BEV reading list because modern driving models often need to fuse different input shapes and produce structured outputs: grids, vectors, trajectories, agent states, and maps. Perceiver IO is one of the cleanest architectural templates for that kind of input/output mismatch.
 
-## Paper map
+## Paper Insights
 
 The problem is architectural specialization. Standard networks bake in assumptions about image grids, token sequences, or fixed output formats. Perceiver IO keeps the computationally expensive processing in a latent space, so input cost scales through cross-attention and output size is controlled by queries. Different query sets can request different output structures from the same latent representation.
 

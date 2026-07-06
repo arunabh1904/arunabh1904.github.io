@@ -19,7 +19,7 @@ summary: DQN combined Q-learning, replay, and target networks to make pixel-base
 
 **Conference:** NIPS Deep Learning Workshop 2013 (expanded Nature version published 2015)
 
-## Paper map
+## Paper Insights
 
 DQN combines Q-learning with deep convolutional networks to learn control directly from pixels. The input is a stack of recent Atari frames; the output is one Q-value per action. Two stabilizers make the method work: experience replay breaks temporal correlations by sampling past transitions, and a target network slows down bootstrapping targets. The same architecture and hyperparameters are applied across seven Atari games, which was the important generality claim at the time. The evidence shows performance above previous methods on six games and above a human expert on three. The caveat is sample inefficiency and instability; later deep RL work spent years improving exploration, targets, replay, and evaluation.
 

@@ -17,7 +17,7 @@ summary: FAST compressed robot action trajectories into tokens so autoregressive
 
 That enables autoregressive VLA models to train on complex manipulation trajectories without sequence lengths exploding.
 
-## Paper map
+## Paper Insights
 
 FAST improves action tokenization for autoregressive VLA policies. Simple per-timestep, per-dimension bins create long token sequences and handle high-frequency dexterous actions poorly. FAST compresses action chunks in frequency space using a discrete cosine transform, then quantizes the compact coefficients into action tokens. This preserves smooth temporal structure while shortening the sequence the model must generate. The evidence is better training and task performance for high-frequency robot behaviors. The caveat is compression design: too much compression loses control detail, while too little gives up the efficiency benefit.
 

@@ -19,7 +19,7 @@ summary: MGMap adds learned masks to online vector-map construction so instance 
 
 The fix is mask-guided learning. MGMap learns masks over enhanced multi-scale BEV features, then uses those masks at the instance level and the point level to localize map elements more precisely.
 
-## Paper map
+## Paper Insights
 
 The paper targets online vectorized HD map construction. The method introduces a Mask-Activated Instance decoder, which uses instance masks to inject global instance and structural information into instance queries. It also adds Position-Guided Mask Patch Refinement, which refines point locations by extracting point-specific patch information from a finer-grained region.
 

@@ -21,7 +21,7 @@ summary: Fourier features turn low-dimensional coordinates into sinusoidal embed
 
 That small input change matters for BEV and mapping work because many spatial tasks are low-dimensional coordinate regression problems with high-frequency structure. Lane boundaries, occupancy edges, radiance fields, and implicit maps all ask a network to represent sharp geometry from coordinates.
 
-## Paper map
+## Paper Insights
 
 The paper studies why coordinate MLPs struggle when the target function contains high-frequency detail. The method samples or chooses Fourier bases, maps an input coordinate through sine and cosine features, and feeds the expanded representation into a standard MLP. Using neural tangent kernel analysis, the authors show that this transformation changes the effective kernel into a stationary kernel whose bandwidth can be tuned by the Fourier feature scale.
 

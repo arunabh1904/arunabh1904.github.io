@@ -19,7 +19,7 @@ summary: Eagle 2 made the post-training data recipe the main contribution, showi
 
 The main lesson is that strong VLMs are not just pretrained once and then lightly tuned. Their behavior is shaped by a careful curriculum of visual tasks and response styles.
 
-## Paper map
+## Paper Insights
 
 Eagle 2 is a data-strategy paper for post-training VLMs. Instead of only releasing a final model, it studies how instruction data, ordering, filtering, and staged tuning affect frontier multimodal performance. The contribution is a transparent recipe and ablation trail showing which data choices move OCR, grounding, visual reasoning, and instruction-following behavior. The evidence comes from step-by-step ablations and broad benchmarks. The caveat is reproducibility: post-training data quality and filtering details are hard to copy exactly, and benchmark leakage must be watched closely.
 

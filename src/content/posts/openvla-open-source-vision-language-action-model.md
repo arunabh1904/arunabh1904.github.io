@@ -19,7 +19,7 @@ summary: OpenVLA released a 7B open robot policy trained on 970k real robot demo
 
 The open release matters: checkpoints, code, and fine-tuning recipes make generalist robot policies easier to study and adapt.
 
-## Paper map
+## Paper Insights
 
 OpenVLA adapts a pretrained vision-language model into an action-generating robot policy and releases the result as an open baseline. The model takes robot observations and language instructions, then predicts actions for manipulation tasks. Its contribution is partly technical and partly ecosystem-oriented: provide an inspectable VLA recipe rather than leaving robot foundation policies closed. The evidence tests generalization across robot tasks and datasets. The caveat is action representation: a VLM backbone helps semantic grounding, but precise continuous control and embodiment transfer still require robot-specific data and validation.
 

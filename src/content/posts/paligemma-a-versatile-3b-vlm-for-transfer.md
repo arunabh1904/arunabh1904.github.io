@@ -17,7 +17,7 @@ summary: PaliGemma combines SigLIP and Gemma into a compact open VLM meant for f
 
 That framing is practical: instead of building a separate head for captioning, VQA, detection, segmentation, remote sensing, and document tasks, the model learns a shared prefix-to-suffix interface that can be fine-tuned.
 
-## Paper map
+## Paper Insights
 
 The architecture is intentionally simple. Image tokens from SigLIP go through a linear projection into Gemma's token space. A task prefix describes what to do, and the decoder autoregressively generates the answer, caption, box tokens, or segmentation tokens.
 

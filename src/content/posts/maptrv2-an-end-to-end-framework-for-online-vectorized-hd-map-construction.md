@@ -19,7 +19,7 @@ summary: MapTRv2 strengthens MapTR with auxiliary one-to-many matching and dense
 
 The important additions are auxiliary one-to-many matching and dense supervision. Those extra training signals reduce the fragility of set matching and help the model learn map geometry before the final sparse vector loss has to carry everything.
 
-## Paper map
+## Paper Insights
 
 The paper presents MapTRansformer as an end-to-end framework for online vectorized HD map construction. It preserves the unified permutation-equivalent representation and hierarchical bipartite matching from MapTR, then adds auxiliary one-to-many matching and dense supervision to accelerate convergence. The model handles map elements with arbitrary shapes and remains a simple encoder-decoder Transformer.
 

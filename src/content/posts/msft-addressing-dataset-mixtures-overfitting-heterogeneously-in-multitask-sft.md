@@ -21,7 +21,7 @@ summary: mSFT adapts multitask fine-tuning mixtures by tracking which datasets o
 
 **Conference:** Preprint
 
-## Paper map
+## Paper Insights
 
 MSFT studies multi-task supervised fine-tuning when datasets learn and overfit at different speeds. A fixed mixture can keep updating an easy task after it has overfit while harder tasks still need training. MSFT trains on an active mixture, detects the earliest-overfitting sub-dataset, removes it, rolls back to that dataset's best checkpoint, and continues. The paper reports gains across benchmarks, base models, dataset sizes, and task granularities. The operational caveat is that the method needs per-dataset validation signals and checkpoint management. The core idea is to allocate SFT compute by task dynamics rather than static mixture weights.
 

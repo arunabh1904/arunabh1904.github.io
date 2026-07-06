@@ -24,7 +24,7 @@ import { bertPlayground } from '../../lib/python-playground-examples';
 **Project page / blog:** [Google AI Blog – "Open Sourcing BERT"](https://ai.googleblog.com/2018/11/open-sourcing-bert-state-of-art-pre.html)  
 **Conference:** NAACL 2019
 
-## Paper map
+## Paper Insights
 
 BERT makes bidirectional pretraining practical by training a Transformer encoder with masked language modeling and next-sentence prediction, then fine-tuning the same backbone for downstream tasks. Masked LM lets each token condition on both left and right context, unlike left-to-right language models. Fine-tuning adds only small task-specific heads for classification, span extraction, or sentence-pair tasks. The empirical case spans GLUE, MultiNLI, SQuAD, and other NLU benchmarks, where deeper bidirectional pretraining beats feature-based and unidirectional baselines. The caveats are the pretrain-finetune mismatch from mask tokens and the later-questioned value of next-sentence prediction. The lasting idea is that one pretrained encoder can become a general language-understanding substrate.
 

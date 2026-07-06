@@ -21,7 +21,7 @@ summary: VLM-AD uses a VLM as a training-time teacher, distilling driving reason
 
 The important deployment detail is that the VLM is not used at inference time. The runtime model stays an end-to-end driver, but its training objective is shaped by language-style reasoning signals that explain why a maneuver makes sense.
 
-## Paper map
+## Paper Insights
 
 The paper studies a missing piece in imitation-heavy end-to-end driving: models can copy trajectories without learning the reasoning behind traffic behavior. VLM-AD addresses that by prompting a VLM to generate two kinds of supervision. The first is freeform reasoning about the scene and intended behavior. The second is structured action information, converted into labels for control, turn, and lane decisions.
 

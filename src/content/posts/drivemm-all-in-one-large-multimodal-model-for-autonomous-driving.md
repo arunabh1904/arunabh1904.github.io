@@ -17,7 +17,7 @@ summary: DriveMM trained one multimodal transformer across perception, predictio
 
 The system takes multi-view driving imagery and produces a unified token sequence that can be decoded into task-specific outputs.
 
-## Paper map
+## Paper Insights
 
 DriveMM, presented as RoboTron-Drive in the paper, tries to unify autonomous-driving tasks in one large multimodal model. It handles multiple datasets and task types through a shared model and prompt formulation instead of training separate specialized networks for every perception, prediction, or planning task. The main evidence is broad performance across six datasets and 13 tasks, including zero-shot generalization to unseen datasets. The limitation is that all-in-one benchmark performance does not prove closed-loop driving safety. The paper is best read as a generalization study for driving LMMs, not as a complete autonomy stack.
 

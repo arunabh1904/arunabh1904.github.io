@@ -19,7 +19,7 @@ summary: Driving with LLMs fed object-level vector scene state into language mod
 
 The bet is that language models may reason better when perception has already converted pixels into meaningful objects, positions, and relationships.
 
-## Paper map
+## Paper Insights
 
 Driving with LLMs feeds structured object-level vectors into a language model instead of raw pixels. A Vector-Former converts detected agents, lanes, and scene state into tokens that the LLM can use for QA and action generation. This makes the driving state more explicit and the model's outputs easier to explain. The method depends heavily on upstream perception: missing or incorrect objects become misleading language-model input. The paper matters as an interface design for combining modular autonomy state with LLM reasoning.
 

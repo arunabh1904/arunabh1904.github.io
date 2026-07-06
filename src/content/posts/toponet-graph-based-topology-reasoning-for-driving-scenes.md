@@ -19,7 +19,7 @@ summary: TopoNet reasons over lane connectivity and traffic-element-to-lane assi
 
 That makes the paper a bridge between perception and map reasoning. A vector map is not useful only because it contains lane curves; it is useful because the curves form a graph with legal and semantic relationships.
 
-## Paper map
+## Paper Insights
 
 The paper introduces TopoNet for graph-based topology reasoning in driving scenes. It uses an embedding module to bring semantic knowledge from 2D traffic elements into a unified feature space, a scene graph neural network to model relationships and feature interactions, and a scene knowledge graph to distinguish different prior relationships inside the road genome.
 

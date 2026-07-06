@@ -17,7 +17,7 @@ summary: LocCa adds location-aware captioning tasks to visual pretraining, impro
 
 The result is a visual encoder that still transfers to holistic tasks like classification, captioning, OCR, and VQA, while becoming much more sensitive to object-level location.
 
-## Paper map
+## Paper Insights
 
 Standard captioning pretraining gives a model a useful global visual representation, but it does not force the representation to know where described objects live. LocCa adds two location-aware proxy tasks next to normal captioning: automatic referring expression (AREF) and grounded captioning (GCAP). The same decoder predicts both text and bounding-box coordinates, with task prefixes telling the model which interface to use.
 

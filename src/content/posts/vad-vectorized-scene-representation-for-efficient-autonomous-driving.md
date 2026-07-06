@@ -19,7 +19,7 @@ summary: VAD replaces dense rasterized planning inputs with vectorized agents an
 
 That design is useful because rasterization can be expensive and can blur the object-level structure that planning cares about. VAD keeps the scene closer to the planner's natural language: agents, lanes, boundaries, and candidate trajectories.
 
-## Paper map
+## Paper Insights
 
 The paper proposes an end-to-end vectorized paradigm for autonomous driving. Instead of generating dense occupancy or semantic-map rasters for planning, VAD uses vectorized agent and map representations, query interactions, and vectorized planning constraints. The model aims to improve both safety and speed by avoiding computation-heavy raster operations and hand-designed post-processing.
 

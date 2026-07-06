@@ -56,7 +56,7 @@ The paper's core math is easier to trust when you can poke at small numbers your
 
 <PythonPlayground client:visible {...attentionIsAllYouNeedPlayground} />
 
-## Paper map
+## Paper Insights
 
 The Transformer replaces recurrence with stacked self-attention and position-wise feed-forward layers. The encoder lets every source token attend to every other source token; the decoder adds masked self-attention so future target tokens remain hidden, then cross-attends to encoder states. Multi-head attention splits representation space so different heads can track different relations, while residual connections, layer normalization, label smoothing, and dropout stabilize training. The empirical case is machine translation: strong BLEU on WMT English-German and English-French with much more parallel training than RNNs. The core limitation is quadratic attention cost in sequence length. The lasting idea is that sequence modeling can be built around content-addressed token interaction rather than step-by-step recurrence.
 
