@@ -17,7 +17,7 @@ summary: MotionLM discretizes continuous trajectories into motion tokens and for
 
 That reframing removes several pieces of hand-built forecasting machinery. The model does not need anchors or explicit latent-variable optimization for multimodality, and it can generate joint futures for interacting agents in one decoding process.
 
-## Paper map
+## Paper Insights
 
 The problem is forecasting plausible, interactive futures for multiple road agents. MotionLM turns continuous trajectories into discrete motion tokens and maximizes the average log probability of those tokens with a standard language-model objective. Its sequential factorization gives the model temporally causal conditional rollouts, which matters when one agent's future should react to another's predicted motion.
 

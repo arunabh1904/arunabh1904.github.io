@@ -17,7 +17,7 @@ summary: DIMA used a large multimodal driving model as a teacher, distilling its
 
 The result is a model that keeps more of the teacher's traffic knowledge while avoiding a full LLM in the runtime loop.
 
-## Paper map
+## Paper Insights
 
 DiMA distills an expensive multimodal or language-enhanced driving planner into an efficient LLM-free planner. The teacher contributes world knowledge and long-tail reasoning; the student learns to reproduce useful planning behavior without calling an LLM at deployment time. The target setting is rare or difficult maneuvers where language reasoning can help, such as overtaking and three-point turns. The key benefit is latency and compute reduction. The caveat is that distillation freezes the teacher's behavior into the student, so the deployed model cannot ask new questions or recover reasoning traces at test time.
 

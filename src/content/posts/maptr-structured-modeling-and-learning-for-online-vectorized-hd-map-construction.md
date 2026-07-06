@@ -19,7 +19,7 @@ summary: MapTR models HD map elements as permutation-equivalent point sets, maki
 
 The key modeling move is permutation equivalence. A map element can be represented by a set of points, but the same shape may have several valid point orders. MapTR encodes that ambiguity directly so training does not punish equivalent representations.
 
-## Paper map
+## Paper Insights
 
 The paper frames online HD map construction as structured set prediction. Map elements are modeled as point sets with a group of equivalent permutations. A hierarchical query embedding scheme encodes instance-level and point-level structure, and hierarchical bipartite matching assigns predictions to ground-truth map elements during training.
 

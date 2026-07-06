@@ -17,7 +17,7 @@ summary: DexVLA paired VLM reasoning with a diffusion policy expert for long-hor
 
 This hybrid design is useful for dexterous, long-horizon tasks where pure language-model action generation may be too coarse and pure diffusion may lack semantic planning.
 
-## Paper map
+## Paper Insights
 
 DexVLA argues that action modeling is a bottleneck for vision-language-action systems. It adds a large diffusion-based action expert to a VLM so the system can model continuous, multi-step robot behavior rather than only discrete tokens. The training recipe uses cross-embodiment pretraining and curriculum learning before adapting to dexterous, long-horizon tasks. The evidence focuses on diverse manipulation skills across robot embodiments. The main caveat is cost: a billion-parameter action expert can represent smoother control, but it is expensive to train and must still be validated under real robot distribution shift.
 

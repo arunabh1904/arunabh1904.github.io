@@ -21,7 +21,7 @@ summary: CLIP used image-text contrastive training to make visual representation
 
 **Conference:** Released as a tech report; widely cited (ICML 2021 oral-style spotlight)
 
-## Paper map
+## Paper Insights
 
 CLIP learns visual representations from natural-language supervision instead of fixed class labels. It trains an image encoder and text encoder contrastively so matching image-caption pairs have high similarity and mismatched pairs have low similarity. At inference, classification becomes text retrieval: write prompts for candidate labels and choose the label whose text embedding best matches the image. The evidence is broad zero-shot transfer across many image benchmarks, with strong robustness to distribution shift compared with supervised ImageNet models. The caveat is data dependence: web-scale captions bring noise, bias, and uneven coverage, and prompt wording can change results. The lasting idea is that language can define open-ended visual categories without retraining a classifier.
 

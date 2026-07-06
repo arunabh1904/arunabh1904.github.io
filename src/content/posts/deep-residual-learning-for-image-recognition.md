@@ -19,7 +19,7 @@ summary: ResNet made very deep CNNs practical by learning residual updates and c
 
 **Conference:** CVPR 2016 (1st place ILSVRC 2015 classifier)
 
-## Paper map
+## Paper Insights
 
 ResNet addresses the degradation problem: deeper plain networks can have higher training error even though, in principle, extra layers could learn identity mappings. The residual block changes the target from learning H(x) directly to learning F(x) = H(x) - x, then adds the shortcut x back. Identity shortcuts add almost no parameters or compute but make very deep optimization tractable. The evidence covers ImageNet and CIFAR, including 50-, 101-, and 152-layer networks that outperform shallower baselines and win major recognition/detection tasks. The limitation is not conceptual but architectural: later work still had to refine normalization, bottlenecks, width, and training recipes. The lasting idea is that skip connections make depth usable.
 

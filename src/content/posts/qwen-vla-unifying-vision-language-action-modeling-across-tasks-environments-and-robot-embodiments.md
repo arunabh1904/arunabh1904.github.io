@@ -19,7 +19,7 @@ summary: Qwen-VLA extends the Qwen vision-language stack with a DiT action decod
 
 The key trick is embodiment-aware prompting. Instead of adding separate output heads for every robot or task family, the prompt describes the embodiment and control convention, while a DiT flow-matching decoder generates the continuous action trajectory.
 
-## Paper map
+## Paper Insights
 
 The model combines a Qwen3.5-4B vision-language backbone with a 1.15B DiT flow-matching action decoder. It is pretrained on a heterogeneous mix: robot manipulation trajectories, human egocentric demonstrations, synthetic simulation, navigation data, trajectory-centric supervision, and auxiliary vision-language data.
 

@@ -17,7 +17,7 @@ summary: DriveVLM combined VLM reasoning with hierarchical planning, then paired
 
 That hybrid design is the interesting part. The VLM contributes semantic reasoning about rare or complex situations; the conventional stack keeps the control loop more grounded.
 
-## Paper map
+## Paper Insights
 
 DriveVLM explores how VLM reasoning can support autonomous driving. It uses language-level scene understanding and hierarchical planning, with a dual variant that combines VLM semantics with conventional driving modules. The evaluation covers public driving datasets and deployment-oriented tests, aiming to show that VLMs can help decompose complex scenes and decisions. The design question is where the VLM belongs: it can reason and explain, but low-level control still needs geometry, timing, and safety constraints. The caveat is standard for driving VLMs: semantic competence is not the same as robust closed-loop planning.
 

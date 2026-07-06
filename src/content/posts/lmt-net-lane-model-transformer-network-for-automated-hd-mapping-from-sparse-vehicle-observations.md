@@ -17,7 +17,7 @@ summary: LMT-Net predicts lane pairs and lane connectivity from sparse vehicle o
 
 The paper is useful because it frames HD mapping as graph construction: lane pairs become nodes, and lane connectivity becomes edges. That is closer to the artifact a planner needs than a dense segmentation mask.
 
-## Paper map
+## Paper Insights
 
 The problem is automated lane-model generation under limited observations. A preprocessing step aligns and aggregates observed lane boundaries into polylines, while driven traces provide starting points for lane-pair prediction. LMT-Net uses an encoder-decoder Transformer to encode the polylines and predict both lane pairs and connectivity. The final lane graph represents each lane pair as a node and each connectivity decision as an edge.
 

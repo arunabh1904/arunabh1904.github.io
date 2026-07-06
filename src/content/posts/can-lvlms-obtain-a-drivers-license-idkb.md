@@ -17,7 +17,7 @@ summary: IDKB tested whether vision-language models know explicit driving rules,
 
 The result is a useful warning: a model may recognize cars and pedestrians but still fail rule-based reasoning that every licensed human driver is expected to know.
 
-## Paper map
+## Paper Insights
 
 IDKB tests whether LVLMs know driving rules and applied traffic knowledge. The benchmark covers signs, laws, exam-style questions, and scenario reasoning, then evaluates 15 representative LVLMs. Its central claim is that visual-language capability is not the same as driving competence: a model may recognize a road scene but still choose an illegal or unsafe action. The benchmark is valuable because autonomous driving needs rule knowledge, not only perception. The caveat is scope: passing IDKB would show specialized knowledge, but it would not prove planning, control, or closed-loop safety.
 

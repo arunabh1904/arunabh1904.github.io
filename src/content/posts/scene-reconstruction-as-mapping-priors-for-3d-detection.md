@@ -17,7 +17,7 @@ summary: MPA3D uses automatically reconstructed surfel and 3D Gaussian maps as d
 
 The detector then uses those priors to separate static background from dynamic foreground, which helps especially for distant, sparse, occluded, or low-visibility objects.
 
-## Paper map
+## Paper Insights
 
 The method is called Mapping Priors Augmented 3D Detection, or MPA3D. It builds two types of scene priors: surfel maps, which are lightweight surface elements from multi-traversal LiDAR and camera data, and 3D Gaussian Splatting maps, which are denser but more compute-heavy. Dynamic objects are removed from the priors so the map mostly represents static structure.
 

@@ -21,7 +21,7 @@ summary: EfficientDet paired BiFPN feature fusion with compound scaling to make 
 
 **Conference:** CVPR 2020
 
-## Paper map
+## Paper Insights
 
 EfficientDet adapts EfficientNet-style scaling to object detection. Its first ingredient is BiFPN, a weighted bidirectional feature pyramid that repeatedly fuses multi-scale features while learning how much each input matters. Its second ingredient is compound scaling across backbone, feature network, prediction heads, and input resolution. The model family D0 through D7 gives a smooth compute-accuracy ladder. The evidence is COCO detection performance versus FLOPs and parameters, where EfficientDet reaches strong accuracy at much lower cost than prior detectors. The caveat is that efficiency depends on the whole recipe: backbone, feature fusion, scaling, and training settings all contribute. The paper matters because it made detector scaling systematic rather than hand-tuned.
 

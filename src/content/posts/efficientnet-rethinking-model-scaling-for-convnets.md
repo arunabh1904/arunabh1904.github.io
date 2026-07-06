@@ -21,7 +21,7 @@ summary: EfficientNet made CNN scaling more systematic by growing depth, width, 
 
 **Conference:** ICML 2019
 
-## Paper map
+## Paper Insights
 
 EfficientNet asks how to scale a ConvNet once a good baseline exists. Instead of independently increasing depth, width, or input resolution, compound scaling uses one coefficient to grow all three dimensions in a balanced way. The authors first search for an efficient baseline, EfficientNet-B0, then scale it to B1-B7 under resource constraints. The empirical case is ImageNet accuracy versus parameters/FLOPs, with transfer results showing that the same family works beyond ImageNet. The key insight is that more resolution needs enough depth and width to use the extra pixels, while more width/depth alone wastes compute. The caveat is that the baseline architecture and search space still matter; compound scaling is not magic for a weak base model.
 

@@ -19,7 +19,7 @@ summary: This paper uses large motion-forecasting ensembles as teachers and dist
 
 The work is a deployment-minded scaling paper. It treats accuracy, latency, and onboard compute as coupled constraints instead of assuming the best leaderboard model can be used directly.
 
-## Paper map
+## Paper Insights
 
 The paper first builds large ensembles of optimized single motion-forecasting models and shows that the ensembles improve generalization. It then develops a generalized distillation framework that transfers those ensemble predictions into smaller student models. The task focus is motion forecasting on real-world autonomous-driving data.
 

@@ -19,7 +19,7 @@ summary: EMMA represented driving inputs and outputs as language tokens so one m
 
 The striking design choice is to represent many non-sensor inputs and outputs as text. That lets the model reuse the structure and world knowledge of a multimodal language model while training across several driving tasks.
 
-## Paper map
+## Paper Insights
 
 EMMA builds autonomous-driving outputs on top of a multimodal foundation model. It maps camera inputs, navigation instructions, ego state, road graph elements, objects, and trajectories into a unified language-like interface with task-specific prompts. The paper's evidence includes strong motion planning on nuScenes and competitive Waymo motion results. The appeal is one model for several driving outputs; the risk is precision. Text-style serialization must still produce exact geometry, calibrated trajectories, and low-latency behavior for safety-critical driving.
 

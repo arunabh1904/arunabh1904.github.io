@@ -19,7 +19,7 @@ summary: Qwen2-VL made resolution and video length more flexible by letting visu
 
 The model family also handles images and video with a shared multimodal position encoding, making it useful for OCR-heavy tasks, documents, visual reasoning, and longer temporal inputs.
 
-## Paper map
+## Paper Insights
 
 Qwen2-VL makes resolution handling a core VLM design choice. Naive Dynamic Resolution converts images of different sizes into different numbers of visual tokens, preserving detail for OCR, documents, charts, and high-resolution scenes. M-RoPE extends positional encoding across text, image, and video so spatial and temporal positions stay aligned. The evaluation covers image understanding, video understanding, multilingual OCR, and reasoning. The tradeoff is token cost: dynamic resolution gives more detail when needed, but large inputs still consume context and compute.
 

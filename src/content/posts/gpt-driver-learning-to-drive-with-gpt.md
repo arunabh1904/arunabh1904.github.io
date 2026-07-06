@@ -19,7 +19,7 @@ summary: GPT-Driver reframed motion planning as language modeling over scene tok
 
 This is not a deployable AV stack by itself. It is a useful probe: language models can absorb structured scene descriptions and generate plausible plans, but latency, grounding, and closed-loop reliability remain hard.
 
-## Paper map
+## Paper Insights
 
 GPT-Driver reformulates motion planning as GPT-style sequence generation. It serializes structured scene state into language-model tokens and predicts future waypoints plus a rationale. This gives the model an interpretable interface: the generated plan can be paired with an explanation of the driving decision. The evidence focuses on open-loop planning quality. The caveat is that open-loop waypoint prediction does not prove closed-loop safety, and LLM latency remains a deployment problem. The paper is useful as an early example of adapting pretrained language models to structured planning rather than raw perception.
 

@@ -19,7 +19,7 @@ summary: DeepSeek-VL2 combined dynamic high-resolution tiling with sparse MoE la
 
 The result is especially relevant for OCR, documents, tables, charts, and visual grounding, where resizing or compressing the image too aggressively destroys the answer.
 
-## Paper map
+## Paper Insights
 
 DeepSeek-VL2 combines high-resolution visual processing with a sparse MoE language backbone. Dynamic tiling lets the vision encoder preserve detail across different image sizes and aspect ratios, which helps OCR, documents, tables, charts, and grounding. DeepSeekMoE with Multi-head Latent Attention improves inference efficiency by activating only part of the model and compressing KV cache information. The paper evaluates a family of model sizes across broad multimodal tasks. The tradeoff is serving complexity: dynamic visual tokens and MoE routing improve capability per active parameter, but they make implementation, batching, and latency management harder.
 

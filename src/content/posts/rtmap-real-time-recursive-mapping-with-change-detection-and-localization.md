@@ -19,7 +19,7 @@ summary: RTMap treats online HD mapping as a recursive system that localizes aga
 
 The paper is useful because it puts three normally separate problems into one system: mapping, map-based localization, and map change detection.
 
-## Paper map
+## Paper Insights
 
 The online module encodes current sensors and the crowdsourced HD map, then uses hybrid queries and existence-aware matching to classify map elements as matched, outdated, or newly observed. Matched map elements can feed either a learned pose head or an explicit maximum-a-posteriori pose estimator.
 

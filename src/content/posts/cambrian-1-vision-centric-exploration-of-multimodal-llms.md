@@ -17,7 +17,7 @@ summary: Cambrian-1 treated VLM design as a vision problem first, systematically
 
 The paper tests many vision encoders and introduces a Spatial Vision Aggregator to preserve richer visual information before it reaches the language model.
 
-## Paper map
+## Paper Insights
 
 Cambrian-1 studies the vision components of multimodal LLMs instead of treating the visual encoder as a fixed detail. It compares many visual encoders, examines supervised and self-supervised representations, and introduces CV-Bench to focus on visual grounding. The paper's contribution is both a model family and an evaluation framework for understanding which visual choices actually improve MLLM behavior. The main lesson is that a stronger language model cannot fully compensate for weak perception. The caveat is benchmark interpretation: multimodal scores often mix language priors, OCR, grounding, and reasoning, so improvements need careful attribution.
 
