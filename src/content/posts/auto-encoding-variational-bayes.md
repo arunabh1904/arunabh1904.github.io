@@ -30,7 +30,7 @@ _Figure from the [AEVB paper](https://arxiv.org/abs/1312.6114), via ar5iv._
 
 That trick turns Monte Carlo estimates of the evidence lower bound (ELBO) into low-variance gradients that work with standard stochastic gradient descent. The paper also made amortised inference practical at scale: the encoder learns to predict posterior parameters directly, rather than solving a separate inference problem for every datapoint.
 
-**Why it mattered:** VAEs gave deep generative modelling a stable likelihood-based recipe. They did not produce the sharpest samples, but they made latent-variable models trainable, inspectable, and useful for representation learning. Later work such as $\beta$-VAE, conditional VAEs, and flow-based models all build on this basic encoder-decoder view of probabilistic inference.
+**Context:** VAEs gave deep generative modelling a stable likelihood-based recipe. They did not produce the sharpest samples, but they made latent-variable models trainable, inspectable, and useful for representation learning. Later work such as $\beta$-VAE, conditional VAEs, and flow-based models all build on this basic encoder-decoder view of probabilistic inference.
 
 **Evals / Latency benchmarks:**
 
@@ -43,4 +43,4 @@ Training cost was modest for the original experiments: minutes per epoch on MNIS
 
 **Critiques & limitations:** The strength of VAEs is stability: training has a clear objective, avoids GAN-style mode collapse, and produces a latent space that supports interpolation. The tradeoff is expressiveness. Simple Gaussian priors and posteriors can underfit complex data, and the ELBO is only a lower bound, so a good training objective does not guarantee a tight estimate of true likelihood.
 
-**Take-home message:** Auto-Encoding Variational Bayes turned variational inference into a scalable deep-learning procedure. The reparameterisation trick is the small mathematical hinge that made the whole recipe practical.
+**Takeaway:** Auto-Encoding Variational Bayes turned variational inference into a scalable deep-learning procedure. The reparameterisation trick is the small mathematical hinge that made the whole recipe practical.

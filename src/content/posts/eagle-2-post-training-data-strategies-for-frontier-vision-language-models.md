@@ -15,7 +15,7 @@ summary: Eagle 2 made the post-training data recipe the main contribution, showi
 
 **GitHub:** [NVlabs/Eagle](https://github.com/NVlabs/EAGLE)
 
-**Plain-language summary:** Eagle 2 argues that frontier VLM performance depends heavily on post-training data strategy. Instead of presenting only final weights, the paper documents how the team builds and balances instruction data, benchmark-oriented data, visual reasoning tasks, and embodied/driving-style examples.
+**Summary:** Eagle 2 argues that frontier VLM performance depends heavily on post-training data strategy. Instead of presenting only final weights, the paper documents how the team builds and balances instruction data, benchmark-oriented data, visual reasoning tasks, and embodied/driving-style examples.
 
 The main lesson is that strong VLMs are not just pretrained once and then lightly tuned. Their behavior is shaped by a careful curriculum of visual tasks and response styles.
 
@@ -39,6 +39,6 @@ _Figure 1: Overview of Eagle2-9B’s result across different multimodal benchmar
 | Transparency | Recipe-focused release | Documents data strategy instead of only final weights. |
 | Scale signal | Eagle2-9B competitive with larger models | Suggests curation can buy efficiency. |
 
-**Why it mattered:** Eagle 2 is valuable because it makes the data engineering visible. That helps turn VLM building from folklore into something closer to an inspectable recipe.
+**Context:** Eagle 2 is valuable because it makes the data engineering visible. That helps turn VLM building from folklore into something closer to an inspectable recipe.
 
-**Take-home message:** Post-training is where a general multimodal model becomes useful. The data mixture is a control surface.
+**Takeaway:** Post-training is where a general multimodal model becomes useful. The data mixture is a control surface.

@@ -13,7 +13,7 @@ summary: PaliGemma combines SigLIP and Gemma into a compact open VLM meant for f
 
 **arXiv:** [2407.07726](https://arxiv.org/abs/2407.07726)
 
-**Plain-language summary:** PaliGemma is a small open VLM built for transfer, not a giant visual chat assistant. It combines a SigLIP-So400m vision encoder with a Gemma-2B language model, then exposes many vision tasks as text generation.
+**Summary:** PaliGemma is a small open VLM built for transfer, not a giant visual chat assistant. It combines a SigLIP-So400m vision encoder with a Gemma-2B language model, then exposes many vision tasks as text generation.
 
 That framing is practical: instead of building a separate head for captioning, VQA, detection, segmentation, remote sensing, and document tasks, the model learns a shared prefix-to-suffix interface that can be fine-tuned.
 
@@ -50,6 +50,6 @@ _Figure 1 shows PaliGemma's core architecture: a SigLIP image encoder feeds a Ge
 | MMVP | PaliGemma-224 reaches 47.3% paired accuracy, compared with 38.7% for GPT-4V and 40.7% for Gemini in the paper's comparison. |
 | Practical training | A final Stage1 run takes just under 3 days on TPUv5e-256; Stage2 resolution increases take about 15 hours each. |
 
-**Why it mattered:** PaliGemma made the "small open VLM as a transferable base model" story concrete. It is useful because it is inspectable, fine-tunable, and broad enough to cover more than chat.
+**Context:** PaliGemma made the "small open VLM as a transferable base model" story concrete. It is useful because it is inspectable, fine-tunable, and broad enough to cover more than chat.
 
-**Take-home message:** PaliGemma is a compact VLM workhorse: simple architecture, many task interfaces, and enough resolution control to make transfer practical.
+**Takeaway:** PaliGemma is a compact VLM workhorse: simple architecture, many task interfaces, and enough resolution control to make transfer practical.

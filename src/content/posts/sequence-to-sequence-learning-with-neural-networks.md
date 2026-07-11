@@ -44,4 +44,4 @@ The paper also contains one of those oddly practical details that becomes famous
 
 **Critiques & limitations:** The architecture was clean because it removed hand-built alignments, but the fixed-length vector became an obvious bottleneck for long sentences. Large vocabularies also made training expensive, and the lack of an official implementation left early adopters guessing about details. Attention mechanisms would soon address the bottleneck directly.
 
-**Take-home message:** The encoder-decoder LSTM showed that a general neural network could outperform traditional translation systems. It did not solve sequence modelling by itself, but it gave the field the scaffold that attention and Transformers later expanded.
+**Takeaway:** The encoder-decoder LSTM showed that a general neural network could outperform traditional translation systems. It did not solve sequence modelling by itself, but it gave the field the scaffold that attention and Transformers later expanded.

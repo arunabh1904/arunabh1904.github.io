@@ -13,7 +13,7 @@ summary: Wayformer shows that a simpler attention stack can fuse heterogeneous r
 
 **arXiv:** [2207.05844](https://arxiv.org/abs/2207.05844)
 
-**Plain-language summary:** Wayformer asks whether motion forecasting really needs many modality-specific modules. Its answer is mostly no: a homogeneous attention architecture can work well if it fuses static and dynamic scene tokens in the right place.
+**Summary:** Wayformer asks whether motion forecasting really needs many modality-specific modules. Its answer is mostly no: a homogeneous attention architecture can work well if it fuses static and dynamic scene tokens in the right place.
 
 The paper is useful because it turns forecasting architecture design into a set of fusion and efficiency choices: early fusion, late fusion, hierarchical fusion, factorized attention, and latent-query attention.
 
@@ -40,6 +40,6 @@ _Figure 1 shows Wayformer as an encoder-decoder attention network over heterogen
 | Inputs | Road geometry, traffic lights, agent history | Covers the messy inputs forecasting systems actually use. |
 | Benchmarks | Waymo Open Motion Dataset and Argoverse | Compares across major public motion forecasting settings. |
 
-**Why it mattered:** Wayformer helped normalize unified attention over heterogeneous driving scenes while keeping the architecture relatively simple.
+**Context:** Wayformer helped normalize unified attention over heterogeneous driving scenes while keeping the architecture relatively simple.
 
-**Take-home message:** A strong general attention backbone can compete with highly specialized forecasting stacks when the fusion strategy is right.
+**Takeaway:** A strong general attention backbone can compete with highly specialized forecasting stacks when the fusion strategy is right.

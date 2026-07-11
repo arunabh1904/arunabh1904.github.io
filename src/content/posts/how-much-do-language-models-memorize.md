@@ -15,7 +15,7 @@ summary: This paper separates memorization from generalization and estimates GPT
 
 **Discussion thread:** [Jack Morris on X](https://x.com/jxmnop/status/1929903028372459909)
 
-**Plain-language summary:** This paper asks how much sample-specific training information a language model stores in its weights. It separates unintended memorization from generalization, then measures storage capacity in settings where the information content of the training data can be controlled.
+**Summary:** This paper asks how much sample-specific training information a language model stores in its weights. It separates unintended memorization from generalization, then measures storage capacity in settings where the information content of the training data can be controlled.
 
 The headline estimate is about 3.6 bits per parameter for GPT-style transformers. The deeper point is that memorization is not a yes-or-no property of a model or a datapoint; it is a finite capacity budget that changes how the model behaves as data size grows.
 
@@ -57,6 +57,6 @@ _Figure 1 isolates capacity with uniform random data: because there is no reusab
 | Text data | Unintended memorization decreases after capacity fills | The model starts spending training signal on generalization. |
 | Membership inference | F1 approaches random guessing as datasets get very large | Average samples become hard to distinguish from held-out text. |
 
-**Why it mattered:** The paper gives a cleaner measurement vocabulary for a fuzzy debate. Instead of asking only whether a string can be extracted, it asks how many bits of sample-specific information the weights contain and how that budget scales.
+**Context:** The paper gives a cleaner measurement vocabulary for a fuzzy debate. Instead of asking only whether a string can be extracted, it asks how many bits of sample-specific information the weights contain and how that budget scales.
 
-**Take-home message:** Memorization is a finite information budget. For GPT-style language models, this paper estimates that budget at roughly 3.6 bits per parameter and shows how it interacts with data size, double descent, and membership inference.
+**Takeaway:** Memorization is a finite information budget. For GPT-style language models, this paper estimates that budget at roughly 3.6 bits per parameter and shows how it interacts with data size, double descent, and membership inference.

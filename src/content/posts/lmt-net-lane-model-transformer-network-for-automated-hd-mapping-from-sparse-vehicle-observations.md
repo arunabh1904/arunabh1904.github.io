@@ -13,7 +13,7 @@ summary: LMT-Net predicts lane pairs and lane connectivity from sparse vehicle o
 
 **arXiv:** [2409.12409](https://arxiv.org/abs/2409.12409)
 
-**Plain-language summary:** LMT-Net attacks HD map maintenance from a sparse-observation angle. Instead of assuming dense sensor sweeps or fully manual annotation, it starts from vehicle observations, aggregates lane-boundary polylines, and predicts a structured lane model.
+**Summary:** LMT-Net attacks HD map maintenance from a sparse-observation angle. Instead of assuming dense sensor sweeps or fully manual annotation, it starts from vehicle observations, aggregates lane-boundary polylines, and predicts a structured lane model.
 
 The paper is useful because it frames HD mapping as graph construction: lane pairs become nodes, and lane connectivity becomes edges. That is closer to the artifact a planner needs than a dense segmentation mask.
 
@@ -39,6 +39,6 @@ _Figure 1 shows the full LMT-Net path from sparse observed polylines to lane-pai
 | Output | Lane pairs plus connectivity | Produces a map-like graph rather than only local detections. |
 | Evaluation | Internal highway and non-highway ODD data | Promising, but harder to compare against public methods. |
 
-**Why it mattered:** LMT-Net is a reminder that online HD mapping is not only a camera-to-vector problem; fleet traces and sparse observations can also drive map upkeep.
+**Context:** LMT-Net is a reminder that online HD mapping is not only a camera-to-vector problem; fleet traces and sparse observations can also drive map upkeep.
 
-**Take-home message:** Predicting the lane graph directly is often the cleanest target when the end user is a planner, not a segmentation dashboard.
+**Takeaway:** Predicting the lane graph directly is often the cleanest target when the end user is a planner, not a segmentation dashboard.

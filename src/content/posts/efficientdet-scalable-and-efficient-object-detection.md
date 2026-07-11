@@ -47,4 +47,4 @@ Compared with its contemporaries, D0 matches YOLOv3 accuracy with 28× fewer FLO
 
 **Critiques & limitations:** EfficientDet's strength is its AP-per-FLOP story. BiFPN removes a lot of manual feature-fusion guesswork, and compound scaling gives practitioners a ready-made detector suite for different devices. The pipeline is still anchor-based and more complex than many modern anchor-free detectors. It also depends heavily on EfficientNet backbones, and transformer-based detectors now surpass its top-end accuracy at very large budgets.
 
-**Take-home message:** EfficientDet showed that scaling every part of the detector matters as much as making it big. Thoughtful feature fusion and end-to-end scaling unlocked large gains in speed and accuracy and continue to influence modern detection pipelines.
+**Takeaway:** EfficientDet showed that scaling every part of the detector matters as much as making it big. Thoughtful feature fusion and end-to-end scaling unlocked large gains in speed and accuracy and continue to influence modern detection pipelines.

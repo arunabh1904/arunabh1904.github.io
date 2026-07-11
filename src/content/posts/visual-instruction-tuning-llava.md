@@ -15,7 +15,7 @@ summary: LLaVA showed that a frozen vision encoder, an LLM, and synthetic instru
 
 **Project:** [llava-vl.github.io](https://llava-vl.github.io/)
 
-**Plain-language summary:** LLaVA connects a CLIP-style visual encoder to Vicuna with a learned projection layer, then teaches the combined model to answer image-conditioned instructions. The important move is not a new vision backbone. It is the recipe: use GPT-4 to turn image captions and boxes into instruction-following conversations, then fine-tune the multimodal model on that data.
+**Summary:** LLaVA connects a CLIP-style visual encoder to Vicuna with a learned projection layer, then teaches the combined model to answer image-conditioned instructions. The important move is not a new vision backbone. It is the recipe: use GPT-4 to turn image captions and boxes into instruction-following conversations, then fine-tune the multimodal model on that data.
 
 That made image understanding feel like chat. A model could describe an image, answer questions, and follow open-ended visual instructions instead of only producing class labels or retrieval scores.
 
@@ -39,6 +39,6 @@ _Figure 1: LLaVA network architecture. From the [Visual Instruction Tuning (LLaV
 | Training signal | Visual instruction tuning | Synthetic QA data teaches the model how to answer about images. |
 | Artifact | Project page and code | The LLaVA recipe became a common open baseline. |
 
-**Why it mattered:** LLaVA made the VLM stack modular: vision encoder, projector, LLM, instruction data. That template became the default starting point for many open multimodal assistants.
+**Context:** LLaVA made the VLM stack modular: vision encoder, projector, LLM, instruction data. That template became the default starting point for many open multimodal assistants.
 
-**Take-home message:** The jump from CLIP to LLaVA is the jump from representation to interface. Once vision features were wired into an instruction-tuned LLM, VLMs became conversational systems.
+**Takeaway:** The jump from CLIP to LLaVA is the jump from representation to interface. Once vision features were wired into an instruction-tuned LLM, VLMs became conversational systems.

@@ -15,7 +15,7 @@ summary: This Waymo technical report studies how autoregressive motion forecasti
 
 **Project:** [Waymo research page](https://waymo.com/research/scaling-laws-of-motion-forecasting-and-planning/)
 
-**Plain-language summary:** This report asks whether motion forecasting and planning scale like language models. Waymo trains a family of encoder-decoder autoregressive Transformer models and measures how performance changes with compute, data, model size, and inference-time sampling.
+**Summary:** This report asks whether motion forecasting and planning scale like language models. Waymo trains a family of encoder-decoder autoregressive Transformer models and measures how performance changes with compute, data, model size, and inference-time sampling.
 
 The result is encouraging for foundation-model-style autonomy: training loss, open-loop metrics, and even closed-loop metrics improve with scale. The paper also makes the resource tradeoff explicit instead of treating model size as the only knob.
 
@@ -49,6 +49,6 @@ _Figure 2 is the core scaling-law evidence: training loss improves predictably a
 | Training examples | 541 million | Gives the scaling study enough examples to vary data budgets. |
 | Compute-optimal trend | Model size grows 1.5x as fast as dataset size | Bigger compute budgets should not be spent on data and parameters equally. |
 
-**Why it mattered:** The paper moved motion forecasting and planning into the scaling-laws conversation with evidence that closed-loop behavior can improve predictably.
+**Context:** The paper moved motion forecasting and planning into the scaling-laws conversation with evidence that closed-loop behavior can improve predictably.
 
-**Take-home message:** For motion and planning models, scaling is a three-way budget problem: training compute, data/model allocation, and inference-time sampling all matter.
+**Takeaway:** For motion and planning models, scaling is a three-way budget problem: training compute, data/model allocation, and inference-time sampling all matter.

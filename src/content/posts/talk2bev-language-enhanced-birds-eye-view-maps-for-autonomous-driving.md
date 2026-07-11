@@ -17,7 +17,7 @@ summary: Talk2BEV grounds language queries in BEV maps by augmenting objects wit
 
 **Code:** [llmbev/talk2bev](https://github.com/llmbev/talk2bev)
 
-**Plain-language summary:** Talk2BEV connects language reasoning to bird's-eye-view maps. It builds a BEV map from sensor data, augments objects with aligned vision-language features, and lets a large vision-language model answer scene-level and object-level driving questions.
+**Summary:** Talk2BEV connects language reasoning to bird's-eye-view maps. It builds a BEV map from sensor data, augments objects with aligned vision-language features, and lets a large vision-language model answer scene-level and object-level driving questions.
 
 The core idea is grounding. Language is useful only if the model can bind words like "pedestrian on the right" or "vehicle in front" to the spatial layout a planner uses.
 
@@ -44,6 +44,6 @@ _Figure 2 shows how Talk2BEV turns generated BEV maps into language-enhanced map
 | QA volume | More than 20,000 questions and responses | Covers varied scene, object, intent, and decision queries. |
 | Source data | nuScenes | Keeps the benchmark tied to a standard driving dataset. |
 
-**Why it mattered:** Talk2BEV is an early clean example of language-grounded scene reasoning over BEV rather than only camera images.
+**Context:** Talk2BEV is an early clean example of language-grounded scene reasoning over BEV rather than only camera images.
 
-**Take-home message:** Driving language models need spatial grounding, and BEV maps are one natural place to attach it.
+**Takeaway:** Driving language models need spatial grounding, and BEV maps are one natural place to attach it.

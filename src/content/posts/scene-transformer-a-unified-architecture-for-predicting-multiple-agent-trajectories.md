@@ -15,7 +15,7 @@ summary: Scene Transformer uses one scene-centric attention architecture for mar
 
 **OpenReview:** [ICLR 2022 submission](https://openreview.net/forum?id=7a2BujHKS7)
 
-**Plain-language summary:** Scene Transformer makes multi-agent trajectory prediction a masking problem over a scene tensor. Instead of training separate systems for marginal prediction, joint prediction, conditional prediction, and goal-conditioned prediction, it uses one attention architecture and changes what the model can see.
+**Summary:** Scene Transformer makes multi-agent trajectory prediction a masking problem over a scene tensor. Instead of training separate systems for marginal prediction, joint prediction, conditional prediction, and goal-conditioned prediction, it uses one attention architecture and changes what the model can see.
 
 That framing is important for planning. Independent per-agent futures can be inconsistent with each other; a scene-centric model can represent futures where agents react to one another.
 
@@ -42,6 +42,6 @@ _Figure 2 shows the two key ideas: prediction tasks become mask patterns, and on
 | Attention axes | Time, agents, and road graph | Lets heterogeneous scene information interact. |
 | Evidence | Waymo Open Motion Dataset and Argoverse | Tests both large-scale scene prediction and public map-rich forecasting. |
 
-**Why it mattered:** Scene Transformer pushed the field toward unified heterogeneous scene attention, where the model reasons over agents, time, and map context together.
+**Context:** Scene Transformer pushed the field toward unified heterogeneous scene attention, where the model reasons over agents, time, and map context together.
 
-**Take-home message:** The forecasting question can be a mask over the scene, not a separate model for every task.
+**Takeaway:** The forecasting question can be a mask over the scene, not a separate model for every task.

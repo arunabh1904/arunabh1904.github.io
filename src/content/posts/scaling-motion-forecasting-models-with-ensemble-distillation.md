@@ -15,7 +15,7 @@ summary: This paper uses large motion-forecasting ensembles as teachers and dist
 
 **Project:** [Waymo research page](https://waymo.com/research/scaling-motion-forecasting-models-with-ensemble-distillation/)
 
-**Plain-language summary:** Motion forecasting gets better when you ensemble many strong models, but autonomous vehicles cannot usually afford to run a large ensemble in real time. This paper uses the ensemble as a teacher and trains smaller student models to keep much of the accuracy at lower compute.
+**Summary:** Motion forecasting gets better when you ensemble many strong models, but autonomous vehicles cannot usually afford to run a large ensemble in real time. This paper uses the ensemble as a teacher and trains smaller student models to keep much of the accuracy at lower compute.
 
 The work is a deployment-minded scaling paper. It treats accuracy, latency, and onboard compute as coupled constraints instead of assuming the best leaderboard model can be used directly.
 
@@ -41,6 +41,6 @@ _Figure 4 shows the deployment tradeoff: larger ensembles improve metrics with m
 | Student | Distilled smaller model | Brings ensemble gains closer to deployment cost. |
 | Benchmarks | WOMD and Argoverse leaderboards | Covers widely used motion-forecasting evaluations. |
 
-**Why it mattered:** It showed a practical way to use scaling and ensembles even when the production model must stay small.
+**Context:** It showed a practical way to use scaling and ensembles even when the production model must stay small.
 
-**Take-home message:** For driving forecasts, the best model family may be a training-time ensemble plus a deployment-time student.
+**Takeaway:** For driving forecasts, the best model family may be a training-time ensemble plus a deployment-time student.

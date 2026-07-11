@@ -15,7 +15,7 @@ summary: VAD replaces dense rasterized planning inputs with vectorized agents an
 
 **Code:** [hustvl/VAD](https://github.com/hustvl/VAD)
 
-**Plain-language summary:** VAD argues that end-to-end driving should not have to plan from dense rasterized scene tensors. It represents the scene with vectors: agent motion and map elements stay as instance-level structures, and the planner can use them as explicit constraints.
+**Summary:** VAD argues that end-to-end driving should not have to plan from dense rasterized scene tensors. It represents the scene with vectors: agent motion and map elements stay as instance-level structures, and the planner can use them as explicit constraints.
 
 That design is useful because rasterization can be expensive and can blur the object-level structure that planning cares about. VAD keeps the scene closer to the planner's natural language: agents, lanes, boundaries, and candidate trajectories.
 
@@ -49,6 +49,6 @@ _Figure 1 shows the representational shift: VAD keeps agents, maps, and ego plan
 | VAD-Tiny | 0.78 | 0.38 | 59.5 | 16.8 |
 | VAD-Base | 0.72 | 0.22 | 224.3 | 4.5 |
 
-**Why it mattered:** VAD connected vectorized scene understanding to end-to-end planning, not just map construction.
+**Context:** VAD connected vectorized scene understanding to end-to-end planning, not just map construction.
 
-**Take-home message:** Planning benefits when the model keeps the world as vectors and relations instead of flattening it into dense pixels too early.
+**Takeaway:** Planning benefits when the model keeps the world as vectors and relations instead of flattening it into dense pixels too early.

@@ -15,7 +15,7 @@ summary: MGMap adds learned masks to online vector-map construction so instance 
 
 **Code:** [xiaolul2/MGMap](https://github.com/xiaolul2/MGMap)
 
-**Plain-language summary:** MGMap observes that vectorized HD map elements have strong shape priors, but their annotations are sparse. Detection-style models can therefore attend to the wrong feature scope and lose fine structure.
+**Summary:** MGMap observes that vectorized HD map elements have strong shape priors, but their annotations are sparse. Detection-style models can therefore attend to the wrong feature scope and lose fine structure.
 
 The fix is mask-guided learning. MGMap learns masks over enhanced multi-scale BEV features, then uses those masks at the instance level and the point level to localize map elements more precisely.
 
@@ -49,6 +49,6 @@ _The MGMap overview shows where the mask guidance enters the vector-map pipeline
 | LiDAR | SECOND | 67.9 | 5.5 |
 | Camera + LiDAR | R50 + SECOND | 71.7 | 4.8 |
 
-**Why it mattered:** MGMap pushed vector-map models toward richer query support instead of treating each polyline point as a thin detection target.
+**Context:** MGMap pushed vector-map models toward richer query support instead of treating each polyline point as a thin detection target.
 
-**Take-home message:** For online HD maps, the hard part is often not just predicting vectors; it is making each vector query look at the right BEV evidence.
+**Takeaway:** For online HD maps, the hard part is often not just predicting vectors; it is making each vector query look at the right BEV evidence.

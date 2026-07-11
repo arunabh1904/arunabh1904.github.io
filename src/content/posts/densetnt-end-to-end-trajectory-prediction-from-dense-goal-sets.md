@@ -19,7 +19,7 @@ summary: DenseTNT removes sparse goal anchors and heuristic goal selection by pr
 
 **CVF:** [ICCV 2021 paper](https://openaccess.thecvf.com/content/ICCV2021/html/Gu_DenseTNT_End-to-End_Trajectory_Prediction_From_Dense_Goal_Sets_ICCV_2021_paper.html)
 
-**Plain-language summary:** DenseTNT is the direct follow-up to goal-based methods like TNT. TNT showed that endpoints are a strong way to represent intent, but sparse anchors and NMS-style goal selection still leave a lot of hand-designed machinery in the loop.
+**Summary:** DenseTNT is the direct follow-up to goal-based methods like TNT. TNT showed that endpoints are a strong way to represent intent, but sparse anchors and NMS-style goal selection still leave a lot of hand-designed machinery in the loop.
 
 DenseTNT replaces that machinery with dense goal probability estimation and a learned goal-set predictor. The model scores dense candidate positions on the road, predicts a set of goals from that heatmap, and completes trajectories conditioned on those goals.
 
@@ -68,6 +68,6 @@ Waymo used mAP as the official ranking metric, so this table is about calibrated
 | SceneTransformer | 0.6117 | 1.2116 | 0.1564 | 0.2788 |
 | DenseTNT | 1.0387 | 1.5514 | 0.1779 | 0.3281 |
 
-**Why it mattered:** DenseTNT pushed goal-conditioned forecasting away from sparse anchor heuristics and toward dense probability maps plus learned set prediction.
+**Context:** DenseTNT pushed goal-conditioned forecasting away from sparse anchor heuristics and toward dense probability maps plus learned set prediction.
 
-**Take-home message:** TNT made endpoints the intent variable; DenseTNT made endpoint selection dense, learned, and closer to end-to-end.
+**Takeaway:** TNT made endpoints the intent variable; DenseTNT made endpoint selection dense, learned, and closer to end-to-end.

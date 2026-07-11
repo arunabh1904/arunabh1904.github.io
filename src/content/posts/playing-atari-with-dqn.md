@@ -33,7 +33,7 @@ _Figure 1 provides sample screenshots from five of the games used for training. 
 
 With those pieces in place, the authors trained one CNN architecture across seven Atari games using the same weights and hyperparameters. That result mattered because it moved deep RL away from game-specific feature engineering and toward end-to-end pixel-to-action learning. Replay memory and target networks also became durable building blocks for value-based deep RL, while the paper's limitations helped motivate later variants such as Double DQN, prioritized replay, and distributional RL.
 
-**Why it mattered:** DQN showed that a relatively simple network, three convolutional layers followed by two fully connected layers, could handle high-dimensional visual state in a reinforcement learning loop. The important contribution was not just the score table. It was the recipe: pair Q-learning with enough neural capacity, then add just enough machinery to make the targets less volatile.
+**Context:** DQN showed that a relatively simple network, three convolutional layers followed by two fully connected layers, could handle high-dimensional visual state in a reinforcement learning loop. The important contribution was not just the score table. It was the recipe: pair Q-learning with enough neural capacity, then add just enough machinery to make the targets less volatile.
 
 **Evals / Benchmarks:**
 
@@ -47,4 +47,4 @@ Overall, DQN beat previous algorithms on 6 of the 7 reported games and exceeded 
 
 **Critiques & limitations:** The cleanest part of DQN is also why it became such a good baseline: one architecture, one training recipe, multiple games. But the method was sample-inefficient, sensitive to tuning, and weak on sparse-reward games such as Montezuma's Revenge. It also inherited Q-learning's tendency to overestimate values, a problem that later work attacked directly with Double DQN and related fixes.
 
-**Take-home message:** DQN made deep reinforcement learning feel real. A CNN, replay memory, and a target network were enough to learn useful control policies from pixels, and that combination became the starting point for much of the modern deep-RL toolbox.
+**Takeaway:** DQN made deep reinforcement learning feel real. A CNN, replay memory, and a target network were enough to learn useful control policies from pixels, and that combination became the starting point for much of the modern deep-RL toolbox.

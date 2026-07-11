@@ -15,7 +15,7 @@ summary: TopoNet reasons over lane connectivity and traffic-element-to-lane assi
 
 **Code:** [OpenDriveLab/TopoNet](https://github.com/OpenDriveLab/TopoNet)
 
-**Plain-language summary:** TopoNet focuses on the topology that a driving system needs after detecting lanes and traffic elements. It asks which lanes connect to which other lanes, and which traffic signs or signals apply to which lanes.
+**Summary:** TopoNet focuses on the topology that a driving system needs after detecting lanes and traffic elements. It asks which lanes connect to which other lanes, and which traffic signs or signals apply to which lanes.
 
 That makes the paper a bridge between perception and map reasoning. A vector map is not useful only because it contains lane curves; it is useful because the curves form a graph with legal and semantic relationships.
 
@@ -48,6 +48,6 @@ _Figure 2 shows how TopoNet routes traffic elements and centerlines through deco
 | MapTR* | 17.7 | 1.1 | 10.4 | 26.0 |
 | TopoNet | 28.5 | 4.1 | 20.8 | 35.6 |
 
-**Why it mattered:** TopoNet made road topology a first-class perception output, not a post-processing afterthought.
+**Context:** TopoNet made road topology a first-class perception output, not a post-processing afterthought.
 
-**Take-home message:** A BEV map becomes a driving map only when its elements know how they connect and which rules apply to them.
+**Takeaway:** A BEV map becomes a driving map only when its elements know how they connect and which rules apply to them.

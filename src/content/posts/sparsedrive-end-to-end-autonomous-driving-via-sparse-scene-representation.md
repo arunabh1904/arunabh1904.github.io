@@ -15,7 +15,7 @@ summary: SparseDrive replaces expensive dense BEV planning features with sparse 
 
 **Code:** [swc-17/SparseDrive](https://github.com/swc-17/SparseDrive)
 
-**Plain-language summary:** SparseDrive asks whether end-to-end driving really needs dense BEV features everywhere. It argues for a sparse-centric representation: keep trackable agents and map elements as sparse instances, then predict motion and plan from those instances.
+**Summary:** SparseDrive asks whether end-to-end driving really needs dense BEV features everywhere. It argues for a sparse-centric representation: keep trackable agents and map elements as sparse instances, then predict motion and plan from those instances.
 
 This puts SparseDrive in the same broad family as VAD: the planner should reason over structured scene entities instead of spending most of its budget on a dense grid.
 
@@ -42,6 +42,6 @@ _Figure 3 shows SparseDrive's architecture: image features become sparse scene r
 | Planning | Parallel motion planner | Lets agent prediction and ego planning interact earlier. |
 | Safety | Collision-aware rescoring | Makes trajectory selection sensitive to physical conflicts. |
 
-**Why it mattered:** SparseDrive sharpened the argument that sparse/vectorized planning can be both faster and more planner-aligned than dense BEV stacks.
+**Context:** SparseDrive sharpened the argument that sparse/vectorized planning can be both faster and more planner-aligned than dense BEV stacks.
 
-**Take-home message:** Dense BEV is powerful, but the planner often wants sparse entities and relations.
+**Takeaway:** Dense BEV is powerful, but the planner often wants sparse entities and relations.

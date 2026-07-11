@@ -13,7 +13,7 @@ summary: AsyncDriver separated slow LLM reasoning from fast motion planning so s
 
 **arXiv:** [2406.14556](https://arxiv.org/abs/2406.14556)
 
-**Plain-language summary:** AsyncDriver addresses a practical problem: LLMs are too slow to sit directly in a high-frequency driving control loop. The system runs a fast planner continuously while a slower LLM produces scene-associated instructions asynchronously.
+**Summary:** AsyncDriver addresses a practical problem: LLMs are too slow to sit directly in a high-frequency driving control loop. The system runs a fast planner continuously while a slower LLM produces scene-associated instructions asynchronously.
 
 Those instructions can guide the planner through complex or ambiguous situations without requiring the LLM to produce every control update.
 
@@ -37,6 +37,6 @@ _Figure 2: Overview of our proposed AsyncDriver framework. From the [AsyncDriver
 | Planner role | Fast conventional motion planner | Keeps control responsive. |
 | Caveat | LLM advice must be bounded | Bad slow guidance should not override safety. |
 
-**Why it mattered:** It is a sober architecture. Instead of pretending language models are real-time controllers, AsyncDriver gives them a slower advisory role.
+**Context:** It is a sober architecture. Instead of pretending language models are real-time controllers, AsyncDriver gives them a slower advisory role.
 
-**Take-home message:** In autonomy, reasoning and control do not need to run at the same frequency. VLM/LLM components can be useful if the system boundary respects latency.
+**Takeaway:** In autonomy, reasoning and control do not need to run at the same frequency. VLM/LLM components can be useful if the system boundary respects latency.

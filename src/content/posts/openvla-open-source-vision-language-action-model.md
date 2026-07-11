@@ -15,7 +15,7 @@ summary: OpenVLA released a 7B open robot policy trained on 970k real robot demo
 
 **Project:** [openvla.github.io](https://openvla.github.io/)
 
-**Plain-language summary:** OpenVLA is a 7B-parameter vision-language-action model trained on real robot demonstrations from Open X-Embodiment. It fuses SigLIP and DINOv2 visual features, maps them into a Llama-style language model, and trains the model to emit robot actions instead of text.
+**Summary:** OpenVLA is a 7B-parameter vision-language-action model trained on real robot demonstrations from Open X-Embodiment. It fuses SigLIP and DINOv2 visual features, maps them into a Llama-style language model, and trains the model to emit robot actions instead of text.
 
 The open release matters: checkpoints, code, and fine-tuning recipes make generalist robot policies easier to study and adapt.
 
@@ -39,6 +39,6 @@ _Figure 1: OpenVLA model architecture. From the [OpenVLA: An Open-Source Vision-
 | Data | 970k robot demonstrations | Gives the model cross-embodiment behavior. |
 | Artifact | Open code/checkpoints | Makes generalist robot policies inspectable. |
 
-**Why it mattered:** OpenVLA made the VLA recipe concrete and public. It also showed that Internet-scale vision-language pretraining can combine with robot demonstration data to produce transferable manipulation policies.
+**Context:** OpenVLA made the VLA recipe concrete and public. It also showed that Internet-scale vision-language pretraining can combine with robot demonstration data to produce transferable manipulation policies.
 
-**Take-home message:** OpenVLA is the CLIP-to-actions moment: visual-language representations become a starting point for robot control.
+**Takeaway:** OpenVLA is the CLIP-to-actions moment: visual-language representations become a starting point for robot control.

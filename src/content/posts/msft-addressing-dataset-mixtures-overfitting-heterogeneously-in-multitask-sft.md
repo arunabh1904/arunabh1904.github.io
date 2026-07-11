@@ -40,7 +40,7 @@ The proposed algorithm makes the mixture overfitting-aware. It trains on the act
 - Figure 3 is the reason the naive single-rollout fix is unstable: once one dataset is removed, the remaining tasks' optimal stopping points move.
 - Figure 6 is the practical claim: under a low compute budget, dataset exclusion can improve accuracy while reducing net FLOPs.
 
-**Why it mattered:** Data mixture tuning is usually treated as a static weighting problem. mSFT reframes it as a training-dynamics problem: the right mixture can change over time because tasks saturate at different rates. That is especially relevant for post-training, where datasets often differ in size, difficulty, quality, and target behavior.
+**Context:** Data mixture tuning is usually treated as a static weighting problem. mSFT reframes it as a training-dynamics problem: the right mixture can change over time because tasks saturate at different rates. That is especially relevant for post-training, where datasets often differ in size, difficulty, quality, and target behavior.
 
 ![Figure 3 from mSFT: optimal compute shifts after excluding part of the data mixture](/assets/images/msft-arxiv-x4.png)
 _Figure 3a from the [mSFT paper](https://arxiv.org/abs/2603.21606), CC BY 4.0._
@@ -62,4 +62,4 @@ The implementation also exposes a fairly simple workflow: example mixtures live 
 
 **Critiques & limitations:** The paper's strength is that the algorithm is simple and addresses a real post-training nuisance. The main tradeoff is operational complexity. mSFT needs periodic evaluation, overfitting detection, checkpoint management, and staged dataset removal, which makes the training loop less straightforward than ordinary SFT. The method also depends on having evaluation signals that can reliably say when a sub-dataset has peaked.
 
-**Take-home message:** mSFT argues that multi-task SFT should not spend compute uniformly across heterogeneous datasets. If each task overfits on its own schedule, the training loop should notice and adapt.
+**Takeaway:** mSFT argues that multi-task SFT should not spend compute uniformly across heterogeneous datasets. If each task overfits on its own schedule, the training loop should notice and adapt.

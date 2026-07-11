@@ -15,7 +15,7 @@ summary: Pi0 used a VLM backbone and flow matching to turn visual-language conte
 
 **Project:** [Physical Intelligence Pi0](https://www.pi.website/blog/pi0)
 
-**Plain-language summary:** Pi0 is a vision-language-action model for general robot control. It starts from the intuition that VLMs contain useful semantic knowledge, but robot policies need continuous, high-frequency actions rather than text tokens.
+**Summary:** Pi0 is a vision-language-action model for general robot control. It starts from the intuition that VLMs contain useful semantic knowledge, but robot policies need continuous, high-frequency actions rather than text tokens.
 
 The paper adds an action generation mechanism based on flow matching, allowing the model to map images and language instructions into robot trajectories across tasks.
 
@@ -39,6 +39,6 @@ _Figure 2 from the [pi0 paper](https://arxiv.org/abs/2410.24164), via arXiv HTML
 | Output | Continuous actions | Requires smooth control, not text. |
 | Mechanism | Flow matching | Models action trajectories for dexterous behavior. |
 
-**Why it mattered:** Pi0 is part of the shift from models that understand scenes to models that act in them. It treats robot control as a foundation-model problem rather than a collection of isolated policies.
+**Context:** Pi0 is part of the shift from models that understand scenes to models that act in them. It treats robot control as a foundation-model problem rather than a collection of isolated policies.
 
-**Take-home message:** Embodied VLMs need an action head that respects physics. Language understanding is useful, but control requires smooth continuous outputs.
+**Takeaway:** Embodied VLMs need an action head that respects physics. Language understanding is useful, but control requires smooth continuous outputs.

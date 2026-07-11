@@ -15,7 +15,7 @@ summary: EMMA represented driving inputs and outputs as language tokens so one m
 
 **Project:** [Waymo research page](https://waymo.com/research/emma/)
 
-**Plain-language summary:** EMMA is Waymo's end-to-end multimodal driving model. It uses camera data plus non-sensor state such as navigation commands and ego status, then predicts driving outputs including trajectories, objects, and road graph elements through task-specific prompts.
+**Summary:** EMMA is Waymo's end-to-end multimodal driving model. It uses camera data plus non-sensor state such as navigation commands and ego status, then predicts driving outputs including trajectories, objects, and road graph elements through task-specific prompts.
 
 The striking design choice is to represent many non-sensor inputs and outputs as text. That lets the model reuse the structure and world knowledge of a multimodal language model while training across several driving tasks.
 
@@ -39,6 +39,6 @@ _Figure 1: EMMA overview diagram. From the [EMMA: End-to-End Multimodal Model fo
 | Output format | Text-encoded trajectories and objects | Lets prompts select task-specific outputs. |
 | Caveat | Limited temporal and 3D sensing | Promising architecture, not a complete AV stack. |
 
-**Why it mattered:** EMMA is a strong example of the generalist-model thesis entering autonomous driving: one model, many outputs, shared representations.
+**Context:** EMMA is a strong example of the generalist-model thesis entering autonomous driving: one model, many outputs, shared representations.
 
-**Take-home message:** Language can be a unifying interface for driving tasks, but EMMA also makes the costs obvious: limited temporal context, no full 3D sensor stack, and heavy compute.
+**Takeaway:** Language can be a unifying interface for driving tasks, but EMMA also makes the costs obvious: limited temporal context, no full 3D sensor stack, and heavy compute.

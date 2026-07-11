@@ -15,7 +15,7 @@ summary: Driving with LLMs fed object-level vector scene state into language mod
 
 **GitHub:** [wayveai/driving-with-llms](https://github.com/wayveai/driving-with-llms)
 
-**Plain-language summary:** This paper studies a middle ground between raw image VLMs and classical planning. It converts the scene into object-level vectors, fuses those structured tokens into an LLM, and asks the model to reason about driving actions and explanations.
+**Summary:** This paper studies a middle ground between raw image VLMs and classical planning. It converts the scene into object-level vectors, fuses those structured tokens into an LLM, and asks the model to reason about driving actions and explanations.
 
 The bet is that language models may reason better when perception has already converted pixels into meaningful objects, positions, and relationships.
 
@@ -39,6 +39,6 @@ _Source figure from the [Driving with LLMs paper](https://arxiv.org/abs/2310.019
 | Task | Driving QA and action generation | Tests scene interpretation and decisions. |
 | Tradeoff | Depends on upstream perception | Bad object state still misleads the LLM. |
 
-**Why it mattered:** The paper made object-centric driving language models a serious baseline. It also clarified a recurring theme in autonomy: sometimes the right multimodal interface is not raw pixels, but structured state.
+**Context:** The paper made object-centric driving language models a serious baseline. It also clarified a recurring theme in autonomy: sometimes the right multimodal interface is not raw pixels, but structured state.
 
-**Take-home message:** For safety-critical planning, language can be useful if it is grounded in the right representation. Object vectors give the LLM a cleaner substrate than raw visual impressions.
+**Takeaway:** For safety-critical planning, language can be useful if it is grounded in the right representation. Object vectors give the LLM a cleaner substrate than raw visual impressions.

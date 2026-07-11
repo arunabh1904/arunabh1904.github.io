@@ -15,7 +15,7 @@ summary: LaneGCN made lane topology and actor-map interaction explicit by buildi
 
 **Code:** [uber-research/lanegcn](https://github.com/uber-research/lanegcn)
 
-**Plain-language summary:** LaneGCN treats the map as a graph, not an image. It constructs lane nodes from raw map data and uses graph convolutions that respect lane connectivity, then fuses those map features with actor motion features.
+**Summary:** LaneGCN treats the map as a graph, not an image. It constructs lane nodes from raw map data and uses graph convolutions that respect lane connectivity, then fuses those map features with actor motion features.
 
 The useful idea is explicit relational structure. LaneGCN does not only ask "what is near the actor?" It asks how actors, lanes, neighboring lanes, and other actors should pass information to each other.
 
@@ -42,6 +42,6 @@ _Figure 1 shows the full LaneGCN pipeline: a lane graph and actor trajectories a
 | Fusion | A2L, L2L, L2A, A2A interactions | Makes actor-map relations first-class. |
 | Benchmark | Argoverse motion forecasting | Tests the value of explicit lane structure in a public driving setting. |
 
-**Why it mattered:** LaneGCN set up a clean actor-map relational template that later forecasting and planning models kept reusing in denser Transformer forms.
+**Context:** LaneGCN set up a clean actor-map relational template that later forecasting and planning models kept reusing in denser Transformer forms.
 
-**Take-home message:** Motion forecasting improves when the model can reason over the lane graph as a graph, not as a painted background.
+**Takeaway:** Motion forecasting improves when the model can reason over the lane graph as a graph, not as a painted background.

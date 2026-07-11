@@ -13,7 +13,7 @@ summary: DIMA used a large multimodal driving model as a teacher, distilling its
 
 **arXiv:** [2501.09757](https://arxiv.org/abs/2501.09757)
 
-**Plain-language summary:** This paper, referred to as DIMA in the generated report, tackles the latency problem directly. A large multimodal LLM planner may reason well, but it is too slow and expensive for deployment. The proposed approach trains a smaller vision-based student to imitate the larger teacher's planning behavior and intermediate reasoning signals.
+**Summary:** This paper, referred to as DIMA in the generated report, tackles the latency problem directly. A large multimodal LLM planner may reason well, but it is too slow and expensive for deployment. The proposed approach trains a smaller vision-based student to imitate the larger teacher's planning behavior and intermediate reasoning signals.
 
 The result is a model that keeps more of the teacher's traffic knowledge while avoiding a full LLM in the runtime loop.
 
@@ -37,6 +37,6 @@ _Source figure from the [DiMA paper](https://arxiv.org/abs/2501.09757), via arXi
 | Student | Vision-only planner | Keeps inference cheaper and faster. |
 | Reported signal | Lower trajectory error and collisions | Measures whether distilled reasoning survives compression. |
 
-**Why it mattered:** Distillation is a plausible path from impressive VLM demos to deployable autonomy components. The expensive model teaches; the small model acts.
+**Context:** Distillation is a plausible path from impressive VLM demos to deployable autonomy components. The expensive model teaches; the small model acts.
 
-**Take-home message:** LLMs may enter driving stacks indirectly, as offline teachers that shape compact planners.
+**Takeaway:** LLMs may enter driving stacks indirectly, as offline teachers that shape compact planners.

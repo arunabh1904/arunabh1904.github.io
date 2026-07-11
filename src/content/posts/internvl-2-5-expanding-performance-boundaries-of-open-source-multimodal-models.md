@@ -15,7 +15,7 @@ summary: InternVL 2.5 scaled open multimodal models with better data, training s
 
 **Project:** [InternVL 2.5](https://internvl.github.io/blog/2024-12-05-InternVL-2.5/)
 
-**Plain-language summary:** InternVL 2.5 is a scaling and training study for open multimodal LLMs. It keeps the broad InternVL architecture but improves data quality, training choices, augmentation, loss balancing, and test-time reasoning.
+**Summary:** InternVL 2.5 is a scaling and training study for open multimodal LLMs. It keeps the broad InternVL architecture but improves data quality, training choices, augmentation, loss balancing, and test-time reasoning.
 
 The paper is useful because it studies several axes together: vision encoder size, language model size, dataset size, and chain-of-thought style inference. The story is not "just scale everything"; it is that scaling only pays off when the data and training recipe stay balanced.
 
@@ -39,6 +39,6 @@ _Figure 1: Performance of various MLLMs on the OpenCompass leaderboard. From the
 | Training | Data quality and balancing | Reduces failures that pure scale does not fix. |
 | Evaluation | MMMU and hallucination-style tests | Looks beyond simple captioning/VQA. |
 
-**Why it mattered:** InternVL 2.5 showed that open models could compete with leading closed systems on difficult multimodal benchmarks while exposing more of the training recipe.
+**Context:** InternVL 2.5 showed that open models could compete with leading closed systems on difficult multimodal benchmarks while exposing more of the training recipe.
 
-**Take-home message:** Open VLMs started becoming systems engineering projects: data mixture, encoder choice, LLM scale, and inference strategy all interact.
+**Takeaway:** Open VLMs started becoming systems engineering projects: data mixture, encoder choice, LLM scale, and inference strategy all interact.
