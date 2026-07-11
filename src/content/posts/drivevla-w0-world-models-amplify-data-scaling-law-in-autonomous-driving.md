@@ -15,7 +15,7 @@ summary: DriveVLA-W0 argues that driving VLAs need dense world-model supervision
 
 **Code:** [BraveGroup/DriveVLA-W0](https://github.com/BraveGroup/DriveVLA-W0)
 
-**Plain-language summary:** DriveVLA-W0 focuses on a supervision problem. Driving action labels are sparse and low-dimensional, so a large VLA can underuse its capacity if training only asks it to predict future actions.
+**Summary:** DriveVLA-W0 focuses on a supervision problem. Driving action labels are sparse and low-dimensional, so a large VLA can underuse its capacity if training only asks it to predict future actions.
 
 The paper adds world modeling. By predicting future images, the model receives dense self-supervised feedback about scene dynamics, not only a sparse trajectory or control target.
 
@@ -42,6 +42,6 @@ _Figure 2 shows the two world-modeling variants: autoregressive discrete visual-
 | Action head | Lightweight action expert | Keeps inference practical after heavy representation learning. |
 | Evaluation | NAVSIM v1/v2 and large in-house data | Tests whether world modeling improves data scaling. |
 
-**Why it mattered:** DriveVLA-W0 makes a strong case that driving VLAs should learn world dynamics, not just imitate sparse action labels.
+**Context:** DriveVLA-W0 makes a strong case that driving VLAs should learn world dynamics, not just imitate sparse action labels.
 
-**Take-home message:** Dense world-model supervision can make scaling useful when action labels are too thin to train a large driving model by themselves.
+**Takeaway:** Dense world-model supervision can make scaling useful when action labels are too thin to train a large driving model by themselves.

@@ -13,7 +13,7 @@ summary: DriveBench tested whether VLM driving answers are visually grounded or 
 
 **arXiv:** [2501.04003](https://arxiv.org/abs/2501.04003)
 
-**Plain-language summary:** This paper introduces DriveBench, an empirical study of VLM reliability for autonomous driving. It evaluates models on driving-scene question answering under clean images, corrupted images, and text-only conditions.
+**Summary:** This paper introduces DriveBench, an empirical study of VLM reliability for autonomous driving. It evaluates models on driving-scene question answering under clean images, corrupted images, and text-only conditions.
 
 The important finding is uncomfortable: models can give confident and plausible answers without grounding them in the visual input. Corruptions expose this because the answer often should change when the evidence changes.
 
@@ -37,6 +37,6 @@ _Figure 1 from the [DriveBench paper](https://arxiv.org/abs/2501.04003), cropped
 | Stress test | 17 input conditions | Checks corruption and text-only reliance. |
 | Main failure | Weak visual grounding | Models can answer from priors instead of perception. |
 
-**Why it mattered:** Capability benchmarks can flatter VLMs. Driving needs reliability benchmarks that ask whether the model actually looked at the scene.
+**Context:** Capability benchmarks can flatter VLMs. Driving needs reliability benchmarks that ask whether the model actually looked at the scene.
 
-**Take-home message:** A VLM that sounds right is not necessarily grounded. For driving, grounding under degradation is the benchmark that matters.
+**Takeaway:** A VLM that sounds right is not necessarily grounded. For driving, grounding under degradation is the benchmark that matters.

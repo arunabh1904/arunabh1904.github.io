@@ -13,7 +13,7 @@ summary: VectorNet encoded HD maps and agent histories as polylines, using local
 
 **arXiv:** [2005.04259](https://arxiv.org/abs/2005.04259)
 
-**Plain-language summary:** VectorNet is a foundational vectorized-scene paper. Instead of rendering maps and trajectories into bird's-eye-view images, it keeps lanes, crosswalks, traffic elements, and agent histories as vectors grouped into polylines.
+**Summary:** VectorNet is a foundational vectorized-scene paper. Instead of rendering maps and trajectories into bird's-eye-view images, it keeps lanes, crosswalks, traffic elements, and agent histories as vectors grouped into polylines.
 
 That representation matters because autonomous driving scenes are already structured. VectorNet lets the model operate on map and agent geometry directly, first within each polyline and then across the whole scene.
 
@@ -40,6 +40,6 @@ _Figure 2 shows the core hierarchy: vectors become polyline features, polyline f
 | Auxiliary task | Masked entity completion | Forces the global graph to use scene context. |
 | Evidence | Internal benchmark and Argoverse | Shows vectorized encoding can compete with rendered BEV baselines. |
 
-**Why it mattered:** VectorNet made vectorized map and agent encoding feel like a primary representation, not a preprocessing trick.
+**Context:** VectorNet made vectorized map and agent encoding feel like a primary representation, not a preprocessing trick.
 
-**Take-home message:** If the world is already made of lanes, agents, and polylines, the encoder should not have to rediscover those entities from pixels.
+**Takeaway:** If the world is already made of lanes, agents, and polylines, the encoder should not have to rediscover those entities from pixels.

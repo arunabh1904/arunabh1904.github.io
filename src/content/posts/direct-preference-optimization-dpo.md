@@ -26,7 +26,7 @@ DPO turns preference optimization into a supervised classification-style objecti
 ![Figure 1: DPO optimizes for human preferences while avoiding reinforcement learning from Direct Preference Optimization](/assets/images/direct-preference-optimization-dpo-paper-figure.png)
 _Figure 1: DPO optimizes for human preferences while avoiding reinforcement learning. From the [Direct Preference Optimization paper](https://arxiv.org/abs/2305.18290), via arXiv HTML._
 
-**Plain-language summary:** DPO removes the reinforcement learning loop from preference tuning. Traditional RLHF fits a reward model from ranked human preferences, then uses PPO under a KL penalty to update the policy. DPO shows that the same KL-regularized objective has a closed-form relationship between reward and policy under the Bradley-Terry preference model, so the policy can be optimized directly.
+**Summary:** DPO removes the reinforcement learning loop from preference tuning. Traditional RLHF fits a reward model from ranked human preferences, then uses PPO under a KL penalty to update the policy. DPO shows that the same KL-regularized objective has a closed-form relationship between reward and policy under the Bradley-Terry preference model, so the policy can be optimized directly.
 
 That turns alignment into a supervised contrastive classification task over preference pairs. There is no explicit reward network, no on-policy sampling loop, and no PPO stability tax. Training looks much closer to standard supervised fine-tuning.
 
@@ -54,4 +54,4 @@ def dpo_loss(policy, ref_policy, batch, beta=0.1):
     return F.binary_cross_entropy_with_logits(logits, torch.ones_like(logits))
 ```
 
-**Take-home message:** DPO reduces preference optimization to a contrastive classification loss. By removing the reward model and RL loop, it matches or beats PPO while being much cheaper and easier to train.
+**Takeaway:** DPO reduces preference optimization to a contrastive classification loss. By removing the reward model and RL loop, it matches or beats PPO while being much cheaper and easier to train.

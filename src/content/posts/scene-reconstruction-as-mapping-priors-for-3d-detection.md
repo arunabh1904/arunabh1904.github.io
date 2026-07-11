@@ -13,7 +13,7 @@ summary: MPA3D uses automatically reconstructed surfel and 3D Gaussian maps as d
 
 **arXiv:** [2605.22997](https://arxiv.org/abs/2605.22997)
 
-**Plain-language summary:** This paper asks a very practical driving question: if the car has seen a place before, can a reconstructed static scene help detect objects there later? Instead of relying on manually built HD maps, the method builds dense mapping priors from aggregated sensor data.
+**Summary:** This paper asks a very practical driving question: if the car has seen a place before, can a reconstructed static scene help detect objects there later? Instead of relying on manually built HD maps, the method builds dense mapping priors from aggregated sensor data.
 
 The detector then uses those priors to separate static background from dynamic foreground, which helps especially for distant, sparse, occluded, or low-visibility objects.
 
@@ -49,6 +49,6 @@ _Figure 2 shows MPA3D: camera BEV features, LiDAR, surfels, and 3D Gaussian prio
 | Gated fusion ablation | 83.3 overall L2 AP, +2.9 over the next-best concat baseline | The fusion mechanism is a real contributor, not just more inputs. |
 | Runtime caveat | Adding both priors increases latency from 245 ms to 452 ms in the reported setup | The accuracy gain comes with deployment cost. |
 
-**Why it mattered:** MPA3D reframes mapping as perception memory. The map does not need to be a manually labeled semantic product; a reconstructed static scene can still be a powerful prior for finding what changed.
+**Context:** MPA3D reframes mapping as perception memory. The map does not need to be a manually labeled semantic product; a reconstructed static scene can still be a powerful prior for finding what changed.
 
-**Take-home message:** For BEV perception, repeated traversals can become dense background knowledge, and background knowledge makes foreground detection easier.
+**Takeaway:** For BEV perception, repeated traversals can become dense background knowledge, and background knowledge makes foreground detection easier.

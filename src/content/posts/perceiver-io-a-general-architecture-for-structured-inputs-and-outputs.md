@@ -15,7 +15,7 @@ summary: Perceiver IO uses latent bottleneck cross-attention plus output queries
 
 **Code:** [google-deepmind/deepmind-research/perceiver](https://github.com/google-deepmind/deepmind-research/tree/master/perceiver)
 
-**Plain-language summary:** Perceiver IO generalizes the Perceiver idea from flexible inputs to flexible inputs and outputs. It uses cross-attention to pull information from large inputs into a latent array, processes the latent array, then uses output queries to decode structured predictions.
+**Summary:** Perceiver IO generalizes the Perceiver idea from flexible inputs to flexible inputs and outputs. It uses cross-attention to pull information from large inputs into a latent array, processes the latent array, then uses output queries to decode structured predictions.
 
 This belongs in a BEV reading list because modern driving models often need to fuse different input shapes and produce structured outputs: grids, vectors, trajectories, agent states, and maps. Perceiver IO is one of the cleanest architectural templates for that kind of input/output mismatch.
 
@@ -49,6 +49,6 @@ _Figure 2 shows the Perceiver IO template: arbitrary inputs enter a latent works
 | Sintel clean optical flow | RAFT at 1.95 EPE | 1.81 EPE | Strong dense prediction without hand-built multiscale matching. |
 | Sintel final optical flow | RAFT at 2.57 EPE | 2.42 EPE | General output queries still handle dense visual output. |
 
-**Why it mattered:** Perceiver IO gave researchers a reusable pattern for multimodal models whose inputs and outputs do not fit one simple grid or sequence.
+**Context:** Perceiver IO gave researchers a reusable pattern for multimodal models whose inputs and outputs do not fit one simple grid or sequence.
 
-**Take-home message:** Use a latent workspace when input size, output size, and output semantics all vary; the important design work moves into queries and embeddings.
+**Takeaway:** Use a latent workspace when input size, output size, and output semantics all vary; the important design work moves into queries and embeddings.

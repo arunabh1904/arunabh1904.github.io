@@ -15,7 +15,7 @@ summary: RTMap treats online HD mapping as a recursive system that localizes aga
 
 **Code:** [CN-ADLab/RTMap](https://github.com/CN-ADLab/RTMap)
 
-**Plain-language summary:** RTMap is about online HD maps that improve over repeated traversals. A vehicle builds a local vector map in real time, aligns it to a crowdsourced prior map, detects what is new or outdated, and sends updates back to an offline aggregation loop.
+**Summary:** RTMap is about online HD maps that improve over repeated traversals. A vehicle builds a local vector map in real time, aligns it to a crowdsourced prior map, detects what is new or outdated, and sends updates back to an offline aggregation loop.
 
 The paper is useful because it puts three normally separate problems into one system: mapping, map-based localization, and map change detection.
 
@@ -51,6 +51,6 @@ _Figure 2 shows RTMap's loop: encode sensors and the crowdsourced HD map, match 
 | Localization | Optimization-based pose estimation outperforms the end-to-end pose head in the nuScenes ablation. | Classical state estimation still helps inside learned mapping systems. |
 | System coupling | Change detection improves localization by rejecting mismatched prior-map elements. | Freshness and localization are linked problems. |
 
-**Why it mattered:** RTMap moves online vector mapping from "predict the local map once" to "maintain a map that can remember, align, and revise itself."
+**Context:** RTMap moves online vector mapping from "predict the local map once" to "maintain a map that can remember, align, and revise itself."
 
-**Take-home message:** A deployable BEV map stack needs recursion: map the scene, localize into the map, detect changes, and feed cleaner observations back into the prior.
+**Takeaway:** A deployable BEV map stack needs recursion: map the scene, localize into the map, detect changes, and feed cleaner observations back into the prior.

@@ -15,7 +15,7 @@ summary: This survey organizes VLA-for-autonomous-driving work around architectu
 
 **Awesome list:** [Awesome-VLA4AD](https://github.com/JohnsonJiang1996/Awesome-VLA4AD)
 
-**Plain-language summary:** This survey is a taxonomy and bibliography for VLA-for-autonomous-driving work. It treats VLA4AD as a distinct line: models that connect visual perception, language understanding, and driving actions rather than stopping at explanation or QA.
+**Summary:** This survey is a taxonomy and bibliography for VLA-for-autonomous-driving work. It treats VLA4AD as a distinct line: models that connect visual perception, language understanding, and driving actions rather than stopping at explanation or QA.
 
 The survey is useful as a map. It shows how the field moved from end-to-end perception-to-control, to VLMs that explain scenes, to VLA systems that generate actions with language-aware reasoning.
 
@@ -42,6 +42,6 @@ _Figure 2 summarizes the VLA4AD architecture blocks, connecting visual inputs, l
 | End-to-end VLA | Map scene inputs and instructions toward actions | OpenDriveVLA and related action models |
 | Augmented VLA | Add tools, chains of thought, or world models | DiffVLA and DriveVLA-W0-style extensions |
 
-**Why it mattered:** The survey gives a shared vocabulary for a field where "VLA" can mean anything from QA to closed-loop trajectory generation.
+**Context:** The survey gives a shared vocabulary for a field where "VLA" can mean anything from QA to closed-loop trajectory generation.
 
-**Take-home message:** Use this paper as the index card for the VLA-for-driving literature, then read the individual method papers for the actual design tradeoffs.
+**Takeaway:** Use this paper as the index card for the VLA-for-driving literature, then read the individual method papers for the actual design tradeoffs.

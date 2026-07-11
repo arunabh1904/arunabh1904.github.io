@@ -17,7 +17,7 @@ summary: Fourier features turn low-dimensional coordinates into sinusoidal embed
 
 **Code:** [tancik/fourier-feature-networks](https://github.com/tancik/fourier-feature-networks)
 
-**Plain-language summary:** A plain MLP has a spectral bias: it learns smooth, low-frequency functions much more easily than sharp boundaries or fine texture. This paper fixes that failure mode by mapping each coordinate through sinusoidal Fourier features before the MLP sees it.
+**Summary:** A plain MLP has a spectral bias: it learns smooth, low-frequency functions much more easily than sharp boundaries or fine texture. This paper fixes that failure mode by mapping each coordinate through sinusoidal Fourier features before the MLP sees it.
 
 That small input change matters for BEV and mapping work because many spatial tasks are low-dimensional coordinate regression problems with high-frequency structure. Lane boundaries, occupancy edges, radiance fields, and implicit maps all ask a network to represent sharp geometry from coordinates.
 
@@ -50,6 +50,6 @@ _Figure 2 shows why the input mapping matters: Fourier features reshape the effe
 | No mapping | 19.32 | 0.864 |
 | Gaussian Fourier features | 25.57 | 0.973 |
 
-**Why it mattered:** Fourier features became one of the standard ways to make coordinate networks useful for detailed spatial signals.
+**Context:** Fourier features became one of the standard ways to make coordinate networks useful for detailed spatial signals.
 
-**Take-home message:** If an MLP is asked to learn geometry from raw coordinates, give it a frequency basis first; otherwise the model starts with the wrong smoothness prior.
+**Takeaway:** If an MLP is asked to learn geometry from raw coordinates, give it a frequency basis first; otherwise the model starts with the wrong smoothness prior.

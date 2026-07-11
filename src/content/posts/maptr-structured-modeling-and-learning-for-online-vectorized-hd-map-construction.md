@@ -15,7 +15,7 @@ summary: MapTR models HD map elements as permutation-equivalent point sets, maki
 
 **Code:** [hustvl/MapTR](https://github.com/hustvl/MapTR)
 
-**Plain-language summary:** MapTR is one of the core papers for online vectorized HD map construction. It replaces dense raster map outputs with structured vector elements such as lane dividers, road boundaries, and pedestrian crossings.
+**Summary:** MapTR is one of the core papers for online vectorized HD map construction. It replaces dense raster map outputs with structured vector elements such as lane dividers, road boundaries, and pedestrian crossings.
 
 The key modeling move is permutation equivalence. A map element can be represented by a set of points, but the same shape may have several valid point orders. MapTR encodes that ambiguity directly so training does not punish equivalent representations.
 
@@ -50,6 +50,6 @@ _Figure 4 shows the structured MapTR pipeline: sensor inputs become BEV features
 | MapTR-nano | Camera | R18 | 45.9 | 25.1 |
 | MapTR-tiny | Camera | R50 | 50.3 | 11.2 |
 
-**Why it mattered:** MapTR gave the field a practical transformer baseline for vector maps and made permutation ambiguity a first-class modeling issue.
+**Context:** MapTR gave the field a practical transformer baseline for vector maps and made permutation ambiguity a first-class modeling issue.
 
-**Take-home message:** Vector-map learning works better when the loss respects the geometry's symmetries instead of forcing one arbitrary point order.
+**Takeaway:** Vector-map learning works better when the loss respects the geometry's symmetries instead of forcing one arbitrary point order.

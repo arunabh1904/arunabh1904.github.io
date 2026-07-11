@@ -15,7 +15,7 @@ summary: GPT-Driver reframed motion planning as language modeling over scene tok
 
 **GitHub:** [PointsCoder/GPT-Driver](https://github.com/PointsCoder/GPT-Driver)
 
-**Plain-language summary:** GPT-Driver asks whether a language model can act as a motion planner when the driving scene is serialized into tokens. Instead of directly predicting a trajectory with a specialized planner, the system prompts and fine-tunes GPT-style models to produce future waypoints and rationales.
+**Summary:** GPT-Driver asks whether a language model can act as a motion planner when the driving scene is serialized into tokens. Instead of directly predicting a trajectory with a specialized planner, the system prompts and fine-tunes GPT-style models to produce future waypoints and rationales.
 
 This is not a deployable AV stack by itself. It is a useful probe: language models can absorb structured scene descriptions and generate plausible plans, but latency, grounding, and closed-loop reliability remain hard.
 
@@ -39,6 +39,6 @@ _Figure 1: Overview of GPT-Driver. From the [GPT-Driver: Learning to Drive with 
 | Output | Future waypoints plus rationale | Adds interpretability to motion planning. |
 | Caveat | Open-loop and LLM latency | Needs closed-loop validation before real deployment. |
 
-**Why it mattered:** It opened a line of work where language is not just for explanation after the fact. It becomes an intermediate representation for planning.
+**Context:** It opened a line of work where language is not just for explanation after the fact. It becomes an intermediate representation for planning.
 
-**Take-home message:** LLMs can help expose the reasoning behind a plan, but driving needs that reasoning to stay grounded, fast, and controllable.
+**Takeaway:** LLMs can help expose the reasoning behind a plan, but driving needs that reasoning to stay grounded, fast, and controllable.

@@ -17,7 +17,7 @@ summary: UniDriveVLA decouples semantic understanding, spatial perception, and a
 
 **Code:** [xiaomi-research/UniDriveVLA](https://github.com/xiaomi-research/UniDriveVLA/)
 
-**Plain-language summary:** UniDriveVLA argues that driving VLAs face an optimization conflict. Image-language models have strong semantic reasoning but weak spatial perception; 3D-enhanced systems improve geometry but can damage the VLM's reasoning behavior.
+**Summary:** UniDriveVLA argues that driving VLAs face an optimization conflict. Image-language models have strong semantic reasoning but weak spatial perception; 3D-enhanced systems improve geometry but can damage the VLM's reasoning behavior.
 
 The paper's answer is expert decoupling. It uses specialized Transformer experts for understanding, perception, and action planning, then coordinates them with masked joint attention.
 
@@ -44,6 +44,6 @@ _Figure 3 shows UniDriveVLA's Mixture-of-Transformers architecture, where specia
 | Training | Three-stage progressive recipe | Stabilizes VLA optimization for driving. |
 | Evaluation | nuScenes and Bench2Drive | Covers open-loop public data and closed-loop simulation. |
 
-**Why it mattered:** UniDriveVLA makes expert decoupling a central design pattern for driving VLAs.
+**Context:** UniDriveVLA makes expert decoupling a central design pattern for driving VLAs.
 
-**Take-home message:** The next VLA architecture fight is not just bigger backbones; it is how to preserve semantic reasoning while adding spatial action competence.
+**Takeaway:** The next VLA architecture fight is not just bigger backbones; it is how to preserve semantic reasoning while adding spatial action competence.

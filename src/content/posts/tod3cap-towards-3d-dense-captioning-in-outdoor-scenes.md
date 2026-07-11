@@ -13,7 +13,7 @@ summary: TOD3Cap asked driving models to detect outdoor 3D objects and caption t
 
 **arXiv:** [2403.19589](https://arxiv.org/abs/2403.19589)
 
-**Plain-language summary:** TOD3Cap turns outdoor driving scenes into a dense captioning problem. Given multi-sensor input, a model must localize objects in 3D and describe each one with useful language.
+**Summary:** TOD3Cap turns outdoor driving scenes into a dense captioning problem. Given multi-sensor input, a model must localize objects in 3D and describe each one with useful language.
 
 That is harder than standard object detection because it requires attributes, context, and grounded descriptions, not just boxes and class IDs.
 
@@ -37,6 +37,6 @@ _Figure 1: We introduce the task of 3D dense captioning in outdoor scenes (right
 | Task | 3D object captioning | Requires boxes plus descriptions. |
 | Use case | Scene explanation and planner context | Turns perception into grounded language. |
 
-**Why it mattered:** Dense captioning is a bridge between perception and explanation. A driving system that can say what every relevant object is doing has a better interface to planners, annotators, and safety reviewers.
+**Context:** Dense captioning is a bridge between perception and explanation. A driving system that can say what every relevant object is doing has a better interface to planners, annotators, and safety reviewers.
 
-**Take-home message:** Rich scene understanding requires language that is spatially grounded. Captions without 3D grounding are not enough for driving.
+**Takeaway:** Rich scene understanding requires language that is spatially grounded. Captions without 3D grounding are not enough for driving.

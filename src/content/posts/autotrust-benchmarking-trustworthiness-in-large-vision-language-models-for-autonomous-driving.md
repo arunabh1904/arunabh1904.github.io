@@ -13,7 +13,7 @@ summary: AutoTrust evaluated driving VLMs across hallucination, safety, robustne
 
 **arXiv:** [2412.15206](https://arxiv.org/abs/2412.15206)
 
-**Plain-language summary:** AutoTrust asks whether driving VLMs can be trusted, not merely whether they answer benchmark questions correctly. It probes five dimensions: truthfulness, safety, robustness, privacy, and fairness.
+**Summary:** AutoTrust asks whether driving VLMs can be trusted, not merely whether they answer benchmark questions correctly. It probes five dimensions: truthfulness, safety, robustness, privacy, and fairness.
 
 That means questions can test whether a model hallucinates, gives unsafe advice, leaks sensitive information, breaks under perturbations, or behaves inconsistently across groups and regions.
 
@@ -37,6 +37,6 @@ _Figure 1 from the [AutoTrust paper](https://arxiv.org/abs/2412.15206), via arXi
 | Axes | Truthfulness, safety, robustness, privacy, fairness | Evaluates more than accuracy. |
 | Main finding | Hidden unsafe behaviors | Capability can improve while trust still lags. |
 
-**Why it mattered:** Trustworthiness is not one metric. A model can improve on standard driving QA while still becoming less safe or less private.
+**Context:** Trustworthiness is not one metric. A model can improve on standard driving QA while still becoming less safe or less private.
 
-**Take-home message:** Driving VLM evaluation needs adversarial and ethical dimensions baked in from the start. Accuracy alone is too small a target.
+**Takeaway:** Driving VLM evaluation needs adversarial and ethical dimensions baked in from the start. Accuracy alone is too small a target.

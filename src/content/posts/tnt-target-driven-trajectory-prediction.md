@@ -17,7 +17,7 @@ summary: TNT makes multimodal motion forecasting explicit by predicting likely t
 
 **Project:** [Waymo research page](https://waymo.com/research/tnt-target-driven-trajectory-prediction/)
 
-**Plain-language summary:** TNT says that for moderate-horizon motion forecasting, most of the multimodality lives in where the agent is trying to end up. Instead of sampling latent variables and hoping they cover the futures, TNT predicts explicit target states, then predicts trajectories conditioned on each target.
+**Summary:** TNT says that for moderate-horizon motion forecasting, most of the multimodality lives in where the agent is trying to end up. Instead of sampling latent variables and hoping they cover the futures, TNT predicts explicit target states, then predicts trajectories conditioned on each target.
 
 That design makes the intermediate outputs interpretable. A planner can inspect possible destinations, target-conditioned rollouts, and trajectory scores instead of receiving only opaque samples from a latent distribution.
 
@@ -54,6 +54,6 @@ _Figure 2 shows the three-stage TNT pipeline: encode the scene, score candidate 
 | PAID pedestrians | MultiPath: 0.43 minFDE, 0.23 minADE | 0.32 minFDE, 0.18 minADE |
 | Stanford Drone | PECNet: 25.98 minFDE, 12.79 minADE | 21.16 minFDE, 12.23 minADE |
 
-**Why it mattered:** TNT made goal-conditioned motion forecasting feel practical for autonomous driving. It kept the multimodal structure visible and showed that endpoint candidates can be a cleaner intent representation than opaque latent samples.
+**Context:** TNT made goal-conditioned motion forecasting feel practical for autonomous driving. It kept the multimodal structure visible and showed that endpoint candidates can be a cleaner intent representation than opaque latent samples.
 
-**Take-home message:** Predict the destination first, then make the trajectory explain how to get there.
+**Takeaway:** Predict the destination first, then make the trajectory explain how to get there.

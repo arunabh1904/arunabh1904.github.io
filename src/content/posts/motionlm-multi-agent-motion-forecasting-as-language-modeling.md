@@ -13,7 +13,7 @@ summary: MotionLM discretizes continuous trajectories into motion tokens and for
 
 **arXiv:** [2309.16534](https://arxiv.org/abs/2309.16534)
 
-**Plain-language summary:** MotionLM asks a simple question: what if multi-agent motion forecasting is a language modeling problem? It tokenizes future trajectories and trains an autoregressive Transformer to predict sequences of motion tokens.
+**Summary:** MotionLM asks a simple question: what if multi-agent motion forecasting is a language modeling problem? It tokenizes future trajectories and trains an autoregressive Transformer to predict sequences of motion tokens.
 
 That reframing removes several pieces of hand-built forecasting machinery. The model does not need anchors or explicit latent-variable optimization for multimodality, and it can generate joint futures for interacting agents in one decoding process.
 
@@ -47,6 +47,6 @@ _Figure 2 shows the language-model analogy concretely: scene features condition 
 | JFP | 0.8817 | 0.4233 | 0.2050 |
 | MotionLM | 0.8911 | 0.4115 | 0.2178 |
 
-**Why it mattered:** MotionLM made the language-model analogy concrete for autonomous-driving behavior prediction.
+**Context:** MotionLM made the language-model analogy concrete for autonomous-driving behavior prediction.
 
-**Take-home message:** A good tokenization can turn motion forecasting into sequence modeling, but the planner still has to care about calibration, coverage, and interaction quality.
+**Takeaway:** A good tokenization can turn motion forecasting into sequence modeling, but the planner still has to care about calibration, coverage, and interaction quality.

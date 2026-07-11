@@ -15,7 +15,7 @@ summary: This survey traces autonomous-driving VLA work from vision-action model
 
 **Awesome list:** [awesome-vla-for-ad](https://github.com/worldbench/awesome-vla-for-ad)
 
-**Plain-language summary:** This survey frames driving VLA as the next step after vision-action models. Vision-action systems map perception to control, but they often lack structured reasoning and instruction following. VLA systems add language as a reasoning and guidance layer.
+**Summary:** This survey frames driving VLA as the next step after vision-action models. Vision-action systems map perception to control, but they often lack structured reasoning and instruction following. VLA systems add language as a reasoning and guidance layer.
 
 The survey is especially useful because it distinguishes end-to-end VLA from dual-system VLA, then breaks down how actions are generated and how language guidance is injected.
 
@@ -42,6 +42,6 @@ _Figure 2 summarizes representative VA and VLA models across end-to-end, world-m
 | Guidance style | Explicit or implicit | Separates prompt-like supervision from representation-level conditioning. |
 | Historical line | VA, world model, VLA | Connects new VLA papers to older driving policy and dynamics work. |
 
-**Why it mattered:** This survey gives a cleaner vocabulary for comparing monolithic driving VLAs against hybrid systems such as DriveVLM-Dual-style designs.
+**Context:** This survey gives a cleaner vocabulary for comparing monolithic driving VLAs against hybrid systems such as DriveVLM-Dual-style designs.
 
-**Take-home message:** "Driving VLA" is not one architecture; it is a set of choices about where language reasoning sits relative to spatial planning and action generation.
+**Takeaway:** "Driving VLA" is not one architecture; it is a set of choices about where language reasoning sits relative to spatial planning and action generation.

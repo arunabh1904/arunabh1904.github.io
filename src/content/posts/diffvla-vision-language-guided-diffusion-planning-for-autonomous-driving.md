@@ -13,7 +13,7 @@ summary: DiffVLA uses VLM-guided hybrid sparse-dense diffusion planning to gener
 
 **arXiv:** [2505.19381](https://arxiv.org/abs/2505.19381)
 
-**Plain-language summary:** DiffVLA combines vision-language guidance with diffusion planning. It treats driving as a trajectory generation problem where a VLM supplies high-level semantic cues and a diffusion policy produces diverse action candidates.
+**Summary:** DiffVLA combines vision-language guidance with diffusion planning. It treats driving as a trajectory generation problem where a VLM supplies high-level semantic cues and a diffusion policy produces diverse action candidates.
 
 The model is useful in the VLA lineage because it makes action diversity explicit. Instead of only predicting one sparse trajectory, it uses a hybrid sparse-dense diffusion representation to explore plausible plans.
 
@@ -40,6 +40,6 @@ _Figure 1 shows DiffVLA's perception-enhanced diffusion VLA framework, where vis
 | Interaction | Agent-map-language fusion | Makes planning depend on actors, road structure, and language context. |
 | Reported signal | 45.0 PDMS in the 2025 challenge setting | Gives a public planning-oriented comparison point. |
 
-**Why it mattered:** DiffVLA shows one path from VLA semantics to action generation: use language to guide a generative planner rather than asking the language model to emit control alone.
+**Context:** DiffVLA shows one path from VLA semantics to action generation: use language to guide a generative planner rather than asking the language model to emit control alone.
 
-**Take-home message:** Diffusion is attractive for driving VLA because safe planning often needs a set of plausible futures, not one tokenized answer.
+**Takeaway:** Diffusion is attractive for driving VLA because safe planning often needs a set of plausible futures, not one tokenized answer.

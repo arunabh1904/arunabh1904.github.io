@@ -15,7 +15,7 @@ summary: Qwen-VLA extends the Qwen vision-language stack with a DiT action decod
 
 **Code:** [QwenLM/Qwen-VLA](https://github.com/QwenLM/Qwen-VLA)
 
-**Plain-language summary:** Qwen-VLA takes a Qwen vision-language backbone and adds a continuous action/trajectory decoder. The goal is not just to answer visual questions about a scene, but to produce robot actions, navigation trajectories, and egocentric motion predictions through one shared interface.
+**Summary:** Qwen-VLA takes a Qwen vision-language backbone and adds a continuous action/trajectory decoder. The goal is not just to answer visual questions about a scene, but to produce robot actions, navigation trajectories, and egocentric motion predictions through one shared interface.
 
 The key trick is embodiment-aware prompting. Instead of adding separate output heads for every robot or task family, the prompt describes the embodiment and control convention, while a DiT flow-matching decoder generates the continuous action trajectory.
 
@@ -50,6 +50,6 @@ _The Qwen-VLA overview shows the shared vision-language backbone feeding a DiT a
 | OOD dynamics | 32.0 SimplerEnv-OOD SR, 26.6 DOMINO SR, 39.5 DOMINO MS | Tests generalization to unseen spatial/visual tasks and dynamic objects. |
 | Real-world ALOHA | 83.6 in-domain average and 76.9 OOD average with pretraining | Shows the pretraining recipe matters outside simulation. |
 
-**Why it mattered:** Qwen-VLA pushes VLA models toward a single embodied interface across robot types and task families. It is less "a VLM that can call a robot head" and more "a VLM backbone trained to speak continuous action."
+**Context:** Qwen-VLA pushes VLA models toward a single embodied interface across robot types and task families. It is less "a VLM that can call a robot head" and more "a VLM backbone trained to speak continuous action."
 
-**Take-home message:** For robotics, the next frontier is not only better visual language understanding. It is making action generation, embodiment, and trajectory prediction first-class parts of the model.
+**Takeaway:** For robotics, the next frontier is not only better visual language understanding. It is making action generation, embodiment, and trajectory prediction first-class parts of the model.

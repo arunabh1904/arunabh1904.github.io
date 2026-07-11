@@ -15,7 +15,7 @@ summary: BEVFormer learns dense BEV features from multi-camera images with spati
 
 **Code:** [fundamentalvision/BEVFormer](https://github.com/fundamentalvision/BEVFormer)
 
-**Plain-language summary:** BEVFormer builds a bird's-eye-view feature map directly from surround cameras. It uses learnable BEV grid queries that attend into camera features for spatial evidence and into previous BEV features for temporal memory.
+**Summary:** BEVFormer builds a bird's-eye-view feature map directly from surround cameras. It uses learnable BEV grid queries that attend into camera features for spatial evidence and into previous BEV features for temporal memory.
 
 This paper matters because it made dense BEV a practical intermediate representation for camera-only driving perception. Later end-to-end systems often either build on this BEV-centric idea or react against its compute cost.
 
@@ -42,6 +42,6 @@ _Figure 2 shows the BEVFormer encoder: camera features, BEV queries, spatial cro
 | Temporal attention | Current BEV attends to previous BEV | Adds motion/history with low extra structure. |
 | Result | 56.9% nuScenes NDS reported in the abstract | Marked BEVFormer as a strong camera-only perception baseline. |
 
-**Why it mattered:** BEVFormer became one of the reference points for dense BEV-oriented autonomous driving stacks.
+**Context:** BEVFormer became one of the reference points for dense BEV-oriented autonomous driving stacks.
 
-**Take-home message:** Multi-camera perception becomes much easier to organize once the model learns a shared BEV workspace.
+**Takeaway:** Multi-camera perception becomes much easier to organize once the model learns a shared BEV workspace.

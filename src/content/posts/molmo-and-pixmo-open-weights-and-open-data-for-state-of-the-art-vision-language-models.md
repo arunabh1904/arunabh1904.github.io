@@ -15,7 +15,7 @@ summary: Molmo argued that high-quality open multimodal data can matter more tha
 
 **Project:** [Allen AI Molmo](https://allenai.org/blog/molmo)
 
-**Plain-language summary:** Molmo is a family of open multimodal models trained with PixMo, a carefully built set of image-text datasets. The core bet is data quality: detailed human descriptions, pointing supervision, and open data can close much of the gap to proprietary systems without relying only on massive scraped corpora.
+**Summary:** Molmo is a family of open multimodal models trained with PixMo, a carefully built set of image-text datasets. The core bet is data quality: detailed human descriptions, pointing supervision, and open data can close much of the gap to proprietary systems without relying only on massive scraped corpora.
 
 This matters because many VLMs are hard to inspect. Molmo makes the data story more visible, which makes the model easier to study and reuse.
 
@@ -39,6 +39,6 @@ _Figure 1: Datasets in PixMo (left) and the capabilities they enable in Molmo (r
 | Openness | Open weights and data | Makes the training story inspectable. |
 | Signal | Small models compete strongly | Suggests annotation quality can substitute for some scale. |
 
-**Why it mattered:** The paper strengthened the case that VLM progress is not just architecture scale. Annotation style, spatial grounding, and openness can move the frontier too.
+**Context:** The paper strengthened the case that VLM progress is not just architecture scale. Annotation style, spatial grounding, and openness can move the frontier too.
 
-**Take-home message:** For multimodal models, the caption is part of the architecture. Better supervision changes what the model can see.
+**Takeaway:** For multimodal models, the caption is part of the architecture. Better supervision changes what the model can see.

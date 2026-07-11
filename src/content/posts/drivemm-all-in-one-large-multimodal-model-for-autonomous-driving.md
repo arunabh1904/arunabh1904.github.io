@@ -13,7 +13,7 @@ summary: DriveMM trained one multimodal transformer across perception, predictio
 
 **arXiv:** [2412.07689](https://arxiv.org/abs/2412.07689)
 
-**Plain-language summary:** DriveMM is an academic generalist model for autonomous driving. It trains across multiple datasets and tasks, including perception, prediction, and planning, with a curriculum that moves from easier visual understanding toward harder planning behavior.
+**Summary:** DriveMM is an academic generalist model for autonomous driving. It trains across multiple datasets and tasks, including perception, prediction, and planning, with a curriculum that moves from easier visual understanding toward harder planning behavior.
 
 The system takes multi-view driving imagery and produces a unified token sequence that can be decoded into task-specific outputs.
 
@@ -37,6 +37,6 @@ _Figure 1: RoboTron-Drive achieves SOTA in both general capabilities and general
 | Inputs | Multi-view driving imagery | Matches surround-camera AV settings. |
 | Evidence | Multiple public benchmarks | Tests whether one model can replace specialists. |
 
-**Why it mattered:** DriveMM pushed against the assumption that every driving subproblem needs a separate specialized network. The paper asks whether shared multimodal representations can support the full stack.
+**Context:** DriveMM pushed against the assumption that every driving subproblem needs a separate specialized network. The paper asks whether shared multimodal representations can support the full stack.
 
-**Take-home message:** End-to-end driving models are becoming multitask foundation models. The hard question is not only performance, but whether shared training improves closed-loop reliability.
+**Takeaway:** End-to-end driving models are becoming multitask foundation models. The hard question is not only performance, but whether shared training improves closed-loop reliability.

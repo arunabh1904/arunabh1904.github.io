@@ -13,7 +13,7 @@ summary: DriveVLM combined VLM reasoning with hierarchical planning, then paired
 
 **arXiv:** [2402.12289](https://arxiv.org/abs/2402.12289)
 
-**Plain-language summary:** DriveVLM uses large vision-language models for scene description, scene analysis, and hierarchical planning in complex driving scenarios. The paper also proposes DriveVLM-Dual, which pairs VLM reasoning with a more traditional autonomous driving pipeline to compensate for spatial precision and latency limits.
+**Summary:** DriveVLM uses large vision-language models for scene description, scene analysis, and hierarchical planning in complex driving scenarios. The paper also proposes DriveVLM-Dual, which pairs VLM reasoning with a more traditional autonomous driving pipeline to compensate for spatial precision and latency limits.
 
 That hybrid design is the interesting part. The VLM contributes semantic reasoning about rare or complex situations; the conventional stack keeps the control loop more grounded.
 
@@ -37,6 +37,6 @@ _Figure 1: DriveVLM and DriveVLM-Dual model pipelines. From the [DriveVLM: The C
 | Hybrid variant | DriveVLM-Dual | Combines VLM semantics with conventional driving modules. |
 | Evidence | nuScenes, SUP-AD, vehicle deployment | Tests both public and production-style settings. |
 
-**Why it mattered:** DriveVLM captures the field's tension clearly: VLMs are useful for understanding and explanation, but driving still needs precise geometry and real-time behavior.
+**Context:** DriveVLM captures the field's tension clearly: VLMs are useful for understanding and explanation, but driving still needs precise geometry and real-time behavior.
 
-**Take-home message:** The near-term role for VLMs in driving may be as semantic planners and critics, not as the only system between sensors and steering.
+**Takeaway:** The near-term role for VLMs in driving may be as semantic planners and critics, not as the only system between sensors and steering.

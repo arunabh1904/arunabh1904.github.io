@@ -17,7 +17,7 @@ summary: VLM-AD uses a VLM as a training-time teacher, distilling driving reason
 
 **OpenReview:** [JM2vDI6DlP](https://openreview.net/forum?id=JM2vDI6DlP)
 
-**Plain-language summary:** VLM-AD uses a vision-language model as a teacher for end-to-end autonomous driving. The VLM watches driving scenes during dataset construction, produces freeform reasoning and structured action annotations, and those annotations become auxiliary supervision for a smaller driving model.
+**Summary:** VLM-AD uses a vision-language model as a teacher for end-to-end autonomous driving. The VLM watches driving scenes during dataset construction, produces freeform reasoning and structured action annotations, and those annotations become auxiliary supervision for a smaller driving model.
 
 The important deployment detail is that the VLM is not used at inference time. The runtime model stays an end-to-end driver, but its training objective is shaped by language-style reasoning signals that explain why a maneuver makes sense.
 
@@ -51,6 +51,6 @@ _Figure 2 shows the training-time teacher setup: the VLM produces freeform reaso
 | VAD-Base on CARLA Town05 Short | 64.29 DS, 87.26 RC | 67.78 DS, 88.56 RC | Better closed-loop score and route completion. |
 | VAD-Base on CARLA Town05 Long | 30.31 DS, 75.20 RC | 35.25 DS, 84.14 RC | Larger gain on the longer interactive route. |
 
-**Why it mattered:** VLM-AD is a clean example of the "language model as teacher" pattern for physical systems. The VLM improves training signal, but the deployed system still respects latency and control constraints.
+**Context:** VLM-AD is a clean example of the "language model as teacher" pattern for physical systems. The VLM improves training signal, but the deployed system still respects latency and control constraints.
 
-**Take-home message:** For autonomous driving, VLMs may be most useful offline: generating rationales and labels that teach compact planners what the trajectory alone does not explain.
+**Takeaway:** For autonomous driving, VLMs may be most useful offline: generating rationales and labels that teach compact planners what the trajectory alone does not explain.

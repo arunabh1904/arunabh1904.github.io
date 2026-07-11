@@ -15,7 +15,7 @@ summary: MapTRv2 strengthens MapTR with auxiliary one-to-many matching and dense
 
 **Code:** [hustvl/MapTR](https://github.com/hustvl/MapTR)
 
-**Plain-language summary:** MapTRv2 keeps MapTR's central idea: represent map elements as permutation-equivalent point sets and learn them with hierarchical queries. The upgrade focuses on making the system train faster and perform better across datasets.
+**Summary:** MapTRv2 keeps MapTR's central idea: represent map elements as permutation-equivalent point sets and learn them with hierarchical queries. The upgrade focuses on making the system train faster and perform better across datasets.
 
 The important additions are auxiliary one-to-many matching and dense supervision. Those extra training signals reduce the fragility of set matching and help the model learn map geometry before the final sparse vector loss has to carry everything.
 
@@ -41,6 +41,6 @@ _Figure 4 shows how MapTRv2 keeps the vector-map decoder structured while adding
 | Training recipe | One-to-many matching plus dense supervision | Improves convergence and final accuracy. |
 | Output | Real-time vector HD map construction | Keeps the planner-friendly vector representation. |
 
-**Why it mattered:** MapTRv2 turned MapTR from a strong baseline into a more robust framework that later online-map papers could compare against.
+**Context:** MapTRv2 turned MapTR from a strong baseline into a more robust framework that later online-map papers could compare against.
 
-**Take-home message:** Once the representation is right, the next bottleneck is supervision density: sparse vector labels often need auxiliary training signals.
+**Takeaway:** Once the representation is right, the next bottleneck is supervision density: sparse vector labels often need auxiliary training signals.

@@ -40,4 +40,4 @@ The important design choice is what MuZero chooses not to model. It predicts onl
 
 **Critiques & limitations:** MuZero is elegant because it preserves the strength of search without requiring explicit rules. The cost is large. Training used enormous compute, inference requires MCTS, and the learned dynamics remain hard to interpret: the model plans well, but it is not obvious what environment structure it has actually learned.
 
-**Take-home message:** MuZero showed that learned latent models can support serious planning across very different domains. It replaced hand-coded rules with learned prediction, but it paid for that generality with compute and search latency.
+**Takeaway:** MuZero showed that learned latent models can support serious planning across very different domains. It replaced hand-coded rules with learned prediction, but it paid for that generality with compute and search latency.

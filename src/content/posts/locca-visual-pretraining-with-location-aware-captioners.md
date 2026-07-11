@@ -13,7 +13,7 @@ summary: LocCa adds location-aware captioning tasks to visual pretraining, impro
 
 **arXiv:** [2403.19596](https://arxiv.org/abs/2403.19596)
 
-**Plain-language summary:** LocCa asks whether a captioning-style pretraining model can learn localization without becoming a special-purpose detector. The answer is yes: keep the encoder-decoder captioner interface, but add tasks where the decoder must talk about regions and predict their coordinates.
+**Summary:** LocCa asks whether a captioning-style pretraining model can learn localization without becoming a special-purpose detector. The answer is yes: keep the encoder-decoder captioner interface, but add tasks where the decoder must talk about regions and predict their coordinates.
 
 The result is a visual encoder that still transfers to holistic tasks like classification, captioning, OCR, and VQA, while becoming much more sensitive to object-level location.
 
@@ -49,6 +49,6 @@ _Figure 1 shows the LocCa task interface: normal captioning, automatic referring
 | Clean evaluation | The authors remove overlapping validation/test images from the combined RefCOCO training set. |
 | VLM transfer | A PaLI-3 model using the LocCa encoder improves over strong SigLIP encoder baselines, especially on object-sensitive tasks. |
 
-**Why it mattered:** LocCa is a neat counterexample to the idea that grounding needs a separate detection-heavy architecture. A captioner can become location-aware if the pretraining interface makes coordinates part of the language game.
+**Context:** LocCa is a neat counterexample to the idea that grounding needs a separate detection-heavy architecture. A captioner can become location-aware if the pretraining interface makes coordinates part of the language game.
 
-**Take-home message:** For VLM pretraining, the task interface is supervision. If captions include where as well as what, the encoder learns a more useful visual representation.
+**Takeaway:** For VLM pretraining, the task interface is supervision. If captions include where as well as what, the encoder learns a more useful visual representation.

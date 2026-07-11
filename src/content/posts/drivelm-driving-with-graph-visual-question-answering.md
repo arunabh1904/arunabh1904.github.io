@@ -17,7 +17,7 @@ summary: DriveLM formulates driving reasoning as graph visual question answering
 
 **Code:** [OpenDriveLab/DriveLM](https://github.com/OpenDriveLab/DriveLM)
 
-**Plain-language summary:** DriveLM argues that driving VQA should be multi-step and graph-structured. Human drivers do not jump from pixels to steering in one question; they identify relevant objects, reason about interactions, decide behavior, and then produce motion.
+**Summary:** DriveLM argues that driving VQA should be multi-step and graph-structured. Human drivers do not jump from pixels to steering in one question; they identify relevant objects, reason about interactions, decide behavior, and then produce motion.
 
 DriveLM captures that process with Graph Visual Question Answering. Nodes represent reasoning stages such as perception, prediction, planning, behavior, and motion. Edges pass context between questions.
 
@@ -44,6 +44,6 @@ _Figure 1 shows DriveLM's task and artifacts: graph VQA, data construction, the 
 | Baseline | DriveLM-Agent | Shows how a VLM can use the graph to produce driving behavior. |
 | Evaluation | DriveLM-Metrics and generalization settings | Tests semantic accuracy, trajectory quality, and unseen conditions. |
 
-**Why it mattered:** DriveLM gave VLM-for-driving work a structured reasoning target instead of only asking open-ended scene questions.
+**Context:** DriveLM gave VLM-for-driving work a structured reasoning target instead of only asking open-ended scene questions.
 
-**Take-home message:** Language helps driving most when it is grounded in a reasoning graph that can feed spatial planning.
+**Takeaway:** Language helps driving most when it is grounded in a reasoning graph that can feed spatial planning.
