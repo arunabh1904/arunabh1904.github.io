@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc">
+  <title id="title">Closed-loop VLA post-training system</title>
+  <desc id="desc">A loop from base VLA through supervised fine-tuning, deployment rollouts, failure mining, feedback, policy optimization, evaluation, and redeployment.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f7fafc"/>
+      <stop offset="1" stop-color="#e9f2ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f2745" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#3567a8"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="760" rx="28" fill="url(#bg)"/>
+  <text x="700" y="60" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700" fill="#102a43">VLA post-training is a measurement loop</text>
+  <text x="700" y="96" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" fill="#486581">Every update is only as good as the failures, feedback, and evaluation that produced it.</text>
+
+  <g fill="none" stroke="#3567a8" stroke-width="4" marker-end="url(#arrow)">
+    <path d="M270 225 H360"/>
+    <path d="M590 225 H680"/>
+    <path d="M910 225 H1000"/>
+    <path d="M1115 295 V390"/>
+    <path d="M1000 470 H910"/>
+    <path d="M680 470 H590"/>
+    <path d="M360 470 H270"/>
+    <path d="M155 390 V295"/>
+  </g>
+
+  <g filter="url(#shadow)" font-family="Inter, Arial, sans-serif">
+    <g><rect x="40" y="155" width="230" height="140" rx="20" fill="#ffffff"/><text x="155" y="210" text-anchor="middle" font-size="23" font-weight="700" fill="#173f5f">Base VLA</text><text x="155" y="244" text-anchor="middle" font-size="16" fill="#526d82">semantic + motor priors</text></g>
+    <g><rect x="360" y="155" width="230" height="140" rx="20" fill="#ffffff"/><text x="475" y="210" text-anchor="middle" font-size="23" font-weight="700" fill="#173f5f">Task SFT</text><text x="475" y="244" text-anchor="middle" font-size="16" fill="#526d82">adapt action interface</text></g>
+    <g><rect x="680" y="155" width="230" height="140" rx="20" fill="#ffffff"/><text x="795" y="210" text-anchor="middle" font-size="23" font-weight="700" fill="#173f5f">Rollouts</text><text x="795" y="244" text-anchor="middle" font-size="16" fill="#526d82">visit policy-induced states</text></g>
+    <g><rect x="1000" y="155" width="230" height="140" rx="20" fill="#ffffff"/><text x="1115" y="210" text-anchor="middle" font-size="23" font-weight="700" fill="#173f5f">Failure mining</text><text x="1115" y="244" text-anchor="middle" font-size="16" fill="#526d82">segment cause, not symptom</text></g>
+    <g><rect x="1000" y="390" width="230" height="160" rx="20" fill="#fff7e6"/><text x="1115" y="440" text-anchor="middle" font-size="23" font-weight="700" fill="#7a4b00">Feedback</text><text x="1115" y="475" text-anchor="middle" font-size="15" fill="#765d31">success · correction · preference</text><text x="1115" y="502" text-anchor="middle" font-size="15" fill="#765d31">progress · safety · uncertainty</text></g>
+    <g><rect x="680" y="390" width="230" height="160" rx="20" fill="#edf9f0"/><text x="795" y="440" text-anchor="middle" font-size="23" font-weight="700" fill="#22633b">Optimize</text><text x="795" y="475" text-anchor="middle" font-size="15" fill="#426b50">correction SFT · KTO/APO</text><text x="795" y="502" text-anchor="middle" font-size="15" fill="#426b50">PPO/RL · distillation</text></g>
+    <g><rect x="360" y="390" width="230" height="160" rx="20" fill="#f2effb"/><text x="475" y="440" text-anchor="middle" font-size="23" font-weight="700" fill="#563d7c">Evaluation</text><text x="475" y="475" text-anchor="middle" font-size="15" fill="#66567d">offline → sim → real</text><text x="475" y="502" text-anchor="middle" font-size="15" fill="#66567d">held-out shifts + CIs</text></g>
+    <g><rect x="40" y="390" width="230" height="160" rx="20" fill="#eaf5ff"/><text x="155" y="440" text-anchor="middle" font-size="23" font-weight="700" fill="#0b568f">Redeploy</text><text x="155" y="475" text-anchor="middle" font-size="15" fill="#476a85">versioned policy + rollback</text><text x="155" y="502" text-anchor="middle" font-size="15" fill="#476a85">repeat under new failures</text></g>
+  </g>
+
+  <rect x="280" y="620" width="840" height="82" rx="18" fill="#102a43"/>
+  <text x="700" y="654" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" fill="#ffffff">North-star metric</text>
+  <text x="700" y="682" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" fill="#d7e7f5">reliable policy improvement per robot-hour, human-hour, annotation-hour, and unit of compute</text>
+</svg>
