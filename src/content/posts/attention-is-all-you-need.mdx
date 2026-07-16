@@ -6,7 +6,7 @@ postSlug: attention-is-all-you-need
 legacyPath: /paper shorts/2017/06/01/attention-is-all-you-need.html
 tags:
   - Other
-field: Natural Language Processing
+field: 'Language Models'
 summary: The Transformer removed recurrence from sequence modeling and made attention-first architectures practical at scale.
 ---
 import PythonPlayground from '../../components/PythonPlayground';
@@ -104,3 +104,9 @@ Self-attention gives every pair of tokens a constant-length path, but it pays fo
 ### Ongoing challenges
 
 The same quadratic cost limits long contexts, and smaller datasets did not immediately erase the case for RNNs. Still, the direction was clear. Transformers became the backbone for BERT, GPT, Vision Transformers, and most of the modern sequence-modeling stack.
+
+## Decision Lens
+
+The Transformer informs the decision to replace recurrent state updates with globally addressable token-to-token communication. Its training unit is a source-target token pair under teacher-forced next-token prediction; position enters through an encoding, while attention and feed-forward weights are shared across sequence positions.
+
+The original translation experiments established parallel training efficiency and strong sequence transduction, not efficient arbitrarily long context. A cleaner ablation would compare attention, recurrence, and convolution with matched parameters, training FLOPs, wall-clock time, and sequence lengths. At 10× context, quadratic attention memory and all-to-all communication become the primary failure mode. The architectural claim would fail if a recurrent or state-space model matched translation quality and training throughput under the same budget while scaling more gracefully with length.

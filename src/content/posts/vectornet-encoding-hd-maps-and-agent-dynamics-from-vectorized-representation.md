@@ -6,7 +6,7 @@ postSlug: vectornet-encoding-hd-maps-and-agent-dynamics-from-vectorized-represen
 legacyPath: /paper shorts/2020/05/08/vectornet-encoding-hd-maps-and-agent-dynamics-from-vectorized-representation.html
 tags:
   - Other
-field: BEV
+field: 'Motion Forecasting & Planning'
 summary: VectorNet encoded HD maps and agent histories as polylines, using local polyline aggregation and a global interaction graph instead of rasterized BEV images.
 ---
 ## 2020 - VectorNet
@@ -39,6 +39,12 @@ _Figure 2 shows the core hierarchy: vectors become polyline features, polyline f
 | Architecture | Local polyline subgraphs plus global graph | Matches the natural hierarchy of driving scenes. |
 | Auxiliary task | Masked entity completion | Forces the global graph to use scene context. |
 | Evidence | Internal benchmark and Argoverse | Shows vectorized encoding can compete with rendered BEV baselines. |
+
+## Decision Lens
+
+VectorNet informs whether HD maps and trajectories should be rasterized or preserved as polylines with explicit geometric identity. The atomic unit is a point feature grouped into a polyline; local aggregation creates polyline embeddings and a global graph models interactions among agents and map elements.
+
+Vectorization preserves topology and avoids empty pixels, but preprocessing choices determine segment length, coordinate frame, and missing-map behavior. The missing ablation matches encoder capacity and latency against raster and raw-point attention across map quality levels. At 10× map extent, global polyline attention and retrieval dominate. The claim would fail if a compact raster encoder matched forecasting accuracy and cross-city generalization without vector-specific preprocessing.
 
 **Context:** VectorNet made vectorized map and agent encoding feel like a primary representation, not a preprocessing trick.
 

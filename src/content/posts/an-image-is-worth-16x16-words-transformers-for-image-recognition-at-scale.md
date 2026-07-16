@@ -8,7 +8,7 @@ legacyPath: >-
   shorts/2020/10/01/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale.html
 tags:
   - Other
-field: Computer Vision
+field: 'Vision Foundations'
 summary: ViT showed that patchified images and standard Transformer encoders can rival CNNs when pre-training data is large enough.
 ---
 ## 2020 – An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale
@@ -68,5 +68,13 @@ class PatchEmbed(nn.Module):
 ```
 
 **Critiques & limitations:** ViT's appeal is its plainness: patchify the image and reuse the Transformer stack. That simplicity helped unify vision and NLP research. The cost is data hunger. Vanilla ViT needs huge pre-training datasets such as JFT-300M, and quadratic attention makes very high resolutions and dense prediction tasks expensive.
+
+## Decision Lens
+
+ViT informs the decision to buy visual scale with learned attention instead of convolutional inductive bias. The atomic unit is a fixed-size image patch embedded as a token; the same attention and feed-forward parameters process every patch position.
+
+The result establishes a data-regime crossover, not universal Transformer superiority: large supervised pre-training makes the plain patch sequence competitive, while smaller datasets still favor stronger visual priors. Patch size is therefore a compression decision as well as an architectural one—smaller patches preserve detail but increase attention cost quadratically.
+
+The decisive missing comparison is a CNN and ViT sweep with identical data, augmentation, parameters, FLOPs, and transfer protocol across several data scales. At 10× resolution, token count and activation memory would fail before parameter count. The central claim would weaken if a convolutional baseline matched transfer accuracy and throughput throughout that controlled crossover study.
 
 **Takeaway:** With enough data, a plain Transformer can rival convolutional backbones for image classification. ViT did not make convolutions obsolete overnight, but it made attention-first vision models credible.

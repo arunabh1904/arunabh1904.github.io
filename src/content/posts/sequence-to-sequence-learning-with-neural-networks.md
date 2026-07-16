@@ -8,7 +8,7 @@ legacyPath: >-
   shorts/2014/09/01/sequence-to-sequence-learning-with-neural-networks.html
 tags:
   - Other
-field: Natural Language Processing
+field: 'Language Models'
 summary: Seq2seq made encoder-decoder neural translation practical before attention became the default alignment mechanism.
 ---
 ## 2014 – Sequence to Sequence Learning with Neural Networks
@@ -43,5 +43,11 @@ The paper also contains one of those oddly practical details that becomes famous
 | Decoding | Beam = 12 | – | ~0.11 s / sentence on CPU |
 
 **Critiques & limitations:** The architecture was clean because it removed hand-built alignments, but the fixed-length vector became an obvious bottleneck for long sentences. Large vocabularies also made training expensive, and the lack of an official implementation left early adopters guessing about details. Attention mechanisms would soon address the bottleneck directly.
+
+## Decision Lens
+
+Seq2seq informs the decision to learn translation as one conditional sequence model rather than assemble a phrase table, language model, and hand-built decoder. The atomic example is a parallel source-target sentence pair: an encoder compresses the source into a fixed vector, and a decoder predicts target tokens autoregressively.
+
+The result established that end-to-end neural translation could beat a strong phrase-based system, but the fixed-vector bottleneck entangles sentence length with representation quality. A length-stratified comparison against an attention-equipped encoder-decoder is the missing decisive ablation. Scaling to much longer documents would fail through information compression and autoregressive exposure bias. The central claim would weaken if a modular or retrieval-based system matched BLEU and generalization under the same parallel-data and compute budget.
 
 **Takeaway:** The encoder-decoder LSTM showed that a general neural network could outperform traditional translation systems. It did not solve sequence modelling by itself, but it gave the field the scaffold that attention and Transformers later expanded.

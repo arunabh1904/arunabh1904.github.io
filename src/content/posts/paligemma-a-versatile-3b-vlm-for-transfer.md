@@ -6,7 +6,7 @@ postSlug: paligemma-a-versatile-3b-vlm-for-transfer
 legacyPath: /paper shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html
 tags:
   - Other
-field: Vision-Language Models
+field: 'Vision-Language Models'
 summary: PaliGemma combines SigLIP and Gemma into a compact open VLM meant for fine-tuning across many vision-language tasks.
 ---
 ## 2024 - PaliGemma
@@ -49,6 +49,12 @@ _Figure 1 shows PaliGemma's core architecture: a SigLIP image encoder feeds a Ge
 | Low-data usability | Most tasks reach within 10% of full-data performance with 4k examples and within 20% with 256 examples. |
 | MMVP | PaliGemma-224 reaches 47.3% paired accuracy, compared with 38.7% for GPT-4V and 40.7% for Gemini in the paper's comparison. |
 | Practical training | A final Stage1 run takes just under 3 days on TPUv5e-256; Stage2 resolution increases take about 15 hours each. |
+
+## Decision Lens
+
+PaliGemma informs whether teams need a large chat-oriented VLM or a compact base model designed for task transfer. SigLIP patch features are linearly projected into Gemma's token space, and captions, answers, boxes, and masks are all emitted autoregressively under task prefixes. Resolution upcycling from 224 to 448 and 896 pixels is the paper's practical compression tradeoff: spend more visual tokens only for tasks whose fine detail warrants them.
+
+The nearly forty-task transfer suite establishes versatility, not that one checkpoint or resolution is universally optimal. The missing decision table is a compute-matched comparison of resolution, visual-token count, and task-specific fine-tuning data across OCR, localization, and semantic tasks. At ten times the image resolution or task count, autoregressive coordinate strings and context length become fragile bottlenecks. The transferable-base thesis would be falsified if specialized models with the same adaptation budget consistently dominate while a single instruction-tuned checkpoint transfers just as well.
 
 **Context:** PaliGemma made the "small open VLM as a transferable base model" story concrete. It is useful because it is inspectable, fine-tunable, and broad enough to cover more than chat.
 

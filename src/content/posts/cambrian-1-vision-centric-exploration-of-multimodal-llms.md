@@ -6,7 +6,7 @@ postSlug: cambrian-1-vision-centric-exploration-of-multimodal-llms
 legacyPath: /paper shorts/2024/06/01/cambrian-1-vision-centric-exploration-of-multimodal-llms.html
 tags:
   - Other
-field: Vision-Language Models
+field: 'Vision-Language Models'
 summary: Cambrian-1 treated VLM design as a vision problem first, systematically studying encoders, connectors, data, and evaluation.
 ---
 ## 2024 - Cambrian-1
@@ -36,6 +36,12 @@ _Figure 8 from the [Cambrian-1 paper](https://arxiv.org/abs/2406.16860), cropped
 | Design axis | 20+ vision encoders tested | Shows visual backbone choice changes downstream VLM behavior. |
 | Connector | Spatial Vision Aggregator | Keeps more local visual evidence for the LLM. |
 | Benchmark | CV-Bench | Evaluates vision-centric reasoning failures. |
+
+## Decision Lens
+
+Cambrian-1 informs where to spend the next unit of MLLM compute: on a larger language model, or on perception that preserves spatial evidence. Its experiments make the vision encoder and connector first-order design variables. Multiple visual backbones feed a Spatial Vision Aggregator, which retains local, high-resolution features before projecting them into the language stream; CV-Bench is then used to separate genuine visual competence from answers recoverable through language priors.
+
+The paper establishes that weak perception remains a binding constraint even when the language model is strong, but it does not fully isolate whether gains come from complementary encoder features, extra visual compute, or the aggregator itself. That matched-compute ablation is the expensive missing comparison. At ten times the scale, feeding ever more spatial tokens and encoders could make context cost and data quality dominate. The central claim would be weakened if a single encoder with the same token and FLOP budget matched the multi-encoder system on grounding-heavy tests while retaining its general benchmark performance.
 
 **Context:** A lot of VLM work implicitly assumes the LLM is the hard part. Cambrian-1 pushes back: the quality of the visual representation and connector can decide whether the language model is reasoning over evidence or filling gaps from priors.
 

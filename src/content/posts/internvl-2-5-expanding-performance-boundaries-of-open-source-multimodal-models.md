@@ -6,7 +6,7 @@ postSlug: internvl-2-5-expanding-performance-boundaries-of-open-source-multimoda
 legacyPath: /paper shorts/2024/12/01/internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models.html
 tags:
   - Other
-field: Vision-Language Models
+field: 'Vision-Language Models'
 summary: InternVL 2.5 scaled open multimodal models with better data, training strategy, and test-time reasoning.
 ---
 ## 2024 - InternVL 2.5
@@ -38,6 +38,12 @@ _Figure 1: Performance of various MLLMs on the OpenCompass leaderboard. From the
 | Scale | 1B to 78B family | Studies where open VLM scaling pays off. |
 | Training | Data quality and balancing | Reduces failures that pure scale does not fix. |
 | Evaluation | MMMU and hallucination-style tests | Looks beyond simple captioning/VQA. |
+
+## Decision Lens
+
+InternVL 2.5 informs how to scale an open multimodal system when model size, visual resolution, data balance, and test-time reasoning all consume the same budget. Its training unit remains an interleaved visual-token and text-token sequence, but the effective curriculum spans image, document, video, multilingual, grounding, and hallucination-oriented data. The paper's broad family from 1B to 78B is most useful as evidence that these levers interact rather than as proof that parameter count alone drives progress.
+
+The reported frontier comparisons establish strong coverage, not a clean causal scaling law. A more revealing study would hold training compute and test-time token budget fixed while independently sweeping model size, data quality, and inference strategy. At ten times the scale, duplicated supervision, evaluation leakage, and test-time latency are likelier bottlenecks than raw capacity. The paper's scaling narrative would fail if smaller models trained on the same curated distribution and given the same inference budget closed the gap on hallucination-resistant, out-of-distribution tests.
 
 **Context:** InternVL 2.5 showed that open models could compete with leading closed systems on difficult multimodal benchmarks while exposing more of the training recipe.
 

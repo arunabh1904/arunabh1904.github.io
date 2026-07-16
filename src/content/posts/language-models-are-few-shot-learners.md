@@ -6,7 +6,7 @@ postSlug: language-models-are-few-shot-learners
 legacyPath: /paper shorts/2020/05/01/language-models-are-few-shot-learners.html
 tags:
   - Other
-field: Natural Language Processing
+field: 'Language Models'
 summary: GPT-3 showed that scale can turn language models into few-shot learners, but also exposed the limits of prompting alone.
 ---
 ## 2020 – Language Models are Few-Shot Learners (GPT-3)
@@ -42,6 +42,12 @@ The paper's central claim is that no-fine-tune performance improves smoothly wit
 Inference speed at a 2048-token context is about 0.4 seconds on an A100-80&nbsp;GB GPU. Memory footprint is roughly 350&nbsp;GB, necessitating model-parallel serving.
 
 **Critiques & discussion:** The minimalist recipe is the point: scale a standard decoder stack and new behaviors appear. Few-shot prompting changed how people interact with language models and helped launch the API-first LLM ecosystem. The costs are just as central. Training required enormous compute, replication was limited to megascale labs, bias and toxicity remained visible, multi-step reasoning was brittle, and closed weights made full scientific scrutiny difficult.
+
+## Decision Lens
+
+GPT-3 informs whether additional pre-training scale can replace task-specific gradient updates with in-context examples. Its atomic unit is the next token in a mixed web, book, and code sequence; the same decoder parameters absorb both stored knowledge and the procedure implied by a prompt.
+
+The reported curves show broad few-shot improvement across the tested model sizes, not that prompting reliably substitutes for training on every task. The missing control is a matched-compute comparison between a larger frozen model, a smaller fine-tuned model, and retrieval-augmented inference. At 10× scale, data quality, memorization, inference cost, and evaluation contamination would dominate parameter count. The scaling thesis would fail if those alternatives delivered equal accuracy and calibration at lower total training-plus-serving cost.
 
 **Takeaway:** GPT-3 shifted the field from task-specific models toward general models steered by prompts. Its breadth came from scale, and its limitations showed what scale alone could not yet solve.
 

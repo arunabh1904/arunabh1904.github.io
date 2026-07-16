@@ -8,7 +8,7 @@ legacyPath: >-
   shorts/2022/02/28/training-language-models-to-follow-instructions-with-human-feedback.html
 tags:
   - Other
-field: Alignment
+field: 'Alignment & Post-Training'
 summary: InstructGPT showed that human preference data can make smaller language models follow instructions better than larger base models.
 ---
 ## 2022 – Training Language Models to Follow Instructions with Human Feedback (InstructGPT)
@@ -73,3 +73,9 @@ A reference policy (the frozen supervised model) keeps the RL step from drifting
 
 **Why it matters**
 RLHF transformed large language models from clever autocomplete systems into instruction-following assistants, laying the groundwork for ChatGPT, GPT-4, and beyond.
+
+## Decision Lens
+
+InstructGPT informs whether scarce human preference data is better spent on supervised demonstrations alone or on a reward model followed by policy optimization. Its training pipeline moves from prompt-response demonstrations to ranked completion pairs and finally to PPO rollouts constrained by a KL penalty to the supervised policy.
+
+The smaller aligned model beating a much larger base model establishes that behavioral supervision can dominate parameter count on instruction-following judgments. It does not isolate the value of PPO from demonstration quality, reward-model capacity, and sampling policy. At 10× scale, annotation consistency, reward hacking, and rollout cost dominate. The RLHF stack would be falsified as necessary if a matched supervised or direct-preference method reproduced helpfulness and safety without the online RL stage.

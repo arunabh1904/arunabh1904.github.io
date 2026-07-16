@@ -6,7 +6,7 @@ postSlug: mastering-atari-go-chess-shogi-muzero
 legacyPath: /paper shorts/2019/11/01/mastering-atari-go-chess-shogi-muzero.html
 tags:
   - Other
-field: Reinforcement Learning
+field: 'Reinforcement Learning'
 summary: MuZero learned just enough model dynamics to plan with MCTS, without reconstructing full environment observations.
 ---
 ## 2019 – Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model (MuZero)
@@ -39,5 +39,11 @@ The important design choice is what MuZero chooses not to model. It predicts onl
 | Chess / Shogi | Matches AlphaZero with fewer training games | Tests whether the same model-based planning recipe transfers across rule systems. |
 
 **Critiques & limitations:** MuZero is elegant because it preserves the strength of search without requiring explicit rules. The cost is large. Training used enormous compute, inference requires MCTS, and the learned dynamics remain hard to interpret: the model plans well, but it is not obvious what environment structure it has actually learned.
+
+## Decision Lens
+
+MuZero informs how much of an environment model must be learned for planning. Its atomic unit is a trajectory segment: representation, dynamics, and prediction networks are trained from observations, actions, rewards, value targets, and MCTS-derived policies, while the latent state is shared between model learning and search.
+
+The evidence shows that predicting decision-relevant rewards and values can outperform reconstructing pixels, but search compute and target generation are part of the result. The missing control compares MuZero with a reconstruction-based world model and a model-free agent under equal environment, training, and planning FLOPs. At 10× horizon, compounding latent error and search branching dominate. The central claim would fail if reconstruction or model-free learning matched return and sample efficiency at lower total compute.
 
 **Takeaway:** MuZero showed that learned latent models can support serious planning across very different domains. It replaced hand-coded rules with learned prediction, but it paid for that generality with compute and search latency.

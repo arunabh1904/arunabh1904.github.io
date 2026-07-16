@@ -6,7 +6,7 @@ postSlug: qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-an
 legacyPath: /paper shorts/2024/09/01/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution.html
 tags:
   - Other
-field: Vision-Language Models
+field: 'Vision-Language Models'
 summary: Qwen2-VL made resolution and video length more flexible by letting visual token count scale with the input.
 ---
 ## 2024 - Qwen2-VL
@@ -38,6 +38,12 @@ _Figure 1: Qwen2-VL capabilities: Multilingual image text understanding, code/ma
 | Resolution | Dynamic visual tokens | Preserves small text and high-resolution detail. |
 | Modalities | Image plus video | One model handles static and temporal inputs. |
 | Artifact | Qwen2-VL docs/project | Useful for OCR-heavy and multilingual multimodal tasks. |
+
+## Decision Lens
+
+Qwen2-VL informs whether visual detail should be normalized away at ingestion or represented through a variable token budget. Naive Dynamic Resolution lets patch count track the source image, while multimodal rotary position encoding supplies a common spatial and temporal coordinate system for text, images, and video. Compression is therefore adaptive rather than fixed: documents and dense scenes pay for more tokens, and simpler inputs remain cheaper.
+
+The OCR, document, and video results demonstrate the value of retaining detail, but they confound resolution, token count, and training distribution. A decisive ablation would compare fixed and dynamic schemes under identical average and tail latency, with separate results for small text, ordinary photographs, and long video. At ten times the input size, context occupation and attention cost can turn adaptive fidelity into unpredictable service behavior. The claim is operationally falsified if a fixed-token resampler matches accuracy and preserves more throughput under the same memory envelope.
 
 **Context:** Resolution is not cosmetic. If a model cannot preserve the evidence, the language model hallucinates around it. Qwen2-VL showed that flexible tokenization can make generalist VLMs much more usable.
 

@@ -6,7 +6,7 @@ postSlug: scene-reconstruction-as-mapping-priors-for-3d-detection
 legacyPath: /paper shorts/2026/05/21/scene-reconstruction-as-mapping-priors-for-3d-detection.html
 tags:
   - Other
-field: BEV
+field: 'BEV Perception & Mapping'
 summary: MPA3D uses automatically reconstructed surfel and 3D Gaussian maps as dense static priors for 3D object detection.
 ---
 ## 2026 - Scene Reconstruction as Mapping Priors for 3D Detection
@@ -48,6 +48,12 @@ _Figure 2 shows MPA3D: camera BEV features, LiDAR, surfels, and 3D Gaussian prio
 | MPA3D vs MAD temporal fusion | +0.2/+0.4 L2 AP/APH on validation and +0.9/+1.2 on testing | Comparable or better than using up to 99 previous frames. |
 | Gated fusion ablation | 83.3 overall L2 AP, +2.9 over the next-best concat baseline | The fusion mechanism is a real contributor, not just more inputs. |
 | Runtime caveat | Adding both priors increases latency from 245 ms to 452 ms in the reported setup | The accuracy gain comes with deployment cost. |
+
+## Decision Lens
+
+MPA3D informs whether static scene reconstruction can serve as a reusable prior for 3D detection instead of forcing each frame to relearn background geometry. The atomic prior is a surfel or 3D Gaussian map element aligned with current sensor features; dynamic-object prediction is conditioned on that persistent static representation.
+
+The method can turn repeated fleet observations into dense supervision, but localization quality and stale geometry determine whether the prior helps. The missing factorial study separates map density, reconstruction type, pose error, and detector capacity under equal current-frame inputs. At 10× territory and map age, storage, retrieval, and change management dominate. The mapping-prior claim would fail if a temporal detector matched 3D accuracy under pose noise without maintaining an external reconstructed map.
 
 **Context:** MPA3D reframes mapping as perception memory. The map does not need to be a manually labeled semantic product; a reconstructed static scene can still be a powerful prior for finding what changed.
 

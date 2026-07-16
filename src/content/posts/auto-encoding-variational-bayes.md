@@ -6,7 +6,7 @@ postSlug: auto-encoding-variational-bayes
 legacyPath: /paper shorts/2014/04/01/auto-encoding-variational-bayes.html
 tags:
   - Other
-field: Variational Inference
+field: 'Generative Modeling'
 summary: VAEs made latent-variable models trainable with SGD by turning stochastic sampling into a differentiable reparameterized path.
 ---
 ## 2014 – Auto-Encoding Variational Bayes
@@ -29,6 +29,14 @@ _Figure from the [AEVB paper](https://arxiv.org/abs/1312.6114), via ar5iv._
 **Summary:** Kingma and Welling made variational inference feel like ordinary neural-network training. Their variational autoencoder pairs an encoder $q_\phi(z \mid x)$, which approximates the posterior over latent variables, with a decoder $p_\theta(x \mid z)$, which reconstructs observations from those latents. The key move is the reparameterisation trick: instead of sampling $z$ in a way that blocks gradients, sample fixed noise and transform it through differentiable parameters.
 
 That trick turns Monte Carlo estimates of the evidence lower bound (ELBO) into low-variance gradients that work with standard stochastic gradient descent. The paper also made amortised inference practical at scale: the encoder learns to predict posterior parameters directly, rather than solving a separate inference problem for every datapoint.
+
+## Decision Lens
+
+The paper clarifies which latent representation and generative objective give the best quality, likelihood, and sampling-cost tradeoff. Its fundamental training unit is a datapoint and a sampled latent variable.
+
+For optimization, the ELBO adds an expected reconstruction term and a KL term per example; the original formulation does not introduce a separate $\beta$ reweighting coefficient. The encoder maps each observation to the parameters of a compact latent distribution sampled through reparameterization.
+
+The most important missing comparison is a matched-compute comparison that separates objective choice, latent compression, sampler steps, and data quality. At 10× scale, data curation, latent bottlenecks, sampling cost, and training instability would dominate simple parameter scaling. The central claim would fail under this test: Hold data, parameters, and sampling compute fixed; reject the objective if a simpler likelihood or adversarial baseline matches quality and coverage.
 
 **Context:** VAEs gave deep generative modelling a stable likelihood-based recipe. They did not produce the sharpest samples, but they made latent-variable models trainable, inspectable, and useful for representation learning. Later work such as $\beta$-VAE, conditional VAEs, and flow-based models all build on this basic encoder-decoder view of probabilistic inference.
 

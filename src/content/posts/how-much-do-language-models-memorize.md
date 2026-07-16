@@ -6,7 +6,7 @@ postSlug: how-much-do-language-models-memorize
 legacyPath: /paper shorts/2025/05/30/how-much-do-language-models-memorize.html
 tags:
   - Other
-field: Natural Language Processing
+field: 'Language Models'
 summary: This paper separates memorization from generalization and estimates GPT-style language-model capacity at about 3.6 bits per parameter.
 ---
 ## 2025 - How Much Do Language Models Memorize?
@@ -56,6 +56,12 @@ _Figure 1 isolates capacity with uniform random data: because there is no reusab
 | Model size sweep | Capacity is roughly linear in parameter count | GPT-style transformers store a stable number of bits per parameter. |
 | Text data | Unintended memorization decreases after capacity fills | The model starts spending training signal on generalization. |
 | Membership inference | F1 approaches random guessing as datasets get very large | Average samples become hard to distinguish from held-out text. |
+
+## Decision Lens
+
+This paper informs how much parameter budget should be interpreted as storage rather than transferable computation. The unit of analysis is a training token whose recoverability is measured against held-out generalization, producing an estimated memorization capacity of roughly 3.6 bits per parameter for the studied GPT-style models.
+
+That estimate is conditional on the data distribution, model family, extraction method, and definition of memorization; it is not a hardware-independent constant. The crucial missing study varies duplication, deduplication, tokenizer, and architecture while holding tokens and optimization fixed. At 10× scale, rare-string extraction, privacy exposure, and benchmark leakage become more important than the average capacity estimate. The claim would fail if an independent extraction protocol produced a substantially different bits-per-parameter slope on held-out model families.
 
 **Context:** The paper gives a cleaner measurement vocabulary for a fuzzy debate. Instead of asking only whether a string can be extracted, it asks how many bits of sample-specific information the weights contain and how that budget scales.
 

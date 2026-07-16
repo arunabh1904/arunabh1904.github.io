@@ -8,7 +8,7 @@ legacyPath: >-
   shorts/2021/06/01/improved-denoising-diffusion-probabilistic-models.html
 tags:
   - Other
-field: Generative Models
+field: 'Generative Modeling'
 summary: Improved DDPM tightened diffusion likelihoods and made sampling faster by learning reverse-process variance.
 ---
 ## 2021 – Improved Denoising Diffusion Probabilistic Models (ID DPM)
@@ -59,5 +59,11 @@ def iddpm_loss(model, x0, timesteps, betas, logvar_schedule):
 Switching to the cosine $\beta_t$ schedule from the appendix further sharpens FID at low step counts.
 
 **Critiques:** The upgrades are attractive because they are almost drop-in: learn variance, adjust the objective, improve the schedule. They became part of the practical diffusion toolbox used by later systems. Sampling still needs dozens of UNet passes, large models remain memory-heavy, and classifier guidance can introduce bias, which later classifier-free methods address more cleanly.
+
+## Decision Lens
+
+Improved DDPM informs where to spend diffusion complexity: on the noise-prediction loss, learned reverse variance, schedule, or additional sampling steps. Its atomic unit remains a noisy image-timestep pair, but the hybrid objective adds likelihood pressure while the learned variance permits aggressive step reduction.
+
+The results show better likelihood and useful samples with far fewer reverse steps in the tested image regimes; they do not isolate whether those gains persist with modern solvers and latent diffusion. A matched wall-clock factorial ablation of variance learning, cosine schedule, objective, and sampler is the missing decision table. At 10× scale, repeated high-resolution evaluations remain dominant. The recipe would be falsified if a fixed-variance model with a stronger solver matched NLL and FID at lower total compute.
 
 **Takeaway:** ID DPM turned diffusion from a slow curiosity into a practical generator, paving the way for fast samplers and classifier-free guidance.

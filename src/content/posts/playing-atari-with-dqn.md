@@ -6,7 +6,7 @@ postSlug: playing-atari-with-dqn
 legacyPath: /paper shorts/2013/12/01/playing-atari-with-dqn.html
 tags:
   - Other
-field: Reinforcement Learning
+field: 'Reinforcement Learning'
 summary: DQN combined Q-learning, replay, and target networks to make pixel-based Atari control work with deep networks.
 ---
 ## 2013 – Playing Atari with Deep Reinforcement Learning
@@ -32,6 +32,12 @@ _Figure 1 provides sample screenshots from five of the games used for training. 
 2. **Target network:** hold a slowly updated copy of the Q-network to compute stable learning targets.
 
 With those pieces in place, the authors trained one CNN architecture across seven Atari games using the same weights and hyperparameters. That result mattered because it moved deep RL away from game-specific feature engineering and toward end-to-end pixel-to-action learning. Replay memory and target networks also became durable building blocks for value-based deep RL, while the paper's limitations helped motivate later variants such as Double DQN, prioritized replay, and distributional RL.
+
+## Decision Lens
+
+DQN informs whether a single convolutional Q-network can replace game-specific features and controllers while learning directly from pixels. The learning unit is a replayed transition $(s,a,r,s')$; replay breaks short-term correlation and a lagged target network stabilizes the bootstrapped label.
+
+The Atari results establish sample reuse and target lag as a workable combination, not a generally stable recipe for every observation or reward distribution. The missing ablation is a seed-rich factorial study of replay, target updates, reward clipping, frame stacking, and optimizer under equal environment steps. At 10× task diversity, replay imbalance and interference would dominate. The claim would fail if an on-policy or model-based baseline matched median human-normalized score with the same frames and less tuning.
 
 **Context:** DQN showed that a relatively simple network, three convolutional layers followed by two fully connected layers, could handle high-dimensional visual state in a reinforcement learning loop. The important contribution was not just the score table. It was the recipe: pair Q-learning with enough neural capacity, then add just enough machinery to make the targets less volatile.
 

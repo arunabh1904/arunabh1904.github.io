@@ -6,7 +6,7 @@ postSlug: unidrivevla-unifying-understanding-perception-and-action-planning-for-
 legacyPath: /paper shorts/2026/04/02/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLA & Planning'
 summary: UniDriveVLA decouples semantic understanding, spatial perception, and action planning into specialized Transformer experts coordinated by masked joint attention.
 ---
 ## 2026 - UniDriveVLA
@@ -43,6 +43,12 @@ _Figure 3 shows UniDriveVLA's Mixture-of-Transformers architecture, where specia
 | Coordination | Masked joint attention | Shares information without collapsing every token into one stream. |
 | Training | Three-stage progressive recipe | Stabilizes VLA optimization for driving. |
 | Evaluation | nuScenes and Bench2Drive | Covers open-loop public data and closed-loop simulation. |
+
+## Decision Lens
+
+UniDriveVLA informs whether one fully shared Transformer should handle driving semantics, spatial perception, and action planning or whether those functions need specialized experts. Its atomic tokens enter expert-specific paths coordinated by masked joint attention, which controls information exchange without forcing every parameter to serve every objective.
+
+Specialization can reduce gradient conflict, but expert boundaries and joint-attention masks may encode the answer manually. The missing factorial ablation matches total parameters across fully shared, expert-only, and partially shared designs while measuring transfer and per-task gradients. At 10× modalities or tasks, routing imbalance and interface bandwidth dominate. The expert claim would fail if a dense shared model matched worst-task and closed-loop performance under equal training and inference FLOPs.
 
 **Context:** UniDriveVLA makes expert decoupling a central design pattern for driving VLAs.
 

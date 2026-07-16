@@ -6,7 +6,7 @@ postSlug: maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-co
 legacyPath: /paper shorts/2022/08/30/maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-construction.html
 tags:
   - Other
-field: BEV
+field: 'BEV Perception & Mapping'
 summary: MapTR models HD map elements as permutation-equivalent point sets, making online vectorized map construction trainable with a structured Transformer.
 ---
 ## 2022 - MapTR
@@ -49,6 +49,12 @@ _Figure 4 shows the structured MapTR pipeline: sensor inputs become BEV features
 | VectorMapNet | Camera | R50 | 40.9 | 2.9 |
 | MapTR-nano | Camera | R18 | 45.9 | 25.1 |
 | MapTR-tiny | Camera | R50 | 50.3 | 11.2 |
+
+## Decision Lens
+
+MapTR informs whether online map elements should be decoded as ordered polylines with one canonical point sequence or as permutation-equivalent point sets. The atomic unit is a map-element query whose point queries represent geometry; hierarchical bipartite matching handles element identity and equivalent point orderings.
+
+The structured set view reduces arbitrary ordering penalties, but matching cost and fixed point count shape the result. A decisive ablation compares canonical ordering, permutation-equivalent matching, and curve-parameter decoders with the same image backbone and query budget. At 10× map extent, query count and Hungarian matching become bottlenecks. MapTR's formulation would fail if a simpler ordered decoder matched topology and geometry at lower latency and with fewer assignment ambiguities.
 
 **Context:** MapTR gave the field a practical transformer baseline for vector maps and made permutation ambiguity a first-class modeling issue.
 

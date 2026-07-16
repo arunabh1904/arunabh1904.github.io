@@ -6,7 +6,7 @@ postSlug: mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction
 legacyPath: /paper shorts/2024/04/01/mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction.html
 tags:
   - Other
-field: BEV
+field: 'BEV Perception & Mapping'
 summary: MGMap adds learned masks to online vector-map construction so instance queries and point refinement focus on the relevant BEV regions.
 ---
 ## 2024 - MGMap
@@ -48,6 +48,12 @@ _The MGMap overview shows where the mask guidance enters the vector-map pipeline
 | Camera | R50 | 61.4 | 11.6 |
 | LiDAR | SECOND | 67.9 | 5.5 |
 | Camera + LiDAR | R50 + SECOND | 71.7 | 4.8 |
+
+## Decision Lens
+
+MGMap informs whether vector-map queries need an explicit spatial mask to focus feature sampling and point refinement. Its atomic unit is a map-instance query coupled to a learned BEV relevance mask; the mask constrains where the decoder looks before producing vector points.
+
+The mask supplies dense localization guidance to an otherwise sparse vector objective, but it may encode the same answer through an auxiliary raster task. The missing control equalizes auxiliary supervision and compares learned masks with deformable attention or uncertainty-guided sampling. At 10× scene extent, mask resolution and foreground imbalance dominate. MGMap's claim would fail if sparse attention learned equivalent regions and map quality without mask labels or raster overhead.
 
 **Context:** MGMap pushed vector-map models toward richer query support instead of treating each polyline point as a thin detection target.
 

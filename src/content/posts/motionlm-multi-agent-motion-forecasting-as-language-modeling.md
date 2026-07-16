@@ -6,7 +6,7 @@ postSlug: motionlm-multi-agent-motion-forecasting-as-language-modeling
 legacyPath: /paper shorts/2023/09/28/motionlm-multi-agent-motion-forecasting-as-language-modeling.html
 tags:
   - Other
-field: BEV
+field: 'Motion Forecasting & Planning'
 summary: MotionLM discretizes continuous trajectories into motion tokens and forecasts interacting road agents with an autoregressive language-model objective.
 ---
 ## 2023 - MotionLM
@@ -46,6 +46,12 @@ _Figure 2 shows the language-model analogy concretely: scene features condition 
 | MTR | 0.9181 | 0.4411 | 0.2037 |
 | JFP | 0.8817 | 0.4233 | 0.2050 |
 | MotionLM | 0.8911 | 0.4115 | 0.2178 |
+
+## Decision Lens
+
+MotionLM informs whether continuous multi-agent futures should be generated jointly as discrete motion tokens. The atomic unit is a quantized displacement token for a particular agent and timestep; autoregressive ordering lets each predicted move condition on the emerging joint future.
+
+Tokenization makes interaction modeling compatible with language-model training, but quantization error, sequence ordering, and exposure bias become part of the planner. The missing study holds backbone and sampling budget fixed across tokenized autoregression and continuous joint decoders. At 10× agents or horizon, sequence length and sampling latency grow linearly while joint combinations grow much faster. The claim would fail if a continuous decoder matched joint metrics and controllable diversity with lower latency and no quantization artifacts.
 
 **Context:** MotionLM made the language-model analogy concrete for autonomous-driving behavior prediction.
 

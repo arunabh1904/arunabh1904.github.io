@@ -6,7 +6,7 @@ postSlug: distilling-multimodal-large-language-models-for-autonomous-driving
 legacyPath: /paper shorts/2025/01/01/distilling-multimodal-large-language-models-for-autonomous-driving.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLMs & Evaluation'
 summary: DIMA used a large multimodal driving model as a teacher, distilling its behavior into a faster vision-based planner.
 ---
 ## 2025 - Distilling Multi-modal Large Language Models for Autonomous Driving
@@ -36,6 +36,12 @@ _Source figure from the [DiMA paper](https://arxiv.org/abs/2501.09757), via arXi
 | Teacher | Multimodal LLM planner | Provides richer traffic reasoning during training. |
 | Student | Vision-only planner | Keeps inference cheaper and faster. |
 | Reported signal | Lower trajectory error and collisions | Measures whether distilled reasoning survives compression. |
+
+## Decision Lens
+
+DIMA informs whether an expensive multimodal driving reasoner should run online or serve as a training-time teacher for a compact vision planner. The atomic supervision unit pairs a driving observation with teacher-produced reasoning or action targets; the student absorbs that signal but executes without the teacher.
+
+Distillation can preserve semantic structure at low latency, but gains may come from extra labels rather than teacher reasoning. The missing factorial ablation compares teacher actions, rationales, intermediate features, and equal-volume human annotations under one student architecture. At 10× teacher size, label-generation cost and systematic teacher errors dominate. The approach would fail if a student trained on simpler privileged labels matched closed-loop safety and progress without the multimodal teacher.
 
 **Context:** Distillation is a plausible path from impressive VLM demos to deployable autonomy components. The expensive model teaches; the small model acts.
 

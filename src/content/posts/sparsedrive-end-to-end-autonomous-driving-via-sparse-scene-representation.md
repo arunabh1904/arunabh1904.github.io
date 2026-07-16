@@ -6,7 +6,7 @@ postSlug: sparsedrive-end-to-end-autonomous-driving-via-sparse-scene-representat
 legacyPath: /paper shorts/2024/05/30/sparsedrive-end-to-end-autonomous-driving-via-sparse-scene-representation.html
 tags:
   - Other
-field: BEV
+field: 'Autonomous Driving: VLA & Planning'
 summary: SparseDrive replaces expensive dense BEV planning features with sparse scene instances, symmetric sparse perception, parallel motion planning, and collision-aware rescoring.
 ---
 ## 2024 - SparseDrive
@@ -41,6 +41,12 @@ _Figure 3 shows SparseDrive's architecture: image features become sparse scene r
 | Perception | Detection, tracking, and mapping in a symmetric sparse module | Keeps dynamic and static scene structure aligned. |
 | Planning | Parallel motion planner | Lets agent prediction and ego planning interact earlier. |
 | Safety | Collision-aware rescoring | Makes trajectory selection sensitive to physical conflicts. |
+
+## Decision Lens
+
+SparseDrive informs whether end-to-end planning needs a dense BEV feature map or can operate on a compact set of detected agents and map instances. Its atomic units are sparse scene queries shared by perception, motion prediction, and planning; collision-aware rescoring links predicted futures back to ego selection.
+
+The sparse interface buys latency by discarding most spatial locations, but missed or poorly localized instances become irreversible planner blind spots. The missing test equalizes backbone and latency across sparse queries, dense BEV, and a hybrid occupancy path under occlusion and long-tail clutter. At 10× actors, query competition and pairwise interaction cost dominate. The claim would fail if a compressed dense representation matched planning safety with better recall at the same runtime.
 
 **Context:** SparseDrive sharpened the argument that sparse/vectorized planning can be both faster and more planner-aligned than dense BEV stacks.
 

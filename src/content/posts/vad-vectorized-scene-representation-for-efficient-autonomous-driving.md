@@ -6,7 +6,7 @@ postSlug: vad-vectorized-scene-representation-for-efficient-autonomous-driving
 legacyPath: /paper shorts/2023/03/21/vad-vectorized-scene-representation-for-efficient-autonomous-driving.html
 tags:
   - Other
-field: BEV
+field: 'Autonomous Driving: VLA & Planning'
 summary: VAD replaces dense rasterized planning inputs with vectorized agents and map elements, improving end-to-end planning efficiency and safety constraints.
 ---
 ## 2023 - VAD
@@ -48,6 +48,12 @@ _Figure 1 shows the representational shift: VAD keeps agents, maps, and ego plan
 | UniAD | 1.03 | 0.31 | 555.6 | 1.8 |
 | VAD-Tiny | 0.78 | 0.38 | 59.5 | 16.8 |
 | VAD-Base | 0.72 | 0.22 | 224.3 | 4.5 |
+
+## Decision Lens
+
+VAD informs whether an ego planner needs a dense raster feature map or can reason over vectorized agents and map elements. Its atomic units are agent vectors, map vectors, and ego trajectory points; vector attention exposes interaction while explicit safety costs rescore plans.
+
+The representation reduces dense BEV compute, but planning quality becomes bounded by vector extraction recall and uncertainty. The missing comparison matches latency and backbone across vector-only, raster-only, and hybrid planners under missed detections and map errors. At 10× actors, pairwise interaction and vector selection dominate. VAD's claim would fail if a low-resolution raster or occupancy interface matched collision and progress metrics while degrading more gracefully when upstream instances are missing.
 
 **Context:** VAD connected vectorized scene understanding to end-to-end planning, not just map construction.
 

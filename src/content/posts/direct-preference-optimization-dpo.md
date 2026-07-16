@@ -6,7 +6,7 @@ postSlug: direct-preference-optimization-dpo
 legacyPath: /paper shorts/2023/05/01/direct-preference-optimization-dpo.html
 tags:
   - Other
-field: Reinforcement Learning
+field: 'Alignment & Post-Training'
 summary: DPO replaced explicit reward modeling and PPO with a direct preference loss derived from the RLHF objective.
 ---
 ## 2023 – Direct Preference Optimization: Your Language Model Is Secretly a Reward Model
@@ -53,5 +53,11 @@ def dpo_loss(policy, ref_policy, batch, beta=0.1):
     logits = beta * ((chosen_logp - reject_logp) - (chosen_ref - reject_ref))
     return F.binary_cross_entropy_with_logits(logits, torch.ones_like(logits))
 ```
+
+## Decision Lens
+
+DPO informs whether preference alignment requires a separately trained reward model and online RL loop. The atomic example is a prompt with chosen and rejected responses; the policy and frozen reference model turn that pair into one logistic preference loss.
+
+The derivation makes the KL-regularized reward optimum directly estimable, but the empirical result does not separate objective quality from preference-data quality and reference-policy coverage. The missing study holds prompts, labels, samples, and base model fixed across DPO, reward-model-plus-PPO, and supervised baselines. At 10× data and model scale, mislabeled preferences and off-policy coverage become dominant. DPO's claim would fail if explicit reward modeling delivered better calibrated preferences and downstream safety at equal total compute.
 
 **Takeaway:** DPO reduces preference optimization to a contrastive classification loss. By removing the reward model and RL loop, it matches or beats PPO while being much cheaper and easier to train.

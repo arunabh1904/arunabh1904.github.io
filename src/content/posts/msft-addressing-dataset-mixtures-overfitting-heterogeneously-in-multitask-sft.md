@@ -8,7 +8,7 @@ legacyPath: >-
   shorts/2026/03/23/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft.html
 tags:
   - Other
-field: Alignment
+field: 'Alignment & Post-Training'
 summary: mSFT adapts multitask fine-tuning mixtures by tracking which datasets overfit at different rates.
 ---
 ## 2026 – mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT
@@ -39,6 +39,12 @@ The proposed algorithm makes the mixture overfitting-aware. It trains on the act
 - Figure 2 is the premise: benchmark sub-datasets peak at materially different epochs, so one global stopping point creates both overfitting and under-training.
 - Figure 3 is the reason the naive single-rollout fix is unstable: once one dataset is removed, the remaining tasks' optimal stopping points move.
 - Figure 6 is the practical claim: under a low compute budget, dataset exclusion can improve accuracy while reducing net FLOPs.
+
+## Decision Lens
+
+mSFT informs whether multitask fine-tuning should keep a static dataset mixture when tasks overfit at different rates. Its atomic unit is a supervised example tagged by dataset; validation behavior feeds back into the probability of sampling that dataset, turning the mixture into a training-control variable.
+
+The method's value depends on whether per-dataset validation loss is a reliable early signal for downstream utility. The missing comparison holds total examples and optimizer steps fixed against static, temperature-based, and loss-proportional mixtures, including tasks whose validation loss is poorly correlated with quality. At 10× tasks, noisy validation signals and scheduler instability can cause oscillating or starved datasets. The claim would fail if a static mixture matched average and worst-task performance under the same compute.
 
 **Context:** Data mixture tuning is usually treated as a static weighting problem. mSFT reframes it as a training-dynamics problem: the right mixture can change over time because tasks saturate at different rates. That is especially relevant for post-training, where datasets often differ in size, difficulty, quality, and target behavior.
 

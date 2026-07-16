@@ -6,7 +6,7 @@ postSlug: wayformer-motion-forecasting-via-simple-and-efficient-attention-networ
 legacyPath: /paper shorts/2022/07/12/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks.html
 tags:
   - Other
-field: BEV
+field: 'Motion Forecasting & Planning'
 summary: Wayformer shows that a simpler attention stack can fuse heterogeneous road, agent, and traffic-light inputs for motion forecasting when the fusion strategy is chosen carefully.
 ---
 ## 2022 - Wayformer
@@ -39,6 +39,12 @@ _Figure 1 shows Wayformer as an encoder-decoder attention network over heterogen
 | Efficiency | Factorized and latent-query attention | Makes large scene attention more practical. |
 | Inputs | Road geometry, traffic lights, agent history | Covers the messy inputs forecasting systems actually use. |
 | Benchmarks | Waymo Open Motion Dataset and Argoverse | Compares across major public motion forecasting settings. |
+
+## Decision Lens
+
+Wayformer informs how much forecasting quality comes from a specialized interaction graph versus a carefully chosen attention fusion strategy. Its atomic tokens represent agents, road elements, and traffic lights over time; early, late, or hierarchical fusion determines when those modalities can interact.
+
+The results favor early fusion in the tested regimes, but fusion choice is entangled with token count and attention approximation. The missing factorial study matches FLOPs while varying fusion point, latent bottleneck, and full versus factorized attention across scene densities. At 10× actors and map tokens, early fusion's quadratic interaction cost becomes decisive. The simplicity claim would fail if hierarchical fusion matched accuracy and calibration with a materially better latency curve.
 
 **Context:** Wayformer helped normalize unified attention over heterogeneous driving scenes while keeping the architecture relatively simple.
 

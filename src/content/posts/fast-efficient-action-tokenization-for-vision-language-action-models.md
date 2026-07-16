@@ -6,7 +6,7 @@ postSlug: fast-efficient-action-tokenization-for-vision-language-action-models
 legacyPath: /paper shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html
 tags:
   - Other
-field: Robotics
+field: 'Vision-Language-Action & Robotics'
 summary: FAST compressed robot action trajectories into tokens so autoregressive VLA models could learn dexterous control more efficiently.
 ---
 ## 2025 - FAST
@@ -36,6 +36,12 @@ _Figure 1: We propose FAST, a simple yet effective approach for tokenization of 
 | Problem | High-frequency continuous actions | Naive tokenization makes sequences too long. |
 | Method | Time-series compression | Creates compact action tokens. |
 | Signal | Faster VLA training | Makes autoregressive robot policies more practical. |
+
+## Decision Lens
+
+FAST informs a representation decision that quietly controls the economics of autoregressive robot policies: how much of a continuous action trajectory deserves its own token. Instead of quantizing every timestep and control dimension independently, it transforms action chunks into frequency coefficients and discretizes the compressed representation. The model predicts a shorter sequence while retaining the smooth temporal structure that dexterous control needs.
+
+The paper shows that action-aware compression can improve training efficiency and behavior, but average task success does not reveal which high-frequency corrections are lost. A missing stress test should stratify tasks by control bandwidth and compare FAST with learned tokenizers at equal bitrate and decoding latency. At ten times the horizon, small reconstruction errors can accumulate and rare abrupt motions may be suppressed by the frequency prior. The claim is falsified if compact tokens help offline likelihood but fail to improve—or reduce—closed-loop robustness under perturbations.
 
 **Context:** Action representation is one of the hidden make-or-break details in robot foundation models. If actions are tokenized poorly, the model wastes capacity on formatting instead of behavior.
 

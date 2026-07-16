@@ -6,7 +6,7 @@ postSlug: senna-bridging-large-vision-language-models-and-end-to-end-autonomous-
 legacyPath: /paper shorts/2024/10/01/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLA & Planning'
 summary: SENNA split driving into high-level language planning and low-level trajectory control.
 ---
 ## 2024 - SENNA
@@ -36,6 +36,12 @@ _Figure 1: Previous methods plan trajectories without a decision-making step, ma
 | Decomposition | Language plan plus control module | Separates semantic intent from numeric control. |
 | Training | Planning-oriented QA and curriculum | Tunes the VLM for traffic decisions. |
 | Caveat | Language plan is not a guarantee | Control still needs safety validation. |
+
+## Decision Lens
+
+SENNA informs whether a driving stack should separate high-level semantic commands from low-level continuous trajectory control. The VLM predicts a compact driving intention from images and language context; a fast planner conditions on that intention to generate the trajectory.
+
+The hierarchy reduces language-generation latency in the control loop, but the command vocabulary can become an information bottleneck. The missing test varies command granularity and compares oracle, learned, and absent high-level guidance under matched planner capacity. At 10× scenario complexity, ambiguous commands and recovery from a wrong high-level decision dominate. The separation would fail if direct end-to-end planning matched safety and generalization without the semantic intermediate.
 
 **Context:** SENNA captures a useful decomposition for safety-critical systems: use language for semantic planning, but keep numeric control in a component designed for precision.
 

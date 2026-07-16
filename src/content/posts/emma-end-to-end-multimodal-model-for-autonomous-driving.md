@@ -6,7 +6,7 @@ postSlug: emma-end-to-end-multimodal-model-for-autonomous-driving
 legacyPath: /paper shorts/2024/10/01/emma-end-to-end-multimodal-model-for-autonomous-driving.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLA & Planning'
 summary: EMMA represented driving inputs and outputs as language tokens so one multimodal model could handle planning, perception, and road structure tasks.
 ---
 ## 2024 - EMMA
@@ -38,6 +38,12 @@ _Figure 1: EMMA overview diagram. From the [EMMA: End-to-End Multimodal Model fo
 | Model role | Generalist driving model | One multimodal model handles several driving outputs. |
 | Output format | Text-encoded trajectories and objects | Lets prompts select task-specific outputs. |
 | Caveat | Limited temporal and 3D sensing | Promising architecture, not a complete AV stack. |
+
+## Decision Lens
+
+EMMA informs whether driving perception, road-structure understanding, and planning can be represented through one language-token interface. Its atomic unit is an autoregressive token conditioned on camera observations and a task prompt; shared parameters produce textual structures and future trajectories in a common format.
+
+The unified vocabulary simplifies task transfer but quantizes geometry and ties control latency to sequence generation. The missing ablation compares tokenized trajectories with a continuous head while keeping the visual-language backbone and multitask data fixed. At 10× horizon or agent count, output length and compounding decoding errors dominate. EMMA's interface would fail if a shared backbone with specialized continuous heads matched transfer and improved closed-loop accuracy and latency.
 
 **Context:** EMMA is a strong example of the generalist-model thesis entering autonomous driving: one model, many outputs, shared representations.
 

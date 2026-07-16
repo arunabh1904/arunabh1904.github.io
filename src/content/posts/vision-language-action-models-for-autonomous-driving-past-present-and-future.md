@@ -6,7 +6,7 @@ postSlug: vision-language-action-models-for-autonomous-driving-past-present-and-
 legacyPath: /paper shorts/2025/12/18/vision-language-action-models-for-autonomous-driving-past-present-and-future.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLA & Planning'
 summary: This survey traces autonomous-driving VLA work from vision-action models to end-to-end and dual-system VLA paradigms, with attention to action generators and guidance styles.
 ---
 ## 2025 - Vision-Language-Action Models for Autonomous Driving
@@ -41,6 +41,12 @@ _Figure 2 summarizes representative VA and VLA models across end-to-end, world-m
 | Action generator | Textual action, numerical trajectory, or control signal | Determines how directly the model can drive. |
 | Guidance style | Explicit or implicit | Separates prompt-like supervision from representation-level conditioning. |
 | Historical line | VA, world model, VLA | Connects new VLA papers to older driving policy and dynamics work. |
+
+## Decision Lens
+
+This survey informs how to compare vision-action, end-to-end VLA, and dual-system driving models without collapsing them into one label. Its key units are system boundaries: where language enters, how action is represented, whether a world model is present, and whether evaluation is open or closed loop.
+
+The historical taxonomy is useful if it predicts engineering tradeoffs rather than merely ordering papers. A common benchmark that fixes sensors, data, action horizon, and latency across the three paradigms is the missing test. As the field scales, proprietary data and inconsistent closed-loop protocols make architectural claims hard to compare. The taxonomy would fail if data scale and evaluator choice explained outcomes better than the proposed model evolution.
 
 **Context:** This survey gives a cleaner vocabulary for comparing monolithic driving VLAs against hybrid systems such as DriveVLM-Dual-style designs.
 

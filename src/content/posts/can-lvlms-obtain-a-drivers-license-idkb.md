@@ -6,7 +6,7 @@ postSlug: can-lvlms-obtain-a-drivers-license-idkb
 legacyPath: /paper shorts/2024/09/01/can-lvlms-obtain-a-drivers-license-idkb.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLMs & Evaluation'
 summary: IDKB tested whether vision-language models know explicit driving rules, not just visual scene facts.
 ---
 ## 2024 - Can LVLMs Obtain a Driver's License?
@@ -36,6 +36,12 @@ _Figure 1: Performance of 15 representative Large Vision-Language Models on IDKB
 | Dataset | 1M+ driving knowledge items | Covers rules, exams, and applied scenarios. |
 | Evaluation | 15 LVLMs | Tests whether general models know driving theory. |
 | Main failure | Missing specialized rule knowledge | Perception alone is not driving competence. |
+
+## Decision Lens
+
+IDKB informs whether a driving LVLM needs explicit traffic-rule knowledge in addition to visual scene description. Its atomic item is a rule-grounded image-question pair that tests recognition, regulation recall, and application of the rule to a scene.
+
+The benchmark distinguishes legal knowledge from generic visual fluency, but written-test competence is not closed-loop driving competence. The missing comparison controls for text-only rule memorization by using counterfactual scenes and jurisdiction changes. At 10× rule coverage, contradictory local regulations and rare signage make annotation and retrieval the bottlenecks. The licensing analogy would fail if high IDKB scores did not predict correct decisions on unseen rule-scene combinations.
 
 **Context:** Driving competence is not only perception. It is perception plus rule knowledge plus judgment under context.
 

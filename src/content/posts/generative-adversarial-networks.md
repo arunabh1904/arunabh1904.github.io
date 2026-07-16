@@ -6,7 +6,7 @@ postSlug: generative-adversarial-networks
 legacyPath: /paper shorts/2014/06/01/generative-adversarial-networks.html
 tags:
   - Other
-field: Generative Models
+field: 'Generative Modeling'
 summary: GANs framed generation as a two-player game between a generator and discriminator, producing sharp samples without explicit likelihoods.
 ---
 ## 2014 – Generative Adversarial Networks
@@ -29,6 +29,12 @@ _Figure 1 from the [GAN paper](https://arxiv.org/abs/1406.2661), via arXiv HTML.
 **Summary:** GANs turn generative modelling into a contest. A generator $G$ maps random noise into synthetic samples, while a discriminator $D$ learns to tell real data from generated data. Training alternates between making $D$ better at the classification problem and making $G$ better at fooling $D$.
 
 The paper's central promise is elegant: with enough capacity and ideal optimization, the generator recovers the true data distribution and the discriminator becomes maximally uncertain, outputting 0.5 everywhere. That framing recasts density estimation as a differentiable game rather than an explicit likelihood problem. It also gives the generator direct feedback in pixel space, which helped avoid some of the blurry samples associated with early likelihood-based models.
+
+## Decision Lens
+
+GANs inform whether a generator should learn through an adversarial density-ratio signal instead of an explicit likelihood. Each update couples a minibatch of real examples with generated samples; the discriminator and generator optimize opposing objectives but share no parameters.
+
+The original experiments established that the game can produce sharp samples, not that it covers the data distribution or converges reliably. The missing decisive evidence is a seed-rich comparison of likelihood coverage, sample quality, and mode recovery against explicit-density models at matched compute. At 10× scale, discriminator overfitting, mode collapse, and oscillatory optimization intensify. The adversarial premise would fail if a non-adversarial model matched perceptual quality while covering rare modes and training more reliably.
 
 **Context:** The first experiments were small, mostly multilayer perceptrons on MNIST-like data, but the idea opened a much larger path. GANs made high-quality sample generation feel less like approximate density estimation and more like learned counterfeiting.
 
