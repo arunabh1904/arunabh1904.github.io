@@ -6,7 +6,7 @@ postSlug: driving-with-llms-fusing-object-level-vector-modality
 legacyPath: /paper shorts/2023/10/01/driving-with-llms-fusing-object-level-vector-modality.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLMs & Evaluation'
 summary: Driving with LLMs fed object-level vector scene state into language models to make driving decisions more explainable.
 ---
 ## 2023 - Driving with LLMs
@@ -38,6 +38,12 @@ _Source figure from the [Driving with LLMs paper](https://arxiv.org/abs/2310.019
 | Input | Object vectors | Structured state reduces visual ambiguity. |
 | Task | Driving QA and action generation | Tests scene interpretation and decisions. |
 | Tradeoff | Depends on upstream perception | Bad object state still misleads the LLM. |
+
+## Decision Lens
+
+Driving with LLMs informs whether an LLM should consume raw visual tokens or a compact object-level vector description of the scene. Its atomic input is an agent or map vector serialized into the language interface; the representation preserves metric relations while the language model supplies reasoning and explanation.
+
+Vectorization buys interpretability and shorter context but makes upstream detection the information bottleneck. The missing comparison matches token budget across object vectors, BEV features, image tokens, and oracle objects while measuring both explanation faithfulness and planning. At 10× agents, serialization order and context length dominate. The claim would fail if a non-language vector planner matched decisions and explanations derived from post-hoc state summaries at lower latency.
 
 **Context:** The paper made object-centric driving language models a serious baseline. It also clarified a recurring theme in autonomy: sometimes the right multimodal interface is not raw pixels, but structured state.
 

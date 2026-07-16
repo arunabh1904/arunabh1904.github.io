@@ -6,7 +6,7 @@ postSlug: scaling-motion-forecasting-models-with-ensemble-distillation
 legacyPath: /paper shorts/2024/04/05/scaling-motion-forecasting-models-with-ensemble-distillation.html
 tags:
   - Other
-field: BEV
+field: 'Motion Forecasting & Planning'
 summary: This paper uses large motion-forecasting ensembles as teachers and distills their gains into smaller student models that fit onboard compute budgets.
 ---
 ## 2024 - Ensemble Distillation
@@ -40,6 +40,12 @@ _Figure 4 shows the deployment tradeoff: larger ensembles improve metrics with m
 | Teacher | Large ensemble of optimized forecasters | Raises the accuracy ceiling. |
 | Student | Distilled smaller model | Brings ensemble gains closer to deployment cost. |
 | Benchmarks | WOMD and Argoverse leaderboards | Covers widely used motion-forecasting evaluations. |
+
+## Decision Lens
+
+This paper informs whether serving constraints should cap teacher quality or whether a costly forecasting ensemble can be used only during training and distilled into one onboard model. The unit is a scene with multiple teacher trajectory distributions; the student learns both logged futures and the ensemble's softened multimodal predictions.
+
+The result establishes a train-serve asymmetry: ensemble diversity can improve a student that cannot afford ensemble inference. The missing comparison matches total teacher-training compute against a single larger teacher and tests which teacher diversity actually transfers. At 10× ensemble size, teacher storage, inference for label generation, and correlated errors dominate. Distillation would fail as the allocation strategy if a directly trained student or single teacher matched leaderboard and calibration metrics at lower end-to-end cost.
 
 **Context:** It showed a practical way to use scaling and ensembles even when the production model must stay small.
 

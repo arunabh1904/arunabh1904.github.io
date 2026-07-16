@@ -6,7 +6,7 @@ postSlug: toponet-graph-based-topology-reasoning-for-driving-scenes
 legacyPath: /paper shorts/2023/04/11/toponet-graph-based-topology-reasoning-for-driving-scenes.html
 tags:
   - Other
-field: BEV
+field: 'BEV Perception & Mapping'
 summary: TopoNet reasons over lane connectivity and traffic-element-to-lane assignment with a scene graph neural network and a scene knowledge graph.
 ---
 ## 2023 - TopoNet
@@ -47,6 +47,12 @@ _Figure 2 shows how TopoNet routes traffic elements and centerlines through deco
 | ------------------------------ | -------------- | ------------------ | --------------------- | --- |
 | MapTR* | 17.7 | 1.1 | 10.4 | 26.0 |
 | TopoNet | 28.5 | 4.1 | 20.8 | 35.6 |
+
+## Decision Lens
+
+TopoNet informs whether lane geometry and traffic-element association should be predicted independently or reasoned over as one scene graph. Its atomic units are lane and traffic-element queries; graph edges represent lane-to-lane connectivity and traffic-element-to-lane assignment.
+
+Joint reasoning can enforce coherent topology, but errors in node detection and edge classification compound. The missing control holds node features fixed while comparing independent edge heads, message passing, and explicit structural constraints. At 10× lane density, candidate edges grow quadratically and class imbalance worsens. The graph claim would fail if a sparse rule-constrained matcher achieved equal topology metrics and downstream route validity with fewer learned pairwise evaluations.
 
 **Context:** TopoNet made road topology a first-class perception output, not a post-processing afterthought.
 

@@ -6,7 +6,7 @@ postSlug: opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-l
 legacyPath: /paper shorts/2025/03/30/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLA & Planning'
 summary: OpenDriveVLA adapts open VLMs for end-to-end driving by aligning 2D and 3D structured visual tokens with language and autoregressively modeling agent-environment-ego interactions.
 ---
 ## 2025 - OpenDriveVLA
@@ -43,6 +43,12 @@ _Figure 2 shows OpenDriveVLA's staged training pipeline, from hierarchical featu
 | Training | Hierarchical alignment plus instruction and planning tuning | Bridges perception, language, and action. |
 | Interaction | Agent-environment-ego autoregressive modeling | Makes other actors and ego state part of the action context. |
 | Evaluation | nuScenes planning and driving QA | Tests both action quality and language-grounded understanding. |
+
+## Decision Lens
+
+OpenDriveVLA informs how an open VLM should be adapted to produce structured driving actions rather than only commentary. The training curriculum moves from vision-centric alignment to driving instruction tuning, agent-environment interaction modeling, and trajectory planning; 2D and 3D visual tokens share the language backbone before action decoding.
+
+The staged recipe makes curriculum order and token balance central, but it is unclear which stage creates planning gains. A matched-token factorial ablation should remove, reorder, or replace each stage and compare 2D-only, 3D-only, and fused tokens. At 10× visual context, token budget and modality interference dominate. The VLA design would fail if a frozen VLM plus a compact geometric planner matched closed-loop performance with lower training and inference cost.
 
 **Context:** OpenDriveVLA made the spatial-token design problem explicit for autonomous-driving VLA systems.
 

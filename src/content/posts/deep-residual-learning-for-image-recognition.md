@@ -6,7 +6,7 @@ postSlug: deep-residual-learning-for-image-recognition
 legacyPath: /paper shorts/2015/12/01/deep-residual-learning-for-image-recognition.html
 tags:
   - Other
-field: Computer Vision
+field: 'Vision Foundations'
 summary: ResNet made very deep CNNs practical by learning residual updates and carrying gradients through identity shortcuts.
 ---
 ## 2015 – Deep Residual Learning for Image Recognition
@@ -29,6 +29,14 @@ _Residual-block diagram from the ResNet paper/project materials._
 **Summary:** ResNet made depth easier to optimize by changing what each block has to learn. Instead of learning a direct mapping $H(x)$, a residual block learns $F(x)=H(x)-x$ and adds the input back through an identity shortcut: $H(x)=F(x)+x$. If the best transformation is close to identity, the block can push $F(x)$ toward zero rather than forcing a stack of layers to relearn the input.
 
 Those shortcuts act like gradient highways without adding parameters or inference cost. They let the authors train 152-layer networks that were both deeper and more accurate than plain CNNs. Bottleneck blocks, built from 1x1, 3x3, and 1x1 convolutions, kept the compute manageable: ResNet-152 was far deeper than VGG-19 while using fewer FLOPs. An ensemble of ResNets achieved 3.57% top-5 error on ImageNet and won ILSVRC 2015.
+
+## Decision Lens
+
+ResNet informs the decision to add depth through residual updates rather than ask each block to relearn a complete transformation. The operative unit is a residual block applied across a mini-batch of images, with identity shortcuts carrying both activations and gradients across depth.
+
+The ImageNet-to-detection transfer results show that the optimization benefit survives beyond classification. They do not isolate identity shortcuts from batch normalization, initialization, or the bottleneck block design as cleanly as a modern controlled study could.
+
+At 10× depth, activation memory, normalization behavior, communication, and diminishing returns dominate the original degradation problem. The residual-learning claim would weaken if a plain network with matched depth, normalization, initialization, FLOPs, and training time reached the same accuracy and optimization stability.
 
 **Context:** The residual connection is a tiny architectural change with huge practical reach. It fixed the degradation problem in very deep CNNs, transferred well to detection and segmentation, and later became part of the default design vocabulary for modern deep networks, including Transformers.
 

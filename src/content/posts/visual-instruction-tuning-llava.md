@@ -6,7 +6,7 @@ postSlug: visual-instruction-tuning-llava
 legacyPath: /paper shorts/2023/04/01/visual-instruction-tuning-llava.html
 tags:
   - Other
-field: Vision-Language Models
+field: 'Vision-Language Models'
 summary: LLaVA showed that a frozen vision encoder, an LLM, and synthetic instruction data could produce a useful open multimodal assistant.
 ---
 ## 2023 - Visual Instruction Tuning (LLaVA)
@@ -38,6 +38,12 @@ _Figure 1: LLaVA network architecture. From the [Visual Instruction Tuning (LLaV
 | Interface | Image-to-chat assistant | Turns visual representations into dialogue. |
 | Training signal | Visual instruction tuning | Synthetic QA data teaches the model how to answer about images. |
 | Artifact | Project page and code | The LLaVA recipe became a common open baseline. |
+
+## Decision Lens
+
+LLaVA informs whether a pretrained visual representation needs architectural reinvention or primarily an instruction-following interface. CLIP patch features pass through a learned projector into the language model, and a two-stage curriculum first aligns that interface and then trains image-grounded dialogue. The expensive asset is not a new encoder but synthetic visual instruction data generated from captions and image context.
+
+The paper establishes that text-style instruction tuning transfers surprisingly well to a visual assistant, but it does not prove that the model's answers are grounded rather than polished expressions of language priors. The key missing ablation pairs equivalent conversations with counterfactual or withheld visual evidence and compares human, synthetic, and caption-only supervision. At ten times the synthetic-data scale, teacher bias and templated reasoning could harden into confident hallucination. The central claim is falsified if performance survives image corruption or swapping, because then the instruction interface has improved conversation without improving perception.
 
 **Context:** LLaVA made the VLM stack modular: vision encoder, projector, LLM, instruction data. That template became the default starting point for many open multimodal assistants.
 

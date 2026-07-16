@@ -6,7 +6,7 @@ postSlug: talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving
 legacyPath: /paper shorts/2023/10/03/talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLMs & Evaluation'
 summary: Talk2BEV grounds language queries in BEV maps by augmenting objects with image-language features, enabling open-ended scene, spatial, intent, and decision questions.
 ---
 ## 2023 - Talk2BEV
@@ -43,6 +43,12 @@ _Figure 2 shows how Talk2BEV turns generated BEV maps into language-enhanced map
 | Dataset | 1,000 BEV scenarios | Gives the paper a human-annotated evaluation set. |
 | QA volume | More than 20,000 questions and responses | Covers varied scene, object, intent, and decision queries. |
 | Source data | nuScenes | Keeps the benchmark tied to a standard driving dataset. |
+
+## Decision Lens
+
+Talk2BEV informs whether open-vocabulary driving questions should be answered from camera tokens directly or from a metric BEV map augmented with language-aligned object features. The atomic representation is a BEV object with geometry, identity, and an image-language embedding; spatial and intent queries operate over that grounded map.
+
+The design preserves metric relations while importing open-vocabulary semantics, but errors from detection, BEV projection, and captioning compound. The missing ablation compares oracle objects, learned BEV objects, and direct image prompting with equal language-model context. At 10× scene density, object selection and relation enumeration dominate. The BEV grounding claim would fail if direct visual prompting matched spatial accuracy and explanation faithfulness without the structured map.
 
 **Context:** Talk2BEV is an early clean example of language-grounded scene reasoning over BEV rather than only camera images.
 

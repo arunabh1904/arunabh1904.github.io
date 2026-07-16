@@ -6,7 +6,7 @@ postSlug: autotrust-benchmarking-trustworthiness-in-large-vision-language-models
 legacyPath: /paper shorts/2024/12/01/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLMs & Evaluation'
 summary: AutoTrust evaluated driving VLMs across hallucination, safety, robustness, privacy, and fairness.
 ---
 ## 2024 - AutoTrust
@@ -36,6 +36,12 @@ _Figure 1 from the [AutoTrust paper](https://arxiv.org/abs/2412.15206), via arXi
 | Dataset | 10k scenes / 18k queries | Designed around trust dimensions. |
 | Axes | Truthfulness, safety, robustness, privacy, fairness | Evaluates more than accuracy. |
 | Main finding | Hidden unsafe behaviors | Capability can improve while trust still lags. |
+
+## Decision Lens
+
+AutoTrust informs which failure dimensions must be measured before a driving VLM can be treated as a trustworthy component. The evaluation unit is a scenario-prompt pair scored across hallucination, safety, robustness, privacy, and fairness rather than one average QA metric.
+
+The benchmark exposes multidimensional risk, but its weights do not define the operational cost of each failure. The missing study validates benchmark scores against human driving-review outcomes and real intervention rates on held-out fleets. At 10× coverage, scenario curation, demographic balance, adversarial diversity, and leakage dominate. AutoTrust would fail as a gate if benchmark rankings did not predict failures on fresh, naturally occurring driving incidents.
 
 **Context:** Trustworthiness is not one metric. A model can improve on standard driving QA while still becoming less safe or less private.
 

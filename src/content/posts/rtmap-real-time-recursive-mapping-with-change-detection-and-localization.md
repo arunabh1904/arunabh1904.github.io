@@ -6,7 +6,7 @@ postSlug: rtmap-real-time-recursive-mapping-with-change-detection-and-localizati
 legacyPath: /paper shorts/2025/07/01/rtmap-real-time-recursive-mapping-with-change-detection-and-localization.html
 tags:
   - Other
-field: BEV
+field: 'BEV Perception & Mapping'
 summary: RTMap treats online HD mapping as a recursive system that localizes against a prior map, detects structural changes, and updates the crowdsourced map over time.
 ---
 ## 2025 - RTMap
@@ -50,6 +50,12 @@ _Figure 2 shows RTMap's loop: encode sensors and the crowdsourced HD map, match 
 | Change detection | RTMap is especially sensitive to the changed category and improves overall accuracy over the TbV baseline. | High recall is valuable for mining possible map-update events. |
 | Localization | Optimization-based pose estimation outperforms the end-to-end pose head in the nuScenes ablation. | Classical state estimation still helps inside learned mapping systems. |
 | System coupling | Change detection improves localization by rejecting mismatched prior-map elements. | Freshness and localization are linked problems. |
+
+## Decision Lens
+
+RTMap informs whether online mapping should rebuild each frame independently or recursively localize against, compare with, and update a prior map. The atomic unit is a local map observation aligned to a persistent vector map; change detection decides which prior elements survive, move, appear, or disappear.
+
+Recursion buys temporal consistency and fleet accumulation, but localization error can masquerade as map change and then contaminate the prior. The missing experiment independently perturbs pose, prior freshness, and change frequency while comparing recursive and stateless mapping. At 10× deployment duration, error accumulation, conflicting updates, and versioning dominate inference. The recursive claim would fail if periodic stateless remapping produced equal change recall and map stability at lower operational complexity.
 
 **Context:** RTMap moves online vector mapping from "predict the local map once" to "maintain a map that can remember, align, and revise itself."
 

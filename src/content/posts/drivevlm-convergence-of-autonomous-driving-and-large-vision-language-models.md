@@ -6,7 +6,7 @@ postSlug: drivevlm-convergence-of-autonomous-driving-and-large-vision-language-m
 legacyPath: /paper shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLMs & Evaluation'
 summary: DriveVLM combined VLM reasoning with hierarchical planning, then paired it with a traditional pipeline for real-time driving.
 ---
 ## 2024 - DriveVLM
@@ -36,6 +36,12 @@ _Figure 1: DriveVLM and DriveVLM-Dual model pipelines. From the [DriveVLM: The C
 | Architecture | VLM plus hierarchical planning | Uses language to decompose complex scenes. |
 | Hybrid variant | DriveVLM-Dual | Combines VLM semantics with conventional driving modules. |
 | Evidence | nuScenes, SUP-AD, vehicle deployment | Tests both public and production-style settings. |
+
+## Decision Lens
+
+DriveVLM informs which decisions benefit from explicit language reasoning and which must remain in a fast geometric pipeline. The model decomposes planning into scene description, object analysis, and hierarchical trajectory reasoning, then fuses that output with a conventional planner for real-time control.
+
+The hybrid design acknowledges that semantic breadth and control latency have different requirements, but it obscures whether the VLM adds causal driving information or merely an ensemble prior. The missing closed-loop ablation removes each reasoning stage and the traditional branch at matched latency. At 10× traffic density, token generation and stale object narratives dominate. The VLM branch would fail its purpose if the conventional planner alone matched safety and progress on the scenarios where language reasoning is supposed to help.
 
 **Context:** DriveVLM captures the field's tension clearly: VLMs are useful for understanding and explanation, but driving still needs precise geometry and real-time behavior.
 

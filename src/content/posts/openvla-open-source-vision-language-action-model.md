@@ -6,7 +6,7 @@ postSlug: openvla-open-source-vision-language-action-model
 legacyPath: /paper shorts/2024/06/01/openvla-open-source-vision-language-action-model.html
 tags:
   - Other
-field: Robotics
+field: 'Vision-Language-Action & Robotics'
 summary: OpenVLA released a 7B open robot policy trained on 970k real robot demonstrations.
 ---
 ## 2024 - OpenVLA
@@ -38,6 +38,12 @@ _Figure 1: OpenVLA model architecture. From the [OpenVLA: An Open-Source Vision-
 | Scale | 7B VLA | Large enough to reuse language-model priors. |
 | Data | 970k robot demonstrations | Gives the model cross-embodiment behavior. |
 | Artifact | Open code/checkpoints | Makes generalist robot policies inspectable. |
+
+## Decision Lens
+
+OpenVLA informs whether an inspectable 7B vision-language backbone trained across many robot datasets is a useful default policy before building a proprietary architecture. The policy fuses SigLIP's semantic features with DINOv2's spatial features, then autoregressively emits discretized actions from language-conditioned observations. Open X-Embodiment's 970,000 demonstrations supply the cross-robot curriculum, making data interoperability as central as model scale.
+
+The release establishes a strong open baseline and shows broad transfer, but it does not separate the contribution of internet-scale VLM priors from robot-data scale and dual visual encoders. A compute-matched policy trained from scratch and a single-encoder ablation across unseen embodiments would answer that. At ten times the embodiments, inconsistent action spaces and dataset imbalance could overwhelm shared tokens. The foundation-policy thesis would fail if per-robot specialists initialized from the same encoders adapt faster and achieve higher closed-loop reliability with equal demonstrations.
 
 **Context:** OpenVLA made the VLA recipe concrete and public. It also showed that Internet-scale vision-language pretraining can combine with robot demonstration data to produce transferable manipulation policies.
 

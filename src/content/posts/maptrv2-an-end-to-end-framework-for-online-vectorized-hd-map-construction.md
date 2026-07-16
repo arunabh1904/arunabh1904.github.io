@@ -6,7 +6,7 @@ postSlug: maptrv2-an-end-to-end-framework-for-online-vectorized-hd-map-construct
 legacyPath: /paper shorts/2023/08/10/maptrv2-an-end-to-end-framework-for-online-vectorized-hd-map-construction.html
 tags:
   - Other
-field: BEV
+field: 'BEV Perception & Mapping'
 summary: MapTRv2 strengthens MapTR with auxiliary one-to-many matching and dense supervision, improving convergence and accuracy on nuScenes and Argoverse2.
 ---
 ## 2023 - MapTRv2
@@ -40,6 +40,12 @@ _Figure 4 shows how MapTRv2 keeps the vector-map decoder structured while adding
 | Datasets | nuScenes and Argoverse2 | Tests whether the MapTR idea transfers across map benchmarks. |
 | Training recipe | One-to-many matching plus dense supervision | Improves convergence and final accuracy. |
 | Output | Real-time vector HD map construction | Keeps the planner-friendly vector representation. |
+
+## Decision Lens
+
+MapTRv2 informs whether sparse one-to-one supervision is sufficient for vector-map queries or should be supplemented with one-to-many assignments and dense auxiliary targets. The training unit remains a map-element query and its point sequence, but extra matches expose more positive supervision during early optimization.
+
+The gains support supervision density as an optimization lever, not a change in the final map representation. The missing ablation matches the number of positive gradients across one-to-many matching, denoising queries, and dense segmentation auxiliaries. At 10× classes or map elements, duplicate assignments and auxiliary-loss balance become unstable. The claim would fail if longer training or a simpler query-denoising scheme matched convergence and map quality without the extra matching path.
 
 **Context:** MapTRv2 turned MapTR from a strong baseline into a more robust framework that later online-map papers could compare against.
 

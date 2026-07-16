@@ -6,7 +6,7 @@ postSlug: bevformer-learning-birds-eye-view-representation-from-multi-camera-ima
 legacyPath: /paper shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html
 tags:
   - Other
-field: BEV
+field: 'BEV Perception & Mapping'
 summary: BEVFormer learns dense BEV features from multi-camera images with spatial cross-attention and temporal self-attention, making BEV a reusable perception representation.
 ---
 ## 2022 - BEVFormer
@@ -41,6 +41,12 @@ _Figure 2 shows the BEVFormer encoder: camera features, BEV queries, spatial cro
 | Spatial attention | BEV queries attend to multi-camera features | Bridges image space and ground-plane reasoning. |
 | Temporal attention | Current BEV attends to previous BEV | Adds motion/history with low extra structure. |
 | Result | 56.9% nuScenes NDS reported in the abstract | Marked BEVFormer as a strong camera-only perception baseline. |
+
+## Decision Lens
+
+BEVFormer informs whether multi-camera perception should first build a persistent metric BEV grid or reason directly in camera views. Its atomic unit is a learned BEV query tied to a ground-plane location; spatial cross-attention samples projected image features, while temporal self-attention carries the same grid across frames.
+
+The representation buys a reusable geometry for 3D detection at the cost of projection assumptions and a dense query budget. The key missing control compares dense BEV queries with sparse object queries under identical backbone, temporal context, and latency. At 10× camera resolution or temporal length, feature sampling and BEV-query attention dominate. The BEV-first claim would fail if a view-space or sparse model matched 3D accuracy and temporal stability with materially lower memory and latency.
 
 **Context:** BEVFormer became one of the reference points for dense BEV-oriented autonomous driving stacks.
 

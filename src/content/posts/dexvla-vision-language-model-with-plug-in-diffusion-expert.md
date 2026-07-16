@@ -6,7 +6,7 @@ postSlug: dexvla-vision-language-model-with-plug-in-diffusion-expert
 legacyPath: /paper shorts/2025/02/01/dexvla-vision-language-model-with-plug-in-diffusion-expert.html
 tags:
   - Other
-field: Robotics
+field: 'Vision-Language-Action & Robotics'
 summary: DexVLA paired VLM reasoning with a diffusion policy expert for long-horizon dexterous robot control.
 ---
 ## 2025 - DexVLA
@@ -36,6 +36,12 @@ _Figure 1: DexVLA architecture and embodied curriculum learning. From the [DexVL
 | Architecture | VLM plus diffusion expert | Splits planning from precise control. |
 | Training | Three-stage embodied curriculum | Moves from general motor skills to task specialization. |
 | Best fit | Dexterous long-horizon tasks | Where pure VLM action output is too coarse. |
+
+## Decision Lens
+
+DexVLA informs whether dexterous, long-horizon control should be forced through a VLM's discrete token head or delegated to a continuous action specialist. The VLM supplies semantic state and high-level guidance, while a billion-parameter diffusion expert generates multi-step action trajectories. A staged cross-embodiment curriculum moves from broad motor priors to embodiment adaptation and then task-specific dexterity.
+
+The results support specialization for precise control, but the architecture adds enough capacity and training complexity that its causal advantage over data and compute is unclear. The missing comparison is a parameter-, latency-, and demonstration-matched action head without diffusion, plus transfer tests where the VLM is frozen. At ten times the task and embodiment count, contradictory control conventions and diffusion sampling latency may dominate. The plug-in-expert claim would fail if a smaller shared action decoder matches closed-loop success and adapts with fewer demonstrations.
 
 **Context:** DexVLA shows how robotics can borrow from both sides of modern AI: language models for task structure and diffusion models for continuous trajectory generation.
 

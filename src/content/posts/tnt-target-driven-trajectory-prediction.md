@@ -6,7 +6,7 @@ postSlug: tnt-target-driven-trajectory-prediction
 legacyPath: /paper shorts/2020/08/19/tnt-target-driven-trajectory-prediction.html
 tags:
   - Other
-field: BEV
+field: 'Motion Forecasting & Planning'
 summary: TNT makes multimodal motion forecasting explicit by predicting likely target states, rolling out target-conditioned trajectories, and scoring a compact diverse set.
 ---
 ## 2020 - TNT: Target-driveN Trajectory Prediction
@@ -53,6 +53,12 @@ _Figure 2 shows the three-stage TNT pipeline: encode the scene, score candidate 
 | INTERACTION validation | MultiPath: 0.99 minFDE, 0.30 minADE | 0.67 minFDE, 0.21 minADE |
 | PAID pedestrians | MultiPath: 0.43 minFDE, 0.23 minADE | 0.32 minFDE, 0.18 minADE |
 | Stanford Drone | PECNet: 25.98 minFDE, 12.79 minADE | 21.16 minFDE, 12.23 minADE |
+
+## Decision Lens
+
+TNT informs whether multimodal forecasting should first choose a destination and then generate the path, rather than regress complete trajectories in one step. The atomic hierarchy is an actor history, a candidate target state, and a target-conditioned trajectory; a final scorer selects a compact diverse set.
+
+The factorization gives modes a semantic endpoint, but target discretization and candidate pruning can exclude valid futures before decoding. The missing ablation holds total proposals fixed while comparing endpoint-first, anchor-trajectory, and direct set prediction across map-rich and map-free datasets. At 10× candidate density, target scoring dominates and duplicates crowd out rare modes. TNT's claim would fail if direct trajectory-set prediction matched miss rate and diversity without a target bottleneck.
 
 **Context:** TNT made goal-conditioned motion forecasting feel practical for autonomous driving. It kept the multimodal structure visible and showed that endpoint candidates can be a cleaner intent representation than opaque latent samples.
 

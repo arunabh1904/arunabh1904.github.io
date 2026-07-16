@@ -6,7 +6,7 @@ postSlug: denoising-diffusion-probabilistic-models
 legacyPath: /paper shorts/2020/06/01/denoising-diffusion-probabilistic-models.html
 tags:
   - Other
-field: Generative Models
+field: 'Generative Modeling'
 summary: DDPMs turned generation into learned denoising, trading slow sampling for stable training and strong image quality.
 ---
 ## 2020 – Denoising Diffusion Probabilistic Models (DDPM)
@@ -31,6 +31,12 @@ _Figure 2 from the [DDPM paper](https://arxiv.org/abs/2006.11239), via ar5iv._
 **Summary:** DDPMs generate data by learning to reverse noise. The forward process gradually corrupts real examples into near-isotropic Gaussian noise. The learned reverse process, usually parameterized by a UNet, removes that noise step by step. Training asks the model to predict the noise $\hat{\epsilon}$ that was added at each timestep, then minimizes a weighted MSE against the true noise $\epsilon$.
 
 The payoff is stability. With 1000 denoising steps, DDPM reached FID 3.17 and IS 9.46 on CIFAR-10, matching StyleGAN-v2 without adversarial training. The framework also connects noise-conditioned denoising to score matching and score-based SDE models, giving diffusion a strong probabilistic interpretation rather than just a good sample generator.
+
+## Decision Lens
+
+DDPM informs the choice between stable iterative denoising and one-shot adversarial generation. The atomic example is an image corrupted at a sampled diffusion timestep; one network learns the reverse direction across the entire noise schedule.
+
+The paper established strong image quality and stable optimization at the cost of hundreds or thousands of sequential denoising steps. The key missing comparison separates the value of the variational formulation from the noise parameterization and sampling schedule at equal training and inference compute. At 10× resolution or duration, latent size and repeated network evaluations dominate. The claim would weaken if a flow, consistency, or adversarial model matched coverage and FID with materially fewer sequential evaluations.
 
 **Context:** Diffusion models made high-quality generation feel less fragile than GAN training. Later improvements, including learned reverse-process variance, faster samplers, and classifier-free guidance, turned the original slow denoising loop into the foundation for modern text-to-image systems.
 

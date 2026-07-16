@@ -6,7 +6,7 @@ postSlug: densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets
 legacyPath: /paper shorts/2021/08/22/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets.html
 tags:
   - Other
-field: BEV
+field: 'Motion Forecasting & Planning'
 summary: DenseTNT removes sparse goal anchors and heuristic goal selection by predicting dense goal probabilities and learning an online goal-set predictor.
 ---
 ## 2021 - DenseTNT
@@ -67,6 +67,12 @@ Waymo used mAP as the official ranking metric, so this table is about calibrated
 | TVN | 0.7558 | 1.5859 | 0.2032 | 0.3168 |
 | SceneTransformer | 0.6117 | 1.2116 | 0.1564 | 0.2788 |
 | DenseTNT | 1.0387 | 1.5514 | 0.1779 | 0.3281 |
+
+## Decision Lens
+
+DenseTNT informs whether multimodal forecasting should rely on hand-designed sparse goal anchors or learn a dense distribution over reachable endpoints. The training unit is one agent history paired with a future trajectory; endpoint probabilities define candidate modes before target-conditioned trajectories are decoded and scored.
+
+The method removes anchor engineering, but dense goal coverage makes map resolution and candidate pruning part of the compute budget. A decisive ablation would match proposal count and decoder capacity across sparse anchors, dense goals, and direct trajectory generation. At 10× scene density, goal scoring and duplicate modes can dominate while rare maneuvers remain underrepresented. DenseTNT's claim would fail if adaptive sparse proposals matched minFDE and miss rate with fewer candidates and better calibration.
 
 **Context:** DenseTNT pushed goal-conditioned forecasting away from sparse anchor heuristics and toward dense probability maps plus learned set prediction.
 

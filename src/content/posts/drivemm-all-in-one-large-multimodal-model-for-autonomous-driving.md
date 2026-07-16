@@ -6,7 +6,7 @@ postSlug: drivemm-all-in-one-large-multimodal-model-for-autonomous-driving
 legacyPath: /paper shorts/2024/12/01/drivemm-all-in-one-large-multimodal-model-for-autonomous-driving.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLMs & Evaluation'
 summary: DriveMM trained one multimodal transformer across perception, prediction, and planning with a driving curriculum.
 ---
 ## 2024 - DriveMM
@@ -36,6 +36,12 @@ _Figure 1: RoboTron-Drive achieves SOTA in both general capabilities and general
 | Training | Driving curriculum | Stages task difficulty for a generalist model. |
 | Inputs | Multi-view driving imagery | Matches surround-camera AV settings. |
 | Evidence | Multiple public benchmarks | Tests whether one model can replace specialists. |
+
+## Decision Lens
+
+DriveMM informs whether perception, prediction, and planning should share one multimodal token-processing model and curriculum. Its atomic examples come from different driving tasks; task prompts and output formats route them through a shared backbone while stage-specific data teaches increasingly action-oriented behavior.
+
+The all-in-one model promises transfer, but mixture proportions and gradient conflict determine whether low-resource tasks benefit or disappear. The missing study measures per-task gradient alignment and transfer while matching total parameters against specialized models and a shared-backbone multi-head baseline. At 10× tasks, sequence formats, sampling weights, and negative transfer dominate. The unified claim would fail if specialists achieved better worst-task and closed-loop performance at equal aggregate inference cost.
 
 **Context:** DriveMM pushed against the assumption that every driving subproblem needs a separate specialized network. The paper asks whether shared multimodal representations can support the full stack.
 

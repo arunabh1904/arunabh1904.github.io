@@ -6,7 +6,7 @@ postSlug: deepseek-vl2-mixture-of-experts-vision-language-models
 legacyPath: /paper shorts/2024/12/01/deepseek-vl2-mixture-of-experts-vision-language-models.html
 tags:
   - Other
-field: Vision-Language Models
+field: 'Vision-Language Models'
 summary: DeepSeek-VL2 combined dynamic high-resolution tiling with sparse MoE language modeling for efficient document-heavy multimodal understanding.
 ---
 ## 2024 - DeepSeek-VL2
@@ -38,6 +38,12 @@ _Figure 1 from the [DeepSeek-VL2 paper](https://arxiv.org/abs/2412.10302), via a
 | Vision | Dynamic tiling | Keeps details from high-res and odd-aspect images. |
 | Language | DeepSeekMoE with latent attention | Improves inference efficiency for a large-capacity model. |
 | Best fit | OCR and documents | Text-heavy visual tasks expose the benefit. |
+
+## Decision Lens
+
+DeepSeek-VL2 informs whether a high-capacity VLM can remain economical by making both visual resolution and language computation conditional. The visual unit is a dynamically tiled patch sequence whose length follows the image, while the language backbone activates only a sparse subset of experts; Multi-head Latent Attention further compresses the inference-time attention state. The shared language space integrates modalities, but capacity and compute are deliberately not uniform across examples or tokens.
+
+Its results support the combination for OCR, documents, charts, and grounding, where fixed resizing destroys information, yet they do not cleanly price each gain in serving terms. A decisive ablation would hold latency, memory, and total visual tokens constant while varying tiling, MoE routing, and latent attention separately. At ten times the traffic or context length, irregular image-token counts and expert imbalance could erode the advertised efficiency through poor batching. The architectural case fails operationally if a dense, fixed-resolution model matches quality at equal end-to-end latency and memory.
 
 **Context:** It is a practical answer to the "large but usable" problem. The model can have broad capacity without paying dense-model cost on every token.
 

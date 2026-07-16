@@ -6,7 +6,7 @@ postSlug: vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-sup
 legacyPath: /paper shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision.html
 tags:
   - Other
-field: Vision-Language Models
+field: 'Autonomous Driving: VLMs & Evaluation'
 summary: VLM-AD uses a VLM as a training-time teacher, distilling driving reasoning and structured action labels into an end-to-end driving model without using the VLM at inference time.
 ---
 ## 2024 - VLM-AD
@@ -50,6 +50,14 @@ _Figure 2 shows the training-time teacher setup: the VLM produces freeform reaso
 | UniAD on nuScenes | 1.03 avg L2, 0.31 avg collision | 0.88 avg L2, 0.19 avg collision | Lower planning error and fewer collisions. |
 | VAD-Base on CARLA Town05 Short | 64.29 DS, 87.26 RC | 67.78 DS, 88.56 RC | Better closed-loop score and route completion. |
 | VAD-Base on CARLA Town05 Long | 30.31 DS, 75.20 RC | 35.25 DS, 84.14 RC | Larger gain on the longer interactive route. |
+
+## Decision Lens
+
+The expensive decision is where semantic reasoning belongs in a real-time driving stack and what can safely remain end to end. Its fundamental training unit is a text token plus a visual patch or compressed visual token. Each modality keeps a separate input encoder before sharing a connector/backbone or common token-processing stack.
+
+The VLM watches driving scenes during dataset construction, produces freeform reasoning and structured action annotations, and those annotations become auxiliary supervision for a smaller driving model. The note does not give full mixture proportions or a reproducible curriculum schedule. Cameras and scene state are compressed into BEV features, object/map vectors, queries, or language tokens.
+
+The most important missing comparison is a closed-loop, matched-latency ablation that isolates semantic reasoning from perception and planner capacity. At 10× scale, sensor-token count, scene density, temporal context, and closed-loop latency would grow faster than the headline offline metric. The central claim would fail under this test: Run matched-latency closed-loop evaluation with and without the proposed reasoning or representation; reject it if safety and progress do not improve.
 
 **Context:** VLM-AD is a clean example of the "language model as teacher" pattern for physical systems. The VLM improves training signal, but the deployed system still respects latency and control constraints.
 

@@ -6,7 +6,7 @@ postSlug: videollama-3-frontier-multimodal-foundation-models
 legacyPath: /paper shorts/2025/01/01/videollama-3-frontier-multimodal-foundation-models.html
 tags:
   - Other
-field: Vision-Language Models
+field: 'Video & Interactive World Models'
 summary: VideoLLaMA 3 showed that strong image understanding can be the foundation for efficient video understanding.
 ---
 ## 2025 - VideoLLaMA 3
@@ -38,6 +38,12 @@ _Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced imag
 | Training stages | Image alignment then video tuning | Uses image semantics before temporal specialization. |
 | Efficiency | Dynamic token merging | Compresses redundant visual tokens across frames. |
 | Evidence | Image and video benchmarks | Checks whether video gains preserve image understanding. |
+
+## Decision Lens
+
+VideoLLaMA 3 informs whether video understanding should begin with a separate temporal model or with a strong image-language representation followed by temporal specialization. Its curriculum first establishes image–text alignment, then adds video data; variable-resolution encoding preserves spatial detail, while dynamic token merging compresses redundant evidence across frames before the language model consumes it.
+
+The joint image and video benchmarks show that this route can add temporal capability without discarding image competence, but they do not isolate whether token merging preserves the events that matter rather than merely benchmark-level appearance. The missing study varies motion density and event duration at equal token budgets. At ten times the video length, rare actions may be merged away while context and decoding costs still grow. The thesis would fail if a temporally explicit model with the same compute consistently wins on long-horizon causal and event-order tests.
 
 **Context:** It connects the image VLM and video VLM stories. If static visual grounding is strong, video becomes a temporal extension rather than a separate world.
 

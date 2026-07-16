@@ -6,7 +6,7 @@ postSlug: are-vlms-ready-for-autonomous-driving-drivebench
 legacyPath: /paper shorts/2025/01/01/are-vlms-ready-for-autonomous-driving-drivebench.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLMs & Evaluation'
 summary: DriveBench tested whether VLM driving answers are visually grounded or merely plausible.
 ---
 ## 2025 - Are VLMs Ready for Autonomous Driving?
@@ -36,6 +36,12 @@ _Figure 1 from the [DriveBench paper](https://arxiv.org/abs/2501.04003), cropped
 | Dataset | 19,200 frames / 20,498 QA pairs | Tests multiple driving tasks and question types. |
 | Stress test | 17 input conditions | Checks corruption and text-only reliance. |
 | Main failure | Weak visual grounding | Models can answer from priors instead of perception. |
+
+## Decision Lens
+
+DriveBench informs whether a VLM's plausible driving language is grounded enough to support deployment claims. Its atomic evaluation item couples a driving frame with a question and answer, then stresses visual corruption and text-only shortcuts to separate perception from learned priors.
+
+The benchmark shows that fluent answers can survive when visual evidence is removed or degraded, so aggregate QA accuracy is not a grounding metric. The missing validation is replication on new geographies, camera rigs, and freshly collected questions with contamination checks and human disagreement estimates. At 10× scale, annotation consistency and shortcut diversity dominate example count. DriveBench's conclusion would weaken if model rankings and failure modes did not reproduce on that independent set.
 
 **Context:** Capability benchmarks can flatter VLMs. Driving needs reliability benchmarks that ask whether the model actually looked at the scene.
 

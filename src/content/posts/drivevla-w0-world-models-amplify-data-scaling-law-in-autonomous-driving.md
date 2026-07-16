@@ -6,7 +6,7 @@ postSlug: drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-drivin
 legacyPath: /paper shorts/2025/10/14/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLA & Planning'
 summary: DriveVLA-W0 argues that driving VLAs need dense world-model supervision, using future image prediction to complement sparse low-dimensional action labels.
 ---
 ## 2025 - DriveVLA-W0
@@ -41,6 +41,12 @@ _Figure 2 shows the two world-modeling variants: autoregressive discrete visual-
 | World model | AR visual-token and diffusion latent variants | Tests two dense prediction routes. |
 | Action head | Lightweight action expert | Keeps inference practical after heavy representation learning. |
 | Evaluation | NAVSIM v1/v2 and large in-house data | Tests whether world modeling improves data scaling. |
+
+## Decision Lens
+
+DriveVLA-W0 informs whether additional driving data should supervise only sparse actions or also dense future visual dynamics. The training unit couples current observations and actions with future images; a shared representation learns both control and world prediction so each logged frame supplies more than a low-dimensional trajectory label.
+
+The reported scaling result suggests world-model supervision improves the return from more data in the tested NAVSIM and internal regimes. It does not isolate future-image prediction from extra decoder capacity or richer augmentation. A held-out scale sweep with equal parameters and target count is decisive. At 10× data, video redundancy and prediction of irrelevant appearance can consume the budget. The claim would fail if action-only training recovered the same scaling slope after matching auxiliary compute and regularization.
 
 **Context:** DriveVLA-W0 makes a strong case that driving VLAs should learn world dynamics, not just imitate sparse action labels.
 

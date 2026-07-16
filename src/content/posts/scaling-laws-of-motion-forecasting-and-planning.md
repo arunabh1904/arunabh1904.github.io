@@ -6,7 +6,7 @@ postSlug: scaling-laws-of-motion-forecasting-and-planning
 legacyPath: /paper shorts/2025/06/09/scaling-laws-of-motion-forecasting-and-planning.html
 tags:
   - Other
-field: BEV
+field: 'Motion Forecasting & Planning'
 summary: This Waymo technical report studies how autoregressive motion forecasting and planning transformers improve with training compute, data, model size, and inference-time sampling.
 ---
 ## 2025 - Scaling Laws of Motion Forecasting and Planning
@@ -48,6 +48,12 @@ _Figure 2 is the core scaling-law evidence: training loss improves predictably a
 | Driving data | 447 thousand hours and 5.6 million miles | Shows the curves come from fleet-scale data. |
 | Training examples | 541 million | Gives the scaling study enough examples to vary data budgets. |
 | Compute-optimal trend | Model size grows 1.5x as fast as dataset size | Bigger compute budgets should not be spent on data and parameters equally. |
+
+## Decision Lens
+
+This study informs how an autonomy program should split additional compute among model parameters, logged driving data, and inference-time trajectory sampling. Its atomic example is an autoregressive scene sequence drawn from fleet-scale logs; the reported curves connect training loss to open-loop and closed-loop forecasting/planning metrics.
+
+The evidence supports predictable improvement within the measured model, data, and sampling ranges, including a compute-optimal trend in which model size grows faster than dataset size. It does not prove that the same exponents survive a new architecture, geography, or safety distribution. A held-out large run with fixed evaluation and confidence intervals is the decisive test. The law would fail operationally if closed-loop ranking reversed even while training loss followed the fitted curve.
 
 **Context:** The paper moved motion forecasting and planning into the scaling-laws conversation with evidence that closed-loop behavior can improve predictably.
 

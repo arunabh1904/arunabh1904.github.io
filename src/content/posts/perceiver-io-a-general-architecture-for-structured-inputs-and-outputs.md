@@ -6,7 +6,7 @@ postSlug: perceiver-io-a-general-architecture-for-structured-inputs-and-outputs
 legacyPath: /paper shorts/2021/07/30/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs.html
 tags:
   - Other
-field: BEV
+field: 'Omni-Model Architectures'
 summary: Perceiver IO uses latent bottleneck cross-attention plus output queries to process arbitrary inputs and produce structured outputs without task-specific heads.
 ---
 ## 2021 - Perceiver IO
@@ -48,6 +48,12 @@ _Figure 2 shows the Perceiver IO template: arbitrary inputs enter a latent works
 | GLUE average | BERT Base at 81.1 | 81.2 with Perceiver IO Base | Comparable language performance with the general architecture. |
 | Sintel clean optical flow | RAFT at 1.95 EPE | 1.81 EPE | Strong dense prediction without hand-built multiscale matching. |
 | Sintel final optical flow | RAFT at 2.57 EPE | 2.42 EPE | General output queries still handle dense visual output. |
+
+## Decision Lens
+
+Perceiver IO informs whether compute should scale with raw input size or with a fixed latent bottleneck and a chosen set of output queries. The atomic operations are input-to-latent cross-attention, latent self-attention, and output-query cross-attention; task structure enters through the queries rather than a bespoke head.
+
+The architecture demonstrates broad modality and output flexibility, but the fixed latent array can discard fine detail before the task reveals what matters. The missing ablation sweeps latent count and output-query density against full attention at matched FLOPs across tasks with different information bottlenecks. At 10× input size, cross-attention remains manageable, but latent capacity becomes the failure point. The claim would fail if task-specific sparse attention preserved accuracy with equal efficiency and less latent tuning.
 
 **Context:** Perceiver IO gave researchers a reusable pattern for multimodal models whose inputs and outputs do not fit one simple grid or sequence.
 

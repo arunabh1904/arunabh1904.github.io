@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: scaling-laws-for-optimal-data-mixtures
 legacyPath: /paper shorts/2025/07/12/scaling-laws-for-optimal-data-mixtures.html
 tags: [Scaling Laws]
-field: Omni-Models
+field: 'Multimodal Scaling & Data Mixtures'
 summary: '2025 – Estimating compute-aware data mixtures from small training runs.'
 ---
 
@@ -26,7 +26,12 @@ The authors validate the prediction framework across LLM, native multimodal, and
 | Domain weights $h$ | Defines the candidate mixture. |
 | Target-domain loss | Defines what “optimal” means. |
 
+## Decision Lens
+
+This paper informs how to allocate a finite pretraining budget across domains when the target metric is known. Small proxy runs fit loss as a function of model size, total data, and mixture weights; optimization then chooses a compute-aware mixture for the target domain. The important conceptual move is that “optimal data” is conditional on the evaluation target, not an intrinsic property of a dataset.
+
+Validation across language, native multimodal, and vision settings supports the fitting procedure, but it leaves distribution drift and data quality largely outside the law. The missing experiment chooses a mixture once, then carries it across a substantial scale jump and a changed model family without retuning. At ten times the corpus size, duplication and domain quality may change faster than mixture weights capture. The method is falsified if its predicted optimum repeatedly underperforms robust heuristic mixtures after including the proxy-search cost.
+
 **Limits:** An extrapolated optimum is only as trustworthy as the small-run fit and the stability of rankings outside the observed regime.
 
 **Takeaway:** Allocate data with an uncertainty-aware fitted model, then update the allocation as new evidence arrives.
-

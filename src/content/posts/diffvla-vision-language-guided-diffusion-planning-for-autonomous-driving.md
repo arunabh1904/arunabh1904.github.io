@@ -6,7 +6,7 @@ postSlug: diffvla-vision-language-guided-diffusion-planning-for-autonomous-drivi
 legacyPath: /paper shorts/2025/05/26/diffvla-vision-language-guided-diffusion-planning-for-autonomous-driving.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLA & Planning'
 summary: DiffVLA uses VLM-guided hybrid sparse-dense diffusion planning to generate diverse driving trajectories with explicit agent-map interaction.
 ---
 ## 2025 - DiffVLA
@@ -39,6 +39,12 @@ _Figure 1 shows DiffVLA's perception-enhanced diffusion VLA framework, where vis
 | Guidance | VLM-conditioned planning | Adds semantic driving cues to geometric planning. |
 | Interaction | Agent-map-language fusion | Makes planning depend on actors, road structure, and language context. |
 | Reported signal | 45.0 PDMS in the 2025 challenge setting | Gives a public planning-oriented comparison point. |
+
+## Decision Lens
+
+DiffVLA informs whether a driving VLM should autoregressively emit one trajectory or guide a diffusion planner over a multimodal continuous trajectory distribution. The atomic training unit is a noisy future trajectory at a sampled diffusion timestep, conditioned on language-aware scene features and explicit agent-map interactions.
+
+Diffusion can preserve multiple feasible maneuvers, but denoising steps, guidance strength, and candidate rescoring determine real-time utility. The missing matched-latency study compares diffusion, autoregressive, and direct-set planners with the same backbone and candidate budget. At 10× horizon, denoising cost and interaction tensors dominate. The diffusion choice would fail if a simpler continuous decoder matched closed-loop safety, diversity, and calibration within the same latency envelope.
 
 **Context:** DiffVLA shows one path from VLA semantics to action generation: use language to guide a generative planner rather than asking the language model to emit control alone.
 

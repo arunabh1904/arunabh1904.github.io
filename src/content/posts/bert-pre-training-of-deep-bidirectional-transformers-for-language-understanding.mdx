@@ -11,7 +11,7 @@ legacyPath: >-
   shorts/2019/06/01/bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding.html
 tags:
   - Other
-field: Natural Language Processing
+field: 'Language Models'
 summary: BERT made bidirectional encoder pre-training reusable across NLP tasks through masked-language modeling and fine-tuning.
 ---
 import PythonPlayground from '../../components/PythonPlayground';
@@ -118,3 +118,11 @@ BERT was compute-hungry in 2018 and still non-trivial to reproduce casually. NSP
 ## Looking Forward
 
 BERT's recipe became a floor, not a ceiling. Better corruption schemes, cheaper compressors, and longer-context attention methods all stand on top of the same basic idea: mask some tokens, optionally test sentence order, backpropagate, and reuse the encoder everywhere. That elegance is why BERT is still worth teaching.
+
+## Decision Lens
+
+BERT informs the decision to spend pre-training compute on a bidirectional encoder that transfers through fine-tuning rather than train a task-specific model or a left-to-right representation. Its atomic unit is a masked token sequence, optionally paired with a second segment for next-sentence prediction.
+
+The pre-training recipe mixes masked-language modeling and next-sentence prediction over BooksCorpus and English Wikipedia, with shorter sequences used for most steps before a smaller number of length-512 updates. That curriculum makes sequence length a compute-allocation choice, not merely a tokenizer setting.
+
+The most consequential missing ablation is a matched-token comparison of MLM with and without next-sentence prediction and with alternative corruption schemes; later work showed that NSP was not generally necessary. At 10× scale, sparse corruption wastes prediction opportunities and long-sequence attention dominates cost. BERT's central recipe would be falsified if a simpler encoder objective matched downstream transfer under identical data, parameters, tokens, and fine-tuning sweeps.

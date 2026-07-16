@@ -6,7 +6,7 @@ postSlug: gpt-driver-learning-to-drive-with-gpt
 legacyPath: /paper shorts/2023/10/01/gpt-driver-learning-to-drive-with-gpt.html
 tags:
   - Other
-field: Autonomous Driving
+field: 'Autonomous Driving: VLA & Planning'
 summary: GPT-Driver reframed motion planning as language modeling over scene tokens and future waypoints.
 ---
 ## 2023 - GPT-Driver
@@ -38,6 +38,12 @@ _Figure 1: Overview of GPT-Driver. From the [GPT-Driver: Learning to Drive with 
 | Input | Structured scene tokens | Makes the driving problem legible to GPT-style models. |
 | Output | Future waypoints plus rationale | Adds interpretability to motion planning. |
 | Caveat | Open-loop and LLM latency | Needs closed-loop validation before real deployment. |
+
+## Decision Lens
+
+GPT-Driver informs whether motion planning can be reframed as conditional language modeling over structured scene tokens and waypoint outputs. The atomic prediction is a discretized coordinate or waypoint token, with textual scene context and chain-of-thought-style supervision preceding the trajectory.
+
+The formulation gains access to pretrained sequence modeling, but coordinate serialization, numerical precision, and rationale faithfulness become hidden design choices. The missing test matches data and backbone across tokenized waypoints, continuous regression, and a non-language autoregressive decoder. At 10× horizon, exposure error and token latency accumulate. The language-modeling claim would fail if the continuous decoder matched planning diversity and safety while using fewer steps and showing better metric precision.
 
 **Context:** It opened a line of work where language is not just for explanation after the fact. It becomes an intermediate representation for planning.
 
