@@ -24,6 +24,8 @@ _The stack is coupled: representation changes sequence length, which changes sys
 
 This guide follows the decisions in the order they should be made. Its companion, [Post-Training Vision-Language-Action Models: Zero to Hero](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html), starts where this one ends: a pretrained model enters deployment, produces failures, and must improve without losing its general capabilities.
 
+The scope is pretraining design, not a catalog of multimodal models. I use papers in two ways: reported experiments establish what happened inside a particular recipe; the decision tests, kill criteria, and preferred architecture are my synthesis. Keeping that boundary visible matters because multimodal papers often change the tokenizer, data, parameter count, and training budget together. A strong result can justify adopting a recipe without identifying which ingredient caused the gain.
+
 ## 1. Define the capability contract before the architecture
 
 “Multimodal” is not a capability. A contrastive encoder, visual assistant, image generator, video predictor, and robot policy can all consume images and text while solving different problems.
@@ -292,3 +294,16 @@ The strongest omni model will probably not be the one that makes every modality 
 My preferred starting hypothesis is a shared transformer with modality-specific input/output experts, explicit per-objective accounting, and a data mixture chosen by proxy scaling rather than intuition. For physical intelligence, I would preserve metric, temporally persistent entity representations alongside open-vocabulary semantics. The generative model can imagine; the world model must preserve consequences; the policy must act; and the training system must reveal when one capability is improving at another's expense.
 
 That is what “zero to hero” means in pretraining: not knowing every paper, but knowing how to turn a literature map into an experiment plan, a compute allocation, a kill decision, and a run that can survive long enough to answer the question.
+
+## References
+
+- [Learning Transferable Visual Models From Natural Language Supervision](https://arxiv.org/abs/2103.00020)
+- [Sigmoid Loss for Language Image Pre-Training](https://arxiv.org/abs/2303.15343)
+- [MM1: Methods, Analysis & Insights from Multimodal LLM Pre-training](https://arxiv.org/abs/2403.09611)
+- [Chameleon: Mixed-Modal Early-Fusion Foundation Models](https://arxiv.org/abs/2405.09818)
+- [Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model](https://arxiv.org/abs/2408.11039)
+- [Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](https://arxiv.org/abs/2410.13848)
+- [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391)
+- [FAST: Efficient Action Tokenization for Vision-Language-Action Models](https://arxiv.org/abs/2501.09747)
+- [Pi0: A Vision-Language-Action Flow Model for General Robot Control](https://arxiv.org/abs/2410.24164)
+- [TorchTitan: One-stop PyTorch Native Solution for Production Ready LLM Pre-training](https://arxiv.org/abs/2410.06511)
