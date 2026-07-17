@@ -26,6 +26,8 @@ _A VLA improves only when deployment failures become correctly attributed superv
 
 This guide builds that system from first principles. It assumes familiarity with the companion [Omni-Model Pretraining: Zero to Hero](/blog/2026/07/15/omni-model-pretraining-decisions.html), which covers how representation, sharing, data mixtures, scaling, and run health create the base model that post-training inherits.
 
+The scope is policy improvement after a broadly pretrained VLA exists. Paper-reported algorithms and results are the evidence layer. The failure taxonomy, evaluation pyramid, and recommended order of operations are my synthesis. I mark frontier work separately because a result in one simulator, embodiment, or reward setup is not yet a general robot-training recipe.
+
 ## 1. What pretraining gives you—and what it does not
 
 A modern VLA begins with two useful priors. Vision-language pretraining supplies objects, concepts, instructions, and scene semantics. Robot pretraining supplies a distribution over physically plausible behavior. [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html) demonstrates the first transfer by expressing actions in the language-token interface. [Open X-Embodiment](/paper%20shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html), [Octo](/paper%20shorts/2024/05/20/octo-an-open-source-generalist-robot-policy.html), and [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html) make the second transfer concrete across heterogeneous robot data.
@@ -274,3 +276,16 @@ The policy needs broad pretrained semantics. The action head needs the right tem
 My strongest bet is a structured, uncertainty-aware process critic: keep the VLA broad and end-to-end, but let the critic see persistent entities, geometry, contact, controller state, and task progress. Use that critic to find high-value failures and conservative updates, then distill the improvement into the deployable policy.
 
 That is the path from “a model that can act” to a policy improvement system that can be trusted to learn.
+
+## References
+
+- [A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning (DAgger)](https://proceedings.mlr.press/v15/ross11a.html)
+- [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347)
+- [Training Language Models to Follow Instructions with Human Feedback](https://arxiv.org/abs/2203.02155)
+- [Direct Preference Optimization](https://arxiv.org/abs/2305.18290)
+- [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](https://arxiv.org/abs/2303.04137)
+- [RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control](https://arxiv.org/abs/2307.15818)
+- [OpenVLA: An Open-Source Vision-Language-Action Model](https://arxiv.org/abs/2406.09246)
+- [DPPO: Diffusion Policy Policy Optimization](https://arxiv.org/abs/2409.00588)
+- [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)
+- [SIMPLER: Evaluating Real-World Robot Manipulation Policies in Simulation](https://arxiv.org/abs/2405.05941)
