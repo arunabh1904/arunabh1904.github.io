@@ -3,7 +3,7 @@
 ## Website Writing Skills
 
 - Apply the global `writing-style` skill to every prose change in this repository, including shelf copy and Code practice text.
-- Also apply exactly the matching category overlay: `write-paper-note`, `write-blog-post`, `write-build-intuition`, `write-revision-notes`, or `write-code-practice-problem`.
+- Also apply exactly the matching category overlay: `write-paper-note`, `write-blog-post`, `write-revision-notes`, or `write-code-practice-problem`. The Blog overlay covers essays, intuition-first technical tutorials, and multi-paper surveys.
 - Use `publish-website-writing` when the request includes adding, publishing, or shipping content. It owns routing and validation; category skills own format; `writing-style` alone owns shared topic, continuity, and prose rules.
 - Do not copy shared prose rules into category skills. Update `writing-style` when a rule should apply everywhere and update an overlay only when the category genuinely differs.
 

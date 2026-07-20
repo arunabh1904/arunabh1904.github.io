@@ -13,7 +13,7 @@ const sourceRoot = process.env.JEKYLL_SOURCE
 const sectionByCategory = {
   'Paper Shorts': 'paper-shorts',
   Ponderings: 'blog',
-  'Build Intuition': 'build-intuition',
+  'Build Intuition': 'blog',
   'Revision Notes': 'revision-notes',
   'Machine Learning Deep-Dives': 'blog',
   'My Journey So Far': 'blog',
