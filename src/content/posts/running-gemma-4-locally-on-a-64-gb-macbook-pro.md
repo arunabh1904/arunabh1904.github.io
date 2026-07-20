@@ -32,7 +32,7 @@ So on a 64 GB machine, all four models are realistic local targets, including th
 - `Gemma 4 26B A4B`
 - `Gemma 4 31B`
 
-The `26B A4B` model is the more interesting everyday laptop option. It is MoE, so only `4B` parameters are active per generated token, even though the full model still has to sit in memory. The `31B` model is the strongest dense option that still makes sense on this machine. Google also lists `128K` context for the small models and `256K` context for the larger ones, which is powerful but not remotely free from a latency perspective ([Google docs](https://ai.google.dev/gemma/docs/core), [Gemma 4 31B card](https://huggingface.co/google/gemma-4-31B-it)).
+The `26B A4B` model is the more interesting everyday laptop option. It is MoE, so only `4B` parameters are active per generated token, even though the full model still has to sit in memory. The `31B` model is the strongest dense option that still makes sense on this machine. Google also lists `128K` context for the small models and `256K` for the larger ones, but those windows carry a substantial latency cost ([Google docs](https://ai.google.dev/gemma/docs/core), [Gemma 4 31B card](https://huggingface.co/google/gemma-4-31B-it)).
 
 My model recommendation is simple:
 

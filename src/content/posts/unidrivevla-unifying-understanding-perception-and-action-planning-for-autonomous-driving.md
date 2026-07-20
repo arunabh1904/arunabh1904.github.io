@@ -52,4 +52,4 @@ Specialization can reduce gradient conflict, but expert boundaries and joint-att
 
 **Context:** UniDriveVLA makes expert decoupling a central design pattern for driving VLAs.
 
-**Takeaway:** The next VLA architecture fight is not just bigger backbones; it is how to preserve semantic reasoning while adding spatial action competence.
+**Takeaway:** The next VLA architecture decision is how to preserve semantic reasoning while adding spatial action competence, not how large to make the backbone.

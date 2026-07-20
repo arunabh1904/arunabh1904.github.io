@@ -13,7 +13,7 @@ summary: MPA3D uses automatically reconstructed surfel and 3D Gaussian maps as d
 
 **arXiv:** [2605.22997](https://arxiv.org/abs/2605.22997)
 
-**Summary:** This paper asks a very practical driving question: if the car has seen a place before, can a reconstructed static scene help detect objects there later? Instead of relying on manually built HD maps, the method builds dense mapping priors from aggregated sensor data.
+**Summary:** MPA3D asks whether a reconstructed static scene can help a car detect objects in a place it has seen before. The method builds dense mapping priors from aggregated sensor data instead of relying on manually built HD maps.
 
 The detector then uses those priors to separate static background from dynamic foreground, which helps especially for distant, sparse, occluded, or low-visibility objects.
 
@@ -55,6 +55,6 @@ MPA3D informs whether static scene reconstruction can serve as a reusable prior 
 
 The method can turn repeated fleet observations into dense supervision, but localization quality and stale geometry determine whether the prior helps. The missing factorial study separates map density, reconstruction type, pose error, and detector capacity under equal current-frame inputs. At 10× territory and map age, storage, retrieval, and change management dominate. The mapping-prior claim would fail if a temporal detector matched 3D accuracy under pose noise without maintaining an external reconstructed map.
 
-**Context:** MPA3D reframes mapping as perception memory. The map does not need to be a manually labeled semantic product; a reconstructed static scene can still be a powerful prior for finding what changed.
+**Context:** MPA3D reframes mapping as perception memory. The map need not be a manually labeled semantic product; a reconstructed static scene can supply a prior for finding what changed.
 
 **Takeaway:** For BEV perception, repeated traversals can become dense background knowledge, and background knowledge makes foreground detection easier.

@@ -13,7 +13,7 @@ summary: DIMA used a large multimodal driving model as a teacher, distilling its
 
 **arXiv:** [2501.09757](https://arxiv.org/abs/2501.09757)
 
-**Summary:** This paper, referred to as DIMA in the generated report, tackles the latency problem directly. A large multimodal LLM planner may reason well, but it is too slow and expensive for deployment. The proposed approach trains a smaller vision-based student to imitate the larger teacher's planning behavior and intermediate reasoning signals.
+**Summary:** DIMA tackles planner latency by distilling a large multimodal LLM into a smaller vision-based student. The teacher may reason well but remains too slow and expensive for deployment, so the student learns both its planning behavior and intermediate reasoning signals.
 
 The result is a model that keeps more of the teacher's traffic knowledge while avoiding a full LLM in the runtime loop.
 

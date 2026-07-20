@@ -14,11 +14,11 @@ summary: '2023 – Mixed-modal scaling laws that model both modality contributio
 **arXiv:** [2301.03728](https://arxiv.org/abs/2301.03728)  
 **Conference:** Technical report
 
-**Summary:** This work runs more than 250 experiments across seven modalities, model sizes from 8M to 30B parameters, and 5–100B training tokens. It extends unimodal scaling laws with terms for both individual modality contributions and cross-modal synergy or competition.
+**Summary:** Scaling Laws for Generative Mixed-Modal Language Models runs more than 250 experiments across seven modalities, model sizes from 8M to 30B parameters, and 5–100B training tokens. Its law includes both individual modality contributions and cross-modal synergy or competition.
 
 ## Paper Insights
 
-The useful shift is from asking whether a mixture is good to estimating how each modality changes loss under a particular model and data budget. The paper also reports modality alternation during training, hyperparameter guidance, and links between mixed-modal competition and training stability; a 30B speech-text model serves as a larger validation run.
+The useful shift is from asking whether a mixture is good to estimating how each modality changes loss under a particular model and data budget. The paper also reports modality alternation during training, hyperparameter guidance, and links between mixed-modal competition and training stability; a 30B speech-text model provides a larger validation run.
 
 | Component | Role |
 | --- | --- |

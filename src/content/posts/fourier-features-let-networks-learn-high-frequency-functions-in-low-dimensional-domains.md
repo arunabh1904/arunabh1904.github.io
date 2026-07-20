@@ -39,7 +39,7 @@ _Figure 2 shows why the input mapping matters: Fourier features reshape the effe
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
-| Core method | Sinusoidal coordinate mapping before an MLP | A small representation change unlocks high-frequency regression. |
+| Core method | Sinusoidal coordinate mapping before an MLP | A small representation change recovers high-frequency regression. |
 | Theory | NTK analysis of the transformed MLP | Explains the frequency bias instead of only showing examples. |
 | Tasks | Low-dimensional vision and graphics regression | Matches the coordinate-heavy structure of implicit scene and map models. |
 

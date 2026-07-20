@@ -13,44 +13,42 @@ summary: >-
 ---
 # Thoughts on Good Research in Industry
 
-I came across [this post](https://emerge-lab.github.io/papers/an-unsolicited-guide-to-good-research.pdf) from [Eugene Vinitsky](https://www.eugenevinitsky.com/) recently, and it stayed with me longer than I expected. Eugene leads the [EMERGE Lab](https://emerge-lab.github.io/), and while the piece is framed as advice for doing good research, a lot of it applies just as well to research in industry. The constraints are different. The timelines are tighter. The work is tangled up with engineering, product, and organizational reality. But the underlying questions are the same: How do you develop taste? How do you work rigorously without getting lost in process? How do you collaborate in a way that compounds?
+[Eugene Vinitsky's guide to good research](https://emerge-lab.github.io/papers/an-unsolicited-guide-to-good-research.pdf) stayed with me because it treats research as a craft rather than a sequence of heroic breakthroughs. Eugene leads the [EMERGE Lab](https://emerge-lab.github.io/), but much of his advice transfers to industry, where research is entangled with engineering, product, deadlines, and organizational constraints.
 
-What I liked most about the piece is that it treats research less like a sequence of heroic breakthroughs and more like a craft. A lot of the job is not just having good ideas. It is learning how to see clearly, choose well, and keep moving.
+Those constraints change the work without changing its central questions. A researcher still needs to decide what matters, design experiments that produce knowledge, and collaborate without losing momentum. Good ideas help. Clear judgment and reliable execution determine whether those ideas survive contact with an organization.
 
 ## Developing taste
 
-One of the hardest parts of becoming a researcher is building a point of view. There is far too much literature for anyone to keep up with all of it, and genuinely important work is much rarer than the volume of papers would suggest. Early on, that can feel overwhelming. Over time, though, you get better at compressing the field. You learn which ideas are foundational, which are incremental, and which are mostly noise.
+Research taste is the ability to decide what deserves attention. The literature grows faster than anyone can read it, while consequential ideas remain much rarer than papers. A new researcher experiences that gap as overload. An experienced one builds a compressed map: foundational results, useful extensions, unresolved questions, and noise.
 
-That, to me, is research taste: the ability to tell what matters. Not all papers are written equal, and not all trends deserve attention. A practical shortcut is to find researchers and labs with consistently strong work and follow them closely. Over time, that habit builds the instinct to separate signal from fashion.
+Following researchers and labs with consistently strong work is a practical way to build that map. The point is not to outsource judgment to famous names. It is to study repeated examples of good problem selection, clean evidence, and durable ideas until you can recognize those qualities yourself.
 
-This is also why virality-based social media feels so flattening. It pushes everyone toward the same visible opinions. But real taste develops more slowly. It comes from sustained exposure, independent judgment, and enough experience to recognize depth when it shows up.
+Virality works against this process. Social feeds reward visible consensus and rapid reaction, which pushes people toward the same papers and the same opinions. Taste develops more slowly, through sustained exposure and enough independent judgment to notice depth before the crowd supplies a verdict.
 
 ## Work that pulls you forward
 
-The best work usually has some element of play in it. Not because it is easy, but because it is intrinsically interesting. Some part of the problem should keep pulling you back even when nobody is asking you to care. Research is too hard to sustain on discipline alone.
+The best work contains an element of play. The problem keeps pulling you back when nobody is asking for an update, not because it is easy, but because some part of it remains intrinsically interesting. Research is too uncertain to sustain on discipline alone.
 
-At the same time, the work should stretch you. The most meaningful progress often happens just beyond your comfort zone: not overwhelmed, but not comfortable either. That slight tension is where growth tends to happen.
+Interest is not the same as comfort. Work that teaches you something usually sits just beyond your current ability: difficult enough to force a new model of the problem, but bounded enough that effort can still produce feedback. Too little tension becomes routine; too much becomes paralysis.
 
 ## Collaboration as leverage
 
-It is very hard to do serious engineering alone. Increasingly, the same is true for research. A lot of the leverage comes from working well with others.
+Serious research increasingly depends on the same coordination as serious engineering. The relevant skill is not simply being agreeable. It is keeping information and decisions moving across people who hold different pieces of the system.
 
-The simplest rule here is also one of the most important: do not block. In large organizations, being someone who keeps momentum alive is a real differentiator. That means communicating constraints early, being explicit about timing, and giving enough context for others to keep moving. Hidden blockers are almost always worse than explicit ones.
+My simplest rule is: do not block. Surface constraints early, give honest timing, and leave enough context for someone else to proceed. An explicit blocker can be routed or planned around; a hidden one quietly stalls several people at once.
 
-The same principle applies to your own work. If you are new to a task, missing context, or stuck on something others have probably seen before, ask for help. Do not sit in silence for days. And when the problem is genuinely yours to solve, sometimes the best move is to step away for a bit. Take a walk. Sleep on it. Many hard problems become more tractable once you stop forcing them.
+Apply the same rule to yourself. Ask for help when someone else likely has the missing context. Do not spend days privately rediscovering an answer the team already knows. When the uncertainty is genuinely yours, step away long enough to stop repeating the same failed approach. A walk or a night's sleep often changes the representation of the problem, which is more useful than another hour of force.
 
 ## Rigor and visibility
 
-ML is an empirical science, so rigor in experimentation is not optional. Every experiment should test one thing. Ablations are how you build confidence that you actually learned something. Without that discipline, it is easy to generate activity without generating knowledge.
+ML is empirical, so an experiment should change one interpretable decision whenever possible. Ablations turn a promising run into evidence about what caused the result. Without them, a team can produce plenty of activity and very little knowledge.
 
-Good documentation is part of that rigor. Future you will need to know what you tried, what changed, and what actually worked. For me, a weekly log strikes the right balance. It is enough structure to keep track of progress without becoming a chore. It also creates a natural moment to reflect. Over time, those notes become useful for collaboration, presentations, and performance reviews. The same goes for a brag document. It may sound awkward, but it is often the easiest way to avoid forgetting the work you are genuinely proud of.
+Documentation is part of the experiment. Future you needs to know what changed, why it changed, and which result was trustworthy. A weekly log gives me enough structure to reconstruct decisions without turning record-keeping into a second job. The same notes later support collaboration, presentations, and performance reviews. A brag document serves a narrower purpose: it prevents useful work from disappearing simply because the author forgot to record it.
 
-Showing your work matters too, but only if it is legible. When presenting, the goal is not to maximize detail. It is to maximize understanding. There is a big difference between proving you did the work and helping someone else understand it.
+Visibility only helps when the work is legible. A presentation should maximize what the audience understands, not how much detail the author can display. Proving that you did the work and helping someone reason about it are different goals.
 
 ## Throughput matters too
 
-There is also a practical side to all of this. If you have access to compute, use it well. Keep the GPUs busy. High-quality research depends not just on good ideas, but on how quickly you can run clean loops of experimentation and learn from them. Velocity without rigor is noise. Rigor without velocity is often too slow. The goal is to build a system where the two reinforce each other.
+Compute changes the value of good judgment because it determines how quickly a question can meet evidence. Keep the GPUs busy, but make each run interpretable. Velocity without rigor produces noise; rigor without enough throughput leaves important decisions unresolved. A good research system makes the two reinforce each other.
 
-What resonates with me most about Eugene's post is that it makes research feel like something you can get better at deliberately. Build taste. Stay unblocked. Run careful experiments. Document what you learn. Communicate clearly. Keep moving.
-
-That is a less romantic view of research, but probably a more useful one. In industry especially, it feels closer to the truth.
+That is what I took from Eugene's post. Research improves through practices that can be trained: build taste, expose blockers, run controlled experiments, record decisions, and explain the result clearly. It is less romantic than the breakthrough story. In industry, it is also much closer to how useful research gets done.

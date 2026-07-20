@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2024/04/05/scaling-motion-forecasting-models-with-ense
 tags:
   - Other
 field: 'Motion Forecasting & Planning'
-summary: This paper uses large motion-forecasting ensembles as teachers and distills their gains into smaller student models that fit onboard compute budgets.
+summary: Large motion-forecasting ensembles serve as teachers whose gains are distilled into smaller student models that fit onboard compute budgets.
 ---
 ## 2024 - Ensemble Distillation
 

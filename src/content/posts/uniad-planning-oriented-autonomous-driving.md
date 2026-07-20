@@ -51,4 +51,4 @@ Joint training makes upstream representations accountable to planning, but it al
 
 **Context:** UniAD set the dense BEV end-to-end driving baseline that later vectorized and VLA systems compare themselves against.
 
-**Takeaway:** End-to-end driving is more than putting heads on a backbone; the intermediate tasks need to be arranged around planning.
+**Takeaway:** An end-to-end driving stack should arrange its intermediate tasks around planning rather than attach independent heads to a shared backbone.

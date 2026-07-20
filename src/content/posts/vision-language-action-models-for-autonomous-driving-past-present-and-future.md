@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2025/12/18/vision-language-action-models-for-autonomou
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: This survey traces autonomous-driving VLA work from vision-action models to end-to-end and dual-system VLA paradigms, with attention to action generators and guidance styles.
+summary: A history of autonomous-driving VLA work from vision-action models to end-to-end and dual-system paradigms, with attention to action generators and guidance styles.
 ---
 ## 2025 - Vision-Language-Action Models for Autonomous Driving
 
@@ -15,7 +15,7 @@ summary: This survey traces autonomous-driving VLA work from vision-action model
 
 **Awesome list:** [awesome-vla-for-ad](https://github.com/worldbench/awesome-vla-for-ad)
 
-**Summary:** This survey frames driving VLA as the next step after vision-action models. Vision-action systems map perception to control, but they often lack structured reasoning and instruction following. VLA systems add language as a reasoning and guidance layer.
+**Summary:** Vision-Language-Action Models for Autonomous Driving frames driving VLA as the successor to vision-action systems. Vision-action models map perception to control but often lack structured reasoning and instruction following; VLA systems add language as a reasoning and guidance layer.
 
 The survey is especially useful because it distinguishes end-to-end VLA from dual-system VLA, then breaks down how actions are generated and how language guidance is injected.
 

@@ -31,7 +31,7 @@ _Figure 4 shows the structured MapTR pipeline: sensor inputs become BEV features
 **What to look at:**
 - Map elements are point sets with multiple equivalent orderings.
 - Hierarchical queries mirror the structure of a vector map element.
-- Matching is part of the method, not just a training detail.
+- Matching defines the structured prediction problem rather than serving as an incidental training detail.
 
 **Evals / Benchmarks / Artifacts:**
 

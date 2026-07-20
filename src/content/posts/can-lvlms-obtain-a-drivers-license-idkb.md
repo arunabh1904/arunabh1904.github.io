@@ -13,7 +13,7 @@ summary: IDKB tested whether vision-language models know explicit driving rules,
 
 **arXiv:** [2409.02914](https://arxiv.org/abs/2409.02914)
 
-**Summary:** This paper introduces IDKB, an Interactive Driving Knowledge Base for evaluating whether LVLMs understand traffic rules and driving theory. It includes official handbook knowledge, exam-style questions, and applied road scenarios.
+**Summary:** IDKB is an Interactive Driving Knowledge Base for testing whether LVLMs understand traffic rules and driving theory. It combines official handbook knowledge, exam-style questions, and applied road scenarios.
 
 The result is a useful warning: a model may recognize cars and pedestrians but still fail rule-based reasoning that every licensed human driver is expected to know.
 

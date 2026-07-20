@@ -92,7 +92,7 @@ These details kept the benchmark from measuring hidden work:
 
 ## What The Benchmarks Say
 
-The first finished runs made one thing clear: `4B` Qwen is not just workable on this machine; it is genuinely pleasant.
+The first finished runs made one thing clear: `4B` Qwen is workable on this machine and genuinely pleasant.
 
 `Qwen 3 4B` came out ahead of `Qwen 3.5 4B` in my current MLX setup on both memory footprint and long-prompt responsiveness. The short-prompt throughput story was closer, but even there `Qwen 3 4B` had the better decode speed.
 

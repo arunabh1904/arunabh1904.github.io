@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2025/06/30/a-survey-on-vision-language-action-models-f
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: This survey organizes VLA-for-autonomous-driving work around architecture blocks, model evolution, datasets, benchmarks, and open deployment challenges.
+summary: A map of VLA-for-autonomous-driving research organized around architecture blocks, model evolution, datasets, benchmarks, and open deployment challenges.
 ---
 ## 2025 - A Survey on VLA Models for Autonomous Driving
 
@@ -15,7 +15,7 @@ summary: This survey organizes VLA-for-autonomous-driving work around architectu
 
 **Awesome list:** [Awesome-VLA4AD](https://github.com/JohnsonJiang1996/Awesome-VLA4AD)
 
-**Summary:** This survey is a taxonomy and bibliography for VLA-for-autonomous-driving work. It treats VLA4AD as a distinct line: models that connect visual perception, language understanding, and driving actions rather than stopping at explanation or QA.
+**Summary:** This VLA-for-autonomous-driving survey provides a taxonomy and a curated bibliography. It treats VLA4AD as a distinct line: models that connect visual perception and language understanding to driving actions rather than stopping at explanation or QA.
 
 The survey is useful as a map. It shows how the field moved from end-to-end perception-to-control, to VLMs that explain scenes, to VLA systems that generate actions with language-aware reasoning.
 

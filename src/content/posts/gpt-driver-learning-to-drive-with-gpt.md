@@ -45,6 +45,6 @@ GPT-Driver informs whether motion planning can be reframed as conditional langua
 
 The formulation gains access to pretrained sequence modeling, but coordinate serialization, numerical precision, and rationale faithfulness become hidden design choices. The missing test matches data and backbone across tokenized waypoints, continuous regression, and a non-language autoregressive decoder. At 10× horizon, exposure error and token latency accumulate. The language-modeling claim would fail if the continuous decoder matched planning diversity and safety while using fewer steps and showing better metric precision.
 
-**Context:** It opened a line of work where language is not just for explanation after the fact. It becomes an intermediate representation for planning.
+**Context:** GPT-Driver uses language as an intermediate planning representation rather than an explanation added after the decision.
 
 **Takeaway:** LLMs can help expose the reasoning behind a plan, but driving needs that reasoning to stay grounded, fast, and controllable.

@@ -15,23 +15,23 @@ const archiveHref = '/archive.html';
   <a
     class="post_navi-item nav_prev"
     href={previous ? previous.data.legacyPath : archiveHref}
-    title={previous ? previous.data.title : 'Blog Archive'}
+    title={previous ? previous.data.title : 'Writing Archive'}
   >
     <div class="post_navi-arrow">&lt;</div>
-    <div class="post_navi-label">{previous ? 'Previous Post' : 'Blog Archive'}</div>
+    <div class="post_navi-label">{previous ? 'Previous Entry' : 'Writing Archive'}</div>
     <div>
-      <span>{previous ? previous.data.title : 'Archive of all previous blog posts'}</span>
+      <span>{previous ? previous.data.title : 'Archive of all writing'}</span>
     </div>
   </a>
   <a
     class="post_navi-item nav_next"
     href={next ? next.data.legacyPath : archiveHref}
-    title={next ? next.data.title : 'Blog Archive'}
+    title={next ? next.data.title : 'Writing Archive'}
   >
     <div class="post_navi-arrow">&gt;</div>
-    <div class="post_navi-label">{next ? 'Next Post' : 'Blog Archive'}</div>
+    <div class="post_navi-label">{next ? 'Next Entry' : 'Writing Archive'}</div>
     <div>
-      <span>{next ? next.data.title : 'Archive of all previous blog posts'}</span>
+      <span>{next ? next.data.title : 'Archive of all writing'}</span>
     </div>
   </a>
 </div>

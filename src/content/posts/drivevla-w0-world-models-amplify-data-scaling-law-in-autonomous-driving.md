@@ -48,6 +48,6 @@ DriveVLA-W0 informs whether additional driving data should supervise only sparse
 
 The reported scaling result suggests world-model supervision improves the return from more data in the tested NAVSIM and internal regimes. It does not isolate future-image prediction from extra decoder capacity or richer augmentation. A held-out scale sweep with equal parameters and target count is decisive. At 10× data, video redundancy and prediction of irrelevant appearance can consume the budget. The claim would fail if action-only training recovered the same scaling slope after matching auxiliary compute and regularization.
 
-**Context:** DriveVLA-W0 makes a strong case that driving VLAs should learn world dynamics, not just imitate sparse action labels.
+**Context:** DriveVLA-W0 argues that driving VLAs should learn dense world dynamics alongside sparse action imitation.
 
 **Takeaway:** Dense world-model supervision can make scaling useful when action labels are too thin to train a large driving model by themselves.

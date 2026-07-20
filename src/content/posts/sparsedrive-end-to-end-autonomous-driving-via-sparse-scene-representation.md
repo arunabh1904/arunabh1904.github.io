@@ -50,4 +50,4 @@ The sparse interface buys latency by discarding most spatial locations, but miss
 
 **Context:** SparseDrive sharpened the argument that sparse/vectorized planning can be both faster and more planner-aligned than dense BEV stacks.
 
-**Takeaway:** Dense BEV is powerful, but the planner often wants sparse entities and relations.
+**Takeaway:** Dense BEV preserves broad spatial evidence, but a planner often needs explicit entities and relations.

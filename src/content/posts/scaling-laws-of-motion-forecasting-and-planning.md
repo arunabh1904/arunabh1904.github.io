@@ -15,7 +15,7 @@ summary: This Waymo technical report studies how autoregressive motion forecasti
 
 **Project:** [Waymo research page](https://waymo.com/research/scaling-laws-of-motion-forecasting-and-planning/)
 
-**Summary:** This report asks whether motion forecasting and planning scale like language models. Waymo trains a family of encoder-decoder autoregressive Transformer models and measures how performance changes with compute, data, model size, and inference-time sampling.
+**Summary:** Waymo's scaling study asks whether motion forecasting and planning improve predictably like language models. It trains encoder-decoder autoregressive Transformers and measures how performance changes with compute, data, model size, and inference-time sampling.
 
 The result is encouraging for foundation-model-style autonomy: training loss, open-loop metrics, and even closed-loop metrics improve with scale. The paper also makes the resource tradeoff explicit instead of treating model size as the only knob.
 
