@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Preference Optimization
 field: 'Robot Post-Training & Evaluation'
-summary: 2025 – APO converts human interventions into binary action desirability for VLA refinement.
+summary: "2025 – Human-Assisted Robotic Policy Refinement via Action Preference Optimization"
 ---
 
 ## 2025 – Human-Assisted Robotic Policy Refinement via Action Preference Optimization

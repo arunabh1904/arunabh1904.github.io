@@ -8,7 +8,7 @@ tags:
   - Alignment
   - Preference Optimization
 field: 'Alignment & Post-Training'
-summary: 2024 – KTO learns from desirable and undesirable outputs without requiring paired preferences.
+summary: "2024 – KTO: Model Alignment as Prospect Theoretic Optimization"
 ---
 
 ## 2024 – KTO: Model Alignment as Prospect Theoretic Optimization

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/12/01/internvl-2-5-expanding-performance-boundari
 tags:
   - Other
 field: 'Vision-Language Models'
-summary: InternVL 2.5 scaled open multimodal models with better data, training strategy, and test-time reasoning.
+summary: "2024 – InternVL 2.5: Expanding Performance Boundaries of Open-Source Multimodal Models"
 ---
-## 2024 - InternVL 2.5
+## 2024 – InternVL 2.5
 
 **arXiv:** [2412.05271](https://arxiv.org/abs/2412.05271)
 

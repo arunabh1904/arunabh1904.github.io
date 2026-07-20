@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2019/11/01/mastering-atari-go-chess-shogi-muzero.html
 tags:
   - Other
 field: 'Reinforcement Learning'
-summary: MuZero learned just enough model dynamics to plan with MCTS, without reconstructing full environment observations.
+summary: "2019 – Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model"
 ---
 ## 2019 – Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model (MuZero)
 

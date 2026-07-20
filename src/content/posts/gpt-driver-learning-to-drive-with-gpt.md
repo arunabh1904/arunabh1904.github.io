@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2023/10/01/gpt-driver-learning-to-drive-with-gpt.html
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: GPT-Driver reframed motion planning as language modeling over scene tokens and future waypoints.
+summary: "2023 – GPT-Driver: Learning to Drive with GPT"
 ---
-## 2023 - GPT-Driver
+## 2023 – GPT-Driver
 
 **arXiv:** [2310.01415](https://arxiv.org/abs/2310.01415)
 

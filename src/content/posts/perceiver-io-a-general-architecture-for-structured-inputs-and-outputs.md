@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2021/07/30/perceiver-io-a-general-architecture-for-str
 tags:
   - Other
 field: 'Omni-Model Architectures'
-summary: Perceiver IO uses latent bottleneck cross-attention plus output queries to process arbitrary inputs and produce structured outputs without task-specific heads.
+summary: "2021 – Perceiver IO: A General Architecture for Structured Inputs & Outputs"
 ---
-## 2021 - Perceiver IO
+## 2021 – Perceiver IO
 
 **arXiv:** [2107.14795](https://arxiv.org/abs/2107.14795)
 

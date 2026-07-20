@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Reinforcement Learning
 field: 'Robot Post-Training & Evaluation'
-summary: 2024 – DPPO applies policy gradients to pretrained diffusion policies through the denoising process.
+summary: "2024 – DPPO: Diffusion Policy Policy Optimization"
 ---
 
 ## 2024 – DPPO: Diffusion Policy Policy Optimization

@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Data
 field: 'Vision-Language-Action & Robotics'
-summary: 2023 – Open X-Embodiment standardizes heterogeneous robot datasets and studies cross-robot transfer.
+summary: "2023 – Open X-Embodiment: Robotic Learning Datasets and RT-X Models"
 ---
 
 ## 2023 – Open X-Embodiment: Robotic Learning Datasets and RT-X Models

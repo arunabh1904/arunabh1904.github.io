@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/03/30/opendrivevla-towards-end-to-end-autonomous-
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: OpenDriveVLA adapts open VLMs for end-to-end driving by aligning 2D and 3D structured visual tokens with language and autoregressively modeling agent-environment-ego interactions.
+summary: "2025 – OpenDriveVLA: Towards End-to-end Autonomous Driving with Large Vision Language Action Model"
 ---
-## 2025 - OpenDriveVLA
+## 2025 – OpenDriveVLA
 
 **arXiv:** [2503.23463](https://arxiv.org/abs/2503.23463)
 

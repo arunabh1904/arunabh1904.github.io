@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2020/05/01/language-models-are-few-shot-learners.html
 tags:
   - Other
 field: 'Language Models'
-summary: GPT-3 showed that scale can turn language models into few-shot learners, but also exposed the limits of prompting alone.
+summary: "2020 – Language Models are Few-Shot Learners"
 ---
 ## 2020 – Language Models are Few-Shot Learners (GPT-3)
 

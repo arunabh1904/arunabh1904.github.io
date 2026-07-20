@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Evaluation
 field: 'Robot Post-Training & Evaluation'
-summary: 2023 – LIBERO separates spatial, object, goal, and mixed knowledge transfer across 130 manipulation tasks.
+summary: "2023 – LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning"
 ---
 
 ## 2023 – LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning

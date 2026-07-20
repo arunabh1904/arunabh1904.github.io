@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Evaluation
 field: 'Robot Post-Training & Evaluation'
-summary: 2025 – RoboTwin 2.0 couples automated bimanual task generation with structured domain randomization.
+summary: "2025 – RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation"
 ---
 
 ## 2025 – RoboTwin 2.0: A Scalable Data Generator and Benchmark

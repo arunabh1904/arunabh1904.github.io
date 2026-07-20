@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/03/28/locca-visual-pretraining-with-location-awar
 tags:
   - Other
 field: 'Vision-Language Models'
-summary: LocCa adds location-aware captioning tasks to visual pretraining, improving region grounding while preserving broad VLM transfer.
+summary: "2024 – LocCa: Visual Pretraining with Location-aware Captioners"
 ---
-## 2024 - LocCa
+## 2024 – LocCa
 
 **arXiv:** [2403.19596](https://arxiv.org/abs/2403.19596)
 

@@ -9,7 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: 'Alignment & Post-Training'
-summary: InstructGPT showed that human preference data can make smaller language models follow instructions better than larger base models.
+summary: "2022 – Training Language Models to Follow Instructions with Human Feedback"
 ---
 ## 2022 – Training Language Models to Follow Instructions with Human Feedback (InstructGPT)
 

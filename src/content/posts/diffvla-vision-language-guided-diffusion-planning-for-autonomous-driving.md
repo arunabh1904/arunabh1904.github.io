@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/05/26/diffvla-vision-language-guided-diffusion-pl
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: DiffVLA uses VLM-guided hybrid sparse-dense diffusion planning to generate diverse driving trajectories with explicit agent-map interaction.
+summary: "2025 – DiffVLA: Vision-Language Guided Diffusion Planning for Autonomous Driving"
 ---
-## 2025 - DiffVLA
+## 2025 – DiffVLA
 
 **arXiv:** [2505.19381](https://arxiv.org/abs/2505.19381)
 

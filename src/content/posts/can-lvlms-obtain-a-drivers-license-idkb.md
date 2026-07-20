@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/09/01/can-lvlms-obtain-a-drivers-license-idkb.htm
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: IDKB tested whether vision-language models know explicit driving rules, not just visual scene facts.
+summary: "2024 – Can LVLMs Obtain a Driver's License?"
 ---
-## 2024 - Can LVLMs Obtain a Driver's License?
+## 2024 – Can LVLMs Obtain a Driver's License?
 
 **arXiv:** [2409.02914](https://arxiv.org/abs/2409.02914)
 

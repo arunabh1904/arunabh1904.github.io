@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/06/01/cambrian-1-vision-centric-exploration-of-mu
 tags:
   - Other
 field: 'Vision-Language Models'
-summary: Cambrian-1 treated VLM design as a vision problem first, systematically studying encoders, connectors, data, and evaluation.
+summary: "2024 – Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs"
 ---
-## 2024 - Cambrian-1
+## 2024 – Cambrian-1
 
 **arXiv:** [2406.16860](https://arxiv.org/abs/2406.16860)
 

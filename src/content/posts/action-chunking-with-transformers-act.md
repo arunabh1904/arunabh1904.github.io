@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Imitation Learning
 field: 'Vision-Language-Action & Robotics'
-summary: 2023 – ACT predicts temporally coherent action chunks for precise bimanual manipulation.
+summary: "2023 – Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware (ACT)"
 ---
 
 ## 2023 – Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/10/14/drivevla-w0-world-models-amplify-data-scali
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: DriveVLA-W0 argues that driving VLAs need dense world-model supervision, using future image prediction to complement sparse low-dimensional action labels.
+summary: "2025 – DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving"
 ---
-## 2025 - DriveVLA-W0
+## 2025 – DriveVLA-W0
 
 **arXiv:** [2510.12796](https://arxiv.org/abs/2510.12796)
 

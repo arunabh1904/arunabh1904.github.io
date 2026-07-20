@@ -18,13 +18,7 @@ The standard history—CLIP, visual chat, video, driving, robotics—makes the f
 
 Each step inherits the previous one, but none is a free upgrade. Global semantic alignment can discard location. Fluent generation can hide weak eyesight. More video frames can consume context without teaching causality. Language can specify a goal while saying nothing about control frequency. The point of this guide is to make those fault lines visible before the papers blur them together.
 
-![Reading map from VLMs to deployed robot policies](/assets/images/multimodal-vla-reading-map.svg)
-_The three-part series follows four contracts: visual evidence, robot experience, an action distribution, and closed-loop feedback. The question under each block is the one worth carrying into the papers._
-
 This is Part I of a three-part reading course. [Part II](/blog/2026/07/15/omni-model-pretraining-decisions.html) asks how multimodal and robot data should shape a pretrained policy. [Part III](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html) asks how deployment failures can justify a policy update. You can read this article alone, but the sequence matters: post-training cannot recover visual evidence that pretraining threw away, and pretraining cannot anticipate every state the deployed policy will create.
-
-![Vision-language model stack](/assets/images/vlm-stack-schematic.svg)
-_The common stack hides several different contracts. Retrieval aligns representations; visual chat conditions a decoder; embodied systems must also preserve state, time, and action consequences._
 
 The scope is deliberately narrow. I follow five transitions: labels to language, alignment to generation, coarse semantics to grounded evidence, answers to decisions, and decisions to actions. I care about the architectural and data choices that survive model generations, not a complete leaderboard. Reported results belong to the cited papers; the interface taxonomy and reading order are my synthesis.
 
@@ -64,6 +58,9 @@ $$
 
 where $\tau$ controls the sharpness of the similarities. At inference, class names become text prompts. Classification is retrieval against language rather than a fixed learned head.
 
+![Figure 1 from the CLIP paper, showing contrastive pretraining and zero-shot transfer through text prompts](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
+_Figure 1 makes the interface change visible: images and text are aligned during pretraining, then written class prompts replace a fixed classifier head. Source: [Learning Transferable Visual Models From Natural Language Supervision](https://arxiv.org/abs/2103.00020), Figure 1._
+
 The important result was not merely zero-shot ImageNet accuracy. CLIP showed that noisy natural language at web scale can define a broad visual supervision space. A prompt can name a class, attribute, style, or relation that never appeared as a dedicated label in the training interface.
 
 The tradeoff sits inside the objective. Batch-softmax contrastive learning treats the other examples in a batch as negatives. Large and diverse batches improve that comparison set, but they demand synchronization and can introduce false negatives when two captions describe compatible content.
@@ -84,6 +81,9 @@ p(y\mid I,x)=\prod_t p(y_t\mid H_v,x,y_{<t}).
 $$
 
 The projector $W$ is small relative to the encoders around it. Yet the system feels qualitatively different because the output contract changed. The model must use visual evidence while maintaining the conversational behavior already learned by the language model.
+
+![The LLaVA paper's visual instruction-tuning pipeline](/assets/images/visual-instruction-tuning-llava-paper-figure.png)
+_LLaVA's source figure separates data generation from model adaptation: GPT-4 first converts image metadata into instruction data, then those examples tune the projected vision-language model. Source: [Visual Instruction Tuning](https://arxiv.org/abs/2304.08485)._
 
 This is a recurring pattern in foundation models: a modest interface plus the right post-training data can elicit a capability that the base components nearly support. It is tempting to conclude that the connector is the central research problem. Controlled studies in [MM1](/paper%20shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html) point elsewhere. In its studied recipe, image encoder quality, resolution, number of visual tokens, and the composition of interleaved, caption, and text-only data matter more than endlessly elaborating the connector.
 
@@ -110,15 +110,7 @@ The operational question is no longer “How many multimodal examples do we have
 
 ## 4. Visual tokens became the scarce resource
 
-Text tokenization compresses language into a sequence of discrete symbols. Images do not arrive with an obvious equivalent. A $1024\times1024$ image can be divided into patches, encoded into a smaller feature grid, tiled at several resolutions, or compressed through a learned tokenizer. Every choice trades detail for sequence length.
-
-The total context is roughly
-
-$$
-T=T_{text}+T_{image}+T_{video}.
-$$
-
-That simple sum drives real costs. More visual tokens preserve small objects and text but consume attention, memory, and latency. Fewer tokens improve throughput but may create an irreversible perceptual bottleneck.
+Text tokenization compresses language into a sequence of discrete symbols. Images do not arrive with an obvious equivalent. A $1024\times1024$ image can be divided into patches, encoded into a smaller feature grid, tiled at several resolutions, or compressed through a learned tokenizer. Every choice trades detail for sequence length: more visual tokens can preserve small objects and text but consume attention, memory, and latency; fewer tokens improve throughput but may create an irreversible perceptual bottleneck.
 
 [PaliGemma](/paper%20shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html) is a clean study of transfer: a SigLIP vision encoder feeds a compact Gemma language model, and resolution upcycling lets later stages pay more visual compute where tasks need it. [Qwen2-VL](/paper%20shorts/2024/09/01/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution.html) makes token count depend on input resolution and adapts positional treatment for images and video. [DeepSeek-VL2](/paper%20shorts/2024/12/01/deepseek-vl2-mixture-of-experts-vision-language-models.html) combines dynamic tiling with sparse language capacity and a more economical attention design.
 
@@ -249,9 +241,7 @@ After these five layers, move to [Part II: Pretraining Multimodal Models for Rob
 
 VLM progress is a sequence of interface contracts. Contrastive learning made images addressable through language. Visual instruction tuning made that representation conversational. Grounding tried to reconnect fluent words to visible evidence. Video introduced persistence and compression. Driving and robotics exposed every shortcut because a plausible answer can become a bad physical decision.
 
-My strongest bet is not that one token stream will erase every modality boundary. It is that semantic reasoning will become a shared layer, while high-bandwidth perception and high-rate control retain specialized representations and losses. The decisive systems will know what to share and what not to compress.
-
-My bet is a shared semantic layer with explicit high-bandwidth routes for geometry, time, and control. A fully unified token stream should replace that hybrid only when, under matched data, parameters, tokens, compute, and latency, it wins on fine grounding, temporal counterfactuals, and closed-loop recovery without losing calibration. Until then, “one model for everything” names an experiment. It does not settle the architecture.
+My strongest bet is a shared semantic layer with explicit high-bandwidth routes for geometry, time, and control. A fully unified token stream should replace that hybrid only when, under matched data, parameters, tokens, compute, and latency, it wins on fine grounding, temporal counterfactuals, and closed-loop recovery without losing calibration. Until then, “one model for everything” names an experiment. It does not settle the architecture.
 
 ## References
 

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: DriveVLM combined VLM reasoning with hierarchical planning, then paired it with a traditional pipeline for real-time driving.
+summary: "2024 – DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models"
 ---
-## 2024 - DriveVLM
+## 2024 – DriveVLM
 
 **arXiv:** [2402.12289](https://arxiv.org/abs/2402.12289)
 

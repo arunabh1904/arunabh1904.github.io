@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Diffusion
 field: 'Vision-Language-Action & Robotics'
-summary: 2023 – Diffusion Policy models multimodal continuous action sequences through iterative denoising.
+summary: "2023 – Diffusion Policy: Visuomotor Policy Learning via Action Diffusion"
 ---
 
 ## 2023 – Diffusion Policy: Visuomotor Policy Learning via Action Diffusion

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/05/30/sparsedrive-end-to-end-autonomous-driving-v
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: SparseDrive replaces expensive dense BEV planning features with sparse scene instances, symmetric sparse perception, parallel motion planning, and collision-aware rescoring.
+summary: "2024 – SparseDrive: End-to-End Autonomous Driving via Sparse Scene Representation"
 ---
-## 2024 - SparseDrive
+## 2024 – SparseDrive
 
 **arXiv:** [2405.19620](https://arxiv.org/abs/2405.19620)
 

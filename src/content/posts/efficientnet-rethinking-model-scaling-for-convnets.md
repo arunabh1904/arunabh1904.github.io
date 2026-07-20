@@ -9,7 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: 'Vision Foundations'
-summary: EfficientNet made CNN scaling more systematic by growing depth, width, and resolution together under a compute budget.
+summary: "2019 – EfficientNet — Rethinking Model Scaling for ConvNets"
 ---
 ## 2019 – EfficientNet — Rethinking Model Scaling for ConvNets
 

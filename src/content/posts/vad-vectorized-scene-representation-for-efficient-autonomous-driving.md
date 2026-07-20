@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2023/03/21/vad-vectorized-scene-representation-for-eff
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: VAD replaces dense rasterized planning inputs with vectorized agents and map elements, improving end-to-end planning efficiency and safety constraints.
+summary: "2023 – VAD: Vectorized Scene Representation for Efficient Autonomous Driving"
 ---
-## 2023 - VAD
+## 2023 – VAD
 
 **arXiv:** [2303.12077](https://arxiv.org/abs/2303.12077)
 

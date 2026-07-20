@@ -9,7 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: 'Vision Foundations'
-summary: ViT showed that patchified images and standard Transformer encoders can rival CNNs when pre-training data is large enough.
+summary: "2020 – An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale"
 ---
 ## 2020 – An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale
 

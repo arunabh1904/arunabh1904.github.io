@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2020/06/01/denoising-diffusion-probabilistic-models.ht
 tags:
   - Other
 field: 'Generative Modeling'
-summary: DDPMs turned generation into learned denoising, trading slow sampling for stable training and strong image quality.
+summary: "2020 – Denoising Diffusion Probabilistic Models"
 ---
 ## 2020 – Denoising Diffusion Probabilistic Models (DDPM)
 

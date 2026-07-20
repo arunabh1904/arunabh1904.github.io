@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/10/01/pi0-vision-language-action-flow-model-for-g
 tags:
   - Other
 field: 'Vision-Language-Action & Robotics'
-summary: Pi0 used a VLM backbone and flow matching to turn visual-language context into continuous robot actions.
+summary: "2024 – Pi0: A Vision-Language-Action Flow Model for General Robot Control"
 ---
-## 2024 - Pi0
+## 2024 – Pi0
 
 **arXiv:** [2410.24164](https://arxiv.org/abs/2410.24164)
 

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2020/08/19/tnt-target-driven-trajectory-prediction.htm
 tags:
   - Other
 field: 'Motion Forecasting & Planning'
-summary: TNT makes multimodal motion forecasting explicit by predicting likely target states, rolling out target-conditioned trajectories, and scoring a compact diverse set.
+summary: "2020 – TNT: Target-driveN Trajectory Prediction"
 ---
-## 2020 - TNT: Target-driveN Trajectory Prediction
+## 2020 – TNT: Target-driveN Trajectory Prediction
 
 **arXiv:** [2008.08294](https://arxiv.org/abs/2008.08294)
 

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2026/05/21/scene-reconstruction-as-mapping-priors-for-
 tags:
   - Other
 field: 'BEV Perception & Mapping'
-summary: MPA3D uses automatically reconstructed surfel and 3D Gaussian maps as dense static priors for 3D object detection.
+summary: "2026 – Scene Reconstruction as Mapping Priors for 3D Detection"
 ---
-## 2026 - Scene Reconstruction as Mapping Priors for 3D Detection
+## 2026 – Scene Reconstruction as Mapping Priors for 3D Detection
 
 **arXiv:** [2605.22997](https://arxiv.org/abs/2605.22997)
 

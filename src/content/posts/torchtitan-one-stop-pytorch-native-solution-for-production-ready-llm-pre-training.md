@@ -6,7 +6,7 @@ postSlug: torchtitan-one-stop-pytorch-native-solution-for-production-ready-llm-p
 legacyPath: /paper shorts/2024/10/09/torchtitan-one-stop-pytorch-native-solution-for-production-ready-llm-pre-training.html
 tags: [ML Systems]
 field: 'Training Systems & Reliability'
-summary: '2024 – TorchTitan: composable parallelism, checkpointing, and debugging for large-scale PyTorch pre-training.'
+summary: "2024 – TorchTitan: One-stop PyTorch Native Solution for Production-ready LLM Pre-training"
 ---
 
 ## 2024 – TorchTitan

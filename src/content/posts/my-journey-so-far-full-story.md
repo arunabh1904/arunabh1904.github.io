@@ -1,5 +1,5 @@
 ---
-title: My Journey So Far - The Full Story
+title: 'My Journey So Far: The Full Story'
 date: '2025-02-08T05:00:00.000Z'
 section: blog
 postSlug: my-journey-so-far-full-story
@@ -11,11 +11,11 @@ summary: >-
   graduate school, DEKA, and Zoox.
 ---
 
-## Introduction
+# My Journey So Far: The Full Story
 
 In 2023, I gave [this interview](https://theinterviewportal.com/2024/01/21/perception-roboticist-interview/) about how I became a robotics engineer focused on perception. Looking back, the interview mostly captured the wins. It did not say much about the missteps, low points, and strange detours that shaped the path just as much. This is the fuller version, starting from the beginning.
 
-## Growing Up
+## Growing up
 
 I grew up in Jaipur, a city that shaped much of my early life. I lost my father when I was 5, but my mother and sisters surrounded me with so much love that I never felt like I was missing anything. I was still deeply introverted, and I escaped into games like DOTA and DOTA 2. I logged around **16,000** hours and even reached the **#16 rank in India** at one point. That obsession helped me cope, but it also taught me something useful: the same intensity, pointed at the real world, could probably take me somewhere. That realization eventually pulled me out of my shell and pushed me toward the US.
 
@@ -26,7 +26,7 @@ Most of my schooling was in Jaipur, and like many aspiring engineers, I spent th
 - Sometimes, **no matter how hard you try, you will fail** - and that's okay.
 - **It's okay to indulge** in things you like (like video games), but don’t let them consume you.
 
-## Undergrad at MIT, Manipal
+## Undergrad at MIT Manipal
 
 I stayed back an extra year, prepared again, and eventually got accepted to MIT, Manipal. It was not an IIT, but it was a solid engineering school, and I had a chance to reset. I did not use that chance immediately. I stayed in my introverted shell, played even more DOTA, often 6-8 hours a day, and picked up smoking cigarettes, which is still the worst habit I have ever had. I skipped many classes during my first two years, and at one point my cumulative GPA was 0.74, not out of 4, but out of 10.
 
@@ -38,7 +38,8 @@ In a bit of a comical twist, we accidentally broke the robot just before filming
 
 Even with that ridiculous ending, the concept was real. A similar design is now in production, helping farmers harvest more safely. That is what made robotics click for me: machines can make difficult, dangerous work safer and more efficient.
 
-<img src="/assets/images/IMG_8842.jpg" alt="Areca Nut Robot" class="float-right" style="max-width:65%;">
+![The areca-nut harvesting robot built for my undergraduate thesis](/assets/images/IMG_8842.jpg)
+_Our undergraduate prototype climbed an areca palm and used a remotely controlled cutter. Source: personal project archive._
 
 ### What undergrad changed
 - **It's never too late to start.**
@@ -55,7 +56,8 @@ After graduation, I had my heart set on pursuing a master's degree in Germany. T
 
 A month later, I was anxiously waiting for the results. Then, I received an email from my safe school. I opened it, expecting good news, only to read that I was being rejected for missing documents. To my horror, I realized I had accidentally sent the documents meant for the safe school to another university. Slowly, the rejection emails from all five universities trickled in, and the reality set in - I wasn't going to Germany.
 
-<img src="/assets/images/tuhh.png" alt="Germany Rejection" class="float-left" style="max-width:65%;">
+![The missing-documents rejection notice that exposed my application mix-up](/assets/images/tuhh.png)
+_The rejection notice that exposed the document mix-up across my German university applications. Source: personal archive._
 
 I was devastated, and it plunged me into a deep depression. For about nine months, my life became a bleak cycle: I'd get up, barely eat, play DOTA 2 in a dark room for 12 hours, smoke heavily, and then go back to sleep, only to repeat the same routine the next day. It was a dark time.
 
@@ -72,7 +74,7 @@ I was accepted into three schools. I still remember rereading the first acceptan
 - **Having a purpose** makes it low-effort to work hard.
 - **Always have a backup plan.**
 
-## Grad school at Mines
+## Graduate school at Mines
 
 In 2016, I moved to the United States for a Master's degree in Robotics at the Colorado School of Mines (CSM). CSM is a relatively small STEM school, but the program was demanding. During the first few months I felt out of place. The culture was new, the academic environment was unfamiliar, and even the classroom style felt different. As an introvert, the adjustment was hard. Over time, I found my rhythm and began to genuinely enjoy learning.
 
@@ -80,7 +82,8 @@ Before the start of the semester, I looked for on-campus opportunities to become
 
 In my second semester, I joined Dr. Petruska's lab as a research assistant. Initially, I worked on a project involving magnetic manipulation, but I quickly realized it wasn't something I was passionate about, and my lack of progress reflected that. In my free time, I spent countless hours tinkering with the Husky robot in the lab, even writing my own ROS packages to make it move. Dr. Petruska noticed my interest and transitioned me to that project. That change made all the difference. The lab became my second home, and I spent more time there than at my apartment. I focused on learning the basics and building a solid foundation in C++ programming and ROS. Curiosity was key. One funny story I remember is when we short-circuited the entire onboard compute stack and spent a couple of weeks putting it back together from scratch. It was a lot of fun and a great learning experience.
 
-<img src="/assets/images/me_in_lab.jpeg" alt="Me in Lab" class="float-right" style="max-width:65%;">
+![Working beside the Clearpath Husky robot in the Colorado School of Mines lab](/assets/images/me_in_lab.jpeg)
+_Working with the Husky platform in the Colorado School of Mines robotics lab. Source: personal archive._
 
 The third semester at CSM was a turning point in my career. I spent much of it conducting independent research and programming a Husky robot for autonomous navigation in GPS-denied environments. My collaborators and I covered the lab whiteboards with optimal-control equations, then implemented them late into the night.
 
@@ -88,7 +91,8 @@ Robotics courses gave me more ways to test the theory. I got my first taste of m
 
 We eventually deployed the Husky inside CSM's Edgar Mine, where it navigated without GPS using our model-predictive controller. The mine was freezing, but watching the robot move without hitting anything made the long nights worthwhile.
 
-<img src="/assets/images/hexy.jpg" alt="Hexapod Robot" class="float-left" style="max-width:65%;">
+![The hexapod robot used for a graduate robotics project](/assets/images/hexy.jpg)
+_The hexapod project paired a 1D LiDAR and Pixy camera with a small mobile platform. Source: personal project archive._
 
 Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grades mattered, but the projects I took on, the problems I solved, and the people I learned from shaped me more. My advice to current graduate students is simple: take on projects that stretch you, use the resources around you, and follow problems that genuinely excite you. That is how progress starts to compound.
 
@@ -98,7 +102,7 @@ Looking back, the best thing I did was build a strong foundation in the skills I
 - **Be intentional** about what you want to get out of grad school. Tailor your coursework and experiences to align with your interests.
 - **Seek out hands-on opportunities**, like TA and RA positions, to apply your learning in practical settings.
 
-## Finding a Job Out of Grad School
+## Finding a job after graduate school
 
 Landing your first job out of grad school in the U.S. can be difficult, especially if you want the dream job immediately and you are not coming from a top university. Even if you spent grad school building skills, doing research, and working on relevant projects, the search can still be tough. These are the things that helped me:
 
@@ -113,7 +117,7 @@ Landing your first job out of grad school in the U.S. can be difficult, especial
 - **Career Fairs**: These can be helpful, but don’t rely on them exclusively.
 - **Honesty**: Never lie on your resume.
 
-## First Job at DEKA
+## First job at DEKA
 
 Right after grad school, I landed at DEKA and joined a small, tight-knit team building autonomous robots for FedEx's last-mile deliveries. DEKA was mostly known for medical devices, so the robotics project felt like new territory. I started in planning, but I soon found my way into robot perception and machine learning. That team is where I really expanded my skills, diving into PyTorch, TensorFlow, TensorRT, CUDA, and OpenCL.
 

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/10/01/senna-bridging-large-vision-language-models
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: SENNA split driving into high-level language planning and low-level trajectory control.
+summary: "2024 – SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving"
 ---
-## 2024 - SENNA
+## 2024 – SENNA
 
 **arXiv:** [2410.22313](https://arxiv.org/abs/2410.22313)
 

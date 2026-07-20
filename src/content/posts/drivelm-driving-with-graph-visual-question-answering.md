@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2023/12/21/drivelm-driving-with-graph-visual-question-
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: DriveLM formulates driving reasoning as graph visual question answering, linking perception, prediction, planning, behavior, and motion questions into a structured reasoning chain.
+summary: "2023 – DriveLM: Driving with Graph Visual Question Answering"
 ---
-## 2023 - DriveLM
+## 2023 – DriveLM
 
 **arXiv:** [2312.14150](https://arxiv.org/abs/2312.14150)
 

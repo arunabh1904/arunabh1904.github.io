@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/06/30/a-survey-on-vision-language-action-models-f
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: A map of VLA-for-autonomous-driving research organized around architecture blocks, model evolution, datasets, benchmarks, and open deployment challenges.
+summary: "2025 – A Survey on Vision-Language-Action Models for Autonomous Driving"
 ---
-## 2025 - A Survey on VLA Models for Autonomous Driving
+## 2025 – A Survey on VLA Models for Autonomous Driving
 
 **arXiv:** [2506.24044](https://arxiv.org/abs/2506.24044)
 

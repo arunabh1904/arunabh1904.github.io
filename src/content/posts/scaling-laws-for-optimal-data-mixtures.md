@@ -6,7 +6,7 @@ postSlug: scaling-laws-for-optimal-data-mixtures
 legacyPath: /paper shorts/2025/07/12/scaling-laws-for-optimal-data-mixtures.html
 tags: [Scaling Laws]
 field: 'Multimodal Scaling & Data Mixtures'
-summary: '2025 – Estimating compute-aware data mixtures from small training runs.'
+summary: "2025 – Scaling Laws for Optimal Data Mixtures"
 ---
 
 ## 2025 – Scaling Laws for Optimal Data Mixtures

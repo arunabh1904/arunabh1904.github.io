@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2020/05/08/vectornet-encoding-hd-maps-and-agent-dynami
 tags:
   - Other
 field: 'Motion Forecasting & Planning'
-summary: VectorNet encoded HD maps and agent histories as polylines, using local polyline aggregation and a global interaction graph instead of rasterized BEV images.
+summary: "2020 – VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation"
 ---
-## 2020 - VectorNet
+## 2020 – VectorNet
 
 **arXiv:** [2005.04259](https://arxiv.org/abs/2005.04259)
 

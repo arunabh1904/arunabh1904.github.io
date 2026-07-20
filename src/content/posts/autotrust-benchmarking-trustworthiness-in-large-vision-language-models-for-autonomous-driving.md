@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/12/01/autotrust-benchmarking-trustworthiness-in-l
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: AutoTrust evaluated driving VLMs across hallucination, safety, robustness, privacy, and fairness.
+summary: "2024 – AutoTrust: Benchmarking Trustworthiness in Large Vision Language Models for Autonomous Driving"
 ---
-## 2024 - AutoTrust
+## 2024 – AutoTrust
 
 **arXiv:** [2412.15206](https://arxiv.org/abs/2412.15206)
 

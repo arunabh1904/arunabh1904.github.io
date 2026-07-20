@@ -6,7 +6,7 @@ postSlug: tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-gen
 legacyPath: /paper shorts/2024/12/04/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation.html
 tags: [Multimodal AI]
 field: 'Omni-Model Architectures'
-summary: '2024 – TokenFlow: a dual-codebook tokenizer for visual semantics and reconstruction detail.'
+summary: "2024 – TokenFlow: Unified Image Tokenizer for Multimodal Understanding and Generation"
 ---
 
 ## 2024 – TokenFlow

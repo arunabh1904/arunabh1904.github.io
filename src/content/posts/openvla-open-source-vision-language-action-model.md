@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/06/01/openvla-open-source-vision-language-action-
 tags:
   - Other
 field: 'Vision-Language-Action & Robotics'
-summary: OpenVLA released a 7B open robot policy trained on 970k real robot demonstrations.
+summary: "2024 – OpenVLA: An Open-Source Vision-Language-Action Model"
 ---
-## 2024 - OpenVLA
+## 2024 – OpenVLA
 
 **arXiv:** [2406.09246](https://arxiv.org/abs/2406.09246)
 

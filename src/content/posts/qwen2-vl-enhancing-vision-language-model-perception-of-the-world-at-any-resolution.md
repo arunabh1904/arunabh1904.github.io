@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/09/01/qwen2-vl-enhancing-vision-language-model-pe
 tags:
   - Other
 field: 'Vision-Language Models'
-summary: Qwen2-VL made resolution and video length more flexible by letting visual token count scale with the input.
+summary: "2024 – Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution"
 ---
-## 2024 - Qwen2-VL
+## 2024 – Qwen2-VL
 
 **arXiv:** [2409.12191](https://arxiv.org/abs/2409.12191)
 

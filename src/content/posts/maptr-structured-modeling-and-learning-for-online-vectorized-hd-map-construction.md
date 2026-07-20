@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2022/08/30/maptr-structured-modeling-and-learning-for-
 tags:
   - Other
 field: 'BEV Perception & Mapping'
-summary: MapTR models HD map elements as permutation-equivalent point sets, making online vectorized map construction trainable with a structured Transformer.
+summary: "2022 – MapTR: Structured Modeling and Learning for Online Vectorized HD Map Construction"
 ---
-## 2022 - MapTR
+## 2022 – MapTR
 
 **arXiv:** [2208.14437](https://arxiv.org/abs/2208.14437)
 

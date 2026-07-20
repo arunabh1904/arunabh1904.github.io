@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/01/01/are-vlms-ready-for-autonomous-driving-drive
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: DriveBench tested whether VLM driving answers are visually grounded or merely plausible.
+summary: "2025 – Are VLMs Ready for Autonomous Driving?"
 ---
-## 2025 - Are VLMs Ready for Autonomous Driving?
+## 2025 – Are VLMs Ready for Autonomous Driving?
 
 **arXiv:** [2501.04003](https://arxiv.org/abs/2501.04003)
 

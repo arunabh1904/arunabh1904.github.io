@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/04/01/mgmap-mask-guided-learning-for-online-vecto
 tags:
   - Other
 field: 'BEV Perception & Mapping'
-summary: MGMap adds learned masks to online vector-map construction so instance queries and point refinement focus on the relevant BEV regions.
+summary: "2024 – MGMap: Mask-Guided Learning for Online Vectorized HD Map Construction"
 ---
-## 2024 - MGMap
+## 2024 – MGMap
 
 **arXiv:** [2404.00876](https://arxiv.org/abs/2404.00876)
 

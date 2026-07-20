@@ -8,7 +8,7 @@ tags:
   - Alignment
   - Reward Models
 field: 'Alignment & Post-Training'
-summary: 2022 – Proxy reward improves before Goodhart's law turns further optimization into regression.
+summary: "2022 – Scaling Laws for Reward Model Overoptimization"
 ---
 
 ## 2022 – Scaling Laws for Reward Model Overoptimization

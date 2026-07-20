@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Generalist Policies
 field: 'Vision-Language-Action & Robotics'
-summary: 2022 – RT-1 scales a compact tokenized-action transformer across real robot tasks and data diversity.
+summary: "2022 – RT-1: Robotics Transformer for Real-World Control at Scale"
 ---
 
 ## 2022 – RT-1: Robotics Transformer for Real-World Control at Scale

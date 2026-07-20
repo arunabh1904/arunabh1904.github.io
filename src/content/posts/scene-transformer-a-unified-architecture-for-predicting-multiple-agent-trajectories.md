@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2021/06/15/scene-transformer-a-unified-architecture-fo
 tags:
   - Other
 field: 'Motion Forecasting & Planning'
-summary: Scene Transformer uses one scene-centric attention architecture for marginal, joint, conditional, and goal-conditioned multi-agent forecasting.
+summary: "2021 – Scene Transformer: A Unified Architecture for Predicting Multiple Agent Trajectories"
 ---
-## 2021 - Scene Transformer
+## 2021 – Scene Transformer
 
 **arXiv:** [2106.08417](https://arxiv.org/abs/2106.08417)
 

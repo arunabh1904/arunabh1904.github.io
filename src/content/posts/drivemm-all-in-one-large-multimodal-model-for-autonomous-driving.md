@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/12/01/drivemm-all-in-one-large-multimodal-model-f
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: DriveMM trained one multimodal transformer across perception, prediction, and planning with a driving curriculum.
+summary: "2024 – DriveMM: All-in-One Large Multimodal Model for Autonomous Driving"
 ---
-## 2024 - DriveMM
+## 2024 – DriveMM
 
 **arXiv:** [2412.07689](https://arxiv.org/abs/2412.07689)
 

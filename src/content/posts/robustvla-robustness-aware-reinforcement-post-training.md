@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Robustness
 field: 'Robot Post-Training & Evaluation'
-summary: 2025 – RobustVLA regularizes observation sensitivity and action smoothness during online RL.
+summary: "2025 – RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models"
 ---
 
 ## 2025 – RobustVLA: Robustness-Aware Reinforcement Post-Training

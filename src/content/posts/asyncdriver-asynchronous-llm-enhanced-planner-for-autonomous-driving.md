@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/06/01/asyncdriver-asynchronous-llm-enhanced-plann
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: AsyncDriver separated slow LLM reasoning from fast motion planning so semantic guidance could enter the loop without blocking control.
+summary: "2024 – AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving"
 ---
-## 2024 - AsyncDriver
+## 2024 – AsyncDriver
 
 **arXiv:** [2406.14556](https://arxiv.org/abs/2406.14556)
 

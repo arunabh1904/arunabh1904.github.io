@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2023/10/01/driving-with-llms-fusing-object-level-vecto
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: Driving with LLMs fed object-level vector scene state into language models to make driving decisions more explainable.
+summary: "2023 – Driving with LLMs: Fusing Object-Level Vector Modality for Explainable Autonomous Driving"
 ---
-## 2023 - Driving with LLMs
+## 2023 – Driving with LLMs
 
 **arXiv:** [2310.01957](https://arxiv.org/abs/2310.01957)
 
