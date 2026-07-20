@@ -1,5 +1,5 @@
 ---
-title: 'Omni-Model Pretraining: Zero to Hero'
+title: 'Pretraining Multimodal Models for Robotics: A Reading Guide'
 date: '2026-07-15T09:00:00.000Z'
 section: blog
 postSlug: omni-model-pretraining-decisions
@@ -8,25 +8,28 @@ tags:
   - Multimodal AI
   - Pretraining
   - Research Leadership
-summary: A paper-linked guide to representation, modality sharing, objectives, data mixtures, proxy scaling, video and action modeling, and reliable large-scale omni-model training.
+summary: A reading guide to the representations, robot data, action interfaces, mixtures, and scaling experiments behind multimodal robot policies.
 ---
 
-# Omni-Model Pretraining: Zero to Hero
+# Pretraining Multimodal Models for Robotics: A Reading Guide
 
-An omni-model is easy to describe and expensive to specify. Put text, images, video, audio, and actions into one model; train at scale; expect transfer. Every clause hides a decision that can waste a major run.
+A robot can inherit the word “drawer” from the internet. The internet does not tell it how a sticky drawer feels, how far a particular arm can reach, or what to do after the gripper slips. Multimodal pretraining works because semantic and motor experience can transfer. It fails when “put everything in one model” becomes a substitute for deciding what should transfer, through which parameters, and under what evidence.
 
-Should an image be a sequence of discrete codes or a grid of continuous latents? Should understanding and generation share a tokenizer? Should video frames compete with text tokens in the same context window? Should actions use the language vocabulary, a frequency tokenizer, or a continuous expert? If a mixture works at 300M parameters, will it still work at 30B? If one modality's loss falls faster, is that positive transfer or gradient domination?
+The hard choices arrive before the large run. An image can become patches, semantic features, discrete codes, or continuous latents. A robot trajectory can become per-axis bins, compressed action tokens, a diffusion target, or a flow field. A dataset mixture can be counted in examples, tokens, FLOPs, or gradient share; those allocations are not equivalent. A shared trunk can enable transfer while one high-volume modality quietly controls every update.
 
-Pretraining leadership is the ability to reduce those questions to evidence before the full bill arrives.
+This guide is about making those choices legible. Its central claim is that a VLA is not created by adding an action head to a VLM. It is created by combining three priors—semantic, visual, and motor—without letting the cheapest one erase the others.
+
+![Reading map from VLMs to deployed robot policies](/assets/images/multimodal-vla-reading-map.svg)
+_Part II sits across the middle of the map. Robot pretraining must decide which experience deserves shared capacity and which action distribution the policy can execute on time._
 
 ![Omni-model pretraining decision stack](/assets/images/omni-pretraining-decision-stack.svg)
 _The stack is coupled: representation changes sequence length, which changes systems cost, mixture economics, and the capabilities that can be measured._
 
-This guide follows the decisions in the order they should be made. Its companion, [Post-Training Vision-Language-Action Models: Zero to Hero](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html), starts where this one ends: a pretrained model enters deployment, produces failures, and must improve without losing its general capabilities.
+This is Part II of the series. [Part I](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html) follows the visual interfaces that made language grounding possible. [Part III](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html) starts when a pretrained policy enters deployment, creates its own state distribution, and has to learn from the result.
 
 The scope is pretraining design, not a catalog of multimodal models. I use papers in two ways: reported experiments establish what happened inside a particular recipe; the decision tests, kill criteria, and preferred architecture are my synthesis. Keeping that boundary visible matters because multimodal papers often change the tokenizer, data, parameter count, and training budget together. A strong result can justify adopting a recipe without identifying which ingredient caused the gain.
 
-## 1. Define the capability contract before the architecture
+## Begin with the capability contract
 
 “Multimodal” is not a capability. A contrastive encoder, visual assistant, image generator, video predictor, and robot policy can all consume images and text while solving different problems.
 
@@ -42,9 +45,29 @@ Write the contract as observable behavior:
 
 The contract determines what must be shared. [CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html) only needs image and text representations to meet in an embedding space. [LLaVA](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html) needs visual tokens to enter a generative language model. [Chameleon](/paper%20shorts/2024/05/16/chameleon-mixed-modal-early-fusion-foundation-models.html) asks one autoregressive transformer to understand and generate mixed-modal sequences. [Transfusion](/paper%20shorts/2024/08/20/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model.html) shares a transformer while giving text and images different objectives. [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html) shares semantic context but gives continuous control a flow-based action expert.
 
-No architecture dominates those contracts for free.
+No architecture dominates those contracts for free. Before comparing models, write down which behavior must work zero-shot, which can be adapted with a small target dataset, which control rate is non-negotiable, and which regression would kill the program. A vague contract makes every later ablation look positive.
 
-## 2. Representation is the first scaling law
+## Robot data is not web data
+
+Internet data offers extraordinary breadth because images and text are cheap to copy. Robot trajectories are expensive, correlated, and attached to hardware. An hour of teleoperation contains the operator's habits, the controller's smoothing, the camera calibration, the reset procedure, and the parts of the state that happened to be logged. “More trajectories” can mean more task coverage, more embodiments, or simply more repetitions of one narrow behavior.
+
+[Open X-Embodiment](/paper%20shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html) made cross-robot pretraining a concrete research program by standardizing data from 22 robot embodiments and reporting positive transfer in RT-X. [Octo](/paper%20shorts/2024/05/20/octo-an-open-source-generalist-robot-policy.html) trained a flexible policy on 800,000 Open X trajectories and treated new sensors, action spaces, and embodiments as adaptation problems. [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html) combined internet-scale visual-language priors with 970,000 robot demonstrations in a 7B open model. [DROID](https://arxiv.org/abs/2403.12945) attacked a different axis: 76,000 trajectories across 564 scenes and 84 tasks, collected by 50 operators, to increase environmental diversity rather than only pooling existing benchmarks.
+
+Those datasets teach different invariances:
+
+| Variation in the corpus | Transfer the model might learn | Shortcut that can look like transfer |
+| --- | --- | --- |
+| More tasks on one robot | instruction and object semantics | memorized scene or controller conventions |
+| More scenes with one setup | visual robustness and geometry | operator or reset regularity |
+| More embodiments | shared task structure | averaging incompatible action units |
+| More operators | recovery and style diversity | identity-specific timing artifacts |
+| More failures and corrections | boundary states and recovery | learning the intervention device |
+
+Cross-embodiment learning therefore needs an explicit interface contract. Which action dimensions are shared? Are commands expressed in end-effector deltas, joint positions, velocities, or gripper states? Which observation keys may be absent? How is control frequency represented? Padding a missing sensor with zeros is an implementation choice that the model can mistake for physical evidence.
+
+The most useful dataset table is not trajectory count. It reports task entropy, scene entropy, embodiment coverage, operator coverage, success and recovery rates, control frequencies, action normalization, missing modalities, and effective unique windows after temporal overlap. Those quantities tell you what generalization the corpus can plausibly support.
+
+## Representation is the first scaling law
 
 Before choosing transformer depth, decide what counts as one training unit.
 
@@ -80,7 +103,7 @@ Those designs are three answers to one question: where should modality specializ
 
 The kill experiment is matched compute and matched sequence length. If separate routes win only because they add parameters or visual tokens, the result is capacity, not reduced interference.
 
-## 3. Sharing is a spectrum, not a binary choice
+## Decide where transfer is allowed
 
 Architectures often get labeled “early fusion” or “late fusion,” but the operational choices are more granular:
 
@@ -108,7 +131,7 @@ Every cell should report transfer under a matched compute budget, along with gra
 
 This is where [MM1](/paper%20shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html) is so useful. Its controlled studies suggest that image encoder quality, resolution, visual-token count, and data composition matter more than endlessly modifying the connector. That is an experiment-allocation result: sweep the variables with large causal leverage before polishing the bridge between them.
 
-## 4. One model can use several losses
+## One model can use several losses
 
 A unified transformer does not require a unified objective.
 
@@ -137,7 +160,12 @@ Normalize and log at three levels:
 
 Then measure parameter-level conflict. If video gradients are ten times larger in shared attention blocks, a small sampling share can still control the update. If text loss falls while VLM transfer regresses, aggregate convergence is hiding interference.
 
-## 5. Data mixture is a policy over scarce compute
+![How a multimodal data mixture becomes a gradient budget](/assets/images/multimodal-pretraining-gradient-budget.svg)
+_Example share is only the first accounting layer. Sequence expansion, loss reduction, compute, and gradient geometry determine which modality actually moves shared parameters._
+
+This distinction becomes acute in robotics. Overlapping windows from one trajectory can produce thousands of training examples without thousands of independent decisions. A long action chunk can contribute many supervised dimensions while representing one correlated maneuver. The cleanest dashboard keeps four ledgers side by side: sampled examples, predicted units, consumed FLOPs, and update norm by module. A mixture is balanced only relative to a capability objective, not because its percentages sum to 100.
+
+## A data mixture is a policy over scarce compute
 
 An omni corpus is not a pile of datasets. It is a sampling policy over modalities, domains, quality levels, sequence lengths, and training stages.
 
@@ -170,7 +198,7 @@ Data mixtures are often nonstationary. A model may first learn vision-language a
 
 Order can reduce optimization difficulty, but it can also cause forgetting. A staged curriculum needs retention evals after every transition and a controlled comparison with an interleaved mixture under equal compute.
 
-## 6. Video is not automatically a world model
+## Video is not automatically a world model
 
 Video generation produces plausible futures. A world model preserves action-conditioned consequences. A policy chooses actions that achieve an outcome.
 
@@ -189,11 +217,11 @@ The evaluation contract must change when control enters. FID and visual preferen
 
 A model that produces a plausible door opening after any action is a video generator with weak conditioning, not a useful world model.
 
-## 7. Actions expose the limits of modality symmetry
+## The action distribution is an architectural choice
 
-Actions are not just another token type. They change the data distribution, carry embodiment-specific units, and operate under a control deadline.
+Actions change the data distribution, carry embodiment-specific units, and operate under a control deadline. Treating them as ordinary tokens hides those constraints behind a convenient interface.
 
-[RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html) shows the appeal of treating actions as language tokens: one decoder, tractable autoregression, and direct transfer from semantic pretraining. [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html) compresses action chunks in frequency space so high-frequency trajectories do not explode sequence length. [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html) uses a continuous flow expert instead of forcing actions through the text head.
+[RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html) shows the appeal of treating actions as language tokens: one decoder, tractable autoregression, and direct transfer from semantic pretraining. [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html) shows why naive binning breaks on high-frequency dexterity and compresses action chunks with a discrete cosine transform. [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html) uses a continuous flow expert instead of forcing actions through the text head. [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html) adds high-level semantic subtask prediction and heterogeneous co-training, making the boundary between “what next” and “how” explicit.
 
 The action-interface memo should compare:
 
@@ -205,9 +233,9 @@ The action-interface memo should compare:
 | Diffusion/flow | Implicit or path-based | Strong | Iterative/parallel | Complex post-training likelihood |
 | Separate action expert | Interface-dependent | Strong | Extra serving path | Semantic/control coordination |
 
-The pretraining question is which action prior should be learned across robots. The post-training question is whether that distribution exposes the likelihoods and responsiveness required by the improvement loop.
+The pretraining question is which action prior should be learned across robots. The answer cannot be read from imitation loss alone. Reconstruct a short trajectory with each representation, compare spectral and contact-heavy errors, measure effective horizon and wall-clock control rate, and test whether a small target dataset can change the embodiment without erasing semantic transfer. The post-training question comes later: does the chosen distribution expose the likelihoods and responsiveness required by the improvement loop?
 
-## 8. Scaling evidence needs a falsification boundary
+## Scaling evidence needs a falsification boundary
 
 A smooth curve is not the same as a causal law. Every scaling claim should name:
 
@@ -231,7 +259,7 @@ For every candidate architecture, write a kill criterion before the proxy runs:
 
 That habit converts paper reading into capital allocation.
 
-## 9. A large run is a fault-tolerant system
+## A large run is a fault-tolerant experiment
 
 Once the architecture and mixture are chosen, the research question becomes operational: can the training system preserve the intended experiment for months?
 
@@ -252,7 +280,7 @@ The runbook should cover:
 
 Every checkpoint must bind model state to optimizer, scheduler, data cursor, mixture policy, tokenizer, code commit, and evaluation config. A weight file without that lineage is not a recoverable experiment.
 
-## 10. The minimum convincing proxy program
+## The minimum convincing proxy program
 
 Before a massive run, build a 100M–1B prototype program with at least text prediction, image-text understanding, visual generation, and a lightweight video or action objective.
 
@@ -273,27 +301,27 @@ The deliverables should be decision artifacts:
 
 Do not present one mixture such as “45% text, 25% image-text, 10% image generation, 15% video, 5% action” as a universal answer. Present how that allocation was estimated, which target it optimizes, how uncertainty changes the ranking, and what evidence triggers a new allocation.
 
-## 11. Reading path: broad map to literature depth
+## A reading course with three routes
 
-**Layer 1: representation foundations.** Read [ViT](/paper%20shorts/2020/10/01/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale.html), [CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html), [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html), and [LLaVA](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html). Track the training unit and the visual information each interface preserves.
+There is no single best order after the foundations. Choose a route based on the decision you need to make, and produce an artifact after each layer.
 
-**Layer 2: unified architecture families.** Read [Chameleon](/paper%20shorts/2024/05/16/chameleon-mixed-modal-early-fusion-foundation-models.html), [Transfusion](/paper%20shorts/2024/08/20/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model.html), [Janus](/paper%20shorts/2024/10/17/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation.html), [TokenFlow](/paper%20shorts/2024/12/04/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation.html), and [Native Multimodal Scaling Laws](/paper%20shorts/2025/04/10/scaling-laws-for-native-multimodal-models.html). For each, mark exactly where parameters and objectives split.
+**Foundation route: where do semantics come from?** Read [ViT](/paper%20shorts/2020/10/01/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale.html), [CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html), [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html), [LLaVA](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html), and [MM1](/paper%20shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html). Produce an information-flow diagram that marks the training unit, visual-token budget, frozen modules, and datasets responsible for alignment versus behavior.
 
-**Layer 3: experimental allocation.** Read [MM1](/paper%20shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html), [Generative Mixed-Modal Scaling](/paper%20shorts/2023/01/10/scaling-laws-for-generative-mixed-modal-language-models.html), and [Optimal Data Mixtures](/paper%20shorts/2025/07/12/scaling-laws-for-optimal-data-mixtures.html). Reconstruct which curve is measured, which is extrapolated, and which control is missing.
+**Unification route: what should share parameters?** Read [Chameleon](/paper%20shorts/2024/05/16/chameleon-mixed-modal-early-fusion-foundation-models.html), [Transfusion](/paper%20shorts/2024/08/20/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model.html), [Janus](/paper%20shorts/2024/10/17/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation.html), [TokenFlow](/paper%20shorts/2024/12/04/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation.html), and [Native Multimodal Scaling Laws](/paper%20shorts/2025/04/10/scaling-laws-for-native-multimodal-models.html). Build a matrix of shared tokenizers, encoders, trunk parameters, experts, objectives, and output heads. Then specify the matched-budget experiment that would justify each split.
 
-**Layer 4: video, worlds, and actions.** Read [Wan](/paper%20shorts/2025/03/26/wan-open-and-advanced-large-scale-video-generative-models.html), [Genie](/paper%20shorts/2024/02/23/genie-generative-interactive-environments.html), [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html), and [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html). Ask whether the representation preserves causality or only appearance.
+**Robot-policy route: what motor prior transfers?** Read [Open X-Embodiment](/paper%20shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html), [Octo](/paper%20shorts/2024/05/20/octo-an-open-source-generalist-robot-policy.html), [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html), [DROID](https://arxiv.org/abs/2403.12945), [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html), [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html), and [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html). Produce two tables: one for dataset variation and one for the action interface. If a paper omits control rate, normalization, or target-data size, write “not reported” rather than smoothing over the gap.
 
-**Layer 5: systems.** Read [TorchTitan](/paper%20shorts/2024/10/09/torchtitan-one-stop-pytorch-native-solution-for-production-ready-llm-pre-training.html) with an operator's eye: what fails, what is checkpointed, what is measured, and which parallelism choice changes the research experiment?
+**Scaling route: which result deserves the large run?** Read [Generative Mixed-Modal Scaling](/paper%20shorts/2023/01/10/scaling-laws-for-generative-mixed-modal-language-models.html), [Optimal Data Mixtures](/paper%20shorts/2025/07/12/scaling-laws-for-optimal-data-mixtures.html), and [TorchTitan](/paper%20shorts/2024/10/09/torchtitan-one-stop-pytorch-native-solution-for-production-ready-llm-pre-training.html). Reconstruct the measured range, extrapolated range, confidence interval, throughput assumption, and kill criterion. The deliverable is a go/no-go memo for one target-scale run.
 
-Then move to the [post-training companion](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html). Pretraining decides what the model can represent and how cheaply it can learn. Post-training decides whether those priors survive contact with deployment.
+Then move to [Part III: Post-Training VLAs](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html). Pretraining decides what the policy can represent and which behaviors are nearby. Deployment reveals which nearby behaviors are actually useful.
 
 ## The research thesis
 
-The strongest omni model will probably not be the one that makes every modality identical. It will share the parameters that benefit from transfer and specialize the interfaces where invariance, fidelity, time, and control impose genuinely different requirements.
+The strongest multimodal robot model will probably not make every modality identical. It will share the parameters that benefit from transfer and specialize the interfaces where fidelity, time, geometry, and control impose different requirements.
 
 My preferred starting hypothesis is a shared transformer with modality-specific input/output experts, explicit per-objective accounting, and a data mixture chosen by proxy scaling rather than intuition. For physical intelligence, I would preserve metric, temporally persistent entity representations alongside open-vocabulary semantics. The generative model can imagine; the world model must preserve consequences; the policy must act; and the training system must reveal when one capability is improving at another's expense.
 
-That is what “zero to hero” means in pretraining: not knowing every paper, but knowing how to turn a literature map into an experiment plan, a compute allocation, a kill decision, and a run that can survive long enough to answer the question.
+The practical standard is demanding but clear: a literature review should end as an experiment plan. It should say what one training unit is, where information is compressed, how data becomes gradient, what transfer is expected, which matched control is missing, and what result would reverse the architecture decision. Anything less is a tour of papers, not a pretraining strategy.
 
 ## References
 
@@ -306,4 +334,9 @@ That is what “zero to hero” means in pretraining: not knowing every paper, b
 - [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391)
 - [FAST: Efficient Action Tokenization for Vision-Language-Action Models](https://arxiv.org/abs/2501.09747)
 - [Pi0: A Vision-Language-Action Flow Model for General Robot Control](https://arxiv.org/abs/2410.24164)
+- [Pi0.5: A Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054)
+- [Open X-Embodiment: Robotic Learning Datasets and RT-X Models](https://arxiv.org/abs/2310.08864)
+- [Octo: An Open-Source Generalist Robot Policy](https://arxiv.org/abs/2405.12213)
+- [OpenVLA: An Open-Source Vision-Language-Action Model](https://arxiv.org/abs/2406.09246)
+- [DROID: A Large-Scale In-The-Wild Robot Manipulation Dataset](https://arxiv.org/abs/2403.12945)
 - [TorchTitan: One-stop PyTorch Native Solution for Production Ready LLM Pre-training](https://arxiv.org/abs/2410.06511)

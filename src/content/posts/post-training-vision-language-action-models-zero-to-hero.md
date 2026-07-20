@@ -1,5 +1,5 @@
 ---
-title: 'Post-Training Vision-Language-Action Models: Zero to Hero'
+title: 'Post-Training VLAs: A Reading Guide to Closed-Loop Improvement'
 date: '2026-07-16T10:00:00.000Z'
 section: blog
 postSlug: post-training-vision-language-action-models-zero-to-hero
@@ -8,12 +8,14 @@ tags:
   - Robotics
   - Post-Training
   - Reinforcement Learning
-summary: A paper-linked guide to turning a pretrained VLA into a closed-loop policy improvement system through SFT, failure mining, preference learning, RL, critics, and real evaluation.
+summary: A mechanism-first guide to turning robot rollouts into justified policy updates through correction data, preference learning, critics, reinforcement learning, and real evaluation.
 ---
 
-# Post-Training Vision-Language-Action Models: Zero to Hero
+# Post-Training VLAs: A Reading Guide to Closed-Loop Improvement
 
-The shortest description of post-training is “make a pretrained model behave better.” That description is harmless for a chatbot and dangerous for a robot. A robot's output changes the next input. It can enter states absent from the training data, make an irreversible contact, recover from its own mistake, or create a failure that an offline dataset never contained.
+A robot fails while closing a drawer. The episode gives us an outcome: failure. It does not tell us whether the camera missed the handle, the language model chose the wrong subtask, the trajectory approached at a bad angle, the gripper slipped, or the success detector fired too early. Post-training begins in that gap between outcome and explanation.
+
+This is why “make the pretrained model behave better” is an inadequate description. A robot's output changes its next input. One small action can create an unfamiliar state, an irreversible contact, or a recovery opportunity that no offline demonstration contains. The hard part is not taking another gradient step. It is deciding what the gradient is justified to say.
 
 The right object is therefore not an optimizer. It is a closed-loop policy improvement system:
 
@@ -24,11 +26,14 @@ The loop is the product. SFT, DPO, PPO, critics, and distillation are replaceabl
 ![Closed-loop VLA post-training system](/assets/images/vla-post-training-closed-loop.svg)
 _A VLA improves only when deployment failures become correctly attributed supervision and survive independent evaluation._
 
-This guide builds that system from first principles. It assumes familiarity with the companion [Omni-Model Pretraining: Zero to Hero](/blog/2026/07/15/omni-model-pretraining-decisions.html), which covers how representation, sharing, data mixtures, scaling, and run health create the base model that post-training inherits.
+This is Part III of a three-part reading course. [Part I](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html) asks what a vision-language model must preserve before it can support action. [Part II](/blog/2026/07/15/omni-model-pretraining-decisions.html) asks how pretraining combines semantic priors, heterogeneous robot experience, and an action distribution. This part asks how evidence collected after deployment should change the policy.
+
+![A reading map from semantic vision to closed-loop evidence](/assets/images/multimodal-vla-reading-map.svg)
+_The three guides follow one dependency chain. Post-training cannot repair information that perception discarded or an action interface cannot express._
 
 The scope is policy improvement after a broadly pretrained VLA exists. Paper-reported algorithms and results are the evidence layer. The failure taxonomy, evaluation pyramid, and recommended order of operations are my synthesis. I mark frontier work separately because a result in one simulator, embodiment, or reward setup is not yet a general robot-training recipe.
 
-## 1. What pretraining gives you—and what it does not
+## The distribution moves when the robot moves
 
 A modern VLA begins with two useful priors. Vision-language pretraining supplies objects, concepts, instructions, and scene semantics. Robot pretraining supplies a distribution over physically plausible behavior. [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html) demonstrates the first transfer by expressing actions in the language-token interface. [Open X-Embodiment](/paper%20shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html), [Octo](/paper%20shorts/2024/05/20/octo-an-open-source-generalist-robot-policy.html), and [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html) make the second transfer concrete across heterogeneous robot data.
 
@@ -40,7 +45,7 @@ This is the first mental model to keep:
 
 That difference is why another million successful demonstrations may be worth less than ten thousand carefully selected recoveries.
 
-## 2. SFT is a family of decisions, not one loss
+## Earn the supervised baseline
 
 For an autoregressive action-token policy, supervised fine-tuning often looks like:
 
@@ -67,7 +72,7 @@ The literature is best read as a sequence of action-interface decisions:
 
 [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html) adds another axis: high-level semantic subtask prediction. Long-horizon household behavior becomes easier when language handles what should happen next and a continuous expert handles how. The cost is a new failure boundary. A wrong subtask can send a perfect low-level controller toward the wrong goal.
 
-The SFT baseline should therefore be an adaptation matrix, not one run:
+The supervised baseline should therefore be an adaptation matrix, not one ceremonial run:
 
 - frozen VLM versus joint tuning;
 - full tuning versus LoRA;
@@ -78,7 +83,7 @@ The SFT baseline should therefore be an adaptation matrix, not one run:
 
 Measure success, robot-data efficiency, control frequency, latency, forgetting, and semantic retention together. A policy that succeeds 3% more often but halves the control rate may be worse before the first rollout.
 
-## 3. Language-model post-training supplies tools, not a recipe
+## Language-model alignment supplies tools, not a robot recipe
 
 The classic language pipeline is documented by [InstructGPT](/paper%20shorts/2022/02/28/training-language-models-to-follow-instructions-with-human-feedback.html): supervised fine-tuning, a Bradley–Terry preference model, then [PPO](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html) against the learned reward with a KL penalty. [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) removes the explicit reward model and expresses the KL-regularized optimum directly through chosen and rejected responses.
 
@@ -109,9 +114,18 @@ The feedback interface should match what deployment actually observed:
 | Safety violation | Constraint failure | Folding it into one scalar reward without severity |
 | Progress judgment | Process supervision between states | Assuming temporal order always means progress |
 
-The central question is not “Can DPO be applied?” It is “What event has a defensible likelihood and a defensible preference label?”
+The central question is not “Can DPO be applied?” It is “What event has a defensible likelihood and a defensible preference label?” The method should follow the evidence unit, not the fashion cycle.
 
-## 4. Failure mining determines the value of robot hours
+## Feedback is an attribution problem
+
+![A ladder from rollout outcome to the smallest justified training target](/assets/images/vla-feedback-attribution-ladder.svg)
+_A rollout outcome becomes useful supervision only after we localize the failure, construct a meaningful alternative, and choose the smallest target the evidence supports._
+
+Suppose the gripper misses the handle at step 42 and a human takes over at step 47. The binary episode label says the rollout failed. The intervention says the policy became unacceptable by step 47. Neither observation proves that every earlier action was wrong. Penalizing the whole trajectory can erase a good approach because of one bad contact. Training only on the human suffix can also be misleading if the human begins from a state the policy would never deliberately create.
+
+The safest useful label is therefore local. Preserve the prefix that still made progress. Mark the first defensible failure window. Record the reached state and the corrective continuation. If a paired alternative cannot be replayed from a matched state, use an unpaired outcome or correction objective rather than pretending to possess a counterfactual.
+
+### Failure mining determines the value of robot hours
 
 Rollouts are not automatically useful. A thousand identical successes provide little gradient. A thousand catastrophic failures may be unsafe and too far outside the policy's recoverable region. The valuable middle consists of near-boundary states: recoverable mistakes, ambiguous objects, distribution shifts, and action segments where a different local decision changes the outcome.
 
@@ -129,7 +143,7 @@ That taxonomy routes data. Semantic failures may need web/VLM retention or instr
 
 The next 1,000 robot hours should go where expected marginal information is highest: high-uncertainty critic regions, recoverable failures, rare safety cases, new environments, and tasks that discriminate between candidate post-training methods. Uniform collection is easy to schedule and often a poor research allocation.
 
-## 5. Four improvement paths
+## Choose the method from the feedback unit
 
 Once failures are labeled, four families cover most practical updates.
 
@@ -141,7 +155,7 @@ Correction SFT should be the default baseline. If a preference or RL method cann
 
 ### Binary or preference optimization
 
-Use DPO when alternatives begin from a defensibly matched context and the policy exposes meaningful likelihoods. Use KTO/APO-style binary objectives when feedback arrives independently or physical irreversibility prevents pairs. Keep task success, safety, efficiency, and style as separate labels long enough to see their conflicts.
+Use DPO when alternatives begin from a defensibly matched context and the policy exposes meaningful likelihoods. Use KTO or [Human-assisted Action Preference Optimization](/paper%20shorts/2025/06/08/action-preference-optimization-for-robotic-policy-refinement.html) when feedback arrives independently or physical irreversibility prevents clean pairs. Keep task success, safety, efficiency, and style as separate labels long enough to see their conflicts. A single scalar makes it easy for smooth motion to conceal a missed task or for fast completion to conceal unsafe contact.
 
 ### Reward-model RL
 
@@ -165,7 +179,7 @@ For diffusion actors, [DPPO](/paper%20shorts/2024/09/01/dppo-diffusion-policy-po
 
 That observation produces a systems requirement: rollout scheduling must create informative contrasts. Sample tasks near the competence boundary, record policy versions, prevent correlated environments from masquerading as independent evidence, and reject groups with no reward variance.
 
-## 6. The critic is often the real bottleneck
+## The critic is part of the environment
 
 A terminal success detector is sparse. A generic VLM reward can miss geometry, contact, occlusion, and temporal progress. A dense hand-engineered reward can teach the simulator rather than the task. The right critic is rarely “a bigger VLM asked whether the robot did well.”
 
@@ -185,9 +199,9 @@ where $\Delta p_t$ is progress, $u_t$ is uncertainty, and $c_t$ is a failure cla
 
 [Constitutional AI](/paper%20shorts/2022/12/15/constitutional-ai-harmlessness-from-ai-feedback.html) adds a complementary idea: make constraints explicit, use models to generate critiques and counterexamples, and keep humans as the auditor. A robot constitution might define forbidden contacts, workspace boundaries, uncertainty-triggered stops, and recovery priorities. The constitution cannot verify its own physical grounding.
 
-Never celebrate rising critic reward alone. Track ground-truth task success, human judgment, critic disagreement, intervention rate, unsafe contact, entropy, KL from SFT, and the causal content of high-reward rollouts.
+Never celebrate rising critic reward alone. Track ground-truth task success, human judgment, critic disagreement, intervention rate, unsafe contact, entropy, KL from SFT, and the causal content of high-reward rollouts. If the policy can change what the critic sees, the critic is no longer a passive metric. It is part of the environment being optimized.
 
-## 7. Evaluation must be a pyramid
+## Evaluation must preserve the deployment decision
 
 Post-training claims are only as strong as the next evaluation layer they predict.
 
@@ -217,9 +231,9 @@ The staff-level metric sits above every level:
 
 > Reliable policy improvement per robot-hour, human-hour, annotation-hour, and unit of compute.
 
-## 8. Systems ownership: the loop must be reproducible
+## The loop must be reproducible
 
-An online VLA program needs more than an RL trainer. It needs versioned policies, rollout workers, environment and robot calibration records, synchronized video/state/action logs, feedback provenance, immutable dataset snapshots, critic versions, and rollback.
+An RL trainer is one component of an online VLA program. The surrounding system needs versioned policies, rollout workers, environment and robot calibration records, synchronized video/state/action logs, feedback provenance, immutable dataset snapshots, critic versions, and rollback.
 
 At minimum, every trajectory should identify:
 
@@ -234,7 +248,7 @@ Asynchronous fleets add one more problem: a rollout may be generated by a policy
 
 The launch checklist should specify minimum lower-confidence-bound success, maximum unsafe-contact and intervention rates, latency limits, regression gates by task family, automatic rollback, and a canary population. A new aggregate record is not a launch criterion if one safety-critical slice regressed.
 
-## 9. A decision guide
+## A decision guide
 
 Use the cheapest method that attacks the diagnosed failure.
 
@@ -249,19 +263,19 @@ Use the cheapest method that attacks the diagnosed failure.
 | Sparse task reward | Process critic such as VLAC | Critic passes held-out error-localization tests |
 | Reward exploitation | Ensembles, conservative objective, real stopping metric | Critics disagree or gold performance turns down |
 
-## 10. Reading path: broad understanding to literature depth
+## A reading course with five outputs
 
-Read in layers, and carry one question from each layer into the next.
+Do not read the following papers as a chronology. Read them as five passes through one hypothetical failure. At the end of each pass, produce an artifact. The artifacts should make your own post-training proposal harder to hand-wave.
 
-**Layer 1: why closed loop changes the problem.** Read [DAgger](/paper%20shorts/2011/04/11/dagger-reduction-of-imitation-learning-to-no-regret-online-learning.html), [PPO](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html), [InstructGPT](/paper%20shorts/2022/02/28/training-language-models-to-follow-instructions-with-human-feedback.html), [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html), and [KTO](/paper%20shorts/2024/02/02/kto-model-alignment-as-prospect-theoretic-optimization.html). Be able to explain state-distribution shift, reference policies, and what feedback unit each objective assumes.
+**Pass 1: explain why closed loop changes the problem.** Read [DAgger](/paper%20shorts/2011/04/11/dagger-reduction-of-imitation-learning-to-no-regret-online-learning.html), [PPO](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html), [InstructGPT](/paper%20shorts/2022/02/28/training-language-models-to-follow-instructions-with-human-feedback.html), [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html), and [KTO](/paper%20shorts/2024/02/02/kto-model-alignment-as-prospect-theoretic-optimization.html). **Output:** a one-page map from the feedback you can collect to the likelihood or reward each objective requires.
 
-**Layer 2: how actions change the optimizer.** Read [ACT](/paper%20shorts/2023/04/23/action-chunking-with-transformers-act.html), [Diffusion Policy](/paper%20shorts/2023/03/07/diffusion-policy-visuomotor-policy-learning-via-action-diffusion.html), [RT-1](/paper%20shorts/2022/12/13/rt-1-robotics-transformer-for-real-world-control-at-scale.html), [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html), [Octo](/paper%20shorts/2024/05/20/octo-an-open-source-generalist-robot-policy.html), [OpenVLA-OFT](/paper%20shorts/2025/02/27/openvla-oft-optimizing-speed-and-success.html), and [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html). For each, write down the action distribution and the real control rate.
+**Pass 2: determine how the action distribution changes the optimizer.** Read [ACT](/paper%20shorts/2023/04/23/action-chunking-with-transformers-act.html), [Diffusion Policy](/paper%20shorts/2023/03/07/diffusion-policy-visuomotor-policy-learning-via-action-diffusion.html), [RT-1](/paper%20shorts/2022/12/13/rt-1-robotics-transformer-for-real-world-control-at-scale.html), [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html), [Octo](/paper%20shorts/2024/05/20/octo-an-open-source-generalist-robot-policy.html), [OpenVLA-OFT](/paper%20shorts/2025/02/27/openvla-oft-optimizing-speed-and-success.html), and [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html). **Output:** an interface sheet containing action units, chunk horizon, control rate, sampling cost, and tractable likelihood for every candidate policy.
 
-**Layer 3: how deployment becomes supervision.** Read [RLDG](/paper%20shorts/2024/12/13/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning.html), [RIPT-VLA](/paper%20shorts/2025/05/22/ript-vla-interactive-post-training-for-vision-language-action-models.html), [APO](/paper%20shorts/2025/06/08/action-preference-optimization-for-robotic-policy-refinement.html), [DPPO](/paper%20shorts/2024/09/01/dppo-diffusion-policy-policy-optimization.html), and [SimpleVLA-RL](/paper%20shorts/2025/09/11/simplevla-rl-scaling-vla-training-via-reinforcement-learning.html). Identify what is on-policy, what receives reward, and what likelihood is optimized.
+**Pass 3: turn deployment into supervision.** Read [RLDG](/paper%20shorts/2024/12/13/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning.html), [RIPT-VLA](/paper%20shorts/2025/05/22/ript-vla-interactive-post-training-for-vision-language-action-models.html), [HAPO](/paper%20shorts/2025/06/08/action-preference-optimization-for-robotic-policy-refinement.html), [DPPO](/paper%20shorts/2024/09/01/dppo-diffusion-policy-policy-optimization.html), and [SimpleVLA-RL](/paper%20shorts/2025/09/11/simplevla-rl-scaling-vla-training-via-reinforcement-learning.html). **Output:** an annotation protocol that identifies the state, temporal window, alternative, label provenance, and policy version behind every update.
 
-**Layer 4: who judges the policy.** Read [Reward Overoptimization](/paper%20shorts/2022/10/19/scaling-laws-for-reward-model-overoptimization.html), [Reward Model Ensembles](/paper%20shorts/2023/10/04/reward-model-ensembles-help-mitigate-overoptimization.html), [VisualPRM](/paper%20shorts/2025/03/13/visualprm-process-reward-model-for-multimodal-reasoning.html), and [VLAC](/paper%20shorts/2025/09/19/vlac-vision-language-action-critic-for-real-world-rl.html). Ask what independent metric would catch each critic's favorite shortcut.
+**Pass 4: decide who judges the policy.** Read [Reward Overoptimization](/paper%20shorts/2022/10/19/scaling-laws-for-reward-model-overoptimization.html), [Reward Model Ensembles](/paper%20shorts/2023/10/04/reward-model-ensembles-help-mitigate-overoptimization.html), [VisualPRM](/paper%20shorts/2025/03/13/visualprm-process-reward-model-for-multimodal-reasoning.html), and [VLAC](/paper%20shorts/2025/09/19/vlac-vision-language-action-critic-for-real-world-rl.html). **Output:** a critic card containing the critic's evidence, uncertainty, likely shortcuts, held-out error-localization test, and independent stopping metric.
 
-**Layer 5: what evidence survives deployment.** Read [LIBERO](/paper%20shorts/2023/06/05/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning.html), [SIMPLER](/paper%20shorts/2024/05/09/simpler-evaluating-real-world-robot-policies-in-simulation.html), [RoboTwin 2.0](/paper%20shorts/2025/06/20/robotwin-2-scalable-data-generator-and-benchmark.html), [VLA-REPLICA](/paper%20shorts/2026/05/20/vla-replica-low-cost-reproducible-real-world-evaluation.html), and [LIBERO-Para](/paper%20shorts/2026/03/30/libero-para-paraphrase-robustness-in-vla-models.html). Ask which real decision each benchmark predicts.
+**Pass 5: test which evidence survives deployment.** Read [LIBERO](/paper%20shorts/2023/06/05/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning.html), [SIMPLER](/paper%20shorts/2024/05/09/simpler-evaluating-real-world-robot-policies-in-simulation.html), [RoboTwin 2.0](/paper%20shorts/2025/06/20/robotwin-2-scalable-data-generator-and-benchmark.html), [VLA-REPLICA](/paper%20shorts/2026/05/20/vla-replica-low-cost-reproducible-real-world-evaluation.html), and [LIBERO-Para](/paper%20shorts/2026/03/30/libero-para-paraphrase-robustness-in-vla-models.html). **Output:** an evaluation ladder in which every cheap metric names the expensive deployment decision it is expected to predict.
 
 ## Frontier signals, not settled recipes
 
@@ -275,7 +289,7 @@ The policy needs broad pretrained semantics. The action head needs the right tem
 
 My strongest bet is a structured, uncertainty-aware process critic: keep the VLA broad and end-to-end, but let the critic see persistent entities, geometry, contact, controller state, and task progress. Use that critic to find high-value failures and conservative updates, then distill the improvement into the deployable policy.
 
-That is the path from “a model that can act” to a policy improvement system that can be trusted to learn.
+That is the path from a model that can act to a policy improvement system that can be trusted to learn: not more feedback in the abstract, but smaller claims extracted from better evidence.
 
 ## References
 
@@ -286,6 +300,10 @@ That is the path from “a model that can act” to a policy improvement system 
 - [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](https://arxiv.org/abs/2303.04137)
 - [RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control](https://arxiv.org/abs/2307.15818)
 - [OpenVLA: An Open-Source Vision-Language-Action Model](https://arxiv.org/abs/2406.09246)
+- [OpenVLA-OFT: Fine-Tuning Vision-Language-Action Models for High-Throughput Robot Control](https://arxiv.org/abs/2502.19645)
+- [π0.5: A Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054)
 - [DPPO: Diffusion Policy Policy Optimization](https://arxiv.org/abs/2409.00588)
+- [Robotic Policy Learning via Human-assisted Action Preference Optimization](https://arxiv.org/abs/2506.07390)
+- [RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2505.17016)
 - [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)
 - [SIMPLER: Evaluating Real-World Robot Manipulation Policies in Simulation](https://arxiv.org/abs/2405.05941)
