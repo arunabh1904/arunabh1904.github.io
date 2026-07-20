@@ -1,5 +1,5 @@
 ---
-title: 'From Seeing to Doing: How Vision-Language Models Became World Interfaces'
+title: 'From Seeing to Acting: A Reading Guide to Vision-Language Models'
 date: '2026-07-05T20:00:00.000Z'
 section: blog
 postSlug: from-seeing-to-doing-the-evolution-of-vision-language-models
@@ -7,21 +7,32 @@ legacyPath: /blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-langua
 tags:
   - Research
   - Vision-Language Models
-summary: A mechanism-first guide to how VLMs moved from image-text retrieval to visual assistants, driving systems, and robot policies—and which capabilities each transition still leaves unresolved.
+summary: A reading guide to the interfaces that turned image-text models into grounded visual assistants and, eventually, robot policies.
 ---
 
-# From Seeing to Doing: How Vision-Language Models Became World Interfaces
+# From Seeing to Acting: A Reading Guide to Vision-Language Models
 
-The usual history of vision-language models is a parade of increasingly capable demos: retrieval, visual question answering, chat, video, driving, robotics. That chronology is accurate and not very explanatory. The more useful question is: **what new responsibility did each generation assign to the visual representation?**
+A model can name the mug, explain that mugs hold liquid, and still drive a gripper into the table beside it. That failure is not surprising once we stop treating “vision-language” as a single capability. Naming an object, grounding it in pixels, estimating its pose, predicting contact, and controlling a wrist are different contracts with different tolerances for lost information.
 
-CLIP only needed an image to land near the right text in an embedding space. LLaVA needed visual features to steer a language model over many generated tokens. A driving VLM must preserve geometry and evidence well enough to inform a decision. A robot policy must turn the result into a timed sequence of actions, observe the consequences, and recover when the world disagrees.
+The standard history—CLIP, visual chat, video, driving, robotics—makes the field look like a sequence of bigger demonstrations. The more useful history follows what the visual representation became responsible for. CLIP needed an image to land near the right sentence. LLaVA needed visual features to steer a decoder for hundreds of tokens. A grounded assistant must retain which pixels justify which words. A robot policy must preserve enough state, geometry, and time to act before its observation becomes stale.
 
-Those are not incremental versions of the same task. Each transition changes the training unit, the interface, the failure modes, and the meaning of evaluation.
+Each step inherits the previous one, but none is a free upgrade. Global semantic alignment can discard location. Fluent generation can hide weak eyesight. More video frames can consume context without teaching causality. Language can specify a goal while saying nothing about control frequency. The point of this guide is to make those fault lines visible before the papers blur them together.
+
+![Reading map from VLMs to deployed robot policies](/assets/images/multimodal-vla-reading-map.svg)
+_The three-part series follows four contracts: visual evidence, robot experience, an action distribution, and closed-loop feedback. The question under each block is the one worth carrying into the papers._
+
+This is Part I of a three-part reading course. [Part II](/blog/2026/07/15/omni-model-pretraining-decisions.html) asks how multimodal and robot data should shape a pretrained policy. [Part III](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html) asks how deployment failures can justify a policy update. You can read this article alone, but the sequence matters: post-training cannot recover visual evidence that pretraining threw away, and pretraining cannot anticipate every state the deployed policy will create.
 
 ![Vision-language model stack](/assets/images/vlm-stack-schematic.svg)
 _The common stack hides several different contracts. Retrieval aligns representations; visual chat conditions a decoder; embodied systems must also preserve state, time, and action consequences._
 
-This guide follows five transitions: labels to language, alignment to generation, coarse semantics to grounded perception, answers to decisions, and decisions to actions. I focus on the architectural and data choices that survive across model families. I do not try to catalog every VLM or leaderboard result; those age faster than the underlying decisions.
+The scope is deliberately narrow. I follow five transitions: labels to language, alignment to generation, coarse semantics to grounded evidence, answers to decisions, and decisions to actions. I care about the architectural and data choices that survive model generations, not a complete leaderboard. Reported results belong to the cited papers; the interface taxonomy and reading order are my synthesis.
+
+## How to use the guide
+
+Do not read every paper with the same question. For alignment papers, identify the unit of comparison. For visual-assistant papers, trace where spatial detail can disappear. For video papers, ask whether time is merely compressed or actually modeled. For driving and robotics papers, write down the action interface, control deadline, and source of closed-loop evidence.
+
+The recurring exercise is simple: draw the path from raw observation to evaluated output, then circle every irreversible compression step. That picture usually explains more than the model name.
 
 ## 1. A VLM is an interface, not one architecture
 
@@ -218,25 +229,29 @@ I use six questions to avoid being carried away by a capability collage.
 
 These questions turn a model paper into a decision record. If the answer to question four is “several things,” then the paper may demonstrate a strong recipe without identifying why it works. That is still useful, but it supports adoption more than causal understanding.
 
-## 11. A layered reading path
+## 11. A reading course, not a bibliography
 
-**Layer 1: alignment.** Read [CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html) and [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html). Track the unit of comparison and the systems assumptions hidden in the loss.
+The list below is ordered by conceptual dependency. Each layer has a deliverable; without it, “reading the paper” too easily becomes collecting model names.
 
-**Layer 2: conditional generation.** Read [LLaVA](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html) and [MM1](/paper%20shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html). Ask which capability comes from the visual encoder, connector, pretraining mixture, and instruction data.
+**Layer 1: alignment.** Read [CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html) and [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html). Derive the two losses and write down the unit of competition. Your deliverable is a one-page note explaining how batch composition becomes part of the learning algorithm.
 
-**Layer 3: visual evidence.** Read [LocCa](/paper%20shorts/2024/03/28/locca-visual-pretraining-with-location-aware-captioners.html), [Cambrian-1](/paper%20shorts/2024/06/01/cambrian-1-vision-centric-exploration-of-multimodal-llms.html), [PaliGemma](/paper%20shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html), [Qwen2-VL](/paper%20shorts/2024/09/01/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution.html), and [Molmo](/paper%20shorts/2024/09/01/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models.html). Track resolution, visual-token count, grounding supervision, and data transparency.
+**Layer 2: conditional generation.** Read [LLaVA](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html) and [MM1](/paper%20shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html). Build an ablation table with four columns: visual encoder, connector, pretraining mixture, and instruction data. The exercise forces you to separate a good recipe from a causal result.
 
-**Layer 4: temporal and safety-critical use.** Read [VideoLLaMA 3](/paper%20shorts/2025/01/01/videollama-3-frontier-multimodal-foundation-models.html), [DriveVLM](/paper%20shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models.html), [VLM-AD](/paper%20shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision.html), [DriveBench](/paper%20shorts/2025/01/01/are-vlms-ready-for-autonomous-driving-drivebench.html), and [AutoTrust](/paper%20shorts/2024/12/01/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving.html). Ask whether the model uses the right evidence under latency and corruption.
+**Layer 3: visual evidence.** Read [LocCa](/paper%20shorts/2024/03/28/locca-visual-pretraining-with-location-aware-captioners.html), [Cambrian-1](/paper%20shorts/2024/06/01/cambrian-1-vision-centric-exploration-of-multimodal-llms.html), [PaliGemma](/paper%20shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html), [Qwen2-VL](/paper%20shorts/2024/09/01/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution.html), and [Molmo](/paper%20shorts/2024/09/01/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models.html). For one image, estimate the visual-token budget under each recipe. Then mark which datasets require pointing, OCR, relations, or only a plausible caption.
 
-**Layer 5: action.** Read [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html), [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html), [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html), and [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html). Write down the action distribution, chunk length, control rate, and source of closed-loop data.
+**Layer 4: temporal and safety-critical use.** Read [VideoLLaMA 3](/paper%20shorts/2025/01/01/videollama-3-frontier-multimodal-foundation-models.html), [DriveVLM](/paper%20shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models.html), [VLM-AD](/paper%20shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision.html), [DriveBench](/paper%20shorts/2025/01/01/are-vlms-ready-for-autonomous-driving-drivebench.html), and [AutoTrust](/paper%20shorts/2024/12/01/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving.html). Design one counterfactual edit that should flip a decision and one irrelevant edit that should not. If the benchmark cannot express that test, note the gap.
+
+**Layer 5: action.** Read [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html), [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html), [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html), and [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html). Reconstruct the action distribution, horizon, control rate, and inference path. The deliverable is a latency budget, not another summary.
+
+After these five layers, move to [Part II: Pretraining Multimodal Models for Robotics](/blog/2026/07/15/omni-model-pretraining-decisions.html). The VLM literature tells you what visual and semantic priors are available. The robotics literature asks which of those priors survive contact with embodiment.
 
 ## The research thesis
 
-VLM progress is best understood as a sequence of interface contracts. Contrastive models made vision addressable through language. Visual assistants made that representation generative and interactive. Grounding and high-resolution work tried to reconnect fluent answers to pixels. Video introduced persistence and temporal compression. Driving and robotics forced language to coexist with geometry, latency, and action consequences.
+VLM progress is a sequence of interface contracts. Contrastive learning made images addressable through language. Visual instruction tuning made that representation conversational. Grounding tried to reconnect fluent words to visible evidence. Video introduced persistence and compression. Driving and robotics exposed every shortcut because a plausible answer can become a bad physical decision.
 
 My strongest bet is not that one token stream will erase every modality boundary. It is that semantic reasoning will become a shared layer, while high-bandwidth perception and high-rate control retain specialized representations and losses. The decisive systems will know what to share and what not to compress.
 
-The falsification test is straightforward. Under matched data, parameters, tokens, compute, and latency, a fully unified model should outperform a hybrid on fine grounding, temporal counterfactuals, and closed-loop recovery without sacrificing calibration. Until that evidence exists, “one model for everything” remains a research direction, not a default architecture.
+My bet is a shared semantic layer with explicit high-bandwidth routes for geometry, time, and control. A fully unified token stream should replace that hybrid only when, under matched data, parameters, tokens, compute, and latency, it wins on fine grounding, temporal counterfactuals, and closed-loop recovery without losing calibration. Until then, “one model for everything” names an experiment. It does not settle the architecture.
 
 ## References
 
