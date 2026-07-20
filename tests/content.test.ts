@@ -62,7 +62,6 @@ describe('migration manifest', () => {
       new Set([
         'paper-shorts',
         'blog',
-        'build-intuition',
         'revision-notes',
       ]),
     );

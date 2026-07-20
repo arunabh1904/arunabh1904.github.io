@@ -10,12 +10,7 @@ const posts = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
-    section: z.enum([
-      'paper-shorts',
-      'blog',
-      'build-intuition',
-      'revision-notes',
-    ]),
+    section: z.enum(['paper-shorts', 'blog', 'revision-notes']),
     postSlug: z.string(),
     legacyPath: z.string(),
     tags: z.array(z.string()).default(['Other']),

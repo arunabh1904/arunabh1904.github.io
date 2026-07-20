@@ -14,6 +14,9 @@ export default defineConfig({
   build: {
     format: 'file',
   },
+  redirects: {
+    '/build_intuition': '/blog.html',
+  },
   integrations: [mdx(), react(), sitemap()],
   markdown: {
     remarkPlugins: [remarkMath],

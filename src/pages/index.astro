@@ -9,12 +9,10 @@ const revisionPosts = (await getPostsBySection('revision-notes', 'desc')).filter
   (post) => post.data.postSlug !== 'cs336-revision-notes',
 );
 const blogPosts = await getPostsBySection('blog', 'desc');
-const buildIntuitionPosts = await getPostsBySection('build-intuition', 'desc');
 
 const totalEntries =
   paperPosts.length +
   blogPosts.length +
-  buildIntuitionPosts.length +
   revisionPosts.length +
   READING_LIST_ITEMS.length +
   codePracticeProblems.length;
@@ -33,16 +31,8 @@ const sectionCards = [
     href: '/blog.html',
     command: 'blog',
     title: 'Blog',
-    description: 'Essays on research practice, local models, robotics, and career lessons.',
+    description: 'Essays, technical explainers, and research guides for ideas worth understanding slowly.',
     count: blogPosts.length,
-  },
-  {
-    id: 'build-intuition',
-    href: '/build_intuition.html',
-    command: 'build-intuition',
-    title: 'Build Intuition',
-    description: 'Concept-first walkthroughs for mechanisms that reward slow understanding.',
-    count: buildIntuitionPosts.length,
   },
   {
     id: 'revision-notes',
@@ -81,16 +71,9 @@ const recentShelves = [
   {
     title: 'Blog',
     href: '/blog.html',
-    summary: 'Essays on research practice, local models, robotics, and career lessons.',
+    summary: 'Essays, technical explainers, and research guides for ideas worth understanding slowly.',
     posts: blogPosts.slice(0, 2),
     emptyMessage: 'No essays yet.',
-  },
-  {
-    title: 'Build Intuition',
-    href: '/build_intuition.html',
-    summary: 'Concept-first walkthroughs for mechanisms that reward slow understanding.',
-    posts: buildIntuitionPosts.slice(0, 2),
-    emptyMessage: 'No explainers yet.',
   },
   {
     title: 'Revision Notes',
