@@ -57,4 +57,4 @@ The mask supplies dense localization guidance to an otherwise sparse vector obje
 
 **Context:** MGMap pushed vector-map models toward richer query support instead of treating each polyline point as a thin detection target.
 
-**Takeaway:** For online HD maps, the hard part is often not just predicting vectors; it is making each vector query look at the right BEV evidence.
+**Takeaway:** Online HD mapping depends on directing each vector query to the right BEV evidence, not merely predicting the vector coordinates.

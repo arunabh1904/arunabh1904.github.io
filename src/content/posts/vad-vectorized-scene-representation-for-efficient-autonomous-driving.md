@@ -55,6 +55,6 @@ VAD informs whether an ego planner needs a dense raster feature map or can reaso
 
 The representation reduces dense BEV compute, but planning quality becomes bounded by vector extraction recall and uncertainty. The missing comparison matches latency and backbone across vector-only, raster-only, and hybrid planners under missed detections and map errors. At 10× actors, pairwise interaction and vector selection dominate. VAD's claim would fail if a low-resolution raster or occupancy interface matched collision and progress metrics while degrading more gracefully when upstream instances are missing.
 
-**Context:** VAD connected vectorized scene understanding to end-to-end planning, not just map construction.
+**Context:** VAD carried vectorized scene understanding beyond map construction and into end-to-end planning.
 
 **Takeaway:** Planning benefits when the model keeps the world as vectors and relations instead of flattening it into dense pixels too early.

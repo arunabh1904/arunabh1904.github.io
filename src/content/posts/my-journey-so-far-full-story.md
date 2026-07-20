@@ -59,13 +59,13 @@ A month later, I was anxiously waiting for the results. Then, I received an emai
 
 I was devastated, and it plunged me into a deep depression. For about nine months, my life became a bleak cycle: I'd get up, barely eat, play DOTA 2 in a dark room for 12 hours, smoke heavily, and then go back to sleep, only to repeat the same routine the next day. It was a dark time.
 
-But in the middle of 2015, a couple of pivotal events occurred. First, a group of close friends dragged me into an impromptu trip. It turned out to be the best thing that could have happened. I spent a few weeks away from my dark room, and slowly, my spirits lifted. Traveling, especially with close friends, felt like therapy.
+Two events interrupted that cycle in the middle of 2015. First, a group of close friends dragged me into an impromptu trip. I spent a few weeks away from my dark room, and my spirits slowly lifted. Traveling with close friends felt like therapy.
 
-Second, I lost someone dear to me in a completely avoidable car accident. This tragic event hit me hard and became a turning point in my life. It made me realize the fragility of life and the importance of pursuing what truly matters.
+Second, I lost someone dear to me in a completely avoidable car accident. The loss made life's fragility impossible to ignore. I began to think more seriously about what I wanted to spend my time doing.
 
 Those experiences helped me find a purpose and clarify what I wanted to work on. Discovering robotics was serendipitous; choosing autonomous driving was intentional. That year changed me. I decided to apply again, this time to graduate programs in the United States. To strengthen my application, I worked at a friend's startup, volunteered, and began taking programming courses online. Andrew Ng's Deep Learning course, David Malan's CS50, and a MATLAB course all became useful primers.
 
-The results started rolling in, and I was accepted into three different schools. I still remember rereading the first acceptance email about five times, in disbelief that I had actually been accepted! With newfound clarity and excitement, I packed my bags and headed to the U.S. for grad school, ready to start a new chapter as a robotics graduate student at the Colorado School of Mines!
+I was accepted into three schools. I still remember rereading the first acceptance email about five times because I could not quite believe it. I packed my bags and moved to the United States to study robotics at the Colorado School of Mines.
 
 ### What the reset clarified
 - **Depression can be scary.**
@@ -82,11 +82,15 @@ In my second semester, I joined Dr. Petruska's lab as a research assistant. Init
 
 <img src="/assets/images/me_in_lab.jpeg" alt="Me in Lab" class="float-right" style="max-width:65%;">
 
-The third semester at CSM was a turning point in my career. I spent a lot of time conducting independent research, programming the Husky robot for autonomous navigation in GPS-denied environments using optimal control strategies. My research collaborators and I spent countless hours covering the whiteboards in the lab with equations, then implementing them in code late into the night. I also took several robotics courses to supplement my research through projects. I got my first taste of machine learning, hand-coding backpropagation from scratch. I still remember the thrill when the loss decreased for the first time - it was exhilarating. I also built a hexapod robot and implemented SLAM using a 1D LiDAR and a basic Pixy camera. All of this gave me a solid understanding of the components needed for an autonomous robot: building a map, localizing based on that map, perceiving the environment in real time, and planning to reach the goal without collisions. Eventually, we deployed the robot inside CSM's Edgar Mine, achieving GPS-denied autonomous navigation using the MPC we developed. It was freezing inside the mine, but it was incredibly rewarding to see the robot navigate without running into things.
+The third semester at CSM was a turning point in my career. I spent much of it conducting independent research and programming a Husky robot for autonomous navigation in GPS-denied environments. My collaborators and I covered the lab whiteboards with optimal-control equations, then implemented them late into the night.
+
+Robotics courses gave me more ways to test the theory. I got my first taste of machine learning by coding backpropagation from scratch, and I still remember the thrill of watching the loss decrease for the first time. I also built a hexapod robot and implemented SLAM with a 1D LiDAR and a basic Pixy camera. These projects taught me the full autonomy loop: map the environment, localize within it, perceive changes in real time, and plan a collision-free path to the goal.
+
+We eventually deployed the Husky inside CSM's Edgar Mine, where it navigated without GPS using our model-predictive controller. The mine was freezing, but watching the robot move without hitting anything made the long nights worthwhile.
 
 <img src="/assets/images/hexy.jpg" alt="Hexapod Robot" class="float-left" style="max-width:65%;">
 
-Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grad school is not just about grades. It is about the projects you take on, the challenges you solve, and the people you learn from. For students in grad school now, my advice is simple: take on projects that stretch you, use the resources around you, and follow the problems that genuinely excite you. That is how progress starts to compound.
+Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grades mattered, but the projects I took on, the problems I solved, and the people I learned from shaped me more. My advice to current graduate students is simple: take on projects that stretch you, use the resources around you, and follow problems that genuinely excite you. That is how progress starts to compound.
 
 ### What Mines taught me
 - **Focus on building a strong foundation** in the areas that excite you.
@@ -113,16 +117,18 @@ Landing your first job out of grad school in the U.S. can be difficult, especial
 
 Right after grad school, I landed at DEKA and joined a small, tight-knit team building autonomous robots for FedEx's last-mile deliveries. DEKA was mostly known for medical devices, so the robotics project felt like new territory. I started in planning, but I soon found my way into robot perception and machine learning. That team is where I really expanded my skills, diving into PyTorch, TensorFlow, TensorRT, CUDA, and OpenCL.
 
-My graduate research had been entirely focused on optimal controls, so when my first task at DEKA was to train a neural network, I had no idea where to start. I vividly remember that uncomfortable feeling as I put my headphones on and just began typing - determined to figure it out. Reflecting on it now, that initial discomfort turned out to be a powerful motivator. It was the first step on a path that ultimately led to my first patent. I immersed myself in reading, learned how to effectively collect data, and built custom mechanisms to do so. I still recall carefully mounting cameras with precise extrinsics onto our makeshift data collection bot, essentially a modified wheelchair. Countless hours were spent driving around, meticulously adjusting angles, and ensuring we captured every necessary perspective. Then came the painstaking task of personally labeling massive datasets, driven by the determination to prove to myself - and my manager - that the concept would work. Finally, I figured out how to properly train a network, crafted insightful visualizations, and deployed the model in real-time on a Jetson Xavier.
+My graduate research had focused entirely on optimal control, so I had no idea where to start when DEKA asked me to train a neural network. I remember putting on my headphones and typing because action felt better than waiting to feel ready. That discomfort started the work that eventually led to my first patent.
 
-In hindsight, some of this work may seem straightforward to someone graduating with an ML degree today. But I was learning everything from scratch on the job, so each small success felt enormous. The experience taught me something important: embracing uncertainty is often the fastest way to grow. Also, file a lot of [patents](https://patents.justia.com/inventor/arunabh-mishra).
+I read constantly, learned how to collect training data, and built the mechanisms we needed. Our data-collection robot was essentially a modified wheelchair with carefully calibrated cameras. I spent countless hours driving it, adjusting camera angles, and checking that we covered the necessary views.
 
-This experience turned out to be the key that opened the door to my dream job.
+Then I labeled the data myself. I wanted to prove to my manager and to myself that the concept could work. Eventually I learned to train the network, built visualizations that exposed its behavior, and deployed the model in real time on a Jetson Xavier.
 
-Looking back, DEKA was more than a stepping stone. It was genuinely transformative. The projects taught me technical skills, but they also shaped how I approach problems and collaborate with others. I also made wonderful friends there, people I still stay in touch with today.
+Some of this work may look straightforward to someone graduating with an ML degree today. I was learning it from scratch on the job, so each small success mattered. The experience taught me that uncertainty is often where the fastest learning begins. Also, file a lot of [patents](https://patents.justia.com/inventor/arunabh-mishra).
+
+DEKA opened the door to my dream job. The projects taught me technical skills, but they also changed how I approach unfamiliar problems and work with other people. I made close friends there whom I still talk to today.
 
 ## Zoox
 
-Moving to Zoox, a leader in autonomous driving, was the realization of a long-held dream. I work on the Perception team, which acts as the eyes of the robot. The team processes data from cameras, LiDARs, and other sensors to build representations the robot can use for planning and action in the real world. These representations are often machine-learned so they can generalize across domains. My role focuses on scene semantics and agent intent, which requires a mix of ML, software engineering, C++, Python, CUDA, and computer vision research. I picked up those skills through self-teaching, grad school, and my time at DEKA.
+Joining Zoox realized a long-held goal: working on autonomous driving. I work on the Perception team, which turns camera, LiDAR, and other sensor data into representations the robot can use for planning. My role focuses on scene semantics and agent intent, drawing on ML, software engineering, C++, Python, CUDA, and computer vision research. I learned those skills through self-teaching, graduate school, and my time at DEKA.
 
 One memory from joining Zoox still feels vivid. I was surrounded by incredibly talented people and felt out of place at first. It was classic imposter syndrome. The way through it was not one dramatic breakthrough; it was small wins, one after another. Those wins slowly built confidence. That feeling is common when switching roles, and it is worth recognizing it as part of professional growth, not proof that you do not belong.

@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2025/05/30/how-much-do-language-models-memorize.html
 tags:
   - Other
 field: 'Language Models'
-summary: This paper separates memorization from generalization and estimates GPT-style language-model capacity at about 3.6 bits per parameter.
+summary: An empirical separation of memorization from generalization that estimates GPT-style language-model capacity at about 3.6 bits per parameter.
 ---
 ## 2025 - How Much Do Language Models Memorize?
 
@@ -15,7 +15,7 @@ summary: This paper separates memorization from generalization and estimates GPT
 
 **Discussion thread:** [Jack Morris on X](https://x.com/jxmnop/status/1929903028372459909)
 
-**Summary:** This paper asks how much sample-specific training information a language model stores in its weights. It separates unintended memorization from generalization, then measures storage capacity in settings where the information content of the training data can be controlled.
+**Summary:** How Much Do Language Models Memorize? measures how much sample-specific training information a language model stores in its weights. It separates unintended memorization from generalization in settings where the information content of the training data can be controlled.
 
 The headline estimate is about 3.6 bits per parameter for GPT-style transformers. The deeper point is that memorization is not a yes-or-no property of a model or a datapoint; it is a finite capacity budget that changes how the model behaves as data size grows.
 
@@ -61,7 +61,7 @@ _Figure 1 isolates capacity with uniform random data: because there is no reusab
 
 This paper informs how much parameter budget should be interpreted as storage rather than transferable computation. The unit of analysis is a training token whose recoverability is measured against held-out generalization, producing an estimated memorization capacity of roughly 3.6 bits per parameter for the studied GPT-style models.
 
-That estimate is conditional on the data distribution, model family, extraction method, and definition of memorization; it is not a hardware-independent constant. The crucial missing study varies duplication, deduplication, tokenizer, and architecture while holding tokens and optimization fixed. At 10× scale, rare-string extraction, privacy exposure, and benchmark leakage become more important than the average capacity estimate. The claim would fail if an independent extraction protocol produced a substantially different bits-per-parameter slope on held-out model families.
+That estimate is conditional on the data distribution, model family, extraction method, and definition of memorization; it is not a hardware-independent constant. The missing study varies duplication, deduplication, tokenizer, and architecture while holding tokens and optimization fixed. At 10× scale, rare-string extraction, privacy exposure, and benchmark leakage become more important than the average capacity estimate. The claim would fail if an independent extraction protocol produced a substantially different bits-per-parameter slope on held-out model families.
 
 **Context:** The paper gives a cleaner measurement vocabulary for a fuzzy debate. Instead of asking only whether a string can be extracted, it asks how many bits of sample-specific information the weights contain and how that budget scales.
 

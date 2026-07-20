@@ -23,7 +23,7 @@ This paper matters because it made dense BEV a practical intermediate representa
 
 BEVFormer has two tailored attention mechanisms. Spatial cross-attention lets each BEV query sample relevant image features from camera views by projecting into 3D reference points. Temporal self-attention lets the current BEV reuse information from the previous timestep. The same BEV representation supports 3D object detection and map segmentation.
 
-The reported nuScenes test result in the abstract is 56.9% NDS, a 9.0 point gain over the prior best method at the time. The tradeoff is exactly what later sparse/vectorized planners try to fix: dense BEV features are powerful but expensive.
+The reported nuScenes test result in the abstract is 56.9% NDS, a 9.0 point gain over the prior best method at the time. The tradeoff is exactly what later sparse/vectorized planners try to fix: dense BEV features preserve broad spatial evidence but cost substantial compute.
 
 ![Figure 2 from BEVFormer showing the BEV encoder with spatial cross-attention and temporal self-attention](/assets/images/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers-paper-figure.png)
 _Figure 2 shows the BEVFormer encoder: camera features, BEV queries, spatial cross-attention, temporal self-attention, and detection/segmentation heads. From the [BEVFormer paper](https://arxiv.org/abs/2203.17270), via the arXiv PDF._

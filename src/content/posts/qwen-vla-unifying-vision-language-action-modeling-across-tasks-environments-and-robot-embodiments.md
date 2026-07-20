@@ -15,7 +15,7 @@ summary: Qwen-VLA extends the Qwen vision-language stack with a DiT action decod
 
 **Code:** [QwenLM/Qwen-VLA](https://github.com/QwenLM/Qwen-VLA)
 
-**Summary:** Qwen-VLA takes a Qwen vision-language backbone and adds a continuous action/trajectory decoder. The goal is not just to answer visual questions about a scene, but to produce robot actions, navigation trajectories, and egocentric motion predictions through one shared interface.
+**Summary:** Qwen-VLA adds a continuous action-and-trajectory decoder to a Qwen vision-language backbone. One shared interface produces robot actions, navigation trajectories, egocentric motion predictions, and visual-language answers.
 
 The key trick is embodiment-aware prompting. Instead of adding separate output heads for every robot or task family, the prompt describes the embodiment and control convention, while a DiT flow-matching decoder generates the continuous action trajectory.
 

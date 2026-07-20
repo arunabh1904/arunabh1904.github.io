@@ -14,7 +14,7 @@ summary: '2025 – Scaling laws comparing native early-fusion and late-fusion mu
 **arXiv:** [2504.07951](https://arxiv.org/abs/2504.07951)  
 **Conference:** ICCV 2025 (oral)
 
-**Summary:** This paper trains 457 native multimodal models with different architectures and mixtures to compare early fusion, late fusion, and modality-expert designs. It revisits the assumption that attaching a pretrained vision encoder is inherently better than learning multimodal representations from the start.
+**Summary:** Scaling Laws for Native Multimodal Models trains 457 models across different architectures and mixtures to compare early fusion, late fusion, and modality-expert designs. The study tests whether attaching a pretrained vision encoder is inherently better than learning multimodal representations from the start.
 
 ## Paper Insights
 

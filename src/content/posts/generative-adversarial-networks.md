@@ -48,4 +48,4 @@ The original experiments established that the game can produce sharp samples, no
 
 **Critiques & limitations:** The formulation is beautiful, but the optimization is fragile. Training can diverge, generators can collapse to a small set of modes, and discriminators can saturate until the generator receives weak gradients. Much of the later GAN literature, including Wasserstein GANs and gradient penalties, is really a response to those failure modes.
 
-**Takeaway:** GANs introduced adversarial training as a powerful but unstable route to generative modelling. The paper's impact comes from both sides of that sentence: the samples were exciting, and the instability became an entire research program.
+**Takeaway:** GANs made adversarial training a viable but unstable route to generative modelling. Both halves mattered: the samples were striking, and the instability became an entire research program.

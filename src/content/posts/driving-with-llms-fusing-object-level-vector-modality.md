@@ -15,7 +15,7 @@ summary: Driving with LLMs fed object-level vector scene state into language mod
 
 **GitHub:** [wayveai/driving-with-llms](https://github.com/wayveai/driving-with-llms)
 
-**Summary:** This paper studies a middle ground between raw image VLMs and classical planning. It converts the scene into object-level vectors, fuses those structured tokens into an LLM, and asks the model to reason about driving actions and explanations.
+**Summary:** Driving with LLMs studies a middle ground between raw-image VLMs and classical planning. It converts the scene into object-level vectors, fuses those structured tokens into an LLM, and asks the model to produce driving actions and explanations.
 
 The bet is that language models may reason better when perception has already converted pixels into meaningful objects, positions, and relationships.
 

@@ -14,7 +14,7 @@ summary: '2025 – Estimating compute-aware data mixtures from small training ru
 **arXiv:** [2507.09404](https://arxiv.org/abs/2507.09404)  
 **Conference:** Technical report
 
-**Summary:** This paper proposes scaling laws that predict loss from model size $N$, training tokens $D$, and a domain-weight vector $h$. The objective is to choose data mixtures systematically rather than through trial and error at the full pre-training scale.
+**Summary:** Scaling Laws for Optimal Data Mixtures predicts loss from model size $N$, training tokens $D$, and a domain-weight vector $h$. The objective is to choose data mixtures systematically rather than through trial and error at full pre-training scale.
 
 ## Paper Insights
 

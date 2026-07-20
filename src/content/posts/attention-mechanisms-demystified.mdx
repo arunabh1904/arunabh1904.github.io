@@ -18,7 +18,7 @@ import { attentionMechanismsPlayground } from '../../lib/python-playground-examp
 
 Attention is easiest to understand as **learned information routing**. Older sequence models, especially recurrent networks, tried to compress everything seen so far into a single running hidden state. Attention takes a different approach: at every layer, each token can ask **which other tokens matter right now** and pull back only the information it needs.
 
-That shift is the reason Transformers feel so powerful. Instead of forcing information to move step by step through a sequence, attention creates direct communication paths between relevant positions. A useful mental model is **differentiable content-addressable memory**: queries ask for information, keys determine where to look, and values determine what content comes back.
+That shift gives Transformers direct communication paths between relevant positions instead of forcing information to move step by step through a sequence. A useful mental model is **differentiable content-addressable memory**: queries ask for information, keys determine where to look, and values determine what content comes back.
 
 ![Attention as differentiable lookup](/assets/images/attention-mechanisms-intuition.svg)
 
@@ -195,7 +195,7 @@ In multimodal systems, text tokens can query image patches, or image features ca
 
 ### Why attention changed modern deep learning
 
-Attention became foundational because it offers several powerful properties at once:
+Attention became foundational because it combines several useful properties:
 
 - **Direct access to distant information:** relevant tokens do not have to wait through many recurrent steps to influence one another.
 - **Parallel computation:** the whole attention matrix can be computed efficiently on modern hardware.

@@ -39,7 +39,7 @@ DQN informs whether a single convolutional Q-network can replace game-specific f
 
 The Atari results establish sample reuse and target lag as a workable combination, not a generally stable recipe for every observation or reward distribution. The missing ablation is a seed-rich factorial study of replay, target updates, reward clipping, frame stacking, and optimizer under equal environment steps. At 10× task diversity, replay imbalance and interference would dominate. The claim would fail if an on-policy or model-based baseline matched median human-normalized score with the same frames and less tuning.
 
-**Context:** DQN showed that a relatively simple network, three convolutional layers followed by two fully connected layers, could handle high-dimensional visual state in a reinforcement learning loop. The important contribution was not just the score table. It was the recipe: pair Q-learning with enough neural capacity, then add just enough machinery to make the targets less volatile.
+**Context:** DQN showed that a relatively simple network—three convolutional layers followed by two fully connected layers—could handle high-dimensional visual state in a reinforcement-learning loop. Its durable contribution was the recipe: pair Q-learning with enough neural capacity, then add experience replay and a target network to make the targets less volatile.
 
 **Evals / Benchmarks:**
 
@@ -53,4 +53,4 @@ Overall, DQN beat previous algorithms on 6 of the 7 reported games and exceeded 
 
 **Critiques & limitations:** The cleanest part of DQN is also why it became such a good baseline: one architecture, one training recipe, multiple games. But the method was sample-inefficient, sensitive to tuning, and weak on sparse-reward games such as Montezuma's Revenge. It also inherited Q-learning's tendency to overestimate values, a problem that later work attacked directly with Double DQN and related fixes.
 
-**Takeaway:** DQN made deep reinforcement learning feel real. A CNN, replay memory, and a target network were enough to learn useful control policies from pixels, and that combination became the starting point for much of the modern deep-RL toolbox.
+**Takeaway:** A CNN, replay memory, and a target network were enough to learn control policies from pixels. That combination became the starting point for much of the modern deep-RL toolbox.
