@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/01/01/distilling-multimodal-large-language-models
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: DIMA used a large multimodal driving model as a teacher, distilling its behavior into a faster vision-based planner.
+summary: "2025 – Distilling Multi-modal Large Language Models for Autonomous Driving"
 ---
-## 2025 - Distilling Multi-modal Large Language Models for Autonomous Driving
+## 2025 – Distilling Multi-modal Large Language Models for Autonomous Driving
 
 **arXiv:** [2501.09757](https://arxiv.org/abs/2501.09757)
 

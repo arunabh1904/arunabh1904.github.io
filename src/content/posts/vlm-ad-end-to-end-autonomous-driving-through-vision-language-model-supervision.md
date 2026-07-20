@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-throug
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: VLM-AD uses a VLM as a training-time teacher, distilling driving reasoning and structured action labels into an end-to-end driving model without using the VLM at inference time.
+summary: "2024 – VLM-AD: End-to-End Autonomous Driving through Vision-Language Model Supervision"
 ---
-## 2024 - VLM-AD
+## 2024 – VLM-AD
 
 **arXiv:** [2412.14446](https://arxiv.org/abs/2412.14446)
 

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2021/08/22/densetnt-end-to-end-trajectory-prediction-f
 tags:
   - Other
 field: 'Motion Forecasting & Planning'
-summary: DenseTNT removes sparse goal anchors and heuristic goal selection by predicting dense goal probabilities and learning an online goal-set predictor.
+summary: "2021 – DenseTNT: End-to-End Trajectory Prediction from Dense Goal Sets"
 ---
-## 2021 - DenseTNT
+## 2021 – DenseTNT
 
 **arXiv:** [2108.09640](https://arxiv.org/abs/2108.09640)
 

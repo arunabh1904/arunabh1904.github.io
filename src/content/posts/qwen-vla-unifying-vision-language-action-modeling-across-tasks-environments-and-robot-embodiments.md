@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2026/05/28/qwen-vla-unifying-vision-language-action-mo
 tags:
   - Other
 field: 'Vision-Language-Action & Robotics'
-summary: Qwen-VLA extends the Qwen vision-language stack with a DiT action decoder so one model can handle manipulation, navigation, and trajectory prediction across embodiments.
+summary: "2026 – Qwen-VLA: Unifying Vision-Language-Action Modeling across Tasks, Environments, and Robot Embodiments"
 ---
-## 2026 - Qwen-VLA
+## 2026 – Qwen-VLA
 
 **arXiv:** [2605.30280](https://arxiv.org/abs/2605.30280)
 

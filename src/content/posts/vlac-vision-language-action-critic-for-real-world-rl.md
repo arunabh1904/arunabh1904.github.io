@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Reward Models
 field: 'Robot Post-Training & Evaluation'
-summary: 2025 – VLAC predicts dense visual progress and completion signals inside an asynchronous real-robot RL loop.
+summary: "2025 – VLAC: A Vision-Language-Action-Critic Model for Real-World Reinforcement Learning"
 ---
 
 ## 2025 – VLAC: A Vision-Language-Action-Critic Model for Real-World Reinforcement Learning

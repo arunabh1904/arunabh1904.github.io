@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2026/04/02/unidrivevla-unifying-understanding-percepti
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: UniDriveVLA decouples semantic understanding, spatial perception, and action planning into specialized Transformer experts coordinated by masked joint attention.
+summary: "2026 – UniDriveVLA: Unifying Understanding, Perception, and Action Planning for Autonomous Driving"
 ---
-## 2026 - UniDriveVLA
+## 2026 – UniDriveVLA
 
 **arXiv:** [2604.02190](https://arxiv.org/abs/2604.02190)
 

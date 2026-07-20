@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2020/07/27/lanegcn-learning-lane-graph-representations
 tags:
   - Other
 field: 'Motion Forecasting & Planning'
-summary: LaneGCN made lane topology and actor-map interaction explicit by building a graph from raw map lanes and fusing actor-to-lane, lane-to-lane, lane-to-actor, and actor-to-actor messages.
+summary: "2020 – LaneGCN: Learning Lane Graph Representations for Motion Forecasting"
 ---
-## 2020 - LaneGCN
+## 2020 – LaneGCN
 
 **arXiv:** [2007.13732](https://arxiv.org/abs/2007.13732)
 

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2023/09/28/motionlm-multi-agent-motion-forecasting-as-
 tags:
   - Other
 field: 'Motion Forecasting & Planning'
-summary: MotionLM discretizes continuous trajectories into motion tokens and forecasts interacting road agents with an autoregressive language-model objective.
+summary: "2023 – MotionLM: Multi-Agent Motion Forecasting as Language Modeling"
 ---
-## 2023 - MotionLM
+## 2023 – MotionLM
 
 **arXiv:** [2309.16534](https://arxiv.org/abs/2309.16534)
 

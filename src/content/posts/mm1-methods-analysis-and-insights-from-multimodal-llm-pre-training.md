@@ -6,7 +6,7 @@ postSlug: mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training
 legacyPath: /paper shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html
 tags: [Multimodal AI]
 field: 'Omni-Model Architectures'
-summary: '2024 – MM1: a controlled study of multimodal pre-training choices.'
+summary: "2024 – MM1: Methods, Analysis & Insights from Multimodal LLM Pre-training"
 ---
 
 ## 2024 – MM1: Methods, Analysis & Insights from Multimodal LLM Pre-training

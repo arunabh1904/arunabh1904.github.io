@@ -6,7 +6,7 @@ postSlug: scaling-laws-for-generative-mixed-modal-language-models
 legacyPath: /paper shorts/2023/01/10/scaling-laws-for-generative-mixed-modal-language-models.html
 tags: [Scaling Laws]
 field: 'Multimodal Scaling & Data Mixtures'
-summary: '2023 – Mixed-modal scaling laws that model both modality contributions and interactions.'
+summary: "2023 – Scaling Laws for Generative Mixed-Modal Language Models"
 ---
 
 ## 2023 – Scaling Laws for Generative Mixed-Modal Language Models

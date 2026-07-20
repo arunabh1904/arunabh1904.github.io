@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2022/07/12/wayformer-motion-forecasting-via-simple-and
 tags:
   - Other
 field: 'Motion Forecasting & Planning'
-summary: Wayformer shows that a simpler attention stack can fuse heterogeneous road, agent, and traffic-light inputs for motion forecasting when the fusion strategy is chosen carefully.
+summary: "2022 – Wayformer: Motion Forecasting via Simple and Efficient Attention Networks"
 ---
-## 2022 - Wayformer
+## 2022 – Wayformer
 
 **arXiv:** [2207.05844](https://arxiv.org/abs/2207.05844)
 

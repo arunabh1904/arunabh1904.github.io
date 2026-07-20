@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/03/01/tod3cap-towards-3d-dense-captioning-in-outd
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: TOD3Cap asked driving models to detect outdoor 3D objects and caption them with rich language.
+summary: "2024 – TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes"
 ---
-## 2024 - TOD3Cap
+## 2024 – TOD3Cap
 
 **arXiv:** [2403.19589](https://arxiv.org/abs/2403.19589)
 

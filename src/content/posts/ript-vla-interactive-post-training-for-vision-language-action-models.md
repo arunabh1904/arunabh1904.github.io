@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Reinforcement Learning
 field: 'Robot Post-Training & Evaluation'
-summary: 2025 – RIPT-VLA adds sparse-reward interactive RL after VLA pretraining and SFT.
+summary: "2025 – RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models"
 ---
 
 ## 2025 – RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models

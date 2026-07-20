@@ -9,7 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: 'Generative Modeling'
-summary: Improved DDPM tightened diffusion likelihoods and made sampling faster by learning reverse-process variance.
+summary: "2021 – Improved Denoising Diffusion Probabilistic Models"
 ---
 ## 2021 – Improved Denoising Diffusion Probabilistic Models (ID DPM)
 

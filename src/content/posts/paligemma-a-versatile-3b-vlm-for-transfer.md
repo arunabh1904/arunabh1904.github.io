@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.h
 tags:
   - Other
 field: 'Vision-Language Models'
-summary: PaliGemma combines SigLIP and Gemma into a compact open VLM meant for fine-tuning across many vision-language tasks.
+summary: "2024 – PaliGemma: A Versatile 3B VLM for Transfer"
 ---
-## 2024 - PaliGemma
+## 2024 – PaliGemma
 
 **arXiv:** [2407.07726](https://arxiv.org/abs/2407.07726)
 

@@ -8,7 +8,7 @@ tags:
   - Imitation Learning
   - Robotics
 field: 'Vision-Language-Action & Robotics'
-summary: 2011 – DAgger trains on states induced by the learner rather than only states visited by an expert.
+summary: "2011 – DAgger: A Reduction of Imitation Learning to No-Regret Online Learning"
 ---
 
 ## 2011 – DAgger: A Reduction of Imitation Learning to No-Regret Online Learning

@@ -19,12 +19,6 @@ The hard choices arrive before the large run. An image can become patches, seman
 
 This guide is about making those choices legible. Its central claim is that a VLA is not created by adding an action head to a VLM. It is created by combining three priors—semantic, visual, and motor—without letting the cheapest one erase the others.
 
-![Reading map from VLMs to deployed robot policies](/assets/images/multimodal-vla-reading-map.svg)
-_Part II sits across the middle of the map. Robot pretraining must decide which experience deserves shared capacity and which action distribution the policy can execute on time._
-
-![Omni-model pretraining decision stack](/assets/images/omni-pretraining-decision-stack.svg)
-_The stack is coupled: representation changes sequence length, which changes systems cost, mixture economics, and the capabilities that can be measured._
-
 This is Part II of the series. [Part I](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html) follows the visual interfaces that made language grounding possible. [Part III](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html) starts when a pretrained policy enters deployment, creates its own state distribution, and has to learn from the result.
 
 The scope is pretraining design, not a catalog of multimodal models. I use papers in two ways: reported experiments establish what happened inside a particular recipe; the decision tests, kill criteria, and preferred architecture are my synthesis. Keeping that boundary visible matters because multimodal papers often change the tokenizer, data, parameter count, and training budget together. A strong result can justify adopting a recipe without identifying which ingredient caused the gain.
@@ -73,14 +67,7 @@ Before choosing transformer depth, decide what counts as one training unit.
 
 Text already arrives as compressed symbolic tokens. Images can be patches, contrastive features, discrete codes, or continuous latents. Video adds a temporal sampling policy on top of spatial compression. Actions can be per-dimension bins, chunks, frequency coefficients, diffusion trajectories, or flow samples.
 
-The unit determines sequence length:
-
-$$
-T_{total}
-=T_{text}+T_{image}+T_{video}+T_{audio}+T_{action}.
-$$
-
-Attention cost, context competition, batch composition, and loss weighting all inherit that choice.
+The unit determines sequence length, and sequence length determines attention cost, context competition, batch composition, and loss balance. Counting one image, video, or action trajectory as one example hides the number of patches, frames, or control targets that actually reach the shared model.
 
 [ViT](/paper%20shorts/2020/10/01/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale.html) made image patches look like tokens, but a 16×16 patch is not semantically equivalent to a wordpiece. [Qwen2-VL](/paper%20shorts/2024/09/01/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution.html) lets visual-token count follow input resolution, preserving small text and document detail at variable cost. [DeepSeek-VL2](/paper%20shorts/2024/12/01/deepseek-vl2-mixture-of-experts-vision-language-models.html) combines dynamic tiling with sparse language capacity and latent attention to manage that cost.
 
@@ -144,13 +131,7 @@ $$
 
 Contrastive understanding uses paired image–text scores. [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html) replaces batch-softmax competition with independent sigmoid pair losses, reducing dependence on enormous synchronized negative sets. Diffusion or flow predicts noise, velocity, or a vector field over a sampled time. Robot imitation may use token CE, L1 action error, denoising, or flow matching.
 
-A joint objective looks simple:
-
-$$
-\mathcal{L}=\sum_m \lambda_m\,\mathcal{L}_m,
-$$
-
-but $\lambda_m$ is not merely a hyperparameter. Losses average over different units. One image example may contribute hundreds of patches, one video contributes many frames, and one robot episode contributes many correlated action steps. The apparent balance changes with sequence packing, mask count, and gradient accumulation.
+Combining those objectives makes the loss weight for each modality look like one more hyperparameter, but the weights do not act on comparable units. One image example may contribute hundreds of patches, one video contributes many frames, and one robot episode contributes many correlated action steps. The apparent balance changes with sequence packing, mask count, and gradient accumulation.
 
 Normalize and log at three levels:
 
@@ -160,23 +141,13 @@ Normalize and log at three levels:
 
 Then measure parameter-level conflict. If video gradients are ten times larger in shared attention blocks, a small sampling share can still control the update. If text loss falls while VLM transfer regresses, aggregate convergence is hiding interference.
 
-![How a multimodal data mixture becomes a gradient budget](/assets/images/multimodal-pretraining-gradient-budget.svg)
-_Example share is only the first accounting layer. Sequence expansion, loss reduction, compute, and gradient geometry determine which modality actually moves shared parameters._
-
 This distinction becomes acute in robotics. Overlapping windows from one trajectory can produce thousands of training examples without thousands of independent decisions. A long action chunk can contribute many supervised dimensions while representing one correlated maneuver. The cleanest dashboard keeps four ledgers side by side: sampled examples, predicted units, consumed FLOPs, and update norm by module. A mixture is balanced only relative to a capability objective, not because its percentages sum to 100.
 
 ## A data mixture is a policy over scarce compute
 
 An omni corpus is not a pile of datasets. It is a sampling policy over modalities, domains, quality levels, sequence lengths, and training stages.
 
-[Scaling Laws for Generative Mixed-Modal Language Models](/paper%20shorts/2023/01/10/scaling-laws-for-generative-mixed-modal-language-models.html) adds an interaction term to unimodal scaling so proxy runs can estimate synergy or competition between modalities. [Scaling Laws for Optimal Data Mixtures](/paper%20shorts/2025/07/12/scaling-laws-for-optimal-data-mixtures.html) treats mixture weights as variables in a fitted loss surface conditioned on model size and total data. The useful form is not one universal law but a family of target-specific predictions:
-
-$$
-L_m(N,D,h)
-=E_m+A_mN^{-\alpha_m}+B_mD_m^{-\beta_m}+I_m(h,N,D),
-$$
-
-where $h$ is the mixture and $I_m$ captures transfer or interference.
+[Scaling Laws for Generative Mixed-Modal Language Models](/paper%20shorts/2023/01/10/scaling-laws-for-generative-mixed-modal-language-models.html) models cross-modal interaction so proxy runs can estimate synergy or competition between modalities. [Scaling Laws for Optimal Data Mixtures](/paper%20shorts/2025/07/12/scaling-laws-for-optimal-data-mixtures.html) instead treats mixture weights as variables in a fitted loss surface conditioned on model size and total data. The useful object is not one invented universal equation but a family of source-reported, target-specific predictions.
 
 The word “target” matters. A mixture optimal for image generation may be wrong for OCR, video reasoning, or action grounding. There is no context-free optimal dataset.
 
@@ -220,6 +191,9 @@ A model that produces a plausible door opening after any action is a video gener
 ## The action distribution is an architectural choice
 
 Actions change the data distribution, carry embodiment-specific units, and operate under a control deadline. Treating them as ordinary tokens hides those constraints behind a convenient interface.
+
+![The Pi0 paper's architecture, with a pretrained vision-language trunk conditioning a flow-based action expert](/assets/images/pi0-vision-language-action-flow-model-for-general-robot-control-paper-figure.jpeg)
+_Pi0 keeps semantic context in the pretrained VLM path while a separate action expert models continuous action chunks. The split is a concrete example of selective sharing rather than forced token unification. Source: [Pi0: A Vision-Language-Action Flow Model for General Robot Control](https://arxiv.org/abs/2410.24164)._
 
 [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html) shows the appeal of treating actions as language tokens: one decoder, tractable autoregression, and direct transfer from semantic pretraining. [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html) shows why naive binning breaks on high-frequency dexterity and compresses action chunks with a discrete cosine transform. [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html) uses a continuous flow expert instead of forcing actions through the text head. [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html) adds high-level semantic subtask prediction and heterogeneous co-training, making the boundary between “what next” and “how” explicit.
 

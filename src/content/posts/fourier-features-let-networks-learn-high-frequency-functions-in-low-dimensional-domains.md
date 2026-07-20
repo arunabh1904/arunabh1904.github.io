@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2020/06/18/fourier-features-let-networks-learn-high-fr
 tags:
   - Other
 field: 'Vision Foundations'
-summary: Fourier features turn low-dimensional coordinates into sinusoidal embeddings so MLPs can fit high-frequency geometry, images, and scene signals.
+summary: "2020 – Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains"
 ---
-## 2020 - Fourier Features
+## 2020 – Fourier Features
 
 **arXiv:** [2006.10739](https://arxiv.org/abs/2006.10739)
 

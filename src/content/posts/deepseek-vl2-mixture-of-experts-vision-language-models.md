@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/12/01/deepseek-vl2-mixture-of-experts-vision-lang
 tags:
   - Other
 field: 'Vision-Language Models'
-summary: DeepSeek-VL2 combined dynamic high-resolution tiling with sparse MoE language modeling for efficient document-heavy multimodal understanding.
+summary: "2024 – DeepSeek-VL2: Mixture-of-Experts Vision-Language Models for Advanced Multimodal Understanding"
 ---
-## 2024 - DeepSeek-VL2
+## 2024 – DeepSeek-VL2
 
 **arXiv:** [2412.10302](https://arxiv.org/abs/2412.10302)
 

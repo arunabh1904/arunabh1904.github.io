@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Reinforcement Learning
 field: 'Robot Post-Training & Evaluation'
-summary: 2025 – SimpleVLA-RL adapts group-relative RL and parallel rollouts to OpenVLA-OFT.
+summary: "2025 – SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning"
 ---
 
 ## 2025 – SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning

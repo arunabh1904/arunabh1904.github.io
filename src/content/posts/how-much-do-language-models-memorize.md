@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/05/30/how-much-do-language-models-memorize.html
 tags:
   - Other
 field: 'Language Models'
-summary: An empirical separation of memorization from generalization that estimates GPT-style language-model capacity at about 3.6 bits per parameter.
+summary: "2025 – How Much Do Language Models Memorize?"
 ---
-## 2025 - How Much Do Language Models Memorize?
+## 2025 – How Much Do Language Models Memorize?
 
 **arXiv:** [2505.24832](https://arxiv.org/abs/2505.24832)
 

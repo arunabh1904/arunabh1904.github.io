@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2023/05/01/direct-preference-optimization-dpo.html
 tags:
   - Other
 field: 'Alignment & Post-Training'
-summary: DPO replaced explicit reward modeling and PPO with a direct preference loss derived from the RLHF objective.
+summary: "2023 – Direct Preference Optimization"
 ---
 ## 2023 – Direct Preference Optimization: Your Language Model Is Secretly a Reward Model
 

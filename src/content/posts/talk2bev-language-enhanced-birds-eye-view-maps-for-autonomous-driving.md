@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2023/10/03/talk2bev-language-enhanced-birds-eye-view-m
 tags:
   - Other
 field: 'Autonomous Driving: VLMs & Evaluation'
-summary: Talk2BEV grounds language queries in BEV maps by augmenting objects with image-language features, enabling open-ended scene, spatial, intent, and decision questions.
+summary: "2023 – Talk2BEV: Language-enhanced Bird's-eye View Maps for Autonomous Driving"
 ---
-## 2023 - Talk2BEV
+## 2023 – Talk2BEV
 
 **arXiv:** [2310.02251](https://arxiv.org/abs/2310.02251)
 

@@ -23,13 +23,7 @@ The right object is therefore not an optimizer. It is a closed-loop policy impro
 
 The loop is the product. SFT, DPO, PPO, critics, and distillation are replaceable components inside it.
 
-![Closed-loop VLA post-training system](/assets/images/vla-post-training-closed-loop.svg)
-_A VLA improves only when deployment failures become correctly attributed supervision and survive independent evaluation._
-
 This is Part III of a three-part reading course. [Part I](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html) asks what a vision-language model must preserve before it can support action. [Part II](/blog/2026/07/15/omni-model-pretraining-decisions.html) asks how pretraining combines semantic priors, heterogeneous robot experience, and an action distribution. This part asks how evidence collected after deployment should change the policy.
-
-![A reading map from semantic vision to closed-loop evidence](/assets/images/multimodal-vla-reading-map.svg)
-_The three guides follow one dependency chain. Post-training cannot repair information that perception discarded or an action interface cannot express._
 
 The scope is policy improvement after a broadly pretrained VLA exists. Paper-reported algorithms and results are the evidence layer. The failure taxonomy, evaluation pyramid, and recommended order of operations are my synthesis. I mark frontier work separately because a result in one simulator, embodiment, or reward setup is not yet a general robot-training recipe.
 
@@ -47,15 +41,7 @@ That difference is why another million successful demonstrations may be worth le
 
 ## Earn the supervised baseline
 
-For an autoregressive action-token policy, supervised fine-tuning often looks like:
-
-$$
-\mathcal{L}_{\text{SFT}}
-=-\mathbb{E}_{(o,\ell,a)\sim\mathcal{D}}
-\left[\sum_t \log \pi_\theta(a_t\mid o_{\le t},\ell,a_{<t})\right].
-$$
-
-The equation hides most of the engineering. What is $a_t$? A scalar joint bin, a whole action chunk, a diffusion denoising target, or a continuous regression vector? How much observation history is available? Does the policy act at 3 Hz or 50 Hz? Does it predict one step, replan a receding horizon, or temporally ensemble overlapping chunks?
+Supervised fine-tuning hides most of its engineering inside the action target. Is the target a scalar joint bin, a whole action chunk, a diffusion denoising target, or a continuous regression vector? How much observation history is available? Does the policy act at 3 Hz or 50 Hz? Does it predict one step, replan a receding horizon, or temporally ensemble overlapping chunks? Those choices determine both the likelihood interface and the states the policy can recover from.
 
 The literature is best read as a sequence of action-interface decisions:
 
@@ -87,6 +73,9 @@ Measure success, robot-data efficiency, control frequency, latency, forgetting, 
 
 The classic language pipeline is documented by [InstructGPT](/paper%20shorts/2022/02/28/training-language-models-to-follow-instructions-with-human-feedback.html): supervised fine-tuning, a Bradley–Terry preference model, then [PPO](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html) against the learned reward with a KL penalty. [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) removes the explicit reward model and expresses the KL-regularized optimum directly through chosen and rejected responses.
 
+![The three-stage InstructGPT training pipeline from demonstrations to reward-model-guided PPO](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-paper-figure.png)
+_The source figure makes the feedback units explicit: demonstrations supervise SFT, rankings supervise the reward model, and prompts drive PPO rollouts. Robot feedback violates several of those clean pairings, which is why the transfer needs care. Source: [Training Language Models to Follow Instructions with Human Feedback](https://arxiv.org/abs/2203.02155)._
+
 For a matched prompt $x$ and preference $y^+\succ y^-$, DPO optimizes a logistic margin between policy and reference log-ratios:
 
 $$
@@ -117,9 +106,6 @@ The feedback interface should match what deployment actually observed:
 The central question is not “Can DPO be applied?” It is “What event has a defensible likelihood and a defensible preference label?” The method should follow the evidence unit, not the fashion cycle.
 
 ## Feedback is an attribution problem
-
-![A ladder from rollout outcome to the smallest justified training target](/assets/images/vla-feedback-attribution-ladder.svg)
-_A rollout outcome becomes useful supervision only after we localize the failure, construct a meaningful alternative, and choose the smallest target the evidence supports._
 
 Suppose the gripper misses the handle at step 42 and a human takes over at step 47. The binary episode label says the rollout failed. The intervention says the policy became unacceptable by step 47. Neither observation proves that every earlier action was wrong. Penalizing the whole trajectory can erase a good approach because of one bad contact. Training only on the human suffix can also be misleading if the human begins from a state the policy would never deliberately create.
 
@@ -187,15 +173,7 @@ A terminal success detector is sparse. A generic VLM reward can miss geometry, c
 
 [VLAC](/paper%20shorts/2025/09/19/vlac-vision-language-action-critic-for-real-world-rl.html) makes the robotics version concrete. Given a goal and two observations, it predicts signed progress and completion. Its data include regressions, stagnation, irrelevant goals, and mismatched samples—not only successful temporal order.
 
-A serious process critic should output a vector rather than one opaque score:
-
-$$
-f_\phi(g,o_0,o_{t-1},o_t,a_t)
-\rightarrow
-(\Delta p_t, P_{done}, P_{fail}, P_{unsafe}, u_t, c_t),
-$$
-
-where $\Delta p_t$ is progress, $u_t$ is uncertainty, and $c_t$ is a failure class. Add structured state—tracked objects, geometry, contact, controller state—when pixels cannot identify the physical event. That is not a retreat from end-to-end learning. It is an attempt to give the critic evidence the policy may not need at inference.
+A serious process critic should not collapse progress, completion, failure, safety, uncertainty, and failure class into one opaque score. Keep those outputs separate long enough to expose their disagreements, and add structured state—tracked objects, geometry, contact, controller state—when pixels cannot identify the physical event. That is not a retreat from end-to-end learning. It gives the critic evidence the policy may not need at inference without presenting a proposed output schema as if it came from a source paper.
 
 [Constitutional AI](/paper%20shorts/2022/12/15/constitutional-ai-harmlessness-from-ai-feedback.html) adds a complementary idea: make constraints explicit, use models to generate critiques and counterexamples, and keep humans as the auditor. A robot constitution might define forbidden contacts, workspace boundaries, uncertainty-triggered stops, and recovery priorities. The constitution cannot verify its own physical grounding.
 

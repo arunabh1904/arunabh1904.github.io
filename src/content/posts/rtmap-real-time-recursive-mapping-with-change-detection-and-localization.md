@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/07/01/rtmap-real-time-recursive-mapping-with-chan
 tags:
   - Other
 field: 'BEV Perception & Mapping'
-summary: RTMap treats online HD mapping as a recursive system that localizes against a prior map, detects structural changes, and updates the crowdsourced map over time.
+summary: "2025 – RTMap: Real-Time Recursive Mapping with Change Detection and Localization"
 ---
-## 2025 - RTMap
+## 2025 – RTMap
 
 **arXiv:** [2507.00980](https://arxiv.org/abs/2507.00980)
 

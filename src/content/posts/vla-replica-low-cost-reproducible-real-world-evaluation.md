@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Evaluation
 field: 'Robot Post-Training & Evaluation'
-summary: 2026 – VLA-REPLICA standardizes an inexpensive real-world benchmark that independent labs can rebuild.
+summary: "2026 – VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation"
 ---
 
 ## 2026 – VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation

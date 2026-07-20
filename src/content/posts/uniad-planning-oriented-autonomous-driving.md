@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2022/12/20/uniad-planning-oriented-autonomous-driving.
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: UniAD connects perception, prediction, occupancy, and planning in one planning-oriented driving stack, using task queries as interfaces between modules.
+summary: "2022 – UniAD: Planning-oriented Autonomous Driving"
 ---
-## 2022 - UniAD
+## 2022 – UniAD
 
 **arXiv:** [2212.10156](https://arxiv.org/abs/2212.10156)
 

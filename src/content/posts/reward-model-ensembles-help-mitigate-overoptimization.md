@@ -8,7 +8,7 @@ tags:
   - Alignment
   - Reward Models
 field: 'Alignment & Post-Training'
-summary: 2023 – Conservative optimization over reward ensembles reduces proxy-reward overoptimization.
+summary: "2023 – Reward Model Ensembles Help Mitigate Overoptimization"
 ---
 
 ## 2023 – Reward Model Ensembles Help Mitigate Overoptimization

@@ -6,7 +6,7 @@ postSlug: janus-decoupling-visual-encoding-for-unified-multimodal-understanding-
 legacyPath: /paper shorts/2024/10/17/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation.html
 tags: [Multimodal AI]
 field: 'Omni-Model Architectures'
-summary: '2024 – Janus: separate visual routes for understanding and generation around one transformer.'
+summary: "2024 – Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation"
 ---
 
 ## 2024 – Janus

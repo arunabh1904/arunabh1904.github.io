@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Vision-Language-Action
 field: 'Vision-Language-Action & Robotics'
-summary: 2025 – Pi0.5 co-trains web semantics, high-level subtasks, and continuous actions for new-home generalization.
+summary: "2025 – Pi0.5: A Vision-Language-Action Model with Open-World Generalization"
 ---
 
 ## 2025 – Pi0.5: A Vision-Language-Action Model with Open-World Generalization

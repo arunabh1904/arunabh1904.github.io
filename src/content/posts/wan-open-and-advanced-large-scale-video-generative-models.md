@@ -6,7 +6,7 @@ postSlug: wan-open-and-advanced-large-scale-video-generative-models
 legacyPath: /paper shorts/2025/03/26/wan-open-and-advanced-large-scale-video-generative-models.html
 tags: [Video Generation]
 field: 'Video & Interactive World Models'
-summary: '2025 – Wan: an open video-generation suite built around diffusion transformers, a VAE, and large-scale curation.'
+summary: "2025 – Wan: Open and Advanced Large-Scale Video Generative Models"
 ---
 
 ## 2025 – Wan

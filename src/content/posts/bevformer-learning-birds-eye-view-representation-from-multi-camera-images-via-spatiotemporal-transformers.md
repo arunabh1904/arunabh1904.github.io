@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2022/03/31/bevformer-learning-birds-eye-view-represent
 tags:
   - Other
 field: 'BEV Perception & Mapping'
-summary: BEVFormer learns dense BEV features from multi-camera images with spatial cross-attention and temporal self-attention, making BEV a reusable perception representation.
+summary: "2022 – BEVFormer: Learning Bird's-Eye-View Representation from Multi-Camera Images via Spatiotemporal Transformers"
 ---
-## 2022 - BEVFormer
+## 2022 – BEVFormer
 
 **arXiv:** [2203.17270](https://arxiv.org/abs/2203.17270)
 

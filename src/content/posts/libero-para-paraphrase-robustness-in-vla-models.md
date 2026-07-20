@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Evaluation
 field: 'Robot Post-Training & Evaluation'
-summary: 2026 – LIBERO-Para exposes large VLA failures under controlled instruction paraphrases.
+summary: "2026 – LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models"
 ---
 
 ## 2026 – LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models

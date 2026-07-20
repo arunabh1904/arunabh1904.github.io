@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2023/08/10/maptrv2-an-end-to-end-framework-for-online-
 tags:
   - Other
 field: 'BEV Perception & Mapping'
-summary: MapTRv2 strengthens MapTR with auxiliary one-to-many matching and dense supervision, improving convergence and accuracy on nuScenes and Argoverse2.
+summary: "2023 – MapTRv2: An End-to-End Framework for Online Vectorized HD Map Construction"
 ---
-## 2023 - MapTRv2
+## 2023 – MapTRv2
 
 **arXiv:** [2308.05736](https://arxiv.org/abs/2308.05736)
 

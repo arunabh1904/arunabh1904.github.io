@@ -6,7 +6,7 @@ postSlug: transfusion-predict-the-next-token-and-diffuse-images-with-one-multimo
 legacyPath: /paper shorts/2024/08/20/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model.html
 tags: [Multimodal AI]
 field: 'Omni-Model Architectures'
-summary: '2024 – Transfusion: one transformer, next-token language modeling, and image diffusion.'
+summary: "2024 – Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model"
 ---
 
 ## 2024 – Transfusion

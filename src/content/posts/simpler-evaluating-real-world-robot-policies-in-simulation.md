@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Evaluation
 field: 'Robot Post-Training & Evaluation'
-summary: 2024 – SIMPLER builds purpose-made real-to-sim evaluations whose policy rankings correlate with real robots.
+summary: "2024 – SIMPLER: Evaluating Real-World Robot Manipulation Policies in Simulation"
 ---
 
 ## 2024 – SIMPLER: Evaluating Real-World Robot Manipulation Policies in Simulation

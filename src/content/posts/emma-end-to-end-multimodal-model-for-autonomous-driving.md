@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/10/01/emma-end-to-end-multimodal-model-for-autono
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: EMMA represented driving inputs and outputs as language tokens so one multimodal model could handle planning, perception, and road structure tasks.
+summary: "2024 – EMMA: End-to-End Multimodal Model for Autonomous Driving"
 ---
-## 2024 - EMMA
+## 2024 – EMMA
 
 **arXiv:** [2410.23262](https://arxiv.org/abs/2410.23262)
 

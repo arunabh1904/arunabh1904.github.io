@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/09/19/lmt-net-lane-model-transformer-network-for-
 tags:
   - Other
 field: 'BEV Perception & Mapping'
-summary: LMT-Net predicts lane pairs and lane connectivity from sparse vehicle observations, turning aggregated lane-boundary traces into a lane graph.
+summary: "2024 – LMT-Net: Lane Model Transformer Network for Automated HD Mapping from Sparse Vehicle Observations"
 ---
-## 2024 - LMT-Net
+## 2024 – LMT-Net
 
 **arXiv:** [2409.12409](https://arxiv.org/abs/2409.12409)
 

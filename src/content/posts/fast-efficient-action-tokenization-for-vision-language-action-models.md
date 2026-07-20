@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/01/01/fast-efficient-action-tokenization-for-visi
 tags:
   - Other
 field: 'Vision-Language-Action & Robotics'
-summary: FAST compressed robot action trajectories into tokens so autoregressive VLA models could learn dexterous control more efficiently.
+summary: "2025 – FAST: Efficient Action Tokenization for Vision-Language-Action Models"
 ---
-## 2025 - FAST
+## 2025 – FAST
 
 **arXiv:** [2501.09747](https://arxiv.org/abs/2501.09747)
 

@@ -6,7 +6,7 @@ postSlug: genie-generative-interactive-environments
 legacyPath: /paper shorts/2024/02/23/genie-generative-interactive-environments.html
 tags: [World Models]
 field: 'Video & Interactive World Models'
-summary: '2024 – Genie: a latent-action generative environment learned from unlabeled Internet video.'
+summary: "2024 – Genie: Generative Interactive Environments"
 ---
 
 ## 2024 – Genie: Generative Interactive Environments

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/02/01/dexvla-vision-language-model-with-plug-in-d
 tags:
   - Other
 field: 'Vision-Language-Action & Robotics'
-summary: DexVLA paired VLM reasoning with a diffusion policy expert for long-horizon dexterous robot control.
+summary: "2025 – DexVLA: Vision-Language Model with Plug-In Diffusion Expert for General Robot Control"
 ---
-## 2025 - DexVLA
+## 2025 – DexVLA
 
 **arXiv:** [2502.05855](https://arxiv.org/abs/2502.05855)
 

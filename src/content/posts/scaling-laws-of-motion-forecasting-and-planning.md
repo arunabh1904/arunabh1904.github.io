@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/06/09/scaling-laws-of-motion-forecasting-and-plan
 tags:
   - Other
 field: 'Motion Forecasting & Planning'
-summary: This Waymo technical report studies how autoregressive motion forecasting and planning transformers improve with training compute, data, model size, and inference-time sampling.
+summary: "2025 – Scaling Laws of Motion Forecasting and Planning"
 ---
-## 2025 - Scaling Laws of Motion Forecasting and Planning
+## 2025 – Scaling Laws of Motion Forecasting and Planning
 
 **arXiv:** [2506.08228](https://arxiv.org/abs/2506.08228)
 

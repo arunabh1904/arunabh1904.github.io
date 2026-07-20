@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Fine-Tuning
 field: 'Vision-Language-Action & Robotics'
-summary: 2025 – OpenVLA-OFT replaces slow autoregressive action tokens with fast continuous parallel chunks.
+summary: "2025 – Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success (OpenVLA-OFT)"
 ---
 
 ## 2025 – Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success

@@ -1,5 +1,5 @@
 ---
-title: Lecture 2
+title: CS336 Lecture 2 — Tensor Fundamentals and Computation Efficiency
 date: '2025-05-15T04:00:00.000Z'
 section: revision-notes
 postSlug: cs336-revision-notes
@@ -8,27 +8,23 @@ tags:
   - Other
 summary: CS336 Lecture 2 — Tensor Fundamentals & Computation Efficiency
 ---
-# CS336 Lecture 2 — Tensor Fundamentals & Computation Efficiency
+# CS336 Lecture 2 — Tensor Fundamentals and Computation Efficiency
 
-*Revision notes updated May 24 2025*
+*Revision notes updated May 24, 2025.*
 
----
-
-## Quick Overview
+## Quick overview
 
 This lecture covers dtype tradeoffs, tensor memory layout, Einops reshaping, computational-efficiency metrics, and initialization strategies. The throughline is practical: understand what the hardware is actually moving and computing.
 
----
-
-## 1 · Environment set-up & timing
+## 1. Environment setup and timing
 
 ```bash
 !pip install -q uv
 !uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-# \u23f1\ufe0f add wall-clock timing
+# Measure wall-clock installation time.
 import time, subprocess, sys
 start = time.perf_counter()
-# \u2192 assume the two shell commands above just executed
+# Assume the two shell commands above just executed.
 print(f"Install runtime: {time.perf_counter()-start:.2f} s")
 ```
 
@@ -40,9 +36,7 @@ Install runtime: 2.37 s
 
 We use `uv` because it is a Rust-based drop-in replacement for `pip` that resolves, builds, and installs wheels in parallel — typically **4–6× faster** than pip on large scientific stacks.
 
----
-
-## 2 · CUDA check & dtype benchmark
+## 2. CUDA check and dtype benchmark
 
 ```python
 import torch, time
@@ -59,37 +53,33 @@ DTYPES = {
 }
 
 N = 2_000_000
+x_ref = torch.randn(N, device=device, dtype=torch.float32)
 for name, dt in DTYPES.items():
-    x = torch.randn(N, device=device, dtype=dt)
+    x = x_ref.to(dt)
     if x.is_cuda:
         torch.cuda.synchronize()
-    t0 = time.perf_counter(); y = x.square().sqrt()
+    t0 = time.perf_counter()
+    y = x.square()
     if x.is_cuda:
         torch.cuda.synchronize()
     ms = (time.perf_counter() - t0) * 1e3
-    rel = (torch.norm(y - x) / torch.norm(x)).item()
+    y_ref = x_ref.square()
+    rel = (torch.norm(y.float() - y_ref) / torch.norm(y_ref)).item()
     print(f"{name:<11} | {x.element_size()} B | {ms:6.2f} ms | rel-err {rel:.2e}")
 ```
 
-```text
-float64     | 8 B |  56.08 ms | rel-err 1.41e+00
-float32     | 4 B |  18.83 ms | rel-err 1.41e+00
-bfloat16    | 2 B |  11.55 ms | rel-err 1.41e+00
-float16     | 2 B |  36.21 ms | rel-err 1.41e+00
-```
+The original comparison used $\sqrt{x^2}$ as the output but compared it with $x$, so negative inputs dominated the reported “error.” This corrected version compares the same square operation against an FP32 reference. Timings and errors are intentionally left as live outputs because they depend on the device and software stack.
 
-Training is usually **bandwidth-bound**. Halving element size improves the compute-to-memory-traffic ratio and can move kernels onto tensor cores. `float64` is the high-precision variant typically used for CPU-heavy numerical work. `float32` remains the default for many deep-learning training paths. `float16` and `bfloat16` are both half-precision formats, but `bfloat16` keeps the 8-bit exponent of FP32, so it usually avoids loss scaling while `float16` often needs it. `FP8 (E4M3/E5M2)` is still mostly an inference-focused format here because backpropagation stresses its tiny dynamic range. Blackwell GPUs also introduce `FP4` variants.
+Many training kernels are limited by memory traffic rather than arithmetic. Halving element size can improve the compute-to-memory-traffic ratio and enable tensor-core paths. `float64` provides high precision but is rarely appropriate for large neural-network training. `float32` remains the reference format, while `float16` and `bfloat16` reduce memory; `bfloat16` keeps FP32's 8-bit exponent and therefore offers a wider dynamic range than `float16`.
 
----
-
-## 3 · Autograd inspector
+## 3. Autograd inspector
 
 ```python
 import torch, inspect, time
 
 t     = torch.randn(2, 3, 4, device=device, requires_grad=True)
 act   = torch.relu(t)                                 # non-linear
-proj  = torch.randn(4, 3, device=device=device)       # weight matrix
+proj  = torch.randn(4, 3, device=device)              # weight matrix
 z     = torch.einsum("bcd,dc->bc", t, proj)          # contraction
 loss  = z.mean()
 
@@ -108,32 +98,28 @@ for n in [t, act, z, loss]:
 
 The `grad_fn` field lets you inspect the dynamic computation graph **without** external tools, which is useful when gradients look wrong.
 
----
-
-## 4 · Memory layout, views, and hidden copies
+## 4. Memory layout, views, and hidden copies
 
 ```python
 # Build a 4\u00d74 tensor 0\u202f..\u202f15, then examine a transposed view.
 
-a      = torch.arange(16).reshape(4, 4)
-view   = a.t()          # view: same storage, different strides
-clone  = view.clone()   # force deep copy
+a          = torch.arange(16).reshape(4, 4)
+view       = a.t()              # same storage, different strides
+contiguous = view.contiguous()  # materialize contiguous storage
 
-print(f"contiguous? view={view.is_contiguous()}  clone={clone.is_contiguous()}")
+print(f"contiguous? view={view.is_contiguous()}  copy={contiguous.is_contiguous()}")
 share_ptr = a.storage().data_ptr() == view.storage().data_ptr()
 print(f"share underlying storage? {share_ptr}")
 ```
 
 ```text
-contiguous? view=False  clone=False
+contiguous? view=False  copy=True
 share underlying storage? True
 ```
 
 **Strides rule everything.** A tensor is `(data_ptr, sizes, strides)`. Transpose costs 0 B until a kernel needs contiguous memory; then PyTorch silently allocates a fresh buffer. Keep one consistent layout, such as `[B, Seq, Heads, Dim]`, through the pipeline.
 
----
-
-## 5 · Clean Tensor Manipulations with Einops
+## 5. Tensor manipulation with Einops
 
 Einops gives tensor reshaping, permutation, and reduction a compact syntax. The practical benefit is readability: it is much harder to hide a dimension-ordering bug inside a named pattern than inside manual indexing.
 
@@ -151,9 +137,7 @@ emb_map = repeat(torch.randn(2, 64), "b d -> b d h w", h=7, w=7)
 
 When strides allow it, Einops changes only metadata. That gives you safer reshaping without unnecessary memory traffic.
 
----
-
-## 6 · Tracking computational efficiency
+## 6. Tracking computational efficiency
 
 FLOPs describe the arithmetic work. Model FLOP Utilization (MFU) compares the FLOPs a model actually achieves to the hardware's theoretical maximum. MFU is usually below 1 because memory latency, kernel launch overhead, and imperfect hardware utilization all get in the way.
 
@@ -183,9 +167,7 @@ def attn_flops(seq:int, dim:int):
 
 Bias, ReLU, and LayerNorm are often less than 1% of an LLM's FLOPs, but they can still dominate latency when launch overhead or memory stalls bite.
 
----
-
-## 7 · Glorot & He initialisation in practice
+## 7. Glorot and He initialization in practice
 
 ```python
 import torch, math
@@ -225,10 +207,12 @@ Transformers often scale residual connections with `x + 0.1 * f(x)` to stabilise
 
 Initialization matters most for very deep networks or extreme dtypes such as FP8, where the optimizer cannot easily rescue bad early signal flow.
 
----
-
 ## Source
-Percy Liang, **CS336 — Large Language Models**, Stanford University, Lecture 2: *Tensor Fundamentals & Computation Efficiency* (Winter 2025).
+Percy Liang, **CS336: Language Modeling from Scratch**, Stanford University, Lecture 2 source materials (Spring 2025). The runnable examples above are clarifications and should be read as companion exercises rather than verbatim lecture code.
+
+- [Official Lecture 2 source](https://github.com/stanford-cs336/spring2025-lectures/blob/main/lecture_02.py)
+- [Spring 2025 lecture repository](https://github.com/stanford-cs336/spring2025-lectures)
 
 ## Colab notebook
-A Google Colab notebook with the code is available [here](https://colab.research.google.com/drive/1heDkWNo4DDdJn9pXYDFEyUYUHLL3M-qc?usp=sharing).
+
+The companion [Google Colab notebook](https://colab.research.google.com/drive/1heDkWNo4DDdJn9pXYDFEyUYUHLL3M-qc?usp=sharing) contains the runnable exercises.

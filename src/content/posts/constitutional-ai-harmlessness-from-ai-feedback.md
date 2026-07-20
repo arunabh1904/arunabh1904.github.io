@@ -8,7 +8,7 @@ tags:
   - Alignment
   - AI Feedback
 field: 'Alignment & Post-Training'
-summary: 2022 – Constitutional AI turns explicit principles into self-revision data and AI-generated preferences.
+summary: "2022 – Constitutional AI: Harmlessness from AI Feedback"
 ---
 
 ## 2022 – Constitutional AI: Harmlessness from AI Feedback

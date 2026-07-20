@@ -6,7 +6,7 @@ postSlug: chameleon-mixed-modal-early-fusion-foundation-models
 legacyPath: /paper shorts/2024/05/16/chameleon-mixed-modal-early-fusion-foundation-models.html
 tags: [Multimodal AI]
 field: 'Omni-Model Architectures'
-summary: '2024 – Chameleon: early fusion over mixed image-and-text token sequences.'
+summary: "2024 – Chameleon: Mixed-Modal Early-Fusion Foundation Models"
 ---
 
 ## 2024 – Chameleon: Mixed-Modal Early-Fusion Foundation Models

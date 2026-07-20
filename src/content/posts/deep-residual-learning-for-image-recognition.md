@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2015/12/01/deep-residual-learning-for-image-recognitio
 tags:
   - Other
 field: 'Vision Foundations'
-summary: ResNet made very deep CNNs practical by learning residual updates and carrying gradients through identity shortcuts.
+summary: "2015 – Deep Residual Learning for Image Recognition"
 ---
 ## 2015 – Deep Residual Learning for Image Recognition
 
@@ -24,7 +24,7 @@ summary: ResNet made very deep CNNs practical by learning residual updates and c
 ResNet addresses the degradation problem: deeper plain networks can have higher training error even though, in principle, extra layers could learn identity mappings. The residual block changes the target from learning H(x) directly to learning F(x) = H(x) - x, then adds the shortcut x back. Identity shortcuts add almost no parameters or compute but make very deep optimization tractable. The evidence covers ImageNet and CIFAR, including 50-, 101-, and 152-layer networks that outperform shallower baselines and win major recognition/detection tasks. The limitation is not conceptual but architectural: later work still had to refine normalization, bottlenecks, width, and training recipes. The lasting idea is that skip connections make depth usable.
 
 ![Residual block schematic](/assets/images/resnet.png)
-_Residual-block diagram from the ResNet paper/project materials._
+_The residual block makes the paper's intervention explicit: learn a residual branch $F(x)$ and add the identity $x$ before the next nonlinearity. Source: [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)._
 
 **Summary:** ResNet made depth easier to optimize by changing what each block has to learn. Instead of learning a direct mapping $H(x)$, a residual block learns $F(x)=H(x)-x$ and adds the input back through an identity shortcut: $H(x)=F(x)+x$. If the best transformation is close to identity, the block can push $F(x)$ toward zero rather than forcing a stack of layers to relearn the input.
 

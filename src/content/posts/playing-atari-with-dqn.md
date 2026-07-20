@@ -7,7 +7,7 @@ legacyPath: /paper shorts/2013/12/01/playing-atari-with-dqn.html
 tags:
   - Other
 field: 'Reinforcement Learning'
-summary: DQN combined Q-learning, replay, and target networks to make pixel-based Atari control work with deep networks.
+summary: "2013 – Playing Atari with Deep Reinforcement Learning"
 ---
 ## 2013 – Playing Atari with Deep Reinforcement Learning
 

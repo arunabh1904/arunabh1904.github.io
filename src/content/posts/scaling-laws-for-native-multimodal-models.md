@@ -6,7 +6,7 @@ postSlug: scaling-laws-for-native-multimodal-models
 legacyPath: /paper shorts/2025/04/10/scaling-laws-for-native-multimodal-models.html
 tags: [Multimodal AI]
 field: 'Multimodal Scaling & Data Mixtures'
-summary: '2025 – Scaling laws comparing native early-fusion and late-fusion multimodal models.'
+summary: "2025 – Scaling Laws for Native Multimodal Models"
 ---
 
 ## 2025 – Scaling Laws for Native Multimodal Models

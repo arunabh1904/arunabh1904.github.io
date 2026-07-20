@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Distillation
 field: 'Robot Post-Training & Evaluation'
-summary: 2024 – RLDG uses task-specific RL policies to generate data that improves a generalist policy.
+summary: "2024 – RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning"
 ---
 
 ## 2024 – RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning

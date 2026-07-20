@@ -9,7 +9,7 @@ legacyPath: >-
 tags:
   - Other
 field: 'Vision Foundations'
-summary: EfficientDet paired BiFPN feature fusion with compound scaling to make detector accuracy and latency easier to trade off.
+summary: "2020 – EfficientDet: Scalable and Efficient Object Detection"
 ---
 ## 2020 – EfficientDet: Scalable and Efficient Object Detection
 

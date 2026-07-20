@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/01/01/videollama-3-frontier-multimodal-foundation
 tags:
   - Other
 field: 'Video & Interactive World Models'
-summary: VideoLLaMA 3 showed that strong image understanding can be the foundation for efficient video understanding.
+summary: "2025 – VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding"
 ---
-## 2025 - VideoLLaMA 3
+## 2025 – VideoLLaMA 3
 
 **arXiv:** [2501.13106](https://arxiv.org/abs/2501.13106)
 

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2023/04/11/toponet-graph-based-topology-reasoning-for-
 tags:
   - Other
 field: 'BEV Perception & Mapping'
-summary: TopoNet reasons over lane connectivity and traffic-element-to-lane assignment with a scene graph neural network and a scene knowledge graph.
+summary: "2023 – TopoNet: Graph-based Topology Reasoning for Driving Scenes"
 ---
-## 2023 - TopoNet
+## 2023 – TopoNet
 
 **arXiv:** [2304.05277](https://arxiv.org/abs/2304.05277)
 

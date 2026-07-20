@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Vision-Language-Action
 field: 'Vision-Language-Action & Robotics'
-summary: 2023 – RT-2 co-trains web vision-language tasks and tokenized robot actions in one VLA model.
+summary: "2023 – RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control"
 ---
 
 ## 2023 – RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control

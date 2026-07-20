@@ -8,7 +8,7 @@ tags:
   - Robotics
   - Generalist Policies
 field: 'Vision-Language-Action & Robotics'
-summary: 2024 – Octo builds a modular open policy that adapts across observations, goals, and action spaces.
+summary: "2024 – Octo: An Open-Source Generalist Robot Policy"
 ---
 
 ## 2024 – Octo: An Open-Source Generalist Robot Policy

@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2024/09/01/molmo-and-pixmo-open-weights-and-open-data-
 tags:
   - Other
 field: 'Vision-Language Models'
-summary: Molmo argued that high-quality open multimodal data can matter more than sheer data volume.
+summary: "2024 – Molmo and PixMo: Open Weights and Open Data for State-of-the-Art Vision-Language Models"
 ---
-## 2024 - Molmo and PixMo
+## 2024 – Molmo and PixMo
 
 **arXiv:** [2409.17146](https://arxiv.org/abs/2409.17146)
 

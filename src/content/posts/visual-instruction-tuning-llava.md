@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2023/04/01/visual-instruction-tuning-llava.html
 tags:
   - Other
 field: 'Vision-Language Models'
-summary: LLaVA showed that a frozen vision encoder, an LLM, and synthetic instruction data could produce a useful open multimodal assistant.
+summary: "2023 – Visual Instruction Tuning (LLaVA)"
 ---
-## 2023 - Visual Instruction Tuning (LLaVA)
+## 2023 – Visual Instruction Tuning (LLaVA)
 
 **arXiv:** [2304.08485](https://arxiv.org/abs/2304.08485)
 

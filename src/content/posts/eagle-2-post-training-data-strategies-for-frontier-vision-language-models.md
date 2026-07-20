@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/01/01/eagle-2-post-training-data-strategies-for-f
 tags:
   - Other
 field: 'Vision-Language Models'
-summary: Eagle 2 made the post-training data recipe the main contribution, showing how curation can move frontier VLM performance.
+summary: "2025 – Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models"
 ---
-## 2025 - Eagle 2
+## 2025 – Eagle 2
 
 **arXiv:** [2501.14818](https://arxiv.org/abs/2501.14818)
 

@@ -8,7 +8,7 @@ tags:
   - Multimodal Reasoning
   - Reward Models
 field: 'Alignment & Post-Training'
-summary: 2025 – VisualPRM supplies step-level multimodal supervision and a benchmark for critic quality.
+summary: "2025 – VisualPRM: An Effective Process Reward Model for Multimodal Reasoning"
 ---
 
 ## 2025 – VisualPRM: An Effective Process Reward Model for Multimodal Reasoning

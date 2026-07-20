@@ -7,9 +7,9 @@ legacyPath: /paper shorts/2025/12/18/vision-language-action-models-for-autonomou
 tags:
   - Other
 field: 'Autonomous Driving: VLA & Planning'
-summary: A history of autonomous-driving VLA work from vision-action models to end-to-end and dual-system paradigms, with attention to action generators and guidance styles.
+summary: "2025 – Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future"
 ---
-## 2025 - Vision-Language-Action Models for Autonomous Driving
+## 2025 – Vision-Language-Action Models for Autonomous Driving
 
 **arXiv:** [2512.16760](https://arxiv.org/abs/2512.16760)
 

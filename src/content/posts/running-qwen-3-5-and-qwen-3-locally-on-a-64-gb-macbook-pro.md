@@ -90,7 +90,7 @@ These details kept the benchmark from measuring hidden work:
 - I used official Qwen GGUF releases for `Qwen 3`, but for `Qwen 3.5` I fell back to pinned community `Q4_K_M` GGUFs because I did not find an official `Qwen 3.5` GGUF release on the Qwen organization page.
 - I had to disable Hugging Face Xet downloads for some official Qwen artifacts because a few larger MLX downloads stalled on incomplete blobs.
 
-## What The Benchmarks Say
+## What the benchmarks say
 
 The first finished runs made one thing clear: `4B` Qwen is workable on this machine and genuinely pleasant.
 
@@ -102,7 +102,7 @@ The first bigger model result, `Qwen 3.5 9B`, is useful because it shows where t
 
 The cross-runtime results sharpened the runtime recommendation. On `Qwen 3.5 9B`, `MLX` beat `llama.cpp` on both suites by a healthy margin, especially once prompt length hit the `8K` range. On `Qwen 3 14B`, the short prompt was much closer, but MLX still pulled ahead on the long prompt where prompt processing dominates the experience.
 
-### Short Suite
+### Short suite
 
 | Model | Runtime | Artifact | TTFT | Decode tok/s | Avg tok/s | Peak memory |
 | ----- | ------- | -------- | ---- | ------------ | --------- | ----------- |
@@ -113,7 +113,7 @@ The cross-runtime results sharpened the runtime recommendation. On `Qwen 3.5 9B`
 | `Qwen 3.5 9B` | MLX | `mlx-community/Qwen3.5-9B-MLX-4bit` | `301 ms` | `96.33` | `79.67` | `7.07 GB` |
 | `Qwen 3 4B` | MLX | `mlx-community/Qwen3-4B-4bit` | `392 ms` | `176.14` | `128.89` | `3.05 GB` |
 
-### Long Suite
+### Long suite
 
 | Model | Runtime | Artifact | TTFT | Decode tok/s | Avg tok/s | Peak memory |
 | ----- | ------- | -------- | ---- | ------------ | --------- | ----------- |
@@ -134,7 +134,7 @@ The pattern:
 - `Qwen 3 14B` makes the runtime story specific: `llama.cpp` is competitive on the short prompt, but MLX is still the better default once prompts get long.
 - Long-prompt behavior matters more than short-prompt decode speed if you care about whether a local model feels snappy.
 
-## What I Would Actually Use
+## What I would actually use
 
 Right now, my practical recommendation is simple:
 
