@@ -1,8 +1,10 @@
 ---
 import HomeLayout from '../layouts/HomeLayout.astro';
+import Icon from '../components/Icon.astro';
 import { getPostsBySection } from '../lib/content';
-import { CODE_PRACTICE_SECTION_SUMMARY, codePracticeProblems } from '../lib/code-practice';
+import { codePracticeProblems } from '../lib/code-practice';
 import { READING_LIST_ITEMS } from '../lib/reading-list';
+import { CONTACT_LINKS } from '../lib/site';
 
 const paperPosts = await getPostsBySection('paper-shorts', 'desc');
 const revisionPosts = (await getPostsBySection('revision-notes', 'desc')).filter(
@@ -10,228 +12,285 @@ const revisionPosts = (await getPostsBySection('revision-notes', 'desc')).filter
 );
 const blogPosts = await getPostsBySection('blog', 'desc');
 
-const totalEntries =
-  paperPosts.length +
-  blogPosts.length +
-  revisionPosts.length +
-  READING_LIST_ITEMS.length +
-  codePracticeProblems.length;
-
 const sectionCards = [
   {
-    id: 'arxiv-notes',
     href: '/paper_summaries_field.html',
-    command: 'arxiv-notes',
     title: 'Arxiv Notes',
-    description: 'Paper notes that track the contribution, tradeoff, and lasting idea.',
+    description: 'Notes on interesting papers I want to remember.',
     count: paperPosts.length,
   },
   {
-    id: 'blog',
     href: '/blog.html',
-    command: 'blog',
     title: 'Blog',
-    description: 'Essays, technical explainers, and research guides for ideas worth understanding slowly.',
+    description: 'Long-form explanations and deep technical surveys.',
     count: blogPosts.length,
   },
   {
-    id: 'revision-notes',
     href: '/revision_notes.html',
-    command: 'revision-notes',
     title: 'Revision Notes',
-    description: 'Course notes and implementation details kept for later review.',
+    description: 'Lecture notes rebuilt for recall and reuse.',
     count: revisionPosts.length,
   },
   {
-    id: 'reading-list',
     href: '/reading_list.html',
-    command: 'reading-list',
     title: 'Reading List',
-    description: 'External writing worth returning to, with one reason to read each link.',
+    description: 'Interesting writing worth returning to.',
     count: READING_LIST_ITEMS.length,
   },
   {
-    id: 'code',
     href: '/code.html',
-    command: 'code',
     title: 'Code',
-    description: CODE_PRACTICE_SECTION_SUMMARY,
+    description: 'Coding practice for core ML and vision ideas.',
     count: codePracticeProblems.length,
-  },
-] as const;
-
-const recentShelves = [
-  {
-    title: 'Arxiv Notes',
-    href: '/paper_summaries_field.html',
-    summary: 'Paper notes that track the contribution, tradeoff, and lasting idea.',
-    posts: paperPosts.slice(0, 2),
-    emptyMessage: 'No paper notes yet.',
-  },
-  {
-    title: 'Blog',
-    href: '/blog.html',
-    summary: 'Essays, technical explainers, and research guides for ideas worth understanding slowly.',
-    posts: blogPosts.slice(0, 2),
-    emptyMessage: 'No essays yet.',
-  },
-  {
-    title: 'Revision Notes',
-    href: '/revision_notes.html',
-    summary: 'Course notes and implementation details kept for later review.',
-    posts: revisionPosts.slice(0, 2),
-    emptyMessage: 'No revision notes yet.',
   },
 ] as const;
 
 const timelineEntries = [
   {
-    years: '2010 - 2014',
+    years: '2010–2014',
     title: 'MIT, Manipal',
     summary:
-      'I studied Mechatronics Engineering at MIT, Manipal, where hands-on projects made robotics feel real. For my thesis, my team built an areca-nut harvesting robot that climbed tall trees and aimed to make a dangerous job safer for farmers.',
+      'Mechatronics projects made robotics real. For my thesis, our team built an areca-nut harvesting robot meant to make a dangerous job safer.',
   },
   {
     years: '2015',
-    title: 'Reset And Recommit',
+    title: 'Reset and recommit',
     summary:
-      'A difficult year became a turning point. After setbacks and a period of depression, I found a clearer sense of purpose, rebuilt my technical foundation, and decided to pursue robotics graduate school in the United States.',
+      'After a difficult year and a period of depression, I rebuilt my technical foundation and chose robotics graduate school in the United States.',
   },
   {
-    years: '2016 - 2018',
-    title: 'Colorado School Of Mines',
+    years: '2016–2018',
+    title: 'Colorado School of Mines',
     summary:
-      'I completed a graduate degree in Mechanical Engineering with a robotics specialization at the Colorado School of Mines. At the M3 Robotics Lab, I worked on GPS-denied navigation, built an MPC-based autonomy stack, and learned how sensors, controls, and software come together on real robots.',
+      'At the M3 Robotics Lab, I built an MPC-based autonomy stack for GPS-denied navigation and learned how sensing, controls, and software meet on a real robot.',
   },
   {
-    years: '2018 - 2022',
+    years: '2018–2022',
     title: 'DEKA',
     summary:
-      'At DEKA, I led part of the perception stack for last-mile autonomous robots. The work ranged from training real-time computer vision models to writing CUDA kernels and porting major parts of the stack to OpenCL and OpenVINO.',
+      'I led part of perception for last-mile robots, from real-time vision models to CUDA kernels and OpenCL/OpenVINO deployment.',
   },
   {
-    years: '2022 - 2026',
+    years: '2022–2026',
     title: 'Zoox',
     summary:
-      'At Zoox, I focus on computer vision research for autonomous navigation, building learned representations that encode scene semantics and support downstream planning. I currently lead work on a generalized scene embedding designed to scale across diverse driving contexts.',
+      'I build learned scene representations for autonomous navigation, with a focus on general scene embeddings that support downstream planning.',
   },
 ] as const;
 
-const formatDate = (date: Date) =>
-  date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: '2-digit',
-    year: 'numeric',
-  });
+const journeyHref = '/blog/2025/02/08/my-journey-so-far-full-story.html';
 ---
 
-<HomeLayout title="Home" timelineEntries={timelineEntries}>
-  <section class="home-hero" id="top">
-    <div class="home-hero__content">
-      <div class="home-hero__copy">
-        <h1 class="home-title">ARUNABH.BLOG</h1>
-        <p class="lead">
-          I work on computer vision and robotics for autonomous systems. This site is where I keep
-          the research notes, implementation records, and personal essays I expect to reuse.
-        </p>
-        <nav class="home-command-bar home-command-bar--hero" aria-label="Homepage sections">
-          <a href="#about">/about</a>
-          <a href="#latest">/latest</a>
-          <a href="/reading_list.html">/reading</a>
-          <a href="/code.html">/code</a>
-        </nav>
-      </div>
+<HomeLayout
+  title="Home"
+  description="Arunabh Mishra is a computer vision researcher and roboticist writing about perception, autonomous systems, machine-learning papers, and implementation."
+>
+  <section class="home-sky home-sky--integrated" id="top" data-sky-landing>
+    <img
+      class="home-sky__image"
+      src="/assets/images/shootingstar.jpg"
+      alt="A shooting star crossing a dark sky above Arunabh in the Tetons"
+      width="1778"
+      height="1388"
+      fetchpriority="high"
+    />
+    <canvas class="home-sky__reveal" data-sky-reveal aria-hidden="true"></canvas>
+    <div class="home-sky__scrim" aria-hidden="true"></div>
 
-      <dl class="home-stat-list" aria-label="Site overview">
-        <div>
-          <dt>Sections</dt>
-          <dd>{String(sectionCards.length).padStart(2, '0')}</dd>
-        </div>
-        <div>
-          <dt>Entries</dt>
-          <dd>{totalEntries}</dd>
-        </div>
-      </dl>
+    <header class="home-sky__header">
+      <a class="home-sky__mark" href="#top" aria-label="Arunabh Mishra, home">AM</a>
+      <span>Arunabh Mishra</span>
+      <nav class="home-sky-contact" aria-label="Contact me">
+        <span>Contact</span>
+        <ul>
+          {CONTACT_LINKS.map((link) => (
+            <li>
+              <a href={link.href} aria-label={link.label} title={link.label}>
+                <Icon name={link.iconName} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+
+    <div class="home-sky__copy home-sky__copy--compact">
+      <h1>About me</h1>
+      <p>
+        I&apos;m a computer vision researcher and roboticist at Zoox, where I lead the Perception
+        Semantic Reasoning team. We train efficient models that encode driving scenes as part of a
+        broader effort to build a generalized scene embedding. Previously, I led a small team
+        developing stereo-camera machine-learning models for Roxo, FedEx&apos;s last-mile delivery
+        robot. My formal training is in robotics.
+      </p>
+      <p>
+        This blog is where I work through ideas by reading arXiv, writing code, and explaining what
+        I learn. The goal behind much of that work is to build safe autonomous systems that work in
+        the real world.
+      </p>
     </div>
-  </section>
 
-  <section class="home-story-grid" id="about">
-    <article class="home-panel home-panel--story" aria-labelledby="about-title">
-      <div class="home-panel__heading">
-        <h2 id="about-title">About me</h2>
-      </div>
-      <p class="intro-text">
-        I work in computer vision research at Zoox, where I build learned representations for
-        autonomous driving scenes. Before that, I led parts of the perception stack at DEKA for
-        Roxo, FedEx&apos;s last-mile delivery robot, focused on short-range perception and
-        traffic-light understanding.
-      </p>
-
-      <p class="intro-text">
-        Robotics started as undergraduate project work at MIT, Manipal, then became a deliberate
-        commitment to autonomy during graduate school at the Colorado School of Mines.
-      </p>
-
-      <p class="intro-text">
-        The throughline is systems that make the physical world safer and easier to navigate. The
-        site is a working archive for that throughline.
-      </p>
-    </article>
-
-    <article class="home-panel home-panel--map" id="sections" aria-labelledby="sections-title">
-      <div class="home-panel__heading">
-        <h2 id="sections-title">Writing and notes</h2>
-      </div>
-      <ul class="home-section-map">
-        {sectionCards.map((section) => (
+    <section class="home-sky-shelves" id="explore" aria-labelledby="explore-title">
+      <h2 id="explore-title">Explore</h2>
+      <ol>
+        {sectionCards.map((section, index) => (
           <li>
             <a href={section.href}>
-              <span>
-                <strong>{section.title}</strong>
-                <small>{section.description}</small>
-              </span>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <b aria-hidden="true">↗</b>
+              <strong>{section.title}</strong>
+              <small>{section.description}</small>
               <em>{section.count}</em>
             </a>
           </li>
         ))}
-      </ul>
-    </article>
+      </ol>
+    </section>
+
+    <section class="home-sky-timeline" aria-labelledby="journey-title">
+      <h2 id="journey-title">
+        <a href={journeyHref}>Journey <span aria-hidden="true">↗</span></a>
+      </h2>
+      <ol>
+        {timelineEntries.map((entry) => (
+          <li tabindex="0">
+            <span>{entry.years}</span>
+            <strong>{entry.title}</strong>
+            <p>{entry.summary}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
   </section>
 
-  <section class="home-shelves" id="latest">
-    <div class="home-section-heading">
-      <h2>Latest writing</h2>
-      <p>
-        The newest entries across the site, grouped by the kind of work they do.
-      </p>
-    </div>
+  <script is:inline>
+    (() => {
+      const landing = document.querySelector('[data-sky-landing]');
+      const canvas = document.querySelector('[data-sky-reveal]');
 
-    <div class="home-shelf-grid">
-      {recentShelves.map((shelf) => (
-        <article class="home-panel home-panel--shelf">
-          <div class="home-shelf__header">
-            <div class="home-shelf__title-block">
-              <h3>{shelf.title}</h3>
-              <p>{shelf.summary}</p>
-            </div>
-            <a href={shelf.href}>View all</a>
-          </div>
+      if (!(landing instanceof HTMLElement) || !(canvas instanceof HTMLCanvasElement)) {
+        return;
+      }
 
-          {shelf.posts.length > 0 ? (
-            <ul class="home-post-list">
-              {shelf.posts.map((post) => (
-                <li>
-                  <a href={post.data.legacyPath}>{post.data.title}</a>
-                  <small>{formatDate(post.data.date)}</small>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p class="home-empty-state">{shelf.emptyMessage}</p>
-          )}
-        </article>
-      ))}
-    </div>
-  </section>
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        landing.dataset.skyReady = 'still';
+        return;
+      }
 
+      const context = canvas.getContext('2d');
+      if (!context) {
+        return;
+      }
+
+      let width = 0;
+      let height = 0;
+      let density = 1;
+      let frame = 0;
+      let lastMove = 0;
+      const stars = [];
+
+      const resize = () => {
+        const bounds = landing.getBoundingClientRect();
+        width = Math.max(1, bounds.width);
+        height = Math.max(1, bounds.height);
+        density = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(width * density);
+        canvas.height = Math.round(height * density);
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        context.setTransform(density, 0, 0, density, 0, 0);
+        context.clearRect(0, 0, width, height);
+      };
+
+      const addStars = (clientX, clientY, amount = 4) => {
+        const bounds = landing.getBoundingClientRect();
+        const originX = clientX - bounds.left;
+        const originY = clientY - bounds.top;
+        if (originX < 0 || originY < 0 || originX > width || originY > height) {
+          return;
+        }
+
+        for (let index = 0; index < amount; index += 1) {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = 8 + Math.random() * 48;
+          stars.push({
+            x: originX + Math.cos(angle) * distance,
+            y: originY + Math.sin(angle) * distance,
+            driftX: (Math.random() - 0.5) * 0.08,
+            driftY: -0.025 - Math.random() * 0.055,
+            size: 0.8 + Math.random() * 2.2,
+            life: 0.82 + Math.random() * 0.18,
+            decay: 0.007 + Math.random() * 0.006,
+            cross: Math.random() > 0.68,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+
+        if (!frame) {
+          frame = window.requestAnimationFrame(draw);
+        }
+      };
+
+      const draw = () => {
+        context.clearRect(0, 0, width, height);
+
+        for (let index = stars.length - 1; index >= 0; index -= 1) {
+          const star = stars[index];
+          star.life -= star.decay;
+          if (star.life <= 0) {
+            stars.splice(index, 1);
+            continue;
+          }
+
+          star.x += star.driftX;
+          star.y += star.driftY;
+          const twinkle = 0.72 + Math.sin(star.life * 18 + star.phase) * 0.22;
+          const alpha = Math.min(1, star.life * 1.5) * twinkle;
+
+          context.save();
+          context.globalAlpha = alpha;
+          context.fillStyle = '#fffdf4';
+          context.shadowColor = 'rgba(255, 253, 244, 0.92)';
+          context.shadowBlur = star.size * 5;
+          context.beginPath();
+          context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+          context.fill();
+
+          if (star.cross && star.life > 0.36) {
+            context.shadowBlur = star.size * 3;
+            context.fillRect(star.x - star.size * 3, star.y - 0.35, star.size * 6, 0.7);
+            context.fillRect(star.x - 0.35, star.y - star.size * 3, 0.7, star.size * 6);
+          }
+          context.restore();
+        }
+
+        if (stars.length) {
+          frame = window.requestAnimationFrame(draw);
+        } else {
+          frame = 0;
+        }
+      };
+
+      landing.addEventListener(
+        'pointermove',
+        (event) => {
+          const now = window.performance.now();
+          if (now - lastMove < 42) {
+            return;
+          }
+          lastMove = now;
+          addStars(event.clientX, event.clientY, 3);
+        },
+        { passive: true },
+      );
+
+      landing.addEventListener('pointerdown', (event) => addStars(event.clientX, event.clientY, 14), {
+        passive: true,
+      });
+
+      resize();
+      landing.dataset.skyReady = 'true';
+      new ResizeObserver(resize).observe(landing);
+    })();
+  </script>
 </HomeLayout>
