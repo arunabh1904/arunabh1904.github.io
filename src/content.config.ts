@@ -15,6 +15,18 @@ const posts = defineCollection({
     legacyPath: z.string(),
     tags: z.array(z.string()).default(['Other']),
     field: z.string().optional(),
+    topics: z
+      .array(
+        z.enum([
+          'multimodal',
+          'embodied',
+          'autonomy',
+          'learning',
+          'generation',
+          'language-systems',
+        ]),
+      )
+      .default([]),
     summary: z.string().optional(),
   }),
 });

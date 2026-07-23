@@ -1,144 +1,1292 @@
 ---
 import SectionHeader from '../components/SectionHeader.astro';
 import PostLayout from '../layouts/PostLayout.astro';
-import { getPostsByField } from '../lib/content';
+import { getPostsBySection } from '../lib/content';
 
-const fields = await getPostsByField();
-const paperCount = fields.reduce((count, field) => count + field.items.length, 0);
+const papers = await getPostsBySection('paper-shorts', 'desc');
 
-const toFieldId = (field: string) =>
-  `field-${field
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')}`;
+const topicDefinitions = [
+  {
+    id: 'multimodal',
+    label: 'Multimodal foundations',
+    shortLabel: 'Multimodal',
+    description:
+      'How vision, language, video, and mixed modalities are represented, fused, and scaled.',
+    color: '#8b7cf6',
+    x: 205,
+    y: 135,
+    fields: [
+      'Vision Foundations',
+      'Vision-Language Models',
+      'Omni-Model Architectures',
+      'Multimodal Scaling & Data Mixtures',
+      'Video & Interactive World Models',
+      'Autonomous Driving: VLMs & Evaluation',
+      'Vision-Language-Action & Robotics',
+    ],
+  },
+  {
+    id: 'embodied',
+    label: 'Embodied intelligence',
+    shortLabel: 'Embodied AI',
+    description:
+      'Policies that turn perception and language into grounded action across robots and environments.',
+    color: '#f08fa1',
+    x: 535,
+    y: 130,
+    fields: [
+      'Vision-Language-Action & Robotics',
+      'Robot Post-Training & Evaluation',
+      'Autonomous Driving: VLA & Planning',
+      'Video & Interactive World Models',
+    ],
+  },
+  {
+    id: 'autonomy',
+    label: 'Autonomous systems',
+    shortLabel: 'Autonomy',
+    description:
+      'Perception, mapping, forecasting, reasoning, and planning for agents operating in the world.',
+    color: '#53bda5',
+    x: 650,
+    y: 345,
+    fields: [
+      'BEV Perception & Mapping',
+      'Motion Forecasting & Planning',
+      'Autonomous Driving: VLA & Planning',
+      'Autonomous Driving: VLMs & Evaluation',
+      'Robot Post-Training & Evaluation',
+    ],
+  },
+  {
+    id: 'learning',
+    label: 'Learning & alignment',
+    shortLabel: 'Learning',
+    description:
+      'Objectives, feedback, post-training, and evaluation methods that shape model behavior.',
+    color: '#efb24d',
+    x: 470,
+    y: 505,
+    fields: [
+      'Reinforcement Learning',
+      'Alignment & Post-Training',
+      'Robot Post-Training & Evaluation',
+      'Vision-Language-Action & Robotics',
+      'Training Systems & Reliability',
+    ],
+  },
+  {
+    id: 'generation',
+    label: 'Generative & world models',
+    shortLabel: 'Generation',
+    description:
+      'Models that generate media, simulate futures, or learn distributions over possible worlds.',
+    color: '#e47bc3',
+    x: 170,
+    y: 455,
+    fields: [
+      'Generative Modeling',
+      'Video & Interactive World Models',
+      'Omni-Model Architectures',
+      'Motion Forecasting & Planning',
+    ],
+  },
+  {
+    id: 'language-systems',
+    label: 'Language & systems',
+    shortLabel: 'Language + systems',
+    description:
+      'Language modeling, data mixtures, scaling behavior, and the systems that make training reliable.',
+    color: '#69aee8',
+    x: 90,
+    y: 285,
+    fields: [
+      'Language Models',
+      'Alignment & Post-Training',
+      'Multimodal Scaling & Data Mixtures',
+      'Training Systems & Reliability',
+      'Omni-Model Architectures',
+    ],
+  },
+] as const;
 
-const pluralize = (count: number, singular: string, plural = `${singular}s`) =>
-  `${count} ${count === 1 ? singular : plural}`;
+type TopicId = (typeof topicDefinitions)[number]['id'];
 
-const fieldGroups = fields.map(({ field, items }) => {
-  const years = items.map((item) => item.data.date.getFullYear());
-  const startYear = Math.min(...years);
-  const endYear = Math.max(...years);
-  const dateRange = startYear === endYear ? `${startYear}` : `${startYear} - ${endYear}`;
+const topicsForField = new Map<string, TopicId[]>();
+for (const topic of topicDefinitions) {
+  for (const field of topic.fields) {
+    const memberships = topicsForField.get(field) ?? [];
+    memberships.push(topic.id);
+    topicsForField.set(field, memberships);
+  }
+}
 
+const indexedPapers = papers.map((paper) => {
+  const field = paper.data.field ?? 'Other';
+  const inferredTopics = topicsForField.get(field) ?? [];
   return {
+    title: paper.data.title,
+    summary: paper.data.summary ?? '',
+    href: paper.data.legacyPath,
+    date: paper.data.date,
+    year: paper.data.date.getFullYear(),
     field,
-    id: toFieldId(field),
-    items,
-    count: items.length,
-    dateRange,
+    topics: [...new Set([...inferredTopics, ...paper.data.topics])],
   };
 });
+
+const years = [...new Set(indexedPapers.map((paper) => paper.year))].sort((a, b) => b - a);
+
+const fieldNodes = [
+  { field: 'Vision Foundations', label: 'Vision', x: 280, y: 47 },
+  { field: 'Vision-Language Models', label: 'VLMs', x: 343, y: 92 },
+  { field: 'Omni-Model Architectures', label: 'Omni models', x: 275, y: 210 },
+  { field: 'Multimodal Scaling & Data Mixtures', label: 'Data mixtures', x: 118, y: 80 },
+  { field: 'Vision-Language-Action & Robotics', label: 'VLA + robotics', x: 430, y: 48 },
+  { field: 'Robot Post-Training & Evaluation', label: 'Robot PT', x: 585, y: 225 },
+  { field: 'Autonomous Driving: VLA & Planning', label: 'Driving VLA', x: 702, y: 225 },
+  { field: 'BEV Perception & Mapping', label: 'BEV + maps', x: 730, y: 405 },
+  { field: 'Motion Forecasting & Planning', label: 'Forecasting', x: 585, y: 445 },
+  { field: 'Autonomous Driving: VLMs & Evaluation', label: 'Driving VLMs', x: 718, y: 115 },
+  { field: 'Reinforcement Learning', label: 'RL', x: 565, y: 555 },
+  { field: 'Alignment & Post-Training', label: 'Alignment', x: 355, y: 555 },
+  { field: 'Generative Modeling', label: 'Generative', x: 76, y: 525 },
+  { field: 'Video & Interactive World Models', label: 'World models', x: 270, y: 380 },
+  { field: 'Language Models', label: 'Language', x: 44, y: 170 },
+  { field: 'Training Systems & Reliability', label: 'Systems', x: 52, y: 395 },
+] as const;
+
+const topicById = new Map(topicDefinitions.map((topic) => [topic.id, topic]));
+const fieldNodeByName = new Map(fieldNodes.map((node) => [node.field, node]));
+
+const graphEdges = topicDefinitions.flatMap((topic) =>
+  topic.fields.flatMap((field) => {
+    const node = fieldNodeByName.get(field);
+    return node
+      ? [{ topicId: topic.id, color: topic.color, x1: topic.x, y1: topic.y, x2: node.x, y2: node.y }]
+      : [];
+  }),
+);
+
+const countForTopic = (topicId: TopicId) =>
+  indexedPapers.filter((paper) => paper.topics.includes(topicId)).length;
+
+const countForField = (field: string) =>
+  indexedPapers.filter((paper) => paper.field === field).length;
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  });
 ---
 
-<PostLayout title="Paper Summaries by Field" showSectionsNav={false}>
-  <div class="paper-field-page">
+<PostLayout title="Research Map" showSectionsNav={false}>
+  <div class="research-index" data-research-index>
     <SectionHeader
       eyebrow="Arxiv Notes"
-      title="Paper summaries by field"
-      description="Paper notes grouped by field, each focused on the contribution, tradeoff, and lasting idea."
-      meta={`${paperCount} entries`}
+      title="Research map"
+      description="A connected index of the ideas I keep returning to. Explore the relationships, or switch to the list when you know what you need."
+      meta={`${indexedPapers.length} papers · ${topicDefinitions.length} themes`}
     />
 
-    <nav class="field-overview" aria-label="Paper fields">
-      <div class="field-overview__header">
-        <h2>Fields</h2>
-        <span>{pluralize(fieldGroups.length, 'group')}</span>
+    <section class="research-toolbar" aria-label="Research index controls">
+      <div class="view-switcher" aria-label="Choose index view">
+        <button type="button" class="is-active" aria-pressed="true" data-view-button="map">
+          <span aria-hidden="true">⌘</span>
+          Map
+        </button>
+        <button type="button" aria-pressed="false" data-view-button="list">
+          <span aria-hidden="true">☷</span>
+          List
+        </button>
       </div>
-      <div class="field-overview__grid">
-        {fieldGroups.map(({ field, id, count, dateRange }) => (
-          <a class="field-overview-card" href={`#${id}`}>
-            <span class="field-overview-card__name">{field}</span>
-            <span class="field-overview-card__meta">
-              {pluralize(count, 'paper')} / {dateRange}
-            </span>
-          </a>
-        ))}
-      </div>
-    </nav>
 
-    <div class="paper-field-actions" aria-label="Field display controls">
-      <button type="button" data-paper-fields-expand>Expand all</button>
-      <button type="button" data-paper-fields-collapse>Collapse all</button>
+      <label class="research-search">
+        <span aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          aria-label="Search papers"
+          placeholder="Search titles, fields, or ideas"
+          autocomplete="off"
+          data-paper-search
+        />
+        <kbd>/</kbd>
+      </label>
+    </section>
+
+    <div class="topic-filter" aria-label="Filter by theme">
+      <button type="button" class="is-active" aria-pressed="true" data-topic-button="all">
+        All research
+        <span>{indexedPapers.length}</span>
+      </button>
+      {
+        topicDefinitions.map((topic) => (
+          <button
+            type="button"
+            aria-pressed="false"
+            data-topic-button={topic.id}
+            style={`--topic-color: ${topic.color}`}
+          >
+            {topic.shortLabel}
+            <span>{countForTopic(topic.id)}</span>
+          </button>
+        ))
+      }
     </div>
 
-    <div class="paper-field-groups">
-      {fieldGroups.map(({ field, id, items, count, dateRange }) => (
-        <details class="paper-field-group" id={id}>
-          <summary>
-            <span class="paper-field-group__title">{field}</span>
-            <span class="paper-field-group__meta">
-              {pluralize(count, 'paper')} / {dateRange}
-            </span>
-          </summary>
-          <ul class="paper-field-list">
-            {items.map((post) => (
-              <li>
-                <a href={post.data.legacyPath}>{post.data.title}</a>
-                <time datetime={post.data.date.toISOString()}>
-                  {
-                    post.data.date.toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: '2-digit',
-                      year: 'numeric',
-                    })
-                  }
-                </time>
-                {post.data.summary && <p>{post.data.summary}</p>}
-              </li>
-            ))}
-          </ul>
-        </details>
-      ))}
-    </div>
+    <section class="research-map-view" data-view-panel="map">
+      <div class="knowledge-map" aria-label="Interactive research topic map">
+        <div class="knowledge-map__heading">
+          <div>
+            <p class="panel-kicker">Knowledge graph</p>
+            <h2>Six lenses, sixteen fields</h2>
+          </div>
+          <p>Lines mark shared territory. Select any node to narrow the library.</p>
+        </div>
+
+        <div class="knowledge-map__canvas">
+          <svg viewBox="0 0 780 590" role="img" aria-labelledby="map-title map-description">
+            <title id="map-title">Research topics and connected paper fields</title>
+            <desc id="map-description">
+              Six broad research themes connect to sixteen fields. Fields can connect to more than one
+              theme.
+            </desc>
+
+            <g class="map-edges" aria-hidden="true">
+              {
+                graphEdges.map((edge) => (
+                  <line
+                    class={`map-edge map-edge--${edge.topicId}`}
+                    x1={edge.x1}
+                    y1={edge.y1}
+                    x2={edge.x2}
+                    y2={edge.y2}
+                    style={`--edge-color: ${edge.color}`}
+                  />
+                ))
+              }
+            </g>
+
+            <g class="map-field-nodes">
+              {
+                fieldNodes.map((node) => (
+                  <g
+                    class="map-field-node"
+                    role="button"
+                    tabindex="0"
+                    aria-label={`${node.field}, ${countForField(node.field)} ${
+                      countForField(node.field) === 1 ? 'paper' : 'papers'
+                    }`}
+                    data-field-node={node.field}
+                    transform={`translate(${node.x} ${node.y})`}
+                  >
+                    <circle r="5" />
+                    <text y="18" text-anchor="middle">{node.label}</text>
+                  </g>
+                ))
+              }
+            </g>
+
+            <g class="map-topic-nodes">
+              {
+                topicDefinitions.map((topic) => (
+                  <g
+                    class={`map-topic-node map-topic-node--${topic.id}`}
+                    role="button"
+                    tabindex="0"
+                    aria-label={`${topic.label}, ${countForTopic(topic.id)} papers`}
+                    data-map-topic={topic.id}
+                    transform={`translate(${topic.x} ${topic.y})`}
+                    style={`--topic-color: ${topic.color}`}
+                  >
+                    <circle r="31" />
+                    <circle class="map-topic-node__halo" r="39" />
+                    <text class="map-topic-node__count" y="4" text-anchor="middle">
+                      {countForTopic(topic.id)}
+                    </text>
+                    <text class="map-topic-node__label" y="52" text-anchor="middle">
+                      {topic.shortLabel}
+                    </text>
+                  </g>
+                ))
+              }
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <aside class="map-inspector" aria-live="polite">
+        <div data-map-inspector-default>
+          <p class="panel-kicker">How to read it</p>
+          <h2>Follow the overlaps</h2>
+          <p>
+            The large nodes are durable themes; the small nodes are the fields used to file individual
+            notes. A field can orbit several themes, so a paper is no longer trapped in one part of the
+            library.
+          </p>
+          <div class="map-legend">
+            <span><i class="legend-node legend-node--topic"></i> Theme</span>
+            <span><i class="legend-node legend-node--field"></i> Field</span>
+            <span><i class="legend-line"></i> Shared territory</span>
+          </div>
+        </div>
+
+        {
+          topicDefinitions.map((topic) => (
+            <div
+              class="map-inspector__topic"
+              data-map-inspector-topic={topic.id}
+              style={`--topic-color: ${topic.color}`}
+              hidden
+            >
+              <p class="panel-kicker">Selected theme</p>
+              <h2>{topic.label}</h2>
+              <p>{topic.description}</p>
+              <div class="inspector-stat">
+                <strong>{countForTopic(topic.id)}</strong>
+                <span>papers across {topic.fields.length} connected fields</span>
+              </div>
+              <div class="inspector-fields">
+                {topic.fields.map((field) => (
+                  <button type="button" data-inspector-field={field}>{field}</button>
+                ))}
+              </div>
+              <button type="button" class="inspector-list-link" data-open-topic-list={topic.id}>
+                Browse these papers <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          ))
+        }
+
+        <div class="map-inspector__field" data-map-inspector-field hidden>
+          <p class="panel-kicker">Selected field</p>
+          <h2 data-selected-field-name></h2>
+          <p data-selected-field-context></p>
+          <div class="inspector-stat">
+            <strong data-selected-field-count></strong>
+            <span>papers in this field</span>
+          </div>
+          <button type="button" class="inspector-list-link" data-open-field-list>
+            Browse this field <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="research-list-view" data-view-panel="list" hidden>
+      <div class="list-heading">
+        <div>
+          <p class="panel-kicker">Library</p>
+          <h2>All paper notes</h2>
+        </div>
+        <p><span data-visible-count>{indexedPapers.length}</span> results</p>
+      </div>
+
+      <div class="active-filter" data-active-filter hidden>
+        <span data-active-filter-label></span>
+        <button type="button" data-clear-field-filter aria-label="Clear field filter">×</button>
+      </div>
+
+      <div class="paper-year-groups">
+        {
+          years.map((year) => (
+            <section class="paper-year-group" data-year-group={year}>
+              <h3>{year}</h3>
+              <ol>
+                {indexedPapers.filter((paper) => paper.year === year).map((paper) => (
+                  <li
+                    data-paper-row
+                    data-paper-topics={paper.topics.join(' ')}
+                    data-paper-field={paper.field}
+                    data-paper-search-text={`${paper.title} ${paper.summary} ${paper.field} ${paper.topics
+                      .map((topicId) => topicById.get(topicId)?.label ?? '')
+                      .join(' ')}`.toLowerCase()}
+                  >
+                    <time datetime={paper.date.toISOString()}>{formatDate(paper.date)}</time>
+                    <div class="paper-row__content">
+                      <a href={paper.href}>{paper.title}</a>
+                      <div class="paper-row__taxonomy">
+                        <button type="button" data-row-field={paper.field}>{paper.field}</button>
+                        {paper.topics.map((topicId) => {
+                          const topic = topicById.get(topicId);
+                          return topic ? (
+                            <button
+                              type="button"
+                              data-row-topic={topic.id}
+                              style={`--topic-color: ${topic.color}`}
+                            >
+                              {topic.shortLabel}
+                            </button>
+                          ) : null;
+                        })}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))
+        }
+      </div>
+
+      <div class="empty-results" data-empty-results hidden>
+        <p>No notes match that combination.</p>
+        <button type="button" data-reset-filters>Reset filters</button>
+      </div>
+    </section>
   </div>
 
   <script is:inline>
     (() => {
-      const groups = Array.from(document.querySelectorAll('.paper-field-group'));
-      const expandButton = document.querySelector('[data-paper-fields-expand]');
-      const collapseButton = document.querySelector('[data-paper-fields-collapse]');
+      const root = document.querySelector('[data-research-index]');
+      if (!(root instanceof HTMLElement)) return;
 
-      const openGroupFromHash = () => {
-        const id = window.location.hash.slice(1);
-        if (!id) {
-          return;
-        }
+      const viewButtons = Array.from(root.querySelectorAll('[data-view-button]'));
+      const viewPanels = Array.from(root.querySelectorAll('[data-view-panel]'));
+      const topicButtons = Array.from(root.querySelectorAll('[data-topic-button]'));
+      const paperRows = Array.from(root.querySelectorAll('[data-paper-row]'));
+      const yearGroups = Array.from(root.querySelectorAll('[data-year-group]'));
+      const searchInput = root.querySelector('[data-paper-search]');
+      const visibleCount = root.querySelector('[data-visible-count]');
+      const emptyResults = root.querySelector('[data-empty-results]');
+      const activeFilter = root.querySelector('[data-active-filter]');
+      const activeFilterLabel = root.querySelector('[data-active-filter-label]');
 
-        const target = document.getElementById(id);
-        if (target instanceof HTMLDetailsElement) {
-          target.open = true;
-        }
+      let activeView = 'map';
+      let activeTopic = 'all';
+      let activeField = '';
+
+      const setView = (view) => {
+        activeView = view === 'list' ? 'list' : 'map';
+        viewButtons.forEach((button) => {
+          const isActive = button.getAttribute('data-view-button') === activeView;
+          button.classList.toggle('is-active', isActive);
+          button.setAttribute('aria-pressed', String(isActive));
+        });
+        viewPanels.forEach((panel) => {
+          panel.toggleAttribute('hidden', panel.getAttribute('data-view-panel') !== activeView);
+        });
+        updateUrl();
       };
 
-      expandButton?.addEventListener('click', () => {
-        groups.forEach((group) => {
-          if (group instanceof HTMLDetailsElement) {
-            group.open = true;
+      const updateMapState = () => {
+        root.querySelectorAll('[data-map-topic]').forEach((node) => {
+          node.classList.toggle('is-active', node.getAttribute('data-map-topic') === activeTopic);
+          node.classList.toggle('is-muted', activeTopic !== 'all' && node.getAttribute('data-map-topic') !== activeTopic);
+        });
+        root.querySelectorAll('.map-edge').forEach((edge) => {
+          edge.classList.toggle('is-muted', activeTopic !== 'all' && !edge.classList.contains(`map-edge--${activeTopic}`));
+          edge.classList.toggle('is-active', activeTopic !== 'all' && edge.classList.contains(`map-edge--${activeTopic}`));
+        });
+        root.querySelectorAll('[data-field-node]').forEach((node) => {
+          const field = node.getAttribute('data-field-node') ?? '';
+          const connected = activeTopic === 'all' || paperRows.some((row) =>
+            row.getAttribute('data-paper-field') === field &&
+            (row.getAttribute('data-paper-topics') ?? '').split(' ').includes(activeTopic)
+          );
+          node.classList.toggle('is-muted', !connected);
+          node.classList.toggle('is-active', field === activeField);
+        });
+
+        const defaultInspector = root.querySelector('[data-map-inspector-default]');
+        const fieldInspector = root.querySelector('[data-map-inspector-field]');
+        defaultInspector?.toggleAttribute('hidden', activeTopic !== 'all' || Boolean(activeField));
+        fieldInspector?.toggleAttribute('hidden', !activeField);
+        root.querySelectorAll('[data-map-inspector-topic]').forEach((panel) => {
+          panel.toggleAttribute(
+            'hidden',
+            Boolean(activeField) || panel.getAttribute('data-map-inspector-topic') !== activeTopic,
+          );
+        });
+      };
+
+      const applyFilters = () => {
+        const query = searchInput instanceof HTMLInputElement ? searchInput.value.trim().toLowerCase() : '';
+        let count = 0;
+
+        paperRows.forEach((row) => {
+          const topics = (row.getAttribute('data-paper-topics') ?? '').split(' ');
+          const matchesTopic = activeTopic === 'all' || topics.includes(activeTopic);
+          const matchesField = !activeField || row.getAttribute('data-paper-field') === activeField;
+          const matchesSearch = !query || (row.getAttribute('data-paper-search-text') ?? '').includes(query);
+          const visible = matchesTopic && matchesField && matchesSearch;
+          row.toggleAttribute('hidden', !visible);
+          if (visible) count += 1;
+        });
+
+        yearGroups.forEach((group) => {
+          const hasVisibleRows = Array.from(group.querySelectorAll('[data-paper-row]')).some(
+            (row) => !row.hasAttribute('hidden'),
+          );
+          group.toggleAttribute('hidden', !hasVisibleRows);
+        });
+
+        if (visibleCount) visibleCount.textContent = String(count);
+        emptyResults?.toggleAttribute('hidden', count !== 0);
+        activeFilter?.toggleAttribute('hidden', !activeField);
+        if (activeFilterLabel) activeFilterLabel.textContent = activeField;
+        updateMapState();
+        updateUrl();
+      };
+
+      const setTopic = (topic) => {
+        activeTopic = topic || 'all';
+        activeField = '';
+        topicButtons.forEach((button) => {
+          const isActive = button.getAttribute('data-topic-button') === activeTopic;
+          button.classList.toggle('is-active', isActive);
+          button.setAttribute('aria-pressed', String(isActive));
+        });
+        applyFilters();
+      };
+
+      const setField = (field) => {
+        activeTopic = 'all';
+        activeField = field;
+        topicButtons.forEach((button) => {
+          const isActive = button.getAttribute('data-topic-button') === 'all';
+          button.classList.toggle('is-active', isActive);
+          button.setAttribute('aria-pressed', String(isActive));
+        });
+        const fieldCount = paperRows.filter((row) => row.getAttribute('data-paper-field') === field).length;
+        const fieldTopics = topicButtons
+          .filter((button) => button.getAttribute('data-topic-button') !== 'all')
+          .filter((button) => {
+            const topic = button.getAttribute('data-topic-button') ?? '';
+            return paperRows.some(
+              (row) =>
+                row.getAttribute('data-paper-field') === field &&
+                (row.getAttribute('data-paper-topics') ?? '').split(' ').includes(topic),
+            );
+          })
+          .map((button) => button.textContent?.replace(/\d+\s*$/, '').trim())
+          .filter(Boolean);
+
+        const name = root.querySelector('[data-selected-field-name]');
+        const context = root.querySelector('[data-selected-field-context]');
+        const count = root.querySelector('[data-selected-field-count]');
+        if (name) name.textContent = field;
+        if (context) {
+          context.textContent = fieldTopics.length > 1
+            ? `This field connects ${fieldTopics.join(', ')}.`
+            : `This field sits within ${fieldTopics[0] ?? 'the wider research library'}.`;
+        }
+        if (count) count.textContent = String(fieldCount);
+        applyFilters();
+      };
+
+      const updateUrl = () => {
+        const url = new URL(window.location.href);
+        if (activeView === 'list') url.searchParams.set('view', 'list');
+        else url.searchParams.delete('view');
+        if (activeTopic !== 'all') url.searchParams.set('topic', activeTopic);
+        else url.searchParams.delete('topic');
+        if (activeField) url.searchParams.set('field', activeField);
+        else url.searchParams.delete('field');
+        window.history.replaceState({}, '', url);
+      };
+
+      viewButtons.forEach((button) => {
+        button.addEventListener('click', () => setView(button.getAttribute('data-view-button')));
+      });
+      topicButtons.forEach((button) => {
+        button.addEventListener('click', () => setTopic(button.getAttribute('data-topic-button')));
+      });
+      root.querySelectorAll('[data-map-topic]').forEach((node) => {
+        const select = () => setTopic(node.getAttribute('data-map-topic'));
+        node.addEventListener('click', select);
+        node.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            select();
           }
         });
       });
-
-      collapseButton?.addEventListener('click', () => {
-        groups.forEach((group) => {
-          if (group instanceof HTMLDetailsElement) {
-            group.open = false;
+      root.querySelectorAll('[data-field-node]').forEach((node) => {
+        const select = () => setField(node.getAttribute('data-field-node') ?? '');
+        node.addEventListener('click', select);
+        node.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            select();
           }
         });
       });
-
-      document.querySelectorAll('.field-overview-card').forEach((link) => {
-        link.addEventListener('click', () => {
-          const id = link.getAttribute('href')?.slice(1);
-          const target = id ? document.getElementById(id) : null;
-          if (target instanceof HTMLDetailsElement) {
-            target.open = true;
-          }
+      root.querySelectorAll('[data-inspector-field], [data-row-field]').forEach((button) => {
+        button.addEventListener('click', () => {
+          setField(button.getAttribute('data-inspector-field') ?? button.getAttribute('data-row-field') ?? '');
         });
       });
+      root.querySelectorAll('[data-row-topic]').forEach((button) => {
+        button.addEventListener('click', () => setTopic(button.getAttribute('data-row-topic')));
+      });
+      root.querySelectorAll('[data-open-topic-list]').forEach((button) => {
+        button.addEventListener('click', () => {
+          setTopic(button.getAttribute('data-open-topic-list'));
+          setView('list');
+        });
+      });
+      root.querySelector('[data-open-field-list]')?.addEventListener('click', () => setView('list'));
+      root.querySelector('[data-clear-field-filter]')?.addEventListener('click', () => {
+        activeField = '';
+        applyFilters();
+      });
+      root.querySelector('[data-reset-filters]')?.addEventListener('click', () => {
+        if (searchInput instanceof HTMLInputElement) searchInput.value = '';
+        setTopic('all');
+      });
+      searchInput?.addEventListener('input', () => {
+        if (activeView !== 'list') setView('list');
+        applyFilters();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === '/' && document.activeElement !== searchInput) {
+          event.preventDefault();
+          if (searchInput instanceof HTMLInputElement) searchInput.focus();
+        }
+      });
 
-      window.addEventListener('hashchange', openGroupFromHash);
-      openGroupFromHash();
+      const params = new URL(window.location.href).searchParams;
+      const initialTopic = params.get('topic');
+      const initialField = params.get('field');
+      if (initialTopic && topicButtons.some((button) => button.getAttribute('data-topic-button') === initialTopic)) {
+        setTopic(initialTopic);
+      }
+      if (initialField) setField(initialField);
+      setView(params.get('view') === 'list' ? 'list' : 'map');
+      applyFilters();
     })();
   </script>
 </PostLayout>
+
+<style>
+  .research-index {
+    --map-surface: color-mix(in srgb, var(--panel-bg) 92%, transparent);
+    --map-line: color-mix(in srgb, var(--text-secondary-color) 22%, transparent);
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .research-toolbar,
+  .topic-filter,
+  .knowledge-map,
+  .map-inspector,
+  .research-list-view {
+    border: 1px solid var(--button-border);
+    background: var(--map-surface);
+    box-shadow: var(--button-shadow);
+  }
+
+  .research-toolbar {
+    display: grid;
+    grid-template-columns: auto minmax(16rem, 1fr);
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.7rem;
+    border-radius: 10px;
+  }
+
+  .view-switcher {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.2rem;
+    padding: 0.2rem;
+    border: 1px solid var(--button-border);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--text-color) 4%, transparent);
+  }
+
+  .view-switcher button,
+  .topic-filter button,
+  .inspector-fields button,
+  .inspector-list-link,
+  .paper-row__taxonomy button,
+  .active-filter button,
+  .empty-results button {
+    border: 0;
+    color: var(--text-color);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .view-switcher button {
+    display: flex;
+    gap: 0.45rem;
+    align-items: center;
+    justify-content: center;
+    min-width: 5.5rem;
+    padding: 0.52rem 0.72rem;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.77rem;
+  }
+
+  .view-switcher button.is-active {
+    background: var(--panel-bg);
+    box-shadow: 0 1px 5px color-mix(in srgb, #000 16%, transparent);
+    color: var(--text-color);
+  }
+
+  .research-search {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.55rem;
+    align-items: center;
+    min-width: 0;
+    padding: 0.52rem 0.7rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--text-secondary-color);
+    background: color-mix(in srgb, var(--text-color) 4%, transparent);
+  }
+
+  .research-search:focus-within {
+    border-color: var(--accent-color);
+  }
+
+  .research-search input {
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    color: var(--text-color);
+    background: transparent;
+    font-family: var(--font-reading);
+    font-size: 0.93rem;
+  }
+
+  .research-search input::placeholder {
+    color: var(--text-secondary-color);
+  }
+
+  .research-search kbd {
+    padding: 0.05rem 0.35rem;
+    border: 1px solid var(--button-border);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+
+  .topic-filter {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.65rem;
+    overflow-x: auto;
+    border-radius: 10px;
+    scrollbar-width: thin;
+  }
+
+  .topic-filter button {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.45rem;
+    align-items: center;
+    padding: 0.48rem 0.62rem;
+    border: 1px solid var(--button-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .topic-filter button::before {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--topic-color, var(--text-secondary-color));
+    content: '';
+  }
+
+  .topic-filter button span {
+    opacity: 0.72;
+  }
+
+  .topic-filter button.is-active {
+    border-color: color-mix(in srgb, var(--topic-color, var(--accent-color)) 60%, var(--button-border));
+    background: color-mix(in srgb, var(--topic-color, var(--accent-color)) 12%, transparent);
+    color: var(--text-color);
+  }
+
+  .research-map-view {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(15rem, 0.8fr);
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .knowledge-map,
+  .map-inspector,
+  .research-list-view {
+    border-radius: 10px;
+  }
+
+  .knowledge-map {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .knowledge-map__heading,
+  .list-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+    padding: 1rem 1.1rem 0.85rem;
+    border-bottom: 1px solid var(--button-border);
+  }
+
+  .knowledge-map__heading h2,
+  .list-heading h2,
+  .map-inspector h2 {
+    margin: 0;
+    font-size: 1.12rem;
+  }
+
+  .knowledge-map__heading > p,
+  .list-heading > p {
+    max-width: 28ch;
+    margin: 0;
+    color: var(--text-secondary-color);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    text-align: right;
+  }
+
+  .panel-kicker {
+    margin: 0 0 0.22rem;
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .knowledge-map__canvas {
+    position: relative;
+    min-height: 32rem;
+    background-image:
+      radial-gradient(circle at center, color-mix(in srgb, var(--text-color) 5%, transparent) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .knowledge-map__canvas::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at center, transparent 38%, var(--map-surface) 100%);
+    content: '';
+  }
+
+  .knowledge-map svg {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 32rem;
+  }
+
+  .map-edge {
+    stroke: var(--edge-color);
+    stroke-width: 1.2;
+    stroke-opacity: 0.3;
+    transition: opacity 180ms ease, stroke-width 180ms ease;
+  }
+
+  .map-edge.is-active {
+    stroke-width: 2;
+    stroke-opacity: 0.72;
+  }
+
+  .map-edge.is-muted {
+    stroke-opacity: 0.05;
+  }
+
+  .map-topic-node,
+  .map-field-node {
+    cursor: pointer;
+    outline: none;
+    transition: opacity 180ms ease;
+  }
+
+  .map-topic-node > circle:first-child {
+    fill: color-mix(in srgb, var(--topic-color) 20%, var(--panel-bg));
+    stroke: var(--topic-color);
+    stroke-width: 1.5;
+    transition: r 180ms ease, fill 180ms ease;
+  }
+
+  .map-topic-node__halo {
+    fill: none;
+    stroke: var(--topic-color);
+    stroke-dasharray: 2 5;
+    stroke-opacity: 0.22;
+  }
+
+  .map-topic-node:hover > circle:first-child,
+  .map-topic-node:focus > circle:first-child,
+  .map-topic-node.is-active > circle:first-child {
+    r: 35;
+    fill: color-mix(in srgb, var(--topic-color) 34%, var(--panel-bg));
+  }
+
+  .map-topic-node__count {
+    fill: var(--text-color);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .map-topic-node__label,
+  .map-field-node text {
+    fill: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 9px;
+  }
+
+  .map-topic-node__label {
+    fill: var(--text-color);
+    font-size: 10px;
+  }
+
+  .map-field-node circle {
+    fill: var(--panel-bg);
+    stroke: var(--text-secondary-color);
+    stroke-width: 1.3;
+    transition: r 180ms ease, fill 180ms ease;
+  }
+
+  .map-field-node:hover circle,
+  .map-field-node:focus circle,
+  .map-field-node.is-active circle {
+    r: 8;
+    fill: var(--accent-color);
+    stroke: var(--accent-color);
+  }
+
+  .map-topic-node.is-muted,
+  .map-field-node.is-muted {
+    opacity: 0.22;
+  }
+
+  .map-inspector {
+    min-height: 100%;
+    padding: 1.15rem;
+  }
+
+  .map-inspector > div {
+    display: grid;
+    gap: 0.85rem;
+    align-content: start;
+  }
+
+  .map-inspector > div[hidden] {
+    display: none;
+  }
+
+  .map-inspector p {
+    margin: 0;
+    color: var(--text-secondary-color);
+    line-height: 1.55;
+  }
+
+  .map-inspector__topic h2 {
+    padding-left: 0.75rem;
+    border-left: 3px solid var(--topic-color);
+  }
+
+  .map-legend {
+    display: grid;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--button-border);
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .map-legend span {
+    display: flex;
+    gap: 0.55rem;
+    align-items: center;
+  }
+
+  .legend-node {
+    width: 0.65rem;
+    height: 0.65rem;
+    border: 1px solid var(--text-secondary-color);
+    border-radius: 50%;
+  }
+
+  .legend-node--topic {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 20%, transparent);
+  }
+
+  .legend-line {
+    width: 1.25rem;
+    border-top: 1px solid var(--text-secondary-color);
+  }
+
+  .inspector-stat {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.65rem;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid var(--button-border);
+    border-radius: 8px;
+  }
+
+  .inspector-stat strong {
+    font-family: var(--font-mono);
+    font-size: 1.45rem;
+  }
+
+  .inspector-stat span {
+    color: var(--text-secondary-color);
+    font-size: 0.78rem;
+    line-height: 1.3;
+  }
+
+  .inspector-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .inspector-fields button,
+  .paper-row__taxonomy button {
+    padding: 0.28rem 0.45rem;
+    border: 1px solid var(--button-border);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.67rem;
+    line-height: 1.3;
+    text-align: left;
+  }
+
+  .inspector-fields button:hover,
+  .paper-row__taxonomy button:hover {
+    border-color: var(--accent-color);
+    color: var(--text-color);
+  }
+
+  .inspector-list-link {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.35rem;
+    padding: 0.65rem 0;
+    border-top: 1px solid var(--button-border);
+    background: transparent;
+    color: var(--accent-color);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+  }
+
+  .research-list-view {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .list-heading > p {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+
+  .active-filter {
+    display: flex;
+    gap: 0.45rem;
+    align-items: center;
+    width: fit-content;
+    margin: 0.8rem 1rem 0;
+    padding: 0.35rem 0.45rem 0.35rem 0.6rem;
+    border: 1px solid var(--accent-color);
+    border-radius: 999px;
+    color: var(--text-color);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+
+  .active-filter button {
+    display: grid;
+    place-items: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--text-color) 8%, transparent);
+  }
+
+  .paper-year-groups {
+    padding: 0 1.1rem 1rem;
+  }
+
+  .paper-year-group {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: 1rem;
+    padding-top: 1.2rem;
+  }
+
+  .paper-year-group h3 {
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+    margin: 0;
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .paper-year-group ol {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .paper-year-group li {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: 0.9rem;
+    min-width: 0;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--button-border);
+  }
+
+  .paper-year-group time {
+    padding-top: 0.12rem;
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+
+  .paper-row__content {
+    display: grid;
+    gap: 0.42rem;
+    min-width: 0;
+  }
+
+  .paper-row__content > a {
+    color: var(--text-color);
+    font-family: var(--font-reading);
+    font-size: 0.98rem;
+    font-weight: 550;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+
+  .paper-row__content > a:hover {
+    color: var(--accent-color);
+  }
+
+  .paper-row__taxonomy {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .paper-row__taxonomy button[data-row-topic] {
+    border-color: color-mix(in srgb, var(--topic-color) 40%, var(--button-border));
+  }
+
+  .empty-results {
+    padding: 3rem 1rem;
+    text-align: center;
+  }
+
+  .empty-results p {
+    color: var(--text-secondary-color);
+  }
+
+  .empty-results button {
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--button-border);
+    border-radius: 6px;
+    background: transparent;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  button:focus-visible,
+  [role='button']:focus-visible,
+  .research-search:focus-within {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 900px) {
+    .research-map-view {
+      grid-template-columns: 1fr;
+    }
+
+    .map-inspector {
+      min-height: auto;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .research-toolbar {
+      grid-template-columns: 1fr;
+    }
+
+    .knowledge-map__heading,
+    .list-heading {
+      align-items: start;
+      flex-direction: column;
+    }
+
+    .knowledge-map__heading > p,
+    .list-heading > p {
+      text-align: left;
+    }
+
+    .knowledge-map__canvas {
+      min-height: 23rem;
+      overflow-x: auto;
+    }
+
+    .knowledge-map svg {
+      width: 48rem;
+      min-height: 23rem;
+    }
+
+    .paper-year-group {
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+    }
+
+    .paper-year-group h3 {
+      position: static;
+    }
+
+    .paper-year-group li {
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .map-edge,
+    .map-topic-node,
+    .map-field-node,
+    .map-topic-node > circle:first-child,
+    .map-field-node circle {
+      transition: none;
+    }
+  }
+</style>
