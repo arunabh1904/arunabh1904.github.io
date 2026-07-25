@@ -19,6 +19,9 @@ This paper measures Goodhart's law instead of citing it. A large “gold” rewa
 
 ## Paper Insights
 
+![Best-of-n and reinforcement-learning curves showing proxy reward rising while gold reward eventually falls for smaller reward models](/assets/images/scaling-laws-for-reward-model-overoptimization-paper-figure.png)
+_Figure 1 shows the Goodharting pattern behind the scaling law: optimization continues to improve proxy reward while the held-out gold reward peaks and then declines, with the failure arriving earlier for smaller reward models. Source: [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)._
+
 The paper parameterizes optimization pressure by distance from the initial policy, using $d=\sqrt{D_{KL}(\pi\|\pi_{init})}$. The fitted gold-reward curves differ by optimizer: best-of-$n$ is well described by $d(\alpha-\beta d)$, while RL follows $d(\alpha-\beta\log d)$ in the synthetic setup. Larger reward models and more reward data change the coefficients smoothly, which makes the location of the peak somewhat predictable.
 
 The practical result is a stopping rule, not permission to optimize harder. Policy size has weak influence on the proxy–gold gap, and a KL penalty does not repair a misspecified reward; it controls movement, not truth. In a robot loop, the analogue is a critic score that rises while real success, safety, or human intervention rate flattens.

@@ -21,6 +21,9 @@ Octo treats adaptation interfaces as part of the foundation-model design. A tran
 
 ## Paper Insights
 
+![Octo architecture tokenizing task and observation inputs with flexible blockwise attention and readout action heads](/assets/images/octo-an-open-source-generalist-robot-policy-paper-figure.png)
+_Figure 0 shows Octo's adaptation interface: task and observation tokens share one transformer, while blockwise attention and readout tokens let fine-tuning add observations or action spaces without rewriting the pretrained backbone. Source: [Octo](https://arxiv.org/abs/2405.12213)._
+
 Octo uses tokenized observations and tasks but a diffusion action head, separating semantic/temporal representation from continuous action generation. Its modular tokenizers and readouts allow new sensors or controllers without rebuilding the backbone. Experiments across nine platforms study both out-of-the-box behavior and downstream adaptation.
 
 The model is an open research baseline rather than a claim of zero-shot universal control. The most useful contribution is inspectability: architecture, data, checkpoints, and adaptation code make it possible to test which priors transfer.

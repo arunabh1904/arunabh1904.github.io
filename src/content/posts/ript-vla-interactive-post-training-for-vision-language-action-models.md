@@ -21,6 +21,9 @@ RIPT-VLA proposes a third VLA training stage after pretraining and supervised fi
 
 ## Paper Insights
 
+![RIPT-VLA training progression from broad pretraining and supervised fine-tuning to interactive reinforcement post-training](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-paper-figure.png)
+_Figure 1 makes the added training stage explicit: RIPT-VLA starts from an SFT policy, collects on-policy interaction, and uses reinforcement learning to repair the deployment distribution rather than only replay demonstrations. Source: [RIPT-VLA](https://arxiv.org/abs/2505.17016)._
+
 The optimizer combines dynamic rollout sampling with leave-one-out advantage estimation. Grouping rollouts by task turns a sparse $0/1$ outcome into a relative signal; batches are constructed to retain non-zero advantage rather than wasting updates on groups where every rollout has the same result. The method applies to both a lightweight QueST policy and the 7B OpenVLA-OFT model.
 
 The paper reports a 21.2-point gain for QueST and 97.5% success for OpenVLA-OFT on the studied LIBERO suites. In a one-demonstration case, interactive training moves a 4% SFT policy to 97% within 15 iterations. These numbers show the potential of on-policy state coverage, but near-saturated simulation does not reveal reward hacking, real-world wear, or safety cost.

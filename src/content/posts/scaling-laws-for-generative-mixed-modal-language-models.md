@@ -18,6 +18,9 @@ summary: "2023 – Scaling Laws for Generative Mixed-Modal Language Models"
 
 ## Paper Insights
 
+![Speech and text perplexity ratio across training showing a predicted cross-modal competition barrier](/assets/images/scaling-laws-for-generative-mixed-modal-language-models-paper-figure.png)
+_Figure 4 visualizes the interaction term rather than only unimodal scaling: speech-text mixtures approach or cross a predicted competition barrier differently as model size and training progress change. Source: [Scaling Laws for Generative Mixed-Modal Language Models](https://arxiv.org/abs/2301.03728)._
+
 The useful shift is from asking whether a mixture is good to estimating how each modality changes loss under a particular model and data budget. The paper also reports modality alternation during training, hyperparameter guidance, and links between mixed-modal competition and training stability; a 30B speech-text model provides a larger validation run.
 
 | Component | Role |

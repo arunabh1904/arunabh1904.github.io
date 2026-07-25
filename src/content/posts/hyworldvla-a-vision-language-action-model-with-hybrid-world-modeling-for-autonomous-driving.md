@@ -26,6 +26,9 @@ The clearest evidence is a 655-case rain-and-fog subset drawn from OpenScene. Hy
 
 ## Paper Insights
 
+![HyWorldVLA three-stage architecture combining video autoencoding, iterative world-model pretraining, and action co-fine-tuning](/assets/images/hyworldvla-a-vision-language-action-model-with-hybrid-world-modeling-for-autonomous-driving-paper-figure.png)
+_Figure 2 shows where the hybrid state enters control: pixel futures and a learned future latent are trained first, then jointly condition the action expert during co-fine-tuning. Source: [HyWorldVLA](https://arxiv.org/abs/2607.20988)._
+
 Training has three stages. First, a text-guided video VAE compresses eight-frame clips into spatiotemporal latents while learning to reconstruct the input video. Text cross-attention is intended to suppress irrelevant reconstruction artifacts and retain semantic scene structure. Second, an Emu3 backbone jointly predicts discrete language tokens, FAST-tokenized actions, discrete visual tokens, and a continuous future-video latent from a learned query.
 
 Third, NAVSIM co-fine-tuning attaches an action expert through joint attention. The expert receives historical actions, navigation commands, backbone context, and the predicted future latent, then generates a trajectory. Pixel-token generation is no longer required at this stage; latent prediction remains as an auxiliary objective so planner optimization does not erase the future representation learned during pretraining.

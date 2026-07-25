@@ -19,6 +19,9 @@ VisualPRM is an 8B process reward model trained to judge intermediate steps in m
 
 ## Paper Insights
 
+![Comparison of outcome, value-based process, and advantage-based process reward modeling across reasoning steps](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-paper-figure.png)
+_Figure 3 distinguishes outcome supervision from stepwise value and advantage targets; VisualPRM uses the step-conditioned signal to score where a multimodal solution goes wrong. Source: [VisualPRM](https://arxiv.org/abs/2503.10291)._
+
 At inference, a policy model generates several reasoning traces and VisualPRM selects among them. Best-of-8 improves six model sizes/families; the paper reports a 5.9-point average gain even for InternVL2.5-78B across seven benchmarks. VisualPRM outperforms outcome reward and self-consistency baselines in the studied comparisons.
 
 The transferable lesson for robotics is methodological. A process critic needs its own benchmark with localized error labels. However, a text reasoning step is inspectable and reversible in ways a physical transition is not. Robot progress supervision must additionally represent geometry, contact, timing, and causal state change.

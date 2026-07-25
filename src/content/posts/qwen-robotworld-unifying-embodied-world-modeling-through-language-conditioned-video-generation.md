@@ -28,6 +28,9 @@ The reported model combines a frozen 7B Qwen2.5-VL action encoder, a 127M-parame
 
 ## Paper Insights
 
+![Qwen-RobotWorld architecture coupling a frozen language-action encoder with a VAE and double-stream multimodal diffusion transformer](/assets/images/qwen-robotworld-unifying-embodied-world-modeling-through-language-conditioned-video-generation-paper-figure.png)
+_The model overview shows the shared transition interface: Qwen2.5-VL encodes the natural-language action, a VAE supplies video latents, and joint attention in every double-stream MMDiT block predicts the instructed future. Source: [Qwen-RobotWorld](https://arxiv.org/abs/2606.17030)._
+
 The architecture keeps language understanding and video generation in separate token streams. Qwen2.5-VL converts the instruction into hidden states; the VAE compresses the observed and target frames; and every MMDiT block uses joint attention to couple the semantic stream with noisy video latents. A 3D rotary encoding allocates position dimensions asymmetrically across time, height, and width, while synchronized views are concatenated during training so the same denoising problem must remain geometrically consistent across cameras.
 
 Training proceeds from general visual priors to embodied specialization. Pretraining mixes text-to-image, text-to-video, and text-image-to-video objectives with general videos, images, and first-person manipulation data. Supervised fine-tuning then increases multi-embodiment, wrist-view, third-person, synchronized multi-view, and high-complexity task data in phases, while retaining general-world samples in every batch. The objective is flow matching in VAE latent space. Exact per-source mixture ratios, total training FLOPs, and optimizer-scale details are not reported.

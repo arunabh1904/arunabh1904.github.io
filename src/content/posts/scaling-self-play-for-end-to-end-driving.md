@@ -28,6 +28,9 @@ The key systems choice is to avoid photorealism during self-play. Gigapixel rend
 
 ## Paper Insights
 
+![Three-stage self-play driving pipeline from vectorized teacher training through pixel student distillation to sim-to-real perception adaptation](/assets/images/scaling-self-play-for-end-to-end-driving-paper-figure.png)
+_Figure 2 isolates the three scaling stages: train a vector teacher with self-play RL, distill a pixel policy with self-play DAgger, then adapt only perception using paired simulated and real images. Source: [Scaling Self-Play for End-to-End Driving](https://arxiv.org/abs/2606.19641)._
+
 Training has three stages. First, a 2.7M-parameter permutation-invariant teacher receives privileged vector observations and trains for 25B agent steps with decentralized PPO. Reward coefficients are randomized and exposed to the policy, producing multiple driving styles from the same weights.
 
 Second, every simulated vehicle is controlled by a pixel student. At each visited state, the simulator forks a parallel rollout in which the teacher produces a future trajectory for every agent. DAgger then trains the student on the distribution created by its own joint behavior rather than on expert-only states. The student receives 150M such steps; because all agents contribute targets, each rollout yields more supervision and more varied interactions than single-agent DAgger.

@@ -23,6 +23,9 @@ summary: "2023 – Sigmoid Loss for Language-Image Pre-Training (SigLIP)"
 
 ## Paper Insights
 
+![Cross-device SigLIP loss computation showing local positives and distributed negatives accumulated without a global softmax](/assets/images/sigmoid-loss-for-language-image-pre-training-siglip-paper-figure.png)
+_Figure 1 visualizes the implementation advantage: each image-text pair contributes an independent sigmoid loss, so devices can exchange chunks of embeddings and accumulate negatives without materializing one global similarity matrix. Source: [SigLIP](https://arxiv.org/abs/2303.15343)._
+
 SigLIP replaces CLIP's softmax contrastive loss with independent pairwise sigmoid losses over image-text pairs. CLIP's softmax needs a global view of pairwise similarities across the batch, which pushes toward large batches and cross-device communication. Sigmoid loss treats each pair as a binary classification problem, making training more memory efficient and easier to scale on fewer accelerators. The evidence compares zero-shot ImageNet and related transfer results, showing strong performance with smaller hardware budgets and practical batch sizes. The caveat is that loss simplicity does not remove the need for high-quality image-text data or careful temperature/bias handling. The paper matters because it made language-image pretraining less tied to enormous synchronized batches.
 
 **Summary:** SigLIP changes one important piece of CLIP: the loss. Instead of a softmax contrastive objective over the batch, it uses per-pair sigmoid binary cross-entropy. That decouples training quality from very large batch sizes and makes strong language-image pre-training possible with fewer devices.

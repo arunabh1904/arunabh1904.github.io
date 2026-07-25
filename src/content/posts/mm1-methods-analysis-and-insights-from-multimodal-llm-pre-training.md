@@ -18,6 +18,9 @@ summary: "2024 – MM1: Methods, Analysis & Insights from Multimodal LLM Pre-tra
 
 ## Paper Insights
 
+![MM1 recipe diagram showing the image encoder vision-language connector decoder-only language model and the main ablation axes](/assets/images/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training-paper-figure.png)
+_Figure 3 turns MM1 into an experimental recipe: hold the decoder-only LLM fixed while varying the visual encoder, connector, resolution, pretraining objective, and data mixture. Source: [MM1](https://arxiv.org/abs/2403.09611)._
+
 The central result is a prioritization rule: image encoder quality, image resolution, visual-token count, and the mix of image-caption, interleaved image-text, and text-only data mattered much more than connector design. That makes MM1 a paper about experiment allocation. Before inventing a new projector, test the representation and data decisions that dominate the result.
 
 | Decision | Signal from MM1 | Why it matters |

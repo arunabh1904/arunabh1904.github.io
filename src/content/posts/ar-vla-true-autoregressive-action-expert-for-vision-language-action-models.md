@@ -27,6 +27,9 @@ That distinction matters in the paper’s matched BridgeV2 experiment. With the 
 
 ## Paper Insights
 
+![AR-VLA framework re-anchoring vision-language keys into a rolling hybrid cache used by an autoregressive action expert](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-paper-figure.png)
+_Figure 2 shows the persistent-controller mechanism: refreshed visual-language keys are timestamped onto the action timeline, while the action expert retains rolling kinematic history and predicts one future action at a time. Source: [AR-VLA](https://arxiv.org/abs/2603.10126)._
+
 The action expert is a causal Transformer over continuous robot states and actions. A linear layer maps each action vector to one token, and a deterministic regression head maps the next hidden state back to an action. Its hybrid key-value cache has two update rules: a token-wise FIFO retains recent proprioception and executed actions, while a single visual-language block is replaced whenever the backbone produces a new observation embedding.
 
 Dynamic Temporal Re-anchoring makes those streams temporally comparable. Visual-language keys receive the action-timeline index at which their image was captured; action tokens keep their ordinary sequential indices. Rotary position encoding then makes attention depend on relative visual staleness rather than an absolute deployment timestep. A frame captured five steps ago therefore presents the same positional relationship at step 25 and step 500, narrowing the gap between short training windows and long rollouts.

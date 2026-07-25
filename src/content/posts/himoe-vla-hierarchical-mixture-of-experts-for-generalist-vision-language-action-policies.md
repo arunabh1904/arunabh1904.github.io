@@ -27,6 +27,9 @@ The resulting 4B-parameter VLA is pretrained end to end on 24.1M frames from Ope
 
 ## Paper Insights
 
+![HiMoE hierarchy with action-space experts at the boundaries heterogeneity-balancing experts nearby and shared transformer layers in the center](/assets/images/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies-paper-figure.png)
+_Figure 2 shows where specialization is permitted: action-space MoEs handle incompatible controls, heterogeneity-balancing MoEs absorb residual variation, and central shared layers carry cross-domain knowledge. Source: [HiMoE-VLA](https://arxiv.org/abs/2512.05693)._
+
 HiMoE organizes the action Transformer into three zones. Action-Space MoE layers sit at the input and output boundaries, where joint-angle and end-effector representations differ most. Adjacent Heterogeneity-Balancing MoE layers absorb residual variation in embodiment, viewpoint, and scene. Dense middle layers integrate information across domains rather than routing the entire network into isolated robot-specific branches.
 
 The losses follow the same hierarchy. Standard flow matching trains action chunks. Action-Space Regularization uses dataset-provided action-space or embodiment identities in a supervised contrastive objective: routing distributions should be similar within an action space and distinct across action spaces. Heterogeneity-Balancing Regularization keeps the adjacent expert pools utilized. This is not metadata-free discovery—the strongest specialization signal comes from known dataset identity and action semantics.

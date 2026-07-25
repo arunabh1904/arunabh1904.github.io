@@ -19,6 +19,9 @@ summary: "2024 – TorchTitan: One-stop PyTorch Native Solution for Production-r
 
 ## Paper Insights
 
+![TorchTitan initialization workflow composing model data parallelism checkpointing logging and training configuration](/assets/images/torchtitan-one-stop-pytorch-native-solution-for-production-ready-llm-pre-training-paper-figure.png)
+_Figure 1 shows TorchTitan's systems claim: production pretraining is assembled from composable configuration, model, data, parallelism, checkpoint, and observability components rather than a single monolithic trainer. Source: [TorchTitan](https://arxiv.org/abs/2410.06511)._
+
 The contribution is operational composability: compare and combine parallelism strategies without stitching together incompatible repositories. The authors evaluate Llama 3.1 models from 8B to 405B parameters and report incremental speedups from 1D, 2D, and 3D parallelism on H100 systems.
 
 | Capability | Operational consequence |

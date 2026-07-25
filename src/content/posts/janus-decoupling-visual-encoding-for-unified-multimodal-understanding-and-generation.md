@@ -18,6 +18,9 @@ summary: "2024 – Janus: Decoupling Visual Encoding for Unified Multimodal Unde
 
 ## Paper Insights
 
+![Janus architecture with separate visual encoders for understanding and image generation feeding one autoregressive transformer](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-paper-figure.png)
+_Figure 2 exposes Janus's core separation: understanding and generation use different visual encoders while language modeling remains shared, avoiding one visual codebook serving incompatible semantic and pixel objectives. Source: [Janus](https://arxiv.org/abs/2410.13848)._
+
 Understanding needs semantic, task-relevant features; generation needs fine visual detail. Janus decouples those interfaces while preserving one shared transformer for multimodal processing. This is an architectural way to reduce representational conflict without giving up a unified model.
 
 | Question | Janus's answer |

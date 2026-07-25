@@ -19,6 +19,9 @@ summary: "2024 – Genie: Generative Interactive Environments"
 
 ## Paper Insights
 
+![Genie architecture with video tokenizer latent action model and dynamics model predicting future video tokens](/assets/images/genie-generative-interactive-environments-paper-figure.png)
+_Figure 2 separates the learned interface from the simulator: the tokenizer compresses video, the latent-action model infers controls from frame pairs, and the dynamics model predicts the next visual state conditioned on those controls. Source: [Genie](https://arxiv.org/abs/2402.15391)._
+
 Genie is valuable because it makes latent actions a trainable interface rather than requiring labeled controls. The learned action space also supports imitating behaviors from unseen videos. For a world-model program, its contribution is the separation of visual compression, dynamics prediction, and action representation.
 
 | Component | Job |

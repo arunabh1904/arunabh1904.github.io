@@ -19,6 +19,9 @@ summary: "2024 – TokenFlow: Unified Image Tokenizer for Multimodal Understandi
 
 ## Paper Insights
 
+![TokenFlow dual semantic and pixel encoders with a shared discrete mapping and separate reconstruction objectives](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-paper-figure.png)
+_Figure 3 shows how TokenFlow keeps one discrete index useful for two jobs: semantic and pixel distances jointly select the code, while separate decoders preserve meaning and reconstruction detail. Source: [TokenFlow](https://arxiv.org/abs/2412.03069)._
+
 The key mechanism is dual codebooks connected through a shared mapping, so shared indices expose both semantic and fine-grained information. The paper reports 7.2% average improvement over LLaVA-1.5 13B on its understanding comparison, FID 0.63 at 384×384 reconstruction, and GenEval 0.55 at 256×256 autoregressive generation.
 
 | Signal | Reported value | Why it matters |

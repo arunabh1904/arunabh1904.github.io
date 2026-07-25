@@ -18,6 +18,9 @@ summary: "2024 – Transfusion: Predict the Next Token and Diffuse Images with O
 
 ## Paper Insights
 
+![Transfusion transformer jointly processing autoregressive text tokens and continuous image patches trained with diffusion](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-paper-figure.png)
+_Figure 1 shows the mixed objective at sequence level: text positions use next-token prediction, image blocks use parallel diffusion denoising, and boundary tokens let one transformer attend across both. Source: [Transfusion](https://arxiv.org/abs/2408.11039)._
+
 The paper separates the question of a shared transformer from the question of a shared loss. Text remains autoregressive while images use diffusion; modality-specific encoders and decoders handle the interface. The authors report that this hybrid recipe scales better than quantizing images into discrete tokens in their setting and can compress images to 16 patches with modality-specific layers.
 
 | Design choice | Why it is useful |

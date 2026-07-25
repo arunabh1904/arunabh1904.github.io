@@ -21,6 +21,9 @@ Action Preference Optimization (APO) learns from a deployment pattern that ordin
 
 ## Paper Insights
 
+![Action Preference Optimization pipeline from human-assisted deployment and interventions to adaptively weighted VLA fine-tuning](/assets/images/action-preference-optimization-for-robotic-policy-refinement-paper-figure.png)
+_Figure 1 connects deployment to learning: human interventions turn failed or suboptimal rollouts into action preferences, and adaptive weighting controls how strongly each corrected segment updates the VLA. Source: [Action Preference Optimization](https://arxiv.org/abs/2506.07127)._
+
 The data loop combines autonomous execution, human takeover, and trajectory logging. APO uses a prospect-theoretic binary objective related to KTO, then adaptively reweights token-level gradients according to decoded continuous-action error. That second step addresses a VLA-specific mismatch: two nearby action tokens may have very different physical effects, while token probability alone does not encode control distance.
 
 The paper evaluates simulation and real manipulation, reporting better generalization and robustness than the compared supervised and preference baselines. The important contribution is the preference unit: intervention data says which local action was failure-prone, but it does not construct a counterfactual episode from the same state.

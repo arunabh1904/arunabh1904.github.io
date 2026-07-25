@@ -19,6 +19,9 @@ Constitutional AI replaces most harmfulness labels with an explicit list of prin
 
 ## Paper Insights
 
+![Constitutional AI pipeline showing supervised self-critique and revision followed by reinforcement learning from AI feedback](/assets/images/constitutional-ai-harmlessness-from-ai-feedback-paper-figure.png)
+_Figure 1 separates the two mechanisms: critique-and-revision creates supervised targets, then constitutional preference judgments train the reward model used for RLAIF. Source: [Constitutional AI](https://arxiv.org/abs/2212.08073)._
+
 The constitution is both specification and data generator. It makes behavioral constraints inspectable, but every generated critique, revision, and preference still passes through a model whose interpretation can be incomplete. The supervised stage also gives the RL policy a safer starting distribution, reducing the exploration burden in the reinforcement phase.
 
 The paper reports a less harmful, less evasive assistant with far fewer direct human harmfulness labels. For embodied systems, the transferable idea is not “let a VLM decide safety.” It is to encode constraints explicitly, generate adversarial and corrective supervision from those constraints, and preserve human evaluation as the external authority.

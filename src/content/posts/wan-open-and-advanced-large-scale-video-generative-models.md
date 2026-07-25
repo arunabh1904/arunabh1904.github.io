@@ -19,6 +19,9 @@ summary: "2025 – Wan: Open and Advanced Large-Scale Video Generative Models"
 
 ## Paper Insights
 
+![Wan diffusion transformer architecture with text conditioning patchified video latents and a stack of DiT blocks](/assets/images/wan-open-and-advanced-large-scale-video-generative-models-paper-figure.png)
+_The Wan-DiT architecture shows the generative core after compression: patchified video latents are denoised through stacked transformer blocks with timestep and text conditioning, then decoded back to video. Source: [Wan](https://arxiv.org/abs/2503.20314)._
+
 Wan supplies a systems-oriented video reference rather than only a generative-model result. It releases 1.3B and 14B models, supports several downstream tasks such as image-to-video and editing, and reports that the 1.3B model can run with 8.19 GB of VRAM.
 
 | Component | Decision it informs |
