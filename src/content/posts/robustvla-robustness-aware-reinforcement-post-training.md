@@ -19,6 +19,9 @@ RobustVLA argues that maximizing nominal task reward during online post-training
 
 ## Paper Insights
 
+![RobustVLA loop injecting observation and action perturbations then applying stability Jacobian and smoothness regularization during reinforcement post-training](/assets/images/robustvla-robustness-aware-reinforcement-post-training-paper-figure.png)
+_Figure 1 traces the robustness claim from intervention to objective: perturbations expose return drift and error amplification, which motivate Jacobian, action-smoothing, and robust RL regularizers. Source: [RobustVLA](https://arxiv.org/abs/2511.01331)._
+
 Observation perturbations model lighting, camera, latency, or state-estimation error; action perturbations model actuator and execution mismatch. Standard RL can overfit to the nominal environment even as success rises. RobustVLA adds lightweight penalties to constrain the sensitivity terms identified by the analysis and reports improved reliability across perturbed robot environments.
 
 The paper shifts robustness from an evaluation afterthought into the post-training objective. The tradeoff is familiar: too much regularization can suppress necessary high-frequency corrections or adaptation to real changes.

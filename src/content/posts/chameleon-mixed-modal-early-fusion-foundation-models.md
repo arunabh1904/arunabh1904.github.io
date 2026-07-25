@@ -18,6 +18,9 @@ summary: "2024 – Chameleon: Mixed-Modal Early-Fusion Foundation Models"
 
 ## Paper Insights
 
+![Chameleon early-fusion transformer representing text and images as one interleaved discrete token sequence](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-paper-figure.png)
+_Figure 1 shows Chameleon's defining constraint: one autoregressive transformer consumes and emits interleaved text and image tokens rather than delegating generation to a separate decoder. Source: [Chameleon](https://arxiv.org/abs/2405.09818)._
+
 Early fusion makes a direct architectural claim: one transformer can model mixed documents instead of bolting a vision encoder onto a language model after pre-training. The evidence spans visual question answering, captioning, text generation, image generation, and long-form mixed-modal generation.
 
 | Decision | Chameleon's answer | Tradeoff |

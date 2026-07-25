@@ -21,6 +21,9 @@ RLDG avoids applying unstable RL updates directly to a large generalist policy. 
 
 ## Paper Insights
 
+![RLDG workflow training specialist reinforcement-learning policies collecting their rollouts and distilling them into a generalist robot policy](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-paper-figure.png)
+_Figure 1 shows the division of labor: narrow RL specialists supply high-quality task data, then one OpenVLA or Octo policy absorbs those behaviors through ordinary fine-tuning. Source: [RLDG](https://arxiv.org/abs/2412.09858)._
+
 On precise insertion and assembly tasks, the paper reports that generalists trained on RL-generated data outperform those trained on human demonstrations by as much as 40%. Analysis attributes the gain to both cleaner action distributions and state coverage: RL specialists visit states and execute corrections that teleoperators may not demonstrate consistently.
 
 The separation also protects general capabilities. The specialist can optimize aggressively under a task reward; the generalist only consumes selected trajectories. The cost is maintaining one RL pipeline per task and deciding which specialist behavior is safe to distill.

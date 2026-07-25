@@ -21,6 +21,9 @@ SIMPLER asks a more useful question than whether a simulator is photorealistic: 
 
 ## Paper Insights
 
+![SIMPLER comparison of expensive real-robot evaluation with reproducible simulated evaluation matched to the same task](/assets/images/simpler-evaluating-real-world-robot-policies-in-simulation-paper-figure.png)
+_Figure 1 states the benchmark proposition directly: replace repeated physical evaluations with purpose-built simulated replicas, then validate the replica by whether policy rankings correlate with real-world performance. Source: [SIMPLER](https://arxiv.org/abs/2405.05941)._
+
 Across RT-1, RT-1-X, RT-2-X, and Octo and roughly 1,500 evaluation episodes, simulated success correlates strongly with paired real-world performance. The simulator also reflects behavioral sensitivities under several distribution shifts. The result makes simulation a screening layer, not a replacement for real trials.
 
 The main design choice is calibration at the policy interface. Robot control mode, camera pose, observation preprocessing, and object appearance must be close enough that differences between policies survive the domain gap. A visually impressive environment that changes the controller distribution can give worse rankings.

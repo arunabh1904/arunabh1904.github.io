@@ -21,6 +21,9 @@ VLA-REPLICA addresses a gap between scalable simulation and expensive centralize
 
 ## Paper Insights
 
+![VLA-REPLICA procedure for aligning camera and robot poses reproducing object placement and running standardized policy evaluations](/assets/images/vla-replica-low-cost-reproducible-real-world-evaluation-paper-figure.png)
+_Figure 2 shows the reproducibility controls: AprilTag and video-overlay alignment fix viewpoint geometry, task reference images fix object placement, and the same suite is then run across policies. Source: [VLA-REPLICA](https://arxiv.org/abs/2605.20774)._
+
 The tasks span pick-and-place, object interaction, and memory-dependent behavior. Independent replicas produce consistent policy results, which is the paper's most important evidence: a benchmark is useful only if rebuilding it does not change the ranking. The controlled light box reduces nuisance variation while deliberate OOD settings reintroduce chosen shifts.
 
 Low cost changes the cadence of evaluation. Instead of one lab reporting a small number of real trials, multiple groups can reproduce the setup and accumulate evidence about hardware, operator, and site variability.

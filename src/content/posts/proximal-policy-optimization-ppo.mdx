@@ -24,6 +24,9 @@ import { ppoPlayground } from '../../lib/python-playground-examples';
 
 ## Paper Insights
 
+![PPO clipped surrogate objective for positive and negative advantages showing where probability-ratio gains flatten](/assets/images/proximal-policy-optimization-ppo-paper-figure.png)
+_Figure 1 supplies the clipping intuition: once the probability ratio moves beyond the trusted band in the reward-improving direction, the surrogate stops paying for a larger update. Source: [PPO](https://arxiv.org/abs/1707.06347)._
+
 PPO is a practical policy-gradient method that reuses fresh rollout data for several minibatch epochs without letting the policy move too far. The clipped objective compares the new policy probability ratio to the old one and limits the incentive when the update exceeds an epsilon band. This approximates the trust-region spirit of TRPO while avoiding second-order optimization and conjugate-gradient machinery. The paper evaluates continuous-control and Atari tasks, where PPO gives a strong balance of simplicity, stability, and sample efficiency among online policy-gradient methods. The caveats are that clipping is heuristic, performance depends on advantage estimation and reward scaling, and the method still needs new on-policy data after each update cycle.
 
 **Summary:** PPO keeps the spirit of Trust-Region Policy Optimization while dropping much of its machinery. TRPO uses a hard KL trust region to prevent policy updates from moving too far. PPO replaces that constraint with a clipped surrogate objective, or sometimes an adaptive KL penalty, so ordinary backprop and Adam can do the work.

@@ -21,6 +21,9 @@ OpenVLA-OFT shows that the fine-tuning interface can matter more than preserving
 
 ## Paper Insights
 
+![OpenVLA-OFT comparison of autoregressive versus parallel decoding and discrete versus continuous action prediction](/assets/images/openvla-oft-optimizing-speed-and-success-paper-figure.png)
+_Figure 2 isolates the fine-tuning choices: OpenVLA-OFT replaces sequential discrete token generation with parallel action decoding and continuous regression or diffusion objectives. Source: [OpenVLA-OFT](https://arxiv.org/abs/2502.19645)._
+
 The paper ablates three coupled decisions: serial versus parallel decoding, discrete versus continuous actions, and next-token versus regression/diffusion objectives. The resulting recipe raises OpenVLA's reported LIBERO average from 76.5% to 97.1% and increases action-generation throughput by 26×. In real ALOHA evaluations it supports higher-frequency bimanual control and beats the compared default VLA recipes and from-scratch imitation policies.
 
 The surprising result is that a simple L1 head can match diffusion fine-tuning in the studied setting. Pretrained semantics remain useful even when the action interface and training loss change completely.

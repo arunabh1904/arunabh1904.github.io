@@ -21,6 +21,9 @@ LIBERO is a procedural benchmark for lifelong robot learning that distinguishes 
 
 ## Paper Insights
 
+![LIBERO benchmark overview with four task suites and five lifelong-learning research axes](/assets/images/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning-paper-figure.png)
+_Figure 1 organizes LIBERO as more than a task list: four controlled suites vary objects, spatial relations, goals, and task count while the benchmark probes distribution shift, architecture, ordering, and pretraining effects. Source: [LIBERO](https://arxiv.org/abs/2306.03310)._
+
 LIBERO-Spatial, Object, and Goal each isolate a type of transfer across ten tasks; LIBERO-100 mixes them at larger scale. The benchmark also varies task order, policy architecture, lifelong-learning algorithm, and visual pretraining. Its initial experiments include counterintuitive results: sequential fine-tuning can beat specialized lifelong methods on forward transfer, and naive supervised pretraining can hurt later learning.
 
 The benchmark later became a common VLA scoreboard, which changes how its numbers should be read. High average success on fixed instructions and simulation states does not establish real-world robustness, paraphrase invariance, or recovery behavior.

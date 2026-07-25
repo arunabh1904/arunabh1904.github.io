@@ -21,6 +21,9 @@ Diffusion Policy represents a visuomotor policy as a conditional denoising proce
 
 ## Paper Insights
 
+![Diffusion Policy overview with observation-conditioned denoising of action sequences using convolutional or transformer backbones](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-paper-figure.png)
+_Figure 2 shows why the output is a trajectory distribution rather than a point action: Gaussian action sequences are iteratively denoised while visual observations condition every convolutional block or transformer decoder layer. Source: [Diffusion Policy](https://arxiv.org/abs/2303.04137)._
+
 The policy conditions a diffusion model on observations, starts from noisy action sequences, and refines them across denoising steps. Receding-horizon control executes only the near part of each sampled trajectory before observing again. This combination gives diffusion enough horizon to coordinate motion while retaining closed-loop replanning.
 
 Across 15 tasks from four manipulation benchmarks, the paper reports an average 46.9% improvement over the compared state of the art. The important mechanism is distributional expressivity: high-dimensional action sequences and multiple valid strategies are represented without an explicit mixture model. The cost is iterative sampling and a likelihood interface that is less convenient for policy-gradient or preference optimization.

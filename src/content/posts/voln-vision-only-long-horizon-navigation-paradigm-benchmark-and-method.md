@@ -27,6 +27,9 @@ VoLN-UAV makes this concrete with 7,210 simulated episodes across 17 AirSim envi
 
 ## Paper Insights
 
+![VoLN two-phase method aligning visual goals with semantics before predicting short-horizon waypoints and stopping decisions](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-paper-figure.png)
+_Figure 5 separates representation learning from control: phase I aligns visual goal views without exposing route language, then phase II predicts closed-loop waypoint chunks and when to stop. Source: [VoLN](https://arxiv.org/abs/2607.21400)._
+
 Each route contains three to five active semantic beacons placed at decision points. Roughly 150 passive beacons per environment create clutter. Direction signs, warnings, environmental distractors, and context-dependent cues appear only through the onboard camera; world-frame position and GPS are excluded from the policy. The final three reference observations define the visual goal.
 
 This is a vision-only task interface, not a language-free method. VoLN-MLLM aligns frozen DINOv3 features with a frozen CLIP image space, then retrieves the top matching text descriptors from a fixed CLIP semantic bank. Recent observations, goal views, retrieved semantic tokens, and proprioception enter a Vicuna-7B planner adapted with rank-16 LoRA. Separate heads predict eight body-frame 3D waypoints and a stop probability; a low-level controller executes the segment before the model replans.

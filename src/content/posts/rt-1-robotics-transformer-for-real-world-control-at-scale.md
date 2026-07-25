@@ -21,6 +21,9 @@ RT-1 tests whether a single real-time policy can absorb a broad robot dataset wi
 
 ## Paper Insights
 
+![RT-1 architecture conditioning EfficientNet with language using FiLM then compressing visual tokens for a decoder-only action transformer](/assets/images/rt-1-robotics-transformer-for-real-world-control-at-scale-paper-figure.png)
+_Figure 3 traces RT-1 end to end: a sentence embedding modulates EfficientNet features, TokenLearner compresses the vision-language grid, and a decoder-only transformer emits discretized robot actions. Source: [RT-1](https://arxiv.org/abs/2212.06817)._
+
 The paper's scaling variable is not only episode count. Task and object diversity produce better generalization than adding redundant examples from the same narrow distribution. TokenLearner compresses the spatial feature map into a small set of visual tokens, making transformer control feasible under a real-time budget.
 
 RT-1 established the multi-task robot policy as a scalable object, but its semantic knowledge comes mainly from the robot dataset. RT-2 later asks what changes when web-scale vision-language data joins the mixture.

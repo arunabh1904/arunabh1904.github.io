@@ -18,6 +18,9 @@ summary: "2025 – Scaling Laws for Optimal Data Mixtures"
 
 ## Paper Insights
 
+![Scaling-law extrapolation from small models to unseen data mixtures and predicted optimal mixture at larger scale](/assets/images/scaling-laws-for-optimal-data-mixtures-paper-figure.png)
+_Figure 1 shows the decision workflow: fit mixture-aware loss curves on small runs, extrapolate to larger models and unseen weights, then minimize the fitted law to choose a target-scale mixture. Source: [Scaling Laws for Optimal Data Mixtures](https://arxiv.org/abs/2507.09404)._
+
 The authors validate the prediction framework across LLM, native multimodal, and large vision-model pre-training. Their claim is operational: a few small runs can estimate parameters that extrapolate to new mixtures and larger scales, then yield compute-aware optimal domain weights for a chosen target.
 
 | Input | Use |

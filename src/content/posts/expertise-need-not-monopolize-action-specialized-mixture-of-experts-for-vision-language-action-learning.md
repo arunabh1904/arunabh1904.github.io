@@ -26,6 +26,9 @@ The paper’s main architectural claim is narrower than “MoE helps.” A conve
 
 ## Paper Insights
 
+![AdaMoE architecture separating expert selection from contribution scaling while retaining shared and routed experts](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-paper-figure.png)
+_Figure 1 identifies AdaMoE's change to a vanilla router: shared experts preserve the inherited FFN path, routed experts add capacity, and an independent scale adapter controls how much selected action experts contribute. Source: [AdaMoE](https://arxiv.org/abs/2510.14300)._
+
 The base policy consumes multi-view RGB, language, and proprioception, then produces an action chunk through conditional flow matching. AdaMoE modifies only its action expert. For every action token, an always-active shared path captures reusable manipulation structure, while top-$k$ routing activates specialized paths. The final expert coefficient is the sum of a router contribution and an independently learned scale-adapter contribution.
 
 This design targets a real optimization conflict. Load balancing needs broad expert usage to avoid collapse; task loss may prefer a sharply weighted specialist for a particular motion phase. If one set of logits must satisfy both, better allocation can dilute useful specialization. The adapter lets the balanced selection pattern coexist with non-uniform contribution weights.

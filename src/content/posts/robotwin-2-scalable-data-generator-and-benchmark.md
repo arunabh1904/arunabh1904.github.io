@@ -21,6 +21,9 @@ RoboTwin 2.0 combines a synthetic-data factory with a 50-task bimanual benchmark
 
 ## Paper Insights
 
+![RoboTwin 2 pipeline using a multimodal model simulation feedback expert code generation and domain randomization to produce manipulation trajectories](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-paper-figure.png)
+_Figure 2 shows how scale is produced: an MLLM writes task programs against a skill API, simulation feedback repairs them, and domain randomization turns successful programs into diverse policy-training trajectories. Source: [RoboTwin 2.0](https://arxiv.org/abs/2506.18088)._
+
 Domain randomization spans clutter, lighting, backgrounds, tabletop height, and language. Embodiment-aware generation adapts grasps and action candidates across five dual-arm platforms. The paper reports a 10.9-point gain in code-generation success, large relative gains from synthetic pretraining, and a 367% relative improvement when synthetic data are combined with ten real demonstrations over the ten-demo baseline.
 
 The benchmark is valuable because data generation and evaluation share explicit variation axes. The danger is co-adaptation: policies can learn the generator's visual and physical conventions, making benchmark robustness look broader than it is.

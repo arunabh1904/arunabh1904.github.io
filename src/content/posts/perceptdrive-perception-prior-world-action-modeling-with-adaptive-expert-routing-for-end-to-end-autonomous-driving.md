@@ -26,6 +26,9 @@ The full system reports 90.4 PDMS on NAVSIM v1 and 90.2 EPDMS on NAVSIM v2. More
 
 ## Paper Insights
 
+![PerceptDrive architecture with distilled geometry semantic and dynamics priors routed into a shared world-action model](/assets/images/perceptdrive-perception-prior-world-action-modeling-with-adaptive-expert-routing-for-end-to-end-autonomous-driving-paper-figure.png)
+_Figure 2 traces the full information path: specialist teachers produce retained priors, query banks compress them, and a scene-conditioned router controls their contribution to one future-conditioned trajectory. Source: [PerceptDrive](https://arxiv.org/abs/2607.20175)._
+
 The frozen perception provider begins as a driving-adapted VLM and distills geometric, semantic, and dynamic knowledge into explicit expert slots. A frozen V-JEPA 2-L video encoder supplies a separate dense observation stream and future-latent targets. During world-action training, learnable query banks read the combined pool: three prior-specific banks, plus global, action, and temporal banks.
 
 Per-branch retention losses prevent all three expert readouts from collapsing into the same imitation features. Each expert may attend to the full perception pool, but its compressed readout must remain predictive of the corresponding prior. A two-layer router then produces a dense simplex over the three conditions. All experts stay active; “expert routing” here means scene-conditioned soft fusion, not sparse top-$k$ execution.

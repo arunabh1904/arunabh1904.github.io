@@ -21,6 +21,9 @@ SimpleVLA-RL treats VLA reinforcement learning as a systems problem as much as a
 
 ## Paper Insights
 
+![SimpleVLA-RL loop comparing limited offline supervised trajectories with on-policy rollouts grouped for advantage estimation](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-paper-figure.png)
+_Figure 2 shows where the additional signal comes from: the SFT policy interacts with the environment, produces groups of trajectories and rewards, and updates from relative advantages instead of remaining bounded by the offline demonstrations. Source: [SimpleVLA-RL](https://arxiv.org/abs/2509.09674)._
+
 The framework reports state-of-the-art results on LIBERO and strong RoboTwin 1.0/2.0 performance, including large gains when SFT data are scarce. The paper also reports a “pushcut” behavior not present in the demonstrations, using it as evidence that RL can discover action patterns beyond imitation.
 
 The claim depends on exploration. Group-relative methods produce no useful gradient when every rollout in a group receives the same reward. The paper introduces exploration-enhancing strategies, but the same mechanism can favor simulator-specific shortcuts if reward and environment diversity are weak.

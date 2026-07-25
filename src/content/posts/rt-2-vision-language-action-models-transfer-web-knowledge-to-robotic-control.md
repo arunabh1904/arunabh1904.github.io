@@ -21,6 +21,9 @@ RT-2 turns robot control into another output language for a vision-language mode
 
 ## Paper Insights
 
+![RT-2 co-fine-tuning pipeline mixing internet-scale vision-language examples with tokenized robot actions for closed-loop control](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-paper-figure.png)
+_Figure 1 shows the transfer interface: robot actions are serialized into the language model's token space, allowing web vision-language data and robot trajectories to co-train one model that is decoded back into closed-loop control. Source: [RT-2](https://arxiv.org/abs/2307.15818)._
+
 The shared token interface allows semantic knowledge from web data to influence action selection. Across roughly 6,000 evaluation trials, RT-2 improves generalization to novel objects and instructions and exhibits behaviors such as selecting an improvised tool. The system demonstrates transfer from semantic pretraining into control, not a general solution to contact dynamics.
 
 Co-training creates an important retention problem: robot data must ground the model without erasing its visual-language priors, while web data must not dominate action learning. Encoding actions as text simplifies the architecture but inherits autoregressive latency and quantization.

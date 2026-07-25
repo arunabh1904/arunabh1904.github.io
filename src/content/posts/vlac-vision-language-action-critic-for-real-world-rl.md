@@ -19,6 +19,9 @@ VLAC turns a multimodal model into a process critic. Given a language goal and t
 
 ## Paper Insights
 
+![VLAC training and deployment overview combining progress-understanding data with action generation and dense rewards for real-world reinforcement learning](/assets/images/vlac-vision-language-action-critic-for-real-world-rl-paper-figure.png)
+_Figure 2 shows the model's dual role: mixed robot and vision-language data teach task progress and actions, then the same network supplies dense progress rewards while acting as a policy in real-world RL. Source: [VLAC](https://arxiv.org/abs/2509.15937)._
+
 The critic sits inside an asynchronous real-world RL system with graded human support: demonstration replay, return-and-explore, and human-guided exploration. Across four real manipulation tasks, the paper reports improvement from roughly 30% to roughly 90% success within 200 interaction episodes; human intervention improves sample efficiency by about 50% and final success reaches as high as 100%.
 
 Dense progress is more informative than terminal success, but also easier to exploit. A model can reward visual motion, object proximity, or familiar subtask order without understanding contact or irreversible damage. VLAC's negative construction is therefore as important as its scale.

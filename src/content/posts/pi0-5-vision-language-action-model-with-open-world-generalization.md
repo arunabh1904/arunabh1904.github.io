@@ -21,6 +21,9 @@ Pi0.5 extends Pi0 by co-training a VLM/action policy on heterogeneous examples: 
 
 ## Paper Insights
 
+![Pi0.5 two-stage training with heterogeneous pretraining high-level subtask prediction and flow-matching action post-training](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-paper-figure.png)
+_Figure 3 shows how open-world behavior is divided: broad robot, web, and semantic-action pretraining builds the base VLA, then mobile-manipulation post-training couples high-level subtask inference to continuous flow-matching actions. Source: [π0.5](https://arxiv.org/abs/2504.16054)._
+
 The paper targets long-horizon generalization rather than isolated tabletop skills. It reports mobile manipulation in entirely new homes, including kitchen and bedroom cleanup tasks lasting 10–15 minutes. Ablations attribute that behavior to heterogeneous co-training and semantic subtask prediction, not simply more robot episodes.
 
 The architecture separates time scales. High-level tokens express what should happen next; continuous action chunks express how. This reduces the burden on low-level control to remember an entire household task, but subtask errors can still compound and are difficult to correct without feedback.

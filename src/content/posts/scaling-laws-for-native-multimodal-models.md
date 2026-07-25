@@ -18,6 +18,9 @@ summary: "2025 – Scaling Laws for Native Multimodal Models"
 
 ## Paper Insights
 
+![Scaling curves comparing early fusion late fusion and mixture-of-experts native multimodal models](/assets/images/scaling-laws-for-native-multimodal-models-paper-figure.png)
+_Figure 1 summarizes the architecture trade-off: early and late fusion reach similar loss scaling, but allocate compute differently between parameters and tokens; sparse early fusion shifts that allocation further toward data. Source: [Scaling Laws for Native Multimodal Models](https://arxiv.org/abs/2504.07951)._
+
 The authors find no inherent late-fusion advantage in their study. Early-fusion models perform better at lower parameter counts, train more efficiently, and are simpler to deploy; adding Mixture of Experts lets the model learn modality-specific weights and improves performance.
 
 | Decision | Evidence in the paper |

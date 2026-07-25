@@ -21,6 +21,9 @@ LIBERO-Para changes the instruction while holding the intended task fixed. It va
 
 ## Paper Insights
 
+![LIBERO-Para controlled evaluation design varying action and object paraphrases between fine-tuning and testing](/assets/images/libero-para-paraphrase-robustness-in-vla-models-paper-figure.png)
+_Figure 2 shows why the benchmark is diagnostic: action wording and object wording vary on separate axes, letting a failure be localized to linguistic generalization rather than task execution alone. Source: [LIBERO-Para](https://arxiv.org/abs/2603.28301)._
+
 Across seven VLA configurations from 0.6B to 7.5B parameters, the paper reports 22–52 percentage-point drops under paraphrasing. Object-level lexical substitutions drive much of the degradation, and 80–96% of failures arise from planning-level trajectory divergence rather than low-level execution. The policy often identifies the wrong task before motor control begins.
 
 The benchmark also introduces PRIDE, which models paraphrase difficulty using semantic and syntactic factors. That matters because average success can be dominated by easy rewordings and hide inconsistent grounding.

@@ -23,6 +23,9 @@ KTO asks whether alignment data must arrive as a chosen–rejected pair. It deri
 
 ## Paper Insights
 
+![KTO implied human value curves showing loss aversion and a reference point for preferred and rejected outcomes](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-paper-figure.png)
+_Figure 1 makes KTO's prospect-theory motivation concrete: desirable and undesirable outcomes are valued relative to a reference point, with asymmetric sensitivity to gains and losses. Source: [KTO](https://arxiv.org/abs/2402.01306)._
+
 KTO measures each completion relative to a reference point estimated from the policy and reference model. Desirable examples receive a gain-shaped objective; undesirable examples receive a loss-shaped objective. The asymmetry encodes loss aversion, while a KL term keeps the policy from moving arbitrarily far from its reference.
 
 The paper places KTO, DPO, and PPO-style objectives inside a broader family called human-aware losses. Across 1B–30B language models, KTO matches or exceeds paired-preference methods in the reported comparisons despite using unpaired binary feedback. The result does not mean pairs are useless. It shows that a loss with the right inductive bias can extract value from a cheaper feedback interface.

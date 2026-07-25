@@ -21,6 +21,9 @@ ACT pairs a low-cost bimanual teleoperation platform with a conditional variatio
 
 ## Paper Insights
 
+![ACT conditional variational autoencoder with a transformer action decoder plus action chunking and temporal ensembling](/assets/images/action-chunking-with-transformers-act-paper-figure.png)
+_Figure 4 shows the learned policy and deployment rule together: the CVAE predicts an action chunk from multi-view images and joints, while temporal ensembling reconciles overlapping chunk predictions during execution. Source: [ACT](https://arxiv.org/abs/2304.13705)._
+
 Action chunking reduces the effective decision horizon and captures coordinated motion that per-step regression tends to fragment. A latent variable models variation across human demonstrations, while a transformer consumes multi-view images and joint state to generate the chunk. Temporal ensembling smooths successive predictions without committing to an entire open-loop plan.
 
 The paper reports 80–90% success on six precise real-world tasks using roughly ten minutes of demonstrations per task. That result ties model design to a data-collection system: cheap, expressive teleoperation produces the demonstrations that make the sequence model useful.

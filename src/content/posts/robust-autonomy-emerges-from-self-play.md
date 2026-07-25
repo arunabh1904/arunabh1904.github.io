@@ -25,6 +25,9 @@ The result depends on simulation throughput as much as reinforcement learning. O
 
 ## Paper Insights
 
+![Gigaflow overview showing batched driving worlds many self-play agents and a shared compact policy](/assets/images/robust-autonomy-emerges-from-self-play-paper-figure.png)
+_Figure 2 identifies Gigaflow's scaling unit: many agents act in tens of thousands of parallel worlds while sharing one policy, turning diverse interactions into one self-play training stream. Source: [Robust Autonomy Emerges from Self-Play](https://arxiv.org/abs/2502.03349)._
+
 Each agent sees an egocentric set representation of lane samples, road boundaries, stop controls, nearby actors, its own state, and a goal. A permutation-invariant Deep Sets-style network maps those observations to low-level actions. The same weights control bodies ranging from pedestrians to trucks; dimensions and dynamics enter as conditioning, so one batched forward pass serves all actors.
 
 Behavioral diversity comes from reward conditioning. Per-agent coefficients vary the priority assigned to goals, collision and off-road avoidance, comfort, lane alignment, lane centering, speed, reversing, and traffic controls. An agent sees its own coefficients but not those of surrounding agents, forcing the policy to respond to drivers whose styles are uncertain. At inference, the coefficients can select a cautious policy from the learned family without retraining.

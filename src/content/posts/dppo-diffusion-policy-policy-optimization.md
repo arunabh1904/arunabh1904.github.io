@@ -21,6 +21,9 @@ DPPO addresses a representation mismatch in robot RL: a diffusion policy does no
 
 ## Paper Insights
 
+![Diffusion Policy MDP unrolling denoising states inside each environment action step for policy-gradient optimization](/assets/images/dppo-diffusion-policy-policy-optimization-paper-figure.png)
+_Figure 3 provides the key reduction: every denoising chain becomes an inner MDP with tractable Gaussian transitions, so environment reward can train the diffusion policy with ordinary policy gradients. Source: [DPPO](https://arxiv.org/abs/2409.00588)._
+
 Starting from an imitation-trained diffusion policy, DPPO fine-tunes with PPO-style machinery and a set of stability choices. The paper finds that the diffusion parameterization encourages structured, on-manifold exploration and stable updates, outperforming the compared RL methods for diffusion policies and several other policy classes. It also demonstrates zero-shot deployment of a simulation-trained policy on hardware for a long-horizon task.
 
 The critical distinction is between environment time and denoising time. Credit must be assigned to a physical action sequence, while log-probabilities arise from the stochastic denoising path that produced it. Changing sampler steps can therefore change the optimization geometry without changing the executed action space.
