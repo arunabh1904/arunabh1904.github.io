@@ -1,22 +1,10 @@
 ---
+import MusicPlayer from '../components/MusicPlayer.astro';
 import PageControls from '../components/PageControls.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Music Player" pageClass="music-page">
   <PageControls showMusicButton={false} />
-  <div id="music-widget">
-    <div class="music-controls">
-      <button id="choose-spotify" class="music-choice" type="button">Spotify</button>
-      <button id="choose-youtube" class="music-choice" type="button">YouTube</button>
-      <button id="close-music-player" class="music-choice" type="button">Close</button>
-    </div>
-    <iframe
-      id="music-iframe"
-      title="Music player"
-      style="border:0;"
-      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-    ></iframe>
-  </div>
-  <script is:inline src="/assets/js/music.js"></script>
+  <MusicPlayer standalone={true} />
 </BaseLayout>

@@ -438,10 +438,11 @@ const formatDate = (date: Date) =>
     </section>
   </div>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (() => {
       const root = document.querySelector('[data-research-index]');
       if (!(root instanceof HTMLElement)) return;
+      const navigationController = new AbortController();
 
       const viewButtons = Array.from(root.querySelectorAll('[data-view-button]'));
       const viewPanels = Array.from(root.querySelectorAll('[data-view-panel]'));
@@ -646,7 +647,13 @@ const formatDate = (date: Date) =>
           event.preventDefault();
           if (searchInput instanceof HTMLInputElement) searchInput.focus();
         }
-      });
+      }, { signal: navigationController.signal });
+
+      document.addEventListener(
+        'astro:before-swap',
+        () => navigationController.abort(),
+        { once: true },
+      );
 
       const params = new URL(window.location.href).searchParams;
       const initialTopic = params.get('topic');

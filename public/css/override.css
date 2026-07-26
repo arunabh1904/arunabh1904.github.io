@@ -465,6 +465,19 @@ img:not(.float-right):not(.float-left) {
   box-shadow: var(--button-shadow-hover);
 }
 
+.page-controls__button--playing::after {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--button-bg);
+  border-radius: 50%;
+  background: #ff5a52;
+  box-shadow: 0 0 9px rgba(255, 90, 82, 0.78);
+  content: "";
+}
+
 .button-icon {
   width: 24px;
   height: 24px;
@@ -489,143 +502,528 @@ img:not(.float-right):not(.float-left) {
   transform: scale(1);
 }
 
-.music-menu {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  display: grid;
-  gap: 0.5rem;
-  min-width: 11rem;
-  padding: 0.75rem;
+.music-player {
+  --tv-cabinet: linear-gradient(145deg, #d8e2f2 0%, #aebbd0 52%, #8999b2 100%);
+  --tv-cabinet-edge: rgba(37, 63, 108, 0.36);
+  --tv-console-ink: #273755;
+  --tv-panel-bg: color-mix(in srgb, var(--button-bg) 94%, transparent);
+  --tv-panel-shadow: 0 24px 70px rgba(26, 48, 92, 0.2), var(--button-shadow);
+  --tv-cabinet-highlight: rgba(255, 255, 255, 0.62);
+  --tv-cabinet-shadow: rgba(24, 39, 64, 0.2);
+  --tv-cabinet-drop-shadow: rgba(35, 54, 87, 0.18);
+  --tv-screen-bezel: #111822;
+  --tv-screen-edge: rgba(4, 12, 24, 0.78);
+  --tv-screen-glow: rgba(61, 105, 135, 0.4);
+  color-scheme: light;
+  position: fixed;
+  top: 100px;
+  right: 28px;
+  z-index: 29;
+  width: min(430px, calc(100vw - 36px));
+  box-sizing: border-box;
+  padding: 18px;
+  overflow: visible;
   border: 1px solid var(--button-border);
-  border-radius: 18px;
-  background: var(--button-bg);
-  box-shadow: var(--button-shadow);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  border-radius: 26px;
+  background: var(--tv-panel-bg);
+  box-shadow: var(--tv-panel-shadow);
+  color: var(--text-color);
+  opacity: 0;
+  transform: translateY(-10px) scale(0.97);
+  transform-origin: top right;
+  transition:
+    opacity 0.2s ease,
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.24s ease,
+    border-color 0.24s ease,
+    box-shadow 0.24s ease,
+    color 0.24s ease;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
 }
 
-.music-menu[hidden] {
+.music-player[hidden] {
   display: none;
 }
 
-.music-menu__item {
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  border: 1px solid rgba(125, 162, 247, 0.18);
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(14, 165, 233, 0.18));
+.music-player--visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.music-player--standalone {
+  position: relative;
+  inset: auto;
+  z-index: 1;
+  width: min(500px, calc(100vw - 32px));
+  margin: auto;
+  transform-origin: center;
+}
+
+:root[data-theme="dark"] .music-player {
+  --tv-cabinet: linear-gradient(145deg, #34342c 0%, #22231e 55%, #151611 100%);
+  --tv-cabinet-edge: rgba(255, 228, 92, 0.32);
+  --tv-console-ink: #f7df68;
+  --tv-panel-bg: color-mix(in srgb, var(--button-bg) 96%, transparent);
+  --tv-panel-shadow: 0 28px 80px rgba(0, 0, 0, 0.62), var(--button-shadow);
+  --tv-cabinet-highlight: rgba(255, 239, 153, 0.1);
+  --tv-cabinet-shadow: rgba(0, 0, 0, 0.5);
+  --tv-cabinet-drop-shadow: rgba(0, 0, 0, 0.48);
+  --tv-screen-bezel: #080a08;
+  --tv-screen-edge: rgba(255, 228, 92, 0.2);
+  --tv-screen-glow: rgba(255, 207, 59, 0.16);
+  color-scheme: dark;
+}
+
+.music-player__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 16px;
+}
+
+.music-player__eyebrow {
+  margin: 0 0 2px;
+  color: var(--text-secondary-color);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.music-player__header h2 {
+  margin: 0;
   color: var(--text-color);
-  font: inherit;
-  font-weight: 600;
-  text-align: left;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.music-player__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.music-player__minimize,
+.music-player__close {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border: 1px solid var(--button-border);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--button-bg-hover) 92%, transparent);
+  color: var(--text-color);
   cursor: pointer;
   transition:
-    transform 0.15s ease,
-    background 0.2s ease,
-    color 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
 }
 
-.music-menu__item:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.14);
+.music-player__minimize span::after {
+  position: absolute;
+  bottom: 11px;
+  left: 10px;
+  width: 15px;
+  height: 1.5px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
 }
 
-.music-menu__item:focus-visible {
+.music-player__close span::before,
+.music-player__close span::after {
+  position: absolute;
+  top: 17px;
+  left: 10px;
+  width: 15px;
+  height: 1.5px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+}
+
+.music-player__close span::before {
+  transform: rotate(45deg);
+}
+
+.music-player__close span::after {
+  transform: rotate(-45deg);
+}
+
+.music-player__minimize:hover,
+.music-player__close:hover {
+  border-color: var(--accent-color);
+  background: var(--button-bg-hover);
+}
+
+.music-player__minimize:hover {
+  transform: translateY(1px);
+}
+
+.music-player__close:hover {
+  transform: rotate(4deg);
+}
+
+.music-player__minimize:focus-visible,
+.music-player__close:focus-visible,
+.music-channel:focus-visible {
   outline: 2px solid var(--accent-color);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
-.music-menu__item--active {
-  border-color: transparent;
-  background: linear-gradient(135deg, var(--music-bg-start), var(--music-bg-end));
-  color: #ffffff;
+.retro-tv {
+  position: relative;
+  padding-top: 12px;
 }
 
-#music-widget {
-  text-align: center;
-  background-color: var(--button-bg);
-  border: 1px solid var(--button-border);
-  border-radius: 24px;
-  box-shadow: var(--button-shadow);
+.retro-tv__aerial {
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 82px;
+  height: 30px;
+  transform: translateX(-50%);
+}
+
+.retro-tv__aerial::after {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 28px;
+  height: 8px;
+  border: 1px solid var(--tv-cabinet-edge);
+  border-radius: 8px 8px 2px 2px;
+  background: var(--tv-cabinet);
+  content: "";
+  transform: translateX(-50%);
+}
+
+.retro-tv__aerial span {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 2px;
+  height: 34px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tv-console-ink) 62%, transparent);
+  transform-origin: bottom;
+}
+
+.retro-tv__aerial span:first-child {
+  transform: rotate(-38deg);
+}
+
+.retro-tv__aerial span:last-child {
+  transform: rotate(38deg);
+}
+
+.retro-tv__cabinet {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 66px;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--tv-cabinet-edge);
+  border-radius: 28px 28px 23px 23px;
+  background: var(--tv-cabinet);
+  box-shadow:
+    inset 0 1px 1px var(--tv-cabinet-highlight),
+    inset 0 -2px 3px var(--tv-cabinet-shadow),
+    0 14px 26px var(--tv-cabinet-drop-shadow);
+  transition:
+    background 0.24s ease,
+    border-color 0.24s ease,
+    box-shadow 0.24s ease;
+}
+
+.retro-tv__cabinet::after {
+  position: absolute;
+  right: 15%;
+  bottom: -7px;
+  left: 15%;
+  height: 7px;
+  border-radius: 0 0 12px 12px;
+  background: color-mix(in srgb, var(--tv-console-ink) 48%, transparent);
+  content: "";
+  filter: blur(0.2px);
+}
+
+.retro-tv__screen-bezel {
+  min-width: 0;
+  padding: 7px;
+  border: 1px solid var(--tv-screen-edge);
+  border-radius: 21px;
+  background: var(--tv-screen-bezel);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.2);
+  transition:
+    background 0.24s ease,
+    border-color 0.24s ease;
+}
+
+.retro-tv__screen {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 15px;
+  background:
+    radial-gradient(circle at center, var(--tv-screen-glow), transparent 65%),
+    #030609;
+  box-shadow:
+    inset 0 0 28px rgba(0, 0, 0, 0.78),
+    inset 0 0 0 1px rgba(174, 216, 239, 0.14);
+}
+
+.retro-tv__screen iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
+
+.retro-tv__scanlines,
+.retro-tv__static {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.retro-tv__scanlines {
+  z-index: 2;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.07), transparent 20% 76%, rgba(255, 255, 255, 0.025)),
+    repeating-linear-gradient(0deg, rgba(3, 8, 12, 0.18) 0, rgba(3, 8, 12, 0.18) 1px, transparent 1px, transparent 4px);
+  mix-blend-mode: screen;
+  opacity: 0.45;
+}
+
+.retro-tv__static {
+  z-index: 3;
+  background:
+    repeating-radial-gradient(circle at 18% 32%, #fff 0 0.5px, transparent 0.8px 3px),
+    repeating-radial-gradient(circle at 72% 61%, #a8c5d8 0 0.6px, transparent 1px 4px),
+    #111;
+  background-size: 7px 9px, 11px 8px, auto;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.retro-tv--tuning .retro-tv__static {
+  opacity: 0.88;
+  animation: tv-static 0.12s steps(2, end) infinite;
+}
+
+.retro-tv__console {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  padding: 9px 4px 5px;
+  color: var(--tv-console-ink);
+}
+
+.retro-tv__on-air {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.retro-tv__on-air span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff5a52;
+  box-shadow: 0 0 8px rgba(255, 67, 58, 0.75);
+  animation: on-air-pulse 2.6s ease-in-out infinite;
+}
+
+.retro-tv__dial {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  margin-top: 16px;
+  border: 1px solid color-mix(in srgb, var(--tv-console-ink) 55%, transparent);
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from -5deg, rgba(255, 255, 255, 0.24) 0 3deg, transparent 3deg 18deg),
+    color-mix(in srgb, var(--tv-console-ink) 16%, transparent);
+  box-shadow:
+    inset 0 0 0 5px color-mix(in srgb, var(--tv-console-ink) 10%, transparent),
+    0 3px 7px rgba(9, 15, 27, 0.24);
+}
+
+.retro-tv__dial span {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  width: 2px;
+  height: 11px;
+  border-radius: 999px;
+  background: var(--tv-console-ink);
+  transform: translateX(-50%) rotate(28deg);
+  transform-origin: 50% 14px;
+}
+
+.retro-tv__speaker {
+  width: 42px;
+  flex: 1;
+  min-height: 54px;
+  margin-top: 16px;
+  border-radius: 9px;
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--tv-console-ink) 64%, transparent) 0 1.2px, transparent 1.4px);
+  background-position: center;
+  background-size: 7px 7px;
+  opacity: 0.76;
+}
+
+.music-player__now-playing {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  margin: 17px 2px 12px;
+  text-align: left;
+}
+
+.music-player__channel-number {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 9px;
+  border: 1px solid color-mix(in srgb, var(--accent-color) 32%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent-color) 9%, transparent);
+  color: var(--accent-color);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.music-player__now-playing strong,
+.music-player__now-playing small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.music-player__now-playing strong {
   color: var(--text-color);
-  padding: 18px;
-  width: min(100%, 380px);
-  margin: auto;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  letter-spacing: 0.035em;
 }
 
-:root[data-theme="light"] #music-widget,
+.music-player__now-playing small {
+  margin-top: 2px;
+  color: var(--text-secondary-color);
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.music-channels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.music-channel {
+  min-width: 0;
+  padding: 9px 8px 8px;
+  overflow: hidden;
+  border: 1px solid var(--button-border);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--button-bg-hover) 74%, transparent);
+  color: var(--text-secondary-color);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition:
+    transform 0.16s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.music-channel span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-secondary-color);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.music-channel:hover {
+  border-color: color-mix(in srgb, var(--accent-color) 46%, transparent);
+  color: var(--text-color);
+  transform: translateY(-1px);
+}
+
+.music-channel--active {
+  border-color: color-mix(in srgb, var(--accent-color) 54%, transparent);
+  background: color-mix(in srgb, var(--accent-color) 12%, var(--button-bg));
+  color: var(--text-color);
+}
+
+.music-channel--active span {
+  color: var(--accent-color);
+}
+
+@keyframes tv-static {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  50% {
+    background-position: 3px -4px, -5px 2px, 0 0;
+  }
+  100% {
+    background-position: -4px 3px, 4px -3px, 0 0;
+  }
+}
+
+@keyframes on-air-pulse {
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+:root[data-theme="light"] .music-player,
 :root[data-theme="light"] .quick-overview {
   box-shadow:
     0 0 0 1px rgba(53, 109, 255, 0.06),
     0 16px 40px rgba(53, 85, 150, 0.12);
 }
 
-:root[data-theme="dark"] #music-widget,
+:root[data-theme="dark"] .music-player,
 :root[data-theme="dark"] .quick-overview {
   box-shadow:
     0 0 0 1px rgba(255, 228, 92, 0.12),
     0 16px 40px rgba(0, 0, 0, 0.52);
-}
-
-.music-controls {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.65rem;
-  margin-bottom: 14px;
-}
-
-
-.music-choice {
-  padding: 0.6rem 1rem;
-  background: rgba(125, 162, 247, 0.12);
-  border: 1px solid rgba(125, 162, 247, 0.24);
-  border-radius: 999px;
-  color: var(--text-color);
-  cursor: pointer;
-  font: inherit;
-  font-weight: 600;
-  transition:
-    transform 0.15s ease,
-    background 0.2s ease,
-    color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.music-choice:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.14);
-}
-
-.music-choice:focus-visible {
-  outline: 2px solid var(--accent-color);
-  outline-offset: 2px;
-}
-
-.music-choice--active {
-  border-color: transparent;
-  background: linear-gradient(135deg, var(--music-bg-start), var(--music-bg-end));
-  color: #ffffff;
-}
-
-#music-iframe {
-  width: 100%;
-  border: none;
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.08);
-  transition: height 0.2s ease;
-}
-
-body.music-page[data-music-provider="spotify"] #music-iframe {
-  height: 352px;
-}
-
-body.music-page[data-music-provider="youtube"] #music-iframe {
-  height: 214px;
 }
 
 /* ------------------------------------------------------
@@ -724,15 +1122,86 @@ a:visited {
   .main-container {
     margin: 1rem;
   }
-  .music-menu {
-    min-width: 10rem;
-    padding: 0.625rem;
+  .music-player {
+    top: 82px;
+    right: 18px;
+    width: min(430px, calc(100vw - 36px));
+    max-height: calc(100vh - 100px);
+    padding: 15px;
+    overflow-y: auto;
   }
-  #music-widget {
-    padding: 16px;
+  .music-player--standalone {
+    inset: auto;
+    max-height: none;
   }
-  .music-choice {
-    flex: 1 1 calc(50% - 0.65rem);
+  .retro-tv__cabinet {
+    grid-template-columns: minmax(0, 1fr) 58px;
+    gap: 9px;
+    padding: 11px;
+  }
+  .retro-tv__dial {
+    width: 33px;
+    height: 33px;
+  }
+  .retro-tv__speaker {
+    width: 36px;
+    min-height: 44px;
+  }
+  .music-channel {
+    padding-inline: 7px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .music-player {
+    right: 12px;
+    width: calc(100vw - 24px);
+  }
+  .retro-tv__cabinet {
+    grid-template-columns: minmax(0, 1fr) 48px;
+    border-radius: 23px 23px 19px 19px;
+  }
+  .retro-tv__console {
+    padding-inline: 0;
+  }
+  .retro-tv__on-air {
+    font-size: 0;
+  }
+  .retro-tv__dial {
+    width: 29px;
+    height: 29px;
+  }
+  .retro-tv__speaker {
+    width: 30px;
+  }
+  .music-player__now-playing {
+    margin-top: 14px;
+  }
+  .music-channels {
+    grid-template-columns: 1fr;
+  }
+  .music-channel {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    align-items: center;
+    padding: 9px 11px;
+  }
+  .music-channel span {
+    margin: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-player,
+  .music-channel,
+  .music-player__minimize,
+  .music-player__close {
+    transition-duration: 0.01ms;
+  }
+  .retro-tv--tuning .retro-tv__static,
+  .retro-tv__on-air span {
+    animation: none;
   }
 }
 
