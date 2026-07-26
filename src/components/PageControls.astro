@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import MusicPlayer from './MusicPlayer.astro';
 
 interface Props {
   showHomeButton?: boolean;
@@ -11,25 +12,23 @@ const { showHomeButton = false, showMusicButton = true } = Astro.props;
 
 <div class="page-controls" data-page-controls>
   {showMusicButton && (
-    <div class="page-controls__item page-controls__item--music" data-music-control>
+    <div
+      class="page-controls__item page-controls__item--music"
+      data-music-controller
+      transition:persist="music-dock"
+    >
       <button
         type="button"
         class="small-rounded-button icon-only-button page-controls__button page-controls__button--music"
-        aria-label="Open music menu"
-        aria-haspopup="menu"
+        aria-label="Open music player"
+        aria-haspopup="dialog"
         aria-expanded="false"
-        data-music-menu-toggle
+        aria-controls="music-player"
+        data-music-open
       >
         <Icon name="music" class="button-icon" />
       </button>
-      <div class="music-menu" data-music-menu role="menu" aria-label="Choose music provider" hidden>
-        <button type="button" class="music-menu__item" data-music-provider="spotify" role="menuitem">
-          Spotify
-        </button>
-        <button type="button" class="music-menu__item" data-music-provider="youtube" role="menuitem">
-          YouTube
-        </button>
-      </div>
+      <MusicPlayer />
     </div>
   )}
   <button
@@ -43,13 +42,13 @@ const { showHomeButton = false, showMusicButton = true } = Astro.props;
   </button>
 
   {showHomeButton && (
-    <button
-      type="button"
+    <a
+      href="/"
       class="small-rounded-button icon-only-button page-controls__button page-controls__button--home"
       aria-label="Go home"
       data-home-button
     >
       <Icon name="arrow-left" class="button-icon" />
-    </button>
+    </a>
   )}
 </div>

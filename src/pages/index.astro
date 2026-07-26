@@ -163,7 +163,7 @@ const journeyHref = '/blog/2025/02/08/my-journey-so-far-full-story.html';
     </section>
   </section>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (() => {
       const landing = document.querySelector('[data-sky-landing]');
       const canvas = document.querySelector('[data-sky-reveal]');
@@ -188,6 +188,8 @@ const journeyHref = '/blog/2025/02/08/my-journey-so-far-full-story.html';
       let frame = 0;
       let lastMove = 0;
       const stars = [];
+      const navigationController = new AbortController();
+      let resizeObserver;
 
       const resize = () => {
         const bounds = landing.getBoundingClientRect();
@@ -281,16 +283,28 @@ const journeyHref = '/blog/2025/02/08/my-journey-so-far-full-story.html';
           lastMove = now;
           addStars(event.clientX, event.clientY, 3);
         },
-        { passive: true },
+        { passive: true, signal: navigationController.signal },
       );
 
       landing.addEventListener('pointerdown', (event) => addStars(event.clientX, event.clientY, 14), {
         passive: true,
+        signal: navigationController.signal,
       });
 
       resize();
       landing.dataset.skyReady = 'true';
-      new ResizeObserver(resize).observe(landing);
+      resizeObserver = new ResizeObserver(resize);
+      resizeObserver.observe(landing);
+
+      document.addEventListener(
+        'astro:before-swap',
+        () => {
+          navigationController.abort();
+          resizeObserver?.disconnect();
+          if (frame) window.cancelAnimationFrame(frame);
+        },
+        { once: true },
+      );
     })();
   </script>
 </HomeLayout>

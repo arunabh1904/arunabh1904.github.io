@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../lib/site';
 
 interface Props {
@@ -13,7 +14,7 @@ const pageTitle = title === SITE_TITLE ? title : `${title} | ${SITE_TITLE}`;
 const canonicalUrl = Astro.site
   ? new URL(Astro.url.pathname, Astro.site).toString()
   : Astro.url.toString();
-const themeStylesheetHref = '/css/override.css?v=20260722-home-badge-copy';
+const themeStylesheetHref = '/css/override.css?v=20260726-music-tv';
 ---
 
 <!DOCTYPE html>
@@ -27,16 +28,25 @@ const themeStylesheetHref = '/css/override.css?v=20260722-home-badge-copy';
     <title>{pageTitle}</title>
     <script is:inline>
       (() => {
-        const saved = localStorage.getItem('theme');
-        const theme =
-          saved === 'light' || saved === 'dark'
-            ? saved
-            : window.matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'dark'
-              : 'light';
-        document.documentElement.setAttribute('data-theme', theme);
+        const applySavedTheme = () => {
+          const saved = localStorage.getItem('theme');
+          const theme =
+            saved === 'light' || saved === 'dark'
+              ? saved
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+        };
+
+        applySavedTheme();
+        if (!window.__siteThemeSwapReady) {
+          window.__siteThemeSwapReady = true;
+          document.addEventListener('astro:after-swap', applySavedTheme);
+        }
       })();
     </script>
+    <ClientRouter fallback="swap" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
@@ -73,22 +83,29 @@ const themeStylesheetHref = '/css/override.css?v=20260722-home-badge-copy';
     <slot />
     <script is:inline src="/assets/js/site-controls.js"></script>
     <script is:inline>
-      document.addEventListener('DOMContentLoaded', () => {
-        if (typeof renderMathInElement !== 'function') {
-          return;
-        }
+      (() => {
+        const renderPageMath = () => {
+          if (typeof renderMathInElement !== 'function') {
+            return;
+          }
 
-        renderMathInElement(document.body, {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '\\[', right: '\\]', display: true },
-            { left: '$', right: '$', display: false },
-            { left: '\\(', right: '\\)', display: false },
-          ],
-          ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-          throwOnError: false,
-        });
-      });
+          renderMathInElement(document.body, {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '$', right: '$', display: false },
+              { left: '\\(', right: '\\)', display: false },
+            ],
+            ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            throwOnError: false,
+          });
+        };
+
+        if (!window.__siteMathNavigationReady) {
+          window.__siteMathNavigationReady = true;
+          document.addEventListener('astro:page-load', renderPageMath);
+        }
+      })();
     </script>
   </body>
 </html>

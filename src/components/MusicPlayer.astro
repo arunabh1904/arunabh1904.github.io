@@ -1,0 +1,144 @@
+---
+interface Props {
+  standalone?: boolean;
+}
+
+const { standalone = false } = Astro.props;
+
+const channels = [
+  {
+    id: 'iranian-jazz',
+    number: '01',
+    name: 'Iranian Jazz',
+    detail: 'Qajar Jazz · one-hour lo-fi fusion',
+    kind: 'youtube',
+    src: 'https://www.youtube.com/embed/z8Dz-IFFFY4?autoplay=1&rel=0&playsinline=1&enablejsapi=1',
+  },
+  {
+    id: 'claude-fm',
+    number: '02',
+    name: 'Claude FM',
+    detail: 'Claude · music for thinking and building',
+    kind: 'youtube',
+    src: 'https://www.youtube.com/embed/tRsQsTMvPNg?autoplay=1&rel=0&playsinline=1&enablejsapi=1',
+  },
+  {
+    id: 'sunset-lofi',
+    number: '03',
+    name: 'Sunset Lo-fi',
+    detail: 'Mind Amend · focus session',
+    kind: 'youtube',
+    src: 'https://www.youtube.com/embed/kGuGH_UvvxA?autoplay=1&rel=0&playsinline=1&enablejsapi=1',
+  },
+  {
+    id: 'spotify-mix',
+    number: '04',
+    name: 'Spotify Mix',
+    detail: 'The original site playlist',
+    kind: 'spotify',
+    src: 'https://open.spotify.com/embed/playlist/4RHYceSp9R1bHyL0dDqTuQ?utm_source=generator&theme=0',
+  },
+];
+
+const defaultChannel = channels[0];
+---
+
+<section
+  id="music-player"
+  class:list={['music-player', { 'music-player--standalone': standalone, 'music-player--visible': standalone }]}
+  data-music-player
+  data-music-status={standalone ? 'open' : 'closed'}
+  data-music-standalone={standalone ? 'true' : undefined}
+  aria-label="Music channels"
+  aria-hidden={standalone ? 'false' : 'true'}
+  role="dialog"
+  hidden={!standalone}
+>
+  <header class="music-player__header">
+    <div>
+      <p class="music-player__eyebrow">Listening room</p>
+      <h2>Airwaves</h2>
+    </div>
+    <div class="music-player__header-actions">
+      {
+        !standalone && (
+          <button
+            class="music-player__minimize"
+            type="button"
+            data-music-minimize
+            aria-label="Minimize music player"
+          >
+            <span aria-hidden="true"></span>
+          </button>
+        )
+      }
+      <button
+        class="music-player__close"
+        type="button"
+        data-music-close
+        aria-label={standalone ? 'Close music player' : 'Stop and close music player'}
+      >
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="retro-tv" data-music-tv>
+    <div class="retro-tv__aerial" aria-hidden="true">
+      <span></span>
+      <span></span>
+    </div>
+    <div class="retro-tv__cabinet">
+      <div class="retro-tv__screen-bezel">
+        <div class="retro-tv__screen">
+          <iframe
+            id="music-player-frame"
+            data-music-iframe
+            title={`${defaultChannel.name} music player`}
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+          <div class="retro-tv__scanlines" aria-hidden="true"></div>
+          <div class="retro-tv__static" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="retro-tv__console" aria-hidden="true">
+        <div class="retro-tv__on-air"><span></span>ON</div>
+        <div class="retro-tv__dial"><span></span></div>
+        <div class="retro-tv__speaker"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="music-player__now-playing" aria-live="polite">
+    <span class="music-player__channel-number" data-music-channel-number>CH {defaultChannel.number}</span>
+    <span>
+      <strong data-music-channel-name>{defaultChannel.name}</strong>
+      <small data-music-channel-detail>{defaultChannel.detail}</small>
+    </span>
+  </div>
+
+  <div class="music-channels" role="group" aria-label="Switch music channel">
+    {
+      channels.map((channel, index) => (
+        <button
+          type="button"
+          class:list={['music-channel', { 'music-channel--active': index === 0 }]}
+          data-music-channel={channel.id}
+          data-channel-number={channel.number}
+          data-channel-name={channel.name}
+          data-channel-detail={channel.detail}
+          data-channel-kind={channel.kind}
+          data-channel-src={channel.src}
+          aria-pressed={index === 0 ? 'true' : 'false'}
+        >
+          <span>CH {channel.number}</span>
+          {channel.name}
+        </button>
+      ))
+    }
+  </div>
+</section>
+
+<script is:inline src="/assets/js/music.js"></script>
