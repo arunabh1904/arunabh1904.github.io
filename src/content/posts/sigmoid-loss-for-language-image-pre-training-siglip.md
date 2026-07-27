@@ -1,60 +1,65 @@
 ---
-title: Sigmoid Loss for Language-Image Pre-Training (SigLIP)
-date: '2023-10-01T04:00:00.000Z'
+title: 'Sigmoid Loss for Language-Image Pre-Training (SigLIP)'
+date: '2023-03-01T18:55:11.000Z'
 section: paper-shorts
 postSlug: sigmoid-loss-for-language-image-pre-training-siglip
-legacyPath: >-
-  /paper
-  shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html
+legacyPath: /paper shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html
 tags:
-  - Other
+  - Vision-Language Models
+  - Contrastive Learning
 field: 'Vision-Language Models'
-summary: "2023 – Sigmoid Loss for Language-Image Pre-Training (SigLIP)"
+topics:
+  - multimodal
+  - learning
+summary: '2023 – Sigmoid Loss for Language-Image Pre-Training (SigLIP)'
 ---
+
 ## 2023 – Sigmoid Loss for Language-Image Pre-Training (SigLIP)
 
 **arXiv:** [2303.15343](https://arxiv.org/abs/2303.15343)
 
-**GitHub:** [google-research/big_vision](https://github.com/google-research/big_vision/tree/main/big_vision/models/proj/siglip)
-
-**Hugging Face ports:** [transformers model doc](https://huggingface.co/docs/transformers/model_doc/siglip)
+**Code:** [google-research/big_vision](https://github.com/google-research/big_vision/tree/main/big_vision/models/proj/siglip)
 
 **Conference:** ICCV 2023 (oral)
 
+SigLIP changes the normalization boundary in image-text contrastive learning. CLIP treats the other items in a batch as classes inside a global softmax. SigLIP treats every image-text combination as an independent positive or negative binary example. The change removes the global denominator, supports chunked cross-device negatives, and reduces the need to make the batch enormous merely to define the loss.
+
 ## Paper Insights
 
-![Cross-device SigLIP loss computation showing local positives and distributed negatives accumulated without a global softmax](/assets/images/sigmoid-loss-for-language-image-pre-training-siglip-paper-figure.png)
-_Figure 1 visualizes the implementation advantage: each image-text pair contributes an independent sigmoid loss, so devices can exchange chunks of embeddings and accumulate negatives without materializing one global similarity matrix. Source: [SigLIP](https://arxiv.org/abs/2303.15343)._
+![Cross-device SigLIP loss computation accumulates independent pair losses without materializing one global softmax](/assets/images/sigmoid-loss-for-language-image-pre-training-siglip-paper-figure.png)
+_Each device keeps local image embeddings and receives chunks of text embeddings. Because pair losses are independent, the system can accumulate negatives without assembling one global similarity matrix. Source: [SigLIP](https://arxiv.org/abs/2303.15343)._
 
-SigLIP replaces CLIP's softmax contrastive loss with independent pairwise sigmoid losses over image-text pairs. CLIP's softmax needs a global view of pairwise similarities across the batch, which pushes toward large batches and cross-device communication. Sigmoid loss treats each pair as a binary classification problem, making training more memory efficient and easier to scale on fewer accelerators. The evidence compares zero-shot ImageNet and related transfer results, showing strong performance with smaller hardware budgets and practical batch sizes. The caveat is that loss simplicity does not remove the need for high-quality image-text data or careful temperature/bias handling. The paper matters because it made language-image pretraining less tied to enormous synchronized batches.
+For a batch of $n$ matched pairs, SigLIP labels diagonal image-text pairs positive and all off-diagonal pairs negative:
 
-**Summary:** SigLIP changes one important piece of CLIP: the loss. Instead of a softmax contrastive objective over the batch, it uses per-pair sigmoid binary cross-entropy. That decouples training quality from very large batch sizes and makes strong language-image pre-training possible with fewer devices.
+$$
+\mathcal{L}
+= -\frac{1}{n}\sum_{i=1}^{n}\sum_{j=1}^{n}
+\log \sigma\left(z_{ij}\left(t\,x_i^\top y_j+b\right)\right),
+$$
 
-The result is surprisingly practical. A ViT-L/256 trained for two days on four TPUs reaches 84.5% ImageNet zero-shot accuracy. The paper also shows that returns diminish beyond about 32k images per batch, and that the objective works well with Locked-image Tuning, where the vision encoder is frozen and the text side adapts.
+where $z_{ij}=1$ for a match and $-1$ otherwise. The learned bias $b$ matters because each image has one positive and $n-1$ negatives; without it, the initial class imbalance can dominate optimization. The temperature scale $t$ controls similarity sharpness.
 
-**Evals / Benchmarks**
+The strongest result is a scaling correction, not “sigmoid always wins.” Benefits are clearest below roughly 16,000 examples per batch. Both sigmoid and softmax objectives saturate around 32,000, and even a one-million-example batch provides little value. The loss makes smaller distributed systems competitive; it does not make unlimited negatives useful.
 
-| Model | Params | Train setup | ImageNet zero-shot top-1 | Notes |
-| ----- | ------ | ----------- | ----------------------- | ----- |
-| SigLIP-B/16 | 86 M | 4 TPUv4, 2 days | 79.7 % | 4 k batch |
-| SigLIP-L/256 + LiT | 400 M | 4 TPUv4, 2 days | 84.5 % | 20 k batch |
-| CLIP-B/16 | 86 M | 32 TPUv3, 12 days | 76.2 % | 32 k batch |
+| Configuration reported in the paper | Hardware and time | ImageNet zero-shot |
+| --- | --- | ---: |
+| Locked-image tuning, ViT-B/8 vision encoder | 4 TPUv4 chips, 1 day, batch 32k | 79.8% |
+| Locked-image tuning, ViT-g/14 vision encoder | 4 TPUv4 chips, 2 days, batch 20k | 84.5% |
+| Unlocked SigLIP B/16 | 16 TPUv4 chips, 3 days, batch 16k | 71.0% |
+| B/16 trained from scratch | 32 TPUv4 chips, 5 days, batch 32k | 73.4% |
 
-**Tiny SigLIP pairwise loss (PyTorch)**
-```python
-def siglip_loss(img_emb, txt_emb, temperature=0.07):
-    """img_emb, txt_emb: L2-normalised feature tensors [B, D]"""
-    logits = (img_emb @ txt_emb.t()) / temperature
-    labels = torch.eye(logits.size(0), device=logits.device)
-    return F.binary_cross_entropy_with_logits(logits, labels)
-```
-
-**Critiques:** SigLIP is compelling because the intervention is so small: swap the loss, get better scaling behavior. It is easier to reproduce at smaller batch sizes than CLIP-style training. The main caveat is the data. The strongest results use the private WebLI dataset, public alternatives lag slightly, and web-scale bias remains part of the model.
+Locked-image tuning freezes the vision encoder and trains the text side, so those rows should not be read as an end-to-end architecture comparison. They demonstrate that the objective remains effective when alignment is added to an existing visual model.
 
 ## Decision Lens
 
-SigLIP informs whether image-text pre-training needs a globally normalized softmax over the batch. Its atomic unit is one image-text pair with an independent sigmoid classification target, which removes the requirement that every accelerator participate in one shared denominator.
+SigLIP informs whether cross-device global softmax normalization is worth its systems cost. Its atomic example is one image-text pair with an independent binary target. That makes it appealing when accelerator memory, all-gather traffic, or cluster size constrains training.
 
-The paper establishes that simpler pairwise normalization can match or improve contrastive transfer while easing large-batch communication. The missing systems ablation is a wall-clock and accuracy comparison across batch sizes and cluster topologies with identical encoders and data. At 10× scale, negative-pair imbalance and web-data noise may replace all-gather as the bottleneck. The claim would fail if a carefully tuned softmax objective reached the same transfer at equal end-to-end throughput or if sigmoid training degraded calibration on hard negatives.
+The source results use WebLI, a private web-scale dataset, so public reproduction cannot fully separate the loss from data composition. The decisive systems comparison would hold data order, encoder, optimizer, total negative pairs, and wall-clock budget fixed across cluster topologies. At ten times scale, false negatives and noisy pairs are more likely to dominate than normalization.
 
-**Takeaway:** SigLIP shows that language-image contrastive learning does not require a softmax over huge batches. A sigmoid BCE loss can deliver better accuracy with much less training infrastructure.
+[dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html) addresses a different decision: preserve a self-supervised dense vision backbone and attach language alignment afterward. SigLIP is primarily a loss and distributed-training choice; dino.txt is primarily an initialization and freezing choice.
+
+**Context:** SigLIP replaces batch-softmax contrastive learning with independent sigmoid losses over image-text pairs.
+
+**Limits:** The best data are private, most negatives remain uncurated, and the objective's advantage narrows at very large batches.
+
+**Takeaway:** Image-text pretraining does not need one global softmax; pairwise sigmoid loss turns normalization into a local systems choice and reveals that useful batch scaling saturates early.
