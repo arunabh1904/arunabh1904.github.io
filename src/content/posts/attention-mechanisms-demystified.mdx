@@ -8,7 +8,8 @@ tags:
   - Other
 summary: >-
   A compact history of attention, from RNN alignment and Transformer
-  self-attention to GQA, MLA, sparse, linear, gated, and hybrid designs.
+  self-attention to GQA, MLA, sparse, linear, gated, and hybrid designs, with
+  efficient PyTorch implementations of the main computation patterns.
 ---
 import PythonPlayground from '../../components/PythonPlayground';
 import { attentionMechanismsPlayground } from '../../lib/python-playground-examples';
@@ -105,6 +106,57 @@ In a decoder-only model, a causal mask removes future positions before softmax. 
 
 <PythonPlayground client:visible {...attentionMechanismsPlayground} />
 
+## From the equation to efficient PyTorch
+
+The equations above are useful for reasoning, but a production implementation should not explicitly build the $T\times T$ score matrix, apply softmax, and save the full probability matrix in high-bandwidth memory. PyTorch's [`scaled_dot_product_attention`](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention) keeps the same semantics while dispatching to an appropriate backend, including fused attention kernels when the device, dtype, and tensor layout support them.
+
+The complete causal multi-head block is therefore short. The projections produce `[batch, time, 3 * d_model]`; reshaping exposes the head axis expected by SDPA; `is_causal=True` applies the autoregressive mask without allocating a dense mask in Python.
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class CausalSelfAttention(nn.Module):
+    def __init__(self, d_model: int, n_heads: int, dropout: float = 0.0):
+        super().__init__()
+        assert d_model % n_heads == 0
+        self.n_heads = n_heads
+        self.head_dim = d_model // n_heads
+        self.dropout = dropout
+
+        # One combined projection avoids two extra projection launches.
+        self.qkv = nn.Linear(d_model, 3 * d_model, bias=False)
+        self.out = nn.Linear(d_model, d_model, bias=False)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        batch, time, d_model = x.shape
+        q, k, v = self.qkv(x).chunk(3, dim=-1)
+
+        # [B, T, C] -> [B, H, T, D]
+        q = q.view(batch, time, self.n_heads, self.head_dim).transpose(1, 2)
+        k = k.view(batch, time, self.n_heads, self.head_dim).transpose(1, 2)
+        v = v.view(batch, time, self.n_heads, self.head_dim).transpose(1, 2)
+
+        y = F.scaled_dot_product_attention(
+            q,
+            k,
+            v,
+            is_causal=True,
+            dropout_p=self.dropout if self.training else 0.0,
+        )
+
+        y = y.transpose(1, 2).contiguous().view(batch, time, d_model)
+        return self.out(y)
+
+
+# Optional after moving the module and inputs to the target device/dtype.
+# attn = torch.compile(CausalSelfAttention(d_model=1024, n_heads=16))
+```
+
+Three details carry most of the performance. The combined QKV projection reduces kernel launches; the head dimension remains the innermost contiguous dimension; and SDPA avoids a Python-level sequence of matmul, mask, softmax, dropout, and matmul operations. PyTorch selects the backend automatically, so forcing FlashAttention should be a diagnostic or benchmarking choice rather than a default. The dropout argument also requires care: SDPA applies dropout whenever `dropout_p` is nonzero, so evaluation must pass `0.0` explicitly as the module does above.
+
 ## The first branches: multiple heads and external memory
 
 Multi-head attention repeats the same operation under several learned projections. Each head has its own $W^Q$, $W^K$, and $W^V$, so the layer can represent several routing patterns before concatenating their outputs. Heads do not reliably map to neat human concepts such as “the syntax head,” but parallel projections do let different token relationships coexist.
@@ -147,6 +199,81 @@ Standard MHA gives every query head its own key and value heads. Multi-query att
 
 The benefit appears during inference. Reducing the number of KV heads reduces the cache stored per token and the memory traffic required to read it, while leaving the surrounding decoder architecture close to standard attention. The trade-off is a spectrum: MHA preserves the most independent K/V capacity, MQA compresses most aggressively, and GQA chooses an intermediate point that often retains more modeling quality.
 
+PyTorch's SDPA accepts different query-head and KV-head counts through `enable_gqa=True`. The implementation below keeps the K/V tensors at `n_kv_heads`; it does not manually repeat them to the query-head count, which would erase much of the memory-traffic advantage.
+
+```python
+class GroupedQueryAttention(nn.Module):
+    def __init__(
+        self,
+        d_model: int,
+        n_query_heads: int,
+        n_kv_heads: int,
+        dropout: float = 0.0,
+    ):
+        super().__init__()
+        assert d_model % n_query_heads == 0
+        assert n_query_heads % n_kv_heads == 0
+
+        self.n_query_heads = n_query_heads
+        self.n_kv_heads = n_kv_heads
+        self.head_dim = d_model // n_query_heads
+        self.dropout = dropout
+
+        self.q_proj = nn.Linear(
+            d_model, n_query_heads * self.head_dim, bias=False
+        )
+        self.kv_proj = nn.Linear(
+            d_model, 2 * n_kv_heads * self.head_dim, bias=False
+        )
+        self.out_proj = nn.Linear(d_model, d_model, bias=False)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        batch, time, d_model = x.shape
+        q = self.q_proj(x)
+        k, v = self.kv_proj(x).chunk(2, dim=-1)
+
+        q = q.view(batch, time, self.n_query_heads, self.head_dim).transpose(1, 2)
+        k = k.view(batch, time, self.n_kv_heads, self.head_dim).transpose(1, 2)
+        v = v.view(batch, time, self.n_kv_heads, self.head_dim).transpose(1, 2)
+
+        y = F.scaled_dot_product_attention(
+            q,
+            k,
+            v,
+            is_causal=True,
+            enable_gqa=True,
+            dropout_p=self.dropout if self.training else 0.0,
+        )
+
+        y = y.transpose(1, 2).contiguous().view(batch, time, d_model)
+        return self.out_proj(y)
+
+
+@torch.no_grad()
+def gqa_decode_step(q, k, v, k_cache, v_cache, position: int):
+    """Attend one new token to a preallocated KV cache.
+
+    q:              [batch, query_heads, 1, head_dim]
+    k, v:           [batch, kv_heads, 1, head_dim]
+    k_cache/v_cache:[batch, kv_heads, max_length, head_dim]
+    """
+    # Apply RoPE to q and k before this write in a RoPE-based model.
+    k_cache[:, :, position : position + 1].copy_(k)
+    v_cache[:, :, position : position + 1].copy_(v)
+
+    # The cache contains only the eligible prefix, so no causal mask is needed.
+    return F.scaled_dot_product_attention(
+        q,
+        k_cache[:, :, : position + 1],
+        v_cache[:, :, : position + 1],
+        is_causal=False,
+        enable_gqa=True,
+        dropout_p=0.0,
+    )
+```
+
+For `n_query_heads=32` and `n_kv_heads=8`, four query heads share each stored K/V head, so the K/V portion of the cache is one quarter of the corresponding 32-head MHA cache. The decode helper also preallocates and updates that cache rather than calling `torch.cat` every step, which would repeatedly copy the growing prefix. Current PyTorch documentation still labels native GQA support experimental and lists backend constraints; confirm the target device and version instead of silently expanding K/V heads as a fallback.
+
 ### MLA compresses instead of sharing
 
 Multi-head latent attention (MLA), introduced with DeepSeek-V2, attacks the same cache bottleneck differently. GQA stores fewer full K/V heads; MLA stores a lower-dimensional latent representation and reconstructs the state needed by attention. This makes MLA a learned cache-compression mechanism embedded inside the layer.
@@ -160,6 +287,37 @@ Sliding-window attention (SWA) keeps only a fixed local neighborhood visible in 
 Learned sparse attention replaces a fixed locality rule with content-based selection. DeepSeek Sparse Attention, for example, uses an indexer to score prior positions and a selector to keep a smaller high-scoring subset. MLA and sparse attention can therefore work together: MLA compresses what is cached, while sparsity reduces how much of that history is revisited for a query.
 
 The risk is retrieval failure. A local window can exclude a distant fact by construction; a learned selector can fail to rank the right fact. Full attention is expensive partly because it preserves the option to inspect every prior position.
+
+An ordinary dense boolean mask gives the right sliding-window result but does not guarantee that masked tiles are skipped. [`FlexAttention`](https://docs.pytorch.org/docs/stable/nn.attention.flex_attention.html) represents the pattern as a `BlockMask`, allowing the generated kernel to avoid blocks outside the causal window. Build and cache the mask once for a given sequence geometry rather than rebuilding it inside every layer.
+
+```python
+import torch
+from torch.nn.attention.flex_attention import create_block_mask, flex_attention
+
+
+def make_causal_window_mask(seq_len: int, window: int, device: torch.device):
+    def causal_window(_batch, _head, q_idx, kv_idx):
+        return (q_idx >= kv_idx) & (q_idx - kv_idx < window)
+
+    return create_block_mask(
+        causal_window,
+        B=None,              # Broadcast across batches.
+        H=None,              # Broadcast across heads.
+        Q_LEN=seq_len,
+        KV_LEN=seq_len,
+        device=device,
+        _compile=True,
+    )
+
+
+# q, k, v: [batch, heads, time, head_dim]
+block_mask = make_causal_window_mask(
+    seq_len=q.size(-2), window=1024, device=q.device
+)
+y = flex_attention(q, k, v, block_mask=block_mask)
+```
+
+The mask function is the policy; the block mask is the execution plan. This separation is what lets a readable four-line causal-window rule become block-sparse work instead of dense attention followed by discarded scores. FlexAttention remains a prototype API, so pin and test the PyTorch version when using it in training or serving code.
 
 ### Linear attention turns the past into a recurrent state
 
@@ -184,6 +342,34 @@ This state does not grow with sequence length, which is attractive for long-cont
 DeltaNet addresses that capacity problem with a delta-rule update. Before writing a key-value association, it reads what the current key already retrieves and writes only the error between that result and the new target value. Gating adds a separate ability to decay old state. The useful distinction is precise: the delta rule can replace a particular association, while a forget gate can clear or weaken memory more broadly.
 
 Kimi Delta Attention refines this line with finer-grained decay control. The supplied GPT-2-to-Kimi history makes the larger trajectory clear: efficient attention stopped being only a question of approximating softmax and became a question of memory management—what to store, what to overwrite, and what to forget.
+
+The recurrent form is easiest to see one decode step at a time. With the positive feature map $\phi(x)=\operatorname{ELU}(x)+1$, the code below updates $S_t$ and $z_t$ without retaining a token-length dimension. It is vectorized over batches and heads, and `torch.compile` can fuse its pointwise and contraction graph on supported backends.
+
+```python
+@torch.compile
+def linear_attention_step(q, k, v, state, normalizer, eps=1e-6):
+    """One causal decode step.
+
+    q, k:       [batch, heads, key_dim]
+    v:          [batch, heads, value_dim]
+    state:      [batch, heads, key_dim, value_dim]
+    normalizer: [batch, heads, key_dim]
+    """
+    phi_q = F.elu(q) + 1.0
+    phi_k = F.elu(k) + 1.0
+
+    state = state + torch.einsum("bhd,bhe->bhde", phi_k, v)
+    normalizer = normalizer + phi_k
+
+    numerator = torch.einsum("bhd,bhde->bhe", phi_q, state)
+    denominator = torch.einsum(
+        "bhd,bhd->bh", phi_q, normalizer
+    ).unsqueeze(-1)
+    y = numerator / denominator.clamp_min(eps)
+    return y, state, normalizer
+```
+
+This recurrence has constant state size with respect to context length, but it is not a drop-in numerical approximation to every trained softmax-attention model: the feature map changes the retrieval rule, and the state still scales with key dimension times value dimension. During full-sequence training, a production implementation uses a fused associative scan or recurrent kernel rather than calling this Python function in a token loop. The step function is most faithful as a map of the state update and as a compact decode prototype.
 
 ### Hybrid stacks keep an exact retrieval path
 
@@ -226,3 +412,5 @@ No variant dominates every regime. Full attention preserves exact access but gro
 - DeepSeek-AI, [“DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model”](https://arxiv.org/abs/2405.04434)
 - Yang et al., [“Gated Delta Networks: Improving Mamba2 with Delta Rule”](https://arxiv.org/abs/2412.06464)
 - DeepSeek-AI, [“DeepSeek-V3.2: Pushing the Frontier of Open Large Language Models”](https://arxiv.org/abs/2512.02556)
+- PyTorch, [`torch.nn.functional.scaled_dot_product_attention`](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention)
+- PyTorch, [`torch.nn.attention.flex_attention`](https://docs.pytorch.org/docs/stable/nn.attention.flex_attention.html)
