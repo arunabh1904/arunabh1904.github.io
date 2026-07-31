@@ -280,9 +280,13 @@ Multi-head latent attention (MLA), introduced with DeepSeek-V2, attacks the same
 
 The distinction matters operationally. GQA is relatively simple and widely supported. MLA can preserve more head-specific information at a similar cache budget, but its projections, positional treatment, and inference path are more involved. They are alternative cache designs, not two names for the same kind of sharing.
 
+DeepSeek-V2's ablations provide one useful but bounded comparison. In that model family, the authors report that their GQA and MQA variants underperformed MHA, while the tuned MLA configuration slightly exceeded MHA with a much smaller cache. That result supports MLA as a viable learned compression scheme; it does not establish that MLA will beat GQA at smaller scales, under a different training recipe, or on hardware without an optimized MLA path.
+
 ### Sliding windows and learned sparsity reduce the lookup set
 
 Sliding-window attention (SWA) keeps only a fixed local neighborhood visible in selected layers. It changes the number of positions examined, not the representation stored for each position. Architectures often mix local layers with periodic global layers so information can still travel across a long sequence. SWA also composes naturally with GQA: the window reduces how many tokens a layer reads, while grouping reduces how much K/V state each token contributes.
+
+Gemma 3 makes those knobs concrete. Its repeating pattern uses five local-attention layers with a 1,024-token window for every global-attention layer, replacing Gemma 2's more frequent global layers and wider local window. The Gemma 3 report attributes the change to KV-cache reduction, and its controlled ablations found only small validation-perplexity changes across several local-to-global ratios and window sizes. That is evidence for this training setup, not a rule that every task can discard distant context safely.
 
 Learned sparse attention replaces a fixed locality rule with content-based selection. DeepSeek Sparse Attention, for example, uses an indexer to score prior positions and a selector to keep a smaller high-scoring subset. MLA and sparse attention can therefore work together: MLA compresses what is cached, while sparsity reduces how much of that history is revisited for a query.
 
@@ -319,6 +323,33 @@ y = flex_attention(q, k, v, block_mask=block_mask)
 
 The mask function is the policy; the block mask is the execution plan. This separation is what lets a readable four-line causal-window rule become block-sparse work instead of dense attention followed by discarded scores. FlexAttention remains a prototype API, so pin and test the PyTorch version when using it in training or serving code.
 
+### Gated attention controls what enters the residual stream
+
+Gated full attention keeps the softmax lookup and adds a query-dependent gate to the retrieved features before the output projection. For one head, the update is
+
+$$
+\tilde{o}_t=
+\sigma(x_tW^G)\odot
+\operatorname{SDPA}(q_t,K_{\leq t},V_{\leq t}).
+$$
+
+The gate can suppress dimensions that the current token does not need, so the residual stream does not have to accept every retrieved feature at full strength. Qiu et al. tested gates at several locations and reported that head-specific, elementwise gating immediately after SDPA worked best in their experiments. The efficient implementation leaves fused attention intact and adds one pointwise multiplication:
+
+```python
+def gated_causal_sdpa(q, k, v, gate_logits, dropout_p=0.0):
+    """q, k, v, gate_logits: [batch, heads, time, head_dim]."""
+    retrieved = F.scaled_dot_product_attention(
+        q,
+        k,
+        v,
+        is_causal=True,
+        dropout_p=dropout_p,
+    )
+    return retrieved * torch.sigmoid(gate_logits)
+```
+
+Raschka's Qwen example places this output gate alongside zero-centered QK-Norm and partial RoPE. Those two choices alter score normalization and positional encoding; they are useful co-designs, not parts of the definition of gating. Keeping the axes separate explains why an architecture can combine gated full attention with GQA, MLA, or a local window.
+
 ### Linear attention turns the past into a recurrent state
 
 Linear attention changes the memory representation more radically. Softmax is applied after $QK^\top$, which couples every query to every key. Kernelized linear attention applies a feature map $\phi$ to queries and keys separately, allowing the multiplication to be reassociated. Instead of retaining every K/V pair, the model can update fixed-size running statistics such as
@@ -339,9 +370,19 @@ $$
 
 This state does not grow with sequence length, which is attractive for long-context decoding. The cost is that individual token associations are superposed inside finite memory. Unlike a KV cache, the state cannot always recover one earlier value cleanly once many associations interfere.
 
-DeltaNet addresses that capacity problem with a delta-rule update. Before writing a key-value association, it reads what the current key already retrieves and writes only the error between that result and the new target value. Gating adds a separate ability to decay old state. The useful distinction is precise: the delta rule can replace a particular association, while a forget gate can clear or weaken memory more broadly.
+DeltaNet addresses that capacity problem with a delta-rule update. It first asks what value the current key already retrieves,
 
-Kimi Delta Attention refines this line with finer-grained decay control. The supplied GPT-2-to-Kimi history makes the larger trajectory clear: efficient attention stopped being only a question of approximating softmax and became a question of memory management—what to store, what to overwrite, and what to forget.
+$$
+\hat v_t=k_t^\top S_{t-1},
+$$
+
+then writes only the prediction error:
+
+$$
+S_t=S_{t-1}+\beta_t k_t(v_t-\hat v_t)^\top.
+$$
+
+The write strength $0\leq\beta_t\leq1$ determines how strongly the new association replaces the old one. Gated DeltaNet adds a decay factor before this targeted correction, giving the model two distinct controls: decay weakens existing memory broadly, while the delta rule repairs the association addressed by the current key. Kimi Delta Attention makes the decay finer-grained by moving from one scalar per head toward channel-wise control over the recurrent state.
 
 The recurrent form is easiest to see one decode step at a time. With the positive feature map $\phi(x)=\operatorname{ELU}(x)+1$, the code below updates $S_t$ and $z_t$ without retaining a token-length dimension. It is vectorized over batches and heads, and `torch.compile` can fuse its pointwise and contraction graph on supported backends.
 
@@ -371,9 +412,41 @@ def linear_attention_step(q, k, v, state, normalizer, eps=1e-6):
 
 This recurrence has constant state size with respect to context length, but it is not a drop-in numerical approximation to every trained softmax-attention model: the feature map changes the retrieval rule, and the state still scales with key dimension times value dimension. During full-sequence training, a production implementation uses a fused associative scan or recurrent kernel rather than calling this Python function in a token loop. The step function is most faithful as a map of the state update and as a compact decode prototype.
 
+The same vectorized shape supports a Gated DeltaNet-style decode step. This educational version uses one learned decay and write strength per head; Kimi Delta Attention's channel-wise decay requires a richer parameterization and a specialized kernel.
+
+```python
+@torch.compile
+def gated_delta_net_step(q, k, v, state, log_decay, write_logits):
+    """One recurrent decode step with constant-size fast-weight memory.
+
+    q, k:         [batch, heads, key_dim]
+    v:            [batch, heads, value_dim]
+    state:        [batch, heads, key_dim, value_dim]
+    log_decay:    [batch, heads, 1]
+    write_logits: [batch, heads, 1]
+    """
+    q = F.normalize(F.silu(q), dim=-1)
+    k = F.normalize(F.silu(k), dim=-1)
+
+    # exp(-softplus(.)) keeps the forget factor in (0, 1).
+    decay = torch.exp(-F.softplus(log_decay)).unsqueeze(-1)
+    write_strength = torch.sigmoid(write_logits).unsqueeze(-1)
+    state = decay * state
+
+    prediction = torch.einsum("bhd,bhde->bhe", k, state)
+    error = v - prediction
+    state = state + write_strength * torch.einsum(
+        "bhd,bhe->bhde", k, error
+    )
+    y = torch.einsum("bhd,bhde->bhe", q, state)
+    return y, state
+```
+
+Decode is naturally recurrent; prefill must expose parallel matrix work. Yang et al. derive a mathematically equivalent chunkwise algorithm by representing the cumulative state transitions as products of generalized Householder matrices. Tokens within each chunk become batched matrix operations, while a smaller recurrence carries state between chunks. Chunk size therefore changes the execution schedule and hardware utilization, not the DeltaNet retrieval rule. Their Triton implementation reported increasing speedups over a recurrent kernel as sequence length and head dimension grew, which is why a production prefill path should use a fused chunkwise kernel rather than a Python token loop.
+
 ### Hybrid stacks keep an exact retrieval path
 
-Fixed-size recurrent memory is efficient but necessarily capacity-limited. Modern hybrid architectures therefore use cheap sequence mixers for most layers and periodically restore a full or compressed softmax-attention layer. Qwen-style hybrids combine runs of Gated DeltaNet with gated full attention; Kimi-style hybrids combine Kimi Delta Attention with periodic MLA; other systems substitute Lightning Attention or Mamba-style state-space blocks.
+Fixed-size recurrent memory is efficient but necessarily capacity-limited. Modern hybrid architectures therefore use cheap sequence mixers for most layers and periodically restore a full or compressed softmax-attention layer. Qwen-style hybrids combine runs of Gated DeltaNet with gated full attention; other systems substitute Lightning Attention or Mamba-style state-space blocks. Ali's Kimi K3 account gives the ratio a concrete form: 23 four-layer groups, each with three Kimi Delta Attention layers followed by one gated MLA layer.
 
 The Gated DeltaNet paper shows the same design choice at two scales: the left and center stacks interleave recurrent modules with sliding-window attention, while the right panel opens the Gated DeltaNet block into its query, key, value, update, and output-gate paths.
 
@@ -383,9 +456,24 @@ The Gated DeltaNet paper shows the same design choice at two scales: the left an
 
 The figure exposes why “hybrid attention” names a composition strategy rather than one attention equation. A model can choose a different cheap mixer, a different periodic retrieval layer, and a different ratio while preserving the same division of labor.
 
-The design principle is more important than any one ratio. Recurrent or linear layers carry a cheap running summary, while occasional full-attention layers recover token-level content that a compressed state may have lost. Gated attention is usually a modification of those retained full-attention blocks: an output gate controls how much retrieved information enters the residual stream, but the block still performs scaled dot-product attention.
+The design principle is more important than any one ratio. Recurrent or linear layers carry a cheap running summary, while occasional full-attention layers recover token-level content that a compressed state may have lost. Gated attention modifies those retained full-attention blocks: an output gate controls how much retrieved information enters the residual stream, but the block still performs scaled dot-product attention.
+
+Attention Residuals changes a different axis: depth rather than token position. A standard PreNorm residual stream accumulates every earlier layer with fixed unit weight. AttnRes instead lets a layer apply softmax attention over preceding layer outputs, and Block AttnRes groups layers to bound the resulting memory and communication cost. It is therefore not another KV-cache replacement. It is an orthogonal retrieval path that asks which earlier representation depth should contribute, completing the Kimi trajectory from selective token memory to selective depth memory.
 
 This is the modern endpoint of the history. The original RNN bottleneck motivated direct retrieval from an explicit sequence; current long-context systems reintroduce compressed recurrent memory for efficiency, then retain selective attention layers because exact retrieval still matters.
+
+### Reported evidence does not settle the architecture choice
+
+The most useful empirical results compare one mechanism against a nearby alternative inside the same training recipe. They should not be read as a universal leaderboard across attention families.
+
+| Source | Reported result | What remains unresolved |
+| --- | --- | --- |
+| DeepSeek-V2 | Its MLA ablation exceeded the paper's MHA baseline while using a substantially smaller KV cache; its GQA and MQA variants scored below MHA. | Whether the result transfers to smaller models, other positional schemes, or less optimized serving stacks. |
+| Gemma 3 | Increasing the share of local layers and shortening the local window reduced KV-cache demand with small validation-perplexity changes in the reported ablations. | Which retrieval-heavy tasks fail when a distant token is absent from most layers. |
+| Gated Attention | Head-specific elementwise output gating gave the strongest result among the tested gate positions and improved training stability. | Whether the same gain survives every architecture, scale, and normalization recipe. |
+| Kimi Linear | The authors report that the KDA hybrid surpassed full attention in their controlled short-context, long-context, and RL-scaling comparisons. | Independent matched-data comparisons and the maturity of optimized kernels across different hardware. |
+
+Raschka's larger caveat is the right one: there is still no single matched-data, matched-compute study that trains GQA, MLA, sparse attention, gated attention, recurrent memory, and their hybrids under one controlled recipe. Kernel maturity also changes observed throughput. A theoretically cheaper hybrid can lose to conventional GQA on a local system if its recurrent or latent-attention path lacks an optimized kernel.
 
 ## What changed, and what stayed the same
 
@@ -410,7 +498,12 @@ No variant dominates every regime. Full attention preserves exact access but gro
 - Katharopoulos et al., [“Transformers are RNNs: Fast Autoregressive Transformers with Linear Attention”](https://arxiv.org/abs/2006.16236)
 - Ainslie et al., [“GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints”](https://arxiv.org/abs/2305.13245)
 - DeepSeek-AI, [“DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model”](https://arxiv.org/abs/2405.04434)
+- Yang et al., [“Parallelizing Linear Transformers with the Delta Rule over Sequence Length”](https://arxiv.org/abs/2406.06484)
 - Yang et al., [“Gated Delta Networks: Improving Mamba2 with Delta Rule”](https://arxiv.org/abs/2412.06464)
+- Gemma Team, [“Gemma 3 Technical Report”](https://arxiv.org/abs/2503.19786)
+- Qiu et al., [“Gated Attention for Large Language Models: Non-linearity, Sparsity, and Attention-Sink-Free”](https://arxiv.org/abs/2505.06708)
+- Kimi Team, [“Kimi Linear: An Expressive, Efficient Attention Architecture”](https://arxiv.org/abs/2510.26692)
+- Kimi Team, [“Attention Residuals”](https://arxiv.org/abs/2603.15031)
 - DeepSeek-AI, [“DeepSeek-V3.2: Pushing the Frontier of Open Large Language Models”](https://arxiv.org/abs/2512.02556)
 - PyTorch, [`torch.nn.functional.scaled_dot_product_attention`](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention)
 - PyTorch, [`torch.nn.attention.flex_attention`](https://docs.pytorch.org/docs/stable/nn.attention.flex_attention.html)
