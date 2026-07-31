@@ -1,5 +1,5 @@
 ---
-title: 'How Unified Sensor Models Are Built for Autonomous Driving'
+title: 'Machine Learning for Autonomous Driving Perception'
 date: '2026-07-31T18:00:00.000Z'
 section: blog
 postSlug: how-unified-sensor-models-are-built-for-autonomous-driving
@@ -14,7 +14,7 @@ topics:
 summary: A mechanism-first guide to what modern driving models share across cameras, LiDAR, radar, time, and perception tasks—and what they deliberately keep separate.
 ---
 
-# How Unified Sensor Models Are Built for Autonomous Driving
+# Machine Learning for Autonomous Driving Perception
 
 A unified perception model is often drawn as three sensor arrows entering one box. That picture hides every expensive decision. Cameras produce dense semantics with uncertain depth. LiDAR produces sparse but accurate geometry. Radar adds range and radial velocity with different noise, multipath, and angular resolution. Detection wants compact object state; lane and free-space prediction need dense structure; tracking needs identity through time; planning cares about the consequence of an error, not whether every head improved its average benchmark.
 
