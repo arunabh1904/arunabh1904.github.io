@@ -1,5 +1,5 @@
 ---
-title: Attention Mechanisms Demystified
+title: 'Attention Mechanisms: A History and Map of Modern Variants'
 date: '2025-05-25T04:00:00.000Z'
 section: blog
 postSlug: attention-mechanisms-demystified
@@ -7,184 +7,222 @@ legacyPath: /build intuition/2025/05/25/attention-mechanisms-demystified.html
 tags:
   - Other
 summary: >-
-  A worked guide to how queries score keys, values carry content, and
-  self-attention turns those operations into contextual token representations.
+  A compact history of attention, from RNN alignment and Transformer
+  self-attention to GQA, MLA, sparse, linear, gated, and hybrid designs.
 ---
 import PythonPlayground from '../../components/PythonPlayground';
 import { attentionMechanismsPlayground } from '../../lib/python-playground-examples';
 
-# Attention Mechanisms Demystified: Building Intuition for Q, K, V, and Self-Attention
+# Attention Mechanisms: A History and Map of Modern Variants
 
-Attention is learned information routing. Older recurrent sequence models pass information through a running hidden state. Attention instead lets each position score the available sources and retrieve a weighted mixture of their content.
+Attention began as an escape hatch from a fixed-size memory. An encoder-decoder recurrent neural network had to compress a source sentence into a hidden state and ask that state to preserve everything the decoder might need. Attention let each decoding step reach back to the encoder states directly. The Transformer made a larger move in 2017: it removed recurrence from the main sequence path and used attention itself to route information between positions.
 
-That shift gives a Transformer a direct path between relevant positions instead of forcing information to travel one recurrent step at a time. The useful mental model is differentiable content-addressable memory: a query states the current information need, keys determine which sources match it, and values carry the content returned by those sources.
+The core operation has survived. A query describes the current information need, keys determine which sources match it, and values carry the content returned by those sources. Most later variants do not replace that idea; they change where the keys and values come from, how much of them must be cached, which positions are eligible, or whether the past is stored token by token at all.
 
-## The one-line equation
+## Why attention was invented
 
-Vaswani et al. define scaled dot-product attention as:
+Early sequence-to-sequence translation used one recurrent network to encode the input and another to decode the output. The decoder's next word depended on a compressed summary of the source, so long or information-dense sentences created a bottleneck: the relevant evidence might exist in an earlier encoder state but be poorly preserved in the final one.
+
+Bahdanau, Cho, and Bengio changed the interface. At every output step, the decoder scored the encoder states, normalized those scores, and formed a weighted context vector. This was cross-attention before the term became standard: the decoder's current state supplied the query, while the encoder sequence supplied the memory.
+
+The paper's learned alignment maps make that retrieval visible. Each row corresponds to a generated French token, each column to an English source token, and brighter cells carry more attention weight.
+
+![Four English-to-French attention alignment heatmaps learned by the Bahdanau encoder-decoder model](/assets/images/attention-history-bahdanau-learned-alignments.png)
+
+*Figure 3 from [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473) shows four soft alignments learned without word-level alignment labels. The diagonal structure tracks mostly monotonic translation, while off-diagonal bands capture phrases whose word order changes between English and French. Source: Bahdanau, Cho, and Bengio, Figure 3.*
+
+The bright cells are not a hand-written dictionary or a hard one-to-one match. They are the learned distribution used to construct the context vector for each output step. That differentiable lookup is the object the Transformer later promoted from a translation aid to the main sequence operation.
+
+The Transformer generalized the same idea. Instead of using attention as an accessory around recurrent networks, it made attention the primary sequence mixer. That change enabled direct paths between distant positions and let the model process all training positions in parallel.
+
+| Period | Architectural step | What changed |
+| --- | --- | --- |
+| 2014–2015 | Encoder-decoder attention | A decoder step retrieves from all encoder states instead of relying on one fixed summary. |
+| 2017 | Transformer self-attention | Tokens retrieve from the same sequence; recurrence leaves the main path. |
+| 2019 | Decoder-only Transformers at scale | Causal self-attention becomes the standard autoregressive language-model core. |
+| 2019–2023 | MQA and GQA | Query heads share fewer key-value heads, shrinking the inference cache. |
+| 2020 onward | Linear attention and fast-weight memory | The token-by-token KV history is folded into a fixed-size recurrent state. |
+| 2024 onward | MLA, learned sparsity, gating, and hybrids | Models compress the cache, select fewer positions, manage finite memory, or combine cheap mixers with periodic full retrieval. |
+
+This timeline is a lineage, not a claim that each idea appeared only once. Modern architectures combine branches from several rows.
+
+## The core mechanism: query, match, retrieve
+
+Vaswani et al. define scaled dot-product attention as
 
 $$
 \operatorname{Attention}(Q, K, V)
 =
-\operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+\operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V.
 $$
 
 ![Figure 2 from Attention Is All You Need, showing scaled dot-product attention and parallel attention heads](/assets/images/attention-paper-figure-2-scaled-dot-product-and-multi-head.png)
 
-*Figure 2 places the operations in dependency order: compare queries with keys, scale and normalize the scores, then mix values. The right panel repeats that operation across learned projections before concatenating the results. Source: [Attention Is All You Need](https://arxiv.org/abs/1706.03762), Figure 2.*
+*Figure 2 puts the operations in dependency order: compare queries with keys, scale and normalize the scores, then mix values. The right panel repeats that operation across learned projections before concatenating the results. Source: [Attention Is All You Need](https://arxiv.org/abs/1706.03762), Figure 2.*
 
-Each term has a distinct job:
+Each term has one job:
 
-- $QK^\top$ computes compatibility scores between what each token is looking for and what every other token advertises.
-- The softmax turns those scores into a probability distribution, so each row becomes a set of attention weights that sum to $1$.
-- Multiplying by $V$ produces a weighted combination of the returned content.
+- $QK^\top$ measures how well each query matches every eligible key.
+- Dividing by $\sqrt{d_k}$ controls the scale of those logits.
+- Softmax turns each row into non-negative weights that sum to $1$.
+- Multiplying by $V$ returns a weighted mixture of content.
 
-The attention weights choose where to look; the values determine what information is retrieved. The mechanism therefore separates discoverability from payload instead of forcing one vector to do both jobs.
+Queries, keys, and values are separate because discoverability and payload are different jobs. A token may need to advertise one feature for matching while returning a richer representation once selected. In a library analogy, the query is the search phrase, the key is the catalog entry, and the value is the book content.
 
-## Why queries, keys, and values are separate
+The scaling term is not cosmetic. If query and key components are independent with mean zero and variance one, their dot product has variance $d_k$. As the key dimension grows, unscaled logits can push softmax into saturated regions with very small gradients. Dividing by $\sqrt{d_k}$ keeps comparisons trainable instead of making the model prematurely overconfident.
 
-Each token in a sequence has to play three different roles at once:
+## Self-attention rewrites a token with context
 
-- **Query:** "What kind of information do I need right now?"
-- **Key:** "What kind of information do I contain, and when should others look at me?"
-- **Value:** "If someone attends to me, what content should I send back?"
+In self-attention, one sequence supplies all three roles. For an input matrix $X \in \mathbb{R}^{n \times d_{\text{model}}}$,
 
-Separating these roles lets a token be easy to match without forcing its returned payload to use the same representation. Being discoverable and being useful are different jobs.
+$$
+Q=XW^Q,\qquad K=XW^K,\qquad V=XW^V,
+$$
 
-A good analogy is a library:
+followed by
 
-- the **query** is the search phrase,
-- the **key** is the catalog entry,
-- the **value** is the actual book content.
+$$
+A=\operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right),
+\qquad Y=AV.
+$$
 
-The catalog helps you find the right shelf; it is not the content you ultimately want to read.
-
-## A worked intuition: how a pronoun finds its meaning
+Each row of $A$ says where one token looks; the corresponding row of $Y$ is that token rewritten after gathering context. A token therefore does not keep one fixed meaning through the network. The representation of `bank`, for example, can become financial or geographic as successive layers retrieve different surrounding evidence.
 
 Consider the sentence:
 
-> "The animal did not cross the street because it was too tired."
+> “The animal did not cross the street because it was too tired.”
 
-When the model updates the representation of `it`, it needs evidence about the likely antecedent. Its query can encode several needs at once:
+When the model updates `it`, its query can ask for an animate antecedent compatible with being tired. `animal` offers a strong matching key and a useful value; `street` is nearby but semantically implausible; `tired` is not the antecedent but carries causal context. The output is not a hard pointer. It is a mixture whose largest contribution may come from `animal`, with additional information from the rest of the sentence.
 
-- I am looking for a likely antecedent.
-- It should be compatible with being "too tired."
-- It should make sense in the broader sentence.
-
-The other tokens provide keys and values. A key controls how strongly its token matches the current need; the corresponding value contains the information that can flow into the new representation of `it`.
-
-| Source token | Why its key might match | Typical attention weight |
+| Source token | Why its key might match | Likely contribution |
 | --- | --- | --- |
-| `animal` | Animate noun and plausible thing that can be tired | High |
-| `street` | Location, but a poor fit for "too tired" | Low |
-| `cross` | Relevant action, but not an antecedent | Medium-low |
-| `tired` | Important semantic clue about the cause | Medium |
+| `animal` | Animate noun and plausible thing that can be tired | Strong antecedent evidence |
+| `street` | Nearby noun but incompatible with fatigue | Low |
+| `cross` | Relevant event but not an antecedent | Event context |
+| `tired` | Explains the causal relation | Semantic clue |
 
-The output for `it` is not a hard pointer to `animal`. It is a weighted mixture, with a large contribution from the value associated with `animal` and additional context from tokens such as `tired`. The new representation therefore carries both a likely referent and the causal context in which fatigue explains the event.
-
-## Why the scaling term $\sqrt{d_k}$ matters
-
-The division by $\sqrt{d_k}$ is not a cosmetic trick. It keeps the softmax in a regime where learning remains stable.
-
-The paper gives a precise variance argument. If the components of a query and key are independent with mean zero and variance one, their dot product has variance $d_k$. Larger key dimensions therefore produce larger logits, pushing softmax toward regions with very small gradients.
-
-Dividing by $\sqrt{d_k}$ acts like temperature control. It prevents the model from becoming prematurely overconfident, especially during training, and lets the network compare candidates without collapsing into a near one-hot choice too soon.
-
-## Self-attention: every token rewrites itself using the whole sequence
-
-In self-attention, the same sequence provides the queries, keys, and values.
-If the input token matrix is $X \in \mathbb{R}^{n \times d_{\text{model}}}$,
-the model computes
-
-$$
-Q = XW^Q,\qquad
-K = XW^K,\qquad
-V = XW^V
-$$
-
-and then
-
-$$
-A = \operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right),
-\qquad
-Y = AV
-$$
-
-where:
-
-- each row of $A$ tells us **where one token looks**,
-- each row of $Y$ is the **rewritten version of that token after gathering context**.
-
-This is the deepest intuition behind self-attention: **a token does not keep a fixed meaning as it moves upward through the network.** It repeatedly rewrites itself by pulling in information from the tokens most relevant to it at that layer.
-
-That is why the word `bank` can mean a riverbank in one context and a financial institution in another. The token starts ambiguous, then becomes progressively disambiguated by attending to surrounding context.
-
-In decoder-only language models such as GPT, self-attention is causal: future positions are masked so a token can attend only to earlier positions. The retrieval operation stays the same; the mask changes which sources are admissible.
-
-To make that less abstract, here is a tiny runnable attention example.
-The default snippet uses a query representing the pronoun-like token and three candidate source tokens.
-Run it once, then step through the guided trace to see the raw scores, softmax weights, and final mixed value vector.
+In a decoder-only model, a causal mask removes future positions before softmax. The retrieval rule stays the same; the mask changes which keys are admissible. Self-attention also has no built-in sense of token order, so positional encodings such as RoPE must supply that structure. Run the small example below, then step through the raw scores, normalized weights, and mixed value vector.
 
 <PythonPlayground client:visible {...attentionMechanismsPlayground} />
 
-## Multi-head attention: one mechanism, many simultaneous views
+## The first branches: multiple heads and external memory
 
-A single attention operation forces every dependency to compete inside one score matrix, while language contains several kinds of relationship at once:
+Multi-head attention repeats the same operation under several learned projections. Each head has its own $W^Q$, $W^K$, and $W^V$, so the layer can represent several routing patterns before concatenating their outputs. Heads do not reliably map to neat human concepts such as “the syntax head,” but parallel projections do let different token relationships coexist.
 
-- syntactic structure,
-- coreference,
-- negation,
-- positional patterns,
-- semantic similarity,
-- long-range topic continuity.
+Cross-attention changes the source rather than the scoring rule. Queries come from one representation; keys and values come from another. A translation decoder can query encoder states, text tokens can query image features, and a learned output query can retrieve from a latent workspace.
 
-Multi-head attention learns several sets of projections. Each head gets its own $W^Q$, $W^K$, and $W^V$, so the model can build several compatibility functions over the same sequence before concatenating their outputs.
-
-People often say that different heads specialize in different things. That is a helpful intuition, even if real heads are not always cleanly interpretable. The key idea is that **multiple routing strategies can coexist in parallel**. One head can focus on local syntax while another tracks longer-range semantic dependencies.
-
-The common claim that individual heads neatly specialize in syntax, coreference, or position is an intuition, not a guarantee of interpretability. The source-backed claim is narrower: parallel learned projections let the layer represent several routing patterns at once.
-
-## Cross-attention: asking one representation to query another
-
-Cross-attention keeps the same mathematical structure but takes queries from one representation and keys and values from another.
-
-| Mechanism | Queries come from | Keys and values come from | Purpose |
+| Mechanism | Queries | Keys and values | Main purpose |
 | --- | --- | --- | --- |
-| Self-attention | The current sequence | The same sequence | Let tokens contextualize one another |
-| Cross-attention | One sequence or modality | A different sequence or modality | Retrieve information from an external source |
+| Self-attention | Current sequence | Same sequence | Contextualize positions within one stream |
+| Causal self-attention | Current sequence | Same sequence up to the current position | Autoregressive generation |
+| Cross-attention | One sequence or modality | Another sequence, modality, or memory | Retrieve external evidence |
+| Multi-head attention (MHA) | Several projected query heads | Separate K/V projections per head | Learn multiple routing patterns in parallel |
 
-In machine translation, the decoder uses cross-attention to query the encoder outputs: which source words are relevant to the next target token?
+These labels describe where information comes from and how many projections are used. Modern variants below change different axes, so a model can use causal self-attention, GQA, and sliding windows simultaneously without contradiction.
 
-In multimodal systems, text tokens can query image patches, or image features can query text embeddings. The deeper pattern is always the same: one representation acts as the current thinker, and another acts as an external memory to retrieve from.
+## Modern variants are responses to different bottlenecks
 
-## Why attention changed modern deep learning
+Full multi-head attention stores a key and value for every previous token and every KV head. During prefill, the model computes a logically dense $T\times T$ pattern of token interactions. During cached autoregressive decoding, one new query reads an ever-growing KV cache, so each step scales linearly with the existing context and cache storage also grows with context length. FlashAttention improves how dense attention moves data and avoids materializing the full matrix in slow memory; it does not remove the underlying all-pairs arithmetic of dense prefill.
 
-Attention became foundational because it combines several useful properties:
+That cost created several distinct design families:
 
-- **Direct access to distant information:** relevant tokens do not have to wait through many recurrent steps to influence one another.
-- **Parallel computation:** the whole attention matrix can be computed efficiently on modern hardware.
-- **Dynamic relevance:** the model decides on the fly which pieces of context matter for the current computation.
-- **Modality flexibility:** the same basic mechanism works for text, images, audio, and multimodal systems.
+| Design axis | Main variants | What they change | Main trade-off |
+| --- | --- | --- | --- |
+| KV-head sharing | MQA, GQA | Store fewer key-value heads | Smaller cache, less per-head K/V capacity |
+| Cache representation | MLA | Cache a compressed latent and reconstruct usable K/V state | Strong compression, more complex training and serving |
+| Visible positions | Sliding-window, learned sparse attention | Attend to a local or selected subset of tokens | Lower long-context cost, weaker guaranteed global access |
+| Memory representation | Linear attention, DeltaNet, Gated DeltaNet | Fold history into a fixed-size recurrent state | Constant-size state, lossy or capacity-limited retrieval |
+| Layer composition | Hybrid attention | Alternate cheap recurrent/local mixers with periodic full attention | Better efficiency-quality balance, more system complexity |
+| Output control | Gated attention | Scale retrieved features before the residual update | More control and stability, little change to core attention cost |
 
-Attention is not magic. Vanilla self-attention has quadratic cost in sequence length, which becomes expensive for long contexts. It also has no built-in notion of locality or order; those biases have to be learned or injected with masking and positional information.
+The table is the map: these methods are not one flat list because they solve different problems.
 
-## The mental model worth keeping
+### MQA and GQA share the KV cache
 
-The mechanism transfers if four distinctions stay intact:
+Standard MHA gives every query head its own key and value heads. Multi-query attention (MQA) takes the most aggressive sharing choice: all query heads use one K/V set. Grouped-query attention (GQA) lies between MHA and MQA, with groups of query heads sharing K/V projections.
 
-- **Attention is differentiable lookup.**
-  The model learns how to search memory rather than compressing everything into one fixed state.
-- **Keys decide where to look, values decide what comes back.**
-  That is the reason Q, K, and V are separate objects.
-- **Self-attention rewrites each token using context.**
-  The output is a new contextual representation, not a copied token.
-- **Multi-head attention lets the model run several routing strategies at once.**
-- **Cross-attention turns one representation into a query over another representation's memory.**
+![Comparison of multi-head, grouped-query, and multi-query attention showing how query heads share key and value heads](/assets/images/attention-variants-mha-gqa-mqa.png)
 
-The equation now answers a concrete question: for each output position, which sources match the current need, and what content should those sources contribute? The remaining limitation is cost: full self-attention compares every position with every other position, so its score matrix grows quadratically with sequence length.
+*Figure 2 from [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints](https://arxiv.org/abs/2305.13245) places the three cache layouts on one spectrum. MHA keeps one K/V pair per query head, GQA shares K/V within groups, and MQA shares one K/V pair across all query heads. Source: Ainslie et al., Figure 2.*
 
-## Further reading
+The benefit appears during inference. Reducing the number of KV heads reduces the cache stored per token and the memory traffic required to read it, while leaving the surrounding decoder architecture close to standard attention. The trade-off is a spectrum: MHA preserves the most independent K/V capacity, MQA compresses most aggressively, and GQA chooses an intermediate point that often retains more modeling quality.
 
-- Bahdanau, Cho, and Bengio, [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473)
-- Vaswani et al., [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
-- Dosovitskiy et al., [An Image Is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)
+### MLA compresses instead of sharing
+
+Multi-head latent attention (MLA), introduced with DeepSeek-V2, attacks the same cache bottleneck differently. GQA stores fewer full K/V heads; MLA stores a lower-dimensional latent representation and reconstructs the state needed by attention. This makes MLA a learned cache-compression mechanism embedded inside the layer.
+
+The distinction matters operationally. GQA is relatively simple and widely supported. MLA can preserve more head-specific information at a similar cache budget, but its projections, positional treatment, and inference path are more involved. They are alternative cache designs, not two names for the same kind of sharing.
+
+### Sliding windows and learned sparsity reduce the lookup set
+
+Sliding-window attention (SWA) keeps only a fixed local neighborhood visible in selected layers. It changes the number of positions examined, not the representation stored for each position. Architectures often mix local layers with periodic global layers so information can still travel across a long sequence. SWA also composes naturally with GQA: the window reduces how many tokens a layer reads, while grouping reduces how much K/V state each token contributes.
+
+Learned sparse attention replaces a fixed locality rule with content-based selection. DeepSeek Sparse Attention, for example, uses an indexer to score prior positions and a selector to keep a smaller high-scoring subset. MLA and sparse attention can therefore work together: MLA compresses what is cached, while sparsity reduces how much of that history is revisited for a query.
+
+The risk is retrieval failure. A local window can exclude a distant fact by construction; a learned selector can fail to rank the right fact. Full attention is expensive partly because it preserves the option to inspect every prior position.
+
+### Linear attention turns the past into a recurrent state
+
+Linear attention changes the memory representation more radically. Softmax is applied after $QK^\top$, which couples every query to every key. Kernelized linear attention applies a feature map $\phi$ to queries and keys separately, allowing the multiplication to be reassociated. Instead of retaining every K/V pair, the model can update fixed-size running statistics such as
+
+$$
+S_t=S_{t-1}+\phi(k_t)v_t^\top,
+\qquad
+z_t=z_{t-1}+\phi(k_t),
+$$
+
+and retrieve with
+
+$$
+y_t=
+\frac{\phi(q_t)^\top S_t}
+{\phi(q_t)^\top z_t}.
+$$
+
+This state does not grow with sequence length, which is attractive for long-context decoding. The cost is that individual token associations are superposed inside finite memory. Unlike a KV cache, the state cannot always recover one earlier value cleanly once many associations interfere.
+
+DeltaNet addresses that capacity problem with a delta-rule update. Before writing a key-value association, it reads what the current key already retrieves and writes only the error between that result and the new target value. Gating adds a separate ability to decay old state. The useful distinction is precise: the delta rule can replace a particular association, while a forget gate can clear or weaken memory more broadly.
+
+Kimi Delta Attention refines this line with finer-grained decay control. The supplied GPT-2-to-Kimi history makes the larger trajectory clear: efficient attention stopped being only a question of approximating softmax and became a question of memory management—what to store, what to overwrite, and what to forget.
+
+### Hybrid stacks keep an exact retrieval path
+
+Fixed-size recurrent memory is efficient but necessarily capacity-limited. Modern hybrid architectures therefore use cheap sequence mixers for most layers and periodically restore a full or compressed softmax-attention layer. Qwen-style hybrids combine runs of Gated DeltaNet with gated full attention; Kimi-style hybrids combine Kimi Delta Attention with periodic MLA; other systems substitute Lightning Attention or Mamba-style state-space blocks.
+
+The Gated DeltaNet paper shows the same design choice at two scales: the left and center stacks interleave recurrent modules with sliding-window attention, while the right panel opens the Gated DeltaNet block into its query, key, value, update, and output-gate paths.
+
+![Gated DeltaNet hybrid stacks and the internal gated delta-rule block](/assets/images/attention-hybrid-gated-deltanet.png)
+
+*Figure 1 from [Gated Delta Networks: Improving Mamba2 with Delta Rule](https://arxiv.org/abs/2412.06464) shows two hybrid stacks and the Gated DeltaNet block. H1 alternates Gated DeltaNet with sliding-window attention; H2 additionally uses Mamba2. The block produces $q$, $k$, $v$, a decay gate $\alpha$, and a write gate $\beta$ before applying the gated delta rule. Source: Yang et al., Figure 1.*
+
+The figure exposes why “hybrid attention” names a composition strategy rather than one attention equation. A model can choose a different cheap mixer, a different periodic retrieval layer, and a different ratio while preserving the same division of labor.
+
+The design principle is more important than any one ratio. Recurrent or linear layers carry a cheap running summary, while occasional full-attention layers recover token-level content that a compressed state may have lost. Gated attention is usually a modification of those retained full-attention blocks: an output gate controls how much retrieved information enters the residual stream, but the block still performs scaled dot-product attention.
+
+This is the modern endpoint of the history. The original RNN bottleneck motivated direct retrieval from an explicit sequence; current long-context systems reintroduce compressed recurrent memory for efficiency, then retain selective attention layers because exact retrieval still matters.
+
+## What changed, and what stayed the same
+
+Attention still answers one question: for this output position, which sources match the current need, and what content should they contribute? The variants differ in where they pay for that answer.
+
+- MHA pays for independent heads and full token-level memory.
+- GQA and MQA reduce the number of cached K/V heads.
+- MLA compresses the cached representation.
+- Sliding-window and learned sparse attention reduce the positions examined.
+- Linear and delta-rule methods replace an explicit token history with a fixed-size state.
+- Hybrid models spend most layers on cheap memory updates and reserve some layers for stronger retrieval.
+
+No variant dominates every regime. Full attention preserves exact access but grows expensive with context. Cache-sharing methods are simpler but reduce K/V capacity. Latent, sparse, and recurrent methods buy more efficiency with new approximation, tuning, kernel, or serving burdens. The right comparison is therefore not “which attention name is newest?” but “which bottleneck dominates this model, and which retrieval failure can it afford?”
+
+## References
+
+- Ali (`@waterloo_intern`), [“22580: From GPT2 to Kimi3, Explained”](https://x.com/i/status/2081762065392541951)
+- Sebastian Raschka, [“A Visual Guide to Attention Variants in Modern LLMs”](https://magazine.sebastianraschka.com/p/visual-attention-variants)
+- Bahdanau, Cho, and Bengio, [“Neural Machine Translation by Jointly Learning to Align and Translate”](https://arxiv.org/abs/1409.0473)
+- Vaswani et al., [“Attention Is All You Need”](https://arxiv.org/abs/1706.03762)
+- Shazeer, [“Fast Transformer Decoding: One Write-Head is All You Need”](https://arxiv.org/abs/1911.02150)
+- Katharopoulos et al., [“Transformers are RNNs: Fast Autoregressive Transformers with Linear Attention”](https://arxiv.org/abs/2006.16236)
+- Ainslie et al., [“GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints”](https://arxiv.org/abs/2305.13245)
+- DeepSeek-AI, [“DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model”](https://arxiv.org/abs/2405.04434)
+- Yang et al., [“Gated Delta Networks: Improving Mamba2 with Delta Rule”](https://arxiv.org/abs/2412.06464)
+- DeepSeek-AI, [“DeepSeek-V3.2: Pushing the Frontier of Open Large Language Models”](https://arxiv.org/abs/2512.02556)
