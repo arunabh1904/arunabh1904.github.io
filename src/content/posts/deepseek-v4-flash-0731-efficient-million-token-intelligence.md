@@ -1,6 +1,6 @@
 ---
 title: 'DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence after Post-Training'
-date: '2026-07-31T12:00:00.000Z'
+date: '2026-04-26T00:00:00.000Z'
 section: paper-shorts
 postSlug: deepseek-v4-flash-0731-efficient-million-token-intelligence
 legacyPath: /paper shorts/2026/07/31/deepseek-v4-flash-0731-efficient-million-token-intelligence.html
