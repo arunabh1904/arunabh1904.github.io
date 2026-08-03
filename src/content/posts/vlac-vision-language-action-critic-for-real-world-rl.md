@@ -1,6 +1,6 @@
 ---
 title: 'VLAC: A Vision-Language-Action-Critic Model for Real-World Reinforcement Learning'
-date: '2025-09-19T09:00:00.000Z'
+date: '2025-09-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: vlac-vision-language-action-critic-for-real-world-rl
 legacyPath: /paper shorts/2025/09/19/vlac-vision-language-action-critic-for-real-world-rl.html

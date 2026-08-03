@@ -1,6 +1,6 @@
 ---
 title: 'DAgger: A Reduction of Imitation Learning to No-Regret Online Learning'
-date: '2011-04-11T09:00:00.000Z'
+date: '2011-06-14T00:00:00.000Z'
 section: paper-shorts
 postSlug: dagger-reduction-of-imitation-learning-to-no-regret-online-learning
 legacyPath: /paper shorts/2011/04/11/dagger-reduction-of-imitation-learning-to-no-regret-online-learning.html

@@ -1,6 +1,6 @@
 ---
 title: 'DriveMM: All-in-One Large Multimodal Model for Autonomous Driving'
-date: '2024-12-01T05:00:00.000Z'
+date: '2024-12-10T00:00:00.000Z'
 section: paper-shorts
 postSlug: drivemm-all-in-one-large-multimodal-model-for-autonomous-driving
 legacyPath: /paper shorts/2024/12/01/drivemm-all-in-one-large-multimodal-model-for-autonomous-driving.html

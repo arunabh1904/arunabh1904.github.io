@@ -1,6 +1,6 @@
 ---
 title: 'TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes'
-date: '2024-03-01T05:00:00.000Z'
+date: '2024-03-28T00:00:00.000Z'
 section: paper-shorts
 postSlug: tod3cap-towards-3d-dense-captioning-in-outdoor-scenes
 legacyPath: /paper shorts/2024/03/01/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes.html

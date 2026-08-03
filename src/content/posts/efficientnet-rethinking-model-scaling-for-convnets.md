@@ -1,6 +1,6 @@
 ---
 title: EfficientNet — Rethinking Model Scaling for ConvNets
-date: '2019-05-01T04:00:00.000Z'
+date: '2019-05-28T00:00:00.000Z'
 section: paper-shorts
 postSlug: efficientnet-rethinking-model-scaling-for-convnets
 legacyPath: >-

@@ -1,6 +1,6 @@
 ---
 title: 'LMT-Net: Lane Model Transformer Network for Automated HD Mapping from Sparse Vehicle Observations'
-date: '2024-09-19T04:00:00.000Z'
+date: '2024-09-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations
 legacyPath: /paper shorts/2024/09/19/lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations.html

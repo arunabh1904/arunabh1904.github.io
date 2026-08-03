@@ -1,6 +1,6 @@
 ---
 title: 'Octo: An Open-Source Generalist Robot Policy'
-date: '2024-05-20T09:00:00.000Z'
+date: '2024-05-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: octo-an-open-source-generalist-robot-policy
 legacyPath: /paper shorts/2024/05/20/octo-an-open-source-generalist-robot-policy.html

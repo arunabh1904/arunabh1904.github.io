@@ -1,6 +1,6 @@
 ---
 title: 'RT-1: Robotics Transformer for Real-World Control at Scale'
-date: '2022-12-13T09:00:00.000Z'
+date: '2022-12-13T00:00:00.000Z'
 section: paper-shorts
 postSlug: rt-1-robotics-transformer-for-real-world-control-at-scale
 legacyPath: /paper shorts/2022/12/13/rt-1-robotics-transformer-for-real-world-control-at-scale.html

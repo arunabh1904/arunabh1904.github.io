@@ -1,6 +1,6 @@
 ---
 title: Improved Denoising Diffusion Probabilistic Models
-date: '2021-06-01T04:00:00.000Z'
+date: '2021-02-18T00:00:00.000Z'
 section: paper-shorts
 postSlug: improved-denoising-diffusion-probabilistic-models
 legacyPath: >-

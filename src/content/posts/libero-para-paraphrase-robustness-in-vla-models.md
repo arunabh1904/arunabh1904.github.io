@@ -1,6 +1,6 @@
 ---
 title: 'LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models'
-date: '2026-03-30T09:00:00.000Z'
+date: '2026-03-30T00:00:00.000Z'
 section: paper-shorts
 postSlug: libero-para-paraphrase-robustness-in-vla-models
 legacyPath: /paper shorts/2026/03/30/libero-para-paraphrase-robustness-in-vla-models.html

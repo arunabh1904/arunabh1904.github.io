@@ -1,6 +1,6 @@
 ---
 title: 'OpenDriveVLA: Towards End-to-end Autonomous Driving with Large Vision Language Action Model'
-date: '2025-03-30T04:00:00.000Z'
+date: '2025-03-30T00:00:00.000Z'
 section: paper-shorts
 postSlug: opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model
 legacyPath: /paper shorts/2025/03/30/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model.html

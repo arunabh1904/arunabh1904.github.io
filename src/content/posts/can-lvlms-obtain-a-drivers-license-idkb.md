@@ -1,6 +1,6 @@
 ---
 title: "Can LVLMs Obtain a Driver's License?"
-date: '2024-09-01T04:00:00.000Z'
+date: '2024-09-04T00:00:00.000Z'
 section: paper-shorts
 postSlug: can-lvlms-obtain-a-drivers-license-idkb
 legacyPath: /paper shorts/2024/09/01/can-lvlms-obtain-a-drivers-license-idkb.html

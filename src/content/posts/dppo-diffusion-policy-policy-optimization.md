@@ -1,6 +1,6 @@
 ---
 title: 'DPPO: Diffusion Policy Policy Optimization'
-date: '2024-09-01T09:00:00.000Z'
+date: '2024-09-01T00:00:00.000Z'
 section: paper-shorts
 postSlug: dppo-diffusion-policy-policy-optimization
 legacyPath: /paper shorts/2024/09/01/dppo-diffusion-policy-policy-optimization.html

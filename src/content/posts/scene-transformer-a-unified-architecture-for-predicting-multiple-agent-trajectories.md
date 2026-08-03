@@ -1,6 +1,6 @@
 ---
 title: 'Scene Transformer: A Unified Architecture for Predicting Multiple Agent Trajectories'
-date: '2021-06-15T04:00:00.000Z'
+date: '2021-06-15T00:00:00.000Z'
 section: paper-shorts
 postSlug: scene-transformer-a-unified-architecture-for-predicting-multiple-agent-trajectories
 legacyPath: /paper shorts/2021/06/15/scene-transformer-a-unified-architecture-for-predicting-multiple-agent-trajectories.html

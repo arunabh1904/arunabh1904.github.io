@@ -1,6 +1,6 @@
 ---
 title: 'TokenFlow: Unified Image Tokenizer for Multimodal Understanding and Generation'
-date: '2024-12-04T09:00:00.000Z'
+date: '2024-12-04T00:00:00.000Z'
 section: paper-shorts
 postSlug: tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation
 legacyPath: /paper shorts/2024/12/04/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation.html

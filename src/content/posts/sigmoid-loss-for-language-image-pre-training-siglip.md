@@ -1,6 +1,6 @@
 ---
 title: 'Sigmoid Loss for Language-Image Pre-Training (SigLIP)'
-date: '2023-03-01T18:55:11.000Z'
+date: '2023-03-27T00:00:00.000Z'
 section: paper-shorts
 postSlug: sigmoid-loss-for-language-image-pre-training-siglip
 legacyPath: /paper shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html

@@ -1,6 +1,6 @@
 ---
 title: 'Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-Language-Action Inference for Closed-Loop Driving'
-date: '2026-07-17T09:00:00.000Z'
+date: '2026-07-17T00:00:00.000Z'
 section: paper-shorts
 postSlug: think-at-5-hz-act-at-20-hz-asynchronous-fast-slow-vision-language-action-inference-for-closed-loop-d
 legacyPath: /paper shorts/2026/07/17/think-at-5-hz-act-at-20-hz-asynchronous-fast-slow-vision-language-action-inference-for-closed-loop-d.html

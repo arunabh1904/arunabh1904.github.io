@@ -1,6 +1,6 @@
 ---
 title: 'Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future'
-date: '2025-12-18T05:00:00.000Z'
+date: '2025-12-18T00:00:00.000Z'
 section: paper-shorts
 postSlug: vision-language-action-models-for-autonomous-driving-past-present-and-future
 legacyPath: /paper shorts/2025/12/18/vision-language-action-models-for-autonomous-driving-past-present-and-future.html

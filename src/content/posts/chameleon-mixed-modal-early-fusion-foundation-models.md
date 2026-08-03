@@ -1,6 +1,6 @@
 ---
 title: 'Chameleon: Mixed-Modal Early-Fusion Foundation Models'
-date: '2024-05-16T09:00:00.000Z'
+date: '2024-05-16T00:00:00.000Z'
 section: paper-shorts
 postSlug: chameleon-mixed-modal-early-fusion-foundation-models
 legacyPath: /paper shorts/2024/05/16/chameleon-mixed-modal-early-fusion-foundation-models.html

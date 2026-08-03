@@ -1,6 +1,6 @@
 ---
 title: 'Constitutional AI: Harmlessness from AI Feedback'
-date: '2022-12-15T09:00:00.000Z'
+date: '2022-12-15T00:00:00.000Z'
 section: paper-shorts
 postSlug: constitutional-ai-harmlessness-from-ai-feedback
 legacyPath: /paper shorts/2022/12/15/constitutional-ai-harmlessness-from-ai-feedback.html

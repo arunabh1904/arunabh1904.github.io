@@ -1,6 +1,6 @@
 ---
 title: 'Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model'
-date: '2019-11-01T05:00:00.000Z'
+date: '2019-11-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: mastering-atari-go-chess-shogi-muzero
 legacyPath: /paper shorts/2019/11/01/mastering-atari-go-chess-shogi-muzero.html

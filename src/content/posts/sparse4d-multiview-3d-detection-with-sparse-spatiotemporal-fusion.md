@@ -1,6 +1,6 @@
 ---
 title: 'Sparse4D: Multi-View 3D Object Detection with Sparse Spatial-Temporal Fusion'
-date: '2022-11-19T05:00:00.000Z'
+date: '2022-11-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion
 legacyPath: /paper shorts/2022/11/19/sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion.html

@@ -1,6 +1,6 @@
 ---
 title: 'MapTR: Structured Modeling and Learning for Online Vectorized HD Map Construction'
-date: '2022-08-30T04:00:00.000Z'
+date: '2022-08-30T00:00:00.000Z'
 section: paper-shorts
 postSlug: maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-construction
 legacyPath: /paper shorts/2022/08/30/maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-construction.html

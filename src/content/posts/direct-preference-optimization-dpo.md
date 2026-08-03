@@ -1,6 +1,6 @@
 ---
 title: 'Direct Preference Optimization'
-date: '2023-05-29T21:55:10.000Z'
+date: '2023-05-29T00:00:00.000Z'
 section: paper-shorts
 postSlug: direct-preference-optimization-dpo
 legacyPath: /paper shorts/2023/05/01/direct-preference-optimization-dpo.html

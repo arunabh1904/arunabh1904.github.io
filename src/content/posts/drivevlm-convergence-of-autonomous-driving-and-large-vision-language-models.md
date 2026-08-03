@@ -1,6 +1,6 @@
 ---
 title: 'DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models'
-date: '2024-02-01T05:00:00.000Z'
+date: '2024-02-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models
 legacyPath: /paper shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models.html

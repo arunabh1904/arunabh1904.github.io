@@ -1,6 +1,6 @@
 ---
 title: 'TorchTitan: One-stop PyTorch Native Solution for Production-ready LLM Pre-training'
-date: '2024-10-09T09:00:00.000Z'
+date: '2024-10-09T00:00:00.000Z'
 section: paper-shorts
 postSlug: torchtitan-one-stop-pytorch-native-solution-for-production-ready-llm-pre-training
 legacyPath: /paper shorts/2024/10/09/torchtitan-one-stop-pytorch-native-solution-for-production-ready-llm-pre-training.html

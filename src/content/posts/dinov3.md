@@ -1,6 +1,6 @@
 ---
 title: 'DINOv3'
-date: '2025-08-13T18:00:55.000Z'
+date: '2025-08-13T00:00:00.000Z'
 section: paper-shorts
 postSlug: dinov3
 legacyPath: /paper shorts/2025/08/13/dinov3.html

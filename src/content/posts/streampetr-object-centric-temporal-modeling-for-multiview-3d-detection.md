@@ -1,6 +1,6 @@
 ---
 title: 'StreamPETR: Object-Centric Temporal Modeling for Efficient Multi-View 3D Object Detection'
-date: '2023-03-21T04:00:00.000Z'
+date: '2023-03-21T00:00:00.000Z'
 section: paper-shorts
 postSlug: streampetr-object-centric-temporal-modeling-for-multiview-3d-detection
 legacyPath: /paper shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html

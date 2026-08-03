@@ -1,6 +1,6 @@
 ---
 title: 'RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning'
-date: '2024-12-13T09:00:00.000Z'
+date: '2024-12-13T00:00:00.000Z'
 section: paper-shorts
 postSlug: rldg-robotic-generalist-policy-distillation-via-reinforcement-learning
 legacyPath: /paper shorts/2024/12/13/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning.html

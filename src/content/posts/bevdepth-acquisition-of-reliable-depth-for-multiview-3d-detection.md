@@ -1,6 +1,6 @@
 ---
 title: 'BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection'
-date: '2022-06-21T04:00:00.000Z'
+date: '2022-06-21T00:00:00.000Z'
 section: paper-shorts
 postSlug: bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection
 legacyPath: /paper shorts/2022/06/21/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection.html

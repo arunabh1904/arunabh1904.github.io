@@ -1,6 +1,6 @@
 ---
 title: 'LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning'
-date: '2023-06-05T09:00:00.000Z'
+date: '2023-06-05T00:00:00.000Z'
 section: paper-shorts
 postSlug: libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning
 legacyPath: /paper shorts/2023/06/05/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning.html

@@ -1,6 +1,6 @@
 ---
 title: 'MetaBEV: Solving Sensor Failures for BEV Detection and Map Segmentation'
-date: '2023-04-19T04:00:00.000Z'
+date: '2023-04-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: metabev-solving-sensor-failures-for-bev-perception
 legacyPath: /paper shorts/2023/04/19/metabev-solving-sensor-failures-for-bev-perception.html

@@ -1,6 +1,6 @@
 ---
 title: 'Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains'
-date: '2020-06-18T04:00:00.000Z'
+date: '2020-06-18T00:00:00.000Z'
 section: paper-shorts
 postSlug: fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains
 legacyPath: /paper shorts/2020/06/18/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains.html

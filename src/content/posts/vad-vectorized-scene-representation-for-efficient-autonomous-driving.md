@@ -1,6 +1,6 @@
 ---
 title: 'VAD: Vectorized Scene Representation for Efficient Autonomous Driving'
-date: '2023-03-21T04:00:00.000Z'
+date: '2023-03-21T00:00:00.000Z'
 section: paper-shorts
 postSlug: vad-vectorized-scene-representation-for-efficient-autonomous-driving
 legacyPath: /paper shorts/2023/03/21/vad-vectorized-scene-representation-for-efficient-autonomous-driving.html

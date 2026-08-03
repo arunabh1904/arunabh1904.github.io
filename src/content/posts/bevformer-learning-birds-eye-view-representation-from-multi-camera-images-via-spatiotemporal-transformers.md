@@ -1,6 +1,6 @@
 ---
 title: "BEVFormer: Learning Bird's-Eye-View Representation from Multi-Camera Images via Spatiotemporal Transformers"
-date: '2022-03-31T04:00:00.000Z'
+date: '2022-03-31T00:00:00.000Z'
 section: paper-shorts
 postSlug: bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers
 legacyPath: /paper shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html

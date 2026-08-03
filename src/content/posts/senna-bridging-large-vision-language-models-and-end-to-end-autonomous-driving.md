@@ -1,6 +1,6 @@
 ---
 title: 'SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving'
-date: '2024-10-01T04:00:00.000Z'
+date: '2024-10-29T00:00:00.000Z'
 section: paper-shorts
 postSlug: senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving
 legacyPath: /paper shorts/2024/10/01/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving.html

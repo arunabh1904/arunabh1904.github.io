@@ -1,6 +1,6 @@
 ---
 title: 'RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models'
-date: '2025-05-22T09:00:00.000Z'
+date: '2025-05-22T00:00:00.000Z'
 section: paper-shorts
 postSlug: ript-vla-interactive-post-training-for-vision-language-action-models
 legacyPath: /paper shorts/2025/05/22/ript-vla-interactive-post-training-for-vision-language-action-models.html

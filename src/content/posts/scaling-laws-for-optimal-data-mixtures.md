@@ -1,6 +1,6 @@
 ---
 title: 'Scaling Laws for Optimal Data Mixtures'
-date: '2025-07-12T09:00:00.000Z'
+date: '2025-07-12T00:00:00.000Z'
 section: paper-shorts
 postSlug: scaling-laws-for-optimal-data-mixtures
 legacyPath: /paper shorts/2025/07/12/scaling-laws-for-optimal-data-mixtures.html

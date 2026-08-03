@@ -1,6 +1,6 @@
 ---
 title: 'Open X-Embodiment: Robotic Learning Datasets and RT-X Models'
-date: '2023-10-13T09:00:00.000Z'
+date: '2023-10-13T00:00:00.000Z'
 section: paper-shorts
 postSlug: open-x-embodiment-robotic-learning-datasets-and-rt-x-models
 legacyPath: /paper shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html

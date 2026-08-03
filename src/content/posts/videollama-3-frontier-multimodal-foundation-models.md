@@ -1,6 +1,6 @@
 ---
 title: 'VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding'
-date: '2025-01-01T05:00:00.000Z'
+date: '2025-01-22T00:00:00.000Z'
 section: paper-shorts
 postSlug: videollama-3-frontier-multimodal-foundation-models
 legacyPath: /paper shorts/2025/01/01/videollama-3-frontier-multimodal-foundation-models.html

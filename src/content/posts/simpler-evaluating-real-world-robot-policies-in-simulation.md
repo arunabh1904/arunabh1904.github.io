@@ -1,6 +1,6 @@
 ---
 title: 'SIMPLER: Evaluating Real-World Robot Manipulation Policies in Simulation'
-date: '2024-05-09T09:00:00.000Z'
+date: '2024-05-09T00:00:00.000Z'
 section: paper-shorts
 postSlug: simpler-evaluating-real-world-robot-policies-in-simulation
 legacyPath: /paper shorts/2024/05/09/simpler-evaluating-real-world-robot-policies-in-simulation.html

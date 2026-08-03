@@ -1,6 +1,6 @@
 ---
 title: 'Scaling Laws for Native Multimodal Models'
-date: '2025-04-10T09:00:00.000Z'
+date: '2025-04-10T00:00:00.000Z'
 section: paper-shorts
 postSlug: scaling-laws-for-native-multimodal-models
 legacyPath: /paper shorts/2025/04/10/scaling-laws-for-native-multimodal-models.html

@@ -1,6 +1,6 @@
 ---
 title: 'TransFusion: Robust LiDAR-Camera Fusion for 3D Object Detection with Transformers'
-date: '2022-03-22T04:00:00.000Z'
+date: '2022-03-22T00:00:00.000Z'
 section: paper-shorts
 postSlug: transfusion-robust-lidar-camera-fusion-with-transformers
 legacyPath: /paper shorts/2022/03/22/transfusion-robust-lidar-camera-fusion-with-transformers.html

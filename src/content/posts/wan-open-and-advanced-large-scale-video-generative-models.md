@@ -1,6 +1,6 @@
 ---
 title: 'Wan: Open and Advanced Large-Scale Video Generative Models'
-date: '2025-03-26T09:00:00.000Z'
+date: '2025-03-26T00:00:00.000Z'
 section: paper-shorts
 postSlug: wan-open-and-advanced-large-scale-video-generative-models
 legacyPath: /paper shorts/2025/03/26/wan-open-and-advanced-large-scale-video-generative-models.html

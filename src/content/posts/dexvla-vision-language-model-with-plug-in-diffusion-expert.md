@@ -1,6 +1,6 @@
 ---
 title: 'DexVLA: Vision-Language Model with Plug-In Diffusion Expert for General Robot Control'
-date: '2025-02-01T05:00:00.000Z'
+date: '2025-02-09T00:00:00.000Z'
 section: paper-shorts
 postSlug: dexvla-vision-language-model-with-plug-in-diffusion-expert
 legacyPath: /paper shorts/2025/02/01/dexvla-vision-language-model-with-plug-in-diffusion-expert.html

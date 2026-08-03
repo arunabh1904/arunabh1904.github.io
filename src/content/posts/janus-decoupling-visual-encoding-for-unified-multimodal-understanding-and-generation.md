@@ -1,6 +1,6 @@
 ---
 title: 'Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation'
-date: '2024-10-17T09:00:00.000Z'
+date: '2024-10-17T00:00:00.000Z'
 section: paper-shorts
 postSlug: janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation
 legacyPath: /paper shorts/2024/10/17/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation.html

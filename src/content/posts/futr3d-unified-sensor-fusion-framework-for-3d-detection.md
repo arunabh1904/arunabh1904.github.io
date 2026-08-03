@@ -1,6 +1,6 @@
 ---
 title: 'FUTR3D: A Unified Sensor Fusion Framework for 3D Detection'
-date: '2022-03-20T04:00:00.000Z'
+date: '2022-03-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: futr3d-unified-sensor-fusion-framework-for-3d-detection
 legacyPath: /paper shorts/2022/03/20/futr3d-unified-sensor-fusion-framework-for-3d-detection.html

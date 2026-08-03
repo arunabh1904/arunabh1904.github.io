@@ -1,6 +1,6 @@
 ---
 title: 'DeepInteraction: 3D Object Detection via Modality Interaction'
-date: '2022-08-23T04:00:00.000Z'
+date: '2022-08-23T00:00:00.000Z'
 section: paper-shorts
 postSlug: deepinteraction-3d-object-detection-via-modality-interaction
 legacyPath: /paper shorts/2022/08/23/deepinteraction-3d-object-detection-via-modality-interaction.html

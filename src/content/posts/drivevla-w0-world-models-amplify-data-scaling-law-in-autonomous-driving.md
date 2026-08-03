@@ -1,6 +1,6 @@
 ---
 title: 'DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving'
-date: '2025-10-14T04:00:00.000Z'
+date: '2025-10-14T00:00:00.000Z'
 section: paper-shorts
 postSlug: drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving
 legacyPath: /paper shorts/2025/10/14/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving.html

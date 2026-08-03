@@ -1,6 +1,6 @@
 ---
 title: 'PerceptDrive: Perception Prior World-Action Modeling with Adaptive Expert Routing for End-to-End Autonomous Driving'
-date: '2026-07-24T14:30:00.000Z'
+date: '2026-07-22T00:00:00.000Z'
 section: paper-shorts
 postSlug: perceptdrive-perception-prior-world-action-modeling-with-adaptive-expert-routing-for-end-to-end-autonomous-driving
 legacyPath: /paper shorts/2026/07/24/perceptdrive-perception-prior-world-action-modeling-with-adaptive-expert-routing-for-end-to-end-autonomous-driving.html

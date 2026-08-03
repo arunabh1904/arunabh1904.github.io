@@ -1,6 +1,6 @@
 ---
 title: 'Robust Autonomy Emerges from Self-Play'
-date: '2026-07-24T13:00:00.000Z'
+date: '2025-02-05T00:00:00.000Z'
 section: paper-shorts
 postSlug: robust-autonomy-emerges-from-self-play
 legacyPath: /paper shorts/2026/07/24/robust-autonomy-emerges-from-self-play.html

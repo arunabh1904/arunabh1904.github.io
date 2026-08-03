@@ -1,6 +1,6 @@
 ---
 title: 'PaliGemma: A Versatile 3B VLM for Transfer'
-date: '2024-07-10T04:00:00.000Z'
+date: '2024-07-10T00:00:00.000Z'
 section: paper-shorts
 postSlug: paligemma-a-versatile-3b-vlm-for-transfer
 legacyPath: /paper shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html

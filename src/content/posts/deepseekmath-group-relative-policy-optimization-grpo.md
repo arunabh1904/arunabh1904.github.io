@@ -1,6 +1,6 @@
 ---
 title: 'DeepSeekMath: Group Relative Policy Optimization (GRPO)'
-date: '2024-02-05T18:55:32.000Z'
+date: '2024-02-05T00:00:00.000Z'
 section: paper-shorts
 postSlug: deepseekmath-group-relative-policy-optimization-grpo
 legacyPath: /paper shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html

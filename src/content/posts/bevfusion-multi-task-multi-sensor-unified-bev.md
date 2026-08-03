@@ -1,6 +1,6 @@
 ---
 title: "BEVFusion: Multi-Task Multi-Sensor Fusion with Unified Bird's-Eye View Representation"
-date: '2022-05-26T04:00:00.000Z'
+date: '2022-05-26T00:00:00.000Z'
 section: paper-shorts
 postSlug: bevfusion-multi-task-multi-sensor-unified-bev
 legacyPath: /paper shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html

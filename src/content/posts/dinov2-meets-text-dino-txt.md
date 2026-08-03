@@ -1,6 +1,6 @@
 ---
 title: 'DINOv2 Meets Text: dino.txt'
-date: '2024-12-20T20:46:48.000Z'
+date: '2024-12-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: dinov2-meets-text-dino-txt
 legacyPath: /paper shorts/2024/12/20/dinov2-meets-text-dino-txt.html

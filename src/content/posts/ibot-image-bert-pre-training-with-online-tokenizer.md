@@ -1,6 +1,6 @@
 ---
 title: 'iBOT: Image BERT Pre-Training with Online Tokenizer'
-date: '2021-11-15T15:18:05.000Z'
+date: '2021-11-15T00:00:00.000Z'
 section: paper-shorts
 postSlug: ibot-image-bert-pre-training-with-online-tokenizer
 legacyPath: /paper shorts/2021/11/15/ibot-image-bert-pre-training-with-online-tokenizer.html

@@ -1,6 +1,6 @@
 ---
 title: 'Expertise Need Not Monopolize: Action-Specialized Mixture of Experts for Vision-Language-Action Learning'
-date: '2026-07-24T14:05:00.000Z'
+date: '2025-10-16T00:00:00.000Z'
 section: paper-shorts
 postSlug: expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning
 legacyPath: /paper shorts/2026/07/24/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning.html

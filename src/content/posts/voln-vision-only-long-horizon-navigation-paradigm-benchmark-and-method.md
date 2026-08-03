@@ -1,6 +1,6 @@
 ---
 title: 'VoLN: Vision-Only Long-Horizon Navigation—Paradigm, Benchmark, and Method'
-date: '2026-07-24T14:25:00.000Z'
+date: '2026-07-23T00:00:00.000Z'
 section: paper-shorts
 postSlug: voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method
 legacyPath: /paper shorts/2026/07/24/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method.html

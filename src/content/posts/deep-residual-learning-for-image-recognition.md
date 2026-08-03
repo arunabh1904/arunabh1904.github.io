@@ -1,6 +1,6 @@
 ---
 title: Deep Residual Learning for Image Recognition
-date: '2015-12-01T05:00:00.000Z'
+date: '2015-12-10T00:00:00.000Z'
 section: paper-shorts
 postSlug: deep-residual-learning-for-image-recognition
 legacyPath: /paper shorts/2015/12/01/deep-residual-learning-for-image-recognition.html

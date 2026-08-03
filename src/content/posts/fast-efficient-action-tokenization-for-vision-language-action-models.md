@@ -1,6 +1,6 @@
 ---
 title: 'FAST: Efficient Action Tokenization for Vision-Language-Action Models'
-date: '2025-01-01T05:00:00.000Z'
+date: '2025-01-16T00:00:00.000Z'
 section: paper-shorts
 postSlug: fast-efficient-action-tokenization-for-vision-language-action-models
 legacyPath: /paper shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html

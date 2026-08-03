@@ -1,6 +1,6 @@
 ---
 title: Sequence to Sequence Learning with Neural Networks
-date: '2014-09-01T04:00:00.000Z'
+date: '2014-09-10T00:00:00.000Z'
 section: paper-shorts
 postSlug: sequence-to-sequence-learning-with-neural-networks
 legacyPath: >-

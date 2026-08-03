@@ -1,6 +1,6 @@
 ---
 title: 'Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model'
-date: '2024-08-20T09:00:00.000Z'
+date: '2024-08-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model
 legacyPath: /paper shorts/2024/08/20/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model.html

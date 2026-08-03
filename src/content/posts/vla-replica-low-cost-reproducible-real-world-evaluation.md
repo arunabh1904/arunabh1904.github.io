@@ -1,6 +1,6 @@
 ---
 title: 'VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation'
-date: '2026-05-20T09:00:00.000Z'
+date: '2026-05-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: vla-replica-low-cost-reproducible-real-world-evaluation
 legacyPath: /paper shorts/2026/05/20/vla-replica-low-cost-reproducible-real-world-evaluation.html

@@ -1,6 +1,6 @@
 ---
 title: 'Scaling Motion Forecasting Models with Ensemble Distillation'
-date: '2024-04-05T04:00:00.000Z'
+date: '2024-04-05T00:00:00.000Z'
 section: paper-shorts
 postSlug: scaling-motion-forecasting-models-with-ensemble-distillation
 legacyPath: /paper shorts/2024/04/05/scaling-motion-forecasting-models-with-ensemble-distillation.html

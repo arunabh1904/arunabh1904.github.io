@@ -1,6 +1,6 @@
 ---
 title: 'VLM-AD: End-to-End Autonomous Driving through Vision-Language Model Supervision'
-date: '2024-12-19T05:00:00.000Z'
+date: '2024-12-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision
 legacyPath: /paper shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision.html

@@ -1,6 +1,6 @@
 ---
 title: 'Scaling Laws for Reward Model Overoptimization'
-date: '2022-10-19T09:00:00.000Z'
+date: '2022-10-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: scaling-laws-for-reward-model-overoptimization
 legacyPath: /paper shorts/2022/10/19/scaling-laws-for-reward-model-overoptimization.html
