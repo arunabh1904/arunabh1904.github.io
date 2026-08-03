@@ -1,6 +1,6 @@
 ---
 title: 'LaneGCN: Learning Lane Graph Representations for Motion Forecasting'
-date: '2020-07-27T04:00:00.000Z'
+date: '2020-07-27T00:00:00.000Z'
 section: paper-shorts
 postSlug: lanegcn-learning-lane-graph-representations-for-motion-forecasting
 legacyPath: /paper shorts/2020/07/27/lanegcn-learning-lane-graph-representations-for-motion-forecasting.html

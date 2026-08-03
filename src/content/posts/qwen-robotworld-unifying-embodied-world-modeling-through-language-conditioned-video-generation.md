@@ -1,6 +1,6 @@
 ---
 title: 'Qwen-RobotWorld: Unifying Embodied World Modeling through Language-Conditioned Video Generation'
-date: '2026-07-24T13:00:00.000Z'
+date: '2026-06-15T00:00:00.000Z'
 section: paper-shorts
 postSlug: qwen-robotworld-unifying-embodied-world-modeling-through-language-conditioned-video-generation
 legacyPath: /paper shorts/2026/07/24/qwen-robotworld-unifying-embodied-world-modeling-through-language-conditioned-video-generation.html

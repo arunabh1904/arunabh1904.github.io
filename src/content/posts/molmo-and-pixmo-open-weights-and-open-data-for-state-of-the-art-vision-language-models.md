@@ -1,6 +1,6 @@
 ---
 title: 'Molmo and PixMo: Open Weights and Open Data for State-of-the-Art Vision-Language Models'
-date: '2024-09-01T04:00:00.000Z'
+date: '2024-09-25T00:00:00.000Z'
 section: paper-shorts
 postSlug: molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models
 legacyPath: /paper shorts/2024/09/01/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models.html

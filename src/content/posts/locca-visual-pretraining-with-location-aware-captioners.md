@@ -1,6 +1,6 @@
 ---
 title: 'LocCa: Visual Pretraining with Location-aware Captioners'
-date: '2024-03-28T04:00:00.000Z'
+date: '2024-03-28T00:00:00.000Z'
 section: paper-shorts
 postSlug: locca-visual-pretraining-with-location-aware-captioners
 legacyPath: /paper shorts/2024/03/28/locca-visual-pretraining-with-location-aware-captioners.html

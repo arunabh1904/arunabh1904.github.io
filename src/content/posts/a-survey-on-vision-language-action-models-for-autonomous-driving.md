@@ -1,6 +1,6 @@
 ---
 title: 'A Survey on Vision-Language-Action Models for Autonomous Driving'
-date: '2025-06-30T04:00:00.000Z'
+date: '2025-06-30T00:00:00.000Z'
 section: paper-shorts
 postSlug: a-survey-on-vision-language-action-models-for-autonomous-driving
 legacyPath: /paper shorts/2025/06/30/a-survey-on-vision-language-action-models-for-autonomous-driving.html

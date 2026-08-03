@@ -1,6 +1,6 @@
 ---
 title: 'KTO: Model Alignment as Prospect Theoretic Optimization'
-date: '2024-02-02T09:00:00.000Z'
+date: '2024-02-02T00:00:00.000Z'
 section: paper-shorts
 postSlug: kto-model-alignment-as-prospect-theoretic-optimization
 legacyPath: /paper shorts/2024/02/02/kto-model-alignment-as-prospect-theoretic-optimization.html

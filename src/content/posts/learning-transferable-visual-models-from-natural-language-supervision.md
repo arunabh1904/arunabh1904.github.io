@@ -1,6 +1,6 @@
 ---
 title: Learning Transferable Visual Models From Natural Language Supervision
-date: '2021-03-01T04:00:00.000Z'
+date: '2021-02-26T00:00:00.000Z'
 section: paper-shorts
 postSlug: learning-transferable-visual-models-from-natural-language-supervision
 legacyPath: >-

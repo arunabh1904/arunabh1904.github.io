@@ -1,6 +1,6 @@
 ---
 title: 'Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rigs by Implicitly Unprojecting to 3D'
-date: '2020-08-13T04:00:00.000Z'
+date: '2020-08-13T00:00:00.000Z'
 section: paper-shorts
 postSlug: lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs
 legacyPath: /paper shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html

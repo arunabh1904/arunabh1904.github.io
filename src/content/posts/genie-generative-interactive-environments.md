@@ -1,6 +1,6 @@
 ---
 title: 'Genie: Generative Interactive Environments'
-date: '2024-02-23T09:00:00.000Z'
+date: '2024-02-23T00:00:00.000Z'
 section: paper-shorts
 postSlug: genie-generative-interactive-environments
 legacyPath: /paper shorts/2024/02/23/genie-generative-interactive-environments.html

@@ -1,6 +1,6 @@
 ---
 title: "Talk2BEV: Language-enhanced Bird's-eye View Maps for Autonomous Driving"
-date: '2023-10-03T04:00:00.000Z'
+date: '2023-10-03T00:00:00.000Z'
 section: paper-shorts
 postSlug: talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving
 legacyPath: /paper shorts/2023/10/03/talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving.html

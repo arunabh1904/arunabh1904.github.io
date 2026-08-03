@@ -1,6 +1,6 @@
 ---
 title: 'UniAD: Planning-oriented Autonomous Driving'
-date: '2022-12-20T05:00:00.000Z'
+date: '2022-12-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: uniad-planning-oriented-autonomous-driving
 legacyPath: /paper shorts/2022/12/20/uniad-planning-oriented-autonomous-driving.html

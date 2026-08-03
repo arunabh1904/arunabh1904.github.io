@@ -1,6 +1,6 @@
 ---
 title: 'RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control'
-date: '2023-07-28T09:00:00.000Z'
+date: '2023-07-28T00:00:00.000Z'
 section: paper-shorts
 postSlug: rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control
 legacyPath: /paper shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html

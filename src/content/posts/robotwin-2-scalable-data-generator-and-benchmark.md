@@ -1,6 +1,6 @@
 ---
 title: 'RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation'
-date: '2025-06-20T09:00:00.000Z'
+date: '2025-06-22T00:00:00.000Z'
 section: paper-shorts
 postSlug: robotwin-2-scalable-data-generator-and-benchmark
 legacyPath: /paper shorts/2025/06/20/robotwin-2-scalable-data-generator-and-benchmark.html

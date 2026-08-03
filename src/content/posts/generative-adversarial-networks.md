@@ -1,6 +1,6 @@
 ---
 title: Generative Adversarial Networks
-date: '2014-06-01T04:00:00.000Z'
+date: '2014-06-10T00:00:00.000Z'
 section: paper-shorts
 postSlug: generative-adversarial-networks
 legacyPath: /paper shorts/2014/06/01/generative-adversarial-networks.html

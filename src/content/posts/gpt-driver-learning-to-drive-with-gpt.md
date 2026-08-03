@@ -1,6 +1,6 @@
 ---
 title: 'GPT-Driver: Learning to Drive with GPT'
-date: '2023-10-01T04:00:00.000Z'
+date: '2023-10-02T00:00:00.000Z'
 section: paper-shorts
 postSlug: gpt-driver-learning-to-drive-with-gpt
 legacyPath: /paper shorts/2023/10/01/gpt-driver-learning-to-drive-with-gpt.html

@@ -1,6 +1,6 @@
 ---
 title: 'DINOv2: Learning Robust Visual Features without Supervision'
-date: '2023-04-14T15:12:19.000Z'
+date: '2023-04-14T00:00:00.000Z'
 section: paper-shorts
 postSlug: dinov2-learning-robust-visual-features-without-supervision
 legacyPath: /paper shorts/2023/04/14/dinov2-learning-robust-visual-features-without-supervision.html

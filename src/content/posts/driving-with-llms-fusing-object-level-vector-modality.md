@@ -1,6 +1,6 @@
 ---
 title: 'Driving with LLMs: Fusing Object-Level Vector Modality for Explainable Autonomous Driving'
-date: '2023-10-01T04:00:00.000Z'
+date: '2023-10-03T00:00:00.000Z'
 section: paper-shorts
 postSlug: driving-with-llms-fusing-object-level-vector-modality
 legacyPath: /paper shorts/2023/10/01/driving-with-llms-fusing-object-level-vector-modality.html

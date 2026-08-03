@@ -1,6 +1,6 @@
 ---
 title: 'Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success (OpenVLA-OFT)'
-date: '2025-02-27T09:00:00.000Z'
+date: '2025-02-27T00:00:00.000Z'
 section: paper-shorts
 postSlug: openvla-oft-optimizing-speed-and-success
 legacyPath: /paper shorts/2025/02/27/openvla-oft-optimizing-speed-and-success.html

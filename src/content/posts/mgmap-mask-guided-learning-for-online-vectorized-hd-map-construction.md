@@ -1,6 +1,6 @@
 ---
 title: 'MGMap: Mask-Guided Learning for Online Vectorized HD Map Construction'
-date: '2024-04-01T04:00:00.000Z'
+date: '2024-04-01T00:00:00.000Z'
 section: paper-shorts
 postSlug: mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction
 legacyPath: /paper shorts/2024/04/01/mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction.html

@@ -1,6 +1,6 @@
 ---
 title: 'Pi0.5: A Vision-Language-Action Model with Open-World Generalization'
-date: '2025-04-22T09:00:00.000Z'
+date: '2025-04-22T00:00:00.000Z'
 section: paper-shorts
 postSlug: pi0-5-vision-language-action-model-with-open-world-generalization
 legacyPath: /paper shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html

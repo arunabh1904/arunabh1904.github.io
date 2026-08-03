@@ -1,6 +1,6 @@
 ---
 title: 'Qwen-VLA: Unifying Vision-Language-Action Modeling across Tasks, Environments, and Robot Embodiments'
-date: '2026-05-28T04:00:00.000Z'
+date: '2026-05-28T00:00:00.000Z'
 section: paper-shorts
 postSlug: qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments
 legacyPath: /paper shorts/2026/05/28/qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments.html

@@ -1,6 +1,6 @@
 ---
 title: 'Perceiver IO: A General Architecture for Structured Inputs & Outputs'
-date: '2021-07-30T04:00:00.000Z'
+date: '2021-07-30T00:00:00.000Z'
 section: paper-shorts
 postSlug: perceiver-io-a-general-architecture-for-structured-inputs-and-outputs
 legacyPath: /paper shorts/2021/07/30/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs.html

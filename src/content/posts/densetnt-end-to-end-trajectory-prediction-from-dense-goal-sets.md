@@ -1,6 +1,6 @@
 ---
 title: 'DenseTNT: End-to-End Trajectory Prediction from Dense Goal Sets'
-date: '2021-08-22T04:00:00.000Z'
+date: '2021-08-22T00:00:00.000Z'
 section: paper-shorts
 postSlug: densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets
 legacyPath: /paper shorts/2021/08/22/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets.html

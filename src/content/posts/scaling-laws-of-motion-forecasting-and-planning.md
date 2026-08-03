@@ -1,6 +1,6 @@
 ---
 title: 'Scaling Laws of Motion Forecasting and Planning'
-date: '2025-06-09T04:00:00.000Z'
+date: '2025-06-09T00:00:00.000Z'
 section: paper-shorts
 postSlug: scaling-laws-of-motion-forecasting-and-planning
 legacyPath: /paper shorts/2025/06/09/scaling-laws-of-motion-forecasting-and-planning.html

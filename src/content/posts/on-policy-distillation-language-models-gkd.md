@@ -1,6 +1,6 @@
 ---
 title: 'On-Policy Distillation of Language Models: GKD'
-date: '2023-06-23T17:56:26.000Z'
+date: '2023-06-23T00:00:00.000Z'
 section: paper-shorts
 postSlug: on-policy-distillation-language-models-gkd
 legacyPath: /paper shorts/2023/06/23/on-policy-distillation-language-models-gkd.html

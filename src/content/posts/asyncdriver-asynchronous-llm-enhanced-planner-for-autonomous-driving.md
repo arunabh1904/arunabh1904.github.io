@@ -1,6 +1,6 @@
 ---
 title: 'AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving'
-date: '2024-06-01T04:00:00.000Z'
+date: '2024-06-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: asyncdriver-asynchronous-llm-enhanced-planner-for-autonomous-driving
 legacyPath: /paper shorts/2024/06/01/asyncdriver-asynchronous-llm-enhanced-planner-for-autonomous-driving.html

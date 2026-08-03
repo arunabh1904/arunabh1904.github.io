@@ -1,6 +1,6 @@
 ---
 title: Visual Instruction Tuning (LLaVA)
-date: '2023-04-01T04:00:00.000Z'
+date: '2023-04-17T00:00:00.000Z'
 section: paper-shorts
 postSlug: visual-instruction-tuning-llava
 legacyPath: /paper shorts/2023/04/01/visual-instruction-tuning-llava.html

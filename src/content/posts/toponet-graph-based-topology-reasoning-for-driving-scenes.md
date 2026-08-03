@@ -1,6 +1,6 @@
 ---
 title: 'TopoNet: Graph-based Topology Reasoning for Driving Scenes'
-date: '2023-04-11T04:00:00.000Z'
+date: '2023-04-11T00:00:00.000Z'
 section: paper-shorts
 postSlug: toponet-graph-based-topology-reasoning-for-driving-scenes
 legacyPath: /paper shorts/2023/04/11/toponet-graph-based-topology-reasoning-for-driving-scenes.html

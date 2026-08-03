@@ -1,6 +1,6 @@
 ---
 title: "UniTR: A Unified and Efficient Multi-Modal Transformer for Bird's-Eye-View Representation"
-date: '2023-08-15T04:00:00.000Z'
+date: '2023-08-15T00:00:00.000Z'
 section: paper-shorts
 postSlug: unitr-unified-efficient-multimodal-transformer-for-bev
 legacyPath: /paper shorts/2023/08/15/unitr-unified-efficient-multimodal-transformer-for-bev.html

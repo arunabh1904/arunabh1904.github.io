@@ -1,6 +1,6 @@
 ---
 title: 'EMMA: End-to-End Multimodal Model for Autonomous Driving'
-date: '2024-10-01T04:00:00.000Z'
+date: '2024-10-30T00:00:00.000Z'
 section: paper-shorts
 postSlug: emma-end-to-end-multimodal-model-for-autonomous-driving
 legacyPath: /paper shorts/2024/10/01/emma-end-to-end-multimodal-model-for-autonomous-driving.html

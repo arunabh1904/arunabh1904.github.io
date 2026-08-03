@@ -1,6 +1,6 @@
 ---
 title: 'DINO: Emerging Properties in Self-Supervised Vision Transformers'
-date: '2021-04-29T12:28:51.000Z'
+date: '2021-04-29T00:00:00.000Z'
 section: paper-shorts
 postSlug: emerging-properties-self-supervised-vision-transformers-dino
 legacyPath: /paper shorts/2021/04/29/emerging-properties-self-supervised-vision-transformers-dino.html

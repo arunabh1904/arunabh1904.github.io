@@ -1,6 +1,6 @@
 ---
 title: 'OpenVLA: An Open-Source Vision-Language-Action Model'
-date: '2024-06-01T04:00:00.000Z'
+date: '2024-06-13T00:00:00.000Z'
 section: paper-shorts
 postSlug: openvla-open-source-vision-language-action-model
 legacyPath: /paper shorts/2024/06/01/openvla-open-source-vision-language-action-model.html

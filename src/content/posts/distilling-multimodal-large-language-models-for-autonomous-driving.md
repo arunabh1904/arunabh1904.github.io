@@ -1,6 +1,6 @@
 ---
 title: 'Distilling Multi-modal Large Language Models for Autonomous Driving'
-date: '2025-01-01T05:00:00.000Z'
+date: '2025-01-16T00:00:00.000Z'
 section: paper-shorts
 postSlug: distilling-multimodal-large-language-models-for-autonomous-driving
 legacyPath: /paper shorts/2025/01/01/distilling-multimodal-large-language-models-for-autonomous-driving.html

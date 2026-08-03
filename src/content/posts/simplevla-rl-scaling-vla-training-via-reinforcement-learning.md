@@ -1,6 +1,6 @@
 ---
 title: 'SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning'
-date: '2025-09-11T09:00:00.000Z'
+date: '2025-09-11T00:00:00.000Z'
 section: paper-shorts
 postSlug: simplevla-rl-scaling-vla-training-via-reinforcement-learning
 legacyPath: /paper shorts/2025/09/11/simplevla-rl-scaling-vla-training-via-reinforcement-learning.html

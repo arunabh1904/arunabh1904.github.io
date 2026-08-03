@@ -1,6 +1,6 @@
 ---
 title: 'UniM²AE: Multi-Modal Masked Autoencoders with Unified 3D Representation for Autonomous Driving'
-date: '2023-08-21T04:00:00.000Z'
+date: '2023-08-21T00:00:00.000Z'
 section: paper-shorts
 postSlug: unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation
 legacyPath: /paper shorts/2023/08/21/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation.html

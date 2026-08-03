@@ -1,6 +1,6 @@
 ---
 title: "Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution"
-date: '2024-09-01T04:00:00.000Z'
+date: '2024-09-18T00:00:00.000Z'
 section: paper-shorts
 postSlug: qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution
 legacyPath: /paper shorts/2024/09/01/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution.html

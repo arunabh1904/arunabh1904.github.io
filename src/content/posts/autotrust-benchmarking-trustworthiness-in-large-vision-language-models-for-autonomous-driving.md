@@ -1,6 +1,6 @@
 ---
 title: 'AutoTrust: Benchmarking Trustworthiness in Large Vision Language Models for Autonomous Driving'
-date: '2024-12-01T05:00:00.000Z'
+date: '2024-12-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving
 legacyPath: /paper shorts/2024/12/01/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving.html

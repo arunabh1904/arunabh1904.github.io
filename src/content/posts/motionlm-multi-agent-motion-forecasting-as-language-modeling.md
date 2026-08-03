@@ -1,6 +1,6 @@
 ---
 title: 'MotionLM: Multi-Agent Motion Forecasting as Language Modeling'
-date: '2023-09-28T04:00:00.000Z'
+date: '2023-09-28T00:00:00.000Z'
 section: paper-shorts
 postSlug: motionlm-multi-agent-motion-forecasting-as-language-modeling
 legacyPath: /paper shorts/2023/09/28/motionlm-multi-agent-motion-forecasting-as-language-modeling.html

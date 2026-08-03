@@ -1,6 +1,6 @@
 ---
 title: 'DeepSeek-VL2: Mixture-of-Experts Vision-Language Models for Advanced Multimodal Understanding'
-date: '2024-12-01T05:00:00.000Z'
+date: '2024-12-13T00:00:00.000Z'
 section: paper-shorts
 postSlug: deepseek-vl2-mixture-of-experts-vision-language-models
 legacyPath: /paper shorts/2024/12/01/deepseek-vl2-mixture-of-experts-vision-language-models.html

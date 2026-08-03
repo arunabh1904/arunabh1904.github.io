@@ -1,6 +1,6 @@
 ---
 title: 'Are VLMs Ready for Autonomous Driving?'
-date: '2025-01-01T05:00:00.000Z'
+date: '2025-01-07T00:00:00.000Z'
 section: paper-shorts
 postSlug: are-vlms-ready-for-autonomous-driving-drivebench
 legacyPath: /paper shorts/2025/01/01/are-vlms-ready-for-autonomous-driving-drivebench.html

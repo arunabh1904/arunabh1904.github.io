@@ -1,6 +1,6 @@
 ---
 title: 'Wayformer: Motion Forecasting via Simple and Efficient Attention Networks'
-date: '2022-07-12T04:00:00.000Z'
+date: '2022-07-12T00:00:00.000Z'
 section: paper-shorts
 postSlug: wayformer-motion-forecasting-via-simple-and-efficient-attention-networks
 legacyPath: /paper shorts/2022/07/12/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks.html

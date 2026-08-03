@@ -1,6 +1,6 @@
 ---
 title: 'UniDriveVLA: Unifying Understanding, Perception, and Action Planning for Autonomous Driving'
-date: '2026-04-02T04:00:00.000Z'
+date: '2026-04-02T00:00:00.000Z'
 section: paper-shorts
 postSlug: unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving
 legacyPath: /paper shorts/2026/04/02/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving.html

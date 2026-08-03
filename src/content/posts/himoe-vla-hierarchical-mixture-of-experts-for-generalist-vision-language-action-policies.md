@@ -1,6 +1,6 @@
 ---
 title: 'HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vision-Language-Action Policies'
-date: '2026-07-24T14:10:00.000Z'
+date: '2025-12-05T00:00:00.000Z'
 section: paper-shorts
 postSlug: himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies
 legacyPath: /paper shorts/2026/07/24/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies.html

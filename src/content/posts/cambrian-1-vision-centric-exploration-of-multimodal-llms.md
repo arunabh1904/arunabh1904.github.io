@@ -1,6 +1,6 @@
 ---
 title: 'Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs'
-date: '2024-06-01T04:00:00.000Z'
+date: '2024-06-24T00:00:00.000Z'
 section: paper-shorts
 postSlug: cambrian-1-vision-centric-exploration-of-multimodal-llms
 legacyPath: /paper shorts/2024/06/01/cambrian-1-vision-centric-exploration-of-multimodal-llms.html

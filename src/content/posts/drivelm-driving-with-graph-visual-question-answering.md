@@ -1,6 +1,6 @@
 ---
 title: 'DriveLM: Driving with Graph Visual Question Answering'
-date: '2023-12-21T05:00:00.000Z'
+date: '2023-12-21T00:00:00.000Z'
 section: paper-shorts
 postSlug: drivelm-driving-with-graph-visual-question-answering
 legacyPath: /paper shorts/2023/12/21/drivelm-driving-with-graph-visual-question-answering.html

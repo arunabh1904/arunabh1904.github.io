@@ -1,6 +1,6 @@
 ---
 title: 'Human-Assisted Robotic Policy Refinement via Action Preference Optimization'
-date: '2025-06-08T09:00:00.000Z'
+date: '2025-06-08T00:00:00.000Z'
 section: paper-shorts
 postSlug: action-preference-optimization-for-robotic-policy-refinement
 legacyPath: /paper shorts/2025/06/08/action-preference-optimization-for-robotic-policy-refinement.html

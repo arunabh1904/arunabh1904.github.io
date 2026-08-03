@@ -1,6 +1,6 @@
 ---
 title: 'MM1: Methods, Analysis & Insights from Multimodal LLM Pre-training'
-date: '2024-03-14T09:00:00.000Z'
+date: '2024-03-14T00:00:00.000Z'
 section: paper-shorts
 postSlug: mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training
 legacyPath: /paper shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html

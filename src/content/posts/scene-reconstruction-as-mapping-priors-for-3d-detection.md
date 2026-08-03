@@ -1,6 +1,6 @@
 ---
 title: 'Scene Reconstruction as Mapping Priors for 3D Detection'
-date: '2026-05-21T04:00:00.000Z'
+date: '2026-05-21T00:00:00.000Z'
 section: paper-shorts
 postSlug: scene-reconstruction-as-mapping-priors-for-3d-detection
 legacyPath: /paper shorts/2026/05/21/scene-reconstruction-as-mapping-priors-for-3d-detection.html

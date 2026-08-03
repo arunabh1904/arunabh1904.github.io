@@ -1,6 +1,6 @@
 ---
 title: 'Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models'
-date: '2025-01-01T05:00:00.000Z'
+date: '2025-01-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: eagle-2-post-training-data-strategies-for-frontier-vision-language-models
 legacyPath: /paper shorts/2025/01/01/eagle-2-post-training-data-strategies-for-frontier-vision-language-models.html

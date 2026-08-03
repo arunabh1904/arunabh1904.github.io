@@ -1,6 +1,6 @@
 ---
 title: 'mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT'
-date: '2026-03-23T04:00:00.000Z'
+date: '2026-03-23T00:00:00.000Z'
 section: paper-shorts
 postSlug: msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft
 legacyPath: >-

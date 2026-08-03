@@ -1,6 +1,6 @@
 ---
 title: 'Scaling Laws for Generative Mixed-Modal Language Models'
-date: '2023-01-10T09:00:00.000Z'
+date: '2023-01-10T00:00:00.000Z'
 section: paper-shorts
 postSlug: scaling-laws-for-generative-mixed-modal-language-models
 legacyPath: /paper shorts/2023/01/10/scaling-laws-for-generative-mixed-modal-language-models.html

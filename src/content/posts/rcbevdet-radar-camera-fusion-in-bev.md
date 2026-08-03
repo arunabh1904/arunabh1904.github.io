@@ -1,6 +1,6 @@
 ---
 title: "RCBEVDet: Radar-Camera Fusion in Bird's-Eye View for 3D Object Detection"
-date: '2024-03-25T04:00:00.000Z'
+date: '2024-03-25T00:00:00.000Z'
 section: paper-shorts
 postSlug: rcbevdet-radar-camera-fusion-in-bev
 legacyPath: /paper shorts/2024/03/25/rcbevdet-radar-camera-fusion-in-bev.html

@@ -1,6 +1,6 @@
 ---
 title: 'SparseDrive: End-to-End Autonomous Driving via Sparse Scene Representation'
-date: '2024-05-30T04:00:00.000Z'
+date: '2024-05-30T00:00:00.000Z'
 section: paper-shorts
 postSlug: sparsedrive-end-to-end-autonomous-driving-via-sparse-scene-representation
 legacyPath: /paper shorts/2024/05/30/sparsedrive-end-to-end-autonomous-driving-via-sparse-scene-representation.html

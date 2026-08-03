@@ -1,6 +1,6 @@
 ---
 title: 'EfficientDet: Scalable and Efficient Object Detection'
-date: '2020-04-01T04:00:00.000Z'
+date: '2019-11-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: efficientdet-scalable-and-efficient-object-detection
 legacyPath: >-

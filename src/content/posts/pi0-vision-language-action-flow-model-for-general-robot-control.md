@@ -1,6 +1,6 @@
 ---
 title: 'Pi0: A Vision-Language-Action Flow Model for General Robot Control'
-date: '2024-10-01T04:00:00.000Z'
+date: '2024-10-31T00:00:00.000Z'
 section: paper-shorts
 postSlug: pi0-vision-language-action-flow-model-for-general-robot-control
 legacyPath: /paper shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html

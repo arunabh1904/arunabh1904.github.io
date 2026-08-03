@@ -1,6 +1,6 @@
 ---
 title: Auto-Encoding Variational Bayes
-date: '2014-04-01T04:00:00.000Z'
+date: '2013-12-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: auto-encoding-variational-bayes
 legacyPath: /paper shorts/2014/04/01/auto-encoding-variational-bayes.html

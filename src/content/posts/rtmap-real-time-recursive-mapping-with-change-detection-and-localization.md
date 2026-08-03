@@ -1,6 +1,6 @@
 ---
 title: 'RTMap: Real-Time Recursive Mapping with Change Detection and Localization'
-date: '2025-07-01T04:00:00.000Z'
+date: '2025-07-01T00:00:00.000Z'
 section: paper-shorts
 postSlug: rtmap-real-time-recursive-mapping-with-change-detection-and-localization
 legacyPath: /paper shorts/2025/07/01/rtmap-real-time-recursive-mapping-with-change-detection-and-localization.html

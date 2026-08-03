@@ -1,6 +1,6 @@
 ---
 title: 'MapTRv2: An End-to-End Framework for Online Vectorized HD Map Construction'
-date: '2023-08-10T04:00:00.000Z'
+date: '2023-08-10T00:00:00.000Z'
 section: paper-shorts
 postSlug: maptrv2-an-end-to-end-framework-for-online-vectorized-hd-map-construction
 legacyPath: /paper shorts/2023/08/10/maptrv2-an-end-to-end-framework-for-online-vectorized-hd-map-construction.html

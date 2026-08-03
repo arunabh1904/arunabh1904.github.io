@@ -1,6 +1,6 @@
 ---
 title: 'VisualPRM: An Effective Process Reward Model for Multimodal Reasoning'
-date: '2025-03-13T09:00:00.000Z'
+date: '2025-03-13T00:00:00.000Z'
 section: paper-shorts
 postSlug: visualprm-process-reward-model-for-multimodal-reasoning
 legacyPath: /paper shorts/2025/03/13/visualprm-process-reward-model-for-multimodal-reasoning.html

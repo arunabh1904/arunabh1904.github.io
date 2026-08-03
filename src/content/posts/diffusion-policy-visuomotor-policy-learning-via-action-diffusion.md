@@ -1,6 +1,6 @@
 ---
 title: 'Diffusion Policy: Visuomotor Policy Learning via Action Diffusion'
-date: '2023-03-07T09:00:00.000Z'
+date: '2023-03-07T00:00:00.000Z'
 section: paper-shorts
 postSlug: diffusion-policy-visuomotor-policy-learning-via-action-diffusion
 legacyPath: /paper shorts/2023/03/07/diffusion-policy-visuomotor-policy-learning-via-action-diffusion.html

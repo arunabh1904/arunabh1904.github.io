@@ -1,6 +1,6 @@
 ---
 title: 'How Much Do Language Models Memorize?'
-date: '2025-05-30T04:00:00.000Z'
+date: '2025-05-30T00:00:00.000Z'
 section: paper-shorts
 postSlug: how-much-do-language-models-memorize
 legacyPath: /paper shorts/2025/05/30/how-much-do-language-models-memorize.html

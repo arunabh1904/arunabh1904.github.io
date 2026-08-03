@@ -1,6 +1,6 @@
 ---
 title: 'Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware (ACT)'
-date: '2023-04-23T09:00:00.000Z'
+date: '2023-04-23T00:00:00.000Z'
 section: paper-shorts
 postSlug: action-chunking-with-transformers-act
 legacyPath: /paper shorts/2023/04/23/action-chunking-with-transformers-act.html

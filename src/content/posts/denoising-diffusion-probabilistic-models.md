@@ -1,6 +1,6 @@
 ---
 title: Denoising Diffusion Probabilistic Models
-date: '2020-06-01T04:00:00.000Z'
+date: '2020-06-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: denoising-diffusion-probabilistic-models
 legacyPath: /paper shorts/2020/06/01/denoising-diffusion-probabilistic-models.html

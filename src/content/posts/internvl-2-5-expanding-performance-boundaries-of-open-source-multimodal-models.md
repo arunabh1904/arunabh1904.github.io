@@ -1,6 +1,6 @@
 ---
 title: 'InternVL 2.5: Expanding Performance Boundaries of Open-Source Multimodal Models'
-date: '2024-12-01T05:00:00.000Z'
+date: '2024-12-06T00:00:00.000Z'
 section: paper-shorts
 postSlug: internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models
 legacyPath: /paper shorts/2024/12/01/internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models.html

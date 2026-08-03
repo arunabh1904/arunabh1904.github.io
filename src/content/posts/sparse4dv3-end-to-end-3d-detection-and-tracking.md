@@ -1,6 +1,6 @@
 ---
 title: 'Sparse4D v3: Advancing End-to-End 3D Detection and Tracking'
-date: '2023-11-20T05:00:00.000Z'
+date: '2023-11-20T00:00:00.000Z'
 section: paper-shorts
 postSlug: sparse4dv3-end-to-end-3d-detection-and-tracking
 legacyPath: /paper shorts/2023/11/20/sparse4dv3-end-to-end-3d-detection-and-tracking.html

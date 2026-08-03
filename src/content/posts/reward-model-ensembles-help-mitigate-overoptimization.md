@@ -1,6 +1,6 @@
 ---
 title: 'Reward Model Ensembles Help Mitigate Overoptimization'
-date: '2023-10-04T09:00:00.000Z'
+date: '2023-10-04T00:00:00.000Z'
 section: paper-shorts
 postSlug: reward-model-ensembles-help-mitigate-overoptimization
 legacyPath: /paper shorts/2023/10/04/reward-model-ensembles-help-mitigate-overoptimization.html

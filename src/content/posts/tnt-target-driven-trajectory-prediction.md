@@ -1,6 +1,6 @@
 ---
 title: 'TNT: Target-driveN Trajectory Prediction'
-date: '2020-08-19T04:00:00.000Z'
+date: '2020-08-19T00:00:00.000Z'
 section: paper-shorts
 postSlug: tnt-target-driven-trajectory-prediction
 legacyPath: /paper shorts/2020/08/19/tnt-target-driven-trajectory-prediction.html

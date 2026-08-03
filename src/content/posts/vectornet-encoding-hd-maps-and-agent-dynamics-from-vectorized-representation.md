@@ -1,6 +1,6 @@
 ---
 title: 'VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation'
-date: '2020-05-08T04:00:00.000Z'
+date: '2020-05-08T00:00:00.000Z'
 section: paper-shorts
 postSlug: vectornet-encoding-hd-maps-and-agent-dynamics-from-vectorized-representation
 legacyPath: /paper shorts/2020/05/08/vectornet-encoding-hd-maps-and-agent-dynamics-from-vectorized-representation.html

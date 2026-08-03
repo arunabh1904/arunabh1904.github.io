@@ -1,6 +1,6 @@
 ---
 title: 'Understanding Reasoning from Pretraining to Post-Training'
-date: '2026-07-17T09:00:00.000Z'
+date: '2026-07-17T00:00:00.000Z'
 section: paper-shorts
 postSlug: understanding-reasoning-from-pretraining-to-post-training
 legacyPath: /paper shorts/2026/07/17/understanding-reasoning-from-pretraining-to-post-training.html

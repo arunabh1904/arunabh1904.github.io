@@ -1,6 +1,6 @@
 ---
 title: 'HyWorldVLA: A Vision-Language-Action Model with Hybrid World Modeling for Autonomous Driving'
-date: '2026-07-24T14:20:00.000Z'
+date: '2026-07-23T00:00:00.000Z'
 section: paper-shorts
 postSlug: hyworldvla-a-vision-language-action-model-with-hybrid-world-modeling-for-autonomous-driving
 legacyPath: /paper shorts/2026/07/24/hyworldvla-a-vision-language-action-model-with-hybrid-world-modeling-for-autonomous-driving.html

@@ -1,6 +1,6 @@
 ---
 title: 'RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models'
-date: '2025-11-03T09:00:00.000Z'
+date: '2025-11-03T00:00:00.000Z'
 section: paper-shorts
 postSlug: robustvla-robustness-aware-reinforcement-post-training
 legacyPath: /paper shorts/2025/11/03/robustvla-robustness-aware-reinforcement-post-training.html

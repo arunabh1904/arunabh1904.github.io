@@ -1,6 +1,6 @@
 ---
 title: 'An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale'
-date: '2020-10-01T04:00:00.000Z'
+date: '2020-10-22T00:00:00.000Z'
 section: paper-shorts
 postSlug: an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale
 legacyPath: >-

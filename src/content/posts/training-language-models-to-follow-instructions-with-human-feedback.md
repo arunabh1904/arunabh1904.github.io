@@ -1,6 +1,6 @@
 ---
 title: Training Language Models to Follow Instructions with Human Feedback
-date: '2022-03-01T04:00:00.000Z'
+date: '2022-03-04T00:00:00.000Z'
 section: paper-shorts
 postSlug: training-language-models-to-follow-instructions-with-human-feedback
 legacyPath: >-

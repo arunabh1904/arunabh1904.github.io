@@ -1,6 +1,6 @@
 ---
 title: Language Models are Few-Shot Learners
-date: '2020-05-01T04:00:00.000Z'
+date: '2020-05-28T00:00:00.000Z'
 section: paper-shorts
 postSlug: language-models-are-few-shot-learners
 legacyPath: /paper shorts/2020/05/01/language-models-are-few-shot-learners.html

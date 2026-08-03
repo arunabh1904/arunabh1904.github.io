@@ -1,6 +1,6 @@
 ---
 title: 'Scaling Self-Play for End-to-End Driving'
-date: '2026-07-24T13:00:00.000Z'
+date: '2026-06-17T00:00:00.000Z'
 section: paper-shorts
 postSlug: scaling-self-play-for-end-to-end-driving
 legacyPath: /paper shorts/2026/07/24/scaling-self-play-for-end-to-end-driving.html
