@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760" role="img" aria-labelledby="title desc">
+  <title id="title">High-level autonomous-driving perception architecture</title>
+  <desc id="desc">Camera, LiDAR, and radar pass through sensor-specific encoders into metric fusion. The shared scene state contains dense BEV and sparse queries, which feed detection, occupancy, mapping, and planning. LiDAR, future frames, and teacher models can provide training-only supervision.</desc>
+
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#2f67d8"/>
+    </marker>
+    <marker id="arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#0b8f8a"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#bd741e"/>
+    </marker>
+    <pattern id="grid" width="18" height="18" patternUnits="userSpaceOnUse">
+      <path d="M18 0H0V18" fill="none" stroke="#91afe8" stroke-width="1"/>
+    </pattern>
+    <style>
+      text { font-family: Inter, "Avenir Next", Arial, sans-serif; fill: #17202b; }
+      .title { font-size: 34px; font-weight: 700; letter-spacing: -0.6px; }
+      .kicker { font-size: 16px; font-weight: 700; letter-spacing: 1.8px; fill: #66717f; }
+      .label { font-size: 22px; font-weight: 680; }
+      .runtime { fill: none; stroke: #2f67d8; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-blue); }
+      .runtime-line { fill: none; stroke: #2f67d8; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .memory { fill: none; stroke: #0b8f8a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-teal); }
+      .training { fill: none; stroke: #bd741e; stroke-width: 2.5; stroke-dasharray: 9 8; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-amber); }
+      .blue-icon { fill: none; stroke: #2f67d8; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .teal-icon { fill: none; stroke: #0b8f8a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="760" fill="#fbfbf8"/>
+  <text x="56" y="60" class="title">Unified perception system</text>
+  <line x1="56" y1="90" x2="1544" y2="90" stroke="#d7dce2" stroke-width="1.5"/>
+
+  <text x="56" y="132" class="kicker">SENSORS</text>
+  <text x="352" y="132" class="kicker">ENCODERS</text>
+  <text x="708" y="132" class="kicker">GEOMETRY</text>
+  <text x="1012" y="132" class="kicker">SCENE STATE</text>
+  <text x="1350" y="132" class="kicker">OUTPUTS</text>
+
+  <!-- Sensors -->
+  <g>
+    <rect x="56" y="166" width="220" height="104" rx="12" fill="#ffffff" stroke="#cbd2da" stroke-width="1.5"/>
+    <g transform="translate(80 193)">
+      <rect x="0" y="7" width="46" height="32" rx="5" class="blue-icon"/>
+      <circle cx="23" cy="23" r="9" class="blue-icon"/>
+      <path d="M46 14 59 9V37L46 32" class="blue-icon"/>
+    </g>
+    <text x="160" y="226" class="label">Camera</text>
+
+    <rect x="56" y="310" width="220" height="104" rx="12" fill="#ffffff" stroke="#cbd2da" stroke-width="1.5"/>
+    <g transform="translate(80 329)">
+      <rect x="14" y="31" width="40" height="22" rx="4" class="blue-icon"/>
+      <path d="M34 31V13M21 23Q34 9 47 23M11 16Q34-6 57 16" class="blue-icon"/>
+      <circle cx="34" cy="42" r="3" fill="#2f67d8"/>
+    </g>
+    <text x="160" y="370" class="label">LiDAR</text>
+
+    <rect x="56" y="454" width="220" height="104" rx="12" fill="#ffffff" stroke="#cbd2da" stroke-width="1.5"/>
+    <g transform="translate(84 477)">
+      <circle cx="15" cy="25" r="7" class="blue-icon"/>
+      <path d="M26 14Q39 25 26 36M35 7Q57 25 35 43M45 0Q74 25 45 50" class="blue-icon"/>
+    </g>
+    <text x="160" y="514" class="label">Radar</text>
+  </g>
+
+  <!-- Sensor-specific encoders -->
+  <rect x="352" y="166" width="260" height="392" rx="14" fill="#f4f7fd" stroke="#8eace4" stroke-width="1.5"/>
+  <text x="386" y="208" class="label">Sensor-specific</text>
+  <text x="386" y="236" class="label">encoders</text>
+  <line x1="376" y1="270" x2="588" y2="270" stroke="#c3d1ea" stroke-width="1.5"/>
+  <line x1="376" y1="414" x2="588" y2="414" stroke="#c3d1ea" stroke-width="1.5"/>
+  <g transform="translate(405 306)">
+    <rect width="48" height="48" rx="5" class="blue-icon"/>
+    <path d="M9 13H39M9 24H39M9 35H39" class="blue-icon"/>
+    <rect x="76" y="0" width="48" height="48" rx="5" class="blue-icon" opacity=".55"/>
+    <path d="M85 13H115M85 24H115M85 35H115" class="blue-icon" opacity=".55"/>
+  </g>
+  <g transform="translate(413 458)" fill="#2f67d8">
+    <rect x="0" y="0" width="13" height="13"/><rect x="23" y="7" width="13" height="13"/><rect x="47" y="0" width="13" height="13"/>
+    <rect x="8" y="28" width="13" height="13"/><rect x="34" y="35" width="13" height="13"/><rect x="67" y="23" width="13" height="13"/>
+  </g>
+  <path d="M522 462 540 492 559 465 578 500" class="blue-icon"/>
+
+  <path d="M276 218H324V334H352" class="runtime"/>
+  <path d="M276 362H352" class="runtime"/>
+  <path d="M276 506H324V390H352" class="runtime"/>
+
+  <!-- Metric fusion -->
+  <rect x="708" y="254" width="220" height="216" rx="14" fill="#ffffff" stroke="#17202b" stroke-width="2"/>
+  <g transform="translate(770 288)">
+    <path d="M0 68V0M0 68H68M0 68 48 20" class="blue-icon"/>
+    <circle cx="0" cy="68" r="5" fill="#2f67d8"/>
+    <path d="m47 20-2 12 12-4" class="blue-icon"/>
+  </g>
+  <text x="751" y="422" class="label">Metric fusion</text>
+  <path d="M612 362H708" class="runtime"/>
+
+  <!-- Persistent scene state -->
+  <rect x="1012" y="166" width="258" height="392" rx="14" fill="#ffffff" stroke="#17202b" stroke-width="2"/>
+  <rect x="1038" y="196" width="206" height="144" rx="10" fill="#edf3ff" stroke="#7298df" stroke-width="1.5"/>
+  <rect x="1062" y="222" width="68" height="68" rx="5" fill="url(#grid)" stroke="#2f67d8" stroke-width="2"/>
+  <rect x="1084" y="244" width="24" height="24" rx="3" fill="#2f67d8" opacity=".82"/>
+  <text x="1150" y="265" class="label">Dense</text>
+  <text x="1150" y="293" class="label">BEV</text>
+
+  <rect x="1038" y="376" width="206" height="152" rx="10" fill="#edf8f6" stroke="#63aaa6" stroke-width="1.5"/>
+  <g transform="translate(1060 413)">
+    <path d="M8 8 49 22 19 58 63 64" class="teal-icon"/>
+    <circle cx="8" cy="8" r="7" fill="#fbfbf8" stroke="#0b8f8a" stroke-width="3"/>
+    <circle cx="49" cy="22" r="7" fill="#fbfbf8" stroke="#0b8f8a" stroke-width="3"/>
+    <circle cx="19" cy="58" r="7" fill="#fbfbf8" stroke="#0b8f8a" stroke-width="3"/>
+    <circle cx="63" cy="64" r="7" fill="#fbfbf8" stroke="#0b8f8a" stroke-width="3"/>
+  </g>
+  <text x="1150" y="445" class="label">Sparse</text>
+  <text x="1150" y="473" class="label">queries</text>
+
+  <path d="M928 362H976V268H1038" class="runtime"/>
+  <path d="M976 362V452H1038" class="memory"/>
+  <circle cx="976" cy="362" r="5" fill="#2f67d8"/>
+
+  <!-- Outputs -->
+  <path d="M1244 268H1310V218H1344" class="runtime"/>
+  <path d="M1244 268H1310V314H1344" class="runtime"/>
+  <path d="M1244 268H1310V410H1344" class="runtime"/>
+  <path d="M1244 452H1310V506H1344" class="memory"/>
+
+  <g>
+    <circle cx="1378" cy="218" r="32" fill="#ffffff" stroke="#2f67d8" stroke-width="2"/>
+    <path d="M1365 208H1390V227H1365ZM1369 204 1394 210V230" class="blue-icon"/>
+    <text x="1426" y="225" class="label">Detect</text>
+
+    <circle cx="1378" cy="314" r="32" fill="#ffffff" stroke="#2f67d8" stroke-width="2"/>
+    <g transform="translate(1362 298)" fill="#2f67d8">
+      <rect width="9" height="9"/><rect x="12" width="9" height="9" opacity=".35"/><rect x="24" width="9" height="9"/>
+      <rect y="12" width="9" height="9" opacity=".35"/><rect x="12" y="12" width="9" height="9"/><rect x="24" y="12" width="9" height="9" opacity=".35"/>
+      <rect y="24" width="9" height="9"/><rect x="12" y="24" width="9" height="9" opacity=".35"/><rect x="24" y="24" width="9" height="9"/>
+    </g>
+    <text x="1426" y="321" class="label">Occupancy</text>
+
+    <circle cx="1378" cy="410" r="32" fill="#ffffff" stroke="#2f67d8" stroke-width="2"/>
+    <path d="M1362 428Q1371 408 1367 391M1394 428Q1385 408 1389 391M1378 425V394" class="blue-icon"/>
+    <text x="1426" y="417" class="label">Map</text>
+
+    <circle cx="1378" cy="506" r="32" fill="#ffffff" stroke="#0b8f8a" stroke-width="2"/>
+    <path d="M1360 516C1366 491 1379 524 1396 486M1387 490l9-4-1 10" class="teal-icon"/>
+    <text x="1426" y="513" class="label">Plan</text>
+  </g>
+
+  <!-- Training-only inputs -->
+  <line x1="56" y1="614" x2="1544" y2="614" stroke="#d7dce2" stroke-width="1.5"/>
+  <text x="56" y="665" class="kicker" fill="#9a631f">TRAINING ONLY</text>
+  <rect x="226" y="636" width="400" height="58" rx="29" fill="#fff7ea" stroke="#bd741e" stroke-width="1.5"/>
+  <text x="264" y="673" class="label" fill="#8b571a">LiDAR • future frames • teacher</text>
+  <path d="M626 665H818V470" class="training"/>
+</svg>

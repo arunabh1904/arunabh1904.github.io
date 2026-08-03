@@ -22,14 +22,12 @@ The same principle applies to tasks and time. Detection, occupancy, lanes, veloc
 
 This post explains those design choices and links each mechanism to an individual paper note.
 
-## The system in one table
+## The system in one graphic
 
-| Stage | Representation | Share | Keep specialized |
-| --- | --- | --- | --- |
-| Sensor encoding | Camera pyramids, LiDAR voxels, radar points or pillars | Backbone weights only when the input statistics match | Tokenization, calibration, timing, uncertainty |
-| Geometry | Dense BEV cells or sparse 3D queries | Vehicle-frame coordinates and cross-view reasoning | Height-sensitive and sensor-native side paths |
-| Temporal state | Short dense scene memory plus long sparse instance memory | Ego-motion compensation and interaction | Query birth, death, confidence, and task history |
-| Outputs | Detection, occupancy, lanes, velocity, tracking | Expensive upstream features | Resolution, decoder, loss units, safety thresholds |
+At runtime, sensor-specific encoders feed metric fusion, persistent scene state, and task-specific outputs. The dashed path exists only during training.
+
+[![Unified autonomous-driving perception system with sensor-specific encoders, shared metric geometry, dense and sparse temporal memory, task heads, and training-only supervision](/assets/images/autonomous-driving-perception-system.svg)](/assets/images/autonomous-driving-perception-system.svg)
+_A high-level architecture synthesized from the linked literature._
 
 The rest of the architecture follows from four questions: what measurement must survive the encoder, where it becomes metric, what state persists through time, and which tasks can safely update the same parameters.
 
@@ -68,6 +66,8 @@ A dense BEV grid is useful because detection, occupancy, lanes, maps, and free s
 
 Query-based models avoid materializing every cell. [DETR3D](/paper%20shorts/2021/10/14/detr3d-multiview-images-via-3d-to-2d-queries.html) projects 3D object queries into multiscale image features. [PETR](/paper%20shorts/2022/03/10/petr-position-embedding-transformation-for-multiview-3d-object-detection.html) embeds possible 3D coordinates into perspective features before attention. [PETRv2](/paper%20shorts/2022/06/02/petrv2-unified-3d-perception-from-multicamera-images.html) aligns those features over time and gives detection, lanes, and segmentation different query geometries. [BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) sits between the two approaches: it stores a dense field of learned BEV queries but retrieves evidence through projected attention.
 
+These methods place the irreversible step in different locations. LSS and BEVDepth assign image evidence to depth bins before BEV pooling; a wrong bin becomes a wrong cell. DETR3D and Sparse4D leave features in perspective space and use calibrated 3D queries to retrieve them, so geometric compute scales with queries and sampled points rather than BEV area—but evidence outside that support is never seen. BEVFormer pays for a dense metric state while keeping image retrieval sparse. The representation choice therefore determines both the compute term and where evidence can disappear.
+
 The choice should follow the output:
 
 | Representation | Best suited to | Main cost | Main failure |
@@ -92,6 +92,8 @@ Sensor fusion differs mainly in where correspondence is imposed.
 _BEVFusion specializes tokenization, shares metric scene processing, and separates the output heads. Source: [BEVFusion](/paper%20shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html), Figure 2._
 
 There is no single best fusion layer. Use point fusion when the association is reliable and the output follows points, query fusion for actors, and BEV fusion for dense scene structure. Keep a sensor-native path when downstream tasks still need precise appearance, height, Doppler, or uncertainty.
+
+A fused model is not automatically a fallback model. [UniBEV](/paper%20shorts/2023/09/25/unibev-robust-multimodal-detection-with-uniform-bev-encoders.html) reports only 3.0 camera-only mAP when training always includes both sensors, versus 35.0 when modality dropout exposes the same network to missing-input modes and fusion is normalized over the streams that remain. [MetaBEV](/paper%20shorts/2023/04/19/metabev-solving-sensor-failures-for-bev-perception.html) similarly lets BEV queries select whichever modality is available. [Grace-BEV](/paper%20shorts/2026/05/29/grace-bev-graceful-degradation-under-sensor-failures.html) handles the harder case in which a stream is present but unreliable. Sensor availability and health must condition fusion; replacing a failed sensor with zeros is not a calibrated fallback.
 
 ## Multi-task learning: share the trunk, control the gradients
 
@@ -149,12 +151,14 @@ Dense memory preserves roads, free space, background, and weak evidence that has
 
 [Sparse4D](/paper%20shorts/2022/11/19/sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion.html) represents actors as 3D anchors. Each anchor predicts keypoints, projects them into cameras and timestamps, samples nearby image features, and refines the object state. Fusion cost moves from every BEV cell toward a bounded number of hypotheses.
 
-[Sparse4D v2](/paper%20shorts/2023/05/23/sparse4dv2-recurrent-temporal-fusion-with-sparse-model.html) transforms previous instances into the current frame and reserves new anchors for births, so decoder cost no longer grows with nominal history length. [Sparse4D v3](/paper%20shorts/2023/11/20/sparse4dv3-end-to-end-3d-detection-and-tracking.html) adds temporal denoising, quality estimation, and recurrent tracking state. [StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html) stores a FIFO memory of high-confidence object queries, transforms their reference points with ego pose, and lets current queries attend to the compact history. [SparseBEV](/paper%20shorts/2023/08/18/sparsebev-high-performance-sparse-3d-object-detection.html) uses pillar queries that learn support points across cameras and timestamps without storing a dense BEV tensor.
+[Sparse4D v2](/paper%20shorts/2023/05/23/sparse4dv2-recurrent-temporal-fusion-with-sparse-model.html) transforms previous instances into the current frame and reserves new anchors for births. Only the prior sparse state crosses the frame boundary, reducing temporal decoder scaling from $O(T)$ to $O(1)$ in history length. [Sparse4D v3](/paper%20shorts/2023/11/20/sparse4dv3-end-to-end-3d-detection-and-tracking.html) adds temporal denoising and separate box-quality estimation so propagated queries learn to recover geometric error instead of treating class confidence as localization quality.
+
+[StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html) keeps a FIFO memory of top foreground queries, transforms their reference points with ego pose, and discards background queries. [SparseBEV](/paper%20shorts/2023/08/18/sparsebev-high-performance-sparse-3d-object-detection.html) instead reopens several timestamps through learned support points, so its retrieval cost still grows with the number of frames. Both are called sparse, but one compresses history into recurrent state while the other sparsifies access to stored observations.
 
 ![Figure 3 from StreamPETR, showing object queries propagated through a temporal memory queue](/assets/images/streampetr-paper-figure-3.png)
 _StreamPETR carries selected object state instead of a sequence of full scene grids. Source: [StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html), Figure 3._
 
-Sparse memory is cheaper only after hypotheses exist. It can miss a new actor, evict a low-confidence hazard, or preserve a stale track. A production design therefore needs explicit query birth, death, age, confidence, and re-observation rules.
+Sparse recurrence makes a missing frame computationally cheap, not semantically harmless. The model can continue from memory, but an unobserved actor state becomes stale while discarded background evidence cannot be recovered until a fresh query is born. A deployed state therefore needs age, observation freshness, confidence, birth, and reset rules; the papers establish learned recurrence, not a complete fallback policy.
 
 The useful default is hybrid: short dense memory for road structure, free space, and query birth; longer sparse memory for actors and vectorized map elements. [SparseDrive](/paper%20shorts/2024/05/30/sparsedrive-end-to-end-autonomous-driving-via-sparse-scene-representation.html) extends this object-and-map state into motion prediction and planning.
 
@@ -183,7 +187,7 @@ Image-classification pretraining teaches appearance but not calibration, cross-v
 | Future occupancy or point clouds | Motion and persistence | A single future cannot represent every valid outcome |
 | Teacher features and pseudo-labels | Task-specific abstractions | Inherits teacher errors and blind spots |
 
-Scale should be measured in scenario diversity and useful temporal transitions, not only frame count. Repeated highway frames add less supervision than intersections, rare actors, adverse weather, calibration variation, and recoveries after occlusion. The strongest evidence for a pretrained representation is transfer across several tasks and label budgets, not a gain on one detector configuration.
+Longer pretraining targets are not automatically better. UniWorld reports that three target frames outperform five; multi-sweep occupancy becomes less reliable as motion, occlusion, pose error, and future ambiguity accumulate. Scale should therefore mean more distinct geometric and temporal situations, with transfer measured across tasks and label budgets, rather than a longer target horizon or a larger count of near-duplicate frames.
 
 ## Practical takeaways
 
@@ -192,8 +196,8 @@ Scale should be measured in scenario diversity and useful temporal transitions, 
 3. Fuse at the output's natural granularity instead of forcing every modality into one tensor.
 4. Share expensive geometry across tasks, but keep task decoders, loss units, and safety thresholds explicit.
 5. Treat loss scale, learning speed, and gradient conflict as different multi-task problems.
-6. Separate training sensors from runtime sensors. LiDAR supervision can improve a camera model without entering its inference graph; depth completion cannot.
-7. Keep short dense temporal state for scene discovery and longer sparse state for tracked entities.
+6. Separate the label-generation graph from runtime, and train every supported sensor configuration explicitly. Privileged LiDAR can supervise camera-only inference; depth completion cannot remove its sparse-depth input.
+7. Keep short dense temporal state for scene discovery and longer sparse state for tracked entities, but age or reset state when observations go missing.
 8. Profile the executed system. Sparse fusion does not remove the cost of camera backbones or irregular memory access.
 9. Pretrain on geometry, correspondence, and future state, then verify transfer across tasks and data regimes.
 
