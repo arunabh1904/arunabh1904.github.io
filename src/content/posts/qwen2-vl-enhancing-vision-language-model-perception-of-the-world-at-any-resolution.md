@@ -15,11 +15,15 @@ summary: "2024 – Qwen2-VL: Enhancing Vision-Language Model's Perception of the
 
 **Project:** [qwen2.org/vl](https://qwen2.org/vl/)
 
-**Summary:** Qwen2-VL focuses on a practical weakness in many VLMs: images are forced into fixed sizes, even when the useful information lives in small text, documents, or high-resolution details. Its dynamic-resolution approach lets the model allocate more or fewer visual tokens depending on the input.
+### Method and reported result
+
+Qwen2-VL focuses on a practical weakness in many VLMs: images are forced into fixed sizes, even when the useful information lives in small text, documents, or high-resolution details. Its dynamic-resolution approach lets the model allocate more or fewer visual tokens depending on the input.
+
+## Summary
 
 The model family also handles images and video with a shared multimodal position encoding, making it useful for OCR-heavy tasks, documents, visual reasoning, and longer temporal inputs.
 
-## Paper Insights
+## Core Insights
 
 Qwen2-VL makes resolution handling a core VLM design choice. Naive Dynamic Resolution converts images of different sizes into different numbers of visual tokens, preserving detail for OCR, documents, charts, and high-resolution scenes. M-RoPE extends positional encoding across text, image, and video so spatial and temporal positions stay aligned. The evaluation covers image understanding, video understanding, multilingual OCR, and reasoning. The tradeoff is token cost: dynamic resolution gives more detail when needed, but large inputs still consume context and compute.
 
@@ -31,7 +35,7 @@ _Figure 1: Qwen2-VL capabilities: Multilingual image text understanding, code/ma
 - Multimodal RoPE supports images and video in one positional scheme.
 - OCR, documents, and long-video tasks are the best places to look for the payoff.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -39,12 +43,12 @@ _Figure 1: Qwen2-VL capabilities: Multilingual image text understanding, code/ma
 | Modalities | Image plus video | One model handles static and temporal inputs. |
 | Artifact | Qwen2-VL docs/project | Useful for OCR-heavy and multilingual multimodal tasks. |
 
-## Decision Lens
+## High-Level Takeaways
 
 Qwen2-VL informs whether visual detail should be normalized away at ingestion or represented through a variable token budget. Naive Dynamic Resolution lets patch count track the source image, while multimodal rotary position encoding supplies a common spatial and temporal coordinate system for text, images, and video. Compression is therefore adaptive rather than fixed: documents and dense scenes pay for more tokens, and simpler inputs remain cheaper.
 
 The OCR, document, and video results demonstrate the value of retaining detail, but they confound resolution, token count, and training distribution. A decisive ablation would compare fixed and dynamic schemes under identical average and tail latency, with separate results for small text, ordinary photographs, and long video. At ten times the input size, context occupation and attention cost can turn adaptive fidelity into unpredictable service behavior. The claim is operationally falsified if a fixed-token resampler matches accuracy and preserves more throughput under the same memory envelope.
 
-**Context:** Resolution is not cosmetic. If a model cannot preserve the evidence, the language model hallucinates around it. Qwen2-VL showed that flexible tokenization can make generalist VLMs much more usable.
+Resolution is not cosmetic. If a model cannot preserve the evidence, the language model hallucinates around it. Qwen2-VL showed that flexible tokenization can make generalist VLMs much more usable.
 
-**Takeaway:** VLMs need adaptive visual bandwidth. A receipt, a street scene, and a video clip should not all be squeezed through the same fixed visual bottleneck.
+VLMs need adaptive visual bandwidth. A receipt, a street scene, and a video clip should not all be squeezed through the same fixed visual bottleneck.

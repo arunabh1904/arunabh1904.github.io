@@ -15,11 +15,15 @@ summary: "2024 – Pi0: A Vision-Language-Action Flow Model for General Robot Co
 
 **Project:** [Physical Intelligence Pi0](https://www.pi.website/blog/pi0)
 
-**Summary:** Pi0 is a vision-language-action model for general robot control. It starts from the intuition that VLMs contain useful semantic knowledge, but robot policies need continuous, high-frequency actions rather than text tokens.
+### Method and reported result
+
+Pi0 is a vision-language-action model for general robot control. It starts from the intuition that VLMs contain useful semantic knowledge, but robot policies need continuous, high-frequency actions rather than text tokens.
+
+## Summary
 
 The paper adds an action generation mechanism based on flow matching, allowing the model to map images and language instructions into robot trajectories across tasks.
 
-## Paper Insights
+## Core Insights
 
 Pi0 connects a pretrained vision-language backbone to continuous robot control through an action model trained with flow matching. The VLM supplies semantic grounding from images and language, while the flow action head models smooth trajectories. Training spans multiple robot embodiments, including single-arm, dual-arm, and mobile manipulation settings. The evaluation emphasizes language-prompted generalist behavior and dexterous tasks. The key caveat is data and robustness: broad robot policies need diverse demonstrations and careful safety validation under distribution shift.
 
@@ -31,7 +35,7 @@ _Figure 2 from the [pi0 paper](https://arxiv.org/abs/2410.24164), via arXiv HTML
 - Flow matching is the action-generation mechanism.
 - The model tests whether a generalist policy can transfer across tasks and embodiments.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -39,12 +43,12 @@ _Figure 2 from the [pi0 paper](https://arxiv.org/abs/2410.24164), via arXiv HTML
 | Output | Continuous actions | Requires smooth control, not text. |
 | Mechanism | Flow matching | Models action trajectories for dexterous behavior. |
 
-## Decision Lens
+## High-Level Takeaways
 
 Pi0 informs whether semantic reasoning and precise continuous control should share a backbone but use different output mathematics. Images and language are processed by a pretrained VLM, while flow matching generates continuous action chunks rather than forcing motor commands into text-like tokens. Training across single-arm, dual-arm, and mobile manipulation makes the trajectory—not the individual scalar command—the meaningful control unit.
 
 The dexterous and language-conditioned results support this hybrid interface, but they do not isolate flow matching from the size, diversity, and quality of the private robot corpus. The missing ablation is a matched-data comparison against diffusion, regression, and autoregressive token heads under identical control frequency and latency. At ten times the horizon or embodiment variety, action distributions may become too multimodal for one shared head and sampling error may compound. The approach is falsified if simpler heads match closed-loop recovery and cross-embodiment adaptation at the same inference budget.
 
-**Context:** Pi0 is part of the shift from models that understand scenes to models that act in them. It treats robot control as a foundation-model problem rather than a collection of isolated policies.
+Pi0 is part of the shift from models that understand scenes to models that act in them. It treats robot control as a foundation-model problem rather than a collection of isolated policies.
 
-**Takeaway:** Embodied VLMs need an action head that respects physics. Language understanding is useful, but control requires smooth continuous outputs.
+Embodied VLMs need an action head that respects physics. Language understanding is useful, but control requires smooth continuous outputs.

@@ -17,9 +17,11 @@ summary: "2023 – RT-2: Vision-Language-Action Models Transfer Web Knowledge to
 
 **Project:** [robotics-transformer2.github.io](https://robotics-transformer2.github.io/)
 
+## Summary
+
 RT-2 turns robot control into another output language for a vision-language model. Continuous action dimensions are discretized into tokens, serialized as text-like outputs, and co-fine-tuned with Internet-scale VQA and image-language tasks.
 
-## Paper Insights
+## Core Insights
 
 ![RT-2 co-fine-tuning pipeline mixing internet-scale vision-language examples with tokenized robot actions for closed-loop control](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-paper-figure.png)
 _Figure 1 shows the transfer interface: robot actions are serialized into the language model's token space, allowing web vision-language data and robot trajectories to co-train one model that is decoded back into closed-loop control. Source: [RT-2](https://arxiv.org/abs/2307.15818)._
@@ -34,14 +36,14 @@ Co-training creates an important retention problem: robot data must ground the m
 | Transformer parameters | Web knowledge can transfer to control | Gradients from abundant web data can dominate robot data. |
 | Co-training mixture | Preserves semantic capability during robot tuning | Mixture ratios become a critical hidden variable. |
 
-## Decision Lens
+## High-Level Takeaways
 
 RT-2 informs whether semantic transfer is worth using a common language/action interface. Its unit is a multimodal sequence ending in either text or action tokens. The model shares nearly the entire transformer; discretization is the bridge between continuous control and next-token prediction.
 
 The evaluations establish semantic generalization in the studied manipulation domain. A missing ablation would compare shared tokens, a continuous action head, and a separate action expert under matched VLM retention and latency. At ten times the control frequency, autoregressive decoding becomes the bottleneck. The central claim weakens if semantic probes improve while closed-loop task success under geometric perturbations does not.
 
-**Context:** RT-2 coined the practical VLA recipe: reuse a VLM, represent actions in its interface, and co-train semantics with control.
+RT-2 coined the practical VLA recipe: reuse a VLM, represent actions in its interface, and co-train semantics with control.
 
-**Limits:** Web knowledge does not supply metric state, force awareness, or recovery data.
+Web knowledge does not supply metric state, force awareness, or recovery data.
 
-**Takeaway:** A shared vocabulary transfers meaning efficiently; it does not make language-token probability a complete control objective.
+A shared vocabulary transfers meaning efficiently; it does not make language-token probability a complete control objective.

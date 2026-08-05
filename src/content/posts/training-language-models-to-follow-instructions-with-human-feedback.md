@@ -21,14 +21,18 @@ summary: "2022 – Training Language Models to Follow Instructions with Human Fe
 
 **Conference:** NeurIPS 2022 (spotlight)
 
-## Paper Insights
+## Summary
 
 InstructGPT aligns GPT-3-style models to user intent through supervised demonstrations and preference-based reinforcement learning. The pipeline first fine-tunes on labeler-written ideal responses, then trains a reward model from ranked model outputs, then optimizes the policy with PPO against that reward while controlling drift from the supervised model. The central result is that smaller InstructGPT models can be preferred over much larger base GPT-3 models on real API prompts. The paper also measures truthfulness, toxicity, and academic NLP performance to check side effects. The caveat is that RLHF optimizes for labeler preference under a specific prompt distribution, so reward-model errors and preference coverage matter. The lasting idea is that instruction following can be an explicit alignment target rather than an automatic result of scale.
+
+## Core Insights
 
 ![Figure 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model from Training Language Models to Follow Instructions with Human Feedback](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-paper-figure.png)
 _Figure 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model. From the [Training Language Models to Follow Instructions with Human Feedback paper](https://arxiv.org/abs/2203.02155), via arXiv HTML._
 
-**Summary:** GPT-3 could generate impressive text, but it often missed what users actually asked for. InstructGPT showed that reinforcement learning from human feedback could move a language model toward user intent. The pipeline has three stages: supervised fine-tuning on human demonstrations, reward-model training from ranked outputs, and PPO policy optimization with a KL penalty that keeps the model close to the supervised baseline.
+### Method and reported result
+
+GPT-3 could generate impressive text, but it often missed what users actually asked for. InstructGPT showed that reinforcement learning from human feedback could move a language model toward user intent. The pipeline has three stages: supervised fine-tuning on human demonstrations, reward-model training from ranked outputs, and PPO policy optimization with a KL penalty that keeps the model close to the supervised baseline.
 
 The striking result is that preference data can beat scale for instruction following. A 1.3B-parameter InstructGPT model was preferred to the 175B GPT-3 on real customer prompts, while also reducing toxicity and hallucination. The paper also helped crystallize the helpfulness, honesty, and harmlessness framing that shaped later alignment evaluations.
 
@@ -69,12 +73,14 @@ for step in range(num_updates):
 ```
 A reference policy (the frozen supervised model) keeps the RL step from drifting too far.
 
-**Critiques:** The pipeline is clear, and the quality-over-size result is still important. But RLHF is expensive in both human labor and compute, reward models can be gamed, and the alignment target is narrow: a model can become better at satisfying raters without becoming robustly truthful or safe in every setting.
+### Where the evidence stops
+
+The pipeline is clear, and the quality-over-size result is still important. But RLHF is expensive in both human labor and compute, reward models can be gamed, and the alignment target is narrow: a model can become better at satisfying raters without becoming robustly truthful or safe in every setting.
 
 **Why it matters**
 RLHF transformed large language models from clever autocomplete systems into instruction-following assistants, laying the groundwork for ChatGPT, GPT-4, and beyond.
 
-## Decision Lens
+## High-Level Takeaways
 
 InstructGPT informs whether scarce human preference data is better spent on supervised demonstrations alone or on a reward model followed by policy optimization. Its training pipeline moves from prompt-response demonstrations to ranked completion pairs and finally to PPO rollouts constrained by a KL penalty to the supervised policy.
 

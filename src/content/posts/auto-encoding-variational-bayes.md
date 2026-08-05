@@ -19,18 +19,22 @@ summary: "2014 – Auto-Encoding Variational Bayes"
 
 **Conference:** ICLR 2014
 
-## Paper Insights
+## Summary
 
 The VAE paper solves inference for latent-variable models whose posterior is intractable but differentiable. It introduces the reparameterization trick: sample noise from a fixed distribution, transform it through encoder outputs, and backpropagate through the stochastic latent variable. The objective is the evidence lower bound, combining reconstruction likelihood with a KL term that keeps the approximate posterior near the prior. An encoder, or recognition model, amortizes inference across datapoints instead of optimizing a separate variational distribution for each one. The experiments show generative modeling and semi-supervised learning can be trained with stochastic gradient descent. The caveat is the usual VAE tradeoff: simple likelihoods and strong KL pressure can produce blurry samples or underused latents.
+
+## Core Insights
 
 ![Figure from Auto-Encoding Variational Bayes: AEVB improves the variational lower bound over wake-sleep](/assets/images/vae-paper-figure-1.png)
 _Figure from the [AEVB paper](https://arxiv.org/abs/1312.6114), via ar5iv._
 
-**Summary:** Kingma and Welling made variational inference feel like ordinary neural-network training. Their variational autoencoder pairs an encoder $q_\phi(z \mid x)$, which approximates the posterior over latent variables, with a decoder $p_\theta(x \mid z)$, which reconstructs observations from those latents. The key move is the reparameterisation trick: instead of sampling $z$ in a way that blocks gradients, sample fixed noise and transform it through differentiable parameters.
+### Method and reported result
+
+Kingma and Welling made variational inference feel like ordinary neural-network training. Their variational autoencoder pairs an encoder $q_\phi(z \mid x)$, which approximates the posterior over latent variables, with a decoder $p_\theta(x \mid z)$, which reconstructs observations from those latents. The key move is the reparameterisation trick: instead of sampling $z$ in a way that blocks gradients, sample fixed noise and transform it through differentiable parameters.
 
 That trick turns Monte Carlo estimates of the evidence lower bound (ELBO) into low-variance gradients that work with standard stochastic gradient descent. The paper also made amortised inference practical at scale: the encoder learns to predict posterior parameters directly, rather than solving a separate inference problem for every datapoint.
 
-## Decision Lens
+## High-Level Takeaways
 
 The paper clarifies which latent representation and generative objective give the best quality, likelihood, and sampling-cost tradeoff. Its fundamental training unit is a datapoint and a sampled latent variable.
 
@@ -38,9 +42,9 @@ For optimization, the ELBO adds an expected reconstruction term and a KL term pe
 
 The most important missing comparison is a matched-compute comparison that separates objective choice, latent compression, sampler steps, and data quality. At 10× scale, data curation, latent bottlenecks, sampling cost, and training instability would dominate simple parameter scaling. The central claim would fail under this test: Hold data, parameters, and sampling compute fixed; reject the objective if a simpler likelihood or adversarial baseline matches quality and coverage.
 
-**Context:** VAEs gave deep generative modelling a stable likelihood-based recipe. They did not produce the sharpest samples, but they made latent-variable models trainable, inspectable, and useful for representation learning. Later work such as $\beta$-VAE, conditional VAEs, and flow-based models all build on this basic encoder-decoder view of probabilistic inference.
+VAEs gave deep generative modelling a stable likelihood-based recipe. They did not produce the sharpest samples, but they made latent-variable models trainable, inspectable, and useful for representation learning. Later work such as $\beta$-VAE, conditional VAEs, and flow-based models all build on this basic encoder-decoder view of probabilistic inference.
 
-**Evals / Latency benchmarks:**
+### Reported evidence and cost
 
 | Dataset | Latent dim | $-\log p(x)$ ↓ (nats) | Notes |
 | ------- | ---------- | ---------------------- | ----- |
@@ -49,6 +53,8 @@ The most important missing comparison is a matched-compute comparison that separ
 
 Training cost was modest for the original experiments: minutes per epoch on MNIST using a single GPU in 2013. Because the method uses SGD mini-batches and one objective, wall-clock time mostly comes down to ordinary forward and backward passes.
 
-**Critiques & limitations:** The strength of VAEs is stability: training has a clear objective, avoids GAN-style mode collapse, and produces a latent space that supports interpolation. The tradeoff is expressiveness. Simple Gaussian priors and posteriors can underfit complex data, and the ELBO is only a lower bound, so a good training objective does not guarantee a tight estimate of true likelihood.
+### Where the evidence stops
 
-**Takeaway:** Auto-Encoding Variational Bayes turned variational inference into a scalable deep-learning procedure. The reparameterisation trick is the small mathematical hinge that made the whole recipe practical.
+The strength of VAEs is stability: training has a clear objective, avoids GAN-style mode collapse, and produces a latent space that supports interpolation. The tradeoff is expressiveness. Simple Gaussian priors and posteriors can underfit complex data, and the ELBO is only a lower bound, so a good training objective does not guarantee a tight estimate of true likelihood.
+
+Auto-Encoding Variational Bayes turned variational inference into a scalable deep-learning procedure. The reparameterisation trick is the small mathematical hinge that made the whole recipe practical.

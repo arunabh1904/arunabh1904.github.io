@@ -12,11 +12,15 @@ summary: '2021 – SST: preserve high-resolution sparse LiDAR features without a
 
 **arXiv:** [2112.06375](https://arxiv.org/abs/2112.06375)
 
-**Summary:** SST argues that the conventional downsampling hierarchy is a poor fit for small 3D actors. It keeps one high-resolution stride and applies Sparse Regional Attention only to non-empty voxel tokens inside local windows. Alternating window shifts allow information to cross regional boundaries without densifying the whole plane.
+### Method and reported result
+
+SST argues that the conventional downsampling hierarchy is a poor fit for small 3D actors. It keeps one high-resolution stride and applies Sparse Regional Attention only to non-empty voxel tokens inside local windows. Alternating window shifts allow information to cross regional boundaries without densifying the whole plane.
+
+## Summary
 
 Its claim is not that attention is inherently better than convolution. The advantage comes from matching attention's variable receptive field to a sparse input while preserving spatial resolution.
 
-## Paper Insights
+## Core Insights
 
 Sparse windows bound the quadratic attention cost by local token count. Empty locations never become tokens, while region shifts create cross-window context. The supplementary comparison reports 64.69 AP for a standard convolutional variant versus 51.57 for a submanifold sparse-convolution variant, illustrating how a sparse operator that never activates new sites can struggle to exchange context.
 
@@ -27,12 +31,12 @@ Sparse windows bound the quadratic attention cost by local token count. Empty lo
 | Context | Local shifted windows | Global context needs depth or larger windows. |
 | Pedestrian result | 83.8 level-1 AP | Strong evidence for resolution-sensitive classes. |
 
-## Decision Lens
+## High-Level Takeaways
 
 SST is useful when the primary failure is lost small-object detail rather than insufficient global scene context. Window occupancy, maximum tokens, sorting, padding, and memory movement must be profiled; sparse FLOPs do not guarantee low wall-clock latency.
 
 The model also cannot represent unobserved free space through absent tokens. Dense BEV context can remain valuable for maps, occupancy, and safety envelopes even when actor detection is sparse.
 
-**Context:** DSVT makes sparse token grouping more hardware-oriented; UniTR later applies a related sparse-transformer interface across modalities.
+DSVT makes sparse token grouping more hardware-oriented; UniTR later applies a related sparse-transformer interface across modalities.
 
-**Takeaway:** Sparse attention earns its place when it preserves resolution and grows context without making empty road cells part of the compute bill.
+Sparse attention earns its place when it preserves resolution and grows context without making empty road cells part of the compute bill.

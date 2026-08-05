@@ -13,11 +13,15 @@ summary: "2024 – PaliGemma: A Versatile 3B VLM for Transfer"
 
 **arXiv:** [2407.07726](https://arxiv.org/abs/2407.07726)
 
-**Summary:** PaliGemma is a small open VLM built for transfer, not a giant visual chat assistant. It combines a SigLIP-So400m vision encoder with a Gemma-2B language model, then exposes many vision tasks as text generation.
+### Method and reported result
+
+PaliGemma is a small open VLM built for transfer, not a giant visual chat assistant. It combines a SigLIP-So400m vision encoder with a Gemma-2B language model, then exposes many vision tasks as text generation.
+
+## Summary
 
 That framing is practical: instead of building a separate head for captioning, VQA, detection, segmentation, remote sensing, and document tasks, the model learns a shared prefix-to-suffix interface that can be fine-tuned.
 
-## Paper Insights
+## Core Insights
 
 The architecture is intentionally simple. Image tokens from SigLIP go through a linear projection into Gemma's token space. A task prefix describes what to do, and the decoder autoregressively generates the answer, caption, box tokens, or segmentation tokens.
 
@@ -32,7 +36,7 @@ _Figure 1 shows PaliGemma's core architecture: a SigLIP image encoder feeds a Ge
 - Higher-resolution checkpoints are part of the design, not an afterthought.
 - None of the pretraining tasks rely on outputs from a larger commercial VLM.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -50,12 +54,12 @@ _Figure 1 shows PaliGemma's core architecture: a SigLIP image encoder feeds a Ge
 | MMVP | PaliGemma-224 reaches 47.3% paired accuracy, compared with 38.7% for GPT-4V and 40.7% for Gemini in the paper's comparison. |
 | Practical training | A final Stage1 run takes just under 3 days on TPUv5e-256; Stage2 resolution increases take about 15 hours each. |
 
-## Decision Lens
+## High-Level Takeaways
 
 PaliGemma informs whether teams need a large chat-oriented VLM or a compact base model designed for task transfer. SigLIP patch features are linearly projected into Gemma's token space, and captions, answers, boxes, and masks are all emitted autoregressively under task prefixes. Resolution upcycling from 224 to 448 and 896 pixels is the paper's practical compression tradeoff: spend more visual tokens only for tasks whose fine detail warrants them.
 
 The nearly forty-task transfer suite establishes versatility, not that one checkpoint or resolution is universally optimal. The missing decision table is a compute-matched comparison of resolution, visual-token count, and task-specific fine-tuning data across OCR, localization, and semantic tasks. At ten times the image resolution or task count, autoregressive coordinate strings and context length become fragile bottlenecks. The transferable-base thesis would be falsified if specialized models with the same adaptation budget consistently dominate while a single instruction-tuned checkpoint transfers just as well.
 
-**Context:** PaliGemma made the "small open VLM as a transferable base model" story concrete. It is useful because it is inspectable, fine-tunable, and broad enough to cover more than chat.
+PaliGemma made the "small open VLM as a transferable base model" story concrete. It is useful because it is inspectable, fine-tunable, and broad enough to cover more than chat.
 
-**Takeaway:** PaliGemma is a compact VLM workhorse: simple architecture, many task interfaces, and enough resolution control to make transfer practical.
+PaliGemma is a compact VLM workhorse: simple architecture, many task interfaces, and enough resolution control to make transfer practical.

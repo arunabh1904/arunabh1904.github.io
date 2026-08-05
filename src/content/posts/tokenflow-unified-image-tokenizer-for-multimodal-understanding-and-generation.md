@@ -15,14 +15,18 @@ summary: "2024 – TokenFlow: Unified Image Tokenizer for Multimodal Understandi
 **GitHub:** [ByteFlow-AI/TokenFlow](https://github.com/ByteFlow-AI/TokenFlow)  
 **Conference:** CVPR 2025
 
-**Summary:** TokenFlow is a unified image tokenizer built around two aligned codebooks: one for semantic features used by understanding and one for pixel-level detail used by generation. It aims to avoid the usual tradeoff of using a reconstruction-focused VQ encoder for both tasks.
+### Method and reported result
 
-## Paper Insights
+TokenFlow is a unified image tokenizer built around two aligned codebooks: one for semantic features used by understanding and one for pixel-level detail used by generation. It aims to avoid the usual tradeoff of using a reconstruction-focused VQ encoder for both tasks.
+
+## Summary
+
+The key mechanism is dual codebooks connected through a shared mapping, so shared indices expose both semantic and fine-grained information. The paper reports 7.2% average improvement over LLaVA-1.5 13B on its understanding comparison, FID 0.63 at 384×384 reconstruction, and GenEval 0.55 at 256×256 autoregressive generation.
+
+## Core Insights
 
 ![TokenFlow dual semantic and pixel encoders with a shared discrete mapping and separate reconstruction objectives](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-paper-figure.png)
 _Figure 3 shows how TokenFlow keeps one discrete index useful for two jobs: semantic and pixel distances jointly select the code, while separate decoders preserve meaning and reconstruction detail. Source: [TokenFlow](https://arxiv.org/abs/2412.03069)._
-
-The key mechanism is dual codebooks connected through a shared mapping, so shared indices expose both semantic and fine-grained information. The paper reports 7.2% average improvement over LLaVA-1.5 13B on its understanding comparison, FID 0.63 at 384×384 reconstruction, and GenEval 0.55 at 256×256 autoregressive generation.
 
 | Signal | Reported value | Why it matters |
 | --- | --- | --- |
@@ -30,12 +34,12 @@ The key mechanism is dual codebooks connected through a shared mapping, so share
 | Reconstruction | FID 0.63 at 384×384 | Tests fine visual detail. |
 | Generation | GenEval 0.55 at 256×256 | Tests the generation side of the tokenizer. |
 
-## Decision Lens
+## High-Level Takeaways
 
 TokenFlow informs whether one discrete image interface can support both semantic understanding and high-fidelity generation. Its dual codebooks preserve semantic and fine-grained signals, while a shared index mapping lets a transformer consume a unified token stream. The image token is therefore not forced to choose between invariance and reconstruction detail; the mapping couples two specialized representations at each position.
 
 The reported understanding, reconstruction, and generation results show that the compromise is viable, but they do not isolate the cost of the larger codebook machinery or test severe compression uniformly. A bitrate- and parameter-matched comparison with single codebooks across resolutions is the missing ablation. At ten times the image complexity or sequence length, index alignment may become brittle and discrete sequences expensive. The unification claim fails if separate tokenizers deliver a better Pareto frontier once tokenizer compute and downstream context cost are counted.
 
-**Limits:** The design adds tokenizer complexity; results depend on the selected comparisons and resolutions.
+The design adds tokenizer complexity; results depend on the selected comparisons and resolutions.
 
-**Takeaway:** The tokenizer is an architectural decision: semantic and reconstruction features can be aligned without being identical.
+The tokenizer is an architectural decision: semantic and reconstruction features can be aligned without being identical.

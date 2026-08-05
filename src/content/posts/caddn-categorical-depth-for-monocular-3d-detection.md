@@ -14,11 +14,15 @@ summary: '2021 – CaDDN: supervise a depth distribution that lifts image featur
 
 **Code:** [TRAILab/CaDDN](https://github.com/TRAILab/CaDDN)
 
-**Summary:** CaDDN predicts a categorical depth distribution for every image feature, takes an outer product between that distribution and semantic image features to build a frustum volume, then transforms the volume into voxels and BEV for 3D detection. Projected LiDAR supplies depth labels during training; inference uses one camera.
+### Method and reported result
+
+CaDDN predicts a categorical depth distribution for every image feature, takes an outer product between that distribution and semantic image features to build a frustum volume, then transforms the volume into voxels and BEV for 3D detection. Projected LiDAR supplies depth labels during training; inference uses one camera.
+
+## Summary
 
 The central idea is to preserve depth uncertainty through lifting instead of committing every pixel to one regressed range.
 
-## Paper Insights
+## Core Insights
 
 Depth bins turn a 2D feature into a probability-weighted ray. The detector loss and explicit depth loss train the same view transformation, connecting image semantics to metric geometry. On KITTI, the paper reports car BEV AP gains of 2.91, 1.59, and 2.22 points for easy, moderate, and hard splits over its cited prior baseline.
 
@@ -29,12 +33,12 @@ Depth bins turn a 2D feature into a probability-weighted ray. The detector loss 
 | Frustum outer product | Couples semantics and range | Produces a large intermediate volume. |
 | Camera-only inference | Cheap deployed sensor set | Appearance cannot resolve every ambiguity. |
 
-## Decision Lens
+## High-Level Takeaways
 
 CaDDN matters when the runtime contract excludes LiDAR but an instrumented training fleet can provide it. The supervision pipeline should track occlusion, time alignment, ignore regions, and confidence; sparse projected points are not dense ground truth.
 
 Compare categorical, continuous, and query-based lifting at matched resolution and latency. Better depth metrics do not guarantee better 3D detection if errors fall in task-irrelevant regions.
 
-**Context:** LSS popularizes distributional lifting; CaDDN adds direct depth supervision, and BEVDepth adapts that lesson to surround-camera BEV detection.
+LSS popularizes distributional lifting; CaDDN adds direct depth supervision, and BEVDepth adapts that lesson to surround-camera BEV detection.
 
-**Takeaway:** A camera-to-BEV transform becomes trainable and auditable when depth uncertainty is explicit and privileged LiDAR is confined to the training target.
+A camera-to-BEV transform becomes trainable and auditable when depth uncertainty is explicit and privileged LiDAR is confined to the training target.

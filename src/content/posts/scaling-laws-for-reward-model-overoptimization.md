@@ -15,9 +15,11 @@ summary: "2022 – Scaling Laws for Reward Model Overoptimization"
 
 **arXiv:** [2210.10760](https://arxiv.org/abs/2210.10760)
 
+## Summary
+
 This paper measures Goodhart's law instead of citing it. A large “gold” reward model stands in for human judgment, a smaller proxy reward model is trained from its labels, and a policy is pushed against the proxy using reinforcement learning or best-of-$n$ sampling. Proxy reward keeps rising after gold reward peaks.
 
-## Paper Insights
+## Core Insights
 
 ![Best-of-n and reinforcement-learning curves showing proxy reward rising while gold reward eventually falls for smaller reward models](/assets/images/scaling-laws-for-reward-model-overoptimization-paper-figure.png)
 _Figure 1 shows the Goodharting pattern behind the scaling law: optimization continues to improve proxy reward while the held-out gold reward peaks and then declines, with the failure arriving earlier for smaller reward models. Source: [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)._
@@ -32,14 +34,14 @@ The practical result is a stopping rule, not permission to optimize harder. Poli
 | Gold reward | Held-out target quality | Real success, safety, and human judgment |
 | KL distance | Optimization pressure | Policy drift from the deployed SFT controller |
 
-## Decision Lens
+## High-Level Takeaways
 
 This paper informs how far to push against a learned critic before collecting better labels or changing the reward. The training unit is a preference-labeled completion in the experiment, but the reusable object is the proxy-versus-ground-truth frontier. Scaling the proxy can postpone overoptimization; it cannot eliminate the fact that the proxy omits something.
 
 The fitted laws hold in a synthetic language setting with a model acting as gold truth. At ten times the deployment diversity, critic blind spots and policy-induced states will change the reward distribution itself. A robot post-training program should therefore sweep optimization pressure and pre-register a real-world stopping metric. The central safety claim fails if a curve fitted on offline critic judgments cannot predict the point where held-out robot success begins to decline.
 
-**Context:** This is the quantitative foundation for treating reward optimization as a budgeted intervention rather than an unlimited objective.
+This is the quantitative foundation for treating reward optimization as a budgeted intervention rather than an unlimited objective.
 
-**Limits:** A synthetic gold model is cheaper and more stationary than human or physical evaluation.
+A synthetic gold model is cheaper and more stationary than human or physical evaluation.
 
-**Takeaway:** Rising reward is evidence of optimization; only an independent measure can tell whether it is evidence of progress.
+Rising reward is evidence of optimization; only an independent measure can tell whether it is evidence of progress.

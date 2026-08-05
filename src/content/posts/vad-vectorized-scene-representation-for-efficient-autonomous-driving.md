@@ -15,11 +15,15 @@ summary: "2023 – VAD: Vectorized Scene Representation for Efficient Autonomous
 
 **Code:** [hustvl/VAD](https://github.com/hustvl/VAD)
 
-**Summary:** VAD argues that end-to-end driving should not have to plan from dense rasterized scene tensors. It represents the scene with vectors: agent motion and map elements stay as instance-level structures, and the planner can use them as explicit constraints.
+### Method and reported result
+
+VAD argues that end-to-end driving should not have to plan from dense rasterized scene tensors. It represents the scene with vectors: agent motion and map elements stay as instance-level structures, and the planner can use them as explicit constraints.
+
+## Summary
 
 That design is useful because rasterization can be expensive and can blur the object-level structure that planning cares about. VAD keeps the scene closer to the planner's natural language: agents, lanes, boundaries, and candidate trajectories.
 
-## Paper Insights
+## Core Insights
 
 The paper proposes an end-to-end vectorized paradigm for autonomous driving. Instead of generating dense occupancy or semantic-map rasters for planning, VAD uses vectorized agent and map representations, query interactions, and vectorized planning constraints. The model aims to improve both safety and speed by avoiding computation-heavy raster operations and hand-designed post-processing.
 
@@ -33,7 +37,7 @@ _Figure 1 shows the representational shift: VAD keeps agents, maps, and ego plan
 - Agent motion and map elements become explicit planning constraints.
 - Efficiency gains come from avoiding dense rasterized representations.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -49,12 +53,12 @@ _Figure 1 shows the representational shift: VAD keeps agents, maps, and ego plan
 | VAD-Tiny | 0.78 | 0.38 | 59.5 | 16.8 |
 | VAD-Base | 0.72 | 0.22 | 224.3 | 4.5 |
 
-## Decision Lens
+## High-Level Takeaways
 
 VAD informs whether an ego planner needs a dense raster feature map or can reason over vectorized agents and map elements. Its atomic units are agent vectors, map vectors, and ego trajectory points; vector attention exposes interaction while explicit safety costs rescore plans.
 
 The representation reduces dense BEV compute, but planning quality becomes bounded by vector extraction recall and uncertainty. The missing comparison matches latency and backbone across vector-only, raster-only, and hybrid planners under missed detections and map errors. At 10× actors, pairwise interaction and vector selection dominate. VAD's claim would fail if a low-resolution raster or occupancy interface matched collision and progress metrics while degrading more gracefully when upstream instances are missing.
 
-**Context:** VAD carried vectorized scene understanding beyond map construction and into end-to-end planning.
+VAD carried vectorized scene understanding beyond map construction and into end-to-end planning.
 
-**Takeaway:** Planning benefits when the model keeps the world as vectors and relations instead of flattening it into dense pixels too early.
+Planning benefits when the model keeps the world as vectors and relations instead of flattening it into dense pixels too early.

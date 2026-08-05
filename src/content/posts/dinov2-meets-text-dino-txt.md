@@ -19,9 +19,11 @@ summary: '2024 – DINOv2 Meets Text: dino.txt'
 
 **Conference:** CVPR 2025
 
+## Summary
+
 dino.txt asks whether language alignment can be added to a strong self-supervised vision model without erasing the dense geometry that made it valuable. It freezes a DINOv2 ViT-L/14, adds two trainable visual transformer blocks, and learns a text encoder from scratch with image-text contrastive training. The added visual path updates both the class token and patch tokens, so image-level retrieval and pixel-level zero-shot segmentation share one aligned representation.
 
-## Paper Insights
+## Core Insights
 
 ![dino.txt appends trainable visual blocks to a frozen DINOv2 backbone and aligns pooled global-plus-patch features with text](/assets/images/dinov2-meets-text-dino-txt-paper-figure.png)
 _The DINOv2 backbone remains frozen. Two new visual blocks adapt its tokens, and the contrastive image embedding concatenates the updated class token with average-pooled patch tokens before matching text. Source: [dino.txt](https://arxiv.org/abs/2412.16334)._
@@ -39,7 +41,7 @@ The second contribution is data curation. LVTD-2.3B is filtered and rebalanced f
 
 The paper also reports 41.0 mIoU on Cityscapes and 67.6 on Pascal VOC under its zero-shot protocol. A “perfect-boundary” ADE20K analysis reaches 38.9 mIoU, showing that boundary quality is not the only limitation: class vocabulary, synonyms, overlapping labels, and text alignment still matter.
 
-## Decision Lens
+## High-Level Takeaways
 
 dino.txt informs whether to retrain a vision-language encoder end to end or attach language to an established dense backbone. Freezing is attractive when DINO features already serve depth, correspondence, or segmentation consumers that should not regress. The tradeoff is a constrained cross-modal interface: two new blocks and a new text tower must absorb the alignment burden.
 
@@ -47,8 +49,8 @@ The paper's best result combines architecture, a 2.3-billion-pair private datase
 
 [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html) simplifies the contrastive loss for image-text training; dino.txt changes the initialization and freezing strategy. [DINOv3](/paper%20shorts/2025/08/13/dinov3.html) later incorporates text alignment as one post-training stage in a larger self-supervised vision pipeline.
 
-**Context:** dino.txt adds image- and pixel-level language alignment to a frozen DINOv2 backbone through a small trainable visual adapter and a new text encoder.
+dino.txt adds image- and pixel-level language alignment to a frozen DINOv2 backbone through a small trainable visual adapter and a new text encoder.
 
-**Limits:** The strongest data are private, the text tower is not generally competitive, and zero-shot segmentation remains sensitive to label wording and evaluation ontology.
+The strongest data are private, the text tower is not generally competitive, and zero-shot segmentation remains sensitive to label wording and evaluation ontology.
 
-**Takeaway:** Language alignment does not require relearning visual structure; a constrained adapter can preserve dense DINO features while making them queryable with text.
+Language alignment does not require relearning visual structure; a constrained adapter can preserve dense DINO features while making them queryable with text.

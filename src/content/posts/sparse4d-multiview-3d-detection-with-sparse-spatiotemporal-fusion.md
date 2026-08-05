@@ -15,11 +15,15 @@ summary: '2022 – Sparse4D: Multi-View 3D Object Detection with Sparse Spatial-
 
 **Code:** [linxuewu/Sparse4D](https://github.com/linxuewu/Sparse4D)
 
-**Summary:** Sparse4D avoids constructing a dense BEV video. Each learnable 3D anchor carries an instance feature and several keypoints. The model projects those keypoints into multiple cameras, feature scales, and timestamps; samples only the corresponding image features; fuses them hierarchically; and iteratively refines the anchor box.
+### Method and reported result
+
+Sparse4D avoids constructing a dense BEV video. Each learnable 3D anchor carries an instance feature and several keypoints. The model projects those keypoints into multiple cameras, feature scales, and timestamps; samples only the corresponding image features; fuses them hierarchically; and iteratively refines the anchor box.
+
+## Summary
 
 “4D” here means sparse 3D hypotheses extended through time. The model spends temporal compute where objects may exist rather than aligning every BEV cell across every frame.
 
-## Paper Insights
+## Core Insights
 
 Sparse 4D sampling starts with fixed keypoints at the anchor's center and face centers, plus learned offsets conditioned on the instance feature. Ego pose and the anchor's estimated velocity move those points across timestamps before camera projection. Hierarchical fusion then aggregates scale and camera, keypoint, and time dimensions in stages. This factorization keeps the attention problem local and makes the contribution of each axis inspectable.
 
@@ -35,12 +39,12 @@ _Sparse4D turns space-time fusion into sparse evidence retrieval around a fixed 
 | 4D keypoints | Local support across views and frames | Depend on calibration, ego pose, and motion estimates. |
 | Depth confidence | Compatibility along the camera ray | Cannot recover an object never covered by an anchor. |
 
-## Decision Lens
+## High-Level Takeaways
 
 Sparse4D informs whether temporal perception should store a dense scene field or a set of persistent object hypotheses. Its atomic unit is an anchor-instance pair. The image backbone is shared across cameras and frames; the decoder shares a sampling and refinement protocol across instances, but the state is object-specific.
 
 The missing matched control compares dense BEV memory and sparse anchors with the same camera backbone, history length, image tokens, and P99 latency. At 10× crowded-scene density, anchor count, self-attention, and duplicate suppression erode the sparse advantage. The method would fail for unmodeled free space, thin map elements, or novel objects if those outputs require a dense field or a much larger proposal set.
 
-**Context:** Sparse4D establishes the anchor-sampling branch of camera-only temporal perception; StreamPETR carries object queries recurrently, while Sparse4D v3 strengthens training and turns the same state into tracks.
+Sparse4D establishes the anchor-sampling branch of camera-only temporal perception; StreamPETR carries object queries recurrently, while Sparse4D v3 strengthens training and turns the same state into tracks.
 
-**Takeaway:** Temporal fusion can follow objects through space-time instead of carrying the entire scene grid forward.
+Temporal fusion can follow objects through space-time instead of carrying the entire scene grid forward.

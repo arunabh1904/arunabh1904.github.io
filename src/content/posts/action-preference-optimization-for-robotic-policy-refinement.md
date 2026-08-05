@@ -17,9 +17,11 @@ summary: "2025 – Human-Assisted Robotic Policy Refinement via Action Preferenc
 
 **Project:** [Action Preference Optimization](https://gewu-lab.github.io/action_preference_optimization/)
 
+## Summary
+
 Action Preference Optimization (APO) learns from a deployment pattern that ordinary DPO handles poorly: a robot starts to fail, a human takes over, and the corrected trajectory continues from a different state. The method labels actions as desirable or undesirable rather than pretending the intervention supplies a matched chosen–rejected pair.
 
-## Paper Insights
+## Core Insights
 
 ![Action Preference Optimization pipeline from human-assisted deployment and interventions to adaptively weighted VLA fine-tuning](/assets/images/action-preference-optimization-for-robotic-policy-refinement-paper-figure.png)
 _Figure 1 connects deployment to learning: human interventions turn failed or suboptimal rollouts into action preferences, and adaptive weighting controls how strongly each corrected segment updates the VLA. Source: [Action Preference Optimization](https://arxiv.org/abs/2506.07127)._
@@ -34,14 +36,14 @@ The paper evaluates simulation and real manipulation, reporting better generaliz
 | Human corrective action | Desirable action evidence |
 | Continuous action error | Adaptive weight on token-level optimization |
 
-## Decision Lens
+## High-Level Takeaways
 
 APO informs whether human time should produce full demonstrations or targeted interventions on policy failures. Its atomic unit is an action labeled by desirability within an interaction trajectory. Irreversibility prevents exact pairing, and adaptive weighting maps physical action discrepancy back into an autoregressive token loss.
 
 The results show that binary action feedback can exploit failures more directly than preferred-sample SFT. A missing ablation compares intervention timing, action-window length, and matched-state resets. At ten times the deployment volume, operator latency and inconsistent takeover thresholds will bias the data. The approach fails if action-level gains do not improve episode-level safety or if the policy learns to rely on states reachable only after human rescue.
 
-**Context:** APO is the practical bridge from KTO-style binary feedback to irreversible physical interaction.
+APO is the practical bridge from KTO-style binary feedback to irreversible physical interaction.
 
-**Limits:** An intervention identifies a bad local choice more reliably than it identifies the earliest causal error.
+An intervention identifies a bad local choice more reliably than it identifies the earliest causal error.
 
-**Takeaway:** Do not force physical corrections into language-style pairs; preserve what the intervention actually tells you.
+Do not force physical corrections into language-style pairs; preserve what the intervention actually tells you.

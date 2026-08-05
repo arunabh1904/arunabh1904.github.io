@@ -13,11 +13,15 @@ summary: "2024 – Can LVLMs Obtain a Driver's License?"
 
 **arXiv:** [2409.02914](https://arxiv.org/abs/2409.02914)
 
-**Summary:** IDKB is an Interactive Driving Knowledge Base for testing whether LVLMs understand traffic rules and driving theory. It combines official handbook knowledge, exam-style questions, and applied road scenarios.
+### Method and reported result
+
+IDKB is an Interactive Driving Knowledge Base for testing whether LVLMs understand traffic rules and driving theory. It combines official handbook knowledge, exam-style questions, and applied road scenarios.
+
+## Summary
 
 The result is a useful warning: a model may recognize cars and pedestrians but still fail rule-based reasoning that every licensed human driver is expected to know.
 
-## Paper Insights
+## Core Insights
 
 IDKB tests whether LVLMs know driving rules and applied traffic knowledge. The benchmark covers signs, laws, exam-style questions, and scenario reasoning, then evaluates 15 representative LVLMs. Its central claim is that visual-language capability is not the same as driving competence: a model may recognize a road scene but still choose an illegal or unsafe action. The benchmark is valuable because autonomous driving needs rule knowledge, not only perception. The caveat is scope: passing IDKB would show specialized knowledge, but it would not prove planning, control, or closed-loop safety.
 
@@ -29,7 +33,7 @@ _Figure 1: Performance of 15 representative Large Vision-Language Models on IDKB
 - The benchmark includes handbooks, exams, and scenario QA.
 - Fine-tuning gains show that general VLM pretraining does not guarantee domain rules.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -37,12 +41,12 @@ _Figure 1: Performance of 15 representative Large Vision-Language Models on IDKB
 | Evaluation | 15 LVLMs | Tests whether general models know driving theory. |
 | Main failure | Missing specialized rule knowledge | Perception alone is not driving competence. |
 
-## Decision Lens
+## High-Level Takeaways
 
 IDKB informs whether a driving LVLM needs explicit traffic-rule knowledge in addition to visual scene description. Its atomic item is a rule-grounded image-question pair that tests recognition, regulation recall, and application of the rule to a scene.
 
 The benchmark distinguishes legal knowledge from generic visual fluency, but written-test competence is not closed-loop driving competence. The missing comparison controls for text-only rule memorization by using counterfactual scenes and jurisdiction changes. At 10× rule coverage, contradictory local regulations and rare signage make annotation and retrieval the bottlenecks. The licensing analogy would fail if high IDKB scores did not predict correct decisions on unseen rule-scene combinations.
 
-**Context:** Driving competence is not only perception. It is perception plus rule knowledge plus judgment under context.
+Driving competence is not only perception. It is perception plus rule knowledge plus judgment under context.
 
-**Takeaway:** Autonomous driving VLMs need a written test as well as a road test.
+Autonomous driving VLMs need a written test as well as a road test.

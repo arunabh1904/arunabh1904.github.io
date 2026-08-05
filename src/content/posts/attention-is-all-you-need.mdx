@@ -26,7 +26,11 @@ import { attentionIsAllYouNeedPlayground } from '../../lib/python-playground-exa
 ![Figure 1: The Transformer - model architecture from Attention Is All You Need](/assets/images/attention-is-all-you-need-paper-figure.png)
 _Figure 1: The Transformer - model architecture. From the [Attention Is All You Need paper](https://arxiv.org/abs/1706.03762), via arXiv HTML._
 
+## Summary
+
 The Transformer did not win by inventing attention from scratch. Its sharper move was to remove recurrence and convolution from sequence modelling and ask whether stacked attention blocks were enough. In that architecture, any token can attend to any other token in one step, which shortens gradient paths and makes training highly parallel. Eight P100 GPUs reached 28.4 BLEU on English to German in 3.5 days, a practical result that mattered as much as the modeling idea.
+
+## Core Insights
 
 At the heart of the architecture is the scaled attention mechanism:
 
@@ -55,8 +59,6 @@ The scaling by $\sqrt{d_k}$ keeps logits numerically stable as key/query dimensi
 The paper's core math is easier to trust when you can poke at small numbers yourself. This playground includes a toy scaled-dot-product attention computation and a positional-encoding helper. Run the default code first, then change the query or position index and watch how the values shift.
 
 <PythonPlayground client:visible {...attentionIsAllYouNeedPlayground} />
-
-## Paper Insights
 
 The Transformer replaces recurrence with stacked self-attention and position-wise feed-forward layers. The encoder lets every source token attend to every other source token; the decoder adds masked self-attention so future target tokens remain hidden, then cross-attends to encoder states. Multi-head attention splits representation space so different heads can track different relations, while residual connections, layer normalization, label smoothing, and dropout stabilize training. The empirical case is machine translation: strong BLEU on WMT English-German and English-French with much more parallel training than RNNs. The core limitation is quadratic attention cost in sequence length. The lasting idea is that sequence modeling can be built around content-addressed token interaction rather than step-by-step recurrence.
 
@@ -105,7 +107,7 @@ Self-attention gives every pair of tokens a constant-length path, but it pays fo
 
 The same quadratic cost limits long contexts, and smaller datasets did not immediately erase the case for RNNs. Still, the direction was clear. Transformers became the backbone for BERT, GPT, Vision Transformers, and most of the modern sequence-modeling stack.
 
-## Decision Lens
+## High-Level Takeaways
 
 The Transformer informs the decision to replace recurrent state updates with globally addressable token-to-token communication. Its training unit is a source-target token pair under teacher-forced next-token prediction; position enters through an encoding, while attention and feed-forward weights are shared across sequence positions.
 

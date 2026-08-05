@@ -15,11 +15,15 @@ summary: '2023 – VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and 
 
 **Code:** [dvlab-research/VoxelNeXt](https://github.com/dvlab-research/VoxelNeXt)
 
-**Summary:** VoxelNeXt keeps LiDAR detection sparse through the prediction head. Instead of compressing sparse 3D features into a dense BEV heatmap and looking for hand-defined centers or anchors, it lets selected occupied voxels predict boxes directly. Sparse max pooling replaces dense heatmap peak extraction, and the predicting voxel can also support tracking association.
+### Method and reported result
+
+VoxelNeXt keeps LiDAR detection sparse through the prediction head. Instead of compressing sparse 3D features into a dense BEV heatmap and looking for hand-defined centers or anchors, it lets selected occupied voxels predict boxes directly. Sparse max pooling replaces dense heatmap peak extraction, and the predicting voxel can also support tracking association.
+
+## Summary
 
 The paper tests a stronger claim than sparse backbones: the output interface does not have to become dense merely because earlier detectors did.
 
-## Paper Insights
+## Core Insights
 
 Extra downsampling stages enlarge the sparse receptive field without filling the grid. Feature-magnitude pruning removes up to half of selected voxels with little validation loss in the reported setting. Sparse height compression then combines a 3D backbone with a 2D sparse head, retaining vertical reasoning early while avoiding an expensive 3D prediction stage.
 
@@ -34,12 +38,12 @@ On nuScenes test, VoxelNeXt reports 64.5 mAP and 70.0 NDS at 66 ms; its double-f
 
 The authors explicitly identify that final mismatch as a limitation: sparse operations depend heavily on implementation and hardware. Direct voxel predictions can also come from outside the box, which makes their provenance less geometrically intuitive than center-based detections.
 
-## Decision Lens
+## High-Level Takeaways
 
 VoxelNeXt informs whether a sparse LiDAR stack should densify for detection and tracking. Its atomic unit remains the occupied voxel from input through output. The expensive architectural decision is the sparse runtime itself: coordinate maps, pruning, pooling, and gathers must all remain efficient on the deployed accelerator.
 
 A matched rejection test compares VoxelNeXt and CenterPoint with equal backbone capacity, range, voxel resolution, and compiler effort. The fully sparse head loses if dense heatmaps give better small-object recall or comparable latency, or if pruning destabilizes degraded and crowded scenes. At larger range, the active voxel count and sparse-kernel memory traffic become the likely limits.
 
-**Context:** SECOND makes the 3D backbone sparse; CenterPoint densifies into BEV for prediction. VoxelNeXt removes that final dense proxy and links the predicting voxel to tracking.
+SECOND makes the 3D backbone sparse; CenterPoint densifies into BEV for prediction. VoxelNeXt removes that final dense proxy and links the predicting voxel to tracking.
 
-**Takeaway:** A sparse backbone is only half a sparse detector; VoxelNeXt asks the prediction head and tracker to operate on the active set too.
+A sparse backbone is only half a sparse detector; VoxelNeXt asks the prediction head and tracker to operate on the active set too.

@@ -21,11 +21,13 @@ summary: '2026 – AR-VLA: True Autoregressive Action Expert for Vision-Language
 **arXiv:** [2603.10126](https://arxiv.org/abs/2603.10126)  
 **Project, code, and videos:** [arvla.insait.ai](https://arvla.insait.ai/)
 
+## Summary
+
 Most continuous-action VLAs are temporally reactive even when their action decoder is called autoregressive: they regenerate an action chunk from the latest observation, then discard the decoder state. AR-VLA instead keeps an action expert alive across control steps. It predicts one continuous action vector at a time from a rolling proprioceptive history while conditioning on the most recent vision-language features, so slow perception can refresh without resetting fast motor memory.
 
-That distinction matters in the paper’s matched BridgeV2 experiment. With the same PaliGemma-3B backbone and roughly 300M-parameter action module, AR-VLA reaches 61.5% average success in SIMPLER, versus 49.0% for the reproduced FAST-token head and 51.0% for the reproduced flow-matching head. Its advantage is not universal: Diffusion Policy remains better on PushT, and ACT is better on human-demonstration ALOHA insertion.
+## Core Insights
 
-## Paper Insights
+That distinction matters in the paper’s matched BridgeV2 experiment. With the same PaliGemma-3B backbone and roughly 300M-parameter action module, AR-VLA reaches 61.5% average success in SIMPLER, versus 49.0% for the reproduced FAST-token head and 51.0% for the reproduced flow-matching head. Its advantage is not universal: Diffusion Policy remains better on PushT, and ACT is better on human-demonstration ALOHA insertion.
 
 ![AR-VLA framework re-anchoring vision-language keys into a rolling hybrid cache used by an autoregressive action expert](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-paper-figure.png)
 _Figure 2 shows the persistent-controller mechanism: refreshed visual-language keys are timestamped onto the action timeline, while the action expert retains rolling kinematic history and predicts one future action at a time. Source: [AR-VLA](https://arxiv.org/abs/2603.10126)._
@@ -47,7 +49,7 @@ Training separates motion modeling from visual grounding. Phase one learns next-
 
 The ablations support the memory mechanism more directly than the headline benchmarks. Removing action-only pretraining drops SIMPLER success from 61.5% to 37.5% at the standard training budget; doubling the no-pretraining budget recovers only to 54.2%. With no historical dropout, validation action error is low but task success is zero, showing that pure next-action fit can produce a history shortcut. Replacing temporal anchoring with static visual positions yields 3.1% success, while a 20-step history reaches 61.5%; longer 40-step history slips to 59.4%.
 
-## Decision Lens
+## High-Level Takeaways
 
 AR-VLA informs a system-level choice: should temporal continuity live inside a persistent controller, or be approximated by repeatedly asking a snapshot-conditioned model for action chunks? The evidence favors persistent motor state when perception and control run at different frequencies. The hybrid cache gives a concrete interface—refresh semantic context as a block, retain kinematics as a stream—and the pretraining result suggests that action-only trajectories can improve the controller before expensive vision-language alignment.
 
@@ -55,8 +57,8 @@ The strongest causal test would compare persistent autoregression with a recurre
 
 At ten times the rollout length, cache policy and error accumulation become the likely bottlenecks. The action expert conditions on its own executed history, so small out-of-distribution mistakes can compound. Visual input is still a sequence of replaceable snapshots rather than a persistent visual memory. The decisive next test is a partially observable, long-horizon physical benchmark with delayed perception, controlled cache lengths, recovery after induced errors, and several seeds.
 
-**Context:** AR-VLA turns the VLA action head into a stateful high-frequency process rather than a stateless chunk generator.
+AR-VLA turns the VLA action head into a stateful high-frequency process rather than a stateless chunk generator.
 
-**Limits:** The strongest controlled results use a small set of simulated and tabletop tasks. Comparisons do not isolate memory from objective under a fully matched recurrent baseline, and the paper notes error accumulation, possible damage to VLM priors without insulation, and snapshot-based visual processing.
+The strongest controlled results use a small set of simulated and tabletop tasks. Comparisons do not isolate memory from objective under a fully matched recurrent baseline, and the paper notes error accumulation, possible damage to VLM priors without insulation, and snapshot-based visual processing.
 
-**Takeaway:** Preserve action history across control steps and timestamp slow visual context; do not assume that calling a within-chunk decoder “autoregressive” gives a robot temporal memory.
+Preserve action history across control steps and timestamp slow visual context; do not assume that calling a within-chunk decoder “autoregressive” gives a robot temporal memory.

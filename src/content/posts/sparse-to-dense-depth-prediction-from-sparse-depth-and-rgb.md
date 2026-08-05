@@ -12,11 +12,15 @@ summary: '2017 – Sparse-to-Dense: complete sparse runtime range measurements w
 
 **arXiv:** [1709.07492](https://arxiv.org/abs/1709.07492)
 
-**Summary:** Sparse-to-Dense feeds RGB and sparse depth into an encoder-decoder that predicts a dense depth map. The sparse values are runtime inputs, not merely training labels. Random sampling simulates different depth densities and lets the paper study how a small number of range measurements changes monocular prediction.
+### Method and reported result
+
+Sparse-to-Dense feeds RGB and sparse depth into an encoder-decoder that predicts a dense depth map. The sparse values are runtime inputs, not merely training labels. Random sampling simulates different depth densities and lets the paper study how a small number of range measurements changes monocular prediction.
+
+## Summary
 
 That lifecycle distinction is essential: depth completion is sensor fusion. Removing the range sensor at deployment changes the input distribution and invalidates the advertised completion behavior.
 
-## Paper Insights
+## Core Insights
 
 The network can use one joint encoder or separate RGB and depth branches. Sparse points anchor metric scale while image features interpolate structure between measurements. The paper reports that 100 samples roughly halve NYU depth error and reduce the cited KITTI error from about 7 m to about 3.5 m; at 500 samples, the fraction of reliable KITTI pixels rises from 59.1% to 93.5%.
 
@@ -27,12 +31,12 @@ The network can use one joint encoder or separate RGB and depth branches. Sparse
 | Sampling mask | Indicates observed support | Must not confuse zero with missing. |
 | Dense output | Consumer-friendly geometry | Can be overconfident between anchors. |
 
-## Decision Lens
+## High-Level Takeaways
 
 Use depth completion when sparse depth is guaranteed at runtime and downstream modules benefit from a dense surface. If the deployment goal is camera-only, use sparse depth as supervision or distillation instead and remove it from the inference graph deliberately.
 
 Evaluate error by distance, object boundary, surface type, and sampling pattern. Uniform random samples are easier than real scanning geometry and motion distortion.
 
-**Context:** DeepLiDAR adds surface-normal reasoning and learned confidence; GuideFormer replaces convolutional exchange with guided attention.
+DeepLiDAR adds surface-normal reasoning and learned confidence; GuideFormer replaces convolutional exchange with guided attention.
 
-**Takeaway:** Sparse measurements can dramatically improve dense depth, but the improvement is a runtime sensor dependency, not free privileged supervision.
+Sparse measurements can dramatically improve dense depth, but the improvement is a runtime sensor dependency, not free privileged supervision.

@@ -13,11 +13,15 @@ summary: "2024 – AsyncDriver: Asynchronous Large Language Model Enhanced Plann
 
 **arXiv:** [2406.14556](https://arxiv.org/abs/2406.14556)
 
-**Summary:** AsyncDriver addresses a practical problem: LLMs are too slow to sit directly in a high-frequency driving control loop. The system runs a fast planner continuously while a slower LLM produces scene-associated instructions asynchronously.
+### Method and reported result
+
+AsyncDriver addresses a practical problem: LLMs are too slow to sit directly in a high-frequency driving control loop. The system runs a fast planner continuously while a slower LLM produces scene-associated instructions asynchronously.
+
+## Summary
 
 Those instructions can guide the planner through complex or ambiguous situations without requiring the LLM to produce every control update.
 
-## Paper Insights
+## Core Insights
 
 AsyncDriver uses an LLM as a high-level driving advisor without putting that LLM directly in the synchronous planning loop. The planner keeps generating trajectories while the language model asynchronously contributes scene reasoning or strategic guidance. This design tries to preserve real-time control while still benefiting from language-level interpretation of traffic context. The key tradeoff is staleness: asynchronous advice can reduce latency, but the system must know when guidance no longer matches the current scene. The paper matters as a pattern for using foundation models near safety-critical loops instead of making every control update wait on them.
 
@@ -29,7 +33,7 @@ _Figure 2: Overview of our proposed AsyncDriver framework. From the [AsyncDriver
 - LLM outputs scene-associated instructions instead of direct controls.
 - The latency solution is the contribution.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -37,12 +41,12 @@ _Figure 2: Overview of our proposed AsyncDriver framework. From the [AsyncDriver
 | Planner role | Fast conventional motion planner | Keeps control responsive. |
 | Caveat | LLM advice must be bounded | Bad slow guidance should not override safety. |
 
-## Decision Lens
+## High-Level Takeaways
 
 AsyncDriver informs where a slow semantic model can enter a fast control stack without setting the control-loop latency. The operative units run at two clocks: infrequent LLM guidance summarizes scene-level intent, while a conventional planner produces high-frequency trajectories from current perception.
 
 The asynchronous boundary buys latency but risks stale guidance during rapid scene changes. The decisive ablation varies guidance age and event-trigger policy while matching planner capacity against no-LLM and synchronous-LLM baselines in closed loop. At 10× traffic complexity, semantic updates and planner state can diverge. The architecture would fail if delayed guidance produced no safety or progress gain over a smaller fast planner, or if rare stale-command failures erased the average benefit.
 
-**Context:** It is a sober architecture. Instead of pretending language models are real-time controllers, AsyncDriver gives them a slower advisory role.
+It is a sober architecture. Instead of pretending language models are real-time controllers, AsyncDriver gives them a slower advisory role.
 
-**Takeaway:** In autonomy, reasoning and control do not need to run at the same frequency. VLM/LLM components can be useful if the system boundary respects latency.
+In autonomy, reasoning and control do not need to run at the same frequency. VLM/LLM components can be useful if the system boundary respects latency.

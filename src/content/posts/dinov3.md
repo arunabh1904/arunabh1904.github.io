@@ -19,9 +19,11 @@ summary: '2025 – DINOv3'
 
 **Code and models:** [facebookresearch/dinov3](https://github.com/facebookresearch/dinov3)
 
+## Summary
+
 DINOv3 scales self-supervised vision to a 6.7-billion-parameter transformer trained on 1.7 billion images, but its key technical result is about what scale breaks. During very long DINO/iBOT training, patch features gradually become too similar to the global class token. Classification keeps improving while dense spatial quality degrades. Gram anchoring constrains patch-to-patch relationships to an earlier, spatially healthier teacher.
 
-## Paper Insights
+## Core Insights
 
 ![DINOv3 ablations show Gram anchoring restoring dense prediction while retaining ImageNet classification](/assets/images/dinov3-gram-anchoring-paper-figure.png)
 _Long training improves global recognition but erodes dense features. Matching the student's patch Gram matrix to an earlier teacher restores segmentation and depth performance with little classification loss. Source: [DINOv3](https://arxiv.org/abs/2508.10104)._
@@ -44,7 +46,7 @@ Because the loss matches pairwise relations rather than individual coordinates, 
 
 This table isolates the main claim better than the largest-model leaderboard. Dense segmentation rises 5.4 points and depth error falls while classification changes by 0.2 points. The result says that one representation can retain both global and local information, but only if the training objective explicitly protects spatial relations late in training.
 
-## Decision Lens
+## High-Level Takeaways
 
 DINOv3 informs whether continued self-supervised scale is uniformly beneficial. It is not: a proxy such as ImageNet linear accuracy can hide deterioration in patch geometry. The atomic monitoring unit should therefore include both global and dense probes throughout the run, not only at the final checkpoint.
 
@@ -52,8 +54,8 @@ Gram anchoring depends on choosing a good earlier teacher. That choice introduce
 
 DINOv3 also uses post-training rather than one monolithic run: resolution adaptation, distillation, and text alignment extend the base model after self-supervised learning. That modularity connects it to [dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html), where a frozen DINOv2 backbone is aligned to language without relearning its visual geometry.
 
-**Context:** DINOv3 scales the DINO/iBOT recipe and introduces Gram anchoring to prevent local patch structure from collapsing into global semantics.
+DINOv3 scales the DINO/iBOT recipe and introduces Gram anchoring to prevent local patch structure from collapsing into global semantics.
 
-**Limits:** The 1.7-billion-image corpus and 6.7B model make full replication inaccessible, while anchor-checkpoint selection and web-data composition remain consequential.
+The 1.7-billion-image corpus and 6.7B model make full replication inaccessible, while anchor-checkpoint selection and web-data composition remain consequential.
 
-**Takeaway:** More self-supervised training can improve classification while silently damaging dense vision; DINOv3 makes preserving patch relations an explicit optimization target.
+More self-supervised training can improve classification while silently damaging dense vision; DINOv3 makes preserving patch relations an explicit optimization target.

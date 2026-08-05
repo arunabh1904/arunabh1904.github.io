@@ -14,11 +14,15 @@ summary: '2023 – DSVT: bounded local attention over variable-density sparse vo
 
 **Code:** [Haiyang-W/DSVT](https://github.com/Haiyang-W/DSVT)
 
-**Summary:** DSVT partitions the variable number of occupied voxels in each window into fixed-size local sets, applies attention within those sets, and changes the partition orientation between blocks. It also introduces an attention-style 3D pooling stage. The result is a sparse transformer that can be deployed through standard tensor operations rather than custom sparse-convolution kernels.
+### Method and reported result
+
+DSVT partitions the variable number of occupied voxels in each window into fixed-size local sets, applies attention within those sets, and changes the partition orientation between blocks. It also introduces an attention-style 3D pooling stage. The result is a sparse transformer that can be deployed through standard tensor operations rather than custom sparse-convolution kernels.
+
+## Summary
 
 Dynamic Sparse Window Attention addresses a practical mismatch: fixed geometric windows contain wildly different token counts in near and far regions, while accelerators prefer bounded regular workloads.
 
-## Paper Insights
+## Core Insights
 
 Rotated set partitioning lets tokens exchange information beyond one grouping without paying global attention cost. The paper applies the same backbone to voxel and pillar forms and reports a TensorRT implementation at 27 Hz, making deployment path part of the contribution.
 
@@ -29,12 +33,12 @@ Rotated set partitioning lets tokens exchange information beyond one grouping wi
 | 3D pooling | Learn height compression | Pooling remains irreversible. |
 | Reported pillar result | 71.14 mAP / 68.59 mAPH | Benchmark-specific, not a universal speed claim. |
 
-## Decision Lens
+## High-Level Takeaways
 
 DSVT is a strong candidate when custom sparse operators complicate export or when active-voxel density makes submanifold convolutions context-limited. The decisive profiling unit is active tokens per set across real scenes, including worst-case crowding, not average FLOPs.
 
 For unified sensing, DSVT provides a reusable interaction primitive only after each modality has produced meaningful tokens. It does not imply that camera patches and LiDAR voxels should share their tokenizer.
 
-**Context:** SST establishes single-stride sparse attention; DSVT regularizes the workload and later informs UniTR's shared multimodal transformer blocks.
+SST establishes single-stride sparse attention; DSVT regularizes the workload and later informs UniTR's shared multimodal transformer blocks.
 
-**Takeaway:** Efficient sparsity is an execution contract as well as a mathematical one: bound the active set and use operators the deployment stack can actually accelerate.
+Efficient sparsity is an execution contract as well as a mathematical one: bound the active set and use operators the deployment stack can actually accelerate.

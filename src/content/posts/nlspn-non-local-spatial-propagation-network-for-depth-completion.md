@@ -15,11 +15,15 @@ summary: '2020 – NLSPN: Non-Local Spatial Propagation Network for Depth Comple
 
 **Code:** [zzangjinsun/NLSPN](https://github.com/zzangjinsun/NLSPN)
 
-**Summary:** NLSPN predicts an initial dense depth map, confidence, non-local neighbor offsets, and affinities. Iterative propagation then gathers depth from learned relevant locations rather than a fixed local window. Confidence enters the affinity normalization so noisy sparse-depth measurements do not spread indiscriminately.
+### Method and reported result
+
+NLSPN predicts an initial dense depth map, confidence, non-local neighbor offsets, and affinities. Iterative propagation then gathers depth from learned relevant locations rather than a fixed local window. Confidence enters the affinity normalization so noisy sparse-depth measurements do not spread indiscriminately.
+
+## Summary
 
 The method targets the mixed-depth problem: a local kernel near an object boundary often copies background depth into the foreground or the reverse.
 
-## Paper Insights
+## Core Insights
 
 Each pixel selects a small set of neighbors that can lie on the same object or plane even when they are not adjacent. Learnable normalization expands the feasible affinity space while maintaining stable iteration. Confidence jointly suppresses unreliable source pixels during propagation instead of masking them only after a dense estimate is formed.
 
@@ -34,12 +38,12 @@ On KITTI Depth Completion test, NLSPN reports 741.68 mm RMSE and 199.59 mm MAE, 
 
 The reported non-local neighbors have lower depth variance than fixed local ones, supporting the boundary argument. The method still assumes sparse depth is present at runtime and pays for iterative dense image-space refinement; it is not a recipe for removing LiDAR from deployment.
 
-## Decision Lens
+## High-Level Takeaways
 
 NLSPN informs whether depth completion should use a large feed-forward decoder or a learned propagation rule. Its atomic unit is a depth pixel, but the neighborhood graph is predicted from RGB and sparse depth. The expensive decision is iterative full-resolution propagation and its memory access pattern.
 
 The matched alternative compares non-local propagation with a transformer or convolutional decoder at equal resolution, iterations, and P99 latency, with boundary- and range-stratified errors. NLSPN loses if the learned offsets become unstable under domain shift or if a simpler local kernel matches boundary quality. At higher image resolution, the dense state and repeated gathers dominate.
 
-**Context:** Sparse-to-Dense regresses depth directly; DeepLiDAR injects surface normals; GuideFormer uses transformer guidance. NLSPN isolates learned propagation as a way to preserve boundaries around sparse measurements.
+Sparse-to-Dense regresses depth directly; DeepLiDAR injects surface normals; GuideFormer uses transformer guidance. NLSPN isolates learned propagation as a way to preserve boundaries around sparse measurements.
 
-**Takeaway:** Depth completion should move measurements along learned geometric neighborhoods, not assume the nearest pixels belong to the same surface.
+Depth completion should move measurements along learned geometric neighborhoods, not assume the nearest pixels belong to the same surface.

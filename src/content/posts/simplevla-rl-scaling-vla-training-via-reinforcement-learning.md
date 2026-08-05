@@ -17,9 +17,11 @@ summary: "2025 – SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning
 
 **GitHub:** [PRIME-RL/SimpleVLA-RL](https://github.com/PRIME-RL/SimpleVLA-RL)
 
+## Summary
+
 SimpleVLA-RL treats VLA reinforcement learning as a systems problem as much as an objective problem. Built on veRL and OpenVLA-OFT, it adds robot-specific trajectory sampling, parallel environments, multi-environment rendering, and optimized loss computation around a group-relative policy update.
 
-## Paper Insights
+## Core Insights
 
 ![SimpleVLA-RL loop comparing limited offline supervised trajectories with on-policy rollouts grouped for advantage estimation](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-paper-figure.png)
 _Figure 2 shows where the additional signal comes from: the SFT policy interacts with the environment, produces groups of trajectories and rewards, and updates from relative advantages instead of remaining bounded by the offline demonstrations. Source: [SimpleVLA-RL](https://arxiv.org/abs/2509.09674)._
@@ -35,14 +37,14 @@ The claim depends on exploration. Group-relative methods produce no useful gradi
 | Loss | Correct masks and likelihoods over action chunks |
 | Evaluation | Seen tasks, held-out shifts, and real-world confirmation |
 
-## Decision Lens
+## High-Level Takeaways
 
 SimpleVLA-RL informs whether scaling rollout infrastructure can extract more from a strong SFT policy than scaling demonstration data. Its atomic unit is a group of task-conditioned trajectories whose relative rewards produce advantages. The policy remains an OpenVLA-OFT continuous chunk model, so likelihood and masking must align with that action interface.
 
 The results establish that RL can outperform SFT in several simulation and real settings. A missing control measures total environment, tuning, and compute cost against failure-targeted SFT. At ten times the worker count, policy staleness and correlated environments become critical; at ten times the task count, reward homogeneity causes advantage collapse. The claim fails if newly discovered behaviors do not transfer outside the training simulator.
 
-**Context:** SimpleVLA-RL is the reference implementation for fleet-like parallel VLA rollouts and group-relative updates.
+SimpleVLA-RL is the reference implementation for fleet-like parallel VLA rollouts and group-relative updates.
 
-**Limits:** High success on benchmark rewards can hide changes in smoothness, safety, and strategy diversity.
+High success on benchmark rewards can hide changes in smoothness, safety, and strategy diversity.
 
-**Takeaway:** VLA RL scales only when rollout diversity produces informative advantages and the infrastructure preserves their provenance.
+VLA RL scales only when rollout diversity produces informative advantages and the infrastructure preserves their provenance.

@@ -15,11 +15,15 @@ summary: "2021 – Scene Transformer: A Unified Architecture for Predicting Mult
 
 **OpenReview:** [ICLR 2022 submission](https://openreview.net/forum?id=7a2BujHKS7)
 
-**Summary:** Scene Transformer makes multi-agent trajectory prediction a masking problem over a scene tensor. Instead of training separate systems for marginal prediction, joint prediction, conditional prediction, and goal-conditioned prediction, it uses one attention architecture and changes what the model can see.
+### Method and reported result
+
+Scene Transformer makes multi-agent trajectory prediction a masking problem over a scene tensor. Instead of training separate systems for marginal prediction, joint prediction, conditional prediction, and goal-conditioned prediction, it uses one attention architecture and changes what the model can see.
+
+## Summary
 
 That framing is important for planning. Independent per-agent futures can be inconsistent with each other; a scene-centric model can represent futures where agents react to one another.
 
-## Paper Insights
+## Core Insights
 
 The model represents the scene across agents, time, and features. Attention operates across time and agents, with cross-attention to road graph information. Different prediction tasks are expressed by masking parts of the agent-time tensor: visible cells are conditioning information, hidden cells are outputs to predict.
 
@@ -33,7 +37,7 @@ _Figure 2 shows the two key ideas: prediction tasks become mask patterns, and on
 - Joint prediction keeps interactions between future agents visible to the model.
 - The same architecture can answer several forecasting queries.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Idea | Detail | Why it matters |
 | ---- | ------ | -------------- |
@@ -42,12 +46,12 @@ _Figure 2 shows the two key ideas: prediction tasks become mask patterns, and on
 | Attention axes | Time, agents, and road graph | Lets heterogeneous scene information interact. |
 | Evidence | Waymo Open Motion Dataset and Argoverse | Tests both large-scale scene prediction and public map-rich forecasting. |
 
-## Decision Lens
+## High-Level Takeaways
 
 Scene Transformer informs whether marginal, joint, conditional, and goal-conditioned forecasting require separate architectures. The atomic unit is an agent-time state token; masks and conditioning inputs alter the forecasting query while the same scene-centric attention stack models interactions.
 
 Unification reduces task-specific machinery, but dense attention over agents and time makes missing-state handling and scene size part of the compute budget. The missing control compares one universal model with specialized models at matched total parameters and training examples, not merely shared implementation. At 10× agents or horizon, the interaction tensor dominates memory. The unification claim would fail if specialized decoders consistently improved joint calibration or rare conditional queries at equal aggregate cost.
 
-**Context:** Scene Transformer pushed the field toward unified heterogeneous scene attention, where the model reasons over agents, time, and map context together.
+Scene Transformer pushed the field toward unified heterogeneous scene attention, where the model reasons over agents, time, and map context together.
 
-**Takeaway:** The forecasting question can be a mask over the scene, not a separate model for every task.
+The forecasting question can be a mask over the scene, not a separate model for every task.

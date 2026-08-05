@@ -19,11 +19,13 @@ summary: '2026 – MIRROR: Learning from the Other View for Multi-Modal Reasonin
 
 **arXiv:** [2607.21552](https://arxiv.org/abs/2607.21552)
 
+## Summary
+
 A geometry problem can be solvable from its text but difficult from its diagram, or the reverse. MIRROR turns this disagreement into supervision. For each problem, it evaluates text-dominant, image-dominant, and combined image-plus-text views, selects the currently strongest view as a teacher, and regularizes students operating on the weaker restricted views toward that teacher.
 
-The method keeps student rollouts on-policy. It applies ordinary outcome-reward GRPO to the student trajectory, then adds a reverse-KL term computed by rescoring those same tokens under an exponential-moving-average teacher conditioned on the selected view. On a curated 2,000-example geometry dataset, MIRROR improves Qwen3-VL-4B-Instruct beyond single-view and mixed-view GRPO. The result is evidence that paired views need a directed transfer objective; merely placing them in the same RL mixture does not make the successful reasoning path move across modalities.
+## Core Insights
 
-## Paper Insights
+The method keeps student rollouts on-policy. It applies ordinary outcome-reward GRPO to the student trajectory, then adds a reverse-KL term computed by rescoring those same tokens under an exponential-moving-average teacher conditioned on the selected view. On a curated 2,000-example geometry dataset, MIRROR improves Qwen3-VL-4B-Instruct beyond single-view and mixed-view GRPO. The result is evidence that paired views need a directed transfer objective; merely placing them in the same RL mixture does not make the successful reasoning path move across modalities.
 
 ODA-Data begins with 97,000 geometry problems from ODA-Math-460k. After difficulty filtering, Gemini-3-Pro-Preview generates and verifies TikZ diagrams and removes from the image-dominant prompt any relations already visible in the diagram. The authors then retain examples that Qwen3-VL-4B-Instruct solves under one view but not the other, yielding about 2,000 paired problems split 85:15 for training and validation. This filtering makes ODA-Val a diagnostic test of modality asymmetry, not a representative sample of general geometry.
 
@@ -43,7 +45,7 @@ The adaptive teacher matters because no fixed view dominates. A text teacher pro
 
 Stability depends on slowing the teacher. With current-policy teacher scores, entropy rises from about 0.3 to 3.9, reference-policy KL reaches 0.33, and reward falls from 0.34 to 0.21 by roughly step 165. An EMA teacher with decay 0.99 keeps entropy and reference KL near 0.29 and 0.02 while reward reaches 0.48. The reverse-KL coefficient is also narrow: 0.01 ranks best in the reported sweep, while 0.1 collapses training.
 
-## Decision Lens
+## High-Level Takeaways
 
 MIRROR informs whether paired multimodal examples should enter RL as independent prompts or as linked views of one latent task. Its atomic unit is a student-generated reasoning token, but the supervision unit is the problem-view pair: the policy chooses which view currently carries the strongest evidence and transfers that distribution toward weaker views. For datasets with verified equivalent representations, the reported results favor explicit directional transfer.
 
@@ -51,8 +53,8 @@ The cost is larger than the 2,000-example headline suggests. The reported jobs u
 
 The missing control is domain transfer without synthetic view filtering. A matched-compute study should construct paired views for charts, scientific figures, and spatial instructions; compare adaptive teachers with uncertainty-weighted soft teachers; and hold the number of student rollouts fixed. The claim should be rejected if gains disappear on naturally occurring paired views or if a cheaper consistency loss matches accuracy without the extra teacher rollouts.
 
-**Context:** MIRROR combines on-policy distillation with multimodal consistency, treating disagreement across equivalent views as a training signal rather than only an evaluation failure.
+MIRROR combines on-policy distillation with multimodal consistency, treating disagreement across equivalent views as a training signal rather than only an evaluation failure.
 
-**Limits:** ODA-Data is geometry-only, synthetically diagrammed, judged by another model, and filtered specifically for view-dependent failures. MathVerse uses an external model judge, and the paper does not establish that the approach transfers to noisy or non-equivalent views.
+ODA-Data is geometry-only, synthetically diagrammed, judged by another model, and filtered specifically for view-dependent failures. MathVerse uses an external model judge, and the paper does not establish that the approach transfers to noisy or non-equivalent views.
 
-**Takeaway:** Paired modalities become useful supervision when training specifies who teaches whom; a mixed RL batch alone does not reliably transfer reasoning across views.
+Paired modalities become useful supervision when training specifies who teaches whom; a mixed RL batch alone does not reliably transfer reasoning across views.

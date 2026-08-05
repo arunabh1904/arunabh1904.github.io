@@ -17,9 +17,11 @@ summary: "2023 – Learning Fine-Grained Bimanual Manipulation with Low-Cost Har
 
 **Project:** [ALOHA](https://tonyzhaozh.github.io/aloha/)
 
+## Summary
+
 ACT pairs a low-cost bimanual teleoperation platform with a conditional variational autoencoder that predicts action sequences. The policy does not choose one motor command in isolation; it proposes a chunk, while temporal ensembling blends overlapping predictions during execution.
 
-## Paper Insights
+## Core Insights
 
 ![ACT conditional variational autoencoder with a transformer action decoder plus action chunking and temporal ensembling](/assets/images/action-chunking-with-transformers-act-paper-figure.png)
 _Figure 4 shows the learned policy and deployment rule together: the CVAE predicts an action chunk from multi-view images and joints, while temporal ensembling reconciles overlapping chunk predictions during execution. Source: [ACT](https://arxiv.org/abs/2304.13705)._
@@ -34,14 +36,14 @@ The paper reports 80–90% success on six precise real-world tasks using roughly
 | Temporal ensembling | Blends overlapping action predictions | Adds a weighting and latency choice |
 | Latent action style | Represents multimodal demonstrations | Can absorb inconsistency rather than task structure |
 
-## Decision Lens
+## High-Level Takeaways
 
 ACT informs the chunk-length and execution-interface decision for imitation-trained robot policies. Its training unit is an observation paired with a future action trajectory. Visual and proprioceptive inputs share a transformer representation, while the CVAE compresses demonstration variation into a latent style variable.
 
 The results establish that chunks are effective for the studied precise bimanual tasks, not that longer is always better. A missing ablation would sweep chunk length under controlled perturbation frequency and inference latency. At ten times the task duration, open-loop commitment and latent-style ambiguity can compound. The method's core advantage disappears if a matched recurrent single-step policy recovers faster from disturbances while retaining the same smoothness and success.
 
-**Context:** ACT made action chunks a default design axis for modern VLA adaptation recipes.
+ACT made action chunks a default design axis for modern VLA adaptation recipes.
 
-**Limits:** The policy still learns from demonstrations and inherits their state coverage.
+The policy still learns from demonstrations and inherits their state coverage.
 
-**Takeaway:** Chunking buys temporal coherence by spending responsiveness; choose the horizon from the disturbance timescale, not convention.
+Chunking buys temporal coherence by spending responsiveness; choose the horizon from the disturbance timescale, not convention.

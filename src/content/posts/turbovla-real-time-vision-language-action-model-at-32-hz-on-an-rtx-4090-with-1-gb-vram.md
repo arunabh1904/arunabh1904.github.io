@@ -22,11 +22,13 @@ summary: '2026 – TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on 
 
 **Project:** [TurboVLA](https://H-EmbodVis.github.io/TurboVLA) · **Code:** [H-EmbodVis/TurboVLA](https://github.com/H-EmbodVis/TurboVLA)
 
+## Summary
+
 Most vision-language-action models route visual tokens through a large language model before producing robot actions. TurboVLA removes that execution path. DINOv3 encodes the cameras, BERT encodes the instruction, six lightweight bidirectional cross-attention blocks exchange information between the streams, and an ACT-style decoder predicts a continuous action chunk in parallel.
 
-On LIBERO, the 0.2B-parameter configuration reaches 97.7% average success with 31.2 ms latency and 0.9 GB peak inference memory on an RTX 4090. It also reaches 60.2% across 50 RoboTwin 2.0 bimanual tasks and outperforms a matched $\pi_{0.5}$ baseline on four real-robot tasks. The result supports a sharp systems claim: concrete execution-level language conditioning does not always require a generative LLM in the control loop. It does not show that the same compact path can perform open-ended task decomposition or high-level planning.
+## Core Insights
 
-## Paper Insights
+On LIBERO, the 0.2B-parameter configuration reaches 97.7% average success with 31.2 ms latency and 0.9 GB peak inference memory on an RTX 4090. It also reaches 60.2% across 50 RoboTwin 2.0 bimanual tasks and outperforms a matched $\pi_{0.5}$ baseline on four real-robot tasks. The result supports a sharp systems claim: concrete execution-level language conditioning does not always require a generative LLM in the control loop. It does not show that the same compact path can perform open-ended task decomposition or high-level planning.
 
 TurboVLA preserves token-level instruction features rather than compressing language to a task ID. Each camera produces spatial visual tokens with positional and view embeddings. The interaction stack alternates visual-to-instruction and instruction-to-visual cross-attention, so scene evidence can refine the instruction representation while language selects relevant visual features. Robot state bypasses this fusion stack and enters only at the action decoder.
 
@@ -45,7 +47,7 @@ The policy is trained by behavior cloning with an $\ell_1$ loss on expert action
 
 The ablations show that efficiency does not come from ignoring language. Removing it collapses LIBERO-Goal from 97.4% to 11.6% and lowers the overall average to 70.8%. A learned task ID recovers 95.4%, while semantic instructions reach 97.7%. Directly concatenating vision and language yields 95.2%; one-way cross-attention reaches 96.1% or 96.5%; bidirectional interaction reaches 97.7%. Six fusion layers outperform two and four, while eight slip to 96.6%. The action horizon is similarly non-monotonic: 12 steps performs best among 8, 10, 12, and 15.
 
-## Decision Lens
+## High-Level Takeaways
 
 TurboVLA informs whether an execution policy should inherit a large language backbone or use a smaller semantic encoder plus direct feature fusion. Its training unit is a continuous action chunk, not an action token. Visual and language parameters remain separate until a compact bidirectional module, and the only optimized objective is action imitation. For closed-set manipulation instructions with benchmark-scale linguistic variation, the reported evidence favors the compact path.
 
@@ -53,8 +55,8 @@ The expensive decision is where to place general reasoning. Removing the LLM cut
 
 A decisive test would compare a compact executor, an LLM-centric policy, and a hierarchical LLM-planner-plus-compact-executor under the same robot demonstrations, visual backbone, and wall-clock budget. Instructions should include novel compositions, ambiguous references, recovery steps, and long-horizon tasks. The compact-path claim should be rejected if its latency advantage disappears once it receives the planning machinery needed to match success on those harder instructions.
 
-**Context:** TurboVLA separates language-conditioned execution from general-purpose language generation, arguing that the former can use grounding-style cross-attention and continuous action decoding.
+TurboVLA separates language-conditioned execution from general-purpose language generation, arguing that the former can use grounding-style cross-attention and continuous action decoding.
 
-**Limits:** Most evidence is simulation; RoboTwin uses only the clean setting; real-world evaluation covers four tasks and 160 total trials; and the comparison mixes methods with different embodied pretraining and data. The authors explicitly scope the model to execution-level instructions rather than high-level planning.
+Most evidence is simulation; RoboTwin uses only the clean setting; real-world evaluation covers four tasks and 160 total trials; and the comparison mixes methods with different embodied pretraining and data. The authors explicitly scope the model to execution-level instructions rather than high-level planning.
 
-**Takeaway:** For concrete manipulation commands, a small bidirectional vision-language interface can match large VLA policies while running at 32 Hz—but planning remains outside the claim.
+For concrete manipulation commands, a small bidirectional vision-language interface can match large VLA policies while running at 32 Hz—but planning remains outside the claim.

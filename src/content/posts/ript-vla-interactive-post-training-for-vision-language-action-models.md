@@ -17,9 +17,11 @@ summary: "2025 – RIPT-VLA: Interactive Post-Training for Vision-Language-Actio
 
 **Project:** [RIPT-VLA](https://ariostgx.github.io/ript_vla/)
 
+## Summary
+
 RIPT-VLA proposes a third VLA training stage after pretraining and supervised fine-tuning: interact with the environment, score complete rollouts with sparse binary success, and update the policy through reinforcement learning.
 
-## Paper Insights
+## Core Insights
 
 ![RIPT-VLA training progression from broad pretraining and supervised fine-tuning to interactive reinforcement post-training](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-paper-figure.png)
 _Figure 1 makes the added training stage explicit: RIPT-VLA starts from an SFT policy, collects on-policy interaction, and uses reinforcement learning to repair the deployment distribution rather than only replay demonstrations. Source: [RIPT-VLA](https://arxiv.org/abs/2505.17016)._
@@ -34,14 +36,14 @@ The paper reports a 21.2-point gain for QueST and 97.5% success for OpenVLA-OFT 
 | Leave-one-out advantages | Converts relative outcomes into lower-variance updates |
 | Dynamic sampling | Avoids groups with no useful reward contrast |
 
-## Decision Lens
+## High-Level Takeaways
 
 RIPT-VLA informs whether the next marginal robot hour should collect expert demonstrations or autonomous rollouts with cheap terminal labels. Its atomic unit is a complete trajectory; action-token likelihoods factor the policy update, while the reward arrives only at episode end.
 
 The results establish strong sample efficiency in simulation under reliable success signals. A missing comparison matches environment interactions and hyperparameter search against DAgger-style corrections and KTO-style binary training. At ten times the task diversity, homogeneous-reward groups, unsafe exploration, and stale asynchronous policies become bottlenecks. The claim would fail if gains do not survive new initial states, reward perturbations, or real-robot trials.
 
-**Context:** RIPT-VLA is the clearest demonstration of SFT as an initialization rather than the endpoint of VLA training.
+RIPT-VLA is the clearest demonstration of SFT as an initialization rather than the endpoint of VLA training.
 
-**Limits:** Sparse success works when the simulator can score the task perfectly; physical tasks often lack that oracle.
+Sparse success works when the simulator can score the task perfectly; physical tasks often lack that oracle.
 
-**Takeaway:** Interactive RL is most valuable where demonstrations fail to cover the states produced by the current policy.
+Interactive RL is most valuable where demonstrations fail to cover the states produced by the current policy.

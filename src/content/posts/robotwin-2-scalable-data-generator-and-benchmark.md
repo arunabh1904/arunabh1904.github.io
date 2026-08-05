@@ -17,9 +17,11 @@ summary: "2025 – RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bim
 
 **Project:** [RoboTwin](https://robotwin-platform.github.io/)
 
+## Summary
+
 RoboTwin 2.0 combines a synthetic-data factory with a 50-task bimanual benchmark. Its object library contains 731 instances across 147 categories, while an MLLM proposes task code and simulation-in-the-loop feedback validates and refines execution.
 
-## Paper Insights
+## Core Insights
 
 ![RoboTwin 2 pipeline using a multimodal model simulation feedback expert code generation and domain randomization to produce manipulation trajectories](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-paper-figure.png)
 _Figure 2 shows how scale is produced: an MLLM writes task programs against a skill API, simulation feedback repairs them, and domain randomization turns successful programs into diverse policy-training trajectories. Source: [RoboTwin 2.0](https://arxiv.org/abs/2506.18088)._
@@ -35,14 +37,14 @@ The benchmark is valuable because data generation and evaluation share explicit 
 | Embodiments | Five dual-arm platforms | Cross-robot robustness |
 | Randomization | Five structured axes | Sim-to-real variation |
 
-## Decision Lens
+## High-Level Takeaways
 
 RoboTwin 2.0 informs whether the next data budget should buy real demonstrations or a synthetic generator plus a small real calibration set. Its unit is a generated bimanual trajectory with task code and validation. MLLM synthesis expands task coverage; simulator feedback filters obviously invalid programs.
 
 The reported gains establish that structured synthetic diversity can improve the tested VLA policies. A missing control evaluates an independently built real task distribution with no shared assets or prompts. At ten times the generated volume, correlated simulator artifacts and validation blind spots dominate. The claim fails if synthetic scale improves benchmark success but not real bimanual transfer per real demonstration.
 
-**Context:** RoboTwin 2.0 is both a training-data intervention and an evaluation environment; those roles should be analyzed separately.
+RoboTwin 2.0 is both a training-data intervention and an evaluation environment; those roles should be analyzed separately.
 
-**Limits:** Relative gains from a low-data baseline can look large while absolute real-world reliability remains modest.
+Relative gains from a low-data baseline can look large while absolute real-world reliability remains modest.
 
-**Takeaway:** Synthetic data is most credible when the held-out evaluation breaks the generator's assumptions.
+Synthetic data is most credible when the held-out evaluation breaks the generator's assumptions.

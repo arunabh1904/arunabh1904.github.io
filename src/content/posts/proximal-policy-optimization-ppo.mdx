@@ -22,9 +22,11 @@ import { ppoPlayground } from '../../lib/python-playground-examples';
 
 **Code:** [openai/baselines](https://github.com/openai/baselines), [OpenAI Spinning Up](https://spinningup.openai.com/en/latest/algorithms/ppo.html)
 
+## Summary
+
 PPO asks how far an on-policy actor can reuse a rollout before the data become misleading. Vanilla policy gradients take one noisy step. TRPO constrains the update with a second-order KL trust region. PPO keeps ordinary first-order optimization and makes overly large probability-ratio changes stop improving the surrogate objective.
 
-## Paper Insights
+## Core Insights
 
 ![PPO's clipped surrogate flattens reward-improving probability-ratio changes outside the epsilon interval](/assets/images/proximal-policy-optimization-ppo-paper-figure.png)
 _For positive and negative advantages, clipping removes the incentive to move the action probability beyond the trusted band in the apparently helpful direction. It does not impose a hard KL constraint. Source: [PPO](https://arxiv.org/abs/1707.06347)._
@@ -67,7 +69,7 @@ The playground makes the update boundary concrete: vary the old and new log-prob
 
 <PythonPlayground client:visible {...ppoPlayground} />
 
-## Decision Lens
+## High-Level Takeaways
 
 PPO informs whether policy stability requires solving a constrained second-order problem. Its atomic unit is an on-policy transition with an advantage estimate, reused for several first-order epochs. It is attractive when environment interaction is available, action likelihood is tractable, and a value function can learn enough structure to reduce variance.
 
@@ -75,8 +77,8 @@ Clipping is a heuristic, not a guarantee that the whole policy remains close in 
 
 [GRPO](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html) retains PPO-style ratios and clipping but removes the value model by comparing same-prompt completions. [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) is a separate offline branch: it removes online rollouts and advantages entirely.
 
-**Context:** PPO turns trust-region intuition into a first-order clipped surrogate that can reuse fresh rollout data for multiple updates.
+PPO turns trust-region intuition into a first-order clipped surrogate that can reuse fresh rollout data for multiple updates.
 
-**Limits:** It remains sample-hungry and sensitive to implementation details; clipping neither validates rewards nor guarantees a bounded policy KL.
+It remains sample-hungry and sensitive to implementation details; clipping neither validates rewards nor guarantees a bounded policy KL.
 
-**Takeaway:** PPO became the default policy optimizer because it makes conservative online updates practical, not because it solves policy stability once and for all.
+PPO became the default policy optimizer because it makes conservative online updates practical, not because it solves policy stability once and for all.

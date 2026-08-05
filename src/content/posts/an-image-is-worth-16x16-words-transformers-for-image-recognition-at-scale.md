@@ -21,14 +21,18 @@ summary: "2020 – An Image Is Worth 16×16 Words: Transformers for Image Recogn
 
 **Conference:** ICLR 2021
 
-## Paper Insights
+## Summary
 
 ViT treats an image as a sequence problem: split the image into fixed-size patches, linearly embed each patch, add a class token plus positional embeddings, and run a standard Transformer encoder. The paper's important condition is scale. Pure attention underperforms CNN inductive bias on smaller datasets, but large pretraining on JFT-300M or ImageNet-21k lets the architecture transfer strongly to ImageNet, CIFAR, Oxford Flowers/Pets, and VTAB. The evidence includes a compute tradeoff: once enough pretraining data is available, large ViTs can match or beat strong convolutional models with fewer training resources. The main caveat is data hunger: ViT deliberately removes locality and translation bias, so it needs pretraining scale or regularization to learn those patterns.
+
+## Core Insights
 
 ![Figure 1: Model overview from An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale](/assets/images/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale-paper-figure.png)
 _Figure 1: Model overview. From the [An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale paper](https://arxiv.org/abs/2010.11929), via arXiv HTML._
 
-**Summary:** ViT treats an image like a sequence. It slices the image into 16x16 patches, projects each patch into an embedding, adds positional embeddings and a `[CLS]` token, then feeds the sequence into a standard Transformer encoder. With enough pre-training data, that plain architecture matches or exceeds leading CNNs while using fewer training FLOPs.
+### Method and reported result
+
+ViT treats an image like a sequence. It slices the image into 16x16 patches, projects each patch into an embedding, adds positional embeddings and a `[CLS]` token, then feeds the sequence into a standard Transformer encoder. With enough pre-training data, that plain architecture matches or exceeds leading CNNs while using fewer training FLOPs.
 
 The surprising part is not the patch trick by itself. It is that locality and translation invariance can emerge from data rather than being hard-coded through convolutions. ViT performs poorly when trained from scratch on smaller datasets, but with more than 100M images it becomes a strong visual backbone.
 
@@ -67,9 +71,11 @@ class PatchEmbed(nn.Module):
         return x + self.pos_embed
 ```
 
-**Critiques & limitations:** ViT's appeal is its plainness: patchify the image and reuse the Transformer stack. That simplicity helped unify vision and NLP research. The cost is data hunger. Vanilla ViT needs huge pre-training datasets such as JFT-300M, and quadratic attention makes very high resolutions and dense prediction tasks expensive.
+### Where the evidence stops
 
-## Decision Lens
+ViT's appeal is its plainness: patchify the image and reuse the Transformer stack. That simplicity helped unify vision and NLP research. The cost is data hunger. Vanilla ViT needs huge pre-training datasets such as JFT-300M, and quadratic attention makes very high resolutions and dense prediction tasks expensive.
+
+## High-Level Takeaways
 
 ViT informs the decision to buy visual scale with learned attention instead of convolutional inductive bias. The atomic unit is a fixed-size image patch embedded as a token; the same attention and feed-forward parameters process every patch position.
 
@@ -77,4 +83,4 @@ The result establishes a data-regime crossover, not universal Transformer superi
 
 The decisive missing comparison is a CNN and ViT sweep with identical data, augmentation, parameters, FLOPs, and transfer protocol across several data scales. At 10× resolution, token count and activation memory would fail before parameter count. The central claim would weaken if a convolutional baseline matched transfer accuracy and throughput throughout that controlled crossover study.
 
-**Takeaway:** With enough data, a plain Transformer can rival convolutional backbones for image classification. ViT did not make convolutions obsolete overnight, but it made attention-first vision models credible.
+With enough data, a plain Transformer can rival convolutional backbones for image classification. ViT did not make convolutions obsolete overnight, but it made attention-first vision models credible.

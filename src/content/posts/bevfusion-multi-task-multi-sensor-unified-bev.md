@@ -17,11 +17,15 @@ summary: "2022 – BEVFusion: Multi-Task Multi-Sensor Fusion with Unified Bird's
 
 **Code:** [mit-han-lab/bevfusion](https://github.com/mit-han-lab/bevfusion)
 
-**Summary:** BEVFusion converts camera and LiDAR features independently into bird's-eye view, fuses them there, and reuses the result for 3D detection and BEV map segmentation. Its central claim is architectural: BEV is not only an output coordinate system but the common representation where dense camera semantics and LiDAR geometry can meet without reducing the image to features sampled at LiDAR points.
+### Method and reported result
+
+BEVFusion converts camera and LiDAR features independently into bird's-eye view, fuses them there, and reuses the result for 3D detection and BEV map segmentation. Its central claim is architectural: BEV is not only an output coordinate system but the common representation where dense camera semantics and LiDAR geometry can meet without reducing the image to features sampled at LiDAR points.
+
+## Summary
 
 This is the paper behind the modern “shared BEV trunk plus task heads” default. A different 2022 paper also called BEVFusion focuses on LiDAR-malfunction robustness; the note here covers the MIT multi-task, multi-sensor system.
 
-## Paper Insights
+## Core Insights
 
 The camera path uses a Lift-Splat-style view transform; the LiDAR path flattens voxel features along height. A convolutional BEV encoder absorbs local misalignment after concatenation, then task-specific heads predict objects or map classes. Because both modalities become dense BEV features before fusion, a semantic task can use camera background evidence that point-level fusion would discard.
 
@@ -37,12 +41,12 @@ _BEVFusion's unification boundary is visible in the middle: modality-specific en
 | Fused BEV | One tensor reusable across heads | Sensor provenance unless retained explicitly. |
 | Task heads | Cheap specialization after the shared trunk | Cross-task interference remains a training problem. |
 
-## Decision Lens
+## High-Level Takeaways
 
 BEVFusion informs whether a production stack should pay once for a shared geometric representation and reuse it across sensors and tasks. The atomic unit is a BEV cell. Camera and LiDAR encoders remain modality-specific, while the BEV encoder is shared; task heads and losses remain separate.
 
 The decisive missing ablation compares shared and task-specific BEV encoders under equal parameters, latency, and augmentation, with gradient-conflict measurements. The paper demonstrates architectural reuse but does not establish that joint detection and segmentation always improve each other. At 10× spatial extent or resolution, dense BEV memory and convolution dominate. The shared-grid bet would fail when sparse object and map queries match downstream task quality and temporal stability at much lower compute.
 
-**Context:** BEVFusion joins LSS's camera view transformation to a task-agnostic multi-sensor trunk and became the reference baseline for later robustness, interaction, and radar-camera work.
+BEVFusion joins LSS's camera view transformation to a task-agnostic multi-sensor trunk and became the reference baseline for later robustness, interaction, and radar-camera work.
 
-**Takeaway:** A unified model becomes economical when sensors share an expensive spatial workspace and tasks specialize only after that workspace is built.
+A unified model becomes economical when sensors share an expensive spatial workspace and tasks specialize only after that workspace is built.

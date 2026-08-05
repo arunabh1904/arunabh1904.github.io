@@ -15,11 +15,15 @@ summary: "2021 – Perceiver IO: A General Architecture for Structured Inputs & 
 
 **Code:** [google-deepmind/deepmind-research/perceiver](https://github.com/google-deepmind/deepmind-research/tree/master/perceiver)
 
-**Summary:** Perceiver IO generalizes the Perceiver idea from flexible inputs to flexible inputs and outputs. It uses cross-attention to pull information from large inputs into a latent array, processes the latent array, then uses output queries to decode structured predictions.
+### Method and reported result
+
+Perceiver IO generalizes the Perceiver idea from flexible inputs to flexible inputs and outputs. It uses cross-attention to pull information from large inputs into a latent array, processes the latent array, then uses output queries to decode structured predictions.
+
+## Summary
 
 This belongs in a BEV reading list because modern driving models often need to fuse different input shapes and produce structured outputs: grids, vectors, trajectories, agent states, and maps. Perceiver IO is one of the cleanest architectural templates for that kind of input/output mismatch.
 
-## Paper Insights
+## Core Insights
 
 The problem is architectural specialization. Standard networks bake in assumptions about image grids, token sequences, or fixed output formats. Perceiver IO keeps the computationally expensive processing in a latent space, so input cost scales through cross-attention and output size is controlled by queries. Different query sets can request different output structures from the same latent representation.
 
@@ -33,7 +37,7 @@ _Figure 2 shows the Perceiver IO template: arbitrary inputs enter a latent works
 - Output queries turn the same latent state into different structured outputs.
 - The architecture separates data shape from model shape.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -49,12 +53,12 @@ _Figure 2 shows the Perceiver IO template: arbitrary inputs enter a latent works
 | Sintel clean optical flow | RAFT at 1.95 EPE | 1.81 EPE | Strong dense prediction without hand-built multiscale matching. |
 | Sintel final optical flow | RAFT at 2.57 EPE | 2.42 EPE | General output queries still handle dense visual output. |
 
-## Decision Lens
+## High-Level Takeaways
 
 Perceiver IO informs whether compute should scale with raw input size or with a fixed latent bottleneck and a chosen set of output queries. The atomic operations are input-to-latent cross-attention, latent self-attention, and output-query cross-attention; task structure enters through the queries rather than a bespoke head.
 
 The architecture demonstrates broad modality and output flexibility, but the fixed latent array can discard fine detail before the task reveals what matters. The missing ablation sweeps latent count and output-query density against full attention at matched FLOPs across tasks with different information bottlenecks. At 10× input size, cross-attention remains manageable, but latent capacity becomes the failure point. The claim would fail if task-specific sparse attention preserved accuracy with equal efficiency and less latent tuning.
 
-**Context:** Perceiver IO gave researchers a reusable pattern for multimodal models whose inputs and outputs do not fit one simple grid or sequence.
+Perceiver IO gave researchers a reusable pattern for multimodal models whose inputs and outputs do not fit one simple grid or sequence.
 
-**Takeaway:** Use a latent workspace when input size, output size, and output semantics all vary; the important design work moves into queries and embeddings.
+Use a latent workspace when input size, output size, and output semantics all vary; the important design work moves into queries and embeddings.

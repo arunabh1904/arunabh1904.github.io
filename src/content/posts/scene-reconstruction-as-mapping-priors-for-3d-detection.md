@@ -13,11 +13,15 @@ summary: "2026 – Scene Reconstruction as Mapping Priors for 3D Detection"
 
 **arXiv:** [2605.22997](https://arxiv.org/abs/2605.22997)
 
-**Summary:** MPA3D asks whether a reconstructed static scene can help a car detect objects in a place it has seen before. The method builds dense mapping priors from aggregated sensor data instead of relying on manually built HD maps.
+### Method and reported result
+
+MPA3D asks whether a reconstructed static scene can help a car detect objects in a place it has seen before. The method builds dense mapping priors from aggregated sensor data instead of relying on manually built HD maps.
+
+## Summary
 
 The detector then uses those priors to separate static background from dynamic foreground, which helps especially for distant, sparse, occluded, or low-visibility objects.
 
-## Paper Insights
+## Core Insights
 
 The method is called Mapping Priors Augmented 3D Detection, or MPA3D. It builds two types of scene priors: surfel maps, which are lightweight surface elements from multi-traversal LiDAR and camera data, and 3D Gaussian Splatting maps, which are denser but more compute-heavy. Dynamic objects are removed from the priors so the map mostly represents static structure.
 
@@ -32,7 +36,7 @@ _Figure 2 shows MPA3D: camera BEV features, LiDAR, surfels, and 3D Gaussian prio
 - Gated fusion handles mismatched feature density across LiDAR and map priors.
 - The priors mostly describe static background, which makes dynamic foreground easier to isolate.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -49,12 +53,12 @@ _Figure 2 shows MPA3D: camera BEV features, LiDAR, surfels, and 3D Gaussian prio
 | Gated fusion ablation | 83.3 overall L2 AP, +2.9 over the next-best concat baseline | The fusion mechanism is a real contributor, not just more inputs. |
 | Runtime caveat | Adding both priors increases latency from 245 ms to 452 ms in the reported setup | The accuracy gain comes with deployment cost. |
 
-## Decision Lens
+## High-Level Takeaways
 
 MPA3D informs whether static scene reconstruction can serve as a reusable prior for 3D detection instead of forcing each frame to relearn background geometry. The atomic prior is a surfel or 3D Gaussian map element aligned with current sensor features; dynamic-object prediction is conditioned on that persistent static representation.
 
 The method can turn repeated fleet observations into dense supervision, but localization quality and stale geometry determine whether the prior helps. The missing factorial study separates map density, reconstruction type, pose error, and detector capacity under equal current-frame inputs. At 10× territory and map age, storage, retrieval, and change management dominate. The mapping-prior claim would fail if a temporal detector matched 3D accuracy under pose noise without maintaining an external reconstructed map.
 
-**Context:** MPA3D reframes mapping as perception memory. The map need not be a manually labeled semantic product; a reconstructed static scene can supply a prior for finding what changed.
+MPA3D reframes mapping as perception memory. The map need not be a manually labeled semantic product; a reconstructed static scene can supply a prior for finding what changed.
 
-**Takeaway:** For BEV perception, repeated traversals can become dense background knowledge, and background knowledge makes foreground detection easier.
+For BEV perception, repeated traversals can become dense background knowledge, and background knowledge makes foreground detection easier.

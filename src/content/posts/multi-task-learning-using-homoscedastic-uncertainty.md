@@ -12,11 +12,15 @@ summary: '2017 – Learn global task-loss weights through homoscedastic uncertai
 
 **arXiv:** [1705.07115](https://arxiv.org/abs/1705.07115)
 
-**Summary:** Kendall, Gal, and Cipolla derive trainable weights for classification and regression losses from task-dependent homoscedastic uncertainty. Each task loss is scaled by an inverse variance and paired with a log-variance regularizer, preventing the model from driving a weight to zero without cost.
+### Method and reported result
+
+Kendall, Gal, and Cipolla derive trainable weights for classification and regression losses from task-dependent homoscedastic uncertainty. Each task loss is scaled by an inverse variance and paired with a log-variance regularizer, preventing the model from driving a weight to zero without cost.
+
+## Summary
 
 The method solves one narrow but common multi-task problem: losses with different units and scales should not be added with arbitrary equal coefficients.
 
-## Paper Insights
+## Core Insights
 
 The learned uncertainty is global for each task, not input-dependent. On the paper's Tiny Cityscapes experiment, joint semantic segmentation, instance regression, and depth reach 63.4 semantic IoU, 3.50 instance error, and 0.522 depth error; the semantic-only result is 59.4 IoU. The final relative task weighting is reported near 43:1:0.16, showing how far raw equal weighting can be from the learned scale.
 
@@ -27,12 +31,12 @@ The learned uncertainty is global for each task, not input-dependent. On the pap
 | Joint likelihood view | Principled classification/regression mix | Task utility or safety priority. |
 | Global parameter | Low overhead | Scenario-dependent affinity. |
 
-## Decision Lens
+## High-Level Takeaways
 
 Use homoscedastic weighting after each task loss is internally normalized and monitored. Inspect both weights and shared-layer gradients: a well-scaled loss can still point against another task. Safety-critical tasks may also need explicit minimum influence rather than unconstrained likelihood optimization.
 
 The relevant ablation compares equal normalized weights, tuned constants, learned uncertainty, and separated heads under matched compute.
 
-**Context:** GradNorm controls relative training rates through gradient magnitude; PCGrad modifies direction when gradients conflict.
+GradNorm controls relative training rates through gradient magnitude; PCGrad modifies direction when gradients conflict.
 
-**Takeaway:** Learned uncertainty is a principled unit converter for multi-task losses, not a complete solution to task conflict or changing sensor reliability.
+Learned uncertainty is a principled unit converter for multi-task losses, not a complete solution to task conflict or changing sensor reliability.

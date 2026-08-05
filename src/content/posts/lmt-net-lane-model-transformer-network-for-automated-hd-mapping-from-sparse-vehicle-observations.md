@@ -13,11 +13,15 @@ summary: "2024 – LMT-Net: Lane Model Transformer Network for Automated HD Mapp
 
 **arXiv:** [2409.12409](https://arxiv.org/abs/2409.12409)
 
-**Summary:** LMT-Net attacks HD map maintenance from a sparse-observation angle. Instead of assuming dense sensor sweeps or fully manual annotation, it starts from vehicle observations, aggregates lane-boundary polylines, and predicts a structured lane model.
+### Method and reported result
+
+LMT-Net attacks HD map maintenance from a sparse-observation angle. Instead of assuming dense sensor sweeps or fully manual annotation, it starts from vehicle observations, aggregates lane-boundary polylines, and predicts a structured lane model.
+
+## Summary
 
 The paper is useful because it frames HD mapping as graph construction: lane pairs become nodes, and lane connectivity becomes edges. That is closer to the artifact a planner needs than a dense segmentation mask.
 
-## Paper Insights
+## Core Insights
 
 The problem is automated lane-model generation under limited observations. A preprocessing step aligns and aggregates observed lane boundaries into polylines, while driven traces provide starting points for lane-pair prediction. LMT-Net uses an encoder-decoder Transformer to encode the polylines and predict both lane pairs and connectivity. The final lane graph represents each lane pair as a node and each connectivity decision as an edge.
 
@@ -31,7 +35,7 @@ _Figure 1 shows the full LMT-Net path from sparse observed polylines to lane-pai
 - Lane pairs and connectivity are predicted together, not as disconnected perception outputs.
 - The graph output matches how downstream autonomy systems reason about lanes.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -39,12 +43,12 @@ _Figure 1 shows the full LMT-Net path from sparse observed polylines to lane-pai
 | Output | Lane pairs plus connectivity | Produces a map-like graph rather than only local detections. |
 | Evaluation | Internal highway and non-highway ODD data | Promising, but harder to compare against public methods. |
 
-## Decision Lens
+## High-Level Takeaways
 
 LMT-Net informs how to turn sparse, aggregated vehicle traces into a topologically valid lane graph rather than a set of disconnected boundary points. The operative units are paired lane-boundary observations and lane queries; the Transformer predicts both lane geometry and connectivity.
 
 The approach is attractive when fleet traces are cheaper than dense mapping surveys, but sparsity, localization error, and observation bias are coupled. The missing control varies trace density and pose noise while comparing pair-based prediction with sequential vectorization under equal map priors. At 10× geographic coverage, inconsistent local frames and topology stitching dominate. The claim would fail if a geometry-first baseline recovered equal lane connectivity with less dependence on repeated observations.
 
-**Context:** LMT-Net is a reminder that online HD mapping is not only a camera-to-vector problem; fleet traces and sparse observations can also drive map upkeep.
+LMT-Net is a reminder that online HD mapping is not only a camera-to-vector problem; fleet traces and sparse observations can also drive map upkeep.
 
-**Takeaway:** Predicting the lane graph directly is often the cleanest target when the end user is a planner, not a segmentation dashboard.
+Predicting the lane graph directly is often the cleanest target when the end user is a planner, not a segmentation dashboard.

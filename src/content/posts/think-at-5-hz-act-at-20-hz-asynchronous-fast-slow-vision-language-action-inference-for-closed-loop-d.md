@@ -20,11 +20,13 @@ summary: '2026 – Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-La
 
 **arXiv:** [2607.15621](https://arxiv.org/abs/2607.15621)
 
+## Summary
+
 The usual way to fit a slow vision-language driving policy into a fast control loop is to run it less often and replay its last action. This paper instead separates the two clocks: a frozen 7B LMDrive backbone updates its scene representation at 5 Hz, while a trainable 337M action expert reads that representation and the current observation to predict fresh waypoints at 20 Hz.
 
-The strongest result is not the composite driving score. Running the same expert at 10 Hz and 20 Hz leaves that score within experimental spread, but fresh 20 Hz control raises route completion from 82.1% to 94.0%, cuts route deviations from 11.3 to 4.3 per kilometer, and reduces red-light violations from 10.4 to 6.9. The architecture makes that comparison feasible because its per-tick model cost stays near 32 ms instead of growing with visual history.
+## Core Insights
 
-## Paper Insights
+The strongest result is not the composite driving score. Running the same expert at 10 Hz and 20 Hz leaves that score within experimental spread, but fresh 20 Hz control raises route completion from 82.1% to 94.0%, cuts route deviations from 11.3 to 4.3 per kilometer, and reduces red-light violations from 10.4 to 6.9. The architecture makes that comparison feasible because its per-tick model cost stays near 32 ms instead of growing with visual history.
 
 The slow path turns instruction text and visual history into a persistent per-layer key-value cache. Every four control ticks, it appends four tokens for the latest frame. At every tick, the action expert contributes ten tokens—current-frame features, ego state, previous predictions, and learned waypoint queries—which cross-attend to the frozen cache at all 32 layers before a small head regresses five waypoints. The split gives language and history a slower update rate without forcing the control path to consume a stale action.
 
@@ -47,7 +49,7 @@ _Full recomputation exceeds the 50 ms control budget even at short histories, wh
 
 Latency accounting needs one qualification. On an RTX 3090 Ti, median model compute is 32.4 ms per tick, including amortized cache maintenance, but the measured end-to-end agent step is 58 ms after sensor formatting and harness overhead. CARLA’s synchronous simulator still receives a new command every tick; wall-clock execution is about 17 Hz, not a demonstrated real-time 20 Hz physical system.
 
-## Decision Lens
+## High-Level Takeaways
 
 This paper informs whether to spend inference budget on repeatedly running a large semantic model or on a small high-rate controller over cached semantic state. Its evidence favors the latter when the large model changes slowly relative to the control loop: the matched-expert ablation attributes a substantial completion gain to action freshness, while latency stays independent of history length.
 
@@ -55,8 +57,8 @@ The missing control is a safety-matched comparison at equal end-to-end wall-cloc
 
 At larger scale, cache bandwidth and hazard coverage become the likely constraints. Every expert layer attends to a growing frozen cache, and short single-town clips do not teach long-horizon traffic negotiation. The decisive next experiment is a multi-town, long-route study with identical training data, retuned low-level controllers, several seeds, real-time sensor overhead, and safety-normalized outcomes.
 
-**Context:** The paper reframes fast-slow VLA design as an interface problem: preserve a slow model’s semantic state, but let a smaller policy act on fresh evidence.
+The paper reframes fast-slow VLA design as an interface problem: preserve a slow model’s semantic state, but let a smaller policy act on fresh evidence.
 
-**Limits:** Results come from CARLA 0.9.10, with two runs for the main comparison and single runs for the frame-skip and transfer rows. On eight unseen long routes, the method completes 85.4% of the route but accumulates enough violations to score 2.96, so short-route transfer is not evidence of road readiness.
+Results come from CARLA 0.9.10, with two runs for the main comparison and single runs for the frame-skip and transfer rows. On eight unseen long routes, the method completes 85.4% of the route but accumulates enough violations to score 2.96, so short-route transfer is not evidence of road readiness.
 
-**Takeaway:** Cache slow semantic reasoning; spend the per-tick budget on a small controller trained for stale context and fresh observations.
+Cache slow semantic reasoning; spend the per-tick budget on a small controller trained for stale context and fresh observations.

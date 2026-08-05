@@ -19,11 +19,15 @@ summary: "2021 – DenseTNT: End-to-End Trajectory Prediction from Dense Goal Se
 
 **CVF:** [ICCV 2021 paper](https://openaccess.thecvf.com/content/ICCV2021/html/Gu_DenseTNT_End-to-End_Trajectory_Prediction_From_Dense_Goal_Sets_ICCV_2021_paper.html)
 
-**Summary:** DenseTNT is the direct follow-up to goal-based methods like TNT. TNT showed that endpoints are a strong way to represent intent, but sparse anchors and NMS-style goal selection still leave a lot of hand-designed machinery in the loop.
+### Method and reported result
+
+DenseTNT is the direct follow-up to goal-based methods like TNT. TNT showed that endpoints are a strong way to represent intent, but sparse anchors and NMS-style goal selection still leave a lot of hand-designed machinery in the loop.
+
+## Summary
 
 DenseTNT replaces that machinery with dense goal probability estimation and a learned goal-set predictor. The model scores dense candidate positions on the road, predicts a set of goals from that heatmap, and completes trajectories conditioned on those goals.
 
-## Paper Insights
+## Core Insights
 
 DenseTNT starts from the observation that sparse goal anchors are too coarse. One anchor can only generate one goal, and two positions on the same lane can carry different local information. The paper therefore samples dense goal candidates on nearby lanes, uses a dense goal encoder to estimate a probability distribution over those candidates, and feeds the distribution into a multi-head goal-set predictor.
 
@@ -38,7 +42,7 @@ _Figure 2 shows the dense-goal pipeline: vectorized context features become a go
 - Offline optimization supplies multi-future pseudo-labels that are missing from ordinary logged data.
 - The online model runs without the optimization loop, but its quality depends on the heatmap and pseudo-label objective.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Component | Detail | Why it matters |
 | --------- | ------ | -------------- |
@@ -68,12 +72,12 @@ Waymo used mAP as the official ranking metric, so this table is about calibrated
 | SceneTransformer | 0.6117 | 1.2116 | 0.1564 | 0.2788 |
 | DenseTNT | 1.0387 | 1.5514 | 0.1779 | 0.3281 |
 
-## Decision Lens
+## High-Level Takeaways
 
 DenseTNT informs whether multimodal forecasting should rely on hand-designed sparse goal anchors or learn a dense distribution over reachable endpoints. The training unit is one agent history paired with a future trajectory; endpoint probabilities define candidate modes before target-conditioned trajectories are decoded and scored.
 
 The method removes anchor engineering, but dense goal coverage makes map resolution and candidate pruning part of the compute budget. A decisive ablation would match proposal count and decoder capacity across sparse anchors, dense goals, and direct trajectory generation. At 10× scene density, goal scoring and duplicate modes can dominate while rare maneuvers remain underrepresented. DenseTNT's claim would fail if adaptive sparse proposals matched minFDE and miss rate with fewer candidates and better calibration.
 
-**Context:** DenseTNT pushed goal-conditioned forecasting away from sparse anchor heuristics and toward dense probability maps plus learned set prediction.
+DenseTNT pushed goal-conditioned forecasting away from sparse anchor heuristics and toward dense probability maps plus learned set prediction.
 
-**Takeaway:** TNT made endpoints the intent variable; DenseTNT made endpoint selection dense, learned, and closer to end-to-end.
+TNT made endpoints the intent variable; DenseTNT made endpoint selection dense, learned, and closer to end-to-end.

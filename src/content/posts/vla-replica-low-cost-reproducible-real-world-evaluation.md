@@ -17,9 +17,11 @@ summary: "2026 – VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-Worl
 
 **Project:** [VLA-REPLICA](https://irvlutd.github.io/VLAReplica/)
 
+## Summary
+
 VLA-REPLICA addresses a gap between scalable simulation and expensive centralized robot evaluation. It specifies a low-cost SO-101 arm, cameras, lighting enclosure, fixed workspace, ten manipulation tasks, adaptation demonstrations, and in-/out-of-distribution protocols that independent labs can assemble locally.
 
-## Paper Insights
+## Core Insights
 
 ![VLA-REPLICA procedure for aligning camera and robot poses reproducing object placement and running standardized policy evaluations](/assets/images/vla-replica-low-cost-reproducible-real-world-evaluation-paper-figure.png)
 _Figure 2 shows the reproducibility controls: AprilTag and video-overlay alignment fix viewpoint geometry, task reference images fix object placement, and the same suite is then run across policies. Source: [VLA-REPLICA](https://arxiv.org/abs/2605.20774)._
@@ -34,14 +36,14 @@ Low cost changes the cadence of evaluation. Instead of one lab reporting a small
 | Controlled workspace | Comparable trials | Understates open-world variation |
 | Local execution | Fast, transparent iteration | Requires calibration discipline across sites |
 
-## Decision Lens
+## High-Level Takeaways
 
 VLA-REPLICA informs whether to centralize evaluation on expensive hardware or distribute a standardized low-cost real setup. Its unit is a real closed-loop trial with a fixed protocol and explicit shift condition. Replication across independently assembled systems is the scaling variable that matters.
 
 The paper establishes initial cross-site consistency for a bounded task suite. A missing study measures how calibration drift, wear, and operator choices affect confidence intervals over months. At ten times the sites, protocol compliance becomes the bottleneck. The benchmark fails its central claim if inter-lab variance is comparable to the policy improvements it is meant to detect.
 
-**Context:** VLA-REPLICA complements SIMPLER: one scales simulation, the other makes real evaluation cheap enough to repeat.
+VLA-REPLICA complements SIMPLER: one scales simulation, the other makes real evaluation cheap enough to repeat.
 
-**Limits:** A reproducible tabletop does not represent the breadth of household or industrial robotics.
+A reproducible tabletop does not represent the breadth of household or industrial robotics.
 
-**Takeaway:** A smaller real benchmark can be more decision-useful than a broader one that nobody else can reproduce.
+A smaller real benchmark can be more decision-useful than a broader one that nobody else can reproduce.

@@ -21,9 +21,11 @@ summary: '2023 – DINOv2: Learning Robust Visual Features without Supervision'
 
 **Journal:** TMLR 2024
 
+## Summary
+
 DINOv2 is less a new loss than a scale-and-curation study for universal visual features. It combines DINO image-level self-distillation with iBOT masked patch prediction, then builds a 142-million-image training set by retrieving, deduplicating, and balancing images from a much larger uncurated pool. The goal is a frozen backbone that transfers across classification, retrieval, depth, and segmentation without task-specific pretraining.
 
-## Paper Insights
+## Core Insights
 
 ![DINOv2 patch features establish semantic correspondences across different objects, poses, and image styles](/assets/images/dinov2-learning-robust-visual-features-paper-figure.png)
 _Principal components of patch features align corresponding parts across pose, category, and style changes. The figure visualizes the spatial structure that dense downstream probes exploit. Source: [DINOv2](https://arxiv.org/abs/2304.07193)._
@@ -41,7 +43,7 @@ The second contribution is the dataset. LVD-142M is assembled from curated seed 
 
 The visual correspondence figure is important because it shows what aggregate classification accuracy hides: nearest patch directions can track heads, wings, or limbs across different objects. Yet these correspondences are descriptive. Whether they are sufficient for a particular robot, medical image, or remote-sensing domain still requires a matched downstream evaluation.
 
-## Decision Lens
+## High-Level Takeaways
 
 DINOv2 informs whether to buy generality through supervised labels, task-specific encoders, or one large self-supervised feature model. The atomic representation is both a global class token and a grid of patch tokens. The expensive choice is the entire pipeline—data discovery, deduplication, teacher-student training, high-resolution adaptation, and distillation—not merely the 1.1B-parameter backbone.
 
@@ -49,8 +51,8 @@ The evidence supports broad frozen transfer, but data and recipe improvements ar
 
 [DINOv3](/paper%20shorts/2025/08/13/dinov3.html) addresses that long-training failure explicitly with Gram anchoring. [dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html) takes the opposite adaptation path: freeze DINOv2 and add text alignment with a small trainable visual interface.
 
-**Context:** DINOv2 packages global self-distillation, masked patch prediction, curated web data, and teacher distillation into a general visual backbone.
+DINOv2 packages global self-distillation, masked patch prediction, curated web data, and teacher distillation into a general visual backbone.
 
-**Limits:** The best results do not separate data curation, objective changes, scale, and distillation, and the web-derived distribution carries unreported coverage and bias decisions.
+The best results do not separate data curation, objective changes, scale, and distillation, and the web-derived distribution carries unreported coverage and bias decisions.
 
-**Takeaway:** DINOv2's durable lesson is that universal visual features are a data-system problem as much as an objective-design problem.
+DINOv2's durable lesson is that universal visual features are a data-system problem as much as an objective-design problem.

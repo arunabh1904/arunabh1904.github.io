@@ -15,11 +15,15 @@ summary: '2023 – StreamPETR: Object-Centric Temporal Modeling for Efficient Mu
 
 **Code:** [exiawsh/StreamPETR](https://github.com/exiawsh/StreamPETR)
 
-**Summary:** StreamPETR models a long camera sequence by propagating a bounded memory of object queries. At each frame, ego-motion-compensated historical queries interact with current multi-view features and new queries. The top foreground queries enter a FIFO queue; background queries are discarded.
+### Method and reported result
+
+StreamPETR models a long camera sequence by propagating a bounded memory of object queries. At each frame, ego-motion-compensated historical queries interact with current multi-view features and new queries. The top foreground queries enter a FIFO queue; background queries are discarded.
+
+## Summary
 
 The model's claim is about state compression. A dense temporal BEV stores evidence for every cell, while StreamPETR keeps the hypotheses most likely to matter for detection and tracking.
 
-## Paper Insights
+## Core Insights
 
 The propagation transformer combines three inputs: memory queries, current image features, and fresh learnable queries that can discover new objects. Motion-aware layer normalization conditions features on ego pose, time interval, and estimated velocity before interaction. This avoids treating an old object query as if it were observed in the current frame at the same coordinates.
 
@@ -35,12 +39,12 @@ _Only top foreground queries survive into the next frame, so query selection is 
 | StreamPETR | Top object queries | Long history at low cost, but background evidence is discarded. |
 | Fresh queries | New object hypotheses | Recovers births that memory cannot contain. |
 
-## Decision Lens
+## High-Level Takeaways
 
 StreamPETR informs whether long-term temporal state should be scene-centric or object-centric. Its atomic unit is an object query carrying reference position, feature, velocity, and time. The camera backbone is shared; temporal capacity is allocated by top-k foreground selection rather than grid size.
 
 The missing test evaluates object birth, temporary occlusion, re-entry, and false-track persistence at fixed memory and compute, then compares against dense BEV recurrence. At 10× actors, the fixed query queue becomes a recall bottleneck and query self-attention grows. The object-memory bet would fail if safety-relevant background or map changes materially affect detection before a fresh query can recover them.
 
-**Context:** StreamPETR turns the PETR camera detector into an online recurrent system and helps establish object queries as compact temporal memory for later sparse end-to-end driving stacks.
+StreamPETR turns the PETR camera detector into an online recurrent system and helps establish object queries as compact temporal memory for later sparse end-to-end driving stacks.
 
-**Takeaway:** A long temporal horizon is affordable when the model stores state, age, and motion for objects instead of replaying the video.
+A long temporal horizon is affordable when the model stores state, age, and motion for objects instead of replaying the video.

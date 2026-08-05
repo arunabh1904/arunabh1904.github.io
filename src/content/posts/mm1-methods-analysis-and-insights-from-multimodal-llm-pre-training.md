@@ -14,14 +14,18 @@ summary: "2024 – MM1: Methods, Analysis & Insights from Multimodal LLM Pre-tra
 **arXiv:** [2403.09611](https://arxiv.org/abs/2403.09611)  
 **Conference:** Technical report
 
-**Summary:** MM1 is a large ablation study of multimodal LLM pre-training. It varies the image encoder, resolution, visual-token count, vision-language connector, and data mixture before scaling the selected recipe to dense and MoE models up to 30B parameters.
+### Method and reported result
 
-## Paper Insights
+MM1 is a large ablation study of multimodal LLM pre-training. It varies the image encoder, resolution, visual-token count, vision-language connector, and data mixture before scaling the selected recipe to dense and MoE models up to 30B parameters.
+
+## Summary
+
+The central result is a prioritization rule: image encoder quality, image resolution, visual-token count, and the mix of image-caption, interleaved image-text, and text-only data mattered much more than connector design. That makes MM1 a paper about experiment allocation. Before inventing a new projector, test the representation and data decisions that dominate the result.
+
+## Core Insights
 
 ![MM1 recipe diagram showing the image encoder vision-language connector decoder-only language model and the main ablation axes](/assets/images/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training-paper-figure.png)
 _Figure 3 turns MM1 into an experimental recipe: hold the decoder-only LLM fixed while varying the visual encoder, connector, resolution, pretraining objective, and data mixture. Source: [MM1](https://arxiv.org/abs/2403.09611)._
-
-The central result is a prioritization rule: image encoder quality, image resolution, visual-token count, and the mix of image-caption, interleaved image-text, and text-only data mattered much more than connector design. That makes MM1 a paper about experiment allocation. Before inventing a new projector, test the representation and data decisions that dominate the result.
 
 | Decision | Signal from MM1 | Why it matters |
 | --- | --- | --- |
@@ -29,12 +33,12 @@ The central result is a prioritization rule: image encoder quality, image resolu
 | Data mixture | Mixed image-caption, interleaved, and text-only data is important | Capability is shaped by the training distribution. |
 | Connector | Smaller effect in the reported ablations | Avoid spending the whole budget on connector variants. |
 
-## Decision Lens
+## High-Level Takeaways
 
 MM1 informs experiment allocation during multimodal pretraining. Its controlled studies indicate that image-encoder quality, resolution, visual-token count, and the mix of caption, interleaved image–text, and text-only data matter more than elaborate connector design. The fundamental unit is the mixed training sequence, but its value depends heavily on how much visual evidence survives encoding and which sequence types shape the shared language model.
 
 The paper establishes a prioritization order within its tested regime, not a timeless ranking of components. The missing evidence is whether connector importance reappears when encoders, token budgets, or downstream tasks change, especially under equal end-to-end compute. At ten times the scale, data provenance and mixture interference may swamp gains from resolution. MM1's practical conclusion would be falsified if a connector sweep on stronger frozen encoders produces larger, more transferable gains than equivalent investment in data or visual tokens.
 
-**Limits:** The conclusions come from MM1's model family and data pipeline; they are a strong experimental prior, not a universal ranking for every architecture.
+The conclusions come from MM1's model family and data pipeline; they are a strong experimental prior, not a universal ranking for every architecture.
 
-**Takeaway:** In multimodal pre-training, spend early runs on the visual representation and mixture before polishing the connector.
+In multimodal pre-training, spend early runs on the visual representation and mixture before polishing the connector.

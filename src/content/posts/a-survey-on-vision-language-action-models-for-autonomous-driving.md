@@ -15,11 +15,15 @@ summary: "2025 – A Survey on Vision-Language-Action Models for Autonomous Driv
 
 **Awesome list:** [Awesome-VLA4AD](https://github.com/JohnsonJiang1996/Awesome-VLA4AD)
 
-**Summary:** This VLA-for-autonomous-driving survey provides a taxonomy and a curated bibliography. It treats VLA4AD as a distinct line: models that connect visual perception and language understanding to driving actions rather than stopping at explanation or QA.
+### Method and reported result
+
+This VLA-for-autonomous-driving survey provides a taxonomy and a curated bibliography. It treats VLA4AD as a distinct line: models that connect visual perception and language understanding to driving actions rather than stopping at explanation or QA.
+
+## Summary
 
 The survey is useful as a map. It shows how the field moved from end-to-end perception-to-control, to VLMs that explain scenes, to VLA systems that generate actions with language-aware reasoning.
 
-## Paper Insights
+## Core Insights
 
 The survey formalizes the building blocks of VLA4AD systems, compares more than 20 representative models, and reviews datasets and benchmarks. It separates architectures by how they connect perception, reasoning, and action, then closes with recurring deployment problems: robustness, real-time efficiency, safety, and formal verification.
 
@@ -42,12 +46,12 @@ _Figure 2 summarizes the VLA4AD architecture blocks, connecting visual inputs, l
 | End-to-end VLA | Map scene inputs and instructions toward actions | OpenDriveVLA and related action models |
 | Augmented VLA | Add tools, chains of thought, or world models | DiffVLA and DriveVLA-W0-style extensions |
 
-## Decision Lens
+## High-Level Takeaways
 
 This survey informs how to partition a driving-VLA research portfolio across perception-language alignment, world modeling, action generation, datasets, and closed-loop evaluation. Its comparison unit is not one token or trajectory but a system interface: visual representation, language/reasoning backbone, action head, and deployment loop.
 
 The taxonomy is useful only if it predicts which interfaces transfer across papers. A controlled benchmark that fixes sensors, backbone, data, latency, and action space would test that causal value. As the field expands, inconsistent action definitions and mostly open-loop metrics will age the taxonomy faster than model names. The survey's organizing claim would fail if capability and safety differences were explained better by data quality or evaluation protocol than by the proposed architecture categories.
 
-**Context:** The survey gives a shared vocabulary for a field where "VLA" can mean anything from QA to closed-loop trajectory generation.
+The survey gives a shared vocabulary for a field where "VLA" can mean anything from QA to closed-loop trajectory generation.
 
-**Takeaway:** Use this paper as the index card for the VLA-for-driving literature, then read the individual method papers for the actual design tradeoffs.
+Use this paper as the index card for the VLA-for-driving literature, then read the individual method papers for the actual design tradeoffs.

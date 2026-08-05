@@ -13,11 +13,15 @@ summary: "2020 – VectorNet: Encoding HD Maps and Agent Dynamics from Vectorize
 
 **arXiv:** [2005.04259](https://arxiv.org/abs/2005.04259)
 
-**Summary:** VectorNet is a foundational vectorized-scene paper. Instead of rendering maps and trajectories into bird's-eye-view images, it keeps lanes, crosswalks, traffic elements, and agent histories as vectors grouped into polylines.
+### Method and reported result
+
+VectorNet is a foundational vectorized-scene paper. Instead of rendering maps and trajectories into bird's-eye-view images, it keeps lanes, crosswalks, traffic elements, and agent histories as vectors grouped into polylines.
+
+## Summary
 
 That representation matters because autonomous driving scenes are already structured. VectorNet lets the model operate on map and agent geometry directly, first within each polyline and then across the whole scene.
 
-## Paper Insights
+## Core Insights
 
 VectorNet uses a hierarchical graph neural network. A local subgraph network summarizes each polyline, such as one lane segment or one agent trajectory. A global interaction graph then lets those polyline-level nodes exchange information. The paper also adds a masked entity completion objective: the model must reconstruct randomly hidden map entities or agent trajectories from context.
 
@@ -31,7 +35,7 @@ _Figure 2 shows the core hierarchy: vectors become polyline features, polyline f
 - The model separates local polyline structure from global scene interaction.
 - Masked map and trajectory completion make context learning part of training.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -40,12 +44,12 @@ _Figure 2 shows the core hierarchy: vectors become polyline features, polyline f
 | Auxiliary task | Masked entity completion | Forces the global graph to use scene context. |
 | Evidence | Internal benchmark and Argoverse | Shows vectorized encoding can compete with rendered BEV baselines. |
 
-## Decision Lens
+## High-Level Takeaways
 
 VectorNet informs whether HD maps and trajectories should be rasterized or preserved as polylines with explicit geometric identity. The atomic unit is a point feature grouped into a polyline; local aggregation creates polyline embeddings and a global graph models interactions among agents and map elements.
 
 Vectorization preserves topology and avoids empty pixels, but preprocessing choices determine segment length, coordinate frame, and missing-map behavior. The missing ablation matches encoder capacity and latency against raster and raw-point attention across map quality levels. At 10× map extent, global polyline attention and retrieval dominate. The claim would fail if a compact raster encoder matched forecasting accuracy and cross-city generalization without vector-specific preprocessing.
 
-**Context:** VectorNet made vectorized map and agent encoding feel like a primary representation, not a preprocessing trick.
+VectorNet made vectorized map and agent encoding feel like a primary representation, not a preprocessing trick.
 
-**Takeaway:** If the world is already made of lanes, agents, and polylines, the encoder should not have to rediscover those entities from pixels.
+If the world is already made of lanes, agents, and polylines, the encoder should not have to rediscover those entities from pixels.

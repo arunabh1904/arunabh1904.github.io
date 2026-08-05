@@ -17,9 +17,11 @@ summary: "2026 – LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness
 
 **GitHub:** [cau-hai-lab/LIBERO-Para](https://github.com/cau-hai-lab/LIBERO-Para)
 
+## Summary
+
 LIBERO-Para changes the instruction while holding the intended task fixed. It varies action expressions and object references independently, then measures whether a VLA's apparent language grounding survives phrasing that was absent from downstream fine-tuning.
 
-## Paper Insights
+## Core Insights
 
 ![LIBERO-Para controlled evaluation design varying action and object paraphrases between fine-tuning and testing](/assets/images/libero-para-paraphrase-robustness-in-vla-models-paper-figure.png)
 _Figure 2 shows why the benchmark is diagnostic: action wording and object wording vary on separate axes, letting a failure be localized to linguistic generalization rather than task execution alone. Source: [LIBERO-Para](https://arxiv.org/abs/2603.28301)._
@@ -34,14 +36,14 @@ The benchmark also introduces PRIDE, which models paraphrase difficulty using se
 | Object reference | Preservation of object identity under synonyms |
 | PRIDE difficulty | Success stability as linguistic distance grows |
 
-## Decision Lens
+## High-Level Takeaways
 
 LIBERO-Para informs whether a post-trained VLA learned task semantics or memorized the fine-tuning instruction surface. Its unit is a set of paraphrases mapped to one closed-loop task. Visual state and controller remain fixed so linguistic variation is the causal intervention.
 
 The results establish a large robustness gap in current configurations, but generated paraphrases may not match how real users speak. At ten times the language diversity, ambiguity and legitimate task reinterpretation complicate the oracle. The benchmark's claim would weaken if human-equivalent commands are not semantically interchangeable or if instruction augmentation closes LIBERO-Para without improving natural user interactions.
 
-**Context:** LIBERO-Para reveals a failure hidden by the original LIBERO protocol's identical train/eval instructions.
+LIBERO-Para reveals a failure hidden by the original LIBERO protocol's identical train/eval instructions.
 
-**Limits:** Language robustness is only one axis; success can still hide visual or control shortcuts.
+Language robustness is only one axis; success can still hide visual or control shortcuts.
 
-**Takeaway:** A VLA has not grounded an instruction if a harmless paraphrase changes the plan.
+A VLA has not grounded an instruction if a harmless paraphrase changes the plan.

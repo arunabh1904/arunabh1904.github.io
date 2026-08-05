@@ -15,11 +15,15 @@ summary: '2021 – DETR3D: 3D Object Detection from Multi-View Images via 3D-to-
 
 **Code:** [WangYueFt/detr3d](https://github.com/WangYueFt/detr3d)
 
-**Summary:** DETR3D predicts a set of 3D boxes directly from multiview image features. Each object query carries a 3D reference point; calibration projects that point into every camera and feature level; sampled image evidence updates the query; and the decoder iteratively refines the reference point and box.
+### Method and reported result
+
+DETR3D predicts a set of 3D boxes directly from multiview image features. Each object query carries a 3D reference point; calibration projects that point into every camera and feature level; sampled image evidence updates the query; and the decoder iteratively refines the reference point and box.
+
+## Summary
 
 The model avoids both a dense BEV view transform and per-camera boxes followed by global NMS. Geometry enters as a retrieval operation: a metric hypothesis asks where supporting pixels should appear.
 
-## Paper Insights
+## Core Insights
 
 DETR3D treats all cameras jointly, which is especially useful where an object crosses camera boundaries. On nuScenes validation, its CBGS configuration reports 34.9 mAP and 43.4 NDS. In overlap regions, the FCOS3D-initialized model reaches 26.8 mAP and 38.4 NDS versus 22.9 mAP and 32.9 NDS for the compared FCOS3D setup.
 
@@ -32,12 +36,12 @@ DETR3D treats all cameras jointly, which is especially useful where an object cr
 
 The query count therefore acts as a capacity and recall budget, not a free scaling knob. The paper also reports higher translation error than explicit per-pixel depth methods and identifies single-point feature sampling as a limitation. A projected reference point can retrieve a local feature, but it does not model object extent or ray-depth ambiguity by itself.
 
-## Decision Lens
+## High-Level Takeaways
 
 DETR3D informs whether camera-only 3D detection needs a scene-wide BEV field. Its atomic unit is an object query with a metric reference point. The image backbone is dense and shared across views, while geometric and temporal cost after the backbone scales with the bounded query set rather than BEV area.
 
 The matched falsification compares query retrieval and dense BEV lifting with the same image pyramid, depth supervision, and P99 budget. DETR3D loses if missed query initialization or point sampling harms long-range recall, or if dense scene context materially improves births and free-space reasoning. At crowded scale, query count and self-attention replace grid area as the limiting resource.
 
-**Context:** DETR3D establishes 3D-to-2D query retrieval. PETR instead embeds 3D coordinates into every image feature before global attention; Sparse4D and SparseBEV make the query's sampled support larger and adaptive.
+DETR3D establishes 3D-to-2D query retrieval. PETR instead embeds 3D coordinates into every image feature before global attention; Sparse4D and SparseBEV make the query's sampled support larger and adaptive.
 
-**Takeaway:** A camera detector can reason in metric 3D without first materializing BEV, provided each hypothesis has a calibrated route back to image evidence.
+A camera detector can reason in metric 3D without first materializing BEV, provided each hypothesis has a calibrated route back to image evidence.

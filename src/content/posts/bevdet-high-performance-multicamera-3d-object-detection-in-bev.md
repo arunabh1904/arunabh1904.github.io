@@ -15,11 +15,15 @@ summary: '2021 – BEVDet: High-Performance Multi-Camera 3D Object Detection in 
 
 **Code:** [HuangJunJie2017/BEVDet](https://github.com/HuangJunJie2017/BEVDet)
 
-**Summary:** BEVDet assembles an image backbone, Lift-Splat-style view transformer, BEV encoder, and CenterPoint-like head into a scalable camera-only detector. Its novelty is less a new mathematical operator than a careful argument that BEV needs its own augmentation, resolution, pooling, and suppression policies.
+### Method and reported result
+
+BEVDet assembles an image backbone, Lift-Splat-style view transformer, BEV encoder, and CenterPoint-like head into a scalable camera-only detector. Its novelty is less a new mathematical operator than a careful argument that BEV needs its own augmentation, resolution, pooling, and suppression policies.
+
+## Summary
 
 The paper is valuable because it treats the view transform as a systems component. Camera resolution, BEV resolution, and pooling implementation determine different parts of the cost.
 
-## Paper Insights
+## Core Insights
 
 Image-space augmentation alone is insufficient because the detector's output lives in ego coordinates. BEVDet applies rotation, scaling, and flipping after view transformation, then uses a BEV encoder to build metric context. In the reported ablation, combining image and BEV augmentation raises peak mAP from 23.0 to 31.6 and largely removes late-training overfit.
 
@@ -34,12 +38,12 @@ The optimized pooling path precomputes fixed-rig indices and replaces accumulati
 
 BEV improves translation, orientation, and velocity reasoning, but the paper reports weaker attribute prediction than image-view methods. Compressing appearance into BEV helps geometry and can weaken fine visual cues.
 
-## Decision Lens
+## High-Level Takeaways
 
 BEVDet informs when explicit BEV is worth its fixed spatial cost. Its atomic units change from pixels and depth bins to BEV cells. The image encoder is shared across cameras; geometry is shared through the vehicle-centered grid; the detector pays uniformly for the chosen range and resolution.
 
 The falsification compares dense BEV with query-based retrieval under equal input pixels, depth supervision, and optimized kernels. BEVDet loses if empty-cell processing dominates P99 latency or if attribute and small-object evidence is damaged by early pooling. At larger range, image resolution and BEV area grow on different axes and must be budgeted separately.
 
-**Context:** Lift, Splat, Shoot supplies the geometric primitive. BEVDet turns it into a tuned detector; BEVDet4D adds recurrent BEV, BEVDepth adds LiDAR-supervised depth, and SOLOFusion stretches the temporal stereo horizon.
+Lift, Splat, Shoot supplies the geometric primitive. BEVDet turns it into a tuned detector; BEVDet4D adds recurrent BEV, BEVDepth adds LiDAR-supervised depth, and SOLOFusion stretches the temporal stereo horizon.
 
-**Takeaway:** BEV performance comes from the whole representation contract—augmentation, resolution, pooling, and heads—not from the view-transform equation alone.
+BEV performance comes from the whole representation contract—augmentation, resolution, pooling, and heads—not from the view-transform equation alone.
