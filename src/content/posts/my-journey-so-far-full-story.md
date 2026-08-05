@@ -1,5 +1,5 @@
 ---
-title: 'My Journey So Far: The Full Story'
+title: 'My Life and Career So Far'
 date: '2025-02-08T05:00:00.000Z'
 section: blog
 postSlug: my-journey-so-far-full-story
@@ -11,7 +11,7 @@ summary: >-
   graduate school, DEKA, and Zoox.
 ---
 
-# My Journey So Far: The Full Story
+# My Life and Career So Far
 
 In 2023, I gave [this interview](https://theinterviewportal.com/2024/01/21/perception-roboticist-interview/) about how I became a robotics engineer focused on perception. Looking back, the interview mostly captured the wins. It did not say much about the missteps, low points, and strange detours that shaped the path just as much. This is the fuller version, starting from the beginning.
 
@@ -21,7 +21,7 @@ I grew up in Jaipur, a city that shaped much of my early life. I lost my father 
 
 Most of my schooling was in Jaipur, and like many aspiring engineers, I spent three intense years in Kota preparing for the JEE. Kota is often described as a **factory** ([Netflix show](https://www.netflix.com/title/81249783) / [Wiki](https://en.wikipedia.org/wiki/Kota_Factory)), and that description is not far off. The city runs on academic competition. It is also a perfect breeding ground for [Girard's mimetic theory of desire](https://en.wikipedia.org/wiki/Mimetic_theory), where students absorb each other's ambitions and anxieties until it becomes hard to tell what you actually want. Despite working hard, I did not clear the IIT exam. At 18, that failure felt crushing, like I had let everyone down after years of preparation. Even now, at 33, the memory still makes my body tense up.
 
-### What that period taught me
+### Early lessons
 - **Be resilient** in the face of adversity.
 - Sometimes, **no matter how hard you try, you will fail** - and that's okay.
 - **It's okay to indulge** in things you like (like video games), but don’t let them consume you.
@@ -41,7 +41,7 @@ Even with that ridiculous ending, the concept was real. A similar design is now 
 ![The areca-nut harvesting robot built for my undergraduate thesis](/assets/images/IMG_8842.jpg)
 _Our undergraduate prototype climbed an areca palm and used a remotely controlled cutter. Source: personal project archive._
 
-### What undergrad changed
+### Lessons from undergrad
 - **It's never too late to start.**
 - **Jugaad** (resourcefulness in Hindi) is okay, as long as you don’t cheat outright!
 - **Building things that help others** brings a ton of joy.
@@ -69,7 +69,7 @@ Those experiences helped me find a purpose and clarify what I wanted to work on.
 
 I was accepted into three schools. I still remember rereading the first acceptance email about five times because I could not quite believe it. I packed my bags and moved to the United States to study robotics at the Colorado School of Mines.
 
-### What the reset clarified
+### Recovery and perspective
 - **Depression can be scary.**
 - **Having a purpose** makes it low-effort to work hard.
 - **Always have a backup plan.**
@@ -96,13 +96,13 @@ _The hexapod project paired a 1D LiDAR and Pixy camera with a small mobile platf
 
 Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grades mattered, but the projects I took on, the problems I solved, and the people I learned from shaped me more. My advice to current graduate students is simple: take on projects that stretch you, use the resources around you, and follow problems that genuinely excite you. That is how progress starts to compound.
 
-### What Mines taught me
+### Lessons from graduate school
 - **Focus on building a strong foundation** in the areas that excite you.
 - **It's okay to feel out of place** in the beginning. Navigating many changes at once can be overwhelming, but it's part of the process.
 - **Be intentional** about what you want to get out of grad school. Tailor your coursework and experiences to align with your interests.
 - **Seek out hands-on opportunities**, like TA and RA positions, to apply your learning in practical settings.
 
-## Finding a job after graduate school
+## Job search after graduate school
 
 Landing your first job out of grad school in the U.S. can be difficult, especially if you want the dream job immediately and you are not coming from a top university. Even if you spent grad school building skills, doing research, and working on relevant projects, the search can still be tough. These are the things that helped me:
 
@@ -117,7 +117,7 @@ Landing your first job out of grad school in the U.S. can be difficult, especial
 - **Career Fairs**: These can be helpful, but don’t rely on them exclusively.
 - **Honesty**: Never lie on your resume.
 
-## First job at DEKA
+## DEKA
 
 Right after grad school, I landed at DEKA and joined a small, tight-knit team building autonomous robots for FedEx's last-mile deliveries. DEKA was mostly known for medical devices, so the robotics project felt like new territory. I started in planning, but I soon found my way into robot perception and machine learning. That team is where I really expanded my skills, diving into PyTorch, TensorFlow, TensorRT, CUDA, and OpenCL.
 
