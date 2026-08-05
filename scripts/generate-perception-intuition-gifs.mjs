@@ -120,17 +120,6 @@ function bevGrid(x, y, w, h, opacity = 1, accent = C.grid) {
   return out;
 }
 
-function sceneRoad(x, y, w, h) {
-  const horizon = y + h * 0.34;
-  let out = rect(x, y, w, h, C.bg2, 14, 1, C.grid, 1);
-  out += `<path d="M ${x + w * 0.34} ${y + h} L ${x + w * 0.46} ${horizon} L ${x + w * 0.54} ${horizon} L ${x + w * 0.70} ${y + h} Z" fill="${C.panel2}"/>`;
-  out += line(x + w * 0.5, horizon + 12, x + w * 0.52, y + h, C.muted, 2, 0.32, '10 10');
-  out += line(x + w * 0.42, horizon, x + w * 0.17, y + h, C.grid, 2, 0.8);
-  out += line(x + w * 0.58, horizon, x + w * 0.86, y + h, C.grid, 2, 0.8);
-  out += circle(x + w * 0.18, horizon - 4, 28, C.camera, 0.05);
-  return out;
-}
-
 function cube(x, y, s, color, opacity = 1) {
   const dx = s * 0.35;
   const dy = s * 0.24;
@@ -139,6 +128,17 @@ function cube(x, y, s, color, opacity = 1) {
 
 function vehicle(x, y, color = C.ink, opacity = 1, scale = 1) {
   return `${rect(x - 16 * scale, y - 27 * scale, 32 * scale, 54 * scale, color, 8 * scale, 0.12 * opacity, color, 1)}${rect(x - 10 * scale, y - 15 * scale, 20 * scale, 21 * scale, color, 5 * scale, 0.16 * opacity)}${circle(x - 14 * scale, y - 16 * scale, 3 * scale, color, opacity)}${circle(x + 14 * scale, y - 16 * scale, 3 * scale, color, opacity)}${circle(x - 14 * scale, y + 17 * scale, 3 * scale, color, opacity)}${circle(x + 14 * scale, y + 17 * scale, 3 * scale, color, opacity)}`;
+}
+
+function crosshair(x, y, color, opacity = 1, radius = 10) {
+  return `${circle(x, y, radius, color, 0.04 * opacity, color, 1.5)}${line(x - radius - 5, y, x + radius + 5, y, color, 1, opacity)}${line(x, y - radius - 5, x, y + radius + 5, color, 1, opacity)}${circle(x, y, 2.5, color, opacity)}`;
+}
+
+function featureMap(x, y, w, h, color, cells = 6, opacity = 1) {
+  let out = rect(x, y, w, h, C.panel2, 8, 1, color, 0.85 * opacity);
+  for (let i = 1; i < cells; i++) out += line(x + (w * i) / cells, y + 2, x + (w * i) / cells, y + h - 2, color, 0.8, 0.16 * opacity);
+  for (let i = 1; i < Math.max(2, Math.round(cells * h / w)); i++) out += line(x + 2, y + (h * i) / Math.max(2, Math.round(cells * h / w)), x + w - 2, y + (h * i) / Math.max(2, Math.round(cells * h / w)), color, 0.8, 0.16 * opacity);
+  return out;
 }
 
 function svg(body, description) {
@@ -161,443 +161,508 @@ function svg(body, description) {
 
 function visionFrame(frame) {
   const t = cycle(frame);
-  const travel = phase(t, 0.08, 0.56);
-  const settle = phase(t, 0.55, 0.78);
-  const pulse = 0.65 + 0.35 * ping(t * 2);
-  let b = header('01', 'vision encoder', 'What the image backbone must preserve');
-  b += sceneRoad(52, 126, 360, 340);
-  b += text('camera', 72, 154, 13, C.muted, 'start', 600, 1, 1);
-  const actorX = 52 + 360 * 0.555;
-  const actorY = 126 + 340 * 0.405;
-  b += rect(actorX - 5, actorY - 8, 10, 16, C.camera, 3, 0.28 + pulse * 0.35, C.camera, 1);
-  b += circle(actorX, actorY, 18 + 3 * pulse, C.camera, 0.05 + 0.05 * pulse);
-  for (let i = 1; i < 8; i++) b += line(52 + (360 * i) / 8, 126, 52 + (360 * i) / 8, 466, C.camera, 1, 0.04);
-  for (let j = 1; j < 6; j++) b += line(52, 126 + (340 * j) / 6, 412, 126 + (340 * j) / 6, C.camera, 1, 0.04);
+  const project = phase(t, 0.08, 0.42);
+  const sample = phase(t, 0.38, 0.72);
+  const pulse = 0.55 + 0.45 * ping(t * 1.5);
+  let b = header('01', 'DETR3D · BEVFORMER', 'A 3D point projects to a different pixel in each camera');
 
-  b += panel(470, 126, 438, 142, 'COARSE-ONLY CONTROL', C.grid);
-  b += panel(470, 286, 438, 180, 'DETR3D · BEVFORMER', C.camera);
-  const coarseXs = [520, 628, 738, 842];
-  coarseXs.forEach((x, i) => {
-    const s = 74 - i * 12;
-    b += rect(x, 177 + i * 3, s, s * 0.65, C.panel2, 8, 1, C.grid, 1);
-    for (let k = 1; k < 4; k++) b += line(x + (s * k) / 4, 180 + i * 3, x + (s * k) / 4, 174 + i * 3 + s * 0.65, C.grid, 1, 0.55);
-    if (i < 3) b += arrow(x + s + 7, 198, coarseXs[i + 1] - 8, 198, C.dim, 1.5, 0.7);
+  b += panel(44, 126, 226, 338, '1 · METRIC POINT', C.metric);
+  b += bevGrid(68, 174, 178, 220, 1, C.metric);
+  b += text('ego frame', 86, 420, 12, C.muted, 'start', 500);
+  b += vehicle(157, 363, C.ink, 0.72, 0.48);
+  const pointX = 198;
+  const pointY = 235;
+  b += line(157, 354, pointX, pointY, C.metric, 1.5, 0.38, '5 6');
+  b += glowCircle(pointX, pointY, 14 + 4 * pulse, C.metric, 0.92);
+  b += text('X = (x, y, z)', pointX, 207, 13, C.metric, 'middle', 600);
+
+  b += panel(292, 126, 356, 338, '2 · CALIBRATED PROJECTION', C.camera);
+  const cameras = [
+    { y: 174, label: 'front camera', px: 508, py: 226 },
+    { y: 304, label: 'left camera', px: 390, py: 356 },
+  ];
+  cameras.forEach((cam, i) => {
+    b += rect(316, cam.y, 308, 108, C.bg2, 12, 0.92, C.grid, 1);
+    b += text(cam.label, 330, cam.y + 23, 12, C.muted, 'start', 600);
+    b += path(`M 342 ${cam.y + 92} L 442 ${cam.y + 39} L 598 ${cam.y + 92}`, C.grid, 1.5, 0.72);
+    b += line(470, cam.y + 34, 470, cam.y + 96, C.grid, 1, 0.28);
+    b += line(328, cam.y + 66, 612, cam.y + 66, C.grid, 1, 0.28);
+    b += crosshair(cam.px, cam.py, C.camera, 0.22 + 0.78 * project, 9 + 2 * pulse);
+    const startY = i === 0 ? 245 : 248;
+    b += flowDot(260, startY, cam.px, cam.py, project, C.metric, 3.2, 0.82);
   });
-  b += flowDot(actorX, actorY, 535, 200, travel, C.camera, 4, 1 - settle * 0.85);
-  b += flowDot(535, 200, 846, 199, clamp((travel - 0.34) / 0.66), C.camera, 4, 0.85 - settle * 0.8);
-  b += circle(862, 202, 3 + 7 * (1 - settle), C.camera, 0.22 * (1 - settle));
+  b += text('uᵢ = π(Kᵢ, Rᵢ, tᵢ, X)', 470, 448, 13, C.ink, 'middle', 500);
 
+  b += panel(670, 126, 246, 338, '3 · SAMPLE FEATURE LEVELS', C.camera);
   const levels = [
-    { x: 520, y: 342, w: 118, h: 78, o: 1 },
-    { x: 646, y: 354, w: 96, h: 64, o: 0.82 },
-    { x: 752, y: 368, w: 72, h: 48, o: 0.62 },
+    { x: 696, y: 178, w: 188, h: 76, stride: 'stride 4', px: 817, py: 216 },
+    { x: 715, y: 273, w: 150, h: 62, stride: 'stride 8', px: 812, py: 304 },
+    { x: 735, y: 354, w: 110, h: 48, stride: 'stride 16', px: 806, py: 378 },
   ];
   levels.forEach((q, i) => {
-    b += rect(q.x, q.y, q.w, q.h, C.panel2, 9, 1, C.camera, 0.9);
-    for (let k = 1; k < 5; k++) b += line(q.x + (q.w * k) / 5, q.y + 2, q.x + (q.w * k) / 5, q.y + q.h - 2, C.camera, 1, 0.16);
-    for (let k = 1; k < 3; k++) b += line(q.x + 2, q.y + (q.h * k) / 3, q.x + q.w - 2, q.y + (q.h * k) / 3, C.camera, 1, 0.16);
-    if (i < 2) b += arrow(q.x + q.w + 6, q.y + q.h * 0.5, levels[i + 1].x - 6, levels[i + 1].y + levels[i + 1].h * 0.5, C.camera, 1.5, 0.72);
+    b += featureMap(q.x, q.y, q.w, q.h, C.camera, 7 - i, 0.65 + 0.35 * sample);
+    b += text(q.stride, q.x + 8, q.y + 18, 10, C.muted, 'start', 600);
+    b += crosshair(q.px, q.py, C.camera, 0.18 + 0.72 * sample, 6 + i);
+    if (i < 2) b += arrow(q.px, q.py + 12, levels[i + 1].px, levels[i + 1].py - 12, C.camera, 1.3, 0.28 + 0.5 * sample);
   });
-  const fx = mix(actorX, 579, travel);
-  const fy = mix(actorY, 380, travel);
-  b += glowCircle(fx, fy, 12, C.camera, 0.95);
-  b += arrow(824, 392, 870, 392, C.metric, 2, 0.85);
-  b += rect(858, 370, 30, 42, C.metric, 6, 0.16 + 0.18 * settle, C.metric, 1);
-  b += text('shared backbone → multiscale features', 890, 438, 12, C.metric, 'end', 500, 0.9, 0.35);
-  return svg(b, 'A tiny distant actor disappears in a coarse-only vision encoder but remains visible in a multiscale feature pyramid.');
+  b += text('Fᵢˡ(uᵢ / strideₗ)', 793, 429, 13, C.ink, 'middle', 500);
+  b += text('FPN is inherited; projection is the 3D step.', 480, 500, 13, C.metric, 'middle', 600);
+  return svg(b, 'DETR3D and BEVFormer start from one metric 3D point, project it to a different pixel in each calibrated camera, and sample inherited multiscale image features at stride-adjusted coordinates.');
 }
 
 function lidarFrame(frame) {
   const t = cycle(frame);
-  const build = phase(t, 0.04, 0.40);
-  const move = phase(t, 0.34, 0.70);
-  const pulse = 0.65 + 0.35 * ping(t * 1.5);
-  let b = header('02', 'lidar encoder', 'When LiDAR height is compressed');
-  b += panel(52, 126, 310, 342, 'SPARSE RETURNS', C.lidar);
-  const lower = [[90,410],[118,396],[146,419],[176,389],[204,414],[237,393],[270,422],[302,397],[326,414],[116,344],[154,358],[215,349],[286,360]];
-  const upper = [[126,274],[158,258],[190,282],[222,263],[254,278],[286,257],[315,276]];
-  [...lower, ...upper].forEach(([x,y], i) => {
-    const o = 0.55 + 0.45 * Math.sin((i * 1.7 + t * Math.PI * 2)) ** 2;
-    b += glowCircle(x, y, 6, i < lower.length ? C.lidar : C.camera, o);
-  });
-  b += path('M 78 435 L 168 348 L 337 378', C.grid, 2, 0.8);
-  b += path('M 105 313 L 173 248 L 325 258', C.grid, 2, 0.6);
-  b += vehicle(203, 431, C.ink, 0.75, 0.55);
+  const encode = phase(t, 0.08, 0.42);
+  const densify = phase(t, 0.38, 0.72);
+  const pulse = 0.55 + 0.45 * ping(t * 1.5);
+  let b = header('02', 'POINTPILLARS · SECOND · DSVT · VOXELNEXT', 'Where LiDAR models become dense');
+  const cards = [
+    { x: 36, label: 'POINTPILLARS', color: C.grid },
+    { x: 342, label: 'SECOND · DSVT', color: C.lidar },
+    { x: 648, label: 'VOXELNEXT', color: C.metric },
+  ];
+  cards.forEach((c) => b += panel(c.x, 126, 276, 340, c.label, c.color));
 
-  b += panel(400, 126, 508, 150, 'POINTPILLARS', C.grid);
-  const pillarXs = [462, 510, 558, 606, 654, 702];
-  pillarXs.forEach((x, i) => {
-    const hi = 25 + (i % 3) * 13;
-    const yTop = mix(170 - hi, 204, move);
-    const yBot = 219;
-    b += rect(x, yTop, 28, Math.max(8, yBot - yTop), C.lidar, 5, 0.08 + 0.14 * build, C.lidar, 1);
-    if (i === 2 || i === 3) b += circle(x + 14, mix(170, 210, move), 5, C.camera, 0.75 * (1 - move));
-  });
-  b += arrow(760, 204, 816, 204, C.muted, 2, 0.75);
-  b += bevGrid(824, 168, 60, 72, 1, C.grid);
-  b += circle(848, 203, 8 + 2 * pulse, C.lidar, 0.25);
-  b += circle(848, 203, 4, C.camera, 0.55 * (1 - move));
-  b += text('pillar features → collapse z → 2D CNN', 886, 258, 12, C.muted, 'end', 500, 0.9, 0.25);
+  const sparseStack = (ox, oy, color, opacity = 1) => {
+    let out = path(`M ${ox} ${oy + 94} L ${ox + 92} ${oy + 54} L ${ox + 176} ${oy + 92}`, C.grid, 1.3, 0.6);
+    const pts = [[12,82],[38,72],[66,90],[94,64],[126,84],[156,70],[47,31],[78,19],[111,34],[142,24]];
+    pts.forEach(([dx,dy], i) => out += cube(ox + dx, oy + dy, 14, i > 5 ? C.camera : color, opacity * (0.72 + 0.28 * Math.sin(i + t * 6) ** 2)));
+    return out;
+  };
 
-  b += panel(400, 294, 508, 174, 'SECOND · DSVT · VOXELNEXT', C.lidar);
-  const vox = [[462,405,C.lidar],[510,385,C.lidar],[558,412,C.lidar],[606,392,C.lidar],[520,340,C.camera],[574,326,C.camera],[632,346,C.camera],[686,401,C.lidar]];
-  vox.forEach(([x,y,c], i) => {
-    b += cube(x, y, 24, c, build);
-    if (i > 0 && i < 7 && (i % 2 === 0 || i === 5)) b += line(vox[i-1][0]+18, vox[i-1][1]+8, x+12, y+8, c, 1.5, 0.16 + 0.42 * pulse * build);
+  // PointPillars: each vertical column is pooled before a dense 2D backbone.
+  b += sparseStack(80, 175, C.lidar, 0.9);
+  [96,128,160,192,224].forEach((x, i) => {
+    const top = 204 + (i % 2) * 18;
+    b += rect(x, top, 22, 92 - (top - 204), C.lidar, 5, 0.05 + 0.13 * encode, C.lidar, 1);
+    b += flowDot(x + 11, top, x + 11, 299, densify, C.lidar, 2.4, 0.82);
   });
-  b += arrow(746, 383, 810, 383, C.lidar, 2, 0.8);
-  b += bevGrid(824, 343, 60, 72, 1, C.lidar);
-  b += circle(844, 395, 6, C.lidar, 0.65);
-  b += circle(858, 365, 6, C.camera, 0.65);
-  b += text('occupied voxels → sparse 3D → late BEV', 886, 448, 12, C.lidar, 'end', 500, 0.9, 0.25);
-  return svg(b, 'LiDAR points are compared through early pillar collapse and sparse 3D encoding that preserves overpass height before bird eye view compression.');
+  b += arrow(174, 310, 174, 337, C.lidar, 1.7, 0.8);
+  b += bevGrid(86, 342, 176, 72, 0.78 + 0.22 * densify, C.lidar);
+  for (let i = 0; i < 18; i++) b += rect(88 + (i % 9) * 19.2, 344 + Math.floor(i / 9) * 34, 18, 32, C.lidar, 2, (0.03 + 0.13 * densify) * (0.5 + (i % 4) / 6));
+  b += text('collapse height first', 174, 442, 12, C.ink, 'middle', 600);
+
+  // SECOND and DSVT keep only occupied 3D cells active, then pool height for BEV heads.
+  b += sparseStack(386, 175, C.lidar, 0.9);
+  const sparseNodes = [[410,274],[452,247],[493,282],[530,232],[566,268],[598,218]];
+  sparseNodes.forEach(([x,y], i) => {
+    b += cube(x, y, 18, i > 3 ? C.camera : C.lidar, 0.45 + 0.55 * encode);
+    if (i > 0) b += line(sparseNodes[i-1][0] + 12, sparseNodes[i-1][1] + 4, x + 8, y + 4, C.lidar, 1.3, 0.12 + 0.5 * pulse * encode);
+  });
+  b += text('sparse 3D mixing', 480, 322, 11, C.lidar, 'middle', 600);
+  b += arrow(480, 330, 480, 349, C.lidar, 1.7, 0.8);
+  b += bevGrid(392, 354, 176, 60, 0.75 + 0.25 * densify, C.lidar);
+  b += rect(431, 371, 38, 26, C.lidar, 4, 0.08 + 0.20 * densify);
+  b += rect(490, 362, 28, 42, C.camera, 4, 0.07 + 0.18 * densify);
+  b += text('densify at the BEV head', 480, 442, 12, C.ink, 'middle', 600);
+
+  // VoxelNeXt keeps sparse voxels through the prediction head.
+  b += sparseStack(692, 175, C.metric, 0.9);
+  const candidates = [[719,274,C.lidar],[762,250,C.lidar],[806,285,C.lidar],[838,230,C.camera]];
+  candidates.forEach(([x,y,c], i) => {
+    b += cube(x, y, 20, c, 0.42 + 0.58 * encode);
+    if (i > 0) b += line(candidates[i-1][0] + 13, candidates[i-1][1] + 5, x + 9, y + 5, C.metric, 1.3, 0.12 + 0.48 * pulse * encode);
+  });
+  b += arrow(785, 316, 785, 353, C.metric, 1.7, 0.82);
+  b += rect(714, 357, 142, 58, C.bg2, 10, 0.9, C.metric, 1);
+  b += crosshair(760, 385, C.metric, 0.25 + 0.75 * densify, 12);
+  b += crosshair(820, 379, C.camera, 0.20 + 0.72 * densify, 9);
+  b += text('boxes from active voxels', 785, 442, 12, C.ink, 'middle', 600);
+
+  b += text('The lineage moves densification later—and VoxelNeXt removes the dense head.', 480, 501, 13, C.metric, 'middle', 600);
+  return svg(b, 'PointPillars collapses height before a dense two-dimensional backbone, SECOND and DSVT preserve sparse three-dimensional cells until a later BEV head, and VoxelNeXt predicts boxes directly from active voxels.');
 }
 
 function radarFrame(frame) {
   const t = cycle(frame);
-  const travel = phase(t, 0.08, 0.62);
-  const settle = phase(t, 0.56, 0.82);
+  const travel = phase(t, 0.08, 0.58);
+  const settle = phase(t, 0.52, 0.80);
   const pulse = 0.55 + 0.45 * ping(t * 1.6);
-  let b = header('03', 'radar encoder', 'Where each radar paper makes correspondence');
+  let b = header('03', 'CRAFT · CRN · RCBEVDET', 'Where radar enters camera perception');
   const cards = [
-    {x:34,label:'CRAFT (2022)',accent:C.radar},
-    {x:342,label:'CRN (2023)',accent:C.camera},
-    {x:650,label:'RCBEVDET (2024)',accent:C.metric},
+    {x:34,label:'CRAFT · PROPOSAL STAGE',accent:C.radar},
+    {x:342,label:'CRN · DEPTH STAGE',accent:C.camera},
+    {x:650,label:'RCBEVDET · BEV STAGE',accent:C.metric},
   ];
   cards.forEach((c)=>b += panel(c.x,126,276,342,c.label,c.accent));
 
-  // CRAFT: a camera proposal selects compatible radar returns in polar coordinates.
+  // One actor and its radar returns are represented at three different intervention points.
   let x=34;
-  b += rect(x+24,170,228,76,C.bg2,10,1,C.camera,1);
-  b += text('camera proposal',x+40,193,11,C.camera,'start',600,0.9,0.4);
-  b += rect(x+112,202,58,28,C.camera,6,0.10+0.08*pulse,C.camera,1);
-  const ox=x+138, oy=393;
-  [46,78,110].forEach((r)=>b += path(`M ${ox-r} ${oy} A ${r} ${r} 0 0 1 ${ox+r} ${oy}`,C.grid,1,0.58));
-  [-50,-25,0,25,50].forEach((a)=>{
-    const rad=(a-90)*Math.PI/180;
-    b += line(ox,oy,ox+118*Math.cos(rad),oy+118*Math.sin(rad),C.grid,1,0.48);
-  });
-  const craftReturns=[[x+83,322],[x+124,286],[x+178,304],[x+209,270]];
+  b += rect(x+24,170,228,72,C.bg2,10,1,C.camera,1);
+  b += text('camera box: weak range',x+39,191,11,C.camera,'start',600);
+  b += rect(x+105,202,66,27,C.camera,5,0.08+0.10*pulse,C.camera,1);
+  b += path(`M ${x+132} 229 L ${x+62} 374 M ${x+158} 229 L ${x+224} 374`,C.camera,1.2,0.25,'none','4 5');
+  const craftReturns=[[x+79,352],[x+116,316],[x+162,303],[x+207,342]];
   craftReturns.forEach(([rx,ry],i)=>{
     const chosen=i===1||i===2;
-    b += circle(rx,ry,chosen?7:5,C.radar,chosen?0.80:0.28,C.radar,1);
-    b += arrow(rx,ry,rx+12+i*2,ry-4,C.metric,1.4,chosen?0.76:0.25);
+    b += circle(rx,ry,chosen?7:5,C.radar,chosen?0.88:0.24,C.radar,1);
+    b += arrow(rx,ry,rx+13+i*2,ry-3,C.metric,1.3,chosen?0.75:0.22);
     if(chosen){
-      b += path(`M ${rx} ${ry} Q ${x+138} 254 ${x+141} 230`,C.radar,1.4,0.18+0.48*travel,'none','4 5');
-      b += flowDot(rx,ry,x+141,230,travel,C.radar,2.5,0.86);
+      b += path(`M ${rx} ${ry} Q ${x+138} 266 ${x+138} 226`,C.radar,1.4,0.18+0.50*travel,'none','4 5');
+      b += flowDot(rx,ry,x+138,226,travel,C.radar,2.5,0.88);
     }
   });
-  b += text('proposal ↔ radar returns',x+138,430,11,C.radar,'middle',500,0.92,0.2);
-  b += text('in polar coordinates',x+138,449,11,C.muted,'middle',500,0.86,0.2);
+  b += text('associate a soft polar set',x+138,406,11,C.radar,'middle',600);
+  b += text('around each camera proposal',x+138,427,11,C.muted,'middle',500);
+  b += text('proposal chooses returns',x+138,450,11,C.ink,'middle',600);
 
-  // CRN: radar sharpens depth lifting, then deformable attention repairs BEV alignment.
+  // CRN changes the depth distribution before lifting, then aligns camera and radar BEV.
   x=342;
-  b += rect(x+24,170,228,78,C.bg2,10,1,C.camera,1);
-  b += path(`M ${x+48} 236 L ${x+108} 188 L ${x+228} 188 L ${x+246} 236`,C.grid,1.3,0.74);
-  const depthSamples=[[x+94,222],[x+124,210],[x+158,198],[x+194,190]];
-  depthSamples.forEach(([dx,dy],i)=>{
-    const hit=i===2;
-    b += circle(dx,dy,hit?7:4,hit?C.radar:C.camera,hit?0.85:0.28,hit?C.radar:'none',1);
+  b += rect(x+24,170,228,74,C.bg2,10,1,C.camera,1);
+  const ray = [[x+60,231],[x+98,218],[x+136,205],[x+174,192],[x+218,178]];
+  ray.forEach(([dx,dy],i)=>{
+    const hit=i===3;
+    const before=[0.12,0.20,0.32,0.25,0.11][i];
+    const after=hit?0.92:before*(1-settle*0.62);
+    b += circle(dx,dy,4+8*after,C.camera,0.12+0.55*after,C.radar,hit?1.2:0);
   });
-  b += path(`M ${x+158} 198 Q ${x+150} 265 ${x+132} 310`,C.radar,1.8,0.25+0.52*travel,'none','5 5');
-  b += flowDot(x+158,198,x+132,310,travel,C.radar,3,0.9);
-  b += bevGrid(x+24,310,228,82,1,C.camera);
-  const roughX=x+126, alignedX=x+154, targetY=348;
-  b += rect(roughX-14,targetY-9,28,18,C.camera,5,0.10,C.camera,1);
-  b += line(roughX,targetY,alignedX,targetY-12,C.metric,1.6,0.35+0.42*settle,'4 4');
-  b += rect(alignedX-14,targetY-21,28,18,C.metric,5,0.08+0.15*settle,C.metric,1);
-  b += text('radar-guided lifting',x+138,430,11,C.radar,'middle',500,0.92,0.2);
-  b += text('→ deformable BEV fusion',x+138,449,11,C.muted,'middle',500,0.86,0.2);
+  b += glowCircle(x+174,192,10,C.radar,0.25+0.60*settle);
+  b += text('radar sharpens p(depth | pixel)',x+138,268,11,C.radar,'middle',600);
+  b += arrow(x+138,278,x+138,306,C.radar,1.7,0.8);
+  b += bevGrid(x+24,314,228,78,1,C.camera);
+  const roughX=x+111, alignedX=x+158, targetY=352;
+  b += rect(roughX-14,targetY-9,28,18,C.camera,5,0.09,C.camera,1);
+  b += line(roughX,targetY,alignedX,targetY-5,C.metric,1.6,0.28+0.55*settle,'4 4');
+  b += rect(alignedX-14,targetY-14,28,18,C.radar,5,0.08+0.16*settle,C.radar,1);
+  b += text('then align radar and camera BEV',x+138,421,11,C.muted,'middle',500);
+  b += text('radar changes the lift',x+138,450,11,C.ink,'middle',600);
 
-  // RCBEVDet: a point stream and a transformer stream build the radar BEV together.
+  // RCBEVDet learns a radar-specific BEV before cross-modal alignment.
   x=650;
-  b += rect(x+24,174,104,56,C.radar,10,0.06,C.radar,1);
-  b += text('point stream',x+76,198,11,C.ink,'middle',500,0.92);
-  [0,1,2].forEach((i)=>b += circle(x+51+i*24,216,3+i,C.radar,0.78));
-  b += rect(x+148,174,104,56,C.metric,10,0.06,C.metric,1);
-  b += text('transformer',x+200,198,11,C.ink,'middle',500,0.92);
+  b += rect(x+24,174,104,62,C.radar,10,0.06,C.radar,1);
+  b += text('point stream',x+76,197,11,C.ink,'middle',600);
+  b += text('RCS scatter',x+76,220,10,C.radar,'middle',500);
+  b += rect(x+148,174,104,62,C.metric,10,0.06,C.metric,1);
+  b += text('transformer',x+200,197,11,C.ink,'middle',600);
+  b += text('global context',x+200,220,10,C.metric,'middle',500);
   [0,1,2].forEach((i)=>{
-    b += circle(x+174+i*25,216,4,C.metric,0.66);
-    if(i<2)b += line(x+178+i*25,216,x+195+i*25,216,C.metric,1,0.42);
+    b += circle(x+43+i*31,256,3+i,C.radar,0.72);
+    b += circle(x+169+i*31,256,4,C.metric,0.62);
+    if(i<2)b += line(x+173+i*31,256,x+196+i*31,256,C.metric,1,0.40);
   });
-  b += line(x+76,230,x+126,280,C.radar,1.8,0.72);
-  b += line(x+200,230,x+150,280,C.metric,1.8,0.72);
-  b += flowDot(x+76,230,x+126,280,travel,C.radar,2.5,0.86);
-  b += flowDot(x+200,230,x+150,280,travel,C.metric,2.5,0.86);
-  b += circle(x+138,286,24,C.task,0.08+0.06*pulse,C.task,1);
-  b += text('⊕',x+138,294,21,C.ink,'middle',500,0.9);
-  b += arrow(x+138,312,x+138,326,C.task,1.8,0.78);
-  b += bevGrid(x+24,330,228,64,1,C.task);
-  b += rect(x+122,348,34,20,C.radar,5,0.10+0.12*settle,C.radar,1);
-  b += text('point stream + transformer',x+138,430,11,C.metric,'middle',500,0.92,0.1);
-  b += text('→ radar BEV',x+138,449,11,C.muted,'middle',500,0.86,0.2);
-  return svg(b, 'CRAFT associates camera proposals with radar in polar coordinates, CRN uses radar-guided lifting and deformable BEV fusion, and RCBEVDet combines point and transformer radar streams.');
+  b += flowDot(x+76,262,x+122,307,travel,C.radar,2.5,0.86);
+  b += flowDot(x+200,262,x+154,307,travel,C.metric,2.5,0.86);
+  b += circle(x+138,312,22,C.task,0.07+0.07*pulse,C.task,1);
+  b += text('⊕',x+138,319,19,C.ink,'middle',500,0.9);
+  b += arrow(x+138,337,x+138,350,C.task,1.7,0.8);
+  b += bevGrid(x+24,354,228,54,1,C.task);
+  b += rect(x+116,370,40,21,C.radar,4,0.08+0.14*settle,C.radar,1);
+  b += text('build radar BEV, then align',x+138,428,11,C.muted,'middle',500);
+  b += text('radar owns a BEV encoder',x+138,450,11,C.ink,'middle',600);
+  return svg(b, 'CRAFT associates radar returns around each camera proposal, CRN changes the camera depth distribution before lifting, and RCBEVDet builds a radar-specific BEV before camera-radar alignment.');
 }
 
 function liftingFrame(frame) {
   const t = cycle(frame);
-  const q = phase(t, 0.06, 0.56);
-  const settle = phase(t, 0.52, 0.74);
+  const q = phase(t, 0.06, 0.54);
+  const settle = phase(t, 0.50, 0.78);
   const pulse = 0.55 + 0.45 * ping(t * 1.4);
-  let b = header('04', 'camera to 3D', 'Where camera features become metric');
+  let b = header('04', 'LSS · DETR3D · BEVFORMER', 'Three camera-to-3D mechanisms');
   const cards = [
-    {x:34,label:'LSS · BEVDEPTH',cost:'rays × depth',accent:C.camera},
-    {x:342,label:'DETR3D',cost:'queries × samples',accent:C.metric},
-    {x:650,label:'BEVFORMER',cost:'cells × samples',accent:C.task},
+    {x:34,label:'LSS · BEVDEPTH',accent:C.camera},
+    {x:342,label:'DETR3D',accent:C.metric},
+    {x:650,label:'BEVFORMER',accent:C.task},
   ];
   cards.forEach((c) => {
-    b += panel(c.x,126,276,346,c.label,c.accent);
-    b += text(c.cost,c.x+138,450,12,C.muted,'middle',500,0.9,0.6);
-    b += rect(c.x+24,166,228,92,C.bg2,10,1,C.grid,1);
-    b += path(`M ${c.x+44} 246 L ${c.x+112} 190 L ${c.x+226} 190 L ${c.x+244} 246`,C.grid,1.5,0.8);
-    b += bevGrid(c.x+24,318,228,100,1,c.accent);
-    b += arrow(c.x+138,272,c.x+138,305,c.accent,2,0.75);
+    b += panel(c.x,126,276,340,c.label,c.accent);
   });
-  // Lift and splat: distribute a pixel along a ray, then pool its probability mass.
+
+  // Lift-Splat-Shoot: an image pixel chooses a probability distribution along one calibrated ray.
   const ax=34;
-  b += glowCircle(ax+128,215,10,C.camera,0.9);
-  const depths=[[ax+78,235],[ax+110,220],[ax+145,206],[ax+182,193],[ax+218,185]];
+  b += rect(ax+22,168,232,92,C.bg2,10,1,C.grid,1);
+  b += path(`M ${ax+43} 248 L ${ax+110} 188 L ${ax+232} 188 L ${ax+246} 248`,C.grid,1.3,0.72);
+  b += crosshair(ax+142,211,C.camera,0.88,8+2*pulse);
+  b += text('one image feature',ax+142,248,10,C.camera,'middle',600);
+  b += arrow(ax+142,266,ax+142,284,C.camera,1.5,0.78);
+  b += bevGrid(ax+22,302,232,108,1,C.camera);
+  const origin=[ax+51,389];
+  const depths=[[ax+82,374],[ax+112,359],[ax+143,344],[ax+174,329],[ax+207,313]];
+  b += line(origin[0],origin[1],depths[4][0]+10,depths[4][1]-5,C.camera,2,0.34);
   depths.forEach(([x,y],i)=>{
-    const w=[0.18,0.38,1,0.52,0.2][i];
-    const px=mix(ax+128,x,q), py=mix(215,y,q);
-    b += circle(px,py,4+5*w,C.camera,0.22+0.55*w);
-    const bx=ax+52+i*39, by=342+(i%2)*22;
-    b += flowDot(x,y,bx,by,clamp((q-0.4)/0.6),C.camera,3,0.45+0.4*w);
-    b += rect(bx-10,by-8,20,16,C.camera,4,0.04+0.16*w*settle,C.camera,0.8);
+    const w=[0.12,0.27,0.83,0.42,0.16][i];
+    const px=mix(origin[0],x,q), py=mix(origin[1],y,q);
+    b += circle(px,py,4+7*w,C.camera,0.12+0.65*w,C.camera,0.6);
   });
-  b += text('depth PDF → frustum → pool',ax+138,296,11,C.camera,'middle',500,0.9,0.2);
+  b += text('predict p(depth) on this ray',ax+138,437,11,C.camera,'middle',600);
 
-  // Object queries: only a few hypotheses project into the image.
+  // DETR3D: each object query owns a 3D reference point and asks cameras for evidence there.
   const bx=342;
-  const queries=[[bx+72,380],[bx+142,350],[bx+208,390]];
-  queries.forEach(([x,y],i)=>{
-    const sx=[bx+82,bx+146,bx+212][i], sy=[235,208,226][i];
-    b += circle(x,y,9,C.metric,0.14,C.metric,1);
-    b += path(`M ${x} ${y} Q ${x} 292 ${sx} ${sy}`,C.metric,1.6,0.22+0.52*q,'none','5 5');
-    b += flowDot(x,y,sx,sy,q,C.metric,3,0.9);
-    b += circle(sx,sy,5+3*pulse,C.metric,0.18+0.25*q);
-  });
-  b += circle(bx+244,236,5,C.danger,0.7);
-  b += text('3D query → project → sample',bx+138,296,11,C.metric,'middle',500,0.9,0.2);
+  b += rect(bx+22,168,108,102,C.bg2,10,1,C.grid,1);
+  b += rect(bx+146,168,108,102,C.bg2,10,1,C.grid,1);
+  b += text('front',bx+34,188,10,C.muted,'start',600);
+  b += text('left',bx+158,188,10,C.muted,'start',600);
+  b += path(`M ${bx+30} 258 L ${bx+74} 200 L ${bx+122} 258`,C.grid,1.2,0.62);
+  b += path(`M ${bx+154} 258 L ${bx+205} 200 L ${bx+246} 258`,C.grid,1.2,0.62);
+  const p1=[bx+87,221], p2=[bx+198,239];
+  b += crosshair(p1[0],p1[1],C.metric,0.22+0.78*q,7);
+  b += crosshair(p2[0],p2[1],C.metric,0.22+0.78*q,7);
+  b += bevGrid(bx+22,304,232,106,1,C.metric);
+  const query=[bx+141,352];
+  b += cube(query[0]-12,query[1]-12,25,C.metric,0.55+0.35*pulse);
+  b += text('3D reference point',query[0],397,10,C.metric,'middle',600);
+  b += path(`M ${query[0]} ${query[1]} Q ${bx+105} 292 ${p1[0]} ${p1[1]}`,C.metric,1.5,0.18+0.52*q,'none','5 5');
+  b += path(`M ${query[0]} ${query[1]} Q ${bx+179} 292 ${p2[0]} ${p2[1]}`,C.metric,1.5,0.18+0.52*q,'none','5 5');
+  b += flowDot(query[0],query[1],p1[0],p1[1],q,C.metric,2.6,0.86);
+  b += flowDot(query[0],query[1],p2[0],p2[1],q,C.metric,2.6,0.86);
+  b += text('query chooses (x, y, z)',bx+138,437,11,C.metric,'middle',600);
 
-  // BEV queries: a dense metric state, sparse retrieval from images.
+  // BEVFormer: each BEV cell owns x,y and samples several z references along a vertical pillar.
   const cx=650;
-  for(let row=0;row<3;row++) for(let col=0;col<6;col++){
-    const x=cx+48+col*33, y=345+row*28;
-    const active=(col+row)%4===0;
-    b += circle(x,y,active?5:3,C.task,active?0.75:0.28);
-    if(active){
-      const sx=cx+58+col*27, sy=232-row*12;
-      b += path(`M ${x} ${y} Q ${cx+138} 292 ${sx} ${sy}`,C.task,1.4,0.18+0.46*q,'none','4 5');
-      b += flowDot(x,y,sx,sy,q,C.task,3,0.85);
-    }
-  }
-  b += text('BEV cell → project → attend',cx+138,296,11,C.task,'middle',500,0.9,0.2);
-  return svg(b, 'Dense lift and splat assigns image evidence across depth bins, object queries retrieve only around object hypotheses, and BEV queries maintain a dense metric state with sparse image sampling.');
+  b += rect(cx+22,168,232,92,C.bg2,10,1,C.grid,1);
+  b += path(`M ${cx+34} 248 L ${cx+90} 194 L ${cx+242} 194`,C.grid,1.2,0.64);
+  const imageSamples=[[cx+86,230],[cx+132,216],[cx+183,202]];
+  imageSamples.forEach(([x,y],i)=>b += crosshair(x,y,C.task,0.18+0.72*q,5+i));
+  b += bevGrid(cx+22,304,232,106,1,C.task);
+  const cell=[cx+146,365];
+  b += rect(cell[0]-14,cell[1]-11,28,22,C.task,4,0.10+0.15*settle,C.task,1);
+  const pillarX=cx+102;
+  b += line(pillarX,379,pillarX,292,C.task,2,0.72);
+  [306,330,354,378].forEach((y)=>b += glowCircle(pillarX,y,7,C.task,0.34+0.52*pulse));
+  imageSamples.forEach(([x,y],i)=>{
+    const py=306+i*24;
+    b += path(`M ${pillarX} ${py} Q ${cx+138} 276 ${x} ${y}`,C.task,1.3,0.15+0.48*q,'none','4 5');
+    b += flowDot(pillarX,py,x,y,q,C.task,2.5,0.82);
+  });
+  b += text('BEV cell fixes (x, y); sample z',cx+138,437,11,C.task,'middle',600);
+  b += text('image chooses depth',172,500,12,C.camera,'middle',600);
+  b += text('object query chooses x, y, z',480,500,12,C.metric,'middle',600);
+  b += text('BEV cell chooses x, y and samples z',788,500,12,C.task,'middle',600);
+  return svg(b, 'Lift-Splat-Shoot predicts depth along each calibrated image ray, DETR3D projects an object query reference point into the cameras, and BEVFormer lifts each BEV cell into a vertical pillar of reference points.');
 }
 
 function fusionFrame(frame) {
   const t = cycle(frame);
-  const flow = phase(t,0.05,0.64);
+  const flow = phase(t,0.05,0.60);
+  const settle = phase(t,0.54,0.82);
   const pulse = 0.55+0.45*ping(t*1.4);
-  let b=header('05','fusion','Where cross-sensor correspondence happens');
-  const rows=[
-    {y:142,label:'POINTPAINTING',mechanism:'pixels → LiDAR points',accent:C.lidar,out:'point labels'},
-    {y:260,label:'FUTR3D',mechanism:'3D query → all sensors',accent:C.metric,out:'actors'},
-    {y:378,label:'BEVFUSION',mechanism:'camera BEV + LiDAR BEV',accent:C.task,out:'scene fields'},
+  let b=header('05','POINTPAINTING · FUTR3D · BEVFUSION','What survives point, query, and BEV fusion');
+  const cards=[
+    {x:34,label:'POINTPAINTING · POINTS',accent:C.lidar},
+    {x:342,label:'FUTR3D · QUERIES',accent:C.metric},
+    {x:650,label:'BEVFUSION · BEV',accent:C.task},
   ];
-  rows.forEach((r,ri)=>{
-    b += rect(52,r.y,856,94,C.panel,17,0.88,r.accent,1);
-    b += text(r.label,76,r.y+30,12,C.muted,'start',600,1,1.3);
-    b += text(r.mechanism,76,r.y+62,11,r.accent,'start',500,0.9,0.2);
-    b += sensorChip(252,r.y+30,'camera',C.camera,1);
-    b += sensorChip(354,r.y+30,'LiDAR',C.lidar,1);
-    b += sensorChip(456,r.y+30,'radar',C.radar,ri===1?1:0.18);
-    const mx=654,my=r.y+48;
-    b += circle(mx,my,24,r.accent,0.10+0.06*pulse,r.accent,1.2);
-    [[298,C.camera],[400,C.lidar],[502,C.radar]].forEach(([sx,c],i)=>{
-      const o=(ri!==1&&i===2)?0.15:0.7;
-      b += line(sx+46,r.y+47,mx-26,my,c,1.6,o);
-      b += flowDot(sx+46,r.y+47,mx-22,my,clamp(flow-i*0.05),c,3,o);
-    });
-    b += arrow(mx+26,my,736,my,r.accent,2,0.8);
-    if(ri===0){
-      [0,1,2,3,4].forEach(i=>b+=circle(750+i*20,my+(i%2?8:-6),5,i%2?C.camera:C.lidar,0.75));
-    }else if(ri===1){
-      b += circle(786,my,15,C.metric,0.12,C.metric,1);
-      b += rect(769,my-12,34,24,C.metric,7,0.08,C.metric,1);
-    }else{
-      b += bevGrid(746,r.y+18,88,60,1,C.task);
-      b += rect(772,r.y+33,30,22,C.task,5,0.16+0.06*pulse,C.task,1);
-    }
-    b += text(r.out,874,r.y+54,12,r.accent,'end',500,0.9,0.4);
+  cards.forEach((c)=>b+=panel(c.x,126,276,340,c.label,c.accent));
+
+  const sharedScene=(x,y,accent)=>{
+    let out=bevGrid(x,y,232,142,1,accent);
+    out+=path(`M ${x+22} ${y+128} Q ${x+92} ${y+70} ${x+210} ${y+22}`,C.camera,5,0.23);
+    out+=path(`M ${x+34} ${y+132} Q ${x+102} ${y+78} ${x+216} ${y+30}`,C.camera,1.5,0.72,'none','7 6');
+    out+=vehicle(x+148,y+70,C.ink,0.72,0.45);
+    [[126,49],[140,57],[156,60],[166,77],[150,88],[132,83],[64,111],[194,40]].forEach(([dx,dy],i)=>out+=circle(x+dx,y+dy,3,C.lidar,i<6?0.88:0.42));
+    return out;
+  };
+
+  // PointPainting transfers image semantics only at LiDAR hit locations.
+  let x=34;
+  b+=sharedScene(x+22,170,C.lidar);
+  b+=text('camera semantics + LiDAR hits',x+138,330,10,C.muted,'middle',500);
+  b+=arrow(x+138,339,x+138,356,C.lidar,1.6,0.8);
+  const painted=[[x+72,393],[x+100,381],[x+131,398],[x+159,378],[x+194,391]];
+  painted.forEach(([px,py],i)=>{
+    b+=flowDot(x+138,304,px,py,flow,C.camera,2.2,0.72);
+    b+=circle(px,py,5,i<4?C.lidar:C.camera,0.55+0.28*settle,i<4?C.camera:C.lidar,1);
   });
-  return svg(b,'Point fusion paints point-aligned outputs, query fusion gathers sensor evidence around actor hypotheses, and bird eye view fusion supports dense scene outputs.');
+  b+=path(`M ${x+54} 424 Q ${x+138} 384 ${x+222} 365`,C.camera,2,0.08*(1-settle),'none','6 6');
+  b+=text('only semantics at hit points survive',x+138,449,11,C.lidar,'middle',600);
+
+  // FUTR3D samples every sensor around an object hypothesis; the carrier is an actor query.
+  x=342;
+  b+=sharedScene(x+22,170,C.metric);
+  const qx=x+169,qy=240;
+  b+=circle(qx,qy,24,C.metric,0.06+0.06*pulse,C.metric,1.2);
+  b+=cube(qx-12,qy-10,24,C.metric,0.58);
+  [[x+55,193,C.camera],[x+74,286,C.lidar],[x+229,204,C.radar]].forEach(([sx,sy,c],i)=>{
+    b+=path(`M ${qx} ${qy} Q ${x+138} ${210+i*35} ${sx} ${sy}`,c,1.4,0.18+0.50*flow,'none','4 5');
+    b+=flowDot(qx,qy,sx,sy,flow,c,2.4,0.82);
+  });
+  b+=text('one 3D object hypothesis',x+138,330,10,C.muted,'middle',500);
+  b+=arrow(x+138,339,x+138,358,C.metric,1.6,0.8);
+  b+=circle(x+138,395,26,C.metric,0.08+0.08*settle,C.metric,1.2);
+  b+=vehicle(x+138,395,C.metric,0.82,0.42);
+  b+=text('actor evidence survives; fields do not',x+138,449,11,C.metric,'middle',600);
+
+  // BEVFusion aligns two dense metric maps, retaining scene semantics and object geometry.
+  x=650;
+  b+=sharedScene(x+22,170,C.task);
+  b+=text('camera BEV',x+74,329,10,C.camera,'middle',600);
+  b+=text('+',x+138,329,13,C.ink,'middle',600);
+  b+=text('LiDAR BEV',x+202,329,10,C.lidar,'middle',600);
+  b+=arrow(x+138,338,x+138,354,C.task,1.6,0.8);
+  b+=bevGrid(x+36,362,204,66,1,C.task);
+  b+=path(`M ${x+48} 420 Q ${x+128} 386 ${x+224} 369`,C.camera,4,0.14+0.24*settle);
+  b+=rect(x+142,378,38,25,C.lidar,5,0.08+0.18*settle,C.lidar,1);
+  b+=vehicle(x+161,390,C.ink,0.72,0.34);
+  b+=circle(x+161,390,18,C.task,0.03+0.04*pulse);
+  b+=text('object geometry and scene fields survive',x+138,449,11,C.task,'middle',600);
+  b+=text('The carrier decides which evidence can reach the heads.',480,500,13,C.metric,'middle',600);
+  return svg(b,'PointPainting can transfer camera semantics only where LiDAR has a return, FUTR3D gathers sensor evidence around sparse object queries, and BEVFusion preserves dense camera semantics and LiDAR geometry on an aligned metric grid.');
 }
 
 function dropoutFrame(frame) {
   const t=cycle(frame);
-  const slot=Math.floor(t*4)%4;
-  const local=(t*4)%1;
-  const states=[[1,1],[1,0],[0,1],[0.28,1]];
-  const active=states[slot];
+  const slot=Math.floor(t*3)%3;
+  const local=(t*3)%1;
+  const states=[
+    {label:'BOTH HEALTHY',cam:1,lidar:1,camHealth:0.90},
+    {label:'LIDAR MISSING',cam:1,lidar:0,camHealth:0.90},
+    {label:'CAMERA DEGRADED',cam:1,lidar:1,camHealth:0.20},
+  ];
+  const state=states[slot];
   const pulse=0.55+0.45*ping(local);
-  let b=header('06','sensor-failure training','How each paper handles missing or degraded sensors');
+  let b=header('06','UNIBEV · METABEV · GRACE-BEV','Missing and degraded sensors require different signals');
   const cards=[
-    {x:34,label:'UNIBEV',accent:C.metric},
-    {x:342,label:'METABEV',accent:C.task},
-    {x:650,label:'GRACE-BEV',accent:C.radar},
+    {x:34,label:'UNIBEV · AVAILABILITY',accent:C.metric},
+    {x:342,label:'METABEV · AVAILABILITY',accent:C.task},
+    {x:650,label:'GRACE-BEV · RELIABILITY',accent:C.radar},
   ];
   cards.forEach((c)=>b += panel(c.x,126,276,342,c.label,c.accent));
 
-  // UniBEV: sample complete and missing-modality packets, then normalize the surviving streams.
-  let x=34;
-  b += sensorChip(x+20,172,'camera',C.camera,active[0]);
-  b += sensorChip(x+164,172,'LiDAR',C.lidar,active[1]);
-  [[1,1],[1,0],[0,1]].forEach((set,i)=>{
-    const xx=x+45+i*64;
-    b += rect(xx,228,48,24,C.panel2,12,1,i===slot?C.metric:C.grid,i===slot?1.5:1);
-    b += circle(xx+17,240,3,C.camera,set[0]);
-    b += circle(xx+31,240,3,C.lidar,set[1]);
-  });
-  const uniSum=Math.max(active[0]+active[1],0.01);
-  b += line(x+66,206,x+120,296,C.camera,2,0.30+active[0]*0.58);
-  b += line(x+210,206,x+156,296,C.lidar,2,0.30+active[1]*0.58);
-  b += circle(x+138,315,32,C.metric,0.08,C.metric,1.2);
-  b += text('Σ / |M|',x+138,320,14,C.ink,'middle',500,0.92);
-  b += text(`${active[0] > 0.1 ? (active[0]/uniSum).toFixed(1) : '0'}  ·  ${active[1] > 0.1 ? (active[1]/uniSum).toFixed(1) : '0'}`,x+138,364,11,C.muted,'middle',500,0.8,0.4);
-  b += arrow(x+138,350,x+138,380,C.metric,1.8,0.75);
-  b += bevGrid(x+62,386,152,42,1,C.metric);
-  b += text('drop modalities → normalize',x+138,448,11,C.metric,'middle',500,0.92,0.1);
+  const scenario=(x)=>{
+    let out=text(state.label,x+138,171,11,state.label.includes('DEGRADED')?C.danger:C.ink,'middle',700,1,0.8);
+    out+=sensorChip(x+20,184,'camera',C.camera,state.cam);
+    out+=sensorChip(x+164,184,'LiDAR',C.lidar,state.lidar);
+    if(state.camHealth<0.5) out+=line(x+24,188,x+108,214,C.danger,2,0.82);
+    return out;
+  };
 
-  // MetaBEV: the same BEV queries retrieve only from encoders that are present.
+  // UniBEV samples missing-modality packets and normalizes only the streams marked present.
+  let x=34;
+  b += scenario(x);
+  [[1,1],[1,0],[0,1]].forEach((set,i)=>{
+    const xx=x+44+i*65;
+    const current=set[0]===state.cam&&set[1]===state.lidar;
+    b += rect(xx,238,48,24,C.panel2,12,1,current?C.metric:C.grid,current?1.5:1);
+    b += circle(xx+17,250,3,C.camera,set[0]);
+    b += circle(xx+31,250,3,C.lidar,set[1]);
+  });
+  const uniSum=Math.max(state.cam+state.lidar,0.01);
+  b += line(x+66,218,x+120,302,C.camera,2,0.20+state.cam*0.66);
+  b += line(x+210,218,x+156,302,C.lidar,2,0.20+state.lidar*0.66);
+  b += circle(x+138,320,30,C.metric,0.08,C.metric,1.2);
+  b += text('Σ / |M|',x+138,325,14,C.ink,'middle',500,0.92);
+  b += text(`${state.cam ? (state.cam/uniSum).toFixed(1) : '0'}  ·  ${state.lidar ? (state.lidar/uniSum).toFixed(1) : '0'}`,x+138,361,11,C.muted,'middle',500,0.8,0.4);
+  b += arrow(x+138,353,x+138,380,C.metric,1.8,0.75);
+  b += bevGrid(x+62,386,152,42,1,C.metric);
+  b += text('drop streams; normalize survivors',x+138,450,11,C.metric,'middle',600);
+
+  // MetaBEV lets BEV queries retrieve from the encoders marked available.
   x=342;
-  b += sensorChip(x+20,172,'camera',C.camera,active[0]);
-  b += sensorChip(x+164,172,'LiDAR',C.lidar,active[1]);
-  b += text('available encoders',x+138,228,11,C.muted,'middle',500,0.82,0.4);
+  b += scenario(x);
+  b += text('queries see the availability mask',x+138,254,10,C.muted,'middle',500);
   b += bevGrid(x+48,304,180,92,1,C.task);
   const queries=[[x+82,334],[x+138,354],[x+194,326]];
   queries.forEach(([qx,qy],i)=>{
     b += circle(qx,qy,6,C.task,0.72,C.task,1);
-    if(active[0]>0.1){
-      const sx=x+66,sy=206;
-      b += path(`M ${qx} ${qy} Q ${x+100+i*12} 260 ${sx} ${sy}`,C.camera,1.3,0.18+0.50*active[0],'none','4 5');
+    if(state.cam){
+      const sx=x+66,sy=218;
+      b += path(`M ${qx} ${qy} Q ${x+100+i*12} 260 ${sx} ${sy}`,C.camera,1.3,0.18+0.50*state.cam,'none','4 5');
       if(i===0)b += flowDot(qx,qy,sx,sy,phase(local,0.05,0.7),C.camera,2.2,0.8);
     }
-    if(active[1]>0.1){
-      const sx=x+210,sy=206;
-      b += path(`M ${qx} ${qy} Q ${x+176-i*10} 260 ${sx} ${sy}`,C.lidar,1.3,0.18+0.50*active[1],'none','4 5');
+    if(state.lidar){
+      const sx=x+210,sy=218;
+      b += path(`M ${qx} ${qy} Q ${x+176-i*10} 260 ${sx} ${sy}`,C.lidar,1.3,0.18+0.50*state.lidar,'none','4 5');
       if(i===2)b += flowDot(qx,qy,sx,sy,phase(local,0.05,0.7),C.lidar,2.2,0.8);
     }
   });
-  b += text('BEV queries attend to',x+138,430,11,C.task,'middle',500,0.92,0.1);
-  b += text('the available modality',x+138,449,11,C.muted,'middle',500,0.86,0.1);
+  b += text('attend only to available encoders',x+138,450,11,C.task,'middle',600);
 
-  // Grace-BEV: estimate trust for streams that can be present but degraded, then gate fusion.
+  // Grace-BEV adds a reliability signal, so present does not have to mean trusted.
   x=650;
-  b += sensorChip(x+20,172,'camera',C.camera,active[0]);
-  b += sensorChip(x+164,172,'LiDAR',C.lidar,active[1]);
-  const camTrust=active[0] < 0.1 ? 0 : active[0] < 0.5 ? 0.22+0.08*pulse : 0.88;
-  const lidarTrust=active[1] < 0.1 ? 0 : 0.88;
-  b += text('estimated trust',x+138,232,11,C.muted,'middle',500,0.82,0.4);
-  b += text(`gcam ${camTrust.toFixed(2)}`,x+28,260,11,C.camera,'start',500,0.9,0.1);
-  b += rect(x+28,270,88,8,C.panel2,4,1,C.grid,0);
-  b += rect(x+28,270,88*camTrust,8,C.camera,4,0.72,C.camera,0);
-  b += text(`gLiDAR ${lidarTrust.toFixed(2)}`,x+160,260,11,C.lidar,'start',500,0.9,0.1);
-  b += rect(x+160,270,88,8,C.panel2,4,1,C.grid,0);
-  b += rect(x+160,270,88*lidarTrust,8,C.lidar,4,0.72,C.lidar,0);
-  b += line(x+66,206,x+121,320,C.camera,1+3*camTrust,0.20+0.68*camTrust);
-  b += line(x+210,206,x+155,320,C.lidar,1+3*lidarTrust,0.20+0.68*lidarTrust);
+  b += scenario(x);
+  const camTrust=state.cam ? state.camHealth + 0.03*pulse : 0;
+  const lidarTrust=state.lidar ? 0.90 : 0;
+  b += text('estimated trust',x+138,252,10,C.muted,'middle',500);
+  b += text(`gcam ${camTrust.toFixed(2)}`,x+28,276,11,C.camera,'start',500);
+  b += rect(x+28,286,88,8,C.panel2,4,1,C.grid,0);
+  b += rect(x+28,286,88*camTrust,8,C.camera,4,0.72,C.camera,0);
+  b += text(`gLiDAR ${lidarTrust.toFixed(2)}`,x+160,276,11,C.lidar,'start',500);
+  b += rect(x+160,286,88,8,C.panel2,4,1,C.grid,0);
+  b += rect(x+160,286,88*lidarTrust,8,C.lidar,4,0.72,C.lidar,0);
+  b += line(x+66,218,x+121,326,C.camera,1+3*camTrust,0.20+0.68*camTrust);
+  b += line(x+210,218,x+155,326,C.lidar,1+3*lidarTrust,0.20+0.68*lidarTrust);
   b += circle(x+138,334,30,C.radar,0.08+0.04*pulse,C.radar,1.2);
   b += text('gated',x+138,339,12,C.ink,'middle',500,0.9);
   b += arrow(x+138,366,x+138,384,C.radar,1.8,0.75);
   b += bevGrid(x+62,388,152,40,1,C.radar);
-  b += text('estimate reliability → gate',x+138,448,11,C.radar,'middle',500,0.92,0.1);
-  return svg(b,'UniBEV drops modalities and normalizes the surviving streams, MetaBEV lets BEV queries attend to available encoders, and Grace-BEV estimates stream reliability before gated fusion.');
+  b += text('estimate health; gate each stream',x+138,450,11,C.radar,'middle',600);
+  b += text('Availability says whether data arrived; reliability says whether to trust it.',480,500,13,C.metric,'middle',600);
+  return svg(b,'UniBEV and MetaBEV condition fusion on which sensors are present, while Grace-BEV estimates reliability so a present but degraded sensor can be downweighted.');
 }
 
 function multitaskFrame(frame){
   const t=cycle(frame);
-  const draw=phase(t,0.04,0.62);
-  const settle=phase(t,0.56,0.84);
+  const draw=phase(t,0.06,0.58);
+  const settle=phase(t,0.52,0.84);
   const pulse=0.55+0.45*ping(t*1.5);
-  let b=header('07','multi-task optimization','What each method changes in the shared update');
+  let b=header('07','KENDALL ET AL. · GRADNORM · PCGRAD','Loss scale, training rate, and gradient conflict');
   const cards=[
-    {x:34,label:'KENDALL ET AL.',accent:C.camera},
-    {x:342,label:'GRADNORM',accent:C.metric},
-    {x:650,label:'PCGRAD',accent:C.task},
+    {x:34,label:'KENDALL · LOSS SCALE',accent:C.camera},
+    {x:342,label:'GRADNORM · TRAINING RATE',accent:C.metric},
+    {x:650,label:'PCGRAD · DIRECTION',accent:C.task},
   ];
   cards.forEach((c)=>b+=panel(c.x,126,276,342,c.label,c.accent));
 
-  // Homoscedastic uncertainty: learn one scale per task and use it to weight each loss.
+  const rawVectors=(x)=>{
+    const o={x:x+138,y:325};
+    const a={x:x+66,y:222};
+    const c={x:x+230,y:372};
+    let out=line(x+36,o.y,x+244,o.y,C.grid,1,0.58);
+    out+=line(o.x,184,o.x,408,C.grid,1,0.58);
+    out+=line(o.x,o.y,a.x,a.y,C.camera,1.4,0.40,'5 5');
+    out+=line(o.x,o.y,c.x,c.y,C.task,1.4,0.40,'5 5');
+    out+=text('raw g₁',a.x-4,a.y-10,10,C.camera,'middle',600,0.72);
+    out+=text('raw g₂',c.x+2,c.y+17,10,C.task,'middle',600,0.72);
+    return {out,o,a,c};
+  };
+
+  // Kendall changes the contribution of each loss through learned uncertainty scales.
   let x=34;
-  const losses=[
-    {y:184,label:'Lbox',sigma:0.7,color:C.camera},
-    {y:232,label:'Llane',sigma:1.4,color:C.metric},
-    {y:280,label:'Locc',sigma:1.0,color:C.task},
-  ];
-  losses.forEach((l,i)=>{
-    b+=rect(x+24,l.y,72,30,l.color,8,0.06,l.color,1);
-    b+=text(l.label,x+60,l.y+20,11,C.ink,'middle',500,0.9);
-    b+=text(`σ${i+1} ${l.sigma.toFixed(1)}`,x+118,l.y+20,10,l.color,'start',500,0.88);
-    const weight=1/(2*l.sigma*l.sigma);
-    b+=line(x+164,l.y+15,x+214,317,l.color,1+2.2*weight,0.38+0.45*draw);
-    b+=flowDot(x+164,l.y+15,x+214,317,draw,l.color,2.4,0.78);
-  });
-  b+=circle(x+214,328,28,C.camera,0.07,C.camera,1);
-  b+=text('Σ',x+214,335,20,C.ink,'middle',500,0.9);
-  b+=text('Lᵢ / 2σᵢ² + log σᵢ',x+138,384,12,C.camera,'middle',500,0.9,0.1);
-  b+=text('learn σᵢ → rescale each loss',x+138,448,11,C.muted,'middle',500,0.88,0.1);
+  let v=rawVectors(x); b+=v.out;
+  const k1={x:mix(v.o.x,x+88,draw),y:mix(v.o.y,253,draw)};
+  const k2={x:mix(v.o.x,x+206,draw),y:mix(v.o.y,360,draw)};
+  b+=arrow(v.o.x,v.o.y,k1.x,k1.y,C.camera,2.8,0.88);
+  b+=arrow(v.o.x,v.o.y,k2.x,k2.y,C.task,2.8,0.88);
+  b+=text('1 / 2σ₁²',x+62,188,11,C.camera,'start',600);
+  b+=text('1 / 2σ₂²',x+214,405,11,C.task,'middle',600);
+  b+=text('learn uncertainty; rescale loss',x+138,443,11,C.camera,'middle',600);
 
-  // GradNorm: change loss weights until shared-layer gradient norms follow task training rates.
+  // GradNorm changes task weights until gradient norms reflect relative training rates.
   x=342;
-  b+=text('shared-layer gradient norm',x+138,182,11,C.muted,'middle',500,0.82,0.25);
-  const initial=[1.0,0.36,0.72];
-  const target=[0.66,0.58,0.62];
-  const colors=[C.camera,C.metric,C.task];
-  const names=['boxes','lanes','occupancy'];
-  names.forEach((name,i)=>{
-    const yy=218+i*58;
-    const length=86*mix(initial[i],target[i],settle);
-    b+=text(name,x+26,yy+8,10,C.ink,'start',500,0.84);
-    b+=rect(x+98,yy-4,112,14,C.panel2,7,1,C.grid,0);
-    b+=rect(x+98,yy-4,length,14,colors[i],7,0.70,colors[i],0);
-    b+=line(x+98+86*target[i],yy-10,x+98+86*target[i],yy+16,C.ink,1,0.42,'2 3');
-  });
-  b+=rect(x+60,374,156,34,C.metric,10,0.06,C.metric,1);
-  b+=text('wᵢ ← relative training rate',x+138,396,11,C.metric,'middle',500,0.9);
-  b+=text('match norms + training rates',x+138,448,11,C.muted,'middle',500,0.88,0.1);
+  v=rawVectors(x); b+=v.out;
+  const g1={x:mix(v.o.x,x+92,settle),y:mix(v.o.y,259,settle)};
+  const g2={x:mix(v.o.x,x+200,settle),y:mix(v.o.y,357,settle)};
+  b+=arrow(v.o.x,v.o.y,g1.x,g1.y,C.camera,2.8,0.88);
+  b+=arrow(v.o.x,v.o.y,g2.x,g2.y,C.task,2.8,0.88);
+  b+=line(x+88,244,x+88,272,C.ink,1,0.36,'2 3');
+  b+=line(x+204,343,x+204,371,C.ink,1,0.36,'2 3');
+  b+=text('target norms from training rate',x+138,192,11,C.metric,'middle',600);
+  b+=text('change weights; match gradient norms',x+138,443,11,C.metric,'middle',600);
 
-  // PCGrad: remove only the component of one task gradient that conflicts with another.
+  // PCGrad changes direction when task gradients have a negative dot product.
   x=650;
-  const origin={x:x+138,y:342};
-  b+=line(x+44,342,x+232,342,C.grid,1,0.62);
-  b+=line(origin.x,190,origin.x,390,C.grid,1,0.62);
-  b+=text('g₁ · g₂ < 0',x+138,188,12,C.danger,'middle',600,0.9,0.2);
-  const g1={x:x+62,y:238};
-  const g2={x:x+226,y:260};
-  b+=arrow(origin.x,origin.y,g1.x,g1.y,C.camera,2.5,0.82);
-  b+=arrow(origin.x,origin.y,g2.x,g2.y,C.task,2.5,0.82);
-  b+=text('g₁',g1.x-8,g1.y-8,11,C.camera,'end',600,0.9);
-  b+=text('g₂',g2.x+8,g2.y-8,11,C.task,'start',600,0.9);
-  const projected={x:x+208,y:224};
-  b+=line(g1.x,g1.y,projected.x,projected.y,C.danger,1.3,0.24+0.52*draw,'4 5');
-  b+=arrow(origin.x,origin.y,mix(origin.x,projected.x,draw),mix(origin.y,projected.y,draw),C.metric,2.8,0.22+0.68*draw);
-  b+=text('projected g₁',x+206,214,11,C.metric,'middle',500,0.82);
-  b+=circle(projected.x,projected.y,8+3*pulse,C.metric,0.04+0.04*pulse);
-  b+=text('project conflicting component',x+138,448,11,C.muted,'middle',500,0.88,0.1);
-  return svg(b,'Kendall and colleagues learn uncertainty scales that rescale task losses, GradNorm balances shared-layer gradient norms using relative training rates, and PCGrad projects away conflicting gradient components.');
+  v=rawVectors(x); b+=v.out;
+  b+=arrow(v.o.x,v.o.y,v.a.x,v.a.y,C.camera,2.6,0.82);
+  b+=arrow(v.o.x,v.o.y,v.c.x,v.c.y,C.task,2.6,0.82);
+  const projected={x:x+185,y:233};
+  b+=line(v.a.x,v.a.y,projected.x,projected.y,C.danger,1.4,0.18+0.55*draw,'4 5');
+  b+=arrow(v.o.x,v.o.y,mix(v.o.x,projected.x,draw),mix(v.o.y,projected.y,draw),C.metric,3,0.24+0.70*draw);
+  b+=text('g₁ · g₂ < 0',x+138,192,11,C.danger,'middle',700);
+  b+=text('projected g₁',projected.x,projected.y-12,10,C.metric,'middle',600);
+  b+=circle(projected.x,projected.y,7+3*pulse,C.metric,0.03+0.04*pulse);
+  b+=text('remove the conflicting component',x+138,443,11,C.task,'middle',600);
+  b+=text('Kendall and GradNorm change magnitude; PCGrad changes direction.',480,500,13,C.metric,'middle',600);
+  return svg(b,'The same two task gradients are shown in every panel: Kendall uncertainty weighting and GradNorm change their magnitudes, while PCGrad projects a conflicting component and changes gradient direction.');
 }
 
 function lidarContractFrame(frame){
   const t=cycle(frame);
   const train=phase(t,0.02,0.44);
   const drive=phase(t,0.48,0.86);
-  let b=header('08','privileged sensing','Where LiDAR exists in train and inference');
+  let b=header('08','BEVDEPTH · SPARSE-TO-DENSE · CRKD','LiDAR can be a label, runtime input, or teacher');
   const cols=[
-    {x:34,label:'BEVDEPTH',accent:C.camera},
-    {x:342,label:'SPARSE-TO-DENSE',accent:C.lidar},
-    {x:650,label:'CRKD',accent:C.metric},
+    {x:34,label:'BEVDEPTH · DEPTH LABELS',accent:C.camera},
+    {x:342,label:'SPARSE-TO-DENSE · INPUT',accent:C.lidar},
+    {x:650,label:'CRKD · TEACHER',accent:C.metric},
   ];
   cols.forEach((c)=>{
     b+=panel(c.x,126,276,342,c.label,c.accent);
@@ -664,71 +729,83 @@ function temporalFrame(frame){
   const carry=phase(t,0.04,0.58);
   const refresh=phase(t,0.55,0.80);
   const pulse=0.55+0.45*ping(t*1.5);
-  let b=header('09','temporal state','What state each method carries across frames');
+  let b=header('09','BEVDET4D · SPARSE4D V2 · STREAMPETR','What crosses the frame boundary');
   const cols=[
-    {x:34,label:'BEVDET4D · BEVFORMER',cost:'warp or recur a full BEV field',accent:C.camera},
-    {x:342,label:'SPARSE4D V2 · STREAMPETR',cost:'transform and retain object queries',accent:C.metric},
-    {x:650,label:'HYBRID · SYNTHESIS',cost:'short dense scene + long sparse actors',accent:C.task},
+    {x:34,label:'BEVDET4D · DENSE FIELD',accent:C.camera},
+    {x:342,label:'SPARSE4D V2 · INSTANCES',accent:C.metric},
+    {x:650,label:'STREAMPETR · QUERY QUEUE',accent:C.task},
   ];
   cols.forEach((c)=>{
     b+=panel(c.x,126,276,342,c.label,c.accent);
-    b+=text(c.cost,c.x+138,449,12,C.muted,'middle',500,0.9,0.45);
     b+=text('t − 1',c.x+54,178,11,C.muted,'middle',500,0.8,0.5);
     b+=text('t',c.x+222,178,11,C.muted,'middle',500,0.8,0.5);
     b+=arrow(c.x+104,293,c.x+170,293,c.accent,2,0.68);
   });
 
-  // Dense BEV: the full field is warped forward; static structure aligns, actors still need motion correction.
+  // Dense recurrence carries the complete BEV state after ego-motion alignment.
   let x=34;
-  b+=bevGrid(x+24,194,108,194,1,C.camera);
-  b+=bevGrid(x+144,194,108,194,1,C.camera);
-  b+=path(`M ${x+54} 368 Q ${x+78} 280 ${x+104} 212`,C.metric,5,0.20);
-  b+=path(`M ${x+174} 368 Q ${x+198} 280 ${x+224} 212`,C.metric,5,0.20+0.18*refresh);
-  const denseOld={x:x+76,y:300};
-  const denseWarp={x:x+196,y:292};
-  const denseTrue={x:x+218,y:270};
+  b+=bevGrid(x+18,194,102,194,1,C.camera);
+  b+=bevGrid(x+156,194,102,194,1,C.camera);
+  b+=path(`M ${x+37} 372 Q ${x+70} 270 ${x+103} 210`,C.metric,5,0.20);
+  b+=path(`M ${x+175} 372 Q ${x+208} 270 ${x+241} 210`,C.metric,5,0.20+0.18*refresh);
+  [[x+50,230,x+188,230],[x+78,270,x+216,270],[x+54,345,x+192,345]].forEach(([x1,y1,x2,y2])=>b+=flowDot(x1,y1,x2,y2,carry,C.camera,2.2,0.46));
+  const denseOld={x:x+74,y:310};
+  const denseWarp={x:x+203,y:301};
+  const denseTrue={x:x+225,y:276};
   b+=rect(denseOld.x-13,denseOld.y-8,26,16,C.camera,5,0.16,C.camera,1);
   b+=path(`M ${denseOld.x} ${denseOld.y} Q ${x+140} 265 ${denseWarp.x} ${denseWarp.y}`,C.camera,1.6,0.30+0.40*carry,'none','5 5');
   b+=rect(mix(denseOld.x,denseWarp.x,carry)-13,mix(denseOld.y,denseWarp.y,carry)-8,26,16,C.camera,5,0.10,C.camera,1);
   b+=rect(denseTrue.x-13,denseTrue.y-8,26,16,C.metric,5,0.08+0.14*refresh,C.metric,1);
   b+=line(denseWarp.x,denseWarp.y,denseTrue.x,denseTrue.y,C.danger,1.5,0.4+0.25*pulse,'4 4');
-  b+=text('warp full field',x+138,416,11,C.camera,'middle',500,0.84,0.35);
+  b+=circle(x+184,358,5+4*refresh,C.task,0.08+0.22*refresh,C.task,1);
+  b+=text('warp every BEV cell',x+138,426,11,C.camera,'middle',600);
+  b+=text('scene context survives',x+138,449,10,C.muted,'middle',500);
 
-  // Sparse recurrence: carry selected actor state, reserve a new query for a birth.
+  // Sparse4D v2 transforms existing instances and adds fresh anchors for births.
   x=342;
-  const oldActors=[[x+62,250],[x+92,330]];
-  const newActors=[[x+184,238],[x+216,312]];
+  b+=rect(x+18,194,102,194,C.bg2,12,0.9,C.grid,1);
+  b+=rect(x+156,194,102,194,C.bg2,12,0.9,C.grid,1);
+  const oldActors=[[x+62,250],[x+88,330]];
+  const newActors=[[x+188,236],[x+218,306]];
   oldActors.forEach(([ox,oy],i)=>{
     b+=circle(ox,oy,12,C.metric,0.12,C.metric,1);
     b+=rect(ox-10,oy-6,20,12,C.metric,4,0.10,C.metric,1);
     const [nx,ny]=newActors[i];
-    b+=path(`M ${ox} ${oy} Q ${x+138} ${oy-16} ${nx} ${ny}`,C.metric,1.8,0.28+0.45*carry,'none','5 5');
+    b+=path(`M ${ox} ${oy} Q ${x+138} ${oy-20} ${nx} ${ny}`,C.metric,1.8,0.28+0.45*carry,'none','5 5');
     b+=circle(mix(ox,nx,carry),mix(oy,ny,carry),8,C.metric,0.16,C.metric,1);
   });
-  const birthX=x+194,birthY=366;
+  b+=text('ego transform',x+138,269,10,C.metric,'middle',600);
+  const birthX=x+188,birthY=358;
   b+=circle(birthX,birthY,6+5*refresh,C.task,0.08+0.22*refresh,C.task,1);
-  b+=path(`M ${x+168} 388 Q ${x+180} 372 ${birthX} ${birthY}`,C.task,1.6,0.22+0.50*refresh,'none','4 5');
-  b+=text('carry actors · birth queries',x+138,416,11,C.metric,'middle',500,0.84,0.35);
+  b+=path(`M ${x+238} 382 Q ${x+220} 366 ${birthX} ${birthY}`,C.task,1.6,0.22+0.50*refresh,'none','4 5');
+  b+=text('fresh anchor',x+224,378,9,C.task,'middle',600);
+  b+=text('transform prior instances',x+138,426,11,C.metric,'middle',600);
+  b+=text('fresh anchors discover births',x+138,449,10,C.muted,'middle',500);
 
-  // Hybrid: short dense context seeds and supports longer sparse tracks.
+  // StreamPETR carries a bounded FIFO of high-confidence foreground queries; background is discarded.
   x=650;
-  b+=bevGrid(x+24,194,108,194,0.72,C.task);
-  b+=bevGrid(x+144,194,108,194,0.72,C.task);
-  b+=path(`M ${x+44} 370 Q ${x+72} 270 ${x+112} 214`,C.metric,4,0.15);
-  b+=path(`M ${x+164} 370 Q ${x+192} 270 ${x+232} 214`,C.metric,4,0.15+0.12*refresh);
-  const hybridOld=[[x+62,260],[x+92,324]];
-  const hybridNew=[[x+182,246],[x+220,302]];
-  hybridOld.forEach(([ox,oy],i)=>{
-    const [nx,ny]=hybridNew[i];
-    b+=circle(ox,oy,9,C.task,0.14,C.task,1);
-    b+=path(`M ${ox} ${oy} Q ${x+138} ${oy-12} ${nx} ${ny}`,C.task,1.7,0.30+0.48*carry,'none','5 5');
-    b+=circle(mix(ox,nx,carry),mix(oy,ny,carry),7,C.task,0.18,C.task,1);
+  const queueY=[208,250,292,334];
+  queueY.forEach((y,i)=>{
+    const fg=i<2;
+    b+=rect(x+26,y,86,28,fg?C.task:C.grid,8,fg?0.09:0.04,fg?C.task:C.grid,1);
+    b+=circle(x+43,y+14,4,fg?C.task:C.dim,fg?0.88:0.42);
+    b+=text(fg?`foreground q${i+1}`:`background q${i+1}`,x+53,y+18,9,fg?C.ink:C.dim,'start',500);
   });
-  const hybridBirthX=x+186,hybridBirthY=352;
-  b+=circle(hybridBirthX,hybridBirthY,5+4*refresh,C.metric,0.08+0.22*refresh,C.metric,1);
-  b+=line(x+156,hybridBirthY+20,hybridBirthX,hybridBirthY,C.metric,1.5,0.25+0.45*refresh,'4 4');
-  b+=text('discover dense · remember sparse',x+138,416,11,C.task,'middle',500,0.84,0.25);
-  return svg(b,'Dense temporal memory warps a complete bird eye view field, sparse recurrence carries selected object queries and creates new birth queries, and a hybrid keeps short dense context with longer sparse actor state.');
+  b+=text('top-K foreground',x+69,385,9,C.task,'middle',600);
+  b+=arrow(x+116,278,x+160,278,C.task,2,0.75);
+  [222,274].forEach((y,i)=>{
+    b+=rect(x+166,y,82,30,C.task,8,0.07+0.08*carry,C.task,1);
+    b+=text(`carried q${i+1}`,x+207,y+20,9,C.ink,'middle',500);
+    b+=flowDot(x+112,queueY[i]+14,x+166,y+15,carry,C.task,2.2,0.82);
+  });
+  b+=line(x+118,queueY[2]+14,x+152,queueY[2]+14,C.danger,1.5,0.5,'4 4');
+  b+=text('discard',x+138,queueY[2]+8,9,C.danger,'middle',600);
+  b+=circle(x+205,350,6+5*refresh,C.metric,0.08+0.22*refresh,C.metric,1);
+  b+=text('fresh query',x+205,376,9,C.metric,'middle',600);
+  b+=text('enqueue top foreground queries',x+138,426,11,C.task,'middle',600);
+  b+=text('background memory is bounded',x+138,449,10,C.muted,'middle',500);
+  b+=text('Dense memory retains fields; sparse memory must manage births and aging.',480,500,13,C.metric,'middle',600);
+  return svg(b,'BEVDet4D carries a dense bird eye view field, Sparse4D version 2 transforms prior object instances and adds fresh anchors, and StreamPETR retains a bounded queue of foreground queries while adding fresh queries for new objects.');
 }
 
 const animations = [
