@@ -1,5 +1,5 @@
 ---
-title: Replacing OpenClaw with Hermes Agent Using Local Weights
+title: Running Hermes Agent with a Local GGUF
 date: '2026-04-04T17:59:45.000Z'
 section: blog
 postSlug: replacing-openclaw-with-hermes-agent-using-local-weights
@@ -9,11 +9,10 @@ tags:
   - LLMs
   - Apple Silicon
 summary: >-
-  How I switched from OpenClaw to Hermes Agent, kept inference fully local, and
-  got it working with an already-downloaded Gemma GGUF instead of pulling new
-  models.
+  How Hermes Agent, an OpenAI-compatible localhost endpoint, llama.cpp, and an
+  already-downloaded Gemma GGUF fit together.
 ---
-# Replacing OpenClaw with Hermes Agent Using Local Weights
+# Running Hermes Agent with a Local GGUF
 
 I wanted a specific outcome: replace OpenClaw with [Hermes Agent](https://github.com/nousresearch/hermes-agent) while keeping inference fully local. That meant two constraints:
 
@@ -22,7 +21,7 @@ I wanted a specific outcome: replace OpenClaw with [Hermes Agent](https://github
 
 On this machine, the artifacts I could verify quickly were local Gemma GGUFs, so that is the path I got working end to end. I did not see my Qwen artifacts in the usual cache locations during setup, but the same `llama.cpp` pattern should apply to local Qwen GGUFs too.
 
-## Why replace OpenClaw with Hermes Agent
+## Separate the agent from inference
 
 Hermes is a much more opinionated agent shell than a bare local chat loop. It has the things I actually care about when I say "agent" instead of "chatbot":
 
@@ -34,6 +33,14 @@ Hermes is a much more opinionated agent shell than a bare local chat loop. It ha
 - multiple provider backends
 
 Hermes does not force one inference path. It works with hosted providers, but it can also point at any OpenAI-compatible local endpoint. That separation let the agent framework stay fixed while the model runtime changed underneath it.
+
+The figure shows the boundary that resolved the setup. A prompt does not travel from Hermes directly into a weight file. Hermes calls an HTTP API; the serving process owns model loading, the KV cache, and token generation; the GGUF is inert model data on disk.
+
+[![Animation showing Hermes Agent calling a localhost OpenAI-compatible endpoint backed by llama-server and an on-disk GGUF](/assets/images/blog-hermes-local-stack.gif)](/assets/images/blog-hermes-local-stack.gif)
+
+*Hermes owns the agent loop, tools, sessions, and skills. The custom endpoint is the interface. `llama-server` owns inference, and the GGUF supplies weights and tokenizer data. A model-load error below the API boundary can therefore be fixed without replacing the agent shell. Custom explanatory diagram, checked against the current [Hermes provider documentation](https://github.com/NousResearch/hermes-agent/blob/main/website/docs/integrations/providers.md).*
+
+This separation also changes how to debug. If Hermes cannot reach `/v1/chat/completions`, inspect the endpoint and configuration. If the endpoint returns HTTP `500` while loading a model, inspect the runtime, artifact, and hardware path. If text is generated but tools appear as plain text, inspect the server's chat template and tool-call support. Treating those as three different contracts avoids reinstalling the wrong layer.
 
 ## Installing Hermes Agent
 
@@ -71,7 +78,7 @@ The machine already had local Gemma GGUF artifacts in the Hugging Face cache, in
 
 `llama-server` was already installed via Homebrew, and it turned out to be the cleanest fully local setup.
 
-I started `llama-server` directly against the cached GGUF:
+I started `llama-server` directly against the cached GGUF. This command records the setup that worked on April 4, 2026:
 
 ```bash
 llama-server \
@@ -85,11 +92,13 @@ llama-server \
   --flash-attn on
 ```
 
-A few details here mattered:
+A few details mattered in that run:
 
 - `--ctx-size 32768` was necessary because Hermes sends a large system prompt and `8192` was not enough.
 - `--parallel 1` kept the memory footprint reasonable while still leaving enough room for the larger context window.
 - `--reasoning off` matched what I wanted anyway: no extra thinking overhead for a local smoke test.
+
+The context value is the main dated part of this recipe. Current Hermes documentation requires at least `64,000` tokens for agent use with tools because the system prompt, schemas, and working conversation already consume substantial context. A new setup should therefore size both Hermes and `llama-server` consistently—typically `65536` or higher if the model and available memory support it—instead of copying the older `32768` value blindly.
 
 Once that server was up, it exposed the OpenAI-compatible endpoint Hermes wanted at:
 
@@ -99,9 +108,9 @@ http://127.0.0.1:18080/v1
 
 That split worked: Hermes stayed as the agent shell, and `llama.cpp` handled local serving.
 
-## Hermes Agent configuration
+## Point Hermes at the local API
 
-I pointed Hermes at the local `llama-server` endpoint by editing `~/.hermes/config.yaml` to this:
+The current Hermes setup path is `hermes model`, then **Custom endpoint**. I originally pointed Hermes at `llama-server` by editing `~/.hermes/config.yaml` directly:
 
 ```yaml
 model:
@@ -134,9 +143,11 @@ READY
 
 That was enough proof: Hermes was running locally against weights already on disk.
 
-## Next steps
+## What the test establishes
 
-This setup is already useful, but there are a few obvious next steps:
+The `READY` response proves the inference path, not full agent quality. A useful next pass should separately test model loading, ordinary chat, structured tool calls, long-context behavior, and recovery when the local server restarts. Those checks locate regressions at the same boundaries shown in the figure.
+
+The remaining operational work is straightforward:
 
 - keep `llama-server` running behind a LaunchAgent or small wrapper script
 - point Hermes at a stronger local model if I want better tool-use quality

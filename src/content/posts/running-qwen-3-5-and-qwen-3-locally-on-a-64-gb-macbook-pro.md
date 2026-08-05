@@ -1,5 +1,5 @@
 ---
-title: Running Qwen 3.5 and Qwen 3 locally on a 64 GB MacBook Pro
+title: Benchmarking Qwen 3.5 and Qwen 3 on a 64 GB MacBook Pro
 date: '2026-04-04T04:00:00.000Z'
 section: blog
 postSlug: running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro
@@ -8,19 +8,19 @@ tags:
   - LLMs
   - Apple Silicon
 summary: >-
-  Local Qwen 3.5 and Qwen 3 benchmarks on a 64 GB M5 Max MacBook Pro, plus
-  the tradeoffs that actually matter when you are picking a local model.
+  A dated comparison of Qwen 3.5 and Qwen 3 latency on a 64 GB M5 Max,
+  including why long-prompt prefill matters more than whether a model fits.
 ---
-# Running Qwen 3.5 and Qwen 3 locally on a 64 GB MacBook Pro
+# Benchmarking Qwen 3.5 and Qwen 3 on a 64 GB MacBook Pro
 
 I wanted one practical answer: on a `64 GB` M5 Max MacBook Pro, which Qwen models are pleasant locally once prompt length stops being toy-sized?
 
-One important scope note up front, as of April 4, 2026:
+One important scope note: the measurements were collected on April 4, 2026.
 
-- The official local/open comparison here covers `Qwen 3.5` and `Qwen 3`.
-- I did not find an official open local `Qwen 3.6` model listing on the [Qwen Hugging Face organization page](https://huggingface.co/Qwen), so there is no real `Qwen 3.6` local benchmark column in this post.
+- The measured comparison covers `Qwen 3.5` and `Qwen 3` only.
+- Qwen has since released the official open-weight [`Qwen3.6-27B`](https://huggingface.co/Qwen/Qwen3.6-27B). It was not available for this run, so I do not add an invented or cross-source `Qwen 3.6` column.
 
-The short version so far:
+Within this benchmark snapshot:
 
 - `Qwen 3 4B` is the cleanest fast local baseline I have run on this machine.
 - `Qwen 3 14B` fits comfortably, but it is where long-prompt responsiveness stops feeling lightweight.
@@ -29,11 +29,11 @@ The short version so far:
 - `MLX` is the first runtime I would reach for on this Mac.
 - `4B` is the speed-first choice, but `14B` is where the local quality conversation starts getting more interesting.
 
-## Model memory requirements
+## Models included in the snapshot
 
-Qwen's current open model lineup immediately narrows the realistic local targets.
+The open lineup available on the measurement date narrowed the realistic local targets.
 
-On the official [Qwen organization page](https://huggingface.co/Qwen), the newest open local families I found were `Qwen 3.5` and `Qwen 3`, along with the very large `Qwen3.5-122B-A10B`, `Qwen3.5-397B-A17B`, and `Qwen3-235B-A22B` variants that are not sensible first bets for a `64 GB` laptop. So I excluded those from the benchmark matrix and focused on the sizes that have a real chance of being pleasant locally.
+On April 4, the newest open local families I found were `Qwen 3.5` and `Qwen 3`, along with very large variants that were not sensible first bets for a `64 GB` laptop. I excluded those and focused on sizes with a realistic chance of being pleasant locally. The later Qwen 3.6 release is a new candidate, not evidence that changes the older measurements.
 
 That left these practical local targets for this machine:
 
@@ -102,6 +102,14 @@ The first bigger model result, `Qwen 3.5 9B`, is useful because it shows where t
 
 The cross-runtime results sharpened the runtime recommendation. On `Qwen 3.5 9B`, `MLX` beat `llama.cpp` on both suites by a healthy margin, especially once prompt length hit the `8K` range. On `Qwen 3 14B`, the short prompt was much closer, but MLX still pulled ahead on the long prompt where prompt processing dominates the experience.
 
+The animation holds every measured model/runtime row fixed and changes only the input length. The important motion is horizontal: long prompts create a much larger time-to-first-token penalty than the decode column alone suggests.
+
+[![Animation comparing short- and long-prompt time to first token and decode throughput for Qwen 3.5 and Qwen 3 on MLX and llama.cpp](/assets/images/local-qwen-long-prompt-latency.gif)](/assets/images/local-qwen-long-prompt-latency.gif)
+
+*The `4B` models remain the interactive tier. `Qwen 3 14B` still fits easily, but TTFT reaches `4.9 s` on MLX and `11.1 s` on llama.cpp in the `8K` suite. Custom visualization of the benchmark tables below; measurements are from one 64 GB M5 Max on April 4, 2026. Qwen 3.6 is intentionally absent because it was released after the run.*
+
+The figure separates three decisions that parameter count often collapses. Memory determines whether a model loads. Decode throughput determines continuation speed. Prefill determines whether document-scale prompts feel responsive. On this machine, moving from `4B` to `14B` changes the third quantity most sharply, which is why the quality-versus-latency decision should be made with realistic prompt lengths.
+
 ### Short-context results
 
 | Model | Runtime | Artifact | TTFT | Decode tok/s | Avg tok/s | Peak memory |
@@ -124,19 +132,13 @@ The cross-runtime results sharpened the runtime recommendation. On `Qwen 3.5 9B`
 | `Qwen 3.5 9B` | MLX | `mlx-community/Qwen3.5-9B-MLX-4bit` | `2894 ms` | `92.66` | `24.53` | `8.39 GB` |
 | `Qwen 3 4B` | MLX | `mlx-community/Qwen3-4B-4bit` | `1742 ms` | `127.76` | `38.41` | `4.24 GB` |
 
-The pattern:
+`Qwen 3 4B` is the lowest-friction baseline in this snapshot. `Qwen 3.5 4B` remains usable but carries more memory overhead in the measured MLX path, while `Qwen 3.5 9B` is the first size where latency feels materially different from the tiny models. It also gives the cleanest cross-runtime result: MLX reaches the first token substantially sooner than llama.cpp in both suites.
 
-- `Qwen 3 4B` is the better low-friction local baseline on this machine.
-- `Qwen 3.5 4B` is still very usable, but it carries more memory overhead in my current MLX path.
-- `Qwen 3.5 9B` still looks laptop-friendly, but it is where the latency tradeoff starts feeling materially different from the tiny models.
-- `Qwen 3.5 9B` also gave the first real runtime verdict: on this hardware, `MLX` was materially better than `llama.cpp`.
-- `Qwen 3 14B` looks like the first genuinely stronger dense option that still feels reasonable to keep around locally, but it is no longer fast in the same way.
-- `Qwen 3 14B` makes the runtime story specific: `llama.cpp` is competitive on the short prompt, but MLX is still the better default once prompts get long.
-- Long-prompt behavior matters more than short-prompt decode speed if you care about whether a local model feels snappy.
+`Qwen 3 14B` is the first stronger dense option I would seriously keep around locally, but it is no longer fast in the same sense. llama.cpp remains competitive on the short prompt; on the `8K` prompt, MLX more than halves TTFT. Long-prompt prefill therefore matters more to the interaction than the short-prompt decode number that usually headlines a local benchmark.
 
 ## Recommendation
 
-Right now, my practical recommendation is simple:
+For this measured snapshot, my practical recommendation is simple:
 
 1. Start with `Qwen 3 4B` if you want the fastest clean local baseline.
 2. Move up to `Qwen 3 14B` if you want a stronger dense model and you can tolerate much slower long-prompt interaction.

@@ -1,5 +1,5 @@
 ---
-title: 'Reinforcement Learning for Reasoning and Vision-Language-Action Models'
+title: 'PPO, DPO, GRPO, and On-Policy Distillation'
 date: '2026-07-27T16:00:00.000Z'
 section: blog
 postSlug: from-ppo-to-grpo-rl-for-reasoning-and-vlas
@@ -8,10 +8,10 @@ tags:
   - Reinforcement Learning
   - Reasoning
   - Robotics
-summary: 'How policy optimization evolved from PPO critics to offline preferences, group-relative rewards, and on-policy distillation—and which pieces survive contact with physical action.'
+summary: 'How PPO, DPO, GRPO, and on-policy distillation construct their learning signals—and which assumptions survive contact with physical action.'
 ---
 
-# Reinforcement Learning for Reasoning and Vision-Language-Action Models
+# PPO, DPO, GRPO, and On-Policy Distillation
 
 Reinforcement learning for language models can look like a parade of acronyms. PPO adds a critic and clips updates. DPO removes the online loop. GRPO removes the critic and compares samples. On-policy distillation brings a teacher back. For vision-language-action models, the same names reappear beside diffusion policies, sparse success rewards, simulators, and robot rollouts.
 
@@ -47,6 +47,14 @@ The score-function term says which behavior becomes more likely. The advantage $
 | Update restraint | Clipped ratio, KL penalty, reference-relative margin, or supervised divergence? | The policy exploits noisy evidence faster than the evidence improves |
 
 This frame also separates two ideas that are routinely conflated. **On-policy** describes where training states come from: the current learner. **Reinforcement learning** describes how future reward weights an action's log-probability. A student can generate its own prefixes and receive teacher-token supervision there; that is on-policy distillation, even though no reward or policy gradient is required.
+
+The figure holds the prompt fixed and changes only the source of contrast. It is not one four-stage pipeline. Each panel answers a different question about what evidence exists before the update begins.
+
+[![Animation comparing how PPO, DPO, GRPO, and on-policy knowledge distillation construct a learning signal](/assets/images/blog-rl-learning-signals.gif)](/assets/images/blog-rl-learning-signals.gif)
+
+*PPO compares sampled actions with a learned value baseline. DPO starts from an already collected chosen–rejected pair. DeepSeekMath's GRPO compares several current-policy completions of the same prompt. GKD samples the student's own prefix and asks a teacher for a dense next-token distribution there. Custom explanatory synthesis based on [PPO](https://arxiv.org/abs/1707.06347), [DPO](https://arxiv.org/abs/2305.18290), [DeepSeekMath](https://arxiv.org/abs/2402.03300), and [On-Policy Distillation](https://arxiv.org/abs/2306.13649).*
+
+This controlled view explains why the methods are not interchangeable. PPO and GRPO need fresh policy samples because their advantages describe current behavior. DPO avoids generation because the contrast is already stored in the dataset. GKD is on-policy in state coverage but supervised in its target: teacher logits repair the student's visited prefixes without estimating future return. The later sections differ mainly in how expensive, noisy, or physically defensible each contrast becomes.
 
 ## PPO: Value baselines and clipped updates
 

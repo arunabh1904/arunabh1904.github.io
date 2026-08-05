@@ -1,5 +1,5 @@
 ---
-title: 'Post-Training Vision-Language-Action Models: A Reading Guide'
+title: 'How Vision-Language-Action Models Improve After Deployment'
 date: '2026-07-16T10:00:00.000Z'
 section: blog
 postSlug: post-training-vision-language-action-models-zero-to-hero
@@ -8,10 +8,10 @@ tags:
   - Robotics
   - Post-Training
   - Reinforcement Learning
-summary: A mechanism-first guide to turning robot rollouts into justified policy updates through correction data, preference learning, critics, reinforcement learning, and real evaluation.
+summary: How robot rollouts become justified policy updates through correction data, action preferences, process critics, interactive reinforcement learning, and real evaluation.
 ---
 
-# Post-Training Vision-Language-Action Models: A Reading Guide
+# How Vision-Language-Action Models Improve After Deployment
 
 A robot fails while closing a drawer. The episode gives us an outcome: failure. It does not tell us whether the camera missed the handle, the language model chose the wrong subtask, the trajectory approached at a bad angle, the gripper slipped, or the success detector fired too early. Post-training begins in that gap between outcome and explanation.
 
@@ -108,6 +108,14 @@ The central question is not “Can DPO be applied?” It is “What event has a 
 ## Feedback attribution
 
 Suppose the gripper misses the handle at step 42 and a human takes over at step 47. The binary episode label says the rollout failed. The intervention says the policy became unacceptable by step 47. Neither observation proves that every earlier action was wrong. Penalizing the whole trajectory can erase a good approach because of one bad contact. Training only on the human suffix can also be misleading if the human begins from a state the policy would never deliberately create.
+
+The figure keeps that rollout fixed and changes only the claim made by the feedback. The red row is broad because a terminal bit contains no temporal attribution. The amber row narrows the label to the intervention and corrective actions. The green row is useful only if a critic can judge intermediate progress or repeated rollouts begin from states similar enough to compare.
+
+[![Animation comparing episode outcomes, Action Preference Optimization, and process or interactive feedback on the same robot failure](/assets/images/blog-vla-feedback-attribution.gif)](/assets/images/blog-vla-feedback-attribution.gif)
+
+*A failed episode can label an outcome without identifying the causal action. Action Preference Optimization uses binary desirability from human intervention and adaptively reweights local action updates. Process critics such as VLAC estimate progress between observations, while RIPT-VLA constructs leave-one-out advantages from dynamically sampled rollout groups. These signals become more local only by adding stronger evidence assumptions. Custom explanatory synthesis based on [Action Preference Optimization](https://arxiv.org/abs/2506.07127), [VLAC](https://arxiv.org/abs/2509.15937), and [RIPT-VLA](https://arxiv.org/abs/2505.17016).*
+
+This is the post-training lineage in one picture. Language-style DPO begins with a matched pair, but physical irreversibility often prevents collecting that pair. APO changes the supervision unit from a whole paired trajectory to locally desirable or undesirable actions observed during intervention. A process critic adds temporal resolution, and interactive RL adds exploration, but neither manufactures causality: critic accuracy and reset fidelity become part of the training claim.
 
 The safest useful label is therefore local. Preserve the prefix that still made progress. Mark the first defensible failure window. Record the reached state and the corrective continuation. If a paired alternative cannot be replayed from a matched state, use an unpaired outcome or correction objective rather than pretending to possess a counterfactual.
 
@@ -281,7 +289,7 @@ That is the path from a model that can act to a policy improvement system that c
 - [OpenVLA-OFT: Fine-Tuning Vision-Language-Action Models for High-Throughput Robot Control](https://arxiv.org/abs/2502.19645)
 - [π0.5: A Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054)
 - [DPPO: Diffusion Policy Policy Optimization](https://arxiv.org/abs/2409.00588)
-- [Robotic Policy Learning via Human-assisted Action Preference Optimization](https://arxiv.org/abs/2506.07390)
+- [Human-assisted Robotic Policy Refinement via Action Preference Optimization](https://arxiv.org/abs/2506.07127)
 - [RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2505.17016)
 - [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)
 - [SIMPLER: Evaluating Real-World Robot Manipulation Policies in Simulation](https://arxiv.org/abs/2405.05941)

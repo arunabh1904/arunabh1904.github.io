@@ -1,5 +1,5 @@
 ---
-title: 'Attention Mechanisms: History and Modern Variants'
+title: 'How Attention Stores and Retrieves Context'
 date: '2025-05-25T04:00:00.000Z'
 section: blog
 postSlug: attention-mechanisms-demystified
@@ -7,14 +7,13 @@ legacyPath: /build intuition/2025/05/25/attention-mechanisms-demystified.html
 tags:
   - Other
 summary: >-
-  A compact history of attention, from RNN alignment and Transformer
-  self-attention to GQA, MLA, sparse, linear, gated, and hybrid designs, with
-  efficient PyTorch implementations of the main computation patterns.
+  How attention evolved from explicit token retrieval to shared, compressed,
+  sparse, and recurrent memory, with efficient PyTorch implementations.
 ---
 import PythonPlayground from '../../components/PythonPlayground';
 import { attentionMechanismsPlayground } from '../../lib/python-playground-examples';
 
-# Attention Mechanisms: History and Modern Variants
+# How Attention Stores and Retrieves Context
 
 Attention began as an escape hatch from a fixed-size memory. An encoder-decoder recurrent neural network had to compress a source sentence into a hidden state and ask that state to preserve everything the decoder might need. Attention let each decoding step reach back to the encoder states directly. The Transformer made a larger move in 2017: it removed recurrence from the main sequence path and used attention itself to route information between positions.
 
@@ -187,7 +186,13 @@ That cost created several distinct design families:
 | Layer composition | Hybrid attention | Alternate cheap recurrent/local mixers with periodic full attention | Better efficiency-quality balance, more system complexity |
 | Output control | Gated attention | Scale retrieved features before the residual update | More control and stability, little change to core attention cost |
 
-The table is the map: these methods are not one flat list because they solve different problems.
+The table is the map: these methods are not one flat list because they solve different problems. The comparison below holds the incoming token sequence fixed and changes only the representation retained for future queries. Watch what is still individually addressable after each write.
+
+[![Animation comparing the memory retained by multi-head attention, grouped-query attention, multi-head latent attention, and Gated DeltaNet](/assets/images/blog-attention-memory.gif)](/assets/images/blog-attention-memory.gif)
+
+*MHA stores a full K/V history for every head. GQA shares fewer full histories across query heads. DeepSeek-V2's MLA projects token state into a smaller cached latent. Gated DeltaNet instead superposes history into one fixed-size recurrent state, while hybrid stacks periodically restore explicit attention. Custom explanatory synthesis based on [GQA](https://arxiv.org/abs/2305.13245), [DeepSeek-V2](https://arxiv.org/abs/2405.04434), and [Gated DeltaNet](https://arxiv.org/abs/2412.06464).*
+
+The irreversible choice is the memory carrier. GQA preserves token-addressable K/V vectors but reduces how many independent copies exist. MLA keeps a token-indexed cache but compresses each token through learned latent projections. Delta-rule models stop retaining a token-indexed history at all: later writes share finite state, so targeted update and forgetting become part of retrieval quality. A hybrid does not erase that distinction; it spends most layers on bounded memory and inserts occasional layers that can still inspect explicit positions.
 
 ### Multi-query and grouped-query attention
 

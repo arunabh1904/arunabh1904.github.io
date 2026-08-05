@@ -1,5 +1,5 @@
 ---
-title: 'My Life and Career So Far'
+title: 'How I Found My Way Into Robotics'
 date: '2025-02-08T05:00:00.000Z'
 section: blog
 postSlug: my-journey-so-far-full-story
@@ -7,11 +7,11 @@ legacyPath: /blog/2025/02/08/my-journey-so-far-full-story.html
 tags:
   - Other
 summary: >-
-  A personal account of finding robotics through setbacks, project work,
-  graduate school, DEKA, and Zoox.
+  How failure, depression, hands-on projects, graduate school, DEKA, and Zoox
+  shaped my path into robotics and autonomous driving.
 ---
 
-# My Life and Career So Far
+# How I Found My Way Into Robotics
 
 In 2023, I gave [this interview](https://theinterviewportal.com/2024/01/21/perception-roboticist-interview/) about how I became a robotics engineer focused on perception. Looking back, the interview mostly captured the wins. It did not say much about the missteps, low points, and strange detours that shaped the path just as much. This is the fuller version, starting from the beginning.
 
@@ -21,10 +21,7 @@ I grew up in Jaipur, a city that shaped much of my early life. I lost my father 
 
 Most of my schooling was in Jaipur, and like many aspiring engineers, I spent three intense years in Kota preparing for the JEE. Kota is often described as a **factory** ([Netflix show](https://www.netflix.com/title/81249783) / [Wiki](https://en.wikipedia.org/wiki/Kota_Factory)), and that description is not far off. The city runs on academic competition. It is also a perfect breeding ground for [Girard's mimetic theory of desire](https://en.wikipedia.org/wiki/Mimetic_theory), where students absorb each other's ambitions and anxieties until it becomes hard to tell what you actually want. Despite working hard, I did not clear the IIT exam. At 18, that failure felt crushing, like I had let everyone down after years of preparation. Even now, at 33, the memory still makes my body tense up.
 
-### Early lessons
-- **Be resilient** in the face of adversity.
-- Sometimes, **no matter how hard you try, you will fail** - and that's okay.
-- **It's okay to indulge** in things you like (like video games), but don’t let them consume you.
+The lesson was not simply to work harder. I had already worked hard in Kota. I had to learn that effort can still end in failure, that a failure can feel physically real without becoming a permanent verdict, and that an absorbing escape like DOTA can be both refuge and trap. Resilience began to mean choosing what to do after the result, not denying how much the result hurt.
 
 ## Undergrad at MIT Manipal
 
@@ -41,10 +38,7 @@ Even with that ridiculous ending, the concept was real. A similar design is now 
 ![The areca-nut harvesting robot built for my undergraduate thesis](/assets/images/IMG_8842.jpg)
 _Our undergraduate prototype climbed an areca palm and used a remotely controlled cutter. Source: personal project archive._
 
-### Lessons from undergrad
-- **It's never too late to start.**
-- **Jugaad** (resourcefulness in Hindi) is okay, as long as you don’t cheat outright!
-- **Building things that help others** brings a ton of joy.
+Undergrad changed my direction because the late start still compounded. The GPA recovery proved I could rebuild after wasting time; the robot proved that I cared most when engineering had a physical consequence for someone else. The reversed video was classic *jugaad*—funny in retrospect and not a substitute for a working demonstration—but the underlying problem made robotics feel worth pursuing.
 
 ## Depression
 
@@ -69,10 +63,7 @@ Those experiences helped me find a purpose and clarify what I wanted to work on.
 
 I was accepted into three schools. I still remember rereading the first acceptance email about five times because I could not quite believe it. I packed my bags and moved to the United States to study robotics at the Colorado School of Mines.
 
-### Recovery and perspective
-- **Depression can be scary.**
-- **Having a purpose** makes it low-effort to work hard.
-- **Always have a backup plan.**
+Recovery did not arrive as one clean insight. Friends changed my immediate environment, loss changed my sense of time, and robotics supplied a direction concrete enough to act on. Purpose did not make depression trivial; it made the next application, course, or volunteer shift easier to choose. The application mix-up also left me with a practical habit I still keep: verify the mundane details and preserve a backup path, because an administrative error can be as consequential as an academic one.
 
 ## Graduate school at Mines
 
@@ -95,12 +86,6 @@ We eventually deployed the Husky inside CSM's Edgar Mine, where it navigated wit
 _The hexapod project paired a 1D LiDAR and Pixy camera with a small mobile platform. Source: personal project archive._
 
 Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grades mattered, but the projects I took on, the problems I solved, and the people I learned from shaped me more. My advice to current graduate students is simple: take on projects that stretch you, use the resources around you, and follow problems that genuinely excite you. That is how progress starts to compound.
-
-### Lessons from graduate school
-- **Focus on building a strong foundation** in the areas that excite you.
-- **It's okay to feel out of place** in the beginning. Navigating many changes at once can be overwhelming, but it's part of the process.
-- **Be intentional** about what you want to get out of grad school. Tailor your coursework and experiences to align with your interests.
-- **Seek out hands-on opportunities**, like TA and RA positions, to apply your learning in practical settings.
 
 ## Job search after graduate school
 
@@ -136,3 +121,5 @@ DEKA opened the door to my dream job. The projects taught me technical skills, b
 Joining Zoox realized a long-held goal: working on autonomous driving. I work on the Perception team, which turns camera, LiDAR, and other sensor data into representations the robot can use for planning. My role focuses on scene semantics and agent intent, drawing on ML, software engineering, C++, Python, CUDA, and computer vision research. I learned those skills through self-teaching, graduate school, and my time at DEKA.
 
 One memory from joining Zoox still feels vivid. I was surrounded by incredibly talented people and felt out of place at first. It was classic imposter syndrome. The way through it was not one dramatic breakthrough; it was small wins, one after another. Those wins slowly built confidence. That feeling is common when switching roles, and it is worth recognizing it as part of professional growth, not proof that you do not belong.
+
+Looking back, the path is less a sequence of triumphs than a sequence of redirects. Failing the IIT exam changed where I studied. A collapsed GPA forced me to rebuild. A mailing mistake closed Germany and eventually opened the United States. Work that initially felt beyond me became a patent, then a route into autonomous driving. The common thread is not that every setback was secretly good. Some were simply painful. What mattered was learning to attach intensity to a problem I cared about, build enough skill to make the next attempt credible, and let small wins accumulate before confidence arrived.

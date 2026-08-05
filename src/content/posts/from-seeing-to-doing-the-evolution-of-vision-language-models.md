@@ -1,5 +1,5 @@
 ---
-title: 'Vision-Language Models: A Reading Guide'
+title: 'From Image-Text Alignment to Robot Actions'
 date: '2026-07-05T20:00:00.000Z'
 section: blog
 postSlug: from-seeing-to-doing-the-evolution-of-vision-language-models
@@ -7,10 +7,10 @@ legacyPath: /blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-langua
 tags:
   - Research
   - Vision-Language Models
-summary: A reading guide to the interfaces that turned image-text models into grounded visual assistants and, eventually, robot policies.
+summary: How visual representations change as the output contract moves from image-text alignment to generation, grounding, temporal reasoning, and robot action.
 ---
 
-# Vision-Language Models: A Reading Guide
+# From Image-Text Alignment to Robot Actions
 
 A model can name the mug, explain that mugs hold liquid, and still drive a gripper into the table beside it. That failure is not surprising once we stop treating “vision-language” as a single capability. Naming an object, grounding it in pixels, estimating its pose, predicting contact, and controlling a wrist are different contracts with different tolerances for lost information.
 
@@ -45,6 +45,14 @@ This table is the first defense against vague claims. A retrieval model can be e
 The shared implementation pattern is simple. An image is converted into visual tokens or features. A connector maps those features into a space that can interact with text. A loss then decides what “interaction” means: contrastive agreement, next-token prediction, region grounding, denoising, or action imitation.
 
 The loss is the contract. Architecture matters because it determines what evidence remains available to satisfy that contract.
+
+The comparison below keeps one mug-and-tray scene fixed. Only the evaluated output changes. Watch which evidence becomes mandatory rather than assuming every later model is simply a larger version of the first.
+
+[![Animation showing how CLIP, LLaVA, Molmo, and Pi0 require progressively different visual evidence from the same scene](/assets/images/blog-vlm-evidence-contract.gif)](/assets/images/blog-vlm-evidence-contract.gif)
+
+*CLIP's contrastive objective can succeed with global semantic identity; it does not require an inspectable location. LLaVA projects visual features into a language model so they can condition generation. Molmo's point supervision makes a spatial binding externally testable. Pi0 adds temporally conditioned continuous action through a flow-based expert. The panels show output contracts, not a claim that one model literally evolves into the next. Custom explanatory synthesis based on [CLIP](https://arxiv.org/abs/2103.00020), [LLaVA](https://arxiv.org/abs/2304.08485), [Molmo](https://arxiv.org/abs/2409.17146), and [Pi0](https://arxiv.org/abs/2410.24164).*
+
+The progression is therefore not “more modalities.” It is a sequence of stricter information obligations. A global vector may identify the mug while discarding its handle location. A generative assistant needs enough visual tokens to support an answer but may still lack an explicitly supervised binding. Point grounding exposes the binding. Action raises the standard again: the representation must remain useful across changing observations and an embodiment-specific control deadline. Once an earlier compression removes that evidence, downstream fluency cannot reconstruct it.
 
 ## 2. Open-vocabulary image-text alignment
 
