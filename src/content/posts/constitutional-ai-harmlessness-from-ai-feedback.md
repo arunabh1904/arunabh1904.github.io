@@ -36,12 +36,8 @@ The paper reports a less harmful, less evasive assistant with far fewer direct h
 
 ## High-Level Takeaways
 
-Constitutional AI informs whether scarce human attention should label every example or define rules and audit the supervision that models generate from them. The fundamental units are a critique–revision example and a preference pair. The policy and preference model are separate, and errors in the AI judge can be amplified by RL.
-
-In robotics, a constitution could encode forbidden contacts, workspace boundaries, uncertainty-triggered stops, and recovery priorities. The missing experiment is causal: compare rule-generated feedback with hand-labeled physical violations under matched human time, then evaluate novel hazards. At ten times the task diversity, principle conflicts and unmodeled geometry will dominate. The approach fails if the critic can verbalize the right rule while rewarding trajectories that violate it physically.
-
-Constitutional AI is a blueprint for scalable supervision, not proof that automated oversight is self-validating.
-
-The work studies dialogue harmlessness; physical safety constraints require grounded state and calibrated uncertainty.
-
-A constitution lowers labeling cost only when independent evaluation can detect how the judge misread it.
+- Constitutional AI informs whether scarce human attention should label every example or define rules and audit the supervision that models generate from them. The fundamental units are a critique–revision example and a preference pair. The policy and preference model are separate, and errors in the AI judge can be amplified by RL.
+- In robotics, a constitution could encode forbidden contacts, workspace boundaries, uncertainty-triggered stops, and recovery priorities. The missing experiment is causal: compare rule-generated feedback with hand-labeled physical violations under matched human time, then evaluate novel hazards. At ten times the task diversity, principle conflicts and unmodeled geometry will dominate. The approach fails if the critic can verbalize the right rule while rewarding trajectories that violate it physically.
+- Constitutional AI is a blueprint for scalable supervision, not proof that automated oversight is self-validating.
+- The work studies dialogue harmlessness; physical safety constraints require grounded state and calibrated uncertainty.
+- A constitution lowers labeling cost only when independent evaluation can detect how the judge misread it.

@@ -74,10 +74,7 @@ Waymo used mAP as the official ranking metric, so this table is about calibrated
 
 ## High-Level Takeaways
 
-DenseTNT informs whether multimodal forecasting should rely on hand-designed sparse goal anchors or learn a dense distribution over reachable endpoints. The training unit is one agent history paired with a future trajectory; endpoint probabilities define candidate modes before target-conditioned trajectories are decoded and scored.
-
-The method removes anchor engineering, but dense goal coverage makes map resolution and candidate pruning part of the compute budget. A decisive ablation would match proposal count and decoder capacity across sparse anchors, dense goals, and direct trajectory generation. At 10× scene density, goal scoring and duplicate modes can dominate while rare maneuvers remain underrepresented. DenseTNT's claim would fail if adaptive sparse proposals matched minFDE and miss rate with fewer candidates and better calibration.
-
-DenseTNT pushed goal-conditioned forecasting away from sparse anchor heuristics and toward dense probability maps plus learned set prediction.
-
-TNT made endpoints the intent variable; DenseTNT made endpoint selection dense, learned, and closer to end-to-end.
+- DenseTNT informs whether multimodal forecasting should rely on hand-designed sparse goal anchors or learn a dense distribution over reachable endpoints. The training unit is one agent history paired with a future trajectory; endpoint probabilities define candidate modes before target-conditioned trajectories are decoded and scored.
+- The method removes anchor engineering, but dense goal coverage makes map resolution and candidate pruning part of the compute budget. A decisive ablation would match proposal count and decoder capacity across sparse anchors, dense goals, and direct trajectory generation. At 10× scene density, goal scoring and duplicate modes can dominate while rare maneuvers remain underrepresented. DenseTNT's claim would fail if adaptive sparse proposals matched minFDE and miss rate with fewer candidates and better calibration.
+- DenseTNT pushed goal-conditioned forecasting away from sparse anchor heuristics and toward dense probability maps plus learned set prediction.
+- TNT made endpoints the intent variable; DenseTNT made endpoint selection dense, learned, and closer to end-to-end.

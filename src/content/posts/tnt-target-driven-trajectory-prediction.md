@@ -60,10 +60,7 @@ _Figure 2 shows the three-stage TNT pipeline: encode the scene, score candidate 
 
 ## High-Level Takeaways
 
-TNT informs whether multimodal forecasting should first choose a destination and then generate the path, rather than regress complete trajectories in one step. The atomic hierarchy is an actor history, a candidate target state, and a target-conditioned trajectory; a final scorer selects a compact diverse set.
-
-The factorization gives modes a semantic endpoint, but target discretization and candidate pruning can exclude valid futures before decoding. The missing ablation holds total proposals fixed while comparing endpoint-first, anchor-trajectory, and direct set prediction across map-rich and map-free datasets. At 10× candidate density, target scoring dominates and duplicates crowd out rare modes. TNT's claim would fail if direct trajectory-set prediction matched miss rate and diversity without a target bottleneck.
-
-TNT made goal-conditioned motion forecasting feel practical for autonomous driving. It kept the multimodal structure visible and showed that endpoint candidates can be a cleaner intent representation than opaque latent samples.
-
-Predict the destination first, then make the trajectory explain how to get there.
+- TNT informs whether multimodal forecasting should first choose a destination and then generate the path, rather than regress complete trajectories in one step. The atomic hierarchy is an actor history, a candidate target state, and a target-conditioned trajectory; a final scorer selects a compact diverse set.
+- The factorization gives modes a semantic endpoint, but target discretization and candidate pruning can exclude valid futures before decoding. The missing ablation holds total proposals fixed while comparing endpoint-first, anchor-trajectory, and direct set prediction across map-rich and map-free datasets. At 10× candidate density, target scoring dominates and duplicates crowd out rare modes. TNT's claim would fail if direct trajectory-set prediction matched miss rate and diversity without a target bottleneck.
+- TNT made goal-conditioned motion forecasting feel practical for autonomous driving. It kept the multimodal structure visible and showed that endpoint candidates can be a cleaner intent representation than opaque latent samples.
+- Predict the destination first, then make the trajectory explain how to get there.

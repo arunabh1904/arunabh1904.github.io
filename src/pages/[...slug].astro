@@ -6,25 +6,52 @@ import { sortPostsAscending, toStaticPostSlug, type PostEntry } from '../lib/con
 export async function getStaticPaths() {
   const posts = sortPostsAscending(await getCollection('posts'));
 
-  return posts.map((entry, index) => ({
-    params: {
-      slug: toStaticPostSlug(entry.data.legacyPath),
-    },
-    props: {
-      entry,
-      previous: posts[index - 1] ?? undefined,
-      next: posts[index + 1] ?? undefined,
-    },
-  }));
+  return posts.map((entry, index) => {
+    const isPaper = entry.data.section === 'paper-shorts';
+    const field = entry.data.field ?? 'Other';
+    const readingPath = isPaper
+      ? posts.filter(
+          (candidate) =>
+            candidate.data.section === 'paper-shorts' &&
+            (candidate.data.field ?? 'Other') === field,
+        )
+      : [];
+    const readingPathIndex = readingPath.findIndex((candidate) => candidate.id === entry.id);
+
+    return {
+      params: {
+        slug: toStaticPostSlug(entry.data.legacyPath),
+      },
+      props: {
+        entry,
+        previous: isPaper ? readingPath[readingPathIndex - 1] : posts[index - 1],
+        next: isPaper ? readingPath[readingPathIndex + 1] : posts[index + 1],
+        navigationContext: isPaper
+          ? {
+              href: `/paper_summaries_field.html?view=list&field=${encodeURIComponent(field)}`,
+              label: `${field} reading path`,
+              position: readingPathIndex + 1,
+              total: readingPath.length,
+            }
+          : undefined,
+      },
+    };
+  });
 }
 
 interface Props {
   entry: PostEntry;
   previous?: PostEntry;
   next?: PostEntry;
+  navigationContext?: {
+    href: string;
+    label: string;
+    position: number;
+    total: number;
+  };
 }
 
-const { entry, previous, next } = Astro.props;
+const { entry, previous, next, navigationContext } = Astro.props;
 const { Content } = await render(entry);
 ---
 
@@ -33,6 +60,7 @@ const { Content } = await render(entry);
   description={entry.data.summary}
   previous={previous}
   next={next}
+  navigationContext={navigationContext}
   showNavigation={true}
 >
   <Content />

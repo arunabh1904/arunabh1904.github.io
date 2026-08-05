@@ -47,10 +47,7 @@ _Figure 4 shows how MapTRv2 keeps the vector-map decoder structured while adding
 
 ## High-Level Takeaways
 
-MapTRv2 informs whether sparse one-to-one supervision is sufficient for vector-map queries or should be supplemented with one-to-many assignments and dense auxiliary targets. The training unit remains a map-element query and its point sequence, but extra matches expose more positive supervision during early optimization.
-
-The gains support supervision density as an optimization lever, not a change in the final map representation. The missing ablation matches the number of positive gradients across one-to-many matching, denoising queries, and dense segmentation auxiliaries. At 10× classes or map elements, duplicate assignments and auxiliary-loss balance become unstable. The claim would fail if longer training or a simpler query-denoising scheme matched convergence and map quality without the extra matching path.
-
-MapTRv2 turned MapTR from a strong baseline into a more robust framework that later online-map papers could compare against.
-
-Once the representation is right, the next bottleneck is supervision density: sparse vector labels often need auxiliary training signals.
+- MapTRv2 informs whether sparse one-to-one supervision is sufficient for vector-map queries or should be supplemented with one-to-many assignments and dense auxiliary targets. The training unit remains a map-element query and its point sequence, but extra matches expose more positive supervision during early optimization.
+- The gains support supervision density as an optimization lever, not a change in the final map representation. The missing ablation matches the number of positive gradients across one-to-many matching, denoising queries, and dense segmentation auxiliaries. At 10× classes or map elements, duplicate assignments and auxiliary-loss balance become unstable. The claim would fail if longer training or a simpler query-denoising scheme matched convergence and map quality without the extra matching path.
+- MapTRv2 turned MapTR from a strong baseline into a more robust framework that later online-map papers could compare against.
+- Once the representation is right, the next bottleneck is supervision density: sparse vector labels often need auxiliary training signals.

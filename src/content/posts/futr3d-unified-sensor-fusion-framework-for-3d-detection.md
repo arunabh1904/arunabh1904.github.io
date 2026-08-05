@@ -39,10 +39,7 @@ _FUTR3D keeps each sensor in its native representation and uses a 3D query to re
 
 ## High-Level Takeaways
 
-FUTR3D informs whether fusion should be organized around a dense shared map or a sparse prediction query. The atomic unit is a 3D object query; modality-specific backbones are not shared, while the sampler and decoder are. A training-only auxiliary LiDAR head adds 3.9 mAP in the paper's ablation, which shows that “unified” inference can still need modality-specific optimization support.
-
-The missing control trains every sensor configuration jointly with explicit modality dropout and compares it against separate specialists at matched parameter and training budgets. FUTR3D establishes architectural compatibility, not universal zero-shot operation under arbitrary sensor removal. At 10× query count or camera resolution, repeated cross-modal sampling dominates. The query-centric design would fail for dense map or occupancy tasks if covering the full scene requires so many queries that a BEV grid is cheaper and easier to calibrate.
-
-FUTR3D is the cleanest early statement of configuration-level unification: one prediction interface across camera, LiDAR, radar, and beam counts.
-
-A sensor-agnostic model need not erase sensor differences; it can standardize how predictions ask each sensor for evidence.
+- FUTR3D informs whether fusion should be organized around a dense shared map or a sparse prediction query. The atomic unit is a 3D object query; modality-specific backbones are not shared, while the sampler and decoder are. A training-only auxiliary LiDAR head adds 3.9 mAP in the paper's ablation, which shows that “unified” inference can still need modality-specific optimization support.
+- The missing control trains every sensor configuration jointly with explicit modality dropout and compares it against separate specialists at matched parameter and training budgets. FUTR3D establishes architectural compatibility, not universal zero-shot operation under arbitrary sensor removal. At 10× query count or camera resolution, repeated cross-modal sampling dominates. The query-centric design would fail for dense map or occupancy tasks if covering the full scene requires so many queries that a BEV grid is cheaper and easier to calibrate.
+- FUTR3D is the cleanest early statement of configuration-level unification: one prediction interface across camera, LiDAR, radar, and beam counts.
+- A sensor-agnostic model need not erase sensor differences; it can standardize how predictions ask each sensor for evidence.

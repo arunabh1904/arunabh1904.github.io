@@ -53,14 +53,9 @@ The gains are not uniform. On HUGSIM’s Extreme tier, behavior-cloned DrivoR sc
 
 ## High-Level Takeaways
 
-Gigapixel informs whether end-to-end driving should learn closed-loop recovery through direct pixel RL, offline imitation, or privileged-teacher distillation. Its evidence favors the third option when a fast vector simulator and teacher are available: DAgger retains the student’s on-policy state distribution while avoiding billions of expensive gradient-bearing pixel-policy interactions.
-
-The expensive interface is the teacher–student boundary. The privileged teacher can act on geometry that is unrecoverable from an occluded camera, so distillation targets may be impossible for the student to match. A matched test should vary teacher observability while holding student architecture, steps, and compute fixed, then measure whether less privilege sacrifices benchmark score but improves calibration and failure recovery.
-
-At ten times the scenario diversity, initialization becomes the next constraint. Gigapixel still starts from nuPlan logs, and its abstract renderer omits debris, unusual obstacles, weather, and lighting. The claim would weaken if gains vanish on procedurally generated initial states or if a behavior-cloned policy with equally targeted recovery data matches self-play at lower compute.
-
-Gigapixel connects structured-state self-play to camera-based end-to-end planning by treating privileged RL, on-policy distillation, and perception adaptation as separate stages.
-
-The renderer cannot represent many visual hazards; non-vehicle actors are log-replayed; sim-to-real adaptation requires paired views; and real-world benchmarks remain reconstructed or pseudo-closed-loop. The system does not demonstrate deployment on a physical vehicle.
-
-Pixel-based self-play becomes practical when RL stays in the cheap privileged teacher and the end-to-end student learns on its own states—but the remaining sim-to-real gap is a perception and observability problem.
+- Gigapixel informs whether end-to-end driving should learn closed-loop recovery through direct pixel RL, offline imitation, or privileged-teacher distillation. Its evidence favors the third option when a fast vector simulator and teacher are available: DAgger retains the student’s on-policy state distribution while avoiding billions of expensive gradient-bearing pixel-policy interactions.
+- The expensive interface is the teacher–student boundary. The privileged teacher can act on geometry that is unrecoverable from an occluded camera, so distillation targets may be impossible for the student to match. A matched test should vary teacher observability while holding student architecture, steps, and compute fixed, then measure whether less privilege sacrifices benchmark score but improves calibration and failure recovery.
+- At ten times the scenario diversity, initialization becomes the next constraint. Gigapixel still starts from nuPlan logs, and its abstract renderer omits debris, unusual obstacles, weather, and lighting. The claim would weaken if gains vanish on procedurally generated initial states or if a behavior-cloned policy with equally targeted recovery data matches self-play at lower compute.
+- Gigapixel connects structured-state self-play to camera-based end-to-end planning by treating privileged RL, on-policy distillation, and perception adaptation as separate stages.
+- The renderer cannot represent many visual hazards; non-vehicle actors are log-replayed; sim-to-real adaptation requires paired views; and real-world benchmarks remain reconstructed or pseudo-closed-loop. The system does not demonstrate deployment on a physical vehicle.
+- Pixel-based self-play becomes practical when RL stays in the cheap privileged teacher and the end-to-end student learns on its own states—but the remaining sim-to-real gap is a perception and observability problem.

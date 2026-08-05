@@ -39,12 +39,8 @@ The benchmark later became a common VLA scoreboard, which changes how its number
 
 ## High-Level Takeaways
 
-LIBERO informs which knowledge transfer failures a post-training method fixes. Its atomic unit is a language-conditioned demonstration trajectory, but evaluation is closed-loop task success across controlled suite shifts. The procedural generator makes task families comparable while preserving repeatability.
-
-The benchmark establishes relative performance inside its simulator. At ten times the paper usage, saturation and tuning to the benchmark become larger risks than task difficulty. A missing test is cross-benchmark and real-robot rank correlation under unseen instruction phrasing. LIBERO ceases to be decision-useful if methods trade places under minor simulator, language, or controller changes.
-
-LIBERO is the common substrate connecting OpenVLA-OFT, RIPT-VLA, and SimpleVLA-RL results.
-
-Fixed instruction templates and simulation physics leave major deployment shifts unmeasured.
-
-Treat LIBERO as a diagnostic suite of transfer types, not as a scalar definition of robot intelligence.
+- LIBERO informs which knowledge transfer failures a post-training method fixes. Its atomic unit is a language-conditioned demonstration trajectory, but evaluation is closed-loop task success across controlled suite shifts. The procedural generator makes task families comparable while preserving repeatability.
+- The benchmark establishes relative performance inside its simulator. At ten times the paper usage, saturation and tuning to the benchmark become larger risks than task difficulty. A missing test is cross-benchmark and real-robot rank correlation under unseen instruction phrasing. LIBERO ceases to be decision-useful if methods trade places under minor simulator, language, or controller changes.
+- LIBERO is the common substrate connecting OpenVLA-OFT, RIPT-VLA, and SimpleVLA-RL results.
+- Fixed instruction templates and simulation physics leave major deployment shifts unmeasured.
+- Treat LIBERO as a diagnostic suite of transfer types, not as a scalar definition of robot intelligence.

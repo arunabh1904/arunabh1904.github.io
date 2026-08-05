@@ -35,10 +35,7 @@ Scene fusion uses hierarchical interaction to strengthen BEV context; instance f
 
 ## High-Level Takeaways
 
-IS-Fusion is relevant when dense BEV fusion localizes the scene but loses fine object evidence. The decisive control matches total parameters against a stronger scene-only encoder and measures gains by range, size, occlusion, and proposal confidence.
-
-Its latency should be profiled by number of proposals and active regions, not only average FPS, because crowded scenes expand instance work.
-
-BEVFusion chooses dense scene fusion; TransFusion chooses object queries; IS-Fusion deliberately pays for both.
-
-Scene cells and object proposals carry complementary information, but a dual path earns its complexity only when matched ablations show each granularity fixes a distinct failure.
+- IS-Fusion is relevant when dense BEV fusion localizes the scene but loses fine object evidence. The decisive control matches total parameters against a stronger scene-only encoder and measures gains by range, size, occlusion, and proposal confidence.
+- Its latency should be profiled by number of proposals and active regions, not only average FPS, because crowded scenes expand instance work.
+- BEVFusion chooses dense scene fusion; TransFusion chooses object queries; IS-Fusion deliberately pays for both.
+- Scene cells and object proposals carry complementary information, but a dual path earns its complexity only when matched ablations show each granularity fixes a distinct failure.

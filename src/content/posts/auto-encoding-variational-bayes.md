@@ -34,16 +34,6 @@ Kingma and Welling made variational inference feel like ordinary neural-network 
 
 That trick turns Monte Carlo estimates of the evidence lower bound (ELBO) into low-variance gradients that work with standard stochastic gradient descent. The paper also made amortised inference practical at scale: the encoder learns to predict posterior parameters directly, rather than solving a separate inference problem for every datapoint.
 
-## High-Level Takeaways
-
-The paper clarifies which latent representation and generative objective give the best quality, likelihood, and sampling-cost tradeoff. Its fundamental training unit is a datapoint and a sampled latent variable.
-
-For optimization, the ELBO adds an expected reconstruction term and a KL term per example; the original formulation does not introduce a separate $\beta$ reweighting coefficient. The encoder maps each observation to the parameters of a compact latent distribution sampled through reparameterization.
-
-The most important missing comparison is a matched-compute comparison that separates objective choice, latent compression, sampler steps, and data quality. At 10× scale, data curation, latent bottlenecks, sampling cost, and training instability would dominate simple parameter scaling. The central claim would fail under this test: Hold data, parameters, and sampling compute fixed; reject the objective if a simpler likelihood or adversarial baseline matches quality and coverage.
-
-VAEs gave deep generative modelling a stable likelihood-based recipe. They did not produce the sharpest samples, but they made latent-variable models trainable, inspectable, and useful for representation learning. Later work such as $\beta$-VAE, conditional VAEs, and flow-based models all build on this basic encoder-decoder view of probabilistic inference.
-
 ### Reported evidence and cost
 
 | Dataset | Latent dim | $-\log p(x)$ ↓ (nats) | Notes |
@@ -58,3 +48,10 @@ Training cost was modest for the original experiments: minutes per epoch on MNIS
 The strength of VAEs is stability: training has a clear objective, avoids GAN-style mode collapse, and produces a latent space that supports interpolation. The tradeoff is expressiveness. Simple Gaussian priors and posteriors can underfit complex data, and the ELBO is only a lower bound, so a good training objective does not guarantee a tight estimate of true likelihood.
 
 Auto-Encoding Variational Bayes turned variational inference into a scalable deep-learning procedure. The reparameterisation trick is the small mathematical hinge that made the whole recipe practical.
+
+## High-Level Takeaways
+
+- The paper clarifies which latent representation and generative objective give the best quality, likelihood, and sampling-cost tradeoff. Its fundamental training unit is a datapoint and a sampled latent variable.
+- For optimization, the ELBO adds an expected reconstruction term and a KL term per example; the original formulation does not introduce a separate $\beta$ reweighting coefficient. The encoder maps each observation to the parameters of a compact latent distribution sampled through reparameterization.
+- The most important missing comparison is a matched-compute comparison that separates objective choice, latent compression, sampler steps, and data quality. At 10× scale, data curation, latent bottlenecks, sampling cost, and training instability would dominate simple parameter scaling. The central claim would fail under this test: Hold data, parameters, and sampling compute fixed; reject the objective if a simpler likelihood or adversarial baseline matches quality and coverage.
+- VAEs gave deep generative modelling a stable likelihood-based recipe. They did not produce the sharpest samples, but they made latent-variable models trainable, inspectable, and useful for representation learning. Later work such as $\beta$-VAE, conditional VAEs, and flow-based models all build on this basic encoder-decoder view of probabilistic inference.

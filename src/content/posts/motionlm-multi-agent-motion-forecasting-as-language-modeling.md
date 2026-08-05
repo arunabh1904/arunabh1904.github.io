@@ -53,10 +53,7 @@ _Figure 2 shows the language-model analogy concretely: scene features condition 
 
 ## High-Level Takeaways
 
-MotionLM informs whether continuous multi-agent futures should be generated jointly as discrete motion tokens. The atomic unit is a quantized displacement token for a particular agent and timestep; autoregressive ordering lets each predicted move condition on the emerging joint future.
-
-Tokenization makes interaction modeling compatible with language-model training, but quantization error, sequence ordering, and exposure bias become part of the planner. The missing study holds backbone and sampling budget fixed across tokenized autoregression and continuous joint decoders. At 10× agents or horizon, sequence length and sampling latency grow linearly while joint combinations grow much faster. The claim would fail if a continuous decoder matched joint metrics and controllable diversity with lower latency and no quantization artifacts.
-
-MotionLM made the language-model analogy concrete for autonomous-driving behavior prediction.
-
-A good tokenization can turn motion forecasting into sequence modeling, but the planner still has to care about calibration, coverage, and interaction quality.
+- MotionLM informs whether continuous multi-agent futures should be generated jointly as discrete motion tokens. The atomic unit is a quantized displacement token for a particular agent and timestep; autoregressive ordering lets each predicted move condition on the emerging joint future.
+- Tokenization makes interaction modeling compatible with language-model training, but quantization error, sequence ordering, and exposure bias become part of the planner. The missing study holds backbone and sampling budget fixed across tokenized autoregression and continuous joint decoders. At 10× agents or horizon, sequence length and sampling latency grow linearly while joint combinations grow much faster. The claim would fail if a continuous decoder matched joint metrics and controllable diversity with lower latency and no quantization artifacts.
+- MotionLM made the language-model analogy concrete for autonomous-driving behavior prediction.
+- A good tokenization can turn motion forecasting into sequence modeling, but the planner still has to care about calibration, coverage, and interaction quality.

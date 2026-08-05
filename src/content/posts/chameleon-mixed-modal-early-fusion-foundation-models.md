@@ -35,12 +35,8 @@ _Figure 1 shows Chameleon's defining constraint: one autoregressive transformer 
 
 ## High-Level Takeaways
 
-Chameleon informs the decision to use one early-fusion token stream for multimodal understanding and generation instead of separate language and image systems. Its atomic unit is a discrete text or image token, and one Transformer shares sequence processing across arbitrary image-text orderings after modality-specific tokenization.
-
-The single next-token objective makes the interface clean, but image quantization and visual-token count determine both reconstruction quality and sequence cost. The paper's stable-training recipe shows that early fusion can work at useful scale; it does not establish that discrete visual tokens are compute-optimal against continuous diffusion or decoupled visual encoders.
-
-A decisive comparison would hold data, parameters, and training FLOPs fixed across discrete early fusion, a continuous-image hybrid, and a shared backbone with separate visual routes. At 10× visual context, token length and modality interference are the likely bottlenecks. The early-fusion claim would fail if a separated design matched mixed-document quality and generation while using materially less training and inference compute.
-
-Strong unified generation does not establish that a fully shared representation is best for every visual understanding or action task.
-
-Chameleon is the clean baseline for asking whether early fusion is worth its sequence-length and interference costs.
+- Chameleon informs the decision to use one early-fusion token stream for multimodal understanding and generation instead of separate language and image systems. Its atomic unit is a discrete text or image token, and one Transformer shares sequence processing across arbitrary image-text orderings after modality-specific tokenization.
+- The single next-token objective makes the interface clean, but image quantization and visual-token count determine both reconstruction quality and sequence cost. The paper's stable-training recipe shows that early fusion can work at useful scale; it does not establish that discrete visual tokens are compute-optimal against continuous diffusion or decoupled visual encoders.
+- A decisive comparison would hold data, parameters, and training FLOPs fixed across discrete early fusion, a continuous-image hybrid, and a shared backbone with separate visual routes. At 10× visual context, token length and modality interference are the likely bottlenecks. The early-fusion claim would fail if a separated design matched mixed-document quality and generation while using materially less training and inference compute.
+- Strong unified generation does not establish that a fully shared representation is best for every visual understanding or action task.
+- Chameleon is the clean baseline for asking whether early fusion is worth its sequence-length and interference costs.

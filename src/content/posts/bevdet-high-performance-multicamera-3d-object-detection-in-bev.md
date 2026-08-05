@@ -40,10 +40,7 @@ BEV improves translation, orientation, and velocity reasoning, but the paper rep
 
 ## High-Level Takeaways
 
-BEVDet informs when explicit BEV is worth its fixed spatial cost. Its atomic units change from pixels and depth bins to BEV cells. The image encoder is shared across cameras; geometry is shared through the vehicle-centered grid; the detector pays uniformly for the chosen range and resolution.
-
-The falsification compares dense BEV with query-based retrieval under equal input pixels, depth supervision, and optimized kernels. BEVDet loses if empty-cell processing dominates P99 latency or if attribute and small-object evidence is damaged by early pooling. At larger range, image resolution and BEV area grow on different axes and must be budgeted separately.
-
-Lift, Splat, Shoot supplies the geometric primitive. BEVDet turns it into a tuned detector; BEVDet4D adds recurrent BEV, BEVDepth adds LiDAR-supervised depth, and SOLOFusion stretches the temporal stereo horizon.
-
-BEV performance comes from the whole representation contract—augmentation, resolution, pooling, and heads—not from the view-transform equation alone.
+- BEVDet informs when explicit BEV is worth its fixed spatial cost. Its atomic units change from pixels and depth bins to BEV cells. The image encoder is shared across cameras; geometry is shared through the vehicle-centered grid; the detector pays uniformly for the chosen range and resolution.
+- The falsification compares dense BEV with query-based retrieval under equal input pixels, depth supervision, and optimized kernels. BEVDet loses if empty-cell processing dominates P99 latency or if attribute and small-object evidence is damaged by early pooling. At larger range, image resolution and BEV area grow on different axes and must be budgeted separately.
+- Lift, Splat, Shoot supplies the geometric primitive. BEVDet turns it into a tuned detector; BEVDet4D adds recurrent BEV, BEVDepth adds LiDAR-supervised depth, and SOLOFusion stretches the temporal stereo horizon.
+- BEV performance comes from the whole representation contract—augmentation, resolution, pooling, and heads—not from the view-transform equation alone.

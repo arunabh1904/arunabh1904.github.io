@@ -54,10 +54,7 @@ _Figure 2 shows how TopoNet routes traffic elements and centerlines through deco
 
 ## High-Level Takeaways
 
-TopoNet informs whether lane geometry and traffic-element association should be predicted independently or reasoned over as one scene graph. Its atomic units are lane and traffic-element queries; graph edges represent lane-to-lane connectivity and traffic-element-to-lane assignment.
-
-Joint reasoning can enforce coherent topology, but errors in node detection and edge classification compound. The missing control holds node features fixed while comparing independent edge heads, message passing, and explicit structural constraints. At 10× lane density, candidate edges grow quadratically and class imbalance worsens. The graph claim would fail if a sparse rule-constrained matcher achieved equal topology metrics and downstream route validity with fewer learned pairwise evaluations.
-
-TopoNet made road topology a first-class perception output, not a post-processing afterthought.
-
-A BEV map becomes a driving map only when its elements know how they connect and which rules apply to them.
+- TopoNet informs whether lane geometry and traffic-element association should be predicted independently or reasoned over as one scene graph. Its atomic units are lane and traffic-element queries; graph edges represent lane-to-lane connectivity and traffic-element-to-lane assignment.
+- Joint reasoning can enforce coherent topology, but errors in node detection and edge classification compound. The missing control holds node features fixed while comparing independent edge heads, message passing, and explicit structural constraints. At 10× lane density, candidate edges grow quadratically and class imbalance worsens. The graph claim would fail if a sparse rule-constrained matcher achieved equal topology metrics and downstream route validity with fewer learned pairwise evaluations.
+- TopoNet made road topology a first-class perception output, not a post-processing afterthought.
+- A BEV map becomes a driving map only when its elements know how they connect and which rules apply to them.

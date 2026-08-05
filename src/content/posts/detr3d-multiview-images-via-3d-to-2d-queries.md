@@ -38,10 +38,7 @@ The query count therefore acts as a capacity and recall budget, not a free scali
 
 ## High-Level Takeaways
 
-DETR3D informs whether camera-only 3D detection needs a scene-wide BEV field. Its atomic unit is an object query with a metric reference point. The image backbone is dense and shared across views, while geometric and temporal cost after the backbone scales with the bounded query set rather than BEV area.
-
-The matched falsification compares query retrieval and dense BEV lifting with the same image pyramid, depth supervision, and P99 budget. DETR3D loses if missed query initialization or point sampling harms long-range recall, or if dense scene context materially improves births and free-space reasoning. At crowded scale, query count and self-attention replace grid area as the limiting resource.
-
-DETR3D establishes 3D-to-2D query retrieval. PETR instead embeds 3D coordinates into every image feature before global attention; Sparse4D and SparseBEV make the query's sampled support larger and adaptive.
-
-A camera detector can reason in metric 3D without first materializing BEV, provided each hypothesis has a calibrated route back to image evidence.
+- DETR3D informs whether camera-only 3D detection needs a scene-wide BEV field. Its atomic unit is an object query with a metric reference point. The image backbone is dense and shared across views, while geometric and temporal cost after the backbone scales with the bounded query set rather than BEV area.
+- The matched falsification compares query retrieval and dense BEV lifting with the same image pyramid, depth supervision, and P99 budget. DETR3D loses if missed query initialization or point sampling harms long-range recall, or if dense scene context materially improves births and free-space reasoning. At crowded scale, query count and self-attention replace grid area as the limiting resource.
+- DETR3D establishes 3D-to-2D query retrieval. PETR instead embeds 3D coordinates into every image feature before global attention; Sparse4D and SparseBEV make the query's sampled support larger and adaptive.
+- A camera detector can reason in metric 3D without first materializing BEV, provided each hypothesis has a calibrated route back to image evidence.

@@ -43,10 +43,7 @@ _Figure 1: DriveVLM and DriveVLM-Dual model pipelines. From the [DriveVLM: The C
 
 ## High-Level Takeaways
 
-DriveVLM informs which decisions benefit from explicit language reasoning and which must remain in a fast geometric pipeline. The model decomposes planning into scene description, object analysis, and hierarchical trajectory reasoning, then fuses that output with a conventional planner for real-time control.
-
-The hybrid design acknowledges that semantic breadth and control latency have different requirements, but it obscures whether the VLM adds causal driving information or merely an ensemble prior. The missing closed-loop ablation removes each reasoning stage and the traditional branch at matched latency. At 10× traffic density, token generation and stale object narratives dominate. The VLM branch would fail its purpose if the conventional planner alone matched safety and progress on the scenarios where language reasoning is supposed to help.
-
-DriveVLM captures the field's tension clearly: VLMs are useful for understanding and explanation, but driving still needs precise geometry and real-time behavior.
-
-The near-term role for VLMs in driving may be as semantic planners and critics, not as the only system between sensors and steering.
+- DriveVLM informs which decisions benefit from explicit language reasoning and which must remain in a fast geometric pipeline. The model decomposes planning into scene description, object analysis, and hierarchical trajectory reasoning, then fuses that output with a conventional planner for real-time control.
+- The hybrid design acknowledges that semantic breadth and control latency have different requirements, but it obscures whether the VLM adds causal driving information or merely an ensemble prior. The missing closed-loop ablation removes each reasoning stage and the traditional branch at matched latency. At 10× traffic density, token generation and stale object narratives dominate. The VLM branch would fail its purpose if the conventional planner alone matched safety and progress on the scenarios where language reasoning is supposed to help.
+- DriveVLM captures the field's tension clearly: VLMs are useful for understanding and explanation, but driving still needs precise geometry and real-time behavior.
+- The near-term role for VLMs in driving may be as semantic planners and critics, not as the only system between sensors and steering.

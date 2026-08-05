@@ -38,12 +38,8 @@ RT-1 established the multi-task robot policy as a scalable object, but its seman
 
 ## High-Level Takeaways
 
-RT-1 informs whether to scale robot capability through one diverse policy or a collection of task-specific controllers. Its atomic unit is an observation–instruction paired with tokenized action dimensions. Visual compression and action discretization are what let shared transformer capacity meet the deployment rate.
-
-The experiments support positive returns from data and task diversity in the tested robot fleet. They do not separate diversity from collection quality or controller conventions. At ten times the embodiments, incompatible action spaces and sensor layouts will dominate. The generalist-policy claim would fail if task specialists trained on equal total data retain higher success and require less adaptation on held-out tasks.
-
-RT-1 is the scaling baseline from which web-grounded VLAs and cross-embodiment datasets developed.
-
-Real-time success at 3 Hz does not cover high-frequency, contact-rich control.
-
-Diversity is useful only when the interface compresses heterogeneous experience into actions the deployed robot can execute reliably.
+- RT-1 informs whether to scale robot capability through one diverse policy or a collection of task-specific controllers. Its atomic unit is an observation–instruction paired with tokenized action dimensions. Visual compression and action discretization are what let shared transformer capacity meet the deployment rate.
+- The experiments support positive returns from data and task diversity in the tested robot fleet. They do not separate diversity from collection quality or controller conventions. At ten times the embodiments, incompatible action spaces and sensor layouts will dominate. The generalist-policy claim would fail if task specialists trained on equal total data retain higher success and require less adaptation on held-out tasks.
+- RT-1 is the scaling baseline from which web-grounded VLAs and cross-embodiment datasets developed.
+- Real-time success at 3 Hz does not cover high-frequency, contact-rich control.
+- Diversity is useful only when the interface compresses heterogeneous experience into actions the deployed robot can execute reliably.

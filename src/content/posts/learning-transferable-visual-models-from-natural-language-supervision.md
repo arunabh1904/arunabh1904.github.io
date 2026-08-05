@@ -76,8 +76,6 @@ CLIP is one of the cleanest bridges between vision and language: one embedding s
 
 ## High-Level Takeaways
 
-CLIP informs the decision to buy visual transfer with image-text supervision rather than a closed-set label vocabulary. The training unit is an image-caption pair; separate visual and text encoders meet in a shared embedding space, and the contrastive batch defines the negative set.
-
-The central tradeoff is breadth versus control: web captions expand semantic coverage but import bias, noise, and prompt sensitivity. A decisive ablation would match data volume and compute across curated class labels, raw captions, and filtered captions while evaluating both zero-shot transfer and calibration. At 10× scale, duplicate pairs and low-information captions dilute the negative set. CLIP's recipe would lose its advantage if a smaller curated or generative objective matched transfer across unseen datasets at lower data and batch-communication cost.
-
-CLIP showed that natural-language supervision can give vision models rich, transferable semantics. It helped turn multimodal learning from a niche setup into a default way to build open-vocabulary systems.
+- CLIP informs the decision to buy visual transfer with image-text supervision rather than a closed-set label vocabulary. The training unit is an image-caption pair; separate visual and text encoders meet in a shared embedding space, and the contrastive batch defines the negative set.
+- The central tradeoff is breadth versus control: web captions expand semantic coverage but import bias, noise, and prompt sensitivity. A decisive ablation would match data volume and compute across curated class labels, raw captions, and filtered captions while evaluating both zero-shot transfer and calibration. At 10× scale, duplicate pairs and low-information captions dilute the negative set. CLIP's recipe would lose its advantage if a smaller curated or generative objective matched transfer across unseen datasets at lower data and batch-communication cost.
+- CLIP showed that natural-language supervision can give vision models rich, transferable semantics. It helped turn multimodal learning from a niche setup into a default way to build open-vocabulary systems.

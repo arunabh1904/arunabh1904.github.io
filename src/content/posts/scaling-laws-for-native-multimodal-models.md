@@ -35,10 +35,7 @@ _Figure 1 summarizes the architecture trade-off: early and late fusion reach sim
 
 ## High-Level Takeaways
 
-This study informs the architectural choice between early fusion and late fusion for native multimodal training. In the reported regime, a shared early-fusion stream is simpler and more efficient at smaller parameter counts, while modality-aware mixture-of-experts weights recover specialization without duplicating the whole model. The result argues that modality-specific capacity can live inside a unified transformer rather than behind separate towers.
-
-The evidence rejects an inherent late-fusion advantage only for the tested modalities, tokenization, and compute range. A decisive missing comparison would equalize active parameters, communication cost, context length, and modality-specific preprocessing across both designs. At ten times the number of modalities or sequence length, shared attention and routing contention may reverse the result. The claim would be falsified if late fusion becomes more sample- or compute-efficient once high-bandwidth modalities and matched systems costs are included.
-
-Scaling-law conclusions are conditional on the architectures, modalities, objectives, and mixtures studied; they should guide a proxy-run plan, not replace one.
-
-Treat early fusion plus learned specialization as a serious baseline rather than assuming a pretrained visual tower is necessary.
+- This study informs the architectural choice between early fusion and late fusion for native multimodal training. In the reported regime, a shared early-fusion stream is simpler and more efficient at smaller parameter counts, while modality-aware mixture-of-experts weights recover specialization without duplicating the whole model. The result argues that modality-specific capacity can live inside a unified transformer rather than behind separate towers.
+- The evidence rejects an inherent late-fusion advantage only for the tested modalities, tokenization, and compute range. A decisive missing comparison would equalize active parameters, communication cost, context length, and modality-specific preprocessing across both designs. At ten times the number of modalities or sequence length, shared attention and routing contention may reverse the result. The claim would be falsified if late fusion becomes more sample- or compute-efficient once high-bandwidth modalities and matched systems costs are included.
+- Scaling-law conclusions are conditional on the architectures, modalities, objectives, and mixtures studied; they should guide a proxy-run plan, not replace one.
+- Treat early fusion plus learned specialization as a serious baseline rather than assuming a pretrained visual tower is necessary.

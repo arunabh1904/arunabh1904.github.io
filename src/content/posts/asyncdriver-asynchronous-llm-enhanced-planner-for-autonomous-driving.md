@@ -43,10 +43,7 @@ _Figure 2: Overview of our proposed AsyncDriver framework. From the [AsyncDriver
 
 ## High-Level Takeaways
 
-AsyncDriver informs where a slow semantic model can enter a fast control stack without setting the control-loop latency. The operative units run at two clocks: infrequent LLM guidance summarizes scene-level intent, while a conventional planner produces high-frequency trajectories from current perception.
-
-The asynchronous boundary buys latency but risks stale guidance during rapid scene changes. The decisive ablation varies guidance age and event-trigger policy while matching planner capacity against no-LLM and synchronous-LLM baselines in closed loop. At 10× traffic complexity, semantic updates and planner state can diverge. The architecture would fail if delayed guidance produced no safety or progress gain over a smaller fast planner, or if rare stale-command failures erased the average benefit.
-
-It is a sober architecture. Instead of pretending language models are real-time controllers, AsyncDriver gives them a slower advisory role.
-
-In autonomy, reasoning and control do not need to run at the same frequency. VLM/LLM components can be useful if the system boundary respects latency.
+- AsyncDriver informs where a slow semantic model can enter a fast control stack without setting the control-loop latency. The operative units run at two clocks: infrequent LLM guidance summarizes scene-level intent, while a conventional planner produces high-frequency trajectories from current perception.
+- The asynchronous boundary buys latency but risks stale guidance during rapid scene changes. The decisive ablation varies guidance age and event-trigger policy while matching planner capacity against no-LLM and synchronous-LLM baselines in closed loop. At 10× traffic complexity, semantic updates and planner state can diverge. The architecture would fail if delayed guidance produced no safety or progress gain over a smaller fast planner, or if rare stale-command failures erased the average benefit.
+- It is a sober architecture. Instead of pretending language models are real-time controllers, AsyncDriver gives them a slower advisory role.
+- In autonomy, reasoning and control do not need to run at the same frequency. VLM/LLM components can be useful if the system boundary respects latency.

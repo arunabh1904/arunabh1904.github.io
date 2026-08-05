@@ -57,12 +57,8 @@ _Figure 2 shows the training-time teacher setup: the VLM produces freeform reaso
 
 ## High-Level Takeaways
 
-The expensive decision is where semantic reasoning belongs in a real-time driving stack and what can safely remain end to end. Its fundamental training unit is a text token plus a visual patch or compressed visual token. Each modality keeps a separate input encoder before sharing a connector/backbone or common token-processing stack.
-
-The VLM watches driving scenes during dataset construction, produces freeform reasoning and structured action annotations, and those annotations become auxiliary supervision for a smaller driving model. The note does not give full mixture proportions or a reproducible curriculum schedule. Cameras and scene state are compressed into BEV features, object/map vectors, queries, or language tokens.
-
-The most important missing comparison is a closed-loop, matched-latency ablation that isolates semantic reasoning from perception and planner capacity. At 10× scale, sensor-token count, scene density, temporal context, and closed-loop latency would grow faster than the headline offline metric. The central claim would fail under this test: Run matched-latency closed-loop evaluation with and without the proposed reasoning or representation; reject it if safety and progress do not improve.
-
-VLM-AD is a clean example of the "language model as teacher" pattern for physical systems. The VLM improves training signal, but the deployed system still respects latency and control constraints.
-
-For autonomous driving, VLMs may be most useful offline: generating rationales and labels that teach compact planners what the trajectory alone does not explain.
+- The expensive decision is where semantic reasoning belongs in a real-time driving stack and what can safely remain end to end. Its fundamental training unit is a text token plus a visual patch or compressed visual token. Each modality keeps a separate input encoder before sharing a connector/backbone or common token-processing stack.
+- The VLM watches driving scenes during dataset construction, produces freeform reasoning and structured action annotations, and those annotations become auxiliary supervision for a smaller driving model. The note does not give full mixture proportions or a reproducible curriculum schedule. Cameras and scene state are compressed into BEV features, object/map vectors, queries, or language tokens.
+- The most important missing comparison is a closed-loop, matched-latency ablation that isolates semantic reasoning from perception and planner capacity. At 10× scale, sensor-token count, scene density, temporal context, and closed-loop latency would grow faster than the headline offline metric. The central claim would fail under this test: Run matched-latency closed-loop evaluation with and without the proposed reasoning or representation; reject it if safety and progress do not improve.
+- VLM-AD is a clean example of the "language model as teacher" pattern for physical systems. The VLM improves training signal, but the deployed system still respects latency and control constraints.
+- For autonomous driving, VLMs may be most useful offline: generating rationales and labels that teach compact planners what the trajectory alone does not explain.

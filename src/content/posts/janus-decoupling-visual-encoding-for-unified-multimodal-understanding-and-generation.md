@@ -35,10 +35,7 @@ _Figure 2 exposes Janus's core separation: understanding and generation use diff
 
 ## High-Level Takeaways
 
-Janus informs whether a unified multimodal model must also impose a unified visual representation. It keeps a shared transformer for cross-modal reasoning but gives understanding and generation distinct visual encoders, acknowledging that semantic invariance and pixel-level fidelity demand different compression. The architecture shares the expensive sequence model while specializing the interfaces where representational conflict is strongest.
-
-Its results support decoupling as a practical compromise, but the paper needs a tighter capacity-matched comparison against one stronger tokenizer and against fully separate models. Without that, gains could come from extra parameters rather than reduced interference. At ten times the modality or resolution scale, the number of specialized interfaces may proliferate and the shared transformer can still suffer gradient conflict. The thesis would be falsified if a single dual-purpose tokenizer matches both understanding and generation under equal compute, or if separate transformers outperform despite losing sharing.
-
-Separate routes add components and do not remove the need to measure interference in the shared transformer.
-
-Share reasoning capacity when it transfers; specialize visual representations when their information requirements differ.
+- Janus informs whether a unified multimodal model must also impose a unified visual representation. It keeps a shared transformer for cross-modal reasoning but gives understanding and generation distinct visual encoders, acknowledging that semantic invariance and pixel-level fidelity demand different compression. The architecture shares the expensive sequence model while specializing the interfaces where representational conflict is strongest.
+- Its results support decoupling as a practical compromise, but the paper needs a tighter capacity-matched comparison against one stronger tokenizer and against fully separate models. Without that, gains could come from extra parameters rather than reduced interference. At ten times the modality or resolution scale, the number of specialized interfaces may proliferate and the shared transformer can still suffer gradient conflict. The thesis would be falsified if a single dual-purpose tokenizer matches both understanding and generation under equal compute, or if separate transformers outperform despite losing sharing.
+- Separate routes add components and do not remove the need to measure interference in the shared transformer.
+- Share reasoning capacity when it transfers; specialize visual representations when their information requirements differ.

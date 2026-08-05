@@ -50,10 +50,7 @@ _Figure 2 shows OpenDriveVLA's staged training pipeline, from hierarchical featu
 
 ## High-Level Takeaways
 
-OpenDriveVLA informs how an open VLM should be adapted to produce structured driving actions rather than only commentary. The training curriculum moves from vision-centric alignment to driving instruction tuning, agent-environment interaction modeling, and trajectory planning; 2D and 3D visual tokens share the language backbone before action decoding.
-
-The staged recipe makes curriculum order and token balance central, but it is unclear which stage creates planning gains. A matched-token factorial ablation should remove, reorder, or replace each stage and compare 2D-only, 3D-only, and fused tokens. At 10× visual context, token budget and modality interference dominate. The VLA design would fail if a frozen VLM plus a compact geometric planner matched closed-loop performance with lower training and inference cost.
-
-OpenDriveVLA made the spatial-token design problem explicit for autonomous-driving VLA systems.
-
-A driving VLA needs language reasoning, but it also needs structured 3D scene tokens that actions can depend on.
+- OpenDriveVLA informs how an open VLM should be adapted to produce structured driving actions rather than only commentary. The training curriculum moves from vision-centric alignment to driving instruction tuning, agent-environment interaction modeling, and trajectory planning; 2D and 3D visual tokens share the language backbone before action decoding.
+- The staged recipe makes curriculum order and token balance central, but it is unclear which stage creates planning gains. A matched-token factorial ablation should remove, reorder, or replace each stage and compare 2D-only, 3D-only, and fused tokens. At 10× visual context, token budget and modality interference dominate. The VLA design would fail if a frozen VLM plus a compact geometric planner matched closed-loop performance with lower training and inference cost.
+- OpenDriveVLA made the spatial-token design problem explicit for autonomous-driving VLA systems.
+- A driving VLA needs language reasoning, but it also needs structured 3D scene tokens that actions can depend on.

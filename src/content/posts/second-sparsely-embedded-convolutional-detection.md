@@ -38,10 +38,7 @@ The paper reports lower pedestrian and cyclist performance than for cars and ide
 
 ## High-Level Takeaways
 
-SECOND informs where a LiDAR model should first become dense. Its atomic unit is an occupied voxel; parameter sharing occurs through sparse kernels over a coordinate map. The expensive decision is not whether the mathematical tensor is sparse, but whether the target accelerator can generate and traverse active rules cheaply enough to beat dense kernels at the observed occupancy.
-
-A matched test should compare sparse and dense 3D middle encoders with the same voxel size, receptive field, BEV head, and P99 latency measurement. The sparse design loses if indexing and memory movement erase its arithmetic savings or if early BEV conversion preserves the same detection quality more cheaply. At larger range and finer voxels, active-set bookkeeping and the final dense BEV map become the likely bottlenecks.
-
-VoxelNet established learned voxel features; SECOND made sparse 3D convolution practical for detection. VoTr and DSVT later replace parts of the convolutional neighborhood with bounded attention, while VoxelNeXt removes the dense prediction head as well.
-
-Sparse LiDAR modeling starts by refusing to compute over empty volume, but the real system boundary is where sparse indexing stops paying for itself.
+- SECOND informs where a LiDAR model should first become dense. Its atomic unit is an occupied voxel; parameter sharing occurs through sparse kernels over a coordinate map. The expensive decision is not whether the mathematical tensor is sparse, but whether the target accelerator can generate and traverse active rules cheaply enough to beat dense kernels at the observed occupancy.
+- A matched test should compare sparse and dense 3D middle encoders with the same voxel size, receptive field, BEV head, and P99 latency measurement. The sparse design loses if indexing and memory movement erase its arithmetic savings or if early BEV conversion preserves the same detection quality more cheaply. At larger range and finer voxels, active-set bookkeeping and the final dense BEV map become the likely bottlenecks.
+- VoxelNet established learned voxel features; SECOND made sparse 3D convolution practical for detection. VoTr and DSVT later replace parts of the convolutional neighborhood with bounded attention, while VoxelNeXt removes the dense prediction head as well.
+- Sparse LiDAR modeling starts by refusing to compute over empty volume, but the real system boundary is where sparse indexing stops paying for itself.

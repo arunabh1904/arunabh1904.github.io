@@ -37,12 +37,8 @@ The main design choice is calibration at the policy interface. Robot control mod
 
 ## High-Level Takeaways
 
-SIMPLER informs which regressions can be screened in simulation before spending robot hours. Its atomic unit is a closed-loop simulated episode executed by a policy trained on real data. The scaling claim concerns rank correlation and failure-mode similarity, not simulation realism by itself.
-
-A missing test repeatedly recalibrates the correlation as new policy families, controllers, and tasks arrive. At ten times the capability breadth, one simulator may preserve rankings for some skills and invert them for others. The central claim fails if improvements selected by SIMPLER do not predict real gains prospectively rather than retrospectively.
-
-SIMPLER supplies the real-to-sim middle layer in an evaluation pyramid.
-
-Correlation on existing policies can break after architecture or action-interface changes.
-
-Use simulation when it predicts a decision you care about; measure that prediction continuously.
+- SIMPLER informs which regressions can be screened in simulation before spending robot hours. Its atomic unit is a closed-loop simulated episode executed by a policy trained on real data. The scaling claim concerns rank correlation and failure-mode similarity, not simulation realism by itself.
+- A missing test repeatedly recalibrates the correlation as new policy families, controllers, and tasks arrive. At ten times the capability breadth, one simulator may preserve rankings for some skills and invert them for others. The central claim fails if improvements selected by SIMPLER do not predict real gains prospectively rather than retrospectively.
+- SIMPLER supplies the real-to-sim middle layer in an evaluation pyramid.
+- Correlation on existing policies can break after architecture or action-interface changes.
+- Use simulation when it predicts a decision you care about; measure that prediction continuously.

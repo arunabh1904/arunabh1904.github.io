@@ -41,10 +41,7 @@ _The left pipeline fuses once; the right keeps both representations alive and ex
 
 ## High-Level Takeaways
 
-DeepInteraction informs whether representation sharing should mean a shared tensor or a shared interaction protocol. Its atomic units are image and LiDAR features plus object queries. Parameters are not fully shared, and the two feature spaces remain explicit until prediction.
-
-The missing matched control gives a BEVFusion-style model the same parameter count, decoder depth, camera backbone, and latency, then tests corruption and calibration slices. At 10× temporal history, retaining two feature memories becomes expensive. The two-stream design would fail if a fused BEV with explicit sensor embeddings preserves the same robustness and rare-class gains with less memory, or if downstream dense tasks need a single scene tensor more than the detector needs native views.
-
-DeepInteraction is the strongest counterpoint to “unified representation” as feature collapse. Later unified backbones must show that parameter sharing does not erase modality-specific information.
-
-Sharing a model is not the same as forcing every sensor into one latent; sometimes the right shared object is the rule for exchanging evidence.
+- DeepInteraction informs whether representation sharing should mean a shared tensor or a shared interaction protocol. Its atomic units are image and LiDAR features plus object queries. Parameters are not fully shared, and the two feature spaces remain explicit until prediction.
+- The missing matched control gives a BEVFusion-style model the same parameter count, decoder depth, camera backbone, and latency, then tests corruption and calibration slices. At 10× temporal history, retaining two feature memories becomes expensive. The two-stream design would fail if a fused BEV with explicit sensor embeddings preserves the same robustness and rare-class gains with less memory, or if downstream dense tasks need a single scene tensor more than the detector needs native views.
+- DeepInteraction is the strongest counterpoint to “unified representation” as feature collapse. Later unified backbones must show that parameter sharing does not erase modality-specific information.
+- Sharing a model is not the same as forcing every sensor into one latent; sometimes the right shared object is the rule for exchanging evidence.

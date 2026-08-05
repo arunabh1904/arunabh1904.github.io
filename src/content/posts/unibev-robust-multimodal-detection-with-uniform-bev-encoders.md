@@ -33,10 +33,7 @@ CNW learns channel-wise modality weights and normalizes them across the modaliti
 
 ## High-Level Takeaways
 
-UniBEV is relevant when memory, validation, or update cost makes three specialist models unattractive. Its atomic shared state is a BEV query and its explicit operating-mode input is modality availability. The decisive production comparison is not fused-mode mAP alone, but one conditional model versus specialists under the same total memory, latency, calibration, and corrupted-sensor test matrix.
-
-The paper models absence better than partial health. Glare, sparse LiDAR in weather, timing drift, and calibration error require reliability signals richer than a modality mask.
-
-UniBEV turns the missing-modality problem into a training distribution and fusion-normalization problem, complementing MetaBEV's expert routing and later reliability-aware work.
-
-A single fallback-capable model works only when missing-sensor modes are trained explicitly and fusion is normalized over the evidence that remains.
+- UniBEV is relevant when memory, validation, or update cost makes three specialist models unattractive. Its atomic shared state is a BEV query and its explicit operating-mode input is modality availability. The decisive production comparison is not fused-mode mAP alone, but one conditional model versus specialists under the same total memory, latency, calibration, and corrupted-sensor test matrix.
+- The paper models absence better than partial health. Glare, sparse LiDAR in weather, timing drift, and calibration error require reliability signals richer than a modality mask.
+- UniBEV turns the missing-modality problem into a training distribution and fusion-normalization problem, complementing MetaBEV's expert routing and later reliability-aware work.
+- A single fallback-capable model works only when missing-sensor modes are trained explicitly and fusion is normalized over the evidence that remains.

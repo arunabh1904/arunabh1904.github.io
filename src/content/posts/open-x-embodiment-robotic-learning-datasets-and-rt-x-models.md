@@ -38,12 +38,8 @@ The paper's deeper contribution is infrastructural: data format, task language, 
 
 ## High-Level Takeaways
 
-Open X-Embodiment informs whether to spend the next robot-data budget inside one platform or on a mixture that may transfer across platforms. Its atomic unit is a standardized trajectory, while the meaningful curriculum is the distribution over datasets, tasks, and embodiments.
-
-The RT-X results establish positive transfer for part of the mixture, not universal benefit from every dataset. The missing experiment is a full leave-one-embodiment-out matrix normalized by trajectory quality and sampling weight. At ten times the sources, hidden controller, timing, and annotation differences become dominant. The foundation-data claim fails if adding embodiments improves average benchmarks but increases adaptation data or harms safety on a target robot.
-
-Open X-Embodiment supplies the data substrate used by Octo, OpenVLA, and later generalist policies.
-
-Dataset scale counts episodes more easily than it measures coverage, quality, or recoveries.
-
-Cross-robot data becomes transferable only when the schema preserves the differences that matter for control.
+- Open X-Embodiment informs whether to spend the next robot-data budget inside one platform or on a mixture that may transfer across platforms. Its atomic unit is a standardized trajectory, while the meaningful curriculum is the distribution over datasets, tasks, and embodiments.
+- The RT-X results establish positive transfer for part of the mixture, not universal benefit from every dataset. The missing experiment is a full leave-one-embodiment-out matrix normalized by trajectory quality and sampling weight. At ten times the sources, hidden controller, timing, and annotation differences become dominant. The foundation-data claim fails if adding embodiments improves average benchmarks but increases adaptation data or harms safety on a target robot.
+- Open X-Embodiment supplies the data substrate used by Octo, OpenVLA, and later generalist policies.
+- Dataset scale counts episodes more easily than it measures coverage, quality, or recoveries.
+- Cross-robot data becomes transferable only when the schema preserves the differences that matter for control.

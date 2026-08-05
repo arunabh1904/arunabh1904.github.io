@@ -134,11 +134,11 @@ const indexedPapers = papers.map((paper) => {
     topics: [...new Set([...inferredTopics, ...paper.data.topics])],
   };
 }).sort((left, right) => {
-  const byDate = right.date.getTime() - left.date.getTime();
+  const byDate = left.date.getTime() - right.date.getTime();
   return byDate || left.title.localeCompare(right.title);
 });
 
-const years = [...new Set(indexedPapers.map((paper) => paper.year))].sort((a, b) => b - a);
+const years = [...new Set(indexedPapers.map((paper) => paper.year))].sort((a, b) => a - b);
 
 const fieldNodes = [
   { field: 'Vision Foundations', label: 'Vision', x: 280, y: 47 },
@@ -384,7 +384,7 @@ const formatDate = (date: Date) =>
           <p class="panel-kicker">Library</p>
           <h2>All paper notes</h2>
         </div>
-        <p><span data-visible-count>{indexedPapers.length}</span> results · ordered by release date</p>
+        <p><span data-visible-count>{indexedPapers.length}</span> results · oldest to newest</p>
       </div>
 
       <div class="active-filter" data-active-filter hidden>

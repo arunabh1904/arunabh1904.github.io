@@ -42,10 +42,7 @@ _UniTR shares encoder weights without pretending that image patches and LiDAR vo
 
 ## High-Level Takeaways
 
-UniTR informs whether parameter sharing across sensors can improve both efficiency and representation learning. Its atomic unit is a sensor token: image patch or LiDAR voxel. Attention weights are shared, but tokenizers, coordinate partitions, BEV pooling, and task heads retain structure specific to their roles.
-
-The missing matched control enlarges separate encoders to the same parameter count and trains them with the same parallel schedule, data, and fusion neighborhoods. Without it, some gain can come from the interaction design rather than weight sharing itself. At 10× tokens, window construction, memory movement, and cross-modal attention dominate. The shared-backbone claim would fail if additional modalities such as radar need enough specialized preprocessing and normalization that shared attention becomes a capacity bottleneck or harms degraded-mode calibration.
-
-UniTR reframes a unified sensor model as shared computation plus explicit coordinate structure, not identical inputs.
-
-The most credible sensor-agnostic backbone shares the expensive transformation while keeping sensor physics visible in tokenization and neighborhoods.
+- UniTR informs whether parameter sharing across sensors can improve both efficiency and representation learning. Its atomic unit is a sensor token: image patch or LiDAR voxel. Attention weights are shared, but tokenizers, coordinate partitions, BEV pooling, and task heads retain structure specific to their roles.
+- The missing matched control enlarges separate encoders to the same parameter count and trains them with the same parallel schedule, data, and fusion neighborhoods. Without it, some gain can come from the interaction design rather than weight sharing itself. At 10× tokens, window construction, memory movement, and cross-modal attention dominate. The shared-backbone claim would fail if additional modalities such as radar need enough specialized preprocessing and normalization that shared attention becomes a capacity bottleneck or harms degraded-mode calibration.
+- UniTR reframes a unified sensor model as shared computation plus explicit coordinate structure, not identical inputs.
+- The most credible sensor-agnostic backbone shares the expensive transformation while keeping sensor physics visible in tokenization and neighborhoods.

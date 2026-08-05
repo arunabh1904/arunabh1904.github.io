@@ -39,12 +39,8 @@ The benchmark is valuable because data generation and evaluation share explicit 
 
 ## High-Level Takeaways
 
-RoboTwin 2.0 informs whether the next data budget should buy real demonstrations or a synthetic generator plus a small real calibration set. Its unit is a generated bimanual trajectory with task code and validation. MLLM synthesis expands task coverage; simulator feedback filters obviously invalid programs.
-
-The reported gains establish that structured synthetic diversity can improve the tested VLA policies. A missing control evaluates an independently built real task distribution with no shared assets or prompts. At ten times the generated volume, correlated simulator artifacts and validation blind spots dominate. The claim fails if synthetic scale improves benchmark success but not real bimanual transfer per real demonstration.
-
-RoboTwin 2.0 is both a training-data intervention and an evaluation environment; those roles should be analyzed separately.
-
-Relative gains from a low-data baseline can look large while absolute real-world reliability remains modest.
-
-Synthetic data is most credible when the held-out evaluation breaks the generator's assumptions.
+- RoboTwin 2.0 informs whether the next data budget should buy real demonstrations or a synthetic generator plus a small real calibration set. Its unit is a generated bimanual trajectory with task code and validation. MLLM synthesis expands task coverage; simulator feedback filters obviously invalid programs.
+- The reported gains establish that structured synthetic diversity can improve the tested VLA policies. A missing control evaluates an independently built real task distribution with no shared assets or prompts. At ten times the generated volume, correlated simulator artifacts and validation blind spots dominate. The claim fails if synthetic scale improves benchmark success but not real bimanual transfer per real demonstration.
+- RoboTwin 2.0 is both a training-data intervention and an evaluation environment; those roles should be analyzed separately.
+- Relative gains from a low-data baseline can look large while absolute real-world reliability remains modest.
+- Synthetic data is most credible when the held-out evaluation breaks the generator's assumptions.

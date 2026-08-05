@@ -38,10 +38,7 @@ The strongest modified nuScenes model reports 69.6 mAP and 73.6 NDS. That number
 
 ## High-Level Takeaways
 
-BEV-MAE informs what a LiDAR foundation objective should reconstruct. Its atomic unit is a masked BEV column containing a set of points, not a generic voxel token. The encoder is the reusable asset; the small decoder and reconstruction targets are discarded after pretraining.
-
-The rejection test holds unlabeled frames, encoder, and fine-tuning budget fixed while comparing coordinate-density reconstruction with occupancy, contrastive, and future-geometry objectives. BEV-MAE loses if gains vanish with more diverse labeled data or fail across sensors with different beam patterns. At 10× pretraining scale, scenario redundancy and data I/O are likely to dominate before the small decoder does.
-
-BEV-MAE is a LiDAR-only pretraining reference. UniM²AE adds camera-LiDAR masked reconstruction in a shared 3D volume; UniWorld, ViDAR, and DriveWorld add temporal prediction so the latent must retain persistence and motion.
-
-A useful driving pretext task reconstructs measurement geometry and range-dependent density, not an arbitrary token merely because it was masked.
+- BEV-MAE informs what a LiDAR foundation objective should reconstruct. Its atomic unit is a masked BEV column containing a set of points, not a generic voxel token. The encoder is the reusable asset; the small decoder and reconstruction targets are discarded after pretraining.
+- The rejection test holds unlabeled frames, encoder, and fine-tuning budget fixed while comparing coordinate-density reconstruction with occupancy, contrastive, and future-geometry objectives. BEV-MAE loses if gains vanish with more diverse labeled data or fail across sensors with different beam patterns. At 10× pretraining scale, scenario redundancy and data I/O are likely to dominate before the small decoder does.
+- BEV-MAE is a LiDAR-only pretraining reference. UniM²AE adds camera-LiDAR masked reconstruction in a shared 3D volume; UniWorld, ViDAR, and DriveWorld add temporal prediction so the latent must retain persistence and motion.
+- A useful driving pretext task reconstructs measurement geometry and range-dependent density, not an arbitrary token merely because it was masked.

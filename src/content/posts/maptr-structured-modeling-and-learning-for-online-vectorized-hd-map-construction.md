@@ -56,10 +56,7 @@ _Figure 4 shows the structured MapTR pipeline: sensor inputs become BEV features
 
 ## High-Level Takeaways
 
-MapTR informs whether online map elements should be decoded as ordered polylines with one canonical point sequence or as permutation-equivalent point sets. The atomic unit is a map-element query whose point queries represent geometry; hierarchical bipartite matching handles element identity and equivalent point orderings.
-
-The structured set view reduces arbitrary ordering penalties, but matching cost and fixed point count shape the result. A decisive ablation compares canonical ordering, permutation-equivalent matching, and curve-parameter decoders with the same image backbone and query budget. At 10× map extent, query count and Hungarian matching become bottlenecks. MapTR's formulation would fail if a simpler ordered decoder matched topology and geometry at lower latency and with fewer assignment ambiguities.
-
-MapTR gave the field a practical transformer baseline for vector maps and made permutation ambiguity a first-class modeling issue.
-
-Vector-map learning works better when the loss respects the geometry's symmetries instead of forcing one arbitrary point order.
+- MapTR informs whether online map elements should be decoded as ordered polylines with one canonical point sequence or as permutation-equivalent point sets. The atomic unit is a map-element query whose point queries represent geometry; hierarchical bipartite matching handles element identity and equivalent point orderings.
+- The structured set view reduces arbitrary ordering penalties, but matching cost and fixed point count shape the result. A decisive ablation compares canonical ordering, permutation-equivalent matching, and curve-parameter decoders with the same image backbone and query budget. At 10× map extent, query count and Hungarian matching become bottlenecks. MapTR's formulation would fail if a simpler ordered decoder matched topology and geometry at lower latency and with fewer assignment ambiguities.
+- MapTR gave the field a practical transformer baseline for vector maps and made permutation ambiguity a first-class modeling issue.
+- Vector-map learning works better when the loss respects the geometry's symmetries instead of forcing one arbitrary point order.

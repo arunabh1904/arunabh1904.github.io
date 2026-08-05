@@ -33,10 +33,7 @@ Sparse windows bound the quadratic attention cost by local token count. Empty lo
 
 ## High-Level Takeaways
 
-SST is useful when the primary failure is lost small-object detail rather than insufficient global scene context. Window occupancy, maximum tokens, sorting, padding, and memory movement must be profiled; sparse FLOPs do not guarantee low wall-clock latency.
-
-The model also cannot represent unobserved free space through absent tokens. Dense BEV context can remain valuable for maps, occupancy, and safety envelopes even when actor detection is sparse.
-
-DSVT makes sparse token grouping more hardware-oriented; UniTR later applies a related sparse-transformer interface across modalities.
-
-Sparse attention earns its place when it preserves resolution and grows context without making empty road cells part of the compute bill.
+- SST is useful when the primary failure is lost small-object detail rather than insufficient global scene context. Window occupancy, maximum tokens, sorting, padding, and memory movement must be profiled; sparse FLOPs do not guarantee low wall-clock latency.
+- The model also cannot represent unobserved free space through absent tokens. Dense BEV context can remain valuable for maps, occupancy, and safety envelopes even when actor detection is sparse.
+- DSVT makes sparse token grouping more hardware-oriented; UniTR later applies a related sparse-transformer interface across modalities.
+- Sparse attention earns its place when it preserves resolution and grows context without making empty road cells part of the compute bill.

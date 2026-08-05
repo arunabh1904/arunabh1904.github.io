@@ -38,12 +38,8 @@ Co-training creates an important retention problem: robot data must ground the m
 
 ## High-Level Takeaways
 
-RT-2 informs whether semantic transfer is worth using a common language/action interface. Its unit is a multimodal sequence ending in either text or action tokens. The model shares nearly the entire transformer; discretization is the bridge between continuous control and next-token prediction.
-
-The evaluations establish semantic generalization in the studied manipulation domain. A missing ablation would compare shared tokens, a continuous action head, and a separate action expert under matched VLM retention and latency. At ten times the control frequency, autoregressive decoding becomes the bottleneck. The central claim weakens if semantic probes improve while closed-loop task success under geometric perturbations does not.
-
-RT-2 coined the practical VLA recipe: reuse a VLM, represent actions in its interface, and co-train semantics with control.
-
-Web knowledge does not supply metric state, force awareness, or recovery data.
-
-A shared vocabulary transfers meaning efficiently; it does not make language-token probability a complete control objective.
+- RT-2 informs whether semantic transfer is worth using a common language/action interface. Its unit is a multimodal sequence ending in either text or action tokens. The model shares nearly the entire transformer; discretization is the bridge between continuous control and next-token prediction.
+- The evaluations establish semantic generalization in the studied manipulation domain. A missing ablation would compare shared tokens, a continuous action head, and a separate action expert under matched VLM retention and latency. At ten times the control frequency, autoregressive decoding becomes the bottleneck. The central claim weakens if semantic probes improve while closed-loop task success under geometric perturbations does not.
+- RT-2 coined the practical VLA recipe: reuse a VLM, represent actions in its interface, and co-train semantics with control.
+- Web knowledge does not supply metric state, force awareness, or recovery data.
+- A shared vocabulary transfers meaning efficiently; it does not make language-token probability a complete control objective.

@@ -41,10 +41,7 @@ _The shared 3D volume is used during pretraining to force cross-modal completion
 
 ## High-Level Takeaways
 
-UniM²AE informs whether synchronized unlabeled sensor logs should pretrain separate encoders independently or through a shared geometric bottleneck. Its atomic units are image patches and LiDAR voxels; encoders and decoders are modality-specific, while the interaction volume is shared.
-
-The missing matched controls equalize visible tokens and compute across camera-only MAE, LiDAR-only MAE, late feature alignment, and shared-volume pretraining. At 10× fleet data, synchronization, calibration drift, data diversity, and storage dominate. The shared-volume objective would fail if future prediction or task-aware distillation transfers better under the same data and compute, or if the deployed camera-only encoder depends too heavily on LiDAR co-occurrence during pretraining.
-
-UniM²AE represents the masked-reconstruction branch of driving pretraining; UniWorld, ViDAR, and DriveWorld instead ask the representation to predict occupancy or future geometry and dynamics.
-
-Pretraining at scale needs a target that forces semantics and geometry to meet before expensive task labels are introduced.
+- UniM²AE informs whether synchronized unlabeled sensor logs should pretrain separate encoders independently or through a shared geometric bottleneck. Its atomic units are image patches and LiDAR voxels; encoders and decoders are modality-specific, while the interaction volume is shared.
+- The missing matched controls equalize visible tokens and compute across camera-only MAE, LiDAR-only MAE, late feature alignment, and shared-volume pretraining. At 10× fleet data, synchronization, calibration drift, data diversity, and storage dominate. The shared-volume objective would fail if future prediction or task-aware distillation transfers better under the same data and compute, or if the deployed camera-only encoder depends too heavily on LiDAR co-occurrence during pretraining.
+- UniM²AE represents the masked-reconstruction branch of driving pretraining; UniWorld, ViDAR, and DriveWorld instead ask the representation to predict occupancy or future geometry and dynamics.
+- Pretraining at scale needs a target that forces semantics and geometry to meet before expensive task labels are introduced.

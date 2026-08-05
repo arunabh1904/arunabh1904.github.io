@@ -35,10 +35,7 @@ _Figure 3 turns MM1 into an experimental recipe: hold the decoder-only LLM fixed
 
 ## High-Level Takeaways
 
-MM1 informs experiment allocation during multimodal pretraining. Its controlled studies indicate that image-encoder quality, resolution, visual-token count, and the mix of caption, interleaved image–text, and text-only data matter more than elaborate connector design. The fundamental unit is the mixed training sequence, but its value depends heavily on how much visual evidence survives encoding and which sequence types shape the shared language model.
-
-The paper establishes a prioritization order within its tested regime, not a timeless ranking of components. The missing evidence is whether connector importance reappears when encoders, token budgets, or downstream tasks change, especially under equal end-to-end compute. At ten times the scale, data provenance and mixture interference may swamp gains from resolution. MM1's practical conclusion would be falsified if a connector sweep on stronger frozen encoders produces larger, more transferable gains than equivalent investment in data or visual tokens.
-
-The conclusions come from MM1's model family and data pipeline; they are a strong experimental prior, not a universal ranking for every architecture.
-
-In multimodal pre-training, spend early runs on the visual representation and mixture before polishing the connector.
+- MM1 informs experiment allocation during multimodal pretraining. Its controlled studies indicate that image-encoder quality, resolution, visual-token count, and the mix of caption, interleaved image–text, and text-only data matter more than elaborate connector design. The fundamental unit is the mixed training sequence, but its value depends heavily on how much visual evidence survives encoding and which sequence types shape the shared language model.
+- The paper establishes a prioritization order within its tested regime, not a timeless ranking of components. The missing evidence is whether connector importance reappears when encoders, token budgets, or downstream tasks change, especially under equal end-to-end compute. At ten times the scale, data provenance and mixture interference may swamp gains from resolution. MM1's practical conclusion would be falsified if a connector sweep on stronger frozen encoders produces larger, more transferable gains than equivalent investment in data or visual tokens.
+- The conclusions come from MM1's model family and data pipeline; they are a strong experimental prior, not a universal ranking for every architecture.
+- In multimodal pre-training, spend early runs on the visual representation and mixture before polishing the connector.

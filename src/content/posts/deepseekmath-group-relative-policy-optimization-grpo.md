@@ -53,14 +53,9 @@ That last row is the central limitation. If every answer is correct or every ans
 
 ## High-Level Takeaways
 
-GRPO informs whether a learned critic is worth its cost when rewards can be verified at the completion level. It is a natural fit for math and code because many samples can be generated from one prompt and an exact checker can cheaply separate them. It is less natural when rewards are noisy, resets are costly, or intermediate actions need distinct credit.
-
-The missing comparison is PPO and GRPO with identical models, prompts, samples, rewards, KL budgets, and total inference compute. The DeepSeekMath system changes data and post-training stages together. At ten times rollout length, copying one terminal advantage to every token increases variance and invites length-dependent artifacts. Later reasoning systems repair sampling and clipping, but do not remove the fundamental dependence on informative within-prompt contrasts.
-
-[PPO](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html) supplies the clipped policy update that GRPO reuses. [On-policy distillation](/paper%20shorts/2023/06/23/on-policy-distillation-language-models-gkd.html) offers a different route: sample the student's own states, then obtain dense token-level targets from a teacher rather than a single outcome.
-
-GRPO replaces PPO's value model with a within-prompt reward baseline and became a core optimizer for verifiable-reward reasoning.
-
-Its advantage disappears on homogeneous groups, terminal rewards give coarse token credit, and the source paper does not isolate optimizer gains from the full DeepSeekMath recipe.
-
-GRPO makes online reasoning RL cheaper by trading a learned critic for more same-prompt samples—and makes sample diversity part of the learning algorithm.
+- GRPO informs whether a learned critic is worth its cost when rewards can be verified at the completion level. It is a natural fit for math and code because many samples can be generated from one prompt and an exact checker can cheaply separate them. It is less natural when rewards are noisy, resets are costly, or intermediate actions need distinct credit.
+- The missing comparison is PPO and GRPO with identical models, prompts, samples, rewards, KL budgets, and total inference compute. The DeepSeekMath system changes data and post-training stages together. At ten times rollout length, copying one terminal advantage to every token increases variance and invites length-dependent artifacts. Later reasoning systems repair sampling and clipping, but do not remove the fundamental dependence on informative within-prompt contrasts.
+- [PPO](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html) supplies the clipped policy update that GRPO reuses. [On-policy distillation](/paper%20shorts/2023/06/23/on-policy-distillation-language-models-gkd.html) offers a different route: sample the student's own states, then obtain dense token-level targets from a teacher rather than a single outcome.
+- GRPO replaces PPO's value model with a within-prompt reward baseline and became a core optimizer for verifiable-reward reasoning.
+- Its advantage disappears on homogeneous groups, terminal rewards give coarse token credit, and the source paper does not isolate optimizer gains from the full DeepSeekMath recipe.
+- GRPO makes online reasoning RL cheaper by trading a learned critic for more same-prompt samples—and makes sample diversity part of the learning algorithm.

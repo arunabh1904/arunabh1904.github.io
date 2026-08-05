@@ -45,14 +45,9 @@ The most memorable qualitative result is not a benchmark number. Heads in the la
 
 ## High-Level Takeaways
 
-DINO informs whether a new vision backbone needs labels or instance-level negatives to acquire semantic structure. Its atomic training signal is cross-view agreement with a slowly moving teacher. The expensive decision is not only model size; it is whether the data augmentation, crop schedule, teacher momentum, centering, and temperature can be reproduced as a coherent recipe.
-
-The paper establishes unusually strong frozen ViT features and emergent object-aligned attention. It does not isolate whether transformers are uniquely responsible: convolutional networks also improve under DINO, while ViTs expose the learned structure more clearly through attention. A decisive follow-up would hold optimization, augmentation, parameter count, and compute fixed across architectures.
-
-At larger scale, DINO's global image target becomes a bottleneck for dense tasks because one class-token distribution does not directly supervise every patch. [iBOT](/paper%20shorts/2021/11/15/ibot-image-bert-pre-training-with-online-tokenizer.html) adds patch-level masked prediction; [DINOv2](/paper%20shorts/2023/04/14/dinov2-learning-robust-visual-features-without-supervision.html) combines both objectives with a curated data pipeline.
-
-DINO made momentum-teacher self-distillation a strong, label-free recipe for vision transformers.
-
-The strongest evidence uses ImageNet-centered pretraining and evaluation; attention maps are suggestive rather than a substitute for supervised dense-task measurement.
-
-DINO's contribution is a stable way to manufacture semantic targets from the model itself—and the discovery that ViTs trained on those targets organize objects without explicit object labels.
+- DINO informs whether a new vision backbone needs labels or instance-level negatives to acquire semantic structure. Its atomic training signal is cross-view agreement with a slowly moving teacher. The expensive decision is not only model size; it is whether the data augmentation, crop schedule, teacher momentum, centering, and temperature can be reproduced as a coherent recipe.
+- The paper establishes unusually strong frozen ViT features and emergent object-aligned attention. It does not isolate whether transformers are uniquely responsible: convolutional networks also improve under DINO, while ViTs expose the learned structure more clearly through attention. A decisive follow-up would hold optimization, augmentation, parameter count, and compute fixed across architectures.
+- At larger scale, DINO's global image target becomes a bottleneck for dense tasks because one class-token distribution does not directly supervise every patch. [iBOT](/paper%20shorts/2021/11/15/ibot-image-bert-pre-training-with-online-tokenizer.html) adds patch-level masked prediction; [DINOv2](/paper%20shorts/2023/04/14/dinov2-learning-robust-visual-features-without-supervision.html) combines both objectives with a curated data pipeline.
+- DINO made momentum-teacher self-distillation a strong, label-free recipe for vision transformers.
+- The strongest evidence uses ImageNet-centered pretraining and evaluation; attention maps are suggestive rather than a substitute for supervised dense-task measurement.
+- DINO's contribution is a stable way to manufacture semantic targets from the model itself—and the discovery that ViTs trained on those targets organize objects without explicit object labels.

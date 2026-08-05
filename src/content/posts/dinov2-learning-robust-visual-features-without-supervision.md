@@ -45,14 +45,9 @@ The visual correspondence figure is important because it shows what aggregate cl
 
 ## High-Level Takeaways
 
-DINOv2 informs whether to buy generality through supervised labels, task-specific encoders, or one large self-supervised feature model. The atomic representation is both a global class token and a grid of patch tokens. The expensive choice is the entire pipeline—data discovery, deduplication, teacher-student training, high-resolution adaptation, and distillation—not merely the 1.1B-parameter backbone.
-
-The evidence supports broad frozen transfer, but data and recipe improvements arrive together. A stronger causal comparison would train the old and new objectives on both the old and new datasets at matched compute. At ten times scale, data redundancy, content policy, and long-training degradation become more important than another small loss ablation.
-
-[DINOv3](/paper%20shorts/2025/08/13/dinov3.html) addresses that long-training failure explicitly with Gram anchoring. [dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html) takes the opposite adaptation path: freeze DINOv2 and add text alignment with a small trainable visual interface.
-
-DINOv2 packages global self-distillation, masked patch prediction, curated web data, and teacher distillation into a general visual backbone.
-
-The best results do not separate data curation, objective changes, scale, and distillation, and the web-derived distribution carries unreported coverage and bias decisions.
-
-DINOv2's durable lesson is that universal visual features are a data-system problem as much as an objective-design problem.
+- DINOv2 informs whether to buy generality through supervised labels, task-specific encoders, or one large self-supervised feature model. The atomic representation is both a global class token and a grid of patch tokens. The expensive choice is the entire pipeline—data discovery, deduplication, teacher-student training, high-resolution adaptation, and distillation—not merely the 1.1B-parameter backbone.
+- The evidence supports broad frozen transfer, but data and recipe improvements arrive together. A stronger causal comparison would train the old and new objectives on both the old and new datasets at matched compute. At ten times scale, data redundancy, content policy, and long-training degradation become more important than another small loss ablation.
+- [DINOv3](/paper%20shorts/2025/08/13/dinov3.html) addresses that long-training failure explicitly with Gram anchoring. [dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html) takes the opposite adaptation path: freeze DINOv2 and add text alignment with a small trainable visual interface.
+- DINOv2 packages global self-distillation, masked patch prediction, curated web data, and teacher distillation into a general visual backbone.
+- The best results do not separate data curation, objective changes, scale, and distillation, and the web-derived distribution carries unreported coverage and bias decisions.
+- DINOv2's durable lesson is that universal visual features are a data-system problem as much as an objective-design problem.

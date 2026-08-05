@@ -35,10 +35,7 @@ Cross-stage distillation aligns radar features with the teacher's LiDAR represen
 
 ## High-Level Takeaways
 
-CRKD is useful when the production sensor set is fixed but richer offline sensors are available. The proper control is the identical student trained directly, with teacher confidence, adverse-weather slices, and distillation weight ablations reported separately.
-
-Knowledge distillation adds no student inference block, but it adds a teacher lifecycle: versioning, target regeneration, calibration, and bias monitoring.
-
-BEVDepth uses LiDAR as a depth label for camera inference; CRKD transfers a broader camera-LiDAR representation into camera-radar perception.
-
-Train-time LiDAR can improve a cheaper runtime model, provided the teacher remains a supervised data dependency rather than a hidden inference dependency.
+- CRKD is useful when the production sensor set is fixed but richer offline sensors are available. The proper control is the identical student trained directly, with teacher confidence, adverse-weather slices, and distillation weight ablations reported separately.
+- Knowledge distillation adds no student inference block, but it adds a teacher lifecycle: versioning, target regeneration, calibration, and bias monitoring.
+- BEVDepth uses LiDAR as a depth label for camera inference; CRKD transfers a broader camera-LiDAR representation into camera-radar perception.
+- Train-time LiDAR can improve a cheaper runtime model, provided the teacher remains a supervised data dependency rather than a hidden inference dependency.

@@ -41,10 +41,7 @@ _MetaBEV makes sensor availability part of the computation path rather than sile
 
 ## High-Level Takeaways
 
-MetaBEV informs whether one deployed model can replace separate nominal and fallback networks. Its atomic unit is a meta-BEV query. Sensor encoders remain separate, while the evolving decoder is shared and conditioned by modality-specific experts; task conflicts receive another expert allocation mechanism.
-
-The missing control compares one conditional model with three separately trained specialists—camera-only, LiDAR-only, and fused—under equal total parameters, training compute, calibration, and deployment memory. At 10× sensor configurations and tasks, expert routing and validation-state coverage dominate. The one-model strategy would fail if specialists provide materially better uncertainty calibration or simpler certification within the same onboard budget.
-
-MetaBEV turns sensor failure from an inference-time accident into a training and architecture variable. UniBEV later studies uniform encoders and normalized weighted fusion for the same missing-modality objective.
-
-Graceful degradation must be trained as a first-class operating mode; a zero-filled failed sensor is not a normal measurement.
+- MetaBEV informs whether one deployed model can replace separate nominal and fallback networks. Its atomic unit is a meta-BEV query. Sensor encoders remain separate, while the evolving decoder is shared and conditioned by modality-specific experts; task conflicts receive another expert allocation mechanism.
+- The missing control compares one conditional model with three separately trained specialists—camera-only, LiDAR-only, and fused—under equal total parameters, training compute, calibration, and deployment memory. At 10× sensor configurations and tasks, expert routing and validation-state coverage dominate. The one-model strategy would fail if specialists provide materially better uncertainty calibration or simpler certification within the same onboard budget.
+- MetaBEV turns sensor failure from an inference-time accident into a training and architecture variable. UniBEV later studies uniform encoders and normalized weighted fusion for the same missing-modality objective.
+- Graceful degradation must be trained as a first-class operating mode; a zero-filled failed sensor is not a normal measurement.

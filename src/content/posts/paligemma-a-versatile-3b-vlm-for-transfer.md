@@ -56,10 +56,7 @@ _Figure 1 shows PaliGemma's core architecture: a SigLIP image encoder feeds a Ge
 
 ## High-Level Takeaways
 
-PaliGemma informs whether teams need a large chat-oriented VLM or a compact base model designed for task transfer. SigLIP patch features are linearly projected into Gemma's token space, and captions, answers, boxes, and masks are all emitted autoregressively under task prefixes. Resolution upcycling from 224 to 448 and 896 pixels is the paper's practical compression tradeoff: spend more visual tokens only for tasks whose fine detail warrants them.
-
-The nearly forty-task transfer suite establishes versatility, not that one checkpoint or resolution is universally optimal. The missing decision table is a compute-matched comparison of resolution, visual-token count, and task-specific fine-tuning data across OCR, localization, and semantic tasks. At ten times the image resolution or task count, autoregressive coordinate strings and context length become fragile bottlenecks. The transferable-base thesis would be falsified if specialized models with the same adaptation budget consistently dominate while a single instruction-tuned checkpoint transfers just as well.
-
-PaliGemma made the "small open VLM as a transferable base model" story concrete. It is useful because it is inspectable, fine-tunable, and broad enough to cover more than chat.
-
-PaliGemma is a compact VLM workhorse: simple architecture, many task interfaces, and enough resolution control to make transfer practical.
+- PaliGemma informs whether teams need a large chat-oriented VLM or a compact base model designed for task transfer. SigLIP patch features are linearly projected into Gemma's token space, and captions, answers, boxes, and masks are all emitted autoregressively under task prefixes. Resolution upcycling from 224 to 448 and 896 pixels is the paper's practical compression tradeoff: spend more visual tokens only for tasks whose fine detail warrants them.
+- The nearly forty-task transfer suite establishes versatility, not that one checkpoint or resolution is universally optimal. The missing decision table is a compute-matched comparison of resolution, visual-token count, and task-specific fine-tuning data across OCR, localization, and semantic tasks. At ten times the image resolution or task count, autoregressive coordinate strings and context length become fragile bottlenecks. The transferable-base thesis would be falsified if specialized models with the same adaptation budget consistently dominate while a single instruction-tuned checkpoint transfers just as well.
+- PaliGemma made the "small open VLM as a transferable base model" story concrete. It is useful because it is inspectable, fine-tunable, and broad enough to cover more than chat.
+- PaliGemma is a compact VLM workhorse: simple architecture, many task interfaces, and enough resolution control to make transfer practical.

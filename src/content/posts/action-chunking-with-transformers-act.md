@@ -38,12 +38,8 @@ The paper reports 80–90% success on six precise real-world tasks using roughly
 
 ## High-Level Takeaways
 
-ACT informs the chunk-length and execution-interface decision for imitation-trained robot policies. Its training unit is an observation paired with a future action trajectory. Visual and proprioceptive inputs share a transformer representation, while the CVAE compresses demonstration variation into a latent style variable.
-
-The results establish that chunks are effective for the studied precise bimanual tasks, not that longer is always better. A missing ablation would sweep chunk length under controlled perturbation frequency and inference latency. At ten times the task duration, open-loop commitment and latent-style ambiguity can compound. The method's core advantage disappears if a matched recurrent single-step policy recovers faster from disturbances while retaining the same smoothness and success.
-
-ACT made action chunks a default design axis for modern VLA adaptation recipes.
-
-The policy still learns from demonstrations and inherits their state coverage.
-
-Chunking buys temporal coherence by spending responsiveness; choose the horizon from the disturbance timescale, not convention.
+- ACT informs the chunk-length and execution-interface decision for imitation-trained robot policies. Its training unit is an observation paired with a future action trajectory. Visual and proprioceptive inputs share a transformer representation, while the CVAE compresses demonstration variation into a latent style variable.
+- The results establish that chunks are effective for the studied precise bimanual tasks, not that longer is always better. A missing ablation would sweep chunk length under controlled perturbation frequency and inference latency. At ten times the task duration, open-loop commitment and latent-style ambiguity can compound. The method's core advantage disappears if a matched recurrent single-step policy recovers faster from disturbances while retaining the same smoothness and success.
+- ACT made action chunks a default design axis for modern VLA adaptation recipes.
+- The policy still learns from demonstrations and inherits their state coverage.
+- Chunking buys temporal coherence by spending responsiveness; choose the horizon from the disturbance timescale, not convention.

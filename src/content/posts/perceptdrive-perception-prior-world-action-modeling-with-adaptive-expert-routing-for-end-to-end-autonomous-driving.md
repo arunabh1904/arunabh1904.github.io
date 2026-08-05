@@ -51,14 +51,9 @@ The model reaches 34.5 EPDMS on NAVSIM v2 navhard, 3.9 points above the stronges
 
 ## High-Level Takeaways
 
-PerceptDrive informs how a planner should consume multiple frozen perception models. Concatenating features assumes that imitation learning will preserve the right information and assign the right scene-specific weights. This paper instead makes preservation and weighting explicit: branch targets maintain specialization, and a distilled evaluator teaches when each prior should matter.
-
-The design is attractive when a trusted offline evaluator exists, but that dependency defines the deployment risk. NAVSIM’s scoring rules determine the quality vectors used to train the branches and gates. The paper explicitly notes that transfer to differently weighted objectives is untested. A decisive experiment would train with one scorer, evaluate under held-out metric weights and closed-loop interventions, and test whether routing remains useful rather than overfitting evaluator structure.
-
-At ten times the prior count, dense soft fusion and target engineering will become expensive. Every expert remains active, and each requires a meaningful retention target. The likely scaling bottleneck is not router capacity but defining reliable, non-conflicting priors and quality signals. Sparse routing is only justified after demonstrating that dropping experts preserves safety across rare scenes.
-
-PerceptDrive separates frozen geometry, semantics, and dynamics into retained planner branches, then uses training-time metric distillation to fuse them per scene.
-
-All evaluations use NAVSIM’s non-reactive protocols; no closed-loop vehicle response is tested. The deterministic future head extrapolates beyond demonstrated actions, and scorer transfer to other driving objectives remains unknown.
-
-Preserve each perception prior through the planner bottleneck and supervise routing explicitly—but treat evaluator distillation as a core dependency, not free generalization.
+- PerceptDrive informs how a planner should consume multiple frozen perception models. Concatenating features assumes that imitation learning will preserve the right information and assign the right scene-specific weights. This paper instead makes preservation and weighting explicit: branch targets maintain specialization, and a distilled evaluator teaches when each prior should matter.
+- The design is attractive when a trusted offline evaluator exists, but that dependency defines the deployment risk. NAVSIM’s scoring rules determine the quality vectors used to train the branches and gates. The paper explicitly notes that transfer to differently weighted objectives is untested. A decisive experiment would train with one scorer, evaluate under held-out metric weights and closed-loop interventions, and test whether routing remains useful rather than overfitting evaluator structure.
+- At ten times the prior count, dense soft fusion and target engineering will become expensive. Every expert remains active, and each requires a meaningful retention target. The likely scaling bottleneck is not router capacity but defining reliable, non-conflicting priors and quality signals. Sparse routing is only justified after demonstrating that dropping experts preserves safety across rare scenes.
+- PerceptDrive separates frozen geometry, semantics, and dynamics into retained planner branches, then uses training-time metric distillation to fuse them per scene.
+- All evaluations use NAVSIM’s non-reactive protocols; no closed-loop vehicle response is tested. The deterministic future head extrapolates beyond demonstrated actions, and scorer transfer to other driving objectives remains unknown.
+- Preserve each perception prior through the planner bottleneck and supervise routing explicitly—but treat evaluator distillation as a core dependency, not free generalization.

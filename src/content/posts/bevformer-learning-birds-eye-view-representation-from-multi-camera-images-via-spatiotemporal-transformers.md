@@ -48,10 +48,7 @@ _Figure 2 shows the BEVFormer encoder: camera features, BEV queries, spatial cro
 
 ## High-Level Takeaways
 
-BEVFormer informs whether multi-camera perception should first build a persistent metric BEV grid or reason directly in camera views. Its atomic unit is a learned BEV query tied to a ground-plane location; spatial cross-attention samples projected image features, while temporal self-attention carries the same grid across frames.
-
-The representation buys a reusable geometry for 3D detection at the cost of projection assumptions and a dense query budget. The key missing control compares dense BEV queries with sparse object queries under identical backbone, temporal context, and latency. At 10× camera resolution or temporal length, feature sampling and BEV-query attention dominate. The BEV-first claim would fail if a view-space or sparse model matched 3D accuracy and temporal stability with materially lower memory and latency.
-
-BEVFormer became one of the reference points for dense BEV-oriented autonomous driving stacks.
-
-Multi-camera perception becomes much easier to organize once the model learns a shared BEV workspace.
+- BEVFormer informs whether multi-camera perception should first build a persistent metric BEV grid or reason directly in camera views. Its atomic unit is a learned BEV query tied to a ground-plane location; spatial cross-attention samples projected image features, while temporal self-attention carries the same grid across frames.
+- The representation buys a reusable geometry for 3D detection at the cost of projection assumptions and a dense query budget. The key missing control compares dense BEV queries with sparse object queries under identical backbone, temporal context, and latency. At 10× camera resolution or temporal length, feature sampling and BEV-query attention dominate. The BEV-first claim would fail if a view-space or sparse model matched 3D accuracy and temporal stability with materially lower memory and latency.
+- BEVFormer became one of the reference points for dense BEV-oriented autonomous driving stacks.
+- Multi-camera perception becomes much easier to organize once the model learns a shared BEV workspace.

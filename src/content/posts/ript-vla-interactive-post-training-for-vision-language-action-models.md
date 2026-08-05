@@ -38,12 +38,8 @@ The paper reports a 21.2-point gain for QueST and 97.5% success for OpenVLA-OFT 
 
 ## High-Level Takeaways
 
-RIPT-VLA informs whether the next marginal robot hour should collect expert demonstrations or autonomous rollouts with cheap terminal labels. Its atomic unit is a complete trajectory; action-token likelihoods factor the policy update, while the reward arrives only at episode end.
-
-The results establish strong sample efficiency in simulation under reliable success signals. A missing comparison matches environment interactions and hyperparameter search against DAgger-style corrections and KTO-style binary training. At ten times the task diversity, homogeneous-reward groups, unsafe exploration, and stale asynchronous policies become bottlenecks. The claim would fail if gains do not survive new initial states, reward perturbations, or real-robot trials.
-
-RIPT-VLA is the clearest demonstration of SFT as an initialization rather than the endpoint of VLA training.
-
-Sparse success works when the simulator can score the task perfectly; physical tasks often lack that oracle.
-
-Interactive RL is most valuable where demonstrations fail to cover the states produced by the current policy.
+- RIPT-VLA informs whether the next marginal robot hour should collect expert demonstrations or autonomous rollouts with cheap terminal labels. Its atomic unit is a complete trajectory; action-token likelihoods factor the policy update, while the reward arrives only at episode end.
+- The results establish strong sample efficiency in simulation under reliable success signals. A missing comparison matches environment interactions and hyperparameter search against DAgger-style corrections and KTO-style binary training. At ten times the task diversity, homogeneous-reward groups, unsafe exploration, and stale asynchronous policies become bottlenecks. The claim would fail if gains do not survive new initial states, reward perturbations, or real-robot trials.
+- RIPT-VLA is the clearest demonstration of SFT as an initialization rather than the endpoint of VLA training.
+- Sparse success works when the simulator can score the task perfectly; physical tasks often lack that oracle.
+- Interactive RL is most valuable where demonstrations fail to cover the states produced by the current policy.

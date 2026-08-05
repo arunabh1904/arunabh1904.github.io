@@ -51,14 +51,9 @@ Latency accounting needs one qualification. On an RTX 3090 Ti, median model comp
 
 ## High-Level Takeaways
 
-This paper informs whether to spend inference budget on repeatedly running a large semantic model or on a small high-rate controller over cached semantic state. Its evidence favors the latter when the large model changes slowly relative to the control loop: the matched-expert ablation attributes a substantial completion gain to action freshness, while latency stays independent of history length.
-
-The missing control is a safety-matched comparison at equal end-to-end wall-clock budget. The 20 Hz system completes more route but has a lower infraction score than its 10 Hz expert variant, and vehicle collisions rise with the extra exposure. The conclusion would weaken if an optimized small recurrent controller over frozen features matched completion and safety without per-layer access to the 7B cache, or if retuning the baseline controller erased the freshness advantage.
-
-At larger scale, cache bandwidth and hazard coverage become the likely constraints. Every expert layer attends to a growing frozen cache, and short single-town clips do not teach long-horizon traffic negotiation. The decisive next experiment is a multi-town, long-route study with identical training data, retuned low-level controllers, several seeds, real-time sensor overhead, and safety-normalized outcomes.
-
-The paper reframes fast-slow VLA design as an interface problem: preserve a slow model’s semantic state, but let a smaller policy act on fresh evidence.
-
-Results come from CARLA 0.9.10, with two runs for the main comparison and single runs for the frame-skip and transfer rows. On eight unseen long routes, the method completes 85.4% of the route but accumulates enough violations to score 2.96, so short-route transfer is not evidence of road readiness.
-
-Cache slow semantic reasoning; spend the per-tick budget on a small controller trained for stale context and fresh observations.
+- This paper informs whether to spend inference budget on repeatedly running a large semantic model or on a small high-rate controller over cached semantic state. Its evidence favors the latter when the large model changes slowly relative to the control loop: the matched-expert ablation attributes a substantial completion gain to action freshness, while latency stays independent of history length.
+- The missing control is a safety-matched comparison at equal end-to-end wall-clock budget. The 20 Hz system completes more route but has a lower infraction score than its 10 Hz expert variant, and vehicle collisions rise with the extra exposure. The conclusion would weaken if an optimized small recurrent controller over frozen features matched completion and safety without per-layer access to the 7B cache, or if retuning the baseline controller erased the freshness advantage.
+- At larger scale, cache bandwidth and hazard coverage become the likely constraints. Every expert layer attends to a growing frozen cache, and short single-town clips do not teach long-horizon traffic negotiation. The decisive next experiment is a multi-town, long-route study with identical training data, retuned low-level controllers, several seeds, real-time sensor overhead, and safety-normalized outcomes.
+- The paper reframes fast-slow VLA design as an interface problem: preserve a slow model’s semantic state, but let a smaller policy act on fresh evidence.
+- Results come from CARLA 0.9.10, with two runs for the main comparison and single runs for the frame-skip and transfer rows. On eight unseen long routes, the method completes 85.4% of the route but accumulates enough violations to score 2.96, so short-route transfer is not evidence of road readiness.
+- Cache slow semantic reasoning; spend the per-tick budget on a small controller trained for stale context and fresh observations.

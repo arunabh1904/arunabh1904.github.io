@@ -53,6 +53,52 @@ async function getMathPostRoutes() {
   return routes;
 }
 
+async function verifyPaperReadingPaths() {
+  const postFiles = await fg('**/*.{md,mdx}', {
+    cwd: postsDir,
+    absolute: true,
+  });
+  const papers = [];
+
+  for (const filePath of postFiles) {
+    const source = await readFile(filePath, 'utf8');
+    const { data } = matter(source);
+    if (data.section !== 'paper-shorts') continue;
+    if (!/^## High-Level Takeaways\s*\n\s*- /m.test(source)) {
+      throw new Error(`Expected bulleted High-Level Takeaways in ${path.relative(projectRoot, filePath)}.`);
+    }
+    papers.push({
+      date: new Date(data.date),
+      field: data.field ?? 'Other',
+      legacyPath: data.legacyPath.trim(),
+      title: data.title,
+    });
+  }
+
+  const fields = new Map();
+  for (const paper of papers) {
+    fields.set(paper.field, [...(fields.get(paper.field) ?? []), paper]);
+  }
+  for (const fieldPapers of fields.values()) {
+    fieldPapers.sort((left, right) => left.date - right.date || left.title.localeCompare(right.title));
+    for (const [index, paper] of fieldPapers.entries()) {
+      const builtPath = path.join(distDir, paper.legacyPath.replace(/^\//, ''));
+      const html = await readFile(builtPath, 'utf8');
+      if (!html.includes(`Paper ${index + 1} of ${fieldPapers.length}`)) {
+        throw new Error(`Incorrect reading-path position in ${paper.legacyPath}.`);
+      }
+      if (fieldPapers[index - 1] && !html.includes(`href="${fieldPapers[index - 1].legacyPath}"`)) {
+        throw new Error(`Missing earlier same-field paper link in ${paper.legacyPath}.`);
+      }
+      if (fieldPapers[index + 1] && !html.includes(`href="${fieldPapers[index + 1].legacyPath}"`)) {
+        throw new Error(`Missing later same-field paper link in ${paper.legacyPath}.`);
+      }
+    }
+  }
+
+  return papers.length;
+}
+
 async function main() {
   for (const page of criticalPages) {
     assertExists(path.join(distDir, page));
@@ -90,7 +136,11 @@ async function main() {
     }
   }
 
-  console.log(`Verified ${criticalPages.length} critical pages and ${manifest.length} post routes.`);
+  const paperCount = await verifyPaperReadingPaths();
+
+  console.log(
+    `Verified ${criticalPages.length} critical pages, ${manifest.length} post routes, and ${paperCount} paper reading paths.`,
+  );
 }
 
 main().catch((error) => {

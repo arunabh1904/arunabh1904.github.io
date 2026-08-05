@@ -40,10 +40,7 @@ On nuScenes validation, the ResNet-50 model reports 42.7 mAP and 53.4 NDS. The l
 
 ## High-Level Takeaways
 
-SOLOFusion informs how to spend a fixed temporal budget between spatial detail and baseline diversity. Its atomic units are depth hypotheses and aligned BEV cells. The short path buys local precision; the long path buys observability and velocity without replaying high-resolution images at every timestamp.
-
-The matched experiment should sweep resolution, frame spacing, and history under one latency and memory envelope, with range-bucketed depth and actor recall. SOLOFusion loses if a sparse recurrent query model matches long-range localization with less dense state, or if pose drift makes long baselines unreliable. At 10× history, stored BEV features and warp bandwidth become the limits even when each frame is coarse.
-
-BEVDet4D uses a short recurrent BEV. SOLOFusion explains why long temporal baselines help camera depth; Sparse4D v2 and StreamPETR instead compress long history into recurrent instances.
-
-Long history is most useful when it changes depth observability; the efficient design spends detail on the short baseline and duration on the coarse one.
+- SOLOFusion informs how to spend a fixed temporal budget between spatial detail and baseline diversity. Its atomic units are depth hypotheses and aligned BEV cells. The short path buys local precision; the long path buys observability and velocity without replaying high-resolution images at every timestamp.
+- The matched experiment should sweep resolution, frame spacing, and history under one latency and memory envelope, with range-bucketed depth and actor recall. SOLOFusion loses if a sparse recurrent query model matches long-range localization with less dense state, or if pose drift makes long baselines unreliable. At 10× history, stored BEV features and warp bandwidth become the limits even when each frame is coarse.
+- BEVDet4D uses a short recurrent BEV. SOLOFusion explains why long temporal baselines help camera depth; Sparse4D v2 and StreamPETR instead compress long history into recurrent instances.
+- Long history is most useful when it changes depth observability; the efficient design spends detail on the short baseline and duration on the coarse one.

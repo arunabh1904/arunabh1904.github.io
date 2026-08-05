@@ -48,14 +48,9 @@ This table isolates the main claim better than the largest-model leaderboard. De
 
 ## High-Level Takeaways
 
-DINOv3 informs whether continued self-supervised scale is uniformly beneficial. It is not: a proxy such as ImageNet linear accuracy can hide deterioration in patch geometry. The atomic monitoring unit should therefore include both global and dense probes throughout the run, not only at the final checkpoint.
-
-Gram anchoring depends on choosing a good earlier teacher. That choice introduces a checkpoint-selection oracle: the system must know when dense quality is high enough to preserve. The decisive missing experiment varies teacher age and anchoring onset under a fixed total compute budget. At ten times scale, storing teachers, computing patch Gram matrices, and running dense probes become material costs, though still smaller than wasting a frontier-scale pretraining run.
-
-DINOv3 also uses post-training rather than one monolithic run: resolution adaptation, distillation, and text alignment extend the base model after self-supervised learning. That modularity connects it to [dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html), where a frozen DINOv2 backbone is aligned to language without relearning its visual geometry.
-
-DINOv3 scales the DINO/iBOT recipe and introduces Gram anchoring to prevent local patch structure from collapsing into global semantics.
-
-The 1.7-billion-image corpus and 6.7B model make full replication inaccessible, while anchor-checkpoint selection and web-data composition remain consequential.
-
-More self-supervised training can improve classification while silently damaging dense vision; DINOv3 makes preserving patch relations an explicit optimization target.
+- DINOv3 informs whether continued self-supervised scale is uniformly beneficial. It is not: a proxy such as ImageNet linear accuracy can hide deterioration in patch geometry. The atomic monitoring unit should therefore include both global and dense probes throughout the run, not only at the final checkpoint.
+- Gram anchoring depends on choosing a good earlier teacher. That choice introduces a checkpoint-selection oracle: the system must know when dense quality is high enough to preserve. The decisive missing experiment varies teacher age and anchoring onset under a fixed total compute budget. At ten times scale, storing teachers, computing patch Gram matrices, and running dense probes become material costs, though still smaller than wasting a frontier-scale pretraining run.
+- DINOv3 also uses post-training rather than one monolithic run: resolution adaptation, distillation, and text alignment extend the base model after self-supervised learning. That modularity connects it to [dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html), where a frozen DINOv2 backbone is aligned to language without relearning its visual geometry.
+- DINOv3 scales the DINO/iBOT recipe and introduces Gram anchoring to prevent local patch structure from collapsing into global semantics.
+- The 1.7-billion-image corpus and 6.7B model make full replication inaccessible, while anchor-checkpoint selection and web-data composition remain consequential.
+- More self-supervised training can improve classification while silently damaging dense vision; DINOv3 makes preserving patch relations an explicit optimization target.

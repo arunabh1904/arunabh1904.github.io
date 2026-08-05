@@ -36,10 +36,7 @@ The segmentation-quality ablation shows detection improving with segmentation mI
 
 ## High-Level Takeaways
 
-PointPainting informs whether sensor fusion needs an end-to-end joint model. Its atomic unit is a LiDAR point augmented with a semantic vector. The camera and LiDAR networks remain independently interpretable; the projection is the only shared interface. This makes the design easy to retrofit and test, but gives LiDAR sampling control over camera recall.
-
-The matched alternative is a learned point- or query-level fusion model using the same image backbone, LiDAR detector, and latency budget. Painting should be rejected if learned retrieval recovers small and distant actors from image regions without points, or if calibration perturbations cause the hard projection to fail abruptly. At scale, the separate segmentation model and duplicated camera computation can dominate the efficiency argument.
-
-PointPainting is a clean early-fusion reference. TransFusion relaxes hard point-pixel correspondence with object-query attention; BEVFusion preserves dense camera context by meeting LiDAR only after both reach BEV.
-
-Early fusion can be simple and effective, but the sensor chosen as the carrier decides which evidence the other sensor is allowed to contribute.
+- PointPainting informs whether sensor fusion needs an end-to-end joint model. Its atomic unit is a LiDAR point augmented with a semantic vector. The camera and LiDAR networks remain independently interpretable; the projection is the only shared interface. This makes the design easy to retrofit and test, but gives LiDAR sampling control over camera recall.
+- The matched alternative is a learned point- or query-level fusion model using the same image backbone, LiDAR detector, and latency budget. Painting should be rejected if learned retrieval recovers small and distant actors from image regions without points, or if calibration perturbations cause the hard projection to fail abruptly. At scale, the separate segmentation model and duplicated camera computation can dominate the efficiency argument.
+- PointPainting is a clean early-fusion reference. TransFusion relaxes hard point-pixel correspondence with object-query attention; BEVFusion preserves dense camera context by meeting LiDAR only after both reach BEV.
+- Early fusion can be simple and effective, but the sensor chosen as the carrier decides which evidence the other sensor is allowed to contribute.

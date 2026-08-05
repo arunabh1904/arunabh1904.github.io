@@ -33,10 +33,7 @@ On View-of-Delft, the paper reports 69.31 EAA and 86.20 DCA; on TJ4DRadSet it re
 
 ## High-Level Takeaways
 
-RPGFusion is relevant for modern elevation-aware radar when direct range and Doppler should guide camera geometry. Validate calibration drift, multipath, stationary and tangential actors, and partial radar blockage; aggregate detection gains cannot establish robustness alone.
-
-The key alternative is a strong independent radar detector plus late object fusion. Compare which architecture retains a usable fallback when the camera or radar prior is wrong.
-
-CRN uses conventional radar to assist lifting; RCBEVDet builds a radar BEV representation; RPGFusion makes 4D radar a query prior.
-
-Radar-camera fusion becomes more efficient when radar narrows the geometric search, provided bad priors cannot erase camera evidence.
+- RPGFusion is relevant for modern elevation-aware radar when direct range and Doppler should guide camera geometry. Validate calibration drift, multipath, stationary and tangential actors, and partial radar blockage; aggregate detection gains cannot establish robustness alone.
+- The key alternative is a strong independent radar detector plus late object fusion. Compare which architecture retains a usable fallback when the camera or radar prior is wrong.
+- CRN uses conventional radar to assist lifting; RCBEVDet builds a radar BEV representation; RPGFusion makes 4D radar a query prior.
+- Radar-camera fusion becomes more efficient when radar narrows the geometric search, provided bad priors cannot erase camera evidence.

@@ -54,14 +54,9 @@ Locked-image tuning freezes the vision encoder and trains the text side, so thos
 
 ## High-Level Takeaways
 
-SigLIP informs whether cross-device global softmax normalization is worth its systems cost. Its atomic example is one image-text pair with an independent binary target. That makes it appealing when accelerator memory, all-gather traffic, or cluster size constrains training.
-
-The source results use WebLI, a private web-scale dataset, so public reproduction cannot fully separate the loss from data composition. The decisive systems comparison would hold data order, encoder, optimizer, total negative pairs, and wall-clock budget fixed across cluster topologies. At ten times scale, false negatives and noisy pairs are more likely to dominate than normalization.
-
-[dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html) addresses a different decision: preserve a self-supervised dense vision backbone and attach language alignment afterward. SigLIP is primarily a loss and distributed-training choice; dino.txt is primarily an initialization and freezing choice.
-
-SigLIP replaces batch-softmax contrastive learning with independent sigmoid losses over image-text pairs.
-
-The best data are private, most negatives remain uncurated, and the objective's advantage narrows at very large batches.
-
-Image-text pretraining does not need one global softmax; pairwise sigmoid loss turns normalization into a local systems choice and reveals that useful batch scaling saturates early.
+- SigLIP informs whether cross-device global softmax normalization is worth its systems cost. Its atomic example is one image-text pair with an independent binary target. That makes it appealing when accelerator memory, all-gather traffic, or cluster size constrains training.
+- The source results use WebLI, a private web-scale dataset, so public reproduction cannot fully separate the loss from data composition. The decisive systems comparison would hold data order, encoder, optimizer, total negative pairs, and wall-clock budget fixed across cluster topologies. At ten times scale, false negatives and noisy pairs are more likely to dominate than normalization.
+- [dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html) addresses a different decision: preserve a self-supervised dense vision backbone and attach language alignment afterward. SigLIP is primarily a loss and distributed-training choice; dino.txt is primarily an initialization and freezing choice.
+- SigLIP replaces batch-softmax contrastive learning with independent sigmoid losses over image-text pairs.
+- The best data are private, most negatives remain uncurated, and the objective's advantage narrows at very large batches.
+- Image-text pretraining does not need one global softmax; pairwise sigmoid loss turns normalization into a local systems choice and reveals that useful batch scaling saturates early.

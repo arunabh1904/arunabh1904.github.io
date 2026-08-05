@@ -33,10 +33,7 @@ On nuScenes, the paper reports 72.1 mAP / 73.5 NDS on validation and 73.6 / 74.9
 
 ## High-Level Takeaways
 
-GAFusion is useful as a recipe study, but its many interacting blocks make attribution the central question. Reproduce each component at matched parameters and latency, then test whether gains survive calibration error, LiDAR sparsity, and sensor dropout.
-
-The published test score is not evidence that every production system should adopt the full stack. Guidance modules also strengthen dependence on healthy LiDAR unless a fallback path is trained.
-
-BEVFusion establishes the dense shared grid; GAFusion adds explicit geometric guidance, adaptive interaction, scale, and short temporal context.
-
-A high-performing fusion stack often combines several small, targeted corrections; deployment should retain only the corrections that survive matched and degraded-mode tests.
+- GAFusion is useful as a recipe study, but its many interacting blocks make attribution the central question. Reproduce each component at matched parameters and latency, then test whether gains survive calibration error, LiDAR sparsity, and sensor dropout.
+- The published test score is not evidence that every production system should adopt the full stack. Guidance modules also strengthen dependence on healthy LiDAR unless a fallback path is trained.
+- BEVFusion establishes the dense shared grid; GAFusion adds explicit geometric guidance, adaptive interaction, scale, and short temporal context.
+- A high-performing fusion stack often combines several small, targeted corrections; deployment should retain only the corrections that survive matched and degraded-mode tests.

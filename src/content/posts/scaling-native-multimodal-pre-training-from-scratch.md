@@ -50,14 +50,9 @@ The downstream evidence adds two narrower findings. Holding the text budget at 2
 
 ## High-Level Takeaways
 
-This paper informs the allocation of a native multimodal pre-training budget across active parameters, total tokens, and modality mixture. Its atomic units are text tokens and continuous image-patch tokens optimized by shared parameters. The evidence argues against choosing model size from a text-only Chinchilla curve and then filling the remaining budget with images. The multimodal objective's preferred allocation changes with the amount of multimodal data.
-
-The expensive decision is committing a large run to exponents estimated from smaller models, one architecture family, one image-text corpus, and training loss as the proxy objective. The study provides fitted scaling behavior within its measured range, not evidence that downstream utility or a different tokenizer obeys the same frontier. At 10× scale, data quality and patch-token redundancy may dominate before the fitted compute curve does.
-
-Before a frontier run, the decisive experiment is a prospective holdout sweep: train several configurations just beyond the fitted compute range, vary mixture ratio and patch compression independently, and select on both held-out multimodal loss and task utility. The claim should be rejected if the predicted allocation fails out of range, if a stronger image encoder changes the exponents, or if equal-loss configurations produce materially different downstream behavior.
-
-The work extends compute-optimal language-model analysis to a shared native multimodal system by fitting the language and multimodal objectives separately before reconciling them on a Pareto frontier.
-
-Models stop at 3B active parameters; the visual data comes from one image-text family; images use one direct patch-embedding scheme; and the scaling fits optimize smoothed training loss rather than a held-out multimodal likelihood or downstream score.
-
-In native multimodal training, the language objective keeps roughly the same allocation law, but the multimodal objective asks for progressively more data as its mixture share grows.
+- This paper informs the allocation of a native multimodal pre-training budget across active parameters, total tokens, and modality mixture. Its atomic units are text tokens and continuous image-patch tokens optimized by shared parameters. The evidence argues against choosing model size from a text-only Chinchilla curve and then filling the remaining budget with images. The multimodal objective's preferred allocation changes with the amount of multimodal data.
+- The expensive decision is committing a large run to exponents estimated from smaller models, one architecture family, one image-text corpus, and training loss as the proxy objective. The study provides fitted scaling behavior within its measured range, not evidence that downstream utility or a different tokenizer obeys the same frontier. At 10× scale, data quality and patch-token redundancy may dominate before the fitted compute curve does.
+- Before a frontier run, the decisive experiment is a prospective holdout sweep: train several configurations just beyond the fitted compute range, vary mixture ratio and patch compression independently, and select on both held-out multimodal loss and task utility. The claim should be rejected if the predicted allocation fails out of range, if a stronger image encoder changes the exponents, or if equal-loss configurations produce materially different downstream behavior.
+- The work extends compute-optimal language-model analysis to a shared native multimodal system by fitting the language and multimodal objectives separately before reconciling them on a Pareto frontier.
+- Models stop at 3B active parameters; the visual data comes from one image-text family; images use one direct patch-embedding scheme; and the scaling fits optimize smoothed training loss rather than a held-out multimodal likelihood or downstream score.
+- In native multimodal training, the language objective keeps roughly the same allocation law, but the multimodal objective asks for progressively more data as its mixture share grows.

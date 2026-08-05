@@ -48,8 +48,6 @@ MuZero is elegant because it preserves the strength of search without requiring 
 
 ## High-Level Takeaways
 
-MuZero informs how much of an environment model must be learned for planning. Its atomic unit is a trajectory segment: representation, dynamics, and prediction networks are trained from observations, actions, rewards, value targets, and MCTS-derived policies, while the latent state is shared between model learning and search.
-
-The evidence shows that predicting decision-relevant rewards and values can outperform reconstructing pixels, but search compute and target generation are part of the result. The missing control compares MuZero with a reconstruction-based world model and a model-free agent under equal environment, training, and planning FLOPs. At 10× horizon, compounding latent error and search branching dominate. The central claim would fail if reconstruction or model-free learning matched return and sample efficiency at lower total compute.
-
-MuZero showed that learned latent models can support serious planning across very different domains. It replaced hand-coded rules with learned prediction, but it paid for that generality with compute and search latency.
+- MuZero informs how much of an environment model must be learned for planning. Its atomic unit is a trajectory segment: representation, dynamics, and prediction networks are trained from observations, actions, rewards, value targets, and MCTS-derived policies, while the latent state is shared between model learning and search.
+- The evidence shows that predicting decision-relevant rewards and values can outperform reconstructing pixels, but search compute and target generation are part of the result. The missing control compares MuZero with a reconstruction-based world model and a model-free agent under equal environment, training, and planning FLOPs. At 10× horizon, compounding latent error and search branching dominate. The central claim would fail if reconstruction or model-free learning matched return and sample efficiency at lower total compute.
+- MuZero showed that learned latent models can support serious planning across very different domains. It replaced hand-coded rules with learned prediction, but it paid for that generality with compute and search latency.

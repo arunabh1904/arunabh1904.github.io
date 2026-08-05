@@ -48,10 +48,7 @@ _Figure 2 summarizes representative VA and VLA models across end-to-end, world-m
 
 ## High-Level Takeaways
 
-This survey informs how to compare vision-action, end-to-end VLA, and dual-system driving models without collapsing them into one label. Its key units are system boundaries: where language enters, how action is represented, whether a world model is present, and whether evaluation is open or closed loop.
-
-The historical taxonomy is useful if it predicts engineering tradeoffs rather than merely ordering papers. A common benchmark that fixes sensors, data, action horizon, and latency across the three paradigms is the missing test. As the field scales, proprietary data and inconsistent closed-loop protocols make architectural claims hard to compare. The taxonomy would fail if data scale and evaluator choice explained outcomes better than the proposed model evolution.
-
-This survey gives a cleaner vocabulary for comparing monolithic driving VLAs against hybrid systems such as DriveVLM-Dual-style designs.
-
-"Driving VLA" is not one architecture; it is a set of choices about where language reasoning sits relative to spatial planning and action generation.
+- This survey informs how to compare vision-action, end-to-end VLA, and dual-system driving models without collapsing them into one label. Its key units are system boundaries: where language enters, how action is represented, whether a world model is present, and whether evaluation is open or closed loop.
+- The historical taxonomy is useful if it predicts engineering tradeoffs rather than merely ordering papers. A common benchmark that fixes sensors, data, action horizon, and latency across the three paradigms is the missing test. As the field scales, proprietary data and inconsistent closed-loop protocols make architectural claims hard to compare. The taxonomy would fail if data scale and evaluator choice explained outcomes better than the proposed model evolution.
+- This survey gives a cleaner vocabulary for comparing monolithic driving VLAs against hybrid systems such as DriveVLM-Dual-style designs.
+- "Driving VLA" is not one architecture; it is a set of choices about where language reasoning sits relative to spatial planning and action generation.

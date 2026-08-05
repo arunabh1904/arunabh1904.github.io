@@ -35,10 +35,7 @@ The method computes per-task gradient norms, compares them with targets derived 
 
 ## High-Level Takeaways
 
-GradNorm is useful when tasks have comparable value but visibly different convergence rates. It does not inspect gradient direction, so two equal-norm tasks can still conflict. In a driving stack, apply it only after defining task-specific metrics and minimum acceptable behavior; training speed is not safety priority.
-
-Measure per-task transfer against single-task controls and inspect scenario slices. A global weight can hide a task that learns normally overall but fails under rare sensor conditions.
-
-Homoscedastic uncertainty handles scale; GradNorm handles relative rate; PCGrad handles conflicting direction.
-
-Shared trunks need gradient instrumentation: adaptive weights should respond to how tasks train the shared representation, not only to the numerical size of their losses.
+- GradNorm is useful when tasks have comparable value but visibly different convergence rates. It does not inspect gradient direction, so two equal-norm tasks can still conflict. In a driving stack, apply it only after defining task-specific metrics and minimum acceptable behavior; training speed is not safety priority.
+- Measure per-task transfer against single-task controls and inspect scenario slices. A global weight can hide a task that learns normally overall but fails under rare sensor conditions.
+- Homoscedastic uncertainty handles scale; GradNorm handles relative rate; PCGrad handles conflicting direction.
+- Shared trunks need gradient instrumentation: adaptive weights should respond to how tasks train the shared representation, not only to the numerical size of their losses.

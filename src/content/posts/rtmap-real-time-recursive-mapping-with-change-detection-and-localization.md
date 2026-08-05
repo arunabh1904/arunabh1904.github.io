@@ -57,10 +57,7 @@ _Figure 2 shows RTMap's loop: encode sensors and the crowdsourced HD map, match 
 
 ## High-Level Takeaways
 
-RTMap informs whether online mapping should rebuild each frame independently or recursively localize against, compare with, and update a prior map. The atomic unit is a local map observation aligned to a persistent vector map; change detection decides which prior elements survive, move, appear, or disappear.
-
-Recursion buys temporal consistency and fleet accumulation, but localization error can masquerade as map change and then contaminate the prior. The missing experiment independently perturbs pose, prior freshness, and change frequency while comparing recursive and stateless mapping. At 10× deployment duration, error accumulation, conflicting updates, and versioning dominate inference. The recursive claim would fail if periodic stateless remapping produced equal change recall and map stability at lower operational complexity.
-
-RTMap moves online vector mapping from "predict the local map once" to "maintain a map that can remember, align, and revise itself."
-
-A deployable BEV map stack needs recursion: map the scene, localize into the map, detect changes, and feed cleaner observations back into the prior.
+- RTMap informs whether online mapping should rebuild each frame independently or recursively localize against, compare with, and update a prior map. The atomic unit is a local map observation aligned to a persistent vector map; change detection decides which prior elements survive, move, appear, or disappear.
+- Recursion buys temporal consistency and fleet accumulation, but localization error can masquerade as map change and then contaminate the prior. The missing experiment independently perturbs pose, prior freshness, and change frequency while comparing recursive and stateless mapping. At 10× deployment duration, error accumulation, conflicting updates, and versioning dominate inference. The recursive claim would fail if periodic stateless remapping produced equal change recall and map stability at lower operational complexity.
+- RTMap moves online vector mapping from "predict the local map once" to "maintain a map that can remember, align, and revise itself."
+- A deployable BEV map stack needs recursion: map the scene, localize into the map, detect changes, and feed cleaner observations back into the prior.

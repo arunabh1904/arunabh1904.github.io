@@ -36,16 +36,6 @@ DDPMs generate data by learning to reverse noise. The forward process gradually 
 
 The payoff is stability. With 1000 denoising steps, DDPM reached FID 3.17 and IS 9.46 on CIFAR-10, matching StyleGAN-v2 without adversarial training. The framework also connects noise-conditioned denoising to score matching and score-based SDE models, giving diffusion a strong probabilistic interpretation rather than just a good sample generator.
 
-## High-Level Takeaways
-
-DDPM informs the choice between stable iterative denoising and one-shot adversarial generation. The atomic example is an image corrupted at a sampled diffusion timestep; one network learns the reverse direction across the entire noise schedule.
-
-The paper established strong image quality and stable optimization at the cost of hundreds or thousands of sequential denoising steps. The key missing comparison separates the value of the variational formulation from the noise parameterization and sampling schedule at equal training and inference compute. At 10× resolution or duration, latent size and repeated network evaluations dominate. The claim would weaken if a flow, consistency, or adversarial model matched coverage and FID with materially fewer sequential evaluations.
-
-Diffusion models made high-quality generation feel less fragile than GAN training. Later improvements, including learned reverse-process variance, faster samplers, and classifier-free guidance, turned the original slow denoising loop into the foundation for modern text-to-image systems.
-
-**Benchmarks**
-
 | Dataset & Steps | FID ↓ | IS ↑ |
 | --------------- | ----- | ---- |
 | CIFAR-10, 1000 steps | 3.17 | 9.46 |
@@ -86,3 +76,10 @@ def p_sample_loop(model, shape, betas, sqrt_recip_alphas,
 DDPMs train stably, avoid mode collapse, and provide a tractable likelihood story. The cost is sampling speed. A naive sampler needs many UNet passes, and training remains compute-heavy even when optimization is well behaved.
 
 DDPM reframed generative modelling around gradual noise erosion and learned denoising. Once variance learning and faster samplers arrived, diffusion moved from elegant curiosity to practical engine.
+
+## High-Level Takeaways
+
+- DDPM informs the choice between stable iterative denoising and one-shot adversarial generation. The atomic example is an image corrupted at a sampled diffusion timestep; one network learns the reverse direction across the entire noise schedule.
+- The paper established strong image quality and stable optimization at the cost of hundreds or thousands of sequential denoising steps. The key missing comparison separates the value of the variational formulation from the noise parameterization and sampling schedule at equal training and inference compute. At 10× resolution or duration, latent size and repeated network evaluations dominate. The claim would weaken if a flow, consistency, or adversarial model matched coverage and FID with materially fewer sequential evaluations.
+- Diffusion models made high-quality generation feel less fragile than GAN training. Later improvements, including learned reverse-process variance, faster samplers, and classifier-free guidance, turned the original slow denoising loop into the foundation for modern text-to-image systems.
+- **Benchmarks**

@@ -34,14 +34,6 @@ GANs turn generative modelling into a contest. A generator $G$ maps random noise
 
 The paper's central promise is elegant: with enough capacity and ideal optimization, the generator recovers the true data distribution and the discriminator becomes maximally uncertain, outputting 0.5 everywhere. That framing recasts density estimation as a differentiable game rather than an explicit likelihood problem. It also gives the generator direct feedback in pixel space, which helped avoid some of the blurry samples associated with early likelihood-based models.
 
-## High-Level Takeaways
-
-GANs inform whether a generator should learn through an adversarial density-ratio signal instead of an explicit likelihood. Each update couples a minibatch of real examples with generated samples; the discriminator and generator optimize opposing objectives but share no parameters.
-
-The original experiments established that the game can produce sharp samples, not that it covers the data distribution or converges reliably. The missing decisive evidence is a seed-rich comparison of likelihood coverage, sample quality, and mode recovery against explicit-density models at matched compute. At 10× scale, discriminator overfitting, mode collapse, and oscillatory optimization intensify. The adversarial premise would fail if a non-adversarial model matched perceptual quality while covering rare modes and training more reliably.
-
-The first experiments were small, mostly multilayer perceptrons on MNIST-like data, but the idea opened a much larger path. GANs made high-quality sample generation feel less like approximate density estimation and more like learned counterfeiting.
-
 ### Reported evidence
 
 | Signal | Detail | Why it matters |
@@ -55,3 +47,9 @@ The first experiments were small, mostly multilayer perceptrons on MNIST-like da
 The formulation is beautiful, but the optimization is fragile. Training can diverge, generators can collapse to a small set of modes, and discriminators can saturate until the generator receives weak gradients. Much of the later GAN literature, including Wasserstein GANs and gradient penalties, is really a response to those failure modes.
 
 GANs made adversarial training a viable but unstable route to generative modelling. Both halves mattered: the samples were striking, and the instability became an entire research program.
+
+## High-Level Takeaways
+
+- GANs inform whether a generator should learn through an adversarial density-ratio signal instead of an explicit likelihood. Each update couples a minibatch of real examples with generated samples; the discriminator and generator optimize opposing objectives but share no parameters.
+- The original experiments established that the game can produce sharp samples, not that it covers the data distribution or converges reliably. The missing decisive evidence is a seed-rich comparison of likelihood coverage, sample quality, and mode recovery against explicit-density models at matched compute. At 10× scale, discriminator overfitting, mode collapse, and oscillatory optimization intensify. The adversarial premise would fail if a non-adversarial model matched perceptual quality while covering rare modes and training more reliably.
+- The first experiments were small, mostly multilayer perceptrons on MNIST-like data, but the idea opened a much larger path. GANs made high-quality sample generation feel less like approximate density estimation and more like learned counterfeiting.

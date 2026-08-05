@@ -4,34 +4,178 @@ import type { PostEntry } from '../lib/content';
 interface Props {
   previous?: PostEntry;
   next?: PostEntry;
+  context?: {
+    href: string;
+    label: string;
+    position: number;
+    total: number;
+  };
 }
 
-const { previous, next } = Astro.props;
+const { previous, next, context } = Astro.props;
 const archiveHref = '/archive.html';
 ---
 
 <hr />
+{
+  context && (
+    <a class="post_navi-context" href={context.href}>
+      <span>Reading path</span>
+      <strong>{context.label}</strong>
+      <span>
+        Paper {context.position} of {context.total}
+      </span>
+    </a>
+  )
+}
 <div class="post_navi">
-  <a
-    class="post_navi-item nav_prev"
-    href={previous ? previous.data.legacyPath : archiveHref}
-    title={previous ? previous.data.title : 'Writing Archive'}
-  >
-    <div class="post_navi-arrow">&lt;</div>
-    <div class="post_navi-label">{previous ? 'Previous Entry' : 'Writing Archive'}</div>
-    <div>
-      <span>{previous ? previous.data.title : 'Archive of all writing'}</span>
-    </div>
-  </a>
-  <a
-    class="post_navi-item nav_next"
-    href={next ? next.data.legacyPath : archiveHref}
-    title={next ? next.data.title : 'Writing Archive'}
-  >
-    <div class="post_navi-arrow">&gt;</div>
-    <div class="post_navi-label">{next ? 'Next Entry' : 'Writing Archive'}</div>
-    <div>
-      <span>{next ? next.data.title : 'Archive of all writing'}</span>
-    </div>
-  </a>
+  {
+    previous ? (
+      <a class="post_navi-item nav_prev" href={previous.data.legacyPath} title={previous.data.title}>
+        <div class="post_navi-arrow">&lt;</div>
+        <div class="post_navi-label">{context ? 'Earlier paper' : 'Previous entry'}</div>
+        <div><span>{previous.data.title}</span></div>
+      </a>
+    ) : context ? (
+      <div class="post_navi-item nav_prev is-boundary">
+        <div class="post_navi-label">Start of field</div>
+        <div><span>No earlier paper in this reading path</span></div>
+      </div>
+    ) : (
+      <a class="post_navi-item nav_prev" href={archiveHref} title="Writing Archive">
+        <div class="post_navi-arrow">&lt;</div>
+        <div class="post_navi-label">Writing archive</div>
+        <div><span>Archive of all writing</span></div>
+      </a>
+    )
+  }
+  {
+    next ? (
+      <a class="post_navi-item nav_next" href={next.data.legacyPath} title={next.data.title}>
+        <div class="post_navi-arrow">&gt;</div>
+        <div class="post_navi-label">{context ? 'Later paper' : 'Next entry'}</div>
+        <div><span>{next.data.title}</span></div>
+      </a>
+    ) : context ? (
+      <div class="post_navi-item nav_next is-boundary">
+        <div class="post_navi-label">Latest in field</div>
+        <div><span>No later paper in this reading path</span></div>
+      </div>
+    ) : (
+      <a class="post_navi-item nav_next" href={archiveHref} title="Writing Archive">
+        <div class="post_navi-arrow">&gt;</div>
+        <div class="post_navi-label">Writing archive</div>
+        <div><span>Archive of all writing</span></div>
+      </a>
+    )
+  }
 </div>
+
+<style>
+  .post_navi-context {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.65rem;
+    align-items: baseline;
+    margin: 1rem 0 0.7rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--button-border);
+    border-radius: 8px;
+    background: var(--panel-bg);
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-decoration: none;
+  }
+
+  .post_navi-context strong {
+    overflow: hidden;
+    color: var(--text-color);
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .post_navi {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .post_navi-item {
+    position: relative;
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+    padding: 0.85rem 0.9rem;
+    border: 1px solid var(--button-border);
+    border-radius: 8px;
+    color: var(--text-color);
+    text-decoration: none;
+  }
+
+  a.post_navi-item:hover,
+  .post_navi-context:hover {
+    border-color: var(--accent-color);
+  }
+
+  .post_navi-label {
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .post_navi-item span {
+    display: -webkit-box;
+    overflow: hidden;
+    font-family: var(--font-reading);
+    font-size: 0.9rem;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .post_navi-arrow {
+    position: absolute;
+    top: 0.75rem;
+    color: var(--accent-color);
+  }
+
+  .nav_prev .post_navi-arrow {
+    left: 0.8rem;
+  }
+
+  .nav_next {
+    text-align: right;
+  }
+
+  .nav_next .post_navi-arrow {
+    right: 0.8rem;
+  }
+
+  .post_navi-item:has(.post_navi-arrow) .post_navi-label {
+    padding-inline: 1rem;
+  }
+
+  .is-boundary {
+    border-style: dashed;
+    color: var(--text-secondary-color);
+    opacity: 0.72;
+  }
+
+  @media (max-width: 620px) {
+    .post_navi-context {
+      grid-template-columns: 1fr auto;
+    }
+
+    .post_navi-context > span:first-child {
+      display: none;
+    }
+
+    .post_navi {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

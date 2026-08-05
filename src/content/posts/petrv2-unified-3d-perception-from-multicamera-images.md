@@ -37,10 +37,7 @@ The robustness study is as important as the leaderboard. Extrinsic noise degrade
 
 ## High-Level Takeaways
 
-PETRv2 informs how one camera representation can support detection, mapping, and lanes without forcing one query geometry on all three. The shared object is a set of calibrated, position-aware image features. Task capacity stays explicit through query initialization and heads; temporal sharing occurs through aligned coordinates.
-
-The rejection test compares this task-query design with a dense BEV trunk at matched resolution and latency, including extrinsic noise, camera loss, and timestamp jitter. PETRv2 loses if global attention or position encoding becomes brittle under real calibration drift, or if dense BEV gives stronger task consistency. At more tasks, query families and their competing gradients become the likely capacity bottleneck.
-
-PETR establishes 3D position embeddings; PETRv2 makes them temporal and multi-task. StreamPETR later retains selected PETR queries as recurrent object state instead of replaying the historical token set.
-
-A unified camera model can share calibrated evidence while giving boxes, maps, and lanes different query contracts—and synchronization remains part of the model.
+- PETRv2 informs how one camera representation can support detection, mapping, and lanes without forcing one query geometry on all three. The shared object is a set of calibrated, position-aware image features. Task capacity stays explicit through query initialization and heads; temporal sharing occurs through aligned coordinates.
+- The rejection test compares this task-query design with a dense BEV trunk at matched resolution and latency, including extrinsic noise, camera loss, and timestamp jitter. PETRv2 loses if global attention or position encoding becomes brittle under real calibration drift, or if dense BEV gives stronger task consistency. At more tasks, query families and their competing gradients become the likely capacity bottleneck.
+- PETR establishes 3D position embeddings; PETRv2 makes them temporal and multi-task. StreamPETR later retains selected PETR queries as recurrent object state instead of replaying the historical token set.
+- A unified camera model can share calibrated evidence while giving boxes, maps, and lanes different query contracts—and synchronization remains part of the model.

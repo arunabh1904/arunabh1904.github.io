@@ -43,10 +43,7 @@ _Source figure from the [DiMA paper](https://arxiv.org/abs/2501.09757), via arXi
 
 ## High-Level Takeaways
 
-DIMA informs whether an expensive multimodal driving reasoner should run online or serve as a training-time teacher for a compact vision planner. The atomic supervision unit pairs a driving observation with teacher-produced reasoning or action targets; the student absorbs that signal but executes without the teacher.
-
-Distillation can preserve semantic structure at low latency, but gains may come from extra labels rather than teacher reasoning. The missing factorial ablation compares teacher actions, rationales, intermediate features, and equal-volume human annotations under one student architecture. At 10× teacher size, label-generation cost and systematic teacher errors dominate. The approach would fail if a student trained on simpler privileged labels matched closed-loop safety and progress without the multimodal teacher.
-
-Distillation is a plausible path from impressive VLM demos to deployable autonomy components. The expensive model teaches; the small model acts.
-
-LLMs may enter driving stacks indirectly, as offline teachers that shape compact planners.
+- DIMA informs whether an expensive multimodal driving reasoner should run online or serve as a training-time teacher for a compact vision planner. The atomic supervision unit pairs a driving observation with teacher-produced reasoning or action targets; the student absorbs that signal but executes without the teacher.
+- Distillation can preserve semantic structure at low latency, but gains may come from extra labels rather than teacher reasoning. The missing factorial ablation compares teacher actions, rationales, intermediate features, and equal-volume human annotations under one student architecture. At 10× teacher size, label-generation cost and systematic teacher errors dominate. The approach would fail if a student trained on simpler privileged labels matched closed-loop safety and progress without the multimodal teacher.
+- Distillation is a plausible path from impressive VLM demos to deployable autonomy components. The expensive model teaches; the small model acts.
+- LLMs may enter driving stacks indirectly, as offline teachers that shape compact planners.

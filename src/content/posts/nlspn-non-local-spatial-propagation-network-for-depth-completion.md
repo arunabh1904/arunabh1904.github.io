@@ -40,10 +40,7 @@ The reported non-local neighbors have lower depth variance than fixed local ones
 
 ## High-Level Takeaways
 
-NLSPN informs whether depth completion should use a large feed-forward decoder or a learned propagation rule. Its atomic unit is a depth pixel, but the neighborhood graph is predicted from RGB and sparse depth. The expensive decision is iterative full-resolution propagation and its memory access pattern.
-
-The matched alternative compares non-local propagation with a transformer or convolutional decoder at equal resolution, iterations, and P99 latency, with boundary- and range-stratified errors. NLSPN loses if the learned offsets become unstable under domain shift or if a simpler local kernel matches boundary quality. At higher image resolution, the dense state and repeated gathers dominate.
-
-Sparse-to-Dense regresses depth directly; DeepLiDAR injects surface normals; GuideFormer uses transformer guidance. NLSPN isolates learned propagation as a way to preserve boundaries around sparse measurements.
-
-Depth completion should move measurements along learned geometric neighborhoods, not assume the nearest pixels belong to the same surface.
+- NLSPN informs whether depth completion should use a large feed-forward decoder or a learned propagation rule. Its atomic unit is a depth pixel, but the neighborhood graph is predicted from RGB and sparse depth. The expensive decision is iterative full-resolution propagation and its memory access pattern.
+- The matched alternative compares non-local propagation with a transformer or convolutional decoder at equal resolution, iterations, and P99 latency, with boundary- and range-stratified errors. NLSPN loses if the learned offsets become unstable under domain shift or if a simpler local kernel matches boundary quality. At higher image resolution, the dense state and repeated gathers dominate.
+- Sparse-to-Dense regresses depth directly; DeepLiDAR injects surface normals; GuideFormer uses transformer guidance. NLSPN isolates learned propagation as a way to preserve boundaries around sparse measurements.
+- Depth completion should move measurements along learned geometric neighborhoods, not assume the nearest pixels belong to the same surface.

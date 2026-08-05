@@ -35,10 +35,7 @@ A class-specific heatmap supplies candidate centers; lightweight attribute heads
 
 ## High-Level Takeaways
 
-CenterPoint is useful beyond its backbone because it defines a compact interface between dense BEV features and object-centric temporal state. Fusion systems can combine sensors in BEV, then expose centers and velocity to tracking or prediction without carrying the full grid forever.
-
-Center-only representations can under-use boundary evidence for large or articulated objects. Evaluate localization, velocity, crowded-scene identity switches, and delayed measurements separately.
-
-BEVFusion and many LiDAR-camera systems adopt CenterPoint-style heads; Sparse4D later makes object instances themselves the recurrent state.
-
-A center is an economical bridge from dense geometry to sparse actor state, but it must be paired with explicit shape, motion, and uncertainty.
+- CenterPoint is useful beyond its backbone because it defines a compact interface between dense BEV features and object-centric temporal state. Fusion systems can combine sensors in BEV, then expose centers and velocity to tracking or prediction without carrying the full grid forever.
+- Center-only representations can under-use boundary evidence for large or articulated objects. Evaluate localization, velocity, crowded-scene identity switches, and delayed measurements separately.
+- BEVFusion and many LiDAR-camera systems adopt CenterPoint-style heads; Sparse4D later makes object instances themselves the recurrent state.
+- A center is an economical bridge from dense geometry to sparse actor state, but it must be paired with explicit shape, motion, and uncertainty.

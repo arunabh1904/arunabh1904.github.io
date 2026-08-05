@@ -35,10 +35,7 @@ Rotated set partitioning lets tokens exchange information beyond one grouping wi
 
 ## High-Level Takeaways
 
-DSVT is a strong candidate when custom sparse operators complicate export or when active-voxel density makes submanifold convolutions context-limited. The decisive profiling unit is active tokens per set across real scenes, including worst-case crowding, not average FLOPs.
-
-For unified sensing, DSVT provides a reusable interaction primitive only after each modality has produced meaningful tokens. It does not imply that camera patches and LiDAR voxels should share their tokenizer.
-
-SST establishes single-stride sparse attention; DSVT regularizes the workload and later informs UniTR's shared multimodal transformer blocks.
-
-Efficient sparsity is an execution contract as well as a mathematical one: bound the active set and use operators the deployment stack can actually accelerate.
+- DSVT is a strong candidate when custom sparse operators complicate export or when active-voxel density makes submanifold convolutions context-limited. The decisive profiling unit is active tokens per set across real scenes, including worst-case crowding, not average FLOPs.
+- For unified sensing, DSVT provides a reusable interaction primitive only after each modality has produced meaningful tokens. It does not imply that camera patches and LiDAR voxels should share their tokenizer.
+- SST establishes single-stride sparse attention; DSVT regularizes the workload and later informs UniTR's shared multimodal transformer blocks.
+- Efficient sparsity is an execution contract as well as a mathematical one: bound the active set and use operators the deployment stack can actually accelerate.

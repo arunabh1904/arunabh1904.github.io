@@ -43,10 +43,7 @@ _Figure 1: We introduce the task of 3D dense captioning in outdoor scenes (right
 
 ## High-Level Takeaways
 
-TOD3Cap informs whether outdoor perception should stop at 3D boxes or attach language descriptions that expose object attributes and relations. The atomic output is a detected 3D instance paired with a caption, so localization and language quality are jointly constrained by the same scene.
-
-Dense captions can support open-ended reasoning, but caption metrics may reward generic descriptions and ignore metric grounding. The missing study conditions on oracle versus predicted boxes and evaluates whether captions improve a downstream driving decision, not only language similarity. At 10× objects, proposal-caption pairing and annotation consistency dominate. The task formulation would fail if richer detection attributes delivered the same downstream utility with less free-form language ambiguity.
-
-Dense captioning is a bridge between perception and explanation. A driving system that can say what every relevant object is doing has a better interface to planners, annotators, and safety reviewers.
-
-Rich scene understanding requires language that is spatially grounded. Captions without 3D grounding are not enough for driving.
+- TOD3Cap informs whether outdoor perception should stop at 3D boxes or attach language descriptions that expose object attributes and relations. The atomic output is a detected 3D instance paired with a caption, so localization and language quality are jointly constrained by the same scene.
+- Dense captions can support open-ended reasoning, but caption metrics may reward generic descriptions and ignore metric grounding. The missing study conditions on oracle versus predicted boxes and evaluates whether captions improve a downstream driving decision, not only language similarity. At 10× objects, proposal-caption pairing and annotation consistency dominate. The task formulation would fail if richer detection attributes delivered the same downstream utility with less free-form language ambiguity.
+- Dense captioning is a bridge between perception and explanation. A driving system that can say what every relevant object is doing has a better interface to planners, annotators, and safety reviewers.
+- Rich scene understanding requires language that is spatially grounded. Captions without 3D grounding are not enough for driving.

@@ -50,14 +50,9 @@ The split is scene-source aware: 5,047 training episodes come from 12 environmen
 
 ## High-Level Takeaways
 
-VoLN informs what a navigation benchmark should reveal through its task interface. If route language encodes turns and layout unavailable onboard, benchmark success entangles navigation with privileged route parsing. Goal views plus local cues create a stricter alternative: perception, evidence accumulation, viewpoint matching, control, and stopping must all work without a task-level route script.
-
-The benchmark still engineers navigation structure into the environment. Active beacons are placed along each reference trajectory, and the method converts them back into language-like semantic tokens through a hand-specified text bank. A decisive control would vary beacon density, remove text descriptors, and compare against natural landmarks and learned memory. Performance that disappears without designed signs would measure beacon following more than open-world visual navigation.
-
-At ten times the route length, memory and error recovery are likely to dominate the 7B planner. The current model uses a fixed recent-observation window and replans slowly at 1.42 seconds per cycle. The next benchmark revision should expose standardized memory budgets, recovery after missed cues, semantic-bank ablations, repeated physical trials, and success by route length rather than only three coarse strata.
-
-VoLN removes route-level language and global position from long-horizon navigation, replacing them with goal views and locally observable cues.
-
-Most evidence comes from simulated UAV routes with deliberately placed beacons. Absolute unseen-scene success is below 8%, Hard routes are only 12% of the data, and the physical demonstration is a single qualitative rollout.
-
-Audit what the instruction gives away; a vision-only task interface is useful precisely because today’s agents largely fail when route structure must be inferred online.
+- VoLN informs what a navigation benchmark should reveal through its task interface. If route language encodes turns and layout unavailable onboard, benchmark success entangles navigation with privileged route parsing. Goal views plus local cues create a stricter alternative: perception, evidence accumulation, viewpoint matching, control, and stopping must all work without a task-level route script.
+- The benchmark still engineers navigation structure into the environment. Active beacons are placed along each reference trajectory, and the method converts them back into language-like semantic tokens through a hand-specified text bank. A decisive control would vary beacon density, remove text descriptors, and compare against natural landmarks and learned memory. Performance that disappears without designed signs would measure beacon following more than open-world visual navigation.
+- At ten times the route length, memory and error recovery are likely to dominate the 7B planner. The current model uses a fixed recent-observation window and replans slowly at 1.42 seconds per cycle. The next benchmark revision should expose standardized memory budgets, recovery after missed cues, semantic-bank ablations, repeated physical trials, and success by route length rather than only three coarse strata.
+- VoLN removes route-level language and global position from long-horizon navigation, replacing them with goal views and locally observable cues.
+- Most evidence comes from simulated UAV routes with deliberately placed beacons. Absolute unseen-scene success is below 8%, Hard routes are only 12% of the data, and the physical demonstration is a single qualitative rollout.
+- Audit what the instruction gives away; a vision-only task interface is useful precisely because today’s agents largely fail when route structure must be inferred online.

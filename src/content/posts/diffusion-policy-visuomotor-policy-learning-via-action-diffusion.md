@@ -38,12 +38,8 @@ Across 15 tasks from four manipulation benchmarks, the paper reports an average 
 
 ## High-Level Takeaways
 
-Diffusion Policy informs whether action multimodality is important enough to justify iterative decoding. Its atomic unit is an action trajectory corrupted at a diffusion timestep; the loss predicts denoising information conditioned on visual state. Temporal compression comes from predicting a sequence and executing it receding-horizon.
-
-The benchmark establishes a strong imitation-learning Pareto point, not that diffusion remains optimal under strict latency or online RL. A missing experiment matches end-to-end control frequency and compute against flow, autoregressive, and parallel regression heads. At ten times the horizon, denoising cost and model error across the unused tail grow. The representation claim fails if a simpler continuous chunk policy matches robustness and multimodality at the same closed-loop rate.
-
-Diffusion Policy made the policy distribution—not only the backbone—a central robot-learning decision.
-
-Strong offline imitation results do not automatically provide tractable action log-probabilities for RL.
-
-Diffusion is valuable when the action distribution has several precise modes; its sampling interface must still fit the control and post-training loop.
+- Diffusion Policy informs whether action multimodality is important enough to justify iterative decoding. Its atomic unit is an action trajectory corrupted at a diffusion timestep; the loss predicts denoising information conditioned on visual state. Temporal compression comes from predicting a sequence and executing it receding-horizon.
+- The benchmark establishes a strong imitation-learning Pareto point, not that diffusion remains optimal under strict latency or online RL. A missing experiment matches end-to-end control frequency and compute against flow, autoregressive, and parallel regression heads. At ten times the horizon, denoising cost and model error across the unused tail grow. The representation claim fails if a simpler continuous chunk policy matches robustness and multimodality at the same closed-loop rate.
+- Diffusion Policy made the policy distribution—not only the backbone—a central robot-learning decision.
+- Strong offline imitation results do not automatically provide tractable action log-probabilities for RL.
+- Diffusion is valuable when the action distribution has several precise modes; its sampling interface must still fit the control and post-training loop.

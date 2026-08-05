@@ -33,10 +33,7 @@ On the paper's OpenScene pretraining setup, reported downstream gains include 7.
 
 ## High-Level Takeaways
 
-DriveWorld is useful when many tasks must reuse a long-lived scene latent. The core ablation should compare one general memory with separate static and dynamic memories at matched capacity, then measure staleness, re-observation, and error propagation over long clips.
-
-Reported broad transfer is promising but does not establish causal planning benefit. Planning evaluation must include closed-loop behavior, latency, and scenario regressions.
-
-BEVDet4D carries one previous dense grid; sparse detectors carry instances; DriveWorld makes persistent 4D state itself the pretrained asset.
-
-Temporal pretraining becomes more reusable when the memory distinguishes what should move, what should remain fixed, and which task is reading it.
+- DriveWorld is useful when many tasks must reuse a long-lived scene latent. The core ablation should compare one general memory with separate static and dynamic memories at matched capacity, then measure staleness, re-observation, and error propagation over long clips.
+- Reported broad transfer is promising but does not establish causal planning benefit. Planning evaluation must include closed-loop behavior, latency, and scenario regressions.
+- BEVDet4D carries one previous dense grid; sparse detectors carry instances; DriveWorld makes persistent 4D state itself the pretrained asset.
+- Temporal pretraining becomes more reusable when the memory distinguishes what should move, what should remain fixed, and which task is reading it.

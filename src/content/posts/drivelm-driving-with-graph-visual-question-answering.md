@@ -50,10 +50,7 @@ _Figure 1 shows DriveLM's task and artifacts: graph VQA, data construction, the 
 
 ## High-Level Takeaways
 
-DriveLM informs whether driving reasoning should be supervised as isolated QA pairs or as a graph connecting perception, prediction, planning, behavior, and motion. The atomic item is a node question-answer pair with directed dependencies that encode which earlier facts support a later decision.
-
-The graph makes reasoning supervision inspectable, but it can reward verbal consistency without improving control. The decisive study holds images and answer volume fixed while comparing graph-structured supervision, independent QA, and direct action labels on downstream closed-loop planning. At 10× graph depth, annotation cost and propagated label errors dominate. The formulation would fail if graph accuracy did not predict intervention rate or trajectory quality better than flat QA accuracy.
-
-DriveLM gave VLM-for-driving work a structured reasoning target instead of only asking open-ended scene questions.
-
-Language helps driving most when it is grounded in a reasoning graph that can feed spatial planning.
+- DriveLM informs whether driving reasoning should be supervised as isolated QA pairs or as a graph connecting perception, prediction, planning, behavior, and motion. The atomic item is a node question-answer pair with directed dependencies that encode which earlier facts support a later decision.
+- The graph makes reasoning supervision inspectable, but it can reward verbal consistency without improving control. The decisive study holds images and answer volume fixed while comparing graph-structured supervision, independent QA, and direct action labels on downstream closed-loop planning. At 10× graph depth, annotation cost and propagated label errors dominate. The formulation would fail if graph accuracy did not predict intervention rate or trajectory quality better than flat QA accuracy.
+- DriveLM gave VLM-for-driving work a structured reasoning target instead of only asking open-ended scene questions.
+- Language helps driving most when it is grounded in a reasoning graph that can feed spatial planning.

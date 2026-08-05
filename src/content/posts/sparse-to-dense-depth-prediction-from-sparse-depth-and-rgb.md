@@ -33,10 +33,7 @@ The network can use one joint encoder or separate RGB and depth branches. Sparse
 
 ## High-Level Takeaways
 
-Use depth completion when sparse depth is guaranteed at runtime and downstream modules benefit from a dense surface. If the deployment goal is camera-only, use sparse depth as supervision or distillation instead and remove it from the inference graph deliberately.
-
-Evaluate error by distance, object boundary, surface type, and sampling pattern. Uniform random samples are easier than real scanning geometry and motion distortion.
-
-DeepLiDAR adds surface-normal reasoning and learned confidence; GuideFormer replaces convolutional exchange with guided attention.
-
-Sparse measurements can dramatically improve dense depth, but the improvement is a runtime sensor dependency, not free privileged supervision.
+- Use depth completion when sparse depth is guaranteed at runtime and downstream modules benefit from a dense surface. If the deployment goal is camera-only, use sparse depth as supervision or distillation instead and remove it from the inference graph deliberately.
+- Evaluate error by distance, object boundary, surface type, and sampling pattern. Uniform random samples are easier than real scanning geometry and motion distortion.
+- DeepLiDAR adds surface-normal reasoning and learned confidence; GuideFormer replaces convolutional exchange with guided attention.
+- Sparse measurements can dramatically improve dense depth, but the improvement is a runtime sensor dependency, not free privileged supervision.

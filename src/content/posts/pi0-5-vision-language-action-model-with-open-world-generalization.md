@@ -39,12 +39,8 @@ The architecture separates time scales. High-level tokens express what should ha
 
 ## High-Level Takeaways
 
-Pi0.5 informs whether long-horizon generalization should come from a monolithic low-level policy or heterogeneous co-training with an explicit semantic time scale. Its units range from web tokens to action chunks; the backbone shares representations while the action expert specializes continuous control.
-
-The demonstrations establish compelling open-world behavior, but the private mixture makes contribution accounting difficult. A missing ablation matches robot hours, web data, and subtask labels against a hierarchical two-model baseline. At ten times the horizon, subtask drift and error recovery become the bottleneck. The central claim weakens if the policy succeeds only when high-level predictions follow familiar household scripts or if a planner/action decomposition recovers more reliably.
-
-Pi0.5 shows why VLA post-training cannot be reduced to one loss: semantic retention, task decomposition, and motor adaptation interact.
-
-Few public details allow exact reproduction of mixture weights and data quality.
-
-Heterogeneous co-training is useful when each data type owns a time scale and the system can measure transfer between them.
+- Pi0.5 informs whether long-horizon generalization should come from a monolithic low-level policy or heterogeneous co-training with an explicit semantic time scale. Its units range from web tokens to action chunks; the backbone shares representations while the action expert specializes continuous control.
+- The demonstrations establish compelling open-world behavior, but the private mixture makes contribution accounting difficult. A missing ablation matches robot hours, web data, and subtask labels against a hierarchical two-model baseline. At ten times the horizon, subtask drift and error recovery become the bottleneck. The central claim weakens if the policy succeeds only when high-level predictions follow familiar household scripts or if a planner/action decomposition recovers more reliably.
+- Pi0.5 shows why VLA post-training cannot be reduced to one loss: semantic retention, task decomposition, and motor adaptation interact.
+- Few public details allow exact reproduction of mixture weights and data quality.
+- Heterogeneous co-training is useful when each data type owns a time scale and the system can measure transfer between them.

@@ -55,10 +55,7 @@ _Figure 1 shows the representational shift: VAD keeps agents, maps, and ego plan
 
 ## High-Level Takeaways
 
-VAD informs whether an ego planner needs a dense raster feature map or can reason over vectorized agents and map elements. Its atomic units are agent vectors, map vectors, and ego trajectory points; vector attention exposes interaction while explicit safety costs rescore plans.
-
-The representation reduces dense BEV compute, but planning quality becomes bounded by vector extraction recall and uncertainty. The missing comparison matches latency and backbone across vector-only, raster-only, and hybrid planners under missed detections and map errors. At 10× actors, pairwise interaction and vector selection dominate. VAD's claim would fail if a low-resolution raster or occupancy interface matched collision and progress metrics while degrading more gracefully when upstream instances are missing.
-
-VAD carried vectorized scene understanding beyond map construction and into end-to-end planning.
-
-Planning benefits when the model keeps the world as vectors and relations instead of flattening it into dense pixels too early.
+- VAD informs whether an ego planner needs a dense raster feature map or can reason over vectorized agents and map elements. Its atomic units are agent vectors, map vectors, and ego trajectory points; vector attention exposes interaction while explicit safety costs rescore plans.
+- The representation reduces dense BEV compute, but planning quality becomes bounded by vector extraction recall and uncertainty. The missing comparison matches latency and backbone across vector-only, raster-only, and hybrid planners under missed detections and map errors. At 10× actors, pairwise interaction and vector selection dominate. VAD's claim would fail if a low-resolution raster or occupancy interface matched collision and progress metrics while degrading more gracefully when upstream instances are missing.
+- VAD carried vectorized scene understanding beyond map construction and into end-to-end planning.
+- Planning benefits when the model keeps the world as vectors and relations instead of flattening it into dense pixels too early.
