@@ -1,5 +1,5 @@
 ---
-title: 'Pretraining Multimodal Models for Robotics'
+title: 'How Multimodal Robot Models Are Pretrained'
 date: '2026-07-15T09:00:00.000Z'
 section: blog
 postSlug: omni-model-pretraining-decisions
@@ -8,10 +8,10 @@ tags:
   - Multimodal AI
   - Pretraining
   - Research Leadership
-summary: A reading guide to the representations, robot data, action interfaces, mixtures, and scaling experiments behind multimodal robot policies.
+summary: How representations, robot data, action interfaces, objective mixtures, and scaling experiments determine a multimodal robot policy.
 ---
 
-# Pretraining Multimodal Models for Robotics
+# How Multimodal Robot Models Are Pretrained
 
 A robot can inherit the word “drawer” from the internet. The internet does not tell it how a sticky drawer feels, how far a particular arm can reach, or what to do after the gripper slips. Multimodal pretraining works because semantic and motor experience can transfer. It fails when “put everything in one model” becomes a substitute for deciding what should transfer, through which parameters, and under what evidence.
 
@@ -132,6 +132,14 @@ $$
 Contrastive understanding uses paired image–text scores. [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html) replaces batch-softmax competition with independent sigmoid pair losses, reducing dependence on enormous synchronized negative sets. Diffusion or flow predicts noise, velocity, or a vector field over a sampled time. Robot imitation may use token CE, L1 action error, denoising, or flow matching.
 
 Combining those objectives makes the loss weight for each modality look like one more hyperparameter, but the weights do not act on comparable units. One image example may contribute hundreds of patches, one video contributes many frames, and one robot episode contributes many correlated action steps. The apparent balance changes with sequence packing, mask count, and gradient accumulation.
+
+The figure makes the accounting problem concrete with an illustrative equal-example mixture. The percentages are not a reported recipe. They are held fixed so the three later imbalances become visible.
+
+[![Animation showing equal text, image, video, and action example shares expanding into unequal training units, compute, and shared-parameter updates](/assets/images/blog-multimodal-gradient-budget.gif)](/assets/images/blog-multimodal-gradient-budget.gif)
+
+*Equal sampled-example shares need not produce equal predicted units, FLOPs, or update norms. Video and action sequences expand differently before they reach shared parameters, so one percentage cannot describe the mixture. Custom explanatory synthesis informed by the controlled data and architecture studies in [MM1](https://arxiv.org/abs/2403.09611), [Scaling Laws for Generative Mixed-Modal Language Models](https://arxiv.org/abs/2301.03728), [Scaling Laws for Optimal Data Mixtures](https://arxiv.org/abs/2507.09404), and [Pi0](https://arxiv.org/abs/2410.24164). Values are illustrative, not paper-reported measurements.*
+
+The deepest error is treating a dataloader share as the amount of learning a modality receives. Sequence expansion decides how many targets are predicted. Representation and model path decide how much compute they consume. Gradient scale and alignment decide how strongly they move the shared trunk. A 10% video sample share can therefore dominate shared updates, while thousands of overlapping robot windows can look numerous without representing thousands of independent decisions.
 
 Normalize and log at three levels:
 
