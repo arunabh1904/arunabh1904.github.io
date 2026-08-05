@@ -23,7 +23,7 @@ The short version, as of April 4, 2026:
 - Most direct low-level path: `llama.cpp`
 - Current Ollama status for Gemma 4 on this machine: it crashes before first token
 
-## What fits
+## Model memory requirements
 
 According to Google's current Gemma docs, approximate Q4 inference memory requirements are `3.2 GB` for `Gemma 4 E2B`, `5 GB` for `Gemma 4 E4B`, `15.6 GB` for `Gemma 4 26B A4B`, and `17.4 GB` for `Gemma 4 31B` ([Google docs](https://ai.google.dev/gemma/docs/core)).
 
@@ -66,7 +66,7 @@ The output task was intentionally boring and deterministic: read background text
 
 One important caveat: this is a fastest-practical-path comparison, not a perfect same-weights lab setup. I used the most direct current artifact for each runtime. That means the `E2B` comparison is not perfectly apples-to-apples: official `llama.cpp` GGUF for `E2B` is `Q8_0`, while the MLX and Ollama paths use 4-bit artifacts.
 
-## Controls that mattered
+## Benchmark controls
 
 These details kept the comparison about runtime behavior rather than hidden work:
 
@@ -76,7 +76,7 @@ These details kept the comparison about runtime behavior rather than hidden work
 - I split the test into short and long prompts on purpose. A runtime can look fine at `512` tokens and then feel much worse once prompt processing climbs into the `8K` range.
 - I tried Ollama with native `gemma4:*` tags, not a hacked local import path, so the Ollama result reflects the current easy path.
 
-## What the benchmarks say
+## Benchmark results
 
 I came into this expecting `llama.cpp` to win on raw speed.
 
@@ -84,7 +84,7 @@ That is not what the machine gave me.
 
 For the smaller models, MLX was clearly faster on this M5 Max. For `26B A4B`, the story got more nuanced: `llama.cpp` and MLX were effectively tied on the short prompt, but MLX still pulled ahead once the prompt got long. For `31B`, MLX went back to being the cleaner win, especially on prompt processing and time to first token.
 
-### Short suite
+### Short-context results
 
 | Model | Runtime | Artifact | TTFT | Decode tok/s | Avg tok/s |
 | ----- | ------- | -------- | ---- | ------------ | --------- |
@@ -97,7 +97,7 @@ For the smaller models, MLX was clearly faster on this M5 Max. For `26B A4B`, th
 | `31B` | MLX | `mlx-community/gemma-4-31b-it-4bit` | `906 ms` | `27.50` | `24.34` |
 | `31B` | llama.cpp | `ggml-org` `Q4_K_M` GGUF | `1279 ms` | `24.89` | `21.35` |
 
-### Long suite
+### Long-context results
 
 | Model | Runtime | Artifact | TTFT | Decode tok/s | Avg tok/s |
 | ----- | ------- | -------- | ---- | ------------ | --------- |
@@ -119,7 +119,7 @@ The pattern:
 - On longer prompts, MLX is still more comfortable because time to first token is substantially lower.
 - The difference between "weights fit" and "this feels good to use" shows up quickly once prompt length grows; TTFT hurts before decode speed does.
 
-## Ollama right now
+## Ollama compatibility
 
 I wanted a clean Ollama column here. I could not get one.
 
@@ -134,7 +134,7 @@ That matters because it changes the recommendation:
 
 So if your question is "should I start with Ollama because it is easiest," my current answer is no, not for Gemma 4 on this hardware, at least not until that backend issue is fixed.
 
-## What I would actually use
+## Recommendation
 
 If I cared about the strongest local Gemma 4 model, I would start with `31B`.
 

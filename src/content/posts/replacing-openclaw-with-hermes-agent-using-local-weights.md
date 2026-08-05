@@ -1,5 +1,5 @@
 ---
-title: Replacing OpenClaw with Hermes Agent using local weights
+title: Replacing OpenClaw with Hermes Agent Using Local Weights
 date: '2026-04-04T17:59:45.000Z'
 section: blog
 postSlug: replacing-openclaw-with-hermes-agent-using-local-weights
@@ -13,7 +13,7 @@ summary: >-
   got it working with an already-downloaded Gemma GGUF instead of pulling new
   models.
 ---
-# Replacing OpenClaw with Hermes Agent using local weights
+# Replacing OpenClaw with Hermes Agent Using Local Weights
 
 I wanted a specific outcome: replace OpenClaw with [Hermes Agent](https://github.com/nousresearch/hermes-agent) while keeping inference fully local. That meant two constraints:
 
@@ -22,7 +22,7 @@ I wanted a specific outcome: replace OpenClaw with [Hermes Agent](https://github
 
 On this machine, the artifacts I could verify quickly were local Gemma GGUFs, so that is the path I got working end to end. I did not see my Qwen artifacts in the usual cache locations during setup, but the same `llama.cpp` pattern should apply to local Qwen GGUFs too.
 
-## Why I wanted Hermes instead
+## Why replace OpenClaw with Hermes Agent
 
 Hermes is a much more opinionated agent shell than a bare local chat loop. It has the things I actually care about when I say "agent" instead of "chatbot":
 
@@ -35,7 +35,7 @@ Hermes is a much more opinionated agent shell than a bare local chat loop. It ha
 
 Hermes does not force one inference path. It works with hosted providers, but it can also point at any OpenAI-compatible local endpoint. That separation let the agent framework stay fixed while the model runtime changed underneath it.
 
-## The install itself was easy
+## Installing Hermes Agent
 
 The Hermes install was not the hard part:
 
@@ -53,7 +53,7 @@ That bootstrapped:
 
 The real question was what local model server Hermes should talk to.
 
-## Ollama was the obvious first try, but it was the wrong one here
+## Why Ollama did not work
 
 Since I already had Ollama installed and local Gemma tags visible, I tried the most obvious route first.
 
@@ -61,7 +61,7 @@ Hermes could see the local endpoint. Ollama listed local Gemma models. But actua
 
 The key realization: Hermes was not the problem. My local model server choice was.
 
-## What actually worked: `llama-server` plus an existing Gemma GGUF
+## `llama-server` with a local Gemma GGUF
 
 The machine already had local Gemma GGUF artifacts in the Hugging Face cache, including:
 
@@ -99,7 +99,7 @@ http://127.0.0.1:18080/v1
 
 That split worked: Hermes stayed as the agent shell, and `llama.cpp` handled local serving.
 
-## The Hermes config I ended up using
+## Hermes Agent configuration
 
 I pointed Hermes at the local `llama-server` endpoint by editing `~/.hermes/config.yaml` to this:
 
@@ -118,7 +118,7 @@ After that, `hermes status --deep` showed exactly what I wanted:
 - provider set to `Custom endpoint`
 - no cloud API keys required
 
-## The actual proof that it was running
+## Verification
 
 The test I cared about was extremely boring on purpose:
 
@@ -134,7 +134,7 @@ READY
 
 That was enough proof: Hermes was running locally against weights already on disk.
 
-## What I would do next
+## Next steps
 
 This setup is already useful, but there are a few obvious next steps:
 

@@ -22,7 +22,7 @@ The same principle applies to tasks and time. Detection, occupancy, lanes, veloc
 
 This post explains those design choices and links each mechanism to an individual paper note.
 
-## The system in one graphic
+## Perception system overview
 
 At runtime, sensor-specific encoders feed metric fusion, persistent scene state, and task-specific outputs. The dashed path exists only during training.
 
@@ -31,7 +31,7 @@ _A high-level architecture synthesized from the linked literature._
 
 The rest of the architecture follows from four questions: what measurement must survive the encoder, where it becomes metric, what state persists through time, and which tasks can safely update the same parameters.
 
-## Sensor encoders should preserve sensor physics
+## Sensor-specific encoders
 
 ### Camera
 
@@ -62,7 +62,7 @@ Radar is not low-resolution LiDAR. Its useful measurements are range, radial vel
 ![Animation comparing early radar rasterization with attribute-aware radar tokens that retain Doppler and uncertainty](/assets/images/autonomous-perception-radar-encoder.gif)
 _Rasterization keeps where a return landed; attribute-aware tokens can also keep how it moved and how much to trust it. This conceptual animation synthesizes the design pressure behind [CRAFT](/paper%20shorts/2022/09/14/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer.html), [CRN](/paper%20shorts/2023/04/03/crn-camera-radar-net-for-3d-perception.html), and [RCBEVDet](/paper%20shorts/2024/03/25/rcbevdet-radar-camera-fusion-in-bev.html)._
 
-## Put the sensors in a common metric frame
+## Shared metric representations
 
 Cameras observe rays; driving tasks reason in meters. The central camera-perception problem is therefore the view transform: where along each ray should an image feature be placed in 3D?
 
@@ -90,7 +90,7 @@ The choice should follow the output:
 
 Many strong systems use more than one representation: dense BEV proposes and describes the scene, while sparse queries carry actors.
 
-## Fuse at the granularity required by the output
+## Fusion granularity
 
 Sensor fusion differs mainly in where correspondence is imposed.
 
@@ -113,7 +113,7 @@ A fused model is not automatically a fallback model. [UniBEV](/paper%20shorts/20
 ![Animation comparing complete-sensor-only training with modality-dropout training and fusion renormalization](/assets/images/autonomous-perception-modality-dropout.gif)
 _The left model sees only complete packets during training; the right cycles through supported missing-sensor modes and renormalizes the streams that remain. This conceptual animation synthesizes the fallback mechanisms in [UniBEV](/paper%20shorts/2023/09/25/unibev-robust-multimodal-detection-with-uniform-bev-encoders.html), [MetaBEV](/paper%20shorts/2023/04/19/metabev-solving-sensor-failures-for-bev-perception.html), and [Grace-BEV](/paper%20shorts/2026/05/29/grace-bev-graceful-degradation-under-sensor-failures.html)._
 
-## Multi-task learning: share the trunk, control the gradients
+## Multi-task learning
 
 Detection, occupancy, lanes, velocity, and tracking all need semantic features, metric geometry, and ego motion. A shared trunk avoids recomputing those features and can make the outputs geometrically consistent. The heads should remain specialized because the tasks differ in resolution, label density, sensor affinity, and error tolerance.
 
@@ -138,7 +138,7 @@ The inverse variance changes the task weight and the logarithm prevents every we
 ![Animation contrasting an unmeasured sum of task gradients with measured, balanced, and selectively split multi-task updates](/assets/images/autonomous-perception-multitask-gradients.gif)
 _Loss weighting changes gradient magnitude; it does not guarantee agreement. The controlled path combines the questions separated by [homoscedastic weighting](/paper%20shorts/2017/05/19/multi-task-learning-using-homoscedastic-uncertainty.html), [GradNorm](/paper%20shorts/2017/11/07/gradnorm-adaptive-loss-balancing.html), and [PCGrad](/paper%20shorts/2020/01/19/pcgrad-gradient-surgery-for-multi-task-learning.html). Conceptual animation synthesized from those optimization mechanisms._
 
-## Use LiDAR during training without requiring it at inference
+## LiDAR supervision without LiDAR inference
 
 “Using LiDAR for depth” describes three different deployment contracts:
 
@@ -161,7 +161,7 @@ The deployed graph and the label-generation graph should be documented separatel
 
 Projected LiDAR is also imperfect supervision. Occlusion, timestamp mismatch, actor motion, and calibration error can move a return across an object boundary. Depth-label generation therefore needs visibility checks, pose interpolation, confidence, and ignore regions.
 
-## Temporal modeling: choose what persists
+## Temporal representations
 
 A single frame does not provide stable velocity, identity through occlusion, or enough parallax for reliable depth. Temporal models differ in the state they retain.
 
@@ -189,7 +189,7 @@ Sparse recurrence makes a missing frame computationally cheap, not semantically 
 
 The useful default is hybrid: short dense memory for road structure, free space, and query birth; longer sparse memory for actors and vectorized map elements. [SparseDrive](/paper%20shorts/2024/05/30/sparsedrive-end-to-end-autonomous-driving-via-sparse-scene-representation.html) extends this object-and-map state into motion prediction and planning.
 
-## Sparse transformers reduce specific costs, not the whole system
+## Sparse transformer tradeoffs
 
 Sparse LiDAR encoders avoid processing empty 3D space. Sparse camera detectors avoid constructing or repeatedly updating every BEV cell. Both save work, but neither makes the full perception stack sparse.
 
@@ -199,7 +199,7 @@ The key sparse-transformer papers change different terms. VoTr, SST, and DSVT bo
 
 Measure end-to-end P95 and P99 latency, peak memory, and recall under dense scenes. Average FPS can hide synchronization, transfer, sparse-kernel overhead, and the rare frame in which many queries or voxels become active.
 
-## Pretraining should teach geometry and persistence
+## Pretraining objectives
 
 Image-classification pretraining teaches appearance but not calibration, cross-view correspondence, metric depth, ego motion, or temporal persistence. Driving pretraining should use synchronized sensor packets or clips and a target that requires those relationships.
 
