@@ -1,5 +1,5 @@
 ---
-title: 'Machine Learning for Autonomous Driving Perception'
+title: 'Perception for Autonomous Driving'
 date: '2026-07-31T18:00:00.000Z'
 section: blog
 postSlug: how-unified-sensor-models-are-built-for-autonomous-driving
@@ -14,7 +14,7 @@ topics:
 summary: How modern driving systems encode each sensor, convert evidence into metric space, fuse it, optimize several tasks, use training-only LiDAR, and carry state through time.
 ---
 
-# Machine Learning for Autonomous Driving Perception
+# Perception for Autonomous Driving
 
 Modern driving perception has three interfaces: **sensor-specific encoding, calibrated metric representation, and task-specific prediction**. Cameras measure appearance along rays, LiDAR measures sparse range and height, and radar measures range and radial velocity with noisy angle. Treating them as interchangeable tensors throws away the reason each sensor is useful. They become comparable only after calibration places their evidence in a shared vehicle frame.
 
