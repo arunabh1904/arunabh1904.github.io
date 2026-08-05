@@ -15,14 +15,18 @@ summary: "2024 – Genie: Generative Interactive Environments"
 **Project:** [Genie project page](https://sites.google.com/view/genie-2024/home)  
 **Conference:** Technical report
 
-**Summary:** Genie learns an interactive generative environment from unlabeled Internet videos. The 11B-parameter model combines a spatiotemporal video tokenizer, an autoregressive dynamics model, and a learned latent-action model, then generates worlds that can be controlled frame by frame.
+### Method and reported result
 
-## Paper Insights
+Genie learns an interactive generative environment from unlabeled Internet videos. The 11B-parameter model combines a spatiotemporal video tokenizer, an autoregressive dynamics model, and a learned latent-action model, then generates worlds that can be controlled frame by frame.
+
+## Summary
+
+Genie is valuable because it makes latent actions a trainable interface rather than requiring labeled controls. The learned action space also supports imitating behaviors from unseen videos. For a world-model program, its contribution is the separation of visual compression, dynamics prediction, and action representation.
+
+## Core Insights
 
 ![Genie architecture with video tokenizer latent action model and dynamics model predicting future video tokens](/assets/images/genie-generative-interactive-environments-paper-figure.png)
 _Figure 2 separates the learned interface from the simulator: the tokenizer compresses video, the latent-action model infers controls from frame pairs, and the dynamics model predicts the next visual state conditioned on those controls. Source: [Genie](https://arxiv.org/abs/2402.15391)._
-
-Genie is valuable because it makes latent actions a trainable interface rather than requiring labeled controls. The learned action space also supports imitating behaviors from unseen videos. For a world-model program, its contribution is the separation of visual compression, dynamics prediction, and action representation.
 
 | Component | Job |
 | --- | --- |
@@ -30,12 +34,12 @@ Genie is valuable because it makes latent actions a trainable interface rather t
 | Dynamics model | Predicts the next latent state. |
 | Latent-action model | Supplies an action-conditioned control interface without action labels. |
 
-## Decision Lens
+## High-Level Takeaways
 
 Genie informs whether controllable world models require action-labeled trajectories or can infer a useful control interface from ordinary video. Its pipeline separates a video tokenizer, a dynamics model over compressed observations, and a latent-action model that discovers transitions capable of conditioning future frames. The learned latent action—not a human command label—is the crucial training unit that turns passive footage into an interactive environment.
 
 The paper establishes that latent controls can reproduce and recombine behaviors in the studied visual domains, but visual controllability is weaker evidence than semantic or physical correctness. The missing test aligns discovered actions with known controls in an environment where both are available, then measures identifiability, long-horizon consistency, and intervention response. At ten times the rollout length or environment diversity, latent actions may drift, collapse, or encode camera artifacts. The central claim fails if the controls cannot predictably reproduce the same intervention across scenes.
 
-**Limits:** Interactive plausibility in generated environments is not evidence of metric accuracy, safety, or causal fidelity in a physical robot or vehicle setting.
+Interactive plausibility in generated environments is not evidence of metric accuracy, safety, or causal fidelity in a physical robot or vehicle setting.
 
-**Takeaway:** A world model needs action-conditioned consequences; realistic video alone is not enough.
+A world model needs action-conditioned consequences; realistic video alone is not enough.

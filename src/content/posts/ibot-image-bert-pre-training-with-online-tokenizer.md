@@ -21,9 +21,11 @@ summary: '2021 – iBOT: Image BERT Pre-Training with Online Tokenizer'
 
 **Conference:** ICLR 2022
 
+## Summary
+
 iBOT turns masked image modeling into self-distillation at the patch level. Instead of reconstructing RGB pixels or committing to a separately trained visual tokenizer, a momentum teacher converts the unmasked image into soft patch targets while the student sees masked patches. The tokenizer is therefore “online”: its vocabulary changes with the representation being learned.
 
-## Paper Insights
+## Core Insights
 
 ![iBOT combines cross-view class-token self-distillation with masked patch-token prediction from an online teacher](/assets/images/ibot-image-bert-pre-training-online-tokenizer-paper-figure.png)
 _The class-token branch preserves DINO-style cross-view alignment; the masked-image branch asks student patch tokens to match teacher patch distributions at the hidden locations. Source: [iBOT](https://arxiv.org/abs/2111.07832)._
@@ -40,7 +42,7 @@ This target choice avoids a recurring masked-modeling dilemma. Pixel reconstruct
 
 The paper also evaluates object detection, instance segmentation, semantic segmentation, and low-shot classification. Those transfers are central to the method's claim: predicting teacher patch tokens should preserve spatial structure better than a global-only objective. The evidence supports broad transfer, but mixes changes in data, backbone size, resolution, and fine-tuning protocol across tables, so the headline results are not one clean attribution study.
 
-## Decision Lens
+## High-Level Takeaways
 
 iBOT informs what a masked vision model should predict. Its atomic unit is a masked patch position paired with a soft target from an unmasked momentum teacher. That makes it attractive when dense transfer matters and a fixed visual codebook would be expensive or domain-mismatched.
 
@@ -48,8 +50,8 @@ The critical control is target quality at equal compute. Pixel reconstruction, a
 
 iBOT supplies the patch-level half of the later [DINOv2](/paper%20shorts/2023/04/14/dinov2-learning-robust-visual-features-without-supervision.html) recipe. DINOv2 keeps DINO's image-level agreement, uses iBOT-style masked patch prediction, and shifts much more attention to data curation and training stability.
 
-**Context:** iBOT joins DINO-style global self-distillation with BERT-like masked prediction over image patches.
+iBOT joins DINO-style global self-distillation with BERT-like masked prediction over image patches.
 
-**Limits:** Its strongest large-model result depends on ImageNet-22K, and an online teacher can propagate its own representation errors.
+Its strongest large-model result depends on ImageNet-22K, and an online teacher can propagate its own representation errors.
 
-**Takeaway:** Masked image modeling need not reconstruct pixels or use a frozen codebook; the model's momentum teacher can generate semantic patch targets while it learns.
+Masked image modeling need not reconstruct pixels or use a frozen codebook; the model's momentum teacher can generate semantic patch targets while it learns.

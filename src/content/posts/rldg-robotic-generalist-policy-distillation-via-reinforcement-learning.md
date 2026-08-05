@@ -17,9 +17,11 @@ summary: "2024 – RLDG: Robotic Generalist Policy Distillation via Reinforcemen
 
 **Project:** [generalist-distillation.github.io](https://generalist-distillation.github.io/)
 
+## Summary
+
 RLDG avoids applying unstable RL updates directly to a large generalist policy. It trains smaller task-specific RL specialists, rolls them out to collect higher-quality and broader-coverage trajectories, and distills those trajectories back into the generalist with supervised fine-tuning.
 
-## Paper Insights
+## Core Insights
 
 ![RLDG workflow training specialist reinforcement-learning policies collecting their rollouts and distilling them into a generalist robot policy](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-paper-figure.png)
 _Figure 1 shows the division of labor: narrow RL specialists supply high-quality task data, then one OpenVLA or Octo policy absorbs those behaviors through ordinary fine-tuning. Source: [RLDG](https://arxiv.org/abs/2412.09858)._
@@ -34,14 +36,14 @@ The separation also protects general capabilities. The specialist can optimize a
 | Data generation | Converged specialist | Produce high-quality state/action coverage |
 | Distillation | Generalist policy | Imitate selected RL trajectories |
 
-## Decision Lens
+## High-Level Takeaways
 
 RLDG informs whether RL should update a generalist directly or serve as a data-generation tool. Its atomic unit is the distilled specialist trajectory. Parameters are not shared during RL; knowledge crosses the boundary through curated experience.
 
 The results establish that specialist-generated data can beat human demonstrations on precise tasks. A missing comparison holds total robot hours constant across direct generalist RL, specialist distillation, and correction SFT. At ten times the task count, training specialists becomes the bottleneck and their styles may conflict. The thesis fails if distilled gains vanish on new tasks or if direct post-training achieves equal improvement without forgetting at lower systems cost.
 
-**Context:** RLDG turns RL into a data flywheel rather than insisting it be the final optimizer.
+RLDG turns RL into a data flywheel rather than insisting it be the final optimizer.
 
-**Limits:** Task rewards and specialist training remain expensive to engineer and validate.
+Task rewards and specialist training remain expensive to engineer and validate.
 
-**Takeaway:** When direct RL is too brittle for a foundation policy, let RL improve the data before it improves the model.
+When direct RL is too brittle for a foundation policy, let RL improve the data before it improves the model.

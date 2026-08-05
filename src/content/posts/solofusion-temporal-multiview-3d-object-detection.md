@@ -15,11 +15,15 @@ summary: '2022 – Time Will Tell: New Outlooks and a Baseline for Temporal Mult
 
 **Code:** [Divadi/SOLOFusion](https://github.com/Divadi/SOLOFusion)
 
-**Summary:** SOLOFusion frames temporal camera detection as stereo with a moving baseline. Short, high-resolution history resolves fine correspondence; long, low-resolution history supplies larger baselines that make distant depth easier to observe. The model combines both rather than spending high resolution over the full temporal window.
+### Method and reported result
+
+SOLOFusion frames temporal camera detection as stereo with a moving baseline. Short, high-resolution history resolves fine correspondence; long, low-resolution history supplies larger baselines that make distant depth easier to observe. The model combines both rather than spending high resolution over the full temporal window.
+
+## Summary
 
 Its central insight is a budget trade: temporal baseline and feature resolution can compensate for each other, but neither should be maximized uniformly.
 
-## Paper Insights
+## Core Insights
 
 The long-term path warps a running sequence of low-resolution BEV features into the present frame and builds a cost volume. The short-term path performs higher-resolution stereo around a few depth hypotheses chosen from the monocular depth distribution. Gaussian-spaced top-k sampling concentrates compute near likely depth while retaining nearby alternatives.
 
@@ -34,12 +38,12 @@ History length matters nonlinearly. Moving from one to sixteen previous frames r
 
 On nuScenes validation, the ResNet-50 model reports 42.7 mAP and 53.4 NDS. The larger test model reaches 54.0 mAP and 61.9 NDS. These results support the representation trade, but the pipeline still carries dense BEV state and its history depends on ego-motion alignment.
 
-## Decision Lens
+## High-Level Takeaways
 
 SOLOFusion informs how to spend a fixed temporal budget between spatial detail and baseline diversity. Its atomic units are depth hypotheses and aligned BEV cells. The short path buys local precision; the long path buys observability and velocity without replaying high-resolution images at every timestamp.
 
 The matched experiment should sweep resolution, frame spacing, and history under one latency and memory envelope, with range-bucketed depth and actor recall. SOLOFusion loses if a sparse recurrent query model matches long-range localization with less dense state, or if pose drift makes long baselines unreliable. At 10× history, stored BEV features and warp bandwidth become the limits even when each frame is coarse.
 
-**Context:** BEVDet4D uses a short recurrent BEV. SOLOFusion explains why long temporal baselines help camera depth; Sparse4D v2 and StreamPETR instead compress long history into recurrent instances.
+BEVDet4D uses a short recurrent BEV. SOLOFusion explains why long temporal baselines help camera depth; Sparse4D v2 and StreamPETR instead compress long history into recurrent instances.
 
-**Takeaway:** Long history is most useful when it changes depth observability; the efficient design spends detail on the short baseline and duration on the coarse one.
+Long history is most useful when it changes depth observability; the efficient design spends detail on the short baseline and duration on the coarse one.

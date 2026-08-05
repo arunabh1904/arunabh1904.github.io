@@ -17,9 +17,11 @@ summary: "2022 – RT-1: Robotics Transformer for Real-World Control at Scale"
 
 **Project:** [robotics-transformer1.github.io](https://robotics-transformer1.github.io/)
 
+## Summary
+
 RT-1 tests whether a single real-time policy can absorb a broad robot dataset without losing execution speed. It combines a FiLM-conditioned EfficientNet, TokenLearner visual compression, a transformer, and discretized arm/base actions in a 35M-parameter controller that runs at 3 Hz.
 
-## Paper Insights
+## Core Insights
 
 ![RT-1 architecture conditioning EfficientNet with language using FiLM then compressing visual tokens for a decoder-only action transformer](/assets/images/rt-1-robotics-transformer-for-real-world-control-at-scale-paper-figure.png)
 _Figure 3 traces RT-1 end to end: a sentence embedding modulates EfficientNet features, TokenLearner compresses the vision-language grid, and a decoder-only transformer emits discretized robot actions. Source: [RT-1](https://arxiv.org/abs/2212.06817)._
@@ -34,14 +36,14 @@ RT-1 established the multi-task robot policy as a scalable object, but its seman
 | TokenLearner | Compresses image features | Salient detail can be discarded. |
 | Discrete action tokens | Makes control autoregressive | Quantization and 3 Hz execution cap precision. |
 
-## Decision Lens
+## High-Level Takeaways
 
 RT-1 informs whether to scale robot capability through one diverse policy or a collection of task-specific controllers. Its atomic unit is an observation–instruction paired with tokenized action dimensions. Visual compression and action discretization are what let shared transformer capacity meet the deployment rate.
 
 The experiments support positive returns from data and task diversity in the tested robot fleet. They do not separate diversity from collection quality or controller conventions. At ten times the embodiments, incompatible action spaces and sensor layouts will dominate. The generalist-policy claim would fail if task specialists trained on equal total data retain higher success and require less adaptation on held-out tasks.
 
-**Context:** RT-1 is the scaling baseline from which web-grounded VLAs and cross-embodiment datasets developed.
+RT-1 is the scaling baseline from which web-grounded VLAs and cross-embodiment datasets developed.
 
-**Limits:** Real-time success at 3 Hz does not cover high-frequency, contact-rich control.
+Real-time success at 3 Hz does not cover high-frequency, contact-rich control.
 
-**Takeaway:** Diversity is useful only when the interface compresses heterogeneous experience into actions the deployed robot can execute reliably.
+Diversity is useful only when the interface compresses heterogeneous experience into actions the deployed robot can execute reliably.

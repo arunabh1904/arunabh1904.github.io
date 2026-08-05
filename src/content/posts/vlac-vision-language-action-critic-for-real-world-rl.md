@@ -15,9 +15,11 @@ summary: "2025 – VLAC: A Vision-Language-Action-Critic Model for Real-World Re
 
 **arXiv:** [2509.15937](https://arxiv.org/abs/2509.15937)
 
+## Summary
+
 VLAC turns a multimodal model into a process critic. Given a language goal and two observations, it predicts signed progress and completion; prompt control also lets the same autoregressive model emit actions. Training mixes vision-language tasks, more than 4,000 hours of robot/human trajectories, and constructed negatives for regressions, stagnation, irrelevant goals, and semantic mismatches.
 
-## Paper Insights
+## Core Insights
 
 ![VLAC training and deployment overview combining progress-understanding data with action generation and dense rewards for real-world reinforcement learning](/assets/images/vlac-vision-language-action-critic-for-real-world-rl-paper-figure.png)
 _Figure 2 shows the model's dual role: mixed robot and vision-language data teach task progress and actions, then the same network supplies dense progress rewards while acting as a policy in real-world RL. Source: [VLAC](https://arxiv.org/abs/2509.15937)._
@@ -32,14 +34,14 @@ Dense progress is more informative than terminal success, but also easier to exp
 | Done probability | Episode termination | Confuses appearance with completion |
 | Action tokens | Shared actor interface | Actor and critic errors become correlated |
 
-## Decision Lens
+## High-Level Takeaways
 
 VLAC informs whether to hand-engineer rewards, learn a task-specific success detector, or train a general visual-language process critic. Its atomic unit is a pair of temporally related observations plus a goal; progress labels come from ordering and curated negatives. Actor and critic share one model interface, buying transfer while increasing correlated-failure risk.
 
 The real-robot loop establishes promising sample efficiency on four tasks, not universal reward validity. A missing ablation gives the critic structured geometry/contact state and tests whether that changes reward hacking and transfer. At ten times the task diversity, visually similar but physically different progress will dominate. The central claim fails if critic score improves while blinded human success, safety, or intervention rate does not.
 
-**Context:** VLAC makes the learned critic—not the policy—the central reusable model in real-world post-training.
+VLAC makes the learned critic—not the policy—the central reusable model in real-world post-training.
 
-**Limits:** Progress supervision inferred from time can label pauses or necessary backtracking incorrectly.
+Progress supervision inferred from time can label pauses or necessary backtracking incorrectly.
 
-**Takeaway:** A general critic needs explicit negative cases for regression, stagnation, and goal mismatch; scale alone does not make progress causal.
+A general critic needs explicit negative cases for regression, stagnation, and goal mismatch; scale alone does not make progress causal.

@@ -17,11 +17,15 @@ summary: "2023 – DriveLM: Driving with Graph Visual Question Answering"
 
 **Code:** [OpenDriveLab/DriveLM](https://github.com/OpenDriveLab/DriveLM)
 
-**Summary:** DriveLM argues that driving VQA should be multi-step and graph-structured. Human drivers do not jump from pixels to steering in one question; they identify relevant objects, reason about interactions, decide behavior, and then produce motion.
+### Method and reported result
+
+DriveLM argues that driving VQA should be multi-step and graph-structured. Human drivers do not jump from pixels to steering in one question; they identify relevant objects, reason about interactions, decide behavior, and then produce motion.
+
+## Summary
 
 DriveLM captures that process with Graph Visual Question Answering. Nodes represent reasoning stages such as perception, prediction, planning, behavior, and motion. Edges pass context between questions.
 
-## Paper Insights
+## Core Insights
 
 The paper contributes a task formulation, dataset, metrics, and a baseline agent. DriveLM-Data provides graph-structured QA annotations over driving scenes. DriveLM-Agent uses a vision-language model to answer stage-specific questions, propagate context through the graph, and convert behavior reasoning into a trajectory.
 
@@ -35,7 +39,7 @@ _Figure 1 shows DriveLM's task and artifacts: graph VQA, data construction, the 
 - Earlier answers become context for later driving decisions.
 - The task hierarchy separates perception, prediction, planning, behavior, and motion.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Artifact | Detail | Why it matters |
 | -------- | ------ | -------------- |
@@ -44,12 +48,12 @@ _Figure 1 shows DriveLM's task and artifacts: graph VQA, data construction, the 
 | Baseline | DriveLM-Agent | Shows how a VLM can use the graph to produce driving behavior. |
 | Evaluation | DriveLM-Metrics and generalization settings | Tests semantic accuracy, trajectory quality, and unseen conditions. |
 
-## Decision Lens
+## High-Level Takeaways
 
 DriveLM informs whether driving reasoning should be supervised as isolated QA pairs or as a graph connecting perception, prediction, planning, behavior, and motion. The atomic item is a node question-answer pair with directed dependencies that encode which earlier facts support a later decision.
 
 The graph makes reasoning supervision inspectable, but it can reward verbal consistency without improving control. The decisive study holds images and answer volume fixed while comparing graph-structured supervision, independent QA, and direct action labels on downstream closed-loop planning. At 10× graph depth, annotation cost and propagated label errors dominate. The formulation would fail if graph accuracy did not predict intervention rate or trajectory quality better than flat QA accuracy.
 
-**Context:** DriveLM gave VLM-for-driving work a structured reasoning target instead of only asking open-ended scene questions.
+DriveLM gave VLM-for-driving work a structured reasoning target instead of only asking open-ended scene questions.
 
-**Takeaway:** Language helps driving most when it is grounded in a reasoning graph that can feed spatial planning.
+Language helps driving most when it is grounded in a reasoning graph that can feed spatial planning.

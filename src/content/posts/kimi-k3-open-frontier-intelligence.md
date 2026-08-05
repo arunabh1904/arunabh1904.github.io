@@ -23,11 +23,13 @@ summary: '2026 – Kimi K3: Open Frontier Intelligence'
 **Code and report:** [MoonshotAI/Kimi-K3](https://github.com/MoonshotAI/Kimi-K3)<br />
 **Weights:** [moonshotai/Kimi-K3](https://huggingface.co/moonshotai/Kimi-K3)
 
+## Summary
+
 Kimi K3 scales an open-weight, natively multimodal model along two axes at once: a 2.78-trillion-parameter sparse backbone supplies more pretrained capacity, while long-horizon reinforcement learning teaches the model to spend up to a million tokens of context on coding, research, and tool use. Only 104.2 billion parameters are active per token, but that is still a large serving workload; the report recommends supernodes with at least 64 accelerators.
 
-The paper's strongest contribution is therefore architectural and systemic rather than a single benchmark lead. Kimi Delta Attention, periodic global attention, depth-wise Attention Residuals, and a much wider expert pool are co-designed with training kernels, expert routing, persistent sandboxes, quantization-aware post-training, and prefix caching. The resulting system approaches the strongest proprietary models on several agentic tasks, but does not erase the cost of serving a 104B-active model or the comparability problems in harness-dependent evaluation.
+## Core Insights
 
-## Paper Insights
+The paper's strongest contribution is therefore architectural and systemic rather than a single benchmark lead. Kimi Delta Attention, periodic global attention, depth-wise Attention Residuals, and a much wider expert pool are co-designed with training kernels, expert routing, persistent sandboxes, quantization-aware post-training, and prefix caching. The resulting system approaches the strongest proprietary models on several agentic tasks, but does not erase the cost of serving a 104B-active model or the comparability problems in harness-dependent evaluation.
 
 ![Kimi K3 architecture combining Kimi Delta Attention, gated MLA, Stable LatentMoE, Attention Residuals, and a MoonViT-V2 vision pathway](/assets/images/kimi-k3-architecture-paper-figure.png)
 _Kimi K3 scales information flow along three axes: KDA and gated MLA mix tokens, Stable LatentMoE mixes channels through sparse experts, and Attention Residuals select earlier block representations across depth. MoonViT-V2 supplies the native vision path. Cropped from Figure 2 of the [Kimi K3 report](https://arxiv.org/abs/2607.24653)._
@@ -51,7 +53,7 @@ Post-training begins with supervised agent trajectories, then trains nine specia
 
 The main evaluation uses maximum reasoning effort and a mixture of Kimi Code, Claude Code, and Codex harnesses. Kimi K3 scores 93.5 on GPQA Diamond, 77.8 on ProgramBench, 88.3 on Terminal-Bench 2.1, 81.2 on FrontierSWE, and 91.2 on BrowseComp. These are competitive frontier results: Terminal-Bench is within 0.5 points of GPT-5.6 Sol, while FrontierSWE trails Claude Fable 5 by 5.4 points. The paper also reports weaker research-level reasoning—43.5 on HLE without tools and 23.4 on CritPt—and explicitly states that Kimi K3 trails Claude Fable 5 and GPT-5.6 Sol overall. Several comparisons use different harnesses, fallback behavior, internal sets, or leaderboard snapshots, so small gaps should not be read as architecture-isolated wins.
 
-## Decision Lens
+## High-Level Takeaways
 
 Kimi K3 informs whether to buy long-context and agentic capability through one enormous sparse model or through a smaller model plus external orchestration. Its atomic units are text and visual tokens, but three distinct sparsity mechanisms allocate work: KDA compresses sequence history into recurrent state, AttnRes selects representations across depth, and LatentMoE activates a small expert subset across width. That coordination is the paper's real bet. A simpler backbone would be easier to serve, but would give up the three independent routes through which K3 scales capacity.
 
@@ -59,8 +61,8 @@ The expensive decision is not the 2.78T headline alone; it is committing trainin
 
 At ten times the workload, expert communication and rollout state are more likely to fail first than raw arithmetic. KDA keeps recurrent state fixed, but the global MLA layers, 104B active parameters, expert dispatch, and persistent million-token sandboxes still demand a large communication and storage domain. The model is most compelling where long trajectories and native vision justify that fixed infrastructure; it is a poor default for latency-sensitive or modest-volume deployment.
 
-**Context:** Kimi K3 extends the Kimi Linear/KDA, Kimi K2 MoE, Kimi K2.5 agent-training, and Attention Residuals lines into one 3T-class native multimodal system.
+Kimi K3 extends the Kimi Linear/KDA, Kimi K2 MoE, Kimi K2.5 agent-training, and Attention Residuals lines into one 3T-class native multimodal system.
 
-**Limits:** Pretraining token count and modality mixture are not reported; component gains are not isolated at matched compute; several agent comparisons depend on different harnesses or internal evaluations; and practical deployment assumes a 64-accelerator-class supernode.
+Pretraining token count and modality mixture are not reported; component gains are not isolated at matched compute; several agent comparisons depend on different harnesses or internal evaluations; and practical deployment assumes a 64-accelerator-class supernode.
 
-**Takeaway:** Kimi K3's falsifiable claim is that coordinated sparsity across sequence, depth, and experts can make a 3T-class multimodal agent worth its systems burden; matched-budget ablations and independent long-horizon evaluations now need to show which parts survive outside Moonshot's stack.
+Kimi K3's falsifiable claim is that coordinated sparsity across sequence, depth, and experts can make a 3T-class multimodal agent worth its systems burden; matched-budget ablations and independent long-horizon evaluations now need to show which parts survive outside Moonshot's stack.

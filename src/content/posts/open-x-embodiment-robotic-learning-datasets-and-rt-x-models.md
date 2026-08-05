@@ -17,9 +17,11 @@ summary: "2023 – Open X-Embodiment: Robotic Learning Datasets and RT-X Models"
 
 **Project:** [robotics-transformer-x.github.io](https://robotics-transformer-x.github.io/)
 
+## Summary
+
 Open X-Embodiment asks whether robotics can build a shared pretraining corpus despite incompatible robots, cameras, action spaces, and collection procedures. The collaboration standardizes data from 22 embodiments and 21 institutions, covering 527 skills and more than a million episodes in later releases.
 
-## Paper Insights
+## Core Insights
 
 ![Open X-Embodiment dataset composition across robot embodiments scenes trajectories skills and object categories](/assets/images/open-x-embodiment-robotic-learning-datasets-and-rt-x-models-paper-figure.png)
 _Figure 0 makes the mixture imbalance visible: embodiments contribute very different numbers of datasets, scenes, and trajectories even while the aggregate corpus covers a broad skill and object vocabulary. Source: [Open X-Embodiment](https://arxiv.org/abs/2310.08864)._
@@ -34,14 +36,14 @@ The paper's deeper contribution is infrastructural: data format, task language, 
 | Actions | Common trajectory container | Embodiment-specific semantics and scale |
 | Tasks | Language or goal interface | Collection policy and success definition |
 
-## Decision Lens
+## High-Level Takeaways
 
 Open X-Embodiment informs whether to spend the next robot-data budget inside one platform or on a mixture that may transfer across platforms. Its atomic unit is a standardized trajectory, while the meaningful curriculum is the distribution over datasets, tasks, and embodiments.
 
 The RT-X results establish positive transfer for part of the mixture, not universal benefit from every dataset. The missing experiment is a full leave-one-embodiment-out matrix normalized by trajectory quality and sampling weight. At ten times the sources, hidden controller, timing, and annotation differences become dominant. The foundation-data claim fails if adding embodiments improves average benchmarks but increases adaptation data or harms safety on a target robot.
 
-**Context:** Open X-Embodiment supplies the data substrate used by Octo, OpenVLA, and later generalist policies.
+Open X-Embodiment supplies the data substrate used by Octo, OpenVLA, and later generalist policies.
 
-**Limits:** Dataset scale counts episodes more easily than it measures coverage, quality, or recoveries.
+Dataset scale counts episodes more easily than it measures coverage, quality, or recoveries.
 
-**Takeaway:** Cross-robot data becomes transferable only when the schema preserves the differences that matter for control.
+Cross-robot data becomes transferable only when the schema preserves the differences that matter for control.

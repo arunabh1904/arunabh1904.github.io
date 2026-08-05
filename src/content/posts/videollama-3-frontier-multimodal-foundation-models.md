@@ -15,11 +15,15 @@ summary: "2025 – VideoLLaMA 3: Frontier Multimodal Foundation Models for Image
 
 **GitHub:** [DAMO-NLP-SG/VideoLLaMA3](https://github.com/DAMO-NLP-SG/VideoLLaMA3)
 
-**Summary:** VideoLLaMA 3 takes a vision-centric route to image and video understanding. It first adapts the vision encoder for variable-resolution images, aligns image-text data at scale, then adds video-specific training and token merging for temporal inputs.
+### Method and reported result
+
+VideoLLaMA 3 takes a vision-centric route to image and video understanding. It first adapts the vision encoder for variable-resolution images, aligns image-text data at scale, then adds video-specific training and token merging for temporal inputs.
+
+## Summary
 
 The key claim is that high-quality image-text learning carries a lot of the load for video. Video data still matters, but the model does not need to learn all semantics from video clips alone.
 
-## Paper Insights
+## Core Insights
 
 VideoLLaMA 3 is a vision-centric model for image and video understanding. Its training recipe treats high-quality image-text data as the base for video capability, then adds video-specific tuning instead of treating video as a separate problem. The framework also uses visual-token efficiency techniques so longer videos do not overwhelm the language context. The evidence compares image and video benchmarks against prior MLLMs. The caveat is that benchmark videos are still cleaner and shorter than many real temporal reasoning tasks. The takeaway is that video MLLMs need both temporal data and strong visual representation design.
 
@@ -31,7 +35,7 @@ _Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced imag
 - Variable-resolution visual encoding helps preserve image detail.
 - Token merging makes longer video contexts cheaper.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -39,12 +43,12 @@ _Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced imag
 | Efficiency | Dynamic token merging | Compresses redundant visual tokens across frames. |
 | Evidence | Image and video benchmarks | Checks whether video gains preserve image understanding. |
 
-## Decision Lens
+## High-Level Takeaways
 
 VideoLLaMA 3 informs whether video understanding should begin with a separate temporal model or with a strong image-language representation followed by temporal specialization. Its curriculum first establishes image–text alignment, then adds video data; variable-resolution encoding preserves spatial detail, while dynamic token merging compresses redundant evidence across frames before the language model consumes it.
 
 The joint image and video benchmarks show that this route can add temporal capability without discarding image competence, but they do not isolate whether token merging preserves the events that matter rather than merely benchmark-level appearance. The missing study varies motion density and event duration at equal token budgets. At ten times the video length, rare actions may be merged away while context and decoding costs still grow. The thesis would fail if a temporally explicit model with the same compute consistently wins on long-horizon causal and event-order tests.
 
-**Context:** It connects the image VLM and video VLM stories. If static visual grounding is strong, video becomes a temporal extension rather than a separate world.
+It connects the image VLM and video VLM stories. If static visual grounding is strong, video becomes a temporal extension rather than a separate world.
 
-**Takeaway:** Video VLMs are constrained by visual token budgets. Good image features plus careful temporal compression are the practical path.
+Video VLMs are constrained by visual token budgets. Good image features plus careful temporal compression are the practical path.

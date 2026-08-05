@@ -17,9 +17,11 @@ summary: "2023 – Reward Model Ensembles Help Mitigate Overoptimization"
 
 **Conference:** ICLR 2024
 
+## Summary
+
 This paper asks whether uncertainty across reward models can identify the regions where policy optimization is exploiting a proxy. It trains ensembles and optimizes either the worst predicted reward or an uncertainty-penalized reward instead of trusting a single mean score.
 
-## Paper Insights
+## Core Insights
 
 ![RLHF pipeline comparing a single proxy reward model with an ensemble used during policy optimization](/assets/images/reward-model-ensembles-help-mitigate-overoptimization-paper-figure.png)
 _Figure 1 highlights the intervention: keep the ordinary SFT and preference-data stages, but optimize the policy against an ensemble of proxy reward models instead of one proxy. Source: [Reward Model Ensembles Help Mitigate Overoptimization](https://arxiv.org/abs/2310.02743)._
@@ -34,14 +36,14 @@ The ensemble is useful because disagreement provides a local warning about extra
 | Worst-case ensemble | Conservative where any member predicts low reward |
 | Uncertainty-weighted ensemble | Trades predicted reward against disagreement |
 
-## Decision Lens
+## High-Level Takeaways
 
 This paper informs whether extra critic capacity should buy a larger single model or an ensemble that exposes epistemic uncertainty. The unit is a response scored by several reward models; the policy objective changes how those scores are normalized and aggregated. The measured gains are orthogonal to simply scaling one reward model in the synthetic study.
 
 The missing control is diversity: compare independently seeded replicas with critics trained from different label sources and representations. At ten times the deployment shift, correlated errors can make the ensemble confidently wrong. The approach is falsified if ensemble disagreement fails to rank real robot failures or if a held-out human/ground-truth metric regresses while the conservative objective rises.
 
-**Context:** Ensembles turn uncertainty into an optimization constraint rather than a dashboard metric.
+Ensembles turn uncertainty into an optimization constraint rather than a dashboard metric.
 
-**Limits:** Synthetic gold rewards and language outputs understate shared physical-perception failures.
+Synthetic gold rewards and language outputs understate shared physical-perception failures.
 
-**Takeaway:** An ensemble helps only when its members disagree for reasons related to the failures that matter.
+An ensemble helps only when its members disagree for reasons related to the failures that matter.

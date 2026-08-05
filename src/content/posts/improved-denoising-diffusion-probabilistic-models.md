@@ -19,14 +19,18 @@ summary: "2021 – Improved Denoising Diffusion Probabilistic Models"
 
 **Conference:** ICML 2021
 
-## Paper Insights
+## Summary
 
 Improved DDPM keeps the diffusion framework but fixes practical weaknesses in likelihood and sampling speed. The paper learns reverse-process variances instead of using a fixed variance schedule, studies hybrid objectives that balance sample quality and likelihood, and introduces a cosine noise schedule that allocates denoising difficulty more smoothly. It also shows that fewer sampling steps can preserve quality better than expected. The evidence includes ImageNet and other image-generation experiments comparing FID, negative log-likelihood, and precision/recall. The caveat is that diffusion still requires sequential denoising, so faster sampling is an improvement rather than a full solution. The paper is important because it turned DDPM from a promising sampler into a more scalable generative modeling recipe.
+
+## Core Insights
 
 ![Figure 3 from Improved DDPM: linear and cosine noise schedules preserve signal at different rates](/assets/images/improved-ddpm-paper-figure-3-noise-schedule.png)
 _Figure 3 from the [Improved DDPM paper](https://arxiv.org/abs/2102.09672), via ar5iv._
 
-**Summary:** Nichol and Dhariwal made DDPMs faster and stronger without changing the basic denoising story. They learn the reverse-process variance $\Sigma_\theta$ instead of keeping it fixed, optimize a hybrid objective that mixes ELBO terms with the simple noise-prediction loss, and use a cosine noise schedule with importance-weighted terms for stabler gradients.
+### Method and reported result
+
+Nichol and Dhariwal made DDPMs faster and stronger without changing the basic denoising story. They learn the reverse-process variance $\Sigma_\theta$ instead of keeping it fixed, optimize a hybrid objective that mixes ELBO terms with the simple noise-prediction loss, and use a cosine noise schedule with importance-weighted terms for stabler gradients.
 
 Those changes let the sampler take larger steps through noise space. Denoising drops from 1000 steps to roughly 50-250 with little FID loss, while log-likelihoods reach parity with autoregressive models on ImageNet-64. The paper also makes a useful empirical claim: bigger UNets and more compute improve bits-per-dim and FID in a predictable scaling-law-like way.
 
@@ -58,12 +62,14 @@ def iddpm_loss(model, x0, timesteps, betas, logvar_schedule):
 ```
 Switching to the cosine $\beta_t$ schedule from the appendix further sharpens FID at low step counts.
 
-**Critiques:** The upgrades are attractive because they are almost drop-in: learn variance, adjust the objective, improve the schedule. They became part of the practical diffusion toolbox used by later systems. Sampling still needs dozens of UNet passes, large models remain memory-heavy, and classifier guidance can introduce bias, which later classifier-free methods address more cleanly.
+### Where the evidence stops
 
-## Decision Lens
+The upgrades are attractive because they are almost drop-in: learn variance, adjust the objective, improve the schedule. They became part of the practical diffusion toolbox used by later systems. Sampling still needs dozens of UNet passes, large models remain memory-heavy, and classifier guidance can introduce bias, which later classifier-free methods address more cleanly.
+
+## High-Level Takeaways
 
 Improved DDPM informs where to spend diffusion complexity: on the noise-prediction loss, learned reverse variance, schedule, or additional sampling steps. Its atomic unit remains a noisy image-timestep pair, but the hybrid objective adds likelihood pressure while the learned variance permits aggressive step reduction.
 
 The results show better likelihood and useful samples with far fewer reverse steps in the tested image regimes; they do not isolate whether those gains persist with modern solvers and latent diffusion. A matched wall-clock factorial ablation of variance learning, cosine schedule, objective, and sampler is the missing decision table. At 10× scale, repeated high-resolution evaluations remain dominant. The recipe would be falsified if a fixed-variance model with a stronger solver matched NLL and FID at lower total compute.
 
-**Takeaway:** ID DPM turned diffusion from a slow curiosity into a practical generator, paving the way for fast samplers and classifier-free guidance.
+ID DPM turned diffusion from a slow curiosity into a practical generator, paving the way for fast samplers and classifier-free guidance.

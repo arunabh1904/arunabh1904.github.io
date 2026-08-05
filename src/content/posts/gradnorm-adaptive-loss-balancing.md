@@ -14,11 +14,15 @@ summary: '2017 – GradNorm: balance task training rates through shared-layer gr
 
 **Code:** [lucidrains/gradnorm-pytorch](https://github.com/lucidrains/gradnorm-pytorch)
 
-**Summary:** GradNorm adapts task weights so gradient norms at a shared layer track each task's relative training rate. A task learning too slowly receives a larger target gradient; one learning quickly is reduced. The asymmetry parameter alpha controls how strongly the algorithm equalizes rates.
+### Method and reported result
+
+GradNorm adapts task weights so gradient norms at a shared layer track each task's relative training rate. A task learning too slowly receives a larger target gradient; one learning quickly is reduced. The asymmetry parameter alpha controls how strongly the algorithm equalizes rates.
+
+## Summary
 
 Unlike loss-scale normalization, GradNorm observes the effect of each task on shared parameters. That makes it relevant to unified perception trunks whose heads learn at different speeds.
 
-## Paper Insights
+## Core Insights
 
 The method computes per-task gradient norms, compares them with targets derived from normalized loss descent, and updates the task weights. On NYUv2 the paper reports roughly 5% training overhead. Across its sweep, most values between 0 and 3 improve over equal weighting, with alpha near 1.5 best in the reported setup.
 
@@ -29,12 +33,12 @@ The method computes per-task gradient norms, compares them with targets derived 
 | Alpha | Strength of rate equalization | Large values can destabilize weights. |
 | Learned weight | Updated task coefficient | Needs bounds and monitoring. |
 
-## Decision Lens
+## High-Level Takeaways
 
 GradNorm is useful when tasks have comparable value but visibly different convergence rates. It does not inspect gradient direction, so two equal-norm tasks can still conflict. In a driving stack, apply it only after defining task-specific metrics and minimum acceptable behavior; training speed is not safety priority.
 
 Measure per-task transfer against single-task controls and inspect scenario slices. A global weight can hide a task that learns normally overall but fails under rare sensor conditions.
 
-**Context:** Homoscedastic uncertainty handles scale; GradNorm handles relative rate; PCGrad handles conflicting direction.
+Homoscedastic uncertainty handles scale; GradNorm handles relative rate; PCGrad handles conflicting direction.
 
-**Takeaway:** Shared trunks need gradient instrumentation: adaptive weights should respond to how tasks train the shared representation, not only to the numerical size of their losses.
+Shared trunks need gradient instrumentation: adaptive weights should respond to how tasks train the shared representation, not only to the numerical size of their losses.

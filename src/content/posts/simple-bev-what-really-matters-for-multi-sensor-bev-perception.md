@@ -21,11 +21,13 @@ summary: '2022 – Simple-BEV: What Really Matters for Multi-Sensor BEV Percepti
 
 **Project and code:** [Simple-BEV](https://simple-bev.github.io/)
 
+## Summary
+
 BEV papers often attribute gains to the operator that lifts perspective-view image features into a bird's-eye-view grid. Simple-BEV holds more of the training recipe fixed and finds a different ordering of importance. Across matched camera-only models on nuScenes vehicle segmentation, input resolution and effective batch size move IoU far more than the choice among depth splatting, deformable attention, and parameter-free bilinear sampling.
 
-The paper also tests a sensor choice that camera-only comparisons omit. Rasterizing three sweeps of raw radar returns into the BEV grid and concatenating them with camera features raises IoU from 47.4 to 55.7; LiDAR reaches 60.8. The lesson is not that radar replaces LiDAR, but that sparse metric measurements can remove enough geometric ambiguity to matter when fused with dense visual features.
+## Core Insights
 
-## Paper Insights
+The paper also tests a sensor choice that camera-only comparisons omit. Rasterizing three sweeps of raw radar returns into the BEV grid and concatenating them with camera features raises IoU from 47.4 to 55.7; LiDAR reaches 60.8. The lesson is not that radar replaces LiDAR, but that sparse metric measurements can remove enough geometric ambiguity to matter when fused with dense visual features.
 
 Simple-BEV begins with a $100\text{ m}\times10\text{ m}\times100\text{ m}$ 3D volume discretized to $200\times8\times200$. A ResNet-101 produces features for six cameras. For every voxel, the model projects its 3D coordinate into each image and bilinearly samples the corresponding feature, then averages valid observations across cameras. The vertical axis is folded into channels, optional radar or LiDAR features are concatenated, and a BEV ResNet-18 predicts vehicle occupancy with auxiliary centerness and offset heads.
 
@@ -44,7 +46,7 @@ The lifting comparison is deliberately matched on resolution, batch size, backbo
 
 Radar succeeds only with the right input contract. Keeping all return metadata rather than binary occupancy adds 0.7 points, disabling the nuScenes outlier filter adds 2.0, and aggregating three time-aligned sweeps instead of one adds 2.6. These results explain why a sparse sensor can appear useless under an impoverished preprocessing pipeline.
 
-## Decision Lens
+## High-Level Takeaways
 
 Simple-BEV informs where to spend a BEV perception budget: lifting research, input fidelity, optimization scale, or another sensor. Its atomic visual unit is a sampled image feature attached to a metric voxel; radar adds sparse BEV cells with position, velocity, and return metadata. Parameters are shared across cameras, and sensor features fuse only after the vertical dimension is collapsed. For nuScenes vehicle segmentation, the evidence favors securing resolution, effective batch size, and radar preprocessing before replacing a simple geometric lifter.
 
@@ -52,8 +54,8 @@ The expensive commitment is the sensor-and-compute stack. A larger batch of 40 i
 
 The missing test is a modern matched-budget replication. Re-run simple sampling, depth lifting, and deformable attention with current backbones across detection, occupancy, mapping, and adverse weather; match wall-clock training, latency, and parameter count; then ablate radar quality and calibration noise. The paper's conclusion should be revised if learned lifting produces consistent gains after these controls or if radar's advantage vanishes outside vehicle segmentation.
 
-**Context:** Simple-BEV is a controlled-baseline paper: it asks whether architectural novelty still wins after training details and readily available metric sensors are treated as first-class variables.
+Simple-BEV is a controlled-baseline paper: it asks whether architectural novelty still wins after training details and readily available metric sensors are treated as first-class variables.
 
-**Limits:** The task is binary vehicle segmentation on the nuScenes validation split, with no temporal camera model, 3D detection, map prediction, or closed-loop driving evaluation. The state-of-the-art table is not fully controlled, and the hardware cost of large effective batches is substantial.
+The task is binary vehicle segmentation on the nuScenes validation split, with no temporal camera model, 3D detection, map prediction, or closed-loop driving evaluation. The state-of-the-art table is not fully controlled, and the hardware cost of large effective batches is substantial.
 
-**Takeaway:** Before inventing a more elaborate camera-to-BEV lift, fix resolution and optimization—and use sparse metric sensing when the vehicle already has it.
+Before inventing a more elaborate camera-to-BEV lift, fix resolution and optimization—and use sparse metric sensing when the vehicle already has it.

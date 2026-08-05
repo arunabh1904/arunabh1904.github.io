@@ -15,11 +15,15 @@ summary: '2023 – Sparse4D v3: Advancing End-to-End 3D Detection and Tracking'
 
 **Code:** [linxuewu/Sparse4D](https://github.com/linxuewu/Sparse4D)
 
-**Summary:** Sparse4D v3 strengthens sparse recurrent queries as a joint detection-and-tracking state. Temporal instance denoising teaches queries to recover perturbed current and propagated anchors; quality estimation separates box quality from class confidence; decoupled attention prevents position and content from creating misleading instance correlations. Tracking then assigns identities to the recurrent detections without a separately trained tracker.
+### Method and reported result
+
+Sparse4D v3 strengthens sparse recurrent queries as a joint detection-and-tracking state. Temporal instance denoising teaches queries to recover perturbed current and propagated anchors; quality estimation separates box quality from class confidence; decoupled attention prevents position and content from creating misleading instance correlations. Tracking then assigns identities to the recurrent detections without a separately trained tracker.
+
+## Summary
 
 The paper shows that a sparse temporal detector becomes a tracker once its state, confidence, and training perturbations are designed for persistence.
 
-## Paper Insights
+## Core Insights
 
 Temporal denoising creates groups of noisy anchors, including anchors propagated from the prior frame. Pre-matching fixes each noisy anchor's ground-truth assignment before decoding, while attention masks prevent denoising groups from leaking into one another. This gives the recurrent decoder explicit practice correcting pose and velocity errors instead of learning only from its own clean query trajectory.
 
@@ -35,12 +39,12 @@ _Denoising follows the same temporal path as deployed queries, so training expos
 | Decoupled attention | Separates semantic and geometric interactions | Avoids correlations caused only by proximity. |
 | Direct ID assignment | Reuses recurrent instances as tracks | Removes a separately learned association model. |
 
-## Decision Lens
+## High-Level Takeaways
 
 Sparse4D v3 informs whether detection and tracking should share the same persistent query state. The atomic unit is a recurrent instance with feature, anchor, quality, and identity. Most parameters are shared across the two tasks; tracking adds inference logic rather than a new network.
 
 The missing comparison matches a conventional detector-plus-tracker for backbone, memory, latency, and track-management rules, then evaluates births, deaths, long occlusion, and calibration. At 10× actors or denoising groups, query attention and matching dominate training. The unified state would fail if explicit motion filters or association logic provide better uncertainty, recoverability, or rare-event behavior with negligible extra compute.
 
-**Context:** Sparse4D v3 turns the original sparse 4D sampler into a more stable recurrent perception primitive and supplies the object-state lineage that SparseDrive extends toward mapping and planning.
+Sparse4D v3 turns the original sparse 4D sampler into a more stable recurrent perception primitive and supplies the object-state lineage that SparseDrive extends toward mapping and planning.
 
-**Takeaway:** A query becomes a track only when training teaches it to survive noise and the model separates semantic belief from geometric quality.
+A query becomes a track only when training teaches it to survive noise and the model separates semantic belief from geometric quality.

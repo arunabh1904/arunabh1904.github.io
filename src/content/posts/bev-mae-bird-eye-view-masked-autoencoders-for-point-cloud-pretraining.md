@@ -15,11 +15,15 @@ summary: "2022 – BEV-MAE: Bird's-Eye-View Masked Autoencoders for Point-Cloud 
 
 **Code:** [VDIGPKU/BEV-MAE](https://github.com/VDIGPKU/BEV-MAE)
 
-**Summary:** BEV-MAE pretrains a sparse LiDAR encoder by masking vertical BEV columns and predicting normalized point coordinates plus density inside the missing regions. A shared learnable token occupies each masked column so the encoder sees a receptive-field pattern closer to downstream fine-tuning.
+### Method and reported result
+
+BEV-MAE pretrains a sparse LiDAR encoder by masking vertical BEV columns and predicting normalized point coordinates plus density inside the missing regions. A shared learnable token occupies each masked column so the encoder sees a receptive-field pattern closer to downstream fine-tuning.
+
+## Summary
 
 The objective is designed around outdoor LiDAR physics. Density falls with range and scan pattern, so reconstructing it forces the encoder to learn where a feature lives instead of only copying local appearance.
 
-## Paper Insights
+## Core Insights
 
 BEV-guided masking removes an entire vertical column rather than independent occupied voxels. That choice lets the model keep a sparse encoder and use a one-layer convolutional decoder. The coordinate target describes local geometry; density supplies a coarse location cue. On Waymo with 20% labeled fine-tuning data, the paper reports 1.42 mAP and 1.34 mAPH over training from scratch.
 
@@ -32,12 +36,12 @@ Using only 5% of Waymo labels, BEV-MAE improves L2 mAP from 44.41 to 51.63. With
 
 The strongest modified nuScenes model reports 69.6 mAP and 73.6 NDS. That number combines pretraining with a changed encoder, so the cleaner evidence for the objective comes from the controlled data-efficiency and masking ablations.
 
-## Decision Lens
+## High-Level Takeaways
 
 BEV-MAE informs what a LiDAR foundation objective should reconstruct. Its atomic unit is a masked BEV column containing a set of points, not a generic voxel token. The encoder is the reusable asset; the small decoder and reconstruction targets are discarded after pretraining.
 
 The rejection test holds unlabeled frames, encoder, and fine-tuning budget fixed while comparing coordinate-density reconstruction with occupancy, contrastive, and future-geometry objectives. BEV-MAE loses if gains vanish with more diverse labeled data or fail across sensors with different beam patterns. At 10× pretraining scale, scenario redundancy and data I/O are likely to dominate before the small decoder does.
 
-**Context:** BEV-MAE is a LiDAR-only pretraining reference. UniM²AE adds camera-LiDAR masked reconstruction in a shared 3D volume; UniWorld, ViDAR, and DriveWorld add temporal prediction so the latent must retain persistence and motion.
+BEV-MAE is a LiDAR-only pretraining reference. UniM²AE adds camera-LiDAR masked reconstruction in a shared 3D volume; UniWorld, ViDAR, and DriveWorld add temporal prediction so the latent must retain persistence and motion.
 
-**Takeaway:** A useful driving pretext task reconstructs measurement geometry and range-dependent density, not an arbitrary token merely because it was masked.
+A useful driving pretext task reconstructs measurement geometry and range-dependent density, not an arbitrary token merely because it was masked.

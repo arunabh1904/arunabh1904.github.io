@@ -15,11 +15,15 @@ summary: '2022 – TransFusion: Robust LiDAR-Camera Fusion for 3D Object Detecti
 
 **Code:** [XuyangBai/TransFusion](https://github.com/XuyangBai/TransFusion)
 
-**Summary:** TransFusion replaces hard point-to-pixel fusion with soft, object-centric association. A LiDAR BEV heatmap initializes category-aware object queries and a first decoder predicts coarse 3D boxes. A second decoder lets those queries attend to useful multi-camera image regions, so calibration gives a spatial prior without dictating a single brittle correspondence.
+### Method and reported result
+
+TransFusion replaces hard point-to-pixel fusion with soft, object-centric association. A LiDAR BEV heatmap initializes category-aware object queries and a first decoder predicts coarse 3D boxes. A second decoder lets those queries attend to useful multi-camera image regions, so calibration gives a spatial prior without dictating a single brittle correspondence.
+
+## Summary
 
 The architectural lesson is precise: a sensor can anchor geometry without forcing every other sensor through its samples. Image evidence joins only after a plausible object hypothesis exists.
 
-## Paper Insights
+## Core Insights
 
 Hard association projects each LiDAR point onto one image pixel. It wastes most image features where LiDAR is sparse and becomes brittle when calibration or illumination degrades. TransFusion instead uses the initial 3D box as a soft spatial prior. Spatially modulated cross-attention searches the relevant image area, while an image-guided initialization path can introduce objects that the LiDAR heatmap misses.
 
@@ -35,12 +39,12 @@ _The two decoder stages separate geometric proposal formation from image refinem
 | Duplicate removal | Set prediction without NMS | Makes the prediction interface cleaner, though matching remains part of training. |
 | Degraded images | LiDAR proposal precedes camera fusion | Reduces dependence on every camera being usable. |
 
-## Decision Lens
+## High-Level Takeaways
 
 TransFusion informs whether camera fusion should happen densely before detection or selectively around object hypotheses. Its atomic unit is an object query initialized from a LiDAR BEV heatmap. Sensor backbones remain separate; sharing begins in the decoder after LiDAR has established a candidate set.
 
 The critical missing control matches BEV fusion and query fusion for image tokens inspected, latency, and LiDAR backbone. At 10× objects, queries and image cross-attention scale with scene density, while the camera encoder still dominates runtime. The design would be rejected for tasks such as free-space segmentation or lane topology where evidence cannot be reduced to object proposals, or if a dense BEV model matches calibration robustness while serving multiple heads more cheaply.
 
-**Context:** TransFusion made query-level soft association a strong alternative to both point painting and dense BEV fusion.
+TransFusion made query-level soft association a strong alternative to both point painting and dense BEV fusion.
 
-**Takeaway:** Calibration should narrow where a model looks; it need not become a hard feature correspondence that turns a small pose error into a missed object.
+Calibration should narrow where a model looks; it need not become a hard feature correspondence that turns a small pose error into a missed object.

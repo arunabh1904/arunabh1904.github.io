@@ -15,11 +15,15 @@ summary: "2020 – LaneGCN: Learning Lane Graph Representations for Motion Forec
 
 **Code:** [uber-research/lanegcn](https://github.com/uber-research/lanegcn)
 
-**Summary:** LaneGCN treats the map as a graph, not an image. It constructs lane nodes from raw map data and uses graph convolutions that respect lane connectivity, then fuses those map features with actor motion features.
+### Method and reported result
+
+LaneGCN treats the map as a graph, not an image. It constructs lane nodes from raw map data and uses graph convolutions that respect lane connectivity, then fuses those map features with actor motion features.
+
+## Summary
 
 The useful idea is explicit relational structure. LaneGCN does not only ask "what is near the actor?" It asks how actors, lanes, neighboring lanes, and other actors should pass information to each other.
 
-## Paper Insights
+## Core Insights
 
 LaneGCN builds a lane graph with several adjacency types and uses dilated lane convolutions to capture long-range dependencies along the road topology. ActorNet encodes observed agent trajectories. FusionNet then applies four interaction blocks: actor-to-lane, lane-to-lane, lane-to-actor, and actor-to-actor.
 
@@ -33,7 +37,7 @@ _Figure 1 shows the full LaneGCN pipeline: a lane graph and actor trajectories a
 - Along-lane dilation helps messages travel farther than immediate lane neighbors.
 - Actor-map fusion is directional and staged, not one generic attention block.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Component | Detail | Why it matters |
 | --------- | ------ | -------------- |
@@ -42,12 +46,12 @@ _Figure 1 shows the full LaneGCN pipeline: a lane graph and actor trajectories a
 | Fusion | A2L, L2L, L2A, A2A interactions | Makes actor-map relations first-class. |
 | Benchmark | Argoverse motion forecasting | Tests the value of explicit lane structure in a public driving setting. |
 
-## Decision Lens
+## High-Level Takeaways
 
 LaneGCN informs whether road topology should be rasterized into pixels or preserved as an explicit directed lane graph for forecasting. Its atomic units are actor histories and lane-segment nodes; typed lane-to-lane, actor-to-lane, lane-to-actor, and actor-to-actor messages control which interactions are represented.
 
 The graph supplies topology efficiently, but map quality and graph radius become hidden dependencies. The missing factorial ablation holds the trajectory decoder fixed while replacing the lane graph with raster and polyline encoders at equal latency. At 10× agents or map extent, interaction edges and neighborhood expansion dominate. LaneGCN's representation claim would fail if a simpler polyline attention model matched forecasting accuracy and map generalization with fewer graph-specific operations.
 
-**Context:** LaneGCN set up a clean actor-map relational template that later forecasting and planning models kept reusing in denser Transformer forms.
+LaneGCN set up a clean actor-map relational template that later forecasting and planning models kept reusing in denser Transformer forms.
 
-**Takeaway:** Motion forecasting improves when the model can reason over the lane graph as a graph, not as a painted background.
+Motion forecasting improves when the model can reason over the lane graph as a graph, not as a painted background.

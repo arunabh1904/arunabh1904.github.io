@@ -13,11 +13,15 @@ summary: "2024 – AutoTrust: Benchmarking Trustworthiness in Large Vision Langu
 
 **arXiv:** [2412.15206](https://arxiv.org/abs/2412.15206)
 
-**Summary:** AutoTrust asks whether driving VLMs can be trusted, not merely whether they answer benchmark questions correctly. It probes five dimensions: truthfulness, safety, robustness, privacy, and fairness.
+### Method and reported result
+
+AutoTrust asks whether driving VLMs can be trusted, not merely whether they answer benchmark questions correctly. It probes five dimensions: truthfulness, safety, robustness, privacy, and fairness.
+
+## Summary
 
 That means questions can test whether a model hallucinates, gives unsafe advice, leaks sensitive information, breaks under perturbations, or behaves inconsistently across groups and regions.
 
-## Paper Insights
+## Core Insights
 
 AutoTrust reframes driving VLM evaluation around trustworthiness. It tests truthfulness, safety, robustness, privacy, and fairness over more than 10k scenes and 18k queries. The benchmark is designed to expose hallucination, unsafe advice, sensitive-information leakage, adversarial brittleness, and unfair or inconsistent behavior across driving contexts. One important finding is that driving specialization does not automatically improve trustworthiness; general VLMs can outperform specialist driving models on some axes. The limitation is that VQA-style trust tests still do not replace closed-loop validation, but they reveal failures ordinary accuracy benchmarks miss.
 
@@ -29,7 +33,7 @@ _Figure 1 from the [AutoTrust paper](https://arxiv.org/abs/2412.15206), via arXi
 - The benchmark includes adversarial and sensitive-information probes.
 - A driving-specialized model can still be less trustworthy than a general model.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -37,12 +41,12 @@ _Figure 1 from the [AutoTrust paper](https://arxiv.org/abs/2412.15206), via arXi
 | Axes | Truthfulness, safety, robustness, privacy, fairness | Evaluates more than accuracy. |
 | Main finding | Hidden unsafe behaviors | Capability can improve while trust still lags. |
 
-## Decision Lens
+## High-Level Takeaways
 
 AutoTrust informs which failure dimensions must be measured before a driving VLM can be treated as a trustworthy component. The evaluation unit is a scenario-prompt pair scored across hallucination, safety, robustness, privacy, and fairness rather than one average QA metric.
 
 The benchmark exposes multidimensional risk, but its weights do not define the operational cost of each failure. The missing study validates benchmark scores against human driving-review outcomes and real intervention rates on held-out fleets. At 10× coverage, scenario curation, demographic balance, adversarial diversity, and leakage dominate. AutoTrust would fail as a gate if benchmark rankings did not predict failures on fresh, naturally occurring driving incidents.
 
-**Context:** Trustworthiness is not one metric. A model can improve on standard driving QA while still becoming less safe or less private.
+Trustworthiness is not one metric. A model can improve on standard driving QA while still becoming less safe or less private.
 
-**Takeaway:** Driving VLM evaluation needs adversarial and ethical dimensions baked in from the start. Accuracy alone is too small a target.
+Driving VLM evaluation needs adversarial and ethical dimensions baked in from the start. Accuracy alone is too small a target.

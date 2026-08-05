@@ -15,11 +15,15 @@ summary: "2025 – RTMap: Real-Time Recursive Mapping with Change Detection and 
 
 **Code:** [CN-ADLab/RTMap](https://github.com/CN-ADLab/RTMap)
 
-**Summary:** RTMap is about online HD maps that improve over repeated traversals. A vehicle builds a local vector map in real time, aligns it to a crowdsourced prior map, detects what is new or outdated, and sends updates back to an offline aggregation loop.
+### Method and reported result
+
+RTMap is about online HD maps that improve over repeated traversals. A vehicle builds a local vector map in real time, aligns it to a crowdsourced prior map, detects what is new or outdated, and sends updates back to an offline aggregation loop.
+
+## Summary
 
 The paper is useful because it puts three normally separate problems into one system: mapping, map-based localization, and map change detection.
 
-## Paper Insights
+## Core Insights
 
 The online module encodes current sensors and the crowdsourced HD map, then uses hybrid queries and existence-aware matching to classify map elements as matched, outdated, or newly observed. Matched map elements can feed either a learned pose head or an explicit maximum-a-posteriori pose estimator.
 
@@ -34,7 +38,7 @@ _Figure 2 shows RTMap's loop: encode sensors and the crowdsourced HD map, match 
 - The system can use an explicit MAP state estimator for 6-DOF localization.
 - Offline crowdsourcing turns repeated local maps into a self-updating prior.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -51,12 +55,12 @@ _Figure 2 shows RTMap's loop: encode sensors and the crowdsourced HD map, match 
 | Localization | Optimization-based pose estimation outperforms the end-to-end pose head in the nuScenes ablation. | Classical state estimation still helps inside learned mapping systems. |
 | System coupling | Change detection improves localization by rejecting mismatched prior-map elements. | Freshness and localization are linked problems. |
 
-## Decision Lens
+## High-Level Takeaways
 
 RTMap informs whether online mapping should rebuild each frame independently or recursively localize against, compare with, and update a prior map. The atomic unit is a local map observation aligned to a persistent vector map; change detection decides which prior elements survive, move, appear, or disappear.
 
 Recursion buys temporal consistency and fleet accumulation, but localization error can masquerade as map change and then contaminate the prior. The missing experiment independently perturbs pose, prior freshness, and change frequency while comparing recursive and stateless mapping. At 10× deployment duration, error accumulation, conflicting updates, and versioning dominate inference. The recursive claim would fail if periodic stateless remapping produced equal change recall and map stability at lower operational complexity.
 
-**Context:** RTMap moves online vector mapping from "predict the local map once" to "maintain a map that can remember, align, and revise itself."
+RTMap moves online vector mapping from "predict the local map once" to "maintain a map that can remember, align, and revise itself."
 
-**Takeaway:** A deployable BEV map stack needs recursion: map the scene, localize into the map, detect changes, and feed cleaner observations back into the prior.
+A deployable BEV map stack needs recursion: map the scene, localize into the map, detect changes, and feed cleaner observations back into the prior.

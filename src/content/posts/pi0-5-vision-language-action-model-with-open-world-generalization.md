@@ -17,9 +17,11 @@ summary: "2025 – Pi0.5: A Vision-Language-Action Model with Open-World General
 
 **Project:** [Physical Intelligence](https://www.pi.website/blog/pi05)
 
+## Summary
+
 Pi0.5 extends Pi0 by co-training a VLM/action policy on heterogeneous examples: web vision-language tasks, object detection, language instructions, high-level subtask predictions, and low-level trajectories from multiple robots. The hierarchy remains inside one model: language predicts useful intermediate goals while a flow-based action expert controls the robot.
 
-## Paper Insights
+## Core Insights
 
 ![Pi0.5 two-stage training with heterogeneous pretraining high-level subtask prediction and flow-matching action post-training](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-paper-figure.png)
 _Figure 3 shows how open-world behavior is divided: broad robot, web, and semantic-action pretraining builds the base VLA, then mobile-manipulation post-training couples high-level subtask inference to continuous flow-matching actions. Source: [π0.5](https://arxiv.org/abs/2504.16054)._
@@ -35,14 +37,14 @@ The architecture separates time scales. High-level tokens express what should ha
 | Multi-robot trajectories | Embodied control priors |
 | Flow action expert | Smooth continuous action chunks |
 
-## Decision Lens
+## High-Level Takeaways
 
 Pi0.5 informs whether long-horizon generalization should come from a monolithic low-level policy or heterogeneous co-training with an explicit semantic time scale. Its units range from web tokens to action chunks; the backbone shares representations while the action expert specializes continuous control.
 
 The demonstrations establish compelling open-world behavior, but the private mixture makes contribution accounting difficult. A missing ablation matches robot hours, web data, and subtask labels against a hierarchical two-model baseline. At ten times the horizon, subtask drift and error recovery become the bottleneck. The central claim weakens if the policy succeeds only when high-level predictions follow familiar household scripts or if a planner/action decomposition recovers more reliably.
 
-**Context:** Pi0.5 shows why VLA post-training cannot be reduced to one loss: semantic retention, task decomposition, and motor adaptation interact.
+Pi0.5 shows why VLA post-training cannot be reduced to one loss: semantic retention, task decomposition, and motor adaptation interact.
 
-**Limits:** Few public details allow exact reproduction of mixture weights and data quality.
+Few public details allow exact reproduction of mixture weights and data quality.
 
-**Takeaway:** Heterogeneous co-training is useful when each data type owns a time scale and the system can measure transfer between them.
+Heterogeneous co-training is useful when each data type owns a time scale and the system can measure transfer between them.

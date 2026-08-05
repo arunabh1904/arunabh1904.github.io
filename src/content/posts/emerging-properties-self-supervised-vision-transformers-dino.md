@@ -21,9 +21,11 @@ summary: '2021 – DINO: Emerging Properties in Self-Supervised Vision Transform
 
 **Conference:** ICCV 2021
 
+## Summary
+
 DINO asks whether a vision transformer can learn useful structure without labels, negative pairs, or a fixed target encoder. Its answer is a self-distillation loop: a student predicts the output distribution of a momentum-updated teacher on different crops of the same image. The loss is simple, but the transformer changes what becomes visible in the representation. Its final-layer class-token attention often follows object boundaries, even though the model never receives segmentation masks.
 
-## Paper Insights
+## Core Insights
 
 ![DINO self-distillation sends global and local image crops through student and momentum-teacher networks](/assets/images/emerging-properties-self-supervised-vision-transformers-dino-paper-figure.png)
 _The teacher sees global crops while the student predicts its centered, sharpened distribution from global and local crops. Stop-gradient and an exponential-moving-average teacher make the target change slowly enough to learn from. Source: [DINO](https://arxiv.org/abs/2104.14294)._
@@ -41,7 +43,7 @@ That combination avoids collapse without the explicit negative pairs used by con
 
 The most memorable qualitative result is not a benchmark number. Heads in the last self-attention layer often isolate objects and object parts. This is emergent correspondence, not a trained segmentation system: the paper visualizes attention maps and evaluates downstream transfer, but does not show that attention alone is a reliable general-purpose mask predictor.
 
-## Decision Lens
+## High-Level Takeaways
 
 DINO informs whether a new vision backbone needs labels or instance-level negatives to acquire semantic structure. Its atomic training signal is cross-view agreement with a slowly moving teacher. The expensive decision is not only model size; it is whether the data augmentation, crop schedule, teacher momentum, centering, and temperature can be reproduced as a coherent recipe.
 
@@ -49,8 +51,8 @@ The paper establishes unusually strong frozen ViT features and emergent object-a
 
 At larger scale, DINO's global image target becomes a bottleneck for dense tasks because one class-token distribution does not directly supervise every patch. [iBOT](/paper%20shorts/2021/11/15/ibot-image-bert-pre-training-with-online-tokenizer.html) adds patch-level masked prediction; [DINOv2](/paper%20shorts/2023/04/14/dinov2-learning-robust-visual-features-without-supervision.html) combines both objectives with a curated data pipeline.
 
-**Context:** DINO made momentum-teacher self-distillation a strong, label-free recipe for vision transformers.
+DINO made momentum-teacher self-distillation a strong, label-free recipe for vision transformers.
 
-**Limits:** The strongest evidence uses ImageNet-centered pretraining and evaluation; attention maps are suggestive rather than a substitute for supervised dense-task measurement.
+The strongest evidence uses ImageNet-centered pretraining and evaluation; attention maps are suggestive rather than a substitute for supervised dense-task measurement.
 
-**Takeaway:** DINO's contribution is a stable way to manufacture semantic targets from the model itself—and the discovery that ViTs trained on those targets organize objects without explicit object labels.
+DINO's contribution is a stable way to manufacture semantic targets from the model itself—and the discovery that ViTs trained on those targets organize objects without explicit object labels.

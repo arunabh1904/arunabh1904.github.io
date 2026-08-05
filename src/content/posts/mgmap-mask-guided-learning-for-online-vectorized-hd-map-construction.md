@@ -15,11 +15,15 @@ summary: "2024 – MGMap: Mask-Guided Learning for Online Vectorized HD Map Cons
 
 **Code:** [xiaolul2/MGMap](https://github.com/xiaolul2/MGMap)
 
-**Summary:** MGMap observes that vectorized HD map elements have strong shape priors, but their annotations are sparse. Detection-style models can therefore attend to the wrong feature scope and lose fine structure.
+### Method and reported result
+
+MGMap observes that vectorized HD map elements have strong shape priors, but their annotations are sparse. Detection-style models can therefore attend to the wrong feature scope and lose fine structure.
+
+## Summary
 
 The fix is mask-guided learning. MGMap learns masks over enhanced multi-scale BEV features, then uses those masks at the instance level and the point level to localize map elements more precisely.
 
-## Paper Insights
+## Core Insights
 
 The paper targets online vectorized HD map construction. The method introduces a Mask-Activated Instance decoder, which uses instance masks to inject global instance and structural information into instance queries. It also adds Position-Guided Mask Patch Refinement, which refines point locations by extracting point-specific patch information from a finer-grained region.
 
@@ -33,7 +37,7 @@ _The MGMap overview shows where the mask guidance enters the vector-map pipeline
 - Instance-level masks improve global shape reasoning.
 - Point-level mask patch refinement keeps local geometry from washing out.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -49,12 +53,12 @@ _The MGMap overview shows where the mask guidance enters the vector-map pipeline
 | LiDAR | SECOND | 67.9 | 5.5 |
 | Camera + LiDAR | R50 + SECOND | 71.7 | 4.8 |
 
-## Decision Lens
+## High-Level Takeaways
 
 MGMap informs whether vector-map queries need an explicit spatial mask to focus feature sampling and point refinement. Its atomic unit is a map-instance query coupled to a learned BEV relevance mask; the mask constrains where the decoder looks before producing vector points.
 
 The mask supplies dense localization guidance to an otherwise sparse vector objective, but it may encode the same answer through an auxiliary raster task. The missing control equalizes auxiliary supervision and compares learned masks with deformable attention or uncertainty-guided sampling. At 10× scene extent, mask resolution and foreground imbalance dominate. MGMap's claim would fail if sparse attention learned equivalent regions and map quality without mask labels or raster overhead.
 
-**Context:** MGMap pushed vector-map models toward richer query support instead of treating each polyline point as a thin detection target.
+MGMap pushed vector-map models toward richer query support instead of treating each polyline point as a thin detection target.
 
-**Takeaway:** Online HD mapping depends on directing each vector query to the right BEV evidence, not merely predicting the vector coordinates.
+Online HD mapping depends on directing each vector query to the right BEV evidence, not merely predicting the vector coordinates.

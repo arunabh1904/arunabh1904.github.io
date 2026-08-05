@@ -21,14 +21,18 @@ summary: "2021 – Learning Transferable Visual Models From Natural Language Sup
 
 **Conference:** Released as a tech report; widely cited (ICML 2021 oral-style spotlight)
 
-## Paper Insights
+## Summary
 
 CLIP learns visual representations from natural-language supervision instead of fixed class labels. It trains an image encoder and text encoder contrastively so matching image-caption pairs have high similarity and mismatched pairs have low similarity. At inference, classification becomes text retrieval: write prompts for candidate labels and choose the label whose text embedding best matches the image. The evidence is broad zero-shot transfer across many image benchmarks, with strong robustness to distribution shift compared with supervised ImageNet models. The caveat is data dependence: web-scale captions bring noise, bias, and uneven coverage, and prompt wording can change results. The lasting idea is that language can define open-ended visual categories without retraining a classifier.
+
+## Core Insights
 
 ![Figure 1 from CLIP: contrastive language-image pre-training and zero-shot transfer](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
 _Figure 1 from the [CLIP paper](https://arxiv.org/abs/2103.00020), via ar5iv._
 
-**Summary:** CLIP trains vision through language. It pairs an image encoder with a text Transformer and learns from 400M web image-caption pairs by pulling matching image/text embeddings together and pushing mismatches apart. After pre-training, classification becomes a prompt comparison problem: embed the image, embed candidate labels such as "a photo of a tiger", and choose the closest text embedding.
+### Method and reported result
+
+CLIP trains vision through language. It pairs an image encoder with a text Transformer and learns from 400M web image-caption pairs by pulling matching image/text embeddings together and pushing mismatches apart. After pre-training, classification becomes a prompt comparison problem: embed the image, embed candidate labels such as "a photo of a tiger", and choose the closest text embedding.
 
 That framing replaced fixed softmax heads with natural-language supervision. One model could perform zero-shot classification across many datasets, and prompt wording became part of the evaluation surface. The same shared embedding space also made text-guided image search and generation feel natural.
 
@@ -66,12 +70,14 @@ pred = labels[probs.argmax()]
 print("Predicted class:", pred)
 ```
 
-**Critiques:** CLIP is one of the cleanest bridges between vision and language: one embedding space, many tasks, no dataset-specific classifier head. The weaknesses follow from the same design. Training depends on heavy compute and a proprietary web-scale dataset, zero-shot accuracy can be sensitive to prompt wording, and fairness problems mirror the data scraped from the web.
+### Where the evidence stops
 
-## Decision Lens
+CLIP is one of the cleanest bridges between vision and language: one embedding space, many tasks, no dataset-specific classifier head. The weaknesses follow from the same design. Training depends on heavy compute and a proprietary web-scale dataset, zero-shot accuracy can be sensitive to prompt wording, and fairness problems mirror the data scraped from the web.
+
+## High-Level Takeaways
 
 CLIP informs the decision to buy visual transfer with image-text supervision rather than a closed-set label vocabulary. The training unit is an image-caption pair; separate visual and text encoders meet in a shared embedding space, and the contrastive batch defines the negative set.
 
 The central tradeoff is breadth versus control: web captions expand semantic coverage but import bias, noise, and prompt sensitivity. A decisive ablation would match data volume and compute across curated class labels, raw captions, and filtered captions while evaluating both zero-shot transfer and calibration. At 10× scale, duplicate pairs and low-information captions dilute the negative set. CLIP's recipe would lose its advantage if a smaller curated or generative objective matched transfer across unseen datasets at lower data and batch-communication cost.
 
-**Takeaway:** CLIP showed that natural-language supervision can give vision models rich, transferable semantics. It helped turn multimodal learning from a niche setup into a default way to build open-vocabulary systems.
+CLIP showed that natural-language supervision can give vision models rich, transferable semantics. It helped turn multimodal learning from a niche setup into a default way to build open-vocabulary systems.

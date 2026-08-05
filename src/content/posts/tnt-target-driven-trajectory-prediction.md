@@ -17,11 +17,15 @@ summary: "2020 – TNT: Target-driveN Trajectory Prediction"
 
 **Project:** [Waymo research page](https://waymo.com/research/tnt-target-driven-trajectory-prediction/)
 
-**Summary:** TNT says that for moderate-horizon motion forecasting, most of the multimodality lives in where the agent is trying to end up. Instead of sampling latent variables and hoping they cover the futures, TNT predicts explicit target states, then predicts trajectories conditioned on each target.
+### Method and reported result
+
+TNT says that for moderate-horizon motion forecasting, most of the multimodality lives in where the agent is trying to end up. Instead of sampling latent variables and hoping they cover the futures, TNT predicts explicit target states, then predicts trajectories conditioned on each target.
+
+## Summary
 
 That design makes the intermediate outputs interpretable. A planner can inspect possible destinations, target-conditioned rollouts, and trajectory scores instead of receiving only opaque samples from a latent distribution.
 
-## Paper Insights
+## Core Insights
 
 The paper decomposes trajectory prediction into target uncertainty and control uncertainty. The target predictor estimates a distribution over candidate endpoints, using lane-centerline samples for vehicles and grid samples for pedestrians. Given each selected target, a motion estimator predicts one trajectory toward it. A final scoring and selection stage ranks the hypotheses and suppresses near-duplicates to produce a small set of trajectories.
 
@@ -36,7 +40,7 @@ _Figure 2 shows the three-stage TNT pipeline: encode the scene, score candidate 
 - Target candidates can come from map structure for vehicles or a grid for pedestrians.
 - The scoring stage matters because good endpoints do not automatically imply good full trajectories.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Component | Detail | Why it matters |
 | --------- | ------ | -------------- |
@@ -54,12 +58,12 @@ _Figure 2 shows the three-stage TNT pipeline: encode the scene, score candidate 
 | PAID pedestrians | MultiPath: 0.43 minFDE, 0.23 minADE | 0.32 minFDE, 0.18 minADE |
 | Stanford Drone | PECNet: 25.98 minFDE, 12.79 minADE | 21.16 minFDE, 12.23 minADE |
 
-## Decision Lens
+## High-Level Takeaways
 
 TNT informs whether multimodal forecasting should first choose a destination and then generate the path, rather than regress complete trajectories in one step. The atomic hierarchy is an actor history, a candidate target state, and a target-conditioned trajectory; a final scorer selects a compact diverse set.
 
 The factorization gives modes a semantic endpoint, but target discretization and candidate pruning can exclude valid futures before decoding. The missing ablation holds total proposals fixed while comparing endpoint-first, anchor-trajectory, and direct set prediction across map-rich and map-free datasets. At 10× candidate density, target scoring dominates and duplicates crowd out rare modes. TNT's claim would fail if direct trajectory-set prediction matched miss rate and diversity without a target bottleneck.
 
-**Context:** TNT made goal-conditioned motion forecasting feel practical for autonomous driving. It kept the multimodal structure visible and showed that endpoint candidates can be a cleaner intent representation than opaque latent samples.
+TNT made goal-conditioned motion forecasting feel practical for autonomous driving. It kept the multimodal structure visible and showed that endpoint candidates can be a cleaner intent representation than opaque latent samples.
 
-**Takeaway:** Predict the destination first, then make the trajectory explain how to get there.
+Predict the destination first, then make the trajectory explain how to get there.

@@ -24,9 +24,11 @@ import { bertPlayground } from '../../lib/python-playground-examples';
 **Project page / blog:** [Google AI Blog – "Open Sourcing BERT"](https://ai.googleblog.com/2018/11/open-sourcing-bert-state-of-art-pre.html)  
 **Conference:** NAACL 2019
 
-## Paper Insights
+## Summary
 
 BERT makes bidirectional pretraining practical by training a Transformer encoder with masked language modeling and next-sentence prediction, then fine-tuning the same backbone for downstream tasks. Masked LM lets each token condition on both left and right context, unlike left-to-right language models. Fine-tuning adds only small task-specific heads for classification, span extraction, or sentence-pair tasks. The empirical case spans GLUE, MultiNLI, SQuAD, and other NLU benchmarks, where deeper bidirectional pretraining beats feature-based and unidirectional baselines. The caveats are the pretrain-finetune mismatch from mask tokens and the later-questioned value of next-sentence prediction. The lasting idea is that one pretrained encoder can become a general language-understanding substrate.
+
+## Core Insights
 
 ![Figure 1: Overall pre-training and fine-tuning procedures for BERT from BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](/assets/images/bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding-paper-figure.png)
 _Figure 1: Overall pre-training and fine-tuning procedures for BERT. From the [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding paper](https://arxiv.org/abs/1810.04805), via arXiv HTML._
@@ -119,7 +121,7 @@ BERT was compute-hungry in 2018 and still non-trivial to reproduce casually. NSP
 
 BERT's recipe became a floor, not a ceiling. Better corruption schemes, cheaper compressors, and longer-context attention methods all stand on top of the same basic idea: mask some tokens, optionally test sentence order, backpropagate, and reuse the encoder everywhere. That elegance is why BERT is still worth teaching.
 
-## Decision Lens
+## High-Level Takeaways
 
 BERT informs the decision to spend pre-training compute on a bidirectional encoder that transfers through fine-tuning rather than train a task-specific model or a left-to-right representation. Its atomic unit is a masked token sequence, optionally paired with a second segment for next-sentence prediction.
 

@@ -21,14 +21,18 @@ summary: "2020 – EfficientDet: Scalable and Efficient Object Detection"
 
 **Conference:** CVPR 2020
 
-## Paper Insights
+## Summary
 
 EfficientDet adapts EfficientNet-style scaling to object detection. Its first ingredient is BiFPN, a weighted bidirectional feature pyramid that repeatedly fuses multi-scale features while learning how much each input matters. Its second ingredient is compound scaling across backbone, feature network, prediction heads, and input resolution. The model family D0 through D7 gives a smooth compute-accuracy ladder. The evidence is COCO detection performance versus FLOPs and parameters, where EfficientDet reaches strong accuracy at much lower cost than prior detectors. The caveat is that efficiency depends on the whole recipe: backbone, feature fusion, scaling, and training settings all contribute. The paper matters because it made detector scaling systematic rather than hand-tuned.
+
+## Core Insights
 
 ![Figure 2 from EfficientDet: feature pyramid variants compared against BiFPN](/assets/images/efficientdet-paper-figure-2-bifpn.png)
 _Figure 2 from the [EfficientDet paper](https://arxiv.org/abs/1911.09070), via ar5iv._
 
-**Summary:** EfficientDet asks the same question for object detection that EfficientNet asked for classification: how far can careful scaling take a CNN family? The authors build on EfficientNet backbones, add a Bi-directional Feature Pyramid Network (BiFPN) for fast multi-scale feature fusion, and scale the entire detector with one coefficient $\phi$.
+### Method and reported result
+
+EfficientDet asks the same question for object detection that EfficientNet asked for classification: how far can careful scaling take a CNN family? The authors build on EfficientNet backbones, add a Bi-directional Feature Pyramid Network (BiFPN) for fast multi-scale feature fusion, and scale the entire detector with one coefficient $\phi$.
 
 BiFPN is the key detector-specific piece. It learns lightweight per-edge weights, so the network can emphasize useful feature paths instead of relying on hand-designed merge heuristics. Compound scaling then grows depth, width, and input resolution across the backbone, feature network, and prediction heads. The result is the D0-D7 family, where each model shares one recipe but targets a different FLOP and latency budget.
 
@@ -45,9 +49,11 @@ Compared with its contemporaries, D0 matches YOLOv3 accuracy with 28× fewer FLO
 
 †Latency measured on Titan V GPU and single-thread Xeon CPU in the paper's ablation study.
 
-**Critiques & limitations:** EfficientDet's strength is its AP-per-FLOP story. BiFPN removes a lot of manual feature-fusion guesswork, and compound scaling gives practitioners a ready-made detector suite for different devices. The pipeline is still anchor-based and more complex than many modern anchor-free detectors. It also depends heavily on EfficientNet backbones, and transformer-based detectors now surpass its top-end accuracy at very large budgets.
+### Where the evidence stops
 
-## Decision Lens
+EfficientDet's strength is its AP-per-FLOP story. BiFPN removes a lot of manual feature-fusion guesswork, and compound scaling gives practitioners a ready-made detector suite for different devices. The pipeline is still anchor-based and more complex than many modern anchor-free detectors. It also depends heavily on EfficientNet backbones, and transformer-based detectors now surpass its top-end accuracy at very large budgets.
+
+## High-Level Takeaways
 
 EfficientDet informs how to allocate a detector's latency budget across backbone size, feature fusion, input resolution, and prediction heads. The operative units are multiscale feature-map locations and anchors, not isolated image patches.
 
@@ -55,4 +61,4 @@ BiFPN compresses a pyramid of backbone features through repeated, learned weight
 
 The key missing study is a latency-matched factorial ablation of BiFPN topology, fusion weights, resolution, backbone depth/width, and head capacity. At 10× resolution, activation memory and pyramid fusion dominate cost. Compound scaling would be falsified as the useful design rule if a single-axis or hardware-aware scaling policy consistently matched AP at lower measured latency and energy.
 
-**Takeaway:** EfficientDet showed that scaling every part of the detector matters as much as making it big. Thoughtful feature fusion and end-to-end scaling unlocked large gains in speed and accuracy and continue to influence modern detection pipelines.
+EfficientDet showed that scaling every part of the detector matters as much as making it big. Thoughtful feature fusion and end-to-end scaling unlocked large gains in speed and accuracy and continue to influence modern detection pipelines.

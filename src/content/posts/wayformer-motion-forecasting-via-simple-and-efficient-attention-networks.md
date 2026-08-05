@@ -13,11 +13,15 @@ summary: "2022 – Wayformer: Motion Forecasting via Simple and Efficient Attent
 
 **arXiv:** [2207.05844](https://arxiv.org/abs/2207.05844)
 
-**Summary:** Wayformer asks whether motion forecasting really needs many modality-specific modules. Its answer is mostly no: a homogeneous attention architecture can work well if it fuses static and dynamic scene tokens in the right place.
+### Method and reported result
+
+Wayformer asks whether motion forecasting really needs many modality-specific modules. Its answer is mostly no: a homogeneous attention architecture can work well if it fuses static and dynamic scene tokens in the right place.
+
+## Summary
 
 The paper is useful because it turns forecasting architecture design into a set of fusion and efficiency choices: early fusion, late fusion, hierarchical fusion, factorized attention, and latent-query attention.
 
-## Paper Insights
+## Core Insights
 
 Wayformer encodes heterogeneous driving inputs such as road geometry, lane connectivity, traffic light state, agent histories, and agent interactions with Transformer-style attention. The model studies several fusion patterns and efficient attention variants, then shows that early fusion is especially strong on Waymo Open Motion Dataset and Argoverse.
 
@@ -31,7 +35,7 @@ _Figure 1 shows Wayformer as an encoder-decoder attention network over heterogen
 - Early fusion lets agents, roads, and signals interact before heavy abstraction.
 - Factorized and latent-query attention trade accuracy for speed and memory.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Design choice | Detail | Why it matters |
 | ------------- | ------ | -------------- |
@@ -40,12 +44,12 @@ _Figure 1 shows Wayformer as an encoder-decoder attention network over heterogen
 | Inputs | Road geometry, traffic lights, agent history | Covers the messy inputs forecasting systems actually use. |
 | Benchmarks | Waymo Open Motion Dataset and Argoverse | Compares across major public motion forecasting settings. |
 
-## Decision Lens
+## High-Level Takeaways
 
 Wayformer informs how much forecasting quality comes from a specialized interaction graph versus a carefully chosen attention fusion strategy. Its atomic tokens represent agents, road elements, and traffic lights over time; early, late, or hierarchical fusion determines when those modalities can interact.
 
 The results favor early fusion in the tested regimes, but fusion choice is entangled with token count and attention approximation. The missing factorial study matches FLOPs while varying fusion point, latent bottleneck, and full versus factorized attention across scene densities. At 10× actors and map tokens, early fusion's quadratic interaction cost becomes decisive. The simplicity claim would fail if hierarchical fusion matched accuracy and calibration with a materially better latency curve.
 
-**Context:** Wayformer helped normalize unified attention over heterogeneous driving scenes while keeping the architecture relatively simple.
+Wayformer helped normalize unified attention over heterogeneous driving scenes while keeping the architecture relatively simple.
 
-**Takeaway:** A strong general attention backbone can compete with highly specialized forecasting stacks when the fusion strategy is right.
+A strong general attention backbone can compete with highly specialized forecasting stacks when the fusion strategy is right.

@@ -23,11 +23,13 @@ summary: '2026 – Understanding Reasoning from Pretraining to Post-Training'
 
 **Models and data:** [Pre2Post Chess collection](https://huggingface.co/collections/pavelslab-nyu/pre2post-chess)
 
+## Summary
+
 Pretraining and reinforcement learning are usually scaled in separate experiments, even though every reasoning policy presented to RL inherits a particular prior. This paper builds a controlled chess analogue of the full language-model pipeline—pretraining on human games, supervised fine-tuning on synthetic search traces, then RL on verifiable puzzles—and asks how the first stage predicts returns in the last.
 
-Across 36 pretraining-to-RL runs, two different pretraining properties predict two different parts of the local RL curve. Lower held-out pretraining loss predicts the pass@1 level reached at a fixed RL compute, while more pretraining tokens predict a steeper improvement per decade of RL compute. This is useful evidence for allocating compute, but it is a fitted local relationship on an intermediate-difficulty chess benchmark, not a universal scaling law.
+## Core Insights
 
-## Paper Insights
+Across 36 pretraining-to-RL runs, two different pretraining properties predict two different parts of the local RL curve. Lower held-out pretraining loss predicts the pass@1 level reached at a fixed RL compute, while more pretraining tokens predict a steeper improvement per decade of RL compute. This is useful evidence for allocating compute, but it is a fitted local relationship on an intermediate-difficulty chess benchmark, not a universal scaling law.
 
 The study pretrains decoder-only Transformers from 5M to 1B parameters on decontaminated Lichess games. A proposal model then generates candidate continuations for chess positions; the continuations are merged into a serialized search tree for supervised fine-tuning. RL operates on 156,000 puzzles with a binary verifiable reward: the model must choose the unique correct move sequence while the environment supplies opponent moves.
 
@@ -55,7 +57,7 @@ _With increasing difficulty, correct-mode amplification declines and wrong-mode 
 
 The math case study uses a fixed 1B OLMo-2 architecture, checkpoints from 10B to 200B math-heavy pretraining tokens, one epoch of NuminaMath-CoT SFT, and RL on a 24,900-problem mixture. Lower pretraining loss again orders the fitted post-RL level, and longer pretraining correlates with a steeper local slope. Because model size, corpus, and checkpoint ancestry are not independently varied, this supports plausibility beyond chess rather than validating the full compute-allocation law for language models.
 
-## Decision Lens
+## High-Level Takeaways
 
 This paper informs whether a fixed reasoning-training budget should buy a stronger pretrained prior or more RL. The result rejects a one-number answer. Pretraining loss predicts the level from which RL can operate, data exposure predicts the observed rate of improvement, and the estimated optimal RL fraction rises with total compute inside the studied regime.
 
@@ -63,8 +65,8 @@ The expensive next decision should therefore be made with a small joint sweep, n
 
 At 10× scale, the principal bottlenecks are experimental coverage and reward diversity. A single pass@1 curve can hide saturation, reward hacking, and wrong-mode reinforcement. Compute allocation should be evaluated against pass@$k$, calibration, held-out task families, and failure severity—not only the metric optimized by RL.
 
-**Context:** The work joins two previously separate scaling questions: what pretraining buys and how quickly a pretrained policy converts verifiable experience into downstream performance.
+The work joins two previously separate scaling questions: what pretraining buys and how quickly a pretrained policy converts verifiable experience into downstream performance.
 
-**Limits:** Chess supplies exact actions and cheap verifiers but is far smaller and more structured than natural-language reasoning. The law is local to the measured compute range, the frontier is model-based extrapolation, and the math extension follows one 1B pretraining trajectory.
+Chess supplies exact actions and cheap verifiers but is far smaller and more structured than natural-language reasoning. The law is local to the measured compute range, the frontier is model-based extrapolation, and the math extension follows one 1B pretraining trajectory.
 
-**Takeaway:** Pretraining determines more than an RL starting point: its loss predicts the attainable local level, while its data exposure predicts how quickly RL improves—but only inside a measured, non-saturated regime.
+Pretraining determines more than an RL starting point: its loss predicts the attainable local level, while its data exposure predicts how quickly RL improves—but only inside a measured, non-saturated regime.

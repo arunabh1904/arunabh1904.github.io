@@ -21,26 +21,30 @@ summary: "2019 – EfficientNet — Rethinking Model Scaling for ConvNets"
 
 **Conference:** ICML 2019
 
-## Paper Insights
+## Summary
 
 EfficientNet asks how to scale a ConvNet once a good baseline exists. Instead of independently increasing depth, width, or input resolution, compound scaling uses one coefficient to grow all three dimensions in a balanced way. The authors first search for an efficient baseline, EfficientNet-B0, then scale it to B1-B7 under resource constraints. The empirical case is ImageNet accuracy versus parameters/FLOPs, with transfer results showing that the same family works beyond ImageNet. Higher resolution needs enough depth and width to use the extra pixels, while width or depth alone can waste compute. The caveat is that the baseline architecture and search space still matter; compound scaling cannot rescue a weak base model.
+
+## Core Insights
 
 ![Figure 2 from EfficientNet: compound scaling balances network width, depth, and resolution](/assets/images/efficientnet-paper-figure-2-model-scaling.png)
 _Figure 2 from the [EfficientNet paper](https://arxiv.org/abs/1905.11946), via ar5iv._
 
-**Summary:** EfficientNet argues that model scaling should be balanced, not improvised one axis at a time. Standard CNNs often grow by becoming deeper, wider, or by consuming higher-resolution images. Tan and Le show that scaling only one dimension leaves accuracy and efficiency on the table.
+### Method and reported result
+
+EfficientNet argues that model scaling should be balanced, not improvised one axis at a time. Standard CNNs often grow by becoming deeper, wider, or by consuming higher-resolution images. Tan and Le show that scaling only one dimension leaves accuracy and efficiency on the table.
 
 Their recipe starts with a mobile-sized architecture found by neural architecture search, EfficientNet-B0. From there, a single compound factor $\phi$ scales depth $\alpha^\phi$, width $\beta^\phi$, and resolution $\gamma^\phi$ together. That rule turns one searched micro-architecture into the B1-B7 family while keeping the accuracy-to-compute tradeoff unusually strong.
 
-## Decision Lens
+## High-Level Takeaways
 
 EfficientNet informs how to spend additional CNN compute across depth, width, and input resolution instead of scaling one axis by habit. The training unit remains an image, but compound scaling changes the capacity and spatial detail available to every block under a common FLOP multiplier.
 
 The measured family shows that balanced scaling gives a better ImageNet accuracy-efficiency frontier around the searched B0 baseline; it does not prove universal coefficients across tasks or hardware. The missing experiment re-optimizes the coefficients for detection, segmentation, and memory-bound accelerators under measured latency rather than FLOPs. At 10× resolution, activation memory and data movement dominate. Compound scaling would fail as a general rule if hardware-aware single-axis or neural-architecture scaling consistently won at matched latency and energy.
 
-**Context:** EfficientNet made scaling feel like a design problem rather than a brute-force contest. B1 roughly matched ResNet-152 with 27x fewer FLOPs, while B7 topped ImageNet with a fraction of the parameters used by earlier NAS-heavy models.
+EfficientNet made scaling feel like a design problem rather than a brute-force contest. B1 roughly matched ResNet-152 with 27x fewer FLOPs, while B7 topped ImageNet with a fraction of the parameters used by earlier NAS-heavy models.
 
-**Evals / Latency benchmarks:**
+### Reported evidence and cost
 
 | Model | Params | FLOPs | ImageNet Top-1 | Notes |
 | ----- | ------ | ----- | -------------- | ----- |
@@ -51,9 +55,11 @@ The measured family shows that balanced scaling gives a better ImageNet accuracy
 
 The reported training recipe uses 600 epochs on ImageNet with AutoAugment and dropout. On TPU-v3 and mobile-oriented hardware, the smaller B0-B3 models run in real time, which is part of why the family became popular outside leaderboard settings.
 
-**Critiques & limitations:** The compound scaling formula is easy to reuse, but the clean story depends on a strong searched baseline and a heavy training recipe. The paper is mainly optimized for classification; detection and segmentation need extra tuning. EfficientNet also makes clear that "efficient" can mean fewer FLOPs at inference while still requiring expensive architecture search and long training runs.
+### Where the evidence stops
 
-**Takeaway:** EfficientNet's lasting lesson is that how you scale can matter more than how much you scale. Balanced depth, width, and resolution gave CNNs a better accuracy-efficiency frontier.
+The compound scaling formula is easy to reuse, but the clean story depends on a strong searched baseline and a heavy training recipe. The paper is mainly optimized for classification; detection and segmentation need extra tuning. EfficientNet also makes clear that "efficient" can mean fewer FLOPs at inference while still requiring expensive architecture search and long training runs.
+
+EfficientNet's lasting lesson is that how you scale can matter more than how much you scale. Balanced depth, width, and resolution gave CNNs a better accuracy-efficiency frontier.
 
 ### MBConv layers in PyTorch
 

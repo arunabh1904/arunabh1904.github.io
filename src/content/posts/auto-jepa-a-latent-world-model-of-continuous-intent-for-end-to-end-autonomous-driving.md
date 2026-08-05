@@ -21,11 +21,13 @@ summary: '2026 – Auto-JEPA: A Latent World Model of Continuous Intent for End-
 
 **Code and models:** [NoctYang/Auto-JEPA](https://github.com/NoctYang/Auto-JEPA)
 
+## Summary
+
 Dense driving world models predict future video, occupancy, or agent state even though a planner ultimately needs an ego trajectory. Auto-JEPA replaces that reconstruction target with a narrower one: the latent representation of the future ego motion. A frozen V-JEPA 2 encoder processes four front-camera frames; ego-motion history and a route command provide additional context; and a 24-layer Transformer predicts eight latent tokens aligned with the encoded ground-truth trajectory.
 
-The predicted latent is not decoded directly into waypoints. It retrieves 300 candidates from a fixed memory of 110,335 logged trajectories, after which a scene-conditioned scorer ranks them and a separate drivable-area gate rejects unsafe candidates. On NAVSIM v1, the resulting camera-only planner reaches 91.3 PDMS. Under the updated NAVSIM v2 evaluator it reaches 89.1 EPDMS. These results support action-oriented prediction as a useful planning interface, but they do not show that trajectory intent can replace a full world model for simulation or counterfactual reasoning.
+## Core Insights
 
-## Paper Insights
+The predicted latent is not decoded directly into waypoints. It retrieves 300 candidates from a fixed memory of 110,335 logged trajectories, after which a scene-conditioned scorer ranks them and a separate drivable-area gate rejects unsafe candidates. On NAVSIM v1, the resulting camera-only planner reaches 91.3 PDMS. Under the updated NAVSIM v2 evaluator it reaches 89.1 EPDMS. These results support action-oriented prediction as a useful planning interface, but they do not show that trajectory intent can replace a full world model for simulation or counterfactual reasoning.
 
 Auto-JEPA first trains a trajectory autoencoder on eight future $(x,y)$ waypoints. Its loss combines coordinate, endpoint, velocity, and acceleration terms. The decoder is then discarded, while the frozen trajectory encoder supplies both the training target and every key in the retrieval memory. This shared encoder makes the predicted intent directly usable as a nearest-neighbor query rather than an intermediate representation that needs another learned generator.
 
@@ -44,7 +46,7 @@ The predictor is trained with three alignment signals: normalized feature matchi
 
 The paper also probes whether the intent responds to planning-relevant agents. Across 15,364 validation scenes, masking dynamic-agent regions changes the latent by 0.080 in cosine distance on average, versus 0.027 for equal-area random masks. The dynamic-agent intervention is larger in 71.1% of scenes. Individual occlusions likewise produce larger trajectory shifts for interacting vehicles than for nearby non-interacting vehicles. This is stronger than a qualitative saliency claim, although it remains an intervention on one deterministic checkpoint rather than a causal guarantee of safe behavior.
 
-## Decision Lens
+## High-Level Takeaways
 
 Auto-JEPA informs whether a driving team should spend model capacity reconstructing the future scene or learn only a planning-oriented predictive state. Its atomic unit is an eight-step future trajectory latent. Visual, route, and ego-history features are fused in the predictor, while executable geometry remains outside the network in a fixed memory. The evidence favors this split when the product needs a strong trajectory proposal under a bounded logged-motion vocabulary and does not need explicit forecasts for other agents.
 
@@ -52,8 +54,8 @@ The expensive commitment is the memory-and-selector interface. Retrieval avoids 
 
 A decisive test would compare three planners under identical visual backbones, training scenes, candidate budgets, and scorer capacity: direct waypoint regression, intent-conditioned retrieval, and intent-conditioned generation or refinement. Evaluation should stratify rare maneuvers and interactive scenes, measure recall before ranking, and include multiple seeds. The retrieval claim should be rejected if a compact generator matches safety and progress while covering maneuvers absent from the logged memory.
 
-**Context:** Auto-JEPA narrows the JEPA idea from predicting a general future representation to predicting the part of the future that directly indexes ego action.
+Auto-JEPA narrows the JEPA idea from predicting a general future representation to predicting the part of the future that directly indexes ego action.
 
-**Limits:** The planner uses only a front camera and a non-reactive NAVSIM evaluation. Its intent does not forecast surrounding agents, its motion space is bounded by a fixed trajectory memory, and the benchmark numbers come from one selected checkpoint rather than independent retraining runs.
+The planner uses only a front camera and a non-reactive NAVSIM evaluation. Its intent does not forecast surrounding agents, its motion space is bounded by a fixed trajectory memory, and the benchmark numbers come from one selected checkpoint rather than independent retraining runs.
 
-**Takeaway:** Predicting future ego-motion latents can be enough to retrieve strong plans, but the gain depends on whether a fixed memory actually contains the maneuver the scene requires.
+Predicting future ego-motion latents can be enough to retrieve strong plans, but the gain depends on whether a fixed memory actually contains the maneuver the scene requires.

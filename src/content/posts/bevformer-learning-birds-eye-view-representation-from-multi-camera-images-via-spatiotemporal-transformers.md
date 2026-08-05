@@ -15,11 +15,15 @@ summary: "2022 – BEVFormer: Learning Bird's-Eye-View Representation from Multi
 
 **Code:** [fundamentalvision/BEVFormer](https://github.com/fundamentalvision/BEVFormer)
 
-**Summary:** BEVFormer builds a bird's-eye-view feature map directly from surround cameras. It uses learnable BEV grid queries that attend into camera features for spatial evidence and into previous BEV features for temporal memory.
+### Method and reported result
+
+BEVFormer builds a bird's-eye-view feature map directly from surround cameras. It uses learnable BEV grid queries that attend into camera features for spatial evidence and into previous BEV features for temporal memory.
+
+## Summary
 
 This paper matters because it made dense BEV a practical intermediate representation for camera-only driving perception. Later end-to-end systems often either build on this BEV-centric idea or react against its compute cost.
 
-## Paper Insights
+## Core Insights
 
 BEVFormer has two tailored attention mechanisms. Spatial cross-attention lets each BEV query sample relevant image features from camera views by projecting into 3D reference points. Temporal self-attention lets the current BEV reuse information from the previous timestep. The same BEV representation supports 3D object detection and map segmentation.
 
@@ -33,7 +37,7 @@ _Figure 2 shows the BEVFormer encoder: camera features, BEV queries, spatial cro
 - Spatial cross-attention connects each BEV cell to camera evidence.
 - Temporal self-attention carries history without recomputing a long video window.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Component | Detail | Why it matters |
 | --------- | ------ | -------------- |
@@ -42,12 +46,12 @@ _Figure 2 shows the BEVFormer encoder: camera features, BEV queries, spatial cro
 | Temporal attention | Current BEV attends to previous BEV | Adds motion/history with low extra structure. |
 | Result | 56.9% nuScenes NDS reported in the abstract | Marked BEVFormer as a strong camera-only perception baseline. |
 
-## Decision Lens
+## High-Level Takeaways
 
 BEVFormer informs whether multi-camera perception should first build a persistent metric BEV grid or reason directly in camera views. Its atomic unit is a learned BEV query tied to a ground-plane location; spatial cross-attention samples projected image features, while temporal self-attention carries the same grid across frames.
 
 The representation buys a reusable geometry for 3D detection at the cost of projection assumptions and a dense query budget. The key missing control compares dense BEV queries with sparse object queries under identical backbone, temporal context, and latency. At 10× camera resolution or temporal length, feature sampling and BEV-query attention dominate. The BEV-first claim would fail if a view-space or sparse model matched 3D accuracy and temporal stability with materially lower memory and latency.
 
-**Context:** BEVFormer became one of the reference points for dense BEV-oriented autonomous driving stacks.
+BEVFormer became one of the reference points for dense BEV-oriented autonomous driving stacks.
 
-**Takeaway:** Multi-camera perception becomes much easier to organize once the model learns a shared BEV workspace.
+Multi-camera perception becomes much easier to organize once the model learns a shared BEV workspace.

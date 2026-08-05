@@ -17,9 +17,11 @@ summary: "2024 – SIMPLER: Evaluating Real-World Robot Manipulation Policies in
 
 **Project:** [simpler-env.github.io](https://simpler-env.github.io/)
 
+## Summary
+
 SIMPLER asks a more useful question than whether a simulator is photorealistic: does an evaluation inside it predict how real policies rank and fail? The benchmark recreates common Google Robot and WidowX setups, reduces control and visual mismatches, and runs real-data-trained policies without retraining them in simulation.
 
-## Paper Insights
+## Core Insights
 
 ![SIMPLER comparison of expensive real-robot evaluation with reproducible simulated evaluation matched to the same task](/assets/images/simpler-evaluating-real-world-robot-policies-in-simulation-paper-figure.png)
 _Figure 1 states the benchmark proposition directly: replace repeated physical evaluations with purpose-built simulated replicas, then validate the replica by whether policy rankings correlate with real-world performance. Source: [SIMPLER](https://arxiv.org/abs/2405.05941)._
@@ -33,14 +35,14 @@ The main design choice is calibration at the policy interface. Robot control mod
 | SIMPLER | Cheap, reproducible, high-volume comparison | Correlation is specific to tasks, policies, and matched interfaces |
 | Real robot | Captures actual physics and operations | Expensive, noisy, difficult to reproduce |
 
-## Decision Lens
+## High-Level Takeaways
 
 SIMPLER informs which regressions can be screened in simulation before spending robot hours. Its atomic unit is a closed-loop simulated episode executed by a policy trained on real data. The scaling claim concerns rank correlation and failure-mode similarity, not simulation realism by itself.
 
 A missing test repeatedly recalibrates the correlation as new policy families, controllers, and tasks arrive. At ten times the capability breadth, one simulator may preserve rankings for some skills and invert them for others. The central claim fails if improvements selected by SIMPLER do not predict real gains prospectively rather than retrospectively.
 
-**Context:** SIMPLER supplies the real-to-sim middle layer in an evaluation pyramid.
+SIMPLER supplies the real-to-sim middle layer in an evaluation pyramid.
 
-**Limits:** Correlation on existing policies can break after architecture or action-interface changes.
+Correlation on existing policies can break after architecture or action-interface changes.
 
-**Takeaway:** Use simulation when it predicts a decision you care about; measure that prediction continuously.
+Use simulation when it predicts a decision you care about; measure that prediction continuously.

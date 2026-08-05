@@ -14,11 +14,15 @@ summary: '2022 – BEVDet4D: align and fuse adjacent camera BEV features for mot
 
 **Code:** [HuangJunJie2017/BEVDet](https://github.com/HuangJunJie2017/BEVDet)
 
-**Summary:** BEVDet4D adds a simple temporal path to BEVDet: transform the previous frame's BEV feature into the current ego frame, concatenate it with the current feature, and process the pair with an extra BEV encoder. Two adjacent observations turn object velocity into a spatial displacement that the detector can learn directly.
+### Method and reported result
+
+BEVDet4D adds a simple temporal path to BEVDet: transform the previous frame's BEV feature into the current ego frame, concatenate it with the current feature, and process the pair with an extra BEV encoder. Two adjacent observations turn object velocity into a spatial displacement that the detector can learn directly.
+
+## Summary
 
 This is the dense-grid temporal baseline against which more elaborate BEV memories and sparse object memories should be judged.
 
-## Paper Insights
+## Core Insights
 
 Ego alignment is critical because a static scene otherwise appears to move with the vehicle. The extra encoder gives local convolutions a way to interpret paired features after warping. In the tiny configuration, the paper reports velocity error falling from 0.909 to 0.337 and NDS increasing from 39.2 to 47.6; the test result reaches 56.9 NDS.
 
@@ -29,12 +33,12 @@ Ego alignment is critical because a static scene otherwise appears to move with 
 | Concatenation | Preserves both timestamps | Doubles temporal feature bandwidth. |
 | Extra BEV encoder | Learns displacement cues | Dense cost grows with grid area. |
 
-## Decision Lens
+## High-Level Takeaways
 
 BEVDet4D is appropriate when one short history fixes velocity and flicker without the complexity of recurrent attention. Evaluate moving actors separately: ego warping aligns the road, not independently moving objects. Timestamp, rolling-shutter, and inference-delay errors should be injected explicitly.
 
 Longer history is not automatically better. Dense grids consume memory linearly in spatial extent and can preserve actors after they leave the scene.
 
-**Context:** BEVFormer uses temporal attention over a dense BEV; StreamPETR and Sparse4D instead keep object-centric state.
+BEVFormer uses temporal attention over a dense BEV; StreamPETR and Sparse4D instead keep object-centric state.
 
-**Takeaway:** A warped previous BEV is a strong temporal baseline because it makes motion visible, but its state is dense, short-lived, and only ego-motion aligned.
+A warped previous BEV is a strong temporal baseline because it makes motion visible, but its state is dense, short-lived, and only ego-motion aligned.

@@ -15,11 +15,15 @@ summary: "2022 – UniAD: Planning-oriented Autonomous Driving"
 
 **Code:** [OpenDriveLab/UniAD](https://github.com/OpenDriveLab/UniAD)
 
-**Summary:** UniAD is a dense BEV-oriented end-to-end driving system. It does not simply train detection, mapping, forecasting, occupancy, and planning heads side by side. It arranges them so upstream tasks serve the final planning objective.
+### Method and reported result
+
+UniAD is a dense BEV-oriented end-to-end driving system. It does not simply train detection, mapping, forecasting, occupancy, and planning heads side by side. It arranges them so upstream tasks serve the final planning objective.
+
+## Summary
 
 That design made UniAD a reference point for "planning-oriented" driving: perception and prediction are useful because they improve the ego vehicle's planned trajectory.
 
-## Paper Insights
+## Core Insights
 
 UniAD uses a BEV backbone followed by a sequence of modules: TrackFormer for object tracking, MapFormer for map elements, MotionFormer for future trajectories, OccFormer for occupancy, and a planner for ego waypoints. Queries carry task-specific state between modules, so the system can represent agents, maps, future motion, occupancy, and ego planning inside one trainable pipeline.
 
@@ -33,7 +37,7 @@ _Figure 2 shows UniAD's pipeline: BEV features feed tracking and mapping, those 
 - Task queries become interfaces between perception, prediction, and planning.
 - Occupancy gives the planner a scene-level safety signal.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Module | Role | Why it matters |
 | ------ | ---- | -------------- |
@@ -43,12 +47,12 @@ _Figure 2 shows UniAD's pipeline: BEV features feed tracking and mapping, those 
 | OccFormer | Predicts occupancy | Adds a dense safety-oriented future signal. |
 | Planner | Predicts ego waypoints | Makes the stack optimize toward driving behavior. |
 
-## Decision Lens
+## High-Level Takeaways
 
 UniAD informs whether perception, tracking, mapping, motion, occupancy, and planning should be optimized as separate products or as one planning-oriented query pipeline. The atomic interfaces are task queries: agent, map, motion, occupancy, and ego queries carry a shared scene state between modules while losses remain task-specific.
 
 Joint training makes upstream representations accountable to planning, but it also obscures which task and loss weight creates the gain. The missing factorial ablation freezes or removes each query interface under matched backbone, data, and latency, then measures closed-loop rather than only open-loop metrics. At 10× task or scene complexity, gradient conflict and query bandwidth dominate. UniAD's claim would fail if a modular pipeline matched closed-loop safety and progress while allowing better independent calibration and recovery.
 
-**Context:** UniAD set the dense BEV end-to-end driving baseline that later vectorized and VLA systems compare themselves against.
+UniAD set the dense BEV end-to-end driving baseline that later vectorized and VLA systems compare themselves against.
 
-**Takeaway:** An end-to-end driving stack should arrange its intermediate tasks around planning rather than attach independent heads to a shared backbone.
+An end-to-end driving stack should arrange its intermediate tasks around planning rather than attach independent heads to a shared backbone.

@@ -19,9 +19,11 @@ summary: "2024 – KTO: Model Alignment as Prospect Theoretic Optimization"
 
 **Conference:** ICML 2024
 
+## Summary
+
 KTO asks whether alignment data must arrive as a chosen–rejected pair. It derives a human-aware loss from prospect theory and trains directly on binary judgments: an output was desirable or undesirable. That interface matters when feedback occurs naturally as approval, a safety flag, or a deployment failure rather than as two completions from the same prompt.
 
-## Paper Insights
+## Core Insights
 
 ![KTO implied human value curves showing loss aversion and a reference point for preferred and rejected outcomes](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-paper-figure.png)
 _Figure 1 makes KTO's prospect-theory motivation concrete: desirable and undesirable outcomes are valued relative to a reference point, with asymmetric sensitivity to gains and losses. Source: [KTO](https://arxiv.org/abs/2402.01306)._
@@ -36,14 +38,14 @@ The paper places KTO, DPO, and PPO-style objectives inside a broader family call
 | Reference | Policy-relative utility with KL control | The reference distribution remains part of the method even without pairwise labels. |
 | Main comparison | Binary feedback versus preference pairs | Data interface and objective must be evaluated together. |
 
-## Decision Lens
+## High-Level Takeaways
 
 KTO informs whether a post-training program should pay to construct matched preference pairs or learn from independent positive and negative outcomes. Its atomic unit is a labeled completion, not a pair. For robotics, that maps naturally to successful and failed action chunks, but only if the label really reflects the action under the state in which it was taken.
 
 The experiments establish that binary feedback can be competitive in the studied language-model regime. They do not establish that KTO handles continuous actions, irreversible transitions, or highly imbalanced failure logs. A decisive robot-policy test would compare KTO-style binary optimization, correction SFT, and paired preferences under the same rollout and annotation budget. The claim would weaken if binary training improves logged desirability while closed-loop recovery and safety remain unchanged.
 
-**Context:** KTO is the clean bridge from paired language preferences to deployment signals that arrive one event at a time.
+KTO is the clean bridge from paired language preferences to deployment signals that arrive one event at a time.
 
-**Limits:** The reference-point estimate, class balance, and mapping from token likelihood to physical action quality become new sources of error in VLA training.
+The reference-point estimate, class balance, and mapping from token likelihood to physical action quality become new sources of error in VLA training.
 
-**Takeaway:** Use KTO when binary feedback is genuinely abundant; do not pretend that an unmatched failure and success form a counterfactual pair.
+Use KTO when binary feedback is genuinely abundant; do not pretend that an unmatched failure and success form a counterfactual pair.

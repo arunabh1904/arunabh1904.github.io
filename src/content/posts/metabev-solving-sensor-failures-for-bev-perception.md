@@ -15,11 +15,15 @@ summary: '2023 – MetaBEV: Solving Sensor Failures for BEV Detection and Map Se
 
 **Project:** [chongjiange.github.io/metabev](https://chongjiange.github.io/metabev/)
 
-**Summary:** MetaBEV trains one camera-LiDAR model for full input, corrupted input, and complete sensor absence while also serving 3D detection and map segmentation. Dense meta-BEV queries selectively attend to whichever sensor features are present, and modality-specific mixture-of-experts layers keep missing-input behavior from being treated as an unusual value inside a fixed concatenation.
+### Method and reported result
+
+MetaBEV trains one camera-LiDAR model for full input, corrupted input, and complete sensor absence while also serving 3D detection and map segmentation. Dense meta-BEV queries selectively attend to whichever sensor features are present, and modality-specific mixture-of-experts layers keep missing-input behavior from being treated as an unusual value inside a fixed concatenation.
+
+## Summary
 
 The important shift is from fusion accuracy to conditional computation. A production model does not always receive the nominal sensor set; its architecture and training distribution must define what happens next.
 
-## Paper Insights
+## Core Insights
 
 Camera and LiDAR encoders produce separate BEV features. The BEV-Evolving decoder starts from learned meta-BEV queries and repeatedly samples camera features, LiDAR features, or both through deformable cross-attention. Self-attention then spreads information within the evolving scene representation. Modality-specific experts adapt the cross-attention path to the available inputs, while a second expert structure addresses interference between detection and segmentation.
 
@@ -35,12 +39,12 @@ _MetaBEV makes sensor availability part of the computation path rather than sile
 | Detection/segmentation conflict | Multi-task mixture of experts | Adds capacity, routing, and validation complexity. |
 | Local fusion under large corruption | Dense queries evolve through attention | Relies on modality masks and learned routing being calibrated. |
 
-## Decision Lens
+## High-Level Takeaways
 
 MetaBEV informs whether one deployed model can replace separate nominal and fallback networks. Its atomic unit is a meta-BEV query. Sensor encoders remain separate, while the evolving decoder is shared and conditioned by modality-specific experts; task conflicts receive another expert allocation mechanism.
 
 The missing control compares one conditional model with three separately trained specialists—camera-only, LiDAR-only, and fused—under equal total parameters, training compute, calibration, and deployment memory. At 10× sensor configurations and tasks, expert routing and validation-state coverage dominate. The one-model strategy would fail if specialists provide materially better uncertainty calibration or simpler certification within the same onboard budget.
 
-**Context:** MetaBEV turns sensor failure from an inference-time accident into a training and architecture variable. UniBEV later studies uniform encoders and normalized weighted fusion for the same missing-modality objective.
+MetaBEV turns sensor failure from an inference-time accident into a training and architecture variable. UniBEV later studies uniform encoders and normalized weighted fusion for the same missing-modality objective.
 
-**Takeaway:** Graceful degradation must be trained as a first-class operating mode; a zero-filled failed sensor is not a normal measurement.
+Graceful degradation must be trained as a first-class operating mode; a zero-filled failed sensor is not a normal measurement.

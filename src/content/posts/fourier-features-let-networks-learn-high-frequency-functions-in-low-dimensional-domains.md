@@ -17,11 +17,15 @@ summary: "2020 – Fourier Features Let Networks Learn High Frequency Functions 
 
 **Code:** [tancik/fourier-feature-networks](https://github.com/tancik/fourier-feature-networks)
 
-**Summary:** A plain MLP has a spectral bias: it learns smooth, low-frequency functions much more easily than sharp boundaries or fine texture. This paper fixes that failure mode by mapping each coordinate through sinusoidal Fourier features before the MLP sees it.
+### Method and reported result
+
+A plain MLP has a spectral bias: it learns smooth, low-frequency functions much more easily than sharp boundaries or fine texture. This paper fixes that failure mode by mapping each coordinate through sinusoidal Fourier features before the MLP sees it.
+
+## Summary
 
 That small input change matters for BEV and mapping work because many spatial tasks are low-dimensional coordinate regression problems with high-frequency structure. Lane boundaries, occupancy edges, radiance fields, and implicit maps all ask a network to represent sharp geometry from coordinates.
 
-## Paper Insights
+## Core Insights
 
 The paper studies why coordinate MLPs struggle when the target function contains high-frequency detail. The method samples or chooses Fourier bases, maps an input coordinate through sine and cosine features, and feeds the expanded representation into a standard MLP. Using neural tangent kernel analysis, the authors show that this transformation changes the effective kernel into a stationary kernel whose bandwidth can be tuned by the Fourier feature scale.
 
@@ -35,7 +39,7 @@ _Figure 2 shows why the input mapping matters: Fourier features reshape the effe
 - Fourier features let a coordinate network expose high frequencies early instead of asking hidden layers to discover them slowly.
 - The bandwidth parameter controls the smoothness/detail tradeoff.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -50,12 +54,12 @@ _Figure 2 shows why the input mapping matters: Fourier features reshape the effe
 | No mapping | 19.32 | 0.864 |
 | Gaussian Fourier features | 25.57 | 0.973 |
 
-## Decision Lens
+## High-Level Takeaways
 
 Fourier features inform whether an MLP should learn geometry directly from raw coordinates or receive a fixed sinusoidal basis that exposes high spatial frequencies. The atomic unit is a coordinate-value pair; a bandwidth-controlled projection maps the coordinate into periodic features before the shared MLP.
 
 The experiments show that the embedding changes the effective kernel and overcomes spectral bias on images and 3D signals. They do not prescribe one bandwidth for noisy, multiscale driving geometry. The missing test jointly sweeps bandwidth, learned encodings, and coordinate noise at matched parameters. At 10× spatial extent or resolution, aliasing and basis size become limiting. The claim would weaken if a learned positional encoding matched high-frequency reconstruction while adapting more robustly across scales.
 
-**Context:** Fourier features became one of the standard ways to make coordinate networks useful for detailed spatial signals.
+Fourier features became one of the standard ways to make coordinate networks useful for detailed spatial signals.
 
-**Takeaway:** If an MLP is asked to learn geometry from raw coordinates, give it a frequency basis first; otherwise the model starts with the wrong smoothness prior.
+If an MLP is asked to learn geometry from raw coordinates, give it a frequency basis first; otherwise the model starts with the wrong smoothness prior.

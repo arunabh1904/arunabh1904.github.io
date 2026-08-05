@@ -15,11 +15,15 @@ summary: "2022 – MapTR: Structured Modeling and Learning for Online Vectorized
 
 **Code:** [hustvl/MapTR](https://github.com/hustvl/MapTR)
 
-**Summary:** MapTR is one of the core papers for online vectorized HD map construction. It replaces dense raster map outputs with structured vector elements such as lane dividers, road boundaries, and pedestrian crossings.
+### Method and reported result
+
+MapTR is one of the core papers for online vectorized HD map construction. It replaces dense raster map outputs with structured vector elements such as lane dividers, road boundaries, and pedestrian crossings.
+
+## Summary
 
 The key modeling move is permutation equivalence. A map element can be represented by a set of points, but the same shape may have several valid point orders. MapTR encodes that ambiguity directly so training does not punish equivalent representations.
 
-## Paper Insights
+## Core Insights
 
 The paper frames online HD map construction as structured set prediction. Map elements are modeled as point sets with a group of equivalent permutations. A hierarchical query embedding scheme encodes instance-level and point-level structure, and hierarchical bipartite matching assigns predictions to ground-truth map elements during training.
 
@@ -33,7 +37,7 @@ _Figure 4 shows the structured MapTR pipeline: sensor inputs become BEV features
 - Hierarchical queries mirror the structure of a vector map element.
 - Matching defines the structured prediction problem rather than serving as an incidental training detail.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -50,12 +54,12 @@ _Figure 4 shows the structured MapTR pipeline: sensor inputs become BEV features
 | MapTR-nano | Camera | R18 | 45.9 | 25.1 |
 | MapTR-tiny | Camera | R50 | 50.3 | 11.2 |
 
-## Decision Lens
+## High-Level Takeaways
 
 MapTR informs whether online map elements should be decoded as ordered polylines with one canonical point sequence or as permutation-equivalent point sets. The atomic unit is a map-element query whose point queries represent geometry; hierarchical bipartite matching handles element identity and equivalent point orderings.
 
 The structured set view reduces arbitrary ordering penalties, but matching cost and fixed point count shape the result. A decisive ablation compares canonical ordering, permutation-equivalent matching, and curve-parameter decoders with the same image backbone and query budget. At 10× map extent, query count and Hungarian matching become bottlenecks. MapTR's formulation would fail if a simpler ordered decoder matched topology and geometry at lower latency and with fewer assignment ambiguities.
 
-**Context:** MapTR gave the field a practical transformer baseline for vector maps and made permutation ambiguity a first-class modeling issue.
+MapTR gave the field a practical transformer baseline for vector maps and made permutation ambiguity a first-class modeling issue.
 
-**Takeaway:** Vector-map learning works better when the loss respects the geometry's symmetries instead of forcing one arbitrary point order.
+Vector-map learning works better when the loss respects the geometry's symmetries instead of forcing one arbitrary point order.

@@ -15,9 +15,11 @@ summary: "2025 – RobustVLA: Robustness-Aware Reinforcement Post-Training for V
 
 **arXiv:** [2511.01331](https://arxiv.org/abs/2511.01331)
 
+## Summary
+
 RobustVLA argues that maximizing nominal task reward during online post-training can make a VLA more brittle. Its analysis bounds performance degradation under observation and action perturbations, motivating Jacobian regularization for perception sensitivity and smoothness regularization for policy updates/actions.
 
-## Paper Insights
+## Core Insights
 
 ![RobustVLA loop injecting observation and action perturbations then applying stability Jacobian and smoothness regularization during reinforcement post-training](/assets/images/robustvla-robustness-aware-reinforcement-post-training-paper-figure.png)
 _Figure 1 traces the robustness claim from intervention to objective: perturbations expose return drift and error amplification, which motivate Jacobian, action-smoothing, and robust RL regularizers. Source: [RobustVLA](https://arxiv.org/abs/2511.01331)._
@@ -31,14 +33,14 @@ The paper shifts robustness from an evaluation afterthought into the post-traini
 | Observation noise | Policy Jacobian penalty | Reduce sensitivity to irrelevant visual changes |
 | Action disturbance | Smoothness penalty | Prevent unstable reactions and oscillation |
 
-## Decision Lens
+## High-Level Takeaways
 
 RobustVLA informs whether post-training should optimize nominal success alone or explicitly reserve capacity for perturbation tolerance. Its unit is a rollout under sampled observation/action noise, with regularizers applied to policy sensitivity in addition to reward.
 
 The experiments support the proposed penalties under studied disturbances. A missing comparison uses physically grounded latency, occlusion, calibration drift, and contact errors rather than generic noise. At ten times the environment diversity, one smoothness coefficient cannot express all controller dynamics. The claim fails if robustness gains disappear under structured shifts or if reduced sensitivity prevents fast recovery from real disturbances.
 
-**Context:** RobustVLA supplies the objective-level counterpart to benchmark suites that measure perturbation sensitivity.
+RobustVLA supplies the objective-level counterpart to benchmark suites that measure perturbation sensitivity.
 
-**Limits:** Mathematical bounds depend on how faithfully the perturbation model represents deployment.
+Mathematical bounds depend on how faithfully the perturbation model represents deployment.
 
-**Takeaway:** Robustness must be optimized against the disturbances the robot will actually face, not an abstract noise distribution.
+Robustness must be optimized against the disturbances the robot will actually face, not an abstract noise distribution.

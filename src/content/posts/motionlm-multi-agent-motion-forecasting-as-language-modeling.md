@@ -13,11 +13,15 @@ summary: "2023 – MotionLM: Multi-Agent Motion Forecasting as Language Modeling
 
 **arXiv:** [2309.16534](https://arxiv.org/abs/2309.16534)
 
-**Summary:** MotionLM asks a simple question: what if multi-agent motion forecasting is a language modeling problem? It tokenizes future trajectories and trains an autoregressive Transformer to predict sequences of motion tokens.
+### Method and reported result
+
+MotionLM asks a simple question: what if multi-agent motion forecasting is a language modeling problem? It tokenizes future trajectories and trains an autoregressive Transformer to predict sequences of motion tokens.
+
+## Summary
 
 That reframing removes several pieces of hand-built forecasting machinery. The model does not need anchors or explicit latent-variable optimization for multimodality, and it can generate joint futures for interacting agents in one decoding process.
 
-## Paper Insights
+## Core Insights
 
 The problem is forecasting plausible, interactive futures for multiple road agents. MotionLM turns continuous trajectories into discrete motion tokens and maximizes the average log probability of those tokens with a standard language-model objective. Its sequential factorization gives the model temporally causal conditional rollouts, which matters when one agent's future should react to another's predicted motion.
 
@@ -31,7 +35,7 @@ _Figure 2 shows the language-model analogy concretely: scene features condition 
 - Joint autoregressive decoding models interactions directly.
 - Temporally causal rollouts make conditional prediction natural.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -47,12 +51,12 @@ _Figure 2 shows the language-model analogy concretely: scene features condition 
 | JFP | 0.8817 | 0.4233 | 0.2050 |
 | MotionLM | 0.8911 | 0.4115 | 0.2178 |
 
-## Decision Lens
+## High-Level Takeaways
 
 MotionLM informs whether continuous multi-agent futures should be generated jointly as discrete motion tokens. The atomic unit is a quantized displacement token for a particular agent and timestep; autoregressive ordering lets each predicted move condition on the emerging joint future.
 
 Tokenization makes interaction modeling compatible with language-model training, but quantization error, sequence ordering, and exposure bias become part of the planner. The missing study holds backbone and sampling budget fixed across tokenized autoregression and continuous joint decoders. At 10× agents or horizon, sequence length and sampling latency grow linearly while joint combinations grow much faster. The claim would fail if a continuous decoder matched joint metrics and controllable diversity with lower latency and no quantization artifacts.
 
-**Context:** MotionLM made the language-model analogy concrete for autonomous-driving behavior prediction.
+MotionLM made the language-model analogy concrete for autonomous-driving behavior prediction.
 
-**Takeaway:** A good tokenization can turn motion forecasting into sequence modeling, but the planner still has to care about calibration, coverage, and interaction quality.
+A good tokenization can turn motion forecasting into sequence modeling, but the planner still has to care about calibration, coverage, and interaction quality.

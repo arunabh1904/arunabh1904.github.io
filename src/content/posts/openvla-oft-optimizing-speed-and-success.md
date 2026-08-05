@@ -17,9 +17,11 @@ summary: "2025 – Fine-Tuning Vision-Language-Action Models: Optimizing Speed a
 
 **Project:** [openvla-oft.github.io](https://openvla-oft.github.io/)
 
+## Summary
+
 OpenVLA-OFT shows that the fine-tuning interface can matter more than preserving a VLA's pretraining objective. It replaces autoregressive discrete action-token decoding with parallel continuous action chunks and trains them with a simple L1 regression loss.
 
-## Paper Insights
+## Core Insights
 
 ![OpenVLA-OFT comparison of autoregressive versus parallel decoding and discrete versus continuous action prediction](/assets/images/openvla-oft-optimizing-speed-and-success-paper-figure.png)
 _Figure 2 isolates the fine-tuning choices: OpenVLA-OFT replaces sequential discrete token generation with parallel action decoding and continuous regression or diffusion objectives. Source: [OpenVLA-OFT](https://arxiv.org/abs/2502.19645)._
@@ -34,14 +36,14 @@ The surprising result is that a simple L1 head can match diffusion fine-tuning i
 | Representation | Continuous actions | Avoids quantization error. |
 | Objective | L1 regression | Fast convergence and inference in the tested tasks. |
 
-## Decision Lens
+## High-Level Takeaways
 
 OpenVLA-OFT informs which parts of a pretrained VLA should be treated as reusable semantics and which should be replaced for deployment. Its unit is an observation paired with a continuous action chunk. The VLM backbone is shared; the action head abandons the language-token interface.
 
 The results establish a strong speed–success recipe on LIBERO and ALOHA, not universal superiority of L1 regression. A missing stress test varies multimodality, perturbation frequency, and chunk length at equal control rate. At ten times the behavioral ambiguity, L1 can average valid modes. The recipe would fail if a diffusion or flow head wins consistently once tasks require multiple precise strategies rather than one dominant trajectory.
 
-**Context:** OpenVLA-OFT is the practical SFT baseline that later RL post-training papers improve.
+OpenVLA-OFT is the practical SFT baseline that later RL post-training papers improve.
 
-**Limits:** Near-saturated LIBERO success leaves little room to measure robustness and recovery.
+Near-saturated LIBERO success leaves little room to measure robustness and recovery.
 
-**Takeaway:** Reuse the representation, not necessarily the pretraining decoder; control latency can justify a different action objective.
+Reuse the representation, not necessarily the pretraining decoder; control latency can justify a different action objective.

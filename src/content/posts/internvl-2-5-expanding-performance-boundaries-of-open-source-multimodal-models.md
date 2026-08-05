@@ -15,11 +15,15 @@ summary: "2024 – InternVL 2.5: Expanding Performance Boundaries of Open-Source
 
 **Project:** [InternVL 2.5](https://internvl.github.io/blog/2024-12-05-InternVL-2.5/)
 
-**Summary:** InternVL 2.5 is a scaling and training study for open multimodal LLMs. It keeps the broad InternVL architecture but improves data quality, training choices, augmentation, loss balancing, and test-time reasoning.
+### Method and reported result
+
+InternVL 2.5 is a scaling and training study for open multimodal LLMs. It keeps the broad InternVL architecture but improves data quality, training choices, augmentation, loss balancing, and test-time reasoning.
+
+## Summary
 
 The paper is useful because it studies several axes together: vision encoder size, language model size, dataset size, and chain-of-thought style inference. The story is not "just scale everything"; it is that scaling only pays off when the data and training recipe stay balanced.
 
-## Paper Insights
+## Core Insights
 
 InternVL 2.5 is an open MLLM scaling and training study. It keeps the InternVL architecture family but improves data quality, model scale, test-time settings, and coverage across images, documents, video, multilingual tasks, grounding, and hallucination benchmarks. The paper compares against strong open and commercial systems, arguing that open models can approach frontier performance when data and inference strategy improve together. The caveat is that broad benchmark averages can hide reliability gaps. The takeaway is that open multimodal progress depends on data, scale, and test-time configuration as a combined system.
 
@@ -31,7 +35,7 @@ _Figure 1: Performance of various MLLMs on the OpenCompass leaderboard. From the
 - Training details such as augmentation and loss balancing matter as much as model scale.
 - Test-time reasoning can improve difficult multimodal benchmarks but may change latency/cost.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -39,12 +43,12 @@ _Figure 1: Performance of various MLLMs on the OpenCompass leaderboard. From the
 | Training | Data quality and balancing | Reduces failures that pure scale does not fix. |
 | Evaluation | MMMU and hallucination-style tests | Looks beyond simple captioning/VQA. |
 
-## Decision Lens
+## High-Level Takeaways
 
 InternVL 2.5 informs how to scale an open multimodal system when model size, visual resolution, data balance, and test-time reasoning all consume the same budget. Its training unit remains an interleaved visual-token and text-token sequence, but the effective curriculum spans image, document, video, multilingual, grounding, and hallucination-oriented data. The paper's broad family from 1B to 78B is most useful as evidence that these levers interact rather than as proof that parameter count alone drives progress.
 
 The reported frontier comparisons establish strong coverage, not a clean causal scaling law. A more revealing study would hold training compute and test-time token budget fixed while independently sweeping model size, data quality, and inference strategy. At ten times the scale, duplicated supervision, evaluation leakage, and test-time latency are likelier bottlenecks than raw capacity. The paper's scaling narrative would fail if smaller models trained on the same curated distribution and given the same inference budget closed the gap on hallucination-resistant, out-of-distribution tests.
 
-**Context:** InternVL 2.5 showed that open models could compete with leading closed systems on difficult multimodal benchmarks while exposing more of the training recipe.
+InternVL 2.5 showed that open models could compete with leading closed systems on difficult multimodal benchmarks while exposing more of the training recipe.
 
-**Takeaway:** Open VLMs started becoming systems engineering projects: data mixture, encoder choice, LLM scale, and inference strategy all interact.
+Open VLMs started becoming systems engineering projects: data mixture, encoder choice, LLM scale, and inference strategy all interact.

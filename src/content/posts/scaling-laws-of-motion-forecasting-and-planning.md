@@ -15,11 +15,15 @@ summary: "2025 – Scaling Laws of Motion Forecasting and Planning"
 
 **Project:** [Waymo research page](https://waymo.com/research/scaling-laws-of-motion-forecasting-and-planning/)
 
-**Summary:** Waymo's scaling study asks whether motion forecasting and planning improve predictably like language models. It trains encoder-decoder autoregressive Transformers and measures how performance changes with compute, data, model size, and inference-time sampling.
+### Method and reported result
+
+Waymo's scaling study asks whether motion forecasting and planning improve predictably like language models. It trains encoder-decoder autoregressive Transformers and measures how performance changes with compute, data, model size, and inference-time sampling.
+
+## Summary
 
 The result is encouraging for foundation-model-style autonomy: training loss, open-loop metrics, and even closed-loop metrics improve with scale. The paper also makes the resource tradeoff explicit instead of treating model size as the only knob.
 
-## Paper Insights
+## Core Insights
 
 The problem is scaling strategy for joint motion forecasting and planning. The study uses a 500 thousand hour driving dataset and fits empirical scaling laws over total training compute. It also studies compute-optimal allocation between model parameters and training data, inference-time compute through sampling and clustering, and the value of training on logged behavior from other agents.
 
@@ -33,7 +37,7 @@ _Figure 2 is the core scaling-law evidence: training loss improves predictably a
 - Data/model allocation matters; bigger models are not the whole story.
 - Inference-time sampling creates a separate scaling axis.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -49,12 +53,12 @@ _Figure 2 is the core scaling-law evidence: training loss improves predictably a
 | Training examples | 541 million | Gives the scaling study enough examples to vary data budgets. |
 | Compute-optimal trend | Model size grows 1.5x as fast as dataset size | Bigger compute budgets should not be spent on data and parameters equally. |
 
-## Decision Lens
+## High-Level Takeaways
 
 This study informs how an autonomy program should split additional compute among model parameters, logged driving data, and inference-time trajectory sampling. Its atomic example is an autoregressive scene sequence drawn from fleet-scale logs; the reported curves connect training loss to open-loop and closed-loop forecasting/planning metrics.
 
 The evidence supports predictable improvement within the measured model, data, and sampling ranges, including a compute-optimal trend in which model size grows faster than dataset size. It does not prove that the same exponents survive a new architecture, geography, or safety distribution. A held-out large run with fixed evaluation and confidence intervals is the decisive test. The law would fail operationally if closed-loop ranking reversed even while training loss followed the fitted curve.
 
-**Context:** The paper moved motion forecasting and planning into the scaling-laws conversation with evidence that closed-loop behavior can improve predictably.
+The paper moved motion forecasting and planning into the scaling-laws conversation with evidence that closed-loop behavior can improve predictably.
 
-**Takeaway:** For motion and planning models, scaling is a three-way budget problem: training compute, data/model allocation, and inference-time sampling all matter.
+For motion and planning models, scaling is a three-way budget problem: training compute, data/model allocation, and inference-time sampling all matter.

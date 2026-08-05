@@ -22,11 +22,13 @@ summary: '2026 – DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence 
 **Original release:** [DeepSeek V4 Preview](https://api-docs.deepseek.com/news/news260424/)<br />
 **Preview weights:** [deepseek-ai/DeepSeek-V4-Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash)
 
+## Summary
+
 DeepSeek-V4-Flash-0731 is a post-training release, not a new base model. It keeps the April preview's architecture and size—284 billion total parameters, 13 billion active per token, and a one-million-token context window—while replacing the API checkpoint with a model tuned for stronger agent behavior and native Responses API use. DeepSeek says only the API changed; the web/app models and V4-Pro endpoint did not, and updated Flash weights were not announced with the July release.
 
-That boundary matters because two sources support different claims. The V4 technical report explains the pretrained architecture, 32-trillion-token training run, long-context efficiency, and original specialist-to-distillation pipeline. The July 31 changelog reports new agent scores and says the checkpoint was “only re-post-trained,” but does not disclose the new data, reward design, rollout budget, teacher models, ablations, or before/after scores under the same harness.
+## Core Insights
 
-## Paper Insights
+That boundary matters because two sources support different claims. The V4 technical report explains the pretrained architecture, 32-trillion-token training run, long-context efficiency, and original specialist-to-distillation pipeline. The July 31 changelog reports new agent scores and says the checkpoint was “only re-post-trained,” but does not disclose the new data, reward design, rollout budget, teacher models, ablations, or before/after scores under the same harness.
 
 ![DeepSeek V4 architecture with hybrid compressed attention, DeepSeekMoE, manifold-constrained hyper-connections, and multi-token prediction](/assets/images/deepseek-v4-architecture-paper-figure.png)
 _DeepSeek V4 retains a Transformer/MoE backbone but replaces ordinary attention with interleaved Compressed Sparse Attention and Heavily Compressed Attention, and replaces a single residual stream with manifold-constrained mixing paths. Cropped from Figure 2 of the [DeepSeek V4 report](https://arxiv.org/abs/2606.19348)._
@@ -50,7 +52,7 @@ The original post-training recipe trains domain specialists with SFT and GRPO, t
 
 The official July evaluation reports 82.7 on Terminal-Bench 2.1, 54.2 on NL2Repo, 76.7 on CyberGym, 54.4 on DeepSWE, 70.3 on Toolathlon Verified, 25.2 on Agents' Last Exam, and 25.1 on the public AutomationBench. Code-agent tests use an unreleased “DeepSeek Harness minimal mode,” maximum effort, temperature 1.0, and top-p 0.95; two additional DSBench results are internal. The numbers establish the API checkpoint's measured level, not the causal gain from re-post-training: the changelog supplies no same-version preview baseline, and benchmark or harness versions differ from several April report tables.
 
-## Decision Lens
+## High-Level Takeaways
 
 DeepSeek-V4-Flash informs whether long context should be made affordable by compressing the memory hierarchy before spending more active parameters. Its atomic unit remains the token, but CSA groups tokens, selects a query-dependent subset of compressed entries, and restores a local window; HCA keeps a much coarser global trace. That design makes retrieval quality—not nominal context length—the central risk. A one-million-token window is useful only if compression and selection retain the evidence an agent needs late in a trajectory.
 
@@ -58,8 +60,8 @@ The expensive commitment is to a custom serving stack for hybrid attention, spar
 
 For the 0731 checkpoint, the missing control is even simpler: evaluate the preview and updated API models with the same public harness, effort budget, samples, and judge. Without that table, the size of the post-training gain is not reported. At ten times the context or trajectory length, selector recall, accumulated compressed-state error, sandbox persistence, and cache bandwidth are likely to dominate before nominal MoE capacity does.
 
-**Context:** DeepSeek-V4-Flash is the smaller V4 branch: it shares the V4 hybrid-attention and post-training stack, but activates 13B parameters rather than V4-Pro's 49B.
+DeepSeek-V4-Flash is the smaller V4 branch: it shares the V4 hybrid-attention and post-training stack, but activates 13B parameters rather than V4-Pro's 49B.
 
-**Limits:** The July checkpoint is API-only, its post-training recipe and updated weights are not reported, its code-agent harness is not yet released, two headline benchmarks are internal, and the release provides no matched preview-versus-0731 table.
+The July checkpoint is API-only, its post-training recipe and updated weights are not reported, its code-agent harness is not yet released, two headline benchmarks are internal, and the release provides no matched preview-versus-0731 table.
 
-**Takeaway:** DeepSeek-V4-Flash-0731 is evidence that post-training can move agent performance without changing a 32T-token base; until the harness and matched before/after results are released, use it as a deployment update rather than proof of a new training method.
+DeepSeek-V4-Flash-0731 is evidence that post-training can move agent performance without changing a 32T-token base; until the harness and matched before/after results are released, use it as a deployment update rather than proof of a new training method.

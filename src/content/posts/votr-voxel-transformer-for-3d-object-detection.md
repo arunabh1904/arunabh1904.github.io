@@ -13,11 +13,15 @@ summary: '2021 – VoTr: Voxel Transformer for 3D Object Detection'
 
 **arXiv:** [2109.02497](https://arxiv.org/abs/2109.02497)
 
-**Summary:** VoTr replaces a sparse-convolutional LiDAR backbone with attention over occupied voxels. Local attention supplies dense nearby context; dilated attention samples a much larger spatial region; and Fast Voxel Query retrieves those neighbors without scanning the full voxel grid.
+### Method and reported result
+
+VoTr replaces a sparse-convolutional LiDAR backbone with attention over occupied voxels. Local attention supplies dense nearby context; dilated attention samples a much larger spatial region; and Fast Voxel Query retrieves those neighbors without scanning the full voxel grid.
+
+## Summary
 
 The paper's useful question is narrower than “should LiDAR use transformers?” It asks when content-dependent long-range retrieval is worth the indexing and latency that convolution avoids.
 
-## Paper Insights
+## Core Insights
 
 VoTr has sparse voxel modules that may create features at new active positions and submanifold modules that update only existing positions. Each query attends to a fixed-size set of local or dilated occupied voxels. The fixed budget keeps attention bounded even when the scene contains tens of thousands of active voxels.
 
@@ -32,12 +36,12 @@ Replacing SECOND's convolutional backbone with VoTr improves Waymo Level-1 vehic
 
 These rows use the paper's KITTI validation setup and are not an accelerator-independent ranking. The important result is that long-range context helps sparse, distant objects, while the attention implementation is slower than the convolutional backbone it replaces.
 
-## Decision Lens
+## High-Level Takeaways
 
 VoTr informs whether to buy LiDAR receptive field through deeper sparse convolution or explicit voxel attention. Its atomic unit is an occupied voxel, but capacity is allocated through a bounded neighbor list. Local and dilated attention share weights across voxels; the coordinate query policy determines which evidence each token can reach.
 
 The decisive control matches receptive field, parameter count, active voxels, and deployed-kernel quality. VoTr should be rejected if large-kernel or multi-stage sparse convolution matches far-range recall at lower P99 latency. At 10× active voxels, neighbor lookup and irregular gathers are more likely to fail first than the attention matrix itself.
 
-**Context:** SECOND established sparse convolution for voxel detection. VoTr introduced sparse voxel attention; SST and DSVT later use windowed or rotated-set designs that are easier to batch and deploy.
+SECOND established sparse convolution for voxel detection. VoTr introduced sparse voxel attention; SST and DSVT later use windowed or rotated-set designs that are easier to batch and deploy.
 
-**Takeaway:** Sparse attention earns its cost when distant, incomplete objects need context that a local voxel kernel cannot reach cheaply.
+Sparse attention earns its cost when distant, incomplete objects need context that a local voxel kernel cannot reach cheaply.

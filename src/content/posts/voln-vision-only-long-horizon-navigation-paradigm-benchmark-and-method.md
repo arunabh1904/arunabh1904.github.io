@@ -21,11 +21,13 @@ summary: '2026 – VoLN: Vision-Only Long-Horizon Navigation—Paradigm, Benchma
 **arXiv:** [2607.21400](https://arxiv.org/abs/2607.21400)  
 **Project:** [VoLN-UAV](https://admire-ljb.github.io/VoLN-UAV/)
 
+## Summary
+
 Vision-and-language navigation instructions often reveal the route: “turn left,” “continue past the building,” and distance phrases provide spatial structure that an onboard agent would not receive in a GPS-denied deployment. VoLN changes the task interface. The agent gets goal images, egocentric RGB, and proprioception; it must discover route-relevant cues locally while flying, decide which cues matter, and stop inside the goal region.
 
-VoLN-UAV makes this concrete with 7,210 simulated episodes across 17 AirSim environments. The reference VoLN-MLLM policy leads the tested baselines, but absolute success on held-out environments is only 7.4% for Easy routes, 4.5% for Normal, and 1.8% for Hard. The benchmark is therefore more valuable as a diagnosis of long-horizon grounding failure than as evidence that the proposed policy solves it.
+## Core Insights
 
-## Paper Insights
+VoLN-UAV makes this concrete with 7,210 simulated episodes across 17 AirSim environments. The reference VoLN-MLLM policy leads the tested baselines, but absolute success on held-out environments is only 7.4% for Easy routes, 4.5% for Normal, and 1.8% for Hard. The benchmark is therefore more valuable as a diagnosis of long-horizon grounding failure than as evidence that the proposed policy solves it.
 
 ![VoLN two-phase method aligning visual goals with semantics before predicting short-horizon waypoints and stopping decisions](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-paper-figure.png)
 _Figure 5 separates representation learning from control: phase I aligns visual goal views without exposing route language, then phase II predicts closed-loop waypoint chunks and when to stop. Source: [VoLN](https://arxiv.org/abs/2607.21400)._
@@ -46,7 +48,7 @@ The aggregate ablation combines difficulty levels. Full VoLN-MLLM reaches 5.7% s
 
 The split is scene-source aware: 5,047 training episodes come from 12 environments, while Test-Unseen contains 1,081 episodes from five environments drawn from a held-out source. Fifty-two percent of all episodes are Easy, 36% Normal, and only 12% Hard. A controlled indoor UAV demonstration shows one representative successful rollout, but supplies qualitative interface validation rather than a physical success rate.
 
-## Decision Lens
+## High-Level Takeaways
 
 VoLN informs what a navigation benchmark should reveal through its task interface. If route language encodes turns and layout unavailable onboard, benchmark success entangles navigation with privileged route parsing. Goal views plus local cues create a stricter alternative: perception, evidence accumulation, viewpoint matching, control, and stopping must all work without a task-level route script.
 
@@ -54,8 +56,8 @@ The benchmark still engineers navigation structure into the environment. Active 
 
 At ten times the route length, memory and error recovery are likely to dominate the 7B planner. The current model uses a fixed recent-observation window and replans slowly at 1.42 seconds per cycle. The next benchmark revision should expose standardized memory budgets, recovery after missed cues, semantic-bank ablations, repeated physical trials, and success by route length rather than only three coarse strata.
 
-**Context:** VoLN removes route-level language and global position from long-horizon navigation, replacing them with goal views and locally observable cues.
+VoLN removes route-level language and global position from long-horizon navigation, replacing them with goal views and locally observable cues.
 
-**Limits:** Most evidence comes from simulated UAV routes with deliberately placed beacons. Absolute unseen-scene success is below 8%, Hard routes are only 12% of the data, and the physical demonstration is a single qualitative rollout.
+Most evidence comes from simulated UAV routes with deliberately placed beacons. Absolute unseen-scene success is below 8%, Hard routes are only 12% of the data, and the physical demonstration is a single qualitative rollout.
 
-**Takeaway:** Audit what the instruction gives away; a vision-only task interface is useful precisely because today’s agents largely fail when route structure must be inferred online.
+Audit what the instruction gives away; a vision-only task interface is useful precisely because today’s agents largely fail when route structure must be inferred online.

@@ -13,11 +13,15 @@ summary: "2025 – DexVLA: Vision-Language Model with Plug-In Diffusion Expert f
 
 **arXiv:** [2502.05855](https://arxiv.org/abs/2502.05855)
 
-**Summary:** DexVLA separates high-level reasoning from low-level control. A VLM-style module processes images and instructions, producing reasoning and action tokens. A diffusion policy expert then turns that guidance into continuous robot actions.
+### Method and reported result
+
+DexVLA separates high-level reasoning from low-level control. A VLM-style module processes images and instructions, producing reasoning and action tokens. A diffusion policy expert then turns that guidance into continuous robot actions.
+
+## Summary
 
 This hybrid design is useful for dexterous, long-horizon tasks where pure language-model action generation may be too coarse and pure diffusion may lack semantic planning.
 
-## Paper Insights
+## Core Insights
 
 DexVLA argues that action modeling is a bottleneck for vision-language-action systems. It adds a large diffusion-based action expert to a VLM so the system can model continuous, multi-step robot behavior rather than only discrete tokens. The training recipe uses cross-embodiment pretraining and curriculum learning before adapting to dexterous, long-horizon tasks. The evidence focuses on diverse manipulation skills across robot embodiments. The main caveat is cost: a billion-parameter action expert can represent smoother control, but it is expensive to train and must still be validated under real robot distribution shift.
 
@@ -29,7 +33,7 @@ _Figure 1: DexVLA architecture and embodied curriculum learning. From the [DexVL
 - A diffusion policy expert generates continuous low-level actions.
 - The curriculum separates general motor skill, embodiment adaptation, and task tuning.
 
-**Evals / Benchmarks / Artifacts:**
+### Reported evidence
 
 | Signal | Detail | Why it matters |
 | ------ | ------ | -------------- |
@@ -37,12 +41,12 @@ _Figure 1: DexVLA architecture and embodied curriculum learning. From the [DexVL
 | Training | Three-stage embodied curriculum | Moves from general motor skills to task specialization. |
 | Best fit | Dexterous long-horizon tasks | Where pure VLM action output is too coarse. |
 
-## Decision Lens
+## High-Level Takeaways
 
 DexVLA informs whether dexterous, long-horizon control should be forced through a VLM's discrete token head or delegated to a continuous action specialist. The VLM supplies semantic state and high-level guidance, while a billion-parameter diffusion expert generates multi-step action trajectories. A staged cross-embodiment curriculum moves from broad motor priors to embodiment adaptation and then task-specific dexterity.
 
 The results support specialization for precise control, but the architecture adds enough capacity and training complexity that its causal advantage over data and compute is unclear. The missing comparison is a parameter-, latency-, and demonstration-matched action head without diffusion, plus transfer tests where the VLM is frozen. At ten times the task and embodiment count, contradictory control conventions and diffusion sampling latency may dominate. The plug-in-expert claim would fail if a smaller shared action decoder matches closed-loop success and adapts with fewer demonstrations.
 
-**Context:** DexVLA shows how robotics can borrow from both sides of modern AI: language models for task structure and diffusion models for continuous trajectory generation.
+DexVLA shows how robotics can borrow from both sides of modern AI: language models for task structure and diffusion models for continuous trajectory generation.
 
-**Takeaway:** The strongest robot policies may be coordinated systems, not monoliths. Let the VLM plan; let the control expert execute.
+The strongest robot policies may be coordinated systems, not monoliths. Let the VLM plan; let the control expert execute.

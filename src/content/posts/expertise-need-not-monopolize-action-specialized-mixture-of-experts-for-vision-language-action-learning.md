@@ -20,11 +20,13 @@ summary: '2025 – Expertise Need Not Monopolize: Action-Specialized Mixture of 
 
 **arXiv:** [2510.14300](https://arxiv.org/abs/2510.14300)
 
+## Summary
+
 AdaMoE asks how to expand a VLA’s action capacity without activating a proportionally larger dense model at every control step. It starts from a pretrained flow-matching VLA, preserves its weights, and replaces feed-forward layers inside the action expert with sparse mixture-of-experts layers. Shared experts always run; a router selects a small subset of additional experts for each action token.
 
-The paper’s main architectural claim is narrower than “MoE helps.” A conventional router uses the same logits both to select experts and to weight their outputs, while a load-balancing loss pushes those logits toward uniform utilization. AdaMoE adds a second scale adapter: the router decides which experts participate, and the adapter independently adjusts how much the selected experts contribute. This separates capacity allocation from task-dependent weighting.
+## Core Insights
 
-## Paper Insights
+The paper’s main architectural claim is narrower than “MoE helps.” A conventional router uses the same logits both to select experts and to weight their outputs, while a load-balancing loss pushes those logits toward uniform utilization. AdaMoE adds a second scale adapter: the router decides which experts participate, and the adapter independently adjusts how much the selected experts contribute. This separates capacity allocation from task-dependent weighting.
 
 ![AdaMoE architecture separating expert selection from contribution scaling while retaining shared and routed experts](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-paper-figure.png)
 _Figure 1 identifies AdaMoE's change to a vanilla router: shared experts preserve the inherited FFN path, routed experts add capacity, and an independent scale adapter controls how much selected action experts contribute. Source: [AdaMoE](https://arxiv.org/abs/2510.14300)._
@@ -46,7 +48,7 @@ The real-robot improvement spans all four reported tasks: Stack Plate rises from
 
 The ablations complicate the specialization story. A vanilla MoE whose router collapses onto one expert still reaches 94.9% on LIBERO, above the 94.2% dense model and the 94.4% load-balanced vanilla MoE. The authors interpret this as adaptive output scaling from the router itself. Four experts outperform eight by 0.4 points, and the best load-balance coefficient reaches 96.0% while weaker or stronger regularization yields 94.5% and 95.1%. Sparse capacity helps, but routing dynamics are sensitive and not synonymous with interpretable skill decomposition.
 
-## Decision Lens
+## High-Level Takeaways
 
 AdaMoE informs whether to scale the action module through more active dense compute or through conditional capacity inherited from an existing VLA. It is attractive when control latency constrains active parameters and a costly pretrained policy must be retained. The shared-expert path protects common behavior, while separate selection and weighting give the routed capacity more freedom than a standard load-balanced gate.
 
@@ -54,8 +56,8 @@ The decisive missing control is a parameter- and compute-matched dense action ex
 
 At ten times the task diversity, the bottleneck is likely router optimization rather than nominal parameter count. Load balance is already sensitive on four LIBERO suites, and top-$k$ sparse kernels can add dispatch overhead even when FLOPs stay flat. The next test should report active and total capacity, tokens per expert, wall-clock latency, multi-seed variance, and transfer to unseen tasks while holding the pretrained backbone and training budget fixed.
 
-**Context:** AdaMoE scales a flow-matching VLA’s action expert with inherited sparse capacity and separates expert selection from expert weighting.
+AdaMoE scales a flow-matching VLA’s action expert with inherited sparse capacity and separates expert selection from expert weighting.
 
-**Limits:** Gains are evaluated on LIBERO, 19 RoboTwin tasks, and four tabletop real-robot tasks. Compute and latency accounting, multi-seed uncertainty, and a parameter-matched dense control are not reported.
+Gains are evaluated on LIBERO, 19 RoboTwin tasks, and four tabletop real-robot tasks. Compute and latency accounting, multi-seed uncertainty, and a parameter-matched dense control are not reported.
 
-**Takeaway:** Sparse action capacity is promising, but the useful mechanism may be adaptive routing and scaling as much as cleanly separated manipulation experts.
+Sparse action capacity is promising, but the useful mechanism may be adaptive routing and scaling as much as cleanly separated manipulation experts.
