@@ -47,14 +47,9 @@ Stability depends on slowing the teacher. With current-policy teacher scores, en
 
 ## High-Level Takeaways
 
-MIRROR informs whether paired multimodal examples should enter RL as independent prompts or as linked views of one latent task. Its atomic unit is a student-generated reasoning token, but the supervision unit is the problem-view pair: the policy chooses which view currently carries the strongest evidence and transfers that distribution toward weaker views. For datasets with verified equivalent representations, the reported results favor explicit directional transfer.
-
-The cost is larger than the 2,000-example headline suggests. The reported jobs use 64 H200 GPUs, approximately 20 minutes per training step, and at least 200 steps—about 4,267 H200 GPU-hours per model. MIRROR uses about 37.5% more FLOPs per update than mixed-modality GRPO, although a matched-cumulative-compute comparison still favors it. At 10× domain breadth, teacher selection rollouts and trustworthy view construction become the likely bottlenecks.
-
-The missing control is domain transfer without synthetic view filtering. A matched-compute study should construct paired views for charts, scientific figures, and spatial instructions; compare adaptive teachers with uncertainty-weighted soft teachers; and hold the number of student rollouts fixed. The claim should be rejected if gains disappear on naturally occurring paired views or if a cheaper consistency loss matches accuracy without the extra teacher rollouts.
-
-MIRROR combines on-policy distillation with multimodal consistency, treating disagreement across equivalent views as a training signal rather than only an evaluation failure.
-
-ODA-Data is geometry-only, synthetically diagrammed, judged by another model, and filtered specifically for view-dependent failures. MathVerse uses an external model judge, and the paper does not establish that the approach transfers to noisy or non-equivalent views.
-
-Paired modalities become useful supervision when training specifies who teaches whom; a mixed RL batch alone does not reliably transfer reasoning across views.
+- MIRROR informs whether paired multimodal examples should enter RL as independent prompts or as linked views of one latent task. Its atomic unit is a student-generated reasoning token, but the supervision unit is the problem-view pair: the policy chooses which view currently carries the strongest evidence and transfers that distribution toward weaker views. For datasets with verified equivalent representations, the reported results favor explicit directional transfer.
+- The cost is larger than the 2,000-example headline suggests. The reported jobs use 64 H200 GPUs, approximately 20 minutes per training step, and at least 200 steps—about 4,267 H200 GPU-hours per model. MIRROR uses about 37.5% more FLOPs per update than mixed-modality GRPO, although a matched-cumulative-compute comparison still favors it. At 10× domain breadth, teacher selection rollouts and trustworthy view construction become the likely bottlenecks.
+- The missing control is domain transfer without synthetic view filtering. A matched-compute study should construct paired views for charts, scientific figures, and spatial instructions; compare adaptive teachers with uncertainty-weighted soft teachers; and hold the number of student rollouts fixed. The claim should be rejected if gains disappear on naturally occurring paired views or if a cheaper consistency loss matches accuracy without the extra teacher rollouts.
+- MIRROR combines on-policy distillation with multimodal consistency, treating disagreement across equivalent views as a training signal rather than only an evaluation failure.
+- ODA-Data is geometry-only, synthetically diagrammed, judged by another model, and filtered specifically for view-dependent failures. MathVerse uses an external model judge, and the paper does not establish that the approach transfers to noisy or non-equivalent views.
+- Paired modalities become useful supervision when training specifies who teaches whom; a mixed RL batch alone does not reliably transfer reasoning across views.

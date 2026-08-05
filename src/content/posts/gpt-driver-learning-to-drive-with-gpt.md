@@ -45,10 +45,7 @@ _Figure 1: Overview of GPT-Driver. From the [GPT-Driver: Learning to Drive with 
 
 ## High-Level Takeaways
 
-GPT-Driver informs whether motion planning can be reframed as conditional language modeling over structured scene tokens and waypoint outputs. The atomic prediction is a discretized coordinate or waypoint token, with textual scene context and chain-of-thought-style supervision preceding the trajectory.
-
-The formulation gains access to pretrained sequence modeling, but coordinate serialization, numerical precision, and rationale faithfulness become hidden design choices. The missing test matches data and backbone across tokenized waypoints, continuous regression, and a non-language autoregressive decoder. At 10× horizon, exposure error and token latency accumulate. The language-modeling claim would fail if the continuous decoder matched planning diversity and safety while using fewer steps and showing better metric precision.
-
-GPT-Driver uses language as an intermediate planning representation rather than an explanation added after the decision.
-
-LLMs can help expose the reasoning behind a plan, but driving needs that reasoning to stay grounded, fast, and controllable.
+- GPT-Driver informs whether motion planning can be reframed as conditional language modeling over structured scene tokens and waypoint outputs. The atomic prediction is a discretized coordinate or waypoint token, with textual scene context and chain-of-thought-style supervision preceding the trajectory.
+- The formulation gains access to pretrained sequence modeling, but coordinate serialization, numerical precision, and rationale faithfulness become hidden design choices. The missing test matches data and backbone across tokenized waypoints, continuous regression, and a non-language autoregressive decoder. At 10× horizon, exposure error and token latency accumulate. The language-modeling claim would fail if the continuous decoder matched planning diversity and safety while using fewer steps and showing better metric precision.
+- GPT-Driver uses language as an intermediate planning representation rather than an explanation added after the decision.
+- LLMs can help expose the reasoning behind a plan, but driving needs that reasoning to stay grounded, fast, and controllable.

@@ -33,10 +33,7 @@ Each point is augmented with offsets from the pillar mean and pillar center befo
 
 ## High-Level Takeaways
 
-PointPillars is appropriate when road-plane structure dominates and latency matters more than retaining a full 3D latent. For multi-sensor fusion, the pseudo-image offers a convenient BEV interface, but camera fusion cannot recover height information that was already compressed.
-
-The relevant benchmark is not only detector throughput. Measure active-pillar saturation, distant small-object recall, vertical classes, memory transfer, and P99 latency under dense traffic and accumulated sweeps.
-
-VoxelNet learns features in 3D voxels; PointPillars makes an aggressive height-for-speed exchange that later BEV fusion systems often inherit.
-
-Pillars are fast because they decide early that most downstream reasoning can live in BEV; that assumption should be task-tested rather than treated as free compression.
+- PointPillars is appropriate when road-plane structure dominates and latency matters more than retaining a full 3D latent. For multi-sensor fusion, the pseudo-image offers a convenient BEV interface, but camera fusion cannot recover height information that was already compressed.
+- The relevant benchmark is not only detector throughput. Measure active-pillar saturation, distant small-object recall, vertical classes, memory transfer, and P99 latency under dense traffic and accumulated sweeps.
+- VoxelNet learns features in 3D voxels; PointPillars makes an aggressive height-for-speed exchange that later BEV fusion systems often inherit.
+- Pillars are fast because they decide early that most downstream reasoning can live in BEV; that assumption should be task-tested rather than treated as free compression.

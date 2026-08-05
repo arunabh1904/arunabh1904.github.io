@@ -41,10 +41,7 @@ _The red supervision arrow exists only during training; the deployed path runs f
 
 ## High-Level Takeaways
 
-BEVDepth informs whether a camera-only production model should spend data-collection budget on LiDAR-equipped teacher vehicles. Its atomic unit is a pixel-by-depth-bin feature. The camera backbone and depth head are shared across views, while calibration conditions the prediction; the depth loss is auxiliary at training but structurally changes the runtime BEV.
-
-The missing control compares sparse LiDAR supervision, dense offline reconstruction, stereo/video self-supervision, and no depth target under equal camera data and training compute. At 10× fleet data, target generation, calibration quality, and long-range label sparsity become the bottleneck rather than model capacity. The privileged-LiDAR recipe would fail if video-only geometry or future-point-cloud pretraining matches range-bucketed detection, calibration, and uncertainty without a LiDAR collection fleet.
-
-LSS made depth a latent distribution; BEVDepth showed that explicitly supervising that latent can materially improve the camera-only detector.
-
-A runtime sensor budget and a training supervision budget are different design variables.
+- BEVDepth informs whether a camera-only production model should spend data-collection budget on LiDAR-equipped teacher vehicles. Its atomic unit is a pixel-by-depth-bin feature. The camera backbone and depth head are shared across views, while calibration conditions the prediction; the depth loss is auxiliary at training but structurally changes the runtime BEV.
+- The missing control compares sparse LiDAR supervision, dense offline reconstruction, stereo/video self-supervision, and no depth target under equal camera data and training compute. At 10× fleet data, target generation, calibration quality, and long-range label sparsity become the bottleneck rather than model capacity. The privileged-LiDAR recipe would fail if video-only geometry or future-point-cloud pretraining matches range-bucketed detection, calibration, and uncertainty without a LiDAR collection fleet.
+- LSS made depth a latent distribution; BEVDepth showed that explicitly supervising that latent can materially improve the camera-only detector.
+- A runtime sensor budget and a training supervision budget are different design variables.

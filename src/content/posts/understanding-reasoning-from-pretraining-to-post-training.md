@@ -59,14 +59,9 @@ The math case study uses a fixed 1B OLMo-2 architecture, checkpoints from 10B to
 
 ## High-Level Takeaways
 
-This paper informs whether a fixed reasoning-training budget should buy a stronger pretrained prior or more RL. The result rejects a one-number answer. Pretraining loss predicts the level from which RL can operate, data exposure predicts the observed rate of improvement, and the estimated optimal RL fraction rises with total compute inside the studied regime.
-
-The expensive next decision should therefore be made with a small joint sweep, not a pretraining-only scaling curve. Train several checkpoints that vary tokens and model size independently, run matched RL budgets on a non-saturating target benchmark, and fit the interaction before committing the full run. The paper’s conclusion would weaken if independently seeded language-model checkpoints with matched loss but different token histories showed the same RL slope, or if the relationship vanished under leave-one-model-family-out prediction.
-
-At 10× scale, the principal bottlenecks are experimental coverage and reward diversity. A single pass@1 curve can hide saturation, reward hacking, and wrong-mode reinforcement. Compute allocation should be evaluated against pass@$k$, calibration, held-out task families, and failure severity—not only the metric optimized by RL.
-
-The work joins two previously separate scaling questions: what pretraining buys and how quickly a pretrained policy converts verifiable experience into downstream performance.
-
-Chess supplies exact actions and cheap verifiers but is far smaller and more structured than natural-language reasoning. The law is local to the measured compute range, the frontier is model-based extrapolation, and the math extension follows one 1B pretraining trajectory.
-
-Pretraining determines more than an RL starting point: its loss predicts the attainable local level, while its data exposure predicts how quickly RL improves—but only inside a measured, non-saturated regime.
+- This paper informs whether a fixed reasoning-training budget should buy a stronger pretrained prior or more RL. The result rejects a one-number answer. Pretraining loss predicts the level from which RL can operate, data exposure predicts the observed rate of improvement, and the estimated optimal RL fraction rises with total compute inside the studied regime.
+- The expensive next decision should therefore be made with a small joint sweep, not a pretraining-only scaling curve. Train several checkpoints that vary tokens and model size independently, run matched RL budgets on a non-saturating target benchmark, and fit the interaction before committing the full run. The paper’s conclusion would weaken if independently seeded language-model checkpoints with matched loss but different token histories showed the same RL slope, or if the relationship vanished under leave-one-model-family-out prediction.
+- At 10× scale, the principal bottlenecks are experimental coverage and reward diversity. A single pass@1 curve can hide saturation, reward hacking, and wrong-mode reinforcement. Compute allocation should be evaluated against pass@$k$, calibration, held-out task families, and failure severity—not only the metric optimized by RL.
+- The work joins two previously separate scaling questions: what pretraining buys and how quickly a pretrained policy converts verifiable experience into downstream performance.
+- Chess supplies exact actions and cheap verifiers but is far smaller and more structured than natural-language reasoning. The law is local to the measured compute range, the frontier is model-based extrapolation, and the math extension follows one 1B pretraining trajectory.
+- Pretraining determines more than an RL starting point: its loss predicts the attainable local level, while its data exposure predicts how quickly RL improves—but only inside a measured, non-saturated regime.

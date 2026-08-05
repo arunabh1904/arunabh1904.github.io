@@ -33,10 +33,7 @@ The learned uncertainty is global for each task, not input-dependent. On the pap
 
 ## High-Level Takeaways
 
-Use homoscedastic weighting after each task loss is internally normalized and monitored. Inspect both weights and shared-layer gradients: a well-scaled loss can still point against another task. Safety-critical tasks may also need explicit minimum influence rather than unconstrained likelihood optimization.
-
-The relevant ablation compares equal normalized weights, tuned constants, learned uncertainty, and separated heads under matched compute.
-
-GradNorm controls relative training rates through gradient magnitude; PCGrad modifies direction when gradients conflict.
-
-Learned uncertainty is a principled unit converter for multi-task losses, not a complete solution to task conflict or changing sensor reliability.
+- Use homoscedastic weighting after each task loss is internally normalized and monitored. Inspect both weights and shared-layer gradients: a well-scaled loss can still point against another task. Safety-critical tasks may also need explicit minimum influence rather than unconstrained likelihood optimization.
+- The relevant ablation compares equal normalized weights, tuned constants, learned uncertainty, and separated heads under matched compute.
+- GradNorm controls relative training rates through gradient magnitude; PCGrad modifies direction when gradients conflict.
+- Learned uncertainty is a principled unit converter for multi-task losses, not a complete solution to task conflict or changing sensor reliability.

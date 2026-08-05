@@ -41,10 +41,7 @@ _The radar path preserves measurement-specific structure before meeting camera f
 
 ## High-Level Takeaways
 
-RCBEVDet informs whether a unified camera-radar model should reuse a generic point-cloud encoder or pay for radar-specific structure. Its atomic unit is a radar return enriched by pointwise and contextual processing. Camera and radar backbones stay separate; sharing begins after both enter BEV.
-
-The missing experiment compares radar-specific and LiDAR-derived encoders under adverse weather, matched latency, and calibrated uncertainty, with range- and velocity-bucketed metrics. At 10× temporal accumulation, ghost returns and association cost can dominate unless the model tracks measurement age and ego motion. The radar-specific path would fail if a simpler pillar encoder plus temporal fusion matches long-range velocity and corruption performance within the same compute budget.
-
-CRN establishes radar-guided camera lifting and real-time camera-radar BEV; RCBEVDet sharpens the radar encoder and alignment path. Later 4D-radar work moves more geometry into the radar stream.
-
-Sensor unification should standardize the interface to radar without discarding the attributes and error modes that make radar valuable.
+- RCBEVDet informs whether a unified camera-radar model should reuse a generic point-cloud encoder or pay for radar-specific structure. Its atomic unit is a radar return enriched by pointwise and contextual processing. Camera and radar backbones stay separate; sharing begins after both enter BEV.
+- The missing experiment compares radar-specific and LiDAR-derived encoders under adverse weather, matched latency, and calibrated uncertainty, with range- and velocity-bucketed metrics. At 10× temporal accumulation, ghost returns and association cost can dominate unless the model tracks measurement age and ego motion. The radar-specific path would fail if a simpler pillar encoder plus temporal fusion matches long-range velocity and corruption performance within the same compute budget.
+- CRN establishes radar-guided camera lifting and real-time camera-radar BEV; RCBEVDet sharpens the radar encoder and alignment path. Later 4D-radar work moves more geometry into the radar stream.
+- Sensor unification should standardize the interface to radar without discarding the attributes and error modes that make radar valuable.

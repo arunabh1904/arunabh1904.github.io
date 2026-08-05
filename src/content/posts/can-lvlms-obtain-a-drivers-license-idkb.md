@@ -43,10 +43,7 @@ _Figure 1: Performance of 15 representative Large Vision-Language Models on IDKB
 
 ## High-Level Takeaways
 
-IDKB informs whether a driving LVLM needs explicit traffic-rule knowledge in addition to visual scene description. Its atomic item is a rule-grounded image-question pair that tests recognition, regulation recall, and application of the rule to a scene.
-
-The benchmark distinguishes legal knowledge from generic visual fluency, but written-test competence is not closed-loop driving competence. The missing comparison controls for text-only rule memorization by using counterfactual scenes and jurisdiction changes. At 10× rule coverage, contradictory local regulations and rare signage make annotation and retrieval the bottlenecks. The licensing analogy would fail if high IDKB scores did not predict correct decisions on unseen rule-scene combinations.
-
-Driving competence is not only perception. It is perception plus rule knowledge plus judgment under context.
-
-Autonomous driving VLMs need a written test as well as a road test.
+- IDKB informs whether a driving LVLM needs explicit traffic-rule knowledge in addition to visual scene description. Its atomic item is a rule-grounded image-question pair that tests recognition, regulation recall, and application of the rule to a scene.
+- The benchmark distinguishes legal knowledge from generic visual fluency, but written-test competence is not closed-loop driving competence. The missing comparison controls for text-only rule memorization by using counterfactual scenes and jurisdiction changes. At 10× rule coverage, contradictory local regulations and rare signage make annotation and retrieval the bottlenecks. The licensing analogy would fail if high IDKB scores did not predict correct decisions on unseen rule-scene combinations.
+- Driving competence is not only perception. It is perception plus rule knowledge plus judgment under context.
+- Autonomous driving VLMs need a written test as well as a road test.

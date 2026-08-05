@@ -46,10 +46,7 @@ _Figure 2 shows the core hierarchy: vectors become polyline features, polyline f
 
 ## High-Level Takeaways
 
-VectorNet informs whether HD maps and trajectories should be rasterized or preserved as polylines with explicit geometric identity. The atomic unit is a point feature grouped into a polyline; local aggregation creates polyline embeddings and a global graph models interactions among agents and map elements.
-
-Vectorization preserves topology and avoids empty pixels, but preprocessing choices determine segment length, coordinate frame, and missing-map behavior. The missing ablation matches encoder capacity and latency against raster and raw-point attention across map quality levels. At 10× map extent, global polyline attention and retrieval dominate. The claim would fail if a compact raster encoder matched forecasting accuracy and cross-city generalization without vector-specific preprocessing.
-
-VectorNet made vectorized map and agent encoding feel like a primary representation, not a preprocessing trick.
-
-If the world is already made of lanes, agents, and polylines, the encoder should not have to rediscover those entities from pixels.
+- VectorNet informs whether HD maps and trajectories should be rasterized or preserved as polylines with explicit geometric identity. The atomic unit is a point feature grouped into a polyline; local aggregation creates polyline embeddings and a global graph models interactions among agents and map elements.
+- Vectorization preserves topology and avoids empty pixels, but preprocessing choices determine segment length, coordinate frame, and missing-map behavior. The missing ablation matches encoder capacity and latency against raster and raw-point attention across map quality levels. At 10× map extent, global polyline attention and retrieval dominate. The claim would fail if a compact raster encoder matched forecasting accuracy and cross-city generalization without vector-specific preprocessing.
+- VectorNet made vectorized map and agent encoding feel like a primary representation, not a preprocessing trick.
+- If the world is already made of lanes, agents, and polylines, the encoder should not have to rediscover those entities from pixels.

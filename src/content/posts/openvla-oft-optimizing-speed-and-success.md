@@ -38,12 +38,8 @@ The surprising result is that a simple L1 head can match diffusion fine-tuning i
 
 ## High-Level Takeaways
 
-OpenVLA-OFT informs which parts of a pretrained VLA should be treated as reusable semantics and which should be replaced for deployment. Its unit is an observation paired with a continuous action chunk. The VLM backbone is shared; the action head abandons the language-token interface.
-
-The results establish a strong speed–success recipe on LIBERO and ALOHA, not universal superiority of L1 regression. A missing stress test varies multimodality, perturbation frequency, and chunk length at equal control rate. At ten times the behavioral ambiguity, L1 can average valid modes. The recipe would fail if a diffusion or flow head wins consistently once tasks require multiple precise strategies rather than one dominant trajectory.
-
-OpenVLA-OFT is the practical SFT baseline that later RL post-training papers improve.
-
-Near-saturated LIBERO success leaves little room to measure robustness and recovery.
-
-Reuse the representation, not necessarily the pretraining decoder; control latency can justify a different action objective.
+- OpenVLA-OFT informs which parts of a pretrained VLA should be treated as reusable semantics and which should be replaced for deployment. Its unit is an observation paired with a continuous action chunk. The VLM backbone is shared; the action head abandons the language-token interface.
+- The results establish a strong speed–success recipe on LIBERO and ALOHA, not universal superiority of L1 regression. A missing stress test varies multimodality, perturbation frequency, and chunk length at equal control rate. At ten times the behavioral ambiguity, L1 can average valid modes. The recipe would fail if a diffusion or flow head wins consistently once tasks require multiple precise strategies rather than one dominant trajectory.
+- OpenVLA-OFT is the practical SFT baseline that later RL post-training papers improve.
+- Near-saturated LIBERO success leaves little room to measure robustness and recovery.
+- Reuse the representation, not necessarily the pretraining decoder; control latency can justify a different action objective.

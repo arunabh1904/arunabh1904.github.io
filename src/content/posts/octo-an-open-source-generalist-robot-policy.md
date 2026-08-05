@@ -38,12 +38,8 @@ The model is an open research baseline rather than a claim of zero-shot universa
 
 ## High-Level Takeaways
 
-Octo informs whether a generalist policy should optimize for zero-shot breadth or for cheap, modular adaptation. Its atomic unit is a heterogeneous robot trajectory; shared transformer tokens carry task and observation context while the action readout remains control-specific.
-
-The experiments show that diverse pretraining can provide a useful initialization across nine platforms. A missing comparison would equalize pretraining compute and target demonstrations against per-robot policies and VLM-backed VLAs. At ten times the sensor/action interfaces, modularity may become a routing and configuration burden. The claim would fail if pretraining does not reduce target data or training time after controlling for architecture and optimizer.
-
-Octo is the clean open baseline for studying what cross-embodiment pretraining buys during adaptation.
-
-A flexible interface cannot compensate for low-quality or incompatible pretraining trajectories.
-
-For robot foundation models, adaptation cost is a first-class metric—not an afterthought to zero-shot success.
+- Octo informs whether a generalist policy should optimize for zero-shot breadth or for cheap, modular adaptation. Its atomic unit is a heterogeneous robot trajectory; shared transformer tokens carry task and observation context while the action readout remains control-specific.
+- The experiments show that diverse pretraining can provide a useful initialization across nine platforms. A missing comparison would equalize pretraining compute and target demonstrations against per-robot policies and VLM-backed VLAs. At ten times the sensor/action interfaces, modularity may become a routing and configuration burden. The claim would fail if pretraining does not reduce target data or training time after controlling for architecture and optimizer.
+- Octo is the clean open baseline for studying what cross-embodiment pretraining buys during adaptation.
+- A flexible interface cannot compensate for low-quality or incompatible pretraining trajectories.
+- For robot foundation models, adaptation cost is a first-class metric—not an afterthought to zero-shot success.

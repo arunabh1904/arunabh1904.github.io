@@ -38,12 +38,8 @@ The critical distinction is between environment time and denoising time. Credit 
 
 ## High-Level Takeaways
 
-DPPO informs whether a strong diffusion imitation policy can be improved directly with RL or should first be distilled into a simpler actor. Its atomic optimization unit is a denoising transition nested inside an action trajectory. The method keeps continuous multimodality but pays for multiple stochastic steps and more complex likelihood accounting.
-
-The experiments establish that policy gradients can work well with diffusion policies under the proposed recipe. A missing comparison equalizes wall-clock control rate and total denoising compute against flow and Gaussian actors. At ten times the action dimension or horizon, variance across denoising steps can dominate. The claim would fail if the same pretrained policy distilled to a simpler distribution reaches equal robustness with fewer interactions and lower latency.
-
-DPPO is the technical reference for asking what “policy likelihood” means when actions come from a diffusion process.
-
-Simulator rewards and an augmented denoising MDP do not remove real-world reward and safety constraints.
-
-Apply RL to the distribution the policy actually samples from, not to an imagined Gaussian action head.
+- DPPO informs whether a strong diffusion imitation policy can be improved directly with RL or should first be distilled into a simpler actor. Its atomic optimization unit is a denoising transition nested inside an action trajectory. The method keeps continuous multimodality but pays for multiple stochastic steps and more complex likelihood accounting.
+- The experiments establish that policy gradients can work well with diffusion policies under the proposed recipe. A missing comparison equalizes wall-clock control rate and total denoising compute against flow and Gaussian actors. At ten times the action dimension or horizon, variance across denoising steps can dominate. The claim would fail if the same pretrained policy distilled to a simpler distribution reaches equal robustness with fewer interactions and lower latency.
+- DPPO is the technical reference for asking what “policy likelihood” means when actions come from a diffusion process.
+- Simulator rewards and an augmented denoising MDP do not remove real-world reward and safety constraints.
+- Apply RL to the distribution the policy actually samples from, not to an imagined Gaussian action head.

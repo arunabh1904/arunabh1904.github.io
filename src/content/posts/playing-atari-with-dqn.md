@@ -37,14 +37,6 @@ DQN made a blunt claim feel plausible: a single neural network could learn contr
 
 With those pieces in place, the authors trained one CNN architecture across seven Atari games using the same weights and hyperparameters. That result mattered because it moved deep RL away from game-specific feature engineering and toward end-to-end pixel-to-action learning. Replay memory and target networks also became durable building blocks for value-based deep RL, while the paper's limitations helped motivate later variants such as Double DQN, prioritized replay, and distributional RL.
 
-## High-Level Takeaways
-
-DQN informs whether a single convolutional Q-network can replace game-specific features and controllers while learning directly from pixels. The learning unit is a replayed transition $(s,a,r,s')$; replay breaks short-term correlation and a lagged target network stabilizes the bootstrapped label.
-
-The Atari results establish sample reuse and target lag as a workable combination, not a generally stable recipe for every observation or reward distribution. The missing ablation is a seed-rich factorial study of replay, target updates, reward clipping, frame stacking, and optimizer under equal environment steps. At 10× task diversity, replay imbalance and interference would dominate. The claim would fail if an on-policy or model-based baseline matched median human-normalized score with the same frames and less tuning.
-
-DQN showed that a relatively simple network—three convolutional layers followed by two fully connected layers—could handle high-dimensional visual state in a reinforcement-learning loop. Its durable contribution was the recipe: pair Q-learning with enough neural capacity, then add experience replay and a target network to make the targets less volatile.
-
 ### Reported evidence
 
 | Game (subset of 7) | DQN vs. prior SOTA | DQN vs. human expert |
@@ -60,3 +52,9 @@ Overall, DQN beat previous algorithms on 6 of the 7 reported games and exceeded 
 The cleanest part of DQN is also why it became such a good baseline: one architecture, one training recipe, multiple games. But the method was sample-inefficient, sensitive to tuning, and weak on sparse-reward games such as Montezuma's Revenge. It also inherited Q-learning's tendency to overestimate values, a problem that later work attacked directly with Double DQN and related fixes.
 
 A CNN, replay memory, and a target network were enough to learn control policies from pixels. That combination became the starting point for much of the modern deep-RL toolbox.
+
+## High-Level Takeaways
+
+- DQN informs whether a single convolutional Q-network can replace game-specific features and controllers while learning directly from pixels. The learning unit is a replayed transition $(s,a,r,s')$; replay breaks short-term correlation and a lagged target network stabilizes the bootstrapped label.
+- The Atari results establish sample reuse and target lag as a workable combination, not a generally stable recipe for every observation or reward distribution. The missing ablation is a seed-rich factorial study of replay, target updates, reward clipping, frame stacking, and optimizer under equal environment steps. At 10× task diversity, replay imbalance and interference would dominate. The claim would fail if an on-policy or model-based baseline matched median human-normalized score with the same frames and less tuning.
+- DQN showed that a relatively simple network—three convolutional layers followed by two fully connected layers—could handle high-dimensional visual state in a reinforcement-learning loop. Its durable contribution was the recipe: pair Q-learning with enough neural capacity, then add experience replay and a target network to make the targets less volatile.

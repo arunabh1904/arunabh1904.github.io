@@ -52,14 +52,9 @@ Real-robot results test both single- and dual-arm transfer. HiMoE-VLA averages 7
 
 ## High-Level Takeaways
 
-HiMoE-VLA informs how much of an action model should be shared when robot datasets disagree about their control interface. Separate heads prevent interference but fragment learning; one dense head maximizes sharing but can let incompatible gradients collide. The paper’s answer is structural: route the boundary layers by action space, use a second sparse stage for residual heterogeneity, and keep a dense integration core.
-
-The controlled mixed-action experiment is the strongest evidence because it compares isolated and combined data under the same CALVIN evaluation. A stricter falsification test would withhold an embodiment or entirely new action space and remove its routing identity at adaptation time. Performance that depends on known dataset labels and carefully audited masks may not transfer to unlabeled mixtures or a control interface absent from pretraining.
-
-At ten times the number of embodiments, metadata quality, per-expert batch size, and router balance become the main risks. The model already requires action-space labels, unified padded vectors, loss masks, two routing losses, and a MoE warm-up before full fine-tuning. Scaling succeeds only if those interfaces remain semantically correct. The next experiment should measure unseen-embodiment adaptation, expert utilization under long-tailed data, and wall-clock gains against separate-head and dense baselines at equal active compute.
-
-HiMoE-VLA makes heterogeneous robot co-training an explicit specialization-versus-sharing problem across Transformer depth.
-
-Pretraining uses 16 A100 GPUs and known action-space metadata; evaluation remains simulation and tabletop manipulation on two physical platforms. Sparse routing adds latency, and the reported real-robot results require downstream fine-tuning.
-
-Specialize where action spaces enter and leave the network, share the middle, and verify that extra robot data creates positive transfer rather than quietly increasing interference.
+- HiMoE-VLA informs how much of an action model should be shared when robot datasets disagree about their control interface. Separate heads prevent interference but fragment learning; one dense head maximizes sharing but can let incompatible gradients collide. The paper’s answer is structural: route the boundary layers by action space, use a second sparse stage for residual heterogeneity, and keep a dense integration core.
+- The controlled mixed-action experiment is the strongest evidence because it compares isolated and combined data under the same CALVIN evaluation. A stricter falsification test would withhold an embodiment or entirely new action space and remove its routing identity at adaptation time. Performance that depends on known dataset labels and carefully audited masks may not transfer to unlabeled mixtures or a control interface absent from pretraining.
+- At ten times the number of embodiments, metadata quality, per-expert batch size, and router balance become the main risks. The model already requires action-space labels, unified padded vectors, loss masks, two routing losses, and a MoE warm-up before full fine-tuning. Scaling succeeds only if those interfaces remain semantically correct. The next experiment should measure unseen-embodiment adaptation, expert utilization under long-tailed data, and wall-clock gains against separate-head and dense baselines at equal active compute.
+- HiMoE-VLA makes heterogeneous robot co-training an explicit specialization-versus-sharing problem across Transformer depth.
+- Pretraining uses 16 A100 GPUs and known action-space metadata; evaluation remains simulation and tabletop manipulation on two physical platforms. Sparse routing adds latency, and the reported real-robot results require downstream fine-tuning.
+- Specialize where action spaces enter and leave the network, share the middle, and verify that extra robot data creates positive transfer rather than quietly increasing interference.

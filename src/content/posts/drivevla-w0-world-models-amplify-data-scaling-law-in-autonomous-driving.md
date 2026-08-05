@@ -48,10 +48,7 @@ _Figure 2 shows the two world-modeling variants: autoregressive discrete visual-
 
 ## High-Level Takeaways
 
-DriveVLA-W0 informs whether additional driving data should supervise only sparse actions or also dense future visual dynamics. The training unit couples current observations and actions with future images; a shared representation learns both control and world prediction so each logged frame supplies more than a low-dimensional trajectory label.
-
-The reported scaling result suggests world-model supervision improves the return from more data in the tested NAVSIM and internal regimes. It does not isolate future-image prediction from extra decoder capacity or richer augmentation. A held-out scale sweep with equal parameters and target count is decisive. At 10× data, video redundancy and prediction of irrelevant appearance can consume the budget. The claim would fail if action-only training recovered the same scaling slope after matching auxiliary compute and regularization.
-
-DriveVLA-W0 argues that driving VLAs should learn dense world dynamics alongside sparse action imitation.
-
-Dense world-model supervision can make scaling useful when action labels are too thin to train a large driving model by themselves.
+- DriveVLA-W0 informs whether additional driving data should supervise only sparse actions or also dense future visual dynamics. The training unit couples current observations and actions with future images; a shared representation learns both control and world prediction so each logged frame supplies more than a low-dimensional trajectory label.
+- The reported scaling result suggests world-model supervision improves the return from more data in the tested NAVSIM and internal regimes. It does not isolate future-image prediction from extra decoder capacity or richer augmentation. A held-out scale sweep with equal parameters and target count is decisive. At 10× data, video redundancy and prediction of irrelevant appearance can consume the budget. The claim would fail if action-only training recovered the same scaling slope after matching auxiliary compute and regularization.
+- DriveVLA-W0 argues that driving VLAs should learn dense world dynamics alongside sparse action imitation.
+- Dense world-model supervision can make scaling useful when action labels are too thin to train a large driving model by themselves.

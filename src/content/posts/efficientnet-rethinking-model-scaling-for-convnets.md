@@ -36,14 +36,6 @@ EfficientNet argues that model scaling should be balanced, not improvised one ax
 
 Their recipe starts with a mobile-sized architecture found by neural architecture search, EfficientNet-B0. From there, a single compound factor $\phi$ scales depth $\alpha^\phi$, width $\beta^\phi$, and resolution $\gamma^\phi$ together. That rule turns one searched micro-architecture into the B1-B7 family while keeping the accuracy-to-compute tradeoff unusually strong.
 
-## High-Level Takeaways
-
-EfficientNet informs how to spend additional CNN compute across depth, width, and input resolution instead of scaling one axis by habit. The training unit remains an image, but compound scaling changes the capacity and spatial detail available to every block under a common FLOP multiplier.
-
-The measured family shows that balanced scaling gives a better ImageNet accuracy-efficiency frontier around the searched B0 baseline; it does not prove universal coefficients across tasks or hardware. The missing experiment re-optimizes the coefficients for detection, segmentation, and memory-bound accelerators under measured latency rather than FLOPs. At 10× resolution, activation memory and data movement dominate. Compound scaling would fail as a general rule if hardware-aware single-axis or neural-architecture scaling consistently won at matched latency and energy.
-
-EfficientNet made scaling feel like a design problem rather than a brute-force contest. B1 roughly matched ResNet-152 with 27x fewer FLOPs, while B7 topped ImageNet with a fraction of the parameters used by earlier NAS-heavy models.
-
 ### Reported evidence and cost
 
 | Model | Params | FLOPs | ImageNet Top-1 | Notes |
@@ -87,3 +79,9 @@ class MBConv(nn.Module):
             out += x
         return out
 ```
+
+## High-Level Takeaways
+
+- EfficientNet informs how to spend additional CNN compute across depth, width, and input resolution instead of scaling one axis by habit. The training unit remains an image, but compound scaling changes the capacity and spatial detail available to every block under a common FLOP multiplier.
+- The measured family shows that balanced scaling gives a better ImageNet accuracy-efficiency frontier around the searched B0 baseline; it does not prove universal coefficients across tasks or hardware. The missing experiment re-optimizes the coefficients for detection, segmentation, and memory-bound accelerators under measured latency rather than FLOPs. At 10× resolution, activation memory and data movement dominate. Compound scaling would fail as a general rule if hardware-aware single-axis or neural-architecture scaling consistently won at matched latency and energy.
+- EfficientNet made scaling feel like a design problem rather than a brute-force contest. B1 roughly matched ResNet-152 with 27x fewer FLOPs, while B7 topped ImageNet with a fraction of the parameters used by earlier NAS-heavy models.

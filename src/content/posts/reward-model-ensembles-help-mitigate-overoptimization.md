@@ -38,12 +38,8 @@ The ensemble is useful because disagreement provides a local warning about extra
 
 ## High-Level Takeaways
 
-This paper informs whether extra critic capacity should buy a larger single model or an ensemble that exposes epistemic uncertainty. The unit is a response scored by several reward models; the policy objective changes how those scores are normalized and aggregated. The measured gains are orthogonal to simply scaling one reward model in the synthetic study.
-
-The missing control is diversity: compare independently seeded replicas with critics trained from different label sources and representations. At ten times the deployment shift, correlated errors can make the ensemble confidently wrong. The approach is falsified if ensemble disagreement fails to rank real robot failures or if a held-out human/ground-truth metric regresses while the conservative objective rises.
-
-Ensembles turn uncertainty into an optimization constraint rather than a dashboard metric.
-
-Synthetic gold rewards and language outputs understate shared physical-perception failures.
-
-An ensemble helps only when its members disagree for reasons related to the failures that matter.
+- This paper informs whether extra critic capacity should buy a larger single model or an ensemble that exposes epistemic uncertainty. The unit is a response scored by several reward models; the policy objective changes how those scores are normalized and aggregated. The measured gains are orthogonal to simply scaling one reward model in the synthetic study.
+- The missing control is diversity: compare independently seeded replicas with critics trained from different label sources and representations. At ten times the deployment shift, correlated errors can make the ensemble confidently wrong. The approach is falsified if ensemble disagreement fails to rank real robot failures or if a held-out human/ground-truth metric regresses while the conservative objective rises.
+- Ensembles turn uncertainty into an optimization constraint rather than a dashboard metric.
+- Synthetic gold rewards and language outputs understate shared physical-perception failures.
+- An ensemble helps only when its members disagree for reasons related to the failures that matter.

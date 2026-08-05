@@ -35,12 +35,8 @@ DAgger's lasting contribution is a data-collection rule: label the states your p
 
 ## High-Level Takeaways
 
-DAgger informs whether the next annotation budget should fund more clean demonstrations or corrections on states the deployed policy actually reaches. Its atomic unit is a visited state paired with an expert action. The environment closes the loop, so data distribution is part of the algorithm rather than a fixed input.
-
-The theory establishes why interactive aggregation can control compounding error under an available expert. It does not resolve delayed feedback, irreversible actions, or human reaction latency. At ten times the rollout volume, expert queries become the bottleneck and policy versions can make aggregated data stale. The central claim is falsified operationally if failure-targeted corrections do not beat an equal number of fresh expert demonstrations on held-out closed-loop disturbances.
-
-DAgger is the conceptual ancestor of failure-driven VLA post-training.
-
-Expert intervention can alter the trajectory, and a corrective label may arrive after the state that caused the failure.
-
-Deployment changes the state distribution; a serious improvement loop must train on that changed distribution.
+- DAgger informs whether the next annotation budget should fund more clean demonstrations or corrections on states the deployed policy actually reaches. Its atomic unit is a visited state paired with an expert action. The environment closes the loop, so data distribution is part of the algorithm rather than a fixed input.
+- The theory establishes why interactive aggregation can control compounding error under an available expert. It does not resolve delayed feedback, irreversible actions, or human reaction latency. At ten times the rollout volume, expert queries become the bottleneck and policy versions can make aggregated data stale. The central claim is falsified operationally if failure-targeted corrections do not beat an equal number of fresh expert demonstrations on held-out closed-loop disturbances.
+- DAgger is the conceptual ancestor of failure-driven VLA post-training.
+- Expert intervention can alter the trajectory, and a corrective label may arrive after the state that caused the failure.
+- Deployment changes the state distribution; a serious improvement loop must train on that changed distribution.

@@ -38,10 +38,7 @@ The low-resolution ResNet-50 model reports 43.9 mAP and 53.9 NDS at 20.3 FPS. Th
 
 ## High-Level Takeaways
 
-Sparse4D v2 informs when temporal compression should occur. Its atomic unit is a recurrent 3D instance rather than a frame, pixel, or BEV cell. The expensive image backbone remains dense; savings arrive in evidence retrieval, temporal storage, and decoder reuse.
-
-The rejection test compares recurrent instances with fixed-window resampling at the same history information, image backbone, and P99 latency. The recurrent design loses if old errors accumulate, new-object recall falls, or dense weak evidence is needed before a query is born. At 10× actors, instance count, duplicate resolution, and self-attention replace history length as the bottleneck.
-
-Sparse4D v1 samples several timestamps explicitly. v2 makes the anchors recurrent; v3 adds stronger denoising, quality estimation, and tracking supervision to keep those instances reliable.
-
-Temporal cost becomes bounded when the model carries forward a scene hypothesis rather than a stack of observations—but query birth and state quality become first-class problems.
+- Sparse4D v2 informs when temporal compression should occur. Its atomic unit is a recurrent 3D instance rather than a frame, pixel, or BEV cell. The expensive image backbone remains dense; savings arrive in evidence retrieval, temporal storage, and decoder reuse.
+- The rejection test compares recurrent instances with fixed-window resampling at the same history information, image backbone, and P99 latency. The recurrent design loses if old errors accumulate, new-object recall falls, or dense weak evidence is needed before a query is born. At 10× actors, instance count, duplicate resolution, and self-attention replace history length as the bottleneck.
+- Sparse4D v1 samples several timestamps explicitly. v2 makes the anchors recurrent; v3 adds stronger denoising, quality estimation, and tracking supervision to keep those instances reliable.
+- Temporal cost becomes bounded when the model carries forward a scene hypothesis rather than a stack of observations—but query birth and state quality become first-class problems.

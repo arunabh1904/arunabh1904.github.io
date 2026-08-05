@@ -40,10 +40,7 @@ The authors explicitly identify that final mismatch as a limitation: sparse oper
 
 ## High-Level Takeaways
 
-VoxelNeXt informs whether a sparse LiDAR stack should densify for detection and tracking. Its atomic unit remains the occupied voxel from input through output. The expensive architectural decision is the sparse runtime itself: coordinate maps, pruning, pooling, and gathers must all remain efficient on the deployed accelerator.
-
-A matched rejection test compares VoxelNeXt and CenterPoint with equal backbone capacity, range, voxel resolution, and compiler effort. The fully sparse head loses if dense heatmaps give better small-object recall or comparable latency, or if pruning destabilizes degraded and crowded scenes. At larger range, the active voxel count and sparse-kernel memory traffic become the likely limits.
-
-SECOND makes the 3D backbone sparse; CenterPoint densifies into BEV for prediction. VoxelNeXt removes that final dense proxy and links the predicting voxel to tracking.
-
-A sparse backbone is only half a sparse detector; VoxelNeXt asks the prediction head and tracker to operate on the active set too.
+- VoxelNeXt informs whether a sparse LiDAR stack should densify for detection and tracking. Its atomic unit remains the occupied voxel from input through output. The expensive architectural decision is the sparse runtime itself: coordinate maps, pruning, pooling, and gathers must all remain efficient on the deployed accelerator.
+- A matched rejection test compares VoxelNeXt and CenterPoint with equal backbone capacity, range, voxel resolution, and compiler effort. The fully sparse head loses if dense heatmaps give better small-object recall or comparable latency, or if pruning destabilizes degraded and crowded scenes. At larger range, the active voxel count and sparse-kernel memory traffic become the likely limits.
+- SECOND makes the 3D backbone sparse; CenterPoint densifies into BEV for prediction. VoxelNeXt removes that final dense proxy and links the predicting voxel to tracking.
+- A sparse backbone is only half a sparse detector; VoxelNeXt asks the prediction head and tracker to operate on the active set too.

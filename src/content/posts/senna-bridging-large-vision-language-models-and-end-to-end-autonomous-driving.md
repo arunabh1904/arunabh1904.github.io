@@ -43,10 +43,7 @@ _Figure 1: Previous methods plan trajectories without a decision-making step, ma
 
 ## High-Level Takeaways
 
-SENNA informs whether a driving stack should separate high-level semantic commands from low-level continuous trajectory control. The VLM predicts a compact driving intention from images and language context; a fast planner conditions on that intention to generate the trajectory.
-
-The hierarchy reduces language-generation latency in the control loop, but the command vocabulary can become an information bottleneck. The missing test varies command granularity and compares oracle, learned, and absent high-level guidance under matched planner capacity. At 10× scenario complexity, ambiguous commands and recovery from a wrong high-level decision dominate. The separation would fail if direct end-to-end planning matched safety and generalization without the semantic intermediate.
-
-SENNA captures a useful decomposition for safety-critical systems: use language for semantic planning, but keep numeric control in a component designed for precision.
-
-The most useful VLM in a driving stack may be the one that thinks out loud at the right abstraction level.
+- SENNA informs whether a driving stack should separate high-level semantic commands from low-level continuous trajectory control. The VLM predicts a compact driving intention from images and language context; a fast planner conditions on that intention to generate the trajectory.
+- The hierarchy reduces language-generation latency in the control loop, but the command vocabulary can become an information bottleneck. The missing test varies command granularity and compares oracle, learned, and absent high-level guidance under matched planner capacity. At 10× scenario complexity, ambiguous commands and recovery from a wrong high-level decision dominate. The separation would fail if direct end-to-end planning matched safety and generalization without the semantic intermediate.
+- SENNA captures a useful decomposition for safety-critical systems: use language for semantic planning, but keep numeric control in a component designed for precision.
+- The most useful VLM in a driving stack may be the one that thinks out loud at the right abstraction level.

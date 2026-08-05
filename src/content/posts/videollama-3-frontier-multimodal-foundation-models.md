@@ -45,10 +45,7 @@ _Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced imag
 
 ## High-Level Takeaways
 
-VideoLLaMA 3 informs whether video understanding should begin with a separate temporal model or with a strong image-language representation followed by temporal specialization. Its curriculum first establishes image–text alignment, then adds video data; variable-resolution encoding preserves spatial detail, while dynamic token merging compresses redundant evidence across frames before the language model consumes it.
-
-The joint image and video benchmarks show that this route can add temporal capability without discarding image competence, but they do not isolate whether token merging preserves the events that matter rather than merely benchmark-level appearance. The missing study varies motion density and event duration at equal token budgets. At ten times the video length, rare actions may be merged away while context and decoding costs still grow. The thesis would fail if a temporally explicit model with the same compute consistently wins on long-horizon causal and event-order tests.
-
-It connects the image VLM and video VLM stories. If static visual grounding is strong, video becomes a temporal extension rather than a separate world.
-
-Video VLMs are constrained by visual token budgets. Good image features plus careful temporal compression are the practical path.
+- VideoLLaMA 3 informs whether video understanding should begin with a separate temporal model or with a strong image-language representation followed by temporal specialization. Its curriculum first establishes image–text alignment, then adds video data; variable-resolution encoding preserves spatial detail, while dynamic token merging compresses redundant evidence across frames before the language model consumes it.
+- The joint image and video benchmarks show that this route can add temporal capability without discarding image competence, but they do not isolate whether token merging preserves the events that matter rather than merely benchmark-level appearance. The missing study varies motion density and event duration at equal token budgets. At ten times the video length, rare actions may be merged away while context and decoding costs still grow. The thesis would fail if a temporally explicit model with the same compute consistently wins on long-horizon causal and event-order tests.
+- It connects the image VLM and video VLM stories. If static visual grounding is strong, video becomes a temporal extension rather than a separate world.
+- Video VLMs are constrained by visual token budgets. Good image features plus careful temporal compression are the practical path.

@@ -33,10 +33,7 @@ VFE alternates pointwise transformation with symmetric aggregation, so the repre
 
 ## High-Level Takeaways
 
-VoxelNet is the reference when deciding what a LiDAR encoder must preserve before sensor fusion. Voxel size sets an accuracy-memory contract; height compression sets a task contract. A fusion system should expose point age, sweep identity, and uncertainty to this tokenizer rather than treating XYZ as the complete measurement.
-
-At large range or fine resolution, sparsity—not feature learning—becomes the bottleneck. Later sparse convolutions and sparse transformers primarily improve this execution regime.
-
-PointPillars collapses the voxel grid to columns for speed; SST and DSVT keep sparse high-resolution structure while expanding context.
-
-Learned sensor encoding starts by choosing a physically meaningful neighborhood; unification should happen after that choice, not before it.
+- VoxelNet is the reference when deciding what a LiDAR encoder must preserve before sensor fusion. Voxel size sets an accuracy-memory contract; height compression sets a task contract. A fusion system should expose point age, sweep identity, and uncertainty to this tokenizer rather than treating XYZ as the complete measurement.
+- At large range or fine resolution, sparsity—not feature learning—becomes the bottleneck. Later sparse convolutions and sparse transformers primarily improve this execution regime.
+- PointPillars collapses the voxel grid to columns for speed; SST and DSVT keep sparse high-resolution structure while expanding context.
+- Learned sensor encoding starts by choosing a physically meaningful neighborhood; unification should happen after that choice, not before it.

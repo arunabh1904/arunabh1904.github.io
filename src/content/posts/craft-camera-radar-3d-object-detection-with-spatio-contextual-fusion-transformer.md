@@ -35,10 +35,7 @@ Replacing naive concatenation with the fusion transformer adds 2.4 car AP. Polar
 
 ## High-Level Takeaways
 
-CRAFT informs whether camera-radar fusion should occur around object proposals instead of a dense BEV. Its atomic unit is an image proposal paired with a variable radar set. The camera supplies semantics and an initial spatial hypothesis; radar is asked to correct range and motion where returns exist.
-
-The rejection test compares proposal fusion with radar-guided BEV lifting under the same camera detector, sweep count, range buckets, and corruption suite. CRAFT loses if proposal errors prevent the relevant radar return from entering the association set or if a dense radar representation recovers weak actors without camera proposals. At crowded range, proposal-return pairing and repeated cross-attention are the likely scaling bottlenecks.
-
-PointPainting hard-projects semantics onto LiDAR points. CRAFT instead uses camera proposals as the sparse fusion unit. CRN and RCBEVDet later move camera-radar interaction into BEV and strengthen radar-specific encoding.
-
-Radar fusion improves when the association rule reflects how each sensor is uncertain, not merely where their nominal coordinates coincide.
+- CRAFT informs whether camera-radar fusion should occur around object proposals instead of a dense BEV. Its atomic unit is an image proposal paired with a variable radar set. The camera supplies semantics and an initial spatial hypothesis; radar is asked to correct range and motion where returns exist.
+- The rejection test compares proposal fusion with radar-guided BEV lifting under the same camera detector, sweep count, range buckets, and corruption suite. CRAFT loses if proposal errors prevent the relevant radar return from entering the association set or if a dense radar representation recovers weak actors without camera proposals. At crowded range, proposal-return pairing and repeated cross-attention are the likely scaling bottlenecks.
+- PointPainting hard-projects semantics onto LiDAR points. CRAFT instead uses camera proposals as the sparse fusion unit. CRN and RCBEVDet later move camera-radar interaction into BEV and strengthen radar-specific encoding.
+- Radar fusion improves when the association rule reflects how each sensor is uncertain, not merely where their nominal coordinates coincide.

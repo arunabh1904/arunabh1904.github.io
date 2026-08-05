@@ -49,10 +49,7 @@ _Figure 2 shows UniAD's pipeline: BEV features feed tracking and mapping, those 
 
 ## High-Level Takeaways
 
-UniAD informs whether perception, tracking, mapping, motion, occupancy, and planning should be optimized as separate products or as one planning-oriented query pipeline. The atomic interfaces are task queries: agent, map, motion, occupancy, and ego queries carry a shared scene state between modules while losses remain task-specific.
-
-Joint training makes upstream representations accountable to planning, but it also obscures which task and loss weight creates the gain. The missing factorial ablation freezes or removes each query interface under matched backbone, data, and latency, then measures closed-loop rather than only open-loop metrics. At 10× task or scene complexity, gradient conflict and query bandwidth dominate. UniAD's claim would fail if a modular pipeline matched closed-loop safety and progress while allowing better independent calibration and recovery.
-
-UniAD set the dense BEV end-to-end driving baseline that later vectorized and VLA systems compare themselves against.
-
-An end-to-end driving stack should arrange its intermediate tasks around planning rather than attach independent heads to a shared backbone.
+- UniAD informs whether perception, tracking, mapping, motion, occupancy, and planning should be optimized as separate products or as one planning-oriented query pipeline. The atomic interfaces are task queries: agent, map, motion, occupancy, and ego queries carry a shared scene state between modules while losses remain task-specific.
+- Joint training makes upstream representations accountable to planning, but it also obscures which task and loss weight creates the gain. The missing factorial ablation freezes or removes each query interface under matched backbone, data, and latency, then measures closed-loop rather than only open-loop metrics. At 10× task or scene complexity, gradient conflict and query bandwidth dominate. UniAD's claim would fail if a modular pipeline matched closed-loop safety and progress while allowing better independent calibration and recovery.
+- UniAD set the dense BEV end-to-end driving baseline that later vectorized and VLA systems compare themselves against.
+- An end-to-end driving stack should arrange its intermediate tasks around planning rather than attach independent heads to a shared backbone.

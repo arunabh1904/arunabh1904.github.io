@@ -44,14 +44,9 @@ The paper also evaluates object detection, instance segmentation, semantic segme
 
 ## High-Level Takeaways
 
-iBOT informs what a masked vision model should predict. Its atomic unit is a masked patch position paired with a soft target from an unmasked momentum teacher. That makes it attractive when dense transfer matters and a fixed visual codebook would be expensive or domain-mismatched.
-
-The critical control is target quality at equal compute. Pixel reconstruction, a frozen tokenizer, and an online tokenizer should be compared with the same backbone, augmentations, schedule, and downstream protocol. The paper supplies many such ablations, but the best scale result also benefits from ImageNet-22K. At ten times the data, teacher inference and storing two networks become systems costs, while target drift can complicate distributed training.
-
-iBOT supplies the patch-level half of the later [DINOv2](/paper%20shorts/2023/04/14/dinov2-learning-robust-visual-features-without-supervision.html) recipe. DINOv2 keeps DINO's image-level agreement, uses iBOT-style masked patch prediction, and shifts much more attention to data curation and training stability.
-
-iBOT joins DINO-style global self-distillation with BERT-like masked prediction over image patches.
-
-Its strongest large-model result depends on ImageNet-22K, and an online teacher can propagate its own representation errors.
-
-Masked image modeling need not reconstruct pixels or use a frozen codebook; the model's momentum teacher can generate semantic patch targets while it learns.
+- iBOT informs what a masked vision model should predict. Its atomic unit is a masked patch position paired with a soft target from an unmasked momentum teacher. That makes it attractive when dense transfer matters and a fixed visual codebook would be expensive or domain-mismatched.
+- The critical control is target quality at equal compute. Pixel reconstruction, a frozen tokenizer, and an online tokenizer should be compared with the same backbone, augmentations, schedule, and downstream protocol. The paper supplies many such ablations, but the best scale result also benefits from ImageNet-22K. At ten times the data, teacher inference and storing two networks become systems costs, while target drift can complicate distributed training.
+- iBOT supplies the patch-level half of the later [DINOv2](/paper%20shorts/2023/04/14/dinov2-learning-robust-visual-features-without-supervision.html) recipe. DINOv2 keeps DINO's image-level agreement, uses iBOT-style masked patch prediction, and shifts much more attention to data curation and training stability.
+- iBOT joins DINO-style global self-distillation with BERT-like masked prediction over image patches.
+- Its strongest large-model result depends on ImageNet-22K, and an online teacher can propagate its own representation errors.
+- Masked image modeling need not reconstruct pixels or use a frozen codebook; the model's momentum teacher can generate semantic patch targets while it learns.

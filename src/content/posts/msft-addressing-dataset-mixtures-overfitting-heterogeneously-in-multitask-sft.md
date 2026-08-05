@@ -44,14 +44,6 @@ The proposed algorithm makes the mixture overfitting-aware. It trains on the act
 - Figure 3 is the reason the naive single-rollout fix is unstable: once one dataset is removed, the remaining tasks' optimal stopping points move.
 - Figure 6 is the practical claim: under a low compute budget, dataset exclusion can improve accuracy while reducing net FLOPs.
 
-## High-Level Takeaways
-
-mSFT informs whether multitask fine-tuning should keep a static dataset mixture when tasks overfit at different rates. Its atomic unit is a supervised example tagged by dataset; validation behavior feeds back into the probability of sampling that dataset, turning the mixture into a training-control variable.
-
-The method's value depends on whether per-dataset validation loss is a reliable early signal for downstream utility. The missing comparison holds total examples and optimizer steps fixed against static, temperature-based, and loss-proportional mixtures, including tasks whose validation loss is poorly correlated with quality. At 10× tasks, noisy validation signals and scheduler instability can cause oscillating or starved datasets. The claim would fail if a static mixture matched average and worst-task performance under the same compute.
-
-Data mixture tuning is usually treated as a static weighting problem. mSFT reframes it as a training-dynamics problem: the right mixture can change over time because tasks saturate at different rates. That is especially relevant for post-training, where datasets often differ in size, difficulty, quality, and target behavior.
-
 ![Figure 3 from mSFT: optimal compute shifts after excluding part of the data mixture](/assets/images/msft-arxiv-x4.png)
 _Figure 3a from the [mSFT paper](https://arxiv.org/abs/2603.21606), CC BY 4.0._
 
@@ -75,3 +67,9 @@ The implementation also exposes a fairly simple workflow: example mixtures live 
 The paper's strength is that the algorithm is simple and addresses a real post-training nuisance. The main tradeoff is operational complexity. mSFT needs periodic evaluation, overfitting detection, checkpoint management, and staged dataset removal, which makes the training loop less straightforward than ordinary SFT. The method also depends on having evaluation signals that can reliably say when a sub-dataset has peaked.
 
 mSFT argues that multi-task SFT should not spend compute uniformly across heterogeneous datasets. If each task overfits on its own schedule, the training loop should notice and adapt.
+
+## High-Level Takeaways
+
+- mSFT informs whether multitask fine-tuning should keep a static dataset mixture when tasks overfit at different rates. Its atomic unit is a supervised example tagged by dataset; validation behavior feeds back into the probability of sampling that dataset, turning the mixture into a training-control variable.
+- The method's value depends on whether per-dataset validation loss is a reliable early signal for downstream utility. The missing comparison holds total examples and optimizer steps fixed against static, temperature-based, and loss-proportional mixtures, including tasks whose validation loss is poorly correlated with quality. At 10× tasks, noisy validation signals and scheduler instability can cause oscillating or starved datasets. The claim would fail if a static mixture matched average and worst-task performance under the same compute.
+- Data mixture tuning is usually treated as a static weighting problem. mSFT reframes it as a training-dynamics problem: the right mixture can change over time because tasks saturate at different rates. That is especially relevant for post-training, where datasets often differ in size, difficulty, quality, and target behavior.

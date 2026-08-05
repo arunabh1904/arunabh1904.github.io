@@ -35,10 +35,7 @@ _Figure 4 visualizes the interaction term rather than only unimodal scaling: spe
 
 ## High-Level Takeaways
 
-This paper informs how to choose a modality mixture before committing to an expensive mixed-modal run. It extends unimodal loss scaling with an interaction term that represents synergy or competition between modalities, then estimates the curve from proxy experiments. The 30B speech–text validation matters because it tests whether small-run mixture behavior extrapolates beyond the fitting regime.
-
-The curve establishes predictability for the studied modalities and budgets, not a universal law of beneficial mixing. The most important missing test is transfer across architectures, tokenizers, and data-quality regimes without refitting the interaction from scratch. At ten times the scale, changing data entropy and curriculum order can make a fixed interaction term nonstationary. The framework is falsified if mixtures selected by proxy fits consistently lose to simple baselines such as temperature sampling when evaluated at the target scale and full training cost.
-
-Scaling fits describe the studied training regime; interactions can change with model family, tokenization, and evaluation target.
-
-Data mixture is an optimization variable with interactions, not a fixed recipe to inherit.
+- This paper informs how to choose a modality mixture before committing to an expensive mixed-modal run. It extends unimodal loss scaling with an interaction term that represents synergy or competition between modalities, then estimates the curve from proxy experiments. The 30B speech–text validation matters because it tests whether small-run mixture behavior extrapolates beyond the fitting regime.
+- The curve establishes predictability for the studied modalities and budgets, not a universal law of beneficial mixing. The most important missing test is transfer across architectures, tokenizers, and data-quality regimes without refitting the interaction from scratch. At ten times the scale, changing data entropy and curriculum order can make a fixed interaction term nonstationary. The framework is falsified if mixtures selected by proxy fits consistently lose to simple baselines such as temperature sampling when evaluated at the target scale and full training cost.
+- Scaling fits describe the studied training regime; interactions can change with model family, tokenization, and evaluation target.
+- Data mixture is an optimization variable with interactions, not a fixed recipe to inherit.

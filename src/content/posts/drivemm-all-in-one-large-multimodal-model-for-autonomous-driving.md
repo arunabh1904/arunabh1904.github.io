@@ -43,10 +43,7 @@ _Figure 1: RoboTron-Drive achieves SOTA in both general capabilities and general
 
 ## High-Level Takeaways
 
-DriveMM informs whether perception, prediction, and planning should share one multimodal token-processing model and curriculum. Its atomic examples come from different driving tasks; task prompts and output formats route them through a shared backbone while stage-specific data teaches increasingly action-oriented behavior.
-
-The all-in-one model promises transfer, but mixture proportions and gradient conflict determine whether low-resource tasks benefit or disappear. The missing study measures per-task gradient alignment and transfer while matching total parameters against specialized models and a shared-backbone multi-head baseline. At 10× tasks, sequence formats, sampling weights, and negative transfer dominate. The unified claim would fail if specialists achieved better worst-task and closed-loop performance at equal aggregate inference cost.
-
-DriveMM pushed against the assumption that every driving subproblem needs a separate specialized network. The paper asks whether shared multimodal representations can support the full stack.
-
-End-to-end driving models are becoming multitask foundation models. The hard question is not only performance, but whether shared training improves closed-loop reliability.
+- DriveMM informs whether perception, prediction, and planning should share one multimodal token-processing model and curriculum. Its atomic examples come from different driving tasks; task prompts and output formats route them through a shared backbone while stage-specific data teaches increasingly action-oriented behavior.
+- The all-in-one model promises transfer, but mixture proportions and gradient conflict determine whether low-resource tasks benefit or disappear. The missing study measures per-task gradient alignment and transfer while matching total parameters against specialized models and a shared-backbone multi-head baseline. At 10× tasks, sequence formats, sampling weights, and negative transfer dominate. The unified claim would fail if specialists achieved better worst-task and closed-loop performance at equal aggregate inference cost.
+- DriveMM pushed against the assumption that every driving subproblem needs a separate specialized network. The paper asks whether shared multimodal representations can support the full stack.
+- End-to-end driving models are becoming multitask foundation models. The hard question is not only performance, but whether shared training improves closed-loop reliability.

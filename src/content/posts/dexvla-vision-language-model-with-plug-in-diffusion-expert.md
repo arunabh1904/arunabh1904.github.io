@@ -43,10 +43,7 @@ _Figure 1: DexVLA architecture and embodied curriculum learning. From the [DexVL
 
 ## High-Level Takeaways
 
-DexVLA informs whether dexterous, long-horizon control should be forced through a VLM's discrete token head or delegated to a continuous action specialist. The VLM supplies semantic state and high-level guidance, while a billion-parameter diffusion expert generates multi-step action trajectories. A staged cross-embodiment curriculum moves from broad motor priors to embodiment adaptation and then task-specific dexterity.
-
-The results support specialization for precise control, but the architecture adds enough capacity and training complexity that its causal advantage over data and compute is unclear. The missing comparison is a parameter-, latency-, and demonstration-matched action head without diffusion, plus transfer tests where the VLM is frozen. At ten times the task and embodiment count, contradictory control conventions and diffusion sampling latency may dominate. The plug-in-expert claim would fail if a smaller shared action decoder matches closed-loop success and adapts with fewer demonstrations.
-
-DexVLA shows how robotics can borrow from both sides of modern AI: language models for task structure and diffusion models for continuous trajectory generation.
-
-The strongest robot policies may be coordinated systems, not monoliths. Let the VLM plan; let the control expert execute.
+- DexVLA informs whether dexterous, long-horizon control should be forced through a VLM's discrete token head or delegated to a continuous action specialist. The VLM supplies semantic state and high-level guidance, while a billion-parameter diffusion expert generates multi-step action trajectories. A staged cross-embodiment curriculum moves from broad motor priors to embodiment adaptation and then task-specific dexterity.
+- The results support specialization for precise control, but the architecture adds enough capacity and training complexity that its causal advantage over data and compute is unclear. The missing comparison is a parameter-, latency-, and demonstration-matched action head without diffusion, plus transfer tests where the VLM is frozen. At ten times the task and embodiment count, contradictory control conventions and diffusion sampling latency may dominate. The plug-in-expert claim would fail if a smaller shared action decoder matches closed-loop success and adapts with fewer demonstrations.
+- DexVLA shows how robotics can borrow from both sides of modern AI: language models for task structure and diffusion models for continuous trajectory generation.
+- The strongest robot policies may be coordinated systems, not monoliths. Let the VLM plan; let the control expert execute.

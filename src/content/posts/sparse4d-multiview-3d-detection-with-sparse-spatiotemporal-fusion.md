@@ -41,10 +41,7 @@ _Sparse4D turns space-time fusion into sparse evidence retrieval around a fixed 
 
 ## High-Level Takeaways
 
-Sparse4D informs whether temporal perception should store a dense scene field or a set of persistent object hypotheses. Its atomic unit is an anchor-instance pair. The image backbone is shared across cameras and frames; the decoder shares a sampling and refinement protocol across instances, but the state is object-specific.
-
-The missing matched control compares dense BEV memory and sparse anchors with the same camera backbone, history length, image tokens, and P99 latency. At 10× crowded-scene density, anchor count, self-attention, and duplicate suppression erode the sparse advantage. The method would fail for unmodeled free space, thin map elements, or novel objects if those outputs require a dense field or a much larger proposal set.
-
-Sparse4D establishes the anchor-sampling branch of camera-only temporal perception; StreamPETR carries object queries recurrently, while Sparse4D v3 strengthens training and turns the same state into tracks.
-
-Temporal fusion can follow objects through space-time instead of carrying the entire scene grid forward.
+- Sparse4D informs whether temporal perception should store a dense scene field or a set of persistent object hypotheses. Its atomic unit is an anchor-instance pair. The image backbone is shared across cameras and frames; the decoder shares a sampling and refinement protocol across instances, but the state is object-specific.
+- The missing matched control compares dense BEV memory and sparse anchors with the same camera backbone, history length, image tokens, and P99 latency. At 10× crowded-scene density, anchor count, self-attention, and duplicate suppression erode the sparse advantage. The method would fail for unmodeled free space, thin map elements, or novel objects if those outputs require a dense field or a much larger proposal set.
+- Sparse4D establishes the anchor-sampling branch of camera-only temporal perception; StreamPETR carries object queries recurrently, while Sparse4D v3 strengthens training and turns the same state into tracks.
+- Temporal fusion can follow objects through space-time instead of carrying the entire scene grid forward.

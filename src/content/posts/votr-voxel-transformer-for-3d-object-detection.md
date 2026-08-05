@@ -38,10 +38,7 @@ These rows use the paper's KITTI validation setup and are not an accelerator-ind
 
 ## High-Level Takeaways
 
-VoTr informs whether to buy LiDAR receptive field through deeper sparse convolution or explicit voxel attention. Its atomic unit is an occupied voxel, but capacity is allocated through a bounded neighbor list. Local and dilated attention share weights across voxels; the coordinate query policy determines which evidence each token can reach.
-
-The decisive control matches receptive field, parameter count, active voxels, and deployed-kernel quality. VoTr should be rejected if large-kernel or multi-stage sparse convolution matches far-range recall at lower P99 latency. At 10× active voxels, neighbor lookup and irregular gathers are more likely to fail first than the attention matrix itself.
-
-SECOND established sparse convolution for voxel detection. VoTr introduced sparse voxel attention; SST and DSVT later use windowed or rotated-set designs that are easier to batch and deploy.
-
-Sparse attention earns its cost when distant, incomplete objects need context that a local voxel kernel cannot reach cheaply.
+- VoTr informs whether to buy LiDAR receptive field through deeper sparse convolution or explicit voxel attention. Its atomic unit is an occupied voxel, but capacity is allocated through a bounded neighbor list. Local and dilated attention share weights across voxels; the coordinate query policy determines which evidence each token can reach.
+- The decisive control matches receptive field, parameter count, active voxels, and deployed-kernel quality. VoTr should be rejected if large-kernel or multi-stage sparse convolution matches far-range recall at lower P99 latency. At 10× active voxels, neighbor lookup and irregular gathers are more likely to fail first than the attention matrix itself.
+- SECOND established sparse convolution for voxel detection. VoTr introduced sparse voxel attention; SST and DSVT later use windowed or rotated-set designs that are easier to batch and deploy.
+- Sparse attention earns its cost when distant, incomplete objects need context that a local voxel kernel cannot reach cheaply.

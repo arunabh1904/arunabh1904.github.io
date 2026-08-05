@@ -55,10 +55,7 @@ _Figure 2 shows MPA3D: camera BEV features, LiDAR, surfels, and 3D Gaussian prio
 
 ## High-Level Takeaways
 
-MPA3D informs whether static scene reconstruction can serve as a reusable prior for 3D detection instead of forcing each frame to relearn background geometry. The atomic prior is a surfel or 3D Gaussian map element aligned with current sensor features; dynamic-object prediction is conditioned on that persistent static representation.
-
-The method can turn repeated fleet observations into dense supervision, but localization quality and stale geometry determine whether the prior helps. The missing factorial study separates map density, reconstruction type, pose error, and detector capacity under equal current-frame inputs. At 10× territory and map age, storage, retrieval, and change management dominate. The mapping-prior claim would fail if a temporal detector matched 3D accuracy under pose noise without maintaining an external reconstructed map.
-
-MPA3D reframes mapping as perception memory. The map need not be a manually labeled semantic product; a reconstructed static scene can supply a prior for finding what changed.
-
-For BEV perception, repeated traversals can become dense background knowledge, and background knowledge makes foreground detection easier.
+- MPA3D informs whether static scene reconstruction can serve as a reusable prior for 3D detection instead of forcing each frame to relearn background geometry. The atomic prior is a surfel or 3D Gaussian map element aligned with current sensor features; dynamic-object prediction is conditioned on that persistent static representation.
+- The method can turn repeated fleet observations into dense supervision, but localization quality and stale geometry determine whether the prior helps. The missing factorial study separates map density, reconstruction type, pose error, and detector capacity under equal current-frame inputs. At 10× territory and map age, storage, retrieval, and change management dominate. The mapping-prior claim would fail if a temporal detector matched 3D accuracy under pose noise without maintaining an external reconstructed map.
+- MPA3D reframes mapping as perception memory. The map need not be a manually labeled semantic product; a reconstructed static scene can supply a prior for finding what changed.
+- For BEV perception, repeated traversals can become dense background knowledge, and background knowledge makes foreground detection easier.

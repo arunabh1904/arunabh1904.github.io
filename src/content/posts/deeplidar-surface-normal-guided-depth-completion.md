@@ -33,10 +33,7 @@ Surface normals transfer more consistently across range than raw depth and provi
 
 ## High-Level Takeaways
 
-DeepLiDAR is relevant when projected sparse depth has structured errors rather than simple missingness. The learned confidence should be audited under moving-object boundaries, timing offsets, reflective surfaces, and a changed LiDAR pattern.
-
-Like Sparse-to-Dense, it expects sparse depth at runtime. Its architecture should not be cited as camera-only privileged training unless that input is explicitly removed and the model retrained.
-
-Sparse-to-Dense establishes learned RGB-depth completion; GuideFormer later uses cross-modal transformer guidance for the same runtime contract.
-
-Geometry-aware completion improves when the model learns which measurements to distrust, not only how to interpolate the ones marked valid.
+- DeepLiDAR is relevant when projected sparse depth has structured errors rather than simple missingness. The learned confidence should be audited under moving-object boundaries, timing offsets, reflective surfaces, and a changed LiDAR pattern.
+- Like Sparse-to-Dense, it expects sparse depth at runtime. Its architecture should not be cited as camera-only privileged training unless that input is explicitly removed and the model retrained.
+- Sparse-to-Dense establishes learned RGB-depth completion; GuideFormer later uses cross-modal transformer guidance for the same runtime contract.
+- Geometry-aware completion improves when the model learns which measurements to distrust, not only how to interpolate the ones marked valid.

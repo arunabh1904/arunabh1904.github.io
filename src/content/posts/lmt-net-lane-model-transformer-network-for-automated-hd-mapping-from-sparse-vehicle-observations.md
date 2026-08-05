@@ -45,10 +45,7 @@ _Figure 1 shows the full LMT-Net path from sparse observed polylines to lane-pai
 
 ## High-Level Takeaways
 
-LMT-Net informs how to turn sparse, aggregated vehicle traces into a topologically valid lane graph rather than a set of disconnected boundary points. The operative units are paired lane-boundary observations and lane queries; the Transformer predicts both lane geometry and connectivity.
-
-The approach is attractive when fleet traces are cheaper than dense mapping surveys, but sparsity, localization error, and observation bias are coupled. The missing control varies trace density and pose noise while comparing pair-based prediction with sequential vectorization under equal map priors. At 10× geographic coverage, inconsistent local frames and topology stitching dominate. The claim would fail if a geometry-first baseline recovered equal lane connectivity with less dependence on repeated observations.
-
-LMT-Net is a reminder that online HD mapping is not only a camera-to-vector problem; fleet traces and sparse observations can also drive map upkeep.
-
-Predicting the lane graph directly is often the cleanest target when the end user is a planner, not a segmentation dashboard.
+- LMT-Net informs how to turn sparse, aggregated vehicle traces into a topologically valid lane graph rather than a set of disconnected boundary points. The operative units are paired lane-boundary observations and lane queries; the Transformer predicts both lane geometry and connectivity.
+- The approach is attractive when fleet traces are cheaper than dense mapping surveys, but sparsity, localization error, and observation bias are coupled. The missing control varies trace density and pose noise while comparing pair-based prediction with sequential vectorization under equal map priors. At 10× geographic coverage, inconsistent local frames and topology stitching dominate. The claim would fail if a geometry-first baseline recovered equal lane connectivity with less dependence on repeated observations.
+- LMT-Net is a reminder that online HD mapping is not only a camera-to-vector problem; fleet traces and sparse observations can also drive map upkeep.
+- Predicting the lane graph directly is often the cleanest target when the end user is a planner, not a segmentation dashboard.

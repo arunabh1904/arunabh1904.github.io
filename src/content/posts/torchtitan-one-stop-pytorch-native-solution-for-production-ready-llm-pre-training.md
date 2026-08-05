@@ -36,10 +36,7 @@ _Figure 1 shows TorchTitan's systems claim: production pretraining is assembled 
 
 ## High-Level Takeaways
 
-TorchTitan informs a systems decision: whether large-model training should be assembled from bespoke frameworks or expressed as composable, PyTorch-native recipes. The effective unit is the recoverable distributed training step, because tensor, pipeline, and data parallelism, checkpointing, logging, and compilation must operate as one system. Results from 8B through 405B models show incremental throughput gains as parallelism becomes multidimensional.
-
-Those measurements establish that the stack can scale on the tested H100 configurations, not that a single recipe is optimal across clusters and failure modes. The missing evaluation combines throughput with utilization, restart cost, checkpoint stalls, and engineer time against mature alternatives. At ten times the device count, network topology, stragglers, and coordinated recovery dominate kernel efficiency. The production-readiness claim is falsified if nominal speedups disappear under realistic failures or require model-specific code that breaks the promised composability.
-
-The reported recipes are LLM-focused. Multimodal runs add long-sequence, data-pipeline, and modality-health failure modes that still need explicit monitoring.
-
-A production training stack is part of the research method because it determines what experiments can be run, compared, and recovered.
+- TorchTitan informs a systems decision: whether large-model training should be assembled from bespoke frameworks or expressed as composable, PyTorch-native recipes. The effective unit is the recoverable distributed training step, because tensor, pipeline, and data parallelism, checkpointing, logging, and compilation must operate as one system. Results from 8B through 405B models show incremental throughput gains as parallelism becomes multidimensional.
+- Those measurements establish that the stack can scale on the tested H100 configurations, not that a single recipe is optimal across clusters and failure modes. The missing evaluation combines throughput with utilization, restart cost, checkpoint stalls, and engineer time against mature alternatives. At ten times the device count, network topology, stragglers, and coordinated recovery dominate kernel efficiency. The production-readiness claim is falsified if nominal speedups disappear under realistic failures or require model-specific code that breaks the promised composability.
+- The reported recipes are LLM-focused. Multimodal runs add long-sequence, data-pipeline, and modality-health failure modes that still need explicit monitoring.
+- A production training stack is part of the research method because it determines what experiments can be run, compared, and recovered.

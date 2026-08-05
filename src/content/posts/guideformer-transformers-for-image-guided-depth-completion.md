@@ -33,10 +33,7 @@ Transformer blocks enlarge the receptive field available to sparse measurements,
 
 ## High-Level Takeaways
 
-GuideFormer is appropriate when local convolution cannot connect sparse anchors across large image regions. Compare it against dilated or multi-scale convolution at matched latency and memory, and test different scan patterns rather than one fixed density.
-
-The model still depends on runtime sparse depth. For a camera-only product, its useful lesson is the directional guidance architecture, not the published input contract.
-
-DeepLiDAR uses normals and confidence to structure completion; GuideFormer uses attention to increase the interaction range between RGB and depth.
-
-Cross-modal attention can make sparse range evidence influence distant pixels, but it must justify that reach against its runtime and calibration cost.
+- GuideFormer is appropriate when local convolution cannot connect sparse anchors across large image regions. Compare it against dilated or multi-scale convolution at matched latency and memory, and test different scan patterns rather than one fixed density.
+- The model still depends on runtime sparse depth. For a camera-only product, its useful lesson is the directional guidance architecture, not the published input contract.
+- DeepLiDAR uses normals and confidence to structure completion; GuideFormer uses attention to increase the interaction range between RGB and depth.
+- Cross-modal attention can make sparse range evidence influence distant pixels, but it must justify that reach against its runtime and calibration cost.

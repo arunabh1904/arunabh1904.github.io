@@ -9,6 +9,12 @@ interface Props {
   description?: string;
   previous?: PostEntry;
   next?: PostEntry;
+  navigationContext?: {
+    href: string;
+    label: string;
+    position: number;
+    total: number;
+  };
   showNavigation?: boolean;
   showSectionsNav?: boolean;
 }
@@ -18,6 +24,7 @@ const {
   description,
   previous,
   next,
+  navigationContext,
   showNavigation = false,
   showSectionsNav = true,
 } = Astro.props;
@@ -28,7 +35,11 @@ const {
   <div class={`page-layout${showSectionsNav ? '' : ' page-layout--centered'}`}>
     <main class="page-content page-content--narrow" aria-label="Content" data-sections-root>
       <slot />
-      {showNavigation && <PostNavigation previous={previous} next={next} />}
+      {
+        showNavigation && (
+          <PostNavigation previous={previous} next={next} context={navigationContext} />
+        )
+      }
     </main>
     {
       showSectionsNav && (

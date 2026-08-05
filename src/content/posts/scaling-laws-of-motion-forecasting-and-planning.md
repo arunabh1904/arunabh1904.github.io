@@ -55,10 +55,7 @@ _Figure 2 is the core scaling-law evidence: training loss improves predictably a
 
 ## High-Level Takeaways
 
-This study informs how an autonomy program should split additional compute among model parameters, logged driving data, and inference-time trajectory sampling. Its atomic example is an autoregressive scene sequence drawn from fleet-scale logs; the reported curves connect training loss to open-loop and closed-loop forecasting/planning metrics.
-
-The evidence supports predictable improvement within the measured model, data, and sampling ranges, including a compute-optimal trend in which model size grows faster than dataset size. It does not prove that the same exponents survive a new architecture, geography, or safety distribution. A held-out large run with fixed evaluation and confidence intervals is the decisive test. The law would fail operationally if closed-loop ranking reversed even while training loss followed the fitted curve.
-
-The paper moved motion forecasting and planning into the scaling-laws conversation with evidence that closed-loop behavior can improve predictably.
-
-For motion and planning models, scaling is a three-way budget problem: training compute, data/model allocation, and inference-time sampling all matter.
+- This study informs how an autonomy program should split additional compute among model parameters, logged driving data, and inference-time trajectory sampling. Its atomic example is an autoregressive scene sequence drawn from fleet-scale logs; the reported curves connect training loss to open-loop and closed-loop forecasting/planning metrics.
+- The evidence supports predictable improvement within the measured model, data, and sampling ranges, including a compute-optimal trend in which model size grows faster than dataset size. It does not prove that the same exponents survive a new architecture, geography, or safety distribution. A held-out large run with fixed evaluation and confidence intervals is the decisive test. The law would fail operationally if closed-loop ranking reversed even while training loss followed the fitted curve.
+- The paper moved motion forecasting and planning into the scaling-laws conversation with evidence that closed-loop behavior can improve predictably.
+- For motion and planning models, scaling is a three-way budget problem: training compute, data/model allocation, and inference-time sampling all matter.

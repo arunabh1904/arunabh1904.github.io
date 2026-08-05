@@ -45,10 +45,7 @@ _Figure 1: Overview of Eagle2-9B’s result across different multimodal benchmar
 
 ## High-Level Takeaways
 
-Eagle 2 informs a post-training allocation decision: whether another model-scale increase is worth more than improving the composition, filtering, and ordering of multimodal instruction data. The fundamental unit is the supervised image–instruction–response example, and the curriculum controls which capabilities are introduced and reinforced across stages. The shared model is conventional; the paper's real mechanism is distribution design across OCR, grounding, reasoning, and instruction following.
-
-The ablation trail shows that curation can make a 9B model competitive with larger systems, but benchmark gains do not by themselves establish that the recipe generalizes beyond the evaluation distribution. The missing test is a contamination-audited, held-out capability suite combined with a cost-matched comparison to simply adding parameters or raw examples. At ten times the data scale, quality filters may select increasingly homogeneous synthetic patterns and amplify benchmark style. The claim is falsified if the carefully staged mixture loses its advantage on fresh tasks after controlling for data provenance and total annotation cost.
-
-Eagle 2 is valuable because it makes the data engineering visible. That helps turn VLM building from folklore into something closer to an inspectable recipe.
-
-Post-training is where a general multimodal model becomes useful. The data mixture is a control surface.
+- Eagle 2 informs a post-training allocation decision: whether another model-scale increase is worth more than improving the composition, filtering, and ordering of multimodal instruction data. The fundamental unit is the supervised image–instruction–response example, and the curriculum controls which capabilities are introduced and reinforced across stages. The shared model is conventional; the paper's real mechanism is distribution design across OCR, grounding, reasoning, and instruction following.
+- The ablation trail shows that curation can make a 9B model competitive with larger systems, but benchmark gains do not by themselves establish that the recipe generalizes beyond the evaluation distribution. The missing test is a contamination-audited, held-out capability suite combined with a cost-matched comparison to simply adding parameters or raw examples. At ten times the data scale, quality filters may select increasingly homogeneous synthetic patterns and amplify benchmark style. The claim is falsified if the carefully staged mixture loses its advantage on fresh tasks after controlling for data provenance and total annotation cost.
+- Eagle 2 is valuable because it makes the data engineering visible. That helps turn VLM building from folklore into something closer to an inspectable recipe.
+- Post-training is where a general multimodal model becomes useful. The data mixture is a control surface.

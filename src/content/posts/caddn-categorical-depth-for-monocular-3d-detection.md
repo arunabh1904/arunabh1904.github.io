@@ -35,10 +35,7 @@ Depth bins turn a 2D feature into a probability-weighted ray. The detector loss 
 
 ## High-Level Takeaways
 
-CaDDN matters when the runtime contract excludes LiDAR but an instrumented training fleet can provide it. The supervision pipeline should track occlusion, time alignment, ignore regions, and confidence; sparse projected points are not dense ground truth.
-
-Compare categorical, continuous, and query-based lifting at matched resolution and latency. Better depth metrics do not guarantee better 3D detection if errors fall in task-irrelevant regions.
-
-LSS popularizes distributional lifting; CaDDN adds direct depth supervision, and BEVDepth adapts that lesson to surround-camera BEV detection.
-
-A camera-to-BEV transform becomes trainable and auditable when depth uncertainty is explicit and privileged LiDAR is confined to the training target.
+- CaDDN matters when the runtime contract excludes LiDAR but an instrumented training fleet can provide it. The supervision pipeline should track occlusion, time alignment, ignore regions, and confidence; sparse projected points are not dense ground truth.
+- Compare categorical, continuous, and query-based lifting at matched resolution and latency. Better depth metrics do not guarantee better 3D detection if errors fall in task-irrelevant regions.
+- LSS popularizes distributional lifting; CaDDN adds direct depth supervision, and BEVDepth adapts that lesson to surround-camera BEV detection.
+- A camera-to-BEV transform becomes trainable and auditable when depth uncertainty is explicit and privileged LiDAR is confined to the training target.

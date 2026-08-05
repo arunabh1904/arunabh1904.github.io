@@ -41,10 +41,7 @@ _Figure 1 shows the contract LSS establishes: evidence from an arbitrary multi-c
 
 ## High-Level Takeaways
 
-LSS informs whether the expensive reusable representation should be built before the task heads. Its atomic unit is a pixel-by-depth feature, and its main compression occurs when height and depth hypotheses are pooled into a 2D BEV cell. Camera encoders share weights; calibration, rather than camera identity, tells the model where each feature belongs.
-
-The missing matched control is a comparison against attention-based lifting at equal image resolution, BEV resolution, memory, and latency. At 10× image resolution or depth bins, the frustum tensor and pooling bandwidth dominate. The LSS design would be rejected when a sparse query mechanism preserves long-range geometry and camera-rig transfer with materially less memory, or when explicit depth supervision is required to meet range-specific safety targets.
-
-LSS supplied the explicit camera-to-BEV mechanism that BEVDet, BEVDepth, BEVFusion, and many radar-camera systems later reuse or optimize.
-
-A shared BEV becomes useful only after the model defines how uncertain perspective evidence enters metric space.
+- LSS informs whether the expensive reusable representation should be built before the task heads. Its atomic unit is a pixel-by-depth feature, and its main compression occurs when height and depth hypotheses are pooled into a 2D BEV cell. Camera encoders share weights; calibration, rather than camera identity, tells the model where each feature belongs.
+- The missing matched control is a comparison against attention-based lifting at equal image resolution, BEV resolution, memory, and latency. At 10× image resolution or depth bins, the frustum tensor and pooling bandwidth dominate. The LSS design would be rejected when a sparse query mechanism preserves long-range geometry and camera-rig transfer with materially less memory, or when explicit depth supervision is required to meet range-specific safety targets.
+- LSS supplied the explicit camera-to-BEV mechanism that BEVDet, BEVDepth, BEVFusion, and many radar-camera systems later reuse or optimize.
+- A shared BEV becomes useful only after the model defines how uncertain perspective evidence enters metric space.

@@ -48,10 +48,7 @@ _Figure 2 shows the two key ideas: prediction tasks become mask patterns, and on
 
 ## High-Level Takeaways
 
-Scene Transformer informs whether marginal, joint, conditional, and goal-conditioned forecasting require separate architectures. The atomic unit is an agent-time state token; masks and conditioning inputs alter the forecasting query while the same scene-centric attention stack models interactions.
-
-Unification reduces task-specific machinery, but dense attention over agents and time makes missing-state handling and scene size part of the compute budget. The missing control compares one universal model with specialized models at matched total parameters and training examples, not merely shared implementation. At 10× agents or horizon, the interaction tensor dominates memory. The unification claim would fail if specialized decoders consistently improved joint calibration or rare conditional queries at equal aggregate cost.
-
-Scene Transformer pushed the field toward unified heterogeneous scene attention, where the model reasons over agents, time, and map context together.
-
-The forecasting question can be a mask over the scene, not a separate model for every task.
+- Scene Transformer informs whether marginal, joint, conditional, and goal-conditioned forecasting require separate architectures. The atomic unit is an agent-time state token; masks and conditioning inputs alter the forecasting query while the same scene-centric attention stack models interactions.
+- Unification reduces task-specific machinery, but dense attention over agents and time makes missing-state handling and scene size part of the compute budget. The missing control compares one universal model with specialized models at matched total parameters and training examples, not merely shared implementation. At 10× agents or horizon, the interaction tensor dominates memory. The unification claim would fail if specialized decoders consistently improved joint calibration or rare conditional queries at equal aggregate cost.
+- Scene Transformer pushed the field toward unified heterogeneous scene attention, where the model reasons over agents, time, and map context together.
+- The forecasting question can be a mask over the scene, not a separate model for every task.

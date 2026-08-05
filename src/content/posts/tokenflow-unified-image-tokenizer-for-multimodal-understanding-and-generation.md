@@ -36,10 +36,7 @@ _Figure 3 shows how TokenFlow keeps one discrete index useful for two jobs: sema
 
 ## High-Level Takeaways
 
-TokenFlow informs whether one discrete image interface can support both semantic understanding and high-fidelity generation. Its dual codebooks preserve semantic and fine-grained signals, while a shared index mapping lets a transformer consume a unified token stream. The image token is therefore not forced to choose between invariance and reconstruction detail; the mapping couples two specialized representations at each position.
-
-The reported understanding, reconstruction, and generation results show that the compromise is viable, but they do not isolate the cost of the larger codebook machinery or test severe compression uniformly. A bitrate- and parameter-matched comparison with single codebooks across resolutions is the missing ablation. At ten times the image complexity or sequence length, index alignment may become brittle and discrete sequences expensive. The unification claim fails if separate tokenizers deliver a better Pareto frontier once tokenizer compute and downstream context cost are counted.
-
-The design adds tokenizer complexity; results depend on the selected comparisons and resolutions.
-
-The tokenizer is an architectural decision: semantic and reconstruction features can be aligned without being identical.
+- TokenFlow informs whether one discrete image interface can support both semantic understanding and high-fidelity generation. Its dual codebooks preserve semantic and fine-grained signals, while a shared index mapping lets a transformer consume a unified token stream. The image token is therefore not forced to choose between invariance and reconstruction detail; the mapping couples two specialized representations at each position.
+- The reported understanding, reconstruction, and generation results show that the compromise is viable, but they do not isolate the cost of the larger codebook machinery or test severe compression uniformly. A bitrate- and parameter-matched comparison with single codebooks across resolutions is the missing ablation. At ten times the image complexity or sequence length, index alignment may become brittle and discrete sequences expensive. The unification claim fails if separate tokenizers deliver a better Pareto frontier once tokenizer compute and downstream context cost are counted.
+- The design adds tokenizer complexity; results depend on the selected comparisons and resolutions.
+- The tokenizer is an architectural decision: semantic and reconstruction features can be aligned without being identical.

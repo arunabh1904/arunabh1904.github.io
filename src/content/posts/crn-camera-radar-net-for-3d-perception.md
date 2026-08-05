@@ -35,10 +35,7 @@ Radar occupancy augments the camera depth distribution, while a top-k BEV-query 
 
 ## High-Level Takeaways
 
-CRN is appropriate when radar's main job is to resolve camera depth rather than act as an independent detector. Its failure audit should cover multipath, ghost returns, radial-velocity ambiguity, weather, timestamp offsets, and radar dropout—not only aggregate nuScenes scores.
-
-Top-k query count is a safety-relevant budget because it directly controls which BEV regions can receive cross-modal correction.
-
-RCBEVDet strengthens the radar representation before BEV fusion; CRN makes radar a guide for camera geometry.
-
-Radar is most valuable when its range and motion evidence changes how camera features are localized, not when it is reduced to a generic feature map.
+- CRN is appropriate when radar's main job is to resolve camera depth rather than act as an independent detector. Its failure audit should cover multipath, ghost returns, radial-velocity ambiguity, weather, timestamp offsets, and radar dropout—not only aggregate nuScenes scores.
+- Top-k query count is a safety-relevant budget because it directly controls which BEV regions can receive cross-modal correction.
+- RCBEVDet strengthens the radar representation before BEV fusion; CRN makes radar a guide for camera geometry.
+- Radar is most valuable when its range and motion evidence changes how camera features are localized, not when it is reduced to a generic feature map.

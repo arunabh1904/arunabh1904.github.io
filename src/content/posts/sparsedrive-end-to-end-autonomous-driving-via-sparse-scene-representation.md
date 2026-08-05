@@ -48,10 +48,7 @@ _Figure 3 shows SparseDrive's architecture: image features become sparse scene r
 
 ## High-Level Takeaways
 
-SparseDrive informs whether end-to-end planning needs a dense BEV feature map or can operate on a compact set of detected agents and map instances. Its atomic units are sparse scene queries shared by perception, motion prediction, and planning; collision-aware rescoring links predicted futures back to ego selection.
-
-The sparse interface buys latency by discarding most spatial locations, but missed or poorly localized instances become irreversible planner blind spots. The missing test equalizes backbone and latency across sparse queries, dense BEV, and a hybrid occupancy path under occlusion and long-tail clutter. At 10× actors, query competition and pairwise interaction cost dominate. The claim would fail if a compressed dense representation matched planning safety with better recall at the same runtime.
-
-SparseDrive sharpened the argument that sparse/vectorized planning can be both faster and more planner-aligned than dense BEV stacks.
-
-Dense BEV preserves broad spatial evidence, but a planner often needs explicit entities and relations.
+- SparseDrive informs whether end-to-end planning needs a dense BEV feature map or can operate on a compact set of detected agents and map instances. Its atomic units are sparse scene queries shared by perception, motion prediction, and planning; collision-aware rescoring links predicted futures back to ego selection.
+- The sparse interface buys latency by discarding most spatial locations, but missed or poorly localized instances become irreversible planner blind spots. The missing test equalizes backbone and latency across sparse queries, dense BEV, and a hybrid occupancy path under occlusion and long-tail clutter. At 10× actors, query competition and pairwise interaction cost dominate. The claim would fail if a compressed dense representation matched planning safety with better recall at the same runtime.
+- SparseDrive sharpened the argument that sparse/vectorized planning can be both faster and more planner-aligned than dense BEV stacks.
+- Dense BEV preserves broad spatial evidence, but a planner often needs explicit entities and relations.

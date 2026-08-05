@@ -33,10 +33,7 @@ Predicting several frames requires the representation to retain geometry and cha
 
 ## High-Level Takeaways
 
-UniWorld is useful when large synchronized logs exist and manual 3D labels are scarce. Audit the occupancy generator: dynamic objects, occlusion, pose error, and multi-sweep fusion can create targets a camera cannot causally observe.
-
-The decisive scaling test compares more scenes, more frames per scene, and richer LiDAR targets under fixed compute. Otherwise gains can be attributed to extra tokens rather than the world-model objective.
-
-UniM²AE reconstructs masked synchronized sensors; UniWorld predicts 4D occupancy; ViDAR predicts future point clouds from historical images.
-
-Privileged LiDAR can supervise a reusable camera world representation, but its generated geometry must be treated as a versioned, fallible label source.
+- UniWorld is useful when large synchronized logs exist and manual 3D labels are scarce. Audit the occupancy generator: dynamic objects, occlusion, pose error, and multi-sweep fusion can create targets a camera cannot causally observe.
+- The decisive scaling test compares more scenes, more frames per scene, and richer LiDAR targets under fixed compute. Otherwise gains can be attributed to extra tokens rather than the world-model objective.
+- UniM²AE reconstructs masked synchronized sensors; UniWorld predicts 4D occupancy; ViDAR predicts future point clouds from historical images.
+- Privileged LiDAR can supervise a reusable camera world representation, but its generated geometry must be treated as a versioned, fallible label source.

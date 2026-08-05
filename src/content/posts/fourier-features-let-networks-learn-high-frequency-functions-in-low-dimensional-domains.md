@@ -56,10 +56,7 @@ _Figure 2 shows why the input mapping matters: Fourier features reshape the effe
 
 ## High-Level Takeaways
 
-Fourier features inform whether an MLP should learn geometry directly from raw coordinates or receive a fixed sinusoidal basis that exposes high spatial frequencies. The atomic unit is a coordinate-value pair; a bandwidth-controlled projection maps the coordinate into periodic features before the shared MLP.
-
-The experiments show that the embedding changes the effective kernel and overcomes spectral bias on images and 3D signals. They do not prescribe one bandwidth for noisy, multiscale driving geometry. The missing test jointly sweeps bandwidth, learned encodings, and coordinate noise at matched parameters. At 10× spatial extent or resolution, aliasing and basis size become limiting. The claim would weaken if a learned positional encoding matched high-frequency reconstruction while adapting more robustly across scales.
-
-Fourier features became one of the standard ways to make coordinate networks useful for detailed spatial signals.
-
-If an MLP is asked to learn geometry from raw coordinates, give it a frequency basis first; otherwise the model starts with the wrong smoothness prior.
+- Fourier features inform whether an MLP should learn geometry directly from raw coordinates or receive a fixed sinusoidal basis that exposes high spatial frequencies. The atomic unit is a coordinate-value pair; a bandwidth-controlled projection maps the coordinate into periodic features before the shared MLP.
+- The experiments show that the embedding changes the effective kernel and overcomes spectral bias on images and 3D signals. They do not prescribe one bandwidth for noisy, multiscale driving geometry. The missing test jointly sweeps bandwidth, learned encodings, and coordinate noise at matched parameters. At 10× spatial extent or resolution, aliasing and basis size become limiting. The claim would weaken if a learned positional encoding matched high-frequency reconstruction while adapting more robustly across scales.
+- Fourier features became one of the standard ways to make coordinate networks useful for detailed spatial signals.
+- If an MLP is asked to learn geometry from raw coordinates, give it a frequency basis first; otherwise the model starts with the wrong smoothness prior.

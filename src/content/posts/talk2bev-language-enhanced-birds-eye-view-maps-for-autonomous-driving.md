@@ -50,10 +50,7 @@ _Figure 2 shows how Talk2BEV turns generated BEV maps into language-enhanced map
 
 ## High-Level Takeaways
 
-Talk2BEV informs whether open-vocabulary driving questions should be answered from camera tokens directly or from a metric BEV map augmented with language-aligned object features. The atomic representation is a BEV object with geometry, identity, and an image-language embedding; spatial and intent queries operate over that grounded map.
-
-The design preserves metric relations while importing open-vocabulary semantics, but errors from detection, BEV projection, and captioning compound. The missing ablation compares oracle objects, learned BEV objects, and direct image prompting with equal language-model context. At 10× scene density, object selection and relation enumeration dominate. The BEV grounding claim would fail if direct visual prompting matched spatial accuracy and explanation faithfulness without the structured map.
-
-Talk2BEV is an early clean example of language-grounded scene reasoning over BEV rather than only camera images.
-
-Driving language models need spatial grounding, and BEV maps are one natural place to attach it.
+- Talk2BEV informs whether open-vocabulary driving questions should be answered from camera tokens directly or from a metric BEV map augmented with language-aligned object features. The atomic representation is a BEV object with geometry, identity, and an image-language embedding; spatial and intent queries operate over that grounded map.
+- The design preserves metric relations while importing open-vocabulary semantics, but errors from detection, BEV projection, and captioning compound. The missing ablation compares oracle objects, learned BEV objects, and direct image prompting with equal language-model context. At 10× scene density, object selection and relation enumeration dominate. The BEV grounding claim would fail if direct visual prompting matched spatial accuracy and explanation faithfulness without the structured map.
+- Talk2BEV is an early clean example of language-grounded scene reasoning over BEV rather than only camera images.
+- Driving language models need spatial grounding, and BEV maps are one natural place to attach it.

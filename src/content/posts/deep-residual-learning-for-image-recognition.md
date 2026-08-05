@@ -34,16 +34,6 @@ ResNet made depth easier to optimize by changing what each block has to learn. I
 
 Those shortcuts act like gradient highways without adding parameters or inference cost. They let the authors train 152-layer networks that were both deeper and more accurate than plain CNNs. Bottleneck blocks, built from 1x1, 3x3, and 1x1 convolutions, kept the compute manageable: ResNet-152 was far deeper than VGG-19 while using fewer FLOPs. An ensemble of ResNets achieved 3.57% top-5 error on ImageNet and won ILSVRC 2015.
 
-## High-Level Takeaways
-
-ResNet informs the decision to add depth through residual updates rather than ask each block to relearn a complete transformation. The operative unit is a residual block applied across a mini-batch of images, with identity shortcuts carrying both activations and gradients across depth.
-
-The ImageNet-to-detection transfer results show that the optimization benefit survives beyond classification. They do not isolate identity shortcuts from batch normalization, initialization, or the bottleneck block design as cleanly as a modern controlled study could.
-
-At 10× depth, activation memory, normalization behavior, communication, and diminishing returns dominate the original degradation problem. The residual-learning claim would weaken if a plain network with matched depth, normalization, initialization, FLOPs, and training time reached the same accuracy and optimization stability.
-
-The residual connection is a tiny architectural change with huge practical reach. It fixed the degradation problem in very deep CNNs, transferred well to detection and segmentation, and later became part of the default design vocabulary for modern deep networks, including Transformers.
-
 ### Reported evidence
 
 | Model | Params | FLOPs | ImageNet‑1k Top‑5 (val) | Notes |
@@ -82,3 +72,10 @@ class MiniResidual(nn.Module):
 ```
 
 ResNet's core idea is almost comically simple: add the identity back. That shortcut reshaped deep-learning practice, and today almost every high-performance architecture inherits some version of its skip-connection logic.
+
+## High-Level Takeaways
+
+- ResNet informs the decision to add depth through residual updates rather than ask each block to relearn a complete transformation. The operative unit is a residual block applied across a mini-batch of images, with identity shortcuts carrying both activations and gradients across depth.
+- The ImageNet-to-detection transfer results show that the optimization benefit survives beyond classification. They do not isolate identity shortcuts from batch normalization, initialization, or the bottleneck block design as cleanly as a modern controlled study could.
+- At 10× depth, activation memory, normalization behavior, communication, and diminishing returns dominate the original degradation problem. The residual-learning claim would weaken if a plain network with matched depth, normalization, initialization, FLOPs, and training time reached the same accuracy and optimization stability.
+- The residual connection is a tiny architectural change with huge practical reach. It fixed the degradation problem in very deep CNNs, transferred well to detection and segmentation, and later became part of the default design vocabulary for modern deep networks, including Transformers.

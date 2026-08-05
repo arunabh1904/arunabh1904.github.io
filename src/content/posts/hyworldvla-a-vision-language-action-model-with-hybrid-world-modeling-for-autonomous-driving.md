@@ -50,14 +50,9 @@ The training footprint is substantial and somewhat specialized. The video VAE is
 
 ## High-Level Takeaways
 
-HyWorldVLA informs where pixel reconstruction belongs in a driving planner. Its evidence favors using pixels as a pretraining constraint that shapes a compact future representation, then letting the action model consume that representation rather than regenerate frames at deployment. This preserves dense physical grounding without tying every planning update to a visually exact future.
-
-The decisive causal control would apply identical corruption to the training and evaluation inputs of matched pixel, latent, and hybrid models while holding backbone, data, parameter count, and compute fixed. The current noisy subset is compelling but paper-defined, and the largest gain could partly reflect how its rain and fog cases align with latent invariances. Robustness to geometric shifts, sensor failures, novel agents, and adversarial illumination is not established.
-
-At ten times the data diversity, VAE target quality and auxiliary-loss balance become the likely bottlenecks. A latent can ignore harmless appearance noise, but it can also suppress small safety-critical objects. The next experiment should stratify corruption by whether it changes appearance, geometry, or visibility and measure which details survive in the predicted future representation.
-
-HyWorldVLA uses pixel prediction to ground a future latent during pretraining, then conditions trajectory generation on the latent during co-fine-tuning.
-
-Results use NAVSIM’s non-reactive protocol and a monocular front camera. The corruption benchmark is a 655-case paper-defined subset, real closed-loop driving is not tested, and runtime is not reported.
-
-Use pixel reconstruction to teach a future representation, but plan from a compact latent whose invariances are tested against realistic scene noise.
+- HyWorldVLA informs where pixel reconstruction belongs in a driving planner. Its evidence favors using pixels as a pretraining constraint that shapes a compact future representation, then letting the action model consume that representation rather than regenerate frames at deployment. This preserves dense physical grounding without tying every planning update to a visually exact future.
+- The decisive causal control would apply identical corruption to the training and evaluation inputs of matched pixel, latent, and hybrid models while holding backbone, data, parameter count, and compute fixed. The current noisy subset is compelling but paper-defined, and the largest gain could partly reflect how its rain and fog cases align with latent invariances. Robustness to geometric shifts, sensor failures, novel agents, and adversarial illumination is not established.
+- At ten times the data diversity, VAE target quality and auxiliary-loss balance become the likely bottlenecks. A latent can ignore harmless appearance noise, but it can also suppress small safety-critical objects. The next experiment should stratify corruption by whether it changes appearance, geometry, or visibility and measure which details survive in the predicted future representation.
+- HyWorldVLA uses pixel prediction to ground a future latent during pretraining, then conditions trajectory generation on the latent during co-fine-tuning.
+- Results use NAVSIM’s non-reactive protocol and a monocular front camera. The corruption benchmark is a 655-case paper-defined subset, real closed-loop driving is not tested, and runtime is not reported.
+- Use pixel reconstruction to teach a future representation, but plan from a compact latent whose invariances are tested against realistic scene noise.

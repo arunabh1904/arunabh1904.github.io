@@ -55,10 +55,7 @@ _Figure 2 shows the Perceiver IO template: arbitrary inputs enter a latent works
 
 ## High-Level Takeaways
 
-Perceiver IO informs whether compute should scale with raw input size or with a fixed latent bottleneck and a chosen set of output queries. The atomic operations are input-to-latent cross-attention, latent self-attention, and output-query cross-attention; task structure enters through the queries rather than a bespoke head.
-
-The architecture demonstrates broad modality and output flexibility, but the fixed latent array can discard fine detail before the task reveals what matters. The missing ablation sweeps latent count and output-query density against full attention at matched FLOPs across tasks with different information bottlenecks. At 10× input size, cross-attention remains manageable, but latent capacity becomes the failure point. The claim would fail if task-specific sparse attention preserved accuracy with equal efficiency and less latent tuning.
-
-Perceiver IO gave researchers a reusable pattern for multimodal models whose inputs and outputs do not fit one simple grid or sequence.
-
-Use a latent workspace when input size, output size, and output semantics all vary; the important design work moves into queries and embeddings.
+- Perceiver IO informs whether compute should scale with raw input size or with a fixed latent bottleneck and a chosen set of output queries. The atomic operations are input-to-latent cross-attention, latent self-attention, and output-query cross-attention; task structure enters through the queries rather than a bespoke head.
+- The architecture demonstrates broad modality and output flexibility, but the fixed latent array can discard fine detail before the task reveals what matters. The missing ablation sweeps latent count and output-query density against full attention at matched FLOPs across tasks with different information bottlenecks. At 10× input size, cross-attention remains manageable, but latent capacity becomes the failure point. The claim would fail if task-specific sparse attention preserved accuracy with equal efficiency and less latent tuning.
+- Perceiver IO gave researchers a reusable pattern for multimodal models whose inputs and outputs do not fit one simple grid or sequence.
+- Use a latent workspace when input size, output size, and output semantics all vary; the important design work moves into queries and embeddings.

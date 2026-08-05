@@ -41,10 +41,7 @@ _The two decoder stages separate geometric proposal formation from image refinem
 
 ## High-Level Takeaways
 
-TransFusion informs whether camera fusion should happen densely before detection or selectively around object hypotheses. Its atomic unit is an object query initialized from a LiDAR BEV heatmap. Sensor backbones remain separate; sharing begins in the decoder after LiDAR has established a candidate set.
-
-The critical missing control matches BEV fusion and query fusion for image tokens inspected, latency, and LiDAR backbone. At 10× objects, queries and image cross-attention scale with scene density, while the camera encoder still dominates runtime. The design would be rejected for tasks such as free-space segmentation or lane topology where evidence cannot be reduced to object proposals, or if a dense BEV model matches calibration robustness while serving multiple heads more cheaply.
-
-TransFusion made query-level soft association a strong alternative to both point painting and dense BEV fusion.
-
-Calibration should narrow where a model looks; it need not become a hard feature correspondence that turns a small pose error into a missed object.
+- TransFusion informs whether camera fusion should happen densely before detection or selectively around object hypotheses. Its atomic unit is an object query initialized from a LiDAR BEV heatmap. Sensor backbones remain separate; sharing begins in the decoder after LiDAR has established a candidate set.
+- The critical missing control matches BEV fusion and query fusion for image tokens inspected, latency, and LiDAR backbone. At 10× objects, queries and image cross-attention scale with scene density, while the camera encoder still dominates runtime. The design would be rejected for tasks such as free-space segmentation or lane topology where evidence cannot be reduced to object proposals, or if a dense BEV model matches calibration robustness while serving multiple heads more cheaply.
+- TransFusion made query-level soft association a strong alternative to both point painting and dense BEV fusion.
+- Calibration should narrow where a model looks; it need not become a hard feature correspondence that turns a small pose error into a missed object.

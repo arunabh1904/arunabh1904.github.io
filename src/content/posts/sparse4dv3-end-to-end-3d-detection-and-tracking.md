@@ -41,10 +41,7 @@ _Denoising follows the same temporal path as deployed queries, so training expos
 
 ## High-Level Takeaways
 
-Sparse4D v3 informs whether detection and tracking should share the same persistent query state. The atomic unit is a recurrent instance with feature, anchor, quality, and identity. Most parameters are shared across the two tasks; tracking adds inference logic rather than a new network.
-
-The missing comparison matches a conventional detector-plus-tracker for backbone, memory, latency, and track-management rules, then evaluates births, deaths, long occlusion, and calibration. At 10× actors or denoising groups, query attention and matching dominate training. The unified state would fail if explicit motion filters or association logic provide better uncertainty, recoverability, or rare-event behavior with negligible extra compute.
-
-Sparse4D v3 turns the original sparse 4D sampler into a more stable recurrent perception primitive and supplies the object-state lineage that SparseDrive extends toward mapping and planning.
-
-A query becomes a track only when training teaches it to survive noise and the model separates semantic belief from geometric quality.
+- Sparse4D v3 informs whether detection and tracking should share the same persistent query state. The atomic unit is a recurrent instance with feature, anchor, quality, and identity. Most parameters are shared across the two tasks; tracking adds inference logic rather than a new network.
+- The missing comparison matches a conventional detector-plus-tracker for backbone, memory, latency, and track-management rules, then evaluates births, deaths, long occlusion, and calibration. At 10× actors or denoising groups, query attention and matching dominate training. The unified state would fail if explicit motion filters or association logic provide better uncertainty, recoverability, or rare-event behavior with negligible extra compute.
+- Sparse4D v3 turns the original sparse 4D sampler into a more stable recurrent perception primitive and supplies the object-state lineage that SparseDrive extends toward mapping and planning.
+- A query becomes a track only when training teaches it to survive noise and the model separates semantic belief from geometric quality.

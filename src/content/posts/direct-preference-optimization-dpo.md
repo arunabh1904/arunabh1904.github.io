@@ -56,14 +56,9 @@ The simplicity has a precise price. DPO is offline. It cannot discover new failu
 
 ## High-Level Takeaways
 
-DPO informs whether an explicit reward model and online policy optimization are necessary for a fixed preference dataset. Its atomic example is one prompt with a matched chosen/rejected pair. It is attractive when pair quality is high, online generation is costly, and operational simplicity matters more than active exploration.
-
-The decisive comparison holds the base model, preference pairs, generated samples, reference, and total compute fixed across DPO and reward-model-plus-PPO. The source paper provides careful task comparisons, but no finite benchmark proves that the two pipelines behave identically under reward hacking, distribution shift, or safety constraints. At ten times data scale, mislabeled pairs and heterogeneous annotator preferences become the dominant source of gradient conflict.
-
-DPO is not the evolutionary successor to [PPO](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html); it is an offline branch that changes the available evidence. [GRPO](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html) returns to online sampling for verifiable reasoning, while [on-policy distillation](/paper%20shorts/2023/06/23/on-policy-distillation-language-models-gkd.html) obtains dense teacher targets on student-generated states.
-
-DPO eliminates the explicit reward-model-plus-RL loop for matched offline preference pairs.
-
-It inherits pair quality and coverage, cannot explore beyond its dataset, and depends on the reference model and preference-model assumptions.
-
-DPO's real advantage is not “RL without RL”; it is a clean offline objective when the evidence already arrives as trustworthy matched preferences.
+- DPO informs whether an explicit reward model and online policy optimization are necessary for a fixed preference dataset. Its atomic example is one prompt with a matched chosen/rejected pair. It is attractive when pair quality is high, online generation is costly, and operational simplicity matters more than active exploration.
+- The decisive comparison holds the base model, preference pairs, generated samples, reference, and total compute fixed across DPO and reward-model-plus-PPO. The source paper provides careful task comparisons, but no finite benchmark proves that the two pipelines behave identically under reward hacking, distribution shift, or safety constraints. At ten times data scale, mislabeled pairs and heterogeneous annotator preferences become the dominant source of gradient conflict.
+- DPO is not the evolutionary successor to [PPO](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html); it is an offline branch that changes the available evidence. [GRPO](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html) returns to online sampling for verifiable reasoning, while [on-policy distillation](/paper%20shorts/2023/06/23/on-policy-distillation-language-models-gkd.html) obtains dense teacher targets on student-generated states.
+- DPO eliminates the explicit reward-model-plus-RL loop for matched offline preference pairs.
+- It inherits pair quality and coverage, cannot explore beyond its dataset, and depends on the reference model and preference-model assumptions.
+- DPO's real advantage is not “RL without RL”; it is a clean offline objective when the evidence already arrives as trustworthy matched preferences.

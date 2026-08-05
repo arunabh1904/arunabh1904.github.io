@@ -43,10 +43,7 @@ _Figure 1 from the [DriveBench paper](https://arxiv.org/abs/2501.04003), cropped
 
 ## High-Level Takeaways
 
-DriveBench informs whether a VLM's plausible driving language is grounded enough to support deployment claims. Its atomic evaluation item couples a driving frame with a question and answer, then stresses visual corruption and text-only shortcuts to separate perception from learned priors.
-
-The benchmark shows that fluent answers can survive when visual evidence is removed or degraded, so aggregate QA accuracy is not a grounding metric. The missing validation is replication on new geographies, camera rigs, and freshly collected questions with contamination checks and human disagreement estimates. At 10× scale, annotation consistency and shortcut diversity dominate example count. DriveBench's conclusion would weaken if model rankings and failure modes did not reproduce on that independent set.
-
-Capability benchmarks can flatter VLMs. Driving needs reliability benchmarks that ask whether the model actually looked at the scene.
-
-A VLM that sounds right is not necessarily grounded. For driving, grounding under degradation is the benchmark that matters.
+- DriveBench informs whether a VLM's plausible driving language is grounded enough to support deployment claims. Its atomic evaluation item couples a driving frame with a question and answer, then stresses visual corruption and text-only shortcuts to separate perception from learned priors.
+- The benchmark shows that fluent answers can survive when visual evidence is removed or degraded, so aggregate QA accuracy is not a grounding metric. The missing validation is replication on new geographies, camera rigs, and freshly collected questions with contamination checks and human disagreement estimates. At 10× scale, annotation consistency and shortcut diversity dominate example count. DriveBench's conclusion would weaken if model rankings and failure modes did not reproduce on that independent set.
+- Capability benchmarks can flatter VLMs. Driving needs reliability benchmarks that ask whether the model actually looked at the scene.
+- A VLM that sounds right is not necessarily grounded. For driving, grounding under degradation is the benchmark that matters.

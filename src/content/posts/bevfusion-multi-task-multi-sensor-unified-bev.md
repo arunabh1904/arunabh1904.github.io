@@ -43,10 +43,7 @@ _BEVFusion's unification boundary is visible in the middle: modality-specific en
 
 ## High-Level Takeaways
 
-BEVFusion informs whether a production stack should pay once for a shared geometric representation and reuse it across sensors and tasks. The atomic unit is a BEV cell. Camera and LiDAR encoders remain modality-specific, while the BEV encoder is shared; task heads and losses remain separate.
-
-The decisive missing ablation compares shared and task-specific BEV encoders under equal parameters, latency, and augmentation, with gradient-conflict measurements. The paper demonstrates architectural reuse but does not establish that joint detection and segmentation always improve each other. At 10× spatial extent or resolution, dense BEV memory and convolution dominate. The shared-grid bet would fail when sparse object and map queries match downstream task quality and temporal stability at much lower compute.
-
-BEVFusion joins LSS's camera view transformation to a task-agnostic multi-sensor trunk and became the reference baseline for later robustness, interaction, and radar-camera work.
-
-A unified model becomes economical when sensors share an expensive spatial workspace and tasks specialize only after that workspace is built.
+- BEVFusion informs whether a production stack should pay once for a shared geometric representation and reuse it across sensors and tasks. The atomic unit is a BEV cell. Camera and LiDAR encoders remain modality-specific, while the BEV encoder is shared; task heads and losses remain separate.
+- The decisive missing ablation compares shared and task-specific BEV encoders under equal parameters, latency, and augmentation, with gradient-conflict measurements. The paper demonstrates architectural reuse but does not establish that joint detection and segmentation always improve each other. At 10× spatial extent or resolution, dense BEV memory and convolution dominate. The shared-grid bet would fail when sparse object and map queries match downstream task quality and temporal stability at much lower compute.
+- BEVFusion joins LSS's camera view transformation to a task-agnostic multi-sensor trunk and became the reference baseline for later robustness, interaction, and radar-camera work.
+- A unified model becomes economical when sensors share an expensive spatial workspace and tasks specialize only after that workspace is built.

@@ -38,12 +38,8 @@ The benchmark also introduces PRIDE, which models paraphrase difficulty using se
 
 ## High-Level Takeaways
 
-LIBERO-Para informs whether a post-trained VLA learned task semantics or memorized the fine-tuning instruction surface. Its unit is a set of paraphrases mapped to one closed-loop task. Visual state and controller remain fixed so linguistic variation is the causal intervention.
-
-The results establish a large robustness gap in current configurations, but generated paraphrases may not match how real users speak. At ten times the language diversity, ambiguity and legitimate task reinterpretation complicate the oracle. The benchmark's claim would weaken if human-equivalent commands are not semantically interchangeable or if instruction augmentation closes LIBERO-Para without improving natural user interactions.
-
-LIBERO-Para reveals a failure hidden by the original LIBERO protocol's identical train/eval instructions.
-
-Language robustness is only one axis; success can still hide visual or control shortcuts.
-
-A VLA has not grounded an instruction if a harmless paraphrase changes the plan.
+- LIBERO-Para informs whether a post-trained VLA learned task semantics or memorized the fine-tuning instruction surface. Its unit is a set of paraphrases mapped to one closed-loop task. Visual state and controller remain fixed so linguistic variation is the causal intervention.
+- The results establish a large robustness gap in current configurations, but generated paraphrases may not match how real users speak. At ten times the language diversity, ambiguity and legitimate task reinterpretation complicate the oracle. The benchmark's claim would weaken if human-equivalent commands are not semantically interchangeable or if instruction augmentation closes LIBERO-Para without improving natural user interactions.
+- LIBERO-Para reveals a failure hidden by the original LIBERO protocol's identical train/eval instructions.
+- Language robustness is only one axis; success can still hide visual or control shortcuts.
+- A VLA has not grounded an instruction if a harmless paraphrase changes the plan.

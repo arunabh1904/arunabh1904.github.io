@@ -36,12 +36,8 @@ Dense progress is more informative than terminal success, but also easier to exp
 
 ## High-Level Takeaways
 
-VLAC informs whether to hand-engineer rewards, learn a task-specific success detector, or train a general visual-language process critic. Its atomic unit is a pair of temporally related observations plus a goal; progress labels come from ordering and curated negatives. Actor and critic share one model interface, buying transfer while increasing correlated-failure risk.
-
-The real-robot loop establishes promising sample efficiency on four tasks, not universal reward validity. A missing ablation gives the critic structured geometry/contact state and tests whether that changes reward hacking and transfer. At ten times the task diversity, visually similar but physically different progress will dominate. The central claim fails if critic score improves while blinded human success, safety, or intervention rate does not.
-
-VLAC makes the learned critic—not the policy—the central reusable model in real-world post-training.
-
-Progress supervision inferred from time can label pauses or necessary backtracking incorrectly.
-
-A general critic needs explicit negative cases for regression, stagnation, and goal mismatch; scale alone does not make progress causal.
+- VLAC informs whether to hand-engineer rewards, learn a task-specific success detector, or train a general visual-language process critic. Its atomic unit is a pair of temporally related observations plus a goal; progress labels come from ordering and curated negatives. Actor and critic share one model interface, buying transfer while increasing correlated-failure risk.
+- The real-robot loop establishes promising sample efficiency on four tasks, not universal reward validity. A missing ablation gives the critic structured geometry/contact state and tests whether that changes reward hacking and transfer. At ten times the task diversity, visually similar but physically different progress will dominate. The central claim fails if critic score improves while blinded human success, safety, or intervention rate does not.
+- VLAC makes the learned critic—not the policy—the central reusable model in real-world post-training.
+- Progress supervision inferred from time can label pauses or necessary backtracking incorrectly.
+- A general critic needs explicit negative cases for regression, stagnation, and goal mismatch; scale alone does not make progress causal.

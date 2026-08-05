@@ -38,12 +38,8 @@ The paper evaluates simulation and real manipulation, reporting better generaliz
 
 ## High-Level Takeaways
 
-APO informs whether human time should produce full demonstrations or targeted interventions on policy failures. Its atomic unit is an action labeled by desirability within an interaction trajectory. Irreversibility prevents exact pairing, and adaptive weighting maps physical action discrepancy back into an autoregressive token loss.
-
-The results show that binary action feedback can exploit failures more directly than preferred-sample SFT. A missing ablation compares intervention timing, action-window length, and matched-state resets. At ten times the deployment volume, operator latency and inconsistent takeover thresholds will bias the data. The approach fails if action-level gains do not improve episode-level safety or if the policy learns to rely on states reachable only after human rescue.
-
-APO is the practical bridge from KTO-style binary feedback to irreversible physical interaction.
-
-An intervention identifies a bad local choice more reliably than it identifies the earliest causal error.
-
-Do not force physical corrections into language-style pairs; preserve what the intervention actually tells you.
+- APO informs whether human time should produce full demonstrations or targeted interventions on policy failures. Its atomic unit is an action labeled by desirability within an interaction trajectory. Irreversibility prevents exact pairing, and adaptive weighting maps physical action discrepancy back into an autoregressive token loss.
+- The results show that binary action feedback can exploit failures more directly than preferred-sample SFT. A missing ablation compares intervention timing, action-window length, and matched-state resets. At ten times the deployment volume, operator latency and inconsistent takeover thresholds will bias the data. The approach fails if action-level gains do not improve episode-level safety or if the policy learns to rely on states reachable only after human rescue.
+- APO is the practical bridge from KTO-style binary feedback to irreversible physical interaction.
+- An intervention identifies a bad local choice more reliably than it identifies the earliest causal error.
+- Do not force physical corrections into language-style pairs; preserve what the intervention actually tells you.

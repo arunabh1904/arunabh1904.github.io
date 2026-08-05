@@ -48,14 +48,9 @@ Scaling changes qualitative behavior. Diagnostic merges that fail at $10^8$ tran
 
 ## High-Level Takeaways
 
-GIGAFLOW informs whether an autonomy program should invest first in more logged human driving or in a simulator capable of generating interactive on-policy experience. Its evidence supports self-play for planning and negotiation when structured state is available: scale exposes recovery, contention, and long-horizon rerouting states that passive logs sample sparsely.
-
-The atomic training unit is a transition from millions of concurrently acting agents, but parameter sharing makes those samples correlated. Reward randomization supplies behavioral diversity without maintaining separate opponent populations. A decisive matched-budget control would compare the shared conditional policy with independently parameterized or population-based agents while holding simulator steps and compute fixed; the claim weakens if robustness comes mainly from reward engineering or shared-policy conventions.
-
-At ten times the perceptual realism, simulator throughput is the likely bottleneck. The current result deliberately abstracts sensing, and photorealistic rendering would make one trillion transitions far more expensive. The next falsification step is to transfer the policy through a learned perception stack and measure closed-loop failures under sensor noise, novel geometry, and real vehicles—not merely replayed human scenarios.
-
-GIGAFLOW shows that self-play can produce a generalist driving policy when environment throughput, shared-agent inference, and tail-focused updates are designed as one system.
-
-Training and evaluation remain in simulation; the policy receives privileged structured state and does not solve perception. Several benchmark actors are scripted or log-replayed, and the strongest robustness number comes from a simplified internal environment.
-
-Self-play can replace much of the driving log with interactive experience for planning, but its road relevance depends on whether the structured-state policy survives perception and sim-to-real transfer.
+- GIGAFLOW informs whether an autonomy program should invest first in more logged human driving or in a simulator capable of generating interactive on-policy experience. Its evidence supports self-play for planning and negotiation when structured state is available: scale exposes recovery, contention, and long-horizon rerouting states that passive logs sample sparsely.
+- The atomic training unit is a transition from millions of concurrently acting agents, but parameter sharing makes those samples correlated. Reward randomization supplies behavioral diversity without maintaining separate opponent populations. A decisive matched-budget control would compare the shared conditional policy with independently parameterized or population-based agents while holding simulator steps and compute fixed; the claim weakens if robustness comes mainly from reward engineering or shared-policy conventions.
+- At ten times the perceptual realism, simulator throughput is the likely bottleneck. The current result deliberately abstracts sensing, and photorealistic rendering would make one trillion transitions far more expensive. The next falsification step is to transfer the policy through a learned perception stack and measure closed-loop failures under sensor noise, novel geometry, and real vehicles—not merely replayed human scenarios.
+- GIGAFLOW shows that self-play can produce a generalist driving policy when environment throughput, shared-agent inference, and tail-focused updates are designed as one system.
+- Training and evaluation remain in simulation; the policy receives privileged structured state and does not solve perception. Several benchmark actors are scripted or log-replayed, and the strongest robustness number comes from a simplified internal environment.
+- Self-play can replace much of the driving log with interactive experience for planning, but its road relevance depends on whether the structured-state policy survives perception and sim-to-real transfer.

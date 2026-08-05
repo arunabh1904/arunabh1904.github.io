@@ -41,10 +41,7 @@ _Only top foreground queries survive into the next frame, so query selection is 
 
 ## High-Level Takeaways
 
-StreamPETR informs whether long-term temporal state should be scene-centric or object-centric. Its atomic unit is an object query carrying reference position, feature, velocity, and time. The camera backbone is shared; temporal capacity is allocated by top-k foreground selection rather than grid size.
-
-The missing test evaluates object birth, temporary occlusion, re-entry, and false-track persistence at fixed memory and compute, then compares against dense BEV recurrence. At 10× actors, the fixed query queue becomes a recall bottleneck and query self-attention grows. The object-memory bet would fail if safety-relevant background or map changes materially affect detection before a fresh query can recover them.
-
-StreamPETR turns the PETR camera detector into an online recurrent system and helps establish object queries as compact temporal memory for later sparse end-to-end driving stacks.
-
-A long temporal horizon is affordable when the model stores state, age, and motion for objects instead of replaying the video.
+- StreamPETR informs whether long-term temporal state should be scene-centric or object-centric. Its atomic unit is an object query carrying reference position, feature, velocity, and time. The camera backbone is shared; temporal capacity is allocated by top-k foreground selection rather than grid size.
+- The missing test evaluates object birth, temporary occlusion, re-entry, and false-track persistence at fixed memory and compute, then compares against dense BEV recurrence. At 10× actors, the fixed query queue becomes a recall bottleneck and query self-attention grows. The object-memory bet would fail if safety-relevant background or map changes materially affect detection before a fresh query can recover them.
+- StreamPETR turns the PETR camera detector into an online recurrent system and helps establish object queries as compact temporal memory for later sparse end-to-end driving stacks.
+- A long temporal horizon is affordable when the model stores state, age, and motion for objects instead of replaying the video.

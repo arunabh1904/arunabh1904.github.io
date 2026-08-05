@@ -35,10 +35,7 @@ The paper reports that ViDAR improves downstream 3D detection by 3.1 NDS, reduce
 
 ## High-Level Takeaways
 
-ViDAR is relevant when downstream tasks need one temporal representation and fleet logs include synchronized LiDAR during collection. Compare deterministic forecasting with occupancy distributions or multi-hypothesis targets; future geometry is inherently uncertain around occlusion and agent intent.
-
-Transfer should be measured at fixed encoder size, pretraining tokens, and fine-tuning labels. A world-model objective is valuable only if gains survive several consumers, not one detector head.
-
-UniWorld predicts 4D occupancy; DriveWorld maintains a reusable 4D latent; ViDAR makes future point-cloud forecasting the visual pretraining task.
-
-Forecasting geometric evidence forces a visual encoder to model persistence and motion, but the target is privileged supervision—not proof that one future is predictable.
+- ViDAR is relevant when downstream tasks need one temporal representation and fleet logs include synchronized LiDAR during collection. Compare deterministic forecasting with occupancy distributions or multi-hypothesis targets; future geometry is inherently uncertain around occlusion and agent intent.
+- Transfer should be measured at fixed encoder size, pretraining tokens, and fine-tuning labels. A world-model objective is valuable only if gains survive several consumers, not one detector head.
+- UniWorld predicts 4D occupancy; DriveWorld maintains a reusable 4D latent; ViDAR makes future point-cloud forecasting the visual pretraining task.
+- Forecasting geometric evidence forces a visual encoder to model persistence and motion, but the target is privileged supervision—not proof that one future is predictable.

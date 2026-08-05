@@ -35,10 +35,7 @@ _Figure 1 shows the mixed objective at sequence level: text positions use next-t
 
 ## High-Level Takeaways
 
-Transfusion informs whether modality unification requires forcing images into next-token prediction. It shares a transformer across text and images but keeps losses appropriate to each representation: autoregressive cross-entropy for text and diffusion denoising for continuous image patches. Modality-specific input and output layers permit aggressive image compression while the shared trunk learns cross-modal dependencies.
-
-The scaling results support hybrid objectives over discrete image-token generation in the studied setting, but loss normalization becomes the hidden control knob because token prediction and denoising have different magnitudes and sample structures. A missing ablation should sweep loss weights and image patch counts at fixed compute, including a stronger discrete tokenizer. At ten times the resolution, diffusion patches can dominate training and attention despite compression. The core claim fails if its advantage vanishes after matching tokenizer quality, effective image compute, and per-modality loss contribution.
-
-Hybrid objectives make loss weighting, training diagnostics, and serving more complicated than one next-token objective.
-
-A unified model does not require a unified loss; use the objective that matches the modality.
+- Transfusion informs whether modality unification requires forcing images into next-token prediction. It shares a transformer across text and images but keeps losses appropriate to each representation: autoregressive cross-entropy for text and diffusion denoising for continuous image patches. Modality-specific input and output layers permit aggressive image compression while the shared trunk learns cross-modal dependencies.
+- The scaling results support hybrid objectives over discrete image-token generation in the studied setting, but loss normalization becomes the hidden control knob because token prediction and denoising have different magnitudes and sample structures. A missing ablation should sweep loss weights and image patch counts at fixed compute, including a stronger discrete tokenizer. At ten times the resolution, diffusion patches can dominate training and attention despite compression. The core claim fails if its advantage vanishes after matching tokenizer quality, effective image compute, and per-modality loss contribution.
+- Hybrid objectives make loss weighting, training diagnostics, and serving more complicated than one next-token objective.
+- A unified model does not require a unified loss; use the objective that matches the modality.

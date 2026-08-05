@@ -46,10 +46,7 @@ _Figure 1 shows Wayformer as an encoder-decoder attention network over heterogen
 
 ## High-Level Takeaways
 
-Wayformer informs how much forecasting quality comes from a specialized interaction graph versus a carefully chosen attention fusion strategy. Its atomic tokens represent agents, road elements, and traffic lights over time; early, late, or hierarchical fusion determines when those modalities can interact.
-
-The results favor early fusion in the tested regimes, but fusion choice is entangled with token count and attention approximation. The missing factorial study matches FLOPs while varying fusion point, latent bottleneck, and full versus factorized attention across scene densities. At 10× actors and map tokens, early fusion's quadratic interaction cost becomes decisive. The simplicity claim would fail if hierarchical fusion matched accuracy and calibration with a materially better latency curve.
-
-Wayformer helped normalize unified attention over heterogeneous driving scenes while keeping the architecture relatively simple.
-
-A strong general attention backbone can compete with highly specialized forecasting stacks when the fusion strategy is right.
+- Wayformer informs how much forecasting quality comes from a specialized interaction graph versus a carefully chosen attention fusion strategy. Its atomic tokens represent agents, road elements, and traffic lights over time; early, late, or hierarchical fusion determines when those modalities can interact.
+- The results favor early fusion in the tested regimes, but fusion choice is entangled with token count and attention approximation. The missing factorial study matches FLOPs while varying fusion point, latent bottleneck, and full versus factorized attention across scene densities. At 10× actors and map tokens, early fusion's quadratic interaction cost becomes decisive. The simplicity claim would fail if hierarchical fusion matched accuracy and calibration with a materially better latency curve.
+- Wayformer helped normalize unified attention over heterogeneous driving scenes while keeping the architecture relatively simple.
+- A strong general attention backbone can compete with highly specialized forecasting stacks when the fusion strategy is right.

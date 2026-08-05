@@ -48,10 +48,7 @@ _Figure 2 summarizes the VLA4AD architecture blocks, connecting visual inputs, l
 
 ## High-Level Takeaways
 
-This survey informs how to partition a driving-VLA research portfolio across perception-language alignment, world modeling, action generation, datasets, and closed-loop evaluation. Its comparison unit is not one token or trajectory but a system interface: visual representation, language/reasoning backbone, action head, and deployment loop.
-
-The taxonomy is useful only if it predicts which interfaces transfer across papers. A controlled benchmark that fixes sensors, backbone, data, latency, and action space would test that causal value. As the field expands, inconsistent action definitions and mostly open-loop metrics will age the taxonomy faster than model names. The survey's organizing claim would fail if capability and safety differences were explained better by data quality or evaluation protocol than by the proposed architecture categories.
-
-The survey gives a shared vocabulary for a field where "VLA" can mean anything from QA to closed-loop trajectory generation.
-
-Use this paper as the index card for the VLA-for-driving literature, then read the individual method papers for the actual design tradeoffs.
+- This survey informs how to partition a driving-VLA research portfolio across perception-language alignment, world modeling, action generation, datasets, and closed-loop evaluation. Its comparison unit is not one token or trajectory but a system interface: visual representation, language/reasoning backbone, action head, and deployment loop.
+- The taxonomy is useful only if it predicts which interfaces transfer across papers. A controlled benchmark that fixes sensors, backbone, data, latency, and action space would test that causal value. As the field expands, inconsistent action definitions and mostly open-loop metrics will age the taxonomy faster than model names. The survey's organizing claim would fail if capability and safety differences were explained better by data quality or evaluation protocol than by the proposed architecture categories.
+- The survey gives a shared vocabulary for a field where "VLA" can mean anything from QA to closed-loop trajectory generation.
+- Use this paper as the index card for the VLA-for-driving literature, then read the individual method papers for the actual design tradeoffs.

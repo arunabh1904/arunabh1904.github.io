@@ -35,12 +35,8 @@ The paper shifts robustness from an evaluation afterthought into the post-traini
 
 ## High-Level Takeaways
 
-RobustVLA informs whether post-training should optimize nominal success alone or explicitly reserve capacity for perturbation tolerance. Its unit is a rollout under sampled observation/action noise, with regularizers applied to policy sensitivity in addition to reward.
-
-The experiments support the proposed penalties under studied disturbances. A missing comparison uses physically grounded latency, occlusion, calibration drift, and contact errors rather than generic noise. At ten times the environment diversity, one smoothness coefficient cannot express all controller dynamics. The claim fails if robustness gains disappear under structured shifts or if reduced sensitivity prevents fast recovery from real disturbances.
-
-RobustVLA supplies the objective-level counterpart to benchmark suites that measure perturbation sensitivity.
-
-Mathematical bounds depend on how faithfully the perturbation model represents deployment.
-
-Robustness must be optimized against the disturbances the robot will actually face, not an abstract noise distribution.
+- RobustVLA informs whether post-training should optimize nominal success alone or explicitly reserve capacity for perturbation tolerance. Its unit is a rollout under sampled observation/action noise, with regularizers applied to policy sensitivity in addition to reward.
+- The experiments support the proposed penalties under studied disturbances. A missing comparison uses physically grounded latency, occlusion, calibration drift, and contact errors rather than generic noise. At ten times the environment diversity, one smoothness coefficient cannot express all controller dynamics. The claim fails if robustness gains disappear under structured shifts or if reduced sensitivity prevents fast recovery from real disturbances.
+- RobustVLA supplies the objective-level counterpart to benchmark suites that measure perturbation sensitivity.
+- Mathematical bounds depend on how faithfully the perturbation model represents deployment.
+- Robustness must be optimized against the disturbances the robot will actually face, not an abstract noise distribution.

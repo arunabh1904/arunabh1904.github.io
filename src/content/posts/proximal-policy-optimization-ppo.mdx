@@ -71,14 +71,9 @@ The playground makes the update boundary concrete: vary the old and new log-prob
 
 ## High-Level Takeaways
 
-PPO informs whether policy stability requires solving a constrained second-order problem. Its atomic unit is an on-policy transition with an advantage estimate, reused for several first-order epochs. It is attractive when environment interaction is available, action likelihood is tractable, and a value function can learn enough structure to reduce variance.
-
-Clipping is a heuristic, not a guarantee that the whole policy remains close in KL. Results depend on reward scaling, advantage normalization, rollout horizon, epoch count, value loss, entropy, and distributed freshness. At ten times policy size, rollout generation and keeping actors synchronized dominate the inexpensive-looking objective.
-
-[GRPO](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html) retains PPO-style ratios and clipping but removes the value model by comparing same-prompt completions. [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) is a separate offline branch: it removes online rollouts and advantages entirely.
-
-PPO turns trust-region intuition into a first-order clipped surrogate that can reuse fresh rollout data for multiple updates.
-
-It remains sample-hungry and sensitive to implementation details; clipping neither validates rewards nor guarantees a bounded policy KL.
-
-PPO became the default policy optimizer because it makes conservative online updates practical, not because it solves policy stability once and for all.
+- PPO informs whether policy stability requires solving a constrained second-order problem. Its atomic unit is an on-policy transition with an advantage estimate, reused for several first-order epochs. It is attractive when environment interaction is available, action likelihood is tractable, and a value function can learn enough structure to reduce variance.
+- Clipping is a heuristic, not a guarantee that the whole policy remains close in KL. Results depend on reward scaling, advantage normalization, rollout horizon, epoch count, value loss, entropy, and distributed freshness. At ten times policy size, rollout generation and keeping actors synchronized dominate the inexpensive-looking objective.
+- [GRPO](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html) retains PPO-style ratios and clipping but removes the value model by comparing same-prompt completions. [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) is a separate offline branch: it removes online rollouts and advantages entirely.
+- PPO turns trust-region intuition into a first-order clipped surrogate that can reuse fresh rollout data for multiple updates.
+- It remains sample-hungry and sensitive to implementation details; clipping neither validates rewards nor guarantees a bounded policy KL.
+- PPO became the default policy optimizer because it makes conservative online updates practical, not because it solves policy stability once and for all.

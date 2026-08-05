@@ -36,10 +36,7 @@ _The Wan-DiT architecture shows the generative core after compression: patchifie
 
 ## High-Level Takeaways
 
-Wan informs how to divide a video-generation budget among latent compression, transformer scale, data curation, and deployability. A video VAE compresses spatial and temporal structure before the generative model operates, while the released 1.3B and 14B variants expose a concrete quality–resource tradeoff; the smaller model's reported 8.19 GB requirement makes consumer hardware an explicit design target.
-
-The broad task support shows that the stack is reusable, but it does not reveal whether model scale, VAE quality, captions, or motion filtering produces the largest marginal gain. A compute- and data-matched component ablation with temporal-fidelity metrics is the missing decision evidence. At ten times the duration or resolution, VAE artifacts and temporal drift can compound faster than model quality improves. The scaling story would be falsified if a smaller transformer with better data or weaker compression matches the 14B model on motion consistency and prompt adherence at much lower cost.
-
-Video quality does not establish action-conditioned dynamics, causal control, or long-horizon world consistency.
-
-Treat the video autoencoder and data pipeline as first-class architecture choices, not preprocessing details.
+- Wan informs how to divide a video-generation budget among latent compression, transformer scale, data curation, and deployability. A video VAE compresses spatial and temporal structure before the generative model operates, while the released 1.3B and 14B variants expose a concrete quality–resource tradeoff; the smaller model's reported 8.19 GB requirement makes consumer hardware an explicit design target.
+- The broad task support shows that the stack is reusable, but it does not reveal whether model scale, VAE quality, captions, or motion filtering produces the largest marginal gain. A compute- and data-matched component ablation with temporal-fidelity metrics is the missing decision evidence. At ten times the duration or resolution, VAE artifacts and temporal drift can compound faster than model quality improves. The scaling story would be falsified if a smaller transformer with better data or weaker compression matches the 14B model on motion consistency and prompt adherence at much lower cost.
+- Video quality does not establish action-conditioned dynamics, causal control, or long-horizon world consistency.
+- Treat the video autoencoder and data pipeline as first-class architecture choices, not preprocessing details.

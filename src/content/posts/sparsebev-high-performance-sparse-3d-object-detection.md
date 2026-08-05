@@ -37,10 +37,7 @@ Pillar queries add 1.4 mAP over 3D points. Scale-adaptive attention adds 4.0 mAP
 
 ## High-Level Takeaways
 
-SparseBEV informs whether a camera detector can retain metric BEV structure as a query prior instead of a dense field. Its atomic unit is a BEV pillar query with adaptive spatial extent. Capacity scales with queries, sample points, feature levels, and timestamps rather than the full metric area.
-
-The rejection test compares SparseBEV with a dense BEV model under causal frames, the same backbone, and corrupted ego pose. SparseBEV loses if pose noise destroys temporal support, if query initialization misses weak actors, or if its nominally sparse gathers compile poorly. The paper also notes that latency still grows linearly with frames because sampled features are stacked across time.
-
-DETR3D samples one projected query point; Sparse4D samples structured 3D keypoints; SparseBEV adds adaptive BEV receptive fields and query-conditioned mixing. Each expands sparse support without materializing the full grid.
-
-Sparse camera detection becomes competitive when the query can adapt where it looks, how much context it uses, and how it mixes the evidence.
+- SparseBEV informs whether a camera detector can retain metric BEV structure as a query prior instead of a dense field. Its atomic unit is a BEV pillar query with adaptive spatial extent. Capacity scales with queries, sample points, feature levels, and timestamps rather than the full metric area.
+- The rejection test compares SparseBEV with a dense BEV model under causal frames, the same backbone, and corrupted ego pose. SparseBEV loses if pose noise destroys temporal support, if query initialization misses weak actors, or if its nominally sparse gathers compile poorly. The paper also notes that latency still grows linearly with frames because sampled features are stacked across time.
+- DETR3D samples one projected query point; Sparse4D samples structured 3D keypoints; SparseBEV adds adaptive BEV receptive fields and query-conditioned mixing. Each expands sparse support without materializing the full grid.
+- Sparse camera detection becomes competitive when the query can adapt where it looks, how much context it uses, and how it mixes the evidence.

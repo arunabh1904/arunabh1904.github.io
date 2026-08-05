@@ -35,10 +35,7 @@ Ego alignment is critical because a static scene otherwise appears to move with 
 
 ## High-Level Takeaways
 
-BEVDet4D is appropriate when one short history fixes velocity and flicker without the complexity of recurrent attention. Evaluate moving actors separately: ego warping aligns the road, not independently moving objects. Timestamp, rolling-shutter, and inference-delay errors should be injected explicitly.
-
-Longer history is not automatically better. Dense grids consume memory linearly in spatial extent and can preserve actors after they leave the scene.
-
-BEVFormer uses temporal attention over a dense BEV; StreamPETR and Sparse4D instead keep object-centric state.
-
-A warped previous BEV is a strong temporal baseline because it makes motion visible, but its state is dense, short-lived, and only ego-motion aligned.
+- BEVDet4D is appropriate when one short history fixes velocity and flicker without the complexity of recurrent attention. Evaluate moving actors separately: ego warping aligns the road, not independently moving objects. Timestamp, rolling-shutter, and inference-delay errors should be injected explicitly.
+- Longer history is not automatically better. Dense grids consume memory linearly in spatial extent and can preserve actors after they leave the scene.
+- BEVFormer uses temporal attention over a dense BEV; StreamPETR and Sparse4D instead keep object-centric state.
+- A warped previous BEV is a strong temporal baseline because it makes motion visible, but its state is dense, short-lived, and only ego-motion aligned.

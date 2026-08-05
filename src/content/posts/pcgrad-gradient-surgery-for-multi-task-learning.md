@@ -33,10 +33,7 @@ PCGrad is optimizer-adjacent and model-agnostic; it requires per-task gradients 
 
 ## High-Level Takeaways
 
-PCGrad is useful after measurement shows persistent negative cosine in shared layers and task quality suffers. It should not be enabled solely because a model has multiple heads. Log conflict rates by layer and scenario, compare adapters or partial separation, and measure training memory and wall time.
-
-Projection also encodes no task priority. Safety or planning ownership still requires an explicit policy for which degradation is acceptable.
-
-Uncertainty weighting and GradNorm change scalar weights; PCGrad changes the direction of the shared update.
-
-Gradient surgery is a targeted response to measured directional conflict, not a substitute for deciding which tasks should share parameters.
+- PCGrad is useful after measurement shows persistent negative cosine in shared layers and task quality suffers. It should not be enabled solely because a model has multiple heads. Log conflict rates by layer and scenario, compare adapters or partial separation, and measure training memory and wall time.
+- Projection also encodes no task priority. Safety or planning ownership still requires an explicit policy for which degradation is acceptable.
+- Uncertainty weighting and GradNorm change scalar weights; PCGrad changes the direction of the shared update.
+- Gradient surgery is a targeted response to measured directional conflict, not a substitute for deciding which tasks should share parameters.

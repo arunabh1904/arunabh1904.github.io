@@ -77,10 +77,7 @@ ViT's appeal is its plainness: patchify the image and reuse the Transformer stac
 
 ## High-Level Takeaways
 
-ViT informs the decision to buy visual scale with learned attention instead of convolutional inductive bias. The atomic unit is a fixed-size image patch embedded as a token; the same attention and feed-forward parameters process every patch position.
-
-The result establishes a data-regime crossover, not universal Transformer superiority: large supervised pre-training makes the plain patch sequence competitive, while smaller datasets still favor stronger visual priors. Patch size is therefore a compression decision as well as an architectural one—smaller patches preserve detail but increase attention cost quadratically.
-
-The decisive missing comparison is a CNN and ViT sweep with identical data, augmentation, parameters, FLOPs, and transfer protocol across several data scales. At 10× resolution, token count and activation memory would fail before parameter count. The central claim would weaken if a convolutional baseline matched transfer accuracy and throughput throughout that controlled crossover study.
-
-With enough data, a plain Transformer can rival convolutional backbones for image classification. ViT did not make convolutions obsolete overnight, but it made attention-first vision models credible.
+- ViT informs the decision to buy visual scale with learned attention instead of convolutional inductive bias. The atomic unit is a fixed-size image patch embedded as a token; the same attention and feed-forward parameters process every patch position.
+- The result establishes a data-regime crossover, not universal Transformer superiority: large supervised pre-training makes the plain patch sequence competitive, while smaller datasets still favor stronger visual priors. Patch size is therefore a compression decision as well as an architectural one—smaller patches preserve detail but increase attention cost quadratically.
+- The decisive missing comparison is a CNN and ViT sweep with identical data, augmentation, parameters, FLOPs, and transfer protocol across several data scales. At 10× resolution, token count and activation memory would fail before parameter count. The central claim would weaken if a convolutional baseline matched transfer accuracy and throughput throughout that controlled crossover study.
+- With enough data, a plain Transformer can rival convolutional backbones for image classification. ViT did not make convolutions obsolete overnight, but it made attention-first vision models credible.

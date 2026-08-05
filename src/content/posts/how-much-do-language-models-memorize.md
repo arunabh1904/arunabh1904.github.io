@@ -63,10 +63,7 @@ _Figure 1 isolates capacity with uniform random data: because there is no reusab
 
 ## High-Level Takeaways
 
-This paper informs how much parameter budget should be interpreted as storage rather than transferable computation. The unit of analysis is a training token whose recoverability is measured against held-out generalization, producing an estimated memorization capacity of roughly 3.6 bits per parameter for the studied GPT-style models.
-
-That estimate is conditional on the data distribution, model family, extraction method, and definition of memorization; it is not a hardware-independent constant. The missing study varies duplication, deduplication, tokenizer, and architecture while holding tokens and optimization fixed. At 10× scale, rare-string extraction, privacy exposure, and benchmark leakage become more important than the average capacity estimate. The claim would fail if an independent extraction protocol produced a substantially different bits-per-parameter slope on held-out model families.
-
-The paper gives a cleaner measurement vocabulary for a fuzzy debate. Instead of asking only whether a string can be extracted, it asks how many bits of sample-specific information the weights contain and how that budget scales.
-
-Memorization is a finite information budget. For GPT-style language models, this paper estimates that budget at roughly 3.6 bits per parameter and shows how it interacts with data size, double descent, and membership inference.
+- This paper informs how much parameter budget should be interpreted as storage rather than transferable computation. The unit of analysis is a training token whose recoverability is measured against held-out generalization, producing an estimated memorization capacity of roughly 3.6 bits per parameter for the studied GPT-style models.
+- That estimate is conditional on the data distribution, model family, extraction method, and definition of memorization; it is not a hardware-independent constant. The missing study varies duplication, deduplication, tokenizer, and architecture while holding tokens and optimization fixed. At 10× scale, rare-string extraction, privacy exposure, and benchmark leakage become more important than the average capacity estimate. The claim would fail if an independent extraction protocol produced a substantially different bits-per-parameter slope on held-out model families.
+- The paper gives a cleaner measurement vocabulary for a fuzzy debate. Instead of asking only whether a string can be extracted, it asks how many bits of sample-specific information the weights contain and how that budget scales.
+- Memorization is a finite information budget. For GPT-style language models, this paper estimates that budget at roughly 3.6 bits per parameter and shows how it interacts with data size, double descent, and membership inference.

@@ -36,12 +36,8 @@ The transferable lesson for robotics is methodological. A process critic needs i
 
 ## High-Level Takeaways
 
-VisualPRM informs whether to spend compute on more policy samples or on a critic capable of ranking their reasoning paths. Its unit is an intermediate multimodal reasoning step. The critic is separate from the policy, so policy scale and critic quality can be varied independently.
-
-The paper establishes value for selection among generated reasoning traces, not for dense robot reward. A missing transfer experiment aligns critic judgments with physical subgoal completion under occlusion and temporal ambiguity. At ten times the rollout length, local step accuracy can still produce globally inconsistent rankings. The process-supervision thesis fails in robotics if step labels do not predict closed-loop outcomes better than terminal success.
-
-VisualPRM provides the clean blueprint for evaluating a critic as a model, dataset, and benchmark—not merely as an RL component.
-
-Automated reasoning traces and physical trajectories have different counterfactual and observability structure.
-
-Before optimizing a policy against a process reward, prove that the critic can localize the errors that cause final failure.
+- VisualPRM informs whether to spend compute on more policy samples or on a critic capable of ranking their reasoning paths. Its unit is an intermediate multimodal reasoning step. The critic is separate from the policy, so policy scale and critic quality can be varied independently.
+- The paper establishes value for selection among generated reasoning traces, not for dense robot reward. A missing transfer experiment aligns critic judgments with physical subgoal completion under occlusion and temporal ambiguity. At ten times the rollout length, local step accuracy can still produce globally inconsistent rankings. The process-supervision thesis fails in robotics if step labels do not predict closed-loop outcomes better than terminal success.
+- VisualPRM provides the clean blueprint for evaluating a critic as a model, dataset, and benchmark—not merely as an RL component.
+- Automated reasoning traces and physical trajectories have different counterfactual and observability structure.
+- Before optimizing a policy against a process reward, prove that the critic can localize the errors that cause final failure.

@@ -38,12 +38,8 @@ The separation also protects general capabilities. The specialist can optimize a
 
 ## High-Level Takeaways
 
-RLDG informs whether RL should update a generalist directly or serve as a data-generation tool. Its atomic unit is the distilled specialist trajectory. Parameters are not shared during RL; knowledge crosses the boundary through curated experience.
-
-The results establish that specialist-generated data can beat human demonstrations on precise tasks. A missing comparison holds total robot hours constant across direct generalist RL, specialist distillation, and correction SFT. At ten times the task count, training specialists becomes the bottleneck and their styles may conflict. The thesis fails if distilled gains vanish on new tasks or if direct post-training achieves equal improvement without forgetting at lower systems cost.
-
-RLDG turns RL into a data flywheel rather than insisting it be the final optimizer.
-
-Task rewards and specialist training remain expensive to engineer and validate.
-
-When direct RL is too brittle for a foundation policy, let RL improve the data before it improves the model.
+- RLDG informs whether RL should update a generalist directly or serve as a data-generation tool. Its atomic unit is the distilled specialist trajectory. Parameters are not shared during RL; knowledge crosses the boundary through curated experience.
+- The results establish that specialist-generated data can beat human demonstrations on precise tasks. A missing comparison holds total robot hours constant across direct generalist RL, specialist distillation, and correction SFT. At ten times the task count, training specialists becomes the bottleneck and their styles may conflict. The thesis fails if distilled gains vanish on new tasks or if direct post-training achieves equal improvement without forgetting at lower systems cost.
+- RLDG turns RL into a data flywheel rather than insisting it be the final optimizer.
+- Task rewards and specialist training remain expensive to engineer and validate.
+- When direct RL is too brittle for a foundation policy, let RL improve the data before it improves the model.

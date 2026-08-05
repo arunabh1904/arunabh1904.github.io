@@ -39,10 +39,7 @@ PETR's strongest externally pretrained test model reports 44.1 mAP and 50.4 NDS 
 
 ## High-Level Takeaways
 
-PETR informs where geometric coordinates should enter a camera transformer. Its atomic units are perspective features annotated with 3D positional hypotheses and object queries initialized by learned anchors. The architecture buys flexible global matching by paying attention over the whole multiview feature set.
-
-A matched test should compare PETR, DETR3D-style sampling, and BEV lifting at equal image tokens, queries, training length, and depth supervision. PETR loses if global attention's memory cost dominates or if its implicit ray matching remains less calibrated than explicit depth. At more cameras or higher resolution, query-image attention grows before object sparsity can help.
-
-PETR follows DETR3D but moves geometry from the query projection into the image-token embedding. PETRv2 aligns those embeddings over time; StreamPETR converts the resulting queries into recurrent object memory.
-
-Position embeddings can turn perspective tokens into a metric search space, but global flexibility is purchased with dense attention and slower geometric learning.
+- PETR informs where geometric coordinates should enter a camera transformer. Its atomic units are perspective features annotated with 3D positional hypotheses and object queries initialized by learned anchors. The architecture buys flexible global matching by paying attention over the whole multiview feature set.
+- A matched test should compare PETR, DETR3D-style sampling, and BEV lifting at equal image tokens, queries, training length, and depth supervision. PETR loses if global attention's memory cost dominates or if its implicit ray matching remains less calibrated than explicit depth. At more cameras or higher resolution, query-image attention grows before object sparsity can help.
+- PETR follows DETR3D but moves geometry from the query projection into the image-token embedding. PETRv2 aligns those embeddings over time; StreamPETR converts the resulting queries into recurrent object memory.
+- Position embeddings can turn perspective tokens into a metric search space, but global flexibility is purchased with dense attention and slower geometric learning.

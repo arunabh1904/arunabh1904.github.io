@@ -38,12 +38,8 @@ Low cost changes the cadence of evaluation. Instead of one lab reporting a small
 
 ## High-Level Takeaways
 
-VLA-REPLICA informs whether to centralize evaluation on expensive hardware or distribute a standardized low-cost real setup. Its unit is a real closed-loop trial with a fixed protocol and explicit shift condition. Replication across independently assembled systems is the scaling variable that matters.
-
-The paper establishes initial cross-site consistency for a bounded task suite. A missing study measures how calibration drift, wear, and operator choices affect confidence intervals over months. At ten times the sites, protocol compliance becomes the bottleneck. The benchmark fails its central claim if inter-lab variance is comparable to the policy improvements it is meant to detect.
-
-VLA-REPLICA complements SIMPLER: one scales simulation, the other makes real evaluation cheap enough to repeat.
-
-A reproducible tabletop does not represent the breadth of household or industrial robotics.
-
-A smaller real benchmark can be more decision-useful than a broader one that nobody else can reproduce.
+- VLA-REPLICA informs whether to centralize evaluation on expensive hardware or distribute a standardized low-cost real setup. Its unit is a real closed-loop trial with a fixed protocol and explicit shift condition. Replication across independently assembled systems is the scaling variable that matters.
+- The paper establishes initial cross-site consistency for a bounded task suite. A missing study measures how calibration drift, wear, and operator choices affect confidence intervals over months. At ten times the sites, protocol compliance becomes the bottleneck. The benchmark fails its central claim if inter-lab variance is comparable to the policy improvements it is meant to detect.
+- VLA-REPLICA complements SIMPLER: one scales simulation, the other makes real evaluation cheap enough to repeat.
+- A reproducible tabletop does not represent the breadth of household or industrial robotics.
+- A smaller real benchmark can be more decision-useful than a broader one that nobody else can reproduce.

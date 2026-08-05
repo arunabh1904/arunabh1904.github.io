@@ -68,8 +68,6 @@ The upgrades are attractive because they are almost drop-in: learn variance, adj
 
 ## High-Level Takeaways
 
-Improved DDPM informs where to spend diffusion complexity: on the noise-prediction loss, learned reverse variance, schedule, or additional sampling steps. Its atomic unit remains a noisy image-timestep pair, but the hybrid objective adds likelihood pressure while the learned variance permits aggressive step reduction.
-
-The results show better likelihood and useful samples with far fewer reverse steps in the tested image regimes; they do not isolate whether those gains persist with modern solvers and latent diffusion. A matched wall-clock factorial ablation of variance learning, cosine schedule, objective, and sampler is the missing decision table. At 10× scale, repeated high-resolution evaluations remain dominant. The recipe would be falsified if a fixed-variance model with a stronger solver matched NLL and FID at lower total compute.
-
-ID DPM turned diffusion from a slow curiosity into a practical generator, paving the way for fast samplers and classifier-free guidance.
+- Improved DDPM informs where to spend diffusion complexity: on the noise-prediction loss, learned reverse variance, schedule, or additional sampling steps. Its atomic unit remains a noisy image-timestep pair, but the hybrid objective adds likelihood pressure while the learned variance permits aggressive step reduction.
+- The results show better likelihood and useful samples with far fewer reverse steps in the tested image regimes; they do not isolate whether those gains persist with modern solvers and latent diffusion. A matched wall-clock factorial ablation of variance learning, cosine schedule, objective, and sampler is the missing decision table. At 10× scale, repeated high-resolution evaluations remain dominant. The recipe would be falsified if a fixed-variance model with a stronger solver matched NLL and FID at lower total compute.
+- ID DPM turned diffusion from a slow curiosity into a practical generator, paving the way for fast samplers and classifier-free guidance.
