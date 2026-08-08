@@ -34,8 +34,8 @@ const testProblem: CodePracticeProblem = {
   solutionNotes: ['Use a row-wise max shift before the exponentials.'],
   solutionCode: 'print("solution")',
   starterCode: 'print("starter")',
-  packages: ['numpy'],
-  tags: ['NumPy'],
+  packages: ['torch', 'numpy'],
+  tags: ['PyTorch', 'NumPy'],
 };
 
 describe('CodePracticeLab', () => {
@@ -142,6 +142,8 @@ describe('CodePracticeLab', () => {
     });
 
     await render();
+
+    expect(container.textContent).toContain('NumPy is also available directly');
 
     const buttons = Array.from(container.querySelectorAll('button'));
     const runButton = buttons.find((button) => button.textContent === 'Run code');

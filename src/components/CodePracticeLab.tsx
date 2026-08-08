@@ -20,11 +20,18 @@ function formatPackages(packages: readonly string[] = []) {
     if (packageName === 'numpy') {
       return 'NumPy';
     }
+    if (packageName === 'torch') {
+      return 'PyTorch-style tensors';
+    }
     return packageName;
   });
 }
 
 function getRuntimeNote(packages: readonly string[] = []) {
+  if (packages.includes('torch')) {
+    return 'PyTorch-style tensors and torch.Tensor annotations are available through a lightweight NumPy-backed browser compatibility layer. NumPy is also available directly with `import numpy as np`. The compatibility layer does not provide autograd, CUDA, nn.Module, or full PyTorch.';
+  }
+
   const packageLabels = formatPackages(packages);
   if (packageLabels.length === 0) {
     return 'The in-browser Python runtime executes this workspace locally in the browser.';
