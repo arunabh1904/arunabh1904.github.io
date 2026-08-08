@@ -23,7 +23,9 @@ export interface CodePracticeProblem {
 }
 
 export const CODE_PRACTICE_SECTION_SUMMARY =
-  'Interview-style Python problems with runnable starter code, focused hints, and hidden solutions.';
+  'Interview-style PyTorch and NumPy exercises with runnable starter code, focused hints, and hidden solutions.';
+
+const PYTORCH_AND_NUMPY_PACKAGES = ['torch', 'numpy'] as const;
 
 export function getCodePracticeProblemPath(problem: Pick<CodePracticeProblem, 'id'> | string) {
   const problemId = typeof problem === 'string' ? problem : problem.id;
@@ -41,16 +43,19 @@ export const codePracticeProblems: readonly CodePracticeProblem[] = [
     title: 'Stable softmax cross-entropy',
     difficulty: 'Medium',
     summary:
-      'Implement a numerically stable batch softmax cross-entropy loss in NumPy with proper input validation.',
+      'Implement a numerically stable batch softmax cross-entropy loss in PyTorch with proper input validation.',
     prompt: [
       'Write `softmax_cross_entropy(logits, labels)` so it returns the mean cross-entropy loss across a batch.',
       'Treat this like an interview question: keep the implementation concise, validate the inputs, and avoid numerical overflow when computing the softmax terms.',
     ],
-    signature: `def softmax_cross_entropy(logits, labels):
+    signature: `def softmax_cross_entropy(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+) -> torch.Tensor:
     ...`,
     requirements: [
-      '`logits` is a 2D NumPy array of shape `(N, C)`.',
-      '`labels` is a 1D NumPy array of shape `(N,)` with integer class ids in `[0, C - 1]`.',
+      '`logits` is a 2D PyTorch tensor of shape `(N, C)`.',
+      '`labels` is a 1D PyTorch tensor of shape `(N,)` with integer class ids in `[0, C - 1]`.',
       'Return the mean cross-entropy loss over the batch.',
       'The implementation must be numerically stable.',
       'Raise `ValueError` on invalid shapes or invalid labels.',
@@ -64,7 +69,7 @@ export const codePracticeProblems: readonly CodePracticeProblem[] = [
     ],
     hint: [
       'Subtract the per-row maximum from `logits` before exponentiating.',
-      'Use `np.arange(N)` to gather the logit for the correct class in each row.',
+      'Use `torch.arange(N)` to gather the logit for the correct class in each row.',
       'Compute the loss as `logsumexp - correct_class_logit`, then average across the batch.',
       'Validate `ndim`, matching batch size, integer labels, non-empty shapes, and label range.',
     ],
@@ -72,53 +77,63 @@ export const codePracticeProblems: readonly CodePracticeProblem[] = [
       'The stable trick is to shift each row by its maximum value before applying `exp`, which preserves the softmax probabilities while avoiding overflow.',
       'Once shifted, the mean cross-entropy is just the average of `log(sum(exp(shifted))) - shifted[row, label]` across the batch.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def softmax_cross_entropy(logits, labels):
-    logits = np.asarray(logits, dtype=np.float64)
-    labels = np.asarray(labels)
+import torch
+
+def _validate_classification_inputs(logits, labels):
+    logits = torch.as_tensor(logits, dtype=torch.float64)
+    labels = torch.as_tensor(labels)
 
     if logits.ndim != 2:
-        raise ValueError("logits must be a 2D array of shape (N, C)")
+        raise ValueError("logits must have shape (N, C)")
     if labels.ndim != 1:
-        raise ValueError("labels must be a 1D array of shape (N,)")
-
+        raise ValueError("labels must have shape (N,)")
     batch_size, num_classes = logits.shape
-    if batch_size == 0:
-        raise ValueError("logits must contain at least one sample")
-    if num_classes == 0:
-        raise ValueError("logits must contain at least one class")
+    if batch_size == 0 or num_classes == 0:
+        raise ValueError("logits must have positive dimensions")
     if labels.shape[0] != batch_size:
-        raise ValueError("labels must have the same batch size as logits")
-    if not np.issubdtype(labels.dtype, np.integer):
+        raise ValueError("labels must match the logits batch size")
+    if torch.is_floating_point(labels):
         raise ValueError("labels must contain integer class ids")
-    if np.any(labels < 0) or np.any(labels >= num_classes):
+    if not bool(torch.all(torch.isfinite(logits))):
+        raise ValueError("logits must contain only finite values")
+
+    labels = torch.as_tensor(labels, dtype=torch.long)
+    if bool(torch.any(labels < 0)) or bool(torch.any(labels >= num_classes)):
         raise ValueError("labels contain out-of-range class ids")
+    return logits, labels
 
-    shifted = logits - np.max(logits, axis=1, keepdims=True)
-    logsumexp = np.log(np.sum(np.exp(shifted), axis=1))
-    # Advanced indexing pulls the true-class logit from each row.
-    correct_class_logits = shifted[np.arange(batch_size), labels]
-    losses = logsumexp - correct_class_logits
+def softmax_cross_entropy(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+) -> torch.Tensor:
+    logits, labels = _validate_classification_inputs(logits, labels)
 
-    return float(np.mean(losses))`,
-    starterCode: `import numpy as np
+    # Cross-entropy on log-softmax avoids materializing probabilities and stays stable for large logits.
+    log_probs = torch.log_softmax(logits, dim=1)
+    target_log_probs = torch.gather(log_probs, 1, torch.unsqueeze(labels, dim=1)).squeeze(1)
+    return -torch.mean(target_log_probs)`,
+    starterCode: `from __future__ import annotations
 
-def softmax_cross_entropy(logits, labels):
-    logits = np.asarray(logits)
-    labels = np.asarray(labels)
+import torch
 
+def softmax_cross_entropy(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+) -> torch.Tensor:
     # TODO:
-    # 1. Validate the input shapes and labels.
-    # 2. Compute a numerically stable mean cross-entropy loss.
+    # 1. Validate the batch/class dimensions and integer label range.
+    # 2. Compute log-softmax along the class dimension.
+    # 3. Gather the target log-probability from each row and average the loss.
     raise NotImplementedError("Implement softmax_cross_entropy")
 
-sample_logits = np.array([[2.0, 1.0, 0.1]])
-sample_labels = np.array([0])
+sample_logits = torch.tensor([[2.0, 1.0, 0.1]], dtype=torch.float64)
+sample_labels = torch.tensor([0], dtype=torch.long)
 
-print(f"{softmax_cross_entropy(sample_logits, sample_labels):.5f}")`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Numerical Stability', 'Interview Practice'],
+print(f"{softmax_cross_entropy(sample_logits, sample_labels).item():.5f}")`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Numerical Stability', 'Interview Practice'],
   },
   {
     id: 'non-maximum-suppression',
@@ -126,16 +141,20 @@ print(f"{softmax_cross_entropy(sample_logits, sample_labels):.5f}")`,
     title: 'Non-maximum suppression',
     difficulty: 'Medium',
     summary:
-      'Implement NumPy-based non-maximum suppression with deterministic score tie-breaking and invalid-box checks.',
+      'Implement PyTorch-based non-maximum suppression with deterministic score tie-breaking and invalid-box checks.',
     prompt: [
       'Write `nms(boxes, scores, iou_threshold)` so it returns the indices of the boxes kept after non-maximum suppression.',
       'Process boxes in descending score order, break ties by smaller original index, suppress only boxes whose IoU with a kept box is strictly greater than `iou_threshold`, and raise `ValueError` when a box has `x2 < x1` or `y2 < y1`.',
     ],
-    signature: `def nms(boxes, scores, iou_threshold):
+    signature: `def nms(
+    boxes: torch.Tensor,
+    scores: torch.Tensor,
+    iou_threshold: float,
+) -> list[int]:
     ...`,
     requirements: [
-      '`boxes` is an `(N, 4)` NumPy array of `[x1, y1, x2, y2]`.',
-      '`scores` is a NumPy array of shape `(N,)`.',
+      '`boxes` is an `(N, 4)` PyTorch tensor of `[x1, y1, x2, y2]`.',
+      '`scores` is a PyTorch tensor of shape `(N,)`.',
       'Return a list of selected box indices after non-maximum suppression.',
       'Process boxes in descending order of score.',
       'If scores tie, prefer the smaller original index first.',
@@ -172,82 +191,84 @@ print(f"{softmax_cross_entropy(sample_logits, sample_labels):.5f}")`,
       'The clean approach is greedy: sort indices by descending score with index-based tie-breaking, repeatedly keep the first remaining box, and compare it against the rest.',
       'Using a vectorized IoU helper lets the loop filter the remaining candidates in one shot while still keeping the implementation short and readable.',
     ],
-solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def compute_iou(box, boxes):
-    x1 = np.maximum(box[0], boxes[:, 0])
-    y1 = np.maximum(box[1], boxes[:, 1])
-    x2 = np.minimum(box[2], boxes[:, 2])
-    y2 = np.minimum(box[3], boxes[:, 3])
+import torch
 
-    inter_w = np.maximum(0.0, x2 - x1)
-    inter_h = np.maximum(0.0, y2 - y1)
-    inter_area = inter_w * inter_h
+def _pairwise_iou(box: torch.Tensor, boxes: torch.Tensor) -> torch.Tensor:
+    x1 = torch.maximum(box[0], boxes[:, 0])
+    y1 = torch.maximum(box[1], boxes[:, 1])
+    x2 = torch.minimum(box[2], boxes[:, 2])
+    y2 = torch.minimum(box[3], boxes[:, 3])
 
+    inter_area = torch.clamp(x2 - x1, min=0.0) * torch.clamp(y2 - y1, min=0.0)
     box_area = (box[2] - box[0]) * (box[3] - box[1])
     boxes_area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
-
     union = box_area + boxes_area - inter_area
-    iou = np.where(union > 0.0, inter_area / union, 0.0)
-    return iou
 
-def nms(boxes, scores, iou_threshold):
-    boxes = np.asarray(boxes, dtype=np.float64)
-    scores = np.asarray(scores, dtype=np.float64)
+    # Avoid division by zero for degenerate boxes while preserving exact zero IoU there.
+    safe_union = torch.where(union > 0.0, union, torch.ones_like(union))
+    return torch.where(union > 0.0, inter_area / safe_union, torch.zeros_like(union))
+
+def nms(
+    boxes: torch.Tensor,
+    scores: torch.Tensor,
+    iou_threshold: float,
+) -> list[int]:
+    boxes = torch.as_tensor(boxes, dtype=torch.float64)
+    scores = torch.as_tensor(scores, dtype=torch.float64)
 
     if boxes.ndim != 2 or boxes.shape[1] != 4:
         raise ValueError("boxes must have shape (N, 4)")
     if scores.ndim != 1 or scores.shape[0] != boxes.shape[0]:
         raise ValueError("scores must have shape (N,)")
-    if not (0.0 <= iou_threshold <= 1.0):
+    if not 0.0 <= iou_threshold <= 1.0:
         raise ValueError("iou_threshold must be in [0, 1]")
+    if not bool(torch.all(torch.isfinite(boxes))) or not bool(torch.all(torch.isfinite(scores))):
+        raise ValueError("boxes and scores must contain only finite values")
+    if bool(torch.any(boxes[:, 2] < boxes[:, 0])) or bool(torch.any(boxes[:, 3] < boxes[:, 1])):
+        raise ValueError("boxes must satisfy x2 >= x1 and y2 >= y1")
 
-    if np.any(boxes[:, 2] < boxes[:, 0]) or np.any(boxes[:, 3] < boxes[:, 1]):
-        raise ValueError("invalid boxes detected")
-
-    n = boxes.shape[0]
-    if n == 0:
-        return []
-
-    order = sorted(range(n), key=lambda i: (-scores[i], i))
-    keep = []
+    # Sorting in Python makes the tie-break rule explicit and reviewable.
+    order = sorted(range(boxes.shape[0]), key=lambda i: (-float(scores[i].item()), i))
+    keep: list[int] = []
 
     while order:
-        current = order[0]
+        current = order.pop(0)
         keep.append(current)
-
-        if len(order) == 1:
+        if not order:
             break
 
-        remaining = np.array(order[1:], dtype=int)
-        ious = compute_iou(boxes[current], boxes[remaining])
-        survivors = remaining[ious <= iou_threshold]
-        order = survivors.tolist()
+        remaining = torch.as_tensor(order, dtype=torch.long)
+        ious = _pairwise_iou(boxes[current], boxes[remaining])
+        order = [int(index) for index in remaining[ious <= iou_threshold].tolist()]
 
     return keep`,
-    starterCode: `import numpy as np
+    starterCode: `from __future__ import annotations
 
-def nms(boxes, scores, iou_threshold):
-    boxes = np.asarray(boxes)
-    scores = np.asarray(scores)
+import torch
 
+def nms(
+    boxes: torch.Tensor,
+    scores: torch.Tensor,
+    iou_threshold: float,
+) -> list[int]:
     # TODO:
-    # 1. Validate the shapes and reject invalid boxes.
-    # 2. Sort candidate indices by score, breaking ties with the smaller index.
-    # 3. Repeatedly keep the best remaining box and suppress boxes
-    #    whose IoU is strictly greater than the threshold.
+    # 1. Validate shape, finite values, box geometry, and threshold.
+    # 2. Sort by descending score with the original index as a deterministic tie-break.
+    # 3. Keep the first candidate and suppress only boxes with IoU > iou_threshold.
     raise NotImplementedError("Implement nms")
 
-sample_boxes = np.array([
-    [0, 0, 2, 2],
+sample_boxes = torch.tensor([
+    [0.0, 0.0, 2.0, 2.0],
     [0.5, 0.5, 2.5, 2.5],
-    [5, 5, 7, 7],
-])
-sample_scores = np.array([0.9, 0.8, 0.7])
+    [5.0, 5.0, 7.0, 7.0],
+], dtype=torch.float64)
+sample_scores = torch.tensor([0.9, 0.8, 0.7], dtype=torch.float64)
 
 print(nms(sample_boxes, sample_scores, iou_threshold=0.3))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Computer Vision', 'Greedy'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Computer Vision', 'Greedy'],
   },
   {
     id: 'causal-attention-mask',
@@ -260,10 +281,13 @@ print(nms(sample_boxes, sample_scores, iou_threshold=0.3))`,
       'Write `make_causal_attention_mask(seq_lens, max_len=None)` to build a batch of causal attention masks.',
       'Each example gets its own valid length. Positions outside that valid length must stay `0`, while valid positions should form a lower-triangular mask where token `i` can attend to itself and earlier tokens only.',
     ],
-    signature: `def make_causal_attention_mask(seq_lens, max_len=None):
+    signature: `def make_causal_attention_mask(
+    seq_lens: torch.Tensor,
+    max_len: int | None = None,
+) -> torch.Tensor:
     ...`,
     requirements: [
-      '`seq_lens` is a 1D list or NumPy array of length `B`.',
+      '`seq_lens` is a 1D list or PyTorch tensor of length `B`.',
       'Each entry is the valid sequence length for one example.',
       'Return a mask of shape `(B, T, T)` where `T = max(max(seq_lens), max_len if given)`.',
       '`mask[b, i, j] == 1` iff `i < seq_lens[b]`, `j < seq_lens[b]`, and `j <= i`.',
@@ -279,7 +303,7 @@ print(nms(sample_boxes, sample_scores, iou_threshold=0.3))`,
       },
     ],
     hint: [
-      'Use `np.tri(T, dtype=np.int64)` or `np.tril` to build the causal lower triangle once.',
+      'Use `torch.tri(T, dtype=torch.int64)` or `torch.tril` to build the causal lower triangle once.',
       'Create a `(B, T)` validity mask from `seq_lens`, then broadcast it across rows and columns.',
       'Multiply the causal triangle by the validity masks so padded rows and columns stay zero.',
       'Validate the rank of `seq_lens`, integer lengths, non-negative values, and `max_len` when it is provided.',
@@ -288,47 +312,55 @@ print(nms(sample_boxes, sample_scores, iou_threshold=0.3))`,
       'The problem is really two masks multiplied together: the causal rule (`j <= i`) and the per-example validity rule (`i, j < seq_len[b]`).',
       'Broadcasting a single lower-triangular template against a batch-wise validity mask gives the full `(B, T, T)` answer without explicit Python loops.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def make_causal_attention_mask(seq_lens, max_len=None):
-    seq_lens = np.asarray(seq_lens)
+import torch
 
-    if seq_lens.ndim != 1:
-        raise ValueError("seq_lens must be a 1D array")
-    if seq_lens.size == 0:
-        raise ValueError("seq_lens must not be empty")
-    if not np.issubdtype(seq_lens.dtype, np.integer):
+def make_causal_attention_mask(
+    seq_lens: torch.Tensor,
+    max_len: int | None = None,
+) -> torch.Tensor:
+    seq_lens = torch.as_tensor(seq_lens)
+
+    if seq_lens.ndim != 1 or seq_lens.shape[0] == 0:
+        raise ValueError("seq_lens must be a non-empty 1D tensor")
+    if torch.is_floating_point(seq_lens):
         raise ValueError("seq_lens must contain integers")
-    if np.any(seq_lens < 0):
+    if bool(torch.any(seq_lens < 0)):
         raise ValueError("seq_lens must be non-negative")
+    if max_len is not None and (isinstance(max_len, bool) or not isinstance(max_len, int)):
+        raise ValueError("max_len must be an integer or None")
+    if max_len is not None and max_len < 0:
+        raise ValueError("max_len must be non-negative")
 
-    T = int(seq_lens.max())
+    seq_lens = torch.as_tensor(seq_lens, dtype=torch.long)
+    length = int(torch.amax(seq_lens).item())
     if max_len is not None:
-        if isinstance(max_len, bool) or not isinstance(max_len, (int, np.integer)):
-            raise ValueError("max_len must be an integer or None")
-        if max_len < 0:
-            raise ValueError("max_len must be non-negative")
-        T = max(T, int(max_len))
+        length = max(length, max_len)
 
-    valid = np.arange(T) < seq_lens[:, None]
-    causal = np.tri(T, dtype=np.int64)
-    # Broadcast valid positions across both axes, then intersect with the causal triangle.
-    mask = causal[None, :, :] * valid[:, :, None] * valid[:, None, :]
-    return mask.astype(np.int64)`,
-    starterCode: `import numpy as np
+    valid = torch.arange(length, dtype=torch.long)[None, :] < seq_lens[:, None]
+    causal = torch.tril(torch.ones((length, length), dtype=torch.int64))
 
-def make_causal_attention_mask(seq_lens, max_len=None):
-    seq_lens = np.asarray(seq_lens)
+    # Intersect causal visibility with both the valid query and valid key positions.
+    return causal[None, :, :] * valid[:, :, None] * valid[:, None, :]`,
+    starterCode: `from __future__ import annotations
 
+import torch
+
+def make_causal_attention_mask(
+    seq_lens: torch.Tensor,
+    max_len: int | None = None,
+) -> torch.Tensor:
     # TODO:
-    # 1. Validate the input shape and sequence lengths.
-    # 2. Build a causal lower-triangular mask for each batch element.
+    # 1. Validate non-empty integer sequence lengths and optional max_len.
+    # 2. Build one lower-triangular template.
+    # 3. Broadcast per-example validity across query and key axes.
     raise NotImplementedError("Implement make_causal_attention_mask")
 
-sample_seq_lens = np.array([3, 1])
+sample_seq_lens = torch.tensor([3, 1], dtype=torch.long)
 print(make_causal_attention_mask(sample_seq_lens, max_len=4))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Attention Masks', 'Sequence Modeling'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Attention Masks', 'Sequence Modeling'],
   },
   {
     id: 'binary-classification-metrics',
@@ -341,7 +373,10 @@ print(make_causal_attention_mask(sample_seq_lens, max_len=4))`,
       'Write `binary_classification_metrics(y_true, y_pred)` so it returns the confusion-matrix counts and derived metrics for a binary classifier.',
       'Treat `y_true` and `y_pred` as equal-length 1D collections of binary labels. Validate the inputs, and make sure any metric with a zero denominator returns `0.0` instead of failing.',
     ],
-    signature: `def binary_classification_metrics(y_true, y_pred):
+    signature: `def binary_classification_metrics(
+    y_true: torch.Tensor,
+    y_pred: torch.Tensor,
+) -> dict[str, int | float]:
     ...`,
     requirements: [
       '`y_true` and `y_pred` are equal-length 1D arrays or lists containing only `0` and `1`.',
@@ -374,53 +409,44 @@ print(make_causal_attention_mask(sample_seq_lens, max_len=4))`,
       'This is mostly a confusion-matrix exercise: once the four counts are correct, the derived metrics are straightforward ratios.',
       'The subtle part is the edge handling. Returning `0.0` for undefined metrics keeps the function predictable when there are no predicted positives or no actual positives.',
     ],
-    solutionCode: `def _coerce_binary_labels(values, name):
-    if isinstance(values, (str, bytes)):
-        raise ValueError(f"{name} must be a 1D sequence of binary labels")
+    solutionCode: `from __future__ import annotations
 
+import torch
+
+def _coerce_binary_labels(values, name: str) -> torch.Tensor:
     try:
-        items = list(values)
-    except TypeError as exc:
+        labels = torch.as_tensor(values)
+    except Exception as exc:
         raise ValueError(f"{name} must be a 1D sequence of binary labels") from exc
 
-    if not items:
-        raise ValueError(f"{name} must not be empty")
+    if labels.ndim != 1 or labels.shape[0] == 0:
+        raise ValueError(f"{name} must be a non-empty 1D tensor")
+    if torch.is_floating_point(labels):
+        raise ValueError(f"{name} must contain integer labels")
+    if not bool(torch.all((labels == 0) | (labels == 1))):
+        raise ValueError(f"{name} must contain only 0 and 1")
+    return torch.as_tensor(labels, dtype=torch.long)
 
-    for item in items:
-        if hasattr(item, "__iter__") and not isinstance(item, (str, bytes)):
-            raise ValueError(f"{name} must be one-dimensional")
-        if item not in (0, 1):
-            raise ValueError(f"{name} must contain only 0 and 1")
-
-    return items
-
-def binary_classification_metrics(y_true, y_pred):
+def binary_classification_metrics(
+    y_true: torch.Tensor,
+    y_pred: torch.Tensor,
+) -> dict[str, int | float]:
     y_true = _coerce_binary_labels(y_true, "y_true")
     y_pred = _coerce_binary_labels(y_pred, "y_pred")
+    if y_true.shape != y_pred.shape:
+        raise ValueError("y_true and y_pred must have the same shape")
 
-    if len(y_true) != len(y_pred):
-        raise ValueError("y_true and y_pred must have the same length")
+    tp = int(torch.sum((y_true == 1) & (y_pred == 1)).item())
+    tn = int(torch.sum((y_true == 0) & (y_pred == 0)).item())
+    fp = int(torch.sum((y_true == 0) & (y_pred == 1)).item())
+    fn = int(torch.sum((y_true == 1) & (y_pred == 0)).item())
 
-    tp = tn = fp = fn = 0
-    for truth, pred in zip(y_true, y_pred):
-        if truth == 1 and pred == 1:
-            tp += 1
-        elif truth == 0 and pred == 0:
-            tn += 1
-        elif truth == 0 and pred == 1:
-            fp += 1
-        else:
-            fn += 1
-
-    total = len(y_true)
-    precision_den = tp + fp
-    recall_den = tp + fn
-
-    precision = tp / precision_den if precision_den else 0.0
-    recall = tp / recall_den if recall_den else 0.0
-    f1_den = precision + recall
-    f1 = (2.0 * precision * recall / f1_den) if f1_den else 0.0
-    accuracy = (tp + tn) / total
+    precision_denominator = tp + fp
+    recall_denominator = tp + fn
+    precision = tp / precision_denominator if precision_denominator else 0.0
+    recall = tp / recall_denominator if recall_denominator else 0.0
+    f1_denominator = precision + recall
+    f1 = 2.0 * precision * recall / f1_denominator if f1_denominator else 0.0
 
     return {
         "tp": tp,
@@ -430,20 +456,28 @@ def binary_classification_metrics(y_true, y_pred):
         "precision": precision,
         "recall": recall,
         "f1": f1,
-        "accuracy": accuracy,
+        "accuracy": (tp + tn) / y_true.shape[0],
     }`,
-    starterCode: `def binary_classification_metrics(y_true, y_pred):
+    starterCode: `from __future__ import annotations
+
+import torch
+
+def binary_classification_metrics(
+    y_true: torch.Tensor,
+    y_pred: torch.Tensor,
+) -> dict[str, int | float]:
     # TODO:
-    # 1. Validate the inputs.
-    # 2. Count tp, tn, fp, and fn.
-    # 3. Compute precision, recall, f1, and accuracy with zero-division guards.
+    # 1. Validate non-empty, one-dimensional binary label tensors.
+    # 2. Count tp, tn, fp, and fn with boolean tensor operations.
+    # 3. Compute zero-safe precision, recall, f1, and accuracy.
     raise NotImplementedError("Implement binary_classification_metrics")
 
-sample_true = [1, 0, 1, 0]
-sample_pred = [1, 0, 0, 1]
+sample_true = torch.tensor([1, 0, 1, 0], dtype=torch.long)
+sample_pred = torch.tensor([1, 0, 0, 1], dtype=torch.long)
 
 print(binary_classification_metrics(sample_true, sample_pred))`,
-    tags: ['Classification', 'Metrics', 'Confusion Matrix'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Classification', 'Metrics', 'Confusion Matrix'],
   },
   {
     id: 'pairwise-cosine-similarity',
@@ -456,7 +490,10 @@ print(binary_classification_metrics(sample_true, sample_pred))`,
       'Write `pairwise_cosine_similarity(x, y)` so it returns the pairwise cosine similarity between every row of `x` and every row of `y`.',
       'Treat this like an interview question: validate the shapes, use a vectorized implementation, and make sure rows with zero norm produce `0.0` similarities instead of `nan` or `inf`.',
     ],
-    signature: `def pairwise_cosine_similarity(x, y):
+    signature: `def pairwise_cosine_similarity(
+    x: torch.Tensor,
+    y: torch.Tensor,
+) -> torch.Tensor:
     ...`,
     requirements: [
       '`x` is a 2D array or list with shape `(N, D)`.',
@@ -480,54 +517,65 @@ print(binary_classification_metrics(sample_true, sample_pred))`,
     hint: [
       'Compute the numerator with `x @ y.T`.',
       'Compute row norms once, then broadcast them into an `(N, M)` denominator.',
-      'Use `np.divide(..., where=denominator != 0)` so zero-norm rows become `0.0` instead of raising warnings.',
+      'Use a denominator mask with `torch.where` so zero-norm rows become `0.0` instead of `nan` or `inf`.',
       'Validate that both inputs are 2D and share the same feature dimension before doing any math.',
     ],
     solutionNotes: [
       'Cosine similarity is just a dot product divided by the product of L2 norms. Once the row norms are in hand, the whole pairwise matrix can be computed with broadcasting.',
       'The key edge case is a zero vector: its norm is zero, so any similarity involving that row is undefined. Filling those positions with `0.0` keeps the result stable and matches the prompt.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def pairwise_cosine_similarity(x, y):
-    x = np.asarray(x, dtype=np.float64)
-    y = np.asarray(y, dtype=np.float64)
+import torch
+
+def pairwise_cosine_similarity(
+    x: torch.Tensor,
+    y: torch.Tensor,
+) -> torch.Tensor:
+    x = torch.as_tensor(x, dtype=torch.float64)
+    y = torch.as_tensor(y, dtype=torch.float64)
 
     if x.ndim != 2 or y.ndim != 2:
-        raise ValueError("x and y must be 2D arrays")
-    if x.shape[1] != y.shape[1]:
-        raise ValueError("x and y must have the same feature dimension")
-    if x.shape[1] == 0:
-        raise ValueError("feature dimension must be positive")
+        raise ValueError("x and y must be 2D tensors")
+    if x.shape[1] != y.shape[1] or x.shape[1] == 0:
+        raise ValueError("x and y must share a positive feature dimension")
+    if not bool(torch.all(torch.isfinite(x))) or not bool(torch.all(torch.isfinite(y))):
+        raise ValueError("x and y must contain only finite values")
 
-    x_norms = np.linalg.norm(x, axis=1)
-    y_norms = np.linalg.norm(y, axis=1)
-    similarities = x @ y.T
-    denominator = x_norms[:, None] * y_norms[None, :]
-
-    return np.divide(
-        similarities,
+    numerator = torch.matmul(x, torch.transpose(y, 0, 1))
+    denominator = torch.norm(x, dim=1)[:, None] * torch.norm(y, dim=1)[None, :]
+    safe_denominator = torch.where(
+        denominator > 0.0,
         denominator,
-        out=np.zeros_like(similarities),
-        where=denominator != 0,
+        torch.ones_like(denominator),
+    )
+
+    # Zero vectors have no direction; define every similarity involving one as zero.
+    return torch.where(
+        denominator > 0.0,
+        numerator / safe_denominator,
+        torch.zeros_like(numerator),
     )`,
-    starterCode: `import numpy as np
+    starterCode: `from __future__ import annotations
 
-def pairwise_cosine_similarity(x, y):
-    x = np.asarray(x)
-    y = np.asarray(y)
+import torch
 
+def pairwise_cosine_similarity(
+    x: torch.Tensor,
+    y: torch.Tensor,
+) -> torch.Tensor:
     # TODO:
-    # 1. Validate that x and y are 2D and share the same feature dimension.
-    # 2. Compute pairwise cosine similarities with zero-norm rows mapped to 0.0.
+    # 1. Validate two-dimensional inputs with the same feature dimension.
+    # 2. Compute pairwise dot products and row norms.
+    # 3. Map similarities involving a zero-norm row to 0.0.
     raise NotImplementedError("Implement pairwise_cosine_similarity")
 
-sample_x = np.array([[1.0, 0.0], [0.0, 0.0]])
-sample_y = np.array([[1.0, 0.0], [1.0, 1.0]])
+sample_x = torch.tensor([[1.0, 0.0], [0.0, 0.0]], dtype=torch.float64)
+sample_y = torch.tensor([[1.0, 0.0], [1.0, 1.0]], dtype=torch.float64)
 
 print(pairwise_cosine_similarity(sample_x, sample_y))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Linear Algebra', 'Vectorization'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Linear Algebra', 'Vectorization'],
   },
   {
     id: 'top-k-accuracy',
@@ -538,9 +586,13 @@ print(pairwise_cosine_similarity(sample_x, sample_y))`,
       'Compute the fraction of examples whose true label appears among the top k logits in each row.',
     prompt: [
       'Write `top_k_accuracy(logits, labels, k)` so it returns the fraction of examples where the true label is among the top `k` logits.',
-      'Treat this like an interview question: validate the inputs, use NumPy for the ranking logic, and accept NumPy’s default ordering behavior when scores tie.',
+      'Treat this like an interview question: validate the inputs, use PyTorch for the ranking logic, and accept PyTorch’s default ordering behavior when scores tie.',
     ],
-    signature: `def top_k_accuracy(logits, labels, k):
+    signature: `def top_k_accuracy(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+    k: int,
+) -> torch.Tensor:
     ...`,
     requirements: [
       '`logits` is a 2D array or list of shape `(N, C)`.',
@@ -572,59 +624,62 @@ print(pairwise_cosine_similarity(sample_x, sample_y))`,
     hint: [
       'Sort each row in descending order and take the first `k` class indices.',
       'A vectorized comparison against `labels[:, None]` makes it easy to test membership in the top-k set.',
-      'Use `np.mean` on the boolean correctness mask to turn per-example hits into a fraction.',
+      'Use `torch.mean` on the boolean correctness mask to turn per-example hits into a fraction.',
       'Validate that `logits` is 2D, `labels` is 1D, the batch sizes match, the labels are in range, and `k` is positive.',
     ],
     solutionNotes: [
       'The implementation is straightforward once the inputs are validated: rank each row from largest to smallest, take the first `k` class ids, and check whether the true label appears in that slice.',
       'Because the check is fully vectorized, the result is a simple mean over a boolean mask, which keeps the code short and easy to read.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def top_k_accuracy(logits, labels, k):
-    logits = np.asarray(logits, dtype=np.float64)
-    labels = np.asarray(labels)
+import torch
 
-    if logits.ndim != 2:
-        raise ValueError("logits must be a 2D array of shape (N, C)")
-    if labels.ndim != 1:
-        raise ValueError("labels must be a 1D array of shape (N,)")
-    if logits.shape[0] == 0:
-        raise ValueError("logits must contain at least one sample")
-    if logits.shape[1] == 0:
-        raise ValueError("logits must contain at least one class")
-    if labels.shape[0] != logits.shape[0]:
-        raise ValueError("labels must have the same batch size as logits")
-    if isinstance(k, bool) or not isinstance(k, (int, np.integer)):
+def top_k_accuracy(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+    k: int,
+) -> torch.Tensor:
+    logits = torch.as_tensor(logits, dtype=torch.float64)
+    labels = torch.as_tensor(labels)
+
+    if logits.ndim != 2 or logits.shape[0] == 0 or logits.shape[1] == 0:
+        raise ValueError("logits must have positive shape (N, C)")
+    if labels.ndim != 1 or labels.shape[0] != logits.shape[0]:
+        raise ValueError("labels must have shape (N,)")
+    if isinstance(k, bool) or not isinstance(k, int) or k <= 0:
         raise ValueError("k must be a positive integer")
-    if k <= 0:
-        raise ValueError("k must be a positive integer")
-    if not np.issubdtype(labels.dtype, np.integer):
+    if torch.is_floating_point(labels):
         raise ValueError("labels must contain integer class ids")
-    if np.any(labels < 0) or np.any(labels >= logits.shape[1]):
+    labels = torch.as_tensor(labels, dtype=torch.long)
+    if bool(torch.any(labels < 0)) or bool(torch.any(labels >= logits.shape[1])):
         raise ValueError("labels contain out-of-range class ids")
 
-    top_k = min(int(k), logits.shape[1])
-    ranked = np.argsort(-logits, axis=1)[:, :top_k]
-    hits = np.any(ranked == labels[:, None], axis=1)
-    return float(np.mean(hits))`,
-    starterCode: `import numpy as np
+    top_k = min(k, logits.shape[1])
+    ranked = torch.topk(logits, k=top_k, dim=1).indices
+    hits = torch.any(ranked == labels[:, None], dim=1)
+    return torch.mean(torch.as_tensor(hits, dtype=torch.float64))`,
+    starterCode: `from __future__ import annotations
 
-def top_k_accuracy(logits, labels, k):
-    logits = np.asarray(logits)
-    labels = np.asarray(labels)
+import torch
 
+def top_k_accuracy(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+    k: int,
+) -> torch.Tensor:
     # TODO:
-    # 1. Validate shapes, label values, and that k is positive.
-    # 2. Rank each row of logits and check whether the true label appears in the top k.
+    # 1. Validate shapes, integer labels, label range, and positive k.
+    # 2. Use torch.topk along the class dimension.
+    # 3. Reduce the per-example membership mask to a mean accuracy.
     raise NotImplementedError("Implement top_k_accuracy")
 
-sample_logits = np.array([[0.1, 0.9, 0.2], [3.0, 1.0, 2.0]])
-sample_labels = np.array([1, 2])
+sample_logits = torch.tensor([[0.1, 0.9, 0.2], [3.0, 1.0, 2.0]], dtype=torch.float64)
+sample_labels = torch.tensor([1, 2], dtype=torch.long)
 
-print(top_k_accuracy(sample_logits, sample_labels, k=1))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Classification', 'Metrics'],
+print(top_k_accuracy(sample_logits, sample_labels, k=1).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Classification', 'Metrics'],
   },
   {
     id: 'iou-matrix',
@@ -637,7 +692,10 @@ print(top_k_accuracy(sample_logits, sample_labels, k=1))`,
       'Write `box_iou_matrix(boxes1, boxes2)` so it returns the pairwise IoU between every box in `boxes1` and every box in `boxes2`.',
       'Treat this like an interview question: validate the shapes, use a vectorized implementation, and raise `ValueError` for malformed boxes.',
     ],
-    signature: `def box_iou_matrix(boxes1, boxes2):
+    signature: `def box_iou_matrix(
+    boxes1: torch.Tensor,
+    boxes2: torch.Tensor,
+) -> torch.Tensor:
     ...`,
     requirements: [
       '`boxes1` is an `(N, 4)` array or list.',
@@ -664,66 +722,71 @@ print(top_k_accuracy(sample_logits, sample_labels, k=1))`,
     hint: [
       'Broadcast `boxes1` against `boxes2` to compute the overlap corners in one shot.',
       'Intersection width and height should be clamped at `0.0` so non-overlapping boxes contribute zero area.',
-      'Compute areas once, then divide intersection by union with a zero-safe `np.divide`.',
+      'Compute areas once, then divide intersection by union with an explicit zero-area policy.',
       'Validate that each box has `x2 >= x1` and `y2 >= y1` before computing anything else.',
     ],
     solutionNotes: [
       'The main trick is to form all pairwise overlap rectangles with broadcasting, then compute intersection areas, box areas, and union areas from those tensors.',
-      'Once the pairwise union is known, `np.divide` with a zero-filled output array keeps the implementation numerically stable and handles degenerate boxes cleanly.',
+      'Once the pairwise union is known, a `torch.where` denominator mask keeps the implementation stable and handles degenerate boxes cleanly.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def _validate_boxes(boxes, name):
-    boxes = np.asarray(boxes, dtype=np.float64)
+import torch
 
+def _validate_boxes(boxes: torch.Tensor, name: str) -> torch.Tensor:
+    boxes = torch.as_tensor(boxes, dtype=torch.float64)
     if boxes.ndim != 2 or boxes.shape[1] != 4:
         raise ValueError(f"{name} must have shape (N, 4)")
-    if np.any(boxes[:, 2] < boxes[:, 0]) or np.any(boxes[:, 3] < boxes[:, 1]):
+    if not bool(torch.all(torch.isfinite(boxes))):
+        raise ValueError(f"{name} must contain only finite values")
+    if bool(torch.any(boxes[:, 2] < boxes[:, 0])) or bool(torch.any(boxes[:, 3] < boxes[:, 1])):
         raise ValueError(f"{name} contains invalid boxes")
-
     return boxes
 
-def box_iou_matrix(boxes1, boxes2):
+def box_iou_matrix(
+    boxes1: torch.Tensor,
+    boxes2: torch.Tensor,
+) -> torch.Tensor:
     boxes1 = _validate_boxes(boxes1, "boxes1")
     boxes2 = _validate_boxes(boxes2, "boxes2")
 
-    # Broadcasting boxes1 against boxes2 produces every pairwise overlap rectangle at once.
-    x1 = np.maximum(boxes1[:, None, 0], boxes2[None, :, 0])
-    y1 = np.maximum(boxes1[:, None, 1], boxes2[None, :, 1])
-    x2 = np.minimum(boxes1[:, None, 2], boxes2[None, :, 2])
-    y2 = np.minimum(boxes1[:, None, 3], boxes2[None, :, 3])
+    x1 = torch.maximum(boxes1[:, None, 0], boxes2[None, :, 0])
+    y1 = torch.maximum(boxes1[:, None, 1], boxes2[None, :, 1])
+    x2 = torch.minimum(boxes1[:, None, 2], boxes2[None, :, 2])
+    y2 = torch.minimum(boxes1[:, None, 3], boxes2[None, :, 3])
 
-    inter_w = np.maximum(0.0, x2 - x1)
-    inter_h = np.maximum(0.0, y2 - y1)
-    inter_area = inter_w * inter_h
-
+    inter_area = torch.clamp(x2 - x1, min=0.0) * torch.clamp(y2 - y1, min=0.0)
     area1 = (boxes1[:, 2] - boxes1[:, 0]) * (boxes1[:, 3] - boxes1[:, 1])
     area2 = (boxes2[:, 2] - boxes2[:, 0]) * (boxes2[:, 3] - boxes2[:, 1])
     union = area1[:, None] + area2[None, :] - inter_area
+    safe_union = torch.where(union > 0.0, union, torch.ones_like(union))
 
-    return np.divide(
-        inter_area,
-        union,
-        out=np.zeros_like(inter_area),
-        where=union > 0,
+    # Degenerate boxes have zero area, so their IoU is defined as zero here.
+    return torch.where(
+        union > 0.0,
+        inter_area / safe_union,
+        torch.zeros_like(inter_area),
     )`,
-    starterCode: `import numpy as np
+    starterCode: `from __future__ import annotations
 
-def box_iou_matrix(boxes1, boxes2):
-    boxes1 = np.asarray(boxes1)
-    boxes2 = np.asarray(boxes2)
+import torch
 
+def box_iou_matrix(
+    boxes1: torch.Tensor,
+    boxes2: torch.Tensor,
+) -> torch.Tensor:
     # TODO:
-    # 1. Validate the shapes and reject malformed boxes.
-    # 2. Compute the pairwise intersection, union, and IoU matrices.
+    # 1. Validate each box tensor has shape (N, 4) and valid coordinates.
+    # 2. Broadcast the two sets to form every overlap rectangle.
+    # 3. Divide intersection by union with an explicit zero-area policy.
     raise NotImplementedError("Implement box_iou_matrix")
 
-sample_boxes1 = np.array([[0, 0, 2, 2], [0, 0, 1, 1]])
-sample_boxes2 = np.array([[1, 1, 3, 3], [0, 0, 2, 2]])
+sample_boxes1 = torch.tensor([[0.0, 0.0, 2.0, 2.0], [0.0, 0.0, 1.0, 1.0]], dtype=torch.float64)
+sample_boxes2 = torch.tensor([[1.0, 1.0, 3.0, 3.0], [0.0, 0.0, 2.0, 2.0]], dtype=torch.float64)
 
 print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Computer Vision', 'Bounding Boxes'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Computer Vision', 'Bounding Boxes'],
   },
   {
     id: 'nearest-centroid-classifier',
@@ -736,7 +799,11 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
       'Write `nearest_centroid_predict(train_X, train_y, test_X)` so it returns a 1D array of predicted class labels for `test_X`.',
       'Compute one centroid per class from `train_X`, then classify each test point by the nearest centroid using Euclidean distance. If distances tie, choose the smaller class label.',
     ],
-    signature: `def nearest_centroid_predict(train_X, train_y, test_X):
+    signature: `def nearest_centroid_predict(
+    train_X: torch.Tensor,
+    train_y: torch.Tensor,
+    test_X: torch.Tensor,
+) -> torch.Tensor:
     ...`,
     requirements: [
       '`train_X` is an `(N, D)` array or list.',
@@ -776,57 +843,66 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
       'The nearest-centroid rule compresses each class into its mean feature vector, then assigns each test point to the closest mean.',
       'Squared Euclidean distance preserves the same ordering as Euclidean distance, and keeping the class labels sorted makes the tie-breaking rule deterministic.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def nearest_centroid_predict(train_X, train_y, test_X):
-    train_X = np.asarray(train_X, dtype=np.float64)
-    train_y = np.asarray(train_y)
-    test_X = np.asarray(test_X, dtype=np.float64)
+import torch
 
-    if train_X.ndim != 2:
-        raise ValueError("train_X must be a 2D array of shape (N, D)")
-    if train_y.ndim != 1:
-        raise ValueError("train_y must be a 1D array of shape (N,)")
-    if test_X.ndim != 2:
-        raise ValueError("test_X must be a 2D array of shape (M, D)")
-    if train_X.shape[0] == 0:
-        raise ValueError("train_X must contain at least one sample")
-    if train_X.shape[0] != train_y.shape[0]:
-        raise ValueError("train_X and train_y must have the same number of samples")
-    if train_X.shape[1] != test_X.shape[1]:
-        raise ValueError("train_X and test_X must have the same feature dimension")
-    if not np.issubdtype(train_y.dtype, np.integer):
+def nearest_centroid_predict(
+    train_X: torch.Tensor,
+    train_y: torch.Tensor,
+    test_X: torch.Tensor,
+) -> torch.Tensor:
+    train_X = torch.as_tensor(train_X, dtype=torch.float64)
+    train_y = torch.as_tensor(train_y)
+    test_X = torch.as_tensor(test_X, dtype=torch.float64)
+
+    if train_X.ndim != 2 or test_X.ndim != 2:
+        raise ValueError("train_X and test_X must be 2D tensors")
+    if train_X.shape[0] == 0 or train_X.shape[1] == 0:
+        raise ValueError("train_X must have positive shape")
+    if train_y.ndim != 1 or train_y.shape[0] != train_X.shape[0]:
+        raise ValueError("train_y must have shape (N,)")
+    if test_X.shape[1] != train_X.shape[1]:
+        raise ValueError("train_X and test_X must share the feature dimension")
+    if torch.is_floating_point(train_y):
         raise ValueError("train_y must contain integer class labels")
+    train_y = torch.as_tensor(train_y, dtype=torch.long)
 
-    labels = np.unique(train_y)
-    if labels.size == 0:
+    labels = torch.unique(train_y, sorted=True)
+    if labels.shape[0] == 0:
         raise ValueError("train_y must contain at least one class")
 
-    centroids = np.vstack([train_X[train_y == label].mean(axis=0) for label in labels])
+    # Sorted labels make argmin's first-index behavior implement the tie-break rule.
+    centroids = torch.stack([
+        torch.mean(train_X[train_y == label], dim=0)
+        for label in labels
+    ])
     deltas = test_X[:, None, :] - centroids[None, :, :]
-    squared_distances = np.sum(deltas * deltas, axis=2)
-    nearest_indices = np.argmin(squared_distances, axis=1)
+    squared_distances = torch.sum(deltas * deltas, dim=2)
+    nearest_indices = torch.argmin(squared_distances, dim=1)
     return labels[nearest_indices]`,
-    starterCode: `import numpy as np
+    starterCode: `from __future__ import annotations
 
-def nearest_centroid_predict(train_X, train_y, test_X):
-    train_X = np.asarray(train_X)
-    train_y = np.asarray(train_y)
-    test_X = np.asarray(test_X)
+import torch
 
+def nearest_centroid_predict(
+    train_X: torch.Tensor,
+    train_y: torch.Tensor,
+    test_X: torch.Tensor,
+) -> torch.Tensor:
     # TODO:
-    # 1. Validate the shapes and labels.
-    # 2. Compute one centroid per class from train_X.
-    # 3. Predict each test point by the nearest centroid.
+    # 1. Validate feature dimensions and integer labels.
+    # 2. Build one centroid per sorted class label.
+    # 3. Broadcast squared distances and choose the nearest centroid.
     raise NotImplementedError("Implement nearest_centroid_predict")
 
-sample_train_X = np.array([[0.0], [2.0], [10.0], [12.0]])
-sample_train_y = np.array([0, 0, 1, 1])
-sample_test_X = np.array([[0.0], [6.0], [12.0]])
+sample_train_X = torch.tensor([[0.0], [2.0], [10.0], [12.0]], dtype=torch.float64)
+sample_train_y = torch.tensor([0, 0, 1, 1], dtype=torch.long)
+sample_test_X = torch.tensor([[0.0], [6.0], [12.0]], dtype=torch.float64)
 
 print(nearest_centroid_predict(sample_train_X, sample_train_y, sample_test_X))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Classification', 'Centroids'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Classification', 'Centroids'],
   },
   {
     id: 'temperature-scaling-of-logits',
@@ -839,7 +915,10 @@ print(nearest_centroid_predict(sample_train_X, sample_train_y, sample_test_X))`,
       'Write `temperature_scaled_probs(logits, temperature)` so it returns softmax probabilities after scaling `logits` by `temperature`.',
       'Use a numerically stable implementation, validate the inputs, and make sure each row of the output sums to `1`.',
     ],
-    signature: `def temperature_scaled_probs(logits, temperature):
+    signature: `def temperature_scaled_probs(
+    logits: torch.Tensor,
+    temperature: float,
+) -> torch.Tensor:
     ...`,
     requirements: [
       '`logits` is an `(N, C)` array or list.',
@@ -874,47 +953,50 @@ print(nearest_centroid_predict(sample_train_X, sample_train_y, sample_test_X))`,
       'Temperature scaling is just softmax on the logits after rescaling them by a positive constant. The key implementation detail is to subtract the row maximum after scaling so the exponentials never blow up.',
       'Once the shifted logits are exponentiated, each row is normalized by its own sum, which gives a valid probability distribution that still sums to `1`.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def temperature_scaled_probs(logits, temperature):
-    logits = np.asarray(logits, dtype=np.float64)
+import math
+import torch
 
-    if isinstance(temperature, (bool, np.bool_)):
-        raise ValueError("temperature must be a positive float")
+def temperature_scaled_probs(
+    logits: torch.Tensor,
+    temperature: float,
+) -> torch.Tensor:
+    logits = torch.as_tensor(logits, dtype=torch.float64)
+    if logits.ndim != 2 or logits.shape[0] == 0 or logits.shape[1] == 0:
+        raise ValueError("logits must have positive shape (N, C)")
+    if not bool(torch.all(torch.isfinite(logits))):
+        raise ValueError("logits must contain only finite values")
+    if isinstance(temperature, bool):
+        raise ValueError("temperature must be a positive finite scalar")
+
     try:
         temperature = float(temperature)
-    except (TypeError, ValueError):
-        raise ValueError("temperature must be a positive float")
+    except (TypeError, ValueError) as exc:
+        raise ValueError("temperature must be a positive finite scalar") from exc
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        raise ValueError("temperature must be a positive finite scalar")
 
-    if logits.ndim != 2:
-        raise ValueError("logits must be a 2D array of shape (N, C)")
-    if logits.shape[0] == 0:
-        raise ValueError("logits must contain at least one sample")
-    if logits.shape[1] == 0:
-        raise ValueError("logits must contain at least one class")
-    if not np.isfinite(temperature) or temperature <= 0:
-        raise ValueError("temperature must be a positive float")
+    # torch.softmax performs the stable max-shift internally after temperature scaling.
+    return torch.softmax(logits / temperature, dim=1)`,
+    starterCode: `from __future__ import annotations
 
-    scaled_logits = logits / temperature
-    shifted = scaled_logits - np.max(scaled_logits, axis=1, keepdims=True)
-    exp_shifted = np.exp(shifted)
-    return exp_shifted / np.sum(exp_shifted, axis=1, keepdims=True)`,
-    starterCode: `import numpy as np
+import torch
 
-def temperature_scaled_probs(logits, temperature):
-    logits = np.asarray(logits)
-
+def temperature_scaled_probs(
+    logits: torch.Tensor,
+    temperature: float,
+) -> torch.Tensor:
     # TODO:
-    # 1. Validate that logits is 2D and temperature is a positive scalar.
-    # 2. Divide by temperature, apply a numerically stable softmax, and return probabilities.
+    # 1. Validate a positive finite temperature and finite 2D logits.
+    # 2. Divide logits by temperature.
+    # 3. Apply stable softmax along the class dimension.
     raise NotImplementedError("Implement temperature_scaled_probs")
 
-sample_logits = np.array([[1000.0, 1001.0, 1002.0]])
-sample_temperature = 1.0
-
-print(temperature_scaled_probs(sample_logits, sample_temperature))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Classification', 'Calibration'],
+sample_logits = torch.tensor([[1000.0, 1001.0, 1002.0]], dtype=torch.float64)
+print(temperature_scaled_probs(sample_logits, temperature=1.0))`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Classification', 'Calibration'],
   },
   {
     id: 'sinusoidal-positional-encoding',
@@ -927,7 +1009,7 @@ print(temperature_scaled_probs(sample_logits, sample_temperature))`,
       'Write `sinusoidal_positional_encoding(length, dim)` so it returns a `(length, dim)` array of sinusoidal positional encodings.',
       'Use the standard Transformer formulas: even columns use `sin(pos / 10000^(2k/dim))` and odd columns use `cos(pos / 10000^(2k/dim))`. If `dim` is odd, the final column should use the even-column formula for its slot.',
     ],
-    signature: `def sinusoidal_positional_encoding(length, dim):
+    signature: `def sinusoidal_positional_encoding(length: int, dim: int) -> torch.Tensor:
     ...`,
     requirements: [
       '`length` is a positive integer.',
@@ -953,47 +1035,53 @@ print(temperature_scaled_probs(sample_logits, sample_temperature))`,
     hint: [
       'Build a column index vector `0..dim-1`, then reuse the same frequency for each even/odd pair.',
       'Broadcast a position vector of shape `(length, 1)` against the per-column frequency vector.',
-      'Fill even columns with `np.sin` and odd columns with `np.cos` after computing the shared angles.',
+      'Fill even columns with `torch.sin` and odd columns with `torch.cos` after computing the shared angles.',
       'If `dim` is odd, the last column still belongs to the even-column branch.',
     ],
     solutionNotes: [
       'Sinusoidal positional encoding is just a deterministic lookup table: each position gets a vector of sines and cosines at frequencies that decay geometrically across the embedding dimension.',
       'The implementation is compact if you compute one denominator per column pair and then broadcast positions across those frequencies. That also makes the odd-dimension case work naturally, because the final column is just the next even slot.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def sinusoidal_positional_encoding(length, dim):
-    if isinstance(length, bool) or not isinstance(length, (int, np.integer)):
+import torch
+
+def sinusoidal_positional_encoding(length: int, dim: int) -> torch.Tensor:
+    if isinstance(length, bool) or not isinstance(length, int) or length <= 0:
         raise ValueError("length must be a positive integer")
-    if isinstance(dim, bool) or not isinstance(dim, (int, np.integer)):
+    if isinstance(dim, bool) or not isinstance(dim, int) or dim <= 0:
         raise ValueError("dim must be a positive integer")
-    if length <= 0 or dim <= 0:
-        raise ValueError("length and dim must be positive integers")
 
-    positions = np.arange(length, dtype=np.float64)[:, None]
-    column_indices = np.arange(dim)
-    even_indices = 2 * (column_indices // 2)
-    angle_rates = np.power(10000.0, even_indices / dim)
+    positions = torch.arange(length, dtype=torch.float64)[:, None]
+    columns = torch.arange(dim, dtype=torch.long)
+    even_indices = 2 * (columns // 2)
+    angle_rates = torch.pow(
+        torch.as_tensor(10000.0, dtype=torch.float64),
+        torch.as_tensor(even_indices, dtype=torch.float64) / dim,
+    )
     angles = positions / angle_rates
 
-    encoding = np.empty((length, dim), dtype=np.float64)
-    encoding[:, 0::2] = np.sin(angles[:, 0::2])
-    encoding[:, 1::2] = np.cos(angles[:, 1::2])
+    encoding = torch.empty((length, dim), dtype=torch.float64)
+    encoding[:, 0::2] = torch.sin(angles[:, 0::2])
+    encoding[:, 1::2] = torch.cos(angles[:, 1::2])
     return encoding`,
-    starterCode: `import numpy as np
+    starterCode: `from __future__ import annotations
 
-def sinusoidal_positional_encoding(length, dim):
+import torch
+
+def sinusoidal_positional_encoding(length: int, dim: int) -> torch.Tensor:
     # TODO:
-    # 1. Validate that length and dim are positive integers.
-    # 2. Build the sinusoidal table with the standard even/odd formulas.
+    # 1. Validate positive integer length and embedding dimension.
+    # 2. Build one angle table using positions and paired frequencies.
+    # 3. Fill even columns with sine and odd columns with cosine.
     raise NotImplementedError("Implement sinusoidal_positional_encoding")
 
 sample_length = 4
 sample_dim = 5
 
 print(sinusoidal_positional_encoding(sample_length, sample_dim))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Sequence Modeling', 'Embeddings'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Sequence Modeling', 'Embeddings'],
   },
   {
     id: 'unpatchify-back-to-image',
@@ -1006,7 +1094,11 @@ print(sinusoidal_positional_encoding(sample_length, sample_dim))`,
       'Write `unpatchify(patches, image_shape, patch_size)` so it reconstructs and returns a batch of images from flattened patch tokens.',
       'Assume the patches are in row-major order across the image grid. Validate the inputs, then reshape the patch tensor back into `(B, C, H, W)`.',
     ],
-    signature: `def unpatchify(patches, image_shape, patch_size):
+    signature: `def unpatchify(
+    patches: torch.Tensor,
+    image_shape: tuple[int, int, int],
+    patch_size: int,
+) -> torch.Tensor:
     ...`,
     requirements: [
       '`patches` has shape `(B, N, C * P * P)`.',
@@ -1047,63 +1139,68 @@ print(sinusoidal_positional_encoding(sample_length, sample_dim))`,
       'This problem is the inverse of patch extraction: each flattened patch vector is first reshaped into `(C, P, P)`, then the patch grid is placed back into its `(H / P, W / P)` spatial layout.',
       'A reshape followed by a transpose is enough to undo the flattening as long as the patch order is row-major and the image dimensions divide evenly by the patch size.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def unpatchify(patches, image_shape, patch_size):
-    patches = np.asarray(patches)
-    image_shape = np.asarray(image_shape)
+import torch
+
+def unpatchify(
+    patches: torch.Tensor,
+    image_shape: tuple[int, int, int],
+    patch_size: int,
+) -> torch.Tensor:
+    patches = torch.as_tensor(patches)
+    shape = torch.as_tensor(image_shape)
 
     if patches.ndim != 3:
         raise ValueError("patches must have shape (B, N, C * P * P)")
-    if image_shape.ndim != 1 or image_shape.size != 3:
-        raise ValueError("image_shape must have shape (3,)")
-    if not np.issubdtype(image_shape.dtype, np.integer):
-        raise ValueError("image_shape must contain integers")
-    if isinstance(patch_size, bool) or not isinstance(patch_size, (int, np.integer)):
-        raise ValueError("patch_size must be a positive integer")
-    if patch_size <= 0:
+    if shape.ndim != 1 or shape.shape[0] != 3 or torch.is_floating_point(shape):
+        raise ValueError("image_shape must contain three integers")
+    if isinstance(patch_size, bool) or not isinstance(patch_size, int) or patch_size <= 0:
         raise ValueError("patch_size must be a positive integer")
 
-    C, H, W = (int(value) for value in image_shape)
-    if C <= 0 or H <= 0 or W <= 0:
-        raise ValueError("image_shape must contain positive integers")
-    if H % patch_size != 0 or W % patch_size != 0:
+    channels, height, width = (int(value) for value in shape.tolist())
+    if channels <= 0 or height <= 0 or width <= 0:
+        raise ValueError("image_shape must contain positive dimensions")
+    if height % patch_size != 0 or width % patch_size != 0:
         raise ValueError("image dimensions must be divisible by patch_size")
 
-    grid_h = H // patch_size
-    grid_w = W // patch_size
-    expected_num_patches = grid_h * grid_w
-    expected_patch_dim = C * patch_size * patch_size
-
-    if patches.shape[1] != expected_num_patches:
-        raise ValueError("patch count does not match image_shape and patch_size")
-    if patches.shape[2] != expected_patch_dim:
-        raise ValueError("patch dimension does not match image_shape and patch_size")
+    grid_h, grid_w = height // patch_size, width // patch_size
+    expected_patches = grid_h * grid_w
+    expected_patch_dim = channels * patch_size * patch_size
+    if patches.shape[1] != expected_patches or patches.shape[2] != expected_patch_dim:
+        raise ValueError("patches do not match image_shape and patch_size")
 
     batch_size = patches.shape[0]
-    # Reshape into the patch grid, then transpose so grid axes interleave with within-patch pixels.
-    reshaped = patches.reshape(batch_size, grid_h, grid_w, C, patch_size, patch_size)
-    reconstructed = reshaped.transpose(0, 3, 1, 4, 2, 5)
-    return reconstructed.reshape(batch_size, C, H, W)`,
-    starterCode: `import numpy as np
+    # The transpose interleaves patch-grid coordinates with within-patch pixels.
+    grid = torch.reshape(
+        patches,
+        (batch_size, grid_h, grid_w, channels, patch_size, patch_size),
+    )
+    grid = torch.permute(grid, (0, 3, 1, 4, 2, 5))
+    return torch.reshape(grid, (batch_size, channels, height, width))`,
+    starterCode: `from __future__ import annotations
 
-def unpatchify(patches, image_shape, patch_size):
-    patches = np.asarray(patches)
-    image_shape = np.asarray(image_shape)
+import torch
 
+def unpatchify(
+    patches: torch.Tensor,
+    image_shape: tuple[int, int, int],
+    patch_size: int,
+) -> torch.Tensor:
     # TODO:
-    # 1. Validate the tensor shapes and patch_size.
-    # 2. Reshape and transpose the patch grid back into (B, C, H, W).
+    # 1. Validate the patch tensor, image shape, and divisibility.
+    # 2. Reshape into patch-grid and within-patch axes.
+    # 3. Permute those axes back to (B, C, H, W).
     raise NotImplementedError("Implement unpatchify")
 
-sample_patches = np.array([
+sample_patches = torch.tensor([
     [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
 ])
 sample_image_shape = (1, 4, 4)
 
 print(unpatchify(sample_patches, sample_image_shape, patch_size=2))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Computer Vision', 'Transformers'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Computer Vision', 'Transformers'],
   },
   {
     id: '2d-patchify-for-images',
@@ -1116,7 +1213,7 @@ print(unpatchify(sample_patches, sample_image_shape, patch_size=2))`,
       'Write `patchify(images, patch_size)` so it converts a batch of images into flattened patch tokens.',
       'Assume patches are ordered row-major over the image grid. Validate the inputs, then return an array of shape `(B, N, C * P * P)` where `N = (H // P) * (W // P)`.',
     ],
-    signature: `def patchify(images, patch_size):
+    signature: `def patchify(images: torch.Tensor, patch_size: int) -> torch.Tensor:
     ...`,
     requirements: [
       '`images` has shape `(B, C, H, W)`.',
@@ -1155,46 +1252,52 @@ print(unpatchify(sample_patches, sample_image_shape, patch_size=2))`,
       'The core trick is to expose the image grid as `(H // P, P, W // P, P)` so the patch structure becomes explicit.',
       'A reshape followed by a transpose keeps row-major patch order and makes the final flattening straightforward.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def patchify(images, patch_size):
-    images = np.asarray(images)
+import torch
+
+def patchify(images: torch.Tensor, patch_size: int) -> torch.Tensor:
+    images = torch.as_tensor(images)
 
     if images.ndim != 4:
         raise ValueError("images must have shape (B, C, H, W)")
-    if isinstance(patch_size, bool) or not isinstance(patch_size, (int, np.integer)):
-        raise ValueError("patch_size must be a positive integer")
-    if patch_size <= 0:
+    if isinstance(patch_size, bool) or not isinstance(patch_size, int) or patch_size <= 0:
         raise ValueError("patch_size must be a positive integer")
 
     batch_size, channels, height, width = images.shape
     if channels <= 0 or height <= 0 or width <= 0:
-        raise ValueError("images must have positive channel and spatial dimensions")
+        raise ValueError("images must have positive dimensions")
     if height % patch_size != 0 or width % patch_size != 0:
         raise ValueError("image dimensions must be divisible by patch_size")
 
-    grid_h = height // patch_size
-    grid_w = width // patch_size
-    # Split H and W into grid axes and within-patch axes before flattening each patch token.
-    reshaped = images.reshape(batch_size, channels, grid_h, patch_size, grid_w, patch_size)
-    patches = reshaped.transpose(0, 2, 4, 1, 3, 5)
-    return patches.reshape(batch_size, grid_h * grid_w, channels * patch_size * patch_size)`,
-    starterCode: `import numpy as np
+    grid_h, grid_w = height // patch_size, width // patch_size
+    # Expose grid and within-patch axes before flattening each row-major token.
+    grid = torch.reshape(
+        images,
+        (batch_size, channels, grid_h, patch_size, grid_w, patch_size),
+    )
+    grid = torch.permute(grid, (0, 2, 4, 1, 3, 5))
+    return torch.reshape(
+        grid,
+        (batch_size, grid_h * grid_w, channels * patch_size * patch_size),
+    )`,
+    starterCode: `from __future__ import annotations
 
-def patchify(images, patch_size):
-    images = np.asarray(images)
+import torch
 
+def patchify(images: torch.Tensor, patch_size: int) -> torch.Tensor:
     # TODO:
-    # 1. Validate the tensor shape and patch_size.
-    # 2. Reshape and transpose the image grid into flattened patch tokens.
+    # 1. Validate the BCHW tensor and positive divisible patch size.
+    # 2. Reshape into grid and within-patch axes.
+    # 3. Permute to row-major tokens and flatten each patch.
     raise NotImplementedError("Implement patchify")
 
-sample_images = np.array([
-    [[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]]
+sample_images = torch.tensor([
+    [[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]],
 ])
 print(patchify(sample_images, patch_size=2))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Computer Vision', 'Patch Embeddings'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Computer Vision', 'Patch Embeddings'],
   },
   {
     id: 'rope-rotary-positional-embedding',
@@ -1207,7 +1310,7 @@ print(patchify(sample_images, patch_size=2))`,
       'Implement rotary positional embeddings for a tensor of shape `(B, T, H, D)`, where `D` is even.',
       'Apply RoPE across the last dimension and return a tensor with the same shape. Treat the position as the `T` axis and rotate each adjacent pair of features with the standard `sin`/`cos` frequencies.',
     ],
-    signature: `def apply_rope(x):
+    signature: `def apply_rope(x: torch.Tensor) -> torch.Tensor:
     ...`,
     requirements: [
       '`x` has shape `(B, T, H, D)`.',
@@ -1241,53 +1344,53 @@ print(patchify(sample_images, patch_size=2))`,
       'RoPE treats each adjacent pair of channels as a 2D vector and rotates it by an angle that depends on the token position. That preserves the vector norm while injecting relative position information into attention.',
       'The implementation is cleanest when you precompute one sine/cosine table per token position and frequency pair, then combine it with the input using the standard `rotate_half` pattern.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def apply_rope(x):
-    x = np.asarray(x, dtype=np.float64)
+import torch
 
-    if x.ndim != 4:
-        raise ValueError("x must have shape (B, T, H, D)")
-    if np.any(np.array(x.shape) <= 0):
-        raise ValueError("x must have positive dimensions")
+def apply_rope(x: torch.Tensor) -> torch.Tensor:
+    x = torch.as_tensor(x, dtype=torch.float64)
+
+    if x.ndim != 4 or any(size <= 0 for size in x.shape):
+        raise ValueError("x must have positive shape (B, T, H, D)")
     if x.shape[-1] % 2 != 0:
         raise ValueError("D must be even")
 
     batch_size, seq_len, num_heads, dim = x.shape
-    half_dim = dim // 2
+    pair_indices = torch.arange(dim // 2, dtype=torch.float64)
+    inverse_frequencies = 1.0 / torch.pow(
+        torch.as_tensor(10000.0, dtype=torch.float64),
+        (2.0 * pair_indices) / dim,
+    )
+    positions = torch.arange(seq_len, dtype=torch.float64)[:, None]
+    angles = positions * inverse_frequencies[None, :]
 
-    positions = np.arange(seq_len, dtype=np.float64)[:, None]
-    pair_indices = np.arange(half_dim, dtype=np.float64)
-    inv_freq = 1.0 / np.power(10000.0, (2.0 * pair_indices) / dim)
-    angles = positions * inv_freq[None, :]
+    sin = torch.sin(angles)[None, :, None, :]
+    cos = torch.cos(angles)[None, :, None, :]
+    x_even, x_odd = x[..., 0::2], x[..., 1::2]
 
-    sin = np.sin(angles)[None, :, None, :]
-    cos = np.cos(angles)[None, :, None, :]
-
-    # RoPE rotates adjacent feature pairs, so the last dimension is split into even/odd coordinates.
-    x_even = x[..., 0::2]
-    x_odd = x[..., 1::2]
-
-    out = np.empty_like(x)
+    # Each adjacent feature pair is a 2D vector rotated by its position-dependent angle.
+    out = torch.empty_like(x)
     out[..., 0::2] = x_even * cos - x_odd * sin
     out[..., 1::2] = x_even * sin + x_odd * cos
     return out`,
-    starterCode: `import numpy as np
+    starterCode: `from __future__ import annotations
 
-def apply_rope(x):
-    x = np.asarray(x)
+import torch
 
+def apply_rope(x: torch.Tensor) -> torch.Tensor:
     # TODO:
-    # 1. Validate the tensor shape and check that D is even.
-    # 2. Build the RoPE sine/cosine tables and rotate each feature pair.
+    # 1. Validate a positive (B, T, H, D) tensor with even D.
+    # 2. Build position/frequency sine and cosine tables.
+    # 3. Rotate each adjacent feature pair and preserve the original shape.
     raise NotImplementedError("Implement apply_rope")
 
-sample_x = np.array([
-    [[[1.0, 0.0, 1.0, 0.0]], [[1.0, 0.0, 1.0, 0.0]]]
-])
+sample_x = torch.tensor([
+    [[[1.0, 0.0, 1.0, 0.0]], [[1.0, 0.0, 1.0, 0.0]]],
+], dtype=torch.float64)
 print(apply_rope(sample_x))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Attention', 'Transformers'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Attention', 'Transformers'],
   },
   {
     id: 'scaled-dot-product-self-attention',
@@ -1300,7 +1403,15 @@ print(apply_rope(sample_x))`,
       'Implement single-call multi-head self-attention for a tensor of shape `(B, T, D_model)`.',
       'Project the input into query, key, and value spaces, split into `num_heads` heads, apply scaled dot-product attention with an optional mask, then project the concatenated heads back to `(B, T, D_model)`.',
     ],
-    signature: `def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    signature: `def self_attention(
+    x: torch.Tensor,
+    W_q: torch.Tensor,
+    W_k: torch.Tensor,
+    W_v: torch.Tensor,
+    W_o: torch.Tensor,
+    num_heads: int,
+    mask: torch.Tensor | None = None,
+) -> torch.Tensor:
     ...`,
     requirements: [
       '`x` has shape `(B, T, D_model)`.',
@@ -1341,90 +1452,110 @@ print(apply_rope(sample_x))`,
       'The workflow is the standard Transformer block: project to queries, keys, and values; split the channel dimension into heads; compute masked scaled dot-product attention; then merge the heads and apply the output projection.',
       'Broadcasted masking and a stable softmax are the two details that make the implementation robust. The mask keeps blocked positions from contributing, while the final projection preserves the original model width.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def _stable_softmax(logits):
-    logits = np.asarray(logits, dtype=np.float64)
-    max_logits = np.max(logits, axis=-1, keepdims=True)
-    max_logits = np.where(np.isfinite(max_logits), max_logits, 0.0)
-    shifted = logits - max_logits
-    exp_shifted = np.exp(shifted)
-    exp_shifted = np.where(np.isfinite(logits), exp_shifted, 0.0)
-    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
-    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+import torch
 
-def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
-    x = np.asarray(x, dtype=np.float64)
-    W_q = np.asarray(W_q, dtype=np.float64)
-    W_k = np.asarray(W_k, dtype=np.float64)
-    W_v = np.asarray(W_v, dtype=np.float64)
-    W_o = np.asarray(W_o, dtype=np.float64)
+def _stable_masked_softmax(logits: torch.Tensor) -> torch.Tensor:
+    finite = torch.isfinite(logits)
+    safe_logits = torch.where(finite, logits, torch.zeros_like(logits))
+    maximum = torch.amax(safe_logits, dim=-1, keepdim=True)
+    exponentiated = torch.exp(safe_logits - maximum) * torch.as_tensor(
+        finite,
+        dtype=logits.dtype,
+    )
+    denominator = torch.sum(exponentiated, dim=-1, keepdim=True)
+    safe_denominator = torch.where(
+        denominator > 0.0,
+        denominator,
+        torch.ones_like(denominator),
+    )
+    return torch.where(
+        denominator > 0.0,
+        exponentiated / safe_denominator,
+        torch.zeros_like(exponentiated),
+    )
 
-    if x.ndim != 3:
-        raise ValueError("x must have shape (B, T, D_model)")
-    if np.any(np.array(x.shape) <= 0):
-        raise ValueError("x must have positive dimensions")
-    if isinstance(num_heads, bool) or not isinstance(num_heads, (int, np.integer)):
-        raise ValueError("num_heads must be a positive integer")
-    if num_heads <= 0:
+def self_attention(
+    x: torch.Tensor,
+    W_q: torch.Tensor,
+    W_k: torch.Tensor,
+    W_v: torch.Tensor,
+    W_o: torch.Tensor,
+    num_heads: int,
+    mask: torch.Tensor | None = None,
+) -> torch.Tensor:
+    x = torch.as_tensor(x, dtype=torch.float64)
+    W_q = torch.as_tensor(W_q, dtype=torch.float64)
+    W_k = torch.as_tensor(W_k, dtype=torch.float64)
+    W_v = torch.as_tensor(W_v, dtype=torch.float64)
+    W_o = torch.as_tensor(W_o, dtype=torch.float64)
+
+    if x.ndim != 3 or any(size <= 0 for size in x.shape):
+        raise ValueError("x must have positive shape (B, T, D_model)")
+    if isinstance(num_heads, bool) or not isinstance(num_heads, int) or num_heads <= 0:
         raise ValueError("num_heads must be a positive integer")
 
     batch_size, seq_len, model_dim = x.shape
     if model_dim % num_heads != 0:
         raise ValueError("num_heads must divide D_model")
-
     for matrix, name in ((W_q, "W_q"), (W_k, "W_k"), (W_v, "W_v"), (W_o, "W_o")):
         if matrix.ndim != 2 or matrix.shape != (model_dim, model_dim):
             raise ValueError(f"{name} must have shape (D_model, D_model)")
 
     head_dim = model_dim // num_heads
+    q = torch.matmul(x, W_q)
+    k = torch.matmul(x, W_k)
+    v = torch.matmul(x, W_v)
+    q = torch.permute(torch.reshape(q, (batch_size, seq_len, num_heads, head_dim)), (0, 2, 1, 3))
+    k = torch.permute(torch.reshape(k, (batch_size, seq_len, num_heads, head_dim)), (0, 2, 1, 3))
+    v = torch.permute(torch.reshape(v, (batch_size, seq_len, num_heads, head_dim)), (0, 2, 1, 3))
 
-    q = x @ W_q
-    k = x @ W_k
-    v = x @ W_v
-
-    # Reshape to (B, H, T, D_head) so attention is computed independently per head.
-    q = q.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)
-    k = k.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)
-    v = v.reshape(batch_size, seq_len, num_heads, head_dim).transpose(0, 2, 1, 3)
-
-    scores = np.matmul(q, np.swapaxes(k, -1, -2)) / np.sqrt(head_dim)
-
+    scores = torch.matmul(q, torch.transpose(k, -1, -2)) / (head_dim ** 0.5)
     if mask is not None:
-        mask_arr = np.asarray(mask)
+        mask = torch.as_tensor(mask)
         try:
-            # Broadcasting lets one mask shape cover every batch/head combination.
-            mask_broadcast = np.broadcast_to(mask_arr, scores.shape)
+            mask = torch.broadcast_to(mask, scores.shape)
         except ValueError as exc:
             raise ValueError("mask must be broadcastable to (B, H, T, T)") from exc
-        if not np.all((mask_broadcast == 0) | (mask_broadcast == 1)):
-            raise ValueError("mask must contain only 0 and 1 values")
-        scores = np.where(mask_broadcast.astype(bool), scores, -np.inf)
+        if not bool(torch.all((mask == 0) | (mask == 1))):
+            raise ValueError("mask must contain only 0 and 1")
+        scores = torch.where(
+            mask != 0,
+            scores,
+            torch.full_like(scores, float("-inf")),
+        )
 
-    attn = _stable_softmax(scores)
-    context = np.matmul(attn, v)
-    context = context.transpose(0, 2, 1, 3).reshape(batch_size, seq_len, model_dim)
-    return context @ W_o`,
-    starterCode: `import numpy as np
+    attention = _stable_masked_softmax(scores)
+    context = torch.matmul(attention, v)
+    context = torch.permute(context, (0, 2, 1, 3))
+    context = torch.reshape(context, (batch_size, seq_len, model_dim))
+    return torch.matmul(context, W_o)`,
+    starterCode: `from __future__ import annotations
 
-def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
-    x = np.asarray(x)
-    W_q = np.asarray(W_q)
-    W_k = np.asarray(W_k)
-    W_v = np.asarray(W_v)
-    W_o = np.asarray(W_o)
+import torch
 
+def self_attention(
+    x: torch.Tensor,
+    W_q: torch.Tensor,
+    W_k: torch.Tensor,
+    W_v: torch.Tensor,
+    W_o: torch.Tensor,
+    num_heads: int,
+    mask: torch.Tensor | None = None,
+) -> torch.Tensor:
     # TODO:
-    # 1. Validate shapes and make sure num_heads divides D_model.
-    # 2. Project x into q/k/v, split into heads, apply masked attention, and combine the heads.
+    # 1. Validate BCHD projection shapes and the head divisibility invariant.
+    # 2. Project, reshape into heads, and compute scaled dot-product scores.
+    # 3. Apply the optional binary mask, normalize stably, merge heads, and project out.
     raise NotImplementedError("Implement self_attention")
 
-sample_x = np.array([[[1.0, 0.0], [0.0, 1.0]]])
-sample_w = np.array([[1.0, 0.0], [0.0, 1.0]])
+sample_x = torch.tensor([[[1.0, 0.0], [0.0, 1.0]]], dtype=torch.float64)
+sample_w = torch.eye(2, dtype=torch.float64)
 
 print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads=1))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Attention', 'Transformers'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Attention', 'Transformers'],
   },
   {
     id: 'cross-attention',
@@ -1437,7 +1568,16 @@ print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads
       'Implement multi-head cross-attention for a query tensor and a separate context tensor.',
       'Project the query sequence into queries, project the context sequence into keys and values, split into heads, apply scaled dot-product attention with an optional mask, then project the concatenated heads back to `(B, Tq, D_model)`.',
     ],
-    signature: `def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    signature: `def cross_attention(
+    query_x: torch.Tensor,
+    context_x: torch.Tensor,
+    W_q: torch.Tensor,
+    W_k: torch.Tensor,
+    W_v: torch.Tensor,
+    W_o: torch.Tensor,
+    num_heads: int,
+    mask: torch.Tensor | None = None,
+) -> torch.Tensor:
     ...`,
     requirements: [
       '`query_x` has shape `(B, Tq, D_model)`.',
@@ -1481,97 +1621,119 @@ print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads
       'Cross-attention is the same attention primitive as self-attention, except the query tokens and the key/value tokens come from different inputs. That makes it the right building block when one sequence needs to read information from another.',
       'The implementation follows the usual Transformer recipe: project queries, keys, and values; split channels into heads; compute masked scaled dot-product attention; then merge the heads and apply the output projection.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def _stable_softmax(logits):
-    logits = np.asarray(logits, dtype=np.float64)
-    max_logits = np.max(logits, axis=-1, keepdims=True)
-    max_logits = np.where(np.isfinite(max_logits), max_logits, 0.0)
-    shifted = logits - max_logits
-    exp_shifted = np.exp(shifted)
-    exp_shifted = np.where(np.isfinite(logits), exp_shifted, 0.0)
-    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
-    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+import torch
 
-def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):
-    query_x = np.asarray(query_x, dtype=np.float64)
-    context_x = np.asarray(context_x, dtype=np.float64)
-    W_q = np.asarray(W_q, dtype=np.float64)
-    W_k = np.asarray(W_k, dtype=np.float64)
-    W_v = np.asarray(W_v, dtype=np.float64)
-    W_o = np.asarray(W_o, dtype=np.float64)
+def _stable_masked_softmax(logits: torch.Tensor) -> torch.Tensor:
+    finite = torch.isfinite(logits)
+    safe_logits = torch.where(finite, logits, torch.zeros_like(logits))
+    maximum = torch.amax(safe_logits, dim=-1, keepdim=True)
+    exponentiated = torch.exp(safe_logits - maximum) * torch.as_tensor(
+        finite,
+        dtype=logits.dtype,
+    )
+    denominator = torch.sum(exponentiated, dim=-1, keepdim=True)
+    safe_denominator = torch.where(
+        denominator > 0.0,
+        denominator,
+        torch.ones_like(denominator),
+    )
+    return torch.where(
+        denominator > 0.0,
+        exponentiated / safe_denominator,
+        torch.zeros_like(exponentiated),
+    )
+
+def cross_attention(
+    query_x: torch.Tensor,
+    context_x: torch.Tensor,
+    W_q: torch.Tensor,
+    W_k: torch.Tensor,
+    W_v: torch.Tensor,
+    W_o: torch.Tensor,
+    num_heads: int,
+    mask: torch.Tensor | None = None,
+) -> torch.Tensor:
+    query_x = torch.as_tensor(query_x, dtype=torch.float64)
+    context_x = torch.as_tensor(context_x, dtype=torch.float64)
+    W_q = torch.as_tensor(W_q, dtype=torch.float64)
+    W_k = torch.as_tensor(W_k, dtype=torch.float64)
+    W_v = torch.as_tensor(W_v, dtype=torch.float64)
+    W_o = torch.as_tensor(W_o, dtype=torch.float64)
 
     if query_x.ndim != 3 or context_x.ndim != 3:
         raise ValueError("query_x and context_x must have shape (B, T, D_model)")
-    if np.any(np.array(query_x.shape) <= 0) or np.any(np.array(context_x.shape) <= 0):
+    if any(size <= 0 for size in query_x.shape) or any(size <= 0 for size in context_x.shape):
         raise ValueError("inputs must have positive dimensions")
-    if query_x.shape[0] != context_x.shape[0]:
-        raise ValueError("query_x and context_x must have the same batch size")
-    if query_x.shape[2] != context_x.shape[2]:
-        raise ValueError("query_x and context_x must have the same model dimension")
-    if isinstance(num_heads, bool) or not isinstance(num_heads, (int, np.integer)):
-        raise ValueError("num_heads must be a positive integer")
-    if num_heads <= 0:
+    if query_x.shape[0] != context_x.shape[0] or query_x.shape[2] != context_x.shape[2]:
+        raise ValueError("query_x and context_x must share batch size and model dimension")
+    if isinstance(num_heads, bool) or not isinstance(num_heads, int) or num_heads <= 0:
         raise ValueError("num_heads must be a positive integer")
 
     batch_size, query_len, model_dim = query_x.shape
     context_len = context_x.shape[1]
     if model_dim % num_heads != 0:
         raise ValueError("num_heads must divide D_model")
-
     for matrix, name in ((W_q, "W_q"), (W_k, "W_k"), (W_v, "W_v"), (W_o, "W_o")):
         if matrix.ndim != 2 or matrix.shape != (model_dim, model_dim):
             raise ValueError(f"{name} must have shape (D_model, D_model)")
 
     head_dim = model_dim // num_heads
+    q = torch.matmul(query_x, W_q)
+    k = torch.matmul(context_x, W_k)
+    v = torch.matmul(context_x, W_v)
+    q = torch.permute(torch.reshape(q, (batch_size, query_len, num_heads, head_dim)), (0, 2, 1, 3))
+    k = torch.permute(torch.reshape(k, (batch_size, context_len, num_heads, head_dim)), (0, 2, 1, 3))
+    v = torch.permute(torch.reshape(v, (batch_size, context_len, num_heads, head_dim)), (0, 2, 1, 3))
 
-    q = query_x @ W_q
-    k = context_x @ W_k
-    v = context_x @ W_v
-
-    # Queries use Tq while keys/values use Tk, so their head reshapes differ on the sequence axis.
-    q = q.reshape(batch_size, query_len, num_heads, head_dim).transpose(0, 2, 1, 3)
-    k = k.reshape(batch_size, context_len, num_heads, head_dim).transpose(0, 2, 1, 3)
-    v = v.reshape(batch_size, context_len, num_heads, head_dim).transpose(0, 2, 1, 3)
-
-    scores = np.matmul(q, np.swapaxes(k, -1, -2)) / np.sqrt(head_dim)
-
+    scores = torch.matmul(q, torch.transpose(k, -1, -2)) / (head_dim ** 0.5)
     if mask is not None:
-        mask_arr = np.asarray(mask)
+        mask = torch.as_tensor(mask)
         try:
-            mask_broadcast = np.broadcast_to(mask_arr, scores.shape)
+            mask = torch.broadcast_to(mask, scores.shape)
         except ValueError as exc:
             raise ValueError("mask must be broadcastable to (B, H, Tq, Tk)") from exc
-        if not np.all((mask_broadcast == 0) | (mask_broadcast == 1)):
-            raise ValueError("mask must contain only 0 and 1 values")
-        scores = np.where(mask_broadcast.astype(bool), scores, -np.inf)
+        if not bool(torch.all((mask == 0) | (mask == 1))):
+            raise ValueError("mask must contain only 0 and 1")
+        scores = torch.where(
+            mask != 0,
+            scores,
+            torch.full_like(scores, float("-inf")),
+        )
 
-    attn = _stable_softmax(scores)
-    context = np.matmul(attn, v)
-    context = context.transpose(0, 2, 1, 3).reshape(batch_size, query_len, model_dim)
-    return context @ W_o`,
-    starterCode: `import numpy as np
+    attention = _stable_masked_softmax(scores)
+    context = torch.matmul(attention, v)
+    context = torch.permute(context, (0, 2, 1, 3))
+    context = torch.reshape(context, (batch_size, query_len, model_dim))
+    return torch.matmul(context, W_o)`,
+    starterCode: `from __future__ import annotations
 
-def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):
-    query_x = np.asarray(query_x)
-    context_x = np.asarray(context_x)
-    W_q = np.asarray(W_q)
-    W_k = np.asarray(W_k)
-    W_v = np.asarray(W_v)
-    W_o = np.asarray(W_o)
+import torch
 
+def cross_attention(
+    query_x: torch.Tensor,
+    context_x: torch.Tensor,
+    W_q: torch.Tensor,
+    W_k: torch.Tensor,
+    W_v: torch.Tensor,
+    W_o: torch.Tensor,
+    num_heads: int,
+    mask: torch.Tensor | None = None,
+) -> torch.Tensor:
     # TODO:
-    # 1. Validate the shapes and make sure num_heads divides D_model.
-    # 2. Project query_x into q, context_x into k/v, apply masked attention, and combine the heads.
+    # 1. Validate query/context dimensions and head divisibility.
+    # 2. Project queries from query_x and keys/values from context_x.
+    # 3. Apply masked scaled dot-product attention and merge the heads.
     raise NotImplementedError("Implement cross_attention")
 
-sample_query = np.array([[[1.0, 0.0]]])
-sample_context = np.array([[[1.0, 0.0], [0.0, 1.0]]])
-sample_w = np.array([[1.0, 0.0], [0.0, 1.0]])
+sample_query = torch.tensor([[[1.0, 0.0]]], dtype=torch.float64)
+sample_context = torch.tensor([[[1.0, 0.0], [0.0, 1.0]]], dtype=torch.float64)
+sample_w = torch.eye(2, dtype=torch.float64)
 
 print(cross_attention(sample_query, sample_context, sample_w, sample_w, sample_w, sample_w, num_heads=1))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Attention', 'Transformers'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Attention', 'Transformers'],
   },
   {
     id: 'manual-backprop-for-a-2-layer-mlp',
@@ -1584,7 +1746,14 @@ print(cross_attention(sample_query, sample_context, sample_w, sample_w, sample_w
       'Implement forward and backward for a 2-layer MLP with one hidden ReLU layer.',
       'Given inputs `X`, labels `y`, and parameters `W1`, `b1`, `W2`, and `b2`, compute the mean softmax cross-entropy loss and the gradients for all four parameters.',
     ],
-    signature: `def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
+    signature: `def mlp_loss_and_grads(
+    X: torch.Tensor,
+    y: torch.Tensor,
+    W1: torch.Tensor,
+    b1: torch.Tensor,
+    W2: torch.Tensor,
+    b2: torch.Tensor,
+) -> dict[str, torch.Tensor]:
     ...`,
     requirements: [
       '`X` has shape `(N, D_in)`.',
@@ -1642,105 +1811,98 @@ print(cross_attention(sample_query, sample_context, sample_w, sample_w, sample_w
       'The forward pass is just affine, ReLU, affine, and mean softmax cross-entropy. Once you have the probabilities, the gradient of the loss with respect to the logits is the usual `probs - one_hot` term divided by the batch size.',
       'From there, the remaining gradients follow by the chain rule: the second affine layer gives `dW2` and `db2`, and the upstream gradient passes through the ReLU mask before producing `dW1` and `db1`.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def _stable_softmax(logits):
-    logits = np.asarray(logits, dtype=np.float64)
-    max_logits = np.max(logits, axis=-1, keepdims=True)
-    shifted = logits - max_logits
-    exp_shifted = np.exp(shifted)
-    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
-    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+import torch
 
-def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
-    X = np.asarray(X, dtype=np.float64)
-    y = np.asarray(y, dtype=np.float64)
-    W1 = np.asarray(W1, dtype=np.float64)
-    b1 = np.asarray(b1, dtype=np.float64)
-    W2 = np.asarray(W2, dtype=np.float64)
-    b2 = np.asarray(b2, dtype=np.float64)
+def _validate_mlp_inputs(X, y, W1, b1, W2, b2):
+    X = torch.as_tensor(X, dtype=torch.float64)
+    y = torch.as_tensor(y)
+    W1 = torch.as_tensor(W1, dtype=torch.float64)
+    b1 = torch.as_tensor(b1, dtype=torch.float64)
+    W2 = torch.as_tensor(W2, dtype=torch.float64)
+    b2 = torch.as_tensor(b2, dtype=torch.float64)
 
-    if X.ndim != 2:
-        raise ValueError("X must have shape (N, D_in)")
-    if np.any(np.array(X.shape) <= 0):
-        raise ValueError("X must have positive dimensions")
-    if y.ndim != 1:
+    if X.ndim != 2 or any(size <= 0 for size in X.shape):
+        raise ValueError("X must have positive shape (N, D_in)")
+    if y.ndim != 1 or y.shape[0] != X.shape[0]:
         raise ValueError("y must have shape (N,)")
-    if y.shape[0] != X.shape[0]:
-        raise ValueError("X and y must have the same batch size")
-    if not np.all(np.isfinite(y)) or not np.allclose(y, np.round(y)):
+    if torch.is_floating_point(y):
         raise ValueError("y must contain integer class labels")
-    y = np.round(y).astype(np.int64)
+    y = torch.as_tensor(y, dtype=torch.long)
 
     input_dim = X.shape[1]
-    if W1.ndim != 2 or W1.shape[0] != input_dim:
+    if W1.ndim != 2 or W1.shape[0] != input_dim or W1.shape[1] == 0:
         raise ValueError("W1 must have shape (D_in, H)")
     hidden_dim = W1.shape[1]
-    if hidden_dim <= 0:
-        raise ValueError("W1 must have positive dimensions")
     if b1.ndim != 1 or b1.shape[0] != hidden_dim:
         raise ValueError("b1 must have shape (H,)")
-    if W2.ndim != 2 or W2.shape[0] != hidden_dim:
+    if W2.ndim != 2 or W2.shape[0] != hidden_dim or W2.shape[1] == 0:
         raise ValueError("W2 must have shape (H, C)")
     num_classes = W2.shape[1]
-    if num_classes <= 0:
-        raise ValueError("W2 must have positive dimensions")
     if b2.ndim != 1 or b2.shape[0] != num_classes:
         raise ValueError("b2 must have shape (C,)")
-    if np.any((y < 0) | (y >= num_classes)):
+    if bool(torch.any(y < 0)) or bool(torch.any(y >= num_classes)):
         raise ValueError("y contains labels outside the valid range")
+    return X, y, W1, b1, W2, b2
 
-    z1 = X @ W1 + b1
-    h = np.maximum(z1, 0.0)
-    logits = h @ W2 + b2
-    probs = _stable_softmax(logits)
+def mlp_loss_and_grads(
+    X: torch.Tensor,
+    y: torch.Tensor,
+    W1: torch.Tensor,
+    b1: torch.Tensor,
+    W2: torch.Tensor,
+    b2: torch.Tensor,
+) -> dict[str, torch.Tensor]:
+    X, y, W1, b1, W2, b2 = _validate_mlp_inputs(X, y, W1, b1, W2, b2)
 
-    batch_size = X.shape[0]
-    loss = -np.log(probs[np.arange(batch_size), y]).mean()
+    hidden_pre = torch.matmul(X, W1) + b1
+    hidden = torch.clamp(hidden_pre, min=0.0)
+    logits = torch.matmul(hidden, W2) + b2
+    log_probs = torch.log_softmax(logits, dim=1)
+    loss = -torch.mean(torch.gather(log_probs, 1, torch.unsqueeze(y, 1)))
 
-    dlogits = probs.copy()
-    dlogits[np.arange(batch_size), y] -= 1.0
-    dlogits /= batch_size
+    # d(logits) for mean cross-entropy is softmax(logits) minus one-hot labels, divided by N.
+    dlogits = torch.clone(torch.softmax(logits, dim=1))
+    dlogits[torch.arange(X.shape[0]), y] -= 1.0
+    dlogits = dlogits / X.shape[0]
 
-    dW2 = h.T @ dlogits
-    db2 = dlogits.sum(axis=0)
-    dh = dlogits @ W2.T
-    dz1 = dh * (z1 > 0)
-    dW1 = X.T @ dz1
-    db1 = dz1.sum(axis=0)
+    dW2 = torch.matmul(torch.transpose(hidden, 0, 1), dlogits)
+    db2 = torch.sum(dlogits, dim=0)
+    dhidden = torch.matmul(dlogits, torch.transpose(W2, 0, 1))
+    dhidden_pre = dhidden * (hidden_pre > 0)
+    dW1 = torch.matmul(torch.transpose(X, 0, 1), dhidden_pre)
+    db1 = torch.sum(dhidden_pre, dim=0)
 
-    return {
-        "loss": float(loss),
-        "dW1": dW1,
-        "db1": db1,
-        "dW2": dW2,
-        "db2": db2,
-    }`,
-    starterCode: `import numpy as np
+    return {"loss": loss, "dW1": dW1, "db1": db1, "dW2": dW2, "db2": db2}`,
+    starterCode: `from __future__ import annotations
 
-def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
-    X = np.asarray(X)
-    y = np.asarray(y)
-    W1 = np.asarray(W1)
-    b1 = np.asarray(b1)
-    W2 = np.asarray(W2)
-    b2 = np.asarray(b2)
+import torch
 
+def mlp_loss_and_grads(
+    X: torch.Tensor,
+    y: torch.Tensor,
+    W1: torch.Tensor,
+    b1: torch.Tensor,
+    W2: torch.Tensor,
+    b2: torch.Tensor,
+) -> dict[str, torch.Tensor]:
     # TODO:
-    # 1. Validate shapes and label ranges.
-    # 2. Run the forward pass, compute the softmax cross-entropy loss, and backpropagate gradients.
+    # 1. Validate shapes, finite values, and integer label range.
+    # 2. Run affine -> ReLU -> affine and mean cross-entropy.
+    # 3. Backpropagate the logits gradient through both affine layers.
     raise NotImplementedError("Implement mlp_loss_and_grads")
 
-sample_X = np.array([[1.0, 2.0]])
-sample_y = np.array([1])
-sample_W1 = np.array([[1.0, 0.0], [0.0, 1.0]])
-sample_b1 = np.array([0.0, 0.0])
-sample_W2 = np.array([[1.0, 0.0], [0.0, 1.0]])
-sample_b2 = np.array([0.0, 0.0])
+sample_X = torch.tensor([[1.0, 2.0]], dtype=torch.float64)
+sample_y = torch.tensor([1], dtype=torch.long)
+sample_W1 = torch.eye(2, dtype=torch.float64)
+sample_b1 = torch.zeros(2, dtype=torch.float64)
+sample_W2 = torch.eye(2, dtype=torch.float64)
+sample_b2 = torch.zeros(2, dtype=torch.float64)
 
 print(mlp_loss_and_grads(sample_X, sample_y, sample_W1, sample_b1, sample_W2, sample_b2))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Backpropagation', 'Neural Networks'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Backpropagation', 'Neural Networks'],
   },
   {
     id: 'classic-mlp-forward-backward',
@@ -1753,10 +1915,15 @@ print(mlp_loss_and_grads(sample_X, sample_y, sample_W1, sample_b1, sample_W2, sa
       'This is the one I would especially practice.',
       'Implement forward and backward for a 2-layer MLP with one hidden ReLU layer, a softmax cross-entropy loss, and gradients for all trainable parameters.',
     ],
-    signature: `hidden_pre = X @ W1 + b1
-hidden = relu(hidden_pre)
-logits = hidden @ W2 + b2
-loss = mean softmax cross-entropy(logits, y)`,
+    signature: `def mlp_forward_backward(
+    X: torch.Tensor,
+    y: torch.Tensor,
+    W1: torch.Tensor,
+    b1: torch.Tensor,
+    W2: torch.Tensor,
+    b2: torch.Tensor,
+) -> dict[str, torch.Tensor]:
+    ...`,
     requirements: [
       '`X` has shape `(N, D_in)`.',
       '`y` has shape `(N,)` and contains integer class labels in the range `[0, C)`.',
@@ -1813,105 +1980,91 @@ loss = mean softmax cross-entropy(logits, y)`,
       'The forward pass is affine, ReLU, affine, and mean softmax cross-entropy. Once you have the probabilities, the gradient of the loss with respect to the logits is the usual `probs - one_hot` term divided by the batch size.',
       'From there, the remaining gradients follow by the chain rule: the second affine layer gives `dW2` and `db2`, and the upstream gradient passes through the ReLU mask before producing `dW1` and `db1`.',
     ],
-    solutionCode: `import numpy as np
+    solutionCode: `from __future__ import annotations
 
-def _stable_softmax(logits):
-    logits = np.asarray(logits, dtype=np.float64)
-    max_logits = np.max(logits, axis=-1, keepdims=True)
-    shifted = logits - max_logits
-    exp_shifted = np.exp(shifted)
-    denom = np.sum(exp_shifted, axis=-1, keepdims=True)
-    return np.divide(exp_shifted, denom, out=np.zeros_like(exp_shifted), where=denom > 0)
+import torch
 
-def mlp_forward_backward(X, y, W1, b1, W2, b2):
-    X = np.asarray(X, dtype=np.float64)
-    y = np.asarray(y, dtype=np.float64)
-    W1 = np.asarray(W1, dtype=np.float64)
-    b1 = np.asarray(b1, dtype=np.float64)
-    W2 = np.asarray(W2, dtype=np.float64)
-    b2 = np.asarray(b2, dtype=np.float64)
+def mlp_forward_backward(
+    X: torch.Tensor,
+    y: torch.Tensor,
+    W1: torch.Tensor,
+    b1: torch.Tensor,
+    W2: torch.Tensor,
+    b2: torch.Tensor,
+) -> dict[str, torch.Tensor]:
+    X = torch.as_tensor(X, dtype=torch.float64)
+    y = torch.as_tensor(y)
+    W1 = torch.as_tensor(W1, dtype=torch.float64)
+    b1 = torch.as_tensor(b1, dtype=torch.float64)
+    W2 = torch.as_tensor(W2, dtype=torch.float64)
+    b2 = torch.as_tensor(b2, dtype=torch.float64)
 
-    if X.ndim != 2:
-        raise ValueError("X must have shape (N, D_in)")
-    if np.any(np.array(X.shape) <= 0):
-        raise ValueError("X must have positive dimensions")
-    if y.ndim != 1:
-        raise ValueError("y must have shape (N,)")
-    if y.shape[0] != X.shape[0]:
-        raise ValueError("X and y must have the same batch size")
-    if not np.all(np.isfinite(y)) or not np.allclose(y, np.round(y)):
-        raise ValueError("y must contain integer class labels")
-    y = np.round(y).astype(np.int64)
+    if X.ndim != 2 or any(size <= 0 for size in X.shape):
+        raise ValueError("X must have positive shape (N, D_in)")
+    if y.ndim != 1 or y.shape[0] != X.shape[0] or torch.is_floating_point(y):
+        raise ValueError("y must be an integer tensor of shape (N,)")
+    y = torch.as_tensor(y, dtype=torch.long)
 
     input_dim = X.shape[1]
-    if W1.ndim != 2 or W1.shape[0] != input_dim:
+    if W1.ndim != 2 or W1.shape[0] != input_dim or W1.shape[1] == 0:
         raise ValueError("W1 must have shape (D_in, H)")
     hidden_dim = W1.shape[1]
-    if hidden_dim <= 0:
-        raise ValueError("W1 must have positive dimensions")
     if b1.ndim != 1 or b1.shape[0] != hidden_dim:
         raise ValueError("b1 must have shape (H,)")
-    if W2.ndim != 2 or W2.shape[0] != hidden_dim:
+    if W2.ndim != 2 or W2.shape[0] != hidden_dim or W2.shape[1] == 0:
         raise ValueError("W2 must have shape (H, C)")
     num_classes = W2.shape[1]
-    if num_classes <= 0:
-        raise ValueError("W2 must have positive dimensions")
     if b2.ndim != 1 or b2.shape[0] != num_classes:
         raise ValueError("b2 must have shape (C,)")
-    if np.any((y < 0) | (y >= num_classes)):
+    if bool(torch.any(y < 0)) or bool(torch.any(y >= num_classes)):
         raise ValueError("y contains labels outside the valid range")
 
-    hidden_pre = X @ W1 + b1
-    hidden = np.maximum(hidden_pre, 0.0)
-    logits = hidden @ W2 + b2
-    probs = _stable_softmax(logits)
+    hidden_pre = torch.matmul(X, W1) + b1
+    hidden = torch.clamp(hidden_pre, min=0.0)
+    logits = torch.matmul(hidden, W2) + b2
+    log_probs = torch.log_softmax(logits, dim=1)
+    loss = -torch.mean(torch.gather(log_probs, 1, torch.unsqueeze(y, 1)))
 
-    batch_size = X.shape[0]
-    loss = -np.log(probs[np.arange(batch_size), y]).mean()
+    dlogits = torch.clone(torch.softmax(logits, dim=1))
+    dlogits[torch.arange(X.shape[0]), y] -= 1.0
+    dlogits = dlogits / X.shape[0]
 
-    dlogits = probs.copy()
-    dlogits[np.arange(batch_size), y] -= 1.0
-    dlogits /= batch_size
-
-    dW2 = hidden.T @ dlogits
-    db2 = dlogits.sum(axis=0)
-    dhidden = dlogits @ W2.T
+    dW2 = torch.matmul(torch.transpose(hidden, 0, 1), dlogits)
+    db2 = torch.sum(dlogits, dim=0)
+    dhidden = torch.matmul(dlogits, torch.transpose(W2, 0, 1))
     dhidden_pre = dhidden * (hidden_pre > 0)
-    dW1 = X.T @ dhidden_pre
-    db1 = dhidden_pre.sum(axis=0)
+    dW1 = torch.matmul(torch.transpose(X, 0, 1), dhidden_pre)
+    db1 = torch.sum(dhidden_pre, dim=0)
 
-    return {
-        "loss": float(loss),
-        "dW1": dW1,
-        "db1": db1,
-        "dW2": dW2,
-        "db2": db2,
-    }`,
-    starterCode: `import numpy as np
+    return {"loss": loss, "dW1": dW1, "db1": db1, "dW2": dW2, "db2": db2}`,
+    starterCode: `from __future__ import annotations
 
-def mlp_forward_backward(X, y, W1, b1, W2, b2):
-    X = np.asarray(X)
-    y = np.asarray(y)
-    W1 = np.asarray(W1)
-    b1 = np.asarray(b1)
-    W2 = np.asarray(W2)
-    b2 = np.asarray(b2)
+import torch
 
+def mlp_forward_backward(
+    X: torch.Tensor,
+    y: torch.Tensor,
+    W1: torch.Tensor,
+    b1: torch.Tensor,
+    W2: torch.Tensor,
+    b2: torch.Tensor,
+) -> dict[str, torch.Tensor]:
     # TODO:
-    # 1. Validate shapes and label ranges.
-    # 2. Run the forward pass, compute the softmax cross-entropy loss, and backpropagate gradients.
+    # 1. Validate shapes, finite values, and integer label range.
+    # 2. Run affine -> ReLU -> affine and mean cross-entropy.
+    # 3. Backpropagate the logits gradient through the ReLU mask and both affine layers.
     raise NotImplementedError("Implement mlp_forward_backward")
 
-sample_X = np.array([[1.0, 2.0]])
-sample_y = np.array([1])
-sample_W1 = np.array([[1.0, 0.0], [0.0, 1.0]])
-sample_b1 = np.array([0.0, 0.0])
-sample_W2 = np.array([[1.0, 0.0], [0.0, 1.0]])
-sample_b2 = np.array([0.0, 0.0])
+sample_X = torch.tensor([[1.0, 2.0]], dtype=torch.float64)
+sample_y = torch.tensor([1], dtype=torch.long)
+sample_W1 = torch.eye(2, dtype=torch.float64)
+sample_b1 = torch.zeros(2, dtype=torch.float64)
+sample_W2 = torch.eye(2, dtype=torch.float64)
+sample_b2 = torch.zeros(2, dtype=torch.float64)
 
 print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, sample_b2))`,
-    packages: ['numpy'],
-    tags: ['NumPy', 'Backpropagation', 'Neural Networks'],
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Backpropagation', 'Neural Networks'],
   },
   {
     id: 'simple-n-gram-language-model',
@@ -1926,16 +2079,16 @@ print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, 
       'Use the provided Tiny Shakespeare loader to pull in real text, tokenize it, and build the model from more than a hand-written toy sequence.',
     ],
     signature: `class NGramModel:
-    def __init__(self, n):
+    def __init__(self, n: int):
         ...
 
-    def fit(self, tokens):
+    def fit(self, tokens: Iterable[Token]) -> NGramModel:
         ...
 
-    def next_token_probs(self, context):
+    def next_token_probs(self, context: Iterable[Token]) -> dict[Token, float]:
         ...
 
-    def generate(self, max_tokens, seed=None):
+    def generate(self, max_tokens: int, seed: int | None = None) -> list[Token]:
         ...`,
     requirements: [
       '`n` is an integer with `n >= 1`.',
@@ -1993,8 +2146,13 @@ generated = ['a', 'b', 'a', 'b', 'a']`,
       'At inference time, truncate the supplied context to at most `n - 1` tokens and repeatedly back off to shorter suffixes until a seen context appears. Normalizing the matching counter gives the probability distribution, and `generate` can repeatedly sample from that distribution with a local `random.Random(seed)` instance for deterministic behavior.',
       'Because `fit` only cares about tokens, a tiny helper can load a slice of Tiny Shakespeare, split it into word tokens, and pass those tokens directly into the same model implementation.',
     ],
-    solutionCode: `from collections import Counter, defaultdict
+    solutionCode: `from __future__ import annotations
+
+from collections import Counter, defaultdict
+from collections.abc import Iterable
 import random
+
+Token = str | int
 
 TINY_SHAKESPEARE_PATH = "/datasets/tiny-shakespeare.txt"
 TINY_SHAKESPEARE_URL = (
@@ -2008,7 +2166,7 @@ First Citizen: First, you know Caius Marcius is chief enemy to the people.
 All: We know't, we know't.
 """
 
-def load_tiny_shakespeare(max_chars=12000):
+def load_tiny_shakespeare(max_chars: int = 12000) -> str:
     if isinstance(max_chars, bool) or not isinstance(max_chars, int) or max_chars <= 0:
         raise ValueError("max_chars must be a positive integer")
 
@@ -2025,94 +2183,85 @@ def load_tiny_shakespeare(max_chars=12000):
         except Exception:
             text = TINY_SHAKESPEARE_FALLBACK
 
-    return text[:max_chars]
+    return str(text[:max_chars])
 
-def tokenize_words(text):
+def tokenize_words(text: str) -> list[str]:
     if not isinstance(text, str) or not text.strip():
         raise ValueError("text must be a non-empty string")
-
     return text.split()
 
-def _coerce_tokens(values, name):
+def _coerce_tokens(values: Iterable[Token], name: str) -> list[Token]:
     if isinstance(values, (str, bytes)):
         raise ValueError(f"{name} must be a sequence of string or int tokens")
-
     try:
         items = list(values)
     except TypeError as exc:
         raise ValueError(f"{name} must be a sequence of string or int tokens") from exc
-
-    for token in items:
-        if isinstance(token, bool) or not isinstance(token, (str, int)):
-            raise ValueError(f"{name} must contain only string or int tokens")
-
+    if any(isinstance(token, bool) or not isinstance(token, (str, int)) for token in items):
+        raise ValueError(f"{name} must contain only string or int tokens")
     return items
 
 class NGramModel:
-    def __init__(self, n):
+    def __init__(self, n: int):
         if isinstance(n, bool) or not isinstance(n, int) or n < 1:
             raise ValueError("n must be an integer >= 1")
         self.n = n
-        self.counts = defaultdict(Counter)
+        self.counts: defaultdict[tuple[Token, ...], Counter[Token]] = defaultdict(Counter)
 
-    def fit(self, tokens):
+    def fit(self, tokens: Iterable[Token]) -> NGramModel:
         tokens = _coerce_tokens(tokens, "tokens")
-        self.counts = defaultdict(Counter)
+        self.counts.clear()
 
-        for i, token in enumerate(tokens):
-            max_context_len = min(self.n - 1, i)
-            for context_len in range(max_context_len + 1):
-                # Counting every available suffix here gives unigram through n-gram statistics in one pass.
-                context = tuple(tokens[i - context_len:i]) if context_len else ()
+        for index, token in enumerate(tokens):
+            # Store every available suffix so inference can back off without retraining.
+            for context_len in range(min(self.n - 1, index) + 1):
+                context = tuple(tokens[index - context_len:index]) if context_len else ()
                 self.counts[context][token] += 1
-
         return self
 
-    def next_token_probs(self, context):
+    def next_token_probs(self, context: Iterable[Token]) -> dict[Token, float]:
         context = _coerce_tokens(context, "context")
-        max_context_len = min(len(context), self.n - 1)
-
-        for context_len in range(max_context_len, -1, -1):
-            # Back off from the longest suffix toward the empty context until we find observed counts.
+        for context_len in range(min(len(context), self.n - 1), -1, -1):
             key = tuple(context[-context_len:]) if context_len else ()
             counts = self.counts.get(key)
             if counts:
                 total = sum(counts.values())
                 return {token: count / total for token, count in counts.items()}
-
         return {}
 
-    def generate(self, max_tokens, seed=None):
+    def generate(self, max_tokens: int, seed: int | None = None) -> list[Token]:
         if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens < 0:
             raise ValueError("max_tokens must be a non-negative integer")
         if seed is not None and (isinstance(seed, bool) or not isinstance(seed, int)):
             raise ValueError("seed must be an integer or None")
 
         rng = random.Random(seed)
-        generated = []
-
+        generated: list[Token] = []
         for _ in range(max_tokens):
             probs = self.next_token_probs(generated)
             if not probs:
                 break
-            # Sampling from the already-generated tokens makes generation autoregressive.
-            tokens = list(probs.keys())
-            weights = list(probs.values())
-            next_token = rng.choices(tokens, weights=weights, k=1)[0]
-            generated.append(next_token)
-
+            tokens, weights = list(probs), list(probs.values())
+            # A local RNG keeps seeded generation reproducible without global-state side effects.
+            generated.append(rng.choices(tokens, weights=weights, k=1)[0])
         return generated
 
 text = load_tiny_shakespeare(max_chars=12000)
 tokens = tokenize_words(text)
-
-model = NGramModel(3)
-model.fit(tokens)
+model = NGramModel(3).fit(tokens)
 
 print(f"loaded {len(tokens)} tokens")
 print(model.next_token_probs(["Before", "we"]))
-print(" ".join(model.generate(12, seed=7)))`,
-    starterCode: `TINY_SHAKESPEARE_PATH = "/datasets/tiny-shakespeare.txt"
+print(" ".join(str(token) for token in model.generate(12, seed=7)))`,
+    starterCode: `from __future__ import annotations
+
+from collections import Counter, defaultdict
+from collections.abc import Iterable
+import random
+
+Token = str | int
+
+TINY_SHAKESPEARE_PATH = "/datasets/tiny-shakespeare.txt"
 TINY_SHAKESPEARE_URL = (
     "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
 )
@@ -2124,7 +2273,7 @@ First Citizen: First, you know Caius Marcius is chief enemy to the people.
 All: We know't, we know't.
 """
 
-def load_tiny_shakespeare(max_chars=12000):
+def load_tiny_shakespeare(max_chars: int = 12000) -> str:
     if isinstance(max_chars, bool) or not isinstance(max_chars, int) or max_chars <= 0:
         raise ValueError("max_chars must be a positive integer")
 
@@ -2141,64 +2290,41 @@ def load_tiny_shakespeare(max_chars=12000):
         except Exception:
             text = TINY_SHAKESPEARE_FALLBACK
 
-    return text[:max_chars]
+    return str(text[:max_chars])
 
-def tokenize_words(text):
+def tokenize_words(text: str) -> list[str]:
     if not isinstance(text, str) or not text.strip():
         raise ValueError("text must be a non-empty string")
-
     return text.split()
 
-def _coerce_tokens(values, name):
-    if isinstance(values, (str, bytes)):
-        raise ValueError(f"{name} must be a sequence of string or int tokens")
-
-    try:
-        items = list(values)
-    except TypeError as exc:
-        raise ValueError(f"{name} must be a sequence of string or int tokens") from exc
-
-    for token in items:
-        if isinstance(token, bool) or not isinstance(token, (str, int)):
-            raise ValueError(f"{name} must contain only string or int tokens")
-
-    return items
+def _coerce_tokens(values: Iterable[Token], name: str) -> list[Token]:
+    # TODO: reject strings as containers and validate each token type.
+    raise NotImplementedError("Implement _coerce_tokens")
 
 class NGramModel:
-    def __init__(self, n):
-        # TODO:
-        # 1. Validate that n >= 1.
-        # 2. Initialize the data structures that will store n-gram counts.
+    def __init__(self, n: int):
+        # TODO: validate n and initialize the suffix-count mapping.
         raise NotImplementedError("Implement __init__")
 
-    def fit(self, tokens):
-        # TODO:
-        # 1. Validate the token list.
-        # 2. Update the observed counts for each context suffix up to length n - 1.
+    def fit(self, tokens: Iterable[Token]) -> NGramModel:
+        # TODO: update counts for every suffix length from 0 through n - 1.
         raise NotImplementedError("Implement fit")
 
-    def next_token_probs(self, context):
-        # TODO:
-        # 1. Truncate the context to the last n - 1 tokens.
-        # 2. Back off to shorter suffixes until you find observed counts.
-        # 3. Normalize the counts into probabilities.
+    def next_token_probs(self, context: Iterable[Token]) -> dict[Token, float]:
+        # TODO: back off from the longest context suffix and normalize counts.
         raise NotImplementedError("Implement next_token_probs")
 
-    def generate(self, max_tokens, seed=None):
-        # TODO:
-        # 1. Seed a local RNG when seed is provided.
-        # 2. Sample tokens autoregressively from next_token_probs.
+    def generate(self, max_tokens: int, seed: int | None = None) -> list[Token]:
+        # TODO: use a local seeded RNG and sample autoregressively.
         raise NotImplementedError("Implement generate")
 
 text = load_tiny_shakespeare(max_chars=12000)
 tokens = tokenize_words(text)
-
-model = NGramModel(3)
-model.fit(tokens)
+model = NGramModel(3).fit(tokens)
 
 print(f"loaded {len(tokens)} tokens")
 print(model.next_token_probs(["Before", "we"]))
-print(" ".join(model.generate(12, seed=7)))`,
+print(" ".join(str(token) for token in model.generate(12, seed=7)))`,
     tags: ['Language Models', 'Probability', 'Hash Maps'],
   },
 ] as const;
