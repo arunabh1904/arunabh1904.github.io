@@ -34,10 +34,7 @@ describe('augmentCodeWithSolution', () => {
         }
       }
       expect(annotatedCode, problem.id).toContain(trailingScaffold);
-      expect(annotatedCode, problem.id).toContain('# Reference solution loaded:');
-      expect(annotatedCode, problem.id).toContain(
-        '# The TODO plan above stays in place; the annotated lines below implement it.',
-      );
+      expect(annotatedCode, problem.id).toContain('# Reference solution');
 
       for (const placeholder of placeholders) {
         expect(annotatedCode, problem.id).toContain(
@@ -73,6 +70,33 @@ describe('augmentCodeWithSolution', () => {
     expect(temperatureCode).toContain('import math');
   });
 
+  it('uses a compact reference view with assertions instead of verbose guard blocks', () => {
+    const problem = codePracticeProblems.find(
+      (candidate) => candidate.id === 'stable-softmax-cross-entropy',
+    );
+    const nmsProblem = codePracticeProblems.find(
+      (candidate) => candidate.id === 'non-maximum-suppression',
+    );
+    const annotatedCode = augmentCodeWithSolution(problem!);
+    const nmsCode = augmentCodeWithSolution(nmsProblem!);
+    const sourceCommentCount = problem!.solutionCode
+      .split('\n')
+      .filter((line) => line.trimStart().startsWith('#')).length;
+    const annotatedCommentCount = annotatedCode
+      .split('\n')
+      .filter((line) => line.trimStart().startsWith('#')).length;
+
+    expect(annotatedCode).toContain(
+      'assert logits.ndim == 2, "logits must have shape (N, C)"',
+    );
+    expect(annotatedCode).not.toContain('raise ValueError("logits must have shape (N, C)")');
+    expect(annotatedCode).not.toContain('# Convert compatible inputs once');
+    expect(annotatedCommentCount).toBeLessThan(sourceCommentCount);
+    expect(nmsCode).toContain(
+      'assert not (boxes.ndim != 2 or boxes.shape[1] != 4), "boxes must have shape (N, 4)"',
+    );
+  });
+
   it('augments the current editor contents without discarding an inserted hint', () => {
     const problem = codePracticeProblems.find(
       (candidate) => candidate.id === 'stable-softmax-cross-entropy',
@@ -84,7 +108,7 @@ describe('augmentCodeWithSolution', () => {
     expect(annotatedCode).toContain(
       '# Hint: subtract the row maximum before exponentiating.',
     );
-    expect(annotatedCode).toContain('# Reference solution loaded:');
+    expect(annotatedCode).toContain('# Reference solution');
     expect(annotatedCode).toContain('return torch.mean(losses)');
   });
 });

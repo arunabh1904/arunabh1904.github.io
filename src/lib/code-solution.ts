@@ -1,6 +1,6 @@
 import type { CodePracticeProblem } from './code-practice';
 
-const REFERENCE_MARKER = '# Reference solution loaded:';
+const REFERENCE_MARKER = '# Reference solution';
 
 interface PythonDefinition {
   kind: 'class' | 'function';
@@ -105,6 +105,67 @@ function reindentBody(
   });
 }
 
+function negateCondition(condition: string) {
+  const trimmed = condition.trim();
+  if (trimmed.startsWith('not ')) {
+    return trimmed.slice(4);
+  }
+
+  const inequality = trimmed.match(/^(.+?)\s*!=\s*(.+)$/);
+  if (inequality && !/\s(?:and|or)\s/.test(trimmed)) {
+    return `${inequality[1]} == ${inequality[2]}`;
+  }
+
+  return `not (${trimmed})`;
+}
+
+function compactSimpleValueErrorGuards(lines: readonly string[]) {
+  const compacted: string[] = [];
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const guard = line.match(/^(\s*)if\s+(.+):\s*$/);
+    const raiseLine = lines[index + 1]?.match(/^(\s+)raise ValueError\((.+)\)$/);
+
+    if (guard && raiseLine && getIndent(raiseLine[1]) > getIndent(guard[1])) {
+      compacted.push(`${guard[1]}assert ${negateCondition(guard[2])}, ${raiseLine[2]}`);
+      index += 1;
+      continue;
+    }
+
+    compacted.push(line);
+  }
+
+  return compacted;
+}
+
+/**
+ * The stored solution remains the complete reference implementation. The code
+ * inserted into the editor is intentionally a shorter, interview-style view:
+ * it keeps executable logic and precondition checks while omitting narration
+ * that would otherwise hide the algorithm below the fold.
+ */
+function createCompactReference(solutionCode: string) {
+  const uncommented = solutionCode
+    .split('\n')
+    .filter((line) => !line.trimStart().startsWith('#'));
+  const guarded = compactSimpleValueErrorGuards(uncommented);
+  const compacted: string[] = [];
+  let previousWasBlank = true;
+
+  for (const line of guarded) {
+    const isBlank = !line.trim();
+    if (isBlank && previousWasBlank) {
+      continue;
+    }
+
+    compacted.push(line);
+    previousWasBlank = isBlank;
+  }
+
+  return compacted.join('\n').trim();
+}
+
 function getMissingTopLevelImports(solutionCode: string, code: string) {
   const presentLines = new Set(code.split('\n').map((line) => line.trim()));
 
@@ -177,14 +238,15 @@ function insertSupportingDefinitions(
  * remains as a comment so readers can still see the exact starting point.
  */
 export function augmentCodeWithSolution(
-  problem: Pick<CodePracticeProblem, 'solutionCode' | 'solutionNotes' | 'starterCode'>,
+  problem: Pick<CodePracticeProblem, 'solutionCode' | 'starterCode'>,
   currentCode = problem.starterCode,
 ) {
   if (currentCode.includes(REFERENCE_MARKER)) {
     return currentCode;
   }
 
-  const solutionDefinitions = getPythonDefinitions(problem.solutionCode);
+  const compactReference = createCompactReference(problem.solutionCode);
+  const solutionDefinitions = getPythonDefinitions(compactReference);
   const solutionByKey = new Map(
     solutionDefinitions.map((definition) => [definitionKey(definition), definition]),
   );
@@ -209,7 +271,7 @@ export function augmentCodeWithSolution(
     }
 
     const indentation = placeholder[1];
-    const solutionLines = problem.solutionCode.split('\n');
+    const solutionLines = compactReference.split('\n');
     const body = reindentBody(
       solutionLines.slice(solutionDefinition.headerEnd + 1, solutionDefinition.end),
       solutionDefinition,
@@ -219,8 +281,6 @@ export function augmentCodeWithSolution(
       ? []
       : [
           `${indentation}${REFERENCE_MARKER}`,
-          ...problem.solutionNotes.map((note) => `${indentation}# ${note}`),
-          `${indentation}# The TODO plan above stays in place; the annotated lines below implement it.`,
         ];
 
     didInsertReference = true;
@@ -237,7 +297,7 @@ export function augmentCodeWithSolution(
 
   return insertSupportingDefinitions(
     annotatedLines.join('\n'),
-    problem.solutionCode,
+    compactReference,
     solutionDefinitions,
   );
 }

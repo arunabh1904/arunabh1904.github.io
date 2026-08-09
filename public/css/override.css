@@ -5968,3 +5968,303 @@ html {
     grid-template-columns: 1fr;
   }
 }
+
+/* Keep the reference workspace compact enough to read an answer in one pass. */
+.code-problem-page {
+  padding: 5.25rem clamp(0.75rem, 2.5vw, 2.5rem) 1.5rem;
+}
+
+.code-problem-page__shell {
+  width: min(100%, 108rem);
+}
+
+.code-practice-lab {
+  grid-template-columns: minmax(17.5rem, 0.58fr) minmax(0, 1.72fr);
+  gap: clamp(1.5rem, 3.2vw, 3.5rem);
+}
+
+.code-practice-lab__problem {
+  padding: 0.25rem clamp(1.25rem, 2.5vw, 2.5rem) 1rem 0;
+  border: 0;
+  border-right: 1px solid rgba(118, 169, 255, 0.2);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .code-practice-lab__problem {
+  border-color: rgba(255, 228, 92, 0.2);
+  background: transparent;
+  box-shadow: none;
+}
+
+.code-practice-lab__problem-header h1 {
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  line-height: 1.15;
+}
+
+.code-practice-lab__copy {
+  margin-top: 0.8rem;
+}
+
+.code-practice-lab__copy p {
+  margin-bottom: 0.7rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.code-practice-lab__specs {
+  gap: 0;
+  margin-top: 1rem;
+}
+
+.code-practice-lab__spec-card,
+.code-practice-lab__specs .code-practice-lab__spec-card {
+  margin: 0;
+  padding: 0.8rem 0;
+  border: 0;
+  border-top: 1px solid rgba(118, 169, 255, 0.16);
+  border-radius: 0;
+  background: transparent;
+}
+
+:root[data-theme="dark"] .code-practice-lab__spec-card,
+:root[data-theme="dark"] .code-practice-lab__specs .code-practice-lab__spec-card {
+  border-color: rgba(255, 228, 92, 0.16);
+  background: transparent;
+}
+
+.code-practice-lab__list {
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.code-practice-lab__example {
+  padding: 0.35rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+:root[data-theme="dark"] .code-practice-lab__example {
+  background: transparent;
+}
+
+.code-practice-lab__workspace {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: min(62rem, calc(100dvh - 6.75rem));
+  min-height: 35rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #dff0ff;
+  top: 5.25rem;
+}
+
+:root[data-theme="dark"] .code-practice-lab__workspace {
+  background: transparent;
+  box-shadow: none;
+}
+
+.code-practice-lab__workspace-header {
+  align-items: center;
+  min-width: 0;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(118, 169, 255, 0.18);
+}
+
+:root[data-theme="dark"] .code-practice-lab__workspace-header {
+  border-color: rgba(255, 228, 92, 0.18);
+}
+
+.code-practice-lab__workspace-identity {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.code-practice-lab__workspace-identity .code-practice-lab__eyebrow {
+  margin: 0;
+}
+
+.code-practice-lab__workspace-identity .code-practice-lab__status {
+  margin: 0 0 0 0.15rem;
+  color: rgba(223, 240, 255, 0.62);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+:root[data-theme="dark"] .code-practice-lab__workspace-identity .code-practice-lab__status {
+  color: rgba(255, 247, 207, 0.62);
+}
+
+.code-practice-lab__file-name {
+  margin: 0;
+  color: rgba(223, 240, 255, 0.82);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+:root[data-theme="dark"] .code-practice-lab__file-name {
+  color: rgba(255, 247, 207, 0.84);
+}
+
+.code-practice-lab__workspace-controls {
+  gap: 0.4rem;
+}
+
+.code-practice-lab__button {
+  min-height: 2.3rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 9px;
+  box-shadow: none;
+  font-size: 0.8rem;
+}
+
+.code-practice-lab__button:hover:not(:disabled) {
+  box-shadow: none;
+}
+
+.code-practice-lab__button kbd,
+.code-practice-lab__shortcut kbd {
+  padding: 0.1rem 0.25rem;
+  font-size: 0.62rem;
+}
+
+.code-practice-lab__editor-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.code-practice-lab__editor-shell {
+  min-height: 0;
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.code-practice-lab__editor {
+  height: 100%;
+  font-size: 0.84rem;
+}
+
+.code-practice-lab__editor .cm-editor,
+.code-practice-lab__editor .cm-scroller {
+  height: 100%;
+  min-height: 0;
+}
+
+.code-practice-lab__editor .cm-scroller {
+  line-height: 1.42;
+}
+
+.code-practice-lab__editor .cm-content,
+.code-practice-lab__editor .cm-gutter {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
+.code-practice-lab--reference .code-practice-lab__editor {
+  font-size: 0.75rem;
+}
+
+.code-practice-lab--reference .code-practice-lab__editor .cm-scroller {
+  line-height: 1.28;
+}
+
+.code-practice-lab--reference .code-practice-lab__editor .cm-content,
+.code-practice-lab--reference .code-practice-lab__editor .cm-gutter {
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+}
+
+.code-practice-lab--reference .code-practice-lab__editor .cm-comment {
+  opacity: 0.76;
+}
+
+.code-practice-lab__output {
+  display: block;
+  margin-top: 0.55rem;
+}
+
+.code-practice-lab__output > div {
+  min-height: 0;
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  border-radius: 10px;
+}
+
+.code-practice-lab__output p {
+  margin-bottom: 0.35rem;
+  font-size: 0.68rem;
+}
+
+.code-practice-lab__output pre {
+  max-height: 7rem;
+  overflow: auto;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 980px) {
+  .code-practice-lab {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .code-practice-lab__problem {
+    padding: 0 0 1.25rem;
+    border-right: 0;
+    border-bottom: 1px solid rgba(118, 169, 255, 0.2);
+  }
+
+  :root[data-theme="dark"] .code-practice-lab__problem {
+    border-color: rgba(255, 228, 92, 0.2);
+  }
+
+  .code-practice-lab__workspace {
+    position: static;
+    height: min(50rem, calc(100dvh - 6.5rem));
+    min-height: 30rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .code-problem-page {
+    padding-inline: 0.85rem;
+  }
+
+  .code-practice-lab__workspace {
+    height: min(44rem, calc(100dvh - 4.5rem));
+    min-height: 26rem;
+  }
+
+  .code-practice-lab__workspace-header {
+    align-items: flex-start;
+  }
+
+  .code-practice-lab__workspace-controls {
+    justify-content: flex-start;
+    gap: 0.35rem;
+  }
+
+  .code-practice-lab__button {
+    min-height: 2.2rem;
+    padding-inline: 0.55rem;
+    font-size: 0.74rem;
+  }
+
+  .code-practice-lab__button--primary kbd {
+    display: none;
+  }
+
+}

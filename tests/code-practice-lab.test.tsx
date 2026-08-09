@@ -146,8 +146,9 @@ describe('CodePracticeLab', () => {
 
     expect(getEditor().textContent).toContain('print("starter")');
     expect(getEditor().textContent).toContain('# Original placeholder: raise NotImplementedError');
-    expect(getEditor().textContent).toContain('# Reference solution loaded:');
+    expect(getEditor().textContent).toContain('# Reference solution');
     expect(getEditor().textContent).toContain('return "solution"');
+    expect(container.querySelector('.code-practice-lab--reference')).not.toBeNull();
     expect(getEditor().textContent).not.toMatch(
       /^\s+raise NotImplementedError\("Implement softmax_cross_entropy"\)$/m,
     );
@@ -166,6 +167,8 @@ describe('CodePracticeLab', () => {
 
     const runButton = container.querySelector<HTMLButtonElement>('button[aria-label="Run code"]');
 
+    expect(runButton?.closest('.code-practice-lab__workspace-header')).not.toBeNull();
+
     await act(async () => {
       runButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
@@ -173,6 +176,7 @@ describe('CodePracticeLab', () => {
 
     expect(loadPackage).toHaveBeenCalledWith(['numpy']);
     expect(container.textContent).toContain('0.41703');
+    expect(container.querySelector('.code-practice-lab__output')).not.toBeNull();
   });
 
   it('runs the current editor contents with Ctrl+Enter', async () => {
