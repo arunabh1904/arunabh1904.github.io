@@ -63,5 +63,7 @@ const { Content } = await render(entry);
   navigationContext={navigationContext}
   showNavigation={true}
 >
-  <Content />
+  <div data-post-section={entry.data.section}>
+    <Content />
+  </div>
 </PostLayout>
