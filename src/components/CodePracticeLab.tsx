@@ -39,6 +39,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('Loading Python...');
   const [isRunning, setIsRunning] = useState(false);
+  const [hasRun, setHasRun] = useState(false);
   const [editorTheme, setEditorTheme] = useState(() =>
     getCodeEditorThemeName(
       typeof document === 'undefined' ? 'light' : document.documentElement.getAttribute('data-theme'),
@@ -75,6 +76,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
     setCode(problem.starterCode);
     setOutput('');
     setErrorOutput('');
+    setHasRun(false);
   }, [problem]);
 
   useEffect(() => {
@@ -162,6 +164,8 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
   const editorId = `${problem.id}-editor`;
   const editorThemeExtension = editorTheme === 'dark' ? githubDark : githubLight;
+  const isReferenceLoaded = code.includes('# Reference solution');
+  const hasExecutionResult = hasRun || Boolean(errorOutput);
 
   async function handleRun() {
     if (isRunningRef.current) {
@@ -175,6 +179,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
     isRunningRef.current = true;
     setIsRunning(true);
+    setHasRun(true);
     setOutput('');
     setErrorOutput('');
 
@@ -201,6 +206,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
     setCode(problem.starterCode);
     setOutput('');
     setErrorOutput('');
+    setHasRun(false);
   }
 
   function handleAddHints() {
@@ -217,6 +223,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
     setCode((currentCode) => augmentCodeWithSolution(problem, currentCode));
     setOutput('');
     setErrorOutput('');
+    setHasRun(false);
   }
 
   // The CodeMirror keymap is created once, so route it through a ref to the
@@ -226,7 +233,10 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   };
 
   return (
-    <section className="code-practice-lab" ref={containerRef}>
+    <section
+      className={`code-practice-lab${isReferenceLoaded ? ' code-practice-lab--reference' : ''}`}
+      ref={containerRef}
+    >
       <article className="code-practice-lab__problem">
         <header className="code-practice-lab__problem-header">
           <div className="code-practice-lab__title-block">
@@ -277,9 +287,17 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
       <article className="code-practice-lab__workspace">
         <header className="code-practice-lab__workspace-header">
-          <div>
-            <p className="code-practice-lab__eyebrow">Workspace</p>
-            <h2>Your solution</h2>
+          <div className="code-practice-lab__workspace-identity">
+            <p className="code-practice-lab__eyebrow">
+              {isReferenceLoaded ? 'Reference' : 'Workspace'}
+            </p>
+            <p className="code-practice-lab__file-name">solution.py</p>
+            <p
+              className={`code-practice-lab__status code-practice-lab__status--${status}`}
+              aria-live="polite"
+            >
+              {statusMessage}
+            </p>
           </div>
           <div className="code-practice-lab__workspace-controls">
             <button
@@ -296,24 +314,29 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
             >
               Load solution
             </button>
+            <button
+              className="code-practice-lab__button code-practice-lab__button--primary"
+              type="button"
+              aria-label="Run code"
+              aria-keyshortcuts="Control+Enter Meta+Enter"
+              onClick={() => void handleRun()}
+              disabled={status !== 'ready' || isRunning}
+            >
+              <span>{isRunning ? 'Running...' : 'Run'}</span>
+              {!isRunning && <kbd>Ctrl / Cmd + Enter</kbd>}
+            </button>
+            <button
+              className="code-practice-lab__button code-practice-lab__button--secondary"
+              type="button"
+              onClick={handleReset}
+            >
+              Reset
+            </button>
           </div>
         </header>
 
-        <div className="code-practice-lab__workspace-meta">
-          <p
-            className={`code-practice-lab__status code-practice-lab__status--${status}`}
-            aria-live="polite"
-          >
-            {statusMessage}
-          </p>
-          <p className="code-practice-lab__shortcut">
-            <kbd>Ctrl / Cmd + Enter</kbd>
-            <span>runs code</span>
-          </p>
-        </div>
-
         <label className="code-practice-lab__editor-label" htmlFor={editorId}>
-          solution.py
+          solution.py editor
         </label>
         <div className="code-practice-lab__editor-shell">
           <CodeMirror
@@ -323,7 +346,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
             basicSetup={false}
             extensions={editorExtensions}
             theme={editorThemeExtension}
-            height="36rem"
+            height="100%"
             editable
             indentWithTab={false}
             value={code}
@@ -331,37 +354,14 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
           />
         </div>
 
-        <div className="code-practice-lab__actions">
-          <button
-            className="code-practice-lab__button code-practice-lab__button--primary"
-            type="button"
-            aria-label="Run code"
-            aria-keyshortcuts="Control+Enter Meta+Enter"
-            onClick={() => void handleRun()}
-            disabled={status !== 'ready' || isRunning}
-          >
-            <span>{isRunning ? 'Running...' : 'Run'}</span>
-            {!isRunning && <kbd>Ctrl / Cmd + Enter</kbd>}
-          </button>
-          <button
-            className="code-practice-lab__button code-practice-lab__button--secondary"
-            type="button"
-            onClick={handleReset}
-          >
-            Reset
-          </button>
-        </div>
-
-        <div className="code-practice-lab__output" aria-live="polite">
-          <div>
-            <p>Output</p>
-            <pre>{output || 'Output appears here.'}</pre>
+        {hasExecutionResult && (
+          <div className="code-practice-lab__output" aria-live="polite">
+            <div>
+              <p>{errorOutput ? 'Errors' : 'Output'}</p>
+              <pre>{errorOutput || output || 'Program finished with no output.'}</pre>
+            </div>
           </div>
-          <div>
-            <p>Errors</p>
-            <pre>{errorOutput || 'Errors appear here.'}</pre>
-          </div>
-        </div>
+        )}
       </article>
     </section>
   );
