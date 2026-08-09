@@ -156,6 +156,29 @@ Image-classification pretraining teaches appearance but not calibration, cross-v
 | Future occupancy or point clouds | Motion and persistence | One target cannot represent every valid future |
 | Teacher features and pseudo-labels | Task-specific abstractions | Inherits teacher errors and blind spots |
 
+## The next step: a driving foundation model
+
+The perception stack described above ends in specialized task heads. A natural next step is to make the shared representation and decoder reusable across more of the driving lifecycle. In [Waymo Co-CEO Dmitri Dolgov's talk, “The Demo Is Only 1% Of The Work”](https://www.youtube.com/watch?v=Gp4zrV3-6N8), Waymo presents a Waymo Foundation Model with a Sensor Fusion Encoder, a Driving VLM, and a Generative World Decoder. The boundary moves from sensor-specific encoders → metric scene representation → task heads toward multimodal evidence → shared world representation → actions and predictions. This is an architectural direction, not evidence that every block in the slide is the deployed online controller.
+
+![The Waymo Foundation Model diagram with sensor fusion, a driving VLM, and a generative world decoder](/assets/images/waymo-foundation-model-architecture.png)
+_Figure: The Waymo Foundation Model architecture shown in [Dmitri Dolgov's Waymo talk](https://www.youtube.com/watch?v=Gp4zrV3-6N8). Screenshot supplied for this post; see Waymo's public [architecture description](https://waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/) and earlier [foundation-model overview](https://waymo.com/blog/2024/10/ai-and-ml-at-waymo/)._
+
+At a high level, the three blocks make different information contracts:
+
+| Path | Input → intermediate representation | Output role |
+| --- | --- | --- |
+| Sensor Fusion Encoder | Camera, LiDAR, radar → objects and sensor embeddings | Fast, metric evidence and reactions |
+| Driving VLM | Text prompts, sensor data, and autonomous-driving history → VLM embeddings, semantics, rationales, and text tokens | Slower semantic reasoning for rare or complex situations |
+| Generative World Decoder | Both representations → a shared world model | Driving actions, agent predictions, and other predictions |
+
+The table's important point is not that the VLM replaces the sensor stack. The sensor-fusion encoder keeps the geometry and latency-sensitive evidence that the earlier sections treated as non-negotiable. The VLM adds a second route for language-conditioned semantics and broader world knowledge; the “thinking fast, thinking slow” annotation makes the timing contract explicit. The decoder then has to reconcile those representations instead of handing language directly to steering.
+
+“Generative world decoder” also changes the target. Perception asks what is present now; a world decoder can be trained to predict how the scene and its agents may evolve, while also producing actions or signals used to validate them. Waymo's public description says its World Decoder predicts road-user behavior, generates maps and vehicle trajectories, and supplies trajectory-validation signals; it also describes adapting large teacher models to the Driver, Simulator, and Critic before distilling smaller students. Those details explain the slide's “versatile” and “multi-stage training” labels, but they do not specify the exact online graph or guarantee closed-loop safety.
+
+This is the next step in the evolution traced by this post: preserve sensor-specific measurement and metric geometry, but expose them to a reusable multimodal model that can carry semantics, history, prediction, and action. It connects directly to [Vision-Language Models: A Reading Guide](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html), which follows the progression from image-text alignment to grounding, video, and action. The Waymo diagram instantiates those interfaces inside a driving system: the VLM contributes semantic context, sensor fusion contributes calibrated world evidence, and the shared decoder must turn both into future predictions and safe behavior.
+
+The open question is therefore sharper than whether a VLM can describe a road scene. Can a shared world decoder remain grounded in metric sensor evidence while using slower language-level reasoning, predict counterfactual futures, and meet the latency and validation requirements of closed-loop driving?
+
 ## Design checklist
 
 1. Preserve what each sensor uniquely measures before converting it: camera appearance, LiDAR geometry, and radar range, velocity, and uncertainty.
