@@ -6154,7 +6154,8 @@ html {
 
 .code-practice-lab__editor {
   height: 100%;
-  font-size: 0.84rem;
+  /* Keep standard 80-character starter and hint lines on one visual row. */
+  font-size: 0.76rem;
 }
 
 .code-practice-lab__editor .cm-editor,
