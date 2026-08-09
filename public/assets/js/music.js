@@ -1,10 +1,37 @@
 const MUSIC_CHANNEL_KEY = 'musicPlayerChannel';
 const MUSIC_PLAYBACK_KEY = 'musicPlayerPlayback';
+const MUSIC_VOLUME_KEY = 'musicPlayerVolume';
 const DEFAULT_MUSIC_CHANNEL = 'iranian-jazz';
+const DEFAULT_MUSIC_VOLUME = 70;
 const closeTimers = new WeakMap();
 const tuneTimers = new WeakMap();
 const youtubePlayers = new WeakMap();
 let youtubeApiPromise;
+
+function clampMusicVolume(value) {
+  const parsed = Number.parseInt(String(value), 10);
+  if (!Number.isFinite(parsed)) {
+    return DEFAULT_MUSIC_VOLUME;
+  }
+
+  return Math.min(100, Math.max(0, parsed));
+}
+
+function readMusicVolume() {
+  try {
+    return clampMusicVolume(localStorage.getItem(MUSIC_VOLUME_KEY));
+  } catch {
+    return DEFAULT_MUSIC_VOLUME;
+  }
+}
+
+function writeMusicVolume(volume) {
+  try {
+    localStorage.setItem(MUSIC_VOLUME_KEY, String(volume));
+  } catch {
+    // The control remains usable when browser storage is unavailable.
+  }
+}
 
 function readPlaybackState() {
   try {
@@ -55,6 +82,69 @@ function loadYouTubeApi() {
 
 function getActiveChannel(player) {
   return getChannelButtons(player).find((button) => button.classList.contains('music-channel--active'));
+}
+
+function getVolumeSlider(player) {
+  const slider = player.querySelector('[data-music-volume]');
+  return slider instanceof HTMLInputElement ? slider : null;
+}
+
+function syncVolumeUi(player, volume) {
+  const slider = getVolumeSlider(player);
+  const control = player.querySelector('[data-music-volume-control]');
+  const readout = player.querySelector('[data-music-volume-readout]');
+
+  if (slider) {
+    slider.value = String(volume);
+    slider.setAttribute('aria-valuetext', `${volume}%`);
+  }
+  if (control instanceof HTMLElement) {
+    control.style.setProperty('--music-volume', `${volume}%`);
+  }
+  if (readout) {
+    readout.textContent = String(volume);
+  }
+}
+
+function syncVolumeAvailability(player, channel = getActiveChannel(player)) {
+  const slider = getVolumeSlider(player);
+  const control = player.querySelector('[data-music-volume-control]');
+  const isSupported = channel?.dataset.channelKind === 'youtube';
+
+  if (slider) {
+    slider.disabled = !isSupported;
+    slider.setAttribute(
+      'aria-label',
+      isSupported ? 'Volume' : 'Volume is controlled in the Spotify player',
+    );
+  }
+  if (control instanceof HTMLElement) {
+    control.classList.toggle('retro-tv__volume-control--unavailable', !isSupported);
+    control.title = isSupported ? 'Adjust volume' : 'Spotify controls volume in its player';
+  }
+}
+
+function applyYouTubeVolume(player, volume = readMusicVolume()) {
+  const iframe = player.querySelector('[data-music-iframe]');
+  const channel = getActiveChannel(player);
+  const record = iframe instanceof HTMLIFrameElement ? youtubePlayers.get(iframe) : null;
+
+  if (!record || channel?.dataset.channelKind !== 'youtube') {
+    return;
+  }
+
+  try {
+    record.api.setVolume(volume);
+  } catch {
+    // The player can briefly be unavailable while an iframe changes channels.
+  }
+}
+
+function setMusicVolume(player, requestedVolume) {
+  const volume = clampMusicVolume(requestedVolume);
+  syncVolumeUi(player, volume);
+  writeMusicVolume(volume);
+  applyYouTubeVolume(player, volume);
 }
 
 function persistYouTubePlayback(player) {
@@ -134,6 +224,7 @@ function connectYouTubePlayer(player) {
   loadYouTubeApi().then((YT) => {
     const existing = youtubePlayers.get(iframe);
     if (existing) {
+      applyYouTubeVolume(player);
       restoreYouTubePlayback(player, existing.api);
       startYouTubeProgress(player, iframe, existing.api);
       return;
@@ -143,6 +234,7 @@ function connectYouTubePlayer(player) {
       events: {
         onReady: (event) => {
           startYouTubeProgress(player, iframe, event.target);
+          applyYouTubeVolume(player);
           restoreYouTubePlayback(player, event.target);
         },
         onStateChange: (event) => {
@@ -228,6 +320,7 @@ function tuneToChannel(player, requestedId, animate = true) {
   }
 
   syncChannelDetails(player, channel);
+  syncVolumeAvailability(player, channel);
   if (tv instanceof HTMLElement) {
     tv.dataset.musicKind = channel.dataset.channelKind || 'youtube';
   }
@@ -356,6 +449,10 @@ function initMusicPlayer(player) {
   const closeButton = player.querySelector('[data-music-close]');
   const isStandalone = player.dataset.musicStandalone === 'true';
   const iframe = player.querySelector('[data-music-iframe]');
+  const volumeSlider = getVolumeSlider(player);
+
+  syncVolumeUi(player, readMusicVolume());
+  syncVolumeAvailability(player);
 
   if (trigger instanceof HTMLButtonElement) {
     trigger.addEventListener('click', (event) => {
@@ -397,6 +494,12 @@ function initMusicPlayer(player) {
       tuneToChannel(player, button.dataset.musicChannel);
     });
   });
+
+  if (volumeSlider) {
+    volumeSlider.addEventListener('input', () => {
+      setMusicVolume(player, volumeSlider.value);
+    });
+  }
 
   if (iframe instanceof HTMLIFrameElement) {
     iframe.addEventListener('load', () => connectYouTubePlayer(player));
