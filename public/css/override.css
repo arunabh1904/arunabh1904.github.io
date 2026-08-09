@@ -5041,6 +5041,62 @@ html {
   margin-bottom: 0;
 }
 
+.revision-code-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  align-items: start;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.revision-code-pair__reference,
+.revision-code-pair__runner {
+  min-width: 0;
+}
+
+.revision-code-pair__reference {
+  overflow: hidden;
+  border: 1px solid var(--code-border-color);
+  border-radius: 18px;
+  background: var(--panel-bg);
+}
+
+.revision-code-pair__reference > summary {
+  padding: 1rem 1.1rem;
+  color: var(--text-color);
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.revision-code-pair__reference > summary:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
+
+.revision-code-pair__reference[open] > summary {
+  border-bottom: 1px solid var(--code-border-color);
+}
+
+.revision-code-pair__reference pre {
+  max-height: 34rem;
+  margin: 0;
+  overflow: auto;
+  padding: 1rem 1.1rem;
+  background: var(--code-block-bg-dark, var(--background-secondary));
+}
+
+.revision-code-pair__reference code {
+  white-space: pre;
+}
+
+.revision-code-pair__runner .python-playground {
+  height: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
 .code-practice-lab {
   display: grid;
   gap: 1.5rem;
@@ -5616,6 +5672,10 @@ html {
   .python-playground__output,
   .python-playground__variables {
     display: grid;
+  }
+
+  .revision-code-pair {
+    grid-template-columns: 1fr;
   }
 
   .code-practice-lab__hero-header,

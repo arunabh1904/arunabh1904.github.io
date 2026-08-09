@@ -1,0 +1,107 @@
+---
+title: PyTorch Tensor Revision Notes
+date: '2026-08-09T04:00:00.000Z'
+section: revision-notes
+postSlug: pytorch-tensor-revision-notes
+legacyPath: /revision notes/2026/08/09/pytorch-tensor-revision-notes.html
+tags:
+  - PyTorch
+summary: A source-linked reference for constructing, inspecting, indexing, joining, reshaping, and mutating PyTorch tensors.
+---
+import RevisionCodePair from '../../components/RevisionCodePair.astro';
+import { pytorchTensorExamples } from '../../lib/pytorch-revision-examples';
+
+# PyTorch Tensor Revision Notes
+
+## Quick overview
+
+According to the [PyTorch 2.13 tensor documentation](https://docs.pytorch.org/docs/2.13/tensors.html), a `torch.Tensor` is a multi-dimensional matrix whose elements have one data type. The useful refinement is that a regular tensor is also a strided view over storage: its shape, dtype, strides, storage offset, and device determine how an index maps to the backing buffer; `torch.tensor(data, dtype=..., device=...)` constructs a new tensor by copying `data`.
+
+This note builds the mental model needed to predict tensor shapes, values, aliasing, and mutation. It covers construction, factory functions, metadata, scalar extraction, indexing, slicing, joining, reshaping, and in-place operations.
+
+The interactive panel is on the right of each example. It runs through Pyodide with a small NumPy-backed compatibility layer because the compiled PyTorch runtime is not shipped to the browser. The panel supports the tensor idioms used here, but it is not full PyTorch: there is no CUDA execution, autograd engine, or `nn.Module` implementation. The collapsed block on the left is the actual PyTorch reference code.
+
+## 1. Constructing tensors
+
+`torch.tensor(data)` accepts a scalar, list, nested sequence, NumPy array, or another tensor. It always copies the input data and creates a tensor with no autograd history by default. That copy is a semantic boundary: later changes to a NumPy source array or input tensor do not change the result.
+
+When avoiding a copy is intentional, use the API that says so. `torch.as_tensor(data)` preserves existing tensor history and avoids copies where possible; `torch.from_numpy(array)` creates a CPU tensor sharing storage with a NumPy array. A shared tensor is useful for interoperability, but it also means that a write through either object can change the other.
+
+`dtype` controls how each element is represented, while `device` controls where the storage lives, usually `cpu`, `cuda`, or `mps`. Pass them to the constructor or a factory function instead of constructing first and silently relying on later conversions. Tensors do not generally move between devices automatically, so model parameters and inputs must be placed deliberately.
+
+<RevisionCodePair {...pytorchTensorExamples.construction} />
+
+The example uses `device="cpu"` so it remains executable in the browser. In a real program, a common explicit choice is `device = torch.device("cuda" if torch.cuda.is_available() else "cpu")`, followed by `torch.zeros((2, 3), dtype=torch.float32, device=device)`.
+
+## 2. Creation ops: zeros, ones, and random values
+
+Factory functions express the intended initialization directly. `zeros` and `ones` create constant tensors; `full` chooses another fill value; `rand` samples uniformly from $[0, 1)$; and `randn` samples from a standard normal distribution. `arange` is useful for integer-like sequences, while `linspace` chooses a fixed number of evenly spaced points. `empty` allocates the requested shape without initializing the elements, so it is only safe when every position will be overwritten before it is read.
+
+The `*_like` family copies shape, dtype, and usually device from an existing tensor: `zeros_like(x)`, `ones_like(x)`, and `empty_like(x)` are often clearer than repeating metadata manually. Random factories consume a pseudorandom generator; call `torch.manual_seed` when a reproducible debugging example matters, and remember that reproducibility across devices and releases has additional constraints.
+
+<RevisionCodePair {...pytorchTensorExamples.creationOps} />
+
+The important prediction is the shape before the values. A call such as `torch.rand((2, 3))` creates six independent logical elements, whereas `torch.rand(2, 3, 1)` creates a rank-three tensor with shape `(2, 3, 1)`.
+
+## 3. A tensor is metadata plus a view over storage
+
+A dense PyTorch tensor is not a nested Python list. Its storage is a contiguous one-dimensional buffer of bytes; tensor metadata gives the dtype, shape, stride, and storage offset needed to interpret that buffer. Multiple tensors can therefore refer to the same storage while exposing different shapes or index-to-memory mappings. This is why a slice or transpose can be cheap, and also why a write through a view can modify the original tensor.
+
+The scalar boundary needs a precise description. `x.item()` does not “get the underlying storage”; it converts a tensor containing exactly one element into a standard Python number and is not differentiable. Use `x.tolist()` for a small tensor of Python values, `x.numpy()` for CPU interoperability when the storage permits it, and `x.detach().cpu().numpy()` when the tensor may require gradients or live on an accelerator. Use `untyped_storage().data_ptr()` when the question is whether two tensors share storage, not when the question is what values they contain.
+
+<RevisionCodePair {...pytorchTensorExamples.inspectStorage} />
+
+The view in the example has a different shape and stride but the same storage identity as `base`. For dense tensors, the logical byte count is commonly reasoned about as `numel() * element_size()`, while a view can cover only part of a larger storage. `stride()` tells you how many storage elements the next index in each dimension skips; it is the bridge between an abstract shape and memory traffic.
+
+## 4. Indexing and slicing
+
+Tensor indexing follows Python and NumPy conventions: indices start at zero, negative indices count from the end, `:` selects a range, and a step such as `::2` skips elements. For a tensor `x` with shape `(B, T, D)`, `x[b]` removes the first dimension, `x[:, t]` selects one position for every batch item, and `x[..., -1]` selects the last feature without spelling out the leading dimensions.
+
+Basic indexing and slicing generally return views. Advanced indexing—integer index tensors, lists of indices, or boolean masks—returns a new tensor containing the selected values. Assignment through either basic or advanced indexing is still an in-place write to the destination. The distinction matters when you mutate the result and expect the source to change.
+
+<RevisionCodePair {...pytorchTensorExamples.indexing} />
+
+When debugging a shape error, print the shape after every indexing step rather than reasoning only from the source shape. Indexing with an integer removes a dimension; slicing preserves it; inserting `None` or calling `unsqueeze` adds a dimension of size one.
+
+## 5. Joining, stacking, and reshaping
+
+`torch.cat` joins tensors along an existing dimension. All non-concatenated dimensions must match, so concatenating two `(B, T, D)` tensors along `T` produces `(B, T_1 + T_2, D)`. `torch.stack` requires every input to have the same shape and inserts a new dimension, so stacking two `(B, T, D)` tensors along dimension zero produces `(2, B, T, D)`.
+
+This is the fastest shape check: ask whether the operation should preserve rank. If yes, start with `cat`; if the operation represents a new batch, time, ensemble, or sample axis, start with `stack`. `split` and `chunk` are the corresponding ways to divide a tensor along an existing dimension.
+
+`view` changes shape without copying when the requested shape is compatible with the current strides. `reshape` is more permissive: it returns a view when possible and makes a copy otherwise, so code should not depend on aliasing through `reshape`. `transpose` and `permute` rearrange dimensions and commonly create non-contiguous views; call `contiguous()` when a downstream operation requires contiguous storage.
+
+<RevisionCodePair {...pytorchTensorExamples.joining} />
+
+The output shapes are determined by the operation, not by the values. Predict them first, then use `.shape` to confirm the prediction. This habit catches most errors in batched linear algebra before the numerical result becomes distracting.
+
+## 6. Mutating operations and autograd
+
+Most tensor expressions are out-of-place: `y = x + 1` allocates a result and leaves `x` unchanged. Methods ending in an underscore—`add_`, `zero_`, `fill_`, `copy_`, and many others—mutate their receiver and return it. Indexing assignment such as `x[:, 0] = 0` is also in-place, even though the syntax does not end in an underscore.
+
+In-place updates can save memory, but they can also invalidate values that autograd saved for backward. Mutating a leaf tensor that requires gradients is often prohibited; when an intentional parameter or buffer update is needed outside the gradient calculation, use `with torch.no_grad():`. Prefer out-of-place expressions in ordinary `forward` code unless the memory and autograd consequences are understood. `.data` is not a safe substitute for `no_grad`.
+
+<RevisionCodePair {...pytorchTensorExamples.mutation} />
+
+The interview-level distinction is simple: the absence of an underscore does not prove that an operation is pure—index assignment is the counterexample—while the presence of an underscore is an explicit request to mutate existing storage.
+
+## 7. Rapid recall
+
+| Question | Short answer | Common trap |
+| --- | --- | --- |
+| What is a tensor? | A typed, strided multi-dimensional view over storage on a device. | Treating it as a Python list with nested shape semantics. |
+| Does `torch.tensor(x)` share `x`? | No; it copies `x` and creates a fresh leaf by default. | Using it when `as_tensor` or `from_numpy` was intended. |
+| What does `item()` do? | Converts a one-element tensor to a Python scalar. | Calling it on a tensor with many elements or confusing it with storage access. |
+| `cat` or `stack`? | `cat` joins an existing dimension; `stack` inserts a new one. | Forgetting that `stack` requires equal input shapes. |
+| `view` or `reshape`? | `view` requires compatible strides; `reshape` may copy. | Assuming every reshape aliases the input. |
+| What does `_` mean? | The operation mutates the receiver in-place. | Breaking autograd by mutating a saved or gradient-tracked tensor. |
+| How do devices interact? | Move explicitly with `.to(device)` and keep participating tensors compatible. | Assuming PyTorch will move ordinary tensors automatically. |
+
+## Source links
+
+- [PyTorch 2.13 tensor documentation](https://docs.pytorch.org/docs/2.13/tensors.html)
+- [Tensor attributes: dtype, device, layout, and strides](https://docs.pytorch.org/docs/2.13/tensor_attributes.html)
+- [Tensor views and aliasing](https://docs.pytorch.org/docs/2.13/tensor_view.html)
+- [`torch.Tensor.item`](https://docs.pytorch.org/docs/2.13/generated/torch.Tensor.item.html)
+- [Creation ops](https://docs.pytorch.org/docs/2.13/torch.html#creation-ops)
+- [Indexing, slicing, joining, and mutating ops](https://docs.pytorch.org/docs/2.13/torch.html#indexing-slicing-joining-mutating-ops)

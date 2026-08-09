@@ -6,10 +6,28 @@ import SectionHeader from '../components/SectionHeader.astro';
 <PostLayout title="Revision Notes" showSectionsNav={false}>
   <SectionHeader
     eyebrow="Revision Notes"
-    title="CS336: Language Modeling from Scratch"
-    description="Course notes, references, and implementation details from CS336."
-    meta="2 lessons"
+    title="PyTorch and CS336"
+    description="Course notes, references, and implementation details for PyTorch and language modeling."
+    meta="3 notes"
   />
+
+  <section class="resource-list">
+    <div class="resource-list__header">
+      <h2>PyTorch</h2>
+      <a href="https://docs.pytorch.org/docs/2.13/tensors.html">Documentation</a>
+    </div>
+    <ul>
+      <li>
+        <div>
+          <strong>Tensor fundamentals</strong>
+          <p>Construction, factories, metadata, views, indexing, joining, reshaping, and mutation.</p>
+        </div>
+        <span>
+          <a href="/revision notes/2026/08/09/pytorch-tensor-revision-notes.html">My notes</a>
+        </span>
+      </li>
+    </ul>
+  </section>
 
   <section class="resource-list">
     <div class="resource-list__header">

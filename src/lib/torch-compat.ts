@@ -21,11 +21,135 @@ _TORCH_COMPAT_INT_DTYPES = {
     _np.dtype(_np.uint8),
 }
 
+class _CompatStorage:
+    def __init__(self, tensor):
+        self.tensor = tensor
+
+    def data_ptr(self):
+        return _storage_data_ptr(self.tensor)
+
+class _CompatTensor(_np.ndarray):
+    def __new__(cls, value, dtype=None, copy=True):
+        if copy:
+            array = _np.array(value, dtype=dtype, copy=True)
+        else:
+            array = _np.asarray(value, dtype=dtype)
+        return array.view(cls)
+
+    def __array_finalize__(self, _source):
+        pass
+
+    @property
+    def device(self):
+        return 'cpu'
+
+    @property
+    def requires_grad(self):
+        return False
+
+    @property
+    def is_cuda(self):
+        return False
+
+    def numel(self):
+        return int(self.size)
+
+    def element_size(self):
+        return int(self.dtype.itemsize)
+
+    def stride(self):
+        return tuple(int(byte_stride // self.itemsize) for byte_stride in self.strides)
+
+    def is_contiguous(self):
+        return bool(self.flags['C_CONTIGUOUS'])
+
+    def contiguous(self):
+        return self if self.is_contiguous() else _tensor(self, copy=True)
+
+    def clone(self):
+        return _tensor(self, copy=True)
+
+    def detach(self):
+        return self
+
+    def requires_grad_(self, _requires_grad=True):
+        return self
+
+    def to(self, dtype=None, device=None, **_kwargs):
+        if dtype is None or _np.dtype(dtype) == self.dtype:
+            return self
+        return _tensor(self, dtype=dtype, copy=True)
+
+    def view(self, *shape):
+        return self.reshape(*shape)
+
+    def add_(self, value):
+        self[...] = _np.asarray(self) + value
+        return self
+
+    def sub_(self, value):
+        self[...] = _np.asarray(self) - value
+        return self
+
+    def mul_(self, value):
+        self[...] = _np.asarray(self) * value
+        return self
+
+    def div_(self, value):
+        self[...] = _np.asarray(self) / value
+        return self
+
+    def zero_(self):
+        self[...] = 0
+        return self
+
+    def fill_(self, value):
+        self[...] = value
+        return self
+
+    def copy_(self, source):
+        self[...] = _np.asarray(source, dtype=self.dtype)
+        return self
+
+    def data_ptr(self):
+        return int(self.__array_interface__['data'][0])
+
+    def storage_offset(self):
+        return int((self.data_ptr() - _storage_data_ptr(self)) // self.itemsize)
+
+    def untyped_storage(self):
+        return _CompatStorage(self)
+
+    def storage(self):
+        return self.untyped_storage()
+
+def _storage_root(value):
+    root = value
+    while isinstance(getattr(root, 'base', None), _np.ndarray):
+        root = root.base
+    return _np.asarray(root)
+
+def _storage_data_ptr(value):
+    return int(_storage_root(value).__array_interface__['data'][0])
+
+def _tensor(value, dtype=None, copy=True):
+    if isinstance(value, _CompatTensor) and dtype is None and not copy:
+        return value
+    return _CompatTensor(value, dtype=dtype, copy=copy)
+
+def _wrap(value):
+    if isinstance(value, _np.ndarray) and not isinstance(value, _CompatTensor):
+        return value.view(_CompatTensor)
+    return value
+
 def _asarray(value, dtype=None):
     return _np.asarray(value, dtype=dtype)
 
 def _shape(size):
     return (int(size),) if isinstance(size, (int, _np.integer)) else tuple(int(v) for v in size)
+
+def _shape_args(sizes):
+    return _shape(sizes[0]) if len(sizes) == 1 else tuple(int(v) for v in sizes)
 
 def _axis(dim):
     return dim
@@ -40,11 +164,11 @@ def _stable_softmax(value, dim=-1):
     maximum = _np.max(safe_value, axis=dim, keepdims=True)
     exponentiated = _np.exp(safe_value - maximum) * finite
     denominator = _np.sum(exponentiated, axis=dim, keepdims=True)
-    return _np.where(
+    return _wrap(_np.where(
         denominator > 0,
         exponentiated / _safe_denominator(denominator),
         _np.zeros_like(exponentiated),
-    )
+    ))
 
 def _log_softmax(value, dim=-1):
     value = _asarray(value, dtype=_np.float64)
@@ -53,7 +177,7 @@ def _log_softmax(value, dim=-1):
     maximum = _np.max(safe_value, axis=dim, keepdims=True)
     shifted = safe_value - maximum
     denominator = _np.sum(_np.exp(shifted) * finite, axis=dim, keepdims=True)
-    return shifted - _np.log(_safe_denominator(denominator))
+    return _wrap(shifted - _np.log(_safe_denominator(denominator)))
 
 def _sum(value, dim=None, keepdim=False):
     return _np.sum(value, axis=_axis(dim), keepdims=keepdim)
@@ -75,7 +199,7 @@ def _norm(value, p=2, dim=None, keepdim=False):
 def _arange(start, end=None, step=1, dtype=None, **_kwargs):
     if end is None:
         start, end = 0, start
-    return _np.arange(start, end, step, dtype=dtype)
+    return _wrap(_np.arange(start, end, step, dtype=dtype))
 
 def _flatten(value, start_dim=0, end_dim=-1):
     value = _np.asarray(value)
@@ -84,19 +208,19 @@ def _flatten(value, start_dim=0, end_dim=-1):
     prefix = value.shape[:start_dim]
     suffix = value.shape[end_dim + 1:]
     middle = int(_np.prod(value.shape[start_dim:end_dim + 1]))
-    return value.reshape(prefix + (middle,) + suffix)
+    return _wrap(value.reshape(prefix + (middle,) + suffix))
 
 def _gather(value, dim, index):
     value = _np.asarray(value)
     index = _np.asarray(index, dtype=_np.int64)
-    return _np.take_along_axis(value, index, axis=dim)
+    return _wrap(_np.take_along_axis(value, index, axis=dim))
 
 def _topk(value, k, dim=-1, largest=True, sorted=True):
     value = _np.asarray(value)
     order = _np.argsort(-value if largest else value, axis=dim, kind='stable')
     indices = _np.take(order, _np.arange(k), axis=dim)
     values = _np.take_along_axis(value, indices, axis=dim)
-    return _types.SimpleNamespace(values=values, indices=indices)
+    return _types.SimpleNamespace(values=_wrap(values), indices=_wrap(indices))
 
 def _cross_entropy(logits, targets, reduction='mean'):
     log_probs = _log_softmax(logits, dim=-1)
@@ -123,7 +247,7 @@ class _NullContext:
 
 torch = _types.ModuleType('torch')
 torch.__path__ = []
-torch.Tensor = _np.ndarray
+torch.Tensor = _CompatTensor
 torch.float16 = _np.float16
 torch.float32 = _np.float32
 torch.float64 = _np.float64
@@ -134,22 +258,24 @@ torch.int64 = _np.int64
 torch.long = _np.int64
 torch.uint8 = _np.uint8
 torch.bool = _np.bool_
-torch.as_tensor = _asarray
-torch.tensor = lambda value, dtype=None, **_kwargs: _np.array(value, dtype=dtype)
-torch.from_numpy = lambda value: _np.asarray(value)
-torch.clone = lambda value: _np.array(value, copy=True)
-torch.zeros = lambda size, dtype=_np.float32, **_kwargs: _np.zeros(_shape(size), dtype=dtype)
-torch.ones = lambda size, dtype=_np.float32, **_kwargs: _np.ones(_shape(size), dtype=dtype)
-torch.empty = lambda size, dtype=_np.float32, **_kwargs: _np.empty(_shape(size), dtype=dtype)
-torch.full = lambda size, fill_value, dtype=None, **_kwargs: _np.full(_shape(size), fill_value, dtype=dtype)
-torch.zeros_like = lambda value, **_kwargs: _np.zeros_like(value)
-torch.ones_like = lambda value, **_kwargs: _np.ones_like(value)
-torch.empty_like = lambda value, **_kwargs: _np.empty_like(value)
-torch.full_like = lambda value, fill_value, **_kwargs: _np.full_like(value, fill_value)
+torch.as_tensor = lambda value, dtype=None, **_kwargs: _tensor(value, dtype=dtype, copy=False)
+torch.tensor = lambda value, dtype=None, **_kwargs: _tensor(value, dtype=dtype, copy=True)
+torch.from_numpy = lambda value: _tensor(value, copy=False)
+torch.clone = lambda value: _tensor(value, copy=True)
+torch.zeros = lambda *size, dtype=_np.float32, **_kwargs: _tensor(_np.zeros(_shape_args(size), dtype=dtype), copy=False)
+torch.ones = lambda *size, dtype=_np.float32, **_kwargs: _tensor(_np.ones(_shape_args(size), dtype=dtype), copy=False)
+torch.empty = lambda *size, dtype=_np.float32, **_kwargs: _tensor(_np.empty(_shape_args(size), dtype=dtype), copy=False)
+torch.full = lambda size, fill_value, dtype=None, **_kwargs: _tensor(_np.full(_shape(size), fill_value, dtype=dtype), copy=False)
+torch.rand = lambda *size, dtype=_np.float32, **_kwargs: _tensor(_np.random.rand(*_shape_args(size)).astype(dtype), copy=False)
+torch.randn = lambda *size, dtype=_np.float32, **_kwargs: _tensor(_np.random.randn(*_shape_args(size)).astype(dtype), copy=False)
+torch.zeros_like = lambda value, **_kwargs: _tensor(_np.zeros_like(value), copy=False)
+torch.ones_like = lambda value, **_kwargs: _tensor(_np.ones_like(value), copy=False)
+torch.empty_like = lambda value, **_kwargs: _tensor(_np.empty_like(value), copy=False)
+torch.full_like = lambda value, fill_value, **_kwargs: _tensor(_np.full_like(value, fill_value), copy=False)
 torch.arange = _arange
-torch.tril = lambda value, diagonal=0: _np.tril(value, diagonal=diagonal)
-torch.eye = lambda n, m=None, dtype=_np.float32, **_kwargs: _np.eye(n, m if m is not None else n, dtype=dtype)
-torch.linspace = lambda start, end, steps, **_kwargs: _np.linspace(start, end, steps)
+torch.tril = lambda value, diagonal=0: _wrap(_np.tril(value, diagonal=diagonal))
+torch.eye = lambda n, m=None, dtype=_np.float32, **_kwargs: _tensor(_np.eye(n, m if m is not None else n, dtype=dtype), copy=False)
+torch.linspace = lambda start, end, steps, **_kwargs: _tensor(_np.linspace(start, end, steps), copy=False)
 torch.exp = _np.exp
 torch.log = _np.log
 torch.sin = _np.sin
@@ -169,17 +295,18 @@ torch.min = _amin
 torch.norm = _norm
 torch.argmax = lambda value, dim=None, keepdim=False: _np.argmax(value, axis=_axis(dim))
 torch.argmin = lambda value, dim=None, keepdim=False: _np.argmin(value, axis=_axis(dim))
-torch.matmul = _np.matmul
-torch.mm = _np.matmul
-torch.bmm = _np.matmul
-torch.transpose = lambda value, dim0, dim1: _np.swapaxes(value, dim0, dim1)
-torch.permute = lambda value, dims: _np.transpose(value, axes=tuple(dims))
-torch.reshape = _np.reshape
+torch.matmul = lambda left, right: _wrap(_np.matmul(left, right))
+torch.mm = torch.matmul
+torch.bmm = torch.matmul
+torch.transpose = lambda value, dim0, dim1: _wrap(_np.swapaxes(value, dim0, dim1))
+torch.permute = lambda value, dims: _wrap(_np.transpose(value, axes=tuple(dims)))
+torch.reshape = lambda value, shape: _wrap(_np.reshape(value, _shape(shape)))
 torch.flatten = _flatten
-torch.unsqueeze = lambda value, dim: _np.expand_dims(value, axis=dim)
-torch.squeeze = lambda value, dim=None: _np.squeeze(value, axis=dim)
-torch.cat = lambda values, dim=0: _np.concatenate(values, axis=dim)
-torch.stack = lambda values, dim=0: _np.stack(values, axis=dim)
+torch.unsqueeze = lambda value, dim: _wrap(_np.expand_dims(value, axis=dim))
+torch.squeeze = lambda value, dim=None: _wrap(_np.squeeze(value, axis=dim))
+torch.cat = lambda values, dim=0: _wrap(_np.concatenate(values, axis=dim))
+torch.concat = torch.cat
+torch.stack = lambda values, dim=0: _wrap(_np.stack(values, axis=dim))
 torch.where = _np.where
 torch.broadcast_to = _np.broadcast_to
 torch.isfinite = _np.isfinite
@@ -190,13 +317,28 @@ torch.unique = lambda value, sorted=True, **_kwargs: _np.unique(value)
 torch.argsort = lambda value, dim=-1, descending=False, stable=False: _np.argsort(-value if descending else value, axis=dim, kind='stable' if stable else None)
 torch.topk = _topk
 torch.gather = _gather
-torch.index_select = lambda value, dim, index: _np.take(value, _np.asarray(index, dtype=_np.int64), axis=dim)
+torch.index_select = lambda value, dim, index: _wrap(_np.take(value, _np.asarray(index, dtype=_np.int64), axis=dim))
+torch.numel = lambda value: int(_np.asarray(value).size)
+torch.equal = lambda left, right: bool(_np.array_equal(left, right))
 torch.softmax = _stable_softmax
 torch.log_softmax = _log_softmax
 torch.logsumexp = _logsumexp
 torch.manual_seed = lambda seed: _np.random.seed(seed)
 torch.no_grad = _NullContext
 torch.inference_mode = _NullContext
+
+class _Device(str):
+    def __new__(cls, value):
+        return str.__new__(cls, value)
+
+    def __repr__(self):
+        return "device(type='" + str(self) + "')"
+
+torch.device = _Device
+
+_cuda = _types.ModuleType('torch.cuda')
+_cuda.is_available = lambda: False
+torch.cuda = _cuda
 
 _nn = _types.ModuleType('torch.nn')
 _nn.__path__ = []
@@ -215,4 +357,5 @@ _sys.modules['torch'] = torch
 _sys.modules['torch.nn'] = _nn
 _sys.modules['torch.nn.functional'] = _functional
 _sys.modules['torch.linalg'] = _linalg
+_sys.modules['torch.cuda'] = _cuda
 `;
