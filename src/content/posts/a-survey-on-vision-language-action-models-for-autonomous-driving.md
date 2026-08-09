@@ -46,6 +46,34 @@ _Figure 2 summarizes the VLA4AD architecture blocks, connecting visual inputs, l
 | End-to-end VLA | Map scene inputs and instructions toward actions | OpenDriveVLA and related action models |
 | Augmented VLA | Add tools, chains of thought, or world models | DiffVLA and DriveVLA-W0-style extensions |
 
+### Chronology of the curated list
+
+The table uses each paper's initial arXiv submission date, not the Awesome list's year column or this site's publication date. It gives a reproducible reading order across the two driving fields; it does not, by itself, establish that a later paper was influenced by an earlier one.
+
+| Initial arXiv date | Paper | Main interface or evidence change |
+| ------------------ | ----- | -------------------------------- |
+| 2023-10-02 | [DriveGPT4](/paper%20shorts/2023/10/02/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model.html) | One multimodal interface for explanations and low-level controls |
+| 2023-11-22 | [ADriver-I](/paper%20shorts/2023/11/22/adriver-i-a-general-world-model-for-autonomous-driving.html) | Interleaved vision-action world-model rollout |
+| 2024-02-16 | [RAG-Driver](/paper%20shorts/2024/02/16/rag-driver-generalisable-driving-explanations-with-retrieval-augmented-in-context-learning.html) | Retrieved demonstrations as driving evidence |
+| 2024-08-19 | [CoVLA](/paper%20shorts/2024/08/19/covla-comprehensive-vision-language-action-dataset-for-autonomous-driving.html) | Video, language, and trajectory data construction |
+| 2024-10-30 | [EMMA](/paper%20shorts/2024/10/01/emma-end-to-end-multimodal-model-for-autonomous-driving.html) | Tokenized multimodal driving inputs and outputs |
+| 2025-02-28 | [SafeAuto](/paper%20shorts/2025/02/28/safeauto-knowledge-enhanced-safe-autonomous-driving-with-multimodal-foundation-models.html) | Explicit loss, rule-checking, and retrieval safety interfaces |
+| 2025-03-12 | [SimLingo](/paper%20shorts/2025/03/12/simlingo-vision-only-closed-loop-autonomous-driving-with-language-action-alignment.html) | Camera-only language-action alignment |
+| 2025-03-14 | [DynRsl-VLM](/paper%20shorts/2025/03/14/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models.html) | Dynamic-resolution visual evidence for VLM reasoning |
+| 2025-03-25 | [ORION](/paper%20shorts/2025/03/25/orion-a-holistic-end-to-end-autonomous-driving-framework-by-vision-language-instructed-action-generation.html) | Long-history reasoning connected to a generative planner |
+| 2025-03-30 | [OpenDriveVLA](/paper%20shorts/2025/03/30/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model.html) | Hierarchical 2D and 3D spatial-token alignment |
+| 2025-04-18 | [LangCoop](/paper%20shorts/2025/04/18/langcoop-collaborative-driving-with-language.html) | Language as a vehicle-to-vehicle communication packet |
+| 2025-05-19 | [TS-VLM](/paper%20shorts/2025/05/19/ts-vlm-text-guided-softsort-pooling-for-vision-language-models-in-multi-view-driving-reasoning.html) | Query-conditioned multi-view pooling |
+| 2025-05-22 | [DriveMoE](/paper%20shorts/2025/05/22/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving.html) | Separate sparse routing of camera and action experts |
+| 2025-05-23 | [FutureSightDrive](/paper%20shorts/2025/05/23/futuresightdrive-thinking-visually-with-spatio-temporal-cot-for-autonomous-driving.html) | Predicted visual future as a planning trace |
+| 2025-05-26 | [DiffVLA](/paper%20shorts/2025/05/26/diffvla-vision-language-guided-diffusion-planning-for-autonomous-driving.html) | Vision-language-conditioned diffusion trajectories |
+| 2025-05-29 | [Impromptu VLA](/paper%20shorts/2025/05/29/impromptu-vla-open-weights-and-open-data-for-driving-vision-language-action-models.html) | Curated corner-case VLA data and diagnostics |
+| 2025-05-30 | [S4-Driver](/paper%20shorts/2025/05/30/s4-driver-scalable-self-supervised-driving-multimodal-large-language-model-with-spatio-temporal-visual-representation.html) | Self-supervised sparse 3D visual representation |
+| 2025-06-09 | [ReCogDrive](/paper%20shorts/2025/06/09/recogdrive-a-reinforced-cognitive-framework-for-end-to-end-autonomous-driving.html) | VLM cognition feeding a diffusion planner |
+| 2025-06-16 | [AutoVLA](/paper%20shorts/2025/06/16/autovla-a-vision-language-action-model-for-end-to-end-autonomous-driving-with-adaptive-reasoning-and-reinforcement-fine-tuning.html) | Adaptive reasoning plus tokenized feasible trajectories |
+| 2025-06-23 | [Drive-R1](/paper%20shorts/2025/06/23/drive-r1-bridging-reasoning-and-planning-in-vlms-for-autonomous-driving-with-reinforcement-learning.html) | RL for visual reasoning-plan alignment |
+| 2025-10-30 | [Alpamayo-R1](/paper%20shorts/2025/10/30/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail.html) | Causal driving traces with diffusion action prediction |
+
 ## High-Level Takeaways
 
 - This survey informs how to partition a driving-VLA research portfolio across perception-language alignment, world modeling, action generation, datasets, and closed-loop evaluation. Its comparison unit is not one token or trajectory but a system interface: visual representation, language/reasoning backbone, action head, and deployment loop.
