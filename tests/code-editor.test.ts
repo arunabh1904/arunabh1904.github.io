@@ -2,8 +2,12 @@
 
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { afterEach, describe, expect, it } from 'vitest';
-import { codeEditorExtensions, codeEditorKeyBindings } from '../src/lib/code-editor';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  codeEditorExtensions,
+  codeEditorKeyBindings,
+  createRunCodeKeyBindings,
+} from '../src/lib/code-editor';
 
 function getKeyBinding(key: string) {
   const binding = codeEditorKeyBindings.find((entry) => entry.key === key);
@@ -44,6 +48,18 @@ describe('codeEditorExtensions', () => {
     expect(codeEditorKeyBindings.map((binding) => binding.key)).toEqual(
       expect.arrayContaining(['Tab', 'Shift-Tab', 'Mod-/']),
     );
+  });
+
+  it('adds Ctrl+Enter and Cmd+Enter bindings for a workspace run action', () => {
+    const runCode = vi.fn();
+    const runBindings = createRunCodeKeyBindings(runCode);
+    const view = createView('print("starter")');
+
+    expect(runBindings.map((binding) => binding.key)).toEqual(
+      expect.arrayContaining(['Ctrl-Enter', 'Mod-Enter']),
+    );
+    expect(runBindings[0]?.run?.(view)).toBe(true);
+    expect(runCode).toHaveBeenCalledOnce();
   });
 
   it('indents and outdents the current selection', () => {

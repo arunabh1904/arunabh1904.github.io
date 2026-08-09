@@ -107,7 +107,7 @@ describe('CodePracticeLab', () => {
     return editor as HTMLElement;
   }
 
-  it('reveals the hint and solution only after the user clicks', async () => {
+  it('keeps hint and solution actions in the workspace and applies them to the editor', async () => {
     loadPyodideRuntime.mockResolvedValueOnce({
       runPythonAsync: vi.fn(),
     });
@@ -120,16 +120,26 @@ describe('CodePracticeLab', () => {
     expect(container.textContent).not.toContain('print("solution")');
 
     const buttons = Array.from(container.querySelectorAll('button'));
-    const hintButton = buttons.find((button) => button.textContent === 'Hint');
-    const solutionButton = buttons.find((button) => button.textContent === 'Solution');
+    const hintButton = buttons.find((button) => button.textContent === 'Add hints');
+    const solutionButton = buttons.find((button) => button.textContent === 'Load solution');
+
+    expect(hintButton?.closest('.code-practice-lab__workspace')).not.toBeNull();
+    expect(solutionButton?.closest('.code-practice-lab__workspace')).not.toBeNull();
 
     await act(async () => {
       hintButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(getEditor().textContent).toContain('# Hints');
+    expect(getEditor().textContent).toContain('# 1. Subtract the row max first.');
+    expect(getEditor().textContent).toContain('print("starter")');
+
+    await act(async () => {
       solutionButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
 
-    expect(container.textContent).toContain('Subtract the row max first.');
-    expect(container.textContent).toContain('print("solution")');
+    expect(getEditor().textContent).toContain('print("solution")');
+    expect(getEditor().textContent).not.toContain('print("starter")');
   });
 
   it('loads required packages and prints run output', async () => {
@@ -143,10 +153,7 @@ describe('CodePracticeLab', () => {
 
     await render();
 
-    expect(container.textContent).toContain('NumPy is also available directly');
-
-    const buttons = Array.from(container.querySelectorAll('button'));
-    const runButton = buttons.find((button) => button.textContent === 'Run code');
+    const runButton = container.querySelector<HTMLButtonElement>('button[aria-label="Run code"]');
 
     await act(async () => {
       runButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -155,6 +162,41 @@ describe('CodePracticeLab', () => {
 
     expect(loadPackage).toHaveBeenCalledWith(['numpy']);
     expect(container.textContent).toContain('0.41703');
+  });
+
+  it('runs the current editor contents with Ctrl+Enter', async () => {
+    const runPythonAsync = vi.fn().mockResolvedValue({
+      toJs: () => ['keyboard run\n', ''],
+    });
+    loadPyodideRuntime.mockResolvedValueOnce({
+      runPythonAsync,
+    });
+
+    await render();
+
+    const editorContent = container.querySelector<HTMLElement>('.cm-content');
+    expect(editorContent).not.toBeNull();
+
+    const shortcutEvent = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      code: 'Enter',
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperties(shortcutEvent, {
+      keyCode: { value: 13 },
+      which: { value: 13 },
+    });
+
+    await act(async () => {
+      editorContent?.dispatchEvent(shortcutEvent);
+    });
+    await flushAsyncWork();
+
+    expect(shortcutEvent.defaultPrevented).toBe(true);
+    expect(runPythonAsync).toHaveBeenCalledOnce();
+    expect(container.textContent).toContain('keyboard run');
   });
 
   it('renders a CodeMirror editor with the starter code', async () => {
@@ -166,6 +208,6 @@ describe('CodePracticeLab', () => {
 
     const editor = getEditor();
     expect(editor.textContent).toContain('print("starter")');
-    expect(container.textContent).toContain('Cmd/Ctrl + /');
+    expect(container.textContent).toContain('Ctrl / Cmd + Enter');
   });
 });

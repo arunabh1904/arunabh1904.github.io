@@ -28,6 +28,23 @@ const problemCountLabel = String(codePracticeProblems.length).padStart(2, '0');
       </div>
     </div>
 
+    <section class="code-index__environment" aria-labelledby="code-environment-title">
+      <div>
+        <p class="code-index__eyebrow">Browser workspace</p>
+        <h2 id="code-environment-title">Run each problem locally</h2>
+        <p>
+          Every problem opens a local Python editor powered by Pyodide. NumPy loads on demand;
+          <code>torch</code> is a lightweight, NumPy-backed compatibility layer for the tensor
+          operations used in these exercises—not the full PyTorch runtime.
+        </p>
+      </div>
+      <ul>
+        <li><kbd>Ctrl / Cmd + Enter</kbd> runs the current editor contents.</li>
+        <li>Hints insert comments into the editor, and Solution loads the reference code.</li>
+        <li>No autograd, CUDA, or <code>nn.Module</code>.</li>
+      </ul>
+    </section>
+
     <ul class="code-index__list">
       {codePracticeProblems.map((problem) => (
         <li>
