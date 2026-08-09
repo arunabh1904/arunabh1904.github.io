@@ -88,26 +88,49 @@ const defaultChannel = channels[0];
       <span></span>
       <span></span>
     </div>
-    <div class="retro-tv__cabinet">
-      <div class="retro-tv__screen-bezel">
-        <div class="retro-tv__screen">
-          <iframe
-            id="music-player-frame"
-            data-music-iframe
-            title={`${defaultChannel.name} music player`}
-            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen
-          ></iframe>
-          <div class="retro-tv__scanlines" aria-hidden="true"></div>
-          <div class="retro-tv__static" aria-hidden="true"></div>
+    <div class="retro-tv__set">
+      <div class="retro-tv__cabinet">
+        <div class="retro-tv__screen-bezel">
+          <div class="retro-tv__screen">
+            <iframe
+              id="music-player-frame"
+              data-music-iframe
+              title={`${defaultChannel.name} music player`}
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+            <div class="retro-tv__scanlines" aria-hidden="true"></div>
+            <div class="retro-tv__static" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="retro-tv__console" aria-hidden="true">
+          <div class="retro-tv__on-air"><span></span>ON</div>
+          <div class="retro-tv__dial"><span></span></div>
+          <div class="retro-tv__speaker"></div>
         </div>
       </div>
-      <div class="retro-tv__console" aria-hidden="true">
-        <div class="retro-tv__on-air"><span></span>ON</div>
-        <div class="retro-tv__dial"><span></span></div>
-        <div class="retro-tv__speaker"></div>
-      </div>
+
+      <label class="retro-tv__volume-control" data-music-volume-control title="Adjust volume">
+        <span class="retro-tv__volume-label" aria-hidden="true">VOL</span>
+        <span class="retro-tv__volume-rail" aria-hidden="true">
+          <span class="retro-tv__volume-fill"></span>
+          <span class="retro-tv__volume-lever"></span>
+        </span>
+        <input
+          class="retro-tv__volume-slider"
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          value="70"
+          aria-label="Volume"
+          aria-orientation="vertical"
+          aria-valuetext="70%"
+          data-music-volume
+        />
+        <output class="retro-tv__volume-readout" data-music-volume-readout aria-hidden="true">70</output>
+      </label>
     </div>
   </div>
 

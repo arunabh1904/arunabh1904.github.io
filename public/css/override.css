@@ -680,6 +680,8 @@ img:not(.float-right):not(.float-left) {
 }
 
 .retro-tv {
+  --volume-control-width: 44px;
+  --volume-control-gap: 10px;
   position: relative;
   padding-top: 12px;
 }
@@ -687,7 +689,7 @@ img:not(.float-right):not(.float-left) {
 .retro-tv__aerial {
   position: absolute;
   top: -7px;
-  left: 50%;
+  left: calc(50% - (var(--volume-control-width) + var(--volume-control-gap)) / 2);
   width: 82px;
   height: 30px;
   transform: translateX(-50%);
@@ -742,6 +744,13 @@ img:not(.float-right):not(.float-left) {
     background 0.24s ease,
     border-color 0.24s ease,
     box-shadow 0.24s ease;
+}
+
+.retro-tv__set {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--volume-control-width);
+  align-items: stretch;
+  gap: var(--volume-control-gap);
 }
 
 .retro-tv__cabinet::after {
@@ -887,6 +896,180 @@ img:not(.float-right):not(.float-left) {
   background-position: center;
   background-size: 7px 7px;
   opacity: 0.76;
+}
+
+.retro-tv__volume-control {
+  --music-volume: 70%;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-width: 0;
+  min-height: 0;
+  justify-items: center;
+  padding: 7px 3px 6px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--tv-cabinet-edge) 88%, transparent);
+  border-radius: 14px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--tv-cabinet-highlight) 38%, transparent), transparent 38%),
+    color-mix(in srgb, var(--button-bg-hover) 82%, var(--tv-console-ink));
+  box-shadow:
+    inset 0 1px 1px color-mix(in srgb, #fff 26%, transparent),
+    inset 0 -2px 3px color-mix(in srgb, var(--tv-console-ink) 18%, transparent),
+    0 7px 14px color-mix(in srgb, var(--tv-cabinet-drop-shadow) 78%, transparent);
+  color: var(--tv-console-ink);
+  transition:
+    opacity 0.18s ease,
+    filter 0.18s ease;
+}
+
+.retro-tv__volume-label,
+.retro-tv__volume-readout {
+  position: relative;
+  z-index: 1;
+  color: var(--tv-console-ink);
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.retro-tv__volume-label {
+  margin-top: 1px;
+}
+
+.retro-tv__volume-readout {
+  min-width: 2ch;
+  margin-bottom: 1px;
+  font-size: 0.48rem;
+  text-align: center;
+}
+
+.retro-tv__volume-rail {
+  position: relative;
+  width: 7px;
+  min-height: 70px;
+  margin: 8px 0;
+  border: 1px solid color-mix(in srgb, var(--tv-console-ink) 54%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tv-console-ink) 14%, transparent);
+  box-shadow:
+    inset 0 1px 2px color-mix(in srgb, #000 28%, transparent),
+    0 1px 0 color-mix(in srgb, #fff 30%, transparent);
+}
+
+.retro-tv__volume-fill {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  left: 1px;
+  height: var(--music-volume);
+  border-radius: inherit;
+  background: linear-gradient(to top, var(--accent-color), color-mix(in srgb, var(--accent-color) 58%, #fff));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent-color) 46%, transparent);
+  transition: height 0.08s linear;
+}
+
+.retro-tv__volume-lever {
+  position: absolute;
+  z-index: 1;
+  bottom: var(--music-volume);
+  left: 50%;
+  width: 24px;
+  height: 12px;
+  border: 1px solid color-mix(in srgb, var(--tv-console-ink) 66%, transparent);
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), transparent 45%),
+    color-mix(in srgb, var(--button-bg-hover) 54%, var(--tv-console-ink));
+  box-shadow:
+    inset 0 1px 1px color-mix(in srgb, #fff 34%, transparent),
+    0 2px 4px color-mix(in srgb, #000 24%, transparent);
+  transform: translate(-50%, 50%);
+  transition: bottom 0.08s linear;
+}
+
+.retro-tv__volume-lever::before {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  bottom: 2px;
+  left: 4px;
+  border-top: 1px solid color-mix(in srgb, var(--tv-console-ink) 58%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, #fff 24%, transparent);
+  content: "";
+}
+
+.retro-tv__volume-slider {
+  position: absolute;
+  z-index: 2;
+  top: 23px;
+  right: 0;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  background: transparent;
+  cursor: ns-resize;
+}
+
+.retro-tv__volume-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.retro-tv__volume-slider::-webkit-slider-thumb {
+  width: 24px;
+  height: 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-appearance: none;
+}
+
+.retro-tv__volume-slider::-moz-range-track {
+  border: 0;
+  background: transparent;
+}
+
+.retro-tv__volume-slider::-moz-range-thumb {
+  width: 24px;
+  height: 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.retro-tv__volume-slider:focus-visible {
+  outline: none;
+}
+
+.retro-tv__volume-control:focus-within {
+  box-shadow:
+    inset 0 1px 1px color-mix(in srgb, #fff 26%, transparent),
+    inset 0 -2px 3px color-mix(in srgb, var(--tv-console-ink) 18%, transparent),
+    0 0 0 2px color-mix(in srgb, var(--accent-color) 70%, transparent),
+    0 7px 14px color-mix(in srgb, var(--tv-cabinet-drop-shadow) 78%, transparent);
+}
+
+.retro-tv__volume-control--unavailable {
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+  opacity: 0.54;
+}
+
+.retro-tv__volume-slider:disabled {
+  cursor: not-allowed;
 }
 
 .music-player__now-playing {
@@ -1140,6 +1323,10 @@ a:visited {
     gap: 9px;
     padding: 11px;
   }
+  .retro-tv {
+    --volume-control-width: 40px;
+    --volume-control-gap: 8px;
+  }
   .retro-tv__dial {
     width: 33px;
     height: 33px;
@@ -1163,6 +1350,10 @@ a:visited {
     grid-template-columns: minmax(0, 1fr) 48px;
     border-radius: 23px 23px 19px 19px;
   }
+  .retro-tv {
+    --volume-control-width: 34px;
+    --volume-control-gap: 6px;
+  }
   .retro-tv__console {
     padding-inline: 0;
   }
@@ -1175,6 +1366,17 @@ a:visited {
   }
   .retro-tv__speaker {
     width: 30px;
+  }
+  .retro-tv__volume-control {
+    padding-inline: 1px;
+    border-radius: 11px;
+  }
+  .retro-tv__volume-lever {
+    width: 20px;
+  }
+  .retro-tv__volume-label,
+  .retro-tv__volume-readout {
+    font-size: 0.42rem;
   }
   .music-player__now-playing {
     margin-top: 14px;
