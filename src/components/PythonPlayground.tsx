@@ -4,6 +4,14 @@ import type { PyodideRuntime } from '../lib/pyodide-loader';
 import type { PythonPlaygroundProps } from '../lib/python-playground';
 import { runPythonSnippet } from '../lib/python-runner';
 
+function createHeadingId(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .replace(/[\s-]+/g, '-');
+}
+
 export default function PythonPlayground({
   title,
   initialCode,
@@ -137,7 +145,7 @@ export default function PythonPlayground({
       <div className="python-playground__header">
         <div>
           <p className="python-playground__eyebrow">Interactive Python</p>
-          <h3>{title}</h3>
+          <h3 id={createHeadingId(title)}>{title}</h3>
         </div>
         <p
           className={`python-playground__status python-playground__status--${status}`}
@@ -214,7 +222,7 @@ export default function PythonPlayground({
           <div className="python-playground__walkthrough-header">
             <div>
               <p className="python-playground__eyebrow">Guided Trace</p>
-              <h4>{currentStep.label}</h4>
+              <h4 id={createHeadingId(currentStep.label)}>{currentStep.label}</h4>
             </div>
             <p>
               Step {activeStep + 1} of {walkthroughSteps.length}
