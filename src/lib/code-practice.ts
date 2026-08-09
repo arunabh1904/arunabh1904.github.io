@@ -70,12 +70,12 @@ export const codePracticeProblems: readonly CodePracticeProblem[] = [
     hint: [
       'Subtract the per-row maximum from `logits` before exponentiating.',
       'Use `torch.arange(N)` to gather the logit for the correct class in each row.',
-      'Compute the loss as `logsumexp - correct_class_logit`, then average across the batch.',
+      'Compute the loss as `log(sum(exp(shifted))) - shifted[row, label]`, then average across the batch.',
       'Validate `ndim`, matching batch size, integer labels, non-empty shapes, and label range.',
     ],
     solutionNotes: [
       'The stable trick is to shift each row by its maximum value before applying `exp`, which preserves the softmax probabilities while avoiding overflow.',
-      'Once shifted, the mean cross-entropy is just the average of `log(sum(exp(shifted))) - shifted[row, label]` across the batch.',
+      'The solution spells out the row-wise `amax`, `exp`, `sum`, and `log` operations so the stable cross-entropy calculation stays visible instead of being hidden behind a softmax helper.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -110,10 +110,15 @@ def softmax_cross_entropy(
 ) -> torch.Tensor:
     logits, labels = _validate_classification_inputs(logits, labels)
 
-    # Cross-entropy on log-softmax avoids materializing probabilities and stays stable for large logits.
-    log_probs = torch.log_softmax(logits, dim=1)
-    target_log_probs = torch.gather(log_probs, 1, torch.unsqueeze(labels, dim=1)).squeeze(1)
-    return -torch.mean(target_log_probs)`,
+    # Build stable cross-entropy from reductions and elementwise tensor primitives.
+    row_maxes = torch.amax(logits, dim=1, keepdim=True)
+    shifted_logits = logits - row_maxes
+    exponentiated = torch.exp(shifted_logits)
+    normalizers = torch.sum(exponentiated, dim=1)
+    row_indices = torch.arange(logits.shape[0], dtype=torch.long)
+    target_logits = shifted_logits[row_indices, labels]
+    losses = torch.log(normalizers) - target_logits
+    return torch.mean(losses)`,
     starterCode: `from __future__ import annotations
 
 import torch
@@ -124,8 +129,8 @@ def softmax_cross_entropy(
 ) -> torch.Tensor:
     # TODO:
     # 1. Validate the batch/class dimensions and integer label range.
-    # 2. Compute log-softmax along the class dimension.
-    # 3. Gather the target log-probability from each row and average the loss.
+    # 2. Subtract a row maximum, exponentiate, and sum the shifted logits.
+    # 3. Form log(sum(exp(...))) minus the target logit, then average the loss.
     raise NotImplementedError("Implement softmax_cross_entropy")
 
 sample_logits = torch.tensor([[2.0, 1.0, 0.1]], dtype=torch.float64)
@@ -303,14 +308,14 @@ print(nms(sample_boxes, sample_scores, iou_threshold=0.3))`,
       },
     ],
     hint: [
-      'Use `torch.tri(T, dtype=torch.int64)` or `torch.tril` to build the causal lower triangle once.',
+      'Compare query and key positions (`query_index >= key_index`) to build the causal lower triangle once.',
       'Create a `(B, T)` validity mask from `seq_lens`, then broadcast it across rows and columns.',
       'Multiply the causal triangle by the validity masks so padded rows and columns stay zero.',
       'Validate the rank of `seq_lens`, integer lengths, non-negative values, and `max_len` when it is provided.',
     ],
     solutionNotes: [
       'The problem is really two masks multiplied together: the causal rule (`j <= i`) and the per-example validity rule (`i, j < seq_len[b]`).',
-      'Broadcasting a single lower-triangular template against a batch-wise validity mask gives the full `(B, T, T)` answer without explicit Python loops.',
+      'Comparing query and key indices constructs that lower-triangular template from primitives, and broadcasting it against the batch-wise validity mask gives the full `(B, T, T)` answer without explicit Python loops.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -338,8 +343,12 @@ def make_causal_attention_mask(
     if max_len is not None:
         length = max(length, max_len)
 
-    valid = torch.arange(length, dtype=torch.long)[None, :] < seq_lens[:, None]
-    causal = torch.tril(torch.ones((length, length), dtype=torch.int64))
+    positions = torch.arange(length, dtype=torch.long)
+    valid = positions[None, :] < seq_lens[:, None]
+    causal = torch.as_tensor(
+        positions[:, None] >= positions[None, :],
+        dtype=torch.int64,
+    )
 
     # Intersect causal visibility with both the valid query and valid key positions.
     return causal[None, :, :] * valid[:, :, None] * valid[:, None, :]`,
@@ -353,7 +362,7 @@ def make_causal_attention_mask(
 ) -> torch.Tensor:
     # TODO:
     # 1. Validate non-empty integer sequence lengths and optional max_len.
-    # 2. Build one lower-triangular template.
+    # 2. Compare query and key positions to build one causal template.
     # 3. Broadcast per-example validity across query and key axes.
     raise NotImplementedError("Implement make_causal_attention_mask")
 
@@ -516,12 +525,12 @@ print(binary_classification_metrics(sample_true, sample_pred))`,
     ],
     hint: [
       'Compute the numerator with `x @ y.T`.',
-      'Compute row norms once, then broadcast them into an `(N, M)` denominator.',
+      'Square each row, sum across its feature dimension, and take a square root before broadcasting the row norms.',
       'Use a denominator mask with `torch.where` so zero-norm rows become `0.0` instead of `nan` or `inf`.',
       'Validate that both inputs are 2D and share the same feature dimension before doing any math.',
     ],
     solutionNotes: [
-      'Cosine similarity is just a dot product divided by the product of L2 norms. Once the row norms are in hand, the whole pairwise matrix can be computed with broadcasting.',
+      'Cosine similarity is just a dot product divided by the product of L2 norms. The solution constructs each norm from squared entries, a sum, and a square root before broadcasting the whole pairwise matrix.',
       'The key edge case is a zero vector: its norm is zero, so any similarity involving that row is undefined. Filling those positions with `0.0` keeps the result stable and matches the prompt.',
     ],
     solutionCode: `from __future__ import annotations
@@ -543,7 +552,9 @@ def pairwise_cosine_similarity(
         raise ValueError("x and y must contain only finite values")
 
     numerator = torch.matmul(x, torch.transpose(y, 0, 1))
-    denominator = torch.norm(x, dim=1)[:, None] * torch.norm(y, dim=1)[None, :]
+    x_norms = torch.sqrt(torch.sum(x * x, dim=1))
+    y_norms = torch.sqrt(torch.sum(y * y, dim=1))
+    denominator = x_norms[:, None] * y_norms[None, :]
     safe_denominator = torch.where(
         denominator > 0.0,
         denominator,
@@ -566,7 +577,7 @@ def pairwise_cosine_similarity(
 ) -> torch.Tensor:
     # TODO:
     # 1. Validate two-dimensional inputs with the same feature dimension.
-    # 2. Compute pairwise dot products and row norms.
+    # 2. Compute pairwise dot products, then form row norms with square, sum, and square root.
     # 3. Map similarities involving a zero-norm row to 0.0.
     raise NotImplementedError("Implement pairwise_cosine_similarity")
 
@@ -628,7 +639,7 @@ print(pairwise_cosine_similarity(sample_x, sample_y))`,
       'Validate that `logits` is 2D, `labels` is 1D, the batch sizes match, the labels are in range, and `k` is positive.',
     ],
     solutionNotes: [
-      'The implementation is straightforward once the inputs are validated: rank each row from largest to smallest, take the first `k` class ids, and check whether the true label appears in that slice.',
+      'The implementation is straightforward once the inputs are validated: rank each row from largest to smallest with a descending sort, take the first `k` class ids, and check whether the true label appears in that slice.',
       'Because the check is fully vectorized, the result is a simple mean over a boolean mask, which keeps the code short and easy to read.',
     ],
     solutionCode: `from __future__ import annotations
@@ -656,8 +667,9 @@ def top_k_accuracy(
         raise ValueError("labels contain out-of-range class ids")
 
     top_k = min(k, logits.shape[1])
-    ranked = torch.topk(logits, k=top_k, dim=1).indices
-    hits = torch.any(ranked == labels[:, None], dim=1)
+    ranked = torch.argsort(logits, dim=1, descending=True)
+    candidate_indices = ranked[:, :top_k]
+    hits = torch.any(candidate_indices == labels[:, None], dim=1)
     return torch.mean(torch.as_tensor(hits, dtype=torch.float64))`,
     starterCode: `from __future__ import annotations
 
@@ -670,7 +682,7 @@ def top_k_accuracy(
 ) -> torch.Tensor:
     # TODO:
     # 1. Validate shapes, integer labels, label range, and positive k.
-    # 2. Use torch.topk along the class dimension.
+    # 2. Rank each row with a descending argsort and slice its first k indices.
     # 3. Reduce the per-example membership mask to a mean accuracy.
     raise NotImplementedError("Implement top_k_accuracy")
 
@@ -834,13 +846,13 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
       },
     ],
     hint: [
-      'Group `train_X` by label, then take the mean of each group to form the centroids.',
+      'Group `train_X` by label, then divide each class-wise feature sum by its count to form the centroids.',
       'Sort the unique labels so that ties fall to the smaller class label when you take an argmin.',
       'Broadcast `test_X` against the centroid matrix to compute all distances at once.',
       'Use squared Euclidean distance to avoid an unnecessary square root.',
     ],
     solutionNotes: [
-      'The nearest-centroid rule compresses each class into its mean feature vector, then assigns each test point to the closest mean.',
+      'The nearest-centroid rule compresses each class into its feature sum divided by its count, then assigns each test point to the closest centroid.',
       'Squared Euclidean distance preserves the same ordering as Euclidean distance, and keeping the class labels sorted makes the tie-breaking rule deterministic.',
     ],
     solutionCode: `from __future__ import annotations
@@ -873,10 +885,11 @@ def nearest_centroid_predict(
         raise ValueError("train_y must contain at least one class")
 
     # Sorted labels make argmin's first-index behavior implement the tie-break rule.
-    centroids = torch.stack([
-        torch.mean(train_X[train_y == label], dim=0)
-        for label in labels
-    ])
+    centroid_rows: list[torch.Tensor] = []
+    for label in labels:
+        class_points = train_X[train_y == label]
+        centroid_rows.append(torch.sum(class_points, dim=0) / class_points.shape[0])
+    centroids = torch.stack(centroid_rows)
     deltas = test_X[:, None, :] - centroids[None, :, :]
     squared_distances = torch.sum(deltas * deltas, dim=2)
     nearest_indices = torch.argmin(squared_distances, dim=1)
@@ -892,7 +905,7 @@ def nearest_centroid_predict(
 ) -> torch.Tensor:
     # TODO:
     # 1. Validate feature dimensions and integer labels.
-    # 2. Build one centroid per sorted class label.
+    # 2. Build each sorted class centroid as its feature sum divided by its count.
     # 3. Broadcast squared distances and choose the nearest centroid.
     raise NotImplementedError("Implement nearest_centroid_predict")
 
@@ -977,8 +990,11 @@ def temperature_scaled_probs(
     if not math.isfinite(temperature) or temperature <= 0.0:
         raise ValueError("temperature must be a positive finite scalar")
 
-    # torch.softmax performs the stable max-shift internally after temperature scaling.
-    return torch.softmax(logits / temperature, dim=1)`,
+    scaled_logits = logits / temperature
+    shifted_logits = scaled_logits - torch.amax(scaled_logits, dim=1, keepdim=True)
+    exponentiated = torch.exp(shifted_logits)
+    normalizers = torch.sum(exponentiated, dim=1, keepdim=True)
+    return exponentiated / normalizers`,
     starterCode: `from __future__ import annotations
 
 import torch
@@ -990,7 +1006,7 @@ def temperature_scaled_probs(
     # TODO:
     # 1. Validate a positive finite temperature and finite 2D logits.
     # 2. Divide logits by temperature.
-    # 3. Apply stable softmax along the class dimension.
+    # 3. Subtract the row max, exponentiate, sum each row, and normalize.
     raise NotImplementedError("Implement temperature_scaled_probs")
 
 sample_logits = torch.tensor([[1000.0, 1001.0, 1002.0]], dtype=torch.float64)
@@ -1803,12 +1819,12 @@ print(cross_attention(sample_query, sample_context, sample_w, sample_w, sample_w
     ],
     hint: [
       'Cache the hidden pre-activations so you can apply the ReLU derivative during backprop.',
-      'For softmax cross-entropy, the gradient with respect to the logits is `probs - one_hot(y)`, averaged over the batch.',
+      'Build stable probabilities with a max shift, exponentials, and row sums; then the logits gradient is `probs - one_hot(y)`, averaged over the batch.',
       'Backpropagate from the output layer into the hidden layer before multiplying by the ReLU mask.',
       'Return the gradients in a dictionary so the caller can inspect each parameter separately.',
     ],
     solutionNotes: [
-      'The forward pass is just affine, ReLU, affine, and mean softmax cross-entropy. Once you have the probabilities, the gradient of the loss with respect to the logits is the usual `probs - one_hot` term divided by the batch size.',
+      'The forward pass is affine, ReLU, affine, and a manually expanded stable softmax cross-entropy. After the max shift, exponentials, and row normalization produce `probs`, the logits gradient is the usual `probs - one_hot` term divided by the batch size.',
       'From there, the remaining gradients follow by the chain rule: the second affine layer gives `dW2` and `db2`, and the upstream gradient passes through the ReLU mask before producing `dW1` and `db1`.',
     ],
     solutionCode: `from __future__ import annotations
@@ -1857,13 +1873,18 @@ def mlp_loss_and_grads(
     X, y, W1, b1, W2, b2 = _validate_mlp_inputs(X, y, W1, b1, W2, b2)
 
     hidden_pre = torch.matmul(X, W1) + b1
-    hidden = torch.clamp(hidden_pre, min=0.0)
+    hidden = torch.where(hidden_pre > 0.0, hidden_pre, torch.zeros_like(hidden_pre))
     logits = torch.matmul(hidden, W2) + b2
-    log_probs = torch.log_softmax(logits, dim=1)
-    loss = -torch.mean(torch.gather(log_probs, 1, torch.unsqueeze(y, 1)))
 
-    # d(logits) for mean cross-entropy is softmax(logits) minus one-hot labels, divided by N.
-    dlogits = torch.clone(torch.softmax(logits, dim=1))
+    # Reuse the same max-shifted exponentials for the manual loss and logits gradient.
+    shifted_logits = logits - torch.amax(logits, dim=1, keepdim=True)
+    exponentiated = torch.exp(shifted_logits)
+    normalizers = torch.sum(exponentiated, dim=1)
+    probabilities = exponentiated / normalizers[:, None]
+    row_indices = torch.arange(X.shape[0], dtype=torch.long)
+    loss = torch.mean(torch.log(normalizers) - shifted_logits[row_indices, y])
+
+    dlogits = torch.clone(probabilities)
     dlogits[torch.arange(X.shape[0]), y] -= 1.0
     dlogits = dlogits / X.shape[0]
 
@@ -1889,7 +1910,7 @@ def mlp_loss_and_grads(
 ) -> dict[str, torch.Tensor]:
     # TODO:
     # 1. Validate shapes, finite values, and integer label range.
-    # 2. Run affine -> ReLU -> affine and mean cross-entropy.
+    # 2. Run affine -> ReLU -> affine, then build stable probabilities from max, exp, sum, and log.
     # 3. Backpropagate the logits gradient through both affine layers.
     raise NotImplementedError("Implement mlp_loss_and_grads")
 
@@ -1972,12 +1993,12 @@ print(mlp_loss_and_grads(sample_X, sample_y, sample_W1, sample_b1, sample_W2, sa
     ],
     hint: [
       'Cache the hidden pre-activations so you can apply the ReLU derivative during backprop.',
-      'For softmax cross-entropy, the gradient with respect to the logits is `probs - one_hot(y)`, averaged over the batch.',
+      'Build stable probabilities with a max shift, exponentials, and row sums; then the logits gradient is `probs - one_hot(y)`, averaged over the batch.',
       'Backpropagate from the output layer into the hidden layer before multiplying by the ReLU mask.',
       'Return the gradients in a dictionary so the caller can inspect each parameter separately.',
     ],
     solutionNotes: [
-      'The forward pass is affine, ReLU, affine, and mean softmax cross-entropy. Once you have the probabilities, the gradient of the loss with respect to the logits is the usual `probs - one_hot` term divided by the batch size.',
+      'The forward pass is affine, ReLU, affine, and a manually expanded stable softmax cross-entropy. After the max shift, exponentials, and row normalization produce `probs`, the logits gradient is the usual `probs - one_hot` term divided by the batch size.',
       'From there, the remaining gradients follow by the chain rule: the second affine layer gives `dW2` and `db2`, and the upstream gradient passes through the ReLU mask before producing `dW1` and `db1`.',
     ],
     solutionCode: `from __future__ import annotations
@@ -2020,12 +2041,18 @@ def mlp_forward_backward(
         raise ValueError("y contains labels outside the valid range")
 
     hidden_pre = torch.matmul(X, W1) + b1
-    hidden = torch.clamp(hidden_pre, min=0.0)
+    hidden = torch.where(hidden_pre > 0.0, hidden_pre, torch.zeros_like(hidden_pre))
     logits = torch.matmul(hidden, W2) + b2
-    log_probs = torch.log_softmax(logits, dim=1)
-    loss = -torch.mean(torch.gather(log_probs, 1, torch.unsqueeze(y, 1)))
 
-    dlogits = torch.clone(torch.softmax(logits, dim=1))
+    # Reuse the same max-shifted exponentials for the manual loss and logits gradient.
+    shifted_logits = logits - torch.amax(logits, dim=1, keepdim=True)
+    exponentiated = torch.exp(shifted_logits)
+    normalizers = torch.sum(exponentiated, dim=1)
+    probabilities = exponentiated / normalizers[:, None]
+    row_indices = torch.arange(X.shape[0], dtype=torch.long)
+    loss = torch.mean(torch.log(normalizers) - shifted_logits[row_indices, y])
+
+    dlogits = torch.clone(probabilities)
     dlogits[torch.arange(X.shape[0]), y] -= 1.0
     dlogits = dlogits / X.shape[0]
 
@@ -2051,7 +2078,7 @@ def mlp_forward_backward(
 ) -> dict[str, torch.Tensor]:
     # TODO:
     # 1. Validate shapes, finite values, and integer label range.
-    # 2. Run affine -> ReLU -> affine and mean cross-entropy.
+    # 2. Run affine -> ReLU -> affine, then build stable probabilities from max, exp, sum, and log.
     # 3. Backpropagate the logits gradient through the ReLU mask and both affine layers.
     raise NotImplementedError("Implement mlp_forward_backward")
 
