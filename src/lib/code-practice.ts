@@ -23,7 +23,7 @@ export interface CodePracticeProblem {
 }
 
 export const CODE_PRACTICE_SECTION_SUMMARY =
-  'Interview-style PyTorch and NumPy exercises with runnable starter code, focused hints, and hidden solutions.';
+  'Interview-style PyTorch and NumPy exercises with runnable starter code, editor-inserted hints, and reference solutions.';
 
 const PYTORCH_AND_NUMPY_PACKAGES = ['torch', 'numpy'] as const;
 

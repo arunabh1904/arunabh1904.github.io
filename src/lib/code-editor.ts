@@ -21,6 +21,7 @@ import {
   crosshairCursor,
   drawSelection,
   dropCursor,
+  EditorView,
   highlightActiveLine,
   highlightActiveLineGutter,
   highlightSpecialChars,
@@ -37,6 +38,24 @@ export const codeEditorKeyBindings: readonly KeyBinding[] = [
   { key: 'Shift-Tab', run: indentLess },
   indentWithTab,
 ];
+
+/**
+ * Adds the workspace run shortcut without changing the editor's shared
+ * indentation and comment behavior. Keep both bindings: `Mod` gives Windows
+ * and Linux users Ctrl+Enter (and macOS users Cmd+Enter), while the explicit
+ * Ctrl binding keeps Ctrl+Enter available on macOS too.
+ */
+export function createRunCodeKeyBindings(runCode: () => void): readonly KeyBinding[] {
+  const run = () => {
+    runCode();
+    return true;
+  };
+
+  return [
+    { key: 'Ctrl-Enter', run },
+    { key: 'Mod-Enter', run },
+  ];
+}
 
 export const codeEditorExtensions = [
   lineNumbers(),
@@ -56,6 +75,7 @@ export const codeEditorExtensions = [
   indentUnit.of(CODE_EDITOR_INDENT),
   EditorState.tabSize.of(4),
   python(),
+  EditorView.lineWrapping,
   Prec.highest(keymap.of([...codeEditorKeyBindings])),
   keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, ...lintKeymap]),
 ];
