@@ -32,8 +32,14 @@ const testProblem: CodePracticeProblem = {
   ],
   hint: ['Subtract the row max first.'],
   solutionNotes: ['Use a row-wise max shift before the exponentials.'],
-  solutionCode: 'print("solution")',
-  starterCode: 'print("starter")',
+  solutionCode: `def softmax_cross_entropy(logits, labels):
+    # Return the reference value after following the stable path.
+    return "solution"`,
+  starterCode: `def softmax_cross_entropy(logits, labels):
+    # TODO: implement the stable path.
+    raise NotImplementedError("Implement softmax_cross_entropy")
+
+print("starter")`,
   packages: ['torch', 'numpy'],
   tags: ['PyTorch', 'NumPy'],
 };
@@ -117,7 +123,7 @@ describe('CodePracticeLab', () => {
     expect(container.textContent).toContain('Problem 01');
     expect(container.textContent).toContain('Stable softmax cross-entropy');
     expect(container.textContent).not.toContain('Subtract the row max first.');
-    expect(container.textContent).not.toContain('print("solution")');
+    expect(container.textContent).not.toContain('return "solution"');
 
     const buttons = Array.from(container.querySelectorAll('button'));
     const hintButton = buttons.find((button) => button.textContent === 'Add hints');
@@ -138,8 +144,13 @@ describe('CodePracticeLab', () => {
       solutionButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
 
-    expect(getEditor().textContent).toContain('print("solution")');
-    expect(getEditor().textContent).not.toContain('print("starter")');
+    expect(getEditor().textContent).toContain('print("starter")');
+    expect(getEditor().textContent).toContain('# Original placeholder: raise NotImplementedError');
+    expect(getEditor().textContent).toContain('# Reference solution loaded:');
+    expect(getEditor().textContent).toContain('return "solution"');
+    expect(getEditor().textContent).not.toMatch(
+      /^\s+raise NotImplementedError\("Implement softmax_cross_entropy"\)$/m,
+    );
   });
 
   it('loads required packages and prints run output', async () => {

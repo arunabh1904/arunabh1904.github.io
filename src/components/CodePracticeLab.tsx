@@ -11,6 +11,7 @@ import {
   createRunCodeKeyBindings,
   getCodeEditorThemeName,
 } from '../lib/code-editor';
+import { augmentCodeWithSolution } from '../lib/code-solution';
 import { runPythonSnippet } from '../lib/python-runner';
 import type { CodePracticeProblem } from '../lib/code-practice';
 
@@ -213,7 +214,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   }
 
   function handleLoadSolution() {
-    setCode(problem.solutionCode);
+    setCode((currentCode) => augmentCodeWithSolution(problem, currentCode));
     setOutput('');
     setErrorOutput('');
   }
