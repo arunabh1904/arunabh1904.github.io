@@ -1,0 +1,32 @@
+---
+title: 'DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving'
+date: '2025-05-22T06:23:04.000Z'
+section: paper-shorts
+postSlug: drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving
+legacyPath: /paper shorts/2025/05/22/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving.html
+tags:
+  - Other
+field: 'Autonomous Driving: VLA & Planning'
+summary: "2025 – DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving"
+---
+## 2025 – DriveMoE
+
+**arXiv:** [2505.16278](https://arxiv.org/abs/2505.16278)
+
+**Project:** [DriveMoE](https://thinklab-sjtu.github.io/DriveMoE/)
+
+## Summary
+
+DriveMoE adds two sparse-routing decisions to a Drive-$\pi_0$ VLA baseline. A scene-specialized Vision MoE selects camera evidence for the driving context, while a skill-specialized Action MoE selects behavior modules for different maneuvers. The paper reports state-of-the-art Bench2Drive closed-loop performance. Its abstract does not give the number of experts, routing load, action latency, or a matched dense-capacity baseline.
+
+## Core Insights
+
+The two routers act at different stages. Vision routing allocates perception compute across cameras; action routing allocates policy capacity across driving skills. That separation targets two sources of averaging: processing every view equally and asking one action function to cover heterogeneous maneuvers. It also creates two ways to fail: the system can suppress the camera that contains the hazard, or select an unsuitable action expert before the maneuver is fully visible.
+
+The result cannot establish which router accounts for the reported improvement without controlled ablations. The abstract does not disclose routing regularization, load balance, expert utilization, data mixture, or whether rare maneuvers receive enough examples to train their specialist. A useful scale test would keep total active FLOPs and demonstrations fixed while comparing a dense model, vision-only routing, action-only routing, and both routers under long-tail route splits.
+
+## High-Level Takeaways
+
+- DriveMoE uses sparse specialization twice: once to choose visual evidence and once to choose a driving behavior module.
+- The reported closed-loop result motivates expert routing, but the abstract does not yet isolate its efficiency, calibration, or rare-event benefits from the larger composite architecture.
+- The key rejection test holds active compute and data fixed; if a dense conditional policy matches safety and long-tail success, the extra routing complexity is not justified.
