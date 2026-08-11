@@ -1,0 +1,160 @@
+---
+title: 'PyTorch II: Autograd and Training'
+date: '2026-08-10T04:00:00.000Z'
+section: revision-notes
+postSlug: pytorch-autograd-and-training
+legacyPath: /revision notes/2026/08/10/pytorch-autograd-and-training.html
+tags:
+  - PyTorch
+summary: Follow tensors through the dynamic autograd graph, registered module state, gradient accumulation, optimization, evaluation, and checkpoints.
+---
+import RevisionCodePair from '../../components/RevisionCodePair.astro';
+import { pytorchRevisionExamples } from '../../lib/pytorch-revision-examples';
+
+# PyTorch II: Autograd and Training
+
+## From tensors to gradients
+
+[Part I](/revision%20notes/2026/08/09/pytorch-tensor-revision-notes.html) treated a tensor as metadata over storage. Training adds one question: how did the loss depend on this tensor? PyTorch answers by recording tensor operations during the forward pass and replaying their local derivatives in reverse.
+
+That single mechanism connects autograd, `nn.Module`, optimizers, gradient modes, and checkpoints. Autograd computes derivatives with respect to leaf tensors; modules register the leaves and persistent state that define a model; optimizers mutate those leaves; checkpoints serialize enough state to continue the same trajectory. By the end of this part, those APIs should feel like one system rather than separate features.
+
+## The autograd graph
+
+When grad mode is enabled and at least one input requires gradients, PyTorch records an operation as a `Function` node. The output points to that node through `grad_fn`, and the node remembers the dependencies or saved tensors needed by its backward rule. Ordinary Python control flow can change which operations run, so the graph is rebuilt on every forward pass.
+
+Consider a linear model followed by mean-squared error:
+
+$$
+\hat{y} = Xw + b, \qquad
+L = \frac{1}{B}\sum_{i=1}^{B}(\hat{y}_i-y_i)^2.
+$$
+
+The forward pass produces a scalar loss from parameters `w` and `b`. Backward starts with $\partial L / \partial L = 1$ and repeatedly applies the chain rule:
+
+$$
+\frac{\partial L}{\partial \hat{y}} = \frac{2}{B}(\hat{y}-y), \qquad
+\frac{\partial L}{\partial w} = X^\top\frac{\partial L}{\partial \hat{y}}, \qquad
+\frac{\partial L}{\partial b} = \sum_i\frac{\partial L}{\partial \hat{y}_i}.
+$$
+
+Autograd does not symbolically derive one giant formula. Each recorded operation receives an upstream vector and applies its local vector-Jacobian product. This is reverse-mode differentiation: efficient when one scalar objective depends on many parameters.
+
+## Vector-Jacobian products
+
+`loss.backward()` is shorthand for `loss.backward(torch.ones_like(loss))`, which works naturally when `loss` has one element. A non-scalar output needs an explicit `gradient` argument because there is no unique derivative of a vector output without choosing how its components are weighted.
+
+```python
+x = torch.tensor([1.0, 2.0], requires_grad=True)
+y = x ** 2
+y.backward(torch.tensor([1.0, 1.0]))
+print(x.grad)  # tensor([2., 4.])
+```
+
+The supplied vector selects a vector-Jacobian product. Use `torch.autograd.grad(outputs, inputs, grad_outputs=...)` when gradients should be returned directly instead of accumulated into tensor state. Use `create_graph=True` when the derivative calculation itself must remain differentiable; `retain_graph=True` only preserves the current graph for another traversal and is rarely the right first response to a graph-lifetime error.
+
+## Leaf tensors and accumulated gradients
+
+A leaf is normally a user-created tensor with no `grad_fn`. Leaf tensors with `requires_grad=True` accumulate into `.grad`; intermediate tensors do not retain `.grad` by default because most training loops only need parameter gradients. Call `retain_grad()` when inspecting one specific non-leaf is worth its additional lifetime and memory.
+
+Accumulation is intentional. Multiple losses, microbatches, or backward calls can contribute to the same parameter gradient before one optimizer step. The training loop must therefore define its accumulation boundary explicitly. `optimizer.zero_grad(set_to_none=True)` clears that state without writing zeros and preserves a useful distinction: `grad is None` means no gradient arrived, whereas a zero tensor means a gradient path arrived and evaluated to zero.
+
+That distinction is diagnostic. An unexpected `None` gradient points to a disconnected graph, a frozen parameter, an unregistered tensor, or a branch that did not execute. Replacing it with zeros hides the question the program needs to answer.
+
+## In-place operations
+
+A view and its base share storage and an autograd version counter. If backward saved a value and an in-place operation changes it, autograd raises a version-mismatch error instead of differentiating a different program from the one executed forward. The error is evidence that mutation crossed a graph-lifetime boundary.
+
+Prefer out-of-place expressions inside `forward` until the memory benefit of mutation is measured and the derivative rule is understood. For deliberate parameter updates, use an optimizer or `with torch.no_grad():`; `.data` bypasses safety checks and can silently corrupt the relationship between the forward program and its derivatives.
+
+## Gradient mode and model mode
+
+Four mechanisms are often collapsed into “turn gradients off,” but they change different contracts.
+
+| Mechanism | Records operations? | Storage relationship | Changes Dropout or BatchNorm? |
+| --- | --- | --- | --- |
+| `x.detach()` | The result has no incoming autograd edge. | Normally shares storage with `x`. | No |
+| `torch.no_grad()` | Operations inside are not recorded. | Normal tensor rules still apply. | No |
+| `torch.inference_mode()` | Removes additional autograd tracking for isolated inference. | Outputs should remain outside later grad graphs. | No |
+| `model.eval()` | Does not change grad recording. | No direct effect. | Yes |
+
+Use `no_grad` for updates or preprocessing whose results may later re-enter grad mode. Try `inference_mode` for an evaluation path that remains isolated. Always set `train()` or `eval()` when the model contains mode-dependent modules; neither method controls autograd.
+
+## Modules and model state
+
+`nn.Module` gives ordinary Python assignment registration semantics. Assigning an `nn.Parameter` registers trainable state, assigning a child `Module` registers a subtree, and `register_buffer` registers non-optimized tensor state. Recursive methods such as `parameters()`, `state_dict()`, `to()`, `train()`, and distributed wrappers traverse that tree.
+
+Call `model(inputs)`, not `model.forward(inputs)`, because `Module.__call__` runs hook and call machinery before delegating to `forward`. Call `super().__init__()` before assigning registered members. Store repeated submodules in `ModuleList`, `ModuleDict`, or `Sequential`; a plain Python list is invisible to device movement, serialization, and optimizer construction.
+
+| State | Optimized? | In `state_dict()`? | Moved by `module.to()`? |
+| --- | --- | --- | --- |
+| `nn.Parameter` | Yes, when passed to the optimizer | Yes | Yes |
+| Persistent buffer | No | Yes | Yes |
+| Non-persistent buffer | No | No | Yes |
+| Plain tensor attribute | No | No | No |
+
+This tree is the bridge between math and software. `forward` defines how tensors interact; registration defines which values constitute the model across training, evaluation, placement, and recovery.
+
+## Loss functions
+
+Every loss has an input contract. `CrossEntropyLoss` normally expects unnormalized class logits and integer class indices. `BCEWithLogitsLoss` combines the sigmoid transformation and binary objective in one stable formulation. `KLDivLoss` distinguishes probabilities from log-probabilities. Passing the right shape with the wrong representation can produce a plausible scalar and still optimize the wrong objective.
+
+The same principle separates `nn` modules from `torch.nn.functional`. A module owns parameters, buffers, mode, hooks, or serialization identity; a functional call receives all state explicitly. Use the form that makes state ownership visible. A `Linear` module owns weight and bias, while `F.linear(input, weight, bias)` computes the same operation from explicit tensors.
+
+## Training loop
+
+The canonical iteration is
+
+```text
+clear gradients → fetch batch → forward → scalar loss → backward
+→ unscale if needed → inspect or clip → optimizer step → scheduler step if due
+```
+
+Each arrow moves or mutates specific state. The batch crosses a device boundary, the forward pass creates activations and a graph, backward accumulates parameter gradients, and the optimizer consumes those gradients while updating parameters and optimizer state such as momentum. Reordering steps changes the algorithm.
+
+Gradient accumulation intentionally repeats forward and backward before stepping. Divide each microbatch loss by the accumulation count when matching a mean-gradient objective, account for a short final window, and under DDP use `no_sync()` only on non-step microbatches. Gradient clipping belongs after AMP unscaling and before the optimizer step; log the pre-clipped norm because clipping can hide a bad learning rate, objective, or batch.
+
+Autocast is operator-specific mixed precision, not a blanket cast of the model. Wrap forward and loss, leave the context before backward, and use `GradScaler` primarily for float16 underflow. Bfloat16 retains float32-like exponent range and often does not require scaling, but numerical validation—not the dtype name—decides.
+
+## Gradient exercise
+
+The code expands one backward pass into its local derivative calculations. Predict each gradient's sign, run the code, then change the initial `weight` or batch values and compare the new gradients.
+
+<RevisionCodePair {...pytorchRevisionExamples.gradientIntuition} />
+
+Real PyTorch replaces the handwritten derivative block with:
+
+```python
+weight = torch.tensor([[0.0]], requires_grad=True)
+bias = torch.tensor([0.0], requires_grad=True)
+loss = torch.mean((x @ weight + bias - target) ** 2)
+loss.backward()
+```
+
+The gradients match because both procedures apply the same chain rule. Autograd's value is not different calculus; it reliably composes local derivative rules across a dynamic tensor program.
+
+## Data loading
+
+A map-style `Dataset` implements indexed sample access; an `IterableDataset` owns iteration for streams or sources without random indexing. `DataLoader` combines sampling, batching, collation, worker processes, and optional pinned-memory staging. `collate_fn` is where a list of samples becomes one batch, so it owns padding, stacking, ragged structure, and batch-level metadata.
+
+Start debugging with `num_workers=0` for direct tracebacks. Multiple workers replicate Python dataset state; iterable datasets must shard with `get_worker_info()` to avoid duplicates. `persistent_workers` saves process startup across epochs, `prefetch_factor` controls queued batches, and pinned memory can support asynchronous CPU-to-CUDA copies when the transfer uses `non_blocking=True`. Each option changes resource use as well as throughput.
+
+## Checkpoints
+
+A module `state_dict` contains parameters and persistent buffers. The returned mapping is shallow and refers to live state, so clone values when an in-memory snapshot must survive later updates. `load_state_dict(strict=True)` requires exact keys; `strict=False` returns missing and unexpected keys that should be reviewed rather than discarded silently.
+
+A resumable checkpoint may need model, optimizer, scheduler, scaler, global step, configuration, RNG states, and data-sampler progress. Saving only weights restores a function but not necessarily the same training trajectory. Load with an explicit `map_location`, prefer `weights_only=True` where applicable, and never unrestrictedly unpickle an untrusted legacy checkpoint.
+
+At this point the model is mathematically and operationally defined: tensors have contracts, autograd produces gradients, modules own state, and the loop advances that state. [Part III: Performance and Scale](/revision%20notes/2026/08/10/pytorch-systems-and-scale.html) asks how the same program behaves when execution becomes asynchronous, compiled, memory-bound, or distributed.
+
+## Sources
+
+- [Autograd mechanics](https://docs.pytorch.org/docs/2.13/notes/autograd.html)
+- [Extending autograd](https://docs.pytorch.org/docs/2.13/notes/extending.html)
+- [`nn.Module`](https://docs.pytorch.org/docs/2.13/generated/torch.nn.Module.html)
+- [`torch.utils.data`](https://docs.pytorch.org/docs/2.13/data.html)
+- [Optimizers and schedulers](https://docs.pytorch.org/docs/2.13/optim.html)
+- [Automatic mixed precision](https://docs.pytorch.org/docs/2.13/amp.html)
+- [Serialization semantics](https://docs.pytorch.org/docs/2.13/notes/serialization.html)
+- [PyTorch Interview Preparation: autograd basics](https://github.com/rohanmistry231/PyTorch-Interview-Preparation/blob/main/PyTorch%20Fundamentals/01%20Core%20PyTorch%20Foundations/02%20Autograd/autograd_basics.py)
+- [PyTorch Interview Preparation](https://github.com/rohanmistry231/PyTorch-Interview-Preparation)

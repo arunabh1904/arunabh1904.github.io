@@ -112,6 +112,9 @@ export default function PythonPlayground({
         setStatus('error');
         setStatusMessage(compact ? 'Unavailable' : 'The Python runtime failed to load.');
         setErrorOutput(error instanceof Error ? error.message : 'The Python runtime failed to load.');
+        if (compact) {
+          setHasRun(true);
+        }
       } finally {
         loadingRef.current = false;
       }
@@ -228,15 +231,6 @@ export default function PythonPlayground({
         aria-label={`${title} editable Python scratchpad`}
       >
         <header className="python-playground__workspace-header">
-          <div className="python-playground__workspace-identity">
-            <p className="python-playground__workspace-title">{title}</p>
-            <p
-              className={`python-playground__status python-playground__status--${status}`}
-              aria-live="polite"
-            >
-              {statusMessage}
-            </p>
-          </div>
           <div className="python-playground__workspace-controls">
             <button
               className="python-playground__button python-playground__button--primary"

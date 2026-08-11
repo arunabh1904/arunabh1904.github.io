@@ -16,6 +16,8 @@ export default defineConfig({
   },
   redirects: {
     '/build_intuition': '/blog.html',
+    '/revision notes/2026/08/10/pytorch-tensor-mechanics':
+      '/revision notes/2026/08/09/pytorch-tensor-revision-notes.html',
   },
   integrations: [mdx(), react(), sitemap()],
   markdown: {
