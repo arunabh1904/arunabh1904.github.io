@@ -4,16 +4,13 @@ import PythonPlayground from './PythonPlayground';
 interface Props {
   title: string;
   initialCode: string;
-  description?: string;
-  notes?: string;
 }
 
-const { title, initialCode, description, notes } = Astro.props;
+const { title, initialCode } = Astro.props;
 const samples = [
   {
     label: 'Starting example',
     code: initialCode,
-    description,
   },
 ];
 ---
@@ -25,7 +22,6 @@ const samples = [
       title={title}
       initialCode={initialCode}
       samples={samples}
-      notes={notes}
       compact
     />
   </div>

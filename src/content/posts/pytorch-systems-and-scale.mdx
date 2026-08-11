@@ -1,0 +1,130 @@
+---
+title: 'PyTorch III: Performance and Scale'
+date: '2026-08-10T04:00:00.000Z'
+section: revision-notes
+postSlug: pytorch-systems-and-scale
+legacyPath: /revision notes/2026/08/10/pytorch-systems-and-scale.html
+tags:
+  - PyTorch
+summary: Connect eager tensor semantics to accelerators, compilation, memory lifetime, distributed execution, profiling, reproducibility, and export.
+---
+import RevisionCodePair from '../../components/RevisionCodePair.astro';
+import { pytorchRevisionExamples } from '../../lib/pytorch-revision-examples';
+
+# PyTorch III: Performance and Scale
+
+## From training code to execution
+
+[Part I](/revision%20notes/2026/08/09/pytorch-tensor-revision-notes.html) established how tensors map logical indices to storage. [Part II](/revision%20notes/2026/08/10/pytorch-autograd-and-training.html) turned tensor operations into a differentiable state-transition protocol. Systems work asks where that protocol waits, allocates, recompiles, communicates, or loses reproducibility.
+
+The governing rule is simple: optimize the executed system, not an isolated expression. A kernel can use fewer FLOPs and make the step slower through poor memory access; compilation can fuse operations and lose the gain to recompilation; more data workers can increase contention; sharding can reduce memory and expose communication. Every optimization changes a resource boundary, so every claim needs a trace from a representative workload.
+
+## Devices and data movement
+
+CPU, CUDA, MPS, XPU, and other backends differ in operator and dtype coverage. Select a device deliberately, place model state once, move each batch at the input boundary, and keep intermediate tensors on-device. Scattered `.cuda()` calls hide ownership and make CPU or alternate-accelerator execution harder to reason about.
+
+`tensor.to(device=..., dtype=..., non_blocking=..., copy=...)` is the general conversion API. It can return the original tensor when nothing changes, so callers should not assume a fresh allocation. `module.to(...)` recursively mutates registered parameters and buffers and returns the module. This asymmetry follows from Part II: a module is a state tree, while a tensor operation usually returns a value.
+
+Pinned host memory can support asynchronous CPU-to-CUDA transfer when `non_blocking=True`, but pinning is not free and asynchronous does not mean automatically overlapped. Useful overlap requires a later host or device operation that can execute while the transfer remains in flight.
+
+## Asynchronous execution
+
+CUDA launches work and returns control to the host before the device necessarily finishes. Operations on one stream execute in order, while independent streams require explicit dependencies through events, `wait_stream`, or `record_stream` when allocator lifetime crosses streams.
+
+Host-visible reads collapse that asynchrony. `item()`, printing a device value, transferring to the CPU, or a Python conditional on an accelerator tensor can force the host to wait. These operations are correct, but placing them in every iteration can serialize a pipeline that otherwise overlaps launch and execution.
+
+Benchmarking must therefore define its synchronization boundary. Warm up kernels and compilation, then use CUDA events or synchronize around the measured region. Host wall-clock time around an asynchronous launch measures dispatch unless the endpoint waits for completion.
+
+## Memory
+
+The caching allocator distinguishes memory occupied by live tensors from memory reserved in allocator segments. `memory_allocated()` tracks the former; `memory_reserved()` tracks the latter. `empty_cache()` releases unused cached blocks for other applications, but it cannot free live tensors or make an oversized live graph fit.
+
+Peak training memory combines several lifetimes:
+
+| State | Typical lifetime | Main scaling variable |
+| --- | --- | --- |
+| Parameters and buffers | Whole run | Model size and dtype |
+| Gradients | Backward through optimizer step | Trainable parameter size |
+| Optimizer state | Whole run after initialization | Parameter size and optimizer |
+| Saved activations | Forward until their backward use | Batch, sequence, width, depth |
+| Temporary kernel workspace | One operation or region | Kernel and input shapes |
+| Communication buffers | Collective lifetime | Bucket and sharding policy |
+
+This decomposition points to different remedies. Lower-precision state reduces bytes per stored value. Activation checkpointing stores fewer forward intermediates and recomputes them during backward. Shorter sequences reduce activation work and can reduce quadratic attention terms. Sharding distributes selected model states. Deleting Python references fixes tensors that outlive their intended scope. One “out of memory” label can therefore describe several different systems failures.
+
+Activation checkpointing preserves the mathematical function while changing the execution graph. Use `torch.utils.checkpoint.checkpoint(..., use_reentrant=False)` unless compatibility requires otherwise, keep the recomputed region semantically identical, and understand RNG preservation. Serialization checkpoints solve recovery; activation checkpoints solve lifetime. Their shared name should not blur their different jobs.
+
+## Memory exercise
+
+The code estimates three memory terms: parameter state, one activation-sized term, and one dense attention-score term. Change one input at a time, predict the result, and rerun it.
+
+<RevisionCodePair {...pytorchRevisionExamples.systemsIntuition} />
+
+The numbers are not a memory forecast. Real kernels may fuse operations, avoid materializing attention scores, save additional tensors for backward, allocate workspace, or shard only some states. The estimate tells you which hypothesis to test with allocator and profiler evidence.
+
+## Compilation
+
+Eager execution is the semantic reference. `torch.compile` asks TorchDynamo to capture Python frames into FX graphs, AOTAutograd to stage backward graphs where needed, and a backend such as Inductor to generate code. The main opportunities are fusion, fewer launches, and backend specialization.
+
+Capture introduces guards on assumptions such as types, shapes, globals, and object identity. When a guard fails, PyTorch may compile a new specialization. Repeated shape or Python-state variation can spend more time compiling than executing and eventually fall back to eager. A graph break ends one compiled region and resumes tracing later; unsupported Python, data-dependent scalar extraction, printing, and opaque extension code are common causes.
+
+Start with `torch.compile(model)`, warm it up, and compare steady-state performance on representative shapes. Use `fullgraph=True` while auditing graph breaks, not as a blind production setting. Inspect `TORCH_LOGS="graph_breaks,recompiles,guards"` or `TORCH_TRACE` with `tlparse` before reaching for private configuration knobs.
+
+Dynamic shapes make selected dimensions symbolic; they do not permit arbitrary value-dependent Python inside a graph. `torch._dynamo.mark_dynamic` can declare expected variation. A custom operator provides an explicit opaque boundary when an extension has a schema, fake or meta implementation, and autograd rule that the compiler can reason about.
+
+## Function transforms
+
+`torch.func` treats differentiation and vectorization as function transforms. `grad` returns a gradient function, `vmap` maps a function over a batch dimension, `jacrev` and `jacfwd` construct Jacobians in reverse or forward mode, and `vjp` or `jvp` compute products without materializing the full matrix. Reverse mode is attractive when outputs are few relative to inputs; forward mode when inputs are few relative to outputs.
+
+`functional_call` runs a module with explicit parameter and buffer mappings. Making state an input enables per-sample gradients, ensembling, meta-learning, and parameter-space derivatives. `functionalize` removes intermediate mutation and aliasing where possible, which connects this higher-level transform back to the ownership rules from Part I.
+
+## Distributed training
+
+Use one process per accelerator. `torchrun` supplies rank metadata, `init_process_group` creates communication state, `local_rank` selects a local device, and every rank must execute collectives in compatible order. A mismatched order can hang because each process waits for peers performing a different operation.
+
+DistributedDataParallel replicates parameters and all-reduces gradient buckets during backward. A `DistributedSampler` partitions map-style data, and `sampler.set_epoch(epoch)` changes shuffling consistently across ranks. DDP reduces compute duplication across data while retaining a full model replica on every rank.
+
+FSDP shards parameters, gradients, and optimizer state, gathering parameter material around computation. Its memory and communication depend on wrapping policy, prefetch, mixed precision, initialization, and state-dict type. Build the optimizer after wrapping so it references the managed parameters.
+
+Tensor parallelism shards individual operations; pipeline parallelism assigns layer ranges to stages; `DeviceMesh` names multidimensional process layouts so data, tensor, and pipeline dimensions can compose. These strategies answer different scaling limits. Choose the partition whose communication and memory trade match the model's bottleneck rather than the strategy with the most machinery.
+
+The primitive layer—`all_reduce`, `all_gather`, `reduce_scatter`, `broadcast`, `all_to_all`, and point-to-point communication—reveals what wrappers must coordinate. Diagnose hangs with rank-local logs, timeouts, `TORCH_DISTRIBUTED_DEBUG`, and collective-order checks before assuming the network is at fault.
+
+## Export
+
+`torch.compile` optimizes a running Python program and can return to Python around graph breaks. `torch.export.export` captures an ahead-of-time graph plus shape constraints for deployment or transformation. Export is stricter because its artifact must describe execution without relying on the original Python control flow.
+
+TorchScript remains relevant to legacy deployments, while current work should begin with the PyTorch 2 compiler and export paths appropriate to the target backend. ONNX, mobile runtimes, and quantization each impose their own supported operator, dtype, and control-flow boundaries. A deployment format should be selected from the consumer's contract, then validated against eager outputs on representative and adversarial inputs.
+
+## Reproducibility
+
+A seed fixes a generator sequence; it does not freeze kernels, libraries, hardware, process scheduling, or data order across arbitrary environments. Seed PyTorch, Python, and NumPy, use explicit `torch.Generator` objects where local control matters, seed DataLoader workers from `torch.initial_seed()`, and serialize RNG states when exact continuation matters.
+
+`torch.use_deterministic_algorithms(True)` requests deterministic implementations or errors, often at a performance cost. `torch.backends.cudnn.benchmark` searches for fast convolution algorithms for observed shapes and is a separate control. Record PyTorch, accelerator toolkit, driver, hardware, compiler, and environment versions with an experiment so a result has a reproducible systems context.
+
+## Profiling
+
+`torch.profiler.profile` records CPU operations and accelerator kernels. For a long job, use a wait, warmup, and active schedule; call `prof.step()` once per iteration; annotate meaningful regions with `record_function`; then inspect self time, total time, shapes, memory, and launch gaps. Shape and stack collection add overhead, so profile representative windows rather than the entire run.
+
+Use the narrowest tool that answers the question:
+
+- `torch.utils.benchmark` for statistically controlled microbenchmarks;
+- CUDA events for device elapsed time;
+- allocator summaries and snapshots for lifetime and fragmentation;
+- compiler logs for graph breaks and recompilation;
+- rank-local traces for collective imbalance;
+- `torch.testing.assert_close` for numerical comparisons with an explicit tolerance policy.
+
+Optimization is a loop: measure a representative path, identify the dominant boundary, change one mechanism, and measure the complete path again. The deepest PyTorch intuition is that tensors, gradients, modules, kernels, memory, and communication are not separate layers of trivia. They are successive views of the same executed program.
+
+## Sources
+
+- [`torch.compile`](https://docs.pytorch.org/docs/2.13/generated/torch.compile.html)
+- [Compiler programming model](https://docs.pytorch.org/docs/2.13/user_guide/torch_compiler/compile/programming_model.html)
+- [`torch.func`](https://docs.pytorch.org/docs/2.13/func.html)
+- [CUDA semantics](https://docs.pytorch.org/docs/2.13/notes/cuda.html)
+- [PyTorch profiler](https://docs.pytorch.org/docs/2.13/profiler.html)
+- [Distributed communication](https://docs.pytorch.org/docs/2.13/distributed.html)
+- [Fully Sharded Data Parallel](https://docs.pytorch.org/docs/2.13/fsdp.html)
+- [Reproducibility](https://docs.pytorch.org/docs/2.13/notes/randomness.html)
+- [PyTorch Interview Preparation](https://github.com/rohanmistry231/PyTorch-Interview-Preparation)

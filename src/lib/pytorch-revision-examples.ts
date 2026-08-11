@@ -1,11 +1,85 @@
 export interface PytorchRevisionExample {
   title: string;
   initialCode: string;
-  description?: string;
-  notes?: string;
 }
 
 export const pytorchRevisionExamples: Record<string, PytorchRevisionExample> = {
+  tensorIntuition: {
+    title: 'Trace one tensor from storage to model input',
+    initialCode: `import torch
+
+base = torch.arange(24, dtype=torch.float32).reshape(2, 3, 4)
+tokens = base[:, :, ::2]
+bias = torch.tensor([10.0, -10.0])
+shifted = tokens + bias
+features = shifted.reshape(6, 2).clone()
+
+print("base     ", base.shape, base.stride())
+print("tokens   ", tokens.shape, tokens.stride())
+print("shifted  ", shifted.shape)
+print("features ", features.shape, features.is_contiguous())
+
+tokens[0, 0, 0] = -99
+print("view mutation reached base:", base[0, 0, 0].item())
+print("clone stayed independent:  ", features[0, 0].item())
+`,
+  },
+
+  gradientIntuition: {
+    title: 'Trace a loss backward through a linear model',
+    initialCode: `import torch
+
+x = torch.tensor([[-1.0], [0.0], [1.0], [2.0]])
+target = 3 * x + 2
+weight = torch.tensor([[0.0]])
+bias = torch.tensor([0.0])
+learning_rate = 0.1
+
+prediction = torch.matmul(x, weight) + bias
+residual = prediction - target
+loss = torch.mean(residual ** 2)
+
+grad_prediction = 2 * residual / x.shape[0]
+grad_weight = torch.matmul(torch.transpose(x, 0, 1), grad_prediction)
+grad_bias = torch.sum(grad_prediction, dim=0)
+
+with torch.no_grad():
+    weight -= learning_rate * grad_weight
+    bias -= learning_rate * grad_bias
+
+print("loss:", loss.item())
+print("grad weight / bias:", grad_weight.item(), grad_bias.item())
+print("updated weight / bias:", weight.item(), bias.item())
+`,
+  },
+
+  systemsIntuition: {
+    title: 'Budget memory before choosing an execution strategy',
+    initialCode: `batch = 4
+tokens = 2048
+width = 4096
+layers = 32
+heads = 32
+bytes_per_value = 2
+world_size = 8
+parameter_count = 7_000_000_000
+
+gib = 1024 ** 3
+parameter_gib = parameter_count * bytes_per_value / gib
+activation_gib = batch * tokens * width * layers * bytes_per_value / gib
+attention_gib = batch * heads * tokens * tokens * bytes_per_value / gib
+sharded_parameter_gib = parameter_gib / world_size
+
+print(f"parameters per replica: {parameter_gib:.2f} GiB")
+print(f"parameters if evenly sharded: {sharded_parameter_gib:.2f} GiB")
+print(f"one activation-sized term: {activation_gib:.2f} GiB")
+print(f"one dense attention-score term: {attention_gib:.2f} GiB")
+
+print("\\nDouble tokens and rerun: the activation term doubles,")
+print("while the dense attention-score term grows by four.")
+`,
+  },
+
   construction: {
     title: 'Construction and NumPy interop',
     initialCode: `import numpy as np

@@ -5085,7 +5085,7 @@ html {
 .python-playground__workspace-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 0.65rem;
   min-width: 0;
   padding: 0.48rem 0.55rem 0.48rem 0.72rem;
