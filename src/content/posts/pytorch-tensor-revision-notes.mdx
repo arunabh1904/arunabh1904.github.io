@@ -1,107 +1,403 @@
 ---
-title: PyTorch Tensor Revision Notes
+title: PyTorch Revision Notes
 date: '2026-08-09T04:00:00.000Z'
 section: revision-notes
 postSlug: pytorch-tensor-revision-notes
 legacyPath: /revision notes/2026/08/09/pytorch-tensor-revision-notes.html
 tags:
   - PyTorch
-summary: A source-linked reference for constructing, inspecting, indexing, joining, reshaping, and mutating PyTorch tensors.
+summary: A dense PyTorch 2.13 reference spanning tensors, autograd, modules, data loading, training, compilation, accelerators, distributed execution, and debugging.
 ---
 import RevisionCodePair from '../../components/RevisionCodePair.astro';
-import { pytorchTensorExamples } from '../../lib/pytorch-revision-examples';
+import { pytorchRevisionExamples } from '../../lib/pytorch-revision-examples';
 
-# PyTorch Tensor Revision Notes
+# PyTorch Revision Notes
 
 ## Quick overview
 
-According to the [PyTorch 2.13 tensor documentation](https://docs.pytorch.org/docs/2.13/tensors.html), a `torch.Tensor` is a multi-dimensional matrix whose elements have one data type. The useful refinement is that a regular tensor is also a strided view over storage: its shape, dtype, strides, storage offset, and device determine how an index maps to the backing buffer; `torch.tensor(data, dtype=..., device=...)` constructs a new tensor by copying `data`.
+According to the [PyTorch 2.13 tensor documentation](https://docs.pytorch.org/docs/2.13/tensors.html), a `torch.Tensor` is a multi-dimensional matrix whose elements have one data type. The more useful systems definition is a logical n-dimensional array described by dtype, device, layout, shape, strides, and storage offset; for the common strided layout, that metadata maps each logical index to a backing storage allocation.
 
-This note builds the mental model needed to predict tensor shapes, values, aliasing, and mutation. It covers construction, factory functions, metadata, scalar extraction, indexing, slicing, joining, reshaping, and in-place operations.
+PyTorch builds the rest of its programming model around that object. Autograd records tensor operations into a dynamic reverse-mode graph; `nn.Module` registers parameters, buffers, and child modules into a state tree; `Dataset` and `DataLoader` construct batches; optimizers consume accumulated parameter gradients; and compiler or distributed layers change execution without changing the mathematical model.
 
-The interactive panel is on the right of each example. It runs through Pyodide with a small NumPy-backed compatibility layer because the compiled PyTorch runtime is not shipped to the browser. The panel supports the tensor idioms used here, but it is not full PyTorch: there is no CUDA execution, autograd engine, or `nn.Module` implementation. The collapsed block on the left is the actual PyTorch reference code.
+This page targets PyTorch 2.13. Each exercise is a compact editable workspace. The browser runtime uses a NumPy-backed subset for tensor algebra, registration, state, and data-loading probes; it does not emulate autograd, accelerator kernels, `torch.compile`, or distributed collectives, whose real runtime behavior is specified in the surrounding API notes.
 
-## 1. Constructing tensors
+## Tensor construction and interoperability
 
-`torch.tensor(data)` accepts a scalar, list, nested sequence, NumPy array, or another tensor. It always copies the input data and creates a tensor with no autograd history by default. That copy is a semantic boundary: later changes to a NumPy source array or input tensor do not change the result.
+`torch.tensor(data, dtype=..., device=...)` always copies `data` and creates a fresh leaf with no autograd history by default. Use `torch.as_tensor` when preserving an existing tensor or avoiding a copy is acceptable, `torch.from_numpy` for shared CPU storage with a NumPy array, `torch.frombuffer` for a Python buffer, and DLPack for zero-copy exchange with another framework that implements the protocol. Sharing is a correctness decision: mutation through either object can affect the other.
 
-When avoiding a copy is intentional, use the API that says so. `torch.as_tensor(data)` preserves existing tensor history and avoids copies where possible; `torch.from_numpy(array)` creates a CPU tensor sharing storage with a NumPy array. A shared tensor is useful for interoperability, but it also means that a write through either object can change the other.
+Factory functions communicate intent and placement better than constructing on CPU and converting later. The `*_like` family inherits shape and normally dtype, layout, and device; pass overrides explicitly when those properties should differ. `torch.empty` leaves values uninitialized, so reading before every element is overwritten is a correctness bug, not merely noisy output.
 
-`dtype` controls how each element is represented, while `device` controls where the storage lives, usually `cpu`, `cuda`, or `mps`. Pass them to the constructor or a factory function instead of constructing first and silently relying on later conversions. Tensors do not generally move between devices automatically, so model parameters and inputs must be placed deliberately.
+<RevisionCodePair {...pytorchRevisionExamples.construction} />
 
-<RevisionCodePair {...pytorchTensorExamples.construction} />
+<RevisionCodePair {...pytorchRevisionExamples.factories} />
 
-The example uses `device="cpu"` so it remains executable in the browser. In a real program, a common explicit choice is `device = torch.device("cuda" if torch.cuda.is_available() else "cpu")`, followed by `torch.zeros((2, 3), dtype=torch.float32, device=device)`.
+The first NumPy contrast is easy to miss: NumPy normally infers `float64` for floating arrays, while PyTorch's default floating dtype is normally `float32`. NumPy arrays are CPU objects; a tensor also carries a device and may represent accelerator-resident memory. A conversion that looks numerically trivial can therefore allocate, copy, synchronize, or change gradient history.
 
-## 2. Creation ops: zeros, ones, and random values
+| Intent | PyTorch | NumPy | Distinction |
+| --- | --- | --- | --- |
+| Copy input | `torch.tensor(x)` | `np.array(x, copy=True)` | PyTorch result is a fresh leaf by default. |
+| Reuse input when possible | `torch.as_tensor(x)` / `torch.asarray(x)` | `np.asarray(x)` | Check dtype, device, writability, and sharing. |
+| Share NumPy CPU storage | `torch.from_numpy(a)` | already an `ndarray` | Mutations can cross the boundary. |
+| Allocate by shape | `zeros`, `ones`, `full`, `empty` | same names | PyTorch accepts `device` and tracks layout. |
+| Range | `arange`, `linspace`, `logspace` | same names | Prefer `linspace` when count matters for floating steps. |
+| Random source | `Generator` plus factory `generator=` | `np.random.Generator` | A generator isolates RNG state from global calls. |
 
-Factory functions express the intended initialization directly. `zeros` and `ones` create constant tensors; `full` chooses another fill value; `rand` samples uniformly from $[0, 1)$; and `randn` samples from a standard normal distribution. `arange` is useful for integer-like sequences, while `linspace` chooses a fixed number of evenly spaced points. `empty` allocates the requested shape without initializing the elements, so it is only safe when every position will be overwritten before it is read.
+### Tensor metadata and conversions
 
-The `*_like` family copies shape, dtype, and usually device from an existing tensor: `zeros_like(x)`, `ones_like(x)`, and `empty_like(x)` are often clearer than repeating metadata manually. Random factories consume a pseudorandom generator; call `torch.manual_seed` when a reproducible debugging example matters, and remember that reproducibility across devices and releases has additional constraints.
+The properties to inspect first are `shape`, `ndim`, `dtype`, `device`, `layout`, `requires_grad`, and `is_leaf`. `numel()` counts logical elements and `element_size()` reports bytes per element; their product estimates the logical payload but not allocator reservation, sparse indices, alignment, or storage retained by another view.
 
-<RevisionCodePair {...pytorchTensorExamples.creationOps} />
+`tensor.to(device=..., dtype=..., non_blocking=..., copy=...)` is the general conversion API. It returns the original tensor when nothing changes unless `copy=True`, so code must not assume a fresh allocation. Convenience methods such as `cpu()`, `cuda()`, `float()`, `half()`, and `bfloat16()` are narrower spellings. For modules, `module.to(...)` recursively mutates parameters and buffers in place and returns the module.
 
-The important prediction is the shape before the values. A call such as `torch.rand((2, 3))` creates six independent logical elements, whereas `torch.rand(2, 3, 1)` creates a rank-three tensor with shape `(2, 3, 1)`.
+`item()` converts exactly one tensor element to a Python scalar; it does not expose storage. `tolist()` recursively converts values to Python objects. `numpy()` is a CPU interoperability boundary and may share storage; the safe diagnostic idiom for a gradient-tracked accelerator tensor is `x.detach().cpu().numpy()`. Both `item()` and a device-to-host conversion can force accelerator synchronization, so keep them out of hot inner loops.
 
-## 3. A tensor is metadata plus a view over storage
+## Shapes, strides, storage, and aliasing
 
-A dense PyTorch tensor is not a nested Python list. Its storage is a contiguous one-dimensional buffer of bytes; tensor metadata gives the dtype, shape, stride, and storage offset needed to interpret that buffer. Multiple tensors can therefore refer to the same storage while exposing different shapes or index-to-memory mappings. This is why a slice or transpose can be cheap, and also why a write through a view can modify the original tensor.
+A strided tensor is metadata over storage. For index $(i_0, \ldots, i_{n-1})$, the logical storage position is
 
-The scalar boundary needs a precise description. `x.item()` does not “get the underlying storage”; it converts a tensor containing exactly one element into a standard Python number and is not differentiable. Use `x.tolist()` for a small tensor of Python values, `x.numpy()` for CPU interoperability when the storage permits it, and `x.detach().cpu().numpy()` when the tensor may require gradients or live on an accelerator. Use `untyped_storage().data_ptr()` when the question is whether two tensors share storage, not when the question is what values they contain.
+$$
+\text{storage\_offset} + \sum_{k=0}^{n-1} i_k\,\text{stride}_k.
+$$
 
-<RevisionCodePair {...pytorchTensorExamples.inspectStorage} />
+That equation explains cheap slices, transposes, broadcasts, and many reshapes: they can change metadata without moving values. It also explains non-contiguity and aliasing. Two tensors can have different shapes and strides while sharing the same storage and version counter.
 
-The view in the example has a different shape and stride but the same storage identity as `base`. For dense tensors, the logical byte count is commonly reasoned about as `numel() * element_size()`, while a view can cover only part of a larger storage. `stride()` tells you how many storage elements the next index in each dimension skips; it is the bridge between an abstract shape and memory traffic.
+<RevisionCodePair {...pytorchRevisionExamples.views} />
 
-## 4. Indexing and slicing
+`view` requires a shape compatible with current size and stride. `reshape` returns a view when possible and copies otherwise, so code must not depend on its aliasing behavior. `transpose`, `permute`, `movedim`, `narrow`, `select`, `squeeze`, and `unsqueeze` generally produce views. `contiguous(memory_format=...)` materializes the requested layout only when needed; `clone` always copies values while preserving gradient connectivity, and `detach` breaks gradient history but still shares storage.
 
-Tensor indexing follows Python and NumPy conventions: indices start at zero, negative indices count from the end, `:` selects a range, and a step such as `::2` skips elements. For a tensor `x` with shape `(B, T, D)`, `x[b]` removes the first dimension, `x[:, t]` selects one position for every batch item, and `x[..., -1]` selects the last feature without spelling out the leading dimensions.
+Memory format is a separate optimization axis from shape. Dense NCHW tensors normally use `torch.contiguous_format`; convolution workloads may benefit from `torch.channels_last` or `channels_last_3d` when the operators and hardware support them. Inspect with `is_contiguous(memory_format=...)` and convert deliberately with `to(memory_format=...)`.
 
-Basic indexing and slicing generally return views. Advanced indexing—integer index tensors, lists of indices, or boolean masks—returns a new tensor containing the selected values. Assignment through either basic or advanced indexing is still an in-place write to the destination. The distinction matters when you mutate the result and expect the source to change.
-
-<RevisionCodePair {...pytorchTensorExamples.indexing} />
-
-When debugging a shape error, print the shape after every indexing step rather than reasoning only from the source shape. Indexing with an integer removes a dimension; slicing preserves it; inserting `None` or calling `unsqueeze` adds a dimension of size one.
-
-## 5. Joining, stacking, and reshaping
-
-`torch.cat` joins tensors along an existing dimension. All non-concatenated dimensions must match, so concatenating two `(B, T, D)` tensors along `T` produces `(B, T_1 + T_2, D)`. `torch.stack` requires every input to have the same shape and inserts a new dimension, so stacking two `(B, T, D)` tensors along dimension zero produces `(2, B, T, D)`.
-
-This is the fastest shape check: ask whether the operation should preserve rank. If yes, start with `cat`; if the operation represents a new batch, time, ensemble, or sample axis, start with `stack`. `split` and `chunk` are the corresponding ways to divide a tensor along an existing dimension.
-
-`view` changes shape without copying when the requested shape is compatible with the current strides. `reshape` is more permissive: it returns a view when possible and makes a copy otherwise, so code should not depend on aliasing through `reshape`. `transpose` and `permute` rearrange dimensions and commonly create non-contiguous views; call `contiguous()` when a downstream operation requires contiguous storage.
-
-<RevisionCodePair {...pytorchTensorExamples.joining} />
-
-The output shapes are determined by the operation, not by the values. Predict them first, then use `.shape` to confirm the prediction. This habit catches most errors in batched linear algebra before the numerical result becomes distracting.
-
-## 6. Mutating operations and autograd
-
-Most tensor expressions are out-of-place: `y = x + 1` allocates a result and leaves `x` unchanged. Methods ending in an underscore—`add_`, `zero_`, `fill_`, `copy_`, and many others—mutate their receiver and return it. Indexing assignment such as `x[:, 0] = 0` is also in-place, even though the syntax does not end in an underscore.
-
-In-place updates can save memory, but they can also invalidate values that autograd saved for backward. Mutating a leaf tensor that requires gradients is often prohibited; when an intentional parameter or buffer update is needed outside the gradient calculation, use `with torch.no_grad():`. Prefer out-of-place expressions in ordinary `forward` code unless the memory and autograd consequences are understood. `.data` is not a safe substitute for `no_grad`.
-
-<RevisionCodePair {...pytorchTensorExamples.mutation} />
-
-The interview-level distinction is simple: the absence of an underscore does not prove that an operation is pure—index assignment is the counterexample—while the presence of an underscore is an explicit request to mutate existing storage.
-
-## 7. Rapid recall
-
-| Question | Short answer | Common trap |
+| Operation | Usually aliases input? | Key consequence |
 | --- | --- | --- |
-| What is a tensor? | A typed, strided multi-dimensional view over storage on a device. | Treating it as a Python list with nested shape semantics. |
-| Does `torch.tensor(x)` share `x`? | No; it copies `x` and creates a fresh leaf by default. | Using it when `as_tensor` or `from_numpy` was intended. |
-| What does `item()` do? | Converts a one-element tensor to a Python scalar. | Calling it on a tensor with many elements or confusing it with storage access. |
-| `cat` or `stack`? | `cat` joins an existing dimension; `stack` inserts a new one. | Forgetting that `stack` requires equal input shapes. |
-| `view` or `reshape`? | `view` requires compatible strides; `reshape` may copy. | Assuming every reshape aliases the input. |
-| What does `_` mean? | The operation mutates the receiver in-place. | Breaking autograd by mutating a saved or gradient-tracked tensor. |
-| How do devices interact? | Move explicitly with `.to(device)` and keep participating tensors compatible. | Assuming PyTorch will move ordinary tensors automatically. |
+| Basic slice, `select`, `transpose`, `permute` | Yes | Mutation can reach the base tensor. |
+| Advanced integer or boolean indexing | No | Selected values are copied. |
+| `view` | Yes or errors | Requires compatible strides. |
+| `reshape` | Maybe | Never rely on sharing. |
+| `expand` | Yes, often zero strides | Do not write assuming independent elements. |
+| `repeat` | No | Values are physically repeated. |
+| `detach` | Yes | No autograd edge, but storage is shared. |
+| `clone` | No | New storage; gradient still flows through the clone op. |
+
+## Indexing, selection, and mutation
+
+Basic indexing follows Python semantics: integer indexing removes a dimension, slicing preserves it, `None` inserts a singleton dimension, `...` fills unspecified dimensions, and negative indices count from the end. Advanced indexing uses integer tensors, lists, or boolean masks and returns copied values. Assignment through either syntax mutates the destination, even though the syntax has no trailing underscore.
+
+`gather` and `scatter` are dimension-explicit indexed data movement; `index_select` selects one dimension; `take_along_dim` follows an index tensor shaped for broadcasting; `masked_select` flattens selected values; `where` chooses elementwise without mutating; and `index_put_` generalizes indexed assignment. Predict the index tensor's required rank and the output shape before thinking about values.
+
+<RevisionCodePair {...pytorchRevisionExamples.indexing} />
+
+Methods ending in `_` mutate their receiver: `add_`, `mul_`, `copy_`, `zero_`, `fill_`, `scatter_`, and initialization functions are common examples. The `out=` argument also writes to supplied storage. In-place operations interact with aliases and autograd's version counters, so prefer out-of-place expressions in `forward` unless memory pressure justifies the extra reasoning.
+
+## Shape transforms and broadcasting
+
+PyTorch and NumPy broadcast from trailing dimensions. Two dimensions are compatible when they are equal or either is one; missing leading dimensions behave as ones. `torch.broadcast_shapes` checks the resulting shape without allocating, `broadcast_tensors` returns broadcast views, and `expand` exposes a larger logical shape through zero strides. Broadcasting avoids copies but can still create expensive downstream computation.
+
+<RevisionCodePair {...pytorchRevisionExamples.shapes} />
+
+`cat` concatenates along an existing dimension and preserves rank; all other dimensions must match. `stack` inserts a new dimension and requires equal input shapes. `split` partitions by size or explicit sections, `chunk` requests a number of chunks but can return fewer, and `unbind` removes a dimension into a tuple of views.
+
+For model code, shape contracts should be visible. Prefer names such as `batch, tokens, channels, height, width`, annotate arguments with `torch.Tensor`, and assert invariants at subsystem boundaries. Shape-aware libraries such as jaxtyping are useful only when they are an intentional dependency; ordinary runtime checks remain executable everywhere.
+
+## Elementwise operations, reductions, and linear algebra
+
+Unary and binary operations dispatch by dtype, device, and layout. Type promotion determines the result dtype, but Python scalars, zero-dimensional tensors, and in-place operations have special rules. In-place operations cannot cast a result into an incompatible receiver dtype, while an out-of-place expression may promote. Inspect `torch.result_type` or `torch.promote_types` when mixed precision is not obvious.
+
+<RevisionCodePair {...pytorchRevisionExamples.linalg} />
+
+`matmul` implements rank-dependent matrix multiplication: vector dot product, matrix-vector, matrix-matrix, or batched broadcasted matrix multiply. `mm` is strictly 2-D and `bmm` strictly 3-D without batch broadcasting. `einsum` makes contraction axes explicit and is excellent for specification, but the clearest expression is not automatically the fastest kernel; benchmark representative shapes.
+
+The `torch.linalg` namespace owns modern linear algebra: `solve` instead of explicitly inverting a matrix, `lstsq` for least squares, `svd` and `eigh` for decompositions, `vector_norm` and `matrix_norm` for explicit norm semantics, and `cond` for conditioning. Factorization can dominate both runtime and numerical error, so choose dtype and algorithm from the problem's stability requirements.
+
+<RevisionCodePair {...pytorchRevisionExamples.reductions} />
+
+Reductions accept `dim` and `keepdim` where NumPy uses `axis` and `keepdims`. Keeping reduced dimensions often makes later broadcasting clearer. Prefer stable fused formulations: `logsumexp` over `log(exp(x).sum())`, `log_softmax` over `softmax(x).log()`, and `cross_entropy` over manually composing probabilities and logarithms.
+
+| Family | APIs to recall |
+| --- | --- |
+| Pointwise math | `abs`, `clamp`, `where`, `lerp`, `sigmoid`, `tanh`, `exp`, `log`, `sqrt`, `rsqrt` |
+| Reductions | `sum`, `mean`, `prod`, `amax`, `amin`, `argmax`, `var`, `std`, `quantile`, `logsumexp` |
+| Sorting and selection | `sort`, `argsort`, `topk`, `kthvalue`, `unique`, `bincount`, `searchsorted` |
+| Comparison | `equal`, `allclose`, `isclose`, `isfinite`, `isnan`, `isinf` |
+| Linear algebra | `matmul`, `einsum`, `linalg.solve`, `linalg.svd`, `linalg.eigh`, `linalg.qr`, `linalg.norm` |
+| Signal and special math | `torch.fft`, `torch.special`, `torch.distributions` |
+
+### Sparse, quantized, and other layouts
+
+`torch.strided` is the ordinary dense layout. Sparse COO, CSR, CSC, BSR, and BSC tensors store indices plus values and expose layout-specific invariants; support varies by operator, autograd path, and device. Coalesce COO tensors before relying on unique sorted indices. Use sparse layouts only when the density and supported operator sequence beat dense kernels.
+
+Quantized tensors encode values with scale and zero point, while quantization workflows may use eager, FX, or export-based APIs depending on backend and deployment path. Nested or jagged tensors represent ragged shapes without padding, but operator coverage remains more constrained than dense strided tensors. Treat layout as part of an API contract, not an internal detail.
+
+## Autograd's dynamic graph
+
+PyTorch records a directed acyclic graph of `Function` nodes while operations execute. The graph is recreated each iteration, so ordinary Python control flow can change the graph. An operation is recorded when grad mode is enabled and at least one input requires gradients. Backward traverses saved dependencies and applies vector-Jacobian products.
+
+Leaves are user-created tensors with no `grad_fn`. Only leaf tensors with `requires_grad=True` accumulate into `.grad` by default; call `retain_grad()` only when a non-leaf gradient must be inspected. Gradients accumulate rather than overwrite, which is why training loops clear them explicitly.
+
+<RevisionCodePair {...pytorchRevisionExamples.autograd} />
+
+`Tensor.backward(gradient=None, retain_graph=False, create_graph=False)` is a side-effect API that accumulates into leaves. The implicit gradient is valid only for a scalar output. `torch.autograd.grad(outputs, inputs, grad_outputs=...)` returns requested gradients and is better for higher-order or functional code. `create_graph=True` records the derivative computation; `retain_graph=True` merely keeps the current graph and is rarely the correct first fix.
+
+Views share an autograd version counter with their base. If backward needs a saved value and an in-place operation changed it, autograd raises a version-mismatch error rather than silently differentiating the wrong program. `torch.autograd.detect_anomaly` adds traceback and NaN diagnostics but is intentionally slow. `gradcheck` and `gradgradcheck` use finite differences in double precision to validate custom derivatives.
+
+### Gradient modes are independent of module mode
+
+| Mechanism | Records autograd? | Can outputs later enter a grad graph? | Changes Dropout/BatchNorm? |
+| --- | --- | --- | --- |
+| Default grad mode | Yes when an input requires grad | Yes | No |
+| `torch.no_grad()` | No | Yes | No |
+| `torch.inference_mode()` | No, with more tracking removed | Generally no | No |
+| `model.eval()` | Unchanged | Unchanged | Yes, for modules with mode-dependent behavior |
+
+Use `no_grad` for parameter updates or preprocessing whose outputs may later participate in grad mode. Try `inference_mode` for evaluation paths that remain isolated from autograd. Always set `train()` and `eval()` explicitly when module behavior depends on mode; neither method disables gradients.
+
+`detach` returns a storage-sharing tensor without an autograd edge; `detach_` cannot detach views in place. Freezing parameters with `module.requires_grad_(False)` prevents their operations from being recorded when no other input requires grad, but it does not remove them from the optimizer's parameter groups or change module mode.
+
+### Hooks, custom derivatives, and saved tensors
+
+Tensor hooks observe or replace a gradient as it is computed. Post-accumulate hooks run after a leaf's `.grad` is updated. Module forward pre-hooks can modify inputs, forward hooks can inspect or replace outputs, and full backward hooks operate at module boundaries; every registration returns a removable handle. Hooks are operational instrumentation, not a substitute for explicit data flow.
+
+Subclass `torch.autograd.Function` when an operation calls non-PyTorch code or needs a custom derivative. Implement static `forward` and `backward`, save tensors with `ctx.save_for_backward`, store non-tensor metadata directly on `ctx`, mark non-differentiable outputs, and validate with gradcheck. Compatibility with `torch.func` transforms may also require `setup_context`, `jvp`, or a `vmap` rule.
+
+Saved-tensor hooks can pack and unpack intermediates, including CPU offload strategies, but the hooks must preserve value, dtype, device, and shape semantics. They trade memory against transfer or recomputation and belong behind measurement.
+
+## Composable function transforms
+
+`torch.func` provides function transforms rather than mutable tape APIs. `grad` returns a gradient function; `vmap` vectorizes a function over selected input dimensions; `jacrev` and `jacfwd` choose reverse- or forward-mode Jacobian construction; `vjp` and `jvp` compute products without materializing a full Jacobian; `hessian` composes modes; and `functionalize` removes intermediate mutation and aliasing when possible.
+
+<RevisionCodePair {...pytorchRevisionExamples.functionalTransforms} />
+
+`functional_call` runs a module with supplied parameter and buffer mappings, turning state into explicit function inputs. That enables per-sample gradients, ensembling, meta-learning, and parameter-space Jacobians. Choose reverse mode when outputs are few relative to inputs, forward mode when inputs are few relative to outputs, and products when a full Jacobian would be wasteful.
+
+## `nn.Module` as a registered state tree
+
+`nn.Module` is a Python object with registration semantics. Assigning an `nn.Parameter` registers trainable state; assigning a child `Module` registers a subtree; `register_buffer` records non-parameter tensor state; ordinary attributes remain ordinary Python state. Recursive APIs such as `parameters()`, `state_dict()`, `to()`, `train()`, and distributed wrappers traverse this tree.
+
+<RevisionCodePair {...pytorchRevisionExamples.modules} />
+
+Call `model(inputs)`, not `model.forward(inputs)`. `Module.__call__` runs hook machinery and then delegates to `forward`. Call `super().__init__()` before assigning registered members. A plain Python list or dictionary of modules is invisible to registration, device movement, checkpointing, and optimizers.
+
+| State kind | How to create it | In `parameters()` | In `state_dict()` | Moved by `to()` |
+| --- | --- | --- | --- | --- |
+| Parameter | `nn.Parameter` or layer assignment | Yes | Yes | Yes |
+| Persistent buffer | `register_buffer(..., persistent=True)` | No | Yes | Yes |
+| Non-persistent buffer | `persistent=False` | No | No | Yes |
+| Child module | assign an `nn.Module` | Its state recurses | Its state recurses | Yes |
+| Plain tensor attribute | ordinary assignment | No | No | No |
+
+`named_parameters`, `named_buffers`, `named_modules`, and `named_children` provide qualified names. `modules()` includes the module itself recursively; `children()` yields immediate children only. `get_submodule("encoder.layers.3")` resolves one path in time proportional to nesting depth and is preferable to scanning all modules for a known target.
+
+### Containers and execution structure
+
+`ModuleList` and `ModuleDict` register modules while leaving execution order to `forward`. `ParameterList` and `ParameterDict` do the same for free parameters. `Sequential` both registers modules and defines straight-line composition. Use named submodules or dictionaries when checkpoint keys must remain stable across refactors.
+
+<RevisionCodePair {...pytorchRevisionExamples.containers} />
+
+Registration occurs on assignment, so replacing a child or parameter changes the state tree. Weight tying assigns or reuses the same parameter object in multiple computations; deduplication in named traversal and optimizer construction then matters. Lazy modules defer shape-dependent initialization until the first input, while the meta device can create shape-only modules without allocating real storage.
+
+### Layer, functional, initialization, and loss APIs
+
+The `nn` namespace groups stateful layers and losses; `torch.nn.functional` exposes stateless operations whose parameters are explicit. A `Linear` module owns weight and bias, while `F.linear` consumes them. Prefer modules when state, mode, hooks, or serialization matter and functional calls for simple stateless composition.
+
+| Area | Core APIs |
+| --- | --- |
+| Dense and convolution | `Linear`, `Bilinear`, `Conv1d/2d/3d`, transposed convolutions |
+| Sequence and attention | `Embedding`, `RNN`, `LSTM`, `GRU`, `MultiheadAttention`, `Transformer*` |
+| Normalization | `BatchNorm*`, `LayerNorm`, `GroupNorm`, `RMSNorm` |
+| Regularization | `Dropout*`, `AlphaDropout`, `Embedding` options, parametrizations |
+| Activations | `ReLU`, `GELU`, `SiLU`, `Mish`, `Softmax`, `GLU` |
+| Pooling and padding | `MaxPool*`, `AvgPool*`, adaptive pooling, `pad` |
+| Losses | `CrossEntropyLoss`, `BCEWithLogitsLoss`, `MSELoss`, `KLDivLoss`, ranking losses |
+| Initialization | `nn.init.kaiming_*`, `xavier_*`, `orthogonal_`, `trunc_normal_`, `calculate_gain` |
+| Utilities | `clip_grad_norm_`, `parameters_to_vector`, `parametrize`, pruning and weight norm utilities |
+
+Know the contracts, not only names. `CrossEntropyLoss` expects unnormalized logits and class indices for the common classification path; `BCEWithLogitsLoss` fuses sigmoid with a stable binary objective; BatchNorm owns running buffers and changes behavior by mode; LayerNorm normalizes trailing dimensions and does not use running statistics.
+
+## State dictionaries and serialization
+
+A module `state_dict` is the stable boundary for parameters and persistent buffers. The returned mapping is shallow and its values refer to live state, so clone values when taking an in-memory snapshot that must survive later updates. `load_state_dict(strict=True)` requires exact keys; `strict=False` returns missing and unexpected keys that should be logged and reviewed, not discarded silently.
+
+Save architecture configuration and state rather than pickling a whole module. A resumable training checkpoint normally includes model state, optimizer state, scheduler state, AMP scaler state, epoch or global step, RNG states, and data-sampler position when exact continuation matters. Move optimizer state to the intended device deliberately after loading.
+
+`torch.save` uses a ZIP-based checkpoint format and preserves storage sharing. `torch.load(..., map_location=..., weights_only=True)` narrows unpickling behavior and is the default when no custom pickle module is supplied in modern PyTorch; it reduces remote-code-execution surface but is not a complete security sandbox. Never load an untrusted legacy pickle with unrestricted unpickling.
+
+For large checkpoints, `mmap=True` lazily maps storages, `FakeTensorMode` inspects metadata without allocating payloads, and distributed checkpoint APIs coordinate sharded state. State-dict pre/post hooks, load hooks, and `get_extra_state` support controlled schema migrations; version those migrations like any other persisted interface.
+
+## Datasets, samplers, collation, and workers
+
+A map-style `Dataset` implements `__getitem__` and normally `__len__`. An `IterableDataset` owns iteration and is appropriate for streams, generated data, or sources without random indexing. `DataLoader` combines fetch order, batching, collation, multiprocessing, and optional pinned-memory staging.
+
+<RevisionCodePair {...pytorchRevisionExamples.data} />
+
+For map-style datasets, `shuffle=True` selects a random sampler and is mutually exclusive with an explicit `sampler`. A `batch_sampler` yields lists of indices and replaces `batch_size`, `shuffle`, `sampler`, and `drop_last`. `collate_fn` turns a list of samples into one batch; default collation recursively stacks tensors in matching mappings, tuples, and sequences.
+
+`num_workers=0` is the debugging baseline with direct tracebacks. Multiple workers are processes with replicated Python dataset state; shard iterable datasets with `get_worker_info` to prevent duplicates. `persistent_workers=True` avoids process restart across epochs, `prefetch_factor` controls batches queued per worker, and `timeout` exposes stalls. With the spawn start method, dataset and worker functions must be picklable.
+
+Pinned host memory can make CPU-to-CUDA copies asynchronous when the transfer uses `non_blocking=True`. It is not free: pinning consumes a constrained host resource and only helps when transfer overlaps useful work. Custom batch classes can implement `pin_memory()` so DataLoader pinning reaches their tensors.
+
+## Training and evaluation invariants
+
+The canonical update is clear gradients, forward, scalar loss, backward, optional gradient processing, and optimizer step. Evaluation sets module mode and disables autograd separately. Inputs, targets, parameters, and relevant buffers must agree on device; loss accumulation should stay on device until a deliberate reporting boundary.
+
+<RevisionCodePair {...pytorchRevisionExamples.training} />
+
+`optimizer.zero_grad(set_to_none=True)` avoids writing zeros and lets backward assign fresh gradient storage. It also distinguishes a parameter that received no gradient (`grad is None`, optimizer normally skips it) from one whose gradient is numerically zero. Unexpected `None` gradients should trigger a connectivity investigation, not automatic replacement with zeros.
+
+Avoid `loss.item()`, Python conditionals on accelerator tensors, printing values, or CPU conversions every iteration; each can synchronize the device. Aggregate detached tensors on-device and convert at a reporting cadence. For accurate wall-clock CUDA timing, use CUDA events or synchronize around the measured region.
+
+### Optimizers, parameter groups, and schedulers
+
+An optimizer owns references to parameters plus state such as momentum or moving averages. Construct it after final device placement and parameter materialization. Parameter collections must have deterministic order; build explicit parameter groups for different learning rates, weight decay, or optimizer options, and assert every trainable parameter appears exactly once.
+
+`SGD` exposes momentum and Nesterov dynamics; `Adam` couples L2-style weight decay with moments, while `AdamW` decouples weight decay from the adaptive update. `Adafactor` reduces second-moment memory, `SparseAdam` handles sparse gradients for supported cases, and `LBFGS` requires a closure that can reevaluate the objective. Optimizer choices still depend on the model and objective; the API does not erase algorithmic assumptions.
+
+Schedulers normally step after the optimizer update. Batch-level schedules such as `OneCycleLR` step per optimizer step; epoch schedules step at the intended epoch boundary; `ReduceLROnPlateau` consumes the validation metric. Serialize scheduler and optimizer state together because counters and momentum are part of the training trajectory.
+
+### Accumulation, AMP, clipping, and checkpointing
+
+<RevisionCodePair {...pytorchRevisionExamples.optimization} />
+
+Gradient accumulation adds microbatch gradients into the same `.grad` buffers. Divide each microbatch loss by the accumulation count when matching the mean-gradient scale, step only at the effective-batch boundary, and account for a short final accumulation window. Under DDP, `no_sync()` can avoid redundant all-reduces on non-step microbatches.
+
+Autocast chooses an operator-specific dtype; it is not a blanket cast of the model or inputs. Wrap forward and loss, then leave the context before backward. `torch.amp.GradScaler("cuda")` is primarily needed for float16's limited exponent range; unscale before clipping or inspecting gradients. Bfloat16 often does not require scaling because it retains float32-like exponent range, though numerical validation still governs the choice.
+
+`clip_grad_norm_` computes a global norm as if gradients were concatenated and mutates gradients in place. Clip after AMP unscale and before `step`. Gradient clipping can bound instability but can also hide a bad objective, learning rate, or data batch; log the pre-clipped norm.
+
+Activation checkpointing trades compute for saved-activation memory by recomputing a region during backward. Use `torch.utils.checkpoint.checkpoint(..., use_reentrant=False)` unless a compatibility requirement dictates otherwise, keep the recomputed function semantically identical, and understand RNG preservation. This is distinct from serialization checkpoints.
+
+EMA and SWA maintain alternate parameter averages. `torch.optim.swa_utils.AveragedModel` can implement both; BatchNorm statistics may need recomputation with `update_bn` before evaluation. Treat averaged weights as separately versioned model state.
+
+## Compilation and export
+
+`torch.compile` asks TorchDynamo to capture Python frames into FX graphs, AOTAutograd to stage backward graphs where relevant, and a backend such as Inductor to generate code. Eager semantics remain the reference. Compilation can fuse pointwise work and reduce launch overhead, but compile time, guards, graph breaks, and shape specialization can erase the gain.
+
+Start with `compiled = torch.compile(model)` or `model.compile()` and benchmark steady state after warmup on representative shapes. Use `fullgraph=True` while auditing graph breaks. A graph break ends one compiled region and resumes tracing later; common causes include unsupported Python, data-dependent scalar extraction, printing, and opaque extension code.
+
+Guards encode assumptions about types, shapes, globals, and object identity. A failed guard can trigger recompilation; repeated specialization can hit the cache limit and fall back to eager. Use `TORCH_LOGS="graph_breaks,recompiles,guards"` or `TORCH_TRACE` plus `tlparse` to diagnose the program before applying private configuration knobs.
+
+Dynamic shapes permit symbolic dimensions, not arbitrary value-dependent Python. `torch._dynamo.mark_dynamic` can declare expected variation; custom operators provide a supported opaque boundary when Dynamo and the backend need explicit schemas, fake/meta implementations, and autograd rules. `torch.compiler.disable` excludes a problematic function deliberately.
+
+`torch.export.export` produces an ahead-of-time graph plus shape constraints for deployment or transformation. It is stricter than eager execution and serves a different purpose from `torch.compile`'s runtime optimization. TorchScript remains relevant to legacy systems, but new compiler and export work should start from the current PyTorch 2 APIs.
+
+## Devices, asynchronous execution, and memory
+
+CPU, CUDA, MPS, XPU, and other backends implement different operator and dtype coverage. The portable pattern selects a device, constructs or transfers model state once, moves batches at the boundary, and keeps intermediate work on-device. Use `torch.device` or accelerator APIs for explicit placement; avoid scattering unconditional `.cuda()` calls through model code.
+
+CUDA execution is asynchronous with respect to the host. Operations on one stream are ordered, while distinct streams require explicit dependencies through events, `wait_stream`, or `record_stream` when allocator lifetime crosses streams. Host-visible reads such as `item()` synchronize. Accurate benchmarks need warmup and synchronization or CUDA events.
+
+The caching allocator separates memory occupied by live tensors (`memory_allocated`) from memory reserved in allocator segments (`memory_reserved`). `empty_cache()` releases unused cached blocks for other applications but cannot free live tensor storage or increase memory available to tensors beyond what deleting references already enables. Use `memory_stats`, `memory_summary`, and `memory_snapshot` before tuning allocator configuration.
+
+Common memory levers are smaller batches, lower-precision activations, activation checkpointing, shorter sequences, fused kernels, avoiding retained graphs, clearing references, and sharding. Memory leaks are often Python references to tensors with graph history, such as appending raw losses to a list.
+
+## Distributed execution
+
+Use one process per accelerator. `torchrun` supplies rank metadata; `init_process_group` initializes communication; `rank` identifies a global process, `local_rank` selects a local device, and `world_size` is the process count. Every rank must execute collectives in compatible order or the job can hang.
+
+`DistributedDataParallel` replicates model state and all-reduces gradient buckets during backward. Construct the optimizer from the wrapped model's parameters, use a `DistributedSampler` for map-style data, and call `sampler.set_epoch(epoch)` so shuffling changes across epochs. `no_sync` suppresses gradient synchronization for intentional accumulation. Prefer DDP over single-process `DataParallel`.
+
+FSDP shards parameters, gradients, and optimizer state, gathering parameter material around computation. Wrapping policy, mixed precision, prefetch, state-dict type, and initialization determine memory and communication behavior. Build the optimizer after wrapping. Tensor parallelism shards individual operations; pipeline parallelism splits layers into stages; `DeviceMesh` names multidimensional process layouts so data, tensor, and pipeline dimensions compose.
+
+The primitive layer includes `all_reduce`, `all_gather`, `reduce_scatter`, `broadcast`, `scatter`, `gather`, `all_to_all`, point-to-point send/receive, process groups, and asynchronous work handles. NCCL is the common CUDA backend and Gloo the common CPU backend. Diagnose hangs with rank-local logs, timeouts, `TORCH_DISTRIBUTED_DEBUG`, and collective consistency before blaming the network.
+
+Distributed checkpointing saves and loads sharded state without assembling a full checkpoint on one rank. Model and optimizer state-dict APIs must agree with the parallel wrapper and mesh; resharding across a new world size is a checkpoint-format capability, not something to assume.
+
+## Reproducibility, diagnostics, and performance
+
+A seed fixes an RNG sequence, not an experiment across arbitrary releases and hardware. Seed PyTorch, Python, and NumPy; use explicit `torch.Generator` objects where local control matters; seed DataLoader workers from `torch.initial_seed()`; and serialize RNG states for exact continuation. `torch.use_deterministic_algorithms(True)` requests deterministic kernels or errors, often with a performance cost.
+
+Set `torch.backends.cudnn.benchmark` from the workload: benchmarking may improve stable-shape convolution performance but can select different algorithms across runs. Deterministic-algorithm selection and cuDNN benchmarking are distinct controls. Record PyTorch, CUDA, driver, hardware, compiler, and environment versions with an experiment.
+
+`torch.profiler.profile` captures CPU operators and device kernels. Use a wait/warmup/active schedule for long jobs, call `prof.step()` once per iteration, annotate regions with `record_function`, and inspect self time, total time, shapes, memory, and launch gaps. `record_shapes` and stack traces add overhead and can perturb reference counts, so profile representative windows rather than entire training runs.
+
+For debugging, combine:
+
+- `torch.testing.assert_close` for values with explicit tolerances and shape/dtype/device checks;
+- `detect_anomaly` for a short failing autograd path;
+- gradient and activation hooks with removable handles;
+- `torch._dynamo.explain` and compiler logs for graph capture;
+- allocator snapshots for CUDA fragmentation and lifetime;
+- `torch.utils.benchmark` for statistically controlled microbenchmarks;
+- `pytest` tests that cover train/eval mode, CPU and accelerator placement, mixed precision, serialization round trips, and dynamic shapes.
+
+Optimize from a trace. Typical wins come from larger vectorized kernels, fewer host synchronizations, fused pointwise work, correct input staging, suitable precision, compile-stable shapes, and communication overlap. A faster isolated kernel does not guarantee a faster step when input, synchronization, memory, or collectives dominate.
+
+## PyTorch and NumPy API map
+
+The libraries intentionally look similar, but PyTorch adds devices, autograd, module state, layouts, and asynchronous execution. Translate the semantic contract, not only the spelling.
+
+| Intent | PyTorch | NumPy | Watch |
+| --- | --- | --- | --- |
+| Array object | `torch.Tensor` | `np.ndarray` | Tensor carries device and autograd metadata. |
+| Default float | usually `float32` | usually `float64` | Constructor inference can change memory and stability. |
+| Axis argument | `dim=` | `axis=` | `keepdim` versus `keepdims`. |
+| Cast or move | `x.to(dtype=..., device=...)` | `x.astype(dtype)` | PyTorch may transfer devices asynchronously. |
+| Concatenate | `torch.cat` | `np.concatenate` | Existing dimension. |
+| Add new stack axis | `torch.stack` | `np.stack` | Inputs must have equal shape. |
+| Reshape | `reshape` / `view` | `reshape` / `view` | Sharing guarantees differ by API and strides. |
+| Transpose | `transpose` / `permute` / `mT` | `swapaxes` / `transpose` / `T` | PyTorch `T` is deprecated for non-2-D semantics. |
+| Clamp | `torch.clamp` | `np.clip` | In-place `clamp_` mutates. |
+| Select by condition | `torch.where` | `np.where` | One-argument nonzero forms differ. |
+| Matrix multiply | `@` / `matmul` | same | PyTorch adds device kernels and gradients. |
+| Contraction | `torch.einsum` | `np.einsum` | Path and kernel performance can differ. |
+| Copy/share bridge | `from_numpy` / `numpy` | same object side | Negative strides and unsupported dtypes can force rejection or copying. |
+| Testing | `torch.testing.assert_close` | `np.testing.assert_allclose` | Specify tolerance policy. |
+
+## API atlas
+
+Use this as a retrieval map. The public namespace is too large for a useful flat dump; these are the surfaces that organize day-to-day reasoning and direct you to the narrower reference.
+
+| Namespace | Working surface |
+| --- | --- |
+| `torch` | factories, pointwise ops, reductions, indexing, shape transforms, random, serialization, compile |
+| `Tensor` | metadata, views, conversions, mutation, device transfer, autograd flags and hooks |
+| `torch.linalg` | solves, decompositions, norms, conditioning |
+| `torch.fft` / `torch.special` | Fourier transforms and special mathematical functions |
+| `torch.sparse` | sparse layouts, conversions, validation, sparse operators |
+| `torch.nn` | `Module`, parameters, containers, layers, losses, initialization, utilities |
+| `torch.nn.functional` | stateless layer and loss operations with explicit tensors |
+| `torch.autograd` | backward engine, `grad`, `Function`, grad mode, graph and saved-tensor hooks |
+| `torch.func` | `grad`, `vmap`, Jacobians, JVP/VJP, functional module calls, functionalization |
+| `torch.optim` | optimizers, parameter groups, state, schedulers, SWA and EMA helpers |
+| `torch.utils.data` | datasets, samplers, batching, collation, workers, pinned memory |
+| `torch.amp` | autocast and gradient scaling across supported device types |
+| `torch.cuda` / accelerator namespaces | devices, streams, events, memory, graphs, communication helpers |
+| `torch.compiler` / `torch._dynamo` | compile control, graph-break and recompile diagnostics |
+| `torch.export` | constrained ahead-of-time graph capture and serialization |
+| `torch.distributed` | process groups, collectives, DDP, FSDP, DeviceMesh, sharded checkpoints |
+| `torch.profiler` / `torch.utils.benchmark` | operator traces, device kernels, memory, microbenchmarks |
+| `torch.testing` | tensor-aware assertions and comparison diagnostics |
+
+## Rapid recall
+
+| Question | Staff-level answer |
+| --- | --- |
+| Does `torch.tensor(x)` share data? | No. It copies and creates a fresh leaf by default. |
+| Why can a transpose be cheap? | It changes shape and strides while sharing storage. |
+| Why can `reshape` be dangerous for alias assumptions? | It may return a view or allocate a copy. |
+| Does `detach` copy? | No. It removes the autograd edge but shares storage. |
+| Where do gradients accumulate? | Leaf parameters with `requires_grad=True`, unless non-leaves explicitly retain them. |
+| Does `eval()` disable gradients? | No. Module mode and grad mode are orthogonal. |
+| Why use `model(x)` instead of `forward(x)`? | `__call__` runs module hook and call machinery. |
+| Why does a Python list of layers fail? | It does not register child modules; use `ModuleList` or explicit attributes. |
+| Parameter or buffer? | Optimize parameters; persist and move non-optimized tensor state as buffers. |
+| Why `set_to_none=True`? | Lower writes and an observable distinction between no gradient and zero gradient. |
+| When does AMP clip? | After `scaler.unscale_(optimizer)` and before `scaler.step`. |
+| Why can `item()` hurt throughput? | It may synchronize asynchronous accelerator work with the host. |
+| Allocated versus reserved CUDA memory? | Live tensor bytes versus allocator-managed segments. |
+| What causes compile recompilation? | A guard fails because an assumption about input or Python state changed. |
+| DDP versus FSDP? | DDP replicates parameters and reduces gradients; FSDP shards model states and gathers around compute. |
+| What belongs in a resumable checkpoint? | Model, optimizer, scheduler, scaler, step, configuration, RNG, and sampler progress as needed. |
 
 ## Source links
 
-- [PyTorch 2.13 tensor documentation](https://docs.pytorch.org/docs/2.13/tensors.html)
-- [Tensor attributes: dtype, device, layout, and strides](https://docs.pytorch.org/docs/2.13/tensor_attributes.html)
-- [Tensor views and aliasing](https://docs.pytorch.org/docs/2.13/tensor_view.html)
-- [`torch.Tensor.item`](https://docs.pytorch.org/docs/2.13/generated/torch.Tensor.item.html)
-- [Creation ops](https://docs.pytorch.org/docs/2.13/torch.html#creation-ops)
-- [Indexing, slicing, joining, and mutating ops](https://docs.pytorch.org/docs/2.13/torch.html#indexing-slicing-joining-mutating-ops)
+- [PyTorch 2.13 documentation](https://docs.pytorch.org/docs/2.13/)
+- [Tensors](https://docs.pytorch.org/docs/2.13/tensors.html), [tensor attributes](https://docs.pytorch.org/docs/2.13/tensor_attributes.html), and [tensor views](https://docs.pytorch.org/docs/2.13/tensor_view.html)
+- [Broadcasting semantics](https://docs.pytorch.org/docs/2.13/notes/broadcasting.html) and [numerical accuracy](https://docs.pytorch.org/docs/2.13/notes/numerical_accuracy.html)
+- [Autograd mechanics](https://docs.pytorch.org/docs/2.13/notes/autograd.html) and [extending autograd](https://docs.pytorch.org/docs/2.13/notes/extending.html)
+- [`nn.Module`](https://docs.pytorch.org/docs/2.13/generated/torch.nn.Module.html), [`ModuleList`](https://docs.pytorch.org/docs/2.13/generated/torch.nn.ModuleList.html), and [`torch.nn`](https://docs.pytorch.org/docs/2.13/nn.html)
+- [`torch.func`](https://docs.pytorch.org/docs/2.13/func.html)
+- [`torch.utils.data`](https://docs.pytorch.org/docs/2.13/data.html)
+- [Optimizers and schedulers](https://docs.pytorch.org/docs/2.13/optim.html), [AMP](https://docs.pytorch.org/docs/2.13/amp.html), and [activation checkpointing](https://docs.pytorch.org/docs/2.13/checkpoint.html)
+- [`torch.compile`](https://docs.pytorch.org/docs/2.13/generated/torch.compile.html) and its [programming model](https://docs.pytorch.org/docs/2.13/user_guide/torch_compiler/compile/programming_model.html)
+- [CUDA semantics](https://docs.pytorch.org/docs/2.13/notes/cuda.html) and [the profiler](https://docs.pytorch.org/docs/2.13/profiler.html)
+- [Distributed communication](https://docs.pytorch.org/docs/2.13/distributed.html) and [FSDP](https://docs.pytorch.org/docs/2.13/fsdp.html)
+- [Serialization semantics](https://docs.pytorch.org/docs/2.13/notes/serialization.html) and [reproducibility](https://docs.pytorch.org/docs/2.13/notes/randomness.html)
+- [NumPy array creation](https://numpy.org/doc/stable/user/basics.creation.html), [broadcasting](https://numpy.org/doc/stable/user/basics.broadcasting.html), and [indexing](https://numpy.org/doc/stable/user/basics.indexing.html)

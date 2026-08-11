@@ -17,4 +17,5 @@ export interface PythonPlaygroundProps {
   samples: PlaygroundSample[];
   walkthroughSteps?: WalkthroughStep[];
   notes?: string;
+  compact?: boolean;
 }

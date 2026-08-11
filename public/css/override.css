@@ -5043,58 +5043,228 @@ html {
 
 .revision-code-pair {
   display: grid;
-  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
-  gap: 1rem;
-  margin: 2rem 0;
+  gap: 0.8rem;
+  margin: 1.35rem 0 1.75rem;
 }
 
-.revision-code-pair__reference,
 .revision-code-pair__runner {
   min-width: 0;
-}
-
-.revision-code-pair__reference {
-  overflow: hidden;
-  border: 1px solid var(--code-border-color);
-  border-radius: 18px;
-  background: var(--panel-bg);
-}
-
-.revision-code-pair__reference > summary {
-  padding: 1rem 1.1rem;
-  color: var(--text-color);
-  font-family: var(--font-mono);
-  font-size: 0.84rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.revision-code-pair__reference > summary:focus-visible {
-  outline: 2px solid var(--accent-color);
-  outline-offset: -2px;
-}
-
-.revision-code-pair__reference[open] > summary {
-  border-bottom: 1px solid var(--code-border-color);
-}
-
-.revision-code-pair__reference pre {
-  max-height: 34rem;
-  margin: 0;
-  overflow: auto;
-  padding: 1rem 1.1rem;
-  background: var(--code-block-bg-dark, var(--background-secondary));
-}
-
-.revision-code-pair__reference code {
-  white-space: pre;
 }
 
 .revision-code-pair__runner .python-playground {
   height: 100%;
   box-sizing: border-box;
   margin: 0;
+}
+
+/* Revision notes use the same compact, code-first workspace as Code practice. */
+.python-playground--compact {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-width: 0;
+  height: auto;
+  min-height: 23rem;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--code-border-color);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  box-shadow: none;
+  color: var(--text-color);
+}
+
+:root[data-theme="dark"] .python-playground--compact {
+  border-color: var(--code-border-color);
+  background: var(--panel-bg);
+  box-shadow: none;
+  color: var(--text-color);
+}
+
+.python-playground__workspace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.48rem 0.55rem 0.48rem 0.72rem;
+  border-bottom: 1px solid var(--code-border-color);
+}
+
+.python-playground__workspace-identity,
+.python-playground__workspace-controls {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.python-playground__workspace-controls {
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 0.35rem;
+}
+
+.python-playground__workspace-title,
+.python-playground--compact .python-playground__status {
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.python-playground__workspace-title {
+  overflow: hidden;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.python-playground--compact .python-playground__status {
+  color: var(--text-secondary-color);
+  font-size: 0.66rem;
+  white-space: nowrap;
+}
+
+.python-playground--compact .python-playground__status--ready {
+  color: #168d67;
+}
+
+:root[data-theme="dark"] .python-playground--compact .python-playground__status--ready {
+  color: #78dcb2;
+}
+
+.python-playground--compact .python-playground__status--error {
+  color: #c44444;
+}
+
+.python-playground__button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 1.9rem;
+  padding: 0.32rem 0.48rem;
+  border: 1px solid var(--button-border);
+  border-radius: 7px;
+  background: var(--button-bg);
+  box-shadow: none;
+  color: var(--text-color);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.python-playground__button:hover:not(:disabled) {
+  border-color: var(--accent-color);
+}
+
+.python-playground__button:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.python-playground__button--primary {
+  border-color: rgba(22, 141, 103, 0.5);
+  background: #168d67;
+  color: #f4fffb;
+}
+
+:root[data-theme="dark"] .python-playground__button--primary {
+  border-color: rgba(122, 240, 182, 0.5);
+  background: #147454;
+  color: #f4fffb;
+}
+
+.python-playground__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
+.python-playground__button kbd {
+  padding: 0.08rem 0.2rem;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.12);
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.55rem;
+  white-space: nowrap;
+}
+
+.python-playground--compact .python-playground__editor-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.python-playground__editor-shell {
+  min-width: 0;
+  height: clamp(21rem, 38vw, 29rem);
+  overflow: hidden;
+}
+
+.python-playground__code-editor,
+.python-playground__code-editor .cm-editor,
+.python-playground__code-editor .cm-scroller {
+  height: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.python-playground__code-editor {
+  font-size: 0.74rem;
+}
+
+.python-playground__code-editor .cm-scroller {
+  overflow: auto;
+  line-height: 1.42;
+}
+
+.python-playground__code-editor .cm-content,
+.python-playground__code-editor .cm-gutter {
+  padding-top: 0.52rem;
+  padding-bottom: 0.52rem;
+}
+
+.python-playground__code-editor .cm-gutters {
+  border-right: 1px solid var(--code-border-color);
+}
+
+.python-playground__compact-output {
+  min-width: 0;
+  padding: 0.45rem 0.65rem;
+  border-top: 1px solid var(--code-border-color);
+  background: var(--background-secondary);
+}
+
+.python-playground__compact-output p,
+.python-playground__compact-output pre {
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.python-playground__compact-output p {
+  margin-bottom: 0.25rem;
+  color: var(--text-secondary-color);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.python-playground__compact-output pre {
+  max-height: 8rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.72rem;
+  line-height: 1.38;
 }
 
 .code-practice-lab {
@@ -5676,6 +5846,20 @@ html {
 
   .revision-code-pair {
     grid-template-columns: 1fr;
+  }
+
+  .python-playground__workspace-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .python-playground__workspace-controls {
+    width: 100%;
+  }
+
+  .python-playground__editor-shell {
+    height: min(27rem, 58vh);
+    min-height: 19rem;
   }
 
   .code-practice-lab__hero-header,

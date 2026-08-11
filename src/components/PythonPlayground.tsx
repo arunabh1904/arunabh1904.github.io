@@ -1,4 +1,21 @@
-import React, { startTransition, useEffect, useRef, useState } from 'react';
+import React, {
+  startTransition,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Prec } from '@codemirror/state';
+import { EditorView, keymap } from '@codemirror/view';
+import CodeMirror from '@uiw/react-codemirror';
+import { githubDark, githubLight } from '@uiw/codemirror-theme-github';
+import {
+  codeEditorExtensions,
+  createCodeEditorThemeObserver,
+  createRunCodeKeyBindings,
+  getCodeEditorThemeName,
+} from '../lib/code-editor';
 import { loadPyodideRuntime } from '../lib/pyodide-loader';
 import type { PyodideRuntime } from '../lib/pyodide-loader';
 import type { PythonPlaygroundProps } from '../lib/python-playground';
@@ -18,28 +35,67 @@ export default function PythonPlayground({
   samples,
   walkthroughSteps = [],
   notes,
+  compact = false,
 }: PythonPlaygroundProps) {
   const containerRef = useRef<HTMLElement | null>(null);
   const runtimeRef = useRef<PyodideRuntime | null>(null);
+  const loadingRef = useRef(false);
+  const isRunningRef = useRef(false);
+  const runHandlerRef = useRef<() => void>(() => {});
+  const generatedEditorId = useId();
+  const editorId = `${createHeadingId(title)}-${generatedEditorId.replace(/:/g, '')}`;
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState('');
   const [errorOutput, setErrorOutput] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
-  const [statusMessage, setStatusMessage] = useState('Python runtime will load when this block scrolls into view.');
+  const [statusMessage, setStatusMessage] = useState(
+    compact ? 'Loading Python…' : 'Python runtime will load when this block scrolls into view.',
+  );
   const [isRunning, setIsRunning] = useState(false);
+  const [hasRun, setHasRun] = useState(false);
   const [selectedSample, setSelectedSample] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
+  const [editorTheme, setEditorTheme] = useState(() =>
+    getCodeEditorThemeName(
+      typeof document === 'undefined' ? 'light' : document.documentElement.getAttribute('data-theme'),
+    ),
+  );
+
+  const runShortcutExtension = useMemo(
+    () =>
+      Prec.highest([
+        keymap.of(createRunCodeKeyBindings(() => runHandlerRef.current())),
+        EditorView.domEventHandlers({
+          keydown(event) {
+            if (event.key !== 'Enter' || (!event.ctrlKey && !event.metaKey)) {
+              return false;
+            }
+
+            event.preventDefault();
+            runHandlerRef.current();
+            return true;
+          },
+        }),
+      ]),
+    [],
+  );
+  const editorExtensions = useMemo(
+    () => [...codeEditorExtensions, runShortcutExtension],
+    [runShortcutExtension],
+  );
+  const editorThemeExtension = editorTheme === 'dark' ? githubDark : githubLight;
 
   useEffect(() => {
     let didCancel = false;
 
     async function bootstrapRuntime() {
-      if (runtimeRef.current || status === 'loading') {
+      if (runtimeRef.current || loadingRef.current) {
         return;
       }
 
+      loadingRef.current = true;
       setStatus('loading');
-      setStatusMessage('Preparing the in-browser Python runtime...');
+      setStatusMessage(compact ? 'Loading Python…' : 'Preparing the in-browser Python runtime...');
 
       try {
         const runtime = await loadPyodideRuntime();
@@ -48,15 +104,16 @@ export default function PythonPlayground({
         }
         runtimeRef.current = runtime;
         setStatus('ready');
-        setStatusMessage('Python is ready. Edit the code and run it.');
+        setStatusMessage(compact ? 'Ready' : 'Python is ready. Edit the code and run it.');
       } catch (error) {
         if (didCancel) {
           return;
         }
         setStatus('error');
-        setStatusMessage(
-          error instanceof Error ? error.message : 'The Python runtime failed to load.',
-        );
+        setStatusMessage(compact ? 'Unavailable' : 'The Python runtime failed to load.');
+        setErrorOutput(error instanceof Error ? error.message : 'The Python runtime failed to load.');
+      } finally {
+        loadingRef.current = false;
       }
     }
 
@@ -97,17 +154,33 @@ export default function PythonPlayground({
       didCancel = true;
       observer.disconnect();
     };
+  }, [compact]);
+
+  useEffect(() => {
+    setEditorTheme(
+      getCodeEditorThemeName(
+        typeof document === 'undefined' ? 'light' : document.documentElement.getAttribute('data-theme'),
+      ),
+    );
+
+    return createCodeEditorThemeObserver(setEditorTheme);
   }, []);
 
   const currentStep = walkthroughSteps[activeStep];
 
   async function handleRun() {
-    if (!runtimeRef.current) {
-      setStatusMessage('Python is still loading. Try again in a moment.');
+    if (isRunningRef.current) {
       return;
     }
 
+    if (!runtimeRef.current) {
+      setStatusMessage(status === 'error' ? 'Unavailable' : 'Loading Python…');
+      return;
+    }
+
+    isRunningRef.current = true;
     setIsRunning(true);
+    setHasRun(true);
     setOutput('');
     setErrorOutput('');
 
@@ -120,6 +193,7 @@ export default function PythonPlayground({
     } catch (error) {
       setErrorOutput(error instanceof Error ? error.message : 'Unknown execution error.');
     } finally {
+      isRunningRef.current = false;
       setIsRunning(false);
     }
   }
@@ -128,6 +202,7 @@ export default function PythonPlayground({
     setCode(initialCode);
     setOutput('');
     setErrorOutput('');
+    setHasRun(false);
     setSelectedSample(0);
     setActiveStep(0);
   }
@@ -137,7 +212,80 @@ export default function PythonPlayground({
     setCode(samples[index]?.code ?? initialCode);
     setOutput('');
     setErrorOutput('');
+    setHasRun(false);
     setActiveStep(0);
+  }
+
+  runHandlerRef.current = () => {
+    void handleRun();
+  };
+
+  if (compact) {
+    return (
+      <section
+        className="python-playground python-playground--compact"
+        ref={containerRef}
+        aria-label={`${title} editable Python scratchpad`}
+      >
+        <header className="python-playground__workspace-header">
+          <div className="python-playground__workspace-identity">
+            <p className="python-playground__workspace-title">{title}</p>
+            <p
+              className={`python-playground__status python-playground__status--${status}`}
+              aria-live="polite"
+            >
+              {statusMessage}
+            </p>
+          </div>
+          <div className="python-playground__workspace-controls">
+            <button
+              className="python-playground__button python-playground__button--primary"
+              type="button"
+              aria-label="Run code"
+              aria-keyshortcuts="Control+Enter Meta+Enter"
+              onClick={() => void handleRun()}
+              disabled={status !== 'ready' || isRunning}
+            >
+              <span>{isRunning ? 'Running…' : 'Run'}</span>
+              {!isRunning && <kbd>Ctrl / Cmd + Enter</kbd>}
+            </button>
+            <button
+              className="python-playground__button"
+              type="button"
+              onClick={handleReset}
+            >
+              Reset
+            </button>
+          </div>
+        </header>
+
+        <label className="python-playground__editor-label" htmlFor={editorId}>
+          {title} Python editor
+        </label>
+        <div className="python-playground__editor-shell">
+          <CodeMirror
+            id={editorId}
+            className="python-playground__code-editor"
+            aria-label={`${title} Python editor`}
+            basicSetup={false}
+            extensions={editorExtensions}
+            theme={editorThemeExtension}
+            height="100%"
+            editable
+            indentWithTab={false}
+            value={code}
+            onChange={(value) => setCode(value)}
+          />
+        </div>
+
+        {hasRun && (
+          <div className="python-playground__compact-output" aria-live="polite">
+            <p>{errorOutput ? 'Errors' : 'Output'}</p>
+            <pre>{errorOutput || output || 'Program finished with no output.'}</pre>
+          </div>
+        )}
+      </section>
+    );
   }
 
   return (
@@ -182,11 +330,11 @@ export default function PythonPlayground({
           <span className="python-playground__prompt">python lesson.py</span>
         </div>
 
-        <label className="python-playground__editor-label" htmlFor={title}>
+        <label className="python-playground__editor-label" htmlFor={editorId}>
           Editable Python snippet
         </label>
         <textarea
-          id={title}
+          id={editorId}
           className="python-playground__editor"
           spellCheck={false}
           value={code}

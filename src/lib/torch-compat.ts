@@ -4,7 +4,8 @@
  * Pyodide does not ship the compiled PyTorch runtime. The snippets still use
  * real PyTorch names and tensor idioms, but this compatibility layer maps the
  * subset used by the practice problems to NumPy arrays. It is not a drop-in
- * replacement for PyTorch: there is no autograd, CUDA, nn.Module, or compiler.
+ * replacement for PyTorch: module and data-loader support is pedagogical, and
+ * there is no autograd engine, accelerator runtime, compiler, or distributed backend.
  */
 export const TORCH_COMPAT_PACKAGE = 'torch';
 
@@ -74,6 +75,24 @@ class _CompatTensor(_np.ndarray):
 
     def requires_grad_(self, _requires_grad=True):
         return self
+
+    def dim(self):
+        return int(self.ndim)
+
+    def ndimension(self):
+        return int(self.ndim)
+
+    def cpu(self):
+        return self
+
+    def numpy(self):
+        return _np.asarray(self)
+
+    def float(self):
+        return self.to(dtype=_np.float32)
+
+    def long(self):
+        return self.to(dtype=_np.int64)
 
     def to(self, dtype=None, device=None, **_kwargs):
         if dtype is None or _np.dtype(dtype) == self.dtype:
@@ -222,6 +241,24 @@ def _topk(value, k, dim=-1, largest=True, sorted=True):
     values = _np.take_along_axis(value, indices, axis=dim)
     return _types.SimpleNamespace(values=_wrap(values), indices=_wrap(indices))
 
+def _sort(value, dim=-1, descending=False, stable=False):
+    value = _np.asarray(value)
+    order = _np.argsort(
+        -value if descending else value,
+        axis=dim,
+        kind='stable' if stable else None,
+    )
+    values = _np.take_along_axis(value, order, axis=dim)
+    return _types.SimpleNamespace(values=_wrap(values), indices=_wrap(order))
+
+def _randint(low, high=None, size=None, dtype=_np.int64, **_kwargs):
+    if high is None:
+        low, high = 0, low
+    return _tensor(_np.random.randint(low, high, size=_shape(size), dtype=dtype), copy=False)
+
+def _randperm(n, dtype=_np.int64, **_kwargs):
+    return _tensor(_np.random.permutation(int(n)).astype(dtype), copy=False)
+
 def _cross_entropy(logits, targets, reduction='mean'):
     log_probs = _log_softmax(logits, dim=-1)
     targets = _np.asarray(targets, dtype=_np.int64)
@@ -268,6 +305,8 @@ torch.empty = lambda *size, dtype=_np.float32, **_kwargs: _tensor(_np.empty(_sha
 torch.full = lambda size, fill_value, dtype=None, **_kwargs: _tensor(_np.full(_shape(size), fill_value, dtype=dtype), copy=False)
 torch.rand = lambda *size, dtype=_np.float32, **_kwargs: _tensor(_np.random.rand(*_shape_args(size)).astype(dtype), copy=False)
 torch.randn = lambda *size, dtype=_np.float32, **_kwargs: _tensor(_np.random.randn(*_shape_args(size)).astype(dtype), copy=False)
+torch.randint = _randint
+torch.randperm = _randperm
 torch.zeros_like = lambda value, **_kwargs: _tensor(_np.zeros_like(value), copy=False)
 torch.ones_like = lambda value, **_kwargs: _tensor(_np.ones_like(value), copy=False)
 torch.empty_like = lambda value, **_kwargs: _tensor(_np.empty_like(value), copy=False)
@@ -298,6 +337,9 @@ torch.argmin = lambda value, dim=None, keepdim=False: _np.argmin(value, axis=_ax
 torch.matmul = lambda left, right: _wrap(_np.matmul(left, right))
 torch.mm = torch.matmul
 torch.bmm = torch.matmul
+torch.einsum = lambda equation, *operands: _wrap(_np.einsum(equation, *operands))
+torch.outer = lambda left, right: _wrap(_np.outer(left, right))
+torch.dot = lambda left, right: _wrap(_np.dot(left, right))
 torch.transpose = lambda value, dim0, dim1: _wrap(_np.swapaxes(value, dim0, dim1))
 torch.permute = lambda value, dims: _wrap(_np.transpose(value, axes=tuple(dims)))
 torch.reshape = lambda value, shape: _wrap(_np.reshape(value, _shape(shape)))
@@ -316,10 +358,14 @@ torch.any = lambda value, dim=None, keepdim=False: _np.any(value, axis=_axis(dim
 torch.unique = lambda value, sorted=True, **_kwargs: _np.unique(value)
 torch.argsort = lambda value, dim=-1, descending=False, stable=False: _np.argsort(-value if descending else value, axis=dim, kind='stable' if stable else None)
 torch.topk = _topk
+torch.sort = _sort
 torch.gather = _gather
 torch.index_select = lambda value, dim, index: _wrap(_np.take(value, _np.asarray(index, dtype=_np.int64), axis=dim))
 torch.numel = lambda value: int(_np.asarray(value).size)
 torch.equal = lambda left, right: bool(_np.array_equal(left, right))
+torch.allclose = lambda left, right, rtol=1e-5, atol=1e-8, **_kwargs: bool(_np.allclose(left, right, rtol=rtol, atol=atol))
+torch.isclose = lambda left, right, rtol=1e-5, atol=1e-8, **_kwargs: _wrap(_np.isclose(left, right, rtol=rtol, atol=atol))
+torch.nan_to_num = lambda value, nan=0.0, posinf=None, neginf=None: _wrap(_np.nan_to_num(value, nan=nan, posinf=posinf, neginf=neginf))
 torch.softmax = _stable_softmax
 torch.log_softmax = _log_softmax
 torch.logsumexp = _logsumexp
@@ -342,12 +388,377 @@ torch.cuda = _cuda
 
 _nn = _types.ModuleType('torch.nn')
 _nn.__path__ = []
+
+class _Parameter(_CompatTensor):
+    def __new__(cls, value, requires_grad=True):
+        obj = _np.array(value, copy=True).view(cls)
+        obj._compat_requires_grad = bool(requires_grad)
+        return obj
+
+    def __array_finalize__(self, source):
+        self._compat_requires_grad = getattr(source, '_compat_requires_grad', True)
+
+    @property
+    def requires_grad(self):
+        return self._compat_requires_grad
+
+    def requires_grad_(self, requires_grad=True):
+        self._compat_requires_grad = bool(requires_grad)
+        return self
+
+class _Module:
+    def __init__(self):
+        object.__setattr__(self, '_parameters', {})
+        object.__setattr__(self, '_buffers', {})
+        object.__setattr__(self, '_non_persistent_buffers', set())
+        object.__setattr__(self, '_modules', {})
+        object.__setattr__(self, 'training', True)
+
+    def __setattr__(self, name, value):
+        if name.startswith('_') or '_modules' not in self.__dict__:
+            object.__setattr__(self, name, value)
+            return
+        if isinstance(value, _Parameter):
+            self._parameters[name] = value
+            self._modules.pop(name, None)
+        elif isinstance(value, _Module):
+            self._modules[name] = value
+            self._parameters.pop(name, None)
+        object.__setattr__(self, name, value)
+
+    def __call__(self, *args, **kwargs):
+        return self.forward(*args, **kwargs)
+
+    def forward(self, *_args, **_kwargs):
+        raise NotImplementedError
+
+    def register_parameter(self, name, parameter):
+        setattr(self, name, parameter)
+
+    def register_buffer(self, name, tensor, persistent=True):
+        tensor = None if tensor is None else _tensor(tensor, copy=False)
+        self._buffers[name] = tensor
+        if not persistent:
+            self._non_persistent_buffers.add(name)
+        object.__setattr__(self, name, tensor)
+
+    def add_module(self, name, module):
+        setattr(self, name, module)
+
+    def named_parameters(self, prefix='', recurse=True):
+        for name, parameter in self._parameters.items():
+            if parameter is not None:
+                yield (prefix + ('.' if prefix else '') + name, parameter)
+        if recurse:
+            for module_name, module in self._modules.items():
+                child_prefix = prefix + ('.' if prefix else '') + module_name
+                yield from module.named_parameters(child_prefix, recurse=True)
+
+    def parameters(self, recurse=True):
+        for _, parameter in self.named_parameters(recurse=recurse):
+            yield parameter
+
+    def named_buffers(self, prefix='', recurse=True):
+        for name, buffer in self._buffers.items():
+            if buffer is not None:
+                yield (prefix + ('.' if prefix else '') + name, buffer)
+        if recurse:
+            for module_name, module in self._modules.items():
+                child_prefix = prefix + ('.' if prefix else '') + module_name
+                yield from module.named_buffers(child_prefix, recurse=True)
+
+    def buffers(self, recurse=True):
+        for _, buffer in self.named_buffers(recurse=recurse):
+            yield buffer
+
+    def named_children(self):
+        yield from self._modules.items()
+
+    def children(self):
+        yield from self._modules.values()
+
+    def named_modules(self, memo=None, prefix=''):
+        memo = set() if memo is None else memo
+        if id(self) in memo:
+            return
+        memo.add(id(self))
+        yield prefix, self
+        for name, module in self._modules.items():
+            child_prefix = prefix + ('.' if prefix else '') + name
+            yield from module.named_modules(memo, child_prefix)
+
+    def modules(self):
+        for _, module in self.named_modules():
+            yield module
+
+    def get_submodule(self, target):
+        module = self
+        if target:
+            for atom in target.split('.'):
+                module = getattr(module, atom)
+                if not isinstance(module, _Module):
+                    raise AttributeError(target)
+        return module
+
+    def train(self, mode=True):
+        self.training = bool(mode)
+        for module in self.children():
+            module.train(mode)
+        return self
+
+    def eval(self):
+        return self.train(False)
+
+    def requires_grad_(self, requires_grad=True):
+        for parameter in self.parameters():
+            parameter.requires_grad_(requires_grad)
+        return self
+
+    def state_dict(self):
+        state = {}
+        for name, parameter in self.named_parameters():
+            state[name] = parameter.clone()
+        for name, buffer in self.named_buffers():
+            owner, _, local_name = name.rpartition('.')
+            module = self.get_submodule(owner) if owner else self
+            if local_name not in module._non_persistent_buffers:
+                state[name] = buffer.clone()
+        return state
+
+    def load_state_dict(self, state_dict, strict=True):
+        live = dict(self.named_parameters()) | dict(self.named_buffers())
+        missing = [name for name in live if name not in state_dict]
+        unexpected = [name for name in state_dict if name not in live]
+        for name, value in state_dict.items():
+            if name in live:
+                live[name].copy_(value)
+        if strict and (missing or unexpected):
+            raise RuntimeError('missing=' + repr(missing) + ', unexpected=' + repr(unexpected))
+        return _types.SimpleNamespace(missing_keys=missing, unexpected_keys=unexpected)
+
+    def to(self, *_args, **_kwargs):
+        return self
+
+    def apply(self, fn):
+        for child in self.children():
+            child.apply(fn)
+        fn(self)
+        return self
+
+class _ModuleList(_Module):
+    def __init__(self, modules=None):
+        super().__init__()
+        for module in modules or []:
+            self.append(module)
+
+    def append(self, module):
+        self.add_module(str(len(self._modules)), module)
+        return self
+
+    def __len__(self):
+        return len(self._modules)
+
+    def __iter__(self):
+        return iter(self._modules.values())
+
+    def __getitem__(self, index):
+        return list(self._modules.values())[index]
+
+class _ModuleDict(_Module):
+    def __init__(self, modules=None):
+        super().__init__()
+        for name, module in (modules or {}).items():
+            self.add_module(name, module)
+
+    def __getitem__(self, key):
+        return self._modules[key]
+
+    def __iter__(self):
+        return iter(self._modules)
+
+    def items(self):
+        return self._modules.items()
+
+class _ParameterList(_Module):
+    def __init__(self, values=None):
+        super().__init__()
+        for value in values or []:
+            self.append(value)
+
+    def append(self, value):
+        parameter = value if isinstance(value, _Parameter) else _Parameter(value)
+        self.register_parameter(str(len(self._parameters)), parameter)
+        return self
+
+    def __len__(self):
+        return len(self._parameters)
+
+    def __iter__(self):
+        return iter(self._parameters.values())
+
+    def __getitem__(self, index):
+        return list(self._parameters.values())[index]
+
+class _ParameterDict(_Module):
+    def __init__(self, values=None):
+        super().__init__()
+        for name, value in (values or {}).items():
+            parameter = value if isinstance(value, _Parameter) else _Parameter(value)
+            self.register_parameter(name, parameter)
+
+    def __getitem__(self, key):
+        return self._parameters[key]
+
+    def items(self):
+        return self._parameters.items()
+
+class _Sequential(_Module):
+    def __init__(self, *modules):
+        super().__init__()
+        for module in modules:
+            self.add_module(str(len(self._modules)), module)
+
+    def forward(self, value):
+        for module in self._modules.values():
+            value = module(value)
+        return value
+
+    def __iter__(self):
+        return iter(self._modules.values())
+
+class _Linear(_Module):
+    def __init__(self, in_features, out_features, bias=True):
+        super().__init__()
+        scale = 1.0 / max(1, int(in_features)) ** 0.5
+        self.weight = _Parameter(_np.random.uniform(-scale, scale, (out_features, in_features)))
+        self.bias = _Parameter(_np.random.uniform(-scale, scale, out_features)) if bias else None
+
+    def forward(self, value):
+        output = _np.matmul(value, self.weight.T)
+        if self.bias is not None:
+            output = output + self.bias
+        return _wrap(output)
+
+class _ReLU(_Module):
+    def forward(self, value):
+        return _wrap(_np.maximum(value, 0))
+
+class _Dropout(_Module):
+    def __init__(self, p=0.5):
+        super().__init__()
+        self.p = float(p)
+
+    def forward(self, value):
+        if not self.training or self.p == 0:
+            return value
+        keep = _np.random.random(_np.asarray(value).shape) >= self.p
+        return _wrap(_np.asarray(value) * keep / (1.0 - self.p))
+
+class _Identity(_Module):
+    def forward(self, value):
+        return value
+
+_nn.Module = _Module
+_nn.Parameter = _Parameter
+_nn.ModuleList = _ModuleList
+_nn.ModuleDict = _ModuleDict
+_nn.ParameterList = _ParameterList
+_nn.ParameterDict = _ParameterDict
+_nn.Sequential = _Sequential
+_nn.Linear = _Linear
+_nn.ReLU = _ReLU
+_nn.Dropout = _Dropout
+_nn.Identity = _Identity
 _functional = _types.ModuleType('torch.nn.functional')
 _functional.softmax = _stable_softmax
 _functional.log_softmax = _log_softmax
 _functional.cross_entropy = _cross_entropy
+_functional.relu = lambda value, inplace=False: _wrap(_np.maximum(value, 0))
+_functional.linear = lambda value, weight, bias=None: _wrap(_np.matmul(value, weight.T) + (0 if bias is None else bias))
 _nn.functional = _functional
 torch.nn = _nn
+
+class _Dataset:
+    pass
+
+class _IterableDataset(_Dataset):
+    pass
+
+class _TensorDataset(_Dataset):
+    def __init__(self, *tensors):
+        if tensors and any(len(tensor) != len(tensors[0]) for tensor in tensors[1:]):
+            raise ValueError('all tensors must have the same first dimension')
+        self.tensors = tensors
+
+    def __len__(self):
+        return 0 if not self.tensors else len(self.tensors[0])
+
+    def __getitem__(self, index):
+        return tuple(_wrap(tensor[index]) for tensor in self.tensors)
+
+def _default_collate(batch):
+    first = batch[0]
+    if isinstance(first, tuple):
+        return tuple(_wrap(_np.stack(values, axis=0)) for values in zip(*batch))
+    if isinstance(first, dict):
+        return {key: _wrap(_np.stack([item[key] for item in batch], axis=0)) for key in first}
+    return _wrap(_np.stack(batch, axis=0))
+
+class _DataLoader:
+    def __init__(
+        self,
+        dataset,
+        batch_size=1,
+        shuffle=False,
+        sampler=None,
+        batch_sampler=None,
+        collate_fn=None,
+        drop_last=False,
+        **_kwargs,
+    ):
+        self.dataset = dataset
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.sampler = sampler
+        self.batch_sampler = batch_sampler
+        self.collate_fn = collate_fn or _default_collate
+        self.drop_last = drop_last
+
+    def __iter__(self):
+        if self.batch_sampler is not None:
+            batches = self.batch_sampler
+        else:
+            indices = list(self.sampler) if self.sampler is not None else list(range(len(self.dataset)))
+            if self.shuffle:
+                _np.random.shuffle(indices)
+            if self.batch_size is None:
+                for index in indices:
+                    yield self.dataset[index]
+                return
+            batches = [indices[start:start + self.batch_size] for start in range(0, len(indices), self.batch_size)]
+        for indices in batches:
+            if self.drop_last and len(indices) < self.batch_size:
+                continue
+            yield self.collate_fn([self.dataset[index] for index in indices])
+
+    def __len__(self):
+        if self.batch_sampler is not None:
+            return len(self.batch_sampler)
+        if self.batch_size is None:
+            return len(self.dataset)
+        size = len(self.dataset) // self.batch_size
+        return size if self.drop_last or len(self.dataset) % self.batch_size == 0 else size + 1
+
+_utils = _types.ModuleType('torch.utils')
+_utils.__path__ = []
+_data = _types.ModuleType('torch.utils.data')
+_data.Dataset = _Dataset
+_data.IterableDataset = _IterableDataset
+_data.TensorDataset = _TensorDataset
+_data.DataLoader = _DataLoader
+_data.default_collate = _default_collate
+_utils.data = _data
+torch.utils = _utils
 
 _linalg = _types.ModuleType('torch.linalg')
 _linalg.norm = _norm
@@ -358,4 +769,6 @@ _sys.modules['torch.nn'] = _nn
 _sys.modules['torch.nn.functional'] = _functional
 _sys.modules['torch.linalg'] = _linalg
 _sys.modules['torch.cuda'] = _cuda
+_sys.modules['torch.utils'] = _utils
+_sys.modules['torch.utils.data'] = _data
 `;
