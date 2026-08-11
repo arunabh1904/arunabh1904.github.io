@@ -15,23 +15,21 @@ import { pytorchRevisionExamples } from '../../lib/pytorch-revision-examples';
 
 ## Quick overview
 
-According to the [PyTorch 2.13 tensor documentation](https://docs.pytorch.org/docs/2.13/tensors.html), a `torch.Tensor` is a multi-dimensional matrix whose elements have one data type. The more useful systems definition is a logical n-dimensional array described by dtype, device, layout, shape, strides, and storage offset; for the common strided layout, that metadata maps each logical index to a backing storage allocation.
+A [torch.Tensor](https://docs.pytorch.org/docs/2.13/tensors.html) is an `N`-dimensional array whose elements share one data type. More precisely, it is a logical array described by its dtype, device, layout, shape, strides, and storage offset. For the common strided layout, that metadata maps each logical index to a position in backing storage.
 
-PyTorch builds the rest of its programming model around that object. Autograd records tensor operations into a dynamic reverse-mode graph; `nn.Module` registers parameters, buffers, and child modules into a state tree; `Dataset` and `DataLoader` construct batches; optimizers consume accumulated parameter gradients; and compiler or distributed layers change execution without changing the mathematical model.
-
-This page targets PyTorch 2.13. Each exercise is a compact editable workspace. The browser runtime uses a NumPy-backed subset for tensor algebra, registration, state, and data-loading probes; it does not emulate autograd, accelerator kernels, `torch.compile`, or distributed collectives, whose real runtime behavior is specified in the surrounding API notes.
+PyTorch builds its programming model around this object. Autograd records tensor operations into a dynamic reverse-mode graph; `nn.Module` registers parameters, buffers, and child modules into a state tree; `Dataset` and `DataLoader` construct batches; optimizers consume accumulated parameter gradients; and compiler or distributed layers change execution without changing the mathematical model.
 
 ## Tensor construction and interoperability
 
-`torch.tensor(data, dtype=..., device=...)` always copies `data` and creates a fresh leaf with no autograd history by default. Use `torch.as_tensor` when preserving an existing tensor or avoiding a copy is acceptable, `torch.from_numpy` for shared CPU storage with a NumPy array, `torch.frombuffer` for a Python buffer, and DLPack for zero-copy exchange with another framework that implements the protocol. Sharing is a correctness decision: mutation through either object can affect the other.
+The first construction choice is whether to copy the input. `torch.tensor(data, dtype=..., device=...)` always copies `data` and creates a fresh leaf with no autograd history by default. Use `torch.as_tensor` when preserving an existing tensor or avoiding a copy is acceptable, `torch.from_numpy` when shared CPU storage with a NumPy array is intentional, and `torch.frombuffer` for a Python buffer.
 
-Factory functions communicate intent and placement better than constructing on CPU and converting later. The `*_like` family inherits shape and normally dtype, layout, and device; pass overrides explicitly when those properties should differ. `torch.empty` leaves values uninitialized, so reading before every element is overwritten is a correctness bug, not merely noisy output.
+Factory functions make both the allocation's purpose and its placement explicit. The `*_like` family starts from an existing tensor's shape and, by default, its dtype, layout, and device; pass overrides when the new tensor should differ. `torch.empty` is the important exception: it allocates storage without initializing the values, so reading from it before every element has been overwritten is a correctness bug, not merely a source of noisy output.
 
 <RevisionCodePair {...pytorchRevisionExamples.construction} />
 
 <RevisionCodePair {...pytorchRevisionExamples.factories} />
 
-The first NumPy contrast is easy to miss: NumPy normally infers `float64` for floating arrays, while PyTorch's default floating dtype is normally `float32`. NumPy arrays are CPU objects; a tensor also carries a device and may represent accelerator-resident memory. A conversion that looks numerically trivial can therefore allocate, copy, synchronize, or change gradient history.
+The NumPy comparison adds two consequences to these construction choices. NumPy normally infers `float64` for floating arrays, while PyTorch's default floating dtype is normally `float32`. NumPy arrays live on the CPU; a tensor also carries a device and may represent accelerator-resident memory. A conversion that looks numerically trivial can therefore allocate, copy, synchronize, or change gradient history.
 
 | Intent | PyTorch | NumPy | Distinction |
 | --- | --- | --- | --- |
@@ -44,7 +42,7 @@ The first NumPy contrast is easy to miss: NumPy normally infers `float64` for fl
 
 ### Tensor metadata and conversions
 
-The properties to inspect first are `shape`, `ndim`, `dtype`, `device`, `layout`, `requires_grad`, and `is_leaf`. `numel()` counts logical elements and `element_size()` reports bytes per element; their product estimates the logical payload but not allocator reservation, sparse indices, alignment, or storage retained by another view.
+Once a tensor exists, inspect the metadata that determines how it behaves: `shape`, `ndim`, `dtype`, `device`, `layout`, `requires_grad`, and `is_leaf`. `numel()` counts logical elements and `element_size()` reports bytes per element; their product estimates the dense logical payload, but not allocator reservation, sparse indices, alignment, or storage retained by another view.
 
 `tensor.to(device=..., dtype=..., non_blocking=..., copy=...)` is the general conversion API. It returns the original tensor when nothing changes unless `copy=True`, so code must not assume a fresh allocation. Convenience methods such as `cpu()`, `cuda()`, `float()`, `half()`, and `bfloat16()` are narrower spellings. For modules, `module.to(...)` recursively mutates parameters and buffers in place and returns the module.
 
@@ -58,7 +56,7 @@ $$
 \text{storage\_offset} + \sum_{k=0}^{n-1} i_k\,\text{stride}_k.
 $$
 
-That equation explains cheap slices, transposes, broadcasts, and many reshapes: they can change metadata without moving values. It also explains non-contiguity and aliasing. Two tensors can have different shapes and strides while sharing the same storage and version counter.
+The equation makes the next set of behaviors predictable. Slices, transposes, broadcasts, and many reshapes can change metadata without moving values, which is why they may be cheap. The same mechanism creates non-contiguity and aliasing: two tensors can have different shapes and strides while sharing storage and an autograd version counter.
 
 <RevisionCodePair {...pytorchRevisionExamples.views} />
 
@@ -79,7 +77,7 @@ Memory format is a separate optimization axis from shape. Dense NCHW tensors nor
 
 ## Indexing, selection, and mutation
 
-Basic indexing follows Python semantics: integer indexing removes a dimension, slicing preserves it, `None` inserts a singleton dimension, `...` fills unspecified dimensions, and negative indices count from the end. Advanced indexing uses integer tensors, lists, or boolean masks and returns copied values. Assignment through either syntax mutates the destination, even though the syntax has no trailing underscore.
+The storage model also explains why indexing needs two separate distinctions. Basic indexing follows Python semantics: integer indexing removes a dimension, slicing preserves it, `None` inserts a singleton dimension, `...` fills unspecified dimensions, and negative indices count from the end. Advanced indexing uses integer tensors, lists, or boolean masks and returns copied values. Assignment through either form still mutates the destination, even though the syntax has no trailing underscore.
 
 `gather` and `scatter` are dimension-explicit indexed data movement; `index_select` selects one dimension; `take_along_dim` follows an index tensor shaped for broadcasting; `masked_select` flattens selected values; `where` chooses elementwise without mutating; and `index_put_` generalizes indexed assignment. Predict the index tensor's required rank and the output shape before thinking about values.
 
@@ -89,7 +87,7 @@ Methods ending in `_` mutate their receiver: `add_`, `mul_`, `copy_`, `zero_`, `
 
 ## Shape transforms and broadcasting
 
-PyTorch and NumPy broadcast from trailing dimensions. Two dimensions are compatible when they are equal or either is one; missing leading dimensions behave as ones. `torch.broadcast_shapes` checks the resulting shape without allocating, `broadcast_tensors` returns broadcast views, and `expand` exposes a larger logical shape through zero strides. Broadcasting avoids copies but can still create expensive downstream computation.
+Indexing changes which values and dimensions are visible; broadcasting changes how those dimensions interact. PyTorch and NumPy align dimensions from the right. Two dimensions are compatible when they are equal or either is one, while missing leading dimensions behave as ones. `torch.broadcast_shapes` checks the result without allocating, `broadcast_tensors` returns broadcast views, and `expand` exposes a larger logical shape through zero strides. Broadcasting avoids copies, but the downstream operation may still process the expanded logical size.
 
 <RevisionCodePair {...pytorchRevisionExamples.shapes} />
 
@@ -99,7 +97,7 @@ For model code, shape contracts should be visible. Prefer names such as `batch, 
 
 ## Elementwise operations, reductions, and linear algebra
 
-Unary and binary operations dispatch by dtype, device, and layout. Type promotion determines the result dtype, but Python scalars, zero-dimensional tensors, and in-place operations have special rules. In-place operations cannot cast a result into an incompatible receiver dtype, while an out-of-place expression may promote. Inspect `torch.result_type` or `torch.promote_types` when mixed precision is not obvious.
+With shapes established, the next question is what dtype and kernel an operation will use. Unary and binary operations dispatch by dtype, device, and layout. Type promotion determines the result dtype, but Python scalars, zero-dimensional tensors, and in-place operations have special rules. In-place operations cannot cast a result into an incompatible receiver dtype, while an out-of-place expression may promote. Inspect `torch.result_type` or `torch.promote_types` when mixed precision is not obvious.
 
 <RevisionCodePair {...pytorchRevisionExamples.linalg} />
 
@@ -122,13 +120,13 @@ Reductions accept `dim` and `keepdim` where NumPy uses `axis` and `keepdims`. Ke
 
 ### Sparse, quantized, and other layouts
 
-`torch.strided` is the ordinary dense layout. Sparse COO, CSR, CSC, BSR, and BSC tensors store indices plus values and expose layout-specific invariants; support varies by operator, autograd path, and device. Coalesce COO tensors before relying on unique sorted indices. Use sparse layouts only when the density and supported operator sequence beat dense kernels.
+The dense `torch.strided` layout is the default, but it is not the only representation. Sparse COO, CSR, CSC, BSR, and BSC tensors store indices alongside values and impose layout-specific invariants; support varies by operator, autograd path, and device. Coalesce COO tensors before relying on unique, sorted indices. Use a sparse layout only when its density and supported operator sequence outperform the corresponding dense kernels.
 
-Quantized tensors encode values with scale and zero point, while quantization workflows may use eager, FX, or export-based APIs depending on backend and deployment path. Nested or jagged tensors represent ragged shapes without padding, but operator coverage remains more constrained than dense strided tensors. Treat layout as part of an API contract, not an internal detail.
+Quantized tensors encode values with a scale and zero point, while quantization workflows may use eager, FX, or export-based APIs depending on the backend and deployment path. Nested or jagged tensors represent ragged shapes without padding, but their operator coverage remains more constrained than that of dense strided tensors. These layouts are therefore part of an API contract, not an implementation detail to hide.
 
 ## Autograd's dynamic graph
 
-PyTorch records a directed acyclic graph of `Function` nodes while operations execute. The graph is recreated each iteration, so ordinary Python control flow can change the graph. An operation is recorded when grad mode is enabled and at least one input requires gradients. Backward traverses saved dependencies and applies vector-Jacobian products.
+The dtype, layout, and aliasing choices above also determine what autograd can record safely. PyTorch records a directed acyclic graph of `Function` nodes as operations execute. The graph is recreated each iteration, so ordinary Python control flow can change it. An operation is recorded when grad mode is enabled and at least one input requires gradients; backward then traverses the saved dependencies and applies vector-Jacobian products.
 
 Leaves are user-created tensors with no `grad_fn`. Only leaf tensors with `requires_grad=True` accumulate into `.grad` by default; call `retain_grad()` only when a non-leaf gradient must be inspected. Gradients accumulate rather than overwrite, which is why training loops clear them explicitly.
 
