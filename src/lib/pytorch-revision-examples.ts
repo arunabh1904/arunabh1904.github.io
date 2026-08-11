@@ -159,25 +159,27 @@ print("L2 norm:", torch.norm(logits, p=2, dim=-1))
   },
 
   autograd: {
-    title: 'Gradient flow and finite-difference checks',
+    title: 'Autograd: backward, accumulation, and gradient modes',
     initialCode: `import torch
 
-def objective(x):
-    return torch.sum(torch.sin(x) * x ** 2)
+scalar = torch.tensor(3.0, requires_grad=True)
+scalar_output = scalar ** 2
+scalar_output.backward()
+print("d(scalar ** 2) / dscalar:", scalar.grad)
 
-x = torch.tensor([0.2, -0.4, 0.8], dtype=torch.float64)
-epsilon = 1e-6
-numerical_grad = torch.zeros_like(x)
+vector = torch.tensor([1.0, 2.0], requires_grad=True)
+vector_output = vector ** 2
+vector_output.backward(torch.ones_like(vector_output))
+print("vector-Jacobian product:", vector.grad)
 
-for index in range(x.shape[0]):
-    step = torch.zeros_like(x)
-    step[index] = epsilon
-    numerical_grad[index] = (objective(x + step) - objective(x - step)) / (2 * epsilon)
+vector.grad.zero_()
+second_output = (vector ** 2).sum()
+second_output.backward()
+print("after clearing and backward:", vector.grad)
 
-analytic_grad = 2 * x * torch.sin(x) + x ** 2 * torch.cos(x)
-print("finite difference:", numerical_grad)
-print("analytic:", analytic_grad)
-print("close:", torch.allclose(numerical_grad, analytic_grad, rtol=1e-5, atol=1e-7))
+with torch.no_grad():
+    vector -= 0.1 * vector.grad
+print("updated without recording the update:", vector)
 `,
   },
 
