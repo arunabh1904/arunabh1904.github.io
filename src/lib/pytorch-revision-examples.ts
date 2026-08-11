@@ -1,255 +1,353 @@
-export interface PytorchTensorExample {
+export interface PytorchRevisionExample {
   title: string;
   initialCode: string;
-  referenceCode: string;
-  description: string;
+  description?: string;
   notes?: string;
 }
 
-export const pytorchTensorExamples: Record<string, PytorchTensorExample> = {
+export const pytorchRevisionExamples: Record<string, PytorchRevisionExample> = {
   construction: {
-    title: 'Construct, copy, and place a tensor',
-    description: 'Edit the source value or dtype, then run the snippet again.',
+    title: 'Construction and NumPy interop',
     initialCode: `import numpy as np
 import torch
 
 source = np.array([[1, 2], [3, 4]], dtype=np.float32)
+
 copied = torch.tensor(source, dtype=torch.float32, device="cpu")
 shared = torch.as_tensor(source)
+from_numpy = torch.from_numpy(source)
 
 source[0, 0] = 99
 
-print("copied:", copied.tolist())
-print("shared:", shared.tolist())
-print("dtype:", copied.dtype)
-print("device:", copied.device)
+print("torch.tensor copied:", copied.tolist())
+print("as_tensor shares:", shared.tolist())
+print("from_numpy shares:", from_numpy.tolist())
+print("dtype / device:", copied.dtype, copied.device)
 `,
-    referenceCode: `import numpy as np
-import torch
-
-source = np.array([[1, 2], [3, 4]], dtype=np.float32)
-
-# torch.tensor always copies its input data.
-copied = torch.tensor(source, dtype=torch.float32, device="cpu")
-
-# These APIs can share CPU storage when the input permits it.
-shared = torch.as_tensor(source)
-shared_from_numpy = torch.from_numpy(source)
-
-source[0, 0] = 99
-
-print("copied:", copied.tolist())
-print("as_tensor:", shared.tolist())
-print("from_numpy:", shared_from_numpy.tolist())
-print("dtype:", copied.dtype)
-print("device:", copied.device)
-`,
-    notes:
-      'The browser runner uses NumPy underneath, so its copy/share behavior mirrors the example but it does not allocate CUDA tensors.',
   },
 
-  creationOps: {
-    title: 'Create zeros, ones, and random tensors',
-    description: 'The seed makes the random examples repeatable in this small exercise.',
-    initialCode: `import torch
+  factories: {
+    title: 'Factories, dtype, device, and randomness',
+    initialCode: `import numpy as np
+import torch
 
 torch.manual_seed(7)
 
-factories = {
-    "zeros": torch.zeros((2, 3)),
-    "ones": torch.ones((2, 3)),
-    "full": torch.full((2, 3), 7),
-    "rand": torch.rand((2, 3)),
-    "randn": torch.randn((2, 3)),
+items = {
+    "zeros": torch.zeros(2, 3, dtype=torch.float32),
+    "ones_like": torch.ones_like(torch.zeros(2, 3)),
+    "full": torch.full((2, 3), 7, dtype=torch.int64),
+    "rand": torch.rand(2, 3),
+    "randn": torch.randn(2, 3),
+    "randint": torch.randint(0, 10, (2, 3)),
     "arange": torch.arange(6).reshape(2, 3),
+    "linspace": torch.linspace(0, 1, 5),
     "eye": torch.eye(3),
 }
 
-for name, value in factories.items():
-    print(name, "shape:", value.shape)
-    print(value)
+for name, value in items.items():
+    print(f"{name:10s}", value.shape, value.dtype)
+
+print("NumPy default float:", np.zeros((1,)).dtype)
+print("Torch default float:", torch.zeros(1).dtype)
 `,
-    referenceCode: `import torch
-
-torch.manual_seed(7)
-
-zeros = torch.zeros((2, 3), dtype=torch.float32)
-ones = torch.ones((2, 3), dtype=torch.float32)
-full = torch.full((2, 3), fill_value=7, dtype=torch.int64)
-uniform = torch.rand((2, 3), dtype=torch.float32)       # [0, 1)
-normal = torch.randn((2, 3), dtype=torch.float32)       # N(0, 1)
-sequence = torch.arange(6, dtype=torch.int64).reshape(2, 3)
-identity = torch.eye(3, dtype=torch.float32)
-empty = torch.empty((2, 3))  # allocated, but not initialized
-
-for name, value in {
-    "zeros": zeros,
-    "ones": ones,
-    "full": full,
-    "uniform": uniform,
-    "normal": normal,
-    "sequence": sequence,
-    "identity": identity,
-}.items():
-    print(name, "shape:", value.shape)
-    print(value)
-`,
-    notes: 'Try changing the factory shape. `empty` is useful when every element will be overwritten, but never read it before initialization.',
   },
 
-  inspectStorage: {
-    title: 'Inspect shape, scalar values, and storage views',
-    description: 'Change the slice and observe the shape, stride, and storage relationship.',
+  views: {
+    title: 'Storage, strides, views, and mutation',
     initialCode: `import torch
 
-base = torch.arange(12, dtype=torch.float32).reshape(3, 4)
-view = base[:, 1:3]
+base = torch.arange(24, dtype=torch.float32).reshape(2, 3, 4)
+view = base[:, :, ::2]
+transposed = torch.permute(base, (0, 2, 1))
 
-print("shape:", base.shape)
-print("ndim:", base.ndim)
-print("numel:", base.numel())
-print("element size:", base.element_size(), "bytes")
-print("base stride:", base.stride())
-print("view stride:", view.stride())
-print("share storage:", base.untyped_storage().data_ptr() == view.untyped_storage().data_ptr())
-print("one Python scalar:", base[1, 2].item())
-print("many Python values:", view.tolist())
+print("base:", base.shape, base.stride(), base.is_contiguous())
+print("view:", view.shape, view.stride(), view.is_contiguous())
+print("permute:", transposed.shape, transposed.stride(), transposed.is_contiguous())
+print("same storage:", base.untyped_storage().data_ptr() == view.untyped_storage().data_ptr())
+
+view[0, 0, 0] = -1
+print("mutation reached base:", base[0, 0, 0].item())
+print("scalar / list:", base[0, 0, 1].item(), view[0].tolist())
 `,
-    referenceCode: `import torch
-
-base = torch.arange(12, dtype=torch.float32).reshape(3, 4)
-view = base[:, 1:3]
-
-print("shape:", base.shape)
-print("ndim:", base.ndim)
-print("numel:", base.numel())
-print("element size:", base.element_size(), "bytes")
-print("base stride:", base.stride())
-print("view stride:", view.stride())
-print(
-    "share storage:",
-    base.untyped_storage().data_ptr() == view.untyped_storage().data_ptr(),
-)
-
-# item() is scalar conversion, not raw-storage access.
-print("one Python scalar:", base[1, 2].item())
-print("many Python values:", view.tolist())
-`,
-    notes:
-      'A tensor is metadata plus a view over storage. Use `item()` for exactly one value, `tolist()` for a small tensor, and `untyped_storage().data_ptr()` only when you need to reason about aliasing.',
   },
 
   indexing: {
-    title: 'Index and slice by dimension',
-    description: 'Try negative indices, a different step, or a different boolean mask.',
+    title: 'Indexing, masks, gather, and scatter',
     initialCode: `import torch
 
 x = torch.arange(20).reshape(4, 5)
-indices = torch.tensor([0, 3])
+rows = torch.tensor([0, 3], dtype=torch.int64)
+gather_index = torch.tensor([[0, 2], [1, 4], [0, 3], [2, 2]])
 
-print("one element:", x[1, 2].item())
-print("one row:\\n", x[1])
-print("rows 0:2, columns 1:4:\\n", x[0:2, 1:4])
-print("every other column:\\n", x[:, ::2])
-print("advanced row selection:\\n", x[indices])
+basic = x[1:3, ::2]
+advanced = x[rows]
+gathered = torch.gather(x, dim=1, index=gather_index)
+mask = x % 3 == 0
 
-# Assignment through a slice changes x in-place.
+print("basic view:\\n", basic)
+print("advanced copy:\\n", advanced)
+print("gathered:\\n", gathered)
+print("masked values:", x[mask].tolist())
+
 x[:2, 0] = -1
-print("after slice assignment:\\n", x)
+print("slice assignment:\\n", x)
 `,
-    referenceCode: `import torch
-
-x = torch.arange(20).reshape(4, 5)
-indices = torch.tensor([0, 3], dtype=torch.int64)
-
-print("one element:", x[1, 2].item())
-print("one row:\\n", x[1])
-print("rows 0:2, columns 1:4:\\n", x[0:2, 1:4])
-print("every other column:\\n", x[:, ::2])
-print("advanced row selection:\\n", x[indices])
-
-# Basic indexing/slicing returns a view. Assignment is in-place.
-x[:2, 0] = -1
-print("after slice assignment:\\n", x)
-`,
-    notes:
-      'Basic slices such as `x[:, 1:4]` are views; advanced indexing such as `x[indices]` produces a copy. Assignment through either form mutates the destination tensor.',
   },
 
-  joining: {
-    title: 'Join and reshape tensors',
-    description: 'Change `dim` and predict the resulting shape before running the code.',
-    initialCode: `import torch
+  shapes: {
+    title: 'Shape transforms and broadcasting',
+    initialCode: `import numpy as np
+import torch
 
-a = torch.tensor([[1, 2], [3, 4]])
-b = torch.tensor([[5, 6], [7, 8]])
+x = torch.arange(24).reshape(2, 3, 4)
+bias = torch.arange(4)
 
-cat_rows = torch.cat((a, b), dim=0)
-cat_columns = torch.cat((a, b), dim=1)
-stacked = torch.stack((a, b), dim=0)
-reshaped = a.reshape(1, 4)
+print("broadcast result:", (x + bias).shape)
+print("unsqueeze:", torch.unsqueeze(x, 1).shape)
+print("squeeze:", torch.squeeze(torch.unsqueeze(x, 1), 1).shape)
+print("flatten middle:", torch.flatten(x, 1, 2).shape)
+print("transpose:", torch.transpose(x, 1, 2).shape)
+print("permute:", torch.permute(x, (2, 0, 1)).shape)
 
-print("cat dim=0:", cat_rows.shape, "\\n", cat_rows)
-print("cat dim=1:", cat_columns.shape, "\\n", cat_columns)
-print("stack dim=0:", stacked.shape, "\\n", stacked)
-print("reshape:", reshaped.shape, "\\n", reshaped)
+a = torch.ones(2, 3)
+b = torch.zeros(2, 3)
+print("cat:", torch.cat((a, b), dim=0).shape)
+print("stack:", torch.stack((a, b), dim=0).shape)
+print("NumPy agrees:", np.stack((a, b), axis=0).shape)
 `,
-    referenceCode: `import torch
-
-a = torch.tensor([[1, 2], [3, 4]])
-b = torch.tensor([[5, 6], [7, 8]])
-
-# cat joins along an existing dimension.
-cat_rows = torch.cat((a, b), dim=0)       # shape (4, 2)
-cat_columns = torch.cat((a, b), dim=1)    # shape (2, 4)
-
-# stack inserts a new dimension; inputs must have the same shape.
-stacked = torch.stack((a, b), dim=0)      # shape (2, 2, 2)
-
-# view shares data when the size/stride constraint is satisfied.
-flat_view = a.view(4)
-reshaped = a.reshape(1, 4)                # view or copy; do not rely on which
-
-print("cat rows:", cat_rows.shape)
-print("cat columns:", cat_columns.shape)
-print("stacked:", stacked.shape)
-print("flat view:", flat_view.shape)
-print("reshaped:", reshaped.shape)
-`,
-    notes:
-      '`cat` preserves rank and joins an existing dimension; `stack` increases rank by inserting a dimension. `reshape` is flexible, while `view` requires compatible strides.',
   },
 
-  mutation: {
-    title: 'Mutate explicitly and protect autograd',
-    description: 'Run the example, then replace an in-place operation with an out-of-place one and compare the result.',
+  linalg: {
+    title: 'Matmul, einsum, and linear algebra',
+    initialCode: `import numpy as np
+import torch
+
+batch, tokens, width, out = 2, 3, 4, 5
+x = torch.arange(batch * tokens * width, dtype=torch.float32).reshape(batch, tokens, width)
+w = torch.arange(width * out, dtype=torch.float32).reshape(width, out)
+
+matmul = torch.matmul(x, w)
+einsum = torch.einsum("btd,do->bto", x, w)
+
+print("matmul:", matmul.shape)
+print("einsum:", einsum.shape)
+print("same values:", torch.allclose(matmul, einsum))
+print("dot:", torch.dot(torch.arange(4), torch.arange(4)).item())
+print("outer:\\n", torch.outer(torch.arange(3), torch.arange(2)))
+print("NumPy matmul agrees:", np.allclose(matmul, np.matmul(x, w)))
+`,
+  },
+
+  reductions: {
+    title: 'Reductions and numerical stability',
     initialCode: `import torch
 
-x = torch.zeros((2, 3), dtype=torch.float32)
+logits = torch.tensor([[1000.0, 1001.0, 999.0], [-1000.0, -999.0, -1001.0]])
 
-with torch.no_grad():
-    x.add_(1.0)
-    x[0, 1] = 7.0
-    x[:, 2].fill_(4.0)
+probabilities = torch.softmax(logits, dim=-1)
+log_probabilities = torch.log_softmax(logits, dim=-1)
+normalizer = torch.logsumexp(logits, dim=-1)
+top = torch.topk(logits, k=2, dim=-1)
 
-y = x + 1.0
-print("x after mutation:\\n", x)
-print("y from out-of-place +:\\n", y)
+print("softmax row sums:", torch.sum(probabilities, dim=-1))
+print("logsumexp:", normalizer)
+print("top values:\\n", top.values)
+print("top indices:\\n", top.indices)
+print("L2 norm:", torch.norm(logits, p=2, dim=-1))
 `,
-    referenceCode: `import torch
+  },
 
-x = torch.zeros((2, 3), dtype=torch.float32)
+  autograd: {
+    title: 'Gradient flow and finite-difference checks',
+    initialCode: `import torch
 
-with torch.no_grad():
-    x.add_(1.0)       # underscore marks an in-place operation
-    x[0, 1] = 7.0     # indexing assignment is also in-place
-    x[:, 2].fill_(4.0)
+def objective(x):
+    return torch.sum(torch.sin(x) * x ** 2)
 
-y = x + 1.0           # out-of-place: x is unchanged by this line
-print("x after mutation:\\n", x)
-print("y from out-of-place +:\\n", y)
+x = torch.tensor([0.2, -0.4, 0.8], dtype=torch.float64)
+epsilon = 1e-6
+numerical_grad = torch.zeros_like(x)
+
+for index in range(x.shape[0]):
+    step = torch.zeros_like(x)
+    step[index] = epsilon
+    numerical_grad[index] = (objective(x + step) - objective(x - step)) / (2 * epsilon)
+
+analytic_grad = 2 * x * torch.sin(x) + x ** 2 * torch.cos(x)
+print("finite difference:", numerical_grad)
+print("analytic:", analytic_grad)
+print("close:", torch.allclose(numerical_grad, analytic_grad, rtol=1e-5, atol=1e-7))
 `,
-    notes:
-      'In real training code, prefer out-of-place operations unless the memory saving is deliberate and autograd permits the mutation. Never use `.data` as a shortcut around autograd.',
+  },
+
+  modules: {
+    title: 'Module registration and buffers',
+    initialCode: `import torch
+from torch import nn
+
+torch.manual_seed(3)
+
+class Projector(nn.Module):
+    def __init__(self, width):
+        super().__init__()
+        self.proj = nn.Linear(width, width)
+        self.scale = nn.Parameter(torch.ones(width))
+        self.register_buffer("running_total", torch.zeros(width))
+        self.unregistered = [nn.Linear(width, width)]
+
+    def forward(self, x):
+        return self.proj(x) * self.scale
+
+model = Projector(4)
+x = torch.ones(2, 4)
+
+print("output shape:", model(x).shape)
+print("parameters:", [name for name, _ in model.named_parameters()])
+print("buffers:", [name for name, _ in model.named_buffers()])
+print("children:", [name for name, _ in model.named_children()])
+print("state dict:", list(model.state_dict()))
+`,
+  },
+
+  containers: {
+    title: 'Module containers, mode, and state',
+    initialCode: `import torch
+from torch import nn
+
+torch.manual_seed(5)
+
+class MLP(nn.Module):
+    def __init__(self, width, depth):
+        super().__init__()
+        self.layers = nn.ModuleList([nn.Linear(width, width) for _ in range(depth)])
+        self.dropout = nn.Dropout(p=0.5)
+
+    def forward(self, x):
+        for layer in self.layers:
+            x = nn.functional.relu(layer(x))
+        return self.dropout(x)
+
+model = MLP(width=4, depth=3)
+inputs = torch.ones(2, 4)
+
+model.train()
+train_output = model(inputs)
+model.eval()
+eval_output = model(inputs)
+
+checkpoint = model.state_dict()
+result = model.load_state_dict(checkpoint, strict=True)
+
+print("registered layers:", [name for name, _ in model.named_modules()])
+print("state keys:", list(checkpoint))
+print("mode:", model.training, model.dropout.training)
+print("train/eval shapes:", train_output.shape, eval_output.shape)
+print("load result:", result.missing_keys, result.unexpected_keys)
+`,
+  },
+
+  data: {
+    title: 'Dataset, DataLoader, and collation',
+    initialCode: `import torch
+from torch.utils.data import DataLoader, Dataset
+
+class Pairs(Dataset):
+    def __init__(self):
+        self.features = torch.arange(30, dtype=torch.float32).reshape(10, 3)
+        self.targets = torch.arange(10, dtype=torch.int64)
+
+    def __len__(self):
+        return self.targets.shape[0]
+
+    def __getitem__(self, index):
+        return {"features": self.features[index], "target": self.targets[index]}
+
+torch.manual_seed(11)
+loader = DataLoader(Pairs(), batch_size=4, shuffle=True, drop_last=False)
+
+for batch_index, batch in enumerate(loader):
+    print(batch_index, batch["features"].shape, batch["target"].tolist())
+`,
+  },
+
+  training: {
+    title: 'Training-loop invariants',
+    initialCode: `import torch
+
+torch.manual_seed(13)
+x = torch.linspace(-1, 1, 16).reshape(16, 1)
+target = 3 * x + 2
+
+weight = torch.randn(1, 1)
+bias = torch.zeros(1)
+learning_rate = 0.2
+
+for step in range(12):
+    prediction = torch.matmul(x, weight) + bias
+    residual = prediction - target
+    loss = torch.mean(residual ** 2)
+
+    grad_weight = 2 * torch.matmul(torch.transpose(x, 0, 1), residual) / x.shape[0]
+    grad_bias = 2 * torch.mean(residual, dim=0)
+
+    with torch.no_grad():
+        weight.sub_(learning_rate * grad_weight)
+        bias.sub_(learning_rate * grad_bias)
+
+print("loss:", float(loss))
+print("weight / bias:", weight.item(), bias.item())
+`,
+  },
+
+  optimization: {
+    title: 'Accumulation, AMP, clipping, and schedulers',
+    initialCode: `import torch
+
+# Loss scaling keeps tiny float16 gradients representable.
+gradient = torch.tensor([2e-8, -7e-8, 4e-5], dtype=torch.float16)
+scale = 1024.0
+scaled = gradient * scale
+unscaled = scaled / scale
+
+print("original float16:", gradient)
+print("scaled:", scaled)
+print("unscaled:", unscaled)
+
+# Accumulating four microbatches requires dividing each loss by four.
+microbatch_losses = torch.tensor([1.2, 0.8, 1.0, 1.4])
+effective_loss = torch.sum(microbatch_losses / 4)
+print("effective mean loss:", effective_loss.item())
+`,
+  },
+
+  functionalTransforms: {
+    title: 'Vectorization and per-sample gradients',
+    initialCode: `import torch
+
+def loss(weight, example, target):
+    prediction = torch.sum(weight * example)
+    return (prediction - target) ** 2
+
+weight = torch.tensor([0.3, -0.2, 0.8], dtype=torch.float64)
+examples = torch.tensor([[1.0, 2.0, 3.0], [3.0, 1.0, -1.0]])
+targets = torch.tensor([1.0, -2.0])
+
+epsilon = 1e-6
+per_sample = []
+for example, target in zip(examples, targets):
+    gradient = torch.zeros_like(weight)
+    for index in range(weight.shape[0]):
+        step = torch.zeros_like(weight)
+        step[index] = epsilon
+        gradient[index] = (
+            loss(weight + step, example, target)
+            - loss(weight - step, example, target)
+        ) / (2 * epsilon)
+    per_sample.append(gradient)
+
+print("per-sample gradient shape:", torch.stack(per_sample).shape)
+print(torch.stack(per_sample))
+`,
   },
 };

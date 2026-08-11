@@ -4,12 +4,11 @@ import PythonPlayground from './PythonPlayground';
 interface Props {
   title: string;
   initialCode: string;
-  referenceCode: string;
   description?: string;
   notes?: string;
 }
 
-const { title, initialCode, referenceCode, description, notes } = Astro.props;
+const { title, initialCode, description, notes } = Astro.props;
 const samples = [
   {
     label: 'Starting example',
@@ -20,11 +19,6 @@ const samples = [
 ---
 
 <section class="revision-code-pair" aria-label={`${title} code example`}>
-  <details class="revision-code-pair__reference">
-    <summary>Reference code</summary>
-    <pre><code>{referenceCode}</code></pre>
-  </details>
-
   <div class="revision-code-pair__runner">
     <PythonPlayground
       client:visible
@@ -32,6 +26,7 @@ const samples = [
       initialCode={initialCode}
       samples={samples}
       notes={notes}
+      compact
     />
   </div>
 </section>
