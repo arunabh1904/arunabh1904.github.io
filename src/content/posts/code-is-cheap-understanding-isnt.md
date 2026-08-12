@@ -33,9 +33,6 @@ That changes what it means to be good at using AI for software. Most of us have 
 
 The scarce part is deciding what should exist.
 
-[![An engineer routes distinct tasks to small specialist robots while reserving one large machine for the hardest work.](/assets/images/agentic-engineering-orchestration.png)](/assets/images/agentic-engineering-orchestration.png)
-_Explanatory illustration: an agentic engineering system is a routing problem. Give bounded work to specialized workers, isolate their context, and reserve the most expensive capability for the decisions that need it. Original image generated with OpenAI ImageGen._
-
 ## Context becomes the scarce input
 
 As implementation gets cheaper, context gets more valuable. An agent might remember more Kubernetes details than I do. It might know more C++ edge cases. It might produce a CUDA kernel in minutes that would have taken me half a day. What it does not automatically know is why a particular system looks the way it does.
@@ -55,7 +52,7 @@ Give it a problem and 8,000 lines of code appear. Something fails, so another ag
 Everyone has been extremely busy. Then somebody has to own it.
 
 [![A cannon creates a tangled heap while an engineer builds a small bridge that carries a real load.](/assets/images/agentic-engineering-slop-cannon.png)](/assets/images/agentic-engineering-slop-cannon.png)
-_Explanatory illustration: output volume is not engineering progress. The pile is easy to create; the small structure that carries a real load is the result that matters. Original image generated with OpenAI ImageGen._
+_The adult in the room builds the bridge. The slop cannon calls the pile velocity. Imagined by OpenAI ImageGen._
 
 There is a large difference between using a model to extend a deep understanding of your tools and using it to generate a system you do not understand. If I would be uncomfortable maintaining an unfamiliar codebase handed to me by a developer I have never met, I should be equally uncomfortable maintaining thousands of generated lines whose decisions I never examined.
 
@@ -134,6 +131,9 @@ The amount of human labor required to produce software will probably fall. Prete
 Imagine two engineers in that organization. One has become extraordinarily good at generating things. Every task invokes the largest model. Every problem becomes a giant agent run. The engineer produces enormous diffs, consumes enormous amounts of inference, and understands a shrinking fraction of what ships.
 
 The other understands the system and the business. They decompose ambiguous problems, know when a small model will do, keep context clean, run independent work in parallel, delete aggressively, challenge the output, and take responsibility for what reaches production.
+
+[![An engineer routes distinct tasks to small specialist robots while reserving one large machine for the hardest work.](/assets/images/agentic-engineering-orchestration.png)](/assets/images/agentic-engineering-orchestration.png)
+_Agent manager — imagined by OpenAI ImageGen._
 
 Which one do you retain?
 
