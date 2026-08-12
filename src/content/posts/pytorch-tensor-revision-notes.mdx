@@ -6,96 +6,96 @@ postSlug: pytorch-tensor-revision-notes
 legacyPath: /revision notes/2026/08/09/pytorch-tensor-revision-notes.html
 tags:
   - PyTorch
-summary: Build a predictive model of PyTorch tensors from storage, metadata, views, indexing, broadcasting, dtype, and layout.
+summary: Understand how PyTorch represents tensors through storage, shape, strides, dtype, device, layout, and autograd metadata.
 ---
 import RevisionCodePair from '../../components/RevisionCodePair.astro';
 import { pytorchRevisionExamples } from '../../lib/pytorch-revision-examples';
 
 # PyTorch I: Tensors
 
-## Tensor model
+## Tensor representation
 
-A tensor is not merely a box of numbers. It is a logical array whose metadata tells PyTorch how to interpret storage and where to execute operations. Shape names the logical axes; strides and storage offset map an index to memory; dtype determines representation and arithmetic; device determines where storage lives; and layout constrains which kernels can consume it.
+For the common dense strided layout, `torch.Tensor` represents an n-dimensional array through a storage allocation and a set of metadata. Shape, strides, and storage offset map logical indices to stored values. Dtype specifies the representation of each value, device places the storage, and layout determines how operators access it. Autograd records additional information when PyTorch must differentiate the operations that produced the tensor.
 
-That definition is useful because most tensor bugs are contract bugs. A model sees the wrong axis, an operation broadcasts farther than intended, a view still aliases its source, or a conversion quietly copies and synchronizes. By the end of this part, you should be able to predict those consequences before running the code.
+The representation explains several common surprises. A transpose can change the apparent dimensions without moving data. A slice can keep a much larger allocation alive. Broadcasting can produce a large logical result from a small stored input. A device transfer can copy data and synchronize execution even though the values do not change. Tensor debugging must therefore inspect the values and the metadata that produced their current interpretation.
 
-This is the first of three connected notes. [Part II](/revision%20notes/2026/08/10/pytorch-autograd-and-training.html) uses this tensor model to explain autograd, modules, and training. [Part III](/revision%20notes/2026/08/10/pytorch-systems-and-scale.html) follows the same tensors through compilation, accelerators, memory, and distributed execution.
+This note develops that representation from storage upward. [Part II](/revision%20notes/2026/08/10/pytorch-autograd-and-training.html) adds autograd, module state, and training. [Part III](/revision%20notes/2026/08/10/pytorch-systems-and-scale.html) follows the same operations through accelerator execution, memory allocation, compilation, and distributed training.
 
 ## Storage and strides
 
-For the common `torch.strided` layout, a logical index $(i_0, \ldots, i_{n-1})$ reaches storage position
+For a dense tensor with `torch.strided` layout, PyTorch maps a logical index $(i_0, \ldots, i_{n-1})$ to a storage position as
 
 $$
 \text{storage\_offset} + \sum_{k=0}^{n-1} i_k\,\text{stride}_k.
 $$
 
-The equation separates the logical tensor from its physical storage. Shape bounds the valid indices, while each stride says how many storage elements to skip when one index advances. A contiguous row-major tensor with shape `(2, 3, 4)` normally has strides `(12, 4, 1)`: move one position along the last axis and storage advances by one; move along the middle axis and it advances by four.
+The shape limits the valid value of each index. The stride for an axis gives the number of storage elements between adjacent positions on that axis. A contiguous tensor with shape `(2, 3, 4)` usually has strides `(12, 4, 1)`: advancing the last index moves one storage element, while advancing the middle index moves four.
 
-Because metadata and storage are separate, several tensors can describe the same allocation. A slice changes the visible range, a transpose swaps shape and strides, and `expand` can assign a zero stride to a repeated logical axis. Those operations can be cheap because values do not move, but their outputs are aliases rather than independent arrays.
+Shape and strides can change without changing the underlying allocation. A slice changes the visible range and may change the storage offset. A transpose reorders shape and strides. `expand` can give an axis a stride of zero, so many logical positions refer to the same stored value. These operations are cheap because they update metadata, but the resulting tensors share storage with their source.
 
 ## Creating tensors
 
-The first construction question is whether the new tensor owns a copy. `torch.tensor(data)` copies its input and creates a fresh leaf by default. `torch.as_tensor(data)` reuses compatible input where possible. `torch.from_numpy(array)` deliberately shares CPU storage with a NumPy array, so a write through either object can reach the other. `torch.frombuffer` exposes a compatible Python buffer under a similar lifetime constraint.
+Tensor construction determines ownership first. `torch.tensor(data)` copies the input. `torch.as_tensor(data)` reuses existing memory when the input representation is compatible. `torch.from_numpy(array)` shares CPU memory with a NumPy array, and `torch.frombuffer` exposes a compatible Python buffer. Shared-memory conversions require the source object to remain valid, and mutation through either view is visible through the other.
 
-The second question is where and how values should be represented. Pass `dtype` and `device` at construction when they are already known. Constructing on the CPU and converting later creates another allocation and, for an accelerator, a transfer. The `*_like` family starts from an existing tensor's shape and normally its dtype, layout, and device, which makes “match this tensor” explicit without repeating metadata.
+Construction also fixes dtype and device. If both are known, pass them to the factory rather than creating a CPU tensor and converting it afterward. The latter performs an extra allocation and may perform a device transfer. The `*_like` factories inherit shape and normally dtype, layout, and device from an existing tensor; explicit keyword arguments override the inherited values.
 
-Factory names communicate initialization intent. `zeros`, `ones`, and `full` initialize every value; `arange` defines a step while `linspace` defines a count; `rand` and `randn` consume random-generator state. `empty` only allocates storage. Its values are undefined until every element has been overwritten, so reading first is a correctness error rather than harmless noise.
+The factory name states how values are initialized. `zeros`, `ones`, and `full` write every element. `arange` specifies an interval and step, while `linspace` specifies the number of samples. `rand` and `randn` draw from a random generator. `empty` allocates without initializing the elements, so every element must be written before the tensor is read.
 
-NumPy and PyTorch look similar at this boundary but have different defaults. NumPy floating arrays normally infer `float64`, while PyTorch's default floating dtype is normally `float32`. NumPy arrays live on the CPU; a tensor can live on an accelerator and carry autograd history. A conversion can therefore change precision, ownership, device, synchronization, and gradient connectivity even when the printed values look unchanged.
+NumPy and PyTorch have different defaults at this boundary. A NumPy array created from Python floating-point values usually uses `float64`; a PyTorch tensor usually uses the current default floating dtype, normally `float32`. NumPy arrays are CPU-resident, while PyTorch tensors may live on an accelerator and carry autograd history. A conversion may therefore change ownership, precision, device, synchronization, or gradient history even when it preserves the values.
 
-| Intent | Preferred operation | What to predict |
+| Intent | Operation | Result |
 | --- | --- | --- |
-| Own a copy | `torch.tensor(x)` or `x.clone()` | New storage; decide dtype and device. |
-| Reuse compatible input | `torch.as_tensor(x)` | Sharing depends on the input and requested conversion. |
-| Share NumPy CPU memory | `torch.from_numpy(a)` | Mutations can cross the boundary. |
-| Match another tensor | `zeros_like`, `ones_like`, `empty_like` | Metadata is inherited unless overridden. |
-| Convert or move | `x.to(dtype=..., device=...)` | May return `x` unchanged or allocate a result. |
+| Copy input data | `torch.tensor(x)` or `x.clone()` | New storage |
+| Reuse compatible data | `torch.as_tensor(x)` | May share storage |
+| Share a NumPy array | `torch.from_numpy(a)` | Shared CPU storage |
+| Match an existing tensor | `zeros_like`, `ones_like`, `empty_like` | Inherits metadata unless overridden |
+| Change dtype or device | `x.to(dtype=..., device=...)` | Returns `x` if no conversion is needed; otherwise allocates |
 
 ## Views and copies
 
-`view` changes shape only when the current size and strides permit that interpretation. `reshape` is more permissive: it returns a view when possible and copies otherwise. Code should therefore depend on `reshape`'s values and shape, not on whether it shares storage. `transpose`, `permute`, `movedim`, `narrow`, `select`, `squeeze`, and `unsqueeze` generally return views.
+`view` returns a new shape only when the existing strides support that interpretation. `reshape` returns a view when possible and copies when necessary. Code that uses `reshape` should not assume either outcome. Operations such as `transpose`, `permute`, `movedim`, `narrow`, `select`, `squeeze`, and `unsqueeze` usually return views.
 
-Three operations mark different boundaries. `contiguous()` materializes a compatible contiguous representation only when needed. `clone()` always copies values but remains connected to autograd. `detach()` removes the autograd edge while normally sharing storage. “Independent values” and “independent gradient history” are different guarantees.
+`contiguous()`, `clone()`, and `detach()` solve different problems. `contiguous()` copies only when the tensor does not already have the requested memory format. `clone()` always copies the values and preserves the autograd connection to the source. `detach()` removes the incoming autograd edge but usually keeps the same storage. A tensor can therefore be independent in storage but connected in the computation graph, or detached from the graph but aliased in storage.
 
-In-place operations expose why aliasing matters. A method ending in `_`, indexing assignment, or an `out=` argument writes into existing storage. If another tensor aliases that storage, it observes the write. Once autograd enters the picture, the same write can invalidate a value saved for backward; Part II develops that consequence.
+Aliasing becomes visible under mutation. Methods ending in `_`, indexed assignment, and operations with an `out=` argument write into existing storage. Every view of that storage can observe the change. During training, an in-place write may also change a value that autograd saved for backward; Part II explains how PyTorch detects that case.
 
 ## Indexing
 
-Basic indexing follows Python rules. An integer removes an axis, a slice preserves it, `None` inserts a singleton axis, `...` fills unspecified axes, and negative indices count from the end. Basic slices generally return views, so mutating the result can mutate the base tensor.
+Basic indexing follows NumPy-style rules. An integer removes an axis, a slice preserves it, `None` inserts an axis of length one, `...` fills unspecified axes, and a negative index counts from the end. Basic slicing usually returns a view, so assigning through the result may change the original tensor.
 
-Advanced indexing uses integer tensors, lists of indices, or boolean masks and returns selected values in new storage. Assignment with advanced indexing still writes to the destination, so the read and write forms have different ownership behavior. `gather`, `index_select`, `take_along_dim`, `masked_select`, `scatter`, and `index_put_` make the indexed axis or write explicit when ordinary syntax hides too much.
+Advanced indexing uses integer tensors, lists of indices, or boolean masks. Reading with advanced indexing returns selected values in new storage. Assignment with the same syntax writes into the indexed positions of the destination. `gather`, `index_select`, `take_along_dim`, `masked_select`, `scatter`, and `index_put_` are useful when the indexed axis or write rule should be explicit.
 
-The reliable habit is to predict the output rank before its values. For `x` shaped `(batch, tokens, channels)`, `x[0]` removes the batch axis, `x[:1]` keeps it, and `x[..., -1]` removes the channel axis. Many model failures that look numerical are one missing or extra singleton dimension.
+Check the output rank before checking the values. If `x` has shape `(batch, tokens, channels)`, then `x[0]` has shape `(tokens, channels)`, `x[:1]` has shape `(1, tokens, channels)`, and `x[..., -1]` has shape `(batch, tokens)`. An unintended integer index often removes an axis that later code expected to preserve.
 
 ## Broadcasting
 
-PyTorch aligns operand shapes from the right. Two aligned dimensions are compatible when they are equal or either is `1`; missing leading dimensions behave as `1`. Adding a bias shaped `(channels,)` to activations shaped `(batch, tokens, channels)` therefore treats the bias as `(1, 1, channels)`.
+Broadcasting compares shapes from the last axis to the first. Two aligned dimensions are compatible if they are equal or if either one is `1`; a missing leading dimension behaves as `1`. Adding a bias with shape `(channels,)` to activations with shape `(batch, tokens, channels)` treats the bias as if it had shape `(1, 1, channels)`.
 
-Broadcasting avoids copying the smaller operand, but it does not make the downstream computation free. `expand` can represent repeated logical values with zero strides, while an operation using the expanded view may still process every logical element. This distinction—cheap representation versus expensive consumer—returns in Part III when we reason about memory and kernels.
+The smaller input is not copied to its expanded logical shape. `expand` can represent repeated values with zero strides. The operation that consumes the expanded tensor may still process every element of the broadcasted result, so broadcasting saves storage for the input but does not remove the arithmetic on the output.
 
-`cat` and `stack` answer a different shape question. `cat` extends an existing axis and preserves rank; every other axis must agree. `stack` requires equal shapes and inserts a new axis. If the operation creates a new semantic category such as ensemble, time, or sample, `stack` is usually the clearer starting point.
+`cat` and `stack` change shapes in different ways. `cat` joins tensors along an existing axis and keeps the rank unchanged; all other dimensions must match. `stack` requires equal input shapes and creates a new axis. Use `stack` when the new axis represents a new variable such as sample, time, or ensemble member.
 
 ## Dtype and layout
 
-Once shapes align, dtype promotion decides the result representation. Out-of-place operations may promote mixed inputs, while an in-place operation cannot store a result that is incompatible with its receiver's dtype. Use `torch.result_type` or `torch.promote_types` when Python scalars, zero-dimensional tensors, or mixed precision make the result unclear.
+After shapes are compatible, dtype promotion determines the result dtype. Out-of-place operations may promote their inputs. In-place operations must write the result back into the dtype of the destination, so some mixed-dtype expressions that work out of place fail in place. `torch.result_type` and `torch.promote_types` expose the promotion rule when Python scalars, zero-dimensional tensors, or mixed precision make it unclear.
 
-Numerical form matters as much as dtype. Prefer `logsumexp(x)` to `log(exp(x).sum())`, `log_softmax(x)` to `softmax(x).log()`, and `cross_entropy(logits, target)` to manually constructing probabilities and logarithms. These formulations preserve the mathematical objective while avoiding unstable intermediate values.
+Numerical stability also depends on the form of the computation. `logsumexp(x)` avoids the large intermediate values created by `log(exp(x).sum())`. `log_softmax(x)` is more stable than `softmax(x).log()`. `cross_entropy(logits, target)` combines log-softmax and negative log-likelihood without materializing probabilities. These functions compute the intended objective while avoiding unstable intermediate steps.
 
-Layout completes the tensor contract. Dense strided tensors dominate general model code; channels-last formats can benefit supported convolution workloads; sparse COO, CSR, CSC, BSR, and BSC layouts store indices with values; quantized tensors add scale and zero point; nested or jagged tensors represent ragged structure. Operator, autograd, dtype, and device coverage vary, so a specialized layout must be chosen for an entire supported operator path rather than for an isolated storage saving.
+Layout describes how tensor values are organized beyond shape and dtype. Dense strided tensors cover most model code. Channels-last memory formats can improve supported convolution workloads. Sparse COO, CSR, CSC, BSR, and BSC tensors store indices along with values. Quantized tensors add scale and zero-point metadata, while nested or jagged tensors represent ragged structure. Support varies by operator, dtype, device, and autograd path, so a specialized layout is useful only when the complete operation sequence supports it.
 
 ## Tensor exercise
 
-Before running the code, predict whether `tokens` shares storage with `base`, how the two-element bias aligns, and whether the final `clone` can observe a later mutation of `base`. Then change the slice or bias and rerun it.
+Before running the code, determine whether `tokens` shares storage with `base`, how the bias aligns with `tokens`, and whether the cloned `features` tensor can observe a later write through `tokens`. Change the slice or bias shape and run it again.
 
 <RevisionCodePair {...pytorchRevisionExamples.tensorIntuition} />
 
-The trace compresses the whole part into one sequence: allocate storage, expose a view, broadcast a smaller logical tensor, reshape the result, then make ownership explicit. In model code, writing these transitions down is usually more useful than printing a wall of values.
+The example performs the main representation changes in order: it creates storage, takes a strided view, broadcasts a bias, reshapes the result, and then copies it. The printed shapes and strides identify which steps changed metadata and which step created independent storage.
 
 ## Debugging tensors
 
-At a subsystem boundary, inspect `shape → dtype → device → layout → strides → ownership`. `numel() * element_size()` estimates the dense logical payload, but not allocator reservation, sparse indices, alignment, or a larger allocation retained by a view. `item()` converts exactly one element to a Python scalar; it does not reveal storage, and on an accelerator it may synchronize the host.
+At an interface between two parts of a model, inspect `shape`, `dtype`, `device`, `layout`, strides, and storage sharing. `numel() * element_size()` gives the dense logical payload, but it does not include allocator reservation, sparse indices, alignment, or unused elements in a larger allocation retained by a view. `item()` returns one Python scalar and may synchronize an accelerator with the host.
 
-The final question is whether the next operation should remember how the tensor was produced. If the answer is yes, the tensor now participates in a differentiable program. That is the starting point for [Part II: Autograd and Training](/revision%20notes/2026/08/10/pytorch-autograd-and-training.html).
+When `requires_grad` is enabled and grad mode is active, PyTorch also records the operations that produced a tensor. [Part II: Autograd and Training](/revision%20notes/2026/08/10/pytorch-autograd-and-training.html) explains that graph and how backward uses it.
 
 ## Sources
 
