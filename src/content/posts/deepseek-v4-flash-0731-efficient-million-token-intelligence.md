@@ -20,11 +20,12 @@ summary: '2026 – DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence 
 **arXiv:** [2606.19348](https://arxiv.org/abs/2606.19348)<br />
 **July 31 update:** [DeepSeek-V4-Flash Update](https://api-docs.deepseek.com/updates/)<br />
 **Original release:** [DeepSeek V4 Preview](https://api-docs.deepseek.com/news/news260424/)<br />
-**Preview weights:** [deepseek-ai/DeepSeek-V4-Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash)
+**0731 weights:** [deepseek-ai/DeepSeek-V4-Flash-0731](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731)<br />
+**Fit and serving guide:** [Can DeepSeek V4 Flash 0731 Run on a 64 GB MacBook Pro?](/blog/2026/08/13/running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro.html)
 
 ## Summary
 
-DeepSeek-V4-Flash-0731 is a post-training release, not a new base model. It keeps the April preview's architecture and size—284 billion total parameters, 13 billion active per token, and a one-million-token context window—while replacing the API checkpoint with a model tuned for stronger agent behavior and native Responses API use. DeepSeek says only the API changed; the web/app models and V4-Pro endpoint did not, and updated Flash weights were not announced with the July release.
+DeepSeek-V4-Flash-0731 is a post-training release, not a new base model. It keeps the April preview's architecture and size—284 billion total parameters, 13 billion active per token, and a one-million-token context window—while replacing the API checkpoint with a model tuned for stronger agent behavior and native Responses API use. DeepSeek initially said the July 31 update changed only the Flash API, leaving the web/app models and V4-Pro endpoint unchanged; the exact `0731` weights were published on Hugging Face on August 1.
 
 ## Core Insights
 
@@ -44,7 +45,7 @@ CSA first compresses each four-token KV group, then uses a learned indexer to se
 | 1M-token efficiency | 10% of V3.2 single-token FLOPs; 7% of its KV cache | Makes million-token decoding materially cheaper in the authors' estimate |
 | Pretraining | 32T tokens; 4K → 16K → 64K → 1M context | Trains the target context progressively rather than extrapolating only at inference |
 | Quantization | FP4 routed-expert weights; FP4 CSA indexer QK path during QAT | Reduces expert memory traffic and long-context index cost |
-| July 31 delta | Same architecture, API checkpoint re-post-trained | Capability change cannot be attributed to a new backbone or more pretraining |
+| July 31 delta | Same architecture, re-post-trained weights plus a DSpark draft module | Capability change cannot be attributed to a new backbone or more pretraining |
 
 The 32T-token corpus extends DeepSeek-V3 data with filtered web pages, mathematics, code, multilingual material, long documents, and agentic mid-training data. Flash trains with dense attention for the first trillion tokens, introduces sparse attention at 64K context, and eventually reaches 1M. The report supplies unusually concrete optimization controls: auxiliary load-balancing loss weight 0.0001, multi-token-prediction loss weight 0.3 for most of training and 0.1 during learning-rate decay, and a 75.5M-token maximum batch. It does not report category mixture proportions or contamination audits for the July agent benchmarks.
 
@@ -58,5 +59,5 @@ The official July evaluation reports 82.7 on Terminal-Bench 2.1, 54.2 on NL2Repo
 - The expensive commitment is to a custom serving stack for hybrid attention, sparse experts, mHC residual paths, FP4 computation, and persistent tool state. The paper reports striking modeled efficiency against V3.2, but does not isolate CSA, HCA, mHC, Muon, data, and scale under a single matched budget. The decisive experiment is a long-context retrieval-and-agent sweep that holds active parameters, training tokens, decoding budget, and hardware constant while varying compression rate and selector top-k. Reject the architecture choice if a simpler MLA/GQA baseline matches end-task accuracy and latency, or if retrieval degrades sharply outside synthetic long-context tests.
 - For the 0731 checkpoint, the missing control is even simpler: evaluate the preview and updated API models with the same public harness, effort budget, samples, and judge. Without that table, the size of the post-training gain is not reported. At ten times the context or trajectory length, selector recall, accumulated compressed-state error, sandbox persistence, and cache bandwidth are likely to dominate before nominal MoE capacity does.
 - DeepSeek-V4-Flash is the smaller V4 branch: it shares the V4 hybrid-attention and post-training stack, but activates 13B parameters rather than V4-Pro's 49B.
-- The July checkpoint is API-only, its post-training recipe and updated weights are not reported, its code-agent harness is not yet released, two headline benchmarks are internal, and the release provides no matched preview-versus-0731 table.
+- The July checkpoint's weights are public, but its post-training recipe is not reported, its code-agent harness is not yet released, two headline benchmarks are internal, and the release provides no controlled ablation of the post-training changes.
 - DeepSeek-V4-Flash-0731 is evidence that post-training can move agent performance without changing a 32T-token base; until the harness and matched before/after results are released, use it as a deployment update rather than proof of a new training method.
