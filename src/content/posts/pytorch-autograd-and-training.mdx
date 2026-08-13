@@ -40,6 +40,10 @@ $$
 
 PyTorch does not construct one symbolic expression for the full derivative. Each node computes a vector-Jacobian product for its own operation. Reverse-mode differentiation is efficient for neural-network training because one scalar loss usually depends on many parameters.
 
+[![Animation showing the forward pass recording an autograd graph and backward traversing it toward leaf parameters](/assets/images/pytorch-autograd-forward-backward.gif)](/assets/images/pytorch-autograd-forward-backward.gif)
+
+Forward creates the nodes and saves only the values their backward rules require. Backward then starts at the scalar loss with an upstream gradient of one, composes local vector-Jacobian products in reverse, and accumulates the results on the leaf parameters.
+
 ## Vector-Jacobian products
 
 For a scalar `loss`, `loss.backward()` supplies an upstream gradient of one. A tensor with more than one element requires an explicit `gradient` argument because its components can be combined in different ways.
@@ -114,6 +118,10 @@ clear gradients → load batch → forward → compute loss → backward
 The order determines which state each operation reads. Forward saves activations for the current parameters. Backward adds gradients computed from those activations. The optimizer reads the gradients and changes the parameters and optimizer state. Moving a step changes the algorithm; for example, clipping before AMP unscaling clips scaled values rather than the gradients used by the optimizer.
 
 Gradient accumulation repeats forward and backward over several microbatches before the optimizer step. Divide each microbatch loss by the accumulation count when matching the gradient of a mean over the combined batch, and handle a short final accumulation window explicitly. Under DDP, `no_sync()` should cover only microbatches that do not perform the optimizer step.
+
+[![Animation showing three microbatch gradients accumulating before one optimizer step and gradient reset](/assets/images/pytorch-gradient-accumulation.gif)](/assets/images/pytorch-gradient-accumulation.gif)
+
+Each backward adds a scaled contribution to the same `.grad` buffer. The optimizer reads the completed sum once, updates the parameter, and only then does `zero_grad(set_to_none=True)` remove the buffer for the next accumulation window.
 
 Autocast selects lower precision for supported operations while retaining higher precision where needed. It should wrap the forward pass and loss, not the optimizer update or backward call. `GradScaler` is mainly used to protect float16 gradients from underflow. Bfloat16 has a wider exponent range and often runs without scaling, but the correct choice depends on numerical tests for the model and hardware.
 
