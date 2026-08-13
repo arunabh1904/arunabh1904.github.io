@@ -33,6 +33,10 @@ The shape limits the valid value of each index. The stride for an axis gives the
 
 Shape and strides can change without changing the underlying allocation. A slice changes the visible range and may change the storage offset. A transpose reorders shape and strides. `expand` can give an axis a stride of zero, so many logical positions refer to the same stored value. These operations are cheap because they update metadata, but the resulting tensors share storage with their source.
 
+[![Animation mapping logical tensor indices through shape and strides into one storage allocation](/assets/images/pytorch-tensor-storage-strides.gif)](/assets/images/pytorch-tensor-storage-strides.gif)
+
+The logical grid and the storage are different objects: shape bounds the valid indices, while strides and the storage offset map each index to an address. A transpose can therefore change traversal order by replacing metadata while leaving every stored value in place.
+
 ## Creating tensors
 
 Tensor construction determines ownership first. `torch.tensor(data)` copies the input. `torch.as_tensor(data)` reuses existing memory when the input representation is compatible. `torch.from_numpy(array)` shares CPU memory with a NumPy array, and `torch.frombuffer` exposes a compatible Python buffer. Shared-memory conversions require the source object to remain valid, and mutation through either view is visible through the other.
@@ -58,6 +62,10 @@ NumPy and PyTorch have different defaults at this boundary. A NumPy array create
 `contiguous()`, `clone()`, and `detach()` solve different problems. `contiguous()` copies only when the tensor does not already have the requested memory format. `clone()` always copies the values and preserves the autograd connection to the source. `detach()` removes the incoming autograd edge but usually keeps the same storage. A tensor can therefore be independent in storage but connected in the computation graph, or detached from the graph but aliased in storage.
 
 Aliasing becomes visible under mutation. Methods ending in `_`, indexed assignment, and operations with an `out=` argument write into existing storage. Every view of that storage can observe the change. During training, an in-place write may also change a value that autograd saved for backward; Part II explains how PyTorch detects that case.
+
+[![Animation comparing how a slice view, detached tensor, and clone respond to an in-place mutation](/assets/images/pytorch-tensor-aliasing.gif)](/assets/images/pytorch-tensor-aliasing.gif)
+
+Both the slice and the detached tensor observe the mutation because both still alias the source storage. The clone keeps its copied value: `detach` changes graph connectivity, whereas `clone` changes storage ownership.
 
 ## Indexing
 

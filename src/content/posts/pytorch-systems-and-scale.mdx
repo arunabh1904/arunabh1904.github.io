@@ -82,11 +82,27 @@ These transforms work best when state is explicit. `functional_call` evaluates a
 
 Distributed PyTorch usually runs one process per accelerator. `torchrun` starts the processes and supplies rank information. Each process selects its local device and joins a process group with `init_process_group`. All ranks must call collectives in a compatible order; if one rank calls a different collective or skips one, the remaining ranks can wait indefinitely.
 
+[![Animation showing two ranks entering all-reduce and broadcast in a different order, leaving both ranks waiting](/assets/images/pytorch-distributed-collective-order.gif)](/assets/images/pytorch-distributed-collective-order.gif)
+
+The animation freezes because rank 0 is waiting for peers in `all_reduce(A)` while rank 1 is waiting for peers in `broadcast(B)`. Rank-local logs that record the next collective expose this mismatch more directly than a generic network timeout.
+
 DistributedDataParallel keeps a full model replica on every rank. Each rank processes a different input batch, and DDP all-reduces gradient buckets during backward so every replica applies the same update. `DistributedSampler` partitions a map-style dataset. Calling `sampler.set_epoch(epoch)` changes the shuffle order while preserving a consistent partition across ranks.
+
+[![Animation showing four DDP ranks computing local gradients, averaging them with all-reduce, and applying the same update](/assets/images/pytorch-distributed-ddp-all-reduce.gif)](/assets/images/pytorch-distributed-ddp-all-reduce.gif)
+
+The batches differ across ranks, but the all-reduce returns the same reduced gradient to every replica. That shared result—not identical inputs—is what keeps the model parameters synchronized after the optimizer step.
 
 FullyShardedDataParallel reduces model-state memory per rank by sharding parameters, gradients, and optimizer state. FSDP gathers parameter material around computation and then reshares it, so wrapping policy and execution order determine both memory and communication. Mixed precision, prefetch, initialization, and state-dict format also change the result. Construct the optimizer after wrapping so it refers to the parameters managed by FSDP.
 
+[![Animation showing FSDP ranks all-gathering parameter shards for computation and resharing them afterward](/assets/images/pytorch-distributed-fsdp-lifecycle.gif)](/assets/images/pytorch-distributed-fsdp-lifecycle.gif)
+
+FSDP spends communication to create a temporary full parameter for a compute region, then releases the copies that each rank does not own. The wrapping boundary therefore controls both how much state is materialized at once and how often ranks communicate.
+
 Tensor parallelism splits individual operations, while pipeline parallelism assigns different layer ranges to different stages. `DeviceMesh` describes multidimensional process layouts that combine data, tensor, and pipeline dimensions. These methods solve different limits: DDP scales data throughput, FSDP reduces replicated state, tensor parallelism divides operations that do not fit on one device, and pipeline parallelism divides depth.
+
+[![Animation comparing data, tensor, and pipeline parallelism, then combining data and tensor dimensions in a DeviceMesh](/assets/images/pytorch-distributed-parallelism-map.gif)](/assets/images/pytorch-distributed-parallelism-map.gif)
+
+“Model parallelism” is the umbrella term for splitting model computation or state across ranks; tensor and pipeline parallelism are two concrete forms. The useful question is therefore not which label is most general, but which object exceeds one device: batches, replicated model state, an individual operation, or layer depth. A hybrid layout can assign each concern to a different `DeviceMesh` dimension.
 
 The collective operations beneath these wrappers include `all_reduce`, `all_gather`, `reduce_scatter`, `broadcast`, and `all_to_all`. When training hangs, first compare rank-local logs and collective order, set timeouts, and enable `TORCH_DISTRIBUTED_DEBUG`. A network failure is only one possible cause; rank divergence can produce the same visible symptom.
 
