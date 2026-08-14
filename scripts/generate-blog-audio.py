@@ -52,7 +52,7 @@ TEMPERATURE = 0.38
 TOP_P = 0.86
 SPEED = 1.0
 BITRATE = "64k"
-MAX_CHARS = 900
+MAX_CHARS = 360
 SILENCE_THRESHOLD = 0.008  # -42 dBFS; matches the verification threshold below.
 BOUNDARY_SILENCE_SAMPLES = 1_200  # Retain 50 ms at 24 kHz, without a synthetic gap.
 LONG_SILENCE_DURATION = 0.8
@@ -66,8 +66,8 @@ SILENCE_FILTER = (
 )
 EXTRACTION_VERSION = "markdown-prose-v4"
 DEFAULT_BATCH_SIZE = 1
-MIN_GENERATION_TOKENS = 768
-MAX_TOKENS_PER_CHAR = 1.5
+MIN_GENERATION_TOKENS = 128
+MAX_TOKENS_PER_CHAR = 1.05
 
 
 def parse_frontmatter(source: str) -> dict[str, str]:
