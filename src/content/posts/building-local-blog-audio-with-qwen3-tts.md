@@ -77,7 +77,7 @@ The model emits 12 Hz acoustic codes and the local [`mlx-audio`](https://github.
 
 ## Long-form synthesis needs a scheduler
 
-One request per post is not reliable. Long technical posts exceed a comfortable generation window, and a failure near the end should not discard forty minutes of work. The exporter therefore breaks narration into sentence-bounded chunks of at most 900 characters. Before concatenation, it removes model-generated leading and trailing dead air while retaining only a 50 ms boundary release. A final waveform pass collapses any residual silence longer than 0.8 seconds to a 90 ms transition. The join is effectively gapless; ordinary rhetorical pauses remain natural.
+One request per post is not reliable. Long technical posts exceed a comfortable generation window, and a failure near the end should not discard forty minutes of work. The exporter therefore breaks narration into sentence-bounded chunks of at most 360 characters. Before concatenation, it removes model-generated leading and trailing dead air while retaining only a 50 ms boundary release. A final waveform pass collapses any residual silence longer than 0.8 seconds to a 90 ms transition. The join is effectively gapless; ordinary rhetorical pauses remain natural.
 
 The exporter loads the model once and keeps it resident for the entire corpus. Each chunk then uses the same direct VoiceDesign path as the approved listening sample. That choice is deliberate: Qwen's continuous batch API is useful for short parallel requests, but for long designed-voice segments it makes progress opaque and can hold a group behind its slowest member. The direct path gives predictable chunk boundaries and a truthful per-post progress signal.
 
@@ -92,11 +92,11 @@ for result in model.generate_voice_design(
     audio_parts.append(result.audio)
 ```
 
-The script also gives each direct call a text-length-derived acoustic-token ceiling: at least 768 tokens, and 1.5 tokens per source character above that. Qwen's generous default is useful for open-ended generation, but a narration segment should not be able to occupy the exporter for several minutes after it has already said what the text contains. The cap is included in the manifest digest, so changing it deliberately invalidates the affected audio.
+The script also gives each direct call a text-length-derived acoustic-token ceiling: at least 128 tokens and 1.05 tokens per source character above that. This detail was a reliability fix, not a cosmetic optimization. An earlier version imposed a 768-token floor; at roughly 12.5 acoustic tokens per second, a short heading or paragraph could keep the decoder running after the text had finished. The audible result was occasional non-speech noise a few items into a post. Shorter source chunks and a ceiling that follows their text prevent that runaway tail. The cap is included in the manifest digest, so changing it deliberately invalidates the affected audio.
 
 The script still exposes `--batch-size` for short segments and future runtime improvements, but its default is one chunk. The real export optimizations are one resident model, sentence-safe work units, bounded generation, resumable manifest checks, atomic post writes, and no wasted inference on captions or code. Those improvements reduce avoidable work without changing the narrator that the listener selected.
 
-After a post completes, the exporter writes temporary WAV chunks, concatenates them with `ffmpeg`, and atomically replaces the target MP3. The manifest is updated only after the post succeeds. An interrupted run can therefore resume: posts whose extracted narration, model ID, voice instruction, chunking profile, generation limit, and encoder settings still match their manifest digest are skipped.
+After a post completes, the exporter writes temporary WAV chunks, concatenates them with `ffmpeg`, applies the residual-silence limit, and atomically replaces the target MP3. That final pass solves a separate failure: VoiceDesign can decode a long quiet tail inside an otherwise valid waveform. Those were the conspicuous multi-second gaps in the middle of early files. The pass keeps normal pauses but reduces any quiet region longer than 0.8 seconds to 90 ms. The manifest is updated only after the post succeeds, so an interrupted run can resume only when its narration, model ID, voice instruction, chunking profile, generation limit, and encoder settings still match.
 
 ## Validation belongs before the voice model
 
