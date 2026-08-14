@@ -262,6 +262,13 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
           ))}
         </div>
 
+        {problem.visual && (
+          <figure className="code-practice-lab__visual">
+            <img src={problem.visual.src} alt={problem.visual.alt} loading="lazy" />
+            <figcaption>{problem.visual.caption}</figcaption>
+          </figure>
+        )}
+
         <div className="code-practice-lab__specs">
           <section className="code-practice-lab__spec-card">
             <p className="code-practice-lab__section-label">Implement</p>
@@ -364,6 +371,11 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
                 {problem.solutionNotes.map((note) => (
                   <p key={note}>{note}</p>
                 ))}
+                {problem.solutionDiagram && (
+                  <pre className="code-practice-lab__solution-diagram">
+                    <code>{problem.solutionDiagram}</code>
+                  </pre>
+                )}
               </div>
             </aside>
           )}

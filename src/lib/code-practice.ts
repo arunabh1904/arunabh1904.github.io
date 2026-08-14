@@ -4,6 +4,12 @@ export interface CodePracticeExample {
   result: string;
 }
 
+export interface CodePracticeVisual {
+  src: string;
+  alt: string;
+  caption: string;
+}
+
 export interface CodePracticeProblem {
   id: string;
   order: number;
@@ -19,6 +25,8 @@ export interface CodePracticeProblem {
   solutionCode: string;
   /** Full commented reference used to explain the compact editor solution line by line. */
   walkthroughCode?: string;
+  visual?: CodePracticeVisual;
+  solutionDiagram?: string;
   starterCode: string;
   packages?: readonly string[];
   tags?: readonly string[];
@@ -50,6 +58,12 @@ const RAW_CODE_PRACTICE_PROBLEMS = [
       'Write `softmax_cross_entropy(logits, labels)` so it returns the mean cross-entropy loss across a batch.',
       'Treat this like an interview question: keep the implementation concise, validate the inputs, and avoid numerical overflow when computing the softmax terms.',
     ],
+    visual: {
+      src: '/assets/images/code-tensor-ops-broadcasting.gif',
+      alt: 'Animated tensor diagrams showing broadcasting, expand, torch.cat, and torch.stack.',
+      caption:
+        'Tensor shape intuition: broadcasting aligns singleton axes, expand exposes a larger view, cat joins an existing axis, and stack creates a new axis. The same shape bookkeeping appears throughout the first PyTorch problems.',
+    },
     signature: `def softmax_cross_entropy(
     logits: torch.Tensor,
     labels: torch.Tensor,
@@ -573,7 +587,8 @@ print(binary_classification_metrics(sample_true, sample_pred))`,
     ],
     solutionNotes: [
       'Cosine similarity is just a dot product divided by the product of L2 norms. The solution constructs each norm from squared entries, a sum, and a square root before broadcasting the whole pairwise matrix.',
-      'The key edge case is a zero vector: its norm is zero, so any similarity involving that row is undefined. Filling those positions with `0.0` keeps the result stable and matches the prompt.',
+      'For `x.shape == (N, D)` and `y.shape == (M, D)`, `x_norms` has shape `(N,)` and `y_norms` has shape `(M,)`. `x_norms[:, None]` changes the first vector to `(N, 1)`, while `y_norms[None, :]` changes the second to `(1, M)`.',
+      'That makes `denominator = x_norms[:, None] * y_norms[None, :]` a broadcasted outer product: entry `[i, j]` is `||x[i]|| * ||y[j]||`, and the whole denominator has shape `(N, M)` to match `x @ y.T`. The key edge case is a zero vector, so those positions are explicitly returned as `0.0`.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -796,9 +811,20 @@ print(top_k_accuracy(sample_logits, sample_labels, k=1).item())`,
       'Validate that each box has `x2 >= x1` and `y2 >= y1` before computing anything else.',
     ],
     solutionNotes: [
-      'The main trick is to form all pairwise overlap rectangles with broadcasting, then compute intersection areas, box areas, and union areas from those tensors.',
+      'The main trick is to form all pairwise overlap rectangles with broadcasting. If `boxes1.shape == (N, 4)` and `boxes2.shape == (M, 4)`, then `boxes1[:, None, :2]` is `(N, 1, 2)` and `boxes2[None, :, :2]` is `(1, M, 2)`; `torch.maximum` broadcasts them to `(N, M, 2)`, one top-left corner for every box pair.',
+      'The same pattern gives bottom-right corners `(N, M, 2)`, intersection areas `(N, M)`, and union `area1[:, None] + area2[None, :] - intersection`, where `(N, 1)` and `(1, M)` broadcast into an `(N, M)` matrix. Every reduction removes only the coordinate axis, so the final output still has one IoU per pair.',
       'Once the pairwise union is known, a `torch.where` denominator mask keeps the implementation stable and handles degenerate boxes cleanly.',
     ],
+    solutionDiagram: `boxes1 (N, 4)      boxes2 (M, 4)
+      │                    │
+      ├─[:, None, :2]      └─[None, :, :2]
+      │  (N, 1, 2)             (1, M, 2)
+      └──────── broadcast maximum ────────┐
+                                           ▼
+                                     top_left (N, M, 2)
+
+area1 (N, 1) + area2 (1, M) - intersection (N, M)
+                         → union / IoU (N, M)`,
     solutionCode: `from __future__ import annotations
 
 import torch
@@ -874,8 +900,8 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
     summary:
       'Compute one centroid per class and predict each test point by the nearest Euclidean centroid.',
     prompt: [
-      'Write `nearest_centroid_predict(train_X, train_y, test_X)` so it returns a 1D array of predicted class labels for `test_X`.',
-      'Compute one centroid per class from `train_X`, then classify each test point by the nearest centroid using Euclidean distance. If distances tie, choose the smaller class label.',
+      'Imagine the training rows as points in a feature space: `train_X[i]` is one point and `train_y[i]` says which class owns it. Write `nearest_centroid_predict(train_X, train_y, test_X)` to label each new row in `test_X`.',
+      'For each distinct class, average its training points to make one representative point—the class centroid. Compare every test point with every centroid using Euclidean distance, then return the label of the closest centroid. If distances tie, choose the smaller class label.',
     ],
     signature: `def nearest_centroid_predict(
     train_X: torch.Tensor,
@@ -918,9 +944,18 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
       'Use squared Euclidean distance to avoid an unnecessary square root.',
     ],
     solutionNotes: [
-      'The nearest-centroid rule compresses each class into its feature sum divided by its count, then assigns each test point to the closest centroid.',
-      'Squared Euclidean distance preserves the same ordering as Euclidean distance, and keeping the class labels sorted makes the tie-breaking rule deterministic.',
+      'The nearest-centroid rule compresses each class into one vector. `class_points` has shape `(number_of_points_in_class, D)`, summing over `dim=0` leaves a `(D,)` vector, and `torch.stack` turns all class vectors into `centroids.shape == (K, D)`.',
+      'With `test_X.shape == (M, D)` and `centroids.shape == (K, D)`, `test_X[:, None, :]` is `(M, 1, D)` and `centroids[None, :, :]` is `(1, K, D)`. Subtraction broadcasts to `(M, K, D)`; summing over `D` gives one squared distance per test-point/class pair, `(M, K)`.',
+      'Squared Euclidean distance preserves the same ordering as Euclidean distance, and keeping the class labels sorted makes `argmin` deterministic when two centroids are equally close.',
     ],
+    solutionDiagram: `train_X (N, D) + train_y (N,)
+        └─ group rows by class → one centroid per class
+           centroids (K, D)
+
+test_X (M, 1, D) - centroids (1, K, D)
+                 → deltas (M, K, D)
+                 → sum over D → distances (M, K)
+                 → argmin over K → predictions (M,)`,
     solutionCode: `from __future__ import annotations
 
 import torch
@@ -1001,7 +1036,7 @@ print(nearest_centroid_predict(sample_train_X, sample_train_y, sample_test_X))`,
       'Convert logits into numerically stable softmax probabilities after dividing by a positive temperature.',
     prompt: [
       'Write `temperature_scaled_probs(logits, temperature)` so it returns softmax probabilities after scaling `logits` by `temperature`.',
-      'Use a numerically stable implementation, validate the inputs, and make sure each row of the output sums to `1`.',
+      'The intended distribution is `p_i(T) = exp(z_i / T) / sum_j exp(z_j / T)`. Use a numerically stable implementation, validate the inputs, and make sure each row of the output sums to `1`.',
     ],
     signature: `def temperature_scaled_probs(
     logits: torch.Tensor,
@@ -1038,8 +1073,8 @@ print(nearest_centroid_predict(sample_train_X, sample_train_y, sample_test_X))`,
       'Reject non-2D logits and any temperature that is not a positive scalar.',
     ],
     solutionNotes: [
-      'Temperature scaling is just softmax on the logits after rescaling them by a positive constant. The key implementation detail is to subtract the row maximum after scaling so the exponentials never blow up.',
-      'Once the shifted logits are exponentiated, each row is normalized by its own sum, which gives a valid probability distribution that still sums to `1`.',
+      'Temperature scaling applies `p_i(T) = exp(z_i / T) / Σ_j exp(z_j / T)`. Dividing by `T` changes the gaps between logits before softmax: at `T = 1` the distribution is unchanged, a low temperature makes the largest class more dominant and the distribution sharper, and a high temperature makes probabilities flatter and more uniform.',
+      'The implementation subtracts the maximum scaled logit in each row before `exp`; this does not change the ratio because the same constant is subtracted from every class. After exponentiation, `normalizers.shape == (N, 1)` broadcasts across the class axis `(N, C)` during the final division.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -1139,8 +1174,8 @@ print(temperature_scaled_probs(sample_logits, temperature=1.0))`,
       'If `dim` is odd, the last column still belongs to the even-column branch.',
     ],
     solutionNotes: [
-      'Sinusoidal positional encoding is just a deterministic lookup table: each position gets a vector of sines and cosines at frequencies that decay geometrically across the embedding dimension.',
-      'The implementation is compact if you compute one denominator per column pair and then broadcast positions across those frequencies. That also makes the odd-dimension case work naturally, because the final column is just the next even slot.',
+      'Sinusoidal positional encoding is a deterministic lookup table. For position `pos` and pair index `k`, `PE(pos, 2k) = sin(pos / 10000^(2k / dim))` and `PE(pos, 2k + 1) = cos(pos / 10000^(2k / dim))`; adjacent columns therefore share a frequency but use different phases.',
+      'The implementation makes the shape arithmetic visible: positions has shape `(length, 1)`, the paired frequency table has shape `(1, ceil(dim / 2))`, and their broadcasted product creates one angle per position/frequency pair. Interleaving sine into `0::2` and cosine into `1::2` then returns `(length, dim)`, including the final unpaired sine column when `dim` is odd.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -1199,6 +1234,12 @@ print(sinusoidal_positional_encoding(sample_length, sample_dim))`,
       'Write `unpatchify(patches, image_shape, patch_size)` so it reconstructs and returns a batch of images from flattened patch tokens.',
       'Assume the patches are in row-major order across the image grid. Validate the inputs, then reshape the patch tensor back into `(B, C, H, W)`.',
     ],
+    visual: {
+      src: '/assets/images/code-patchify-layout.gif',
+      alt: 'Animated 4 by 4 image diagram showing row-major patch tokens and the inverse reshape and permutation.',
+      caption:
+        'Read the layout from left to right: patch tokens are ordered by grid row, then grid column; each token contains all channels and its local P×P pixels. Unpatchify reverses those axis moves.',
+    },
     signature: `def unpatchify(
     patches: torch.Tensor,
     image_shape: tuple[int, int, int],
@@ -1241,9 +1282,15 @@ print(sinusoidal_positional_encoding(sample_length, sample_dim))`,
       'The row-major assumption means the patch index should map to `(row, column)` in standard nested-loop order.',
     ],
     solutionNotes: [
-      'This problem is the inverse of patch extraction: each flattened patch vector is first reshaped into `(C, P, P)`, then the patch grid is placed back into its `(H / P, W / P)` spatial layout.',
-      'A reshape followed by a transpose is enough to undo the flattening as long as the patch order is row-major and the image dimensions divide evenly by the patch size.',
+      'This problem is the inverse of patch extraction. Starting from `patches.shape == (B, N, C * P * P)`, reshape to `(B, grid_h, grid_w, C, P, P)` so the flat token index becomes explicit grid row and grid column axes.',
+      'The permutation `(0, 3, 1, 4, 2, 5)` changes that layout to `(B, C, grid_h, P, grid_w, P)`: each grid axis now sits next to its local pixel axis. The final reshape collapses `(grid_h, P)` into `H` and `(grid_w, P)` into `W`, producing `(B, C, H, W)`.',
     ],
+    solutionDiagram: `patches (B, N, C·P·P)
+  reshape → (B, grid_h, grid_w, C, P, P)
+  permute → (B, C, grid_h, P, grid_w, P)
+  reshape → (B, C, H, W)
+
+row-major token index: token = row * grid_w + column`,
     solutionCode: `from __future__ import annotations
 
 import torch
@@ -1324,6 +1371,12 @@ print(unpatchify(sample_patches, sample_image_shape, patch_size=2))`,
       'Write `patchify(images, patch_size)` so it converts a batch of images into flattened patch tokens.',
       'Assume patches are ordered row-major over the image grid. Validate the inputs, then return an array of shape `(B, N, C * P * P)` where `N = (H // P) * (W // P)`.',
     ],
+    visual: {
+      src: '/assets/images/code-patchify-layout.gif',
+      alt: 'Animated 4 by 4 image diagram showing a row-major patch grid flattened into four patch tokens.',
+      caption:
+        'Patchify first exposes `(grid_h, P, grid_w, P)`, then permutes to put the grid axes first. Only after that permutation is each P×P patch flattened into one token.',
+    },
     signature: `def patchify(images: torch.Tensor, patch_size: int) -> torch.Tensor:
     ...`,
     requirements: [
@@ -1360,9 +1413,15 @@ print(unpatchify(sample_patches, sample_image_shape, patch_size=2))`,
       'Validate that `patch_size` is positive and divides both spatial dimensions.',
     ],
     solutionNotes: [
-      'The core trick is to expose the image grid as `(H // P, P, W // P, P)` so the patch structure becomes explicit.',
-      'A reshape followed by a transpose keeps row-major patch order and makes the final flattening straightforward.',
+      'The core trick is to expose the image grid as `(B, C, grid_h, P, grid_w, P)`. The original image shape `(B, C, H, W)` is only being re-labeled because `H = grid_h * P` and `W = grid_w * P`.',
+      'The permutation `(0, 2, 4, 1, 3, 5)` produces `(B, grid_h, grid_w, C, P, P)`, which places the row-major patch grid before each patch’s channel and local-pixel data. Flattening the last four axes yields `(B, N, C * P * P)` without mixing neighboring patches.',
     ],
+    solutionDiagram: `images (B, C, H, W)
+  reshape → (B, C, grid_h, P, grid_w, P)
+  permute → (B, grid_h, grid_w, C, P, P)
+  reshape → (B, N, C·P·P)
+
+N = grid_h · grid_w; token order is row-major over the grid`,
     solutionCode: `from __future__ import annotations
 
 import torch
@@ -1458,8 +1517,17 @@ print(patchify(sample_images, patch_size=2))`,
     ],
     solutionNotes: [
       'RoPE treats each adjacent pair of channels as a 2D vector and rotates it by an angle that depends on the token position. That preserves the vector norm while injecting relative position information into attention.',
-      'The implementation is cleanest when you precompute one sine/cosine table per token position and frequency pair, then combine it with the input using the standard `rotate_half` pattern.',
+      'The angle line comes from the standard RoPE frequency schedule: `angles = torch.arange(seq_len, dtype=torch.float64)[:, None] * (10000.0 ** (-2 * pair / dim))[None, :]`. `torch.arange(seq_len)[:, None]` has shape `(T, 1)` and the inverse-frequency term has shape `(1, D / 2)`, so broadcasting creates `angles.shape == (T, D / 2)`: every position gets one angle for every adjacent feature pair.',
+      'The slices use Python’s `start:stop:step` convention on the last axis. `x[..., 0::2]` starts at index `0` and takes every second value, so it selects indices `0, 2, 4, 6, 8, ...`—the even positions. `x[..., 1::2]` starts at index `1` and takes every second value, so it selects indices `1, 3, 5, 7, 9, ...`—the odd positions. Pairing those two views lets the code apply the 2D rotation formula to each neighboring pair.',
+      'The sine and cosine tables are reshaped to `(1, T, 1, D / 2)` so the same position-dependent rotation broadcasts over batch and head dimensions.',
     ],
+    solutionDiagram: `For each position t and pair k:
+  angle[t, k] = t · 10000^(-2k / D)
+  [x_even, x_odd] → [x_even cos - x_odd sin,
+                     x_even sin + x_odd cos]
+
+x[..., 0::2] = even channels: 0, 2, 4, ...
+x[..., 1::2] = odd channels:  1, 3, 5, ...`,
     solutionCode: `from __future__ import annotations
 
 import torch
@@ -1570,9 +1638,19 @@ print(apply_rope(sample_x))`,
       'After attention, transpose the heads back and concatenate them before the final output projection.',
     ],
     solutionNotes: [
-      'The workflow is the standard Transformer block: project to queries, keys, and values; split the channel dimension into heads; compute masked scaled dot-product attention; then merge the heads and apply the output projection.',
-      'Broadcasted masking and a stable softmax are the two details that make the implementation robust. The mask keeps blocked positions from contributing, while the final projection preserves the original model width.',
+      'Both exercises use the same core equation: `Attention(Q, K, V) = softmax(QKᵀ / √D_head) V`. The code projects inputs, reshapes `(B, T, D_model)` into `(B, H, T, D_head)`, computes scores `(B, H, query_length, key_length)`, applies the mask before softmax, mixes values, then permutes and reshapes back to `(B, T, D_model)`.',
+      'For self-attention, the same sequence supplies all three inputs: `Q, K, V` come from `x`, so `query_length = key_length = T` and scores have shape `(B, H, T, T)`. A token can read from other tokens in that sequence, subject to the mask.',
+      'The mask and stable softmax are the important implementation details: blocked scores become `-inf`, and subtracting a row maximum prevents overflow. The final output projection preserves the original model width.',
     ],
+    solutionDiagram: `Self-attention:
+x (B, T, D) ──┬─ Q (B, H, T, Dh)
+              ├─ K (B, H, T, Dh) → scores (B, H, T, T)
+              └─ V (B, H, T, Dh)
+
+Cross-attention uses the same path, but query_x supplies Q and
+context_x supplies K,V:
+query (B, Tq, D) + context (B, Tk, D)
+→ scores (B, H, Tq, Tk) → output (B, Tq, D)`,
     solutionCode: `from __future__ import annotations
 
 import torch
@@ -1756,9 +1834,18 @@ print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads
       'If a mask is provided, broadcast it to the score tensor and zero out blocked positions before softmax.',
     ],
     solutionNotes: [
-      'Cross-attention is the same attention primitive as self-attention, except the query tokens and the key/value tokens come from different inputs. That makes it the right building block when one sequence needs to read information from another.',
-      'The implementation follows the usual Transformer recipe: project queries, keys, and values; split channels into heads; compute masked scaled dot-product attention; then merge the heads and apply the output projection.',
+      'Cross-attention is the same primitive as self-attention, with one deliberate change: `Q` comes from `query_x`, while `K` and `V` come from `context_x`. That lets one sequence read another sequence—for example, decoder tokens reading encoder outputs.',
+      'The equation and most shapes are unchanged: `Attention(Q, K, V) = softmax(QKᵀ / √D_head) V`, but `query_x.shape == (B, Tq, D)` and `context_x.shape == (B, Tk, D)`. Therefore `Q` is `(B, H, Tq, D_head)`, `K,V` are `(B, H, Tk, D_head)`, scores are `(B, H, Tq, Tk)`, and the output is `(B, Tq, D)`.',
+      'That shape contrast is the whole distinction: self-attention compares every token with the same sequence length `T`, while cross-attention compares each query token with all `Tk` context tokens. Masking still happens on the score matrix before the stable softmax.',
     ],
+    solutionDiagram: `Self:  Q,K,V ← one sequence x
+      scores: (B, H, T, T)
+
+Cross: Q ← query_x (B, Tq, D)
+       K,V ← context_x (B, Tk, D)
+       scores: (B, H, Tq, Tk)
+
+Only the source of K,V and the key length change.`,
     solutionCode: `from __future__ import annotations
 
 import torch
@@ -2583,7 +2670,7 @@ print(" ".join(str(token) for token in model.generate(12, seed=7)))`,
       'Reduce all residuals with a mean.',
     ],
     solutionNotes: [
-      'L1 loss is the mean of `|prediction - target|`, so the whole implementation is one elementwise operation followed by one reduction.',
+      'L1 loss is `L = (1 / K) Σ_i |prediction_i - target_i|`, where `K` is the number of entries. The implementation computes the residual elementwise, takes its absolute value, then reduces every entry to one scalar with `torch.mean`.',
       'Its penalty grows linearly rather than quadratically, which makes a large residual matter without allowing it to dominate as strongly as L2 loss.',
     ],
     solutionCode: `import torch
@@ -2650,8 +2737,8 @@ print(l1_loss(prediction, target).item())`,
       '`torch.where` selects the branch elementwise without a Python loop.',
     ],
     solutionNotes: [
-      'Huber loss keeps L2’s smooth gradient for small errors but switches to L1-like growth after `delta`, limiting the influence of large mistakes.',
-      'Compute both branches once, select with `torch.where`, and reduce at the end; the piecewise definition stays visible without making the code noisy.',
+      'With error `e = prediction - target`, Huber loss is `L_delta(e) = 0.5 e²` when `|e| <= delta`, and `delta (|e| - 0.5 delta)` otherwise. The returned scalar is the mean of this piecewise value over all entries.',
+      'Huber loss keeps L2’s smooth gradient for small errors but switches to L1-like growth after `delta`, limiting the influence of large mistakes. Compute both branches once, select with `torch.where`, and reduce at the end.',
     ],
     solutionCode: `import torch
 
@@ -2723,8 +2810,8 @@ print(huber_loss(prediction, target).item())`,
       'Clamp once before both logarithms.',
     ],
     solutionNotes: [
-      'Binary cross-entropy selects the log-probability of the observed class: `-y log(p) - (1-y) log(1-p)`.',
-      'The clamp prevents `log(0)`. For model training, logits are normally better because the fused logits loss avoids explicitly forming probabilities.',
+      'Binary cross-entropy is `L = -(1 / K) Σ_i [y_i log(p_i) + (1 - y_i) log(1 - p_i)]`. When `y_i = 1`, only `-log(p_i)` remains; when `y_i = 0`, only `-log(1 - p_i)` remains.',
+      'The clamp prevents `log(0)` before either logarithm is evaluated. For model training, logits are normally better because the fused logits loss avoids explicitly forming probabilities.',
     ],
     solutionCode: `import torch
 
@@ -2871,8 +2958,9 @@ print(box_iou(box_a, box_b).item())`,
       'For a lower-memory version, use `||x||^2 + ||y||^2 - 2 x y^T`.',
     ],
     solutionNotes: [
-      'The direct broadcasted difference makes the shape progression explicit: `(N, 1, D) - (1, M, D) -> (N, M, D)`, then summing over `D` gives the answer.',
-      'The norm identity avoids materializing the `(N, M, D)` tensor, so it is the better production implementation when the point sets are large.',
+      'The target is `D[i, j] = ||x_i - y_j||²`. Expanding the square gives `||x_i||² + ||y_j||² - 2 x_i · y_j`, which lets one matrix multiplication compute all pairwise dot products at once.',
+      'Here `x_squared` has shape `(N, 1)`, `y_squared` is reshaped to `(1, M)`, and `x @ y.T` has shape `(N, M)`. Therefore `distances = x_squared + y_squared - 2 * x @ torch.transpose(y, 0, 1)` broadcasts the two norm terms into an `(N, M)` matrix and subtracts twice the dot product for each `(i, j)` pair.',
+      'The norm identity avoids materializing the direct broadcasted difference `(N, M, D)`, so it is the better production implementation when the point sets are large. Small negative values from floating-point roundoff are clamped to zero.',
     ],
     solutionCode: `import torch
 
@@ -3081,8 +3169,8 @@ print(topk_features(scores, features, k=2))`,
       'Elementwise multiplication gives the soft intersection.',
     ],
     solutionNotes: [
-      'Dice measures overlap directly, so it is less dominated by abundant background pixels than raw accuracy. Flattening each example makes the reduction independent of spatial rank.',
-      'The small `eps` keeps empty or nearly empty masks finite; averaging per-example Dice scores keeps each image equally important.',
+      'For each batch item, Dice is `Dice = (2 · Σ(prediction · target) + eps) / (Σ prediction + Σ target + eps)`, and the loss is `1 - mean(Dice)`. The factor of `2` rewards shared foreground mass while the denominator counts the predicted and target mass separately.',
+      'Dice measures overlap directly, so it is less dominated by abundant background pixels than raw accuracy. Flattening each example makes the reduction independent of spatial rank, and `eps` keeps empty or nearly empty masks finite.',
     ],
     solutionCode: `import torch
 
@@ -3154,8 +3242,8 @@ print(dice_loss(prediction, target).item())`,
       'Keep the batch axis while flattening all remaining dimensions.',
     ],
     solutionNotes: [
-      'Soft IoU replaces set membership with probabilities, so the loss remains usable in gradient-based training. The numerator is the elementwise product sum and the union subtracts that overlap once.',
-      'The result is averaged after computing one IoU per example, with smoothing only to avoid an undefined empty union.',
+      'For each batch item, soft IoU is `IoU = (Σ(prediction · target) + eps) / (Σ prediction + Σ target - Σ(prediction · target) + eps)`, and the loss is `mean(1 - IoU)`. The union subtracts the intersection once because the overlap appears in both sums.',
+      'Soft IoU replaces set membership with probabilities, so the loss remains usable in gradient-based training. Flattening keeps one score per example, and smoothing only prevents an undefined empty union.',
     ],
     solutionCode: `import torch
 
@@ -3227,8 +3315,8 @@ print(iou_loss(prediction, target).item())`,
       'The modulating factor is close to zero for an easy example with `p_t` near one.',
     ],
     solutionNotes: [
-      'Focal loss starts with binary cross-entropy and multiplies each example by `(1 - p_t)^gamma`. Correct, easy examples therefore shrink rapidly while hard examples retain gradient signal.',
-      'This compact exercise exposes the focusing mechanism. In production, use a fused logits-based implementation to avoid explicitly materializing probabilities.',
+      'For a sigmoid probability `p = sigmoid(logit)`, define `p_t = p` when `target = 1` and `p_t = 1 - p` when `target = 0`. Focal loss is `L = -(1 / K) Σ_i (1 - p_t,i)^gamma log(p_t,i)`.',
+      'The factor `(1 - p_t)^gamma` is close to zero for a correct, easy example with `p_t` near one, while hard examples retain more weight. In production, use a fused logits-based implementation to avoid explicitly materializing probabilities.',
     ],
     solutionCode: `import torch
 
@@ -3441,7 +3529,8 @@ print(angular_difference(prediction, target) * 180 / 3.141592653589793)`,
       'A true positive contributes the precision at its rank; false positives only increase the denominator.',
     ],
     solutionNotes: [
-      'Average precision rewards finding true objects early: after sorting by confidence, each true positive contributes precision at the rank where it appears.',
+      'After sorting detections by descending confidence, let `TP(k)` be the number of true positives in the first `k` predictions and let `m_k` be `1` only when rank `k` is a true positive. Then `precision(k) = TP(k) / k`, and `AP = (1 / num_ground_truth) Σ_k m_k · precision(k)`.',
+      'The code follows that equation directly: `cumulative_tp` has one count per rank, `ranks` is `1..N`, and the boolean match mask selects only the ranks that contribute precision. False positives still increase the rank denominator, so they lower later precision even though they add no numerator.',
       'The ground-truth count normalizes the sum and makes the metric comparable across images or classes. Full mAP additionally averages this AP across classes and IoU thresholds.',
     ],
     solutionCode: `import torch
@@ -3596,7 +3685,7 @@ print(match_predictions(predictions, scores, ground_truth, 0.5))`,
     summary: 'Apply one 4×4 homogeneous transform to a batch of 3D points.',
     prompt: [
       'Write `transform_points(points, transform)` for `points.shape == (N, 3)` and a homogeneous transform shaped `(4, 4)`.',
-      'Append a homogeneous coordinate of one, multiply by the transform, and return the transformed XYZ coordinates.',
+      'Append a padding coordinate of one to every point, multiply by the transform, and return the transformed XYZ coordinates. The extra coordinate is what lets one matrix multiplication represent both rotation and translation.',
     ],
     signature: `def transform_points(
     points: torch.Tensor,
@@ -3620,9 +3709,18 @@ print(match_predictions(predictions, scores, ground_truth, 0.5))`,
       'Multiply `transform @ points_h.T`, transpose back, and discard the fourth coordinate.',
     ],
     solutionNotes: [
-      'Homogeneous coordinates turn the affine map `R p + t` into one matrix product. The appended one is what lets the final column encode translation.',
-      'The transpose is only a layout step: a `(4, 4)` transform multiplies points arranged as columns, then the result is returned in the original `(N, 3)` row layout.',
+      'The ordinary affine equation is `p′ = R p + t`. Homogeneous coordinates rewrite it as `[p′; 1] = [[R, t], [0, 1]] [p; 1]`, so translation becomes part of the same matrix multiplication as rotation.',
+      'For `points.shape == (N, 3)`, `ones.shape == (N, 1)` and `torch.cat([points, ones], dim=1)` creates `homogeneous.shape == (N, 4)`. The transform expects points as columns, so `transform (4, 4) @ homogeneous.T (4, N)` produces `(4, N)`; transposing back gives `(N, 4)`, and `[:, :3]` removes the padding coordinate.',
+      'The padding value is `1`, not `0`: multiplying the last transform column by one adds the translation vector `t` to every point. The final homogeneous coordinate is discarded because the task asks for XYZ only.',
     ],
+    solutionDiagram: `point row:        [x, y, z]
+pad one column:  [x, y, z, 1]   ← homogeneous point
+
+transform (4,4) @ homogeneous.T (4,N)
+      → transformed.T (N,4)
+      → transformed[:, :3] (N,3)
+
+last input value 1 activates the translation column`,
     solutionCode: `import torch
 
 def transform_points(
@@ -4005,10 +4103,86 @@ class NGramModel:
         return output`,
 };
 
-export const codePracticeProblems: readonly CodePracticeProblem[] = RAW_CODE_PRACTICE_PROBLEMS.map(
-  (problem) => ({
+const PROGRESSIVE_ORDER: Readonly<Record<string, number>> = {
+  'l1-regression-loss': 1,
+  'binary-cross-entropy-from-probabilities': 2,
+  'masked-mean': 3,
+  'binary-classification-metrics': 4,
+  'top-k-accuracy': 5,
+  'single-box-iou': 6,
+  'wrapped-angular-difference': 7,
+  'smooth-l1-huber-loss': 8,
+  'stable-softmax-cross-entropy': 9,
+  'temperature-scaling-of-logits': 10,
+  'pairwise-squared-distance': 11,
+  'pairwise-cosine-similarity': 12,
+  'nearest-centroid-classifier': 13,
+  'iou-matrix': 14,
+  'non-maximum-suppression': 15,
+  'weighted-box-regression-loss': 16,
+  'dice-loss': 17,
+  'segmentation-iou-loss': 18,
+  'focal-loss': 19,
+  'top-k-gather': 20,
+  'homogeneous-coordinate-transform': 21,
+  '2d-patchify-for-images': 22,
+  'unpatchify-back-to-image': 23,
+  'sinusoidal-positional-encoding': 24,
+  'causal-attention-mask': 25,
+  'rope-rotary-positional-embedding': 26,
+  'scaled-dot-product-self-attention': 27,
+  'cross-attention': 28,
+  'simple-n-gram-language-model': 29,
+  'average-precision-from-matches': 30,
+  'greedy-detection-matching': 31,
+  'batched-best-iou-match': 32,
+  'manual-backprop-for-a-2-layer-mlp': 33,
+  'classic-mlp-forward-backward': 34,
+};
+
+const PROGRESSIVE_DIFFICULTY: Readonly<Record<string, CodePracticeProblem['difficulty']>> = {
+  'l1-regression-loss': 'Easy',
+  'binary-cross-entropy-from-probabilities': 'Easy',
+  'masked-mean': 'Easy',
+  'binary-classification-metrics': 'Easy',
+  'top-k-accuracy': 'Easy',
+  'single-box-iou': 'Easy',
+  'wrapped-angular-difference': 'Easy',
+  'smooth-l1-huber-loss': 'Medium',
+  'stable-softmax-cross-entropy': 'Medium',
+  'temperature-scaling-of-logits': 'Medium',
+  'pairwise-squared-distance': 'Medium',
+  'pairwise-cosine-similarity': 'Medium',
+  'nearest-centroid-classifier': 'Medium',
+  'iou-matrix': 'Medium',
+  'non-maximum-suppression': 'Medium',
+  'weighted-box-regression-loss': 'Medium',
+  'dice-loss': 'Medium',
+  'segmentation-iou-loss': 'Medium',
+  'focal-loss': 'Medium',
+  'top-k-gather': 'Medium',
+  'homogeneous-coordinate-transform': 'Medium',
+  '2d-patchify-for-images': 'Medium',
+  'unpatchify-back-to-image': 'Medium',
+  'sinusoidal-positional-encoding': 'Medium',
+  'causal-attention-mask': 'Medium',
+  'rope-rotary-positional-embedding': 'Medium',
+  'scaled-dot-product-self-attention': 'Hard',
+  'cross-attention': 'Hard',
+  'simple-n-gram-language-model': 'Hard',
+  'average-precision-from-matches': 'Hard',
+  'greedy-detection-matching': 'Hard',
+  'batched-best-iou-match': 'Hard',
+  'manual-backprop-for-a-2-layer-mlp': 'Hard',
+  'classic-mlp-forward-backward': 'Hard',
+};
+
+export const codePracticeProblems: readonly CodePracticeProblem[] = [...RAW_CODE_PRACTICE_PROBLEMS]
+  .map((problem) => ({
     ...problem,
+    order: PROGRESSIVE_ORDER[problem.id] ?? problem.order,
+    difficulty: PROGRESSIVE_DIFFICULTY[problem.id] ?? problem.difficulty,
     walkthroughCode: problem.solutionCode,
     solutionCode: COMPACT_REFERENCE_SOLUTIONS[problem.id] ?? problem.solutionCode,
-  }),
-);
+  }))
+  .sort((left, right) => left.order - right.order);
