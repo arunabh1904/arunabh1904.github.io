@@ -85,13 +85,11 @@ Autograd state and module mode are separate controls:
 
 Use `no_grad` for parameter updates and for computations whose results may later be used with autograd. Use `inference_mode` for an isolated inference path after checking compatibility. Call `model.train()` or `model.eval()` whenever the model contains modules whose forward behavior changes by mode. Evaluation usually requires both `model.eval()` and a disabled gradient context.
 
-<RevisionInsight title="More you know · five switches, five meanings" icon="🧠">
+<RevisionInsight title="Five switches, five meanings" icon="💡">
 
-`model.train()` and `model.eval()` change module behavior—most visibly Dropout and BatchNorm—but they do not turn autograd on or off. `torch.no_grad()` changes the gradient-recording context, so the usual validation boundary is `model.eval()` plus `torch.no_grad()`.
+`model.train()` and `model.eval()` control module behavior such as Dropout and BatchNorm; they do not control autograd. `torch.no_grad()` and `torch.inference_mode()` control graph recording, so validation usually needs `model.eval()` plus `torch.no_grad()`.
 
-`requires_grad` is tensor metadata: it asks autograd to track future operations involving that tensor when grad mode is enabled. It is not the same as `detach()`, which removes an existing graph edge. A leaf tensor is typically user-created and has no `grad_fn`; when it requires gradients, backward writes into its `.grad`. Intermediate tensors do not retain `.grad` unless you call `retain_grad()`.
-
-The debugging question is therefore: “Is the module in the right mode, is grad recording enabled, and is this tensor a leaf connected to the loss?” Those are three separate checks, not three spellings for the same operation.
+`requires_grad` tracks future operations, while `detach()` cuts an existing graph edge. Leaf tensors receive `.grad`; intermediate tensors need `retain_grad()`. Debug these as separate checks: module mode, grad mode, and whether the tensor is a leaf connected to the loss.
 
 </RevisionInsight>
 
@@ -110,7 +108,7 @@ Call `model(inputs)` rather than `model.forward(inputs)` so that `Module.__call_
 
 `forward` defines the computation. Registration defines which tensors belong to the model across optimization, device placement, serialization, and distributed wrapping. A tensor used by `forward` but absent from the registered tree may compute correctly on one machine and still disappear from the rest of the training system.
 
-<RevisionInsight title="More you know · the model is the registered tree" icon="🧩">
+<RevisionInsight title="The model is the registered tree" icon="💡">
 
 The screenshot's bug is a registration bug, not a Python-loop bug:
 
@@ -128,9 +126,9 @@ class GoodModel(nn.Module):
         self.register_buffer("temperature", torch.ones(()))
 ```
 
-An assigned `nn.Parameter` is trainable model state; an ordinary `Tensor`, even one with `requires_grad=True`, is not automatically a parameter. `ModuleList` and `ModuleDict` register child modules, while a plain Python `list` or `dict` hides them from `parameters()`, `state_dict()`, `to()`, `cuda()`, and `train()`/`eval()`. `register_buffer()` is for tensor state that should move and serialize with the module but should not be optimized.
+`nn.Parameter` is trainable model state. `ModuleList` and `ModuleDict` register child modules; a plain Python `list` or `dict` hides them from `parameters()`, `state_dict()`, `to()`, `cuda()`, and `train()`/`eval()`. Use `register_buffer()` for non-trainable tensor state that should move and serialize.
 
-This is why `model.cuda()` or `model.to(device)` cannot repair an unregistered layer: device movement only traverses the registered module tree. When a model behaves differently across CPU and GPU, inspect `named_parameters()`, `named_buffers()`, and every child container before inspecting the kernel.
+`model.to(device)` cannot repair an unregistered layer because it only traverses the registered tree. If CPU/GPU behavior differs, inspect `named_parameters()`, `named_buffers()`, and child containers.
 
 </RevisionInsight>
 

@@ -28,11 +28,11 @@ PyTorch supports several backends, including CPU, CUDA, MPS, and XPU, with diffe
 
 Pinned CPU memory allows CUDA to perform direct memory access for host-to-device copies. With `non_blocking=True`, the Python thread does not wait for the copy to finish. This does not guarantee overlap with useful work: overlap requires independent host work or device work on a stream that can run while the transfer is in progress. Pinning also consumes a limited host resource, so it should be tested with the actual input pipeline.
 
-<RevisionInsight title="More you know · device bugs often start in containers" icon="🚦">
+<RevisionInsight title="Device bugs often start in containers" icon="💡">
 
-`model.to(device)` and `model.cuda()` recurse through registered parameters, buffers, and child modules only. A layer kept in a plain Python `list` remains unregistered and may stay on the CPU even though the top-level model reports a CUDA device. Use `ModuleList`/`ModuleDict` for dynamic module collections and `register_buffer()` for non-trainable tensor state that must follow the model.
+`model.to(device)` follows registered parameters, buffers, and child modules only. A layer in a plain Python `list` can stay on the CPU; use `ModuleList`/`ModuleDict` and `register_buffer()` for state that must follow the model.
 
-Before chasing an accelerator error, check that the inputs, `named_parameters()`, and `named_buffers()` agree on device and dtype. Registration is the boundary between “Python can reach this object” and “PyTorch knows this object is part of the model.”
+Before chasing an accelerator error, compare the inputs, `named_parameters()`, and `named_buffers()` for device and dtype mismatches.
 
 </RevisionInsight>
 
