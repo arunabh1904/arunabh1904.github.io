@@ -6676,3 +6676,101 @@ html {
   }
 
 }
+
+/* Final light-mode overrides for the Code practice lab. */
+:root[data-theme="light"] .code-practice-lab__problem,
+:root[data-theme="light"] .code-practice-lab__workspace {
+  color: var(--text-color);
+  background: transparent;
+  box-shadow: none;
+}
+
+:root[data-theme="light"] .code-practice-lab__problem-header h1,
+:root[data-theme="light"] .code-practice-lab__workspace-header h2,
+:root[data-theme="light"] .code-practice-lab__walkthrough-heading h2 {
+  color: var(--text-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__copy p,
+:root[data-theme="light"] .code-practice-lab__status,
+:root[data-theme="light"] .code-practice-lab__shortcut,
+:root[data-theme="light"] .code-practice-lab__editor-label,
+:root[data-theme="light"] .code-practice-lab__walkthrough-copy p,
+:root[data-theme="light"] .code-practice-lab__walkthrough-tip {
+  color: var(--text-secondary-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__spec-card,
+:root[data-theme="light"] .code-practice-lab__example,
+:root[data-theme="light"] .code-practice-lab__walkthrough,
+:root[data-theme="light"] .code-practice-lab__output > div {
+  border-color: var(--code-border-color);
+  background: var(--panel-bg);
+  color: var(--text-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__spec-card pre,
+:root[data-theme="light"] .code-practice-lab__example pre,
+:root[data-theme="light"] .code-practice-lab__output pre,
+:root[data-theme="light"] .code-practice-lab__list {
+  color: var(--text-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__difficulty,
+:root[data-theme="light"] .code-practice-lab__button {
+  border-color: var(--button-border);
+  background: var(--button-bg);
+  box-shadow: var(--button-shadow);
+  color: var(--text-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__button:hover:not(:disabled) {
+  border-color: var(--accent-color);
+  background: var(--button-bg-hover);
+  box-shadow: var(--button-shadow-hover);
+}
+
+:root[data-theme="light"] .code-practice-lab__button--primary {
+  border-color: rgba(19, 137, 92, 0.38);
+  background: linear-gradient(135deg, #0f8b61, #28b782);
+  color: #ffffff;
+}
+
+:root[data-theme="light"] .code-practice-lab__button--solution {
+  border-color: rgba(154, 105, 18, 0.35);
+  background: #fff6dc;
+  color: #654409;
+}
+
+:root[data-theme="light"] .code-practice-lab__view-toggle {
+  border-color: var(--button-border);
+  background: var(--background-secondary);
+}
+
+:root[data-theme="light"] .code-practice-lab__button--view:hover:not(:disabled),
+:root[data-theme="light"] .code-practice-lab__button--view.code-practice-lab__button--active {
+  border-color: rgba(53, 109, 255, 0.36);
+  background: rgba(53, 109, 255, 0.14);
+  box-shadow: none;
+}
+
+:root[data-theme="light"] .code-practice-lab__editor-shell,
+:root[data-theme="light"] .code-practice-lab__editor .cm-editor {
+  border-color: var(--code-border-color);
+  background: #ffffff;
+}
+
+:root[data-theme="light"] .code-practice-lab__editor-shell {
+  box-shadow: var(--button-shadow);
+}
+
+:root[data-theme="light"] .code-practice-lab__editor .cm-gutters {
+  border-right-color: rgba(53, 109, 255, 0.14);
+  background: #f6f8fa;
+  color: #57606a;
+}
+
+:root[data-theme="light"] .code-practice-lab__editor .cm-activeLine,
+:root[data-theme="light"] .code-practice-lab__editor .cm-activeLineGutter {
+  background: rgba(53, 109, 255, 0.07);
+}
