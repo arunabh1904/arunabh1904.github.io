@@ -225,4 +225,36 @@ describe('CodePracticeLab', () => {
     expect(editor.textContent).toContain('print("starter")');
     expect(container.textContent).toContain('Ctrl / Cmd + Enter');
   });
+
+  it('toggles between the editable code and the problem walkthrough', async () => {
+    loadPyodideRuntime.mockResolvedValueOnce({
+      runPythonAsync: vi.fn(),
+    });
+
+    await render();
+
+    const walkthroughButton = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Walkthrough',
+    );
+    expect(walkthroughButton).toBeDefined();
+    expect(container.querySelector('.code-practice-lab__walkthrough')).toBeNull();
+
+    await act(async () => {
+      walkthroughButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(container.querySelector('.code-practice-lab__walkthrough')).not.toBeNull();
+    expect(container.textContent).toContain('How to reason through it');
+    expect(container.querySelector('.cm-editor')).toBeNull();
+
+    const codeButton = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Code',
+    );
+    await act(async () => {
+      codeButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(container.querySelector('.code-practice-lab__walkthrough')).toBeNull();
+    expect(container.querySelector('.cm-editor')).not.toBeNull();
+  });
 });

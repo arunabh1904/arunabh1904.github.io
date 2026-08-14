@@ -319,6 +319,7 @@ torch.exp = _np.exp
 torch.log = _np.log
 torch.sin = _np.sin
 torch.cos = _np.cos
+torch.atan2 = _np.arctan2
 torch.sqrt = _np.sqrt
 torch.pow = _np.power
 torch.abs = _np.abs
@@ -327,6 +328,7 @@ torch.maximum = _np.maximum
 torch.minimum = _np.minimum
 torch.sum = _sum
 torch.mean = _mean
+torch.cumsum = lambda value, dim: _wrap(_np.cumsum(value, axis=dim))
 torch.amax = _amax
 torch.amin = _amin
 torch.max = _amax

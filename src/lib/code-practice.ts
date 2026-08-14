@@ -2549,4 +2549,1184 @@ print(model.next_token_probs(["Before", "we"]))
 print(" ".join(str(token) for token in model.generate(12, seed=7)))`,
     tags: ['Language Models', 'Probability', 'Hash Maps'],
   },
+  {
+    id: 'l1-regression-loss',
+    order: 19,
+    title: 'L1 regression loss',
+    difficulty: 'Easy',
+    summary: 'Compute mean absolute error and explain why its linear penalty is robust to outliers.',
+    prompt: [
+      'Write `l1_loss(prediction, target)` to return the mean absolute error between two tensors.',
+      'Keep the implementation vectorized and reject mismatched shapes.',
+    ],
+    signature: `def l1_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      '`prediction` and `target` have the same shape.',
+      'Return one scalar equal to the mean absolute error.',
+      'Raise `ValueError` when the shapes differ.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['prediction = [1, 2, 10]', 'target = [2, 2, 7]'],
+        result: '1.33333',
+      },
+    ],
+    hint: [
+      'Subtract the target from the prediction and take the absolute value.',
+      'Reduce all residuals with a mean.',
+    ],
+    solutionNotes: [
+      'L1 loss is the mean of `|prediction - target|`, so the whole implementation is one elementwise operation followed by one reduction.',
+      'Its penalty grows linearly rather than quadratically, which makes a large residual matter without allowing it to dominate as strongly as L2 loss.',
+    ],
+    solutionCode: `import torch
+
+def l1_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+) -> torch.Tensor:
+    prediction = torch.as_tensor(prediction, dtype=torch.float64)
+    target = torch.as_tensor(target, dtype=torch.float64)
+    if prediction.shape != target.shape:
+        raise ValueError("prediction and target must have the same shape")
+    return torch.mean(torch.abs(prediction - target))
+
+prediction = torch.tensor([1.0, 2.0, 10.0])
+target = torch.tensor([2.0, 2.0, 7.0])
+print(l1_loss(prediction, target).item())`,
+    starterCode: `import torch
+
+def l1_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+) -> torch.Tensor:
+    # TODO: compute the mean absolute error.
+    raise NotImplementedError("Implement l1_loss")
+
+prediction = torch.tensor([1.0, 2.0, 10.0])
+target = torch.tensor([2.0, 2.0, 7.0])
+print(l1_loss(prediction, target).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Regression', 'Losses'],
+  },
+  {
+    id: 'smooth-l1-huber-loss',
+    order: 20,
+    title: 'Smooth L1 / Huber loss',
+    difficulty: 'Medium',
+    summary: 'Implement a piecewise loss that is quadratic near zero and linear for large residuals.',
+    prompt: [
+      'Write `huber_loss(prediction, target, delta)` using the quadratic branch for `|error| <= delta` and the linear branch otherwise.',
+      'Return the mean loss over all entries and validate the shape and positive transition parameter.',
+    ],
+    signature: `def huber_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    delta: float = 1.0,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      'Use `0.5 * error**2` when `|error| <= delta`.',
+      'Use `delta * (|error| - 0.5 * delta)` otherwise.',
+      'Return the mean over all entries.',
+      'Raise `ValueError` for mismatched shapes or non-positive `delta`.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['prediction = [0, 2, 4]', 'target = [0, 0, 0]', 'delta = 1'],
+        result: '1.66667',
+      },
+    ],
+    hint: [
+      'Compute the quadratic and linear tensors independently.',
+      '`torch.where` selects the branch elementwise without a Python loop.',
+    ],
+    solutionNotes: [
+      'Huber loss keeps L2’s smooth gradient for small errors but switches to L1-like growth after `delta`, limiting the influence of large mistakes.',
+      'Compute both branches once, select with `torch.where`, and reduce at the end; the piecewise definition stays visible without making the code noisy.',
+    ],
+    solutionCode: `import torch
+
+def huber_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    delta: float = 1.0,
+) -> torch.Tensor:
+    prediction = torch.as_tensor(prediction, dtype=torch.float64)
+    target = torch.as_tensor(target, dtype=torch.float64)
+    if prediction.shape != target.shape or delta <= 0:
+        raise ValueError("prediction and target must match and delta must be positive")
+    error = prediction - target
+    magnitude = torch.abs(error)
+    quadratic = 0.5 * error ** 2
+    linear = delta * (magnitude - 0.5 * delta)
+    return torch.mean(torch.where(magnitude <= delta, quadratic, linear))
+
+prediction = torch.tensor([0.0, 2.0, 4.0])
+target = torch.zeros(3)
+print(huber_loss(prediction, target).item())`,
+    starterCode: `import torch
+
+def huber_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    delta: float = 1.0,
+) -> torch.Tensor:
+    # TODO: implement the quadratic and linear branches of Huber loss.
+    raise NotImplementedError("Implement huber_loss")
+
+prediction = torch.tensor([0.0, 2.0, 4.0])
+target = torch.zeros(3)
+print(huber_loss(prediction, target).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Regression', 'Losses'],
+  },
+  {
+    id: 'binary-cross-entropy-from-probabilities',
+    order: 21,
+    title: 'Binary cross-entropy from probabilities',
+    difficulty: 'Easy',
+    summary: 'Compute binary cross-entropy from probabilities while keeping logarithms finite.',
+    prompt: [
+      'Write `binary_cross_entropy(probability, target)` for elementwise binary targets in `{0, 1}`.',
+      'Clamp probabilities before taking logarithms, then return the mean loss. In production, explain why logits plus `binary_cross_entropy_with_logits` are usually preferable.',
+    ],
+    signature: `def binary_cross_entropy(
+    probability: torch.Tensor,
+    target: torch.Tensor,
+    eps: float = 1e-8,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      '`probability` and `target` have the same shape.',
+      'Targets contain only `0` and `1`.',
+      'Clamp probabilities to `[eps, 1 - eps]` before taking logs.',
+      'Return the mean binary cross-entropy.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['probability = [0.9, 0.2]', 'target = [1, 0]'],
+        result: '0.16425',
+      },
+    ],
+    hint: [
+      'Use `-(target * log(p) + (1 - target) * log(1 - p))`.',
+      'Clamp once before both logarithms.',
+    ],
+    solutionNotes: [
+      'Binary cross-entropy selects the log-probability of the observed class: `-y log(p) - (1-y) log(1-p)`.',
+      'The clamp prevents `log(0)`. For model training, logits are normally better because the fused logits loss avoids explicitly forming probabilities.',
+    ],
+    solutionCode: `import torch
+
+def binary_cross_entropy(
+    probability: torch.Tensor,
+    target: torch.Tensor,
+    eps: float = 1e-8,
+) -> torch.Tensor:
+    probability = torch.as_tensor(probability, dtype=torch.float64)
+    target = torch.as_tensor(target, dtype=torch.float64)
+    if probability.shape != target.shape:
+        raise ValueError("probability and target must have the same shape")
+    if bool(torch.any((target != 0) & (target != 1))):
+        raise ValueError("target must contain only 0 and 1")
+    probability = torch.clamp(probability, min=eps, max=1 - eps)
+    loss = -target * torch.log(probability) - (1 - target) * torch.log(1 - probability)
+    return torch.mean(loss)
+
+probability = torch.tensor([0.9, 0.2])
+target = torch.tensor([1.0, 0.0])
+print(binary_cross_entropy(probability, target).item())`,
+    starterCode: `import torch
+
+def binary_cross_entropy(
+    probability: torch.Tensor,
+    target: torch.Tensor,
+    eps: float = 1e-8,
+) -> torch.Tensor:
+    # TODO: clamp probabilities, apply the binary cross-entropy formula, and mean-reduce.
+    raise NotImplementedError("Implement binary_cross_entropy")
+
+probability = torch.tensor([0.9, 0.2])
+target = torch.tensor([1.0, 0.0])
+print(binary_cross_entropy(probability, target).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Classification', 'Losses'],
+  },
+  {
+    id: 'single-box-iou',
+    order: 22,
+    title: 'Single-box IoU',
+    difficulty: 'Easy',
+    summary: 'Compute intersection-over-union for two `[x1, y1, x2, y2]` boxes.',
+    prompt: [
+      'Write `box_iou(box_a, box_b)` for two axis-aligned boxes in corner format.',
+      'Clamp non-overlapping intersection dimensions to zero and define IoU as `0.0` when the union has zero area.',
+    ],
+    signature: `def box_iou(
+    box_a: torch.Tensor,
+    box_b: torch.Tensor,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      'Both inputs have shape `(4,)` and valid corner ordering.',
+      'Compute `intersection / union`.',
+      'Return zero for non-overlap and zero-area unions.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['box_a = [0, 0, 2, 2]', 'box_b = [1, 1, 3, 3]'],
+        result: '0.14286',
+      },
+    ],
+    hint: [
+      'The intersection uses maximum top-left and minimum bottom-right corners.',
+      'Union is `area_a + area_b - intersection` because overlap was counted twice.',
+    ],
+    solutionNotes: [
+      'The geometry is two reductions: intersect the corners, then compute each box area and subtract the overlap once from the sum.',
+      'Clamping the intersection dimensions handles disjoint boxes; guarding the union gives a defined zero result for degenerate boxes.',
+    ],
+    solutionCode: `import torch
+
+def box_iou(
+    box_a: torch.Tensor,
+    box_b: torch.Tensor,
+) -> torch.Tensor:
+    box_a = torch.as_tensor(box_a, dtype=torch.float64)
+    box_b = torch.as_tensor(box_b, dtype=torch.float64)
+    if box_a.shape != (4,) or box_b.shape != (4,):
+        raise ValueError("boxes must have shape (4,)")
+    if bool(torch.any(box_a[2:] < box_a[:2])) or bool(torch.any(box_b[2:] < box_b[:2])):
+        raise ValueError("boxes must use x2 >= x1 and y2 >= y1")
+    top_left = torch.maximum(box_a[:2], box_b[:2])
+    bottom_right = torch.minimum(box_a[2:], box_b[2:])
+    intersection_size = torch.clamp(bottom_right - top_left, min=0.0)
+    intersection = intersection_size[0] * intersection_size[1]
+    size_a = box_a[2:] - box_a[:2]
+    size_b = box_b[2:] - box_b[:2]
+    area_a = size_a[0] * size_a[1]
+    area_b = size_b[0] * size_b[1]
+    union = area_a + area_b - intersection
+    safe_union = torch.where(union > 0, union, torch.ones_like(union))
+    return torch.where(union > 0, intersection / safe_union, torch.zeros_like(union))
+
+box_a = torch.tensor([0.0, 0.0, 2.0, 2.0])
+box_b = torch.tensor([1.0, 1.0, 3.0, 3.0])
+print(box_iou(box_a, box_b).item())`,
+    starterCode: `import torch
+
+def box_iou(
+    box_a: torch.Tensor,
+    box_b: torch.Tensor,
+) -> torch.Tensor:
+    # TODO: compute intersection area divided by union area.
+    raise NotImplementedError("Implement box_iou")
+
+box_a = torch.tensor([0.0, 0.0, 2.0, 2.0])
+box_b = torch.tensor([1.0, 1.0, 3.0, 3.0])
+print(box_iou(box_a, box_b).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Computer Vision', 'Bounding Boxes'],
+  },
+  {
+    id: 'pairwise-squared-distance',
+    order: 23,
+    title: 'Pairwise squared distance',
+    difficulty: 'Medium',
+    summary: 'Build an `(N, M)` matrix of squared Euclidean distances between two point sets.',
+    prompt: [
+      'Write `pairwise_squared_distance(x, y)` for `x.shape == (N, D)` and `y.shape == (M, D)`.',
+      'Use broadcasting or the equivalent norm-and-matmul identity, and return one distance for every pair of rows.',
+    ],
+    signature: `def pairwise_squared_distance(
+    x: torch.Tensor,
+    y: torch.Tensor,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      'Return shape `(N, M)`.',
+      'Compute `||x_i - y_j||^2` without Python loops.',
+      'Raise `ValueError` when either input is not 2D or the feature dimensions differ.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['x = [[0, 0], [1, 1]]', 'y = [[1, 0], [2, 2]]'],
+        result: '[[1.0, 8.0], [1.0, 2.0]]',
+      },
+    ],
+    hint: [
+      'Insert singleton axes to make `(N, 1, D)` and `(1, M, D)`.',
+      'For a lower-memory version, use `||x||^2 + ||y||^2 - 2 x y^T`.',
+    ],
+    solutionNotes: [
+      'The direct broadcasted difference makes the shape progression explicit: `(N, 1, D) - (1, M, D) -> (N, M, D)`, then summing over `D` gives the answer.',
+      'The norm identity avoids materializing the `(N, M, D)` tensor, so it is the better production implementation when the point sets are large.',
+    ],
+    solutionCode: `import torch
+
+def pairwise_squared_distance(
+    x: torch.Tensor,
+    y: torch.Tensor,
+) -> torch.Tensor:
+    x = torch.as_tensor(x, dtype=torch.float64)
+    y = torch.as_tensor(y, dtype=torch.float64)
+    if x.ndim != 2 or y.ndim != 2 or x.shape[1] != y.shape[1]:
+        raise ValueError("x and y must be 2D with the same feature dimension")
+    x_squared = torch.sum(x * x, dim=1, keepdim=True)
+    y_squared = torch.sum(y * y, dim=1)[None, :]
+    distances = x_squared + y_squared - 2 * x @ torch.transpose(y, 0, 1)
+    return torch.clamp(distances, min=0.0)
+
+x = torch.tensor([[0.0, 0.0], [1.0, 1.0]])
+y = torch.tensor([[1.0, 0.0], [2.0, 2.0]])
+print(pairwise_squared_distance(x, y))`,
+    starterCode: `import torch
+
+def pairwise_squared_distance(
+    x: torch.Tensor,
+    y: torch.Tensor,
+) -> torch.Tensor:
+    # TODO: broadcast the pair dimension and reduce squared differences over D.
+    raise NotImplementedError("Implement pairwise_squared_distance")
+
+x = torch.tensor([[0.0, 0.0], [1.0, 1.0]])
+y = torch.tensor([[1.0, 0.0], [2.0, 2.0]])
+print(pairwise_squared_distance(x, y))`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Broadcasting', 'Geometry'],
+  },
+  {
+    id: 'masked-mean',
+    order: 24,
+    title: 'Masked mean',
+    difficulty: 'Easy',
+    summary: 'Reduce padded `(B, N, D)` features while excluding invalid rows from each batch mean.',
+    prompt: [
+      'Write `masked_mean(features, mask)` for features shaped `(B, N, D)` and a validity mask shaped `(B, N)`.',
+      'Return one `(B, D)` mean per batch item. A row with no valid entries should return zeros rather than divide by zero.',
+    ],
+    signature: `def masked_mean(
+    features: torch.Tensor,
+    mask: torch.Tensor,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      'Broadcast the mask across the feature dimension.',
+      'Sum over `N` and divide by the number of valid rows per batch item.',
+      'Clamp the count so an all-padding item returns zero.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['features = [[[1, 2], [3, 4], [0, 0]]]', 'mask = [[1, 1, 0]]'],
+        result: '[[2.0, 3.0]]',
+      },
+    ],
+    hint: [
+      'Use `mask.unsqueeze(-1)` to turn `(B, N)` into `(B, N, 1)`.',
+      'Sum masked features and masked counts over the same axis.',
+    ],
+    solutionNotes: [
+      'The mask is a selector, not a new reduction rule: cast it to the feature dtype, multiply it into `(B, N, D)`, and reduce over `N`.',
+      'Keeping the count as `(B, 1)` makes the final division broadcast across `D`; clamping only the denominator makes empty batches return zero.',
+    ],
+    solutionCode: `import torch
+
+def masked_mean(
+    features: torch.Tensor,
+    mask: torch.Tensor,
+) -> torch.Tensor:
+    features = torch.as_tensor(features, dtype=torch.float64)
+    mask = torch.as_tensor(mask)
+    if features.ndim != 3 or mask.shape != features.shape[:2]:
+        raise ValueError("features must be (B, N, D) and mask must be (B, N)")
+    weights = torch.unsqueeze(torch.as_tensor(mask, dtype=features.dtype), -1)
+    total = torch.sum(features * weights, dim=1)
+    count = torch.clamp(torch.sum(weights, dim=1), min=1.0)
+    return total / count
+
+features = torch.tensor([[[1.0, 2.0], [3.0, 4.0], [0.0, 0.0]]])
+mask = torch.tensor([[1, 1, 0]])
+print(masked_mean(features, mask))`,
+    starterCode: `import torch
+
+def masked_mean(
+    features: torch.Tensor,
+    mask: torch.Tensor,
+) -> torch.Tensor:
+    # TODO: exclude masked rows from the mean without a Python loop.
+    raise NotImplementedError("Implement masked_mean")
+
+features = torch.tensor([[[1.0, 2.0], [3.0, 4.0], [0.0, 0.0]]])
+mask = torch.tensor([[1, 1, 0]])
+print(masked_mean(features, mask))`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Masking', 'Reductions'],
+  },
+  {
+    id: 'top-k-gather',
+    order: 25,
+    title: 'Top-k features with gather',
+    difficulty: 'Medium',
+    summary: 'Select the top-k rows of batched features using per-batch scores and explicit gather shapes.',
+    prompt: [
+      'Write `topk_features(scores, features, k)` where `scores.shape == (B, N)` and `features.shape == (B, N, D)`.',
+      'Return the feature rows corresponding to each batch item’s top-k scores in descending score order.',
+    ],
+    signature: `def topk_features(
+    scores: torch.Tensor,
+    features: torch.Tensor,
+    k: int,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      'Return shape `(B, k, D)`.',
+      'Each batch item may select different rows.',
+      'Use `unsqueeze`, broadcasting or expansion, and `torch.gather` rather than a Python loop.',
+      'Raise `ValueError` when shapes or `k` are invalid.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['scores = [[0.2, 0.9, 0.4]]', 'features = [[[2, 0], [9, 0], [4, 0]]]', 'k = 2'],
+        result: '[[[9, 0], [4, 0]]]',
+      },
+    ],
+    hint: [
+      'Sort indices along `N` and slice the first `k` columns.',
+      'Turn `(B, k)` indices into `(B, k, D)` indices before gathering along dimension `1`.',
+    ],
+    solutionNotes: [
+      'The scores produce row indices, but `gather` needs an index for every feature channel. Adding a last axis and broadcasting it from `(B, k, 1)` to `(B, k, D)` supplies exactly that shape.',
+      'The batch axis is preserved throughout, so each example can choose different rows without flattening or looping.',
+    ],
+    solutionCode: `import torch
+
+def topk_features(
+    scores: torch.Tensor,
+    features: torch.Tensor,
+    k: int,
+) -> torch.Tensor:
+    scores = torch.as_tensor(scores, dtype=torch.float64)
+    features = torch.as_tensor(features, dtype=torch.float64)
+    if scores.ndim != 2 or features.ndim != 3 or features.shape[:2] != scores.shape:
+        raise ValueError("scores must be (B, N) and features must be (B, N, D)")
+    if isinstance(k, bool) or not isinstance(k, int) or not 1 <= k <= scores.shape[1]:
+        raise ValueError("k must be between 1 and N")
+    indices = torch.argsort(scores, dim=1, descending=True)[:, :k]
+    gather_indices = torch.broadcast_to(indices[:, :, None], (scores.shape[0], k, features.shape[2]))
+    return torch.gather(features, dim=1, index=gather_indices)
+
+scores = torch.tensor([[0.2, 0.9, 0.4]])
+features = torch.tensor([[[2.0, 0.0], [9.0, 0.0], [4.0, 0.0]]])
+print(topk_features(scores, features, k=2))`,
+    starterCode: `import torch
+
+def topk_features(
+    scores: torch.Tensor,
+    features: torch.Tensor,
+    k: int,
+) -> torch.Tensor:
+    # TODO: create (B, k, D) gather indices from (B, k) top-score indices.
+    raise NotImplementedError("Implement topk_features")
+
+scores = torch.tensor([[0.2, 0.9, 0.4]])
+features = torch.tensor([[[2.0, 0.0], [9.0, 0.0], [4.0, 0.0]]])
+print(topk_features(scores, features, k=2))`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Indexing', 'Gather'],
+  },
+  {
+    id: 'dice-loss',
+    order: 26,
+    title: 'Dice loss',
+    difficulty: 'Medium',
+    summary: 'Implement a batch-wise Dice loss that emphasizes overlap for imbalanced segmentation masks.',
+    prompt: [
+      'Write `dice_loss(prediction, target)` for batched segmentation probabilities and binary targets.',
+      'Flatten spatial dimensions per example, compute the smoothed Dice coefficient, and return `1 - mean(Dice)`.',
+    ],
+    signature: `def dice_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    eps: float = 1e-6,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      'Preserve the first dimension as batch size and flatten the remaining dimensions.',
+      'Use `2 * intersection / (prediction_sum + target_sum)` with `eps` smoothing.',
+      'Return one scalar loss.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['prediction = [[[1, 0], [0, 1]]]', 'target = [[[1, 0], [1, 0]]]'],
+        result: '0.5',
+      },
+    ],
+    hint: [
+      'Use `reshape(batch_size, -1)` to keep one row per image.',
+      'Elementwise multiplication gives the soft intersection.',
+    ],
+    solutionNotes: [
+      'Dice measures overlap directly, so it is less dominated by abundant background pixels than raw accuracy. Flattening each example makes the reduction independent of spatial rank.',
+      'The small `eps` keeps empty or nearly empty masks finite; averaging per-example Dice scores keeps each image equally important.',
+    ],
+    solutionCode: `import torch
+
+def dice_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    eps: float = 1e-6,
+) -> torch.Tensor:
+    prediction = torch.as_tensor(prediction, dtype=torch.float64)
+    target = torch.as_tensor(target, dtype=torch.float64)
+    if prediction.shape != target.shape or prediction.ndim < 2:
+        raise ValueError("prediction and target must have the same batched shape")
+    prediction = prediction.reshape(prediction.shape[0], -1)
+    target = target.reshape(target.shape[0], -1)
+    intersection = torch.sum(prediction * target, dim=1)
+    denominator = torch.sum(prediction, dim=1) + torch.sum(target, dim=1)
+    dice = (2 * intersection + eps) / (denominator + eps)
+    return 1 - torch.mean(dice)
+
+prediction = torch.tensor([[[1.0, 0.0], [0.0, 1.0]]])
+target = torch.tensor([[[1.0, 0.0], [1.0, 0.0]]])
+print(dice_loss(prediction, target).item())`,
+    starterCode: `import torch
+
+def dice_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    eps: float = 1e-6,
+) -> torch.Tensor:
+    # TODO: flatten each batch item, compute smoothed Dice, and return 1 - mean(Dice).
+    raise NotImplementedError("Implement dice_loss")
+
+prediction = torch.tensor([[[1.0, 0.0], [0.0, 1.0]]])
+target = torch.tensor([[[1.0, 0.0], [1.0, 0.0]]])
+print(dice_loss(prediction, target).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Segmentation', 'Losses'],
+  },
+  {
+    id: 'segmentation-iou-loss',
+    order: 27,
+    title: 'Segmentation IoU loss',
+    difficulty: 'Medium',
+    summary: 'Compute a differentiable soft IoU loss over batched segmentation masks.',
+    prompt: [
+      'Write `iou_loss(prediction, target)` using soft masks rather than thresholding the predictions.',
+      'Flatten each batch item, compute intersection and union, and return the mean of `1 - IoU`.',
+    ],
+    signature: `def iou_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    eps: float = 1e-6,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      'Preserve the first dimension as batch size.',
+      'Use `union = prediction_sum + target_sum - intersection`.',
+      'Use `eps` to keep zero-union examples finite.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['prediction = [[[1, 0], [0, 1]]]', 'target = [[[1, 0], [1, 0]]]'],
+        result: '0.66667',
+      },
+    ],
+    hint: [
+      'IoU is the same intersection-over-union geometry used for boxes, applied to mask entries.',
+      'Keep the batch axis while flattening all remaining dimensions.',
+    ],
+    solutionNotes: [
+      'Soft IoU replaces set membership with probabilities, so the loss remains usable in gradient-based training. The numerator is the elementwise product sum and the union subtracts that overlap once.',
+      'The result is averaged after computing one IoU per example, with smoothing only to avoid an undefined empty union.',
+    ],
+    solutionCode: `import torch
+
+def iou_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    eps: float = 1e-6,
+) -> torch.Tensor:
+    prediction = torch.as_tensor(prediction, dtype=torch.float64)
+    target = torch.as_tensor(target, dtype=torch.float64)
+    if prediction.shape != target.shape or prediction.ndim < 2:
+        raise ValueError("prediction and target must have the same batched shape")
+    prediction = prediction.reshape(prediction.shape[0], -1)
+    target = target.reshape(target.shape[0], -1)
+    intersection = torch.sum(prediction * target, dim=1)
+    union = torch.sum(prediction, dim=1) + torch.sum(target, dim=1) - intersection
+    return torch.mean(1 - (intersection + eps) / (union + eps))
+
+prediction = torch.tensor([[[1.0, 0.0], [0.0, 1.0]]])
+target = torch.tensor([[[1.0, 0.0], [1.0, 0.0]]])
+print(iou_loss(prediction, target).item())`,
+    starterCode: `import torch
+
+def iou_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    eps: float = 1e-6,
+) -> torch.Tensor:
+    # TODO: compute soft intersection-over-union per batch item.
+    raise NotImplementedError("Implement iou_loss")
+
+prediction = torch.tensor([[[1.0, 0.0], [0.0, 1.0]]])
+target = torch.tensor([[[1.0, 0.0], [1.0, 0.0]]])
+print(iou_loss(prediction, target).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Segmentation', 'Losses'],
+  },
+  {
+    id: 'focal-loss',
+    order: 28,
+    title: 'Focal loss',
+    difficulty: 'Medium',
+    summary: 'Implement binary focal loss so easy negatives contribute less under extreme class imbalance.',
+    prompt: [
+      'Write `focal_loss(logits, target, gamma)` for binary targets using logits as input.',
+      'Compute `p_t`, downweight it by `(1 - p_t) ** gamma`, and use a stable enough probability path for ordinary finite logits.',
+    ],
+    signature: `def focal_loss(
+    logits: torch.Tensor,
+    target: torch.Tensor,
+    gamma: float = 2.0,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      'Targets contain only `0` and `1` and match `logits` shape.',
+      'Use `p_t = p` for positive targets and `1 - p` for negative targets.',
+      'Return the mean `-(1 - p_t)^gamma * log(p_t)`.',
+      'Raise `ValueError` for negative `gamma` or invalid targets.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['logits = [4.0, -0.4]', 'target = [1, 0]', 'gamma = 2'],
+        result: 'approximately 0.092',
+      },
+    ],
+    hint: [
+      'A sigmoid converts logits to probabilities; clamp the result before `log`.',
+      'The modulating factor is close to zero for an easy example with `p_t` near one.',
+    ],
+    solutionNotes: [
+      'Focal loss starts with binary cross-entropy and multiplies each example by `(1 - p_t)^gamma`. Correct, easy examples therefore shrink rapidly while hard examples retain gradient signal.',
+      'This compact exercise exposes the focusing mechanism. In production, use a fused logits-based implementation to avoid explicitly materializing probabilities.',
+    ],
+    solutionCode: `import torch
+
+def focal_loss(
+    logits: torch.Tensor,
+    target: torch.Tensor,
+    gamma: float = 2.0,
+) -> torch.Tensor:
+    logits = torch.as_tensor(logits, dtype=torch.float64)
+    target = torch.as_tensor(target, dtype=torch.float64)
+    if logits.shape != target.shape or gamma < 0:
+        raise ValueError("logits and target must match and gamma must be non-negative")
+    if bool(torch.any((target != 0) & (target != 1))):
+        raise ValueError("target must contain only 0 and 1")
+    probability = 1 / (1 + torch.exp(-torch.clamp(logits, min=-60.0, max=60.0)))
+    p_t = torch.where(target == 1, probability, 1 - probability)
+    p_t = torch.clamp(p_t, min=1e-8, max=1.0)
+    return torch.mean(-((1 - p_t) ** gamma) * torch.log(p_t))
+
+logits = torch.tensor([4.0, -0.4])
+target = torch.tensor([1.0, 0.0])
+print(focal_loss(logits, target).item())`,
+    starterCode: `import torch
+
+def focal_loss(
+    logits: torch.Tensor,
+    target: torch.Tensor,
+    gamma: float = 2.0,
+) -> torch.Tensor:
+    # TODO: compute p_t and apply the focal modulating factor.
+    raise NotImplementedError("Implement focal_loss")
+
+logits = torch.tensor([4.0, -0.4])
+target = torch.tensor([1.0, 0.0])
+print(focal_loss(logits, target).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Detection', 'Class Imbalance'],
+  },
+  {
+    id: 'weighted-box-regression-loss',
+    order: 29,
+    title: 'Weighted bounding-box regression loss',
+    difficulty: 'Easy',
+    summary: 'Combine per-coordinate regression errors with explicit weights for position, size, angle, and velocity.',
+    prompt: [
+      'Write `weighted_box_regression_loss(prediction, target, weights)` as a weighted mean absolute error over the final coordinate dimension.',
+      'The weights may reflect different semantic groups such as position, size, yaw, and velocity.',
+    ],
+    signature: `def weighted_box_regression_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    weights: torch.Tensor,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      '`prediction` and `target` share shape `(..., D)`.',
+      '`weights` has shape `(D,)` and contains non-negative values.',
+      'Return the mean weighted L1 error.',
+      'Raise `ValueError` on incompatible shapes or negative weights.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['prediction = [[1, 2, 3]]', 'target = [[0, 0, 0]]', 'weights = [1, 2, 0.5]'],
+        result: '2.16667',
+      },
+    ],
+    hint: [
+      'Subtract and take absolute values before multiplying by `weights`.',
+      'The last-axis weight vector broadcasts across every leading dimension.',
+    ],
+    solutionNotes: [
+      'Different box coordinates can have different units and importance, so a single unweighted error can let one group dominate. A final-axis weight vector makes that tradeoff explicit.',
+      'The code keeps the weighting separate from the reduction: broadcast the weights over the coordinate axis, then mean all weighted residuals.',
+    ],
+    solutionCode: `import torch
+
+def weighted_box_regression_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    weights: torch.Tensor,
+) -> torch.Tensor:
+    prediction = torch.as_tensor(prediction, dtype=torch.float64)
+    target = torch.as_tensor(target, dtype=torch.float64)
+    weights = torch.as_tensor(weights, dtype=torch.float64)
+    if prediction.shape != target.shape or prediction.ndim == 0 or weights.shape != prediction.shape[-1:]:
+        raise ValueError("prediction, target, and weights have incompatible shapes")
+    if bool(torch.any(weights < 0)):
+        raise ValueError("weights must be non-negative")
+    return torch.mean(torch.abs(prediction - target) * weights)
+
+prediction = torch.tensor([[1.0, 2.0, 3.0]])
+target = torch.zeros_like(prediction)
+weights = torch.tensor([1.0, 2.0, 0.5])
+print(weighted_box_regression_loss(prediction, target, weights).item())`,
+    starterCode: `import torch
+
+def weighted_box_regression_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    weights: torch.Tensor,
+) -> torch.Tensor:
+    # TODO: compute weighted absolute error over the coordinate dimension.
+    raise NotImplementedError("Implement weighted_box_regression_loss")
+
+prediction = torch.tensor([[1.0, 2.0, 3.0]])
+target = torch.zeros_like(prediction)
+weights = torch.tensor([1.0, 2.0, 0.5])
+print(weighted_box_regression_loss(prediction, target, weights).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Regression', 'Detection'],
+  },
+  {
+    id: 'wrapped-angular-difference',
+    order: 30,
+    title: 'Wrapped angular difference',
+    difficulty: 'Easy',
+    summary: 'Compute the shortest signed difference between angles without a discontinuity at ±π.',
+    prompt: [
+      'Write `angular_difference(prediction, target)` for angles in radians.',
+      'A prediction of `179°` and target of `-179°` should differ by about `2°`, not `358°`.',
+    ],
+    signature: `def angular_difference(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      'Inputs have the same shape.',
+      'Return values in `[-π, π]` using the shortest signed rotation.',
+      'Do not use a naive subtraction as the final answer.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['prediction = 179°', 'target = -179°'],
+        result: 'approximately -2°',
+      },
+    ],
+    hint: [
+      'First compute the raw difference.',
+      '`atan2(sin(difference), cos(difference))` wraps it to the principal interval.',
+    ],
+    solutionNotes: [
+      'Angles live on a circle, so ordinary subtraction mistakes the seam at `±π` for a long physical rotation.',
+      'The sine and cosine preserve the direction on that circle, and `atan2` recovers the equivalent angle in the principal interval.',
+    ],
+    solutionCode: `import torch
+
+def angular_difference(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+) -> torch.Tensor:
+    prediction = torch.as_tensor(prediction, dtype=torch.float64)
+    target = torch.as_tensor(target, dtype=torch.float64)
+    if prediction.shape != target.shape:
+        raise ValueError("prediction and target must have the same shape")
+    difference = prediction - target
+    return torch.atan2(torch.sin(difference), torch.cos(difference))
+
+prediction = torch.tensor(179.0 * 3.141592653589793 / 180)
+target = torch.tensor(-179.0 * 3.141592653589793 / 180)
+print(angular_difference(prediction, target) * 180 / 3.141592653589793)`,
+    starterCode: `import torch
+
+def angular_difference(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+) -> torch.Tensor:
+    # TODO: wrap the raw difference to the shortest signed angle.
+    raise NotImplementedError("Implement angular_difference")
+
+prediction = torch.tensor(179.0 * 3.141592653589793 / 180)
+target = torch.tensor(-179.0 * 3.141592653589793 / 180)
+print(angular_difference(prediction, target) * 180 / 3.141592653589793)`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Geometry', 'Autonomous Driving'],
+  },
+  {
+    id: 'average-precision-from-matches',
+    order: 31,
+    title: 'Average precision from ranked matches',
+    difficulty: 'Hard',
+    summary: 'Compute one-class average precision from confidence-ranked true-positive matches.',
+    prompt: [
+      'Write `average_precision(scores, is_true_positive, num_ground_truth)` for detections from one class.',
+      'Sort by confidence, sweep the ranked list, and sum precision at each newly recovered ground-truth object.',
+    ],
+    signature: `def average_precision(
+    scores: torch.Tensor,
+    is_true_positive: torch.Tensor,
+    num_ground_truth: int,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      '`scores` and `is_true_positive` are 1D and have the same length.',
+      'Sort predictions by descending score before accumulating counts.',
+      'Compute AP as the mean precision over true-positive ranks, normalized by `num_ground_truth`.',
+      'Raise `ValueError` for invalid shapes or no ground-truth objects.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['scores = [0.9, 0.8, 0.7]', 'is_true_positive = [1, 0, 1]', 'num_ground_truth = 2'],
+        result: '0.83333',
+      },
+    ],
+    hint: [
+      'Use descending `argsort` to create the evaluation order.',
+      'A true positive contributes the precision at its rank; false positives only increase the denominator.',
+    ],
+    solutionNotes: [
+      'Average precision rewards finding true objects early: after sorting by confidence, each true positive contributes precision at the rank where it appears.',
+      'The ground-truth count normalizes the sum and makes the metric comparable across images or classes. Full mAP additionally averages this AP across classes and IoU thresholds.',
+    ],
+    solutionCode: `import torch
+
+def average_precision(
+    scores: torch.Tensor,
+    is_true_positive: torch.Tensor,
+    num_ground_truth: int,
+) -> torch.Tensor:
+    scores = torch.as_tensor(scores, dtype=torch.float64)
+    is_true_positive = torch.as_tensor(is_true_positive, dtype=torch.bool)
+    if scores.ndim != 1 or is_true_positive.shape != scores.shape or num_ground_truth <= 0:
+        raise ValueError("scores and matches must be 1D with positive ground-truth count")
+    order = torch.argsort(scores, descending=True)
+    matches = is_true_positive[order]
+    cumulative_tp = torch.cumsum(torch.as_tensor(matches, dtype=torch.float64), dim=0)
+    ranks = torch.arange(scores.shape[0], dtype=torch.float64) + 1
+    precision = cumulative_tp / ranks
+    return torch.sum(precision * torch.as_tensor(matches, dtype=torch.float64)) / num_ground_truth
+
+scores = torch.tensor([0.9, 0.8, 0.7])
+matches = torch.tensor([1, 0, 1], dtype=torch.bool)
+print(average_precision(scores, matches, num_ground_truth=2).item())`,
+    starterCode: `import torch
+
+def average_precision(
+    scores: torch.Tensor,
+    is_true_positive: torch.Tensor,
+    num_ground_truth: int,
+) -> torch.Tensor:
+    # TODO: sort by confidence and average precision at true-positive ranks.
+    raise NotImplementedError("Implement average_precision")
+
+scores = torch.tensor([0.9, 0.8, 0.7])
+matches = torch.tensor([1, 0, 1], dtype=torch.bool)
+print(average_precision(scores, matches, num_ground_truth=2).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Detection', 'Metrics'],
+  },
+  {
+    id: 'greedy-detection-matching',
+    order: 32,
+    title: 'Greedy prediction-to-ground-truth matching',
+    difficulty: 'Hard',
+    summary: 'Match confidence-ranked predictions to at most one ground-truth box using an IoU threshold.',
+    prompt: [
+      'Write `match_predictions(predictions, scores, ground_truth, iou_threshold)` and return the matched ground-truth index for each prediction, or `-1` for a false positive.',
+      'Process predictions in descending confidence order; a ground-truth box can be matched only once.',
+    ],
+    signature: `def match_predictions(
+    predictions: torch.Tensor,
+    scores: torch.Tensor,
+    ground_truth: torch.Tensor,
+    iou_threshold: float,
+) -> list[int]:
+    ...`,
+    requirements: [
+      'Inputs have shapes `(N, 4)`, `(N,)`, and `(M, 4)`.',
+      'For each prediction, choose the unmatched ground truth with highest IoU.',
+      'Mark a match only when the best IoU is at least the threshold.',
+      'Return `-1` for unmatched predictions and preserve prediction-index order in the output.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: [
+          'predictions = [[0, 0, 2, 2], [0, 0, 2, 2]]',
+          'scores = [0.9, 0.8]',
+          'ground_truth = [[0, 0, 2, 2]]',
+          'iou_threshold = 0.5',
+        ],
+        result: '[0, -1]',
+      },
+    ],
+    hint: [
+      'Compute a vectorized `(N, M)` IoU matrix first.',
+      'Use a `set` of already claimed ground-truth indices while traversing sorted predictions.',
+      'Do not let a second high-overlap prediction become a second true positive.',
+    ],
+    solutionNotes: [
+      'Detection evaluation is not independent per prediction: once a ground-truth object is claimed by the highest-confidence matching prediction, later duplicates are false positives.',
+      'The vectorized IoU calculation handles geometry; the small greedy loop handles the one-to-one assignment rule and keeps the confidence ordering explicit.',
+    ],
+    solutionCode: `import torch
+
+def match_predictions(
+    predictions: torch.Tensor,
+    scores: torch.Tensor,
+    ground_truth: torch.Tensor,
+    iou_threshold: float,
+) -> list[int]:
+    predictions = torch.as_tensor(predictions, dtype=torch.float64)
+    scores = torch.as_tensor(scores, dtype=torch.float64)
+    ground_truth = torch.as_tensor(ground_truth, dtype=torch.float64)
+    if predictions.ndim != 2 or predictions.shape[1] != 4 or ground_truth.ndim != 2 or ground_truth.shape[1] != 4:
+        raise ValueError("predictions and ground_truth must have shape (N, 4) and (M, 4)")
+    if scores.shape != (predictions.shape[0],) or not 0 <= iou_threshold <= 1:
+        raise ValueError("scores or iou_threshold is invalid")
+
+    top_left = torch.maximum(predictions[:, None, :2], ground_truth[None, :, :2])
+    bottom_right = torch.minimum(predictions[:, None, 2:], ground_truth[None, :, 2:])
+    size = torch.clamp(bottom_right - top_left, min=0.0)
+    intersection = size[..., 0] * size[..., 1]
+    area_pred = (predictions[:, 2] - predictions[:, 0]) * (predictions[:, 3] - predictions[:, 1])
+    area_gt = (ground_truth[:, 2] - ground_truth[:, 0]) * (ground_truth[:, 3] - ground_truth[:, 1])
+    union = area_pred[:, None] + area_gt[None, :] - intersection
+    ious = torch.where(union > 0, intersection / torch.where(union > 0, union, torch.ones_like(union)), torch.zeros_like(union))
+
+    matches = [-1] * predictions.shape[0]
+    used = set()
+    for prediction_index in torch.argsort(scores, descending=True).tolist():
+        if ground_truth.shape[0] == 0:
+            continue
+        best_gt = int(torch.argmax(ious[prediction_index]).item())
+        best_iou = float(ious[prediction_index, best_gt].item())
+        if best_iou >= iou_threshold and best_gt not in used:
+            matches[prediction_index] = best_gt
+            used.add(best_gt)
+    return matches
+
+predictions = torch.tensor([[0.0, 0.0, 2.0, 2.0], [0.0, 0.0, 2.0, 2.0]])
+scores = torch.tensor([0.9, 0.8])
+ground_truth = torch.tensor([[0.0, 0.0, 2.0, 2.0]])
+print(match_predictions(predictions, scores, ground_truth, 0.5))`,
+    starterCode: `import torch
+
+def match_predictions(
+    predictions: torch.Tensor,
+    scores: torch.Tensor,
+    ground_truth: torch.Tensor,
+    iou_threshold: float,
+) -> list[int]:
+    # TODO: compute pairwise IoU, then greedily claim each ground-truth box once.
+    raise NotImplementedError("Implement match_predictions")
+
+predictions = torch.tensor([[0.0, 0.0, 2.0, 2.0], [0.0, 0.0, 2.0, 2.0]])
+scores = torch.tensor([0.9, 0.8])
+ground_truth = torch.tensor([[0.0, 0.0, 2.0, 2.0]])
+print(match_predictions(predictions, scores, ground_truth, 0.5))`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Detection', 'Greedy Matching'],
+  },
+  {
+    id: 'homogeneous-coordinate-transform',
+    order: 33,
+    title: '3D coordinate transform',
+    difficulty: 'Medium',
+    summary: 'Apply one 4×4 homogeneous transform to a batch of 3D points.',
+    prompt: [
+      'Write `transform_points(points, transform)` for `points.shape == (N, 3)` and a homogeneous transform shaped `(4, 4)`.',
+      'Append a homogeneous coordinate of one, multiply by the transform, and return the transformed XYZ coordinates.',
+    ],
+    signature: `def transform_points(
+    points: torch.Tensor,
+    transform: torch.Tensor,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      'Return shape `(N, 3)`.',
+      'Use one matrix multiplication for rotation and translation.',
+      'Reject malformed point or transform shapes.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: ['points = [[1, 2, 3]]', 'transform = identity with translation [10, 20, 30]'],
+        result: '[[11, 22, 33]]',
+      },
+    ],
+    hint: [
+      'Concatenate a column of ones to get `(N, 4)`.',
+      'Multiply `transform @ points_h.T`, transpose back, and discard the fourth coordinate.',
+    ],
+    solutionNotes: [
+      'Homogeneous coordinates turn the affine map `R p + t` into one matrix product. The appended one is what lets the final column encode translation.',
+      'The transpose is only a layout step: a `(4, 4)` transform multiplies points arranged as columns, then the result is returned in the original `(N, 3)` row layout.',
+    ],
+    solutionCode: `import torch
+
+def transform_points(
+    points: torch.Tensor,
+    transform: torch.Tensor,
+) -> torch.Tensor:
+    points = torch.as_tensor(points, dtype=torch.float64)
+    transform = torch.as_tensor(transform, dtype=torch.float64)
+    if points.ndim != 2 or points.shape[1] != 3 or transform.shape != (4, 4):
+        raise ValueError("points must be (N, 3) and transform must be (4, 4)")
+    ones = torch.ones(points.shape[0], 1, dtype=points.dtype)
+    homogeneous = torch.cat([points, ones], dim=1)
+    transformed = torch.transpose(transform @ torch.transpose(homogeneous, 0, 1), 0, 1)
+    return transformed[:, :3]
+
+points = torch.tensor([[1.0, 2.0, 3.0]])
+transform = torch.tensor([[1.0, 0, 0, 10], [0, 1.0, 0, 20], [0, 0, 1.0, 30], [0, 0, 0, 1.0]])
+print(transform_points(points, transform))`,
+    starterCode: `import torch
+
+def transform_points(
+    points: torch.Tensor,
+    transform: torch.Tensor,
+) -> torch.Tensor:
+    # TODO: append homogeneous ones, transform, and return XYZ.
+    raise NotImplementedError("Implement transform_points")
+
+points = torch.tensor([[1.0, 2.0, 3.0]])
+transform = torch.tensor([[1.0, 0, 0, 10], [0, 1.0, 0, 20], [0, 0, 1.0, 30], [0, 0, 0, 1.0]])
+print(transform_points(points, transform))`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', '3D Geometry', 'Autonomous Driving'],
+  },
+  {
+    id: 'batched-best-iou-match',
+    order: 34,
+    title: 'Batched best-IoU matching',
+    difficulty: 'Hard',
+    summary: 'For every predicted box in every batch item, find the ground-truth box with maximum IoU.',
+    prompt: [
+      'Write `best_iou_match(predictions, ground_truth)` for tensors shaped `(B, N, 4)` and `(B, M, 4)`.',
+      'Return both the best IoU and the best ground-truth index for each predicted box.',
+    ],
+    signature: `def best_iou_match(
+    predictions: torch.Tensor,
+    ground_truth: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    ...`,
+    requirements: [
+      'Return `best_iou` and `best_gt` with shape `(B, N)`.',
+      'Use broadcasting to form pairwise IoUs within each batch item.',
+      'Use `argmax` over the ground-truth axis and gather the corresponding IoUs.',
+      'Raise `ValueError` for incompatible batch or box shapes.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: [
+          'predictions.shape = [B, N, 4]',
+          'ground_truth.shape = [B, M, 4]',
+        ],
+        result: 'best_iou.shape = [B, N]; best_gt.shape = [B, N]',
+      },
+    ],
+    hint: [
+      'Use `predictions[:, :, None, :]` and `ground_truth[:, None, :, :]` to create `(B, N, M, 4)` pairs.',
+      'After `argmax(dim=-1)`, add a final singleton axis before `torch.gather`.',
+    ],
+    solutionNotes: [
+      'This is the full pattern in one exercise: batch-aware broadcasting creates every prediction–ground-truth pair, and the last axis is reduced to the best match.',
+      'The shapes make the logic auditable: IoUs are `(B, N, M)`, so `argmax(-1)` and gather both naturally return `(B, N)`.',
+    ],
+    solutionCode: `import torch
+
+def best_iou_match(
+    predictions: torch.Tensor,
+    ground_truth: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    predictions = torch.as_tensor(predictions, dtype=torch.float64)
+    ground_truth = torch.as_tensor(ground_truth, dtype=torch.float64)
+    if predictions.ndim != 3 or ground_truth.ndim != 3 or predictions.shape[0] != ground_truth.shape[0] or predictions.shape[2] != 4 or ground_truth.shape[2] != 4:
+        raise ValueError("predictions and ground_truth must be (B, N, 4) and (B, M, 4)")
+    top_left = torch.maximum(predictions[:, :, None, :2], ground_truth[:, None, :, :2])
+    bottom_right = torch.minimum(predictions[:, :, None, 2:], ground_truth[:, None, :, 2:])
+    size = torch.clamp(bottom_right - top_left, min=0.0)
+    intersection = size[..., 0] * size[..., 1]
+    area_pred = (predictions[..., 2] - predictions[..., 0]) * (predictions[..., 3] - predictions[..., 1])
+    area_gt = (ground_truth[..., 2] - ground_truth[..., 0]) * (ground_truth[..., 3] - ground_truth[..., 1])
+    union = area_pred[:, :, None] + area_gt[:, None, :] - intersection
+    ious = torch.where(union > 0, intersection / torch.where(union > 0, union, torch.ones_like(union)), torch.zeros_like(union))
+    best_gt = torch.argmax(ious, dim=-1)
+    best_iou = torch.gather(ious, dim=-1, index=best_gt[..., None]).squeeze(-1)
+    return best_iou, best_gt
+
+predictions = torch.tensor([[[0.0, 0.0, 2.0, 2.0]]])
+ground_truth = torch.tensor([[[1.0, 1.0, 3.0, 3.0]]])
+print(best_iou_match(predictions, ground_truth))`,
+    starterCode: `import torch
+
+def best_iou_match(
+    predictions: torch.Tensor,
+    ground_truth: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    # TODO: broadcast pairwise IoU over B, N, and M, then argmax over M.
+    raise NotImplementedError("Implement best_iou_match")
+
+predictions = torch.tensor([[[0.0, 0.0, 2.0, 2.0]]])
+ground_truth = torch.tensor([[[1.0, 1.0, 3.0, 3.0]]])
+print(best_iou_match(predictions, ground_truth))`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Broadcasting', 'Detection'],
+  },
 ] as const;

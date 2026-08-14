@@ -40,6 +40,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const [statusMessage, setStatusMessage] = useState('Loading Python...');
   const [isRunning, setIsRunning] = useState(false);
   const [hasRun, setHasRun] = useState(false);
+  const [viewMode, setViewMode] = useState<'code' | 'walkthrough'>('code');
   const [editorTheme, setEditorTheme] = useState(() =>
     getCodeEditorThemeName(
       typeof document === 'undefined' ? 'light' : document.documentElement.getAttribute('data-theme'),
@@ -77,6 +78,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
     setOutput('');
     setErrorOutput('');
     setHasRun(false);
+    setViewMode('code');
   }, [problem]);
 
   useEffect(() => {
@@ -300,67 +302,117 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
             </p>
           </div>
           <div className="code-practice-lab__workspace-controls">
-            <button
-              className="code-practice-lab__button code-practice-lab__button--secondary"
-              type="button"
-              onClick={handleAddHints}
-            >
-              Add hints
-            </button>
-            <button
-              className="code-practice-lab__button code-practice-lab__button--solution"
-              type="button"
-              onClick={handleLoadSolution}
-            >
-              Load solution
-            </button>
-            <button
-              className="code-practice-lab__button code-practice-lab__button--primary"
-              type="button"
-              aria-label="Run code"
-              aria-keyshortcuts="Control+Enter Meta+Enter"
-              onClick={() => void handleRun()}
-              disabled={status !== 'ready' || isRunning}
-            >
-              <span>{isRunning ? 'Running...' : 'Run'}</span>
-              {!isRunning && <kbd>Ctrl / Cmd + Enter</kbd>}
-            </button>
-            <button
-              className="code-practice-lab__button code-practice-lab__button--secondary"
-              type="button"
-              onClick={handleReset}
-            >
-              Reset
-            </button>
+            <div className="code-practice-lab__view-toggle" role="group" aria-label="Practice view">
+              <button
+                className={`code-practice-lab__button code-practice-lab__button--view${viewMode === 'code' ? ' code-practice-lab__button--active' : ''}`}
+                type="button"
+                aria-pressed={viewMode === 'code'}
+                onClick={() => setViewMode('code')}
+              >
+                Code
+              </button>
+              <button
+                className={`code-practice-lab__button code-practice-lab__button--view${viewMode === 'walkthrough' ? ' code-practice-lab__button--active' : ''}`}
+                type="button"
+                aria-pressed={viewMode === 'walkthrough'}
+                onClick={() => setViewMode('walkthrough')}
+              >
+                Walkthrough
+              </button>
+            </div>
+            {viewMode === 'code' && (
+              <>
+                <button
+                  className="code-practice-lab__button code-practice-lab__button--secondary"
+                  type="button"
+                  onClick={handleAddHints}
+                >
+                  Add hints
+                </button>
+                <button
+                  className="code-practice-lab__button code-practice-lab__button--solution"
+                  type="button"
+                  onClick={handleLoadSolution}
+                >
+                  Load solution
+                </button>
+                <button
+                  className="code-practice-lab__button code-practice-lab__button--primary"
+                  type="button"
+                  aria-label="Run code"
+                  aria-keyshortcuts="Control+Enter Meta+Enter"
+                  onClick={() => void handleRun()}
+                  disabled={status !== 'ready' || isRunning}
+                >
+                  <span>{isRunning ? 'Running...' : 'Run'}</span>
+                  {!isRunning && <kbd>Ctrl / Cmd + Enter</kbd>}
+                </button>
+                <button
+                  className="code-practice-lab__button code-practice-lab__button--secondary"
+                  type="button"
+                  onClick={handleReset}
+                >
+                  Reset
+                </button>
+              </>
+            )}
           </div>
         </header>
 
-        <label className="code-practice-lab__editor-label" htmlFor={editorId}>
-          solution.py editor
-        </label>
-        <div className="code-practice-lab__editor-shell">
-          <CodeMirror
-            id={editorId}
-            className="code-practice-lab__editor"
-            aria-label="Python solution editor"
-            basicSetup={false}
-            extensions={editorExtensions}
-            theme={editorThemeExtension}
-            height="100%"
-            editable
-            indentWithTab={false}
-            value={code}
-            onChange={(value) => setCode(value)}
-          />
-        </div>
-
-        {hasExecutionResult && (
-          <div className="code-practice-lab__output" aria-live="polite">
-            <div>
-              <p>{errorOutput ? 'Errors' : 'Output'}</p>
-              <pre>{errorOutput || output || 'Program finished with no output.'}</pre>
+        {viewMode === 'code' ? (
+          <>
+            <label className="code-practice-lab__editor-label" htmlFor={editorId}>
+              solution.py editor
+            </label>
+            <div className="code-practice-lab__editor-shell">
+              <CodeMirror
+                id={editorId}
+                className="code-practice-lab__editor"
+                aria-label="Python solution editor"
+                basicSetup={false}
+                extensions={editorExtensions}
+                theme={editorThemeExtension}
+                height="100%"
+                editable
+                indentWithTab={false}
+                value={code}
+                onChange={(value) => setCode(value)}
+              />
             </div>
-          </div>
+
+            {hasExecutionResult && (
+              <div className="code-practice-lab__output" aria-live="polite">
+                <div>
+                  <p>{errorOutput ? 'Errors' : 'Output'}</p>
+                  <pre>{errorOutput || output || 'Program finished with no output.'}</pre>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <section className="code-practice-lab__walkthrough" aria-labelledby={`${problem.id}-walkthrough-title`}>
+            <div className="code-practice-lab__walkthrough-heading">
+              <div>
+                <p className="code-practice-lab__section-label">Reference</p>
+                <h2 id={`${problem.id}-walkthrough-title`}>How to reason through it</h2>
+              </div>
+              <button
+                className="code-practice-lab__button code-practice-lab__button--solution"
+                type="button"
+                onClick={() => setViewMode('code')}
+              >
+                Back to code
+              </button>
+            </div>
+            <div className="code-practice-lab__walkthrough-copy">
+              {problem.solutionNotes.map((note) => (
+                <p key={note}>{note}</p>
+              ))}
+            </div>
+            <p className="code-practice-lab__walkthrough-tip">
+              When you are ready, switch to Code and use Load solution to inspect the complete implementation.
+            </p>
+          </section>
         )}
       </article>
     </section>
