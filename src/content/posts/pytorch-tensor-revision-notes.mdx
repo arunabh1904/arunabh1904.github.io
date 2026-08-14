@@ -64,13 +64,11 @@ NumPy and PyTorch have different defaults at this boundary. A NumPy array create
 
 Aliasing becomes visible under mutation. Methods ending in `_`, indexed assignment, and operations with an `out=` argument write into existing storage. Every view of that storage can observe the change. During training, an in-place write may also change a value that autograd saved for backward; Part II explains how PyTorch detects that case.
 
-<RevisionInsight title="More you know · storage and graph are different" icon="👀">
+<RevisionInsight title="Storage and graph are different" icon="💡">
 
-`view()` is a stride-only reinterpretation and fails when the layout cannot support it; `reshape()` chooses a view when possible and silently copies otherwise. `contiguous()` makes a contiguous copy only when needed. Do not use `reshape()` when you need to prove that no allocation occurred.
+`view()` only changes shape when strides allow it; `reshape()` may silently copy. `contiguous()` copies only when needed, `clone()` copies storage but keeps the graph edge, and `detach()` cuts the edge but usually shares storage. For an independent snapshot, use `x.detach().clone()`.
 
-`clone()` gives the values new storage but keeps the autograd connection. `detach()` cuts the graph edge but usually shares storage with the source. For an independent snapshot with no gradient history, use `x.detach().clone()`.
-
-An `in-place` operation such as `add_()`, `relu_()`, or indexed assignment mutates every alias. That can change a value saved for backward and trigger a version-counter error—or, outside autograd's checks, make the computation harder to reason about. Prefer the out-of-place form unless the memory trade-off is deliberate and tested.
+In-place writes mutate every alias and can invalidate values saved for backward. Prefer out-of-place operations unless the memory trade-off is measured and tested.
 
 </RevisionInsight>
 
