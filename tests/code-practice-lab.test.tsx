@@ -145,14 +145,9 @@ describe('CodePracticeLab', () => {
     expect(getEditor().textContent).not.toMatch(
       /^\s+raise NotImplementedError\("Implement softmax_cross_entropy"\)$/m,
     );
-    expect(container.querySelectorAll('.cm-solution-line-toggle').length).toBeGreaterThan(0);
-
-    await act(async () => {
-      container.querySelector<HTMLButtonElement>('.cm-solution-line-toggle')?.click();
-    });
-
-    expect(container.querySelector('.code-practice-lab__walkthrough-panel')).not.toBeNull();
-    expect(container.textContent).toContain('Return the reference value after following the stable path.');
+    expect(container.querySelector('.cm-solution-line-toggle')).toBeNull();
+    expect(container.querySelector('.code-practice-lab__solution-notes')).not.toBeNull();
+    expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
   });
 
   it('loads required packages and prints run output', async () => {
@@ -235,11 +230,10 @@ describe('CodePracticeLab', () => {
     await render();
 
     expect(container.querySelector('.code-practice-lab__view-toggle')).toBeNull();
-    expect(container.querySelector('.code-practice-lab__editor-layout--single')).not.toBeNull();
-    expect(container.querySelector('.code-practice-lab__annotations')).toBeNull();
+    expect(container.querySelector('.code-practice-lab__editor-layout')).not.toBeNull();
+    expect(container.querySelector('.code-practice-lab__solution-notes')).toBeNull();
     expect(container.querySelector('.cm-solution-line-toggle')).toBeNull();
-    expect(container.querySelector('.code-practice-lab__walkthrough-panel')).toBeNull();
-    expect(container.textContent).not.toContain('What this solution line is doing');
+    expect(container.textContent).not.toContain('How it works');
     expect(container.querySelector('.cm-editor')).not.toBeNull();
   });
 });
