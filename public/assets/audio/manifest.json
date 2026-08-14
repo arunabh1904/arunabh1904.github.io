@@ -1,0 +1,107 @@
+{
+  "attention-mechanisms-demystified": {
+    "digest": "37266dd4f02e1f765b2d54e04d8b0cb928ac193f87a69af595f7d950b2816bfd",
+    "file": "/assets/audio/blog/attention-mechanisms-demystified.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "code-is-cheap-understanding-isnt": {
+    "digest": "0b10baa9c5e099f8ed0d3693b5705efc69e91cbce7c839f062f0f7b08ff7369a",
+    "file": "/assets/audio/blog/code-is-cheap-understanding-isnt.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "from-ppo-to-grpo-rl-for-reasoning-and-vlas": {
+    "digest": "51f7e7432be9960dc0d21b90e177578f3d5e2bfe83521d6bbdd967867ef8c2a9",
+    "file": "/assets/audio/blog/from-ppo-to-grpo-rl-for-reasoning-and-vlas.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "from-seeing-to-doing-the-evolution-of-vision-language-models": {
+    "digest": "c634ff1f96b3314970dc9c989295055d8965ce80f150ca44e8b01e2c8cb5fe87",
+    "file": "/assets/audio/blog/from-seeing-to-doing-the-evolution-of-vision-language-models.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "how-unified-sensor-models-are-built-for-autonomous-driving": {
+    "digest": "eb62b3d7e691af69490f4ddddef7d6be22623bcf207560bda98df5c7cc9e021a",
+    "file": "/assets/audio/blog/how-unified-sensor-models-are-built-for-autonomous-driving.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "my-journey-so-far-full-story": {
+    "digest": "23232fcc389db83e79a95b9a50fd14c1f49398e74fd8aae2c5cf77e0c4d4a78c",
+    "file": "/assets/audio/blog/my-journey-so-far-full-story.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "omni-model-pretraining-decisions": {
+    "digest": "7c3c15eba2d8f35fab58746a1ecd798e0ee34b7e063ba7847d235d5bbda0c30d",
+    "file": "/assets/audio/blog/omni-model-pretraining-decisions.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "open-weight-models-that-fit-on-a-64-gb-macbook-pro": {
+    "digest": "adf0258569dbbd31561f893fc88494706342cfd7f5c76f5c25597c3c664be5ec",
+    "file": "/assets/audio/blog/open-weight-models-that-fit-on-a-64-gb-macbook-pro.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "post-training-vision-language-action-models-zero-to-hero": {
+    "digest": "4425dea982554d73faf064e8d98166cbf484f9e8e52facbc5eb8d9e29f1143a6",
+    "file": "/assets/audio/blog/post-training-vision-language-action-models-zero-to-hero.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "replacing-openclaw-with-hermes-agent-using-local-weights": {
+    "digest": "ae45be63f137fecab2e31aacdb3db9dde0fcab03e41f2746675e91a98cd4f586",
+    "file": "/assets/audio/blog/replacing-openclaw-with-hermes-agent-using-local-weights.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro": {
+    "digest": "3c1bd2a9638a51f50361fafbefdefea4dab03560a6ffb185fbcd5234fb593297",
+    "file": "/assets/audio/blog/running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "running-gemma-4-locally-on-a-64-gb-macbook-pro": {
+    "digest": "dc98c036fac0b9e9532d4ec2fc16abe02ea52e2308645a87c3fcf7aeb0163649",
+    "file": "/assets/audio/blog/running-gemma-4-locally-on-a-64-gb-macbook-pro.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro": {
+    "digest": "981e8bbe3f4bf286d81553ae290ba8ed9a99a97d41ed203a5a8b71be8c806484",
+    "file": "/assets/audio/blog/running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro": {
+    "digest": "efd915cfe55c41e5f163aa3401f5bf98b99355487cc3fd6ee753a1ad893814cc",
+    "file": "/assets/audio/blog/running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  },
+  "thoughts-on-good-research-in-industry": {
+    "digest": "5d65cddbc4a61f34c6821b8339ea999a0183e42d33a12a47f3f1d6da4c1ed5a2",
+    "file": "/assets/audio/blog/thoughts-on-good-research-in-industry.mp3",
+    "model": "mlx-community/Kokoro-82M-bf16",
+    "speed": 1.0,
+    "voice": "af_heart"
+  }
+}

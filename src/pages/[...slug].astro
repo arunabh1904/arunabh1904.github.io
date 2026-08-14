@@ -53,6 +53,8 @@ interface Props {
 
 const { entry, previous, next, navigationContext } = Astro.props;
 const { Content } = await render(entry);
+const readAloudAudio =
+  entry.data.section === 'blog' ? `/assets/audio/blog/${entry.data.postSlug}.mp3` : undefined;
 ---
 
 <PostLayout
@@ -62,6 +64,7 @@ const { Content } = await render(entry);
   next={next}
   navigationContext={navigationContext}
   showNavigation={true}
+  readAloudAudio={readAloudAudio}
 >
   <div data-post-section={entry.data.section}>
     <Content />
