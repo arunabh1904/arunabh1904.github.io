@@ -57,6 +57,18 @@ const REQUIRED_PRIMITIVES = [
 ] as const;
 
 describe('code-practice primitive-first solutions', () => {
+  it('gives every exercise a reference walkthrough and unique ordered route', () => {
+    const ids = new Set<string>();
+
+    for (const [index, problem] of codePracticeProblems.entries()) {
+      expect(ids.has(problem.id), problem.id).toBe(false);
+      ids.add(problem.id);
+      expect(problem.order, problem.id).toBe(index + 1);
+      expect(problem.solutionNotes.length, problem.id).toBeGreaterThan(0);
+      expect(problem.solutionCode.trim(), problem.id).not.toBe('');
+    }
+  });
+
   it('does not bypass a lesson with a matching PyTorch convenience helper', () => {
     const torchProblems = codePracticeProblems.filter((problem) => problem.packages?.includes('torch'));
 
