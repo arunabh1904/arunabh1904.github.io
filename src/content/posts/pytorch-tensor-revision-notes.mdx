@@ -9,6 +9,7 @@ tags:
 summary: Understand how PyTorch represents tensors through storage, shape, strides, dtype, device, layout, and autograd metadata.
 ---
 import RevisionCodePair from '../../components/RevisionCodePair.astro';
+import RevisionInsight from '../../components/RevisionInsight.astro';
 import { pytorchRevisionExamples } from '../../lib/pytorch-revision-examples';
 
 # PyTorch I: Tensors
@@ -62,6 +63,16 @@ NumPy and PyTorch have different defaults at this boundary. A NumPy array create
 `contiguous()`, `clone()`, and `detach()` solve different problems. `contiguous()` copies only when the tensor does not already have the requested memory format. `clone()` always copies the values and preserves the autograd connection to the source. `detach()` removes the incoming autograd edge but usually keeps the same storage. A tensor can therefore be independent in storage but connected in the computation graph, or detached from the graph but aliased in storage.
 
 Aliasing becomes visible under mutation. Methods ending in `_`, indexed assignment, and operations with an `out=` argument write into existing storage. Every view of that storage can observe the change. During training, an in-place write may also change a value that autograd saved for backward; Part II explains how PyTorch detects that case.
+
+<RevisionInsight title="More you know · storage and graph are different" icon="👀">
+
+`view()` is a stride-only reinterpretation and fails when the layout cannot support it; `reshape()` chooses a view when possible and silently copies otherwise. `contiguous()` makes a contiguous copy only when needed. Do not use `reshape()` when you need to prove that no allocation occurred.
+
+`clone()` gives the values new storage but keeps the autograd connection. `detach()` cuts the graph edge but usually shares storage with the source. For an independent snapshot with no gradient history, use `x.detach().clone()`.
+
+An `in-place` operation such as `add_()`, `relu_()`, or indexed assignment mutates every alias. That can change a value saved for backward and trigger a version-counter error—or, outside autograd's checks, make the computation harder to reason about. Prefer the out-of-place form unless the memory trade-off is deliberate and tested.
+
+</RevisionInsight>
 
 [![Animation comparing how a slice view, detached tensor, and clone respond to an in-place mutation](/assets/images/pytorch-tensor-aliasing.gif)](/assets/images/pytorch-tensor-aliasing.gif)
 
