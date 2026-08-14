@@ -69,6 +69,16 @@ describe('code-practice primitive-first solutions', () => {
     }
   });
 
+  it('keeps learner-facing reference implementations concise', () => {
+    for (const problem of codePracticeProblems) {
+      expect(problem.solutionCode.split('\n').length, problem.id).toBeLessThanOrEqual(45);
+      expect(
+        problem.solutionCode.split('\n').filter((line) => line.trimStart().startsWith('#')),
+        problem.id,
+      ).toHaveLength(0);
+    }
+  });
+
   it('does not bypass a lesson with a matching PyTorch convenience helper', () => {
     const torchProblems = codePracticeProblems.filter((problem) => problem.packages?.includes('torch'));
 
