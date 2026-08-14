@@ -122,8 +122,9 @@ describe('CodePracticeLab', () => {
 
     expect(container.textContent).toContain('Problem 01');
     expect(container.textContent).toContain('Stable softmax cross-entropy');
-    expect(container.textContent).not.toContain('Subtract the row max first.');
+    expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
     expect(container.textContent).not.toContain('return "solution"');
+    expect(getEditor().textContent).not.toContain('TODO');
 
     const buttons = Array.from(container.querySelectorAll('button'));
     const hintButton = buttons.find((button) => button.textContent === 'Add hints');
@@ -226,35 +227,18 @@ describe('CodePracticeLab', () => {
     expect(container.textContent).toContain('Ctrl / Cmd + Enter');
   });
 
-  it('toggles between the editable code and the problem walkthrough', async () => {
+  it('keeps the editor and walkthrough annotations visible together', async () => {
     loadPyodideRuntime.mockResolvedValueOnce({
       runPythonAsync: vi.fn(),
     });
 
     await render();
 
-    const walkthroughButton = Array.from(container.querySelectorAll('button')).find(
-      (button) => button.textContent === 'Walkthrough',
-    );
-    expect(walkthroughButton).toBeDefined();
-    expect(container.querySelector('.code-practice-lab__walkthrough')).toBeNull();
-
-    await act(async () => {
-      walkthroughButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
-
-    expect(container.querySelector('.code-practice-lab__walkthrough')).not.toBeNull();
-    expect(container.textContent).toContain('How to reason through it');
-    expect(container.querySelector('.cm-editor')).toBeNull();
-
-    const codeButton = Array.from(container.querySelectorAll('button')).find(
-      (button) => button.textContent === 'Code',
-    );
-    await act(async () => {
-      codeButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
-
-    expect(container.querySelector('.code-practice-lab__walkthrough')).toBeNull();
+    expect(container.querySelector('.code-practice-lab__view-toggle')).toBeNull();
+    expect(container.querySelector('.code-practice-lab__editor-layout')).not.toBeNull();
+    expect(container.querySelector('.code-practice-lab__annotations')).not.toBeNull();
+    expect(container.textContent).toContain('What the important lines do');
+    expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
     expect(container.querySelector('.cm-editor')).not.toBeNull();
   });
 });
