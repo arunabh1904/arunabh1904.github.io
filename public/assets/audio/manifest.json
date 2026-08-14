@@ -6,12 +6,41 @@
     "speed": 1.0,
     "voice": "af_heart"
   },
-  "code-is-cheap-understanding-isnt": {
-    "digest": "0b10baa9c5e099f8ed0d3693b5705efc69e91cbce7c839f062f0f7b08ff7369a",
-    "file": "/assets/audio/blog/code-is-cheap-understanding-isnt.mp3",
-    "model": "mlx-community/Kokoro-82M-bf16",
+  "building-local-blog-audio-with-qwen3-tts": {
+    "bitrate": "64k",
+    "boundary_silence_samples": 1200,
+    "digest": "898f5d708ba934dc68cb042c672112c0c44ddfc1f300f5b015ec68c2edae00fb",
+    "file": "/assets/audio/blog/building-local-blog-audio-with-qwen3-tts.mp3",
+    "language": "English",
+    "long_silence_duration": 0.8,
+    "max_chars": 900,
+    "max_tokens_per_char": 1.5,
+    "min_generation_tokens": 768,
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-8bit",
+    "retained_silence_duration": 0.09,
+    "silence_threshold": 0.008,
     "speed": 1.0,
-    "voice": "af_heart"
+    "temperature": 0.38,
+    "top_p": 0.86,
+    "voice": "designed-clean-warm"
+  },
+  "code-is-cheap-understanding-isnt": {
+    "bitrate": "64k",
+    "boundary_silence_samples": 1200,
+    "digest": "b25905fb9fa3fc527c3d1f2863035219c392e1218f9f1bd77abefdafb94b3748",
+    "file": "/assets/audio/blog/code-is-cheap-understanding-isnt.mp3",
+    "language": "English",
+    "long_silence_duration": 0.8,
+    "max_chars": 900,
+    "max_tokens_per_char": 1.5,
+    "min_generation_tokens": 768,
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-8bit",
+    "retained_silence_duration": 0.09,
+    "silence_threshold": 0.008,
+    "speed": 1.0,
+    "temperature": 0.38,
+    "top_p": 0.86,
+    "voice": "designed-clean-warm"
   },
   "from-ppo-to-grpo-rl-for-reasoning-and-vlas": {
     "digest": "51f7e7432be9960dc0d21b90e177578f3d5e2bfe83521d6bbdd967867ef8c2a9",
@@ -28,11 +57,22 @@
     "voice": "af_heart"
   },
   "how-unified-sensor-models-are-built-for-autonomous-driving": {
-    "digest": "eb62b3d7e691af69490f4ddddef7d6be22623bcf207560bda98df5c7cc9e021a",
+    "bitrate": "64k",
+    "boundary_silence_samples": 1200,
+    "digest": "deb3d32d2061a4f130124f493eb87e24291dda7fe746e70e0372c46b3e4d122a",
     "file": "/assets/audio/blog/how-unified-sensor-models-are-built-for-autonomous-driving.mp3",
-    "model": "mlx-community/Kokoro-82M-bf16",
+    "language": "English",
+    "long_silence_duration": 0.8,
+    "max_chars": 900,
+    "max_tokens_per_char": 1.5,
+    "min_generation_tokens": 768,
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-8bit",
+    "retained_silence_duration": 0.09,
+    "silence_threshold": 0.008,
     "speed": 1.0,
-    "voice": "af_heart"
+    "temperature": 0.38,
+    "top_p": 0.86,
+    "voice": "designed-clean-warm"
   },
   "my-journey-so-far-full-story": {
     "digest": "23232fcc389db83e79a95b9a50fd14c1f49398e74fd8aae2c5cf77e0c4d4a78c",
