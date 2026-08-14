@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageControls from '../../components/PageControls.astro';
 import CodePracticeLab from '../../components/CodePracticeLab';
 import type { CodePracticeProblem } from '../../lib/code-practice';
-import { codePracticeProblems } from '../../lib/code-practice';
+import { codePracticeProblems, getCodePracticeProblemPath } from '../../lib/code-practice';
 
 export function getStaticPaths() {
   return codePracticeProblems.map((problem) => ({
@@ -17,17 +17,54 @@ interface Props {
 }
 
 const { problem } = Astro.props;
+const problemIndex = codePracticeProblems.findIndex(({ id }) => id === problem.id);
+const previousProblem = problemIndex > 0 ? codePracticeProblems[problemIndex - 1] : undefined;
+const nextProblem = problemIndex < codePracticeProblems.length - 1 ? codePracticeProblems[problemIndex + 1] : undefined;
 ---
 
 <BaseLayout title={problem.title} description={problem.summary}>
   <PageControls showHomeButton={true} />
   <main class="code-problem-page" aria-label={`${problem.title} interview practice`}>
     <div class="code-problem-page__shell">
-      <p class="code-problem-page__back-link">
-        <a href="/code.html">All problems</a>
-        <span>/</span>
-        <span>{`Problem ${String(problem.order).padStart(2, '0')}`}</span>
-      </p>
+      <nav class="code-problem-page__navigation" aria-label="Problem navigation">
+        {previousProblem ? (
+          <a class="code-problem-page__navigation-link" href={getCodePracticeProblemPath(previousProblem)}>
+            <span aria-hidden="true">←</span>
+            <span>
+              <small>Previous</small>
+              <strong>{`Problem ${String(previousProblem.order).padStart(2, '0')}`}</strong>
+            </span>
+          </a>
+        ) : (
+          <span class="code-problem-page__navigation-link is-disabled" aria-disabled="true">
+            <span aria-hidden="true">←</span>
+            <span>
+              <small>Previous</small>
+              <strong>First problem</strong>
+            </span>
+          </span>
+        )}
+
+        <a class="code-problem-page__navigation-index" href="/code.html">All problems</a>
+
+        {nextProblem ? (
+          <a class="code-problem-page__navigation-link code-problem-page__navigation-link--next" href={getCodePracticeProblemPath(nextProblem)}>
+            <span>
+              <small>Next</small>
+              <strong>{`Problem ${String(nextProblem.order).padStart(2, '0')}`}</strong>
+            </span>
+            <span aria-hidden="true">→</span>
+          </a>
+        ) : (
+          <span class="code-problem-page__navigation-link code-problem-page__navigation-link--next is-disabled" aria-disabled="true">
+            <span>
+              <small>Next</small>
+              <strong>Last problem</strong>
+            </span>
+            <span aria-hidden="true">→</span>
+          </span>
+        )}
+      </nav>
 
       <CodePracticeLab client:visible problem={problem} />
     </div>

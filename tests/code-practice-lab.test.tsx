@@ -113,7 +113,7 @@ describe('CodePracticeLab', () => {
     return editor as HTMLElement;
   }
 
-  it('keeps hint and solution actions in the workspace and applies them to the editor', async () => {
+  it('keeps a direct solution action in the workspace and applies it to the editor', async () => {
     loadPyodideRuntime.mockResolvedValueOnce({
       runPythonAsync: vi.fn(),
     });
@@ -122,24 +122,16 @@ describe('CodePracticeLab', () => {
 
     expect(container.textContent).toContain('Problem 01');
     expect(container.textContent).toContain('Stable softmax cross-entropy');
-    expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
+    expect(container.textContent).not.toContain('Use a row-wise max shift before the exponentials.');
     expect(container.textContent).not.toContain('return "solution"');
     expect(getEditor().textContent).not.toContain('TODO');
 
     const buttons = Array.from(container.querySelectorAll('button'));
-    const hintButton = buttons.find((button) => button.textContent === 'Add hints');
-    const solutionButton = buttons.find((button) => button.textContent === 'Load solution');
+    const solutionButton = buttons.find((button) => button.textContent === 'Solution');
 
-    expect(hintButton?.closest('.code-practice-lab__workspace')).not.toBeNull();
+    expect(buttons.find((button) => button.textContent === 'Add hints')).toBeUndefined();
+    expect(buttons.find((button) => button.textContent === 'Need help?')).toBeUndefined();
     expect(solutionButton?.closest('.code-practice-lab__workspace')).not.toBeNull();
-
-    await act(async () => {
-      hintButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
-
-    expect(getEditor().textContent).toContain('# Hints');
-    expect(getEditor().textContent).toContain('# 1. Subtract the row max first.');
-    expect(getEditor().textContent).toContain('print("starter")');
 
     await act(async () => {
       solutionButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -153,6 +145,14 @@ describe('CodePracticeLab', () => {
     expect(getEditor().textContent).not.toMatch(
       /^\s+raise NotImplementedError\("Implement softmax_cross_entropy"\)$/m,
     );
+    expect(container.querySelectorAll('.cm-solution-line-toggle').length).toBeGreaterThan(0);
+
+    await act(async () => {
+      container.querySelector<HTMLButtonElement>('.cm-solution-line-toggle')?.click();
+    });
+
+    expect(container.querySelector('.code-practice-lab__walkthrough-panel')).not.toBeNull();
+    expect(container.textContent).toContain('Return the reference value after following the stable path.');
   });
 
   it('loads required packages and prints run output', async () => {
@@ -227,7 +227,7 @@ describe('CodePracticeLab', () => {
     expect(container.textContent).toContain('Ctrl / Cmd + Enter');
   });
 
-  it('keeps the editor and walkthrough annotations visible together', async () => {
+  it('keeps the default workspace focused until a reference solution is loaded', async () => {
     loadPyodideRuntime.mockResolvedValueOnce({
       runPythonAsync: vi.fn(),
     });
@@ -235,10 +235,11 @@ describe('CodePracticeLab', () => {
     await render();
 
     expect(container.querySelector('.code-practice-lab__view-toggle')).toBeNull();
-    expect(container.querySelector('.code-practice-lab__editor-layout')).not.toBeNull();
-    expect(container.querySelector('.code-practice-lab__annotations')).not.toBeNull();
-    expect(container.textContent).toContain('What the important lines do');
-    expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
+    expect(container.querySelector('.code-practice-lab__editor-layout--single')).not.toBeNull();
+    expect(container.querySelector('.code-practice-lab__annotations')).toBeNull();
+    expect(container.querySelector('.cm-solution-line-toggle')).toBeNull();
+    expect(container.querySelector('.code-practice-lab__walkthrough-panel')).toBeNull();
+    expect(container.textContent).not.toContain('What this solution line is doing');
     expect(container.querySelector('.cm-editor')).not.toBeNull();
   });
 });
