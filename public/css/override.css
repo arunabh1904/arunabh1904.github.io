@@ -6193,102 +6193,6 @@ html {
   justify-content: flex-end;
 }
 
-.code-practice-lab__view-toggle {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border: 1px solid rgba(127, 197, 255, 0.28);
-  border-radius: 14px;
-  background: rgba(5, 16, 34, 0.72);
-}
-
-.code-practice-lab__button--view {
-  min-height: 2.35rem;
-  padding-inline: 0.75rem;
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
-}
-
-.code-practice-lab__button--view:hover:not(:disabled),
-.code-practice-lab__button--view.code-practice-lab__button--active {
-  border-color: rgba(127, 197, 255, 0.46);
-  background: rgba(41, 91, 151, 0.54);
-  box-shadow: none;
-}
-
-.code-practice-lab__walkthrough {
-  min-height: 36rem;
-  padding: clamp(1.25rem, 3vw, 2.4rem);
-  border: 1px solid rgba(127, 197, 255, 0.2);
-  border-radius: 18px;
-  background: rgba(7, 20, 43, 0.72);
-}
-
-.code-practice-lab__walkthrough-heading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.code-practice-lab__walkthrough-heading h2 {
-  margin: 0.25rem 0 0;
-  color: #f5fbff;
-  font-size: clamp(1.2rem, 2vw, 1.65rem);
-}
-
-.code-practice-lab__walkthrough-copy {
-  max-width: 62ch;
-  margin-top: 1.5rem;
-}
-
-.code-practice-lab__walkthrough-copy p {
-  margin: 0 0 1rem;
-  color: rgba(223, 240, 255, 0.9);
-  line-height: 1.7;
-}
-
-.code-practice-lab__walkthrough-tip {
-  max-width: 62ch;
-  margin: 2rem 0 0;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(127, 197, 255, 0.16);
-  color: rgba(223, 240, 255, 0.68);
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-:root[data-theme="dark"] .code-practice-lab__view-toggle {
-  border-color: rgba(255, 228, 92, 0.28);
-  background: rgba(35, 28, 2, 0.72);
-}
-
-:root[data-theme="dark"] .code-practice-lab__button--view:hover:not(:disabled),
-:root[data-theme="dark"] .code-practice-lab__button--view.code-practice-lab__button--active {
-  border-color: rgba(255, 228, 92, 0.5);
-  background: rgba(104, 78, 8, 0.56);
-}
-
-:root[data-theme="dark"] .code-practice-lab__walkthrough {
-  border-color: rgba(255, 228, 92, 0.2);
-  background: rgba(24, 20, 3, 0.72);
-}
-
-:root[data-theme="dark"] .code-practice-lab__walkthrough-heading h2 {
-  color: #fff7cf;
-}
-
-:root[data-theme="dark"] .code-practice-lab__walkthrough-copy p {
-  color: rgba(255, 247, 207, 0.9);
-}
-
-:root[data-theme="dark"] .code-practice-lab__walkthrough-tip {
-  border-color: rgba(255, 228, 92, 0.16);
-  color: rgba(255, 247, 207, 0.68);
-}
-
 .code-practice-lab__button {
   appearance: none;
   display: inline-flex;
@@ -6819,8 +6723,7 @@ html {
 }
 
 :root[data-theme="light"] .code-practice-lab__problem-header h1,
-:root[data-theme="light"] .code-practice-lab__workspace-header h2,
-:root[data-theme="light"] .code-practice-lab__walkthrough-heading h2 {
+:root[data-theme="light"] .code-practice-lab__workspace-header h2 {
   color: var(--text-color);
 }
 
@@ -6828,14 +6731,12 @@ html {
 :root[data-theme="light"] .code-practice-lab__status,
 :root[data-theme="light"] .code-practice-lab__shortcut,
 :root[data-theme="light"] .code-practice-lab__editor-label,
-:root[data-theme="light"] .code-practice-lab__walkthrough-copy p,
-:root[data-theme="light"] .code-practice-lab__walkthrough-tip {
+:root[data-theme="light"] .code-practice-lab__annotation p {
   color: var(--text-secondary-color);
 }
 
 :root[data-theme="light"] .code-practice-lab__spec-card,
 :root[data-theme="light"] .code-practice-lab__example,
-:root[data-theme="light"] .code-practice-lab__walkthrough,
 :root[data-theme="light"] .code-practice-lab__output > div {
   border-color: var(--code-border-color);
   background: var(--panel-bg);
@@ -6875,18 +6776,6 @@ html {
   color: #654409;
 }
 
-:root[data-theme="light"] .code-practice-lab__view-toggle {
-  border-color: var(--button-border);
-  background: var(--background-secondary);
-}
-
-:root[data-theme="light"] .code-practice-lab__button--view:hover:not(:disabled),
-:root[data-theme="light"] .code-practice-lab__button--view.code-practice-lab__button--active {
-  border-color: rgba(53, 109, 255, 0.36);
-  background: rgba(53, 109, 255, 0.14);
-  box-shadow: none;
-}
-
 :root[data-theme="light"] .code-practice-lab__editor-shell,
 :root[data-theme="light"] .code-practice-lab__editor .cm-editor {
   border-color: var(--code-border-color);
@@ -6906,4 +6795,130 @@ html {
 :root[data-theme="light"] .code-practice-lab__editor .cm-activeLine,
 :root[data-theme="light"] .code-practice-lab__editor .cm-activeLineGutter {
   background: rgba(53, 109, 255, 0.07);
+}
+
+/* Keep the explanation beside the code so it is available while editing. */
+.code-practice-lab__editor-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.38fr);
+  gap: 1rem;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.code-practice-lab__editor-column {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.code-practice-lab__annotations {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.55rem 0.25rem 0.75rem 1rem;
+  border-left: 1px solid rgba(118, 169, 255, 0.18);
+}
+
+.code-practice-lab__annotations-heading h2 {
+  margin: 0.25rem 0 0;
+  color: #f5fbff;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+:root[data-theme="dark"] .code-practice-lab__annotations {
+  border-color: rgba(255, 228, 92, 0.18);
+}
+
+:root[data-theme="dark"] .code-practice-lab__annotations-heading h2 {
+  color: #fff7cf;
+}
+
+.code-practice-lab__annotation-list {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.1rem;
+}
+
+.code-practice-lab__annotation {
+  display: grid;
+  grid-template-columns: 1.8rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: start;
+  padding: 0.75rem 0.8rem 0.8rem 0;
+  border-top: 1px solid rgba(118, 169, 255, 0.14);
+}
+
+.code-practice-lab__annotation-marker {
+  display: inline-grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 1px solid rgba(127, 197, 255, 0.3);
+  border-radius: 50%;
+  color: #8fd2ff;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.code-practice-lab__annotation p {
+  margin: 0;
+  color: rgba(223, 240, 255, 0.78);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+:root[data-theme="dark"] .code-practice-lab__annotation {
+  border-color: rgba(255, 228, 92, 0.14);
+}
+
+:root[data-theme="dark"] .code-practice-lab__annotation-marker {
+  border-color: rgba(255, 228, 92, 0.34);
+  color: #ffe45c;
+}
+
+:root[data-theme="dark"] .code-practice-lab__annotation p {
+  color: rgba(255, 247, 207, 0.78);
+}
+
+:root[data-theme="light"] .code-practice-lab__annotations {
+  border-color: var(--code-border-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__annotations-heading h2 {
+  color: var(--text-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__annotation {
+  border-color: var(--code-border-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__annotation-marker {
+  border-color: rgba(53, 109, 255, 0.3);
+  color: var(--accent-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__annotation p {
+  color: var(--text-secondary-color);
+}
+
+@media (max-width: 980px) {
+  .code-practice-lab__editor-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(24rem, 1fr) auto;
+    overflow: auto;
+  }
+
+  .code-practice-lab__annotations {
+    overflow: visible;
+    padding: 1rem 0 0;
+    border-top: 1px solid rgba(118, 169, 255, 0.18);
+    border-left: 0;
+  }
+
+  :root[data-theme="dark"] .code-practice-lab__annotations {
+    border-color: rgba(255, 228, 92, 0.18);
+  }
 }
