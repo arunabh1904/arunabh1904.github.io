@@ -7156,7 +7156,6 @@ html {
 .code-practice-lab li,
 .code-practice-lab button,
 .code-practice-lab label,
-.code-practice-lab span,
 .code-practice-lab strong {
   font-family: var(--font-body);
 }
