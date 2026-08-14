@@ -102,6 +102,14 @@ class _CompatTensor(_np.ndarray):
     def view(self, *shape):
         return self.reshape(*shape)
 
+    def permute(self, *dims):
+        # Match torch.Tensor.permute(*dims), including its variadic dimension API.
+        return _wrap(_np.transpose(self, axes=tuple(int(dim) for dim in dims)))
+
+    def transpose(self, dim0, dim1):
+        # Tensor.transpose swaps exactly two axes; NumPy's transpose expects all axes.
+        return _wrap(_np.swapaxes(self, int(dim0), int(dim1)))
+
     def add_(self, value):
         self[...] = _np.asarray(self) + value
         return self
