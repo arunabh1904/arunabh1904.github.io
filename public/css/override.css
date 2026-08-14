@@ -7148,3 +7148,140 @@ html {
   }
 
 }
+
+/* A calm, readable workspace: prose is set as prose and code as code. */
+.code-practice-lab h1,
+.code-practice-lab h2,
+.code-practice-lab p,
+.code-practice-lab li,
+.code-practice-lab button,
+.code-practice-lab label,
+.code-practice-lab span,
+.code-practice-lab strong {
+  font-family: var(--font-body);
+}
+
+.code-practice-lab code,
+.code-practice-lab pre,
+.code-practice-lab kbd,
+.code-practice-lab__section-label,
+.code-practice-lab__eyebrow {
+  font-family: var(--font-mono);
+}
+
+.code-practice-lab__problem-header h1 {
+  font-family: var(--font-body);
+  font-size: clamp(1.8rem, 2.4vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+.code-practice-lab__copy p,
+.code-practice-lab__list {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.code-practice-lab__spec-card pre,
+.code-practice-lab__example pre {
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.code-practice-lab__workspace {
+  height: min(50rem, calc(100dvh - 6.75rem));
+}
+
+.code-practice-lab__editor-layout {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+}
+
+.code-practice-lab--reference .code-practice-lab__editor-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.38fr);
+}
+
+.code-practice-lab__editor,
+.code-practice-lab--reference .code-practice-lab__editor {
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+}
+
+.code-practice-lab__editor .cm-editor,
+.code-practice-lab__editor .cm-scroller,
+.code-practice-lab--reference .code-practice-lab__editor .cm-scroller {
+  font-family: var(--font-mono);
+  line-height: 1.5;
+}
+
+.code-practice-lab__editor .cm-content,
+.code-practice-lab__editor .cm-gutter,
+.code-practice-lab--reference .code-practice-lab__editor .cm-content,
+.code-practice-lab--reference .code-practice-lab__editor .cm-gutter {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+/* Preserve Python's visual structure; horizontal scrolling is clearer than
+ * wrapping a single expression across several editor rows. */
+.code-practice-lab__editor .cm-content {
+  white-space: pre;
+}
+
+.code-practice-lab__editor .cm-scroller {
+  overflow: auto;
+}
+
+.code-practice-lab__solution-notes {
+  align-self: stretch;
+  min-width: 0;
+  padding: 1.2rem 0 1rem 1.25rem;
+  border-left: 1px solid rgba(255, 228, 92, 0.24);
+}
+
+.code-practice-lab__solution-notes h2 {
+  margin: 0.25rem 0 0;
+  color: #fff7cf;
+  font-family: var(--font-body);
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+
+.code-practice-lab__solution-notes-copy {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.25rem;
+}
+
+.code-practice-lab__solution-notes-copy p {
+  margin: 0;
+  color: rgba(255, 247, 207, 0.78);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+:root[data-theme="light"] .code-practice-lab__solution-notes {
+  border-color: var(--code-border-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__solution-notes h2 {
+  color: var(--text-color);
+}
+
+:root[data-theme="light"] .code-practice-lab__solution-notes-copy p {
+  color: var(--text-secondary-color);
+}
+
+@media (max-width: 760px) {
+  .code-practice-lab--reference .code-practice-lab__editor-layout {
+    grid-template-columns: 1fr;
+    overflow: visible;
+  }
+
+  .code-practice-lab__solution-notes {
+    padding: 1.25rem 0 0;
+    border-top: 1px solid rgba(255, 228, 92, 0.24);
+    border-left: 0;
+  }
+}
