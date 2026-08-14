@@ -32,6 +32,12 @@ const testProblem: CodePracticeProblem = {
   ],
   hint: ['Subtract the row max first.'],
   solutionNotes: ['Use a row-wise max shift before the exponentials.'],
+  visual: {
+    src: '/assets/images/code-tensor-ops-broadcasting.gif',
+    alt: 'Tensor operation visual',
+    caption: 'Shape visual',
+  },
+  solutionDiagram: '(N, 1) × (1, M) → (N, M)',
   solutionCode: `def softmax_cross_entropy(logits, labels):
     # Return the reference value after following the stable path.
     return "solution"`,
@@ -148,6 +154,11 @@ describe('CodePracticeLab', () => {
     expect(container.querySelector('.cm-solution-line-toggle')).toBeNull();
     expect(container.querySelector('.code-practice-lab__solution-notes')).not.toBeNull();
     expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
+    expect(container.querySelector('.code-practice-lab__visual img')?.getAttribute('src')).toBe(
+      '/assets/images/code-tensor-ops-broadcasting.gif',
+    );
+    expect(container.querySelector('.code-practice-lab__solution-diagram')).not.toBeNull();
+    expect(container.textContent).toContain('(N, 1) × (1, M) → (N, M)');
   });
 
   it('loads required packages and prints run output', async () => {

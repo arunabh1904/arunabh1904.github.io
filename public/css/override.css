@@ -7248,6 +7248,50 @@ html {
   color: var(--text-secondary-color);
 }
 
+.code-practice-lab__visual {
+  margin: 1.35rem 0 0;
+  padding: 0.8rem;
+  border: 1px solid rgba(255, 228, 92, 0.24);
+  border-radius: 0.8rem;
+  background: rgba(12, 17, 24, 0.72);
+}
+
+.code-practice-lab__visual img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.45rem;
+}
+
+.code-practice-lab__visual figcaption {
+  margin: 0.65rem 0.2rem 0.1rem;
+  color: rgba(255, 247, 207, 0.78);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.code-practice-lab__solution-diagram {
+  margin: 0;
+  padding: 0.85rem;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 228, 92, 0.18);
+  border-radius: 0.55rem;
+  color: rgba(255, 247, 207, 0.86);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+:root[data-theme="light"] .code-practice-lab__visual {
+  border-color: var(--code-border-color);
+  background: rgba(244, 247, 252, 0.96);
+}
+
+:root[data-theme="light"] .code-practice-lab__visual figcaption,
+:root[data-theme="light"] .code-practice-lab__solution-diagram {
+  color: var(--text-secondary-color);
+}
+
 @media (max-width: 760px) {
   .code-practice-lab--reference .code-practice-lab__editor-layout {
     grid-template-columns: 1fr;
