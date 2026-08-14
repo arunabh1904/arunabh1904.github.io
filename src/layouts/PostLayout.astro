@@ -1,6 +1,7 @@
 ---
 import PageControls from '../components/PageControls.astro';
 import PostNavigation from '../components/PostNavigation.astro';
+import ReadAloud from '../components/ReadAloud.astro';
 import type { PostEntry } from '../lib/content';
 import BaseLayout from './BaseLayout.astro';
 
@@ -17,6 +18,7 @@ interface Props {
   };
   showNavigation?: boolean;
   showSectionsNav?: boolean;
+  readAloudAudio?: string;
 }
 
 const {
@@ -27,6 +29,7 @@ const {
   navigationContext,
   showNavigation = false,
   showSectionsNav = true,
+  readAloudAudio,
 } = Astro.props;
 ---
 
@@ -34,6 +37,7 @@ const {
   <PageControls showHomeButton={true} />
   <div class={`page-layout${showSectionsNav ? '' : ' page-layout--centered'}`}>
     <main class="page-content page-content--narrow" aria-label="Content" data-sections-root>
+      {readAloudAudio && <ReadAloud src={readAloudAudio} title={title} />}
       <slot />
       {
         showNavigation && (

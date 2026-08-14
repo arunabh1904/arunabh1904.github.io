@@ -1,0 +1,123 @@
+---
+interface Props {
+  src: string;
+  title: string;
+}
+
+const { src, title } = Astro.props;
+---
+
+<section class="read-aloud" data-read-aloud aria-label={`Listen to ${title}`}>
+  <div class="read-aloud__header">
+    <button
+      type="button"
+      class="read-aloud__toggle"
+      data-read-aloud-toggle
+      aria-label={`Listen to ${title}`}
+      aria-pressed="false"
+    >
+      <span class="read-aloud__play-icon" data-read-aloud-icon aria-hidden="true">▶</span>
+      <span data-read-aloud-label>Listen</span>
+    </button>
+    <span class="read-aloud__hint">Read this post aloud</span>
+    <label class="read-aloud__speed">
+      <span>Speed</span>
+      <select data-read-aloud-speed aria-label="Playback speed">
+        <option value="0.8">0.8×</option>
+        <option value="1" selected>1×</option>
+        <option value="1.2">1.2×</option>
+        <option value="1.5">1.5×</option>
+        <option value="2">2×</option>
+      </select>
+    </label>
+  </div>
+  <div class="read-aloud__timeline">
+    <input
+      type="range"
+      min="0"
+      max="100"
+      value="0"
+      step="0.1"
+      data-read-aloud-progress
+      aria-label="Audio progress"
+    />
+    <span class="read-aloud__time" data-read-aloud-current>0:00</span>
+    <span aria-hidden="true">/</span>
+    <span class="read-aloud__time" data-read-aloud-duration>--:--</span>
+  </div>
+  <audio class="read-aloud__native" data-read-aloud-audio controls preload="metadata" src={src}>
+    <a href={src}>Download the audio for this post</a>
+  </audio>
+</section>
+
+<script is:inline>
+  (() => {
+    const formatTime = (seconds) => {
+      if (!Number.isFinite(seconds)) return '--:--';
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return `${minutes}:${remainingSeconds}`;
+    };
+
+    const initReadAloud = () => {
+      document.querySelectorAll('[data-read-aloud]').forEach((root) => {
+        if (root.dataset.readAloudReady === 'true') return;
+        const audio = root.querySelector('[data-read-aloud-audio]');
+        const toggle = root.querySelector('[data-read-aloud-toggle]');
+        const label = root.querySelector('[data-read-aloud-label]');
+        const icon = root.querySelector('[data-read-aloud-icon]');
+        const progress = root.querySelector('[data-read-aloud-progress]');
+        const current = root.querySelector('[data-read-aloud-current]');
+        const duration = root.querySelector('[data-read-aloud-duration]');
+        const speed = root.querySelector('[data-read-aloud-speed]');
+        if (!audio || !toggle || !label || !icon || !progress || !current || !duration || !speed) return;
+
+        root.dataset.readAloudReady = 'true';
+        root.classList.add('read-aloud--enhanced');
+
+        const renderState = () => {
+          const playing = !audio.paused && !audio.ended;
+          icon.textContent = playing ? 'Ⅱ' : '▶';
+          label.textContent = playing ? 'Pause' : audio.ended ? 'Listen again' : 'Listen';
+          toggle.setAttribute('aria-label', playing ? 'Pause audio' : 'Listen to this post');
+          toggle.setAttribute('aria-pressed', String(playing));
+          root.classList.toggle('read-aloud--playing', playing);
+        };
+
+        toggle.addEventListener('click', () => {
+          if (audio.paused || audio.ended) {
+            if (audio.ended) audio.currentTime = 0;
+            void audio.play().catch(() => {
+              label.textContent = 'Press again to play';
+            });
+          } else {
+            audio.pause();
+          }
+        });
+        audio.addEventListener('play', renderState);
+        audio.addEventListener('pause', renderState);
+        audio.addEventListener('ended', renderState);
+        audio.addEventListener('loadedmetadata', () => {
+          duration.textContent = formatTime(audio.duration);
+          progress.max = String(audio.duration);
+          progress.disabled = false;
+        });
+        audio.addEventListener('timeupdate', () => {
+          current.textContent = formatTime(audio.currentTime);
+          progress.value = String(audio.currentTime);
+        });
+        progress.addEventListener('input', () => {
+          audio.currentTime = Number(progress.value);
+        });
+        speed.addEventListener('change', () => {
+          audio.playbackRate = Number(speed.value);
+        });
+        progress.disabled = true;
+        renderState();
+      });
+    };
+
+    initReadAloud();
+    document.addEventListener('astro:page-load', initReadAloud);
+  })();
+</script>
