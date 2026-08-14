@@ -17,6 +17,8 @@ export interface CodePracticeProblem {
   hint: readonly string[];
   solutionNotes: readonly string[];
   solutionCode: string;
+  /** Full commented reference used to explain the compact editor solution line by line. */
+  walkthroughCode?: string;
   starterCode: string;
   packages?: readonly string[];
   tags?: readonly string[];
@@ -4001,6 +4003,7 @@ class NGramModel:
 export const codePracticeProblems: readonly CodePracticeProblem[] = RAW_CODE_PRACTICE_PROBLEMS.map(
   (problem) => ({
     ...problem,
+    walkthroughCode: problem.solutionCode,
     solutionCode: COMPACT_REFERENCE_SOLUTIONS[problem.id] ?? problem.solutionCode,
   }),
 );
