@@ -5060,12 +5060,9 @@ html {
 }
 
 .revision-insight {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.9rem;
-  align-items: start;
+  display: block;
   margin: 1.5rem 0 1.75rem;
-  padding: 1rem 1.1rem;
+  padding: 1.15rem 1.25rem 1.25rem;
   border: 1px solid color-mix(in srgb, var(--accent-color) 40%, transparent);
   border-left: 4px solid var(--accent-color);
   border-radius: 14px;
@@ -5073,6 +5070,15 @@ html {
     linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 12%, transparent), transparent 70%),
     var(--panel-bg);
   box-shadow: 0 10px 28px color-mix(in srgb, var(--accent-color) 8%, transparent);
+}
+
+.revision-insight__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent-color) 20%, transparent);
 }
 
 .revision-insight__badge {
@@ -5087,10 +5093,10 @@ html {
 }
 
 .revision-insight__title {
-  margin: 0 0 0.35rem;
+  margin: 0;
   color: var(--text-color);
   font-family: var(--font-heading);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -5114,10 +5120,6 @@ html {
 }
 
 @media (max-width: 560px) {
-  .revision-insight {
-    grid-template-columns: 1fr;
-  }
-
   .revision-insight__badge {
     width: 2rem;
     height: 2rem;
