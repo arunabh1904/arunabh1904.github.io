@@ -38,18 +38,19 @@ ROOT = Path(__file__).resolve().parents[1]
 POSTS_DIR = ROOT / "src" / "content" / "posts"
 AUDIO_DIR = ROOT / "public" / "assets" / "audio" / "blog"
 MANIFEST_PATH = ROOT / "public" / "assets" / "audio" / "manifest.json"
-MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-8bit"
-VOICE = "designed-clean-warm"
+MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-8bit"
+VOICE = "synthetic-clean-warm-icl"
 LANGUAGE = "English"
-VOICE_INSTRUCTION = (
-    "A mature male narrator for a thoughtful technology documentary. Low-mid register, "
-    "warm and resonant, with a clear, dry, close-miked delivery. Calm confidence, measured "
-    "pacing, natural pauses, and restrained emotional contour. Keep the vocal tone solid and "
-    "supported rather than airy or breathy. No whispering, rasp, theatrical performance, or "
-    "exaggerated drama. Never imitate any real person."
+LANGUAGE_CODE = "english"
+# This is a deliberately synthetic narrator reference, not a recording of a person.
+# The matching transcript is required by Qwen3-TTS in-context learning (ICL).
+REFERENCE_AUDIO_PATH = ROOT / "scripts" / "audio-assets" / "clean-warm-synthetic-reference.wav"
+REFERENCE_TEXT = (
+    "I will guide you through technical ideas with calm confidence. "
+    "The delivery is warm, clear, and measured."
 )
-TEMPERATURE = 0.38
-TOP_P = 0.86
+TEMPERATURE = 0.25
+TOP_P = 0.85
 SPEED = 1.0
 BITRATE = "64k"
 MAX_CHARS = 360
@@ -81,6 +82,17 @@ def parse_frontmatter(source: str) -> dict[str, str]:
         if separator:
             values[key.strip()] = value.strip().strip("'\"")
     return values
+
+
+def reference_audio_sha256() -> str:
+    """Return a stable identity for the fixed synthetic narrator reference."""
+
+    if not REFERENCE_AUDIO_PATH.is_file():
+        raise FileNotFoundError(
+            f"Missing narrator reference: {REFERENCE_AUDIO_PATH}. "
+            "Restore the committed synthetic reference before exporting audio."
+        )
+    return hashlib.sha256(REFERENCE_AUDIO_PATH.read_bytes()).hexdigest()
 
 
 def _table_sentences(rows: list[str]) -> list[str]:
@@ -236,6 +248,7 @@ def split_for_tts(text: str, max_chars: int = MAX_CHARS) -> list[str]:
 
 def discover_posts() -> list[dict[str, Any]]:
     posts: list[dict[str, Any]] = []
+    reference_hash = reference_audio_sha256()
     for path in sorted(POSTS_DIR.glob("*.md")) + sorted(POSTS_DIR.glob("*.mdx")):
         source = path.read_text(encoding="utf-8")
         frontmatter = parse_frontmatter(source)
@@ -253,7 +266,10 @@ def discover_posts() -> list[dict[str, Any]]:
                     "model": MODEL,
                     "voice": VOICE,
                     "language": LANGUAGE,
-                    "voice_instruction": VOICE_INSTRUCTION,
+                    "language_code": LANGUAGE_CODE,
+                    "voice_mode": "in-context-learning",
+                    "reference_audio_sha256": reference_hash,
+                    "reference_text": REFERENCE_TEXT,
                     "temperature": TEMPERATURE,
                     "top_p": TOP_P,
                     "speed": SPEED,
@@ -347,12 +363,15 @@ def generate_post(
                         math.ceil(len(chunk_batch[0]) * MAX_TOKENS_PER_CHAR),
                     )
                     results = list(
-                        model.generate_voice_design(
+                        model.generate(
                             text=chunk_batch[0],
-                            language=LANGUAGE,
-                            instruct=VOICE_INSTRUCTION,
+                            ref_audio=str(REFERENCE_AUDIO_PATH),
+                            ref_text=REFERENCE_TEXT,
+                            lang_code=LANGUAGE_CODE,
                             temperature=TEMPERATURE,
                             top_p=TOP_P,
+                            repetition_penalty=1.5,
+                            split_pattern="",
                             max_tokens=max_tokens,
                         )
                     )
@@ -367,10 +386,16 @@ def generate_post(
                     for result in model.batch_generate(
                         texts=chunk_batch,
                         voices=[None] * len(chunk_batch),
-                        instructs=[VOICE_INSTRUCTION] * len(chunk_batch),
+                        ref_audio=str(REFERENCE_AUDIO_PATH),
+                        ref_text=REFERENCE_TEXT,
                         temperature=TEMPERATURE,
                         top_p=TOP_P,
-                        lang_code=LANGUAGE,
+                        repetition_penalty=1.5,
+                        lang_code=LANGUAGE_CODE,
+                        max_tokens=max(
+                            max(MIN_GENERATION_TOKENS, math.ceil(len(chunk) * MAX_TOKENS_PER_CHAR))
+                            for chunk in chunk_batch
+                        ),
                     ):
                         # Non-streaming batch generation yields one complete audio
                         # result per sequence. Current mlx-audio marks these events
@@ -477,7 +502,10 @@ def main() -> int:
     from mlx_audio.tts.utils import load_model
 
     targets = posts if args.force else stale
-    print(f"Loading {MODEL} once for {len(targets)} post(s)...")
+    print(
+        f"Loading {MODEL} once for {len(targets)} post(s) "
+        f"with the fixed synthetic narrator reference..."
+    )
     model = load_model(MODEL)
     with tqdm(total=len(targets), desc="Blogs", unit="post", position=0) as blog_progress:
         for index, post in enumerate(targets, start=1):
@@ -496,6 +524,10 @@ def main() -> int:
                 "model": MODEL,
                 "voice": VOICE,
                 "language": LANGUAGE,
+                "language_code": LANGUAGE_CODE,
+                "voice_mode": "in-context-learning",
+                "reference_audio_sha256": reference_audio_sha256(),
+                "reference_text": REFERENCE_TEXT,
                 "temperature": TEMPERATURE,
                 "top_p": TOP_P,
                 "speed": SPEED,

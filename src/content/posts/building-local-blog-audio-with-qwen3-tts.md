@@ -11,8 +11,8 @@ tags:
   - Audio
 summary: >-
   How this site turns Blog Markdown into static MP3 narration with Qwen3-TTS,
-  extracts prose rather than visual or code artifacts, and serves playback
-  without a runtime model or API dependency.
+  keeps a synthetic narrator stable across chunks, excludes visual or code
+  artifacts, and serves playback without a runtime model or API dependency.
 ---
 
 # Building Local Blog Audio with Qwen3-TTS
@@ -34,7 +34,7 @@ Blog Markdown or MDX
 narration-safe text extraction
         |
         v
-sentence-bounded Qwen3-TTS chunks
+fixed synthetic voice reference + Qwen3-TTS ICL chunks
         |
         v
 24 kHz mono MP3 plus manifest digest
@@ -67,36 +67,37 @@ This is an editorial policy, not a claim that code, figures, or equations are un
 
 The extractor preserves headings, strips Markdown links down to their labels, turns table rows into phrases such as `Runtime: MLX; TTFT: 684 ms`, and splits only on sentence boundaries. It also explicitly skips the caption immediately following an image rather than relying on a fragile global regular expression. These choices keep the voice from changing topic just because the source contains presentation markup.
 
-## Why Qwen3-TTS
+## A single narrator needs a persistent reference
 
-The voice is generated with the 8-bit MLX conversion of [`Qwen3-TTS-12Hz-1.7B-VoiceDesign`](https://github.com/QwenLM/Qwen3-TTS). Qwen's VoiceDesign model takes a natural-language description of the narrator rather than a fixed speaker ID. That matters here because the target is not a named person's voice; it is a set of audible constraints: mature low-mid register, warm and resonant tone, clean close-miked delivery, measured pacing, restrained emphasis, and no breathiness or theatrical performance.
+The first export used the 8-bit MLX conversion of [`Qwen3-TTS-12Hz-1.7B-VoiceDesign`](https://github.com/QwenLM/Qwen3-TTS) for every chunk. VoiceDesign accepts a natural-language description of a narrator, which was useful for finding the target sound: a mature low-mid register, warm and resonant tone, clean close-miked delivery, measured pacing, restrained emphasis, and no breathiness or theatrical performance. It was the wrong production interface for a long post. Each chunk was a new design request, so the description could hold the style roughly steady without giving the model a speaker identity to preserve. The result was audible identity drift from chunk to chunk.
 
-The `1.7B` model is heavier than a browser speech engine or a compact local TTS model, but its prosody is the point. A technical post needs sentence-level emphasis, pauses that land at argument boundaries, and a voice that does not turn every paragraph into the same synthetic cadence. The model runs once for the export, not once per listener, so export cost is a better trade than a permanently weak reading experience.
+The exporter now uses the 8-bit MLX conversion of `Qwen3-TTS-12Hz-1.7B-Base` in its in-context-learning mode. It conditions every chunk on the same short synthetic reference WAV and its exact transcript. The reference was designed locally; it is not a recording of, or an attempt to imitate, a real person. That one audio-and-text pair gives the base model a concrete timbre, cadence, and speaker identity to carry through the entire post. The exporter hashes both the reference file and transcript into every manifest digest, so changing either intentionally invalidates the corpus.
 
-The model emits 12 Hz acoustic codes and the local [`mlx-audio`](https://github.com/Blaizzy/mlx-audio) runtime decodes them to waveform audio. I encode the final waveform as mono `24 kHz` MP3 at `64 kbit/s`: enough bandwidth for spoken voice while keeping the static bundle reasonable. The original WAV chunks are temporary; only the MP3s are committed.
+The `1.7B` model is heavier than a browser speech engine or a compact local TTS model, but its prosody is the point. A technical post needs sentence-level emphasis, pauses that land at argument boundaries, and a voice that does not turn every paragraph into the same synthetic cadence. The model runs once for the export, not once per listener, so export cost is a better trade than a permanently weak reading experience. It emits 12 Hz acoustic codes and the local [`mlx-audio`](https://github.com/Blaizzy/mlx-audio) runtime decodes them to waveform audio. I encode the final waveform as mono `24 kHz` MP3 at `64 kbit/s`: enough bandwidth for spoken voice while keeping the static bundle reasonable. The original WAV chunks are temporary; only the MP3s are committed.
 
 ## Long-form synthesis needs a scheduler
 
 One request per post is not reliable. Long technical posts exceed a comfortable generation window, and a failure near the end should not discard forty minutes of work. The exporter therefore breaks narration into sentence-bounded chunks of at most 360 characters. Before concatenation, it removes model-generated leading and trailing dead air while retaining only a 50 ms boundary release. A final waveform pass collapses any residual silence longer than 0.8 seconds to a 90 ms transition. The join is effectively gapless; ordinary rhetorical pauses remain natural.
 
-The exporter loads the model once and keeps it resident for the entire corpus. Each chunk then uses the same direct VoiceDesign path as the approved listening sample. That choice is deliberate: Qwen's continuous batch API is useful for short parallel requests, but for long designed-voice segments it makes progress opaque and can hold a group behind its slowest member. The direct path gives predictable chunk boundaries and a truthful per-post progress signal.
+The exporter loads the model once and keeps it resident for the entire corpus. Each direct synthesis call receives the same reference and transcript. That choice is deliberate: Qwen's continuous batch API is useful for short parallel requests, but the default path keeps one chunk at a time so progress remains truthful and every join is easy to inspect.
 
 ```python
-for result in model.generate_voice_design(
+for result in model.generate(
     text=chunk,
-    instruct=VOICE_INSTRUCTION,
-    temperature=0.38,
-    top_p=0.86,
-    language="English",
+    ref_audio="clean-warm-synthetic-reference.wav",
+    ref_text=REFERENCE_TEXT,
+    temperature=0.25,
+    top_p=0.85,
+    lang_code="english",
 ):
     audio_parts.append(result.audio)
 ```
 
 The script also gives each direct call a text-length-derived acoustic-token ceiling: at least 128 tokens and 1.05 tokens per source character above that. This detail was a reliability fix, not a cosmetic optimization. An earlier version imposed a 768-token floor; at roughly 12.5 acoustic tokens per second, a short heading or paragraph could keep the decoder running after the text had finished. The audible result was occasional non-speech noise a few items into a post. Shorter source chunks and a ceiling that follows their text prevent that runaway tail. The cap is included in the manifest digest, so changing it deliberately invalidates the affected audio.
 
-The script still exposes `--batch-size` for short segments and future runtime improvements, but its default is one chunk. The real export optimizations are one resident model, sentence-safe work units, bounded generation, resumable manifest checks, atomic post writes, and no wasted inference on captions or code. Those improvements reduce avoidable work without changing the narrator that the listener selected.
+The script still exposes `--batch-size` for short segments and future runtime improvements, but its default is one chunk. The real export optimizations are one resident model, sentence-safe work units, bounded generation, resumable manifest checks, atomic post writes, and no wasted inference on captions or code. The fixed reference removes a different class of failure: it prevents each chunk from deciding who is speaking again.
 
-After a post completes, the exporter writes temporary WAV chunks, concatenates them with `ffmpeg`, applies the residual-silence limit, and atomically replaces the target MP3. That final pass solves a separate failure: VoiceDesign can decode a long quiet tail inside an otherwise valid waveform. Those were the conspicuous multi-second gaps in the middle of early files. The pass keeps normal pauses but reduces any quiet region longer than 0.8 seconds to 90 ms. The manifest is updated only after the post succeeds, so an interrupted run can resume only when its narration, model ID, voice instruction, chunking profile, generation limit, and encoder settings still match.
+After a post completes, the exporter writes temporary WAV chunks, concatenates them with `ffmpeg`, applies the residual-silence limit, and atomically replaces the target MP3. That final pass solves a separate failure: an otherwise valid chunk can decode a long quiet tail. Those were the conspicuous multi-second gaps in the middle of early files. The pass keeps normal pauses but reduces any quiet region longer than 0.8 seconds to 90 ms. The manifest is updated only after the post succeeds, so an interrupted run can resume only when its narration, model ID, reference identity, chunking profile, generation limit, and encoder settings still match.
 
 ## Validation belongs before the voice model
 
@@ -108,7 +109,8 @@ The final checks happen at three levels:
 
 1. The exporter verifies manifest coverage for every Blog post.
 2. The site runs its normal static build and CI checks.
-3. A browser test confirms that the control appears on Blog routes, remains absent from non-Blog routes, and can play, pause, seek, and change speed without console errors.
+3. Listening checks sample the beginning, middle, and end of each newly exported priority post. The test is specifically for non-speech tails, long joins, and speaker drift.
+4. A browser test confirms that the control appears on Blog routes, remains absent from non-Blog routes, and can play, pause, seek, and change speed without console errors.
 
 ## Static audio has real trade-offs
 
