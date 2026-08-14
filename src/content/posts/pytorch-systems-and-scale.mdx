@@ -9,6 +9,7 @@ tags:
 summary: Analyze PyTorch execution through device transfers, streams, memory lifetime, compilation, distributed training, export, and profiling.
 ---
 import RevisionCodePair from '../../components/RevisionCodePair.astro';
+import RevisionInsight from '../../components/RevisionInsight.astro';
 import { pytorchRevisionExamples } from '../../lib/pytorch-revision-examples';
 
 # PyTorch III: Performance and Scale
@@ -26,6 +27,14 @@ PyTorch supports several backends, including CPU, CUDA, MPS, and XPU, with diffe
 `tensor.to(device=..., dtype=..., non_blocking=..., copy=...)` handles tensor conversion. It may return the original tensor when neither dtype nor device changes. `module.to(...)` instead updates the registered parameters and buffers in the module tree and returns the module. The difference matters when tracking allocation: tensor conversion usually produces a value, while module conversion updates model state.
 
 Pinned CPU memory allows CUDA to perform direct memory access for host-to-device copies. With `non_blocking=True`, the Python thread does not wait for the copy to finish. This does not guarantee overlap with useful work: overlap requires independent host work or device work on a stream that can run while the transfer is in progress. Pinning also consumes a limited host resource, so it should be tested with the actual input pipeline.
+
+<RevisionInsight title="More you know · device bugs often start in containers" icon="🚦">
+
+`model.to(device)` and `model.cuda()` recurse through registered parameters, buffers, and child modules only. A layer kept in a plain Python `list` remains unregistered and may stay on the CPU even though the top-level model reports a CUDA device. Use `ModuleList`/`ModuleDict` for dynamic module collections and `register_buffer()` for non-trainable tensor state that must follow the model.
+
+Before chasing an accelerator error, check that the inputs, `named_parameters()`, and `named_buffers()` agree on device and dtype. Registration is the boundary between “Python can reach this object” and “PyTorch knows this object is part of the model.”
+
+</RevisionInsight>
 
 ## Asynchronous execution
 

@@ -5059,6 +5059,71 @@ html {
   margin: 0;
 }
 
+.revision-insight {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+  margin: 1.5rem 0 1.75rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--accent-color) 40%, transparent);
+  border-left: 4px solid var(--accent-color);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 12%, transparent), transparent 70%),
+    var(--panel-bg);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--accent-color) 8%, transparent);
+}
+
+.revision-insight__badge {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent-color) 18%, transparent);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.revision-insight__title {
+  margin: 0 0 0.35rem;
+  color: var(--text-color);
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.revision-insight__content > :first-child {
+  margin-top: 0;
+}
+
+.revision-insight__content > :last-child {
+  margin-bottom: 0;
+}
+
+.revision-insight__content p,
+.revision-insight__content li {
+  font-size: 0.95rem;
+}
+
+.revision-insight__content pre {
+  margin: 0.8rem 0;
+}
+
+@media (max-width: 560px) {
+  .revision-insight {
+    grid-template-columns: 1fr;
+  }
+
+  .revision-insight__badge {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
 /* Revision notes use the same compact, code-first workspace as Code practice. */
 .python-playground--compact {
   display: grid;

@@ -1,0 +1,16 @@
+---
+interface Props {
+  title?: string;
+  icon?: string;
+}
+
+const { title = 'More you know', icon = '🧠' } = Astro.props;
+---
+
+<aside class="revision-insight" aria-label={title}>
+  <div class="revision-insight__badge" aria-hidden="true">{icon}</div>
+  <div class="revision-insight__body">
+    <p class="revision-insight__title">{title}</p>
+    <div class="revision-insight__content"><slot /></div>
+  </div>
+</aside>
