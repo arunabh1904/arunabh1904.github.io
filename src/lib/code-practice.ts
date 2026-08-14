@@ -1,6 +1,6 @@
 export interface CodePracticeExample {
   label: string;
-  lines: string[];
+  lines: readonly string[];
   result: string;
 }
 
@@ -10,12 +10,12 @@ export interface CodePracticeProblem {
   title: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   summary: string;
-  prompt: string[];
+  prompt: readonly string[];
   signature: string;
-  requirements: string[];
-  examples: CodePracticeExample[];
-  hint: string[];
-  solutionNotes: string[];
+  requirements: readonly string[];
+  examples: readonly CodePracticeExample[];
+  hint: readonly string[];
+  solutionNotes: readonly string[];
   solutionCode: string;
   starterCode: string;
   packages?: readonly string[];
@@ -36,7 +36,7 @@ export function getCodePracticeProblemById(problemId: string) {
   return codePracticeProblems.find((problem) => problem.id === problemId);
 }
 
-export const codePracticeProblems: readonly CodePracticeProblem[] = [
+const RAW_CODE_PRACTICE_PROBLEMS = [
   {
     id: 'stable-softmax-cross-entropy',
     order: 1,
@@ -3730,3 +3730,277 @@ print(best_iou_match(predictions, ground_truth))`,
     tags: ['PyTorch', 'Broadcasting', 'Detection'],
   },
 ] as const;
+
+// Keep the learner-facing references close to the short, shape-first interview solutions.
+// Requirements and walkthroughs carry validation and edge-case discussion; these snippets show
+// the tensor path an interviewer is actually testing.
+const COMPACT_REFERENCE_SOLUTIONS: Readonly<Record<string, string>> = {
+  'stable-softmax-cross-entropy': `import torch
+
+def softmax_cross_entropy(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+    shifted = logits - torch.amax(logits, dim=1, keepdim=True)
+    exp_logits = torch.exp(shifted)
+    normalizers = torch.sum(exp_logits, dim=1)
+    rows = torch.arange(logits.shape[0], dtype=torch.long)
+    return torch.mean(torch.log(normalizers) - shifted[rows, labels])`,
+  'non-maximum-suppression': `import torch
+
+def _pairwise_iou(box, boxes):
+    top_left = torch.maximum(box[:2], boxes[:, :2])
+    bottom_right = torch.minimum(box[2:], boxes[:, 2:])
+    size = torch.clamp(bottom_right - top_left, min=0)
+    intersection = size[:, 0] * size[:, 1]
+    area_box = (box[2] - box[0]) * (box[3] - box[1])
+    area_boxes = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+    union = area_box + area_boxes - intersection
+    return intersection / torch.clamp(union, min=1e-8)
+
+def nms(boxes: torch.Tensor, scores: torch.Tensor, iou_threshold: float) -> list[int]:
+    order = torch.argsort(scores, descending=True, stable=True).tolist()
+    keep = []
+    while order:
+        current, order = order[0], order[1:]
+        keep.append(current)
+        if order:
+            remaining = torch.as_tensor(order, dtype=torch.long)
+            order = [int(i) for i in remaining[_pairwise_iou(boxes[current], boxes[remaining]) <= iou_threshold].tolist()]
+    return keep`,
+  'causal-attention-mask': `import torch
+
+def make_causal_attention_mask(seq_lens: torch.Tensor, max_len: int | None = None) -> torch.Tensor:
+    seq_lens = torch.as_tensor(seq_lens, dtype=torch.long)
+    length = int(torch.amax(seq_lens).item()) if max_len is None else max(int(torch.amax(seq_lens).item()), max_len)
+    positions = torch.arange(length, dtype=torch.long)
+    valid = positions[None, :] < seq_lens[:, None]
+    causal = positions[:, None] >= positions[None, :]
+    return torch.as_tensor(causal[None] & valid[:, :, None] & valid[:, None, :], dtype=torch.int64)`,
+  'binary-classification-metrics': `import torch
+
+def binary_classification_metrics(y_true: torch.Tensor, y_pred: torch.Tensor) -> dict[str, int | float]:
+    tp = int(torch.sum((y_true == 1) & (y_pred == 1)).item())
+    tn = int(torch.sum((y_true == 0) & (y_pred == 0)).item())
+    fp = int(torch.sum((y_true == 0) & (y_pred == 1)).item())
+    fn = int(torch.sum((y_true == 1) & (y_pred == 0)).item())
+    precision = tp / (tp + fp) if tp + fp else 0.0
+    recall = tp / (tp + fn) if tp + fn else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+    return {'tp': tp, 'tn': tn, 'fp': fp, 'fn': fn, 'precision': precision, 'recall': recall, 'f1': f1, 'accuracy': (tp + tn) / y_true.numel()}`,
+  'pairwise-cosine-similarity': `import torch
+
+def pairwise_cosine_similarity(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    numerator = x @ torch.transpose(y, 0, 1)
+    x_norm = torch.sqrt(torch.sum(x * x, dim=1))
+    y_norm = torch.sqrt(torch.sum(y * y, dim=1))
+    denominator = x_norm[:, None] * y_norm[None, :]
+    return torch.where(denominator > 0, numerator / torch.clamp(denominator, min=1e-8), torch.zeros_like(numerator))`,
+  'top-k-accuracy': `import torch
+
+def top_k_accuracy(logits: torch.Tensor, labels: torch.Tensor, k: int) -> torch.Tensor:
+    top_k = min(k, logits.shape[1])
+    ranked = torch.argsort(logits, dim=1, descending=True)
+    candidate_indices = ranked[:, :top_k]
+    hits = torch.any(candidate_indices == labels[:, None], dim=1)
+    return torch.mean(torch.as_tensor(hits, dtype=torch.float64))`,
+  'iou-matrix': `import torch
+
+def box_iou_matrix(boxes1: torch.Tensor, boxes2: torch.Tensor) -> torch.Tensor:
+    top_left = torch.maximum(boxes1[:, None, :2], boxes2[None, :, :2])
+    bottom_right = torch.minimum(boxes1[:, None, 2:], boxes2[None, :, 2:])
+    size = torch.clamp(bottom_right - top_left, min=0)
+    intersection = size[..., 0] * size[..., 1]
+    area1 = (boxes1[:, 2] - boxes1[:, 0]) * (boxes1[:, 3] - boxes1[:, 1])
+    area2 = (boxes2[:, 2] - boxes2[:, 0]) * (boxes2[:, 3] - boxes2[:, 1])
+    union = area1[:, None] + area2[None, :] - intersection
+    return intersection / torch.clamp(union, min=1e-8)`,
+  'nearest-centroid-classifier': `import torch
+
+def nearest_centroid_predict(train_X: torch.Tensor, train_y: torch.Tensor, test_X: torch.Tensor) -> torch.Tensor:
+    labels = torch.unique(train_y, sorted=True)
+    centroids = []
+    for label in labels:
+        class_points = train_X[train_y == label]
+        centroids.append(torch.sum(class_points, dim=0) / class_points.shape[0])
+    centroids = torch.stack(centroids)
+    distances = torch.sum((test_X[:, None, :] - centroids[None, :, :]) ** 2, dim=-1)
+    return labels[torch.argmin(distances, dim=1)]`,
+  'temperature-scaling-of-logits': `import torch
+
+def temperature_scaled_probs(logits: torch.Tensor, temperature: float) -> torch.Tensor:
+    scaled = logits / temperature
+    shifted = scaled - torch.amax(scaled, dim=-1, keepdim=True)
+    exp_logits = torch.exp(shifted)
+    return exp_logits / torch.sum(exp_logits, dim=-1, keepdim=True)`,
+  'sinusoidal-positional-encoding': `import math
+import torch
+
+def sinusoidal_positional_encoding(length: int, dim: int) -> torch.Tensor:
+    positions = torch.arange(length, dtype=torch.float64)[:, None]
+    indices = torch.arange(0, dim, 2, dtype=torch.float64)
+    frequencies = torch.exp(-math.log(10000.0) * indices / dim)
+    angles = positions * frequencies[None, :]
+    encoding = torch.zeros(length, dim, dtype=torch.float64)
+    encoding[:, 0::2] = torch.sin(angles)
+    encoding[:, 1::2] = torch.cos(angles[:, :encoding[:, 1::2].shape[1]])
+    return encoding`,
+  'unpatchify-back-to-image': `import torch
+
+def unpatchify(patches: torch.Tensor, image_shape: tuple[int, int, int], patch_size: int) -> torch.Tensor:
+    channels, height, width = image_shape
+    grid_h, grid_w = height // patch_size, width // patch_size
+    batch_size = patches.shape[0]
+    grid = patches.reshape(batch_size, grid_h, grid_w, channels, patch_size, patch_size)
+    grid = grid.permute(0, 3, 1, 4, 2, 5)
+    return grid.reshape(batch_size, channels, height, width)`,
+  '2d-patchify-for-images': `import torch
+
+def patchify(images: torch.Tensor, patch_size: int) -> torch.Tensor:
+    batch_size, channels, height, width = images.shape
+    grid_h, grid_w = height // patch_size, width // patch_size
+    grid = images.reshape(batch_size, channels, grid_h, patch_size, grid_w, patch_size)
+    grid = grid.permute(0, 2, 4, 1, 3, 5)
+    return grid.reshape(batch_size, grid_h * grid_w, channels * patch_size * patch_size)`,
+  'rope-rotary-positional-embedding': `import torch
+
+def apply_rope(x: torch.Tensor) -> torch.Tensor:
+    batch_size, seq_len, num_heads, dim = x.shape
+    pair = torch.arange(dim // 2, dtype=torch.float64)
+    angles = torch.arange(seq_len, dtype=torch.float64)[:, None] * (10000.0 ** (-2 * pair / dim))[None, :]
+    sin, cos = torch.sin(angles)[None, :, None, :], torch.cos(angles)[None, :, None, :]
+    even, odd = x[..., 0::2], x[..., 1::2]
+    output = torch.empty_like(x)
+    output[..., 0::2] = even * cos - odd * sin
+    output[..., 1::2] = even * sin + odd * cos
+    return output`,
+  'scaled-dot-product-self-attention': `import torch
+
+def _masked_softmax(scores):
+    valid = torch.isfinite(scores)
+    scores = torch.where(valid, scores, torch.zeros_like(scores))
+    scores = scores - torch.amax(scores, dim=-1, keepdim=True)
+    weights = torch.exp(scores) * torch.as_tensor(valid, dtype=scores.dtype)
+    return weights / torch.clamp(torch.sum(weights, dim=-1, keepdim=True), min=1e-8)
+
+def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    batch_size, seq_len, model_dim = x.shape
+    head_dim = model_dim // num_heads
+    split = lambda z: z.reshape(batch_size, seq_len, num_heads, head_dim).permute(0, 2, 1, 3)
+    q, k, v = split(x @ W_q), split(x @ W_k), split(x @ W_v)
+    scores = q @ k.transpose(-1, -2) / (head_dim ** 0.5)
+    if mask is not None:
+        scores = torch.where(mask != 0, scores, torch.full_like(scores, float('-inf')))
+    context = _masked_softmax(scores) @ v
+    context = context.permute(0, 2, 1, 3).reshape(batch_size, seq_len, model_dim)
+    return context @ W_o`,
+  'cross-attention': `import torch
+
+def _masked_softmax(scores):
+    valid = torch.isfinite(scores)
+    scores = torch.where(valid, scores, torch.zeros_like(scores))
+    scores = scores - torch.amax(scores, dim=-1, keepdim=True)
+    weights = torch.exp(scores) * torch.as_tensor(valid, dtype=scores.dtype)
+    return weights / torch.clamp(torch.sum(weights, dim=-1, keepdim=True), min=1e-8)
+
+def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    batch_size, query_len, model_dim = query_x.shape
+    context_len = context_x.shape[1]
+    head_dim = model_dim // num_heads
+    def split(z, length):
+        return z.reshape(batch_size, length, num_heads, head_dim).permute(0, 2, 1, 3)
+    q = split(query_x @ W_q, query_len)
+    k = split(context_x @ W_k, context_len)
+    v = split(context_x @ W_v, context_len)
+    scores = q @ k.transpose(-1, -2) / (head_dim ** 0.5)
+    if mask is not None:
+        scores = torch.where(mask != 0, scores, torch.full_like(scores, float('-inf')))
+    context = _masked_softmax(scores) @ v
+    context = context.permute(0, 2, 1, 3).reshape(batch_size, query_len, model_dim)
+    return context @ W_o`,
+  'manual-backprop-for-a-2-layer-mlp': `import torch
+
+def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
+    hidden_pre = X @ W1 + b1
+    hidden = torch.clamp(hidden_pre, min=0)
+    logits = hidden @ W2 + b2
+    shifted = logits - torch.amax(logits, dim=1, keepdim=True)
+    exp_logits = torch.exp(shifted)
+    normalizers = torch.sum(exp_logits, dim=1)
+    probs = exp_logits / normalizers[:, None]
+    rows = torch.arange(X.shape[0], dtype=torch.long)
+    loss = torch.mean(torch.log(normalizers) - shifted[rows, y])
+    dlogits = probs.clone()
+    dlogits[rows, y] -= 1
+    dlogits /= X.shape[0]
+    dW2 = hidden.T @ dlogits
+    db2 = torch.sum(dlogits, dim=0)
+    dhidden = dlogits @ W2.T * (hidden_pre > 0)
+    dW1 = X.T @ dhidden
+    db1 = torch.sum(dhidden, dim=0)
+    return {'loss': loss, 'dW1': dW1, 'db1': db1, 'dW2': dW2, 'db2': db2}`,
+  'classic-mlp-forward-backward': `import torch
+
+def mlp_forward_backward(X, y, W1, b1, W2, b2):
+    hidden_pre = X @ W1 + b1
+    hidden = torch.clamp(hidden_pre, min=0)
+    logits = hidden @ W2 + b2
+    shifted = logits - torch.amax(logits, dim=1, keepdim=True)
+    exp_logits = torch.exp(shifted)
+    normalizers = torch.sum(exp_logits, dim=1)
+    probs = exp_logits / normalizers[:, None]
+    rows = torch.arange(X.shape[0], dtype=torch.long)
+    loss = torch.mean(torch.log(normalizers) - shifted[rows, y])
+    dlogits = probs.clone()
+    dlogits[rows, y] -= 1
+    dlogits /= X.shape[0]
+    dW2 = hidden.T @ dlogits
+    db2 = torch.sum(dlogits, dim=0)
+    dhidden = dlogits @ W2.T * (hidden_pre > 0)
+    dW1 = X.T @ dhidden
+    db1 = torch.sum(dhidden, dim=0)
+    return {'loss': loss, 'dW1': dW1, 'db1': db1, 'dW2': dW2, 'db2': db2}`,
+  'simple-n-gram-language-model': `from collections import Counter, defaultdict
+import random
+
+def _coerce_tokens(values, name):
+    return list(values)
+
+class NGramModel:
+    def __init__(self, n):
+        self.n = n
+        self.counts = defaultdict(Counter)
+
+    def fit(self, tokens):
+        tokens = _coerce_tokens(tokens, 'tokens')
+        self.counts.clear()
+        for index, token in enumerate(tokens):
+            for size in range(min(self.n - 1, index) + 1):
+                context = tuple(tokens[index - size:index])
+                self.counts[context][token] += 1
+        return self
+
+    def next_token_probs(self, context):
+        context = list(context)
+        for size in range(min(self.n - 1, len(context)), -1, -1):
+            counts = self.counts.get(tuple(context[-size:]))
+            if counts:
+                total = sum(counts.values())
+                return {token: count / total for token, count in counts.items()}
+        return {}
+
+    def generate(self, max_tokens, seed=None):
+        rng = random.Random(seed)
+        output = []
+        for _ in range(max_tokens):
+            probs = self.next_token_probs(output)
+            if not probs:
+                break
+            tokens, weights = zip(*probs.items())
+            output.append(rng.choices(tokens, weights=weights, k=1)[0])
+        return output`,
+};
+
+export const codePracticeProblems: readonly CodePracticeProblem[] = RAW_CODE_PRACTICE_PROBLEMS.map(
+  (problem) => ({
+    ...problem,
+    solutionCode: COMPACT_REFERENCE_SOLUTIONS[problem.id] ?? problem.solutionCode,
+  }),
+);

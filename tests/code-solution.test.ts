@@ -50,7 +50,7 @@ describe('augmentCodeWithSolution', () => {
     }
   });
 
-  it('adds solution-only imports and helpers before the starter function that uses them', () => {
+  it('keeps the reference path focused on the operation being taught', () => {
     const softmaxProblem = codePracticeProblems.find(
       (problem) => problem.id === 'stable-softmax-cross-entropy',
     );
@@ -64,13 +64,12 @@ describe('augmentCodeWithSolution', () => {
     const softmaxCode = augmentCodeWithSolution(softmaxProblem!);
     const temperatureCode = augmentCodeWithSolution(temperatureProblem!);
 
-    expect(softmaxCode.indexOf('def _validate_classification_inputs')).toBeLessThan(
-      softmaxCode.indexOf('def softmax_cross_entropy'),
-    );
-    expect(temperatureCode).toContain('import math');
+    expect(softmaxCode).not.toContain('def _validate_classification_inputs');
+    expect(softmaxCode).toContain('torch.amax(logits, dim=1, keepdim=True)');
+    expect(temperatureCode).not.toContain('raise ValueError');
   });
 
-  it('uses a compact reference view with assertions instead of verbose guard blocks', () => {
+  it('keeps reference snippets short and leaves validation in the prompt', () => {
     const problem = codePracticeProblems.find(
       (candidate) => candidate.id === 'stable-softmax-cross-entropy',
     );
@@ -79,22 +78,11 @@ describe('augmentCodeWithSolution', () => {
     );
     const annotatedCode = augmentCodeWithSolution(problem!);
     const nmsCode = augmentCodeWithSolution(nmsProblem!);
-    const sourceCommentCount = problem!.solutionCode
-      .split('\n')
-      .filter((line) => line.trimStart().startsWith('#')).length;
-    const annotatedCommentCount = annotatedCode
-      .split('\n')
-      .filter((line) => line.trimStart().startsWith('#')).length;
-
-    expect(annotatedCode).toContain(
-      'assert logits.ndim == 2, "logits must have shape (N, C)"',
-    );
-    expect(annotatedCode).not.toContain('raise ValueError("logits must have shape (N, C)")');
-    expect(annotatedCode).not.toContain('# Convert compatible inputs once');
-    expect(annotatedCommentCount).toBeLessThan(sourceCommentCount);
-    expect(nmsCode).toContain(
-      'assert not (boxes.ndim != 2 or boxes.shape[1] != 4), "boxes must have shape (N, 4)"',
-    );
+    expect(problem!.solutionCode.split('\n').length).toBeLessThanOrEqual(45);
+    expect(nmsProblem!.solutionCode.split('\n').length).toBeLessThanOrEqual(45);
+    expect(annotatedCode).not.toContain('raise ValueError');
+    expect(annotatedCode).toContain('return torch.mean(torch.log(normalizers)');
+    expect(nmsCode).toContain('while order:');
   });
 
   it('augments the current editor contents without discarding an inserted hint', () => {
@@ -109,6 +97,6 @@ describe('augmentCodeWithSolution', () => {
       '# Hint: subtract the row maximum before exponentiating.',
     );
     expect(annotatedCode).toContain('# Reference solution');
-    expect(annotatedCode).toContain('return torch.mean(losses)');
+    expect(annotatedCode).toContain('return torch.mean(torch.log(normalizers)');
   });
 });
