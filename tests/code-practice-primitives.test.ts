@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { codePracticeProblems } from '../src/lib/code-practice';
+import { TORCH_COMPAT_SOURCE } from '../src/lib/torch-compat';
 
 // These helpers solve the operation being taught instead of exposing its tensor steps.
 const BANNED_CONVENIENCE_CALLS = [
@@ -105,5 +106,19 @@ describe('code-practice primitive-first solutions', () => {
         expect(problem?.solutionCode, `${id} must include ${fragment}`).toContain(fragment);
       }
     }
+  });
+
+  it('handles the two audited edge cases in the reference code', () => {
+    const ngram = codePracticeProblems.find((problem) => problem.id === 'simple-n-gram-language-model');
+    const matching = codePracticeProblems.find((problem) => problem.id === 'greedy-detection-matching');
+
+    expect(ngram?.solutionCode).toContain('key = tuple(context[-size:]) if size else ()');
+    expect(matching?.solutionCode).toContain('candidate_ious = torch.where(available');
+    expect(matching?.solutionCode).not.toContain('best_gt not in used');
+  });
+
+  it('supports tensor transpose methods used by 2D and attention references', () => {
+    expect(TORCH_COMPAT_SOURCE).toContain('def permute(self, *dims):');
+    expect(TORCH_COMPAT_SOURCE).toContain('def transpose(self, dim0, dim1):');
   });
 });

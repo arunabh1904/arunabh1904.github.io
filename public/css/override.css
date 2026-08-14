@@ -7160,9 +7160,6 @@ html {
   font-family: var(--font-body);
 }
 
-.code-practice-lab code,
-.code-practice-lab pre,
-.code-practice-lab kbd,
 .code-practice-lab__section-label,
 .code-practice-lab__eyebrow {
   font-family: var(--font-mono);
@@ -7199,27 +7196,6 @@ html {
 
 .code-practice-lab--reference .code-practice-lab__editor-layout {
   grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.38fr);
-}
-
-.code-practice-lab__editor,
-.code-practice-lab--reference .code-practice-lab__editor {
-  font-family: var(--font-mono);
-  font-size: 0.92rem;
-}
-
-.code-practice-lab__editor .cm-editor,
-.code-practice-lab__editor .cm-scroller,
-.code-practice-lab--reference .code-practice-lab__editor .cm-scroller {
-  font-family: var(--font-mono);
-  line-height: 1.5;
-}
-
-.code-practice-lab__editor .cm-content,
-.code-practice-lab__editor .cm-gutter,
-.code-practice-lab--reference .code-practice-lab__editor .cm-content,
-.code-practice-lab--reference .code-practice-lab__editor .cm-gutter {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
 }
 
 /* Preserve Python's visual structure; horizontal scrolling is clearer than

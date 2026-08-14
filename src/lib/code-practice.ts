@@ -3555,9 +3555,13 @@ def match_predictions(
     for prediction_index in torch.argsort(scores, descending=True).tolist():
         if ground_truth.shape[0] == 0:
             continue
-        best_gt = int(torch.argmax(ious[prediction_index]).item())
-        best_iou = float(ious[prediction_index, best_gt].item())
-        if best_iou >= iou_threshold and best_gt not in used:
+        available = torch.as_tensor([ground_truth_index not in used for ground_truth_index in range(ground_truth.shape[0])], dtype=torch.bool)
+        if not torch.any(available):
+            continue
+        candidate_ious = torch.where(available, ious[prediction_index], torch.full_like(ious[prediction_index], float('-inf')))
+        best_gt = int(torch.argmax(candidate_ious).item())
+        best_iou = float(candidate_ious[best_gt].item())
+        if best_iou >= iou_threshold:
             matches[prediction_index] = best_gt
             used.add(best_gt)
     return matches
@@ -3982,7 +3986,8 @@ class NGramModel:
     def next_token_probs(self, context):
         context = list(context)
         for size in range(min(self.n - 1, len(context)), -1, -1):
-            counts = self.counts.get(tuple(context[-size:]))
+            key = tuple(context[-size:]) if size else ()
+            counts = self.counts.get(key)
             if counts:
                 total = sum(counts.values())
                 return {token: count / total for token, count in counts.items()}
