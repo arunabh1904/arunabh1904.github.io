@@ -118,7 +118,13 @@ DEKA opened the door to my dream job. The projects taught me technical skills, b
 
 ## Zoox
 
-Joining Zoox realized a long-held goal: working on autonomous driving. I work on the Perception team, which turns camera, LiDAR, and other sensor data into representations the robot can use for planning. My role focuses on scene semantics and agent intent, drawing on ML, software engineering, C++, Python, CUDA, and computer vision research. I learned those skills through self-teaching, graduate school, and my time at DEKA.
+Joining Zoox realized a long-held goal: working on autonomous driving. I am now a technical lead on the Perception team, where I lead a broader initiative to make our autonomy systems more capable and efficient. The work sits at the intersection of machine learning, software engineering, and the practical constraints of deploying models on real vehicles.
+
+Over the last couple of quarters, we shipped a major production improvement that increased system efficiency while improving model quality. The work started as a small side project that I prototyped around the middle of last year. Once we showed that the approach could work, we built a dedicated team and roadmap around it. I moved from an IC role back into technical leadership, built out the team, and we shipped the result earlier this year.
+
+The next phase is about extending the work across more autonomy capabilities and continuing to improve how we develop, evaluate, and deploy these systems. I also participate in a broader research committee across Zoox, which connects this work to technical direction outside my immediate area.
+
+The business value is deliberately practical: the work has to operate on real vehicles, use resources responsibly, improve the quality of the system, and give the organization a credible path to add capability over time. That has changed how I think about technical leadership. Technical depth still matters because I need to understand the constraints well enough to make sound design and evaluation decisions. But the larger leverage comes from turning an uncertain idea into a shared direction, giving a team the context and ownership to execute, and using the results to improve the next decision. The lesson I carry forward is simple: explain why the problem matters, make a concrete bet, understand the tradeoffs, and learn from what reaches production.
 
 One memory from joining Zoox still feels vivid. I was surrounded by incredibly talented people and felt out of place at first. It was classic imposter syndrome. The way through it was not one dramatic breakthrough; it was small wins, one after another. Those wins slowly built confidence. That feeling is common when switching roles, and it is worth recognizing it as part of professional growth, not proof that you do not belong.
 
