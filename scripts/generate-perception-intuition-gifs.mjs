@@ -509,7 +509,7 @@ function dropoutFrame(frame) {
   ];
   const state=states[slot];
   const pulse=0.55+0.45*ping(local);
-  let b=header('06','UNIBEV · METABEV · GRACE-BEV','Missing and degraded sensors require different signals');
+  let b=header('07','UNIBEV · METABEV · GRACE-BEV','Missing and degraded sensors require different signals');
   const cards=[
     {x:34,label:'UNIBEV · AVAILABILITY',accent:C.metric},
     {x:342,label:'METABEV · AVAILABILITY',accent:C.task},
@@ -594,7 +594,7 @@ function multitaskFrame(frame){
   const draw=phase(t,0.06,0.58);
   const settle=phase(t,0.52,0.84);
   const pulse=0.55+0.45*ping(t*1.5);
-  let b=header('07','KENDALL ET AL. · GRADNORM · PCGRAD','Loss scale, training rate, and gradient conflict');
+  let b=header('10','KENDALL ET AL. · GRADNORM · PCGRAD','Loss scale, training rate, and gradient conflict');
   const cards=[
     {x:34,label:'KENDALL · LOSS SCALE',accent:C.camera},
     {x:342,label:'GRADNORM · TRAINING RATE',accent:C.metric},
@@ -658,7 +658,7 @@ function lidarContractFrame(frame){
   const t=cycle(frame);
   const train=phase(t,0.02,0.44);
   const drive=phase(t,0.48,0.86);
-  let b=header('08','BEVDEPTH · SPARSE-TO-DENSE · CRKD','LiDAR can be a label, runtime input, or teacher');
+  let b=header('09','BEVDEPTH · SPARSE-TO-DENSE · CRKD','LiDAR can be a label, runtime input, or teacher');
   const cols=[
     {x:34,label:'BEVDEPTH · DEPTH LABELS',accent:C.camera},
     {x:342,label:'SPARSE-TO-DENSE · INPUT',accent:C.lidar},
@@ -729,7 +729,7 @@ function temporalFrame(frame){
   const carry=phase(t,0.04,0.58);
   const refresh=phase(t,0.55,0.80);
   const pulse=0.55+0.45*ping(t*1.5);
-  let b=header('09','BEVDET4D · SPARSE4D V2 · STREAMPETR','What crosses the frame boundary');
+  let b=header('08','BEVDET4D · SPARSE4D V2 · STREAMPETR','What crosses the frame boundary');
   const cols=[
     {x:34,label:'BEVDET4D · DENSE FIELD',accent:C.camera},
     {x:342,label:'SPARSE4D V2 · INSTANCES',accent:C.metric},
@@ -808,16 +808,128 @@ function temporalFrame(frame){
   return svg(b,'BEVDet4D carries a dense bird eye view field, Sparse4D version 2 transforms prior object instances and adds fresh anchors, and StreamPETR retains a bounded queue of foreground queries while adding fresh queries for new objects.');
 }
 
+function proposalRecallFrame(frame){
+  const t=cycle(frame);
+  const query=phase(t,0.05,0.42);
+  const merge=phase(t,0.32,0.68);
+  const recover=phase(t,0.58,0.84);
+  const pulse=0.55+0.45*ping(t*1.5);
+  let b=header('06','TRANSFUSION · MULTI-PROPOSAL · BEVFUSION','Proposal recall can cap multimodal recovery');
+  const cols=[
+    {x:34,label:'LIDAR-OWNED PROPOSALS',accent:C.lidar},
+    {x:342,label:'MERGE PROPOSALS',accent:C.camera},
+    {x:650,label:'FUSE BEFORE DETECTION',accent:C.metric},
+  ];
+  cols.forEach((c)=>b+=panel(c.x,126,276,342,c.label,c.accent));
+
+  const scene=(x,opacity=1)=>{
+    let out=bevGrid(x+28,174,220,170,opacity,C.grid);
+    out+=path(`M ${x+52} 326 Q ${x+132} 264 ${x+218} 194`,C.camera,4,0.24*opacity);
+    out+=vehicle(x+143,292,C.ink,0.42*opacity,0.34);
+    out+=circle(x+199,216,7,C.camera,0.20*opacity,C.camera,1.4);
+    out+=rect(x+184,202,30,19,C.camera,5,0.06*opacity,C.camera,1);
+    return out;
+  };
+
+  // A LiDAR-controlled proposal stage cannot query camera evidence for an actor LiDAR missed.
+  b+=scene(34,0.9);
+  [[96,270],[126,251],[165,278],[208,238]].forEach(([x,y])=>b+=circle(x,y,4,C.lidar,0.25+0.65*query,C.lidar,1));
+  b+=circle(233,211,20,C.lidar,0.04+0.10*query,C.lidar,1.2);
+  b+=text('camera sees actor',172,372,11,C.camera,'middle',600);
+  b+=text('no LiDAR proposal',172,393,11,C.danger,'middle',600);
+  b+=arrow(172,406,172,431,C.danger,1.7,0.35+0.55*query);
+  b+=text('fusion cannot query it',172,451,12,C.ink,'middle',600);
+
+  // Letting each modality propose removes the single-modality recall ceiling, but introduces matching work.
+  b+=scene(342,0.82);
+  b+=circle(541,216,22,C.camera,0.04+0.12*merge,C.camera,1.5);
+  b+=circle(541,216,15,C.lidar,0.04+0.12*merge,C.lidar,1.5);
+  b+=text('camera + LiDAR',480,371,11,C.metric,'middle',600);
+  b+=text('duplicate hypotheses',480,393,11,C.danger,'middle',600);
+  b+=arrow(480,406,480,431,C.metric,1.7,0.35+0.55*merge);
+  b+=text('merge, match, deduplicate',480,451,12,C.ink,'middle',600);
+
+  // Shared BEV fuses both modalities before the task head, preserving a recovery path.
+  b+=bevGrid(678,174,220,70,0.88,C.camera);
+  b+=text('camera BEV',788,265,11,C.camera,'middle',600);
+  b+=bevGrid(678,275,220,70,0.88,C.lidar);
+  b+=text('LiDAR BEV',788,366,11,C.lidar,'middle',600);
+  b+=arrow(788,247,788,270,C.camera,1.7,0.35+0.55*recover);
+  b+=arrow(788,348,788,372,C.lidar,1.7,0.35+0.55*recover);
+  b+=bevGrid(678,382,220,50,0.92,C.metric);
+  b+=rect(810,399,34,20,C.camera,5,0.08+0.16*recover,C.camera,1.2);
+  b+=circle(827,409,23,C.metric,0.04+0.10*pulse,C.metric,1.2);
+  b+=text('shared BEV recovers actor evidence',788,451,12,C.ink,'middle',600);
+  b+=text('proposal recall is a ceiling; fusion location decides whether recovery remains possible.',480,500,13,C.metric,'middle',600);
+  return svg(b,'Proposal-conditioned fusion can inherit a LiDAR proposal recall ceiling. Merging proposals from multiple modalities removes that single-modality bottleneck but requires matching and deduplication, while shared BEV fusion preserves both modality fields before detection.');
+}
+
+function latentMemoryFrame(frame){
+  const t=cycle(frame);
+  const carry=phase(t,0.05,0.72);
+  let b=header('11','DENSE BEV · QUERIES · LATENTS · POOLING','What survives world-state compression');
+  const cols=[
+    {x:18,label:'DENSE BEV',accent:C.metric},
+    {x:254,label:'SPARSE QUERIES',accent:C.task},
+    {x:490,label:'LEARNED LATENTS',accent:C.camera},
+    {x:726,label:'ONE EMBEDDING',accent:C.danger},
+  ];
+  cols.forEach((c)=>b+=panel(c.x,126,216,342,c.label,c.accent));
+
+  // Keep the same scene across all four cards so the changing variable is compression, not input.
+  b+=bevGrid(34,178,184,150,1,C.metric);
+  b+=path('M 48 304 Q 111 251 202 194',C.camera,4,0.32);
+  b+=vehicle(112,267,C.ink,0.72,0.30);
+  b+=circle(71,232,7,C.camera,0.85,C.camera,1.2);
+  b+=circle(174,214,6,C.radar,0.85,C.radar,1.2);
+  b+=rect(142,246,26,18,C.lidar,5,0.10+0.14*carry,C.lidar,1);
+  b+=text('every cell can persist',126,366,11,C.metric,'middle',600);
+  b+=text('rich spatial context · expensive',126,389,10,C.muted,'middle',500);
+
+  b+=bevGrid(270,178,184,150,0.32,C.task);
+  b+=circle(314,244,15,C.task,0.07+0.12*carry,C.task,1.5);
+  b+=circle(384,216,15,C.task,0.07+0.12*carry,C.task,1.5);
+  b+=circle(416,286,15,C.task,0.07+0.12*carry,C.task,1.5);
+  b+=text('selected actors persist',362,366,11,C.task,'middle',600);
+  b+=text('cheap · query-dependent',362,389,10,C.muted,'middle',500);
+
+  b+=bevGrid(506,178,184,150,0.24,C.camera);
+  const tokens=[[540,221],[584,245],[628,212],[548,286],[603,302],[650,274]];
+  tokens.forEach(([x,y],i)=>{
+    const opacity=0.20+0.72*carry;
+    if(i>0)b+=line(tokens[i-1][0],tokens[i-1][1],x,y,C.camera,1.2,0.18+0.36*carry);
+    b+=circle(x,y,10,C.camera,0.06+0.14*carry,C.camera,1.5);
+    b+=circle(x,y,3,C.camera,opacity);
+  });
+  b+=text('learned tokens carry useful state',598,366,11,C.camera,'middle',600);
+  b+=text('compact · spatial roles emerge',598,389,10,C.muted,'middle',500);
+
+  b+=bevGrid(742,178,184,150,0.08,C.danger);
+  b+=circle(834,252,42,C.danger,0.06+0.10*carry,C.danger,1.5);
+  b+=circle(834,252,15,C.danger,0.12+0.28*carry);
+  [[783,216,C.camera],[886,216,C.lidar],[788,293,C.radar],[884,292,C.metric]].forEach(([x,y,c])=>{
+    b+=circle(x,y,5,c,0.14+0.26*carry,c,1);
+    b+=line(x,y,834,252,c,1,0.10+0.30*carry,'4 5');
+  });
+  b+=text('spatial separation collapses',834,366,11,C.danger,'middle',600);
+  b+=text('cheap · poor for precise placement',834,389,10,C.muted,'middle',500);
+
+  b+=text('same scene, increasingly aggressive information bottlenecks',480,500,13,C.metric,'middle',600);
+  return svg(b,'A compression ladder keeps the same driving scene while moving from a dense BEV field to sparse object queries, a compact set of learned latent tokens, and finally one pooled embedding that loses explicit spatial separation.');
+}
+
 const animations = [
   ['autonomous-perception-vision-encoder.gif', visionFrame],
   ['autonomous-perception-lidar-encoder.gif', lidarFrame],
   ['autonomous-perception-radar-encoder.gif', radarFrame],
   ['autonomous-perception-camera-lifting.gif', liftingFrame],
   ['autonomous-perception-fusion-granularity.gif', fusionFrame],
+  ['autonomous-perception-proposal-recall.gif', proposalRecallFrame],
   ['autonomous-perception-modality-dropout.gif', dropoutFrame],
   ['autonomous-perception-multitask-gradients.gif', multitaskFrame],
   ['autonomous-perception-lidar-training-contracts.gif', lidarContractFrame],
   ['autonomous-perception-temporal-memory.gif', temporalFrame],
+  ['autonomous-perception-latent-memory.gif', latentMemoryFrame],
 ];
 
 async function renderAnimation(filename, renderer) {
