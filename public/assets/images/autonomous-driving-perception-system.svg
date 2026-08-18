@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="820" viewBox="0 0 1600 820" role="img" aria-labelledby="title desc">
   <title id="title">Autonomous-driving perception pipeline</title>
-  <desc id="desc">Camera, LiDAR, and radar retain sensor-specific measurements through separate encoders. Calibrated geometry converts them into dense bird's-eye-view fields or sparse object queries. Temporal state carries dense scene context or selected actors into task-specific heads. LiDAR labels, teacher models, and future frames appear only in the training graph.</desc>
+  <desc id="desc">Camera, LiDAR, and radar retain sensor-specific measurements through separate encoders. Calibrated geometry converts them into dense bird's-eye-view fields, sparse object queries, or compact learned latent tokens. Temporal state carries dense scene context, selected actors, or compressed world state into task-specific heads. LiDAR labels, teacher models, and future frames appear only in the training graph.</desc>
   <defs>
     <radialGradient id="bg" cx="52%" cy="0%" r="96%"><stop offset="0%" stop-color="#173248"/><stop offset="54%" stop-color="#081019"/><stop offset="100%" stop-color="#050a10"/></radialGradient>
     <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#142737"/><stop offset="55%" stop-color="#0e1c28"/><stop offset="100%" stop-color="#09131d"/></linearGradient>
@@ -56,27 +56,32 @@
 
   <!-- Colored sensor flows into encoders and geometry -->
   <path d="M250 290H298" class="flow cam" marker-end="url(#arrow-camera)"/><path d="M250 426H298" class="flow lidar" marker-end="url(#arrow-lidar)"/><path d="M250 562H298" class="flow radar" marker-end="url(#arrow-radar)"/>
-  <path d="M562 290H604V350H630" class="flow cam" marker-end="url(#arrow-camera)"/><path d="M562 426H630" class="flow lidar" marker-end="url(#arrow-lidar)"/><path d="M562 562H604V502H630" class="flow radar" marker-end="url(#arrow-radar)"/>
+  <path d="M562 290H604V340H630" class="flow cam" marker-end="url(#arrow-camera)"/><path d="M562 426H630" class="flow lidar" marker-end="url(#arrow-lidar)"/><path d="M562 562H604V544H630" class="flow radar" marker-end="url(#arrow-radar)"/>
 
   <!-- Metric representation -->
   <g filter="url(#shadow)"><rect x="630" y="234" width="330" height="384" rx="20" class="node metric"/></g>
   <text x="656" y="270" class="micro" fill="#78e0a5">CALIBRATED 3D INTERFACE</text>
-  <rect x="656" y="298" width="278" height="132" rx="15" class="chip metric"/>
-  <rect x="678" y="323" width="96" height="82" rx="8" fill="url(#bev)" stroke="#78e0a5" stroke-width="1.2"/><path d="M692 392Q722 352 760 333" fill="none" stroke="#58d8ff" stroke-width="4" opacity=".35"/><rect x="723" y="355" width="28" height="18" rx="4" fill="#ffc15a" opacity=".72"/>
-  <text x="802" y="349" class="label">Dense BEV</text><text x="802" y="375" class="small">roads · free space</text><text x="802" y="397" class="small">occupancy · maps</text>
-  <rect x="656" y="454" width="278" height="132" rx="15" class="chip metric"/>
-  <g transform="translate(686 487)" fill="none" stroke="#78e0a5" stroke-width="2"><path d="M6 8 54 23 21 68 80 74"/><circle cx="6" cy="8" r="7" fill="#0c1622"/><circle cx="54" cy="23" r="7" fill="#0c1622"/><circle cx="21" cy="68" r="7" fill="#0c1622"/><circle cx="80" cy="74" r="7" fill="#0c1622"/></g>
-  <text x="802" y="505" class="label">Sparse queries</text><text x="802" y="531" class="small">actors · tracks</text><text x="802" y="553" class="small">vector map elements</text>
+  <rect x="656" y="292" width="278" height="92" rx="15" class="chip metric"/>
+  <rect x="678" y="310" width="84" height="58" rx="8" fill="url(#bev)" stroke="#78e0a5" stroke-width="1.2"/><path d="M690 357Q718 331 752 319" fill="none" stroke="#58d8ff" stroke-width="4" opacity=".35"/><rect x="720" y="334" width="24" height="15" rx="4" fill="#ffc15a" opacity=".72"/>
+  <text x="790" y="328" class="label">Dense BEV</text><text x="790" y="350" class="small">roads · free space</text><text x="790" y="370" class="small">occupancy · maps</text>
+  <rect x="656" y="396" width="278" height="92" rx="15" class="chip metric"/>
+  <g transform="translate(684 417)" fill="none" stroke="#78e0a5" stroke-width="2"><path d="M6 8 46 20 18 54 66 60"/><circle cx="6" cy="8" r="6" fill="#0c1622"/><circle cx="46" cy="20" r="6" fill="#0c1622"/><circle cx="18" cy="54" r="6" fill="#0c1622"/><circle cx="66" cy="60" r="6" fill="#0c1622"/></g>
+  <text x="790" y="432" class="label">Sparse queries</text><text x="790" y="454" class="small">actors · tracks</text><text x="790" y="474" class="small">map elements</text>
+  <rect x="656" y="500" width="278" height="92" rx="15" class="chip metric"/>
+  <g transform="translate(684 526)" fill="none" stroke="#b19aff" stroke-width="2"><circle cx="14" cy="20" r="9" fill="#0c1622"/><circle cx="52" cy="8" r="9" fill="#0c1622"/><circle cx="70" cy="42" r="9" fill="#0c1622"/><path d="M22 17 43 11M54 16 65 34M22 26 62 40"/></g>
+  <text x="790" y="536" class="label">Latent tokens</text><text x="790" y="558" class="small">compressed world state</text><text x="790" y="578" class="small">learned information bottleneck</text>
   <text x="795" y="608" class="small" text-anchor="middle">carrier determines what can survive fusion</text>
 
   <!-- Temporal state -->
   <g filter="url(#shadow)"><rect x="1018" y="234" width="242" height="384" rx="20" class="node task"/></g>
   <text x="1044" y="270" class="micro" fill="#b19aff">FRAME-TO-FRAME STATE</text>
-  <rect x="1044" y="298" width="190" height="132" rx="15" class="chip task"/><text x="1066" y="332" class="label">Dense recurrence</text><text x="1066" y="358" class="small">warp or attend</text><text x="1066" y="380" class="small">the full BEV field</text>
-  <g transform="translate(1164 383)"><rect x="0" y="0" width="45" height="28" rx="5" fill="url(#bev)" stroke="#58d8ff"/><rect x="-18" y="-10" width="45" height="28" rx="5" fill="url(#bev)" stroke="#58d8ff" opacity=".55"/></g>
-  <rect x="1044" y="454" width="190" height="132" rx="15" class="chip task"/><text x="1066" y="488" class="label">Sparse recurrence</text><text x="1066" y="514" class="small">transform, retain,</text><text x="1066" y="536" class="small">birth, and age queries</text>
-  <g transform="translate(1165 548)" fill="none" stroke="#b19aff" stroke-width="2"><circle cx="0" cy="0" r="6"/><circle cx="30" cy="-12" r="6"/><circle cx="54" cy="7" r="6"/><path d="M6-2 24-10M36-9 48 4"/></g>
-  <path d="M960 364H990V364H1018" class="flow metric" marker-end="url(#arrow-metric)"/><path d="M960 520H990V520H1018" class="flow metric" marker-end="url(#arrow-metric)"/>
+  <rect x="1044" y="292" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="320" class="label">Dense recurrence</text><text x="1066" y="344" class="small">warp or attend</text><text x="1066" y="364" class="small">the full BEV field</text>
+  <g transform="translate(1164 372)"><rect x="0" y="0" width="39" height="24" rx="5" fill="url(#bev)" stroke="#58d8ff"/><rect x="-15" y="-9" width="39" height="24" rx="5" fill="url(#bev)" stroke="#58d8ff" opacity=".55"/></g>
+  <rect x="1044" y="396" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="424" class="label">Sparse recurrence</text><text x="1066" y="448" class="small">transform, retain,</text><text x="1066" y="468" class="small">birth, and age queries</text>
+  <g transform="translate(1165 472)" fill="none" stroke="#b19aff" stroke-width="2"><circle cx="0" cy="0" r="5"/><circle cx="26" cy="-10" r="5"/><circle cx="48" cy="6" r="5"/><path d="M5-2 21-8M31-8 43 3"/></g>
+  <rect x="1044" y="500" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="528" class="label">Latent recurrence</text><text x="1066" y="552" class="small">compress, carry,</text><text x="1066" y="572" class="small">and refresh useful state</text>
+  <g transform="translate(1165 575)" fill="none" stroke="#78e0a5" stroke-width="2"><circle cx="0" cy="0" r="5"/><circle cx="25" cy="-8" r="5"/><circle cx="48" cy="4" r="5"/><path d="M5-2 20-7M30-7 43 2"/></g>
+  <path d="M960 338H990V338H1018" class="flow metric" marker-end="url(#arrow-metric)"/><path d="M960 442H990V442H1018" class="flow metric" marker-end="url(#arrow-metric)"/><path d="M960 546H990V546H1018" class="flow metric" marker-end="url(#arrow-metric)"/>
 
   <!-- Task heads -->
   <g filter="url(#shadow)"><rect x="1325" y="234" width="217" height="384" rx="20" class="node task"/></g>
@@ -88,7 +93,7 @@
     <rect x="1350" y="502" width="166" height="52" rx="14" class="chip radar"/><circle cx="1376" cy="528" r="7" fill="#ff6fae"/><text x="1395" y="535" class="label">Velocity</text>
     <rect x="1350" y="570" width="166" height="52" rx="14" class="chip task"/><circle cx="1376" cy="596" r="7" fill="#b19aff"/><text x="1395" y="603" class="label">Planning</text>
   </g>
-  <path d="M1260 364H1290V324H1325" class="flow task" marker-end="url(#arrow-task)"/><path d="M1260 520H1290V528H1325" class="flow task" marker-end="url(#arrow-task)"/>
+  <path d="M1260 338H1290V324H1325" class="flow task" marker-end="url(#arrow-task)"/><path d="M1260 442H1290V460H1325" class="flow task" marker-end="url(#arrow-task)"/><path d="M1260 546H1290V596H1325" class="flow task" marker-end="url(#arrow-task)"/>
 
   <!-- Training-only graph -->
   <line x1="58" y1="674" x2="1542" y2="674" stroke="#26394a" stroke-width="1.2"/>
