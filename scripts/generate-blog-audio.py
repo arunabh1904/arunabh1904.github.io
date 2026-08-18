@@ -13,7 +13,9 @@ Usage:
 
 The model is loaded once per invocation. Existing files whose source hash and
 voice settings are unchanged are skipped, so the command is safe to rerun
-after adding or editing posts.
+after adding or editing posts. The fixed synthetic ICL reference anchors one
+narrator; low-temperature sampling with a stable per-chunk seed keeps runs
+reproducible without relying on greedy decoding's unreliable long-form stop.
 """
 
 from __future__ import annotations
@@ -49,11 +51,12 @@ REFERENCE_TEXT = (
     "I will guide you through technical ideas with calm confidence. "
     "The delivery is warm, clear, and measured."
 )
-TEMPERATURE = 0.25
-TOP_P = 0.85
+TEMPERATURE = 0.05
+TOP_P = 0.9
+SAMPLING_SEED_VERSION = "per-post-chunk-v1"
 SPEED = 1.0
 BITRATE = "64k"
-MAX_CHARS = 360
+MAX_CHARS = 360  # Proven reliable bound; low-temperature seeded sampling prevents drift.
 SILENCE_THRESHOLD = 0.008  # -42 dBFS; matches the verification threshold below.
 BOUNDARY_SILENCE_SAMPLES = 1_200  # Retain 50 ms at 24 kHz, without a synthetic gap.
 LONG_SILENCE_DURATION = 0.8
@@ -65,7 +68,7 @@ SILENCE_FILTER = (
     f"stop_periods=-1:stop_duration={LONG_SILENCE_DURATION}:"
     f"stop_threshold={SILENCE_THRESHOLD}:stop_silence={RETAINED_SILENCE_DURATION}"
 )
-EXTRACTION_VERSION = "markdown-prose-v4"
+EXTRACTION_VERSION = "markdown-prose-v5-narration"
 DEFAULT_BATCH_SIZE = 1
 MIN_GENERATION_TOKENS = 128
 MAX_TOKENS_PER_CHAR = 1.05
@@ -208,6 +211,22 @@ def clean_markdown(source: str) -> str:
     return re.sub(r"\.{2,}", ".", text).strip()
 
 
+def shape_narration(text: str) -> str:
+    """Add restrained, content-led delivery cues without changing visible prose."""
+
+    # Qwen3-TTS Base has no reliable SSML-style emphasis channel. These cues
+    # mark real argument turns without adding claims, caps, or fake intensity.
+    text = re.sub(r"\b(But|However|Instead|Yet|Still),?\s+", r"\1 — ", text)
+    text = re.sub(
+        r"\b(The point|The result|The consequence|The lesson|The trade-off) is\b",
+        r"\1 is:",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(r"\b(That means|In practice|Put differently),?\s+", r"\1 — ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def split_for_tts(text: str, max_chars: int = MAX_CHARS) -> list[str]:
     """Split on sentence/paragraph boundaries while keeping model inputs bounded."""
 
@@ -258,7 +277,7 @@ def discover_posts() -> list[dict[str, Any]]:
         title = frontmatter.get("title", path.stem)
         if not post_slug:
             raise ValueError(f"Blog post is missing postSlug: {path}")
-        text = clean_markdown(source)
+        text = shape_narration(clean_markdown(source))
         digest = hashlib.sha256(
             json.dumps(
                 {
@@ -272,6 +291,7 @@ def discover_posts() -> list[dict[str, Any]]:
                     "reference_text": REFERENCE_TEXT,
                     "temperature": TEMPERATURE,
                     "top_p": TOP_P,
+                    "sampling_seed_version": SAMPLING_SEED_VERSION,
                     "speed": SPEED,
                     "bitrate": BITRATE,
                     "max_chars": MAX_CHARS,
@@ -336,6 +356,15 @@ def trim_boundary_silence(audio: Any) -> Any:
     return samples[start:end]
 
 
+def seed_chunk_generation(post_slug: str, chunk_index: int) -> None:
+    """Make low-temperature sampling reproducible without forcing greedy EOS behavior."""
+
+    import mlx.core as mx
+
+    digest = hashlib.sha256(f"{post_slug}:{chunk_index}".encode("utf-8")).digest()
+    mx.random.seed(int.from_bytes(digest[:4], byteorder="big"))
+
+
 def generate_post(
     model: Any,
     post: dict[str, Any],
@@ -358,6 +387,7 @@ def generate_post(
                 chunk_batch = chunks[batch_start : batch_start + batch_size]
                 results_by_index: dict[int, tuple[Any, int]] = {}
                 if len(chunk_batch) == 1:
+                    seed_chunk_generation(post["slug"], batch_start)
                     max_tokens = max(
                         MIN_GENERATION_TOKENS,
                         math.ceil(len(chunk_batch[0]) * MAX_TOKENS_PER_CHAR),
@@ -530,6 +560,7 @@ def main() -> int:
                 "reference_text": REFERENCE_TEXT,
                 "temperature": TEMPERATURE,
                 "top_p": TOP_P,
+                "sampling_seed_version": SAMPLING_SEED_VERSION,
                 "speed": SPEED,
                 "bitrate": BITRATE,
                 "max_chars": MAX_CHARS,
