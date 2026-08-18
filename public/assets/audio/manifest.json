@@ -185,7 +185,7 @@
   "open-weight-models-that-fit-on-a-64-gb-macbook-pro": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "a35daa2c0d7087eeb971105788da31be09ec6e920edc52362d6b72e0c18d077c",
+    "digest": "22b45dfec047c29aba820a29be2fe8212233c13afe66483500ac6f0b33d1ab56",
     "file": "/assets/audio/blog/open-weight-models-that-fit-on-a-64-gb-macbook-pro.mp3",
     "language": "English",
     "language_code": "english",
@@ -197,10 +197,11 @@
     "reference_audio_sha256": "d27f040b15d4056af5f2e5ba5461fad0fdc094ddbca09440e8f43cf9a817047a",
     "reference_text": "I will guide you through technical ideas with calm confidence. The delivery is warm, clear, and measured.",
     "retained_silence_duration": 0.09,
+    "sampling_seed_version": "per-post-chunk-v1",
     "silence_threshold": 0.008,
     "speed": 1.0,
-    "temperature": 0.25,
-    "top_p": 0.85,
+    "temperature": 0.05,
+    "top_p": 0.9,
     "voice": "synthetic-clean-warm-icl",
     "voice_mode": "in-context-learning"
   },
