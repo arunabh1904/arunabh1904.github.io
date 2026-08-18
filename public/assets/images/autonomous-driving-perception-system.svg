@@ -47,11 +47,11 @@
   <g filter="url(#shadow)">
     <rect x="298" y="234" width="264" height="112" rx="18" class="node cam"/><rect x="298" y="370" width="264" height="112" rx="18" class="node lidar"/><rect x="298" y="506" width="264" height="112" rx="18" class="node radar"/>
   </g>
-  <text x="322" y="268" class="micro" fill="#58d8ff">CAMERA BACKBONE</text><text x="322" y="300" class="label">Multiscale image features</text><text x="322" y="325" class="small">shared weights; view-specific geometry</text>
+  <text x="322" y="268" class="micro" fill="#58d8ff">CAMERA BACKBONE</text><text x="322" y="300" class="label">Multiscale image features</text><text x="322" y="325" class="small">calibrated views</text>
   <g transform="translate(496 260)" fill="none" stroke="#58d8ff"><rect width="42" height="54" rx="5" opacity=".45"/><rect x="-10" y="8" width="42" height="54" rx="5" opacity=".7"/><rect x="-20" y="16" width="42" height="54" rx="5"/></g>
   <text x="322" y="404" class="micro" fill="#ffc15a">LIDAR BACKBONE</text><text x="322" y="436" class="label">Sparse occupied voxels</text><text x="322" y="461" class="small">densify early, late, or never</text>
   <g transform="translate(492 399)" fill="#ffc15a"><rect width="13" height="13" opacity=".9"/><rect x="23" y="8" width="13" height="13" opacity=".6"/><rect x="46" y="0" width="13" height="13"/><rect x="8" y="31" width="13" height="13" opacity=".5"/><rect x="38" y="38" width="13" height="13" opacity=".8"/></g>
-  <text x="322" y="540" class="micro" fill="#ff6fae">RADAR BACKBONE</text><text x="322" y="572" class="label">Returns, proposals, or BEV</text><text x="322" y="597" class="small">preserve Doppler before fusion</text>
+  <text x="322" y="540" class="micro" fill="#ff6fae">RADAR BACKBONE</text><text x="322" y="572" class="label">Returns + Doppler</text><text x="322" y="597" class="small">before fusion</text>
   <g transform="translate(493 540)" fill="none" stroke="#ff6fae" stroke-width="2"><circle cx="16" cy="35" r="5" fill="#ff6fae"/><path d="M16 35 54 13M16 35 62 35M16 35 52 55"/><circle cx="54" cy="13" r="4"/><circle cx="62" cy="35" r="4"/><circle cx="52" cy="55" r="4"/></g>
 
   <!-- Colored sensor flows into encoders and geometry -->
@@ -69,17 +69,17 @@
   <text x="790" y="432" class="label">Sparse queries</text><text x="790" y="454" class="small">actors · tracks</text><text x="790" y="474" class="small">map elements</text>
   <rect x="656" y="500" width="278" height="92" rx="15" class="chip metric"/>
   <g transform="translate(684 526)" fill="none" stroke="#b19aff" stroke-width="2"><circle cx="14" cy="20" r="9" fill="#0c1622"/><circle cx="52" cy="8" r="9" fill="#0c1622"/><circle cx="70" cy="42" r="9" fill="#0c1622"/><path d="M22 17 43 11M54 16 65 34M22 26 62 40"/></g>
-  <text x="790" y="536" class="label">Latent tokens</text><text x="790" y="558" class="small">compressed world state</text><text x="790" y="578" class="small">learned bottleneck</text>
-  <text x="795" y="608" class="small" text-anchor="middle">carrier determines what can survive fusion</text>
+  <text x="790" y="536" class="label">Latent tokens</text><text x="790" y="558" class="small">compressed state</text><text x="790" y="578" class="small">learned bottleneck</text>
+  <text x="795" y="608" class="small" text-anchor="middle">carrier sets surviving evidence</text>
 
   <!-- Temporal state -->
   <g filter="url(#shadow)"><rect x="1018" y="234" width="242" height="384" rx="20" class="node task"/></g>
   <text x="1044" y="270" class="micro" fill="#b19aff">FRAME-TO-FRAME STATE</text>
-  <rect x="1044" y="292" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="320" class="label">Dense recurrence</text><text x="1066" y="344" class="small">warp or attend</text><text x="1066" y="364" class="small">the full BEV field</text>
+  <rect x="1044" y="292" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="320" class="label">Dense recurrence</text><text x="1066" y="344" class="small">warp or attend</text><text x="1066" y="364" class="small">BEV state</text>
   <g transform="translate(1164 372)"><rect x="0" y="0" width="39" height="24" rx="5" fill="url(#bev)" stroke="#58d8ff"/><rect x="-15" y="-9" width="39" height="24" rx="5" fill="url(#bev)" stroke="#58d8ff" opacity=".55"/></g>
-  <rect x="1044" y="396" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="424" class="label">Sparse recurrence</text><text x="1066" y="448" class="small">transform, retain,</text><text x="1066" y="468" class="small">birth, age queries</text>
+  <rect x="1044" y="396" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="424" class="label">Sparse recurrence</text><text x="1066" y="448" class="small">keep queries</text><text x="1066" y="468" class="small">birth, age</text>
   <g transform="translate(1165 472)" fill="none" stroke="#b19aff" stroke-width="2"><circle cx="0" cy="0" r="5"/><circle cx="26" cy="-10" r="5"/><circle cx="48" cy="6" r="5"/><path d="M5-2 21-8M31-8 43 3"/></g>
-  <rect x="1044" y="500" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="528" class="label">Latent recurrence</text><text x="1066" y="552" class="small">compress, carry,</text><text x="1066" y="572" class="small">and refresh useful state</text>
+  <rect x="1044" y="500" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="528" class="label">Latent recurrence</text><text x="1066" y="552" class="small">compress, carry</text><text x="1066" y="572" class="small">refresh state</text>
   <g transform="translate(1165 575)" fill="none" stroke="#78e0a5" stroke-width="2"><circle cx="0" cy="0" r="5"/><circle cx="25" cy="-8" r="5"/><circle cx="48" cy="4" r="5"/><path d="M5-2 20-7M30-7 43 2"/></g>
   <path d="M960 338H990V338H1018" class="flow metric" marker-end="url(#arrow-metric)"/><path d="M960 442H990V442H1018" class="flow metric" marker-end="url(#arrow-metric)"/><path d="M960 546H990V546H1018" class="flow metric" marker-end="url(#arrow-metric)"/>
 
