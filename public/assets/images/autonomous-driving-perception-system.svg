@@ -69,7 +69,7 @@
   <text x="790" y="432" class="label">Sparse queries</text><text x="790" y="454" class="small">actors · tracks</text><text x="790" y="474" class="small">map elements</text>
   <rect x="656" y="500" width="278" height="92" rx="15" class="chip metric"/>
   <g transform="translate(684 526)" fill="none" stroke="#b19aff" stroke-width="2"><circle cx="14" cy="20" r="9" fill="#0c1622"/><circle cx="52" cy="8" r="9" fill="#0c1622"/><circle cx="70" cy="42" r="9" fill="#0c1622"/><path d="M22 17 43 11M54 16 65 34M22 26 62 40"/></g>
-  <text x="790" y="536" class="label">Latent tokens</text><text x="790" y="558" class="small">compressed world state</text><text x="790" y="578" class="small">learned information bottleneck</text>
+  <text x="790" y="536" class="label">Latent tokens</text><text x="790" y="558" class="small">compressed world state</text><text x="790" y="578" class="small">learned bottleneck</text>
   <text x="795" y="608" class="small" text-anchor="middle">carrier determines what can survive fusion</text>
 
   <!-- Temporal state -->
@@ -77,7 +77,7 @@
   <text x="1044" y="270" class="micro" fill="#b19aff">FRAME-TO-FRAME STATE</text>
   <rect x="1044" y="292" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="320" class="label">Dense recurrence</text><text x="1066" y="344" class="small">warp or attend</text><text x="1066" y="364" class="small">the full BEV field</text>
   <g transform="translate(1164 372)"><rect x="0" y="0" width="39" height="24" rx="5" fill="url(#bev)" stroke="#58d8ff"/><rect x="-15" y="-9" width="39" height="24" rx="5" fill="url(#bev)" stroke="#58d8ff" opacity=".55"/></g>
-  <rect x="1044" y="396" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="424" class="label">Sparse recurrence</text><text x="1066" y="448" class="small">transform, retain,</text><text x="1066" y="468" class="small">birth, and age queries</text>
+  <rect x="1044" y="396" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="424" class="label">Sparse recurrence</text><text x="1066" y="448" class="small">transform, retain,</text><text x="1066" y="468" class="small">birth, age queries</text>
   <g transform="translate(1165 472)" fill="none" stroke="#b19aff" stroke-width="2"><circle cx="0" cy="0" r="5"/><circle cx="26" cy="-10" r="5"/><circle cx="48" cy="6" r="5"/><path d="M5-2 21-8M31-8 43 3"/></g>
   <rect x="1044" y="500" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="528" class="label">Latent recurrence</text><text x="1066" y="552" class="small">compress, carry,</text><text x="1066" y="572" class="small">and refresh useful state</text>
   <g transform="translate(1165 575)" fill="none" stroke="#78e0a5" stroke-width="2"><circle cx="0" cy="0" r="5"/><circle cx="25" cy="-8" r="5"/><circle cx="48" cy="4" r="5"/><path d="M5-2 20-7M30-7 43 2"/></g>
