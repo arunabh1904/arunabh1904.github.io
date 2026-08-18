@@ -118,11 +118,11 @@ DEKA opened the door to my dream job. The projects taught me technical skills, b
 
 ## Zoox
 
-Joining Zoox realized a long-held goal: working on autonomous driving. I am now a technical lead on the Perception team, where I lead a broader initiative to make our autonomy systems more capable and efficient. I also had imposter syndrome when I moved into the role: I was surrounded by talented people and initially felt out of place. The way through it was small wins—understanding the system, making sound technical decisions, and helping the team ship. The work has to improve a system that runs on real vehicles, so technical quality and production usefulness are inseparable.
+Joining Zoox realized a long-held goal: working on autonomous driving. I am now a technical lead on the Perception team, where I lead a broader initiative to make our autonomy systems more capable and efficient. But I also had imposter syndrome when I moved into the role. I was surrounded by incredibly talented people and felt out of place at first. The way through it was not one dramatic breakthrough; it was small wins—understanding the system, making good technical decisions, and helping the team ship. The work has to improve a system that runs on real vehicles, so technical quality and production usefulness are inseparable.
 
-The initiative began as a small side project that I prototyped around the middle of last year. Once we had evidence that the approach could work, it grew into a dedicated team and roadmap; we shipped the result earlier this year.
+One part of that work I am particularly proud of is where it began. Around the middle of last year, I started prototyping the idea as a small side project. At first, it was simply something I wanted to test. Once we had enough evidence that the approach could work, the project grew into a dedicated team and roadmap. Over the last couple of quarters, we turned it into a production improvement that made the system more efficient while improving quality, and we shipped the result earlier this year.
 
-Moving from an IC role back into technical leadership was intentional. By then, I had enough experience to contribute to the hard technical decisions while also setting direction, clarifying tradeoffs, and helping a team execute. I also participate in a broader research committee across Zoox, which gives me exposure to technical direction outside my immediate area.
+That transition—from a side project to a team—also changed my role. Moving from an IC role back into technical leadership was intentional. By then, I had enough experience under my belt to be useful in both modes: I could go deep on the hard technical decisions, but I could also set direction, explain tradeoffs, and help other people execute. I also participate in a broader research committee across Zoox, which gives me exposure to technical direction outside my immediate area.
 
 ## Looking Back
 
