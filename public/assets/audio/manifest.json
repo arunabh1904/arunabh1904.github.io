@@ -116,7 +116,7 @@
   "how-unified-sensor-models-are-built-for-autonomous-driving": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "b133fb4cbf35dae7bc7462f39b609728fbd384a72c996f5a238dffcc8a2e6f74",
+    "digest": "31531acb711ce53143b5f55b260645ae4d56e443906c41c8dacc0138bcc472d9",
     "file": "/assets/audio/blog/how-unified-sensor-models-are-built-for-autonomous-driving.mp3",
     "language": "English",
     "language_code": "english",
@@ -128,10 +128,11 @@
     "reference_audio_sha256": "d27f040b15d4056af5f2e5ba5461fad0fdc094ddbca09440e8f43cf9a817047a",
     "reference_text": "I will guide you through technical ideas with calm confidence. The delivery is warm, clear, and measured.",
     "retained_silence_duration": 0.09,
+    "sampling_seed_version": "per-post-chunk-v1",
     "silence_threshold": 0.008,
     "speed": 1.0,
-    "temperature": 0.25,
-    "top_p": 0.85,
+    "temperature": 0.05,
+    "top_p": 0.9,
     "voice": "synthetic-clean-warm-icl",
     "voice_mode": "in-context-learning"
   },

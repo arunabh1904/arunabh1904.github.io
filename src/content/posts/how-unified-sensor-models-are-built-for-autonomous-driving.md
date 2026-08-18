@@ -20,15 +20,7 @@ An autonomous vehicle receives several partial descriptions of the same scene. C
 
 The central architectural question is therefore not simply how to combine sensors. It is where to preserve their differences, where to establish a shared geometric representation, and where to spend the information that the model can no longer recover. The progression in this article follows that dependency:
 
-<aside class="revision-insight" aria-label="The autonomous-driving perception pipeline">
-  <header class="revision-insight__header">
-    <div class="revision-insight__badge" aria-hidden="true">→</div>
-    <h3 class="revision-insight__title">The progression to keep in mind</h3>
-  </header>
-  <div class="revision-insight__content">
-    <p><strong>sensor-specific encoders → metric 3D representation → temporal state → task heads</strong></p>
-  </div>
-</aside>
+sensor-specific encoders → metric 3D representation → temporal state → task heads
 
 Fusion sits between the second and third steps. The model should preserve modality-specific evidence first, align it in the vehicle frame, and only then decide whether the shared state should be a dense scene field, a sparse set of object queries, or a learned mixture of both.
 
