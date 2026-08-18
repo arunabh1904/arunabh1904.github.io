@@ -27,14 +27,14 @@
   <line x1="58" y1="168" x2="1542" y2="168" stroke="#26394a" stroke-width="1.2"/>
 
   <text x="58" y="205" class="kicker">SENSORS</text>
-  <text x="298" y="205" class="kicker">SENSOR ENCODERS</text>
+  <text x="310" y="205" class="kicker">SENSOR ENCODERS</text>
   <text x="630" y="205" class="kicker">METRIC REPRESENTATION</text>
   <text x="1018" y="205" class="kicker">TEMPORAL STATE</text>
   <text x="1325" y="205" class="kicker">TASK HEADS</text>
 
   <!-- Sensor rows -->
   <g filter="url(#shadow)">
-    <rect x="58" y="234" width="192" height="112" rx="18" class="node cam"/><rect x="58" y="370" width="192" height="112" rx="18" class="node lidar"/><rect x="58" y="506" width="192" height="112" rx="18" class="node radar"/>
+    <rect x="58" y="234" width="220" height="112" rx="18" class="node cam"/><rect x="58" y="370" width="220" height="112" rx="18" class="node lidar"/><rect x="58" y="506" width="220" height="112" rx="18" class="node radar"/>
   </g>
   <g transform="translate(83 263)" fill="none" stroke="#58d8ff" stroke-width="2.5"><rect x="0" y="7" width="42" height="30" rx="5"/><circle cx="21" cy="22" r="8"/><path d="M42 14 56 9v26l-14-5"/></g>
   <text x="154" y="280" class="label">Camera</text><text x="154" y="305" class="small">appearance · rays</text><text x="154" y="327" class="small">calibration · time</text>
@@ -45,18 +45,17 @@
 
   <!-- Sensor-specific encoders -->
   <g filter="url(#shadow)">
-    <rect x="298" y="234" width="264" height="112" rx="18" class="node cam"/><rect x="298" y="370" width="264" height="112" rx="18" class="node lidar"/><rect x="298" y="506" width="264" height="112" rx="18" class="node radar"/>
+    <rect x="310" y="234" width="242" height="112" rx="18" class="node cam"/><rect x="310" y="370" width="242" height="112" rx="18" class="node lidar"/><rect x="310" y="506" width="242" height="112" rx="18" class="node radar"/>
   </g>
-  <text x="322" y="268" class="micro" fill="#58d8ff">CAMERA BACKBONE</text><text x="322" y="300" class="label">Multiscale image features</text><text x="322" y="325" class="small">calibrated views</text>
-  <g transform="translate(496 260)" fill="none" stroke="#58d8ff"><rect width="42" height="54" rx="5" opacity=".45"/><rect x="-10" y="8" width="42" height="54" rx="5" opacity=".7"/><rect x="-20" y="16" width="42" height="54" rx="5"/></g>
-  <text x="322" y="404" class="micro" fill="#ffc15a">LIDAR BACKBONE</text><text x="322" y="436" class="label">Sparse occupied voxels</text><text x="322" y="461" class="small">densify early, late, or never</text>
-  <g transform="translate(492 399)" fill="#ffc15a"><rect width="13" height="13" opacity=".9"/><rect x="23" y="8" width="13" height="13" opacity=".6"/><rect x="46" y="0" width="13" height="13"/><rect x="8" y="31" width="13" height="13" opacity=".5"/><rect x="38" y="38" width="13" height="13" opacity=".8"/></g>
-  <text x="322" y="540" class="micro" fill="#ff6fae">RADAR BACKBONE</text><text x="322" y="572" class="label">Returns + Doppler</text><text x="322" y="597" class="small">before fusion</text>
-  <g transform="translate(493 540)" fill="none" stroke="#ff6fae" stroke-width="2"><circle cx="16" cy="35" r="5" fill="#ff6fae"/><path d="M16 35 54 13M16 35 62 35M16 35 52 55"/><circle cx="54" cy="13" r="4"/><circle cx="62" cy="35" r="4"/><circle cx="52" cy="55" r="4"/></g>
+  <!-- Encoder cards intentionally use text only: decorative overlays made the labels hard to read. -->
+  <text x="334" y="268" class="micro" fill="#58d8ff">CAMERA BACKBONE</text><text x="334" y="296" class="label">Multiscale image</text><text x="334" y="317" class="label">features</text><text x="334" y="337" class="small">calibrated views</text>
+  <text x="334" y="404" class="micro" fill="#ffc15a">LIDAR BACKBONE</text><text x="334" y="430" class="label">Sparse occupied</text><text x="334" y="451" class="label">voxels</text><text x="334" y="473" class="small">densify early, late, or never</text>
+  <g transform="translate(502 382) scale(.62)" fill="#ffc15a"><rect width="13" height="13" opacity=".9"/><rect x="23" y="8" width="13" height="13" opacity=".6"/><rect x="46" y="0" width="13" height="13"/><rect x="8" y="31" width="13" height="13" opacity=".5"/><rect x="38" y="38" width="13" height="13" opacity=".8"/></g>
+  <text x="334" y="540" class="micro" fill="#ff6fae">RADAR BACKBONE</text><text x="334" y="572" class="label">Returns + Doppler</text><text x="334" y="597" class="small">before fusion</text>
 
   <!-- Colored sensor flows into encoders and geometry -->
-  <path d="M250 290H298" class="flow cam" marker-end="url(#arrow-camera)"/><path d="M250 426H298" class="flow lidar" marker-end="url(#arrow-lidar)"/><path d="M250 562H298" class="flow radar" marker-end="url(#arrow-radar)"/>
-  <path d="M562 290H604V340H630" class="flow cam" marker-end="url(#arrow-camera)"/><path d="M562 426H630" class="flow lidar" marker-end="url(#arrow-lidar)"/><path d="M562 562H604V544H630" class="flow radar" marker-end="url(#arrow-radar)"/>
+  <path d="M278 290H310" class="flow cam" marker-end="url(#arrow-camera)"/><path d="M278 426H310" class="flow lidar" marker-end="url(#arrow-lidar)"/><path d="M278 562H310" class="flow radar" marker-end="url(#arrow-radar)"/>
+  <path d="M552 290H604V340H630" class="flow cam" marker-end="url(#arrow-camera)"/><path d="M552 426H630" class="flow lidar" marker-end="url(#arrow-lidar)"/><path d="M552 562H604V544H630" class="flow radar" marker-end="url(#arrow-radar)"/>
 
   <!-- Metric representation -->
   <g filter="url(#shadow)"><rect x="630" y="234" width="330" height="384" rx="20" class="node metric"/></g>
@@ -76,7 +75,7 @@
   <g filter="url(#shadow)"><rect x="1018" y="234" width="242" height="384" rx="20" class="node task"/></g>
   <text x="1044" y="270" class="micro" fill="#b19aff">FRAME-TO-FRAME STATE</text>
   <rect x="1044" y="292" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="320" class="label">Dense recurrence</text><text x="1066" y="344" class="small">warp or attend</text><text x="1066" y="364" class="small">BEV state</text>
-  <g transform="translate(1164 372)"><rect x="0" y="0" width="39" height="24" rx="5" fill="url(#bev)" stroke="#58d8ff"/><rect x="-15" y="-9" width="39" height="24" rx="5" fill="url(#bev)" stroke="#58d8ff" opacity=".55"/></g>
+  <g transform="translate(1183 351)"><rect x="0" y="0" width="39" height="24" rx="5" fill="url(#bev)" stroke="#58d8ff"/><rect x="-15" y="-9" width="39" height="24" rx="5" fill="url(#bev)" stroke="#58d8ff" opacity=".55"/></g>
   <rect x="1044" y="396" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="424" class="label">Sparse recurrence</text><text x="1066" y="448" class="small">keep queries</text><text x="1066" y="468" class="small">birth, age</text>
   <g transform="translate(1165 472)" fill="none" stroke="#b19aff" stroke-width="2"><circle cx="0" cy="0" r="5"/><circle cx="26" cy="-10" r="5"/><circle cx="48" cy="6" r="5"/><path d="M5-2 21-8M31-8 43 3"/></g>
   <rect x="1044" y="500" width="190" height="92" rx="15" class="chip task"/><text x="1066" y="528" class="label">Latent recurrence</text><text x="1066" y="552" class="small">compress, carry</text><text x="1066" y="572" class="small">refresh state</text>
