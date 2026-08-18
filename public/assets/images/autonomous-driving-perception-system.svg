@@ -26,11 +26,11 @@
   <text x="58" y="143" class="small">Sensors become comparable only after calibrated metric conversion.</text>
   <line x1="58" y1="168" x2="1542" y2="168" stroke="#26394a" stroke-width="1.2"/>
 
-  <text x="58" y="205" class="kicker">SENSORS</text>
-  <text x="310" y="205" class="kicker">SENSOR ENCODERS</text>
-  <text x="630" y="205" class="kicker">METRIC REPRESENTATION</text>
-  <text x="1018" y="205" class="kicker">TEMPORAL STATE</text>
-  <text x="1325" y="205" class="kicker">TASK HEADS</text>
+  <text x="168" y="205" class="kicker" text-anchor="middle">SENSORS</text>
+  <text x="431" y="205" class="kicker" text-anchor="middle">SENSOR ENCODERS</text>
+  <text x="795" y="205" class="kicker" text-anchor="middle">METRIC REPRESENTATION</text>
+  <text x="1139" y="205" class="kicker" text-anchor="middle">TEMPORAL STATE</text>
+  <text x="1434" y="205" class="kicker" text-anchor="middle">TASK HEADS</text>
 
   <!-- Sensor rows -->
   <g filter="url(#shadow)">
@@ -47,11 +47,13 @@
   <g filter="url(#shadow)">
     <rect x="310" y="234" width="242" height="112" rx="18" class="node cam"/><rect x="310" y="370" width="242" height="112" rx="18" class="node lidar"/><rect x="310" y="506" width="242" height="112" rx="18" class="node radar"/>
   </g>
-  <!-- Encoder cards intentionally use text only: decorative overlays made the labels hard to read. -->
+  <!-- Miniatures occupy reserved upper-right lanes; labels never run underneath them. -->
   <text x="334" y="268" class="micro" fill="#58d8ff">CAMERA BACKBONE</text><text x="334" y="296" class="label">Multiscale image</text><text x="334" y="317" class="label">features</text><text x="334" y="337" class="small">calibrated views</text>
+  <g transform="translate(530 246) scale(.46)" fill="none" stroke="#58d8ff"><rect width="42" height="54" rx="5" opacity=".45"/><rect x="-10" y="8" width="42" height="54" rx="5" opacity=".7"/><rect x="-20" y="16" width="42" height="54" rx="5"/></g>
   <text x="334" y="404" class="micro" fill="#ffc15a">LIDAR BACKBONE</text><text x="334" y="430" class="label">Sparse occupied</text><text x="334" y="451" class="label">voxels</text><text x="334" y="473" class="small">densify early, late, or never</text>
   <g transform="translate(502 382) scale(.62)" fill="#ffc15a"><rect width="13" height="13" opacity=".9"/><rect x="23" y="8" width="13" height="13" opacity=".6"/><rect x="46" y="0" width="13" height="13"/><rect x="8" y="31" width="13" height="13" opacity=".5"/><rect x="38" y="38" width="13" height="13" opacity=".8"/></g>
   <text x="334" y="540" class="micro" fill="#ff6fae">RADAR BACKBONE</text><text x="334" y="572" class="label">Returns + Doppler</text><text x="334" y="597" class="small">before fusion</text>
+  <g transform="translate(513 519) scale(.50)" fill="none" stroke="#ff6fae" stroke-width="2"><circle cx="16" cy="35" r="5" fill="#ff6fae"/><path d="M16 35 54 13M16 35 62 35M16 35 52 55"/><circle cx="54" cy="13" r="4"/><circle cx="62" cy="35" r="4"/><circle cx="52" cy="55" r="4"/></g>
 
   <!-- Colored sensor flows into encoders and geometry -->
   <path d="M278 290H310" class="flow cam" marker-end="url(#arrow-camera)"/><path d="M278 426H310" class="flow lidar" marker-end="url(#arrow-lidar)"/><path d="M278 562H310" class="flow radar" marker-end="url(#arrow-radar)"/>
