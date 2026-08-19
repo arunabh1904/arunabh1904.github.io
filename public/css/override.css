@@ -15,6 +15,10 @@
   --text-color: #10213f;
   --text-secondary-color: #4d628f;
   --accent-color: #356dff;
+  --link-color: #5b4bb7;
+  --link-hover-color: #40349a;
+  --link-visited-color: #775ca6;
+  --link-underline-color: rgba(91, 75, 183, 0.42);
   --icon-color: #356dff;
   --image-border-color: #6c96ff;
   --code-border-color: rgba(53, 109, 255, 0.18);
@@ -48,6 +52,10 @@
   --text-color: #10213f;
   --text-secondary-color: #4d628f;
   --accent-color: #356dff;
+  --link-color: #5b4bb7;
+  --link-hover-color: #40349a;
+  --link-visited-color: #775ca6;
+  --link-underline-color: rgba(91, 75, 183, 0.42);
   --icon-color: #356dff;
   --image-border-color: #6c96ff;
   --code-border-color: rgba(53, 109, 255, 0.18);
@@ -76,6 +84,10 @@
   --text-color: #f6e7a6;
   --text-secondary-color: #b9ab66;
   --accent-color: #ffe45c;
+  --link-color: #b7b2ff;
+  --link-hover-color: #e2e0ff;
+  --link-visited-color: #c7b4ee;
+  --link-underline-color: rgba(183, 178, 255, 0.62);
   --icon-color: #ffe45c;
   --image-border-color: #ffe45c;
   --code-border-color: rgba(255, 228, 92, 0.55);
@@ -1387,51 +1399,51 @@ body.image-viewer-open {
    4) GLOBAL LINK STYLING (Site-wide)
    ------------------------------------------------------ */
 
-/* All <a> tags: light blue by default, no underline */
+/* All <a> tags: blue-berry by default, no underline */
 a {
-  color: #7d9dff;
+  color: var(--link-color);
   text-decoration: none;
 }
 
-/* Hover state: darker blue + underline */
+/* Hover state: blue-berry highlight + underline */
 a:hover {
-  color: #2ac3de;
+  color: var(--link-hover-color);
   text-decoration: underline;
 }
 
 a:visited {
-  color: #7aa2f7 !important; /* Slightly darker for visited links. */
+  color: var(--link-visited-color) !important;
   text-decoration: none;
 }
 
 :root[data-theme="light"] a {
-  color: var(--accent-color);
-  text-decoration-color: rgba(53, 109, 255, 0.4);
+  color: var(--link-color);
+  text-decoration-color: var(--link-underline-color);
 }
 
 :root[data-theme="light"] a:hover {
-  color: #214fcb;
+  color: var(--link-hover-color);
   text-decoration: underline;
-  text-shadow: 0 0 10px rgba(79, 132, 255, 0.16);
+  text-shadow: 0 0 10px rgba(91, 75, 183, 0.16);
 }
 
 :root[data-theme="light"] a:visited {
-  color: #4a58c8 !important;
+  color: var(--link-visited-color) !important;
 }
 
 :root[data-theme="dark"] a {
-  color: var(--accent-color);
-  text-decoration-color: rgba(255, 228, 92, 0.5);
+  color: var(--link-color);
+  text-decoration-color: var(--link-underline-color);
 }
 
 :root[data-theme="dark"] a:hover {
-  color: #fff2a1;
+  color: var(--link-hover-color);
   text-decoration: underline;
-  text-shadow: 0 0 12px rgba(255, 228, 92, 0.34);
+  text-shadow: 0 0 12px rgba(183, 178, 255, 0.34);
 }
 
 :root[data-theme="dark"] a:visited {
-  color: #d8bc45 !important;
+  color: var(--link-visited-color) !important;
 }
 
 /* ------------------------------------------------------
