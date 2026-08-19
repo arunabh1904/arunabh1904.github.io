@@ -153,10 +153,10 @@ The remaining operational work is straightforward:
 - point Hermes at a stronger local model if I want better tool-use quality
 - wire in the local Qwen artifacts the same way, once I decide which exact GGUF or local server path I want to standardize on
 
-The architecture is now clean:
+> The architecture is now clean:
 
-- Hermes for the agent layer
-- `llama.cpp` for the local serving layer
-- existing local weights for inference
+> - Hermes for the agent layer
+> - `llama.cpp` for the local serving layer
+> - existing local weights for inference
 
-That split is cleaner than asking one tool to own the agent layer, serving layer, and model artifacts at once.
+> That split is cleaner than asking one tool to own the agent layer, serving layer, and model artifacts at once.

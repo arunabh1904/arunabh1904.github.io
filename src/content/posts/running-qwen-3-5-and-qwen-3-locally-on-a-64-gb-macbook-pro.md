@@ -138,11 +138,11 @@ The figure separates three decisions that parameter count often collapses. Memor
 
 ## Recommendation
 
-For this measured snapshot, my practical recommendation is simple:
+> For this measured snapshot, my practical recommendation is simple:
 
-1. Start with `Qwen 3 4B` if you want the fastest clean local baseline.
-2. Move up to `Qwen 3 14B` if you want a stronger dense model and you can tolerate much slower long-prompt interaction.
-3. Keep `Qwen 3.5 9B` in the mix if you specifically care about the 3.5 family behavior and do not mind the extra latency and memory overhead.
-4. Prefer `MLX` first on this Mac unless a specific `llama.cpp` model artifact or integration path gives you a reason to switch.
+> 1. Start with `Qwen 3 4B` if you want the fastest clean local baseline.
+> 2. Move up to `Qwen 3 14B` if you want a stronger dense model and you can tolerate much slower long-prompt interaction.
+> 3. Keep `Qwen 3.5 9B` in the mix if you specifically care about the 3.5 family behavior and do not mind the extra latency and memory overhead.
+> 4. Prefer `MLX` first on this Mac unless a specific `llama.cpp` model artifact or integration path gives you a reason to switch.
 
-That answer comes from this machine, not parameter counts or release notes.
+> That answer comes from this machine, not parameter counts or release notes.
