@@ -2,6 +2,7 @@
 title: 'How Vision-Language-Action Models Improve After Deployment'
 date: '2026-07-16T10:00:00.000Z'
 section: blog
+blogGroup: research-guides
 postSlug: post-training-vision-language-action-models-zero-to-hero
 legacyPath: /blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html
 tags:

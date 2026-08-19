@@ -2,6 +2,7 @@
 title: Benchmarking Muse Glimmer 30B on a 64 GB MacBook Pro
 date: '2026-08-13T04:00:00.000Z'
 section: blog
+blogGroup: local-ai-lab
 postSlug: running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro
 legacyPath: /blog/2026/08/13/running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro.html
 tags:

@@ -2,6 +2,7 @@
 title: How Good Research Works in Industry
 date: '2026-03-22T04:00:00.000Z'
 section: blog
+blogGroup: essays
 postSlug: thoughts-on-good-research-in-industry
 legacyPath: /blog/2026/03/22/thoughts-on-good-research-in-industry.html
 tags:

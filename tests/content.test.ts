@@ -10,6 +10,7 @@ import {
   sortPostsDescending,
   toStaticPostSlug,
 } from '../src/lib/post-utils';
+import { groupBlogPosts } from '../src/lib/blog-index';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
@@ -128,5 +129,21 @@ describe('content helpers', () => {
     expect(toStaticPostSlug('/paper shorts/2024/06/03/gamma.html')).toBe(
       'paper shorts/2024/06/03/gamma',
     );
+  });
+});
+
+describe('blog index', () => {
+  it('groups posts into fixed reading paths and preserves any ungrouped post', () => {
+    const posts = [
+      { data: { blogGroup: 'projects' as const } },
+      { data: { blogGroup: 'research-guides' as const } },
+      { data: {} },
+    ];
+
+    expect(groupBlogPosts(posts).map((group) => [group.id, group.posts.length])).toEqual([
+      ['projects', 1],
+      ['research-guides', 1],
+      ['other', 1],
+    ]);
   });
 });

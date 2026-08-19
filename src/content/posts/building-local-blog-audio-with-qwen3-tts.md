@@ -2,6 +2,7 @@
 title: Building Local Blog Audio with Qwen3-TTS
 date: '2026-08-13T23:30:00.000Z'
 section: blog
+blogGroup: projects
 postSlug: building-local-blog-audio-with-qwen3-tts
 legacyPath: /blog/2026/08/13/building-local-blog-audio-with-qwen3-tts.html
 tags:

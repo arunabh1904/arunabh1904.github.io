@@ -2,6 +2,7 @@
 title: 'How to Read Scaling Laws for Language Models'
 date: '2026-08-19T12:00:00.000Z'
 section: blog
+blogGroup: research-guides
 postSlug: how-to-read-scaling-laws-for-language-models
 legacyPath: /blog/2026/08/19/how-to-read-scaling-laws-for-language-models.html
 tags:

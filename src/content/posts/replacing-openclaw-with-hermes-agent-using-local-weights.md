@@ -2,6 +2,7 @@
 title: Running Hermes Agent with a Local GGUF
 date: '2026-04-04T17:59:45.000Z'
 section: blog
+blogGroup: projects
 postSlug: replacing-openclaw-with-hermes-agent-using-local-weights
 legacyPath: /blog/2026/04/04/replacing-openclaw-with-hermes-agent-using-local-weights.html
 tags:

@@ -2,6 +2,7 @@
 title: 'Perception for Autonomous Driving'
 date: '2026-07-31T18:00:00.000Z'
 section: blog
+blogGroup: research-guides
 postSlug: how-unified-sensor-models-are-built-for-autonomous-driving
 legacyPath: /blog/2026/07/31/how-unified-sensor-models-are-built-for-autonomous-driving.html
 tags:

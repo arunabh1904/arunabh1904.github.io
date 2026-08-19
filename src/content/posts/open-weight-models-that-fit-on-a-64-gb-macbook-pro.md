@@ -2,6 +2,7 @@
 title: Which Current Open-Weight Models Fit on a 64 GB MacBook Pro?
 date: '2026-08-13T04:00:00.000Z'
 section: blog
+blogGroup: local-ai-lab
 postSlug: open-weight-models-that-fit-on-a-64-gb-macbook-pro
 legacyPath: /blog/2026/08/13/open-weight-models-that-fit-on-a-64-gb-macbook-pro.html
 tags:

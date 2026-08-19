@@ -2,6 +2,7 @@
 title: Benchmarking Qwen 3.5 and Qwen 3 on a 64 GB MacBook Pro
 date: '2026-04-04T04:00:00.000Z'
 section: blog
+blogGroup: local-ai-lab
 postSlug: running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro
 legacyPath: /blog/2026/04/04/running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro.html
 tags:
