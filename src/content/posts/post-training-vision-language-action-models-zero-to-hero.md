@@ -9,7 +9,7 @@ tags:
   - Robotics
   - Post-Training
   - Reinforcement Learning
-summary: How robot rollouts become justified policy updates through correction data, action preferences, process critics, interactive reinforcement learning, and real evaluation.
+summary: How correction data, preferences, critics, and RL improve deployed robot policies.
 ---
 
 # How Vision-Language-Action Models Improve After Deployment

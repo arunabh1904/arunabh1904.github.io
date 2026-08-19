@@ -9,7 +9,7 @@ tags:
   - Reinforcement Learning
   - Reasoning
   - Robotics
-summary: 'How PPO, DPO, GRPO, and on-policy distillation construct their learning signals—and which assumptions survive contact with physical action.'
+summary: 'A practical map of PPO, DPO, GRPO, and on-policy distillation.'
 ---
 
 # PPO, DPO, GRPO, and On-Policy Distillation

@@ -12,8 +12,7 @@ tags:
 topics:
   - language-systems
 summary: >-
-  What remains valuable when agents make implementation abundant: context,
-  judgment, task decomposition, efficient orchestration, and ownership.
+  What engineers should learn when AI makes writing code cheap.
 ---
 
 # Code Is Cheap. Understanding Isn't.

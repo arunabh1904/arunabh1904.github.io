@@ -10,8 +10,7 @@ tags:
   - Apple Silicon
   - Inference
 summary: >-
-  Why DeepSeek V4 Flash 0731 does not fit in 64 GB unified memory, what its
-  13B active parameter count actually means, and the practical serving path.
+  Why DeepSeek V4 Flash 0731 cannot fit in 64 GB—and what can.
 ---
 # Can DeepSeek V4 Flash 0731 Run on a 64 GB MacBook Pro?
 

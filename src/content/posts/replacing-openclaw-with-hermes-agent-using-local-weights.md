@@ -10,8 +10,7 @@ tags:
   - LLMs
   - Apple Silicon
 summary: >-
-  How Hermes Agent, an OpenAI-compatible localhost endpoint, llama.cpp, and an
-  already-downloaded Gemma GGUF fit together.
+  How to run Hermes Agent locally with llama.cpp and an existing GGUF.
 ---
 # Running Hermes Agent with a Local GGUF
 

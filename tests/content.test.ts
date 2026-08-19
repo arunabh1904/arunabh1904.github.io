@@ -161,8 +161,8 @@ describe('blog index', () => {
     ];
 
     expect(groupBlogPosts(posts).map((group) => [group.id, group.posts.length])).toEqual([
-      ['projects', 1],
       ['research-guides', 1],
+      ['projects', 1],
       ['other', 1],
     ]);
   });

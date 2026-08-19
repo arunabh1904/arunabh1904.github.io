@@ -10,8 +10,7 @@ tags:
   - Apple Silicon
   - Inference
 summary: >-
-  A current fit guide for Muse Glimmer, Ministral, Granite, Nemotron, Mistral
-  Small 4, and DeepSeek V4 Flash on a 64 GB Apple Silicon machine.
+  Which current open-weight models actually fit on a 64 GB Mac.
 ---
 # Which Current Open-Weight Models Fit on a 64 GB MacBook Pro?
 

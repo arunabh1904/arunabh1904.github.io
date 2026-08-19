@@ -2181,11 +2181,16 @@ h3,
 }
 
 .blog-index-groups {
-  border-bottom: 1px solid var(--button-border);
+  display: grid;
+  gap: 0.75rem;
 }
 
 .blog-index-group {
-  border-top: 1px solid var(--button-border);
+  overflow: hidden;
+  border: 1px solid var(--button-border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  box-shadow: var(--button-shadow);
 }
 
 .blog-index-group summary {
@@ -2193,16 +2198,22 @@ h3,
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 1.25rem;
   align-items: center;
-  padding: 1.15rem 0;
+  padding: 1rem 1.1rem;
   cursor: pointer;
   list-style: none;
+  transition: background-color 160ms ease, border-color 160ms ease;
 }
 
 .blog-index-group summary::-webkit-details-marker {
   display: none;
 }
 
-.blog-index-group summary:hover h2 {
+.blog-index-group summary:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.blog-index-group summary:hover h2,
+.blog-index-group[open] summary h2 {
   color: var(--link-color);
 }
 
@@ -2237,25 +2248,30 @@ h3,
   line-height: 1.5;
 }
 
-.blog-index-group__toggle {
-  width: 0.55rem;
-  height: 0.55rem;
-  margin: -0.25rem 0.35rem 0 0;
-  border-right: 1.5px solid var(--text-secondary-color);
-  border-bottom: 1.5px solid var(--text-secondary-color);
-  transform: rotate(45deg);
-  transition: transform 160ms ease;
+.blog-index-group__action {
+  color: var(--text-secondary-color);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
-.blog-index-group[open] .blog-index-group__toggle {
-  margin-top: 0.2rem;
-  transform: rotate(225deg);
+.blog-index-group__action-label--open {
+  display: none;
+}
+
+.blog-index-group[open] .blog-index-group__action-label--closed {
+  display: none;
+}
+
+.blog-index-group[open] .blog-index-group__action-label--open {
+  display: inline;
 }
 
 .blog-index-group > .post-list {
-  margin: 0 0 1rem 1rem;
-  padding-left: 1rem;
-  border-top: 0;
+  margin: 0 1.1rem 1rem;
+  padding: 0 0 0 1rem;
+  border-top: 1px solid var(--button-border);
   border-left: 1px solid var(--button-border);
 }
 

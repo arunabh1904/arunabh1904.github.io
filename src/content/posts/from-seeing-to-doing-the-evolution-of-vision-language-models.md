@@ -8,7 +8,7 @@ legacyPath: /blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-langua
 tags:
   - Research
   - Vision-Language Models
-summary: How visual representations change as the output contract moves from image-text alignment to generation, grounding, temporal reasoning, and robot action.
+summary: How vision-language models evolved from image-text alignment to robot action.
 ---
 
 # From Image-Text Alignment to Robot Actions

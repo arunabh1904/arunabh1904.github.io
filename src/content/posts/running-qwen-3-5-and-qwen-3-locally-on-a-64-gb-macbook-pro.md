@@ -9,8 +9,7 @@ tags:
   - LLMs
   - Apple Silicon
 summary: >-
-  A dated comparison of Qwen 3.5 and Qwen 3 latency on a 64 GB M5 Max,
-  including why long-prompt prefill matters more than whether a model fits.
+  Qwen 3.5 versus Qwen 3 latency and long-prompt performance on an M5 Max.
 ---
 # Benchmarking Qwen 3.5 and Qwen 3 on a 64 GB MacBook Pro
 
