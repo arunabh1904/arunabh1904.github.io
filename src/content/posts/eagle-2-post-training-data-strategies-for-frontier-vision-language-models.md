@@ -21,7 +21,7 @@ Eagle 2 argues that frontier VLM performance depends heavily on post-training da
 
 ## Summary
 
-The main lesson is that strong VLMs are not just pretrained once and then lightly tuned. Their behavior is shaped by a careful curriculum of visual tasks and response styles.
+> The main lesson is that strong VLMs are not just pretrained once and then lightly tuned. Their behavior is shaped by a careful curriculum of visual tasks and response styles.
 
 ## Core Insights
 

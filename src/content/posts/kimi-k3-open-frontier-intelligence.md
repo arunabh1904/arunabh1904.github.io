@@ -25,7 +25,7 @@ summary: '2026 – Kimi K3: Open Frontier Intelligence'
 
 ## Summary
 
-Kimi K3 scales an open-weight, natively multimodal model along two axes at once: a 2.78-trillion-parameter sparse backbone supplies more pretrained capacity, while long-horizon reinforcement learning teaches the model to spend up to a million tokens of context on coding, research, and tool use. Only 104.2 billion parameters are active per token, but that is still a large serving workload; the report recommends supernodes with at least 64 accelerators.
+> Kimi K3 scales an open-weight, natively multimodal model along two axes at once: a 2.78-trillion-parameter sparse backbone supplies more pretrained capacity, while long-horizon reinforcement learning teaches the model to spend up to a million tokens of context on coding, research, and tool use. Only 104.2 billion parameters are active per token, but that is still a large serving workload; the report recommends supernodes with at least 64 accelerators.
 
 ## Core Insights
 

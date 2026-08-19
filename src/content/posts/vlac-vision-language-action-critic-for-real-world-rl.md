@@ -17,7 +17,7 @@ summary: "2025 – VLAC: A Vision-Language-Action-Critic Model for Real-World Re
 
 ## Summary
 
-VLAC turns a multimodal model into a process critic. Given a language goal and two observations, it predicts signed progress and completion; prompt control also lets the same autoregressive model emit actions. Training mixes vision-language tasks, more than 4,000 hours of robot/human trajectories, and constructed negatives for regressions, stagnation, irrelevant goals, and semantic mismatches.
+> VLAC turns a multimodal model into a process critic. Given a language goal and two observations, it predicts signed progress and completion; prompt control also lets the same autoregressive model emit actions. Training mixes vision-language tasks, more than 4,000 hours of robot/human trajectories, and constructed negatives for regressions, stagnation, irrelevant goals, and semantic mismatches.
 
 ## Core Insights
 

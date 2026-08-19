@@ -23,7 +23,7 @@ summary: '2026 – VoLN: Vision-Only Long-Horizon Navigation—Paradigm, Benchma
 
 ## Summary
 
-Vision-and-language navigation instructions often reveal the route: “turn left,” “continue past the building,” and distance phrases provide spatial structure that an onboard agent would not receive in a GPS-denied deployment. VoLN changes the task interface. The agent gets goal images, egocentric RGB, and proprioception; it must discover route-relevant cues locally while flying, decide which cues matter, and stop inside the goal region.
+> Vision-and-language navigation instructions often reveal the route: “turn left,” “continue past the building,” and distance phrases provide spatial structure that an onboard agent would not receive in a GPS-denied deployment. VoLN changes the task interface. The agent gets goal images, egocentric RGB, and proprioception; it must discover route-relevant cues locally while flying, decide which cues matter, and stop inside the goal region.
 
 ## Core Insights
 

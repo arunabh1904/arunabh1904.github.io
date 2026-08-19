@@ -22,7 +22,7 @@ summary: '2023 – On-Policy Distillation of Language Models: GKD'
 
 ## Summary
 
-Generalized Knowledge Distillation fixes a distribution mismatch in ordinary language-model distillation. A student trained only on teacher-written or human-written sequences learns under prefixes it may not visit at inference. GKD instead samples some sequences from the student, asks the teacher for a token distribution on those student-generated prefixes, and trains the student there. “On-policy” describes where the states come from; the method does not require a scalar reward or a policy-gradient estimator.
+> Generalized Knowledge Distillation fixes a distribution mismatch in ordinary language-model distillation. A student trained only on teacher-written or human-written sequences learns under prefixes it may not visit at inference. GKD instead samples some sequences from the student, asks the teacher for a token distribution on those student-generated prefixes, and trains the student there. “On-policy” describes where the states come from; the method does not require a scalar reward or a policy-gradient estimator.
 
 ## Core Insights
 

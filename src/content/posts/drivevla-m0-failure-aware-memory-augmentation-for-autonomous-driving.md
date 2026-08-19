@@ -19,7 +19,7 @@ summary: "2026 – DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous
 
 ## Summary
 
-DriveVLA-M0 turns previous failures into a retrieval and correction mechanism for end-to-end driving. A latent memory stores failed cases with structural scene representations and expert trajectories; a retriever separates static road structure from dynamic agents; and a lightweight decoupled LoRA test-time update adapts the backbone to the retrieved case. The paper reports 94.1 PDMS on Navtest, 47.0 EPDMS on Navhard, and only 26.44 ms of backward-latency overhead.
+> DriveVLA-M0 turns previous failures into a retrieval and correction mechanism for end-to-end driving. A latent memory stores failed cases with structural scene representations and expert trajectories; a retriever separates static road structure from dynamic agents; and a lightweight decoupled LoRA test-time update adapts the backbone to the retrieved case. The paper reports 94.1 PDMS on Navtest, 47.0 EPDMS on Navhard, and only 26.44 ms of backward-latency overhead.
 
 ## Core Insights
 

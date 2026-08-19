@@ -20,7 +20,7 @@ Chameleon trains token-based, early-fusion models that can understand and genera
 
 ## Summary
 
-Early fusion makes a direct architectural claim: one transformer can model mixed documents instead of bolting a vision encoder onto a language model after pre-training. The evidence spans visual question answering, captioning, text generation, image generation, and long-form mixed-modal generation.
+> Early fusion makes a direct architectural claim: one transformer can model mixed documents instead of bolting a vision encoder onto a language model after pre-training. The evidence spans visual question answering, captioning, text generation, image generation, and long-form mixed-modal generation.
 
 ## Core Insights
 

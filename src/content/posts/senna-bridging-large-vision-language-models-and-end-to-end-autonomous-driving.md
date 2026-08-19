@@ -19,7 +19,7 @@ SENNA uses a hybrid architecture: a vision-language model produces a high-level 
 
 ## Summary
 
-This makes the language layer inspectable. A planner can say what it intends to do before the control module turns that intent into geometry.
+> This makes the language layer inspectable. A planner can say what it intends to do before the control module turns that intent into geometry.
 
 ## Core Insights
 

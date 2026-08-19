@@ -21,7 +21,7 @@ SOLOFusion frames temporal camera detection as stereo with a moving baseline. Sh
 
 ## Summary
 
-Its central insight is a budget trade: temporal baseline and feature resolution can compensate for each other, but neither should be maximized uniformly.
+> Its central insight is a budget trade: temporal baseline and feature resolution can compensate for each other, but neither should be maximized uniformly.
 
 ## Core Insights
 

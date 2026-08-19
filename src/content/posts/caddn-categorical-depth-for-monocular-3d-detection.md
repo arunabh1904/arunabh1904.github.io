@@ -20,7 +20,7 @@ CaDDN predicts a categorical depth distribution for every image feature, takes a
 
 ## Summary
 
-The central idea is to preserve depth uncertainty through lifting instead of committing every pixel to one regressed range.
+> The central idea is to preserve depth uncertainty through lifting instead of committing every pixel to one regressed range.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ DriveMM is an academic generalist model for autonomous driving. It trains across
 
 ## Summary
 
-The system takes multi-view driving imagery and produces a unified token sequence that can be decoded into task-specific outputs.
+> The system takes multi-view driving imagery and produces a unified token sequence that can be decoded into task-specific outputs.
 
 ## Core Insights
 

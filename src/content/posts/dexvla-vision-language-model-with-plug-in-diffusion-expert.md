@@ -19,7 +19,7 @@ DexVLA separates high-level reasoning from low-level control. A VLM-style module
 
 ## Summary
 
-This hybrid design is useful for dexterous, long-horizon tasks where pure language-model action generation may be too coarse and pure diffusion may lack semantic planning.
+> This hybrid design is useful for dexterous, long-horizon tasks where pure language-model action generation may be too coarse and pure diffusion may lack semantic planning.
 
 ## Core Insights
 

@@ -23,7 +23,7 @@ summary: '2023 – DINOv2: Learning Robust Visual Features without Supervision'
 
 ## Summary
 
-DINOv2 is less a new loss than a scale-and-curation study for universal visual features. It combines DINO image-level self-distillation with iBOT masked patch prediction, then builds a 142-million-image training set by retrieving, deduplicating, and balancing images from a much larger uncurated pool. The goal is a frozen backbone that transfers across classification, retrieval, depth, and segmentation without task-specific pretraining.
+> DINOv2 is less a new loss than a scale-and-curation study for universal visual features. It combines DINO image-level self-distillation with iBOT masked patch prediction, then builds a 142-million-image training set by retrieving, deduplicating, and balancing images from a much larger uncurated pool. The goal is a frozen backbone that transfers across classification, retrieval, depth, and segmentation without task-specific pretraining.
 
 ## Core Insights
 

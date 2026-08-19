@@ -24,7 +24,7 @@ summary: '2023 – Sigmoid Loss for Language-Image Pre-Training (SigLIP)'
 
 ## Summary
 
-SigLIP changes the normalization boundary in image-text contrastive learning. CLIP treats the other items in a batch as classes inside a global softmax. SigLIP treats every image-text combination as an independent positive or negative binary example. The change removes the global denominator, supports chunked cross-device negatives, and reduces the need to make the batch enormous merely to define the loss.
+> SigLIP changes the normalization boundary in image-text contrastive learning. CLIP treats the other items in a batch as classes inside a global softmax. SigLIP treats every image-text combination as an independent positive or negative binary example. The change removes the global denominator, supports chunked cross-device negatives, and reduces the need to make the batch enormous merely to define the loss.
 
 ## Core Insights
 

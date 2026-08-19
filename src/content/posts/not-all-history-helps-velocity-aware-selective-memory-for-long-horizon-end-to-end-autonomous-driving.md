@@ -18,7 +18,7 @@ summary: "2026 – Not All History Helps: Velocity-Aware Selective Memory for Lo
 
 ## Summary
 
-StableDrive argues that self-generated planning history is useful only when it matches the current motion stage. Its Selective Momentum Memory uses a Mamba state-space operator to gate the previous plan, while a Motion-Stage Training Scaffold teaches stage-aware long-horizon behavior and is removed before inference. A fixed midpoint between two architecture-aligned endpoints gives one deployable planner without an ensemble or extra serving cost.
+> StableDrive argues that self-generated planning history is useful only when it matches the current motion stage. Its Selective Momentum Memory uses a Mamba state-space operator to gate the previous plan, while a Motion-Stage Training Scaffold teaches stage-aware long-horizon behavior and is removed before inference. A fixed midpoint between two architecture-aligned endpoints gives one deployable planner without an ensemble or extra serving cost.
 
 ## Core Insights
 

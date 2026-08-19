@@ -19,7 +19,7 @@ FAST tackles a low-level but important bottleneck in vision-language-action mode
 
 ## Summary
 
-That enables autoregressive VLA models to train on complex manipulation trajectories without sequence lengths exploding.
+> That enables autoregressive VLA models to train on complex manipulation trajectories without sequence lengths exploding.
 
 ## Core Insights
 

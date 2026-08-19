@@ -21,7 +21,7 @@ summary: '2026 – Scaling Native Multimodal Pre-Training From Scratch'
 
 ## Summary
 
-Native multimodal pre-training shares one Transformer across text and image patches from the start, but the two objectives need not want the same compute allocation. This paper fits separate IsoFLOP frontiers for language loss and multimodal loss across six model sizes and three image-text mixture ratios. Language allocation is nearly invariant to the mixture once text compute is held fixed; multimodal allocation is not. As the multimodal ratio increases, the loss-minimizing recipe shifts toward more training tokens and slower parameter growth.
+> Native multimodal pre-training shares one Transformer across text and image patches from the start, but the two objectives need not want the same compute allocation. This paper fits separate IsoFLOP frontiers for language loss and multimodal loss across six model sizes and three image-text mixture ratios. Language allocation is nearly invariant to the mixture once text compute is held fixed; multimodal allocation is not. As the multimodal ratio increases, the loss-minimizing recipe shifts toward more training tokens and slower parameter growth.
 
 ## Core Insights
 

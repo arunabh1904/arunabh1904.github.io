@@ -15,7 +15,7 @@ summary: "2025 – SimLingo: Vision-Only Closed-Loop Autonomous Driving with Lan
 
 ## Summary
 
-SimLingo is a camera-only VLM that is trained to do closed-loop driving, vision-language understanding, and language-action alignment together. Its claim is narrower and more useful than a generic VQA score: language understanding matters for driving only when the answer remains consistent with the action. The paper reports strong Bench2Drive performance in CARLA and identifies the system as the CARLA Challenge 2024 winner; the abstract does not specify action frequency, training data size, or a real-road evaluation.
+> SimLingo is a camera-only VLM that is trained to do closed-loop driving, vision-language understanding, and language-action alignment together. Its claim is narrower and more useful than a generic VQA score: language understanding matters for driving only when the answer remains consistent with the action. The paper reports strong Bench2Drive performance in CARLA and identifies the system as the CARLA Challenge 2024 winner; the abstract does not specify action frequency, training data size, or a real-road evaluation.
 
 ## Core Insights
 

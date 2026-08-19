@@ -19,7 +19,7 @@ summary: "2026 – Geometry-Grounded Unified 3D Perception for Autonomous Drivin
 
 ## Summary
 
-GeoUP adapts a reconstruction-oriented latent to calibrated streaming driving scenes and uses it as a shared representation for depth, 3D detection, and semantic occupancy. It separates self-, temporal-, and view-attention and adds calibration-aware raymaps so the latent carries metric camera geometry. Joint multi-task training across nuScenes, Argoverse 2, Waymo, KITTI, and DDAD yields strong reported results across the three readouts.
+> GeoUP adapts a reconstruction-oriented latent to calibrated streaming driving scenes and uses it as a shared representation for depth, 3D detection, and semantic occupancy. It separates self-, temporal-, and view-attention and adds calibration-aware raymaps so the latent carries metric camera geometry. Joint multi-task training across nuScenes, Argoverse 2, Waymo, KITTI, and DDAD yields strong reported results across the three readouts.
 
 ## Core Insights
 

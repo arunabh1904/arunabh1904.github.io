@@ -21,7 +21,7 @@ DeepInteraction challenges the assumption that fusion should collapse camera and
 
 ## Summary
 
-The paper's enduring question is what unification must preserve. A single coordinate frame simplifies reuse, but a single feature tensor can erase the neighborhood structure and failure profile that made each sensor complementary.
+> The paper's enduring question is what unification must preserve. A single coordinate frame simplifies reuse, but a single feature tensor can erase the neighborhood structure and failure profile that made each sensor complementary.
 
 ## Core Insights
 

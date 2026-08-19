@@ -18,7 +18,7 @@ VoxelNet replaces hand-designed point-cloud descriptors with a learned Voxel Fea
 
 ## Summary
 
-The durable contribution is the tokenizer. Voxelization supplies metric locality and bounded computation; the learned within-voxel set encoder retains more geometry than a fixed occupancy statistic.
+> The durable contribution is the tokenizer. Voxelization supplies metric locality and bounded computation; the learned within-voxel set encoder retains more geometry than a fixed occupancy statistic.
 
 ## Core Insights
 

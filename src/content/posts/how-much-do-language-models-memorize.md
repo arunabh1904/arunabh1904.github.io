@@ -21,7 +21,7 @@ How Much Do Language Models Memorize? measures how much sample-specific training
 
 ## Summary
 
-The headline estimate is about 3.6 bits per parameter for GPT-style transformers. The deeper point is that memorization is not a yes-or-no property of a model or a datapoint; it is a finite capacity budget that changes how the model behaves as data size grows.
+> The headline estimate is about 3.6 bits per parameter for GPT-style transformers. The deeper point is that memorization is not a yes-or-no property of a model or a datapoint; it is a finite capacity budget that changes how the model behaves as data size grows.
 
 ## Core Insights
 

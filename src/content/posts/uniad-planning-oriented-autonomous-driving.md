@@ -21,7 +21,7 @@ UniAD is a dense BEV-oriented end-to-end driving system. It does not simply trai
 
 ## Summary
 
-That design made UniAD a reference point for "planning-oriented" driving: perception and prediction are useful because they improve the ego vehicle's planned trajectory.
+> That design made UniAD a reference point for "planning-oriented" driving: perception and prediction are useful because they improve the ego vehicle's planned trajectory.
 
 ## Core Insights
 

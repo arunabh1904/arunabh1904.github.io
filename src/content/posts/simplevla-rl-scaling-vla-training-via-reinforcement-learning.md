@@ -19,7 +19,7 @@ summary: "2025 – SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning
 
 ## Summary
 
-SimpleVLA-RL treats VLA reinforcement learning as a systems problem as much as an objective problem. Built on veRL and OpenVLA-OFT, it adds robot-specific trajectory sampling, parallel environments, multi-environment rendering, and optimized loss computation around a group-relative policy update.
+> SimpleVLA-RL treats VLA reinforcement learning as a systems problem as much as an objective problem. Built on veRL and OpenVLA-OFT, it adds robot-specific trajectory sampling, parallel environments, multi-environment rendering, and optimized loss computation around a group-relative policy update.
 
 ## Core Insights
 

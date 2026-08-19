@@ -18,7 +18,7 @@ summary: "2026 – GhostPoint: Self-Supervised Representation Learning by Halluc
 
 ## Summary
 
-GhostPoint targets a visible-surface bias in LiDAR self-supervision. Point-wise objectives supervise measured returns, but 3D detection must reason about the unobserved parts of an object. GhostPoint discovers instance proposals, dilates them into local neighborhoods, and trains a predictor to hallucinate latent features for occluded voxels. The paper reports 59.5 mAP/64.2 NDS in its probabilistic nuScenes setting and 67.5 mAP/71.2 NDS after fine-tuning.
+> GhostPoint targets a visible-surface bias in LiDAR self-supervision. Point-wise objectives supervise measured returns, but 3D detection must reason about the unobserved parts of an object. GhostPoint discovers instance proposals, dilates them into local neighborhoods, and trains a predictor to hallucinate latent features for occluded voxels. The paper reports 59.5 mAP/64.2 NDS in its probabilistic nuScenes setting and 67.5 mAP/71.2 NDS after fine-tuning.
 
 ## Core Insights
 

@@ -21,7 +21,7 @@ Motion forecasting gets better when you ensemble many strong models, but autonom
 
 ## Summary
 
-The work is a deployment-minded scaling paper. It treats accuracy, latency, and onboard compute as coupled constraints instead of assuming the best leaderboard model can be used directly.
+> The work is a deployment-minded scaling paper. It treats accuracy, latency, and onboard compute as coupled constraints instead of assuming the best leaderboard model can be used directly.
 
 ## Core Insights
 

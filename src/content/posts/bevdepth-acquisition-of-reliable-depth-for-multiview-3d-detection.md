@@ -21,7 +21,7 @@ BEVDepth shows that a camera-only detector can use LiDAR as training supervision
 
 ## Summary
 
-The key distinction is lifecycle. LiDAR supplies targets while the model learns; runtime inputs remain surround-camera images and calibration. This is privileged sensing, not sensor fusion.
+> The key distinction is lifecycle. LiDAR supplies targets while the model learns; runtime inputs remain surround-camera images and calibration. This is privileged sensing, not sensor fusion.
 
 ## Core Insights
 

@@ -18,7 +18,7 @@ summary: "2026 – LIRA: Local Cross-Layer Information Routing for Vision-Langua
 
 ## Summary
 
-LIRA changes the interface between a pretrained VLM and a VLA action decoder. Instead of exposing one matched VLM layer to each decoder block, it gives each Parallel Fusion Block a depth-aligned local window and lets it aggregate nearby intermediate features. Under the same 0.5B-parameter configuration, the paper reports improvements across LIBERO, LIBERO-Plus, CALVIN, and real-world manipulation; zero-shot LIBERO-Plus success rises from 59.1% for VLA-Adapter to 78.0%.
+> LIRA changes the interface between a pretrained VLM and a VLA action decoder. Instead of exposing one matched VLM layer to each decoder block, it gives each Parallel Fusion Block a depth-aligned local window and lets it aggregate nearby intermediate features. Under the same 0.5B-parameter configuration, the paper reports improvements across LIBERO, LIBERO-Plus, CALVIN, and real-world manipulation; zero-shot LIBERO-Plus success rises from 59.1% for VLA-Adapter to 78.0%.
 
 ## Core Insights
 

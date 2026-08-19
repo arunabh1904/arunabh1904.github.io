@@ -18,7 +18,7 @@ Sparse-to-Dense feeds RGB and sparse depth into an encoder-decoder that predicts
 
 ## Summary
 
-That lifecycle distinction is essential: depth completion is sensor fusion. Removing the range sensor at deployment changes the input distribution and invalidates the advertised completion behavior.
+> That lifecycle distinction is essential: depth completion is sensor fusion. Removing the range sensor at deployment changes the input distribution and invalidates the advertised completion behavior.
 
 ## Core Insights
 

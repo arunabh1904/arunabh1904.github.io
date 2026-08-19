@@ -18,7 +18,7 @@ DriveWorld pretrains a 4D scene representation through a Memory State-Space Mode
 
 ## Summary
 
-The architecture separates two temporal regimes: static structure can be propagated geometrically, while dynamic state needs learned recurrent updates.
+> The architecture separates two temporal regimes: static structure can be propagated geometrically, while dynamic state needs learned recurrent updates.
 
 ## Core Insights
 

@@ -21,7 +21,7 @@ MetaBEV trains one camera-LiDAR model for full input, corrupted input, and compl
 
 ## Summary
 
-The important shift is from fusion accuracy to conditional computation. A production model does not always receive the nominal sensor set; its architecture and training distribution must define what happens next.
+> The important shift is from fusion accuracy to conditional computation. A production model does not always receive the nominal sensor set; its architecture and training distribution must define what happens next.
 
 ## Core Insights
 

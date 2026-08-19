@@ -21,7 +21,7 @@ EMMA is Waymo's end-to-end multimodal driving model. It uses camera data plus no
 
 ## Summary
 
-The striking design choice is to represent many non-sensor inputs and outputs as text. That lets the model reuse the structure and world knowledge of a multimodal language model while training across several driving tasks.
+> The striking design choice is to represent many non-sensor inputs and outputs as text. That lets the model reuse the structure and world knowledge of a multimodal language model while training across several driving tasks.
 
 ## Core Insights
 

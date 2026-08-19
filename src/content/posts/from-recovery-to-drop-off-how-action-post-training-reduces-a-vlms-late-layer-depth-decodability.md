@@ -18,7 +18,7 @@ summary: "2026 – From Recovery to Drop-off: How Action Post-training Reduces a
 
 ## Summary
 
-This paper measures what action post-training does to a VLM's spatial representation rather than treating the resulting VLA as a black box. Using a weight-matched Molmo2-ER/MolmoAct2-LIBERO pair, it probes depth from every decoder layer and finds a persistent degradation floor plus a late-layer cliff. Matched causal ablations localize most of the cliff to late-layer MLP writes, not attention.
+> This paper measures what action post-training does to a VLM's spatial representation rather than treating the resulting VLA as a black box. Using a weight-matched Molmo2-ER/MolmoAct2-LIBERO pair, it probes depth from every decoder layer and finds a persistent degradation floor plus a late-layer cliff. Matched causal ablations localize most of the cliff to late-layer MLP writes, not attention.
 
 ## Core Insights
 

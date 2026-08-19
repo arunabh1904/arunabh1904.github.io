@@ -24,7 +24,7 @@ summary: '2026 – Scaling Self-Play for End-to-End Driving'
 
 ## Summary
 
-GIGAFLOW showed that self-play can train a strong driving policy from privileged vector state; Gigapixel asks whether the same interactive experience can train an end-to-end planner from pixels. Direct pixel-space reinforcement learning is too sample-inefficient at this model scale, so the paper separates the problem: train a compact privileged teacher with PPO, distill it on the student’s own self-play states, then adapt only the student’s perception backbone to real images.
+> GIGAFLOW showed that self-play can train a strong driving policy from privileged vector state; Gigapixel asks whether the same interactive experience can train an end-to-end planner from pixels. Direct pixel-space reinforcement learning is too sample-inefficient at this model scale, so the paper separates the problem: train a compact privileged teacher with PPO, distill it on the student’s own self-play states, then adapt only the student’s perception backbone to real images.
 
 ## Core Insights
 

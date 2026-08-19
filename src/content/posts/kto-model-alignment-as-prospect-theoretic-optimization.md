@@ -21,7 +21,7 @@ summary: "2024 – KTO: Model Alignment as Prospect Theoretic Optimization"
 
 ## Summary
 
-KTO asks whether alignment data must arrive as a chosen–rejected pair. It derives a human-aware loss from prospect theory and trains directly on binary judgments: an output was desirable or undesirable. That interface matters when feedback occurs naturally as approval, a safety flag, or a deployment failure rather than as two completions from the same prompt.
+> KTO asks whether alignment data must arrive as a chosen–rejected pair. It derives a human-aware loss from prospect theory and trains directly on binary judgments: an output was desirable or undesirable. That interface matters when feedback occurs naturally as approval, a safety flag, or a deployment failure rather than as two completions from the same prompt.
 
 ## Core Insights
 

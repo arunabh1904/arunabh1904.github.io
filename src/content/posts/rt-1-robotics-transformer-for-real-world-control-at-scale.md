@@ -19,7 +19,7 @@ summary: "2022 – RT-1: Robotics Transformer for Real-World Control at Scale"
 
 ## Summary
 
-RT-1 tests whether a single real-time policy can absorb a broad robot dataset without losing execution speed. It combines a FiLM-conditioned EfficientNet, TokenLearner visual compression, a transformer, and discretized arm/base actions in a 35M-parameter controller that runs at 3 Hz.
+> RT-1 tests whether a single real-time policy can absorb a broad robot dataset without losing execution speed. It combines a FiLM-conditioned EfficientNet, TokenLearner visual compression, a transformer, and discretized arm/base actions in a 35M-parameter controller that runs at 3 Hz.
 
 ## Core Insights
 

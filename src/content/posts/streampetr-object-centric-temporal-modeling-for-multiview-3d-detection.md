@@ -21,7 +21,7 @@ StreamPETR models a long camera sequence by propagating a bounded memory of obje
 
 ## Summary
 
-The model's claim is about state compression. A dense temporal BEV stores evidence for every cell, while StreamPETR keeps the hypotheses most likely to matter for detection and tracking.
+> The model's claim is about state compression. A dense temporal BEV stores evidence for every cell, while StreamPETR keeps the hypotheses most likely to matter for detection and tracking.
 
 ## Core Insights
 

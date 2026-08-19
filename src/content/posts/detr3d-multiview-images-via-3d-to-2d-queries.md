@@ -21,7 +21,7 @@ DETR3D predicts a set of 3D boxes directly from multiview image features. Each o
 
 ## Summary
 
-The model avoids both a dense BEV view transform and per-camera boxes followed by global NMS. Geometry enters as a retrieval operation: a metric hypothesis asks where supporting pixels should appear.
+> The model avoids both a dense BEV view transform and per-camera boxes followed by global NMS. Geometry enters as a retrieval operation: a metric hypothesis asks where supporting pixels should appear.
 
 ## Core Insights
 

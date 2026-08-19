@@ -22,7 +22,7 @@ summary: '2026 – Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-La
 
 ## Summary
 
-The usual way to fit a slow vision-language driving policy into a fast control loop is to run it less often and replay its last action. This paper instead separates the two clocks: a frozen 7B LMDrive backbone updates its scene representation at 5 Hz, while a trainable 337M action expert reads that representation and the current observation to predict fresh waypoints at 20 Hz.
+> The usual way to fit a slow vision-language driving policy into a fast control loop is to run it less often and replay its last action. This paper instead separates the two clocks: a frozen 7B LMDrive backbone updates its scene representation at 5 Hz, while a trainable 337M action expert reads that representation and the current observation to predict fresh waypoints at 20 Hz.
 
 ## Core Insights
 

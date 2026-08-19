@@ -20,7 +20,7 @@ Camera Radar Net uses radar twice: Radar-Assisted View Transformation supplies r
 
 ## Summary
 
-This is different from rasterizing radar as another occupancy channel. The sparse measurements control where dense image evidence should enter metric space.
+> This is different from rasterizing radar as another occupancy channel. The sparse measurements control where dense image evidence should enter metric space.
 
 ## Core Insights
 

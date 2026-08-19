@@ -24,7 +24,7 @@ summary: '2026 – TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on 
 
 ## Summary
 
-Most vision-language-action models route visual tokens through a large language model before producing robot actions. TurboVLA removes that execution path. DINOv3 encodes the cameras, BERT encodes the instruction, six lightweight bidirectional cross-attention blocks exchange information between the streams, and an ACT-style decoder predicts a continuous action chunk in parallel.
+> Most vision-language-action models route visual tokens through a large language model before producing robot actions. TurboVLA removes that execution path. DINOv3 encodes the cameras, BERT encodes the instruction, six lightweight bidirectional cross-attention blocks exchange information between the streams, and an ACT-style decoder predicts a continuous action chunk in parallel.
 
 ## Core Insights
 

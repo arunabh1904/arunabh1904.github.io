@@ -18,7 +18,7 @@ SST argues that the conventional downsampling hierarchy is a poor fit for small 
 
 ## Summary
 
-Its claim is not that attention is inherently better than convolution. The advantage comes from matching attention's variable receptive field to a sparse input while preserving spatial resolution.
+> Its claim is not that attention is inherently better than convolution. The advantage comes from matching attention's variable receptive field to a sparse input while preserving spatial resolution.
 
 ## Core Insights
 

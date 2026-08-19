@@ -19,7 +19,7 @@ summary: "2025 – Alpamayo-R1: Bridging Reasoning and Action Prediction for Gen
 
 ## Summary
 
-Alpamayo-R1 combines Chain of Causation reasoning with a diffusion trajectory decoder for long-tail driving. The Chain of Causation dataset uses automated labeling plus human-in-the-loop review to produce decision-grounded traces, Cosmos-Reason supplies the VLM backbone, and a multi-stage recipe uses supervised fine-tuning followed by RL for reasoning-action consistency. The paper reports up to 12% higher planning accuracy on challenging cases, a 35% lower close-encounter rate in closed-loop simulation, 45% higher reasoning quality, 37% higher reasoning-action consistency, and 99 ms on-vehicle latency. The abstract does not define each metric or report independent retraining variance.
+> Alpamayo-R1 combines Chain of Causation reasoning with a diffusion trajectory decoder for long-tail driving. The Chain of Causation dataset uses automated labeling plus human-in-the-loop review to produce decision-grounded traces, Cosmos-Reason supplies the VLM backbone, and a multi-stage recipe uses supervised fine-tuning followed by RL for reasoning-action consistency. The paper reports up to 12% higher planning accuracy on challenging cases, a 35% lower close-encounter rate in closed-loop simulation, 45% higher reasoning quality, 37% higher reasoning-action consistency, and 99 ms on-vehicle latency. The abstract does not define each metric or report independent retraining variance.
 
 ## Core Insights
 

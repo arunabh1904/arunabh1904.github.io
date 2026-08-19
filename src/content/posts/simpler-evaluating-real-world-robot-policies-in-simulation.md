@@ -19,7 +19,7 @@ summary: "2024 – SIMPLER: Evaluating Real-World Robot Manipulation Policies in
 
 ## Summary
 
-SIMPLER asks a more useful question than whether a simulator is photorealistic: does an evaluation inside it predict how real policies rank and fail? The benchmark recreates common Google Robot and WidowX setups, reduces control and visual mismatches, and runs real-data-trained policies without retraining them in simulation.
+> SIMPLER asks a more useful question than whether a simulator is photorealistic: does an evaluation inside it predict how real policies rank and fail? The benchmark recreates common Google Robot and WidowX setups, reduces control and visual mismatches, and runs real-data-trained policies without retraining them in simulation.
 
 ## Core Insights
 

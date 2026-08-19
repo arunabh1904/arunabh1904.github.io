@@ -17,7 +17,7 @@ summary: "2025 – Impromptu VLA: Open Weights and Open Data for Driving Vision-
 
 ## Summary
 
-Impromptu VLA is a data and evaluation intervention for unstructured driving corner cases. Its dataset contains more than 80,000 curated video clips distilled from more than two million clips across eight open datasets. The clips are organized around four challenging categories and pair planning-oriented questions with action trajectories. The paper reports improved NeuroNCAP closed-loop scores and collision rates, plus near state-of-the-art open-loop nuScenes trajectory accuracy; the abstract does not disclose the data split, model architectures, or a human-quality audit of the annotations.
+> Impromptu VLA is a data and evaluation intervention for unstructured driving corner cases. Its dataset contains more than 80,000 curated video clips distilled from more than two million clips across eight open datasets. The clips are organized around four challenging categories and pair planning-oriented questions with action trajectories. The paper reports improved NeuroNCAP closed-loop scores and collision rates, plus near state-of-the-art open-loop nuScenes trajectory accuracy; the abstract does not disclose the data split, model architectures, or a human-quality audit of the annotations.
 
 ## Core Insights
 

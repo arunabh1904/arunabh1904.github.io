@@ -21,7 +21,7 @@ NLSPN predicts an initial dense depth map, confidence, non-local neighbor offset
 
 ## Summary
 
-The method targets the mixed-depth problem: a local kernel near an object boundary often copies background depth into the foreground or the reverse.
+> The method targets the mixed-depth problem: a local kernel near an object boundary often copies background depth into the foreground or the reverse.
 
 ## Core Insights
 

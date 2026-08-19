@@ -21,7 +21,7 @@ Wan is an open suite of video foundation models built on diffusion transformers.
 
 ## Summary
 
-Wan supplies a systems-oriented video reference rather than only a generative-model result. It releases 1.3B and 14B models, supports several downstream tasks such as image-to-video and editing, and reports that the 1.3B model can run with 8.19 GB of VRAM.
+> Wan supplies a systems-oriented video reference rather than only a generative-model result. It releases 1.3B and 14B models, supports several downstream tasks such as image-to-video and editing, and reports that the 1.3B model can run with 8.19 GB of VRAM.
 
 ## Core Insights
 

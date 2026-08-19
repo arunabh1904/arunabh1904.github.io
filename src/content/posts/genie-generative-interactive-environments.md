@@ -21,7 +21,7 @@ Genie learns an interactive generative environment from unlabeled Internet video
 
 ## Summary
 
-Genie is valuable because it makes latent actions a trainable interface rather than requiring labeled controls. The learned action space also supports imitating behaviors from unseen videos. For a world-model program, its contribution is the separation of visual compression, dynamics prediction, and action representation.
+> Genie is valuable because it makes latent actions a trainable interface rather than requiring labeled controls. The learned action space also supports imitating behaviors from unseen videos. For a world-model program, its contribution is the separation of visual compression, dynamics prediction, and action representation.
 
 ## Core Insights
 

@@ -18,7 +18,7 @@ summary: "2026 – SIPTraj: Map-Free End-to-End Trajectory Prediction via Physic
 
 ## Summary
 
-SIPTraj addresses two priors that map-free trajectory predictors usually lose together: lane-like scene structure and physical feasibility. Its Hierarchical Agent-Scene Encoder grounds each agent progressively in BEV evidence, while its Physics-Guided Iterative Decoder conditions the internal prediction state on instantaneous kinematics. On nuScenes and Argoverse 2 Sensor, the paper reports lower displacement and miss metrics than the compared map-free and map-based baselines, without using an HD map at inference.
+> SIPTraj addresses two priors that map-free trajectory predictors usually lose together: lane-like scene structure and physical feasibility. Its Hierarchical Agent-Scene Encoder grounds each agent progressively in BEV evidence, while its Physics-Guided Iterative Decoder conditions the internal prediction state on instantaneous kinematics. On nuScenes and Argoverse 2 Sensor, the paper reports lower displacement and miss metrics than the compared map-free and map-based baselines, without using an HD map at inference.
 
 ## Core Insights
 

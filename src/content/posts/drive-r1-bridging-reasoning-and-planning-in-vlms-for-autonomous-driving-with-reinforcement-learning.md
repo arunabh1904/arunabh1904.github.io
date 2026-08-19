@@ -15,7 +15,7 @@ summary: "2025 – Drive-R1: Bridging Reasoning and Planning in VLMs for Autonom
 
 ## Summary
 
-Drive-R1 trains a small domain-specific VLM to reason from visual input to a driving plan, then reinforces it with trajectory- and meta-action-based rewards. Its supervised stage contains both long and short chains of thought; the reinforcement stage is intended to favor reasoning paths that improve planning rather than merely sound plausible. The paper reports superior results on nuScenes and DriveLM-nuScenes relative to its compared VLMs. The abstract does not provide planning metrics, reward weights, or a closed-loop evaluation.
+> Drive-R1 trains a small domain-specific VLM to reason from visual input to a driving plan, then reinforces it with trajectory- and meta-action-based rewards. Its supervised stage contains both long and short chains of thought; the reinforcement stage is intended to favor reasoning paths that improve planning rather than merely sound plausible. The paper reports superior results on nuScenes and DriveLM-nuScenes relative to its compared VLMs. The abstract does not provide planning metrics, reward weights, or a closed-loop evaluation.
 
 ## Core Insights
 

@@ -25,7 +25,7 @@ summary: '2026 – Understanding Reasoning from Pretraining to Post-Training'
 
 ## Summary
 
-Pretraining and reinforcement learning are usually scaled in separate experiments, even though every reasoning policy presented to RL inherits a particular prior. This paper builds a controlled chess analogue of the full language-model pipeline—pretraining on human games, supervised fine-tuning on synthetic search traces, then RL on verifiable puzzles—and asks how the first stage predicts returns in the last.
+> Pretraining and reinforcement learning are usually scaled in separate experiments, even though every reasoning policy presented to RL inherits a particular prior. This paper builds a controlled chess analogue of the full language-model pipeline—pretraining on human games, supervised fine-tuning on synthetic search traces, then RL on verifiable puzzles—and asks how the first stage predicts returns in the last.
 
 ## Core Insights
 

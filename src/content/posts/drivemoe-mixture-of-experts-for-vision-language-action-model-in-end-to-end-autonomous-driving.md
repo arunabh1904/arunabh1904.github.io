@@ -17,7 +17,7 @@ summary: "2025 – DriveMoE: Mixture-of-Experts for Vision-Language-Action Model
 
 ## Summary
 
-DriveMoE adds two sparse-routing decisions to a Drive-$\pi_0$ VLA baseline. A scene-specialized Vision MoE selects camera evidence for the driving context, while a skill-specialized Action MoE selects behavior modules for different maneuvers. The paper reports state-of-the-art Bench2Drive closed-loop performance. Its abstract does not give the number of experts, routing load, action latency, or a matched dense-capacity baseline.
+> DriveMoE adds two sparse-routing decisions to a Drive-$\pi_0$ VLA baseline. A scene-specialized Vision MoE selects camera evidence for the driving context, while a skill-specialized Action MoE selects behavior modules for different maneuvers. The paper reports state-of-the-art Bench2Drive closed-loop performance. Its abstract does not give the number of experts, routing load, action latency, or a matched dense-capacity baseline.
 
 ## Core Insights
 

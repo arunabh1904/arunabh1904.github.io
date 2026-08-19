@@ -19,7 +19,7 @@ summary: "2024 – Octo: An Open-Source Generalist Robot Policy"
 
 ## Summary
 
-Octo treats adaptation interfaces as part of the foundation-model design. A transformer policy pretrained on 800,000 Open X-Embodiment trajectories accepts language or goal-image tasks, supports flexible camera and proprioceptive inputs, and can be fine-tuned to new action spaces on consumer GPUs.
+> Octo treats adaptation interfaces as part of the foundation-model design. A transformer policy pretrained on 800,000 Open X-Embodiment trajectories accepts language or goal-image tasks, supports flexible camera and proprioceptive inputs, and can be fine-tuned to new action spaces on consumer GPUs.
 
 ## Core Insights
 

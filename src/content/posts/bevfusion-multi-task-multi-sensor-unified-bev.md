@@ -23,7 +23,7 @@ BEVFusion converts camera and LiDAR features independently into bird's-eye view,
 
 ## Summary
 
-This is the paper behind the modern “shared BEV trunk plus task heads” default. A different 2022 paper also called BEVFusion focuses on LiDAR-malfunction robustness; the note here covers the MIT multi-task, multi-sensor system.
+> This is the paper behind the modern “shared BEV trunk plus task heads” default. A different 2022 paper also called BEVFusion focuses on LiDAR-malfunction robustness; the note here covers the MIT multi-task, multi-sensor system.
 
 ## Core Insights
 

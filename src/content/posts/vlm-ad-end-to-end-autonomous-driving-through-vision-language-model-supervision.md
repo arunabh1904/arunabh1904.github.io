@@ -23,7 +23,7 @@ VLM-AD uses a vision-language model as a teacher for end-to-end autonomous drivi
 
 ## Summary
 
-The important deployment detail is that the VLM is not used at inference time. The runtime model stays an end-to-end driver, but its training objective is shaped by language-style reasoning signals that explain why a maneuver makes sense.
+> The important deployment detail is that the VLM is not used at inference time. The runtime model stays an end-to-end driver, but its training objective is shaped by language-style reasoning signals that explain why a maneuver makes sense.
 
 ## Core Insights
 

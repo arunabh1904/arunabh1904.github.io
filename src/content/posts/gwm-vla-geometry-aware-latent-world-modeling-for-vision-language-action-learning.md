@@ -18,7 +18,7 @@ summary: "2026 – GWM-VLA: Geometry-Aware Latent World Modeling for Vision-Lang
 
 ## Summary
 
-GWM-VLA treats geometry as part of the latent interface between visual observations and robot actions. A VGGT-derived encoder aggregates simultaneous camera views into a geometry-aware state; a world model predicts the next wrist-view patch tokens; and a shared latent-action representation conditions both the prediction loss and the flow-matching action head. Simulation and real-world experiments report improved robustness under visual and environmental shifts.
+> GWM-VLA treats geometry as part of the latent interface between visual observations and robot actions. A VGGT-derived encoder aggregates simultaneous camera views into a geometry-aware state; a world model predicts the next wrist-view patch tokens; and a shared latent-action representation conditions both the prediction loss and the flow-matching action head. Simulation and real-world experiments report improved robustness under visual and environmental shifts.
 
 ## Core Insights
 

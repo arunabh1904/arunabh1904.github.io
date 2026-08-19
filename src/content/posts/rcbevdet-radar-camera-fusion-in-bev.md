@@ -21,7 +21,7 @@ RCBEVDet treats radar as a distinct sensor rather than a poor substitute for LiD
 
 ## Summary
 
-That decomposition matters for production camera-radar stacks. Radar supplies range and radial velocity in conditions where images weaken, but its azimuth noise, sparsity, multipath, and weak elevation make a LiDAR encoder a bad default.
+> That decomposition matters for production camera-radar stacks. Radar supplies range and radial velocity in conditions where images weaken, but its azimuth noise, sparsity, multipath, and weak elevation make a LiDAR encoder a bad default.
 
 ## Core Insights
 

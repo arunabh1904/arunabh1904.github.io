@@ -19,7 +19,7 @@ IDKB is an Interactive Driving Knowledge Base for testing whether LVLMs understa
 
 ## Summary
 
-The result is a useful warning: a model may recognize cars and pedestrians but still fail rule-based reasoning that every licensed human driver is expected to know.
+> The result is a useful warning: a model may recognize cars and pedestrians but still fail rule-based reasoning that every licensed human driver is expected to know.
 
 ## Core Insights
 

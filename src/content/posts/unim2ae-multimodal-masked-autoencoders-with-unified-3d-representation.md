@@ -21,7 +21,7 @@ UniM²AE pretrains camera and LiDAR encoders by masking both inputs, projecting 
 
 ## Summary
 
-The paper addresses a scale problem: labeled 3D boxes and maps are expensive, but synchronized images and point clouds are abundant on instrumented fleets. A masked reconstruction objective can consume those pairs before task-specific fine-tuning.
+> The paper addresses a scale problem: labeled 3D boxes and maps are expensive, but synchronized images and point clouds are abundant on instrumented fleets. A masked reconstruction objective can consume those pairs before task-specific fine-tuning.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ PaliGemma is a small open VLM built for transfer, not a giant visual chat assist
 
 ## Summary
 
-That framing is practical: instead of building a separate head for captioning, VQA, detection, segmentation, remote sensing, and document tasks, the model learns a shared prefix-to-suffix interface that can be fine-tuned.
+> That framing is practical: instead of building a separate head for captioning, VQA, detection, segmentation, remote sensing, and document tasks, the model learns a shared prefix-to-suffix interface that can be fine-tuned.
 
 ## Core Insights
 

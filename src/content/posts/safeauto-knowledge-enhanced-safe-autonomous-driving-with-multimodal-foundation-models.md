@@ -17,7 +17,7 @@ summary: "2025 – SafeAuto: Knowledge-Enhanced Safe Autonomous Driving with Mul
 
 ## Summary
 
-SafeAuto combines three safety-oriented interfaces around a multimodal foundation model: a position-dependent cross-entropy loss for text-encoded controls, traffic rules translated into first-order logic and checked through a Markov Logic Network, and retrieval over prior multimodal driving experience. The paper reports gains over its baselines across multiple datasets. The abstract does not report the safety metrics, the rate at which the rule checker catches harmful actions, or a closed-loop intervention study.
+> SafeAuto combines three safety-oriented interfaces around a multimodal foundation model: a position-dependent cross-entropy loss for text-encoded controls, traffic rules translated into first-order logic and checked through a Markov Logic Network, and retrieval over prior multimodal driving experience. The paper reports gains over its baselines across multiple datasets. The abstract does not report the safety metrics, the rate at which the rule checker catches harmful actions, or a closed-loop intervention study.
 
 ## Core Insights
 

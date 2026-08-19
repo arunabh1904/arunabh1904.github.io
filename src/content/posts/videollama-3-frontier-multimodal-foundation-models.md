@@ -21,7 +21,7 @@ VideoLLaMA 3 takes a vision-centric route to image and video understanding. It f
 
 ## Summary
 
-The key claim is that high-quality image-text learning carries a lot of the load for video. Video data still matters, but the model does not need to learn all semantics from video clips alone.
+> The key claim is that high-quality image-text learning carries a lot of the load for video. Video data still matters, but the model does not need to learn all semantics from video clips alone.
 
 ## Core Insights
 

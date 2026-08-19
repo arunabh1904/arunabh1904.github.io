@@ -21,7 +21,7 @@ LLaVA connects a CLIP-style visual encoder to Vicuna with a learned projection l
 
 ## Summary
 
-That made image understanding feel like chat. A model could describe an image, answer questions, and follow open-ended visual instructions instead of only producing class labels or retrieval scores.
+> That made image understanding feel like chat. A model could describe an image, answer questions, and follow open-ended visual instructions instead of only producing class labels or retrieval scores.
 
 ## Core Insights
 

@@ -18,7 +18,7 @@ RPGFusion uses 4D-radar confidence and depth as priors for image-BEV query initi
 
 ## Summary
 
-The design makes radar decide where camera evidence should be retrieved, rather than asking a generic fusion block to discover range correspondence after both modalities have been compressed.
+> The design makes radar decide where camera evidence should be retrieved, rather than asking a generic fusion block to discover range correspondence after both modalities have been compressed.
 
 ## Core Insights
 

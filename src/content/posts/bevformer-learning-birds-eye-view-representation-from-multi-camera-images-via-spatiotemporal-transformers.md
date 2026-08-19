@@ -21,7 +21,7 @@ BEVFormer builds a bird's-eye-view feature map directly from surround cameras. I
 
 ## Summary
 
-This paper matters because it made dense BEV a practical intermediate representation for camera-only driving perception. Later end-to-end systems often either build on this BEV-centric idea or react against its compute cost.
+> This paper matters because it made dense BEV a practical intermediate representation for camera-only driving perception. Later end-to-end systems often either build on this BEV-centric idea or react against its compute cost.
 
 ## Core Insights
 

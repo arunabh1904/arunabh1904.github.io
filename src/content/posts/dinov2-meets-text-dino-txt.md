@@ -21,7 +21,7 @@ summary: '2024 – DINOv2 Meets Text: dino.txt'
 
 ## Summary
 
-dino.txt asks whether language alignment can be added to a strong self-supervised vision model without erasing the dense geometry that made it valuable. It freezes a DINOv2 ViT-L/14, adds two trainable visual transformer blocks, and learns a text encoder from scratch with image-text contrastive training. The added visual path updates both the class token and patch tokens, so image-level retrieval and pixel-level zero-shot segmentation share one aligned representation.
+> dino.txt asks whether language alignment can be added to a strong self-supervised vision model without erasing the dense geometry that made it valuable. It freezes a DINOv2 ViT-L/14, adds two trainable visual transformer blocks, and learns a text encoder from scratch with image-text contrastive training. The added visual path updates both the class token and patch tokens, so image-level retrieval and pixel-level zero-shot segmentation share one aligned representation.
 
 ## Core Insights
 

@@ -15,7 +15,7 @@ summary: "2025 – AutoVLA: A Vision-Language-Action Model for End-to-End Autono
 
 ## Summary
 
-AutoVLA puts semantic reasoning and trajectory planning in one autoregressive generation stream. It discretizes continuous trajectories into feasible action tokens, trains both a fast trajectory-only mode and a slower chain-of-thought mode with supervised fine-tuning, then applies GRPO to reduce unnecessary reasoning on straightforward scenes. The paper reports competitive results across nuPlan, nuScenes, Waymo, and CARLA in open- and closed-loop settings. The abstract does not report the tokenization resolution, the trigger for slow reasoning, or the compute cost of its adaptive policy.
+> AutoVLA puts semantic reasoning and trajectory planning in one autoregressive generation stream. It discretizes continuous trajectories into feasible action tokens, trains both a fast trajectory-only mode and a slower chain-of-thought mode with supervised fine-tuning, then applies GRPO to reduce unnecessary reasoning on straightforward scenes. The paper reports competitive results across nuPlan, nuScenes, Waymo, and CARLA in open- and closed-loop settings. The abstract does not report the tokenization resolution, the trigger for slow reasoning, or the compute cost of its adaptive policy.
 
 ## Core Insights
 

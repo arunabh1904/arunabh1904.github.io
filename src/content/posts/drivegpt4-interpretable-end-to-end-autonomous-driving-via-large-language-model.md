@@ -15,7 +15,7 @@ summary: "2023 – DriveGPT4: Interpretable End-to-end Autonomous Driving via La
 
 ## Summary
 
-DriveGPT4 puts natural-language explanation and low-level driving control behind one multimodal language-model interface. It consumes multi-frame video and textual queries, then produces scene-grounded answers, action rationales, and control signals. The paper reports quantitative and qualitative results on BDD-X and compares its domain-tuned system with GPT-4V for driving grounding; the abstract does not disclose a closed-loop safety evaluation.
+> DriveGPT4 puts natural-language explanation and low-level driving control behind one multimodal language-model interface. It consumes multi-frame video and textual queries, then produces scene-grounded answers, action rationales, and control signals. The paper reports quantitative and qualitative results on BDD-X and compares its domain-tuned system with GPT-4V for driving grounding; the abstract does not disclose a closed-loop safety evaluation.
 
 ## Core Insights
 

@@ -18,7 +18,7 @@ Kendall, Gal, and Cipolla derive trainable weights for classification and regres
 
 ## Summary
 
-The method solves one narrow but common multi-task problem: losses with different units and scales should not be added with arbitrary equal coefficients.
+> The method solves one narrow but common multi-task problem: losses with different units and scales should not be added with arbitrary equal coefficients.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ summary: "2026 – Towards Real-Time and Adaptable LiDAR Scene Completion"
 
 ## Summary
 
-RapidLiDAR makes initialization a learned, spatially varying displacement of the observed point cloud instead of fixed noise or random Gaussian noise. A multi-scale reconstruction module then refines the coarse scene through voxel and BEV features. On SemanticKITTI and KITTI-360, the paper reports state-of-the-art-level completion quality at 0.1 seconds per scene—2.3× faster than the fastest prior method—and adapts to different input resolutions without manual noise recalibration.
+> RapidLiDAR makes initialization a learned, spatially varying displacement of the observed point cloud instead of fixed noise or random Gaussian noise. A multi-scale reconstruction module then refines the coarse scene through voxel and BEV features. On SemanticKITTI and KITTI-360, the paper reports state-of-the-art-level completion quality at 0.1 seconds per scene—2.3× faster than the fastest prior method—and adapts to different input resolutions without manual noise recalibration.
 
 ## Core Insights
 

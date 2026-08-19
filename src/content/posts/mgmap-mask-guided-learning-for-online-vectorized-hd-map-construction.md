@@ -21,7 +21,7 @@ MGMap observes that vectorized HD map elements have strong shape priors, but the
 
 ## Summary
 
-The fix is mask-guided learning. MGMap learns masks over enhanced multi-scale BEV features, then uses those masks at the instance level and the point level to localize map elements more precisely.
+> The fix is mask-guided learning. MGMap learns masks over enhanced multi-scale BEV features, then uses those masks at the instance level and the point level to localize map elements more precisely.
 
 ## Core Insights
 

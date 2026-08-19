@@ -21,7 +21,7 @@ VoxelNeXt keeps LiDAR detection sparse through the prediction head. Instead of c
 
 ## Summary
 
-The paper tests a stronger claim than sparse backbones: the output interface does not have to become dense merely because earlier detectors did.
+> The paper tests a stronger claim than sparse backbones: the output interface does not have to become dense merely because earlier detectors did.
 
 ## Core Insights
 

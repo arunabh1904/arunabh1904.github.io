@@ -19,7 +19,7 @@ AutoTrust asks whether driving VLMs can be trusted, not merely whether they answ
 
 ## Summary
 
-That means questions can test whether a model hallucinates, gives unsafe advice, leaks sensitive information, breaks under perturbations, or behaves inconsistently across groups and regions.
+> That means questions can test whether a model hallucinates, gives unsafe advice, leaks sensitive information, breaks under perturbations, or behaves inconsistently across groups and regions.
 
 ## Core Insights
 

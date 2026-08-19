@@ -21,7 +21,7 @@ OpenVLA is a 7B-parameter vision-language-action model trained on real robot dem
 
 ## Summary
 
-The open release matters: checkpoints, code, and fine-tuning recipes make generalist robot policies easier to study and adapt.
+> The open release matters: checkpoints, code, and fine-tuning recipes make generalist robot policies easier to study and adapt.
 
 ## Core Insights
 

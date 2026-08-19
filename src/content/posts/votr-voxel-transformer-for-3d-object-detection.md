@@ -19,7 +19,7 @@ VoTr replaces a sparse-convolutional LiDAR backbone with attention over occupied
 
 ## Summary
 
-The paper's useful question is narrower than “should LiDAR use transformers?” It asks when content-dependent long-range retrieval is worth the indexing and latency that convolution avoids.
+> The paper's useful question is narrower than “should LiDAR use transformers?” It asks when content-dependent long-range retrieval is worth the indexing and latency that convolution avoids.
 
 ## Core Insights
 

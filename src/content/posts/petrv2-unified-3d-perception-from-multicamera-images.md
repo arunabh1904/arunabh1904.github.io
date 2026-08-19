@@ -21,7 +21,7 @@ PETRv2 extends PETR's 3D position-aware image tokens across time and tasks. Ego 
 
 ## Summary
 
-The paper unifies the interface, not the output representation. Boxes use sparse 3D detection queries, BEV segmentation uses patch queries, and lanes use ordered anchor-point queries.
+> The paper unifies the interface, not the output representation. Boxes use sparse 3D detection queries, BEV segmentation uses patch queries, and lanes use ordered anchor-point queries.
 
 ## Core Insights
 

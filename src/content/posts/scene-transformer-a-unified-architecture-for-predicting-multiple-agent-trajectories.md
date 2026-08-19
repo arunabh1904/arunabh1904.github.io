@@ -21,7 +21,7 @@ Scene Transformer makes multi-agent trajectory prediction a masking problem over
 
 ## Summary
 
-That framing is important for planning. Independent per-agent futures can be inconsistent with each other; a scene-centric model can represent futures where agents react to one another.
+> That framing is important for planning. Independent per-agent futures can be inconsistent with each other; a scene-centric model can represent futures where agents react to one another.
 
 ## Core Insights
 

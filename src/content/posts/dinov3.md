@@ -21,7 +21,7 @@ summary: '2025 – DINOv3'
 
 ## Summary
 
-DINOv3 scales self-supervised vision to a 6.7-billion-parameter transformer trained on 1.7 billion images, but its key technical result is about what scale breaks. During very long DINO/iBOT training, patch features gradually become too similar to the global class token. Classification keeps improving while dense spatial quality degrades. Gram anchoring constrains patch-to-patch relationships to an earlier, spatially healthier teacher.
+> DINOv3 scales self-supervised vision to a 6.7-billion-parameter transformer trained on 1.7 billion images, but its key technical result is about what scale breaks. During very long DINO/iBOT training, patch features gradually become too similar to the global class token. Classification keeps improving while dense spatial quality degrades. Gram anchoring constrains patch-to-patch relationships to an earlier, spatially healthier teacher.
 
 ## Core Insights
 

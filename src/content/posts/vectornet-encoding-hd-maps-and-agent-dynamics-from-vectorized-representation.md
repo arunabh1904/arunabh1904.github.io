@@ -19,7 +19,7 @@ VectorNet is a foundational vectorized-scene paper. Instead of rendering maps an
 
 ## Summary
 
-That representation matters because autonomous driving scenes are already structured. VectorNet lets the model operate on map and agent geometry directly, first within each polyline and then across the whole scene.
+> That representation matters because autonomous driving scenes are already structured. VectorNet lets the model operate on map and agent geometry directly, first within each polyline and then across the whole scene.
 
 ## Core Insights
 

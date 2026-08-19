@@ -19,7 +19,7 @@ summary: "2023 – RT-2: Vision-Language-Action Models Transfer Web Knowledge to
 
 ## Summary
 
-RT-2 turns robot control into another output language for a vision-language model. Continuous action dimensions are discretized into tokens, serialized as text-like outputs, and co-fine-tuned with Internet-scale VQA and image-language tasks.
+> RT-2 turns robot control into another output language for a vision-language model. Continuous action dimensions are discretized into tokens, serialized as text-like outputs, and co-fine-tuned with Internet-scale VQA and image-language tasks.
 
 ## Core Insights
 

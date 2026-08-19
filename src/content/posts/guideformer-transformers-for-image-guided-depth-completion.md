@@ -18,7 +18,7 @@ GuideFormer uses separate color and sparse-depth branches, then transfers image 
 
 ## Summary
 
-The method illustrates a broader fusion rule: interaction should be directional when one modality supplies the metric anchor and another supplies structural guidance.
+> The method illustrates a broader fusion rule: interaction should be directional when one modality supplies the metric anchor and another supplies structural guidance.
 
 ## Core Insights
 

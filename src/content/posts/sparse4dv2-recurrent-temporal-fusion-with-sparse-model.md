@@ -21,7 +21,7 @@ Sparse4D v2 changes the first Sparse4D from explicit multi-frame image sampling 
 
 ## Summary
 
-The architectural change is a memory decision: transmit structured hypotheses frame by frame instead of repeatedly reopening the video.
+> The architectural change is a memory decision: transmit structured hypotheses frame by frame instead of repeatedly reopening the video.
 
 ## Core Insights
 

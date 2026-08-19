@@ -19,7 +19,7 @@ DIMA tackles planner latency by distilling a large multimodal LLM into a smaller
 
 ## Summary
 
-The result is a model that keeps more of the teacher's traffic knowledge while avoiding a full LLM in the runtime loop.
+> The result is a model that keeps more of the teacher's traffic knowledge while avoiding a full LLM in the runtime loop.
 
 ## Core Insights
 

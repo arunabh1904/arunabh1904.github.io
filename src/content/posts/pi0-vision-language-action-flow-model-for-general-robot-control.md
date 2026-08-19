@@ -21,7 +21,7 @@ Pi0 is a vision-language-action model for general robot control. It starts from 
 
 ## Summary
 
-The paper adds an action generation mechanism based on flow matching, allowing the model to map images and language instructions into robot trajectories across tasks.
+> The paper adds an action generation mechanism based on flow matching, allowing the model to map images and language instructions into robot trajectories across tasks.
 
 ## Core Insights
 

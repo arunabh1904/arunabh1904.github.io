@@ -19,7 +19,7 @@ Cambrian-1 is less a single model trick and more a careful design study. It asks
 
 ## Summary
 
-The paper tests many vision encoders and introduces a Spatial Vision Aggregator to preserve richer visual information before it reaches the language model.
+> The paper tests many vision encoders and introduces a Spatial Vision Aggregator to preserve richer visual information before it reaches the language model.
 
 ## Core Insights
 

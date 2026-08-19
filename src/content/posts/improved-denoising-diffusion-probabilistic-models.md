@@ -21,7 +21,7 @@ summary: "2021 – Improved Denoising Diffusion Probabilistic Models"
 
 ## Summary
 
-Improved DDPM keeps the diffusion framework but fixes practical weaknesses in likelihood and sampling speed. The paper learns reverse-process variances instead of using a fixed variance schedule, studies hybrid objectives that balance sample quality and likelihood, and introduces a cosine noise schedule that allocates denoising difficulty more smoothly. It also shows that fewer sampling steps can preserve quality better than expected. The evidence includes ImageNet and other image-generation experiments comparing FID, negative log-likelihood, and precision/recall. The caveat is that diffusion still requires sequential denoising, so faster sampling is an improvement rather than a full solution. The paper is important because it turned DDPM from a promising sampler into a more scalable generative modeling recipe.
+> Improved DDPM keeps the diffusion framework but fixes practical weaknesses in likelihood and sampling speed. The paper learns reverse-process variances instead of using a fixed variance schedule, studies hybrid objectives that balance sample quality and likelihood, and introduces a cosine noise schedule that allocates denoising difficulty more smoothly. It also shows that fewer sampling steps can preserve quality better than expected. The evidence includes ImageNet and other image-generation experiments comparing FID, negative log-likelihood, and precision/recall. The caveat is that diffusion still requires sequential denoising, so faster sampling is an improvement rather than a full solution. The paper is important because it turned DDPM from a promising sampler into a more scalable generative modeling recipe.
 
 ## Core Insights
 

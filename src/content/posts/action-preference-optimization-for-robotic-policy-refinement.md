@@ -19,7 +19,7 @@ summary: "2025 – Human-Assisted Robotic Policy Refinement via Action Preferenc
 
 ## Summary
 
-Action Preference Optimization (APO) learns from a deployment pattern that ordinary DPO handles poorly: a robot starts to fail, a human takes over, and the corrected trajectory continues from a different state. The method labels actions as desirable or undesirable rather than pretending the intervention supplies a matched chosen–rejected pair.
+> Action Preference Optimization (APO) learns from a deployment pattern that ordinary DPO handles poorly: a robot starts to fail, a human takes over, and the corrected trajectory continues from a different state. The method labels actions as desirable or undesirable rather than pretending the intervention supplies a matched chosen–rejected pair.
 
 ## Core Insights
 

@@ -20,7 +20,7 @@ Transfusion combines next-token prediction for discrete data with diffusion for 
 
 ## Summary
 
-The paper separates the question of a shared transformer from the question of a shared loss. Text remains autoregressive while images use diffusion; modality-specific encoders and decoders handle the interface. The authors report that this hybrid recipe scales better than quantizing images into discrete tokens in their setting and can compress images to 16 patches with modality-specific layers.
+> The paper separates the question of a shared transformer from the question of a shared loss. Text remains autoregressive while images use diffusion; modality-specific encoders and decoders handle the interface. The authors report that this hybrid recipe scales better than quantizing images into discrete tokens in their setting and can compress images to 16 patches with modality-specific layers.
 
 ## Core Insights
 

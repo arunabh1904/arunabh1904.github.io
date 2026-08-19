@@ -21,7 +21,7 @@ GPT-Driver asks whether a language model can act as a motion planner when the dr
 
 ## Summary
 
-This is not a deployable AV stack by itself. It is a useful probe: language models can absorb structured scene descriptions and generate plausible plans, but latency, grounding, and closed-loop reliability remain hard.
+> This is not a deployable AV stack by itself. It is a useful probe: language models can absorb structured scene descriptions and generate plausible plans, but latency, grounding, and closed-loop reliability remain hard.
 
 ## Core Insights
 

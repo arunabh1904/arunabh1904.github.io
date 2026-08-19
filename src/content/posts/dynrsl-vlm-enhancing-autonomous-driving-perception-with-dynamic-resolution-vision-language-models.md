@@ -15,7 +15,7 @@ summary: "2025 – DynRsl-VLM: Enhancing Autonomous Driving Perception with Dyna
 
 ## Summary
 
-DynRsl-VLM changes the visual interface of a driving VLM. Instead of accepting a heavily downsampled image, it uses dynamic-resolution processing to retain entity detail while keeping the Vision Transformer input tractable. A custom image-text alignment module replaces a Q-Former for the resulting variable-resolution features. The paper frames distant pedestrians, signs, and obstacles as the motivation; the abstract does not report a driving benchmark, a control result, or a quantitative small-object analysis.
+> DynRsl-VLM changes the visual interface of a driving VLM. Instead of accepting a heavily downsampled image, it uses dynamic-resolution processing to retain entity detail while keeping the Vision Transformer input tractable. A custom image-text alignment module replaces a Q-Former for the resulting variable-resolution features. The paper frames distant pedestrians, signs, and obstacles as the motivation; the abstract does not report a driving benchmark, a control result, or a quantitative small-object analysis.
 
 ## Core Insights
 

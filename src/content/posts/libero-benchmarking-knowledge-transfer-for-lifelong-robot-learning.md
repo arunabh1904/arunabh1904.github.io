@@ -19,7 +19,7 @@ summary: "2023 – LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Le
 
 ## Summary
 
-LIBERO is a procedural benchmark for lifelong robot learning that distinguishes declarative knowledge—objects, layouts, goals—from procedural knowledge about how to act. It provides four suites and 130 language-conditioned manipulation tasks with teleoperated demonstrations.
+> LIBERO is a procedural benchmark for lifelong robot learning that distinguishes declarative knowledge—objects, layouts, goals—from procedural knowledge about how to act. It provides four suites and 130 language-conditioned manipulation tasks with teleoperated demonstrations.
 
 ## Core Insights
 

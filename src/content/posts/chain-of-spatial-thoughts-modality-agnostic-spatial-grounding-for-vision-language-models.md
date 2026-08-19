@@ -18,7 +18,7 @@ summary: "2026 – Chain of Spatial Thoughts: Modality-Agnostic Spatial Groundin
 
 ## Summary
 
-Chain of Spatial Thoughts adds continuous spatial tokens to a VLM without adding a separate inference-time spatial encoder. The tokens distill scene-level 3D geometry and object-centric attributes, remain available inside the model's chain of thought, and can be decoded to check whether they contain the intended geometry. On VSI-Bench, the paper reports a 4.3% improvement for Qwen3-VL-8B and 1.3% for SenseNova-SI-1.3, with especially strong object-size and room-size results.
+> Chain of Spatial Thoughts adds continuous spatial tokens to a VLM without adding a separate inference-time spatial encoder. The tokens distill scene-level 3D geometry and object-centric attributes, remain available inside the model's chain of thought, and can be decoded to check whether they contain the intended geometry. On VSI-Bench, the paper reports a 4.3% improvement for Qwen3-VL-8B and 1.3% for SenseNova-SI-1.3, with especially strong object-size and room-size results.
 
 ## Core Insights
 

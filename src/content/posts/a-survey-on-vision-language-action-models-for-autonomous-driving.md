@@ -21,7 +21,7 @@ This VLA-for-autonomous-driving survey provides a taxonomy and a curated bibliog
 
 ## Summary
 
-The survey is useful as a map. It shows how the field moved from end-to-end perception-to-control, to VLMs that explain scenes, to VLA systems that generate actions with language-aware reasoning.
+> The survey is useful as a map. It shows how the field moved from end-to-end perception-to-control, to VLMs that explain scenes, to VLA systems that generate actions with language-aware reasoning.
 
 ## Core Insights
 

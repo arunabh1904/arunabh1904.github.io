@@ -21,7 +21,7 @@ MapTRv2 keeps MapTR's central idea: represent map elements as permutation-equiva
 
 ## Summary
 
-The important additions are auxiliary one-to-many matching and dense supervision. Those extra training signals reduce the fragility of set matching and help the model learn map geometry before the final sparse vector loss has to carry everything.
+> The important additions are auxiliary one-to-many matching and dense supervision. Those extra training signals reduce the fragility of set matching and help the model learn map geometry before the final sparse vector loss has to carry everything.
 
 ## Core Insights
 

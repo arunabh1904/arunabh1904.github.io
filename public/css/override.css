@@ -32,6 +32,11 @@
   --table-border-color: rgba(53, 109, 255, 0.18);
   --table-header-bg: rgba(146, 178, 255, 0.18);
   --table-row-alt-bg: rgba(53, 109, 255, 0.04);
+  --callout-bg: #e6f5f2;
+  --callout-border: #0f766e;
+  --callout-text: #153c36;
+  --callout-link: #0b5f59;
+  --callout-shadow: rgba(15, 118, 110, 0.12);
   --button-bg: rgba(248, 251, 255, 0.94);
   --button-bg-hover: rgba(239, 245, 255, 0.98);
   --button-border: rgba(53, 109, 255, 0.16);
@@ -67,6 +72,11 @@
   --table-border-color: rgba(53, 109, 255, 0.18);
   --table-header-bg: rgba(146, 178, 255, 0.18);
   --table-row-alt-bg: rgba(53, 109, 255, 0.04);
+  --callout-bg: #e6f5f2;
+  --callout-border: #0f766e;
+  --callout-text: #153c36;
+  --callout-link: #0b5f59;
+  --callout-shadow: rgba(15, 118, 110, 0.12);
   --button-bg: rgba(248, 251, 255, 0.94);
   --button-bg-hover: rgba(239, 245, 255, 0.98);
   --button-border: rgba(53, 109, 255, 0.16);
@@ -103,6 +113,11 @@
   --table-border-color: rgba(255, 228, 92, 0.3);
   --table-header-bg: rgba(255, 228, 92, 0.09);
   --table-row-alt-bg: rgba(255, 228, 92, 0.04);
+  --callout-bg: #102a29;
+  --callout-border: #5eead4;
+  --callout-text: #e5fffb;
+  --callout-link: #99f6e4;
+  --callout-shadow: rgba(0, 0, 0, 0.28);
   --button-bg: rgba(12, 12, 12, 0.92);
   --button-bg-hover: rgba(26, 26, 26, 0.96);
   --button-border: rgba(255, 228, 92, 0.34);
@@ -259,6 +274,35 @@ body {
 .page-content td,
 .page-content th {
   font-family: var(--font-reading);
+}
+
+/* Curated takeaways and thesis statements sit apart from ordinary prose. */
+.page-content blockquote {
+  margin: 1.25rem 0;
+  padding: 1rem 1.15rem 1rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--callout-border) 32%, transparent);
+  border-inline-start: 0.3rem solid var(--callout-border);
+  border-radius: 0 14px 14px 0;
+  background: var(--callout-bg);
+  color: var(--callout-text);
+  box-shadow: 0 8px 20px var(--callout-shadow);
+}
+
+.page-content blockquote p {
+  color: inherit;
+}
+
+.page-content blockquote p:first-child {
+  margin-top: 0;
+}
+
+.page-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.page-content blockquote a {
+  color: var(--callout-link);
+  text-decoration-color: color-mix(in srgb, var(--callout-link) 55%, transparent);
 }
 
 .intro-text {

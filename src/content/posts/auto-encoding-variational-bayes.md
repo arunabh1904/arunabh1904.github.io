@@ -21,7 +21,7 @@ summary: "2014 – Auto-Encoding Variational Bayes"
 
 ## Summary
 
-The VAE paper solves inference for latent-variable models whose posterior is intractable but differentiable. It introduces the reparameterization trick: sample noise from a fixed distribution, transform it through encoder outputs, and backpropagate through the stochastic latent variable. The objective is the evidence lower bound, combining reconstruction likelihood with a KL term that keeps the approximate posterior near the prior. An encoder, or recognition model, amortizes inference across datapoints instead of optimizing a separate variational distribution for each one. The experiments show generative modeling and semi-supervised learning can be trained with stochastic gradient descent. The caveat is the usual VAE tradeoff: simple likelihoods and strong KL pressure can produce blurry samples or underused latents.
+> The VAE paper solves inference for latent-variable models whose posterior is intractable but differentiable. It introduces the reparameterization trick: sample noise from a fixed distribution, transform it through encoder outputs, and backpropagate through the stochastic latent variable. The objective is the evidence lower bound, combining reconstruction likelihood with a KL term that keeps the approximate posterior near the prior. An encoder, or recognition model, amortizes inference across datapoints instead of optimizing a separate variational distribution for each one. The experiments show generative modeling and semi-supervised learning can be trained with stochastic gradient descent. The caveat is the usual VAE tradeoff: simple likelihoods and strong KL pressure can produce blurry samples or underused latents.
 
 ## Core Insights
 

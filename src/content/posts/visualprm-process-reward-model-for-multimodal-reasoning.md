@@ -17,7 +17,7 @@ summary: "2025 – VisualPRM: An Effective Process Reward Model for Multimodal R
 
 ## Summary
 
-VisualPRM is an 8B process reward model trained to judge intermediate steps in multimodal reasoning. It introduces an automated 400K-example process-supervision dataset and VisualProcessBench, which contains human-labeled step correctness for evaluating critics rather than only final answers.
+> VisualPRM is an 8B process reward model trained to judge intermediate steps in multimodal reasoning. It introduces an automated 400K-example process-supervision dataset and VisualProcessBench, which contains human-labeled step correctness for evaluating critics rather than only final answers.
 
 ## Core Insights
 

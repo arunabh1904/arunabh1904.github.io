@@ -15,7 +15,7 @@ summary: "2023 – ADriver-I: A General World Model for Autonomous Driving"
 
 ## Summary
 
-ADriver-I turns an interleaved sequence of visual features and control signals into a driving world model. The model predicts the current control, conditions future-frame generation on that control and the history, then feeds the imagined frame back into another control step. It is therefore a joint action-and-observation rollout rather than a planner that predicts a trajectory once. The paper evaluates on nuScenes and a private dataset, but its abstract does not report a closed-loop metric or the horizon over which the recursive rollout remains reliable.
+> ADriver-I turns an interleaved sequence of visual features and control signals into a driving world model. The model predicts the current control, conditions future-frame generation on that control and the history, then feeds the imagined frame back into another control step. It is therefore a joint action-and-observation rollout rather than a planner that predicts a trajectory once. The paper evaluates on nuScenes and a private dataset, but its abstract does not report a closed-loop metric or the horizon over which the recursive rollout remains reliable.
 
 ## Core Insights
 

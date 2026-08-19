@@ -19,7 +19,7 @@ DriveVLM uses large vision-language models for scene description, scene analysis
 
 ## Summary
 
-That hybrid design is the interesting part. The VLM contributes semantic reasoning about rare or complex situations; the conventional stack keeps the control loop more grounded.
+> That hybrid design is the interesting part. The VLM contributes semantic reasoning about rare or complex situations; the conventional stack keeps the control loop more grounded.
 
 ## Core Insights
 

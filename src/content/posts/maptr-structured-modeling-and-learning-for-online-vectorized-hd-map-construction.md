@@ -21,7 +21,7 @@ MapTR is one of the core papers for online vectorized HD map construction. It re
 
 ## Summary
 
-The key modeling move is permutation equivalence. A map element can be represented by a set of points, but the same shape may have several valid point orders. MapTR encodes that ambiguity directly so training does not punish equivalent representations.
+> The key modeling move is permutation equivalence. A map element can be represented by a set of points, but the same shape may have several valid point orders. MapTR encodes that ambiguity directly so training does not punish equivalent representations.
 
 ## Core Insights
 

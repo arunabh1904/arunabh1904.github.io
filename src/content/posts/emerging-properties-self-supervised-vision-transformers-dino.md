@@ -23,7 +23,7 @@ summary: '2021 – DINO: Emerging Properties in Self-Supervised Vision Transform
 
 ## Summary
 
-DINO asks whether a vision transformer can learn useful structure without labels, negative pairs, or a fixed target encoder. Its answer is a self-distillation loop: a student predicts the output distribution of a momentum-updated teacher on different crops of the same image. The loss is simple, but the transformer changes what becomes visible in the representation. Its final-layer class-token attention often follows object boundaries, even though the model never receives segmentation masks.
+> DINO asks whether a vision transformer can learn useful structure without labels, negative pairs, or a fixed target encoder. Its answer is a self-distillation loop: a student predicts the output distribution of a momentum-updated teacher on different crops of the same image. The loss is simple, but the transformer changes what becomes visible in the representation. Its final-layer class-token attention often follows object boundaries, even though the model never receives segmentation masks.
 
 ## Core Insights
 

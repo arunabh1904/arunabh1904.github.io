@@ -22,7 +22,7 @@ summary: '2026 – HyWorldVLA: A Vision-Language-Action Model with Hybrid World 
 
 ## Summary
 
-Driving world models face a supervision tradeoff. Predicting future pixels preserves geometry and motion detail, but makes the learning target sensitive to rain, fog, illumination, and appearance changes that need not change the correct plan. Predicting only latent features is more invariant, but can discard scene structure without a reconstruction anchor. HyWorldVLA trains with both targets, then uses only the predicted latent future to condition its action expert during planning fine-tuning.
+> Driving world models face a supervision tradeoff. Predicting future pixels preserves geometry and motion detail, but makes the learning target sensitive to rain, fog, illumination, and appearance changes that need not change the correct plan. Predicting only latent features is more invariant, but can discard scene structure without a reconstruction anchor. HyWorldVLA trains with both targets, then uses only the predicted latent future to condition its action expert during planning fine-tuning.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ summary: "2026 – Map-Det3D: Metric Feed-Forward 3D Reconstruction Prior for Mu
 
 ## Summary
 
-Map-Det3D moves multi-view monocular detection into a metric 3D reconstruction representation. A feed-forward reconstruction model processes a short temporal window, and an object-aware adaptation lets the detector predict boxes directly in metric space rather than lifting 2D detections into 3D. The paper reports online performance and transfer across benchmarks without adaptation, positioning reconstruction priors as the geometry backbone for detection.
+> Map-Det3D moves multi-view monocular detection into a metric 3D reconstruction representation. A feed-forward reconstruction model processes a short temporal window, and an object-aware adaptation lets the detector predict boxes directly in metric space rather than lifting 2D detections into 3D. The paper reports online performance and transfer across benchmarks without adaptation, positioning reconstruction priors as the geometry backbone for detection.
 
 ## Core Insights
 

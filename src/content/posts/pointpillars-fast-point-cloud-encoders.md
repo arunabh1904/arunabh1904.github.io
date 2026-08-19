@@ -18,7 +18,7 @@ PointPillars partitions a point cloud into vertical columns, learns a PointNet-s
 
 ## Summary
 
-The architecture is an explicit compression decision: vertical detail is summarized inside each pillar so nearly all expensive spatial processing happens on the ground plane.
+> The architecture is an explicit compression decision: vertical detail is summarized inside each pillar so nearly all expensive spatial processing happens on the ground plane.
 
 ## Core Insights
 

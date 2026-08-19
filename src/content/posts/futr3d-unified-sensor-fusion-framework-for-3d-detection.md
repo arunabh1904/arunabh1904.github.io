@@ -19,7 +19,7 @@ FUTR3D makes the object query—not one sensor grid—the common fusion interfac
 
 ## Summary
 
-This design answers a different question from BEVFusion. BEVFusion asks how all sensors can be rasterized into one reusable spatial canvas. FUTR3D asks how one detector can accept different sensor configurations without inventing a new fusion block for each combination.
+> This design answers a different question from BEVFusion. BEVFusion asks how all sensors can be rasterized into one reusable spatial canvas. FUTR3D asks how one detector can accept different sensor configurations without inventing a new fusion block for each combination.
 
 ## Core Insights
 

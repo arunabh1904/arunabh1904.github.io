@@ -21,7 +21,7 @@ Qwen-VLA adds a continuous action-and-trajectory decoder to a Qwen vision-langua
 
 ## Summary
 
-The key trick is embodiment-aware prompting. Instead of adding separate output heads for every robot or task family, the prompt describes the embodiment and control convention, while a DiT flow-matching decoder generates the continuous action trajectory.
+> The key trick is embodiment-aware prompting. Instead of adding separate output heads for every robot or task family, the prompt describes the embodiment and control convention, while a DiT flow-matching decoder generates the continuous action trajectory.
 
 ## Core Insights
 

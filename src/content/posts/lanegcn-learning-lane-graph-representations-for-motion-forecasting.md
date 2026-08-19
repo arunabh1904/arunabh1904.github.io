@@ -21,7 +21,7 @@ LaneGCN treats the map as a graph, not an image. It constructs lane nodes from r
 
 ## Summary
 
-The useful idea is explicit relational structure. LaneGCN does not only ask "what is near the actor?" It asks how actors, lanes, neighboring lanes, and other actors should pass information to each other.
+> The useful idea is explicit relational structure. LaneGCN does not only ask "what is near the actor?" It asks how actors, lanes, neighboring lanes, and other actors should pass information to each other.
 
 ## Core Insights
 

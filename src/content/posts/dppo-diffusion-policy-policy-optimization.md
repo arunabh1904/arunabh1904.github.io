@@ -19,7 +19,7 @@ summary: "2024 – DPPO: Diffusion Policy Policy Optimization"
 
 ## Summary
 
-DPPO addresses a representation mismatch in robot RL: a diffusion policy does not expose one simple action density in the same way as a Gaussian policy. The method treats denoising as an augmented Markov process and applies policy-gradient updates across denoising transitions.
+> DPPO addresses a representation mismatch in robot RL: a diffusion policy does not expose one simple action density in the same way as a Gaussian policy. The method treats denoising as an augmented Markov process and applies policy-gradient updates across denoising transitions.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ summary: "2026 – VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-Worl
 
 ## Summary
 
-VLA-REPLICA addresses a gap between scalable simulation and expensive centralized robot evaluation. It specifies a low-cost SO-101 arm, cameras, lighting enclosure, fixed workspace, ten manipulation tasks, adaptation demonstrations, and in-/out-of-distribution protocols that independent labs can assemble locally.
+> VLA-REPLICA addresses a gap between scalable simulation and expensive centralized robot evaluation. It specifies a low-cost SO-101 arm, cameras, lighting enclosure, fixed workspace, ten manipulation tasks, adaptation demonstrations, and in-/out-of-distribution protocols that independent labs can assemble locally.
 
 ## Core Insights
 

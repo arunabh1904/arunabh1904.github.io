@@ -21,7 +21,7 @@ BEVDet assembles an image backbone, Lift-Splat-style view transformer, BEV encod
 
 ## Summary
 
-The paper is valuable because it treats the view transform as a systems component. Camera resolution, BEV resolution, and pooling implementation determine different parts of the cost.
+> The paper is valuable because it treats the view transform as a systems component. Camera resolution, BEV resolution, and pooling implementation determine different parts of the cost.
 
 ## Core Insights
 

@@ -21,7 +21,7 @@ UniTR pushes unification below BEV fusion into the backbone. Images and LiDAR us
 
 ## Summary
 
-This is the paper most directly aligned with “unified sensor modeling” as parameter sharing. Earlier systems standardize the fusion space or prediction interface; UniTR asks whether the expensive encoder itself can be modality-agnostic.
+> This is the paper most directly aligned with “unified sensor modeling” as parameter sharing. Earlier systems standardize the fusion space or prediction interface; UniTR asks whether the expensive encoder itself can be modality-agnostic.
 
 ## Core Insights
 

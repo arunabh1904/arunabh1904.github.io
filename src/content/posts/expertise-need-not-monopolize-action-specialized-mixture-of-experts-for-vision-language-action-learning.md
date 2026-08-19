@@ -22,7 +22,7 @@ summary: '2025 – Expertise Need Not Monopolize: Action-Specialized Mixture of 
 
 ## Summary
 
-AdaMoE asks how to expand a VLA’s action capacity without activating a proportionally larger dense model at every control step. It starts from a pretrained flow-matching VLA, preserves its weights, and replaces feed-forward layers inside the action expert with sparse mixture-of-experts layers. Shared experts always run; a router selects a small subset of additional experts for each action token.
+> AdaMoE asks how to expand a VLA’s action capacity without activating a proportionally larger dense model at every control step. It starts from a pretrained flow-matching VLA, preserves its weights, and replaces feed-forward layers inside the action expert with sparse mixture-of-experts layers. Shared experts always run; a router selects a small subset of additional experts for each action token.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ DiffVLA combines vision-language guidance with diffusion planning. It treats dri
 
 ## Summary
 
-The model is useful in the VLA lineage because it makes action diversity explicit. Instead of only predicting one sparse trajectory, it uses a hybrid sparse-dense diffusion representation to explore plausible plans.
+> The model is useful in the VLA lineage because it makes action diversity explicit. Instead of only predicting one sparse trajectory, it uses a hybrid sparse-dense diffusion representation to explore plausible plans.
 
 ## Core Insights
 
