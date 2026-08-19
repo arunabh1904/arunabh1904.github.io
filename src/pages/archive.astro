@@ -1,32 +1,226 @@
 ---
+import WritingIndexList from '../components/WritingIndexList.astro';
 import PostLayout from '../layouts/PostLayout.astro';
-import SectionHeader from '../components/SectionHeader.astro';
-import { getAllPosts, groupPostsByTag } from '../lib/content';
+import { groupBlogPosts } from '../lib/blog-index';
+import {
+  getAllPosts,
+  getPostsBySection,
+  groupPostsByField,
+  sortPostsDescending,
+} from '../lib/content';
 
-const posts = await getAllPosts();
-const grouped = groupPostsByTag(posts);
+const allPosts = await getAllPosts('desc');
+const blogPosts = await getPostsBySection('blog', 'desc');
+const paperPosts = await getPostsBySection('paper-shorts', 'desc');
+const revisionPosts = await getPostsBySection('revision-notes', 'desc');
+
+const blogGroups = groupBlogPosts(blogPosts);
+const paperFields = groupPostsByField(paperPosts)
+  .map(({ field, posts }) => ({ field, posts: sortPostsDescending(posts) }))
+  .sort((left, right) => left.field.localeCompare(right.field));
+
+const sections = [
+  {
+    id: 'blog',
+    title: 'Blog',
+    description: 'Long-form technical guides, projects, local experiments, and essays.',
+    count: blogPosts.length,
+  },
+  {
+    id: 'arxiv-notes',
+    title: 'Arxiv Notes',
+    description: 'Compact paper notes, grouped by the research problem they address.',
+    count: paperPosts.length,
+  },
+  {
+    id: 'revision-notes',
+    title: 'Revision Notes',
+    description: 'Lecture and course material rebuilt for fast recall.',
+    count: revisionPosts.length,
+  },
+] as const;
 ---
 
-<PostLayout title="Blog Archive" showSectionsNav={false}>
-  <SectionHeader
-    eyebrow="Archive"
-    title="All writing by tag"
-    description="A compact index for jumping across research notes, essays, explainers, and revision material."
-    meta={`${posts.length} entries`}
-  />
-  {grouped.map(({ tag, items }) => (
-    <section class="section-index-group">
-      <h3>{tag}</h3>
-      <ul class="archive-list">
-        {items.map((post) => (
-          <li>
-            <a href={post.data.legacyPath}>
-              <span>{post.data.title}</span>
-              <small>{post.data.date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</small>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  ))}
+<PostLayout
+  title="Writing"
+  description="Essays, technical guides, paper notes, and revision material, grouped by form and subject."
+  showSectionsNav={false}
+>
+  <div class="writing-index" data-writing-index>
+    <header class="blog-index-intro">
+      <h1>Writing</h1>
+      <p>Essays, technical guides, paper notes, and revision material, grouped by form and subject.</p>
+    </header>
+
+    <div class="writing-index-toolbar">
+      <label class="writing-index-search">
+        <span aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          placeholder="Search titles, summaries, or fields"
+          autocomplete="off"
+          data-writing-search
+        />
+      </label>
+      <output data-writing-count>{allPosts.length} entries</output>
+    </div>
+
+    <div class="blog-index-groups">
+      <details class="blog-index-group no-icon" id={sections[0].id} data-writing-section>
+        <summary>
+          <div>
+            <div class="blog-index-group__title">
+              <h2>{sections[0].title}</h2>
+              <span>{sections[0].count} posts</span>
+            </div>
+            <p>{sections[0].description}</p>
+          </div>
+          <span class="blog-index-group__action" aria-hidden="true">
+            <span class="blog-index-group__action-label--closed">View entries ↓</span>
+            <span class="blog-index-group__action-label--open">Hide entries ↑</span>
+          </span>
+        </summary>
+        <div class="writing-index-section__body">
+          <div class="writing-index-subgroups">
+            {blogGroups.map((group) => (
+              <details class="writing-index-subgroup no-icon" data-writing-subgroup>
+                <summary>
+                  <div>
+                    <div class="writing-index-subgroup__title">
+                      <h3>{group.title}</h3>
+                      <span>{group.posts.length} posts</span>
+                    </div>
+                    <p>{group.description}</p>
+                  </div>
+                  <span class="writing-index-subgroup__action" aria-hidden="true">
+                    <span class="writing-index-subgroup__action-label--closed">View posts ↓</span>
+                    <span class="writing-index-subgroup__action-label--open">Hide posts ↑</span>
+                  </span>
+                </summary>
+                <WritingIndexList posts={group.posts} context={`Blog ${group.title}`} />
+              </details>
+            ))}
+          </div>
+        </div>
+      </details>
+
+      <details class="blog-index-group no-icon" id={sections[1].id} data-writing-section>
+        <summary>
+          <div>
+            <div class="blog-index-group__title">
+              <h2>{sections[1].title}</h2>
+              <span>{sections[1].count} notes</span>
+            </div>
+            <p>{sections[1].description}</p>
+          </div>
+          <span class="blog-index-group__action" aria-hidden="true">
+            <span class="blog-index-group__action-label--closed">View entries ↓</span>
+            <span class="blog-index-group__action-label--open">Hide entries ↑</span>
+          </span>
+        </summary>
+        <div class="writing-index-section__body">
+          <div class="writing-index-subgroups">
+            {paperFields.map(({ field, posts }) => (
+              <details class="writing-index-subgroup no-icon" data-writing-subgroup>
+                <summary>
+                  <div class="writing-index-subgroup__title">
+                    <h3>{field}</h3>
+                    <span>{posts.length} notes</span>
+                  </div>
+                  <span class="writing-index-subgroup__action" aria-hidden="true">
+                    <span class="writing-index-subgroup__action-label--closed">View notes ↓</span>
+                    <span class="writing-index-subgroup__action-label--open">Hide notes ↑</span>
+                  </span>
+                </summary>
+                <WritingIndexList posts={posts} context={`Arxiv Notes ${field}`} />
+              </details>
+            ))}
+          </div>
+        </div>
+      </details>
+
+      <details class="blog-index-group no-icon" id={sections[2].id} data-writing-section>
+        <summary>
+          <div>
+            <div class="blog-index-group__title">
+              <h2>{sections[2].title}</h2>
+              <span>{sections[2].count} notes</span>
+            </div>
+            <p>{sections[2].description}</p>
+          </div>
+          <span class="blog-index-group__action" aria-hidden="true">
+            <span class="blog-index-group__action-label--closed">View entries ↓</span>
+            <span class="blog-index-group__action-label--open">Hide entries ↑</span>
+          </span>
+        </summary>
+        <div class="writing-index-section__body writing-index-section__body--list">
+          <WritingIndexList posts={revisionPosts} context="Revision Notes" />
+        </div>
+      </details>
+    </div>
+    <p class="writing-index-empty" data-writing-empty hidden>No writing found for that search.</p>
+  </div>
+
+  <script is:inline>
+    (() => {
+      const root = document.querySelector('[data-writing-index]');
+      const input = root?.querySelector('[data-writing-search]');
+      const count = root?.querySelector('[data-writing-count]');
+      const empty = root?.querySelector('[data-writing-empty]');
+
+      if (!(root instanceof HTMLElement) || !(input instanceof HTMLInputElement)) return;
+
+      const sections = [...root.querySelectorAll('[data-writing-section]')];
+      const subgroups = [...root.querySelectorAll('[data-writing-subgroup]')];
+      const items = [...root.querySelectorAll('[data-writing-item]')];
+
+      const update = () => {
+        const query = input.value.trim().toLocaleLowerCase();
+        let matches = 0;
+
+        for (const item of items) {
+          if (!(item instanceof HTMLElement)) continue;
+          const matchesQuery = query === '' || (item.dataset.searchText ?? '').includes(query);
+          item.hidden = !matchesQuery;
+          if (matchesQuery) matches += 1;
+        }
+
+        for (const subgroup of subgroups) {
+          if (!(subgroup instanceof HTMLDetailsElement)) continue;
+          const hasMatch = [...subgroup.querySelectorAll('[data-writing-item]')].some(
+            (item) => item instanceof HTMLElement && !item.hidden,
+          );
+          subgroup.hidden = query !== '' && !hasMatch;
+          subgroup.open = query !== '' && hasMatch;
+        }
+
+        for (const section of sections) {
+          if (!(section instanceof HTMLDetailsElement)) continue;
+          const hasMatch = [...section.querySelectorAll('[data-writing-item]')].some(
+            (item) => item instanceof HTMLElement && !item.hidden,
+          );
+          section.hidden = query !== '' && !hasMatch;
+          section.open = query !== '' && hasMatch;
+        }
+
+        if (count instanceof HTMLOutputElement) {
+          count.textContent = query === ''
+            ? `${items.length} entries`
+            : `${matches} ${matches === 1 ? 'match' : 'matches'}`;
+        }
+
+        if (empty instanceof HTMLElement) {
+          empty.hidden = query === '' || matches > 0;
+        }
+      };
+
+      input.addEventListener('input', update);
+      input.addEventListener('search', update);
+      input.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || input.value === '') return;
+        input.value = '';
+        update();
+      });
+    })();
+  </script>
 </PostLayout>

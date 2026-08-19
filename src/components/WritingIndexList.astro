@@ -1,0 +1,40 @@
+---
+import type { PostEntry } from '../lib/content';
+
+interface Props {
+  posts: PostEntry[];
+  context?: string;
+}
+
+const { posts, context = '' } = Astro.props;
+
+const searchTextFor = (post: PostEntry) =>
+  [
+    post.data.title,
+    post.data.summary,
+    post.data.field,
+    post.data.tags.join(' '),
+    context,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLocaleLowerCase();
+---
+
+<ul class="post-list writing-index-list">
+  {posts.map((post) => (
+    <li data-writing-item data-search-text={searchTextFor(post)}>
+      <a href={post.data.legacyPath}>{post.data.title}</a>
+      <small>
+        {
+          post.data.date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+          })
+        }
+      </small>
+      {post.data.summary && <p>{post.data.summary}</p>}
+    </li>
+  ))}
+</ul>
