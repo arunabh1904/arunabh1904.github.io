@@ -16,7 +16,7 @@ summary: >-
 
 I wanted the same practical answer I measured for Qwen and Gemma: can I fit the exact `DeepSeek-V4-Flash-0731` checkpoint on my `64 GB` M5 Max MacBook Pro, and can I serve it at an interactive speed?
 
-No. The official checkpoint is about `167 GB` on disk, and the maintained vLLM recipe assigns it a `200 GB` minimum accelerator-memory target. That is before leaving room for the inference runtime, activations, and KV cache. A `64 GB` Mac can call the hosted model and can serve a local application backed by that API, but it cannot load the official weights into unified memory.
+> No. The official checkpoint is about `167 GB` on disk, and the maintained vLLM recipe assigns it a `200 GB` minimum accelerator-memory target. That is before leaving room for the inference runtime, activations, and KV cache. A `64 GB` Mac can call the hosted model and can serve a local application backed by that API, but it cannot load the official weights into unified memory.
 
 This is a sizing analysis dated August 13, 2026, not a benchmark. I did not manufacture latency numbers for a model that cannot load on the machine.
 

@@ -19,7 +19,7 @@ summary: How camera, LiDAR, and radar become a unified, temporal scene represent
 
 An autonomous vehicle receives several partial descriptions of the same scene. Cameras provide dense appearance and semantic detail, but depth has to be inferred and image quality falls under glare, darkness, rain, or fog. LiDAR measures range directly and resolves 3D shape well, but the point cloud becomes sparse with distance and can be degraded by weather, reflectivity, occlusion, and motion during a scan. Radar measures range and radial velocity at long distance and is comparatively tolerant of poor visibility, but its angle estimates are coarse and multipath produces ambiguous returns.
 
-The central architectural question is therefore not simply how to combine sensors. It is where to preserve their differences, where to establish a shared geometric representation, and where to spend the information that the model can no longer recover. The progression in this article follows that dependency:
+> The central architectural question is therefore not simply how to combine sensors. It is where to preserve their differences, where to establish a shared geometric representation, and where to spend the information that the model can no longer recover. The progression in this article follows that dependency:
 
 sensor-specific encoders → metric 3D representation → temporal state → task heads
 
