@@ -17,7 +17,7 @@ summary: "2025 – LangCoop: Collaborative Driving with Language"
 
 ## Summary
 
-LangCoop makes natural language the communication medium between collaborating vehicles. Its $M^3$CoT component structures zero-shot vision-language reasoning, while LangPack turns selected information into concise language messages. In CARLA, the paper reports up to a 96% reduction in communication bandwidth, with messages under 2 KB, while retaining competitive closed-loop driving performance. The abstract does not report message loss, latency, or an evaluation against adversarial or misleading language.
+> LangCoop makes natural language the communication medium between collaborating vehicles. Its $M^3$CoT component structures zero-shot vision-language reasoning, while LangPack turns selected information into concise language messages. In CARLA, the paper reports up to a 96% reduction in communication bandwidth, with messages under 2 KB, while retaining competitive closed-loop driving performance. The abstract does not report message loss, latency, or an evaluation against adversarial or misleading language.
 
 ## Core Insights
 

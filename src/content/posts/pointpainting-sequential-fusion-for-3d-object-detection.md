@@ -19,7 +19,7 @@ PointPainting runs image semantic segmentation first, projects every LiDAR point
 
 ## Summary
 
-Its appeal is modularity. The LiDAR model receives explicit semantic evidence without learning a large joint feature space. The same choice also defines its ceiling: image information can survive only where LiDAR produced a point and only in the form the segmentation model emitted.
+> Its appeal is modularity. The LiDAR model receives explicit semantic evidence without learning a large joint feature space. The same choice also defines its ceiling: image information can survive only where LiDAR produced a point and only in the form the segmentation model emitted.
 
 ## Core Insights
 

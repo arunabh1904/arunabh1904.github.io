@@ -24,7 +24,7 @@ summary: '2026 – Qwen-RobotWorld: Unifying Embodied World Modeling through Lan
 
 ## Summary
 
-Qwen-RobotWorld treats natural language as a common action interface for robotic manipulation, autonomous driving, indoor navigation, and human-to-robot transfer. Given an initial observation and an instruction, the model generates the future video rather than predicting embodiment-specific joint commands. The contribution is therefore a shared visual transition model: heterogeneous experience can train one backbone after each action has been expressed as language.
+> Qwen-RobotWorld treats natural language as a common action interface for robotic manipulation, autonomous driving, indoor navigation, and human-to-robot transfer. Given an initial observation and an instruction, the model generates the future video rather than predicting embodiment-specific joint commands. The contribution is therefore a shared visual transition model: heterogeneous experience can train one backbone after each action has been expressed as language.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ AsyncDriver addresses a practical problem: LLMs are too slow to sit directly in 
 
 ## Summary
 
-Those instructions can guide the planner through complex or ambiguous situations without requiring the LLM to produce every control update.
+> Those instructions can guide the planner through complex or ambiguous situations without requiring the LLM to produce every control update.
 
 ## Core Insights
 

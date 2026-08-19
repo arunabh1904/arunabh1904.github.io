@@ -23,7 +23,7 @@ DriveLM argues that driving VQA should be multi-step and graph-structured. Human
 
 ## Summary
 
-DriveLM captures that process with Graph Visual Question Answering. Nodes represent reasoning stages such as perception, prediction, planning, behavior, and motion. Edges pass context between questions.
+> DriveLM captures that process with Graph Visual Question Answering. Nodes represent reasoning stages such as perception, prediction, planning, behavior, and motion. Edges pass context between questions.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ summary: "2023 – Open X-Embodiment: Robotic Learning Datasets and RT-X Models"
 
 ## Summary
 
-Open X-Embodiment asks whether robotics can build a shared pretraining corpus despite incompatible robots, cameras, action spaces, and collection procedures. The collaboration standardizes data from 22 embodiments and 21 institutions, covering 527 skills and more than a million episodes in later releases.
+> Open X-Embodiment asks whether robotics can build a shared pretraining corpus despite incompatible robots, cameras, action spaces, and collection procedures. The collaboration standardizes data from 22 embodiments and 21 institutions, covering 527 skills and more than a million episodes in later releases.
 
 ## Core Insights
 

@@ -15,7 +15,7 @@ summary: "2025 – TS-VLM: Text-Guided SoftSort Pooling for Vision-Language Mode
 
 ## Summary
 
-TS-VLM replaces costly cross-view attention with Text-Guided SoftSort Pooling. A question ranks multi-view visual features by their semantic relevance, then pools them into the language path. On DriveLM, the paper reports BLEU-4 56.82, METEOR 41.91, ROUGE-L 74.64, and CIDEr 3.39; its smallest model has 20.1 million parameters and is reported to reduce compute by up to 90%. Those are reasoning metrics, not evidence of a vehicle control policy.
+> TS-VLM replaces costly cross-view attention with Text-Guided SoftSort Pooling. A question ranks multi-view visual features by their semantic relevance, then pools them into the language path. On DriveLM, the paper reports BLEU-4 56.82, METEOR 41.91, ROUGE-L 74.64, and CIDEr 3.39; its smallest model has 20.1 million parameters and is reported to reduce compute by up to 90%. Those are reasoning metrics, not evidence of a vehicle control policy.
 
 ## Core Insights
 

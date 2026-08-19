@@ -21,7 +21,7 @@ InternVL 2.5 is a scaling and training study for open multimodal LLMs. It keeps 
 
 ## Summary
 
-The paper is useful because it studies several axes together: vision encoder size, language model size, dataset size, and chain-of-thought style inference. The story is not "just scale everything"; it is that scaling only pays off when the data and training recipe stay balanced.
+> The paper is useful because it studies several axes together: vision encoder size, language model size, dataset size, and chain-of-thought style inference. The story is not "just scale everything"; it is that scaling only pays off when the data and training recipe stay balanced.
 
 ## Core Insights
 

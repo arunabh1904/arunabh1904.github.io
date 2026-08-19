@@ -18,7 +18,7 @@ summary: "2026 – 4D-WAM: 4D Consistent World Modeling for Autonomous Driving"
 
 ## Summary
 
-4D-WAM argues that future video frames are an incomplete training target for driving world-action models: they can look plausible while violating scene geometry or motion. It feeds generated futures through a geometric foundation model and uses feature- and depth-level responses as a 4D consistency loss. A decision-oriented timestep sampler then concentrates supervision at early noisy diffusion steps, where the paper argues planning decisions are formed.
+> 4D-WAM argues that future video frames are an incomplete training target for driving world-action models: they can look plausible while violating scene geometry or motion. It feeds generated futures through a geometric foundation model and uses feature- and depth-level responses as a 4D consistency loss. A decision-oriented timestep sampler then concentrates supervision at early noisy diffusion steps, where the paper argues planning decisions are formed.
 
 ## Core Insights
 

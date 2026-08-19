@@ -18,7 +18,7 @@ summary: "2026 – RoadWeaver: Large-Scale Lane-Level HD Map Generation from Scr
 
 ## Summary
 
-RoadWeaver generates complete simulation-ready lane maps rather than isolated local road fragments. Its coarse-to-fine pipeline samples a global road layout, expands it into a connected network, and then constructs lane geometry and topology. The reported maps reach 99.8% reachability, a 10.7% dead-end ratio, and 0.24 m endpoint alignment error, while generation takes 1.39–3.50 seconds.
+> RoadWeaver generates complete simulation-ready lane maps rather than isolated local road fragments. Its coarse-to-fine pipeline samples a global road layout, expands it into a connected network, and then constructs lane geometry and topology. The reported maps reach 99.8% reachability, a 10.7% dead-end ratio, and 0.24 m endpoint alignment error, while generation takes 1.39–3.50 seconds.
 
 ## Core Insights
 

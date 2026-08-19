@@ -18,7 +18,7 @@ UniWorld pretrains a camera encoder and BEV representation by predicting geometr
 
 ## Summary
 
-The method is label-free with respect to manual annotations, not sensor-free. Its scale comes from automatically generated image-LiDAR pairs and a target that forces metric scene completion.
+> The method is label-free with respect to manual annotations, not sensor-free. Its scale comes from automatically generated image-LiDAR pairs and a target that forces metric scene completion.
 
 ## Core Insights
 

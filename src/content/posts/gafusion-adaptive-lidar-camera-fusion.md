@@ -18,7 +18,7 @@ GAFusion uses LiDAR to guide camera geometry through Sparse Depth Guidance and L
 
 ## Summary
 
-The architecture's unifying idea is guidance: LiDAR should shape where and at what scale camera evidence enters BEV before the modalities are blended.
+> The architecture's unifying idea is guidance: LiDAR should shape where and at what scale camera evidence enters BEV before the modalities are blended.
 
 ## Core Insights
 

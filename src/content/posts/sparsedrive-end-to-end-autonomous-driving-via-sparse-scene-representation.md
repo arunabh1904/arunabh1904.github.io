@@ -21,7 +21,7 @@ SparseDrive asks whether end-to-end driving really needs dense BEV features ever
 
 ## Summary
 
-This puts SparseDrive in the same broad family as VAD: the planner should reason over structured scene entities instead of spending most of its budget on a dense grid.
+> This puts SparseDrive in the same broad family as VAD: the planner should reason over structured scene entities instead of spending most of its budget on a dense grid.
 
 ## Core Insights
 

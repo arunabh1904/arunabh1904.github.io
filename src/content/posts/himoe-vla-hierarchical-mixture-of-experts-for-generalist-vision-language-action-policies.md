@@ -23,7 +23,7 @@ summary: '2025 – HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vis
 
 ## Summary
 
-Generalist robot training mixes more than tasks. Datasets disagree about embodiment, camera layout, state representation, and whether actions encode joints or end-effector motion. HiMoE-VLA treats this heterogeneity as a depth-dependent routing problem: specialize near the action interface, preserve shared computation in the middle, and allocate additional sparse capacity beside the specialized boundaries.
+> Generalist robot training mixes more than tasks. Datasets disagree about embodiment, camera layout, state representation, and whether actions encode joints or end-effector motion. HiMoE-VLA treats this heterogeneity as a depth-dependent routing problem: specialize near the action interface, preserve shared computation in the middle, and allocate additional sparse capacity beside the specialized boundaries.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ DriveBench measures VLM reliability for autonomous driving through scene questio
 
 ## Summary
 
-The important finding is uncomfortable: models can give confident and plausible answers without grounding them in the visual input. Corruptions expose this because the answer often should change when the evidence changes.
+> The important finding is uncomfortable: models can give confident and plausible answers without grounding them in the visual input. Corruptions expose this because the answer often should change when the evidence changes.
 
 ## Core Insights
 

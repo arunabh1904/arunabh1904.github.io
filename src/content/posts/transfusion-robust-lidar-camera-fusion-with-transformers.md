@@ -21,7 +21,7 @@ TransFusion replaces hard point-to-pixel fusion with soft, object-centric associ
 
 ## Summary
 
-The architectural lesson is precise: a sensor can anchor geometry without forcing every other sensor through its samples. Image evidence joins only after a plausible object hypothesis exists.
+> The architectural lesson is precise: a sensor can anchor geometry without forcing every other sensor through its samples. Image evidence joins only after a plausible object hypothesis exists.
 
 ## Core Insights
 

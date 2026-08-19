@@ -21,7 +21,7 @@ Lift, Splat, Shoot (LSS) turns an arbitrary camera rig into a metric bird's-eye-
 
 ## Summary
 
-The durable idea is the interface, not the rhyme in the title. Perspective images disagree about where evidence should live, while planning needs a vehicle-centered spatial map. LSS makes the camera-to-BEV transformation differentiable and lets every camera contribute to the same grid.
+> The durable idea is the interface, not the rhyme in the title. Perspective images disagree about where evidence should live, while planning needs a vehicle-centered spatial map. LSS makes the camera-to-BEV transformation differentiable and lets every camera contribute to the same grid.
 
 ## Core Insights
 

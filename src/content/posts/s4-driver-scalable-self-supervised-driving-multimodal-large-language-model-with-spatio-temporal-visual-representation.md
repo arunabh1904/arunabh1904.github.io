@@ -17,7 +17,7 @@ summary: "2025 – S4-Driver: Scalable Self-Supervised Driving Multimodal Large 
 
 ## Summary
 
-S4-Driver turns multi-view, multi-frame visual features from a PaLI multimodal model into a sparse 3D volume, then plans in that 3D representation without fine-tuning the vision encoder. The self-supervised recipe targets trajectories directly and avoids human intermediate annotations. The paper reports favorable results against supervised multi-task approaches on nuScenes and Waymo Open Motion Dataset camera data, with further scaling on unannotated driving logs. The abstract does not give the pretraining volume, the self-supervised objective, or closed-loop safety metrics.
+> S4-Driver turns multi-view, multi-frame visual features from a PaLI multimodal model into a sparse 3D volume, then plans in that 3D representation without fine-tuning the vision encoder. The self-supervised recipe targets trajectories directly and avoids human intermediate annotations. The paper reports favorable results against supervised multi-task approaches on nuScenes and Waymo Open Motion Dataset camera data, with further scaling on unannotated driving logs. The abstract does not give the pretraining volume, the self-supervised objective, or closed-loop safety metrics.
 
 ## Core Insights
 

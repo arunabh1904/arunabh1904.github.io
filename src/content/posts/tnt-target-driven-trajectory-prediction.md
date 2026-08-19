@@ -23,7 +23,7 @@ TNT says that for moderate-horizon motion forecasting, most of the multimodality
 
 ## Summary
 
-That design makes the intermediate outputs interpretable. A planner can inspect possible destinations, target-conditioned rollouts, and trajectory scores instead of receiving only opaque samples from a latent distribution.
+> That design makes the intermediate outputs interpretable. A planner can inspect possible destinations, target-conditioned rollouts, and trajectory scores instead of receiving only opaque samples from a latent distribution.
 
 ## Core Insights
 

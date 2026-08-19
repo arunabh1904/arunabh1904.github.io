@@ -19,7 +19,7 @@ summary: "2025 – RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bim
 
 ## Summary
 
-RoboTwin 2.0 combines a synthetic-data factory with a 50-task bimanual benchmark. Its object library contains 731 instances across 147 categories, while an MLLM proposes task code and simulation-in-the-loop feedback validates and refines execution.
+> RoboTwin 2.0 combines a synthetic-data factory with a 50-task bimanual benchmark. Its object library contains 731 instances across 147 categories, while an MLLM proposes task code and simulation-in-the-loop feedback validates and refines execution.
 
 ## Core Insights
 

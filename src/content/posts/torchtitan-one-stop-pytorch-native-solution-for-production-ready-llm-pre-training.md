@@ -21,7 +21,7 @@ TorchTitan is a PyTorch-native distributed training system for composing large-m
 
 ## Summary
 
-The contribution is operational composability: compare and combine parallelism strategies without stitching together incompatible repositories. The authors evaluate Llama 3.1 models from 8B to 405B parameters and report incremental speedups from 1D, 2D, and 3D parallelism on H100 systems.
+> The contribution is operational composability: compare and combine parallelism strategies without stitching together incompatible repositories. The authors evaluate Llama 3.1 models from 8B to 405B parameters and report incremental speedups from 1D, 2D, and 3D parallelism on H100 systems.
 
 ## Core Insights
 

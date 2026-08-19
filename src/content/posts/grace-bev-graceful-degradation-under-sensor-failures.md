@@ -18,7 +18,7 @@ Grace-BEV treats sensor failure as a reliability-estimation problem rather than 
 
 ## Summary
 
-The important shift is from availability to health. A stream can be present yet misleading because of weather, glare, corruption, or sparse returns. Reliability must therefore condition fusion before erroneous evidence dominates the shared scene state.
+> The important shift is from availability to health. A stream can be present yet misleading because of weather, glare, corruption, or sparse returns. Reliability must therefore condition fusion before erroneous evidence dominates the shared scene state.
 
 ## Core Insights
 

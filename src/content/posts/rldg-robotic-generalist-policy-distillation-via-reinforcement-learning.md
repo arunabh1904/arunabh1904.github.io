@@ -19,7 +19,7 @@ summary: "2024 – RLDG: Robotic Generalist Policy Distillation via Reinforcemen
 
 ## Summary
 
-RLDG avoids applying unstable RL updates directly to a large generalist policy. It trains smaller task-specific RL specialists, rolls them out to collect higher-quality and broader-coverage trajectories, and distills those trajectories back into the generalist with supervised fine-tuning.
+> RLDG avoids applying unstable RL updates directly to a large generalist policy. It trains smaller task-specific RL specialists, rolls them out to collect higher-quality and broader-coverage trajectories, and distills those trajectories back into the generalist with supervised fine-tuning.
 
 ## Core Insights
 

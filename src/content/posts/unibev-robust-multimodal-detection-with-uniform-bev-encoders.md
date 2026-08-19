@@ -18,7 +18,7 @@ UniBEV asks whether one trained detector can handle camera plus LiDAR, camera on
 
 ## Summary
 
-Uniformity here means a common interface, not identical raw-sensor processing. Camera features are sampled through calibrated projections; LiDAR features already occupy metric space. What is shared is the query-based BEV construction and the downstream detector.
+> Uniformity here means a common interface, not identical raw-sensor processing. Camera features are sampled through calibrated projections; LiDAR features already occupy metric space. What is shared is the query-based BEV construction and the downstream detector.
 
 ## Core Insights
 

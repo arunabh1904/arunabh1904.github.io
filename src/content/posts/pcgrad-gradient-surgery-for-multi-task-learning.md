@@ -18,7 +18,7 @@ Projected Conflicting Gradient modifies a task gradient when its dot product wit
 
 ## Summary
 
-The method targets the “tragic triad” identified by the paper: conflicting directions, unequal gradient magnitudes, and high local curvature can make a joint update worse than either task update alone.
+> The method targets the “tragic triad” identified by the paper: conflicting directions, unequal gradient magnitudes, and high local curvature can make a joint update worse than either task update alone.
 
 ## Core Insights
 

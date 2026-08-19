@@ -20,7 +20,7 @@ DSVT partitions the variable number of occupied voxels in each window into fixed
 
 ## Summary
 
-Dynamic Sparse Window Attention addresses a practical mismatch: fixed geometric windows contain wildly different token counts in near and far regions, while accelerators prefer bounded regular workloads.
+> Dynamic Sparse Window Attention addresses a practical mismatch: fixed geometric windows contain wildly different token counts in near and far regions, while accelerators prefer bounded regular workloads.
 
 ## Core Insights
 

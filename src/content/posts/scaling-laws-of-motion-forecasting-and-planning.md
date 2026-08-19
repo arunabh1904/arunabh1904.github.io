@@ -21,7 +21,7 @@ Waymo's scaling study asks whether motion forecasting and planning improve predi
 
 ## Summary
 
-The result is encouraging for foundation-model-style autonomy: training loss, open-loop metrics, and even closed-loop metrics improve with scale. The paper also makes the resource tradeoff explicit instead of treating model size as the only knob.
+> The result is encouraging for foundation-model-style autonomy: training loss, open-loop metrics, and even closed-loop metrics improve with scale. The paper also makes the resource tradeoff explicit instead of treating model size as the only knob.
 
 ## Core Insights
 

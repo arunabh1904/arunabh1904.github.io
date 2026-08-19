@@ -21,7 +21,7 @@ Vision-Language-Action Models for Autonomous Driving frames driving VLA as the s
 
 ## Summary
 
-The survey is especially useful because it distinguishes end-to-end VLA from dual-system VLA, then breaks down how actions are generated and how language guidance is injected.
+> The survey is especially useful because it distinguishes end-to-end VLA from dual-system VLA, then breaks down how actions are generated and how language guidance is injected.
 
 ## Core Insights
 

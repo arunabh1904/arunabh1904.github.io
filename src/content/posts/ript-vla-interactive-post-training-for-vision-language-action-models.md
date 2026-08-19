@@ -19,7 +19,7 @@ summary: "2025 – RIPT-VLA: Interactive Post-Training for Vision-Language-Actio
 
 ## Summary
 
-RIPT-VLA proposes a third VLA training stage after pretraining and supervised fine-tuning: interact with the environment, score complete rollouts with sparse binary success, and update the policy through reinforcement learning.
+> RIPT-VLA proposes a third VLA training stage after pretraining and supervised fine-tuning: interact with the environment, score complete rollouts with sparse binary success, and update the policy through reinforcement learning.
 
 ## Core Insights
 

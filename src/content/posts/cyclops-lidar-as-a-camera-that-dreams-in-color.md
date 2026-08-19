@@ -18,7 +18,7 @@ summary: "2026 – Cyclops: LiDAR as a Camera That Dreams in Color"
 
 ## Summary
 
-Cyclops uses sparse non-repetitive-scanning LiDAR intensity to synthesize RGB-like video, allowing RGB-trained perception models to operate without a camera. A frozen densification module first creates a dense intensity latent; Latent Bridge Matching then transports it toward the RGB distribution in a few ODE steps. Temporal attention reduces flicker, and a differentiable terminal reward trains the velocity field for fidelity.
+> Cyclops uses sparse non-repetitive-scanning LiDAR intensity to synthesize RGB-like video, allowing RGB-trained perception models to operate without a camera. A frozen densification module first creates a dense intensity latent; Latent Bridge Matching then transports it toward the RGB distribution in a few ODE steps. Temporal attention reduces flicker, and a differentiable terminal reward trains the velocity field for fidelity.
 
 ## Core Insights
 

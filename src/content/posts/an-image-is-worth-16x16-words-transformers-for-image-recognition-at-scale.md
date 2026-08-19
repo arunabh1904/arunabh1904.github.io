@@ -23,7 +23,7 @@ summary: "2020 – An Image Is Worth 16×16 Words: Transformers for Image Recogn
 
 ## Summary
 
-ViT treats an image as a sequence problem: split the image into fixed-size patches, linearly embed each patch, add a class token plus positional embeddings, and run a standard Transformer encoder. The paper's important condition is scale. Pure attention underperforms CNN inductive bias on smaller datasets, but large pretraining on JFT-300M or ImageNet-21k lets the architecture transfer strongly to ImageNet, CIFAR, Oxford Flowers/Pets, and VTAB. The evidence includes a compute tradeoff: once enough pretraining data is available, large ViTs can match or beat strong convolutional models with fewer training resources. The main caveat is data hunger: ViT deliberately removes locality and translation bias, so it needs pretraining scale or regularization to learn those patterns.
+> ViT treats an image as a sequence problem: split the image into fixed-size patches, linearly embed each patch, add a class token plus positional embeddings, and run a standard Transformer encoder. The paper's important condition is scale. Pure attention underperforms CNN inductive bias on smaller datasets, but large pretraining on JFT-300M or ImageNet-21k lets the architecture transfer strongly to ImageNet, CIFAR, Oxford Flowers/Pets, and VTAB. The evidence includes a compute tradeoff: once enough pretraining data is available, large ViTs can match or beat strong convolutional models with fewer training resources. The main caveat is data hunger: ViT deliberately removes locality and translation bias, so it needs pretraining scale or regularization to learn those patterns.
 
 ## Core Insights
 

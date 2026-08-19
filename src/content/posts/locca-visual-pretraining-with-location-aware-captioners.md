@@ -19,7 +19,7 @@ LocCa asks whether a captioning-style pretraining model can learn localization w
 
 ## Summary
 
-The result is a visual encoder that still transfers to holistic tasks like classification, captioning, OCR, and VQA, while becoming much more sensitive to object-level location.
+> The result is a visual encoder that still transfers to holistic tasks like classification, captioning, OCR, and VQA, while becoming much more sensitive to object-level location.
 
 ## Core Insights
 

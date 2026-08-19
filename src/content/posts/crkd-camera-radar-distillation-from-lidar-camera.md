@@ -20,7 +20,7 @@ CRKD uses a BEVFusion-style LiDAR-camera teacher to supervise a cheaper camera-r
 
 ## Summary
 
-This is a concrete version of privileged sensing: development-fleet hardware raises the supervision ceiling without entering the deployed bill of materials.
+> This is a concrete version of privileged sensing: development-fleet hardware raises the supervision ceiling without entering the deployed bill of materials.
 
 ## Core Insights
 

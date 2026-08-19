@@ -17,7 +17,7 @@ summary: "2025 – RobustVLA: Robustness-Aware Reinforcement Post-Training for V
 
 ## Summary
 
-RobustVLA argues that maximizing nominal task reward during online post-training can make a VLA more brittle. Its analysis bounds performance degradation under observation and action perturbations, motivating Jacobian regularization for perception sensitivity and smoothness regularization for policy updates/actions.
+> RobustVLA argues that maximizing nominal task reward during online post-training can make a VLA more brittle. Its analysis bounds performance degradation under observation and action perturbations, motivating Jacobian regularization for perception sensitivity and smoothness regularization for policy updates/actions.
 
 ## Core Insights
 

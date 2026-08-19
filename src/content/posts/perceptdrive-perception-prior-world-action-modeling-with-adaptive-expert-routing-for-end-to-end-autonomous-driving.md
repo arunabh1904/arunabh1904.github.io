@@ -22,7 +22,7 @@ summary: '2026 – PerceptDrive: Perception Prior World-Action Modeling with Ada
 
 ## Summary
 
-PerceptDrive treats perception-to-planning transfer as an information-bottleneck problem. A large frozen model may encode geometry, semantics, and dynamics, but a small set of planner queries can compress those signals into redundant features. The method creates separate query branches for three perception priors, anchors each compressed branch to its designated prior, and learns scene-dependent soft weights before a flow-matching actor generates one trajectory.
+> PerceptDrive treats perception-to-planning transfer as an information-bottleneck problem. A large frozen model may encode geometry, semantics, and dynamics, but a small set of planner queries can compress those signals into redundant features. The method creates separate query branches for three perception priors, anchors each compressed branch to its designated prior, and learns scene-dependent soft weights before a flow-matching actor generates one trajectory.
 
 ## Core Insights
 

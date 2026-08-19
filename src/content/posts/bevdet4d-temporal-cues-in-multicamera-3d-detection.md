@@ -20,7 +20,7 @@ BEVDet4D adds a simple temporal path to BEVDet: transform the previous frame's B
 
 ## Summary
 
-This is the dense-grid temporal baseline against which more elaborate BEV memories and sparse object memories should be judged.
+> This is the dense-grid temporal baseline against which more elaborate BEV memories and sparse object memories should be judged.
 
 ## Core Insights
 

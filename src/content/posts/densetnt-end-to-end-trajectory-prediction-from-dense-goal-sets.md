@@ -25,7 +25,7 @@ DenseTNT is the direct follow-up to goal-based methods like TNT. TNT showed that
 
 ## Summary
 
-DenseTNT replaces that machinery with dense goal probability estimation and a learned goal-set predictor. The model scores dense candidate positions on the road, predicts a set of goals from that heatmap, and completes trajectories conditioned on those goals.
+> DenseTNT replaces that machinery with dense goal probability estimation and a learned goal-set predictor. The model scores dense candidate positions on the road, predicts a set of goals from that heatmap, and completes trajectories conditioned on those goals.
 
 ## Core Insights
 

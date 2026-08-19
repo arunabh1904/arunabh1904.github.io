@@ -21,7 +21,7 @@ Sparse4D v3 strengthens sparse recurrent queries as a joint detection-and-tracki
 
 ## Summary
 
-The paper shows that a sparse temporal detector becomes a tracker once its state, confidence, and training perturbations are designed for persistence.
+> The paper shows that a sparse temporal detector becomes a tracker once its state, confidence, and training perturbations are designed for persistence.
 
 ## Core Insights
 

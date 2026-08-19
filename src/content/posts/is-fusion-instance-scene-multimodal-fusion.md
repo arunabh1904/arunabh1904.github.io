@@ -20,7 +20,7 @@ IS-Fusion argues that one fusion granularity cannot serve both scene context and
 
 ## Summary
 
-The two paths answer different questions: where is the scene structure, and what evidence belongs to this candidate object?
+> The two paths answer different questions: where is the scene structure, and what evidence belongs to this candidate object?
 
 ## Core Insights
 

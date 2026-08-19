@@ -19,7 +19,7 @@ summary: "2011 – DAgger: A Reduction of Imitation Learning to No-Regret Online
 
 ## Summary
 
-DAgger explains why a policy with low supervised error can still fail catastrophically in closed loop. The learner's actions change its next observation. Once it leaves the expert distribution, small errors expose unfamiliar states and compound across the horizon.
+> DAgger explains why a policy with low supervised error can still fail catastrophically in closed loop. The learner's actions change its next observation. Once it leaves the expert distribution, small errors expose unfamiliar states and compound across the horizon.
 
 ## Core Insights
 

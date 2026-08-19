@@ -23,7 +23,7 @@ summary: '2022 – Simple-BEV: What Really Matters for Multi-Sensor BEV Percepti
 
 ## Summary
 
-BEV papers often attribute gains to the operator that lifts perspective-view image features into a bird's-eye-view grid. Simple-BEV holds more of the training recipe fixed and finds a different ordering of importance. Across matched camera-only models on nuScenes vehicle segmentation, input resolution and effective batch size move IoU far more than the choice among depth splatting, deformable attention, and parameter-free bilinear sampling.
+> BEV papers often attribute gains to the operator that lifts perspective-view image features into a bird's-eye-view grid. Simple-BEV holds more of the training recipe fixed and finds a different ordering of importance. Across matched camera-only models on nuScenes vehicle segmentation, input resolution and effective batch size move IoU far more than the choice among depth splatting, deformable attention, and parameter-free bilinear sampling.
 
 ## Core Insights
 

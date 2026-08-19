@@ -15,7 +15,7 @@ summary: "2025 – ReCogDrive: A Reinforced Cognitive Framework for End-to-End A
 
 ## Summary
 
-ReCogDrive separates driving cognition from continuous action generation. An autoregressive VLM learns driving priors through a three-stage data pipeline—generation, refinement, and quality control—then conditions a diffusion planner that produces continuous trajectories. A Diffusion Group Relative Policy Optimization stage targets safety and comfort. The paper reports state-of-the-art results on NAVSIM and Bench2Drive, plus qualitative DriveBench understanding results; the abstract does not provide the underlying scores, planning latency, or a component-level ablation.
+> ReCogDrive separates driving cognition from continuous action generation. An autoregressive VLM learns driving priors through a three-stage data pipeline—generation, refinement, and quality control—then conditions a diffusion planner that produces continuous trajectories. A Diffusion Group Relative Policy Optimization stage targets safety and comfort. The paper reports state-of-the-art results on NAVSIM and Bench2Drive, plus qualitative DriveBench understanding results; the abstract does not provide the underlying scores, planning latency, or a component-level ablation.
 
 ## Core Insights
 

@@ -20,7 +20,7 @@ ViDAR pretrains a multi-camera temporal encoder by forecasting future LiDAR poin
 
 ## Summary
 
-LiDAR is the automatically collected future target; the transferred encoder remains visual. This separates expensive geometric supervision from the deployed sensor graph.
+> LiDAR is the automatically collected future target; the transferred encoder remains visual. This separates expensive geometric supervision from the deployed sensor graph.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ SECOND turns VoxelNet's dense 3D middle encoder into a sparse one. It computes o
 
 ## Summary
 
-The lasting contribution is the execution rule: preserve 3D structure while it is informative, but do not convolve over empty road volume. That rule became a foundation for later LiDAR detectors and sparse voxel transformers.
+> The lasting contribution is the execution rule: preserve 3D structure while it is informative, but do not convolve over empty road volume. That rule became a foundation for later LiDAR detectors and sparse voxel transformers.
 
 ## Core Insights
 

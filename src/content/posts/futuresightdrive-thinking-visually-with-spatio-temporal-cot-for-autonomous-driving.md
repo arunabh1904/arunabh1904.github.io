@@ -17,7 +17,7 @@ summary: "2025 – FutureSightDrive: Thinking Visually with Spatio-Temporal CoT 
 
 ## Summary
 
-FutureSightDrive makes its chain of thought a predicted visual scene rather than a text trace. A world-model path generates a future frame with background, future lane dividers, and 3D boxes; an inverse-dynamics VLA then plans a trajectory from the current observation and that visual spatio-temporal CoT. The paper reports improved trajectory accuracy and fewer collisions on nuScenes and NAVSIM, plus competitive video-generation FID and DriveLM understanding results. The abstract does not report the planning latency or a control that replaces the imagined frame with an equally informative nonvisual state.
+> FutureSightDrive makes its chain of thought a predicted visual scene rather than a text trace. A world-model path generates a future frame with background, future lane dividers, and 3D boxes; an inverse-dynamics VLA then plans a trajectory from the current observation and that visual spatio-temporal CoT. The paper reports improved trajectory accuracy and fewer collisions on nuScenes and NAVSIM, plus competitive video-generation FID and DriveLM understanding results. The abstract does not report the planning latency or a control that replaces the imagined frame with an equally informative nonvisual state.
 
 ## Core Insights
 

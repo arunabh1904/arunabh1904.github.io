@@ -21,7 +21,7 @@ TopoNet focuses on the topology that a driving system needs after detecting lane
 
 ## Summary
 
-That makes the paper a bridge between perception and map reasoning. A vector map is not useful only because it contains lane curves; it is useful because the curves form a graph with legal and semantic relationships.
+> That makes the paper a bridge between perception and map reasoning. A vector map is not useful only because it contains lane curves; it is useful because the curves form a graph with legal and semantic relationships.
 
 ## Core Insights
 

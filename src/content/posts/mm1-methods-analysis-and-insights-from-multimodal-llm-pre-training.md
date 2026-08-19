@@ -20,7 +20,7 @@ MM1 is a large ablation study of multimodal LLM pre-training. It varies the imag
 
 ## Summary
 
-The central result is a prioritization rule: image encoder quality, image resolution, visual-token count, and the mix of image-caption, interleaved image-text, and text-only data mattered much more than connector design. That makes MM1 a paper about experiment allocation. Before inventing a new projector, test the representation and data decisions that dominate the result.
+> The central result is a prioritization rule: image encoder quality, image resolution, visual-token count, and the mix of image-caption, interleaved image-text, and text-only data mattered much more than connector design. That makes MM1 a paper about experiment allocation. Before inventing a new projector, test the representation and data decisions that dominate the result.
 
 ## Core Insights
 

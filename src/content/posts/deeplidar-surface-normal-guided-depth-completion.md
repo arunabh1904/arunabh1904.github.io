@@ -18,7 +18,7 @@ DeepLiDAR predicts depth through two paths. One estimates surface normals from R
 
 ## Summary
 
-The paper's useful intuition is that dense depth needs both measurement anchors and a representation of local surface structure.
+> The paper's useful intuition is that dense depth needs both measurement anchors and a representation of local surface structure.
 
 ## Core Insights
 

@@ -22,7 +22,7 @@ summary: '2024 – DeepSeekMath: Group Relative Policy Optimization (GRPO)'
 
 ## Summary
 
-DeepSeekMath introduces Group Relative Policy Optimization as a cheaper alternative to PPO for language-model reasoning. For each prompt, the policy samples a group of completions and scores them with an outcome or process reward. Their within-group mean and standard deviation replace PPO's learned value baseline. Removing the critic saves memory and training compute, but it also makes learning depend on reward variation among samples of the same prompt.
+> DeepSeekMath introduces Group Relative Policy Optimization as a cheaper alternative to PPO for language-model reasoning. For each prompt, the policy samples a group of completions and scores them with an outcome or process reward. Their within-group mean and standard deviation replace PPO's learned value baseline. Removing the critic saves memory and training compute, but it also makes learning depend on reward variation among samples of the same prompt.
 
 ## Core Insights
 

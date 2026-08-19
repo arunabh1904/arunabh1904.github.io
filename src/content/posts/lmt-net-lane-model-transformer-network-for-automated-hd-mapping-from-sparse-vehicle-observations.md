@@ -19,7 +19,7 @@ LMT-Net attacks HD map maintenance from a sparse-observation angle. Instead of a
 
 ## Summary
 
-The paper is useful because it frames HD mapping as graph construction: lane pairs become nodes, and lane connectivity becomes edges. That is closer to the artifact a planner needs than a dense segmentation mask.
+> The paper is useful because it frames HD mapping as graph construction: lane pairs become nodes, and lane connectivity becomes edges. That is closer to the artifact a planner needs than a dense segmentation mask.
 
 ## Core Insights
 

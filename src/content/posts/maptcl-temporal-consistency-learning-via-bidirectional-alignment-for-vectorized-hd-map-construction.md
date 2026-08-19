@@ -18,7 +18,7 @@ summary: "2026 – MapTCL: Temporal Consistency Learning via Bidirectional Align
 
 ## Summary
 
-MapTCL adds an explicit temporal objective to online vectorized mapping. Bidirectional Vector Consistency Learning aligns corresponding map instances across current and historical frames, while Raster map Consistency Learning stabilizes the dense BEV features underneath them. The plug-in losses improve the paper's baselines by 3.7 mAP and 2.8 C-mAP on nuScenes and by 3.1 mAP and 2.5 C-mAP on Argoverse 2 without adding inference-time computation.
+> MapTCL adds an explicit temporal objective to online vectorized mapping. Bidirectional Vector Consistency Learning aligns corresponding map instances across current and historical frames, while Raster map Consistency Learning stabilizes the dense BEV features underneath them. The plug-in losses improve the paper's baselines by 3.7 mAP and 2.8 C-mAP on nuScenes and by 3.1 mAP and 2.5 C-mAP on Argoverse 2 without adding inference-time computation.
 
 ## Core Insights
 

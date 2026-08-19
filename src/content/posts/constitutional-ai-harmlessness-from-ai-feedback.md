@@ -17,7 +17,7 @@ summary: "2022 – Constitutional AI: Harmlessness from AI Feedback"
 
 ## Summary
 
-Constitutional AI replaces most harmfulness labels with an explicit list of principles and two model-mediated stages. The supervised stage produces critiques and revisions of harmful responses. The reinforcement stage asks a model to choose between responses under a sampled principle, trains a preference model, and optimizes the assistant against that model.
+> Constitutional AI replaces most harmfulness labels with an explicit list of principles and two model-mediated stages. The supervised stage produces critiques and revisions of harmful responses. The reinforcement stage asks a model to choose between responses under a sampled principle, trains a preference model, and optimizes the assistant against that model.
 
 ## Core Insights
 

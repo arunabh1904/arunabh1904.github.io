@@ -19,7 +19,7 @@ CRAFT starts from camera-generated 3D proposals, associates nearby radar returns
 
 ## Summary
 
-The key modeling choice is coordinate-aware correspondence. Camera localization error is anisotropic: depth is much less certain than azimuth. Polar association expresses that structure more naturally than a Cartesian ball.
+> The key modeling choice is coordinate-aware correspondence. Camera localization error is anisotropic: depth is much less certain than azimuth. Polar association expresses that structure more naturally than a Cartesian ball.
 
 ## Core Insights
 

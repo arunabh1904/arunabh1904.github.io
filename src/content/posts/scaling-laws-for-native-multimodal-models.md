@@ -20,7 +20,7 @@ Scaling Laws for Native Multimodal Models trains 457 models across different arc
 
 ## Summary
 
-The authors find no inherent late-fusion advantage in their study. Early-fusion models perform better at lower parameter counts, train more efficiently, and are simpler to deploy; adding Mixture of Experts lets the model learn modality-specific weights and improves performance.
+> The authors find no inherent late-fusion advantage in their study. Early-fusion models perform better at lower parameter counts, train more efficiently, and are simpler to deploy; adding Mixture of Experts lets the model learn modality-specific weights and improves performance.
 
 ## Core Insights
 

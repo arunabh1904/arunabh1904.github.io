@@ -20,7 +20,7 @@ Scaling Laws for Optimal Data Mixtures predicts loss from model size $N$, traini
 
 ## Summary
 
-The authors validate the prediction framework across LLM, native multimodal, and large vision-model pre-training. Their claim is operational: a few small runs can estimate parameters that extrapolate to new mixtures and larger scales, then yield compute-aware optimal domain weights for a chosen target.
+> The authors validate the prediction framework across LLM, native multimodal, and large vision-model pre-training. Their claim is operational: a few small runs can estimate parameters that extrapolate to new mixtures and larger scales, then yield compute-aware optimal domain weights for a chosen target.
 
 ## Core Insights
 

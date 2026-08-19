@@ -21,7 +21,7 @@ Driving with LLMs studies a middle ground between raw-image VLMs and classical p
 
 ## Summary
 
-The bet is that language models may reason better when perception has already converted pixels into meaningful objects, positions, and relationships.
+> The bet is that language models may reason better when perception has already converted pixels into meaningful objects, positions, and relationships.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ summary: "2023 – Learning Fine-Grained Bimanual Manipulation with Low-Cost Har
 
 ## Summary
 
-ACT pairs a low-cost bimanual teleoperation platform with a conditional variational autoencoder that predicts action sequences. The policy does not choose one motor command in isolation; it proposes a chunk, while temporal ensembling blends overlapping predictions during execution.
+> ACT pairs a low-cost bimanual teleoperation platform with a conditional variational autoencoder that predicts action sequences. The policy does not choose one motor command in isolation; it proposes a chunk, while temporal ensembling blends overlapping predictions during execution.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ summary: "2025 – Fine-Tuning Vision-Language-Action Models: Optimizing Speed a
 
 ## Summary
 
-OpenVLA-OFT shows that the fine-tuning interface can matter more than preserving a VLA's pretraining objective. It replaces autoregressive discrete action-token decoding with parallel continuous action chunks and trains them with a simple L1 regression loss.
+> OpenVLA-OFT shows that the fine-tuning interface can matter more than preserving a VLA's pretraining objective. It replaces autoregressive discrete action-token decoding with parallel continuous action chunks and trains them with a simple L1 regression loss.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ TOD3Cap turns outdoor driving scenes into a dense captioning problem. Given mult
 
 ## Summary
 
-That is harder than standard object detection because it requires attributes, context, and grounded descriptions, not just boxes and class IDs.
+> That is harder than standard object detection because it requires attributes, context, and grounded descriptions, not just boxes and class IDs.
 
 ## Core Insights
 

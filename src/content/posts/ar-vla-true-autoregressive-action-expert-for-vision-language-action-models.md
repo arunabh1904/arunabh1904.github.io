@@ -23,7 +23,7 @@ summary: '2026 – AR-VLA: True Autoregressive Action Expert for Vision-Language
 
 ## Summary
 
-Most continuous-action VLAs are temporally reactive even when their action decoder is called autoregressive: they regenerate an action chunk from the latest observation, then discard the decoder state. AR-VLA instead keeps an action expert alive across control steps. It predicts one continuous action vector at a time from a rolling proprioceptive history while conditioning on the most recent vision-language features, so slow perception can refresh without resetting fast motor memory.
+> Most continuous-action VLAs are temporally reactive even when their action decoder is called autoregressive: they regenerate an action chunk from the latest observation, then discard the decoder state. AR-VLA instead keeps an action expert alive across control steps. It predicts one continuous action vector at a time from a rolling proprioceptive history while conditioning on the most recent vision-language features, so slow perception can refresh without resetting fast motor memory.
 
 ## Core Insights
 

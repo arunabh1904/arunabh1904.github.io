@@ -21,7 +21,7 @@ TokenFlow is a unified image tokenizer built around two aligned codebooks: one f
 
 ## Summary
 
-The key mechanism is dual codebooks connected through a shared mapping, so shared indices expose both semantic and fine-grained information. The paper reports 7.2% average improvement over LLaVA-1.5 13B on its understanding comparison, FID 0.63 at 384×384 reconstruction, and GenEval 0.55 at 256×256 autoregressive generation.
+> The key mechanism is dual codebooks connected through a shared mapping, so shared indices expose both semantic and fine-grained information. The paper reports 7.2% average improvement over LLaVA-1.5 13B on its understanding comparison, FID 0.63 at 384×384 reconstruction, and GenEval 0.55 at 256×256 autoregressive generation.
 
 ## Core Insights
 

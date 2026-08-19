@@ -18,7 +18,7 @@ summary: "2026 – XCoT-VLA: Executable Chain-of-Thought for Vision-Language-Act
 
 ## Summary
 
-XCoT-VLA replaces verbose natural-language reasoning with two to six compact executable tokens that directly condition trajectory generation. Automatic Reason–Action labels connect logged actions to scene semantics, and deterministic routing gives reasoning tokens a Reason FFN while trajectory queries use a Control FFN. The paper reports lower longitudinal ADE on a general set and lower lateral FDE in lane-change scenarios while staying within the planning-time budget.
+> XCoT-VLA replaces verbose natural-language reasoning with two to six compact executable tokens that directly condition trajectory generation. Automatic Reason–Action labels connect logged actions to scene semantics, and deterministic routing gives reasoning tokens a Reason FFN while trajectory queries use a Control FFN. The paper reports lower longitudinal ADE on a general set and lower lateral FDE in lane-change scenarios while staying within the planning-time budget.
 
 ## Core Insights
 

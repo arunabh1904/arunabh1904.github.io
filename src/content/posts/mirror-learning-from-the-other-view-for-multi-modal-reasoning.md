@@ -21,7 +21,7 @@ summary: '2026 – MIRROR: Learning from the Other View for Multi-Modal Reasonin
 
 ## Summary
 
-A geometry problem can be solvable from its text but difficult from its diagram, or the reverse. MIRROR turns this disagreement into supervision. For each problem, it evaluates text-dominant, image-dominant, and combined image-plus-text views, selects the currently strongest view as a teacher, and regularizes students operating on the weaker restricted views toward that teacher.
+> A geometry problem can be solvable from its text but difficult from its diagram, or the reverse. MIRROR turns this disagreement into supervision. For each problem, it evaluates text-dominant, image-dominant, and combined image-plus-text views, selects the currently strongest view as a teacher, and regularizes students operating on the weaker restricted views toward that teacher.
 
 ## Core Insights
 

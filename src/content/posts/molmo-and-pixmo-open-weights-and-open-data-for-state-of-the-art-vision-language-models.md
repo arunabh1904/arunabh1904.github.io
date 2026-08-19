@@ -21,7 +21,7 @@ Molmo is a family of open multimodal models trained with PixMo, a carefully buil
 
 ## Summary
 
-This matters because many VLMs are hard to inspect. Molmo makes the data story more visible, which makes the model easier to study and reuse.
+> This matters because many VLMs are hard to inspect. Molmo makes the data story more visible, which makes the model easier to study and reuse.
 
 ## Core Insights
 

@@ -23,7 +23,7 @@ Talk2BEV connects language reasoning to bird's-eye-view maps. It builds a BEV ma
 
 ## Summary
 
-The core idea is grounding. Language is useful only if the model can bind words like "pedestrian on the right" or "vehicle in front" to the spatial layout a planner uses.
+> The core idea is grounding. Language is useful only if the model can bind words like "pedestrian on the right" or "vehicle in front" to the spatial layout a planner uses.
 
 ## Core Insights
 

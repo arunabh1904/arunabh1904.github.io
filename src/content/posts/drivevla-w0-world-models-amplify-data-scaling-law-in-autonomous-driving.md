@@ -21,7 +21,7 @@ DriveVLA-W0 focuses on a supervision problem. Driving action labels are sparse a
 
 ## Summary
 
-The paper adds world modeling. By predicting future images, the model receives dense self-supervised feedback about scene dynamics, not only a sparse trajectory or control target.
+> The paper adds world modeling. By predicting future images, the model receives dense self-supervised feedback about scene dynamics, not only a sparse trajectory or control target.
 
 ## Core Insights
 

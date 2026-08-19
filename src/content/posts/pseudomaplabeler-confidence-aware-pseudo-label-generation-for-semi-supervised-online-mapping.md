@@ -18,7 +18,7 @@ summary: "2026 – PseudoMapLabeler: Confidence-Aware Pseudo-Label Generation fo
 
 ## Summary
 
-PseudoMapLabeler improves online HD mapping when dense labels are scarce by refining teacher predictions before using them as pseudo-labels. Beta-distribution confidence maps estimate reliability across temporal observations, and spatial clipping preserves high-confidence segments instead of discarding an entire map element. In the reported low-label nuScenes setting, the refined teacher-student pipeline improves mAP by 6.1 points over labeled-only training.
+> PseudoMapLabeler improves online HD mapping when dense labels are scarce by refining teacher predictions before using them as pseudo-labels. Beta-distribution confidence maps estimate reliability across temporal observations, and spatial clipping preserves high-confidence segments instead of discarding an entire map element. In the reported low-label nuScenes setting, the refined teacher-student pipeline improves mAP by 6.1 points over labeled-only training.
 
 ## Core Insights
 

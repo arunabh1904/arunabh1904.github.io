@@ -19,7 +19,7 @@ MPA3D asks whether a reconstructed static scene can help a car detect objects in
 
 ## Summary
 
-The detector then uses those priors to separate static background from dynamic foreground, which helps especially for distant, sparse, occluded, or low-visibility objects.
+> The detector then uses those priors to separate static background from dynamic foreground, which helps especially for distant, sparse, occluded, or low-visibility objects.
 
 ## Core Insights
 

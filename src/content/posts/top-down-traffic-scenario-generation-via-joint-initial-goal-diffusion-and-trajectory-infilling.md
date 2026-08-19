@@ -19,7 +19,7 @@ summary: "2026 – Top-down Traffic Scenario Generation via Joint Initial-Goal D
 
 ## Summary
 
-TrafficDiffuser separates scenario generation from trajectory generation by modeling an agent's initial and goal states jointly. The initial-goal pair is a more interpretable high-level scenario object than an unconstrained sampled start, and fixing it turns future motion generation into trajectory infilling. On Argoverse 2, the paper reports a 55.3% reduction in speed-distribution distance and a 2.8-point reduction in off-road rate over the next-best initialization method.
+> TrafficDiffuser separates scenario generation from trajectory generation by modeling an agent's initial and goal states jointly. The initial-goal pair is a more interpretable high-level scenario object than an unconstrained sampled start, and fixing it turns future motion generation into trajectory infilling. On Argoverse 2, the paper reports a 55.3% reduction in speed-distribution distance and a 2.8-point reduction in off-road rate over the next-best initialization method.
 
 ## Core Insights
 

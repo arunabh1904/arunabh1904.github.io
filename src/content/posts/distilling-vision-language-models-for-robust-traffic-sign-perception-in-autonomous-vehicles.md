@@ -19,7 +19,7 @@ summary: "2026 – Distilling Vision-Language Models for Robust Traffic Sign Per
 
 ## Summary
 
-LAMDA transfers language-grounded structure into an image-only traffic-sign classifier. It builds frozen prototype banks from VLM-generated sign descriptions and class names, then uses two auxiliary alignment losses during training; the text encoder and prototypes are discarded at inference. Across GTSRB and LISA, four backbones, and three physical attack types, the paper reports consistent robustness gains while usually preserving clean accuracy.
+> LAMDA transfers language-grounded structure into an image-only traffic-sign classifier. It builds frozen prototype banks from VLM-generated sign descriptions and class names, then uses two auxiliary alignment losses during training; the text encoder and prototypes are discarded at inference. Across GTSRB and LISA, four backbones, and three physical attack types, the paper reports consistent robustness gains while usually preserving clean accuracy.
 
 ## Core Insights
 

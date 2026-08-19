@@ -23,7 +23,7 @@ summary: '2026 – Auto-JEPA: A Latent World Model of Continuous Intent for End-
 
 ## Summary
 
-Dense driving world models predict future video, occupancy, or agent state even though a planner ultimately needs an ego trajectory. Auto-JEPA replaces that reconstruction target with a narrower one: the latent representation of the future ego motion. A frozen V-JEPA 2 encoder processes four front-camera frames; ego-motion history and a route command provide additional context; and a 24-layer Transformer predicts eight latent tokens aligned with the encoded ground-truth trajectory.
+> Dense driving world models predict future video, occupancy, or agent state even though a planner ultimately needs an ego trajectory. Auto-JEPA replaces that reconstruction target with a narrower one: the latent representation of the future ego motion. A frozen V-JEPA 2 encoder processes four front-camera frames; ego-motion history and a route command provide additional context; and a 24-layer Transformer predicts eight latent tokens aligned with the encoded ground-truth trajectory.
 
 ## Core Insights
 

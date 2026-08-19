@@ -18,7 +18,7 @@ summary: "2026 – BrainWAM: Action-Space Coordination of Semantic Priors and Pr
 
 ## Summary
 
-BrainWAM argues that naively mixing VLA semantics and WAM dynamics in one token-attention space creates an allocation mismatch: semantic shortcuts can suppress predictive dynamics. It instead gives the two branches specialized action-oriented pathways and aligns them in compact action space. An asynchronous rectified-flow schedule decouples video and action denoising. The paper reports 89.5 PDMS on NAVSIM v1 and 89.6 EPDMS on NAVSIM v2.
+> BrainWAM argues that naively mixing VLA semantics and WAM dynamics in one token-attention space creates an allocation mismatch: semantic shortcuts can suppress predictive dynamics. It instead gives the two branches specialized action-oriented pathways and aligns them in compact action space. An asynchronous rectified-flow schedule decouples video and action denoising. The paper reports 89.5 PDMS on NAVSIM v1 and 89.6 EPDMS on NAVSIM v2.
 
 ## Core Insights
 

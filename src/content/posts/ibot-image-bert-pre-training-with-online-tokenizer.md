@@ -23,7 +23,7 @@ summary: '2021 – iBOT: Image BERT Pre-Training with Online Tokenizer'
 
 ## Summary
 
-iBOT turns masked image modeling into self-distillation at the patch level. Instead of reconstructing RGB pixels or committing to a separately trained visual tokenizer, a momentum teacher converts the unmasked image into soft patch targets while the student sees masked patches. The tokenizer is therefore “online”: its vocabulary changes with the representation being learned.
+> iBOT turns masked image modeling into self-distillation at the patch level. Instead of reconstructing RGB pixels or committing to a separately trained visual tokenizer, a momentum teacher converts the unmasked image into soft patch targets while the student sees masked patches. The tokenizer is therefore “online”: its vocabulary changes with the representation being learned.
 
 ## Core Insights
 

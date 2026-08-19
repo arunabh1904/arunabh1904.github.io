@@ -20,7 +20,7 @@ Janus keeps an autoregressive multimodal transformer but separates the visual en
 
 ## Summary
 
-Understanding needs semantic, task-relevant features; generation needs fine visual detail. Janus decouples those interfaces while preserving one shared transformer for multimodal processing. This is an architectural way to reduce representational conflict without giving up a unified model.
+> Understanding needs semantic, task-relevant features; generation needs fine visual detail. Janus decouples those interfaces while preserving one shared transformer for multimodal processing. This is an architectural way to reduce representational conflict without giving up a unified model.
 
 ## Core Insights
 

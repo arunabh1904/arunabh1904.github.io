@@ -20,7 +20,7 @@ Scaling Laws for Generative Mixed-Modal Language Models runs more than 250 exper
 
 ## Summary
 
-The useful shift is from asking whether a mixture is good to estimating how each modality changes loss under a particular model and data budget. The paper also reports modality alternation during training, hyperparameter guidance, and links between mixed-modal competition and training stability; a 30B speech-text model provides a larger validation run.
+> The useful shift is from asking whether a mixture is good to estimating how each modality changes loss under a particular model and data budget. The paper also reports modality alternation during training, hyperparameter guidance, and links between mixed-modal competition and training stability; a 30B speech-text model provides a larger validation run.
 
 ## Core Insights
 

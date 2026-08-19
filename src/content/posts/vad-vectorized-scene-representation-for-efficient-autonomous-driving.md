@@ -21,7 +21,7 @@ VAD argues that end-to-end driving should not have to plan from dense rasterized
 
 ## Summary
 
-That design is useful because rasterization can be expensive and can blur the object-level structure that planning cares about. VAD keeps the scene closer to the planner's natural language: agents, lanes, boundaries, and candidate trajectories.
+> That design is useful because rasterization can be expensive and can blur the object-level structure that planning cares about. VAD keeps the scene closer to the planner's natural language: agents, lanes, boundaries, and candidate trajectories.
 
 ## Core Insights
 

@@ -21,7 +21,7 @@ DeepSeek-VL2 improves both halves of the VLM stack. On the vision side, dynamic 
 
 ## Summary
 
-The result is especially relevant for OCR, documents, tables, charts, and visual grounding, where resizing or compressing the image too aggressively destroys the answer.
+> The result is especially relevant for OCR, documents, tables, charts, and visual grounding, where resizing or compressing the image too aggressively destroys the answer.
 
 ## Core Insights
 

@@ -21,7 +21,7 @@ summary: '2025 – Robust Autonomy Emerges from Self-Play'
 
 ## Summary
 
-GIGAFLOW asks how far autonomous-driving policy learning can go without demonstrations, recorded traffic, or hand-scripted scenarios. Its answer is a six-million-parameter policy trained by PPO for one trillion state transitions—1.6B simulated kilometers—while every vehicle, pedestrian, and cyclist is controlled by the same network. Evaluated zero-shot, that policy exceeds the reported specialist results on CARLA, nuPlan, and Waymax despite never training on their logs.
+> GIGAFLOW asks how far autonomous-driving policy learning can go without demonstrations, recorded traffic, or hand-scripted scenarios. Its answer is a six-million-parameter policy trained by PPO for one trillion state transitions—1.6B simulated kilometers—while every vehicle, pedestrian, and cyclist is controlled by the same network. Evaluated zero-shot, that policy exceeds the reported specialist results on CARLA, nuPlan, and Waymax despite never training on their logs.
 
 ## Core Insights
 

@@ -21,7 +21,7 @@ RTMap is about online HD maps that improve over repeated traversals. A vehicle b
 
 ## Summary
 
-The paper is useful because it puts three normally separate problems into one system: mapping, map-based localization, and map change detection.
+> The paper is useful because it puts three normally separate problems into one system: mapping, map-based localization, and map change detection.
 
 ## Core Insights
 

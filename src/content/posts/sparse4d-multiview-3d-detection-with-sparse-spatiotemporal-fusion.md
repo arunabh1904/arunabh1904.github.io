@@ -21,7 +21,7 @@ Sparse4D avoids constructing a dense BEV video. Each learnable 3D anchor carries
 
 ## Summary
 
-“4D” here means sparse 3D hypotheses extended through time. The model spends temporal compute where objects may exist rather than aligning every BEV cell across every frame.
+> “4D” here means sparse 3D hypotheses extended through time. The model spends temporal compute where objects may exist rather than aligning every BEV cell across every frame.
 
 ## Core Insights
 

@@ -19,7 +19,7 @@ summary: "2025 – Pi0.5: A Vision-Language-Action Model with Open-World General
 
 ## Summary
 
-Pi0.5 extends Pi0 by co-training a VLM/action policy on heterogeneous examples: web vision-language tasks, object detection, language instructions, high-level subtask predictions, and low-level trajectories from multiple robots. The hierarchy remains inside one model: language predicts useful intermediate goals while a flow-based action expert controls the robot.
+> Pi0.5 extends Pi0 by co-training a VLM/action policy on heterogeneous examples: web vision-language tasks, object detection, language instructions, high-level subtask predictions, and low-level trajectories from multiple robots. The hierarchy remains inside one model: language predicts useful intermediate goals while a flow-based action expert controls the robot.
 
 ## Core Insights
 

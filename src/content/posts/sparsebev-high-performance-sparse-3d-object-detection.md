@@ -21,7 +21,7 @@ SparseBEV keeps the BEV prior without building a dense BEV map. Pillar-shaped qu
 
 ## Summary
 
-The paper argues that sparse camera detectors lagged dense ones because their retrieval and mixing were too rigid, not because sparsity itself was the wrong representation.
+> The paper argues that sparse camera detectors lagged dense ones because their retrieval and mixing were too rigid, not because sparsity itself was the wrong representation.
 
 ## Core Insights
 

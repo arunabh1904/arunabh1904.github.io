@@ -19,7 +19,7 @@ Wayformer asks whether motion forecasting really needs many modality-specific mo
 
 ## Summary
 
-The paper is useful because it turns forecasting architecture design into a set of fusion and efficiency choices: early fusion, late fusion, hierarchical fusion, factorized attention, and latent-query attention.
+> The paper is useful because it turns forecasting architecture design into a set of fusion and efficiency choices: early fusion, late fusion, hierarchical fusion, factorized attention, and latent-query attention.
 
 ## Core Insights
 

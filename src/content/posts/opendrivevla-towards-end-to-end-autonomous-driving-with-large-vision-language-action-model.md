@@ -23,7 +23,7 @@ OpenDriveVLA is a driving VLA built on open-source language models. It condition
 
 ## Summary
 
-The interesting part is spatial grounding. The paper does not treat a VLM as a generic captioner bolted onto the stack. It aligns 2D and 3D driving tokens with the language model and then trains the system for driving instruction following, agent-environment-ego interaction, and trajectory planning.
+> The interesting part is spatial grounding. The paper does not treat a VLM as a generic captioner bolted onto the stack. It aligns 2D and 3D driving tokens with the language model and then trains the system for driving instruction following, agent-environment-ego interaction, and trajectory planning.
 
 ## Core Insights
 

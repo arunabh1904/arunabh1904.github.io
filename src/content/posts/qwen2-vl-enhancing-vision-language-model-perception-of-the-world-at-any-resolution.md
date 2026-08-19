@@ -21,7 +21,7 @@ Qwen2-VL focuses on a practical weakness in many VLMs: images are forced into fi
 
 ## Summary
 
-The model family also handles images and video with a shared multimodal position encoding, making it useful for OCR-heavy tasks, documents, visual reasoning, and longer temporal inputs.
+> The model family also handles images and video with a shared multimodal position encoding, making it useful for OCR-heavy tasks, documents, visual reasoning, and longer temporal inputs.
 
 ## Core Insights
 

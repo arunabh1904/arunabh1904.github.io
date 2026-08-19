@@ -25,7 +25,7 @@ summary: '2026 – DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence 
 
 ## Summary
 
-DeepSeek-V4-Flash-0731 is a post-training release, not a new base model. It keeps the April preview's architecture and size—284 billion total parameters, 13 billion active per token, and a one-million-token context window—while replacing the API checkpoint with a model tuned for stronger agent behavior and native Responses API use. DeepSeek initially said the July 31 update changed only the Flash API, leaving the web/app models and V4-Pro endpoint unchanged; the exact `0731` weights were published on Hugging Face on August 1.
+> DeepSeek-V4-Flash-0731 is a post-training release, not a new base model. It keeps the April preview's architecture and size—284 billion total parameters, 13 billion active per token, and a one-million-token context window—while replacing the API checkpoint with a model tuned for stronger agent behavior and native Responses API use. DeepSeek initially said the July 31 update changed only the Flash API, leaving the web/app models and V4-Pro endpoint unchanged; the exact `0731` weights were published on Hugging Face on August 1.
 
 ## Core Insights
 

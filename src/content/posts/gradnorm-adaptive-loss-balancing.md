@@ -20,7 +20,7 @@ GradNorm adapts task weights so gradient norms at a shared layer track each task
 
 ## Summary
 
-Unlike loss-scale normalization, GradNorm observes the effect of each task on shared parameters. That makes it relevant to unified perception trunks whose heads learn at different speeds.
+> Unlike loss-scale normalization, GradNorm observes the effect of each task on shared parameters. That makes it relevant to unified perception trunks whose heads learn at different speeds.
 
 ## Core Insights
 

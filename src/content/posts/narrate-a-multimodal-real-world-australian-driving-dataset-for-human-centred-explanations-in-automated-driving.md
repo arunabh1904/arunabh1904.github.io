@@ -19,7 +19,7 @@ summary: "2026 – NARRATE: A Multimodal Real-World Australian Driving Dataset f
 
 ## Summary
 
-NARRATE collects explanations from the drivers who performed real-world manoeuvres, rather than asking observers or language models to reconstruct reasons after the fact. It contains 2,050 annotated events from 35 experienced drivers and instructors in Brisbane, synchronized with four camera views, LiDAR, localization, and motion streams. The labels cover driver action, six high-level and 32 fine-grained contexts, and span-level Perception, Comprehension, and Projection annotations.
+> NARRATE collects explanations from the drivers who performed real-world manoeuvres, rather than asking observers or language models to reconstruct reasons after the fact. It contains 2,050 annotated events from 35 experienced drivers and instructors in Brisbane, synchronized with four camera views, LiDAR, localization, and motion streams. The labels cover driver action, six high-level and 32 fine-grained contexts, and span-level Perception, Comprehension, and Projection annotations.
 
 ## Core Insights
 

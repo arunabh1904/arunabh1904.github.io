@@ -15,7 +15,7 @@ summary: "2025 – ORION: A Holistic End-to-End Autonomous Driving Framework by 
 
 ## Summary
 
-ORION couples long-horizon scene history, language-model reasoning, and a generative trajectory planner in one end-to-end framework. QT-Former aggregates the history, an LLM produces driving reasoning, and the planner turns the combined state into precise trajectories. On Bench2Drive, the paper reports a 77.74 driving score and 54.62% success rate—improvements of 14.28 score points and 19.61 percentage points over its stated prior best. The abstract does not report latency, number of seeds, or a reasoning-ablation matched to the planner.
+> ORION couples long-horizon scene history, language-model reasoning, and a generative trajectory planner in one end-to-end framework. QT-Former aggregates the history, an LLM produces driving reasoning, and the planner turns the combined state into precise trajectories. On Bench2Drive, the paper reports a 77.74 driving score and 54.62% success rate—improvements of 14.28 score points and 19.61 percentage points over its stated prior best. The abstract does not report latency, number of seeds, or a reasoning-ablation matched to the planner.
 
 ## Core Insights
 

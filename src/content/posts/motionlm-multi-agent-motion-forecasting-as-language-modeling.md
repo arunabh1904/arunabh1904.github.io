@@ -19,7 +19,7 @@ MotionLM asks a simple question: what if multi-agent motion forecasting is a lan
 
 ## Summary
 
-That reframing removes several pieces of hand-built forecasting machinery. The model does not need anchors or explicit latent-variable optimization for multimodality, and it can generate joint futures for interacting agents in one decoding process.
+> That reframing removes several pieces of hand-built forecasting machinery. The model does not need anchors or explicit latent-variable optimization for multimodality, and it can generate joint futures for interacting agents in one decoding process.
 
 ## Core Insights
 

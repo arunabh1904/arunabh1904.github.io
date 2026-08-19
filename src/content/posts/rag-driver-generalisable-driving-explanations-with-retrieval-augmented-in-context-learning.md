@@ -15,7 +15,7 @@ summary: "2024 – RAG-Driver: Generalisable Driving Explanations with Retrieval
 
 ## Summary
 
-RAG-Driver uses retrieved expert demonstrations as in-context evidence for a multimodal driving model. Its stated goal is to generate a control prediction together with driving explanations and justifications without repeatedly fine-tuning a large model for every domain. The paper reports state-of-the-art results on its evaluated explanation and control tasks, plus zero-shot generalization to unseen environments; the abstract does not provide the benchmark breakdown or a closed-loop safety result.
+> RAG-Driver uses retrieved expert demonstrations as in-context evidence for a multimodal driving model. Its stated goal is to generate a control prediction together with driving explanations and justifications without repeatedly fine-tuning a large model for every domain. The paper reports state-of-the-art results on its evaluated explanation and control tasks, plus zero-shot generalization to unseen environments; the abstract does not provide the benchmark breakdown or a closed-loop safety result.
 
 ## Core Insights
 

@@ -20,7 +20,7 @@ CenterPoint detects objects as center points in BEV, then regresses height, dime
 
 ## Summary
 
-The representation removes an awkward transplant from 2D detection: oriented 3D anchors have many sizes and headings, while an object's center remains a stable geometric primitive.
+> The representation removes an awkward transplant from 2D detection: oriented 3D anchors have many sizes and headings, while an object's center remains a stable geometric primitive.
 
 ## Core Insights
 

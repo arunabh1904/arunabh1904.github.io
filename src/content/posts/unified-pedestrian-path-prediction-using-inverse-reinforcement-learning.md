@@ -19,7 +19,7 @@ summary: "2026 – Unified Pedestrian Path Prediction Using Inverse Reinforcemen
 
 ## Summary
 
-This paper reformulates pedestrian path prediction as a decision process instead of treating it only as supervised coordinate regression. It adapts a Spatial-Temporal Graph Attention Network with task-specific state and action definitions, then compares deterministic and stochastic policies, one-time and sequential decisions, REINFORCE, and PPO. The reported formulations improve prediction across the selected benchmarks over the standard supervised objective.
+> This paper reformulates pedestrian path prediction as a decision process instead of treating it only as supervised coordinate regression. It adapts a Spatial-Temporal Graph Attention Network with task-specific state and action definitions, then compares deterministic and stochastic policies, one-time and sequential decisions, REINFORCE, and PPO. The reported formulations improve prediction across the selected benchmarks over the standard supervised objective.
 
 ## Core Insights
 

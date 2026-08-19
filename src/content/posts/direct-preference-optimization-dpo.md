@@ -24,7 +24,7 @@ summary: '2023 – Direct Preference Optimization: Your Language Model Is Secret
 
 ## Summary
 
-DPO converts one class of KL-regularized preference optimization into a supervised pairwise loss. Standard RLHF first fits a reward model, then samples online and uses PPO to maximize that proxy while penalizing departure from a reference policy. DPO derives the optimal policy's reward directly from its log-ratio to the reference, so chosen and rejected responses can train the policy without an explicit reward model, value model, or online RL loop.
+> DPO converts one class of KL-regularized preference optimization into a supervised pairwise loss. Standard RLHF first fits a reward model, then samples online and uses PPO to maximize that proxy while penalizing departure from a reference policy. DPO derives the optimal policy's reward directly from its log-ratio to the reference, so chosen and rejected responses can train the policy without an explicit reward model, value model, or online RL loop.
 
 ## Core Insights
 

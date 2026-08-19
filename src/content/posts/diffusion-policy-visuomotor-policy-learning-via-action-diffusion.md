@@ -19,7 +19,7 @@ summary: "2023 – Diffusion Policy: Visuomotor Policy Learning via Action Diffu
 
 ## Summary
 
-Diffusion Policy represents a visuomotor policy as a conditional denoising process over action trajectories. Instead of regressing toward the average of several valid behaviors, it learns the score of a multimodal action distribution and samples a coherent sequence at inference time.
+> Diffusion Policy represents a visuomotor policy as a conditional denoising process over action trajectories. Instead of regressing toward the average of several valid behaviors, it learns the score of a multimodal action distribution and samples a coherent sequence at inference time.
 
 ## Core Insights
 

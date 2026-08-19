@@ -17,7 +17,7 @@ summary: "2024 – CoVLA: Comprehensive Vision-Language-Action Dataset for Auton
 
 ## Summary
 
-CoVLA contributes a driving dataset rather than a new action architecture. It contains more than 80 hours of real-world video, paired with generated driving trajectories and natural-language descriptions of the environment and maneuvers. The paper uses the collection to train and inspect multimodal models that emit language and action together. Its abstract reports coherent outputs, but does not give a closed-loop comparison or an independent annotation-quality audit.
+> CoVLA contributes a driving dataset rather than a new action architecture. It contains more than 80 hours of real-world video, paired with generated driving trajectories and natural-language descriptions of the environment and maneuvers. The paper uses the collection to train and inspect multimodal models that emit language and action together. Its abstract reports coherent outputs, but does not give a closed-loop comparison or an independent annotation-quality audit.
 
 ## Core Insights
 

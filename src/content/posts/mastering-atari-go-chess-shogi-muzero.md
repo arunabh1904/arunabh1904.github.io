@@ -21,7 +21,7 @@ summary: "2019 – Mastering Atari, Go, Chess & Shogi by Planning with a Learned
 
 ## Summary
 
-MuZero combines learned dynamics with tree search without requiring known game rules. It learns three functions: representation from observations to latent state, dynamics from latent state/action to next latent state plus reward, and prediction from latent state to policy and value. Planning uses MCTS over the learned latent model, optimizing only the quantities needed for control rather than reconstructing observations. The evidence spans Atari-57 and board games such as Go, chess, and shogi, showing one algorithm can plan in visual and perfect-information domains. The caveat is compute and data intensity: MuZero is expensive, and the learned model is task-specific. The lasting idea is model-based RL without explicit environment simulators.
+> MuZero combines learned dynamics with tree search without requiring known game rules. It learns three functions: representation from observations to latent state, dynamics from latent state/action to next latent state plus reward, and prediction from latent state to policy and value. Planning uses MCTS over the learned latent model, optimizing only the quantities needed for control rather than reconstructing observations. The evidence spans Atari-57 and board games such as Go, chess, and shogi, showing one algorithm can plan in visual and perfect-information domains. The caveat is compute and data intensity: MuZero is expensive, and the learned model is task-specific. The lasting idea is model-based RL without explicit environment simulators.
 
 ## Core Insights
 

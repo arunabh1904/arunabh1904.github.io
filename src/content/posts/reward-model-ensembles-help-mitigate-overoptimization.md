@@ -19,7 +19,7 @@ summary: "2023 – Reward Model Ensembles Help Mitigate Overoptimization"
 
 ## Summary
 
-This paper asks whether uncertainty across reward models can identify the regions where policy optimization is exploiting a proxy. It trains ensembles and optimizes either the worst predicted reward or an uncertainty-penalized reward instead of trusting a single mean score.
+> This paper asks whether uncertainty across reward models can identify the regions where policy optimization is exploiting a proxy. It trains ensembles and optimizes either the worst predicted reward or an uncertainty-penalized reward instead of trusting a single mean score.
 
 ## Core Insights
 

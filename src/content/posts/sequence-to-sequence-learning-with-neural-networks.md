@@ -23,7 +23,7 @@ summary: "2014 – Sequence to Sequence Learning with Neural Networks"
 
 ## Summary
 
-This paper shows that a neural network can map variable-length input sequences to variable-length output sequences with an encoder-decoder LSTM. The encoder reads the source sentence into a fixed vector; the decoder generates the target sentence from that vector. Reversing the source sentence shortens the effective dependency path between corresponding source and target words. The main evidence is WMT 2014 English-French translation, where a deep LSTM achieves strong BLEU and improves an SMT system through reranking. The caveat is the fixed-vector bottleneck: long or information-dense inputs strain the representation, which later attention mechanisms addressed. The lasting idea is end-to-end sequence transduction with learned representations.
+> This paper shows that a neural network can map variable-length input sequences to variable-length output sequences with an encoder-decoder LSTM. The encoder reads the source sentence into a fixed vector; the decoder generates the target sentence from that vector. Reversing the source sentence shortens the effective dependency path between corresponding source and target words. The main evidence is WMT 2014 English-French translation, where a deep LSTM achieves strong BLEU and improves an SMT system through reranking. The caveat is the fixed-vector bottleneck: long or information-dense inputs strain the representation, which later attention mechanisms addressed. The lasting idea is end-to-end sequence transduction with learned representations.
 
 ## Core Insights
 

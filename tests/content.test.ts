@@ -89,6 +89,26 @@ describe('markdown authoring', () => {
       'Use $...$ or $$...$$ instead of \\(...\\) or \\[...\\] in markdown posts.',
     ).toEqual([]);
   });
+
+  it('keeps paper-note summaries marked as callouts', async () => {
+    const postFiles = await fg('**/*.{md,mdx}', {
+      cwd: postsDir,
+      absolute: true,
+    });
+
+    const offenders: string[] = [];
+    for (const filePath of postFiles) {
+      const source = await readFile(filePath, 'utf8');
+      if (
+        /^section: paper-shorts$/m.test(source) &&
+        !/^## Summary\n\n> /m.test(source)
+      ) {
+        offenders.push(path.relative(projectRoot, filePath));
+      }
+    }
+
+    expect(offenders, 'Paper-note summaries should render as callouts.').toEqual([]);
+  });
 });
 
 describe('content helpers', () => {

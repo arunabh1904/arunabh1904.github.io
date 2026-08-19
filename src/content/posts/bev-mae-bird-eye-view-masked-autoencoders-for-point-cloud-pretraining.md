@@ -21,7 +21,7 @@ BEV-MAE pretrains a sparse LiDAR encoder by masking vertical BEV columns and pre
 
 ## Summary
 
-The objective is designed around outdoor LiDAR physics. Density falls with range and scan pattern, so reconstructing it forces the encoder to learn where a feature lives instead of only copying local appearance.
+> The objective is designed around outdoor LiDAR physics. Density falls with range and scan pattern, so reconstructing it forces the encoder to learn where a feature lives instead of only copying local appearance.
 
 ## Core Insights
 

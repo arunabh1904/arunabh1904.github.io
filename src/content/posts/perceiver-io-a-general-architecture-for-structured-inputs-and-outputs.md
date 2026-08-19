@@ -21,7 +21,7 @@ Perceiver IO generalizes the Perceiver idea from flexible inputs to flexible inp
 
 ## Summary
 
-This belongs in a BEV reading list because modern driving models often need to fuse different input shapes and produce structured outputs: grids, vectors, trajectories, agent states, and maps. Perceiver IO is one of the cleanest architectural templates for that kind of input/output mismatch.
+> This belongs in a BEV reading list because modern driving models often need to fuse different input shapes and produce structured outputs: grids, vectors, trajectories, agent states, and maps. Perceiver IO is one of the cleanest architectural templates for that kind of input/output mismatch.
 
 ## Core Insights
 

@@ -17,7 +17,7 @@ summary: "2022 – Scaling Laws for Reward Model Overoptimization"
 
 ## Summary
 
-This paper measures Goodhart's law instead of citing it. A large “gold” reward model stands in for human judgment, a smaller proxy reward model is trained from its labels, and a policy is pushed against the proxy using reinforcement learning or best-of-$n$ sampling. Proxy reward keeps rising after gold reward peaks.
+> This paper measures Goodhart's law instead of citing it. A large “gold” reward model stands in for human judgment, a smaller proxy reward model is trained from its labels, and a policy is pushed against the proxy using reinforcement learning or best-of-$n$ sampling. Proxy reward keeps rising after gold reward peaks.
 
 ## Core Insights
 

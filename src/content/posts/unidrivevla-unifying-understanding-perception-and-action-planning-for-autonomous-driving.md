@@ -23,7 +23,7 @@ UniDriveVLA argues that driving VLAs face an optimization conflict. Image-langua
 
 ## Summary
 
-The paper's answer is expert decoupling. It uses specialized Transformer experts for understanding, perception, and action planning, then coordinates them with masked joint attention.
+> The paper's answer is expert decoupling. It uses specialized Transformer experts for understanding, perception, and action planning, then coordinates them with masked joint attention.
 
 ## Core Insights
 

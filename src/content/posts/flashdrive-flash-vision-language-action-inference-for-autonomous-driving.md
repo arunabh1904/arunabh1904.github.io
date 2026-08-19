@@ -19,7 +19,7 @@ summary: "2026 – FlashDrive: Flash Vision-Language-Action Inference for Autono
 
 ## Summary
 
-FlashDrive treats VLA latency as a cascade rather than a single model-size problem. It reuses visual KV state across frames, drafts low-entropy reasoning tokens non-autoregressively, caches adaptive flow-matching steps, and combines these changes with CUDA graph and kernel optimizations. On Alpamayo 1.5-10B with W4A8 quantization, end-to-end latency falls from 716.9 ms to 151.4 ms while the reported trajectory errors remain close to the baseline.
+> FlashDrive treats VLA latency as a cascade rather than a single model-size problem. It reuses visual KV state across frames, drafts low-entropy reasoning tokens non-autoregressively, caches adaptive flow-matching steps, and combines these changes with CUDA graph and kernel optimizations. On Alpamayo 1.5-10B with W4A8 quantization, end-to-end latency falls from 716.9 ms to 151.4 ms while the reported trajectory errors remain close to the baseline.
 
 ## Core Insights
 

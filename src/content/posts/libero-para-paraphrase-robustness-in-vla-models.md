@@ -19,7 +19,7 @@ summary: "2026 – LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness
 
 ## Summary
 
-LIBERO-Para changes the instruction while holding the intended task fixed. It varies action expressions and object references independently, then measures whether a VLA's apparent language grounding survives phrasing that was absent from downstream fine-tuning.
+> LIBERO-Para changes the instruction while holding the intended task fixed. It varies action expressions and object references independently, then measures whether a VLA's apparent language grounding survives phrasing that was absent from downstream fine-tuning.
 
 ## Core Insights
 

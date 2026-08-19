@@ -21,7 +21,7 @@ PETR assigns each multiview image feature a 3D position embedding derived from t
 
 ## Summary
 
-This is a different answer to the camera-to-3D problem: make perspective features position-aware, then let attention learn the correspondence.
+> This is a different answer to the camera-to-3D problem: make perspective features position-aware, then let attention learn the correspondence.
 
 ## Core Insights
 
