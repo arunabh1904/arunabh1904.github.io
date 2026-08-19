@@ -117,7 +117,7 @@
   "how-to-read-scaling-laws-for-language-models": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "0ccd1a7240e5e96f73ca76146278cb14e7fa065cdb0ffedab22edb6640b1be28",
+    "digest": "0d91aa22d5730738d58e1632ef4685578298a79a9b74a96cffc7c4da8925a833",
     "file": "/assets/audio/blog/how-to-read-scaling-laws-for-language-models.mp3",
     "language": "English",
     "language_code": "english",
