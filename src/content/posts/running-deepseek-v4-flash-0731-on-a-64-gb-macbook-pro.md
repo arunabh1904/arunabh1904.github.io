@@ -2,6 +2,7 @@
 title: Can DeepSeek V4 Flash 0731 Run on a 64 GB MacBook Pro?
 date: '2026-08-13T04:00:00.000Z'
 section: blog
+blogGroup: local-ai-lab
 postSlug: running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro
 legacyPath: /blog/2026/08/13/running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro.html
 tags:

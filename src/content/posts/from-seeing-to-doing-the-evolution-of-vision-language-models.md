@@ -2,6 +2,7 @@
 title: 'From Image-Text Alignment to Robot Actions'
 date: '2026-07-05T20:00:00.000Z'
 section: blog
+blogGroup: research-guides
 postSlug: from-seeing-to-doing-the-evolution-of-vision-language-models
 legacyPath: /blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html
 tags:

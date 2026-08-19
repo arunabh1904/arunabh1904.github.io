@@ -2,6 +2,7 @@
 title: 'How I Found My Way Into Robotics'
 date: '2025-02-08T05:00:00.000Z'
 section: blog
+blogGroup: essays
 postSlug: my-journey-so-far-full-story
 legacyPath: /blog/2025/02/08/my-journey-so-far-full-story.html
 tags:

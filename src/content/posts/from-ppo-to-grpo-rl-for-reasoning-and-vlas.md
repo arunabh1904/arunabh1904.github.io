@@ -2,6 +2,7 @@
 title: 'PPO, DPO, GRPO, and On-Policy Distillation'
 date: '2026-07-27T16:00:00.000Z'
 section: blog
+blogGroup: research-guides
 postSlug: from-ppo-to-grpo-rl-for-reasoning-and-vlas
 legacyPath: /blog/2026/07/27/from-ppo-to-grpo-rl-for-reasoning-and-vlas.html
 tags:

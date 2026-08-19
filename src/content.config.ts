@@ -11,6 +11,9 @@ const posts = defineCollection({
     title: z.string(),
     date: z.coerce.date(),
     section: z.enum(['paper-shorts', 'blog', 'revision-notes']),
+    blogGroup: z
+      .enum(['projects', 'local-ai-lab', 'research-guides', 'essays'])
+      .optional(),
     postSlug: z.string(),
     legacyPath: z.string(),
     tags: z.array(z.string()).default(['Other']),
@@ -28,6 +31,9 @@ const posts = defineCollection({
       )
       .default([]),
     summary: z.string().optional(),
+  }).refine((post) => post.section !== 'blog' || post.blogGroup !== undefined, {
+    message: 'Blog posts must declare a blogGroup so they remain findable in the Blog index.',
+    path: ['blogGroup'],
   }),
 });
 

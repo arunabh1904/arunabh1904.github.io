@@ -2,6 +2,7 @@
 title: 'How Multimodal Robot Models Are Pretrained'
 date: '2026-07-15T09:00:00.000Z'
 section: blog
+blogGroup: research-guides
 postSlug: omni-model-pretraining-decisions
 legacyPath: /blog/2026/07/15/omni-model-pretraining-decisions.html
 tags:

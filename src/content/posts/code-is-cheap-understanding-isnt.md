@@ -2,6 +2,7 @@
 title: "Code Is Cheap. Understanding Isn't."
 date: '2026-08-12T04:00:00.000Z'
 section: blog
+blogGroup: essays
 postSlug: code-is-cheap-understanding-isnt
 legacyPath: /blog/2026/08/12/code-is-cheap-understanding-isnt.html
 tags:

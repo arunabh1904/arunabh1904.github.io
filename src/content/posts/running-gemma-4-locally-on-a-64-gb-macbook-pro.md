@@ -2,6 +2,7 @@
 title: Benchmarking Gemma 4 on a 64 GB MacBook Pro
 date: '2026-04-04T04:00:00.000Z'
 section: blog
+blogGroup: local-ai-lab
 postSlug: running-gemma-4-locally-on-a-64-gb-macbook-pro
 legacyPath: /blog/2026/04/04/running-gemma-4-locally-on-a-64-gb-macbook-pro.html
 tags:
