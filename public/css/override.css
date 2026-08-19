@@ -15,10 +15,10 @@
   --text-color: #10213f;
   --text-secondary-color: #4d628f;
   --accent-color: #356dff;
-  --link-color: #5b4bb7;
-  --link-hover-color: #40349a;
-  --link-visited-color: #775ca6;
-  --link-underline-color: rgba(91, 75, 183, 0.42);
+  --link-color: #2a625c;
+  --link-hover-color: #1d4944;
+  --link-visited-color: #507970;
+  --link-underline-color: rgba(42, 98, 92, 0.46);
   --icon-color: #356dff;
   --image-border-color: #6c96ff;
   --code-border-color: rgba(53, 109, 255, 0.18);
@@ -57,10 +57,10 @@
   --text-color: #10213f;
   --text-secondary-color: #4d628f;
   --accent-color: #356dff;
-  --link-color: #5b4bb7;
-  --link-hover-color: #40349a;
-  --link-visited-color: #775ca6;
-  --link-underline-color: rgba(91, 75, 183, 0.42);
+  --link-color: #2a625c;
+  --link-hover-color: #1d4944;
+  --link-visited-color: #507970;
+  --link-underline-color: rgba(42, 98, 92, 0.46);
   --icon-color: #356dff;
   --image-border-color: #6c96ff;
   --code-border-color: rgba(53, 109, 255, 0.18);
@@ -1449,7 +1449,7 @@ a {
   text-decoration: none;
 }
 
-/* Hover state: blue-berry highlight + underline */
+/* Hover state: deeper teal highlight + underline */
 a:hover {
   color: var(--link-hover-color);
   text-decoration: underline;
@@ -1468,7 +1468,7 @@ a:visited {
 :root[data-theme="light"] a:hover {
   color: var(--link-hover-color);
   text-decoration: underline;
-  text-shadow: 0 0 10px rgba(91, 75, 183, 0.16);
+  text-shadow: 0 0 10px rgba(42, 98, 92, 0.16);
 }
 
 :root[data-theme="light"] a:visited {
