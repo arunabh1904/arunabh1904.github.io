@@ -3,25 +3,25 @@ export const BLOG_GROUPS = [
     id: 'projects',
     title: 'Projects & systems',
     description:
-      'End-to-end builds, including the local Qwen3-TTS blog narrator and a local-weight agent.',
+      'The useful part starts after the demo: turning a local model into a system I actually rely on.',
   },
   {
     id: 'local-ai-lab',
     title: 'Local AI lab',
     description:
-      'Measured model-fit and inference decisions for running open weights on a 64 GB MacBook Pro.',
+      'What actually fits, how fast it runs, and where a 64 GB Mac stops being enough.',
   },
   {
     id: 'research-guides',
     title: 'Long-form research guides',
     description:
-      'Mechanism-first explanations of attention, scaling, multimodal learning, robot policies, and perception.',
+      'I follow the mechanism until a stack of papers becomes a mental model I can use.',
   },
   {
     id: 'essays',
     title: 'Essays & career',
     description:
-      'Personal experience and working principles for research, engineering, and a career in robotics.',
+      'The harder questions behind the work: what to learn, how to choose, and what remains valuable.',
   },
 ] as const;
 
@@ -54,7 +54,7 @@ export function groupBlogPosts<TPost extends BlogPostLike>(posts: readonly TPost
           {
             id: 'other',
             title: 'Other writing',
-            description: 'Posts awaiting a more specific reading path.',
+            description: 'Writing that has not found a better shelf yet.',
             posts: ungrouped,
           },
         ]
