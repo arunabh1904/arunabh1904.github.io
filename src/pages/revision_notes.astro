@@ -1,64 +1,102 @@
 ---
 import PostLayout from '../layouts/PostLayout.astro';
-import SectionHeader from '../components/SectionHeader.astro';
+
+const revisionGroups = [
+  {
+    title: 'PyTorch',
+    description: 'Tensor mechanics, autograd, and the systems that make training fast and scalable.',
+    resource: { label: 'PyTorch documentation ↗', href: 'https://docs.pytorch.org/docs/2.13/' },
+    entries: [
+      {
+        title: 'I · Tensors',
+        summary: 'Shapes, strides, storage, views, broadcasting, dtypes, and the contracts behind every tensor program.',
+        links: [
+          { label: 'Notes', href: '/revision notes/2026/08/09/pytorch-tensor-revision-notes.html' },
+        ],
+      },
+      {
+        title: 'II · Autograd and training',
+        summary: 'How PyTorch records computation, propagates gradients, and turns a differentiable graph into a training loop.',
+        links: [
+          { label: 'Notes', href: '/revision notes/2026/08/10/pytorch-autograd-and-training.html' },
+        ],
+      },
+      {
+        title: 'III · Performance and scale',
+        summary: 'Compilation, mixed precision, memory, data loading, and distributed execution—the systems that decide throughput.',
+        links: [
+          { label: 'Notes', href: '/revision notes/2026/08/10/pytorch-systems-and-scale.html' },
+        ],
+      },
+    ],
+  },
+  {
+    title: 'CS336',
+    description: 'Tensor efficiency in Lecture 2, then Transformer architecture in Lecture 3.',
+    resource: { label: 'Course website ↗', href: 'https://cs336.stanford.edu/spring2025/' },
+    entries: [
+      {
+        title: 'Lecture 2 · Tensor efficiency',
+        summary: 'Memory layout, dtypes, einsum, and the arithmetic that determines whether tensor code is actually efficient.',
+        links: [
+          { label: 'Notes', href: '/revision notes/2025/05/15/cs336-revision-notes.html' },
+          { label: 'Material', href: 'https://cs336.stanford.edu/spring2025-lectures/?trace=var/traces/lecture_02.json' },
+        ],
+      },
+      {
+        title: 'Lecture 3 · Transformer architecture',
+        summary: 'From the residual stream through attention and MLP blocks to a complete language-model implementation.',
+        links: [
+          { label: 'Notes', href: '/revision notes/2025/05/22/cs336-lecture-3.html' },
+          { label: 'Video', href: 'https://www.youtube.com/watch?v=ptFiH_bHnJw' },
+          { label: 'Slides', href: 'https://github.com/stanford-cs336/spring2025-lectures/blob/e9cb2488fdb53ea37f0e38924ec3a1701925cef3/nonexecutable/2025%20Lecture%203%20-%20architecture.pdf' },
+        ],
+      },
+    ],
+  },
+];
 ---
 
 <PostLayout title="Revision Notes" showSectionsNav={false}>
-  <SectionHeader
-    eyebrow="Revision Notes"
-    title="PyTorch and CS336"
-    description="Course notes, references, and implementation details for PyTorch and language modeling."
-    meta="5 notes"
-  />
+  <header class="blog-index-intro">
+    <h1>Revision Notes</h1>
+    <p>Notes I rebuilt from lectures and documentation so I can return to the ideas quickly.</p>
+  </header>
 
-  <section class="resource-list">
-    <div class="resource-list__header">
-      <h2>PyTorch</h2>
-      <a href="https://docs.pytorch.org/docs/2.13/">Documentation</a>
-    </div>
-    <ul>
-      <li>
-        <div>
-          <strong>PyTorch from tensors to distributed execution</strong>
-          <p>Three connected notes: tensor contracts, differentiable training, then the systems that execute and scale the same program.</p>
-        </div>
-        <span>
-          <a href="/revision notes/2026/08/09/pytorch-tensor-revision-notes.html">I · Tensors</a>
-          <a href="/revision notes/2026/08/10/pytorch-autograd-and-training.html">II · Autograd and training</a>
-          <a href="/revision notes/2026/08/10/pytorch-systems-and-scale.html">III · Performance and scale</a>
-        </span>
-      </li>
-    </ul>
-  </section>
+  <section class="revision-index blog-index-groups" aria-label="Revision note collections">
+    {revisionGroups.map((group) => (
+      <details class="blog-index-group no-icon">
+        <summary>
+          <div>
+            <div class="blog-index-group__title">
+              <h2>{group.title}</h2>
+              <span>{group.entries.length} {group.entries.length === 1 ? 'note' : 'notes'}</span>
+            </div>
+            <p>{group.description}</p>
+          </div>
+          <span class="blog-index-group__action" aria-hidden="true">
+            <span class="blog-index-group__action-label--closed">View notes ↓</span>
+            <span class="blog-index-group__action-label--open">Hide notes ↑</span>
+          </span>
+        </summary>
 
-  <section class="resource-list">
-    <div class="resource-list__header">
-      <h2>Course links</h2>
-      <a href="https://stanford-cs336.github.io/spring2025/">Course website</a>
-    </div>
-    <ul>
-      <li>
-        <div>
-          <strong>Lesson 2</strong>
-          <p>Tensor fundamentals, memory layout, dtypes, and computation efficiency.</p>
+        <div class="compact-index-shelf">
+          <a class="compact-index-resource" href={group.resource.href}>{group.resource.label}</a>
+          <ul class="compact-index-list">
+            {group.entries.map((entry) => (
+              <li>
+                <div>
+                  <h3><a href={entry.links[0].href}>{entry.title}</a></h3>
+                  <p>{entry.summary}</p>
+                </div>
+                <span class="compact-index-links">
+                  {entry.links.map((link) => <a href={link.href}>{link.label}</a>)}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
-        <span>
-          <a href="/revision notes/2025/05/15/cs336-revision-notes.html">My notes</a>
-          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">YouTube</a>
-          <a href="https://stanford-cs336.github.io/spring2025/lectures/2">Material</a>
-        </span>
-      </li>
-      <li>
-        <div>
-          <strong>Lesson 3</strong>
-          <p>Architecture notes and transformer implementation details.</p>
-        </div>
-        <span>
-          <a href="/revision notes/2025/05/22/cs336-lecture-3.html">My notes</a>
-          <a href="https://www.youtube.com/watch?v=ptFiH_bHnJw">YouTube</a>
-          <a href="https://github.com/stanford-cs336/spring2024-lectures/blob/main/nonexecutable/Lecture%203%20-%20architecture.pdf">Slides</a>
-        </span>
-      </li>
-    </ul>
+      </details>
+    ))}
   </section>
 </PostLayout>

@@ -1,35 +1,51 @@
 ---
-import SectionHeader from '../components/SectionHeader.astro';
 import PostLayout from '../layouts/PostLayout.astro';
-import { READING_LIST_ITEMS } from '../lib/reading-list';
+import { READING_LIST_GROUPS, READING_LIST_ITEMS } from '../lib/reading-list';
 
-const itemCountLabel = `${READING_LIST_ITEMS.length} ${
-  READING_LIST_ITEMS.length === 1 ? 'item' : 'items'
-}`;
+const groups = READING_LIST_GROUPS.map((group) => ({
+  ...group,
+  items: READING_LIST_ITEMS.filter((item) => item.group === group.id),
+})).filter((group) => group.items.length > 0);
 ---
 
 <PostLayout title="Reading List" showSectionsNav={false}>
-  <SectionHeader
-    eyebrow="Reading List"
-    title="External references"
-    description="Essays, blogs, and references worth returning to, with one reason to read each."
-    meta={itemCountLabel}
-  />
+  <header class="blog-index-intro">
+    <h1>Reading List</h1>
+    <p>Things I have read, learned from, and want to return to.</p>
+  </header>
 
-  <section class="resource-list">
-    <ul>
-      {READING_LIST_ITEMS.map((item) => (
-        <li>
+  <section class="reading-index blog-index-groups" aria-label="Reading list categories">
+    {groups.map((group) => (
+      <details class="blog-index-group no-icon">
+        <summary>
           <div>
-            <strong>{item.title}</strong>
-            <p>{item.summary}</p>
-            <small>{item.author} / {item.dateLabel}</small>
+            <div class="blog-index-group__title">
+              <h2>{group.title}</h2>
+              <span>{group.items.length} {group.items.length === 1 ? 'entry' : 'entries'}</span>
+            </div>
+            <p>{group.description}</p>
           </div>
-          <span>
-            <a href={item.href}>Read</a>
+          <span class="blog-index-group__action" aria-hidden="true">
+            <span class="blog-index-group__action-label--closed">View entries ↓</span>
+            <span class="blog-index-group__action-label--open">Hide entries ↑</span>
           </span>
-        </li>
-      ))}
-    </ul>
+        </summary>
+
+        <div class="compact-index-shelf">
+          <ul class="compact-index-list">
+            {group.items.map((item) => (
+              <li>
+                <div>
+                  <h3><a href={item.href}>{item.title}</a></h3>
+                  <p>{item.summary}</p>
+                  <small>{item.author} · {item.dateLabel}</small>
+                </div>
+                <a class="compact-index-link" href={item.href} aria-label={`Read ${item.title}`}>Read ↗</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </details>
+    ))}
   </section>
 </PostLayout>

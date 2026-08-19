@@ -2309,6 +2309,77 @@ h3,
   border-left: 1px solid var(--button-border);
 }
 
+.compact-index-shelf {
+  margin: 0 1.1rem 1.1rem;
+  padding: 0.9rem 0 0 1rem;
+  border-top: 1px solid var(--button-border);
+  border-left: 1px solid var(--button-border);
+}
+
+.compact-index-resource {
+  display: inline-block;
+  margin: 0 0 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+}
+
+.compact-index-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compact-index-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--button-border);
+}
+
+.compact-index-list li:first-child {
+  border-top: 0;
+}
+
+.compact-index-list h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.compact-index-list p {
+  max-width: 64ch;
+  margin: 0.28rem 0 0;
+  color: var(--text-secondary-color);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.compact-index-list small {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--text-secondary-color);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.compact-index-link,
+.compact-index-links {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.compact-index-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: flex-end;
+}
+
 .writing-index {
   min-width: 0;
 }
@@ -3440,12 +3511,25 @@ body.home-page small {
 
   .writing-index-toolbar,
   .writing-index .blog-index-group > summary,
+  .reading-index .blog-index-group > summary,
+  .revision-index .blog-index-group > summary,
   .writing-index-subgroup > summary {
     grid-template-columns: 1fr;
   }
 
-  .writing-index .blog-index-group__action {
+  .writing-index .blog-index-group__action,
+  .reading-index .blog-index-group__action,
+  .revision-index .blog-index-group__action {
     justify-self: start;
+  }
+
+  .compact-index-list li {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .compact-index-links {
+    justify-content: flex-start;
   }
 
   .writing-index-subgroup__title {
