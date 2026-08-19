@@ -1,7 +1,6 @@
 ---
 import PostLayout from '../layouts/PostLayout.astro';
 import PostList from '../components/PostList.astro';
-import SectionHeader from '../components/SectionHeader.astro';
 import { groupBlogPosts } from '../lib/blog-index';
 import { getPostsBySection } from '../lib/content';
 
@@ -10,34 +9,34 @@ const groups = groupBlogPosts(posts);
 ---
 
 <PostLayout title="Blog" description="Technical guides, local experiments, projects, and essays." showSectionsNav={false}>
-  <SectionHeader
-    eyebrow="Blog"
-    title="Choose a reading path"
-    description="Browse by the kind of question you want to answer, then use the archive when a tag is the better handle."
-    meta={`${posts.length} posts · ${groups.length} paths`}
-  />
-
-  <nav class="blog-index-nav" aria-label="Blog reading paths">
-    {groups.map((group) => (
-      <a href={`#${group.id}`}>
-        <span>{group.title}</span>
-        <small>{group.posts.length} posts</small>
-      </a>
-    ))}
-  </nav>
+  <header class="blog-index-intro">
+    <h1>Blog</h1>
+    <p>
+      I fundamentally believe writing is the way to learn. It forces a half-formed idea into
+      something I can inspect, test, and return to.
+    </p>
+    <p>
+      AI has accelerated that process and empowered me to follow every question further. The
+      curiosity is almost infectious: each experiment becomes a note, and each note opens another
+      question.
+    </p>
+  </header>
 
   <div class="blog-index-groups">
     {groups.map((group) => (
-      <section class="blog-index-group" id={group.id}>
-        <div class="blog-index-group__header">
+      <details class="blog-index-group" id={group.id}>
+        <summary>
           <div>
-            <h2>{group.title}</h2>
+            <div class="blog-index-group__title">
+              <h2>{group.title}</h2>
+              <span>{group.posts.length} posts</span>
+            </div>
             <p>{group.description}</p>
           </div>
-          <p class="blog-index-group__count">{group.posts.length} posts</p>
-        </div>
+          <span class="blog-index-group__toggle" aria-hidden="true"></span>
+        </summary>
         <PostList posts={group.posts} />
-      </section>
+      </details>
     ))}
   </div>
 </PostLayout>
