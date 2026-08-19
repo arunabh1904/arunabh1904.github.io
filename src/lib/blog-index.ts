@@ -1,17 +1,5 @@
 export const BLOG_GROUPS = [
   {
-    id: 'projects',
-    title: 'Projects & systems',
-    description:
-      'The useful part starts after the demo: turning a local model into a system I actually rely on.',
-  },
-  {
-    id: 'local-ai-lab',
-    title: 'Local AI lab',
-    description:
-      'What actually fits, how fast it runs, and where a 64 GB Mac stops being enough.',
-  },
-  {
     id: 'research-guides',
     title: 'Long-form research guides',
     description:
@@ -22,6 +10,18 @@ export const BLOG_GROUPS = [
     title: 'Essays & career',
     description:
       'The harder questions behind the work: what to learn, how to choose, and what remains valuable.',
+  },
+  {
+    id: 'projects',
+    title: 'Projects & systems',
+    description:
+      'The useful part starts after the demo: turning a local model into a system I actually rely on.',
+  },
+  {
+    id: 'local-ai-lab',
+    title: 'Local AI lab',
+    description:
+      'What actually fits, how fast it runs, and where a 64 GB Mac stops being enough.',
   },
 ] as const;
 

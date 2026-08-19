@@ -12,13 +12,9 @@ const groups = groupBlogPosts(posts);
   <header class="blog-index-intro">
     <h1>Blog</h1>
     <p>
-      I fundamentally believe writing is the way to learn. It forces a half-formed idea into
-      something I can inspect, test, and return to.
-    </p>
-    <p>
-      AI has accelerated that process and empowered me to follow every question further. The
-      curiosity is almost infectious: each experiment becomes a note, and each note opens another
-      question.
+      I fundamentally believe writing is the way to learn. When I write, a half-formed idea in my
+      head becomes something concrete and deeply etched in my memory. Here are some of the ideas I
+      have thought through over the past few years.
     </p>
   </header>
 
@@ -33,7 +29,14 @@ const groups = groupBlogPosts(posts);
             </div>
             <p>{group.description}</p>
           </div>
-          <span class="blog-index-group__toggle" aria-hidden="true"></span>
+          <span class="blog-index-group__action" aria-hidden="true">
+            <span class="blog-index-group__action-label blog-index-group__action-label--closed">Explore</span>
+            <span class="blog-index-group__action-label blog-index-group__action-label--open">Close</span>
+            <span class="blog-index-group__toggle">
+              <span class="blog-index-group__toggle-closed">+</span>
+              <span class="blog-index-group__toggle-open">−</span>
+            </span>
+          </span>
         </summary>
         <PostList posts={group.posts} />
       </details>
