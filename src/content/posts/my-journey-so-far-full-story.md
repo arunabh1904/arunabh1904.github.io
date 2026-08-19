@@ -8,8 +8,7 @@ legacyPath: /blog/2025/02/08/my-journey-so-far-full-story.html
 tags:
   - Other
 summary: >-
-  How failure, depression, hands-on projects, graduate school, DEKA, and Zoox
-  shaped my path into robotics and autonomous driving.
+  How failure, projects, graduate school, and industry led me into robotics.
 ---
 
 # How I Found My Way Into Robotics

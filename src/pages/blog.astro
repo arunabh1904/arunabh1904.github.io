@@ -20,7 +20,7 @@ const groups = groupBlogPosts(posts);
 
   <div class="blog-index-groups">
     {groups.map((group) => (
-      <details class="blog-index-group" id={group.id}>
+      <details class="blog-index-group no-icon" id={group.id}>
         <summary>
           <div>
             <div class="blog-index-group__title">
@@ -30,12 +30,8 @@ const groups = groupBlogPosts(posts);
             <p>{group.description}</p>
           </div>
           <span class="blog-index-group__action" aria-hidden="true">
-            <span class="blog-index-group__action-label blog-index-group__action-label--closed">Explore</span>
-            <span class="blog-index-group__action-label blog-index-group__action-label--open">Close</span>
-            <span class="blog-index-group__toggle">
-              <span class="blog-index-group__toggle-closed">+</span>
-              <span class="blog-index-group__toggle-open">−</span>
-            </span>
+            <span class="blog-index-group__action-label--closed">View posts ↓</span>
+            <span class="blog-index-group__action-label--open">Hide posts ↑</span>
           </span>
         </summary>
         <PostList posts={group.posts} />

@@ -3,25 +3,25 @@ export const BLOG_GROUPS = [
     id: 'research-guides',
     title: 'Long-form research guides',
     description:
-      'I follow the mechanism until a stack of papers becomes a mental model I can use.',
+      'Deep dives into perception, multimodal models, reinforcement learning, and scaling.',
   },
   {
     id: 'essays',
     title: 'Essays & career',
     description:
-      'The harder questions behind the work: what to learn, how to choose, and what remains valuable.',
+      'Notes on research, careers, and what remains valuable as AI changes the work.',
   },
   {
     id: 'projects',
     title: 'Projects & systems',
     description:
-      'The useful part starts after the demo: turning a local model into a system I actually rely on.',
+      'Local agents, Blog audio, and the systems I built around open models.',
   },
   {
     id: 'local-ai-lab',
     title: 'Local AI lab',
     description:
-      'What actually fits, how fast it runs, and where a 64 GB Mac stops being enough.',
+      'Benchmarks and fit checks for running open-weight models on a 64 GB Mac.',
   },
 ] as const;
 

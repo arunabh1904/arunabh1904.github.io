@@ -9,7 +9,7 @@ tags:
   - Multimodal AI
   - Pretraining
   - Research Leadership
-summary: How representations, robot data, action interfaces, objective mixtures, and scaling experiments determine a multimodal robot policy.
+summary: The key decisions behind pretraining multimodal robot policies.
 ---
 
 # How Multimodal Robot Models Are Pretrained

@@ -9,8 +9,8 @@ tags:
   - Research
   - Career
 summary: >-
-  How research taste, problem choice, collaboration, controlled experiments,
-  and throughput combine into a reliable research system.
+  How taste, problem choice, collaboration, and experiment cadence produce good
+  research.
 ---
 # How Good Research Works in Industry
 

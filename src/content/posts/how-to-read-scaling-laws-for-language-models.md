@@ -9,7 +9,7 @@ tags:
   - Language Models
   - Scaling Laws
   - Pretraining
-summary: A close reading of cross-entropy, perplexity, Kaplan, and Chinchilla—and why a scaling curve should change an experiment plan, not end the discussion.
+summary: How to interpret scaling curves—and turn them into better experiments.
 ---
 
 # Some Thoughts on Scaling Laws for Language Models

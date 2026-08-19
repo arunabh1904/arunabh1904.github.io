@@ -10,8 +10,8 @@ tags:
   - Apple Silicon
   - Inference
 summary: >-
-  A measured llama.cpp benchmark of Meta's official 17 GB Muse Glimmer 30B
-  quant on a 64 GB M5 Max, including reasoning latency and an 8K prompt test.
+  Measured Muse Glimmer 30B latency, memory use, and long-context behavior on
+  an M5 Max.
 ---
 # Benchmarking Muse Glimmer 30B on a 64 GB MacBook Pro
 

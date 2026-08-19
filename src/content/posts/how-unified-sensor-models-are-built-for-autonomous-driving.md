@@ -12,7 +12,7 @@ tags:
 topics:
   - autonomy
   - multimodal
-summary: How camera, LiDAR, and radar encoders preserve different measurements, align them in metric space, fuse them, and carry scene state through time.
+summary: How camera, LiDAR, and radar become a unified, temporal scene representation.
 ---
 
 # Perception for Autonomous Driving in 2026

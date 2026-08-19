@@ -11,9 +11,8 @@ tags:
   - Apple Silicon
   - Audio
 summary: >-
-  How this site turns Blog Markdown into static MP3 narration with Qwen3-TTS,
-  keeps a synthetic narrator stable across chunks, excludes visual or code
-  artifacts, and serves playback without a runtime model or API dependency.
+  A local Qwen3-TTS pipeline that turns Blog Markdown into consistent, static
+  narration.
 ---
 
 # Building Local Blog Audio with Qwen3-TTS

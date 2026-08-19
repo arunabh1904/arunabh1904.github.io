@@ -9,8 +9,7 @@ tags:
   - LLMs
   - Apple Silicon
 summary: >-
-  A dated comparison of MLX and llama.cpp latency for Gemma 4 on a 64 GB M5
-  Max, including why long-prompt prefill changes the recommendation.
+  MLX versus llama.cpp performance for Gemma 4 on a 64 GB M5 Max.
 ---
 # Benchmarking Gemma 4 on a 64 GB MacBook Pro
 
