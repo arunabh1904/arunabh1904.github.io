@@ -1,5 +1,5 @@
 ---
-title: 'Some Thoughts on Scaling Laws for Language Models'
+title: 'How to Read Scaling Laws for Language Models'
 date: '2026-08-19T12:00:00.000Z'
 section: blog
 blogGroup: research-guides
@@ -9,109 +9,173 @@ tags:
   - Language Models
   - Scaling Laws
   - Pretraining
-summary: How to interpret scaling curves—and turn them into better experiments.
+  - Inference
+summary: Kaplan, Chinchilla, data constraints, inference economics, and why every scaling law is a local map of one experimental regime.
 ---
 
-# Some Thoughts on Scaling Laws for Language Models
+# How to Read Scaling Laws for Language Models
 
-This post is long overdue. I have had it in my backlog for a long time, not because Kaplan and Chinchilla are obscure, but because I wanted to understand what their results actually mean now. They appear in almost every discussion of a model release: sometimes as an argument for a bigger model, sometimes as a fixed token-to-parameter ratio, and sometimes as a vague claim that progress is inevitable. None of those versions survives a close reading.
+Kaplan and Chinchilla appear in almost every discussion of a model release: sometimes as an argument for a bigger model, sometimes as a fixed token-to-parameter ratio, and sometimes as a vague claim that progress is inevitable. None of those versions survives a close reading.
 
-A scaling law does not say that a model becomes intelligent if we make it larger. It makes a more useful, narrower claim: inside a measured training regime, a chosen error metric changes predictably as we spend more parameters, data, or compute. That turns a large pretraining run from one heroic bet into a resource-allocation problem. If a cheap sweep can fit the curve, it can tell us whether the next dollar should buy a larger model, more tokens, a different mixture, or a better evaluation.
+A scaling law does not say that a model becomes intelligent if we make it larger. It makes a narrower and more useful claim: within a measured training regime, a chosen metric changes predictably as we spend more parameters, data, or compute. That can turn a frontier run from a heroic bet into a resource-allocation problem. A good small sweep tells us whether the next unit of budget should buy a larger model, more tokens, a different data mixture, a better architecture, or more inference-time search.
 
-The original language-model result was much sharper than "bigger models work." [Kaplan et al. (2020)](https://arxiv.org/abs/2001.08361) measured validation cross-entropy across model size, dataset size, and training compute, then showed the smooth trend that appears when the other resources are not yet binding. [Hoffmann et al. (2022)](https://arxiv.org/abs/2203.15556), the Chinchilla paper, asked the question that matters whenever someone cites a scaling law: with a fixed FLOP budget, what combination of parameters and tokens actually minimizes loss? The answer starts with the metric, not the model-size headline.
+> A scaling curve should change an experiment plan, not end the discussion.
+
+The phrase *within a measured regime* does most of the work. A fitted curve inherits its architecture, tokenizer, data construction, optimizer, schedule, context length, compute accounting, and evaluation distribution. Change enough of those and we are not moving along the same curve anymore.
+
+I separate four claims that are too often all called a “scaling law.”
+
+1. A **descriptive** law says measured runs follow a smooth relationship.
+2. A **predictive** law says that relationship forecasts a held-out, more expensive run.
+3. A **prescriptive** law optimizes the fitted relationship under a resource constraint.
+4. A **system-optimal** law remains useful after serving demand, latency, memory, post-training, and test-time compute enter the objective.
+
+[Kaplan et al. (2020)](https://arxiv.org/abs/2001.08361) established striking descriptive regularity. [Chinchilla](https://arxiv.org/abs/2203.15556) turned a fitted loss surface into a pretraining allocation. Neither result, by itself, solves the system-optimal problem. That distinction is the spine of this post.
 
 ## What a scaling law measures
 
-For an autoregressive language model, each next token has a probability assigned by the model. On a held-out token sequence $x_1, \ldots, x_T$, the average negative log-probability is
+For an autoregressive language model, each next token receives a probability. On a held-out token sequence $x_1, \ldots, x_T$, average negative log-likelihood is
 
 $$
 \mathcal{L}_{\mathrm{NLL}}
 = -\frac{1}{T}\sum_{t=1}^{T}\log p_\theta(x_t \mid x_{<t}).
 $$
 
-This is cross-entropy, measured in *nats* when $\log$ is natural log. A model that consistently gives the observed next token more probability has lower loss. It is a proper scoring rule: confidently assigning probability to the wrong token hurts more than admitting uncertainty. I like validation loss as the first object for a scaling study because it is dense, stable, and cheap; I do not like the move from "loss improved" to "the system is now better at everything." Those are different claims.
+This is cross-entropy, measured in *nats* when $\log$ is natural log. A model that assigns the observed next token more probability has lower loss. It is dense, stable, and inexpensive to fit. It is not a certificate that the resulting system is better at everything.
 
-Three quantities are routinely collapsed into one. They should not be.
-
-**Entropy $H(p)$** is the irreducible uncertainty of the true token distribution $p$, under one tokenizer and one data distribution. It belongs to the source, not to a particular model.
-
-**Cross-entropy $H(p, q_\theta)$** is the expected negative log-probability assigned by model $q_\theta$ to data from $p$. Lower cross-entropy means the model predicts the held-out distribution better.
-
-**Perplexity $\operatorname{PPL}$** is $\exp(H(p,q_\theta))$ when cross-entropy is measured in nats. It turns an additive loss into an effective branching factor, which is useful for intuition but easy to misuse in comparison.
-
-The relationship is exact:
+Three quantities are routinely collapsed into one. **Entropy $H(p)$** is uncertainty in a specified source distribution. **Cross-entropy $H(p,q_\theta)$** is the expected negative log-probability assigned by model $q_\theta$. **Perplexity** is $\exp(H(p,q_\theta))$ when loss is in nats. Their relationship is exact:
 
 $$
 H(p,q_\theta) = H(p) + D_{\mathrm{KL}}(p\,\Vert\,q_\theta).
 $$
 
-Entropy is the floor for that tokenization and distribution; the KL divergence is the model's excess loss above it. We almost never know the true $H(p)$ for natural language, so a measured cross-entropy is not "how much entropy the model has." It is a score for one model on one held-out sample. It changes if the tokenizer, document mixture, de-duplication policy, or evaluation corpus changes.
+The entropy term is not a universal property of “English,” and a validation loss is not an estimate of it. Tokenizer, corpus, and conditioning define the unit. A perplexity comparison across tokenizers is therefore not automatically meaningful; bits per byte can sometimes be a better normalized quantity.
 
-Perplexity is simply the exponentiated cross-entropy. It is often intuitive because $\operatorname{PPL}=20$ reads as an effective choice among roughly twenty equally likely continuations, but it can conceal additive changes in the quantity being optimized. A decrease from $2.0$ to $1.9$ nats has the same loss difference as $3.0$ to $2.9$ nats; after exponentiation, the first reduces perplexity by about $9.5\%$ and the second by about $9.5\%$. Compare and fit loss in log space. Report perplexity when its multiplicative interpretation helps a reader.
+Perplexity is a presentation transform, not another training objective. Whether a fit uses raw loss, log loss, or reducible loss is a modeling choice that should be selected by held-out prediction. The rule is simple: name the target, its units, and the test used to validate the fit.
 
-That distinction establishes the object of study. A scaling law is a fitted relationship between a metric and a resource. It is not a property of language in the abstract, and it is definitely not a license to forget what changed in the data or the evaluation.
+## From a curve to an allocation
 
-## Kaplan et al.: three curves, not one parameter curve
-
-Kaplan et al. varied non-embedding parameters $N$, training-data tokens $D$, and compute $C$. The original Figure 1 below is worth reading slowly. Each right-hand panel holds the other constraints loose enough that the plotted resource is the dominant limitation. The approximately straight trend on log-log axes is the empirical signature of a power law, not a claim that loss falls linearly with the resource.
+Kaplan measured regular loss trends with non-embedding parameters $N$, training tokens $D$, and compute $C$. The original Figure 1 is useful precisely because it is three curves, not one model-size curve.
 
 ![Kaplan et al. 2020 Figure 1: validation loss as a function of compute, dataset size, and non-embedding parameters](/assets/images/kaplan-2020-simple-power-laws-paper-figure.png)
 
-*Original Figure 1 from [Kaplan et al., “Scaling Laws for Neural Language Models”](https://arxiv.org/abs/2001.08361), rendered without alteration from the authors’ arXiv source. The three panels show the measured loss curves against training compute, dataset size, and non-embedding parameters.*
+*Original Figure 1 from [Kaplan et al., “Scaling Laws for Neural Language Models”](https://arxiv.org/abs/2001.08361), rendered without alteration from the authors’ arXiv source.*
 
-The compact mental model is a loss surface with three kinds of limitation:
+A useful local model is
 
 $$
-L(N,D) \approx L_\infty + \frac{A}{N^\alpha} + \frac{B}{D^\beta}.
+L(N,D)=E + A N^{-\alpha}+B D^{-\beta},
+\qquad C=\kappa ND.
 $$
 
-This is a useful schematic, not the exact Kaplan fitting equation. $L_\infty$ represents an irreducible floor for the stated data distribution and setup. The parameter term says capacity can be the limiting factor; the data term says coverage and repetition can be the limiting factor. A training-compute constraint couples the two because dense-transformer training cost is approximately proportional to $ND$ up to architecture and systems constants. If either $N$ or $D$ stays fixed, the other eventually delivers diminishing returns because its term is no longer dominant.
+This is a schematic, not a claim that every experiment has this exact form. $E$ is an asymptotic floor for the stated setup. The remaining terms say finite capacity and finite data can each limit loss. Dense-transformer training cost couples them, approximately, through $ND$.
 
-Kaplan's reported compute-optimal prescription had a surprising consequence: for a fixed compute budget, it favored a very large model trained for relatively few tokens, well short of convergence. In their fitted regime, the optimal parameter count grew much faster with compute than the token count. That conclusion was conditional on the curve, the WebText2-based setup, the optimizer, and the assumptions used to turn updates into compute. It was not a permanent rule that data is less valuable than parameters.
+Under that constraint, minimizing the surface gives
 
-This is where I think the paper has often been over-read. Figure 1 should change an experiment plan, not end one. A straight line says that an interpolation is plausible over the measured range. It does not say that the same exponent survives a new tokenizer, a long-context architecture, cleaner data, a multimodal objective, or a scale jump far outside the sweep.
+$$
+N_{\mathrm{opt}}(C)=G\left(\frac{C}{\kappa}\right)^{\frac{\beta}{\alpha+\beta}},
+\qquad
+D_{\mathrm{opt}}(C)=G^{-1}\left(\frac{C}{\kappa}\right)^{\frac{\alpha}{\alpha+\beta}},
+$$
 
-## Chinchilla: the compute-optimal recipe changed
+where $G=\left(\frac{\alpha A}{\beta B}\right)^{\frac{1}{\alpha+\beta}}$. At the optimum, $\alpha A N^{-\alpha}=\beta B D^{-\beta}$.
 
-Chinchilla revisited the allocation rather than disputing the premise. Hoffmann et al. trained more than 400 language models from 70M to over 16B parameters and varied training length over 5B to 500B tokens. Their three fitting approaches all placed the compute-optimal solution close to equal exponents: approximately $N_{\mathrm{opt}} \propto C^{0.5}$ and $D_{\mathrm{opt}} \propto C^{0.5}$. In plain language, each additional scale step should increase both parameters and training tokens, rather than primarily parameters.
+The exponents determine how allocation moves with compute. The coefficients determine where the frontier sits in absolute terms. This is why an exponent alone is not a recipe. A prescriptive claim also needs a measured response surface, preferably an IsoFLOP valley with points on both sides of the minimum.
+
+## Chinchilla changed the frontier, not the question
+
+Chinchilla revisited allocation at fixed training compute. Across more than 400 models from 70M to over 16B parameters and 5B to 500B tokens, Hoffmann et al. found that optimal model size and training tokens scale approximately equally with compute.
 
 ![Chinchilla paper Figure 1: compute-optimal parameter counts against training FLOPs, including the Kaplan prediction and named language models](/assets/images/chinchilla-compute-frontier-paper-figure.png)
 
-*Original Figure 1 from [Hoffmann et al., “Training Compute-Optimal Large Language Models”](https://arxiv.org/abs/2203.15556), rendered without alteration from the authors’ arXiv source. The solid curves are three Chinchilla fitting approaches; the dashed line is the Kaplan prediction. The plot is a recipe comparison at fixed training FLOPs, not a benchmark leaderboard.*
+*Original Figure 1 from [Hoffmann et al., “Training Compute-Optimal Large Language Models”](https://arxiv.org/abs/2203.15556), rendered without alteration from the authors’ arXiv source. The solid curves are Chinchilla fits; the dashed line is the Kaplan prediction.*
 
-The figure makes the revision concrete. At a given compute budget, the Chinchilla curves select fewer parameters than the Kaplan projection and reserve the released FLOPs for a longer training run. The flagship comparison held training compute roughly fixed: Chinchilla used 70B parameters and four times the training data of 280B-parameter Gopher. The paper reports that Chinchilla outperformed Gopher and several contemporaries across its downstream evaluation suite. The scientific point is not that 70B is a magic size; it is that *undertraining is an allocation error*. A smaller deployed model can also reduce inference cost, so a compute-optimal pretraining recipe and a serving-optimal choice may happen to point in the same direction.
+Chinchilla used the same training-compute budget as Gopher, with 70B rather than 280B parameters and four times as much training data. It outperformed Gopher and several contemporaries on the paper's downstream suite. The lesson is not that 70B is a magic size. A model can be undertrained *relative to a validation-loss objective at fixed pretraining compute*.
 
-The disagreement is exact. Kaplan's fitted frontier scales parameters roughly as $C^{0.73}$ and tokens as $C^{0.27}$; Chinchilla estimates both close to $C^{0.5}$. The objective did not change—both optimize validation loss at fixed training compute. The estimated frontier changed. That is why Chinchilla is a useful warning against memorizing a recipe from an earlier fit, not proof that there is now one correct recipe forever.
+The familiar shorthand of roughly twenty tokens per parameter needs the same qualification. Near-equal fitted exponents make $D/N$ approximately constant in that regime. Its numerical value is a coefficient-level property of those experiments, not a universal exponent or a law of nature.
 
-This is the corrective I wish accompanied every invocation of Chinchilla. The popular shorthand of about twenty training tokens per parameter describes a point on one dense-language-model frontier; it is not a law of nature. Change the data distribution, tokenizer, architecture, context length, recurrent reuse, mixture, or objective, and the proxy curve deserves to be refit before anyone spends the full budget.
+The Kaplan-versus-Chinchilla story is not simply “the old recipe was wrong.” [Porian et al. (2024)](https://arxiv.org/abs/2406.19146) reproduced the Kaplan-style result and traced much of the discrepancy to last-layer compute accounting, warmup duration, and scale-dependent optimizer tuning. A scaling law predicts the optimization frontier represented by its experiments. If the proxy runs are not comparably tuned, it can extrapolate the wrong frontier very cleanly.
 
-## How I read a scaling plot
+That gives a practical standard: hold out expensive scale, report extrapolation distance, repeat seeds at anchor points, propagate fitting uncertainty into the allocation, and compare plausible functional forms. [Broken Neural Scaling Laws](https://arxiv.org/abs/2210.14891) is a useful reminder that curvature and regime changes are empirical possibilities.
 
-I do not take an exponent as a training recipe until I can answer six questions.
+## Tokens are not effective data
 
-1. **What is on the vertical axis?** Cross-entropy, perplexity, benchmark accuracy, reward, and human preference do not have interchangeable slopes.
-2. **What changed besides the x-axis?** A model-size curve can quietly change batch size, data quality, sequence length, optimizer, or architecture.
-3. **Is compute really comparable?** Training FLOPs omit data preparation, communication, failed runs, and often inference. A pretraining-optimal choice can be a poor deployed system.
-4. **Is there a measured optimum?** An allocation claim needs an IsoFLOP valley or an equivalent frontier, not two separate monotone curves.
-5. **How far is the extrapolation?** A fit can be excellent across one or two orders of magnitude and still reverse five orders later.
-6. **What capability is absent from the loss?** Held-out NLL can improve while safety, tool use, reasoning reliability, latency, or a rare domain remains the actual bottleneck.
+The symbol $D$ hides the modern choice that matters most: what those token positions contain. Two streams with the same length can differ in duplication, novelty, quality, contamination, target-domain coverage, and mixture weights. A more honest conceptual object is
 
-The last question matters most to me now. Loss is a scalar average over tokens. A product is not. A data mixture can lower average NLL by improving common web patterns while leaving a codebase, a multilingual low-resource language, long-horizon agent behavior, or calibration unchanged. A capability evaluation is noisier and easier to game than NLL, but it is also where we find out whether the capability vector that matters actually moved.
+$$
+D_{\mathrm{eff}} = f(\text{unique data},\text{mixture},\text{quality},\text{repetition},N).
+$$
 
-That is also where entropy becomes practical rather than philosophical. Adding a trillion near-duplicate tokens may increase the counter $D$ while contributing little new conditional information. A smaller source with rare syntax, expert reasoning traces, or an underrepresented language can be far more valuable per token, but only if it improves the target distribution rather than merely shifting it. Token count is a budget proxy. The real resource is useful predictive signal under the objective we actually care about.
+This is not a universally measured unit. It is a warning that consumed tokens are a budget proxy, not useful predictive information itself.
 
-## Some thoughts
+[Muennighoff et al.](https://arxiv.org/abs/2305.16264) found little loss degradation from up to four passes over data at fixed compute, followed by diminishing returns as repetition increased. [DoReMi](https://arxiv.org/abs/2305.10429) and [Data Mixing Laws](https://arxiv.org/abs/2403.16952) make the same point from another direction: corpus mixture is an optimization variable, not appendix detail.
 
-The supplied threads are useful because they pull the discussion back to the decision layer. [Jie Tang’s note](https://x.com/jietang/status/2089941544581403107) pushes against treating parameter count as a standalone description of a model. [Ishaan’s long-form thread](https://x.com/auto_grad_/status/2089970913408380932) asks what actually governs capability extraction. [Zixuan Li’s post](https://x.com/ZixuanLi_/status/2089950717347774919) compresses the allocation problem into one question: where does the next unit of compute remove the most important current failure?
+At the boundaries, the additive Chinchilla-style surface is a testable approximation. Recent coupled model-data work, including [Skaling](https://arxiv.org/abs/2608.07222), reports systematic error from independent data and parameter terms in data-scarce or heavily overtrained settings. These are emerging results, not a settled replacement. They are enough to justify checking residuals rather than assuming separability.
 
-I agree with that framing, with one guardrail. We cannot identify the bottleneck from a headline parameter count or a single validation-loss curve. I would first build a small response surface: sweep a few model sizes, token budgets, and data mixtures; keep the architecture and evaluation fixed; fit uncertainty, not only a line; then check whether the candidate recipe improves the capability that motivated the run. If latency, data access, or evaluation reliability is the active bottleneck, the next unit of compute may have lower return than work on that constraint.
+## The objective now spans a lifecycle
 
-## Deep insights
+Chinchilla optimizes pretraining loss under a pretraining-compute budget. A deployed model lives under a larger objective:
 
-> **The frontier is a two-dimensional constrained optimization problem.** A curve for $L(N)$ does not prescribe how to spend a fixed budget because $N$ and $D$ are coupled by training compute. The allocation question needs an IsoFLOP sweep: vary model size while holding total FLOPs fixed, train each candidate long enough to expose the loss valley, then fit how the valley moves. Without that valley, an exponent is descriptive rather than prescriptive.
+$$
+C_{\mathrm{total}} = C_{\mathrm{pre}} + C_{\mathrm{post}} + R\,\mathbb{E}_{x}[C_{\mathrm{infer}}(x)],
+$$
 
-> **Perplexity is a presentation transform, not a second metric.** Optimization occurs in cross-entropy or NLL; perplexity is its exponential. Fit and compare the additive loss, especially when curves are close. Entropy supplies the irreducible term in $H(p,q_\theta)=H(p)+D_{\mathrm{KL}}(p\Vert q_\theta)$, but changing the tokenizer or the held-out distribution changes the unit of measurement itself. A perplexity comparison across different tokenizations is not automatically meaningful.
+where $R$ is inference demand. Latency, memory, bandwidth, and reliability are often hard constraints.
 
-> **Token count is not effective data.** $D$ records how many token positions the optimizer saw. It does not record how much new conditional structure those positions supplied after de-duplication, filtering, contamination, overlap, and mixture weighting. Two corpora with the same $D$ can produce different loss surfaces. A modern scaling study should therefore report data construction and mixture weights as part of the fitted regime, not as appendix detail.
+[Sardana et al. (2024)](https://arxiv.org/abs/2401.00448) show the consequence: with substantial serving demand, a smaller model trained for much longer can be preferable because additional training buys a permanently smaller inference footprint. “Overtrained” is incomplete without an objective.
 
-> **Use loss to choose a pretraining frontier; use a capability vector to accept a system.** NLL is the right dense signal for deciding whether one pretraining recipe is more sample- or compute-efficient. It cannot decide whether the resulting system is acceptable for a target domain, latency budget, safety envelope, or tool-use task. Keep those evaluations separate, and treat a divergence between loss and capability as evidence that the scalar training objective is no longer the bottleneck you care about.
+Test-time compute adds another axis rather than one scalar knob. Sequential reasoning, sampling complete candidates, voting, verification, search over partial trajectories, and prompt-adaptive allocation have different failure modes. [Snell et al. (2024)](https://arxiv.org/abs/2408.03314) found that adaptive allocation by problem difficulty could substantially outperform fixed best-of-$N$, and that test-time compute could beat a much larger FLOP-matched model when the smaller model already had nontrivial success probability.
+
+The useful mental model is a compute vector $(C_{\mathrm{pre}}, C_{\mathrm{post}}, C_{\mathrm{test}})$ plus a policy for assigning test-time compute across requests. Post-training, verifier quality, and environment interactions add more coordinates. I would model their interactions separately before compressing them into one exponent.
+
+## Smooth loss can coexist with jagged capability
+
+Average validation loss can improve smoothly while a benchmark appears flat and then jumps. Some jumps are metric artifacts: [Schaeffer et al. (2023)](https://arxiv.org/abs/2304.15004) showed how nonlinear and discontinuous metrics can create sharp-looking transitions from smoothly changing model outputs. Probability can move steadily toward the right answer while exact-match accuracy remains zero until the top-ranked answer flips.
+
+But loss does not determine every capability. Under a controlled corpus, tokenizer, and architecture, [Du et al. (2024)](https://arxiv.org/abs/2403.15796) found models with similar pretraining loss could show similar downstream performance, while reporting task-specific thresholds. Conversely, [Lourie et al. (2025)](https://arxiv.org/abs/2507.00885) found reliably predictable downstream scaling in only 39% of examined cases.
+
+These results are compatible. Aggregate loss averages away rare features, formatting constraints, long-horizon reliability, and evaluation protocol. A task can amplify a small per-step change: if success requires $m$ reliable steps, a per-step success probability $p$ becomes roughly $p^m$.
+
+Use loss to choose an efficient pretraining candidate. Use a capability vector to accept a system. When they diverge, look for the missing distribution, metric, inference policy, or post-training stage instead of forcing one scalar to explain the product.
+
+## What I would run before a frontier model
+
+A useful scaling study is an experimental design, not a regression script.
+
+1. **State the decision first.** Model size, token count, data mixture, serving footprint, post-training budget, and test-time strategy require different targets.
+2. **Fix the transfer regime.** Hold architecture, tokenizer, context construction, data pipeline, optimizer, schedule semantics, and evaluation fixed unless one is the deliberate axis.
+3. **Sweep across the valley.** For several compute budgets, run enough allocations to place points on both sides of the loss minimum.
+4. **Tune the proxy frontier.** A family of under-tuned runs can yield a beautiful law for under-tuned models.
+5. **Measure uncertainty and hold out scale.** Report intervals for $N_{\mathrm{opt}}$ and $D_{\mathrm{opt}}$, and validate a genuinely more expensive run.
+6. **Validate the acceptance metric.** Re-evaluate target capability, safety properties, latency, and inference protocol at the proposed recipe.
+
+The best scaling study ends by changing the next experiment.
+
+## What I think survives
+
+- **Scaling laws are local.** Their usefulness comes from controlled regularity, not universality.
+- **A curve is not yet a prescription.** Allocation requires a constraint and a measured frontier.
+- **Exponents are not the whole recipe.** Coefficients set absolute allocation, and interactions can matter at the edges.
+- **Tokens are not information.** Novelty, quality, mixture, and repetition belong in the data model.
+- **Parameters are not a system.** Active compute, architecture, memory, and latency change the deployment optimum.
+- **Compute is a vector.** Pretraining, post-training, serving, sampling, search, and verification compete for lifecycle budget.
+- **Smooth loss does not imply smooth product behavior.** The metric, task, and inference protocol determine what the user sees.
+
+The law is not the strategy. It is a local map of where marginal return currently lives.
+
+The strategy is deciding which map describes the system we are actually building, and knowing when to redraw it.
+
+## A reading map
+
+- [Hestness et al. (2017), “Deep Learning Scaling is Predictable, Empirically”](https://arxiv.org/abs/1712.00409)
+- [Kaplan et al. (2020), “Scaling Laws for Neural Language Models”](https://arxiv.org/abs/2001.08361)
+- [Hernandez et al. (2021), “Scaling Laws for Transfer”](https://arxiv.org/abs/2102.01293)
+- [Hoffmann et al. (2022), “Training Compute-Optimal Large Language Models”](https://arxiv.org/abs/2203.15556)
+- [Caballero et al. (2023), “Broken Neural Scaling Laws”](https://arxiv.org/abs/2210.14891)
+- [Besiroglu et al. (2024), “Chinchilla Scaling: A Replication Attempt”](https://arxiv.org/abs/2404.10102)
+- [Porian et al. (2024), “Resolving Discrepancies in Compute-Optimal Scaling of Language Models”](https://arxiv.org/abs/2406.19146)
+- [Muennighoff et al. (2025), “Scaling Data-Constrained Language Models”](https://arxiv.org/abs/2305.16264)
+- [Sardana et al. (2024), “Beyond Chinchilla-Optimal”](https://arxiv.org/abs/2401.00448)
+- [Snell et al. (2024), “Scaling LLM Test-Time Compute Optimally”](https://arxiv.org/abs/2408.03314)
+- [Du et al. (2024), “Understanding Emergent Abilities of Language Models from the Loss Perspective”](https://arxiv.org/abs/2403.15796)
+- [Lourie et al. (2025), “Scaling Laws Are Unreliable for Downstream Tasks”](https://arxiv.org/abs/2507.00885)
