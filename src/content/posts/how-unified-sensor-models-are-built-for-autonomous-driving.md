@@ -12,260 +12,465 @@ tags:
 topics:
   - autonomy
   - multimodal
-summary: How camera, LiDAR, and radar encoders preserve different measurements, align them in metric space, fuse them, and carry scene state through time.
+summary: How modern autonomous-driving systems preserve sensor-specific evidence, establish metric geometry, fuse modalities, carry world state through time, and connect perception to planning, simulation, and validation.
 ---
-
 # Autonomous-Vehicle Perception, circa 2026
+A distant cyclist at dusk may appear as a few image pixels, two or three LiDAR returns, and a noisy radar detection with radial velocity. None of those measurements is the scene. Each is partial evidence with a different sampling pattern, uncertainty, and failure mode.
 
-An autonomous vehicle receives several partial descriptions of the same scene. Cameras provide dense appearance and semantic detail, but depth has to be inferred and image quality falls under glare, darkness, rain, or fog. LiDAR measures range directly and resolves 3D shape well, but the point cloud becomes sparse with distance and can be degraded by weather, reflectivity, occlusion, and motion during a scan. Radar measures range and radial velocity at long distance and is comparatively tolerant of poor visibility, but its angle estimates are coarse and multipath produces ambiguous returns.
+The tempting definition of a unified sensor model is one that converts every sensor into one tensor as early as possible. That is usually the wrong objective. Early unification can erase the very signal that made a sensor useful: image texture, LiDAR height structure, radar Doppler, measurement age, or sensor-specific confidence. Once that information has been averaged away, a larger downstream model cannot reconstruct it.
 
-The central architectural question is therefore not simply how to combine sensors. It is where to preserve their differences, where to establish a shared geometric representation, and where to spend the information that the model can no longer recover. The progression in this article follows that dependency:
+The real architectural problem is deciding where each measurement becomes geometry, where different modalities are allowed to interact, what state survives through time, and which parts of that state are made explicit for prediction, planning, simulation, and validation. The progression is:
 
-sensor-specific encoders → metric 3D representation → temporal state → task heads
+sensor-specific evidence → calibrated metric support → cross-modal interaction → temporal world state → materialized outputs and latent embeddings → prediction and planning
 
-Fusion sits between the second and third steps. The model should preserve modality-specific evidence, then align it in the vehicle frame. Only then should it choose a dense scene field, sparse object queries, or a learned mixture of both.
+This gives a stricter meaning to *unified*. A system can be unified along several independent axes:
 
-## From measurements to a scene
+| Axis of unification | What becomes shared | What can remain specialized |
+| --- | --- | --- |
+| Sensors | A vehicle-centered geometric support and downstream state | Native encoders, uncertainty models, sampling patterns, and health signals |
+| Time | A recurrent world state | Update, aging, birth, deletion, and reset rules for different state elements |
+| Tasks | Sensor computation and scene context | Task heads, losses, label spaces, and validation contracts |
+| System | A common model family or world-state vocabulary across the Driver, Simulator, and Critic | Model size, execution frequency, supervision, and deployment constraints |
 
-The runtime diagram shows the complete path. Each sensor first passes through an encoder designed for its sampling pattern. Intrinsics describe how a camera maps 3D rays to pixels; extrinsics describe where every sensor sits relative to the vehicle; timestamps and ego poses place measurements at a common time. These transformations let the model ask whether an image edge, a LiDAR return, and a radar detection refer to the same location. If calibration is wrong, fusion creates structured errors rather than random noise: a vehicle can acquire a displaced image feature, a lane boundary can shift across the BEV grid, and displacement from an angular error grows with range.
+These axes should not be collapsed into one claim. Sharing a BEV backbone across detection and mapping does not imply that camera and radar should share an encoder. Backpropagating through perception and planning does not imply that every learned intermediate should remain opaque at runtime. Using one foundation-model family across driving and simulation does not imply that the same graph runs onboard and offline.
 
-After alignment, the model stores the scene as a dense bird's-eye-view (BEV) field, a sparse set of 3D queries, or a mixture of both. BEV gives every ground-plane location a persistent cell, which suits occupancy, free space, lanes, and maps. Queries allocate state to selected actors or map elements, which suits detection, tracking, and motion prediction. A temporal module then aligns previous state to the current ego frame. This step reduces frame-to-frame flicker, exposes velocity through displacement, and preserves evidence through a short occlusion; it can also propagate stale detections or pose error if state is not aged and refreshed carefully.
+The central thesis of this article is simple: **preserve sensor-native evidence until geometry makes interaction meaningful, then preserve enough structured and latent state to make the next decision both capable and testable.**
+
+This is a design map rather than an exhaustive paper catalog. It focuses on onboard camera, LiDAR, and radar, plus the learned world state that connects perception to prediction and planning. Localization, control, V2X, and sensor hardware are outside the main scope except where they constrain that state. Sources were checked through August 2026.
+
+## The system contract: preserve, align, interact, persist, materialize
+The runtime path begins with encoders matched to each measurement process. Intrinsics describe how a camera maps rays to pixels. Extrinsics describe where each sensor sits relative to the vehicle. Timestamps and ego poses place measurements at a common time. These transformations let the model ask whether an image edge, a LiDAR return, and a radar detection could refer to the same physical support.
+
+Calibration does not add information. It creates a correspondence rule. If that rule is wrong, fusion produces structured errors rather than independent noise. A vehicle can inherit image evidence from an adjacent lane, a lane boundary can shift across the BEV grid, and a small angular error can become a large lateral displacement at long range. Timestamp error has a similar effect for moving actors: two correct measurements can disagree because they describe different moments.
+
+After alignment, the model needs a scene state. A dense BEV field gives each ground-plane location a persistent cell and naturally supports occupancy, free space, lanes, and maps. Sparse queries allocate state to selected actors or map elements and naturally support detection, tracking, motion prediction, and vectorized road structure. Learned latent tokens compress the scene more aggressively and let the model decide what information is worth preserving. Most practical systems will mix these forms rather than choose one globally.
 
 [![Autonomous-driving perception pipeline from sensor-specific encoders through calibrated metric representations, dense or sparse temporal state, and task heads, with learned latent tokens and a separate training-only graph](/assets/images/autonomous-driving-perception-system.svg)](/assets/images/autonomous-driving-perception-system.svg)
-_The runtime path moves from sensor-specific features to a calibrated BEV field, query set, or learned latent state, then carries that state into task heads. The lower path shows supervision that may exist during training without becoming a deployed sensor input._
+_The runtime path moves from sensor-specific features to calibrated metric support, then into a dense field, sparse query set, or learned latent state. The lower path shows supervision and teacher models that can exist during training without becoming deployed sensor inputs._
 
-## Preserve each sensor
+“Fusion” is often used for three different operations:
 
+1. **Alignment** establishes which measurements could refer to the same place and time.
+2. **Interaction** determines how evidence from one modality changes features from another.
+3. **Materialization** determines what shared state downstream tasks are allowed to consume.
+
+Separating these operations clarifies many architecture comparisons. Two models may use the same BEV coordinates but perform very different interaction. A model may fuse features deeply while still materializing separate object, occupancy, and roadgraph outputs. Conversely, a model may concatenate aligned tensors once and call the result unified, even though one stream dominates and the others contribute little.
+
+Shared coordinates also do not imply shared certainty. A fused feature should retain, explicitly or implicitly, which sensors support it, how old that support is, and whether the relevant sensor is degraded. A high-confidence prediction resting on one stale or corrupted stream is not equivalent to the same prediction supported by current camera, LiDAR, and radar evidence.
+
+## Sensor encoders preserve different evidence
 The first step is not fusion. It is choosing an encoder that does not erase the measurement that makes a modality useful.
 
-### Cameras: semantics at several scales
+### Cameras: dense semantics at several scales
+Cameras provide the richest appearance signal in the stack. They distinguish lane paint from a crack in the road, read lights and signs, recognize unusual objects, and preserve boundaries that may occupy only a handful of pixels. Their weakness is metric ambiguity: a pixel identifies a ray through the camera center, not a distance along that ray.
 
-Camera encoding must recognize visual patterns without discarding the spatial detail needed for 3D placement. Convolutional backbones build local features with translation-equivariant kernels and map well to optimized inference libraries; production-oriented systems such as [NVAutoNet](https://openaccess.thecvf.com/content/WACV2024/html/Pham_NVAutoNet_Fast_and_Accurate_360deg_3D_Visual_Perception_for_Self_WACV_2024_paper.html) use efficient CNNs for both image and BEV processing. Vision transformers use content-dependent attention to connect distant image regions, which can help when recognition depends on wider context, but global attention at full surround-camera resolution is expensive. Both families still produce dense per-view feature maps, and neither removes the need for calibrated 3D reasoning downstream.
+Camera encoding must therefore retain both semantics and spatial detail. Convolutional backbones build local features with translation-equivariant kernels and map well to optimized inference libraries. Production-oriented systems such as [NVAutoNet](https://openaccess.thecvf.com/content/WACV2024/html/Pham_NVAutoNet_Fast_and_Accurate_360deg_3D_Visual_Perception_for_Self_WACV_2024_paper.html) use efficient CNNs for image and BEV processing. Vision transformers use content-dependent attention to connect distant regions, which can help when recognition depends on broader context, but global attention at full surround-camera resolution is expensive. Large pretrained image models improve appearance features; they do not remove the need for calibrated 3D reasoning.
 
-Feature pyramids are especially useful in driving because apparent object size changes sharply with range. A high-resolution level preserves the few pixels that represent a distant pedestrian or traffic light. Lower-resolution levels combine evidence over a larger receptive field and are cheaper to use for large vehicles, road layout, and scene context. [EfficientDet](/paper%20shorts/2020/04/01/efficientdet-scalable-and-efficient-object-detection.html) is a clear 2D example of learned multiscale fusion. [BEVFormer v2](https://openaccess.thecvf.com/content/CVPR2023/html/Yang_BEVFormer_v2_Adapting_Modern_Image_Backbones_to_Birds-Eye-View_Recognition_via_CVPR_2023_paper.html) shows a separate issue in 3D: modern image backbones benefit from perspective-view supervision because a loss applied only after BEV conversion gives the image features a weak and indirect training signal.
+Feature pyramids remain important because apparent object size changes sharply with range. High-resolution levels preserve a distant pedestrian, traffic light, or narrow lane marking. Lower-resolution levels aggregate larger context and are cheaper for vehicles, road layout, and scene semantics. [EfficientDet](/paper%20shorts/2020/04/01/efficientdet-scalable-and-efficient-object-detection.html) is a clear 2D example of learned multiscale fusion.
 
-For a 3D point $X$, camera $i$ uses its intrinsics $K_i$ and extrinsics $(R_i,t_i)$ to compute
+[BEVFormer v2](https://openaccess.thecvf.com/content/CVPR2023/html/Yang_BEVFormer_v2_Adapting_Modern_Image_Backbones_to_Birds-Eye-View_Recognition_via_CVPR_2023_paper.html) exposes a separate optimization issue. A loss applied only after BEV conversion gives the image backbone a weak and indirect training signal, so perspective-view supervision can materially improve the features before they enter 3D.
+
+For a 3D point $X$, camera $i$ uses intrinsics $K_i$ and extrinsics $(R_i, t_i)$ to compute
 
 $$
-u_i=\pi(K_i,R_i,t_i,X).
+u_i = \pi(K_i, R_i, t_i, X).
 $$
 
-The same point appears at a different pixel in each camera. If pyramid level $l$ has stride $s_l$, the feature is sampled at $u_i/s_l$. This projection is a correspondence rule, not a source of visual information: it can retrieve a fine boundary only if the backbone retained that boundary, and it can retrieve broad context only if the receptive field encoded it.
+The same point appears at a different pixel in each camera. If pyramid level $l$ has stride $s_l$, its feature is sampled at $u_i/s_l$. Projection can retrieve a fine boundary only if the backbone retained that boundary, and it can retrieve broad context only if the receptive field encoded it.
 
 [![Animation showing one metric 3D point projected to different pixels in two calibrated cameras and sampled at stride-adjusted feature-pyramid coordinates](/assets/images/autonomous-perception-vision-encoder.gif)](/assets/images/autonomous-perception-vision-encoder.gif)
-_A single 3D reference point lands at different pixels in different cameras and at different coordinates on each pyramid level. [DETR3D](/paper%20shorts/2021/10/14/detr3d-multiview-images-via-3d-to-2d-queries.html) uses this operation for object queries; [BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) uses it for BEV queries._
+_A single 3D reference point lands at different pixels in different cameras and at different coordinates on each pyramid level. [DETR3D](/paper%20shorts/2021/10/14/detr3d-multiview-images-via-3d-to-2d-queries.html) applies this operation to object queries; [BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) applies it to BEV queries._
 
-Camera encoders are strongest where appearance matters: class identity, lane paint, signs, lights, and object boundaries. Their main 3D weakness is not a lack of semantics but depth ambiguity. Increasing input resolution or backbone capacity can improve recognition without fixing that ambiguity. The next decision is therefore where to place image evidence in metric space.
+The camera encoder is strongest where appearance matters. Its main 3D weakness is not missing semantics but uncertain depth. More image resolution or a larger backbone can improve recognition without resolving where along a ray the evidence belongs.
 
-### LiDAR: sparse geometry
+### LiDAR: sparse geometry before dense BEV
+A LiDAR sweep is already metric, but it is irregular, sparse, and strongly range-dependent. Point encoders preserve individual returns but make neighborhood construction expensive. Pillar encoders group points into vertical columns and collapse height early. Voxel encoders retain a 3D grid for longer, preserving overpasses, trucks, poles, and other height-dependent structure. The main encoder decision is where to trade 3D detail for the speed and regularity of a 2D BEV backbone.
 
-A LiDAR sweep is already metric, but it is irregular, sparse, and strongly range-dependent. Point encoders preserve individual returns but make neighborhood construction expensive. Pillar encoders group points in vertical columns and collapse height early. Voxel encoders retain a 3D grid for longer, which preserves overpasses, trucks, poles, and other height-dependent structure. The main encoder decision is where to trade 3D detail for the speed and regularity of a 2D BEV backbone.
+[PointPillars](/paper%20shorts/2018/12/14/pointpillars-fast-point-cloud-encoders.html) makes that trade early: it pools each occupied pillar, scatters the result into a dense pseudo-image, and performs nearly all later computation with 2D convolutions. [SECOND](/paper%20shorts/2018/10/06/second-sparsely-embedded-convolutional-detection.html) keeps sparse 3D voxels through a middle encoder and densifies only after height has been compressed.
 
-[PointPillars](/paper%20shorts/2018/12/14/pointpillars-fast-point-cloud-encoders.html) makes that trade early: it pools each occupied pillar, scatters the result into a dense pseudo-image, and performs nearly all later computation with 2D convolutions. [SECOND](/paper%20shorts/2018/10/06/second-sparsely-embedded-convolutional-detection.html) keeps sparse 3D voxels through a middle encoder and densifies only after height has been compressed. Sparse convolution is effective because it shares local kernels over occupied cells, but coordinate-map construction and irregular memory access remain real system costs.
-
-Sparse attention changes how occupied cells communicate. [DSVT](/paper%20shorts/2023/01/15/dsvt-dynamic-sparse-voxel-transformer.html) partitions variable-density voxels into bounded local sets, applies attention inside each set, and rotates the partition between layers so information crosses set boundaries. Attention can connect non-adjacent occupied cells more directly than a small convolutional kernel, while bounded sets keep the workload deployable. It does not make the representation free: sorting, padding, token density, and the eventual height compression still determine latency.
+Sparse convolution is effective because it shares local kernels over occupied cells, but coordinate-map construction and irregular memory access are real system costs. Sparse attention changes how occupied cells communicate. [DSVT](/paper%20shorts/2023/01/15/dsvt-dynamic-sparse-voxel-transformer.html) partitions variable-density voxels into bounded local sets, applies attention inside each set, and rotates the partition between layers so information crosses set boundaries. Attention can connect non-adjacent occupied cells more directly than a small convolutional kernel, while bounded sets keep the workload controlled. Sorting, padding, token density, and the eventual height compression still determine latency.
 
 [![Animation comparing early densification in PointPillars, late BEV densification in SECOND and DSVT, and box prediction from active voxels in VoxelNeXt](/assets/images/autonomous-perception-lidar-encoder.gif)](/assets/images/autonomous-perception-lidar-encoder.gif)
 _PointPillars compresses height before its dense 2D backbone. SECOND and DSVT retain sparse 3D cells for longer, then construct BEV. [VoxelNeXt](/paper%20shorts/2023/03/20/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking.html) keeps the active-voxel representation through the prediction head._
 
-The right encoder depends on the operating envelope. Pillars are a strong latency baseline on mostly planar roads. Sparse voxels are preferable when vertical separation, long range, or dense 3D structure matters. Fully sparse heads save BEV work when occupied cells remain rare, but the wall-clock gain can be much smaller than the FLOP reduction on hardware with weak sparse-kernel support. In every case, intensity, timestamp, and point age should remain attached to the geometry: LiDAR range is direct, but a rotating scan is not an instantaneous snapshot.
+The right encoder depends on the operating envelope. Pillars are a strong latency baseline on mostly planar roads. Sparse voxels are preferable when vertical separation, long range, or dense 3D structure matters. Fully sparse heads save BEV work when occupied cells remain rare, but a large FLOP reduction may yield a modest wall-clock gain on hardware with weak sparse-kernel support.
 
-### Radar: motion under uncertainty
+Intensity, return type, timestamp, and point age should remain attached to the geometry. LiDAR range is direct, but a rotating scan is not an instantaneous snapshot. A point measured near the beginning of a sweep may already be stale by the time the full scan is processed.
 
-Radar should be modeled around the measurements that distinguish it from LiDAR. A return may contain range, azimuth, elevation, radial velocity, Radar Cross Section (RCS), timestamp, and a sensor-specific confidence estimate. Doppler can reveal a moving actor before image-only temporal inference has enough baseline, and millimeter-wave sensing is less sensitive than cameras to darkness and often more tolerant than cameras or LiDAR in rain and fog. The cost is weak angular localization, sparse semantic evidence, multipath, and ghost returns. Radar supplies useful constraints, not clean 3D boxes.
+### Radar: range and motion under uncertainty
+Radar should be modeled around the measurements that distinguish it from LiDAR. A return may contain range, azimuth, elevation, radial velocity, Radar Cross Section (RCS), timestamp, and a sensor-specific confidence estimate. Doppler can reveal a moving actor before image-only temporal inference has enough baseline. Millimeter-wave sensing is also insensitive to darkness and is often more tolerant than cameras or LiDAR under rain and fog.
 
-Three encoder families correspond to three fusion strategies. A point encoder keeps individual returns and is useful when association happens around an object proposal. A polar or range-azimuth tensor preserves the sensor's native sampling pattern and can exploit local radar structure before Cartesian resampling. A radar-BEV encoder creates an independent metric feature map for later alignment with camera or LiDAR BEV. Rasterizing too early into binary occupancy removes Doppler, RCS, confidence, and return-level ambiguity—the exact information needed to reject clutter.
+The cost is weak angular localization, sparse semantic evidence, multipath, and ghost returns. Radar supplies useful constraints, not clean 3D boxes.
+
+Three encoder families correspond to three fusion strategies. A point encoder keeps individual returns and is useful when association happens around an object proposal. A polar or range-azimuth tensor preserves the native sampling pattern and can exploit local radar structure before Cartesian resampling. A radar-BEV encoder creates an independent metric feature map for later alignment with camera or LiDAR BEV.
+
+Rasterizing too early into binary occupancy removes Doppler, RCS, confidence, and return-level ambiguity. Those are precisely the signals needed to distinguish motion from clutter.
 
 [![Animation comparing camera-radar interaction at the proposal, depth, and BEV stages in CRAFT, CRN, and RCBEVDet](/assets/images/autonomous-perception-radar-encoder.gif)](/assets/images/autonomous-perception-radar-encoder.gif)
 _[CRAFT](/paper%20shorts/2022/09/14/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer.html) associates a soft set of radar returns with each camera proposal. [CRN](/paper%20shorts/2023/04/03/crn-camera-radar-net-for-3d-perception.html) uses radar to refine camera depth before lifting and aligns both BEV maps with deformable attention. [RCBEVDet](/paper%20shorts/2024/03/25/rcbevdet-radar-camera-fusion-in-bev.html) combines point and transformer radar paths before BEV fusion._
 
-Recent radar-camera systems improve less by treating radar as an extra image channel than by deciding where its range and Doppler should change the computation. [Simple-BEV](/paper%20shorts/2022/06/16/simple-bev-what-really-matters-for-multi-sensor-bev-perception.html) found that retaining radar metadata, disabling an aggressive outlier filter, and accumulating aligned sweeps all affected performance. [Doppler-Aware LiDAR–Radar Fusion](https://openaccess.thecvf.com/content/ICCV2025/html/Chae_Doppler-Aware_LiDAR-RADAR_Fusion_for_Weather-Robust_3D_Detection_ICCV_2025_paper.html) processes radar power and Doppler as distinct signals during multimodal interaction, while [DinoRADE](https://openaccess.thecvf.com/content/CVPR2026W/DriveX/html/Leitgeb_DinoRADE_Full_Spectral_Radar-Camera_Fusion_with_Vision_Foundation_Model_Features_CVPRW_2026_paper.html) combines dense radar tensors with DINOv3 image features in adverse-weather detection. A useful comparison should report adverse-weather and long-range accuracy together with false associations and velocity error; higher average detection is not enough if ghost returns attach to the wrong actor.
+Recent camera-radar systems improve less by treating radar as an extra image channel than by deciding where range and Doppler should change the computation. [Simple-BEV](/paper%20shorts/2022/06/16/simple-bev-what-really-matters-for-multi-sensor-bev-perception.html) found that retaining radar metadata, disabling an aggressive outlier filter, and accumulating aligned sweeps all affected performance. [Doppler-Aware LiDAR–Radar Fusion](https://openaccess.thecvf.com/content/ICCV2025/html/Chae_Doppler-Aware_LiDAR-RADAR_Fusion_for_Weather-Robust_3D_Detection_ICCV_2025_paper.html) processes radar power and Doppler as distinct signals during multimodal interaction. [DinoRADE](https://openaccess.thecvf.com/content/CVPR2026W/DriveX/html/Leitgeb_DinoRADE_Full_Spectral_Radar-Camera_Fusion_with_Vision_Foundation_Model_Features_CVPRW_2026_paper.html) combines dense radar tensors with DINOv3 image features for adverse-weather detection.
 
-The encoders now preserve the right evidence for each modality. The next question is how a camera feature becomes a metric 3D feature before it meets LiDAR or radar.
+A useful radar comparison should report adverse-weather and long-range accuracy together with false associations and velocity error. Higher average detection is not enough if a ghost return is attached to the wrong actor.
 
-## Camera depth: LSS and BEVDepth
+The encoders now preserve the right evidence. The next question is where that evidence acquires metric support.
 
-A pixel fixes a ray through the camera center, not a distance along that ray. Camera-based 3D perception must decide where along the ray to place its feature. The first important family makes that uncertainty explicit.
+## Where metric geometry enters
+There is no geometry-free sensor fusion. A model can hide geometry inside attention, depth logits, positional encodings, or learned correspondences, but camera evidence must eventually be assigned to physical support before it can interact coherently with LiDAR, radar, maps, or temporal state.
 
-[Lift, Splat, Shoot](/paper%20shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html) predicts a categorical depth distribution for each image location, copies the image feature along the corresponding depth bins, and pools those lifted features into BEV:
+The main camera-to-3D families differ in where the metric hypothesis begins.
+
+### Push image evidence into 3D: LSS and BEVDepth
+A pixel fixes a ray through the camera center, not a distance along that ray. [Lift, Splat, Shoot](/paper%20shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html) predicts a categorical depth distribution for each image location, copies the image feature along the candidate depth bins, and pools those lifted features into BEV:
 
 image pixel → ray → depth distribution → 3D feature cloud → BEV grid
 
-The depth distribution in the original LSS is a latent variable. It is not directly supervised; downstream BEV task losses push the distribution toward geometry that helps detection and other outputs. [BEVDepth](/paper%20shorts/2022/06/21/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection.html) adds projected LiDAR depth supervision, so the camera branch receives both a direct geometric signal and the downstream task signal. LiDAR can therefore be present during training and disappear at inference. That is learning with privileged information; it becomes teacher-student or cross-modal distillation only when a separate teacher explicitly transfers knowledge to a student.
+The depth distribution in the original LSS is latent. It is not directly supervised; downstream BEV losses push it toward geometry that helps detection and other tasks. [BEVDepth](/paper%20shorts/2022/06/21/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection.html) adds projected LiDAR depth supervision, so the camera branch receives both a direct geometric signal and a downstream task signal.
 
-These forward-projection methods preserve dense image evidence, which is useful for occupancy and maps, but a depth error writes the feature into the wrong metric cell.
+LiDAR can therefore be present during training and disappear at inference. That is learning with privileged information. It becomes teacher-student or cross-modal distillation only when a separate teacher transfers knowledge to a student.
+
+Forward lifting preserves dense image evidence and is a natural fit for occupancy and maps. Its failure is equally direct: a depth error writes the feature into the wrong metric cell.
 
 ![Figure 1 from Lift, Splat, Shoot, showing multiview evidence represented in vehicle-centered BEV](/assets/images/lift-splat-shoot-paper-figure-1.png)
 _Lift, Splat, Shoot predicts depth along every camera ray and pools the lifted features into a vehicle-centered BEV grid. Source: [Lift, Splat, Shoot](/paper%20shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html), Figure 1._
 
-Pull-based methods start in metric space. [Simple-BEV](/paper%20shorts/2022/06/16/simple-bev-what-really-matters-for-multi-sensor-bev-perception.html) projects each 3D voxel into the cameras and bilinearly samples the visible image features. Its controlled experiments found that input resolution and effective batch size changed vehicle-segmentation IoU more than the lifting operator in that setup. The result is a useful warning against reading every benchmark gain as evidence for a better view transformer; training recipe, image resolution, and sensor inputs must be matched first.
+### Pull image evidence from metric space
+Pull-based methods begin with a hypothesis in physical space and ask the images for supporting evidence. [Simple-BEV](/paper%20shorts/2022/06/16/simple-bev-what-really-matters-for-multi-sensor-bev-perception.html) projects each 3D voxel into the cameras and bilinearly samples visible image features. Its controlled experiments found that input resolution and effective batch size changed vehicle-segmentation IoU more than the lifting operator in that setup. This is a useful warning: before attributing a benchmark gain to a new view transformer, match the backbone, image resolution, training schedule, batch size, and sensor inputs.
 
-The metric representation can also be queried sparsely. That creates a second branch of the progression.
+The metric hypothesis can also be sparse.
 
-## Sparse 3D: DETR3D to StreamPETR
+[DETR](https://arxiv.org/abs/2005.12872) introduced object queries for 2D detection: a bounded set of learned vectors asks whether an object should be represented, and a transformer decoder turns those queries into a set of predictions. [DETR3D](/paper%20shorts/2021/10/14/detr3d-multiview-images-via-3d-to-2d-queries.html) attaches each query to a 3D reference point, projects that point into every camera, and samples image evidence around the projections.
 
-[DETR](https://arxiv.org/abs/2005.12872) introduced object queries for 2D detection. A bounded set of learned query vectors asks which objects need representation, and a transformer decoder turns those queries into class and box predictions. [DETR3D](/paper%20shorts/2021/10/14/detr3d-multiview-images-via-3d-to-2d-queries.html) attaches each query to a 3D reference point $(x,y,z)$, projects that point into every camera, and samples image evidence around the projections.
+The difference from dense lifting is where the model spends its geometric budget. LSS represents every image location across candidate depth bins. DETR3D asks only about a bounded set of candidate objects. This can be efficient for detection, but it creates a recall dependency: if no query acquires support for an actor, later refinement cannot recover evidence that was never represented.
 
-The difference from dense lifting is where the model spends its geometric budget. LSS represents every image location and every candidate depth bin. DETR3D asks only about a bounded set of candidate objects. It can therefore be efficient for detection, but it also inherits a recall risk: if no query acquires support for an actor, later refinement cannot recover evidence that was never represented.
+[PETR](/paper%20shorts/2022/03/10/petr-position-embedding-transformation-for-multiview-3d-object-detection.html) moves more geometry into the image features. Multi-view features otherwise know appearance and camera identity, but not directly which region of physical 3D space they describe. PETR injects 3D positional information into those features, allowing attention to reason over image evidence with explicit geometric context. A useful shorthand is that DETR3D places much of the geometry in the query and reference-point mechanism, while PETR makes the features themselves more geometry-aware.
 
-[PETR](/paper%20shorts/2022/03/10/petr-position-embedding-transformation-for-multiview-3d-object-detection.html) moves more of the geometry into the image features themselves. Multi-view features otherwise know their appearance and camera index, but not directly which region of physical 3D space they describe. PETR injects 3D positional information into those features, so subsequent attention can reason over image evidence with explicit geometric context. A useful shorthand is that DETR3D puts much of the geometry into the query and reference-point mechanism, while PETR makes the features more explicitly geometry-aware.
-
-[StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html) extends the object-query representation through time. Instead of rediscovering every actor from each frame, it retains a bounded queue of foreground queries, conditions them on ego pose, elapsed time, and velocity, and introduces fresh queries for newly visible actors. The temporal state is sparse and object-centric: it improves stability and occlusion handling without storing a full scene grid, but query birth, duplicate removal, aging, and stale false positives become part of the model.
-
-The sparse branch gives us an efficient answer for selected actors. Driving perception also needs a representation for everything between those actors: lanes, free space, occupancy, and map structure.
-
-## Dense 3D: BEVFormer
-
-BEVFormer changes the unit of representation from an object query to a BEV query. Imagine a learned token for every bird's-eye-view location. Each token asks the image features what appears to exist at that physical location, using calibration-aware attention to sample several heights along the corresponding vertical pillar.
-
-This builds a dense spatial world representation using attention rather than LSS-style depth lifting. Temporal attention can update the current BEV representation from previous BEV representations, so the model carries scene context rather than only selected actors. The price is that the number of BEV cells, cameras, heights, and attention samples can dominate compute.
-
-Dense BEV is useful beyond bounding boxes because the same spatial field can support detection, occupancy, map segmentation, lanes, free space, motion, and planning. The representation choice is therefore a task decision:
+[BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) changes the unit from an object query to a BEV query. A learned token for each bird's-eye-view location samples image evidence at several heights along the corresponding vertical pillar. This creates a dense spatial field without explicitly predicting a depth distribution for every pixel. The price is that BEV cells, cameras, heights, and attention samples can dominate computation.
 
 [![Animation comparing depth along an image ray in LSS, a 3D object-query reference point in DETR3D, and vertical reference points from a BEV cell in BEVFormer](/assets/images/autonomous-perception-camera-lifting.gif)](/assets/images/autonomous-perception-camera-lifting.gif)
 _The highlighted variable is the source of metric support: depth along an image ray in LSS, a 3D object reference point in DETR3D, or several heights above a fixed BEV cell in BEVFormer._
 
-| 3D construction | Where the metric hypothesis starts | Best fit | Main cost | Typical failure |
+| 3D construction | Where the metric hypothesis begins | Best fit | Main cost | Characteristic failure |
 | --- | --- | --- | --- | --- |
-| Depth lift and splat | Every image location predicts depth | Dense occupancy, maps, and detection | Pixels × depth bins, followed by BEV processing | Wrong depth moves evidence to the wrong BEV cell |
-| Voxel-to-image sampling | Every metric voxel projects into each camera | Simple dense BEV baselines | Voxels × visible cameras | A sampled pixel may contain mixed depths or occlusion |
-| Object queries | A bounded set of 3D actor hypotheses | Detection, tracking, and motion | Queries × views × samples | An object is missed when no query acquires support |
-| BEV queries | Every ground-plane cell samples several heights | Dense scene state with selective image retrieval | BEV cells × heights × views | Weak or incorrect projected support creates false or empty cells |
+| Depth lift and splat | Every image location predicts depth | Dense occupancy, maps, and detection | Pixels × depth bins, followed by BEV processing | Wrong depth moves evidence to the wrong metric cell |
+| Voxel-to-image sampling | Every metric voxel projects into visible cameras | Simple dense BEV baselines | Voxels × cameras | A sampled pixel may mix depths or lie behind an occluder |
+| Object queries | A bounded set of 3D actor hypotheses | Detection, tracking, and motion | Queries × views × samples | An actor is missed when no query acquires support |
+| BEV queries | Every ground-plane cell samples several heights | Dense scene state with selective image retrieval | BEV cells × heights × views | Weak projected support creates false or empty cells |
 
-No row dominates every task. Dense BEV says “represent the world”; object queries say “represent the candidate actors.” The important question is what evidence each representation has thrown away, and whether a later module can recover it.
+No row dominates every task. Dense methods say “represent the world.” Object queries say “represent candidate actors.” The useful comparison is not which abstraction is newer, but what evidence each one discards and whether a later module has any path to recover it.
 
-> **Deep insight:** A representation is an information budget. Dense BEV spends it on spatial coverage; object queries spend it on selected actors. The failure begins where that budget stops buying evidence.
+## Fusion is alignment, interaction, and routing
+Once camera, LiDAR, and radar features have metric support, the model must decide how they interact. Early fusion combines near-raw inputs, but pixels, points, and Doppler returns do not naturally share a sampling pattern. Late fusion combines independent predictions, which is modular and easy to validate but gives up feature-level complementarity. Intermediate fusion lets each modality preserve its own evidence first, then interact after geometric alignment.
 
-The decision does not end at BEV versus object queries. A driving stack also needs different output objects for different questions: tracks for agents with identity and motion, occupancy for free space and unmodelled geometry, and vector roadgraphs for lane topology and routing. [Occ3D](https://arxiv.org/abs/2304.14365) makes the occupancy distinction concrete: every voxel is free, occupied, or unobserved, with semantics where they are known. That makes occupancy a useful interface for low obstacles and open-set geometry, but it does not by itself encode which lane centerline connects to the next intersection. [MapTR](https://arxiv.org/abs/2208.14437) treats map elements as structured point sets instead. A credible shared state therefore need not force every consumer through one universal tensor; it needs compatible representations and an explicit account of what each one preserves.
+For heterogeneous driving sensors, intermediate fusion is the most useful default. It is not one architecture. The decisive choice is the granularity at which sensors meet.
 
-## Fusion in metric space
+### Point, query, and dense-field fusion
+[PointPainting](/paper%20shorts/2019/11/22/pointpainting-sequential-fusion-for-3d-object-detection.html) attaches camera class scores to LiDAR points before voxelization. This is cheap and geometrically direct, but image evidence survives only where LiDAR produced a return. Empty space and camera-only observations disappear from the shared representation.
 
-Once camera, LiDAR, and radar have metric support, the model must decide where they interact. Early fusion combines near-raw inputs, but pixels, points, and Doppler returns do not naturally share a representation. Late fusion combines independent object predictions, which is modular but loses feature-level complementarity. Intermediate fusion lets each sensor use its own encoder first, then aligns the resulting features and combines them. For heterogeneous driving sensors, this is the most useful conceptual baseline.
-
-[PointPainting](/paper%20shorts/2019/11/22/pointpainting-sequential-fusion-for-3d-object-detection.html) attaches camera class scores to LiDAR points before voxelization. This is cheap and geometrically direct, but image evidence survives only where LiDAR produced a return. [FUTR3D](/paper%20shorts/2022/03/20/futr3d-unified-sensor-fusion-framework-for-3d-detection.html) samples camera, LiDAR, and radar features around the same 3D object reference point. It matches an object-centric output but does not retain a complete background field.
+[FUTR3D](/paper%20shorts/2022/03/20/futr3d-unified-sensor-fusion-framework-for-3d-detection.html) samples camera, LiDAR, and radar features around the same 3D object reference point. This matches an object-centric output and spends computation selectively, but it does not retain a complete background field.
 
 [BEVFusion](/paper%20shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html) gives each modality an appropriate encoder, transforms the resulting features into a shared BEV grid, and fuses there:
 
-The path is camera images → camera encoder → camera BEV; LiDAR point cloud → point or voxel encoder → LiDAR BEV; then camera BEV + LiDAR BEV → fusion → task heads.
+- camera images → camera encoder → camera BEV
+- LiDAR point cloud → point or voxel encoder → LiDAR BEV
+- camera BEV + LiDAR BEV → fusion → task heads
 
-BEV becomes a natural meeting room because a camera feature at $(x,y)$ and a LiDAR feature at $(x,y)$ refer to approximately the same physical location. The model does not make the camera behave like LiDAR or LiDAR behave like a camera; it preserves their inductive biases until physical alignment makes interaction meaningful.
+BEV is a natural meeting room because a camera feature at $(x,y)$ and a LiDAR feature at $(x,y)$ refer to approximately the same physical support. The model does not need to make the camera behave like LiDAR or LiDAR behave like a camera. It preserves their inductive biases until physical alignment makes interaction meaningful.
 
 [![Animation showing the same actor and lane evidence entering point, object-query, and dense-BEV fusion](/assets/images/autonomous-perception-fusion-granularity.gif)](/assets/images/autonomous-perception-fusion-granularity.gif)
-_Point fusion retains camera features only at measured points. Query fusion gathers evidence around selected actors. Dense BEV fusion keeps actor evidence and the surrounding lane or occupancy field._
+_Point fusion retains camera features only at measured points. Query fusion gathers evidence around selected actors. Dense BEV fusion keeps actor evidence together with the surrounding lane, occupancy, and free-space field._
 
-## Fusion around proposals
-
-The shared BEV path is not the only way to fuse. Proposal-based fusion spends compute selectively: [TransFusion](/paper%20shorts/2022/03/22/transfusion-robust-lidar-camera-fusion-with-transformers.html) uses LiDAR proposals to retrieve image evidence around candidate objects instead of trusting one calibrated pixel. This can be efficient and robust to small correspondence errors, but it exposes a structural failure mode. If LiDAR misses an object that the camera sees, a LiDAR-controlled proposal stage may never give the camera evidence a chance to recover it.
+### Proposal recall is an architectural ceiling
+Proposal-conditioned fusion spends compute selectively. [TransFusion](/paper%20shorts/2022/03/22/transfusion-robust-lidar-camera-fusion-with-transformers.html) uses LiDAR proposals to retrieve image evidence around candidate objects instead of trusting one calibrated pixel. This can tolerate small correspondence errors, but it exposes a structural failure mode: if LiDAR misses an actor that the camera sees, a LiDAR-controlled proposal stage may never give the camera evidence a chance to recover it.
 
 [![Animation comparing LiDAR-controlled proposals, merged proposals from multiple modalities, and shared-BEV fusion before detection](/assets/images/autonomous-perception-proposal-recall.gif)](/assets/images/autonomous-perception-proposal-recall.gif)
-_Proposal-conditioned fusion is selective, but proposal recall can become a ceiling: a missed LiDAR proposal may prevent camera evidence from entering the refinement path. Multi-proposal fusion restores recall at the cost of matching and deduplication; shared BEV fusion preserves both modality fields before detection._
+_Proposal-conditioned fusion is selective, but proposal recall can become a ceiling. Multi-proposal fusion restores a recovery path at the cost of matching and deduplication; shared-BEV fusion preserves both modality fields before detection._
 
-One response is to let each modality generate proposals and merge them before refinement. That creates a different set of problems—duplicate proposals, conflicting confidence, inconsistent localization, and cross-modal matching—but it removes the single-modality recall ceiling. A dense shared representation makes the opposite choice: fuse world evidence first and generate detections afterward. It spends more compute, but it preserves a path for one modality to recover what another missed.
+One response is to let each modality generate proposals and merge them before refinement. That removes the single-modality recall ceiling, but introduces duplicates, conflicting confidence, inconsistent localization, and cross-modal matching. Dense shared fusion makes the opposite choice: preserve both modality fields before generating detections. It spends more computation but keeps a recovery path when one sensor misses an actor.
 
-Fusion can also happen repeatedly rather than in one terminal block. A simple architecture runs a camera encoder and a LiDAR encoder to completion and applies one fusion block. [DeepInteraction](/paper%20shorts/2022/08/23/deepinteraction-3d-object-detection-via-modality-interaction.html) allows the streams to update one another across representation stages; [UniTR](/paper%20shorts/2023/08/15/unitr-unified-efficient-multimodal-transformer-for-bev.html) applies shared transformer blocks after modality-specific tokenization. The important distinction is not merely that cross-attention exists. It is that modality interaction is allowed before feature extraction is completely finished, so one stream can refine what the other treats as relevant.
+This creates a general diagnostic question for any fusion architecture: **which modality controls admission into the shared representation?** If the answer is one sensor's proposals, points, or confidence threshold, then that sensor's recall becomes a ceiling unless another path explicitly bypasses it.
+
+> **Deep insight:** In multimodal fusion, the hidden bottleneck is often admission rather than attention. The sensor that creates the proposals, points, or thresholds decides which evidence becomes eligible for downstream computation; without a bypass, its recall becomes the system's ceiling.
+
+### Interaction can occur before either stream is finished
+A simple architecture runs a camera encoder and a LiDAR encoder to completion, then applies one fusion block. [DeepInteraction](/paper%20shorts/2022/08/23/deepinteraction-3d-object-detection-via-modality-interaction.html) lets the streams update one another across representation stages. [UniTR](/paper%20shorts/2023/08/15/unitr-unified-efficient-multimodal-transformer-for-bev.html) applies shared transformer blocks after modality-specific tokenization.
+
+The important distinction is not merely that cross-attention exists. It is whether one modality can change what another stream chooses to preserve before feature extraction is complete. Repeated interaction can improve complementarity, but it also makes failure attribution harder. A corrupted stream may contaminate several layers instead of one terminal block, so deeper fusion increases the need for health-aware routing and modality-specific diagnostics.
 
 ![Figure 2 from BEVFusion, showing modality-specific encoders converging on a shared BEV and task-specific heads](/assets/images/bevfusion-unified-bev-paper-figure-2.png)
 _BEVFusion keeps camera and LiDAR encoding separate until both modalities occupy the same BEV grid, then shares that grid across detection and map heads. Source: [BEVFusion](/paper%20shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html), Figure 2._
 
-The right fusion design therefore depends on the output and the failure being optimized. Point fusion is tied to measured support, proposal fusion is tied to query recall, and dense BEV fusion is tied to grid cost. The next problem is that even a good fused representation describes only the current sensor window.
+### Missing, degraded, and misaligned sensors
+A fusion network trained only with all sensors often becomes dependent on its strongest stream. Zeroing LiDAR at inference does not turn such a network into a competent camera-only model.
 
-### Missing and degraded sensors
-
-A fusion network trained only with all sensors often becomes dependent on the strongest stream. Zeroing LiDAR at inference does not turn such a network into a competent camera-only model. [UniBEV](/paper%20shorts/2023/09/25/unibev-robust-multimodal-detection-with-uniform-bev-encoders.html) demonstrates this directly: its model trained only in fused mode reaches 3.0 camera-only mAP in the reported ablation, while modality dropout and fusion normalized over the streams that remain produce a usable camera-only path. [MetaBEV](/paper%20shorts/2023/04/19/metabev-solving-sensor-failures-for-bev-perception.html) similarly trains full, camera-only, and LiDAR-only modes and lets BEV queries attend to whichever encoders are available. Its reported missing-LiDAR result improves 35.5 NDS over a vanilla BEVFusion comparison, showing that graceful fallback is primarily a training-distribution and routing problem.
+[UniBEV](/paper%20shorts/2023/09/25/unibev-robust-multimodal-detection-with-uniform-bev-encoders.html) demonstrates the failure directly. In its reported ablation, a model trained only in fused mode collapses under camera-only inference, while modality dropout and normalization over the streams that remain produce a usable fallback path. [MetaBEV](/paper%20shorts/2023/04/19/metabev-solving-sensor-failures-for-bev-perception.html) trains full, camera-only, and LiDAR-only modes and lets BEV queries attend to whichever encoders are available.
 
 [![Animation contrasting modality availability in UniBEV and MetaBEV with reliability gating in Grace-BEV](/assets/images/autonomous-perception-modality-dropout.gif)](/assets/images/autonomous-perception-modality-dropout.gif)
-_Modality dropout covers discrete cases in which a stream is absent. A reliability gate is needed for the harder case shown in the final phase: the camera still arrives, but its evidence is degraded and should receive less weight._
+_Modality dropout covers discrete cases in which a stream is absent. Reliability gating covers the harder case in which a tensor is present but its evidence should receive less weight._
 
-Sensor absence is only one failure mode. Blur, saturation, fog, reduced LiDAR beams, blocked fields of view, packet delay, and calibration drift leave a tensor present but unreliable. [Grace-BEV](/paper%20shorts/2026/05/29/grace-bev-graceful-degradation-under-sensor-failures.html) adds reliability-aware gating, while [MetaBEV](https://openaccess.thecvf.com/content/ICCV2023/html/Ge_MetaBEV_Solving_Sensor_Failures_for_3D_Detection_and_Map_Segmentation_ICCV_2023_paper.html) evaluates several corruptions in addition to missing streams. A production model needs both mechanisms: modality dropout for supported sensor configurations, and corruption training plus an observable health signal for partial degradation. Calibration noise should be included as a separate test because every projected association can be confidently wrong in the same direction.
+Sensor absence is only one failure mode. Blur, saturation, fog, reduced LiDAR beams, blocked fields of view, packet delay, interference, and calibration drift all leave a tensor present but unreliable. [Grace-BEV](/paper%20shorts/2026/05/29/grace-bev-graceful-degradation-under-sensor-failures.html) adds reliability-aware gating, while [MetaBEV](https://openaccess.thecvf.com/content/ICCV2023/html/Ge_MetaBEV_Solving_Sensor_Failures_for_3D_Detection_and_Map_Segmentation_ICCV_2023_paper.html) evaluates several corruptions in addition to missing streams.
 
-## Time: objects or scene?
+A production model needs at least three mechanisms:
 
-Camera features and a single LiDAR sweep do not directly provide a complete object velocity, preserve evidence through an occlusion, or stabilize a noisy depth estimate. Radar supplies radial velocity, but not the full motion state of every actor. Temporal modeling fills the remaining gap by comparing evidence across frames. Old features must first be expressed in the current coordinate frame: ego-motion compensation aligns roads and static structures, while independently moving actors require velocity or learned motion updates. Timestamp error, pose error, and rolling-shutter effects appear as residual motion after alignment.
+- modality dropout for supported sensor configurations,
+- corruption training and observable health signals for partial degradation,
+- calibration and timing perturbations as separate tests.
 
-Dense temporal memory stores scene-level BEV features. [BEVDet4D](/paper%20shorts/2022/03/31/bevdet4d-temporal-cues-in-multicamera-3d-detection.html) warps the previous BEV feature into the current ego frame, concatenates it with the current feature, and lets a BEV encoder learn displacement cues. [BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) uses temporal attention to update a recurrent BEV field. [SOLOFusion](/paper%20shorts/2022/10/05/solofusion-temporal-multiview-3d-object-detection.html) keeps a short high-resolution history for fine stereo correspondence and a longer low-resolution BEV history for depth and velocity. Dense state retains roads, free space, and weak background evidence that may later support a new detection, but its memory and warp cost scale with BEV area and history.
+The third category matters because miscalibration can make every projected association confidently wrong in the same direction. It is not equivalent to random feature noise.
 
-Sparse temporal memory stores selected objects or queries. The StreamPETR queue from the sparse-3D section is the clearest example: it keeps a bounded set of foreground representations and introduces fresh queries for actors not already in memory. [Sparse4D v2](/paper%20shorts/2023/05/23/sparse4dv2-recurrent-temporal-fusion-with-sparse-model.html) transforms prior instances into the current frame and combines them with fresh anchors. Sparse memory is lighter and naturally object-centric, but it can discard free space, road structure, undetected objects, and context that has not yet become a confident query.
+A tensor being available is not the same as its evidence being trustworthy. Reliability should therefore survive fusion. At minimum, downstream state should preserve modality support, timestamp or age, and a health estimate. Otherwise, the network may emit a confident fused prediction without exposing that it rests entirely on one degraded stream.
+
+## Time: what should survive the next frame?
+A single camera frame or LiDAR sweep does not directly provide a complete motion state, preserve evidence through an occlusion, or stabilize an uncertain depth estimate. Radar supplies radial velocity, but not the full velocity of every actor. Temporal modeling fills the gap by comparing evidence across time.
+
+Before old state can be reused, it must be expressed in the current coordinate frame. Ego-motion compensation aligns roads and static structures. Independently moving actors require velocity, motion hypotheses, or learned updates. Timestamp error, pose error, rolling shutter, and scan motion appear as residual displacement after alignment.
+
+A useful abstraction is
+
+$$
+S_t = f\left(\operatorname{Align}(S_{t-1}, \Delta T_t), X_t, \Delta t, H_t\right),
+$$
+
+where $S_{t-1}$ is prior scene state, $X_t$ is current sensor evidence, $\Delta T_t$ is the ego-frame transformation, $\Delta t$ is elapsed time, and $H_t$ contains sensor-health information. The equation is simple; the hard choice is what $S_t$ contains.
+
+### Dense scene memory
+Dense temporal memory stores a scene-level BEV field. [BEVDet4D](/paper%20shorts/2022/03/31/bevdet4d-temporal-cues-in-multicamera-3d-detection.html) warps the previous BEV feature into the current ego frame, concatenates it with the current feature, and lets a BEV encoder learn displacement cues. [BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) uses temporal attention to update a recurrent BEV representation.
+
+[SOLOFusion](/paper%20shorts/2022/10/05/solofusion-temporal-multiview-3d-object-detection.html) separates temporal resolution: a short high-resolution history supports fine stereo correspondence, while a longer low-resolution BEV history supports depth and velocity. Dense state retains roads, free space, and weak background evidence that may later support a new detection. Its memory and warp cost scale with BEV area and history, and stale background evidence can persist if updates are too conservative.
+
+### Sparse entity memory
+Sparse temporal memory stores selected actors or queries. [StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html) retains a bounded queue of foreground queries, conditions them on ego pose, elapsed time, and velocity, and introduces fresh queries for newly visible actors. [Sparse4D v2](/paper%20shorts/2023/05/23/sparse4dv2-recurrent-temporal-fusion-with-sparse-model.html) transforms prior instances into the current frame and combines them with fresh anchors.
+
+Sparse memory is lighter and naturally object-centric, but query birth, duplicate removal, aging, and deletion become part of the learned system. It can discard free space, road structure, undetected actors, and context that has not yet become a confident query.
 
 [![Animation comparing a warped dense BEV field, transformed recurrent instances with fresh anchors, and a bounded foreground-query queue](/assets/images/autonomous-perception-temporal-memory.gif)](/assets/images/autonomous-perception-temporal-memory.gif)
-_Dense recurrence carries every BEV cell. Sparse4D v2 transforms recurrent object instances and adds fresh anchors. StreamPETR carries a bounded queue of foreground queries and introduces new queries for actors that were not already in memory._
+_Dense recurrence carries every BEV cell. Sparse4D v2 transforms recurrent object instances and adds fresh anchors. StreamPETR carries a bounded foreground-query queue and introduces new queries for actors not already in memory._
 
 [![Figure 3 from StreamPETR, showing object queries propagated through a temporal memory queue](/assets/images/streampetr-paper-figure-3.png)](/assets/images/streampetr-paper-figure-3.png)
 _StreamPETR transforms selected object queries into the current frame, updates them from current images, and keeps the strongest foreground queries for the next step. Query selection saves memory but can discard weak evidence before an actor is confidently detected. Source: [StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html), Figure 3._
 
-[SparseBEV](/paper%20shorts/2023/08/18/sparsebev-high-performance-sparse-3d-object-detection.html) keeps sparse object support but retrieves from several stored frames, so its cost still grows with history length. “Sparse temporal” can therefore mean compressing history into recurrent state or retaining history and reading only selected locations; the two designs have different memory, latency, and error-accumulation behavior. StreamPETR remembers objects; SOLOFusion remembers the scene.
+[SparseBEV](/paper%20shorts/2023/08/18/sparsebev-high-performance-sparse-3d-object-detection.html) keeps sparse object support but retrieves from several stored frames, so its cost still grows with history. “Sparse temporal” can mean either compressing history into recurrent state or retaining history and reading selected locations. Those designs have different memory, latency, and error-accumulation behavior. StreamPETR remembers selected objects; SOLOFusion remembers a scene field.
 
-Sparsity should be reported per component. A sparse LiDAR backbone avoids empty voxels; a sparse camera decoder avoids a full BEV field; a sparse temporal model avoids replaying every frame. None of them removes the dense surround-camera backbone. Sparse operators also pay for indexing, sorting, padding, gathers, and irregular memory access. FLOPs are therefore insufficient: the relevant deployment measurements are component latency, peak memory, P95/P99 end-to-end latency, active-token count in crowded scenes, and recall when the query budget saturates.
+Dense and sparse memory fail in opposite directions. Dense state preserves weak evidence but can carry clutter and stale features. Sparse state limits cost but may delete evidence before it becomes important. A practical hybrid can keep a lower-resolution scene field for occupancy and topology, high-resolution queries for actors and map elements, and explicit age or confidence for both.
 
-## Training is not deployment
+Sparsity should be reported per component. A sparse LiDAR backbone avoids empty voxels. A sparse camera decoder avoids a full BEV field. A sparse temporal model avoids replaying every location in every frame. None removes the dense surround-camera backbone, and sparse operators still pay for indexing, sorting, padding, gathers, and irregular memory access.
 
-The runtime sensor graph is not always the training sensor graph. In [BEVDepth](/paper%20shorts/2022/06/21/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection.html), projected LiDAR supervises camera depth and disappears at inference. In [Sparse-to-Dense](/paper%20shorts/2017/09/21/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb.html), sparse depth remains a deployed input. In [CRKD](/paper%20shorts/2024/06/17/crkd-camera-radar-distillation-from-lidar-camera.html), a camera-LiDAR teacher transfers features, relations, and outputs to a camera-radar student. These systems should not all be described as “using LiDAR”; they have different runtime contracts.
+FLOPs are therefore insufficient. Deployment evaluation should include component latency, peak memory, P95 and P99 end-to-end latency, active-token count in crowded scenes, recall when the query budget saturates, and error after long occlusions or ego-pose drift.
 
-[![Animation separating LiDAR depth labels, runtime sparse-depth input, and a LiDAR-camera teacher](/assets/images/autonomous-perception-lidar-training-contracts.gif)](/assets/images/autonomous-perception-lidar-training-contracts.gif)
-_LiDAR supplies labels to BEVDepth, remains a runtime input for Sparse-to-Dense, and belongs to the training-only teacher in CRKD. The deployed sensor contract differs in every column._
-
-The same distinction applies to pretraining. Image classification teaches appearance but not calibration, metric depth, ego motion, or persistence. [UniM²AE](/paper%20shorts/2023/08/21/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation.html) reconstructs masked camera and LiDAR inputs through a shared 3D volume; [BEV-MAE](/paper%20shorts/2022/12/12/bev-mae-bird-eye-view-masked-autoencoders-for-point-cloud-pretraining.html) reconstructs masked LiDAR columns. [UniWorld](/paper%20shorts/2023/08/14/uniworld-autonomous-driving-pretraining-via-world-models.html), [ViDAR](/paper%20shorts/2023/12/29/vidar-visual-point-cloud-forecasting-for-autonomous-driving.html), and [DriveWorld](/paper%20shorts/2024/05/07/driveworld-4d-pretrained-scene-understanding.html) add future occupancy, point-cloud prediction, or dynamic state. These targets are useful when they improve transfer across tasks and label budgets; a longer forecast is not automatically better because distant futures are increasingly ambiguous.
-
-The same BEV feature may feed detection, occupancy, lanes, velocity, tracking, and planning heads. Sharing saves repeated sensor encoding and lets tasks exchange scene context, but their losses have different units, label densities, and learning speeds. Normalize each loss by a meaningful count before adjusting task weights. If one task still dominates shared layers, [uncertainty weighting](/paper%20shorts/2017/05/19/multi-task-learning-using-homoscedastic-uncertainty.html) or [GradNorm](/paper%20shorts/2017/11/07/gradnorm-adaptive-loss-balancing.html) can change gradient magnitude; if task gradients point in opposing directions, [PCGrad](/paper%20shorts/2020/01/19/pcgrad-gradient-surgery-for-multi-task-learning.html), adapters, or an earlier architectural split address a different problem. Multi-task learning is useful here, but it is an optimization constraint on the shared representation rather than a separate perception architecture.
-
-[![Animation comparing loss-scale weighting, GradNorm's training-rate targets, and PCGrad's projection of conflicting gradients](/assets/images/autonomous-perception-multitask-gradients.gif)](/assets/images/autonomous-perception-multitask-gradients.gif)
-_Loss weighting changes gradient magnitude; GradNorm adjusts weights using relative training rates; PCGrad changes direction when task gradients conflict. These methods solve different problems._
-
-## Compress the world state
-
-Dense BEV memory preserves a great deal of spatial structure, while sparse queries preserve selected actors. A natural next question is whether the world can be compressed into a smaller learned state without collapsing it into one undifferentiated vector.
+## The world state is not one tensor
+Dense BEV fields and sparse object queries are often presented as competing philosophies. They are better understood as different points on a compression ladder. The state can preserve every spatial cell, selected entities, a small set of learned latent tokens, or one pooled scene vector.
 
 [![Animation comparing dense BEV memory, sparse object queries, learned latent tokens, and a single pooled embedding](/assets/images/autonomous-perception-latent-memory.gif)](/assets/images/autonomous-perception-latent-memory.gif)
-_The compression ladder keeps the scene fixed while changing what persists: every BEV cell, selected actors, a small learned token set, or one pooled vector. The further right the representation moves, the more the model must learn which spatial evidence is worth retaining._
+_The scene remains fixed while the representation changes: every BEV cell, selected actors, a compact learned token set, or one pooled vector. Moving right saves computation but asks the learning objective to decide which spatial evidence can be discarded._
 
-Let $X_t$ contain the current sensor features and let $Z_{t-1}$ be a compact set of learned latent tokens. A recurrent world state could be updated as
+Let $X_t$ contain current sensor features and let $Z_{t-1}$ be a compact set of learned latent tokens. A recurrent latent state could be updated as
 
 $$
 Z_t = \operatorname{CrossAttention}(Z_{t-1}, X_t).
 $$
 
-The tokens are a bottleneck: the model must learn which parts of the observation are worth carrying forward for perception, forecasting, or planning. This is related to Perceiver-style bottlenecks, token compression, memory tokens, and latent world models. The benefit is compute that scales with the number of latents rather than every BEV cell or every stored object query.
+The latent tokens form an information bottleneck. Compute scales with the number of retained tokens rather than every BEV cell or every stored observation. This is related to Perceiver-style bottlenecks, memory tokens, token compression, and latent world models.
 
-[Driving on Registers](https://arxiv.org/abs/2601.05083) gives a useful planning-oriented example of this choice. It uses camera-aware register tokens to compress multiview ViT features into a compact scene representation, then keeps candidate-trajectory generation separate from scoring. The result is not evidence that a compact token set replaces metric state for every driving task; it is evidence that compression can be task-aware when the downstream contract is explicit. A planner may need a few scene tokens to rank candidate maneuvers, while a validator still needs object, occupancy, and roadgraph state it can inspect geometrically.
+Mean-pooling the entire map into one embedding is usually too aggressive for driving. One vector would need to preserve a pedestrian on the left, a stop sign ahead, lane curvature, a cyclist approaching from behind, an occluded vehicle, and free-space topology. Mean pooling is better suited to “what kind of scene is this?” than “where is the pedestrian relative to the ego vehicle?”
 
-Mean-pooling the entire map into one embedding is usually too aggressive for driving. One vector would need to preserve a pedestrian on the left, a stop sign 30 meters ahead, the curvature of the lane, a cyclist approaching from behind, an occluded vehicle, and the free-space topology. Mean pooling removes explicit spatial separation and is better suited to “what kind of scene is this?” than “where exactly is the pedestrian relative to the ego vehicle?”
+A small token set is more plausible because different tokens can specialize through learning. [Driving on Registers](https://arxiv.org/abs/2601.05083) explores this direction for end-to-end driving: camera-aware register tokens compress multi-camera features into a compact scene representation, then lightweight decoders generate and score candidate trajectories. The result is evidence that targeted token compression can support planning without carrying every camera token downstream. It is not evidence that all metric structure should disappear.
 
-A more realistic compression strategy is a small set of latent tokens whose specializations emerge through learning. Some may preserve nearby dynamic actors, road topology, far-field hazards, or route context, but those roles do not need to be hard-coded. The design space is a compression ladder:
+A 2025 preprint, [UniLION](https://arxiv.org/abs/2511.01768), pushes unification into the backbone itself. Its linear group RNN supports LiDAR-only, temporal LiDAR, multimodal, and multimodal-temporal variants across perception, prediction, and planning tasks. The interesting claim is not that one operator has solved the stack, but that sensor, time, and task unification can be treated as one sequence-modeling problem. Whether one architecture remains optimal across hardware, calibration, and failure constraints is still empirical.
 
-dense BEV memory → sparse object memory → learned latent memory → single pooled embedding
+The compression ladder is therefore:
 
-Moving right saves memory and compute, but also increases the burden on the learning objective to decide what information matters. The central architectural question returns here in its most compressed form: what is discarded, at what stage, and can a downstream task recover it?
+dense scene field → sparse structured entities → learned latent registers → single pooled embedding
 
-## Toward a driving foundation model
+Moving right saves memory and compute. It also increases the burden on the objective to preserve the right information. The design question is still the same: what is discarded, when is it discarded, and can any downstream component recover it?
 
-The research direction is moving from separate heads toward systems that share state across perception, prediction, simulation, and planning. That is “unified” in four distinct senses: sensors meet in a common geometric frame; time updates a persistent world state; tasks consume compatible state rather than reconstructing it independently; and the Driver, Simulator, and Critic reuse the same semantics. Sharing any one of those does not imply the others.
+### Materialized structure and latent state should coexist
+Compression alone does not decide what the rest of the system can inspect. A driving model can expose several complementary views of the same learned world state:
 
-[UniAD](https://arxiv.org/abs/2212.10156) makes task sharing planning-oriented: its perception and prediction tasks communicate through unified query interfaces so that their learned state is optimized for the final driving task. [DiffusionDrive](https://arxiv.org/abs/2411.15139) changes the planning contract instead, using a short, anchored diffusion process to generate multiple plausible trajectories. [WPT](https://openaccess.thecvf.com/content/CVPR2026/html/Jiang_WPT_World-to-Policy_Transfer_via_Online_World_Model_Distillation_CVPR_2026_paper.html) provides the complementary deployment lesson: a rich online world-model teacher can train a lightweight student policy without retaining the teacher's full runtime graph. These are different transitions—task sharing, multimodal action generation, and teacher-to-student transfer—not interchangeable evidence for a single architectural recipe.
+| Representation | What it preserves well | What it tends to miss | Natural consumers |
+| --- | --- | --- | --- |
+| Objects and tracks | Dynamic agents, identity, kinematics, compact interaction state | Unmodeled geometry, unusual objects, amorphous hazards | Prediction, interaction modeling, behavior planning, validation |
+| Vector roadgraph and map elements | Lane boundaries, connectivity, stop lines, route topology | Non-map obstacles and uncertain geometry | Routing, rule reasoning, planning, simulation |
+| Occupancy and free space | Detailed geometry, unknown obstacles, traversability | Stable instance identity and long-range semantics | Collision checking, mapping, simulation, planning |
+| Dense BEV features | Spatially organized residual evidence | Expensive to store and difficult to validate directly | Shared perception heads and local planning features |
+| Latent tokens | High-bandwidth information under a fixed compute budget | Explicit geometry and independent interpretability | World decoders, policies, generative models |
 
-### Waymo's public design
+Bounding boxes are efficient, but they assume that the relevant world can be divided into known instances. Occupancy asks a more basic question: which parts of 3D space are occupied, free, or unobserved? [Occ3D](https://arxiv.org/abs/2304.14365) formalized dense, visibility-aware semantic occupancy benchmarks; [PanoOcc](https://arxiv.org/abs/2306.10013) treats occupancy as a unified representation for camera-based 3D panoptic understanding. [OccAny](https://arxiv.org/abs/2603.23502) pushes the research frontier toward metric occupancy in out-of-domain and even uncalibrated urban scenes. These results do not remove calibration requirements from a production stack, but they show why occupancy is becoming a general scene interface rather than one auxiliary head.
 
-Waymo has described one version of this system-level design. Its public account names a Sensor Fusion Encoder, a Driving VLM, and a World Decoder; it says the first fuses camera, LiDAR, and radar evidence over time, while the second contributes semantic reasoning for rare or complex situations. Both feed the World Decoder, which Waymo says predicts road-user behavior, produces maps and vehicle trajectories, and emits signals for trajectory validation. This is a useful public architecture description, not a specification of every deployed online component.
+Road structure has a different natural form. [MapTR](https://arxiv.org/abs/2208.14437) models online vectorized map elements as structured point sets rather than raster pixels. A vector roadgraph preserves connectivity and shape in a form that planning and simulation can consume directly.
+
+The strongest system contract is therefore not “structured outputs or learned embeddings.” It is structured outputs **and** learned embeddings. Materialized objects, roadgraph elements, occupancy, semantics, uncertainty, and timestamps provide compact interfaces for validation and simulation. Latent features preserve residual information that those schemas do not capture.
+
+This distinction also resolves a common false choice. End-to-end learning does not require an unstructured runtime. A model can backpropagate through perception, prediction, and planning while still materializing selected state for independent checks. Conversely, a stack can have named modules yet remain difficult to validate if the interfaces carry poorly calibrated learned features.
+
+## Training contracts shape the deployed model
+The graph that learns can be richer than the graph that runs. Confusing the two makes architecture descriptions imprecise.
+
+In [BEVDepth](/paper%20shorts/2022/06/21/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection.html), projected LiDAR supervises camera depth and disappears at inference. In [Sparse-to-Dense](/paper%20shorts/2017/09/21/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb.html), sparse depth remains a deployed input. In [CRKD](/paper%20shorts/2024/06/17/crkd-camera-radar-distillation-from-lidar-camera.html), a camera-LiDAR teacher transfers features, relations, and outputs to a camera-radar student. These systems should not all be described as “using LiDAR.” Their runtime sensor contracts are different.
+
+[![Animation separating LiDAR depth labels, runtime sparse-depth input, and a LiDAR-camera teacher](/assets/images/autonomous-perception-lidar-training-contracts.gif)](/assets/images/autonomous-perception-lidar-training-contracts.gif)
+_LiDAR supplies labels to BEVDepth, remains a runtime input for Sparse-to-Dense, and belongs to the training-only teacher in CRKD. The deployed sensor contract differs in every column._
+
+The same distinction applies to pretraining. Image classification teaches appearance, but not calibration, metric depth, ego motion, or temporal persistence. [UniM²AE](/paper%20shorts/2023/08/21/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation.html) reconstructs masked camera and LiDAR inputs through a shared 3D volume. [BEV-MAE](/paper%20shorts/2022/12/12/bev-mae-bird-eye-view-masked-autoencoders-for-point-cloud-pretraining.html) reconstructs masked LiDAR columns.
+
+[UniWorld](/paper%20shorts/2023/08/14/uniworld-autonomous-driving-pretraining-via-world-models.html), [ViDAR](/paper%20shorts/2023/12/29/vidar-visual-point-cloud-forecasting-for-autonomous-driving.html), and [DriveWorld](/paper%20shorts/2024/05/07/driveworld-4d-pretrained-scene-understanding.html) add future occupancy, point-cloud prediction, or dynamic state. Their shared idea is that a useful scene representation should explain not only the current observation but also how the world evolves. A longer forecast is not automatically better, because distant futures are increasingly multimodal and supervision can reward averaging.
+
+The same BEV or token state may feed detection, occupancy, mapping, velocity, tracking, prediction, and planning. Sharing saves repeated sensor encoding and lets tasks exchange scene context, but their losses have different units, label densities, and learning speeds. Each loss should first be normalized by a meaningful count. If one task still dominates shared layers, [uncertainty weighting](/paper%20shorts/2017/05/19/multi-task-learning-using-homoscedastic-uncertainty.html) or [GradNorm](/paper%20shorts/2017/11/07/gradnorm-adaptive-loss-balancing.html) changes gradient magnitude. If gradients point in opposing directions, [PCGrad](/paper%20shorts/2020/01/19/pcgrad-gradient-surgery-for-multi-task-learning.html), adapters, or an earlier architectural split addresses a different problem.
+
+[![Animation comparing loss-scale weighting, GradNorm's training-rate targets, and PCGrad's projection of conflicting gradients](/assets/images/autonomous-perception-multitask-gradients.gif)](/assets/images/autonomous-perception-multitask-gradients.gif)
+_Loss weighting changes gradient magnitude. GradNorm adjusts weights using relative training rates. PCGrad changes direction when task gradients conflict. These mechanisms solve different problems._
+
+Multi-task learning is not a separate perception architecture. It is an optimization contract imposed on the shared representation. A task should share layers only while the shared features remain useful to it. “One model” is not a reason to force all tasks through the same bottleneck.
+
+The broader principle is that end-to-end gradient flow and end-to-end runtime coupling are different decisions. Large teachers can use privileged sensors, longer history, future labels, simulation, language supervision, or expensive world models. A deployable student can inherit part of that knowledge while retaining a smaller and more testable runtime graph.
+
+## From unified perception to a driving foundation model
+The boundary between perception and planning is becoming less rigid. [UniAD](https://arxiv.org/abs/2212.10156) connected detection, tracking, mapping, motion prediction, occupancy, and planning through unified query interfaces optimized toward the planning task. The significance was not simply that several heads occupied one repository. It made the downstream driving objective part of representation design.
+
+Planning also cannot be reduced to one deterministic future. Traffic scenes contain genuine multimodality: yield or proceed, pass or wait, merge ahead or behind. [DiffusionDrive](https://arxiv.org/abs/2411.15139) uses a truncated diffusion policy to generate diverse driving trajectories with a small number of denoising steps. [Driving on Registers](https://arxiv.org/abs/2601.05083) separates candidate generation from candidate scoring. These methods move the output contract from “predict one trajectory” toward “represent several plausible actions and evaluate them.”
+
+World models add another layer. Instead of using the current scene state only to emit an action, they predict how road users, geometry, and sensor observations may evolve under candidate actions. The runtime question is whether that model must execute onboard. [WPT](https://arxiv.org/abs/2511.20095) offers one answer: use a world model and learned reward model to train a teacher policy, then distill the resulting reasoning into a lightweight student. This preserves real-time deployability while allowing a richer model to shape training.
+
+These lines of work lead to a system-level foundation model: a shared model family and world-state vocabulary across perception, prediction, planning, simulation, evaluation, and data generation. The difficult part is not attaching a VLM to a sensor encoder. It is deciding which component owns geometry, which component supplies semantics, how uncertainty is represented, and where independent validation remains possible.
+
+## Waymo's public foundation-model architecture
+Waymo has publicly described one version of this system-level design. In [Waymo Co-CEO Dmitri Dolgov's talk, “The Demo Is Only 1% Of The Work”](https://www.youtube.com/watch?v=Gp4zrV3-6N8) and Waymo's [architecture description](https://waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/), the Waymo Foundation Model contains a Sensor Fusion Encoder, a Driving VLM, and a World Decoder. Waymo also describes learned embeddings coexisting with compact materialized representations such as objects, semantic attributes, and roadgraph elements.
+
+This is an architecture overview, not a complete specification of the deployed online graph. It establishes the public interfaces and training philosophy, but not the execution frequency, model sizes, exact state schema, or all safety checks.
 
 ![The Waymo Foundation Model diagram with sensor fusion, a driving VLM, and a generative world decoder](/assets/images/waymo-foundation-model-architecture.png)
-_Waymo's diagram separates a fast sensor-fusion path from a slower language-conditioned path, then joins both inside a generative world decoder. Source: [Dmitri Dolgov's Waymo talk](https://www.youtube.com/watch?v=Gp4zrV3-6N8); see Waymo's public [architecture description](https://waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/) and earlier [foundation-model overview](https://waymo.com/blog/2024/10/ai-and-ml-at-waymo/)._
+_Waymo's diagram separates a fast sensor-fusion path from a slower semantic-reasoning path, then joins both inside a World Decoder. Source: [Dmitri Dolgov's Waymo talk](https://www.youtube.com/watch?v=Gp4zrV3-6N8); see Waymo's public [architecture description](https://waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/) and earlier [foundation-model overview](https://waymo.com/blog/2024/10/ai-and-ml-at-waymo/)._
 
-The three blocks have different roles:
-
-| Path | Input → intermediate representation | Output role |
+| Component | Publicly described input and state | Publicly described role |
 | --- | --- | --- |
-| Sensor Fusion Encoder | Camera, LiDAR, radar → objects, semantics, and learned embeddings | Fast, metric evidence and reactions |
-| Driving VLM | Rich camera evidence and driving data → semantic signals for unusual or ambiguous situations | Slower semantic reasoning |
-| World Decoder | Both representations → behavior predictions, maps, vehicle trajectories, and validation signals | Shared future-state and trajectory interface |
+| Sensor Fusion Encoder | Camera, LiDAR, and radar over time → objects, semantics, and learned embeddings | Fast metric perception and reaction |
+| Driving VLM | Rich camera data, driving data, and broader learned world knowledge → semantic signals | Reasoning about rare, novel, or semantically complex situations |
+| World Decoder | Sensor-fusion and VLM representations | Predict road-user behavior, produce maps, generate vehicle trajectories, and provide trajectory-validation signals |
+| Driver validation layer | Candidate trajectory and materialized state | Independently verify the generative trajectory onboard |
+| Simulator and Critic | Shared foundation-model family and compact world state | Generate closed-loop worlds, evaluate behavior, identify failures, and produce training signals |
 
-Waymo also describes a second boundary that is easy to miss: its learned embeddings coexist with compact materialized state, including objects, semantic attributes, and roadgraph elements. It says this structured state supports onboard validation, efficient simulation, and feedback from the Critic. It further describes adapting the foundation model into large Driver, Simulator, and Critic teachers, then distilling smaller student models; the Driver retains a separate onboard trajectory-validation layer. Those claims establish the intended contracts, but they do not reveal the exact online graph or demonstrate closed-loop safety by themselves.
+The architecture makes several choices that are consistent with the progression in this article.
 
-### A concrete design
+First, the latency-critical path still preserves sensor measurements, establishes geometry, and updates state at driving frequency. A VLM does not replace calibration, depth, occupancy, motion, or tracking.
 
-My read is that the most credible design is hybrid at every important boundary. The fast path should own calibrated geometry, sensor health, freshness, occupancy, tracks, and roadgraph state. A slower VLM should emit grounded semantic hypotheses with confidence and expiry—not unrestricted driving instructions—so its contribution can be fused with, or rejected by, the metric state. Materialized state should coexist with high-bandwidth learned embeddings: the latter preserve nuance for learning, while the former gives a validator an inspectable object to check.
+Second, semantics and geometry enter through different paths. A VLM can recognize that a burning vehicle, unusual hand signal, or temporary construction pattern should alter behavior even when free space appears geometrically open. That signal is useful because it changes the interpretation of the scene, not because language is a better range sensor.
 
-The World Decoder should predict multiple plausible agent futures and ego trajectories rather than one averaged continuation. Generation, scoring, and validation should remain distinct contracts: generate candidate futures, score them against task objectives and uncertainty, then validate the selected trajectory against the materialized state and independent safety constraints. Large world-model and VLM teachers can improve the training signal, but the onboard student must be evaluated as the deployed model. The Driver, Simulator, and Critic should share state semantics rather than merely sharing a large encoder.
+Third, the world state is dual. Learned embeddings retain information that a fixed schema may omit. Materialized objects, semantics, and roadgraph elements support validation, simulation, and evaluation. This is neither a classical modular stack nor a single opaque policy.
 
-That design creates a practical evaluation agenda. Test corrupt and stale sensors separately. Report query or latent-token saturation, semantic grounding in metric state, multimodal future coverage, P95/P99 latency, and every validator intervention. A result is much less persuasive if it improves one open-loop score while hiding a failure in any of those contracts.
+Fourth, the model that teaches is larger than the model that runs. Waymo describes adapting large teacher models to the Driver, Simulator, and Critic, then distilling smaller students. The onboard Driver mirrors the foundation-model structure but remains paired with a separate validation layer.
 
-The foundation-model label does not remove the engineering boundaries established earlier. Sensor encoders still have to preserve modality-specific evidence. Calibration and synchronization still determine whether features refer to the same place and time. Temporal state still needs freshness, birth, and reset rules. [Vision-Language Models: A Reading Guide](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html) covers the adjacent progression from image-text alignment to grounding, video, and action; the driving problem adds metric geometry, real-time recurrence, and closed-loop validation.
+Finally, the Driver, Simulator, and Critic share a world-model family. This creates a common state vocabulary for action generation, closed-loop scenario generation, evaluation, and data selection. The benefit is not only parameter reuse. It is the ability to turn a failure discovered by the Critic into a simulation, a training target, and a regression test without translating between unrelated representations at every step.
 
-The final test is simple: what evidence is preserved, where does it acquire metric support, what survives through time, and what becomes inspectable before the next driving decision? A substantially simpler unstructured policy could falsify the hybrid design if it matched or exceeded it under controlled closed-loop evaluation, sensor failures, tail latency, multimodal coverage, and validation interventions. Until then, the architecture should be judged by the contracts it makes explicit—not by parameter count or the presence of a VLM.
+## How I would design a system in this family
+The following is my design synthesis, not a claim about Waymo's exact implementation.
+
+The architecture would have two online perception paths and one broader training ecosystem:
+
+```text
+camera / LiDAR / radar
+        ↓
+modality-specific encoders
+        ↓
+calibration, time alignment, ego-motion compensation, sensor health
+        ↓
+hybrid recurrent world state
+        ├── materialized state: tracks, occupancy, roadgraph, semantics, uncertainty, age
+        └── latent state: dense features and compact scene tokens
+
+selected camera history + route context + rare-event trigger
+        ↓
+driving VLM
+        ↓
+grounded semantic hypotheses with confidence and expiry
+
+materialized state + latent state + grounded semantic hypotheses
+        ↓
+world decoder
+        ↓
+multimodal agent futures + candidate ego trajectories
+        ↓
+independent scorer and validation layer
+        ↓
+control
+```
+
+### The fast path should own geometry and freshness
+The sensor-fusion path should run at the highest control-relevant frequency. Camera, LiDAR, and radar should keep separate encoders until they occupy calibrated metric support. Timestamps, ego pose, point age, scan phase, and sensor-health signals should enter before or during temporal fusion, not be reconstructed afterward.
+
+Its recurrent state should be hybrid. A dense or semi-dense field should preserve occupancy, free space, and weak background evidence. Sparse queries should preserve actor identity, kinematics, and roadgraph elements. Compact latent tokens should retain residual scene information for the world decoder. No one representation needs to carry every contract.
+
+The path should produce two interfaces. The first is materialized state: tracked actors, semantic attributes, occupancy or traversability, roadgraph elements, traffic controls, uncertainty, provenance, and freshness. The second is a learned latent state with higher bandwidth than the schema. Planning consumes both. Validation should be able to operate on the first even when it cannot interpret every dimension of the second.
+
+### The slow path should produce grounded hypotheses, not unbounded authority
+The Driving VLM should operate at a lower frequency or be triggered by uncertainty and rare events. Its inputs can include selected camera views, short temporal clips, route context, and a compact summary of the fast path. Sending the entire raw sensor stream through a large language-conditioned model at control frequency is difficult to justify when most frames contain routine geometry.
+
+Its outputs should be grounded semantic hypotheses, not free-form instructions. A useful output might say that a particular region contains a vehicle fire, that a person is likely directing traffic, or that temporary signage invalidates the nominal lane rule. Each hypothesis should identify its supporting region or entity, confidence, timestamp, and expiry condition.
+
+The VLM should not directly overwrite metric state. It should modify costs, constraints, route preferences, or uncertainty only after grounding into the shared world representation. This prevents a stale semantic token from silently moving an object or declaring free space where the fast path sees an obstacle.
+
+### The world decoder should represent several plausible futures
+The decoder should predict a distribution over future world evolution, not one averaged future. For each relevant actor, it should preserve several plausible modes and their interactions with the ego plan. It should also predict scene-level evolution such as occupancy flow, traffic-control state, or roadgraph changes when those are decision-relevant.
+
+Ego planning should similarly generate a compact set of diverse trajectories rather than one point estimate. Diffusion or autoregressive decoding is one mechanism, but the representation matters more than the generator. The candidate set must cover materially different choices, not minor perturbations of the same behavior.
+
+### Generation, scoring, and validation should remain distinct contracts
+A generative decoder is optimized to cover plausible actions. A scorer is optimized to rank them. A validation layer is optimized to reject unreasonable risk. These objectives overlap, but they are not identical.
+
+The generate-then-score split in [Driving on Registers](https://arxiv.org/abs/2601.05083) is a useful learned pattern. Waymo's public description adds a separate onboard validation layer. I would preserve both distinctions. A learned scorer can evaluate safety, comfort, progress, compliance, and semantic appropriateness. A validation layer can apply independent checks using materialized geometry, vehicle dynamics, route rules, uncertainty bounds, sensor health, and fallback policy.
+
+The validator should not be asked to prove that the entire neural network is correct. It should verify concrete properties of the proposed trajectory against the current world state. The model remains responsible for proposing capable behavior; the validator prevents a single generative failure from becoming control without another contract being violated.
+
+### The training graph should be broader than the onboard graph
+Offline teachers can use longer temporal context, privileged future labels, richer sensor inputs, large VLMs, expensive world models, and simulation rollouts. The onboard student should inherit the resulting representation and policy improvements without reproducing the entire teacher graph.
+
+[WPT](https://arxiv.org/abs/2511.20095) is a useful example of this separation. Its world model and learned reward guide a teacher policy, then policy and reward knowledge are distilled into a faster student. The broader lesson is that a world model can shape the decision boundary without remaining tightly coupled to runtime.
+
+Distillation should occur at more than the final action. Matching intermediate world state, future distributions, trajectory rankings, and uncertainty can preserve more of the teacher's reasoning. The student should still be trained on the failure modes created by its own smaller capacity, because teacher-consistent outputs under clean data do not guarantee graceful behavior under sensor corruption or distribution shift.
+
+### The Driver, Simulator, and Critic should share state semantics
+A simulator does not need every internal Driver activation, but it benefits from the same materialized vocabulary: actors, geometry, roadgraph, traffic controls, uncertainty, and behavior modes. It can generate synthetic camera and LiDAR observations from that compact state, alter scene factors, and test counterfactual behavior.
+
+The Critic should evaluate both trajectories and representation failures. It should flag not only a poor maneuver but also stale tracks, inconsistent occupancy, sensor disagreement, VLM hypotheses that outlive their evidence, or candidate sets that omit the safe mode. Those failures can then define targeted data mining, simulation perturbations, teacher supervision, and regression suites.
+
+The closed loop is:
+
+real-world or simulated failure → Critic diagnosis → targeted scenario and labels → teacher improvement → student distillation → closed-loop regression → deployment review
+
+A shared foundation-model family helps only if this loop preserves the semantics of the failure. A larger common encoder is not itself a learning flywheel.
+
+### Evaluation should test the contracts, not only the final score
+A system in this family needs matched evaluation across several levels:
+
+- clean-sensor accuracy with controlled backbone, resolution, and training recipe,
+- missing, corrupted, delayed, and miscalibrated sensors,
+- state freshness after occlusion, pose drift, and long recurrence,
+- query or token saturation in crowded scenes,
+- coverage and calibration of multimodal agent and ego futures,
+- stale or incorrectly grounded VLM semantics,
+- disagreement between objects, occupancy, and roadgraph outputs,
+- P95 and P99 component and end-to-end latency,
+- closed-loop interventions by the scorer or validator,
+- regression performance in scenarios discovered by the Critic.
+
+The most informative failures occur where contracts disagree. If a track says an actor is absent but occupancy remains blocked, the system should expose uncertainty rather than average the representations into silent confidence. If the VLM says a lane is unsafe but its grounding has expired, the semantic cost should decay. If all cameras are degraded while LiDAR is healthy, the model should alter both its fusion weights and its uncertainty.
+
+This is the practical reason to materialize selected state. It creates places where the system can detect disagreement before the final trajectory.
+
+## The design rule
+A useful way to read any autonomous-driving perception architecture is to ask six questions:
+
+1. What measurement does each sensor contribute that the others do not?
+2. Where does camera evidence acquire metric support?
+3. Which modality controls admission into the shared representation?
+4. What state survives through time, and how is it aged or reset?
+5. Which world properties are materialized for downstream reasoning and validation, and which remain latent?
+6. What information exists only during training, and what actually runs onboard?
+
+These questions cut through many naming differences. A BEV model, query model, recurrent model, world model, and driving foundation model all make the same irreversible decisions. They decide what evidence to preserve, what to compress, and what the next component is allowed to know.
+
+My current read is that the most credible architecture is hybrid at every important boundary. It uses sensor-specific encoders before shared geometry; dense fields for free space and occupancy together with sparse entities for actors and maps; materialized state together with learned embeddings; a fast metric path together with slower semantic reasoning; and large training-time teachers together with a smaller onboard student and an independent validation layer.
+
+This thesis is falsifiable. It would be wrong if a substantially simpler unstructured policy consistently matched or exceeded the hybrid system under controlled closed-loop evaluation, sensor failures, tail latency, multimodal coverage, and validation interventions. The point is not to preserve modules for their own sake. It is to preserve information and contracts only where they improve capability, deployability, or evidence of safety.
+
+A driving foundation model is therefore not defined by its parameter count or by the presence of a VLM. It is defined by whether one learned system can preserve measurement-specific evidence, build a calibrated temporal world state, represent several plausible futures, and expose enough structure for closed-loop validation. The model classes will keep changing. Those invariants will not.
+
+[Vision-Language Models: A Reading Guide](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html) covers the adjacent progression from image-text alignment to grounding, video, and action. Autonomous driving adds metric geometry, real-time recurrence, multimodal uncertainty, and the requirement that every useful capability survive contact with closed-loop validation.
