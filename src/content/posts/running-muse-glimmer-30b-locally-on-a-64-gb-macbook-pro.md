@@ -107,7 +107,7 @@ The reusable harness for this run is in [`scripts/bench_llama_server_local.py`](
 
 ## Recommendation
 
-> I would run Glimmer locally when I want one current model that can cover text and images without putting pressure on a `64 GB` memory budget. I would start with the official `17 GB Q4_K_M`, add the projector only when the application needs vision, and keep the context well below the advertised maximum until the workload proves otherwise.
+> **Deep insight.** The `17 GB` Q4_K_M quant makes Glimmer useful on a `64 GB` Mac because it leaves headroom for the application and context, not because the advertised maximum context is automatically usable. Add the projector only when vision is needed, then measure the workload before expanding context.
 
 I would use the full-Metal DFlash configuration for rapid local chat. Nearly `48 tok/s` on the short suite is fluid, and the model still leaves ample memory headroom. I would remain careful with agent loops that repeatedly inject `8K` of state: speculative decoding accelerates generation, not the entire prefill, so the long suite still took almost `18 s` to expose an answer. The next optimization target is prompt reuse or a smaller active context, not a larger quant.
 

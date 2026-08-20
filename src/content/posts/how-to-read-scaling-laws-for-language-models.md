@@ -19,8 +19,6 @@ Kaplan and Chinchilla appear in almost every discussion of a model release: some
 
 A scaling law does not say that a model becomes intelligent if we make it larger. It makes a narrower and more useful claim: within a measured training regime, a chosen metric changes predictably as we spend more parameters, data, or compute. That can turn a frontier run from a heroic bet into a resource-allocation problem. A good small sweep tells us whether the next unit of budget should buy a larger model, more tokens, a different data mixture, a better architecture, or more inference-time search.
 
-> A scaling curve should change an experiment plan, not end the discussion.
-
 The phrase *within a measured regime* does most of the work. A fitted curve inherits its architecture, tokenizer, data construction, optimizer, schedule, context length, compute accounting, and evaluation distribution. Change enough of those and we are not moving along the same curve anymore.
 
 I separate four claims that are too often all called a “scaling law.”
@@ -93,6 +91,8 @@ Chinchilla revisited allocation at fixed training compute. Across more than 400 
 Chinchilla used the same training-compute budget as Gopher, with 70B rather than 280B parameters and four times as much training data. It outperformed Gopher and several contemporaries on the paper's downstream suite. The lesson is not that 70B is a magic size. A model can be undertrained *relative to a validation-loss objective at fixed pretraining compute*.
 
 The familiar shorthand of roughly twenty tokens per parameter needs the same qualification. Near-equal fitted exponents make $D/N$ approximately constant in that regime. Its numerical value is a coefficient-level property of those experiments, not a universal exponent or a law of nature.
+
+> **Deep insight.** Chinchilla's approximate token-to-parameter ratio is not an independent law. It follows from a particular fitted loss surface: near-equal data and parameter exponents make the ratio nearly constant, while the coefficients set its value. Change the training regime and the ratio is a hypothesis to remeasure, not a recipe to repeat.
 
 The Kaplan-versus-Chinchilla story is not simply “the old recipe was wrong.” [Porian et al. (2024)](https://arxiv.org/abs/2406.19146) reproduced the Kaplan-style result and traced much of the discrepancy to last-layer compute accounting, warmup duration, and scale-dependent optimizer tuning. A scaling law predicts the optimization frontier represented by its experiments. If the proxy runs are not comparably tuned, it can extrapolate the wrong frontier very cleanly.
 

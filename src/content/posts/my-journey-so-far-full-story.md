@@ -126,4 +126,4 @@ That transition—from a side project to a team—also changed my role. Moving f
 
 ## Looking Back
 
-> Looking back, the path is less a sequence of triumphs than a sequence of redirects. Failing the IIT exam changed where I studied. A collapsed GPA forced me to rebuild. A mailing mistake closed Germany and eventually opened the United States. Work that initially felt beyond me became a patent, then a route into autonomous driving. The common thread is not that every setback was secretly good. Some were simply painful. What mattered was learning to attach intensity to a problem I cared about, build enough skill to make the next attempt credible, and let small wins accumulate before confidence arrived.
+> **Deep insight.** The path was less a sequence of triumphs than a sequence of redirects: the IIT exam changed where I studied, a collapsed GPA forced a rebuild, and a mailing mistake eventually opened the United States. The transferable lesson is not that setbacks are secretly good; it is that a credible next attempt requires focused skill-building before confidence arrives.

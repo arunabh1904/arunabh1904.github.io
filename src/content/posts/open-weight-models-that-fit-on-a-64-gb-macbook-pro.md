@@ -69,12 +69,12 @@ DeepSeek V4 Flash is even clearer. Its official `0731` checkpoint is about `167 
 
 ## What I would run
 
-> For this `64 GB` M5 Max, my order is:
+For this `64 GB` M5 Max, my order is:
 
-> 1. Start with `Muse Glimmer 30B Q4_K_M` for a current local multimodal generalist.
-> 2. Start with `Ministral 3 14B Q4_K_M` when speed, context headroom, and application co-residency matter more than model scale.
-> 3. Evaluate `Granite 4.1 30B Q4_K_M` for text-heavy retrieval and tool workflows.
-> 4. Treat `Nemotron 3 Nano` as a community-quant experiment unless an official compressed artifact appears.
-> 5. Serve `Mistral Small 4` and `DeepSeek V4 Flash` elsewhere instead of turning SSD swap into an inference strategy.
+1. Start with `Muse Glimmer 30B Q4_K_M` for a current local multimodal generalist.
+2. Start with `Ministral 3 14B Q4_K_M` when speed, context headroom, and application co-residency matter more than model scale.
+3. Evaluate `Granite 4.1 30B Q4_K_M` for text-heavy retrieval and tool workflows.
+4. Treat `Nemotron 3 Nano` as a community-quant experiment unless an official compressed artifact appears.
+5. Serve `Mistral Small 4` and `DeepSeek V4 Flash` elsewhere instead of turning SSD swap into an inference strategy.
 
-> My earlier [Gemma 4 benchmark](/blog/2026/04/04/running-gemma-4-locally-on-a-64-gb-macbook-pro.html) remains relevant if Gemma is already working well. The point of this list is not to replace a stable model every release cycle. It is to make the current capacity boundary explicit: on a `64 GB` Mac, the practical sweet spot is still an official `8–20 GB` quant with enough remaining memory for the context and the application around it.
+> **Deep insight.** The practical limit on a `64 GB` Mac is not parameter count. It is the headroom left after weights for context and the surrounding application. That makes an official `8–20 GB` quant a better default than a larger model that pushes serving into swap.

@@ -31,7 +31,7 @@ A coding agent can search, inspect a repository, run a test, revise its plan, ca
 
 That changes what it means to be good at using AI for software. Most of us have not calibrated yet. We are still impressed by how much code an agent can produce when code is rapidly becoming the least scarce part of the system.
 
-> The scarce part is deciding what should exist.
+The scarce part is deciding what should exist.
 
 ## Context becomes the scarce input
 
@@ -137,7 +137,7 @@ _Agent manager — imagined by OpenAI ImageGen._
 
 Which one do you retain?
 
-> The answer says a great deal about where the profession is going. The future does not belong to whoever can generate the most code. Code is becoming abundant. The durable skill is understanding what should be built, why it should exist, what context matters, and how to marshal increasingly capable machines to build it well.
+> **Deep insight.** As code generation becomes abundant, the durable advantage moves upstream: deciding what should be built, why it should exist, what context changes the answer, and how to direct capable machines through the resulting constraints.
 
 Writing software was always about building. Code was a tool. Agents are tools too.
 
