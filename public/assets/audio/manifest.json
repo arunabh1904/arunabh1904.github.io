@@ -128,7 +128,7 @@
   "how-unified-sensor-models-are-built-for-autonomous-driving": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "55a094077c2b2e0c71a983b05c47e326e1c2535915131288e3b713273aeebb62",
+    "digest": "d3a17eba0792a3a6ec6aa1d9fbb33731052657a57bcdb6f6ae364943baeeb0ab",
     "file": "/assets/audio/blog/how-unified-sensor-models-are-built-for-autonomous-driving.mp3",
     "language": "English",
     "language_code": "english",
@@ -136,15 +136,17 @@
     "max_chars": 360,
     "max_tokens_per_char": 1.05,
     "min_generation_tokens": 128,
-    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-8bit",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-CustomVoice-8bit",
+    "narrator_seed": 1904,
     "retained_silence_duration": 0.06,
-    "sampling_seed_version": "per-post-chunk-v1",
+    "sampling_seed_version": "single-narrator-v2",
     "silence_threshold": 0.008,
     "speed": 1.0,
     "temperature": 0.05,
     "top_p": 0.9,
     "voice": "Ryan",
-    "voice_mode": "predefined-speaker-generated-only-v1"
+    "voice_instruct": "Use a calm, warm, measured technical-narration delivery. Keep a natural low-mid register, close-miked clarity, restrained emphasis, and steady pacing.",
+    "voice_mode": "custom-voice-fixed-profile-v2"
   },
   "my-journey-so-far-full-story": {
     "bitrate": "64k",
