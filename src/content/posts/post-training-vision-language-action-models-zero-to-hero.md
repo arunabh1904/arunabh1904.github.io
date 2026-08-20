@@ -20,7 +20,7 @@ This is why “make the pretrained model behave better” is an inadequate descr
 
 The right object is therefore not an optimizer. It is a closed-loop policy improvement system:
 
-> Base VLA → task SFT → deployment rollouts → failure mining → preference or reward supervision → policy optimization → real evaluation → redeployment.
+`Base VLA → task SFT → deployment rollouts → failure mining → preference or reward supervision → policy optimization → real evaluation → redeployment`
 
 The loop is the product. SFT, DPO, PPO, critics, and distillation are replaceable components inside it.
 
@@ -36,7 +36,7 @@ Neither prior guarantees that the deployed policy occupies familiar states. [DAg
 
 This is the first mental model to keep:
 
-> Supervised fine-tuning learns what to do in the states represented by its data. Interactive post-training changes which states become data.
+> **Deep insight.** Supervised fine-tuning learns what to do in the states represented by its data. Interactive post-training changes which states become data, which is why a small set of recovery trajectories can be worth more than a large set of already-successful demonstrations.
 
 That difference is why another million successful demonstrations may be worth less than ten thousand carefully selected recoveries.
 
@@ -216,7 +216,7 @@ Measure action error, chunk likelihood, critic accuracy, preference accuracy, re
 
 The staff-level metric sits above every level:
 
-> Reliable policy improvement per robot-hour, human-hour, annotation-hour, and unit of compute.
+The staff-level metric is reliable policy improvement per robot-hour, human-hour, annotation-hour, and unit of compute.
 
 ## Reproducible training loops
 

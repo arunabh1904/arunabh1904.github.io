@@ -91,7 +91,7 @@ Each row of $A$ says where one token looks; the corresponding row of $Y$ is that
 
 Consider the sentence:
 
-> “The animal did not cross the street because it was too tired.”
+“The animal did not cross the street because it was too tired.”
 
 When the model updates `it`, its query can ask for an animate antecedent compatible with being tired. `animal` offers a strong matching key and a useful value; `street` is nearby but semantically implausible; `tired` is not the antecedent but carries causal context. The output is not a hard pointer. It is a mixture whose largest contribution may come from `animal`, with additional information from the rest of the sentence.
 
@@ -485,14 +485,16 @@ Raschka's larger caveat is the right one: there is still no single matched-data,
 
 Attention still answers one question: for this output position, which sources match the current need, and what content should they contribute? The variants differ in where they pay for that answer.
 
-> - MHA pays for independent heads and full token-level memory.
-> - GQA and MQA reduce the number of cached K/V heads.
-> - MLA compresses the cached representation.
-> - Sliding-window and learned sparse attention reduce the positions examined.
-> - Linear and delta-rule methods replace an explicit token history with a fixed-size state.
-> - Hybrid models spend most layers on cheap memory updates and reserve some layers for stronger retrieval.
+- MHA pays for independent heads and full token-level memory.
+- GQA and MQA reduce the number of cached K/V heads.
+- MLA compresses the cached representation.
+- Sliding-window and learned sparse attention reduce the positions examined.
+- Linear and delta-rule methods replace an explicit token history with a fixed-size state.
+- Hybrid models spend most layers on cheap memory updates and reserve some layers for stronger retrieval.
 
 No variant dominates every regime. Full attention preserves exact access but grows expensive with context. Cache-sharing methods are simpler but reduce K/V capacity. Latent, sparse, and recurrent methods buy more efficiency with new approximation, tuning, kernel, or serving burdens. The right comparison is therefore not “which attention name is newest?” but “which bottleneck dominates this model, and which retrieval failure can it afford?”
+
+> **Deep insight.** Attention variants spend the same budget in different places: exact token retrieval, cache capacity, compressed memory, or fixed-size state. The right architecture follows the dominant bottleneck and the retrieval error the system can afford, not the newest name.
 
 ## References
 

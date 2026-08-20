@@ -18,7 +18,7 @@ Reinforcement learning for language models can look like a parade of acronyms. P
 
 The useful history is not the sequence of names. It is the sequence of compromises around one estimator:
 
-> Given behavior sampled from the current policy, what evidence should increase or decrease its probability, and relative to what baseline?
+The governing question is: given behavior sampled from the current policy, what evidence should increase or decrease its probability, and relative to what baseline?
 
 This essay follows that question from PPO through verifiable-reward reasoning and into VLA post-training. It is intentionally narrower than [Post-Training VLAs: A Reading Guide to Closed-Loop Improvement](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html). That guide covers the whole deployment loop: action interfaces, failure mining, feedback collection, critics, evaluation, and reproducibility. Here, those are held at the boundary. The subject is the update machinery itself—sampling distribution, advantage construction, likelihood ratio, and credit assignment.
 
@@ -261,7 +261,7 @@ PPO learns a critic so each action can be compared with expected return. DPO ass
 
 Reasoning models made GRPO powerful because prompts reset perfectly and verifiers are cheap. VLAs expose the limits because physical state does not reset cleanly, action likelihood may pass through diffusion, and a terminal bit is far from the causal motion. The transferable object is therefore not GRPO itself. It is the estimator-design discipline:
 
-> Sample where the policy will act, compare only what the environment makes comparable, and make feedback no coarser than the decision it is supposed to credit.
+> **Deep insight.** Sample where the policy will act, compare only what the environment makes comparable, and make feedback no coarser than the decision it is supposed to credit. This is the estimator-design constraint that transfers from reasoning RL to VLAs.
 
 That principle explains the past decade of policy optimization better than the acronym sequence—and gives VLA post-training a testable path beyond copying language-model RL.
 

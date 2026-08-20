@@ -110,7 +110,7 @@ describe('markdown authoring', () => {
     expect(offenders, 'Paper-note summaries should render as callouts.').toEqual([]);
   });
 
-  it('keeps Blog takeaways marked as callouts', async () => {
+  it('keeps one substantive, labeled deep insight in every Blog post', async () => {
     const postFiles = await fg('**/*.{md,mdx}', {
       cwd: postsDir,
       absolute: true,
@@ -119,12 +119,18 @@ describe('markdown authoring', () => {
     const offenders: string[] = [];
     for (const filePath of postFiles) {
       const source = await readFile(filePath, 'utf8');
-      if (/^section: blog$/m.test(source) && !/^> /m.test(source)) {
+      if (
+        /^section: blog$/m.test(source) &&
+        !/^> \*\*Deep insight\.\*\* .+/m.test(source)
+      ) {
         offenders.push(path.relative(projectRoot, filePath));
       }
     }
 
-    expect(offenders, 'Blog takeaways should render as callouts.').toEqual([]);
+    expect(
+      offenders,
+      'Blog callouts must contain a labeled, substantive deep insight.',
+    ).toEqual([]);
   });
 });
 

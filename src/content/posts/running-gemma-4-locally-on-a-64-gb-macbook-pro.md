@@ -141,14 +141,14 @@ The linked upstream issue #13460 is now closed, so this result should not be rea
 
 ## Recommendation
 
-> Within this measured snapshot, if I cared about the strongest local Gemma 4 model, I would start with `31B`.
+Within this measured snapshot, if I cared about the strongest local Gemma 4 model, I would start with `31B`.
 
-> If I cared about the model I would actually want to use every day on this machine, I would pay the closest attention to `26B A4B`.
+If I cared about the model I would actually want to use every day on this machine, I would pay the closest attention to `26B A4B`.
 
-> If I cared about the fastest usable runtime on this machine, the answer is no longer "obviously llama.cpp." These measurements point toward:
+If I cared about the fastest usable runtime on this machine, the answer is no longer "obviously llama.cpp." These measurements point toward:
 
-> 1. `MLX` first
-> 2. `llama.cpp` second
-> 3. `Ollama` only after a fresh compatibility run
+1. `MLX` first
+2. `llama.cpp` second
+3. `Ollama` only after a fresh compatibility run
 
-> If you do not want a terminal workflow, this maps cleanly to a tiny local browser chat app. Both `MLX` and `llama.cpp` are reasonable backends if the goal is simply to serve Gemma locally and talk to it.
+> **Deep insight.** The best model, the best daily model, and the best runtime are different optimization targets. The measurements favor `31B` for maximum local capability, `26B A4B` for daily use, and `MLX` for speed on this machine.

@@ -36,7 +36,7 @@ Interest is not the same as comfort. Work that teaches you something usually sit
 
 Serious research increasingly depends on the same coordination as serious engineering. The relevant skill is not simply being agreeable. It is keeping information and decisions moving across people who hold different pieces of the system.
 
-> My simplest rule is: do not block. Surface constraints early, give honest timing, and leave enough context for someone else to proceed. An explicit blocker can be routed or planned around; a hidden one quietly stalls several people at once.
+> **Deep insight.** Surface constraints early, give honest timing, and leave enough context for someone else to proceed. An explicit blocker can be routed or planned around; a hidden one silently stalls every dependent decision.
 
 Apply the same rule to yourself. Ask for help when someone else likely has the missing context. Do not spend days privately rediscovering an answer the team already knows. When the uncertainty is genuinely yours, step away long enough to stop repeating the same failed approach. A walk or a night's sleep often changes the representation of the problem, which is more useful than another hour of force.
 
