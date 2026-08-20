@@ -8,7 +8,7 @@ legacyPath: /blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-langua
 tags:
   - Research
   - Vision-Language Models
-summary: How vision-language models evolved from image-text alignment to robot action.
+summary: How visual representations change as the output contract moves from image-text alignment to generation, grounding, temporal reasoning, and robot action.
 ---
 
 # From Image-Text Alignment to Robot Actions
@@ -29,7 +29,7 @@ Do not read every paper with the same question. For alignment papers, identify t
 
 The recurring exercise is simple: draw the path from raw observation to evaluated output, then circle every irreversible compression step. That picture usually explains more than the model name.
 
-## 1. VLM architectures and interfaces
+## Five output contracts
 
 “Vision-language model” covers several systems with different outputs:
 
@@ -45,17 +45,19 @@ This table is the first defense against vague claims. A retrieval model can be e
 
 The shared implementation pattern is simple. An image is converted into visual tokens or features. A connector maps those features into a space that can interact with text. A loss then decides what “interaction” means: contrastive agreement, next-token prediction, region grounding, denoising, or action imitation.
 
-> The loss is the contract. Architecture matters because it decides which evidence remains available to satisfy that contract, so a change in prediction target can invalidate an otherwise successful representation.
+> **Deep insight:** The loss is the contract. The architecture decides which evidence survives long enough to satisfy it—and which evidence no later stage can recover.
 
-The comparison below keeps one mug-and-tray scene fixed. Only the evaluated output changes. Watch which evidence becomes mandatory rather than assuming every later model is simply a larger version of the first.
+The next comparison keeps one mug-and-tray scene fixed. Only the evaluated output changes. Watch which evidence becomes mandatory rather than assuming every later model is simply a larger version of the first.
 
 [![Animation showing how CLIP, LLaVA, Molmo, and Pi0 require progressively different visual evidence from the same scene](/assets/images/blog-vlm-evidence-contract.gif)](/assets/images/blog-vlm-evidence-contract.gif)
 
 *CLIP's contrastive objective can succeed with global semantic identity; it does not require an inspectable location. LLaVA projects visual features into a language model so they can condition generation. Molmo's point supervision makes a spatial binding externally testable. Pi0 adds temporally conditioned continuous action through a flow-based expert. The panels show output contracts, not a claim that one model literally evolves into the next. Custom explanatory synthesis based on [CLIP](https://arxiv.org/abs/2103.00020), [LLaVA](https://arxiv.org/abs/2304.08485), [Molmo](https://arxiv.org/abs/2409.17146), and [Pi0](https://arxiv.org/abs/2410.24164).*
 
-The progression is therefore not “more modalities.” It is a sequence of stricter information obligations. A global vector may identify the mug while discarding its handle location. A generative assistant needs enough visual tokens to support an answer but may still lack an explicitly supervised binding. Point grounding exposes the binding. Action raises the standard again: the representation must remain useful across changing observations and an embodiment-specific control deadline. Once an earlier compression removes that evidence, downstream fluency cannot reconstruct it.
+The progression is therefore not “more modalities.” It is a sequence of stricter information obligations. A global vector may identify the mug while discarding its handle location. A generative assistant needs enough visual tokens to support an answer but may still lack an explicitly supervised binding. Point grounding exposes the binding.
 
-## 2. Open-vocabulary image-text alignment
+Action raises the standard again. The representation must remain useful across changing observations and an embodiment-specific control deadline. Once an earlier compression removes that evidence, downstream fluency cannot reconstruct it.
+
+## Alignment
 
 Before large-scale image-text pretraining, a vision classifier typically learned a closed vocabulary. Its final layer represented the categories chosen by the dataset designer. Adding a new class meant collecting labels and training again.
 
@@ -78,7 +80,7 @@ The tradeoff sits inside the objective. Batch-softmax contrastive learning treat
 
 What retrieval pretraining does not provide is equally important. A shared embedding can tell us that an image and sentence belong together without preserving which patch supports which phrase, how objects relate spatially, or how to generate a multi-sentence answer. Global semantic alignment is a strong prior, not a complete visual interface.
 
-## 3. Visual instruction tuning
+## Generation
 
 [LLaVA](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html) made the next transition legible. Start with a pretrained visual encoder and an instruction-tuned language model. Learn a projector that maps visual features into the language model's token space. Then fine-tune on image-instruction-response examples.
 
@@ -117,7 +119,7 @@ This distinction explains why modern VLM recipes separate several data roles:
 
 The operational question is no longer “How many multimodal examples do we have?” It is “Which behavior does each dataset teach, and which capability regresses when we increase its weight?”
 
-## 4. Visual-token efficiency
+## The visual-token budget
 
 Text tokenization compresses language into a sequence of discrete symbols. Images do not arrive with an obvious equivalent. A $1024\times1024$ image can be divided into patches, encoded into a smaller feature grid, tiled at several resolutions, or compressed through a learned tokenizer. Every choice trades detail for sequence length: more visual tokens can preserve small objects and text but consume attention, memory, and latency; fewer tokens improve throughput but may create an irreversible perceptual bottleneck.
 
@@ -127,7 +129,7 @@ These systems differ in implementation, but they answer one shared question: **w
 
 A convincing comparison must therefore match more than parameter count. It should report visual tokens, input resolution, training and inference FLOPs, latency, and performance on tasks that isolate small text, counting, localization, and global scene reasoning. Otherwise, a “better architecture” may simply be buying more pixels.
 
-## 5. Visual grounding
+## Grounding
 
 A model can answer “the traffic light is red” for at least three reasons: it localized the light and read its state, it used a language prior about the scene, or it guessed from dataset regularities. Standard answer accuracy often fails to distinguish them.
 
@@ -145,7 +147,7 @@ This gives a useful hierarchy for evaluating visual evidence:
 
 The fifth level is the hardest and most revealing. If the answer remains unchanged after the traffic light is masked or its state is edited, the model's explanation was not causally grounded in that evidence.
 
-## 6. Video and temporal modeling
+## Time
 
 Video looks like “more images,” yet it changes the representation problem. Adjacent frames are highly redundant, important events can be brief, and the correct sampling rate depends on the question. Uniformly encoding every frame wastes context; aggressive sampling can delete the event.
 
@@ -162,7 +164,7 @@ For video VLMs, I would separate four tests:
 
 The first three measure temporal understanding. The fourth begins to test a model of action-conditioned worlds.
 
-## 7. VLMs for autonomous driving
+## Driving
 
 Autonomous driving compresses nearly every VLM weakness into one domain: small distant objects, geometry, rules, rare hazards, temporal prediction, uncertainty, and hard latency limits.
 
@@ -180,7 +182,7 @@ These designs should not be collapsed into “VLMs for driving.” They correspo
 
 My current read is that the strongest near-term use is hybrid. VLMs contribute semantic knowledge, intent understanding, rare-scenario interpretation, and supervision. Metric perception, motion forecasting, safety constraints, and high-rate control retain explicit structure. This is not an argument that end-to-end systems cannot work. It is a statement about evidence: fluent rationales and open-loop trajectory metrics do not yet establish reliable closed-loop control.
 
-## 8. Grounding-aware benchmarks
+## Benchmarks that force looking
 
 [DriveBench](/paper%20shorts/2025/01/01/are-vlms-ready-for-autonomous-driving-drivebench.html), [IDKB](/paper%20shorts/2024/09/01/can-lvlms-obtain-a-drivers-license-idkb.html), [TOD3Cap](/paper%20shorts/2024/03/01/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes.html), and [AutoTrust](/paper%20shorts/2024/12/01/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving.html) attack different versions of the same problem: plausible language can hide weak evidence use.
 
@@ -197,7 +199,7 @@ A benchmark that tests only final-answer agreement can reward memorized priors. 
 
 The practical implication is uncomfortable: a higher aggregate VLM score may be less valuable than a lower score with better calibration and causal grounding. Deployment cares about the shape of failure, not only its average frequency.
 
-## 9. VLMs for robotics
+## Action
 
 Robotics completes the transition from description to intervention. Once the model emits actions, its outputs change the next observation. Errors compound under the state distribution created by the policy itself.
 
@@ -217,7 +219,7 @@ A caption has no control frequency. An action does. A robot policy must fit sens
 
 This is where “language as a universal interface” reaches its limit. Language can carry task semantics. It does not make units, embodiment, contact dynamics, or control latency disappear.
 
-## 10. How to read a VLM paper
+## Read by contract
 
 I use six questions to avoid being carried away by a capability collage.
 
@@ -230,9 +232,9 @@ I use six questions to avoid being carried away by a capability collage.
 
 These questions turn a model paper into a decision record. If the answer to question four is “several things,” then the paper may demonstrate a strong recipe without identifying why it works. That is still useful, but it supports adoption more than causal understanding.
 
-## 11. Reading course
+## Reading course
 
-The list below is ordered by conceptual dependency. Each layer has a deliverable; without it, “reading the paper” too easily becomes collecting model names.
+The reading course is ordered by conceptual dependency. Each layer has a deliverable; without it, “reading the paper” too easily becomes collecting model names.
 
 **Layer 1: alignment.** Read [CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html) and [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html). Derive the two losses and write down the unit of competition. Your deliverable is a one-page note explaining how batch composition becomes part of the learning algorithm.
 
@@ -246,7 +248,7 @@ The list below is ordered by conceptual dependency. Each layer has a deliverable
 
 After these five layers, move to [Part II: Pretraining Multimodal Models for Robotics](/blog/2026/07/15/omni-model-pretraining-decisions.html). The VLM literature tells you what visual and semantic priors are available. The robotics literature asks which of those priors survive contact with embodiment.
 
-## The research thesis
+## A testable thesis
 
 VLM progress is a sequence of interface contracts. Contrastive learning made images addressable through language. Visual instruction tuning made that representation conversational. Grounding tried to reconnect fluent words to visible evidence. Video introduced persistence and compression. Driving and robotics exposed every shortcut because a plausible answer can become a bad physical decision.
 

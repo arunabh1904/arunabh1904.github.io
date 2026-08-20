@@ -1,5 +1,5 @@
 ---
-title: 'How Multimodal Robot Models Are Pretrained'
+title: 'What a Robot Learns Before It Acts'
 date: '2026-07-15T09:00:00.000Z'
 section: blog
 blogGroup: research-guides
@@ -9,14 +9,14 @@ tags:
   - Multimodal AI
   - Pretraining
   - Research Leadership
-summary: The key decisions behind pretraining multimodal robot policies.
+summary: How representations, robot data, action interfaces, objective mixtures, and scaling experiments determine a multimodal robot policy.
 ---
 
-# How Multimodal Robot Models Are Pretrained
+# What a Robot Learns Before It Acts
 
 A robot can inherit the word “drawer” from the internet. The internet does not tell it how a sticky drawer feels, how far a particular arm can reach, or what to do after the gripper slips. Multimodal pretraining works because semantic and motor experience can transfer. It fails when “put everything in one model” becomes a substitute for deciding what should transfer, through which parameters, and under what evidence.
 
-> The decisive choices arrive before the large run: representation, prediction target, data-accounting unit, and gradient allocation. A shared trunk can enable transfer while a high-volume modality quietly controls every update, so “one model” is not evidence of balanced learning.
+The hard choices arrive before the large run. An image can become patches, semantic features, discrete codes, or continuous latents. A robot trajectory can become per-axis bins, compressed action tokens, a diffusion target, or a flow field. A dataset mixture can be counted in examples, tokens, FLOPs, or gradient share; those allocations are not equivalent. A shared trunk can enable transfer while one high-volume modality quietly controls every update.
 
 This guide is about making those choices legible. Its central claim is that a VLA is not created by adding an action head to a VLM. It is created by combining three priors—semantic, visual, and motor—without letting the cheapest one erase the others.
 
@@ -24,7 +24,7 @@ This is Part II of the series. [Part I](/blog/2026/07/05/from-seeing-to-doing-th
 
 The scope is pretraining design, not a catalog of multimodal models. I use papers in two ways: reported experiments establish what happened inside a particular recipe; the decision tests, kill criteria, and preferred architecture are my synthesis. Keeping that boundary visible matters because multimodal papers often change the tokenizer, data, parameter count, and training budget together. A strong result can justify adopting a recipe without identifying which ingredient caused the gain.
 
-## Capability requirements
+## Capabilities
 
 “Multimodal” is not a capability. A contrastive encoder, visual assistant, image generator, video predictor, and robot policy can all consume images and text while solving different problems.
 
@@ -42,7 +42,7 @@ The contract determines what must be shared. [CLIP](/paper%20shorts/2021/02/28/l
 
 No architecture dominates those contracts for free. Before comparing models, write down which behavior must work zero-shot, which can be adapted with a small target dataset, which control rate is non-negotiable, and which regression would kill the program. A vague contract makes every later ablation look positive.
 
-## Robot data and web data
+## Robot data
 
 Internet data offers extraordinary breadth because images and text are cheap to copy. Robot trajectories are expensive, correlated, and attached to hardware. An hour of teleoperation contains the operator's habits, the controller's smoothing, the camera calibration, the reset procedure, and the parts of the state that happened to be logged. “More trajectories” can mean more task coverage, more embodiments, or simply more repetitions of one narrow behavior.
 
@@ -62,7 +62,7 @@ Cross-embodiment learning therefore needs an explicit interface contract. Which 
 
 The most useful dataset table is not trajectory count. It reports task entropy, scene entropy, embodiment coverage, operator coverage, success and recovery rates, control frequencies, action normalization, missing modalities, and effective unique windows after temporal overlap. Those quantities tell you what generalization the corpus can plausibly support.
 
-## Training representations
+## Training units
 
 Before choosing transformer depth, decide what counts as one training unit.
 
@@ -74,7 +74,7 @@ The unit determines sequence length, and sequence length determines attention co
 
 The first useful budget is therefore not “percentage of image data.” It is tokens or FLOPs per capability gain. A 10% video mixture can consume most of the compute if every clip expands into thousands of visual tokens.
 
-### Representations for understanding and generation
+### Understanding versus generation
 
 Understanding rewards invariance. A classifier should ignore texture changes that preserve object identity. Generation punishes lost detail. A tokenizer optimized for semantic invariance can be a poor reconstruction code; a pixel-faithful code can waste sequence budget on information irrelevant to reasoning.
 
@@ -91,7 +91,7 @@ Those designs are three answers to one question: where should modality specializ
 
 The kill experiment is matched compute and matched sequence length. If separate routes win only because they add parameters or visual tokens, the result is capacity, not reduced interference.
 
-## Cross-modal parameter sharing
+## Shared parameters
 
 Architectures often get labeled “early fusion” or “late fusion,” but the operational choices are more granular:
 
@@ -119,7 +119,7 @@ Every cell should report transfer under a matched compute budget, along with gra
 
 This is where [MM1](/paper%20shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html) is so useful. Its controlled studies suggest that image encoder quality, resolution, visual-token count, and data composition matter more than endlessly modifying the connector. That is an experiment-allocation result: sweep the variables with large causal leverage before polishing the bridge between them.
 
-## Multi-objective training
+## Objectives
 
 A unified transformer does not require a unified objective.
 
@@ -140,7 +140,7 @@ The figure makes the accounting problem concrete with an illustrative equal-exam
 
 *Equal sampled-example shares need not produce equal predicted units, FLOPs, or update norms. Video and action sequences expand differently before they reach shared parameters, so one percentage cannot describe the mixture. Custom explanatory synthesis informed by the controlled data and architecture studies in [MM1](https://arxiv.org/abs/2403.09611), [Scaling Laws for Generative Mixed-Modal Language Models](https://arxiv.org/abs/2301.03728), [Scaling Laws for Optimal Data Mixtures](https://arxiv.org/abs/2507.09404), and [Pi0](https://arxiv.org/abs/2410.24164). Values are illustrative, not paper-reported measurements.*
 
-The deepest error is treating a dataloader share as the amount of learning a modality receives. Sequence expansion decides how many targets are predicted. Representation and model path decide how much compute they consume. Gradient scale and alignment decide how strongly they move the shared trunk. A 10% video sample share can therefore dominate shared updates, while thousands of overlapping robot windows can look numerous without representing thousands of independent decisions.
+> **Deep insight:** A dataloader share is not a learning share. Sequence expansion sets the target count, the model path sets compute, and gradient alignment decides who moves the shared trunk.
 
 Normalize and log at three levels:
 
@@ -152,7 +152,7 @@ Then measure parameter-level conflict. If video gradients are ten times larger i
 
 This distinction becomes acute in robotics. Overlapping windows from one trajectory can produce thousands of training examples without thousands of independent decisions. A long action chunk can contribute many supervised dimensions while representing one correlated maneuver. The cleanest dashboard keeps four ledgers side by side: sampled examples, predicted units, consumed FLOPs, and update norm by module. A mixture is balanced only relative to a capability objective, not because its percentages sum to 100.
 
-## Data mixture design
+## Mixtures
 
 An omni corpus is not a pile of datasets. It is a sampling policy over modalities, domains, quality levels, sequence lengths, and training stages.
 
@@ -172,13 +172,13 @@ The proxy study should vary:
 
 Report uncertainty on extrapolated rankings, not only fitted loss. The expensive decision is whether candidate A will still beat candidate B at target scale. If confidence intervals overlap, the proxy run did not justify a nine-figure allocation.
 
-### Training curricula
+### Curriculum
 
 Data mixtures are often nonstationary. A model may first learn vision-language alignment, then high-resolution grounding, then video, then action. [VideoLLaMA 3](/paper%20shorts/2025/01/01/videollama-3-frontier-multimodal-foundation-models.html) uses strong image-text alignment as the base for video and compresses redundant temporal tokens. [PaliGemma](/paper%20shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html) upcycles resolution in stages. [Eagle 2](/paper%20shorts/2025/01/01/eagle-2-post-training-data-strategies-for-frontier-vision-language-models.html) shows how post-training ordering and curation can make a smaller VLM competitive.
 
 Order can reduce optimization difficulty, but it can also cause forgetting. A staged curriculum needs retention evals after every transition and a controlled comparison with an interleaved mixture under equal compute.
 
-## Video models and world models
+## Video is not a world model
 
 Video generation produces plausible futures. A world model preserves action-conditioned consequences. A policy chooses actions that achieve an outcome.
 
@@ -197,7 +197,7 @@ The evaluation contract must change when control enters. FID and visual preferen
 
 A model that produces a plausible door opening after any action is a video generator with weak conditioning, not a useful world model.
 
-## Action representations
+## Actions
 
 Actions change the data distribution, carry embodiment-specific units, and operate under a control deadline. Treating them as ordinary tokens hides those constraints behind a convenient interface.
 
@@ -218,7 +218,7 @@ The action-interface memo should compare:
 
 The pretraining question is which action prior should be learned across robots. The answer cannot be read from imitation loss alone. Reconstruct a short trajectory with each representation, compare spectral and contact-heavy errors, measure effective horizon and wall-clock control rate, and test whether a small target dataset can change the embodiment without erasing semantic transfer. The post-training question comes later: does the chosen distribution expose the likelihoods and responsiveness required by the improvement loop?
 
-## Testing scaling claims
+## Scaling claims
 
 A smooth curve is not the same as a causal law. Every scaling claim should name:
 
@@ -242,7 +242,7 @@ For every candidate architecture, write a kill criterion before the proxy runs:
 
 That habit converts paper reading into capital allocation.
 
-## Fault-tolerant training
+## Training failures
 
 Once the architecture and mixture are chosen, the research question becomes operational: can the training system preserve the intended experiment for months?
 
@@ -263,7 +263,7 @@ The runbook should cover:
 
 Every checkpoint must bind model state to optimizer, scheduler, data cursor, mixture policy, tokenizer, code commit, and evaluation config. A weight file without that lineage is not a recoverable experiment.
 
-## Proxy experiments before large runs
+## Proxy runs
 
 Before a massive run, build a 100M–1B prototype program with at least text prediction, image-text understanding, visual generation, and a lightweight video or action objective.
 
@@ -298,7 +298,7 @@ There is no single best order after the foundations. Choose a route based on the
 
 Then move to [Part III: Post-Training VLAs](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html). Pretraining decides what the policy can represent and which behaviors are nearby. Deployment reveals which nearby behaviors are actually useful.
 
-## The research thesis
+## A testable thesis
 
 The strongest multimodal robot model will probably not make every modality identical. It will share the parameters that benefit from transfer and specialize the interfaces where fidelity, time, geometry, and control impose different requirements.
 

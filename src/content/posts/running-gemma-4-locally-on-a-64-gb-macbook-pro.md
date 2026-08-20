@@ -9,13 +9,14 @@ tags:
   - LLMs
   - Apple Silicon
 summary: >-
-  MLX versus llama.cpp performance for Gemma 4 on a 64 GB M5 Max.
+  A dated comparison of MLX and llama.cpp latency for Gemma 4 on a 64 GB M5
+  Max, including why long-prompt prefill changes the recommendation.
 ---
 # Benchmarking Gemma 4 on a 64 GB MacBook Pro
 
 I wanted one concrete answer: on a 64 GB M5 Max MacBook Pro, which Gemma 4 model should I actually run locally, and through which runtime?
 
-The measurements below are a hardware-and-software snapshot from April 4, 2026, not a permanent runtime leaderboard. Google subsequently released Gemma 4 12B Unified on June 3, so that model is outside this benchmark. I also have not rerun the earlier Ollama failure on current releases.
+These measurements are a hardware-and-software snapshot from April 4, 2026, not a permanent runtime leaderboard. Google subsequently released Gemma 4 12B Unified on June 3, so that model is outside this benchmark. I also have not rerun the earlier Ollama failure on current releases.
 
 Within the measured snapshot:
 
@@ -90,9 +91,11 @@ The animation keeps the model/runtime rows fixed while the input grows from `512
 
 [![Animation comparing short- and long-prompt time to first token and decode throughput for Gemma 4 on MLX and llama.cpp](/assets/images/local-gemma-long-prompt-latency.gif)](/assets/images/local-gemma-long-prompt-latency.gif)
 
-*Long prompts expose prefill as the practical bottleneck. The `31B` weights fit, but TTFT rises to `13.5 s` on MLX and `24.2 s` on llama.cpp in the measured long suite. `26B A4B` retains roughly `100 tok/s` decode while reaching the first token much sooner. Custom visualization of the benchmark tables below; measurements are from one 64 GB M5 Max on April 4, 2026.*
+*Long prompts expose prefill as the practical bottleneck. The `31B` weights fit, but TTFT rises to `13.5 s` on MLX and `24.2 s` on llama.cpp in the measured long suite. `26B A4B` retains roughly `100 tok/s` decode while reaching the first token much sooner. Custom visualization of this post's benchmark tables; measurements are from one 64 GB M5 Max on April 4, 2026.*
 
 This is the distinction the memory table cannot show. Capacity answers whether a model can load. Decode throughput answers how quickly it continues once generation has started. Prefill latency answers whether an `8K` document or agent state feels interactive at all. For daily use, the last quantity makes `26B A4B` a different product from `31B` even though both fit comfortably.
+
+> **Deep insight:** Local inference has three thresholds: load, start, and continue. Weight memory controls the first; prefill controls the second; decode throughput controls the third.
 
 ### Short-context results
 
@@ -124,7 +127,7 @@ MLX wins the small-model tests by a healthy margin. `26B A4B` is the exception t
 
 `31B` changes the model choice more than the runtime choice. It fits comfortably, but its long-prompt TTFT is roughly six times the `26B A4B` MLX result and more than seven times the corresponding llama.cpp result. MLX is still better behaved, yet the larger conclusion is that “weights fit” and “this feels good to use” are separate thresholds.
 
-## Ollama failure in the measured setup
+## The measured Ollama failure
 
 I wanted a clean Ollama column here. I could not get one.
 
@@ -151,4 +154,4 @@ If I cared about the fastest usable runtime on this machine, the answer is no lo
 2. `llama.cpp` second
 3. `Ollama` only after a fresh compatibility run
 
-> The best model, the best daily model, and the best runtime are different optimization targets. The measurements favor `31B` for maximum local capability, `26B A4B` for daily use, and `MLX` for speed on this machine.
+If you do not want a terminal workflow, this maps cleanly to a tiny local browser chat app. Both `MLX` and `llama.cpp` are reasonable backends if the goal is simply to serve Gemma locally and talk to it.

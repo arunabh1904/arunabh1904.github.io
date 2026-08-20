@@ -8,8 +8,8 @@ legacyPath: /build intuition/2025/05/25/attention-mechanisms-demystified.html
 tags:
   - Other
 summary: >-
-  How attention retrieves, compresses, sparsifies, and carries context—with
-  runnable PyTorch.
+  How attention evolved from explicit token retrieval to shared, compressed,
+  sparse, and recurrent memory, with efficient PyTorch implementations.
 ---
 import PythonPlayground from '../../components/PythonPlayground';
 import { attentionMechanismsPlayground } from '../../lib/python-playground-examples';
@@ -59,7 +59,7 @@ $$
 
 ![Figure 2 from Attention Is All You Need, showing scaled dot-product attention and parallel attention heads](/assets/images/attention-paper-figure-2-scaled-dot-product-and-multi-head.png)
 
-*Figure 2 puts the operations in dependency order: compare queries with keys, scale and normalize the scores, then mix values. The right panel repeats that operation across learned projections before concatenating the results. Source: [Attention Is All You Need](https://arxiv.org/abs/1706.03762), Figure 2.*
+*Figure 2 puts the operations in dependency order: compare queries with keys, scale and normalize the scores, then mix values. Its multi-head diagram repeats that operation across learned projections before concatenating the results. Source: [Attention Is All You Need](https://arxiv.org/abs/1706.03762), Figure 2.*
 
 Each term has one job:
 
@@ -91,7 +91,7 @@ Each row of $A$ says where one token looks; the corresponding row of $Y$ is that
 
 Consider the sentence:
 
-“The animal did not cross the street because it was too tired.”
+> “The animal did not cross the street because it was too tired.”
 
 When the model updates `it`, its query can ask for an animate antecedent compatible with being tired. `animal` offers a strong matching key and a useful value; `street` is nearby but semantically implausible; `tired` is not the antecedent but carries causal context. The output is not a hard pointer. It is a mixture whose largest contribution may come from `animal`, with additional information from the rest of the sentence.
 
@@ -102,13 +102,13 @@ When the model updates `it`, its query can ask for an animate antecedent compati
 | `cross` | Relevant event but not an antecedent | Event context |
 | `tired` | Explains the causal relation | Semantic clue |
 
-In a decoder-only model, a causal mask removes future positions before softmax. The retrieval rule stays the same; the mask changes which keys are admissible. Self-attention also has no built-in sense of token order, so positional encodings such as RoPE must supply that structure. Run the small example below, then step through the raw scores, normalized weights, and mixed value vector.
+In a decoder-only model, a causal mask removes future positions before softmax. The retrieval rule stays the same; the mask changes which keys are admissible. Self-attention also has no built-in sense of token order, so positional encodings such as RoPE must supply that structure. The interactive example that follows exposes the raw scores, normalized weights, and mixed value vector.
 
 <PythonPlayground client:visible {...attentionMechanismsPlayground} />
 
 ## Efficient PyTorch implementation
 
-The equations above are useful for reasoning, but a production implementation should not explicitly build the $T\times T$ score matrix, apply softmax, and save the full probability matrix in high-bandwidth memory. PyTorch's [`scaled_dot_product_attention`](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention) keeps the same semantics while dispatching to an appropriate backend, including fused attention kernels when the device, dtype, and tensor layout support them.
+The explicit equations are useful for reasoning, but a production implementation should not build the $T\times T$ score matrix and save the full probability matrix in high-bandwidth memory. PyTorch's [`scaled_dot_product_attention`](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention) keeps the same semantics while dispatching to an appropriate backend, including fused attention kernels when the device, dtype, and tensor layout support them.
 
 The complete causal multi-head block is therefore short. The projections produce `[batch, time, 3 * d_model]`; reshaping exposes the head axis expected by SDPA; `is_causal=True` applies the autoregressive mask without allocating a dense mask in Python.
 
@@ -155,7 +155,7 @@ class CausalSelfAttention(nn.Module):
 # attn = torch.compile(CausalSelfAttention(d_model=1024, n_heads=16))
 ```
 
-Three details carry most of the performance. The combined QKV projection reduces kernel launches; the head dimension remains the innermost contiguous dimension; and SDPA avoids a Python-level sequence of matmul, mask, softmax, dropout, and matmul operations. PyTorch selects the backend automatically, so forcing FlashAttention should be a diagnostic or benchmarking choice rather than a default. The dropout argument also requires care: SDPA applies dropout whenever `dropout_p` is nonzero, so evaluation must pass `0.0` explicitly as the module does above.
+Three details carry most of the performance. The combined QKV projection reduces kernel launches; the head dimension remains the innermost contiguous dimension; and SDPA avoids a Python-level sequence of matmul, mask, softmax, dropout, and matmul operations. PyTorch selects the backend automatically, so forcing FlashAttention should be a diagnostic or benchmarking choice rather than a default. The dropout argument also requires care: SDPA applies dropout whenever `dropout_p` is nonzero, so evaluation must pass `0.0` explicitly as this module does.
 
 ## Multi-head and cross-attention
 
@@ -170,9 +170,9 @@ Cross-attention changes the source rather than the scoring rule. Queries come fr
 | Cross-attention | One sequence or modality | Another sequence, modality, or memory | Retrieve external evidence |
 | Multi-head attention (MHA) | Several projected query heads | Separate K/V projections per head | Learn multiple routing patterns in parallel |
 
-These labels describe where information comes from and how many projections are used. Modern variants below change different axes, so a model can use causal self-attention, GQA, and sliding windows simultaneously without contradiction.
+These labels describe where information comes from and how many projections are used. The next variants change different axes, so a model can use causal self-attention, GQA, and sliding windows simultaneously without contradiction.
 
-## Attention variants by bottleneck
+## Change the bottleneck
 
 Full multi-head attention stores a key and value for every previous token and every KV head. During prefill, the model computes a logically dense $T\times T$ pattern of token interactions. During cached autoregressive decoding, one new query reads an ever-growing KV cache, so each step scales linearly with the existing context and cache storage also grows with context length. FlashAttention improves how dense attention moves data and avoids materializing the full matrix in slow memory; it does not remove the underlying all-pairs arithmetic of dense prefill.
 
@@ -187,7 +187,7 @@ That cost created several distinct design families:
 | Layer composition | Hybrid attention | Alternate cheap recurrent/local mixers with periodic full attention | Better efficiency-quality balance, more system complexity |
 | Output control | Gated attention | Scale retrieved features before the residual update | More control and stability, little change to core attention cost |
 
-The table is the map: these methods are not one flat list because they solve different problems. The comparison below holds the incoming token sequence fixed and changes only the representation retained for future queries. Watch what is still individually addressable after each write.
+The table is the map: these methods are not one flat list because they solve different problems. The next comparison holds the incoming token sequence fixed and changes only the representation retained for future queries. Watch what is still individually addressable after each write.
 
 [![Animation comparing the memory retained by multi-head attention, grouped-query attention, multi-head latent attention, and Gated DeltaNet](/assets/images/blog-attention-memory.gif)](/assets/images/blog-attention-memory.gif)
 
@@ -195,7 +195,9 @@ The table is the map: these methods are not one flat list because they solve dif
 
 The irreversible choice is the memory carrier. GQA preserves token-addressable K/V vectors but reduces how many independent copies exist. MLA keeps a token-indexed cache but compresses each token through learned latent projections. Delta-rule models stop retaining a token-indexed history at all: later writes share finite state, so targeted update and forgetting become part of retrieval quality. A hybrid does not erase that distinction; it spends most layers on bounded memory and inserts occasional layers that can still inspect explicit positions.
 
-### Multi-query and grouped-query attention
+> **Deep insight:** Attention variants are memory policies. Each one decides what remains addressable after a write, and its characteristic failure follows from what that policy discards.
+
+### Share the cache
 
 Standard MHA gives every query head its own key and value heads. Multi-query attention (MQA) takes the most aggressive sharing choice: all query heads use one K/V set. Grouped-query attention (GQA) lies between MHA and MQA, with groups of query heads sharing K/V projections.
 
@@ -205,7 +207,7 @@ Standard MHA gives every query head its own key and value heads. Multi-query att
 
 The benefit appears during inference. Reducing the number of KV heads reduces the cache stored per token and the memory traffic required to read it, while leaving the surrounding decoder architecture close to standard attention. The trade-off is a spectrum: MHA preserves the most independent K/V capacity, MQA compresses most aggressively, and GQA chooses an intermediate point that often retains more modeling quality.
 
-PyTorch's SDPA accepts different query-head and KV-head counts through `enable_gqa=True`. The implementation below keeps the K/V tensors at `n_kv_heads`; it does not manually repeat them to the query-head count, which would erase much of the memory-traffic advantage.
+PyTorch's SDPA accepts different query-head and KV-head counts through `enable_gqa=True`. The following implementation keeps the K/V tensors at `n_kv_heads`; it does not manually repeat them to the query-head count, which would erase much of the memory-traffic advantage.
 
 ```python
 class GroupedQueryAttention(nn.Module):
@@ -280,7 +282,7 @@ def gqa_decode_step(q, k, v, k_cache, v_cache, position: int):
 
 For `n_query_heads=32` and `n_kv_heads=8`, four query heads share each stored K/V head, so the K/V portion of the cache is one quarter of the corresponding 32-head MHA cache. The decode helper also preallocates and updates that cache rather than calling `torch.cat` every step, which would repeatedly copy the growing prefix. Current PyTorch documentation still labels native GQA support experimental and lists backend constraints; confirm the target device and version instead of silently expanding K/V heads as a fallback.
 
-### Multi-head latent attention
+### Compress the cache
 
 Multi-head latent attention (MLA), introduced with DeepSeek-V2, attacks the same cache bottleneck differently. GQA stores fewer full K/V heads; MLA stores a lower-dimensional latent representation and reconstructs the state needed by attention. This makes MLA a learned cache-compression mechanism embedded inside the layer.
 
@@ -288,7 +290,7 @@ The distinction matters operationally. GQA is relatively simple and widely suppo
 
 DeepSeek-V2's ablations provide one useful but bounded comparison. In that model family, the authors report that their GQA and MQA variants underperformed MHA, while the tuned MLA configuration slightly exceeded MHA with a much smaller cache. That result supports MLA as a viable learned compression scheme; it does not establish that MLA will beat GQA at smaller scales, under a different training recipe, or on hardware without an optimized MLA path.
 
-### Sliding-window and sparse attention
+### Read fewer positions
 
 Sliding-window attention (SWA) keeps only a fixed local neighborhood visible in selected layers. It changes the number of positions examined, not the representation stored for each position. Architectures often mix local layers with periodic global layers so information can still travel across a long sequence. SWA also composes naturally with GQA: the window reduces how many tokens a layer reads, while grouping reduces how much K/V state each token contributes.
 
@@ -329,7 +331,7 @@ y = flex_attention(q, k, v, block_mask=block_mask)
 
 The mask function is the policy; the block mask is the execution plan. This separation is what lets a readable four-line causal-window rule become block-sparse work instead of dense attention followed by discarded scores. FlexAttention remains a prototype API, so pin and test the PyTorch version when using it in training or serving code.
 
-### Gated attention
+### Gate the retrieved state
 
 Gated full attention keeps the softmax lookup and adds a query-dependent gate to the retrieved features before the output projection. For one head, the update is
 
@@ -356,7 +358,7 @@ def gated_causal_sdpa(q, k, v, gate_logits, dropout_p=0.0):
 
 Raschka's Qwen example places this output gate alongside zero-centered QK-Norm and partial RoPE. Those two choices alter score normalization and positional encoding; they are useful co-designs, not parts of the definition of gating. Keeping the axes separate explains why an architecture can combine gated full attention with GQA, MLA, or a local window.
 
-### Linear attention
+### Replace history with state
 
 Linear attention changes the memory representation more radically. Softmax is applied after $QK^\top$, which couples every query to every key. Kernelized linear attention applies a feature map $\phi$ to queries and keys separately, allowing the multiplication to be reassociated. Instead of retaining every K/V pair, the model can update fixed-size running statistics such as
 
@@ -390,7 +392,7 @@ $$
 
 The write strength $0\leq\beta_t\leq1$ determines how strongly the new association replaces the old one. Gated DeltaNet adds a decay factor before this targeted correction, giving the model two distinct controls: decay weakens existing memory broadly, while the delta rule repairs the association addressed by the current key. Kimi Delta Attention makes the decay finer-grained by moving from one scalar per head toward channel-wise control over the recurrent state.
 
-The recurrent form is easiest to see one decode step at a time. With the positive feature map $\phi(x)=\operatorname{ELU}(x)+1$, the code below updates $S_t$ and $z_t$ without retaining a token-length dimension. It is vectorized over batches and heads, and `torch.compile` can fuse its pointwise and contraction graph on supported backends.
+The recurrent form is easiest to see one decode step at a time. With the positive feature map $\phi(x)=\operatorname{ELU}(x)+1$, the following code updates $S_t$ and $z_t$ without retaining a token-length dimension. It is vectorized over batches and heads, and `torch.compile` can fuse its pointwise and contraction graph on supported backends.
 
 ```python
 @torch.compile
@@ -416,7 +418,7 @@ def linear_attention_step(q, k, v, state, normalizer, eps=1e-6):
     return y, state, normalizer
 ```
 
-This recurrence has constant state size with respect to context length, but it is not a drop-in numerical approximation to every trained softmax-attention model: the feature map changes the retrieval rule, and the state still scales with key dimension times value dimension. During full-sequence training, a production implementation uses a fused associative scan or recurrent kernel rather than calling this Python function in a token loop. The step function is most faithful as a map of the state update and as a compact decode prototype.
+This recurrence has constant state size with respect to context length. It is not a drop-in approximation to every trained softmax-attention model: the feature map changes retrieval, and the state still scales with key dimension times value dimension. During full-sequence training, a production implementation uses a fused associative scan or recurrent kernel rather than calling this Python function in a token loop. The step function is most faithful as a map of the state update and as a compact decode prototype.
 
 The same vectorized shape supports a Gated DeltaNet-style decode step. This educational version uses one learned decay and write strength per head; Kimi Delta Attention's channel-wise decay requires a richer parameterization and a specialized kernel.
 
@@ -450,11 +452,11 @@ def gated_delta_net_step(q, k, v, state, log_decay, write_logits):
 
 Decode is naturally recurrent; prefill must expose parallel matrix work. Yang et al. derive a mathematically equivalent chunkwise algorithm by representing the cumulative state transitions as products of generalized Householder matrices. Tokens within each chunk become batched matrix operations, while a smaller recurrence carries state between chunks. Chunk size therefore changes the execution schedule and hardware utilization, not the DeltaNet retrieval rule. Their Triton implementation reported increasing speedups over a recurrent kernel as sequence length and head dimension grew, which is why a production prefill path should use a fused chunkwise kernel rather than a Python token loop.
 
-### Hybrid attention stacks
+### Mix cheap memory with exact retrieval
 
 Fixed-size recurrent memory is efficient but necessarily capacity-limited. Modern hybrid architectures therefore use cheap sequence mixers for most layers and periodically restore a full or compressed softmax-attention layer. Qwen-style hybrids combine runs of Gated DeltaNet with gated full attention; other systems substitute Lightning Attention or Mamba-style state-space blocks. Ali's Kimi K3 account gives the ratio a concrete form: 23 four-layer groups, each with three Kimi Delta Attention layers followed by one gated MLA layer.
 
-The Gated DeltaNet paper shows the same design choice at two scales: the left and center stacks interleave recurrent modules with sliding-window attention, while the right panel opens the Gated DeltaNet block into its query, key, value, update, and output-gate paths.
+The Gated DeltaNet paper shows the same design choice at two scales. Its H1 and H2 stacks interleave recurrent modules with sliding-window attention; the block diagram then exposes the query, key, value, update, and output-gate paths.
 
 ![Gated DeltaNet hybrid stacks and the internal gated delta-rule block](/assets/images/attention-hybrid-gated-deltanet.png)
 
@@ -468,7 +470,7 @@ Attention Residuals changes a different axis: depth rather than token position. 
 
 This is the modern endpoint of the history. The original RNN bottleneck motivated direct retrieval from an explicit sequence; current long-context systems reintroduce compressed recurrent memory for efficiency, then retain selective attention layers because exact retrieval still matters.
 
-### Evidence and comparison limits
+### What the evidence supports
 
 The most useful empirical results compare one mechanism against a nearby alternative inside the same training recipe. They should not be read as a universal leaderboard across attention families.
 
@@ -481,7 +483,7 @@ The most useful empirical results compare one mechanism against a nearby alterna
 
 Raschka's larger caveat is the right one: there is still no single matched-data, matched-compute study that trains GQA, MLA, sparse attention, gated attention, recurrent memory, and their hybrids under one controlled recipe. Kernel maturity also changes observed throughput. A theoretically cheaper hybrid can lose to conventional GQA on a local system if its recurrent or latent-attention path lacks an optimized kernel.
 
-## What attention variants change
+## Choose the failure you can afford
 
 Attention still answers one question: for this output position, which sources match the current need, and what content should they contribute? The variants differ in where they pay for that answer.
 
@@ -493,8 +495,6 @@ Attention still answers one question: for this output position, which sources ma
 - Hybrid models spend most layers on cheap memory updates and reserve some layers for stronger retrieval.
 
 No variant dominates every regime. Full attention preserves exact access but grows expensive with context. Cache-sharing methods are simpler but reduce K/V capacity. Latent, sparse, and recurrent methods buy more efficiency with new approximation, tuning, kernel, or serving burdens. The right comparison is therefore not “which attention name is newest?” but “which bottleneck dominates this model, and which retrieval failure can it afford?”
-
-> Attention variants spend the same budget in different places: exact token retrieval, cache capacity, compressed memory, or fixed-size state. The right architecture follows the dominant bottleneck and the retrieval error the system can afford, not the newest name.
 
 ## References
 

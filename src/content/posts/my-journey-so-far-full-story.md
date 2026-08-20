@@ -1,5 +1,5 @@
 ---
-title: 'How I Found My Way Into Robotics'
+title: 'The Long Way Into Robotics'
 date: '2025-02-08T05:00:00.000Z'
 section: blog
 blogGroup: essays
@@ -8,10 +8,11 @@ legacyPath: /blog/2025/02/08/my-journey-so-far-full-story.html
 tags:
   - Other
 summary: >-
-  How failure, projects, graduate school, and industry led me into robotics.
+  How failure, depression, hands-on projects, graduate school, DEKA, and Zoox
+  shaped my path into robotics and autonomous driving.
 ---
 
-# How I Found My Way Into Robotics
+# The Long Way Into Robotics
 
 In 2023, I gave [this interview](https://theinterviewportal.com/2024/01/21/perception-roboticist-interview/) about how I became a robotics engineer focused on perception. Looking back, the interview mostly captured the wins. It did not say much about the missteps, low points, and strange detours that shaped the path just as much. This is the fuller version, starting from the beginning.
 
@@ -19,17 +20,21 @@ In 2023, I gave [this interview](https://theinterviewportal.com/2024/01/21/perce
 
 I grew up in Jaipur, a city that shaped much of my early life. I lost my father when I was 5, but my mother and sisters surrounded me with so much love that I never felt like I was missing anything. I was still deeply introverted, and I escaped into games like DOTA and DOTA 2. I logged around **16,000** hours and even reached the **#16 rank in India** at one point. That obsession helped me cope, but it also taught me something useful: the same intensity, pointed at the real world, could probably take me somewhere. That realization eventually pulled me out of my shell and pushed me toward the US.
 
-Most of my schooling was in Jaipur, and like many aspiring engineers, I spent three intense years in Kota preparing for the JEE. Kota is often described as a **factory** ([Netflix show](https://www.netflix.com/title/81249783) / [Wiki](https://en.wikipedia.org/wiki/Kota_Factory)), and that description is not far off. The city runs on academic competition. It is also a perfect breeding ground for [Girard's mimetic theory of desire](https://en.wikipedia.org/wiki/Mimetic_theory), where students absorb each other's ambitions and anxieties until it becomes hard to tell what you actually want. Despite working hard, I did not clear the IIT exam. At 18, that failure felt crushing, like I had let everyone down after years of preparation. Even now, at 33, the memory still makes my body tense up.
+Most of my schooling was in Jaipur, and like many aspiring engineers, I spent three intense years in Kota preparing for the JEE. Kota is often described as a **factory** ([Netflix show](https://www.netflix.com/title/81249783) / [Wiki](https://en.wikipedia.org/wiki/Kota_Factory)), and that description is not far off. The city runs on academic competition. It is also a perfect breeding ground for [Girard's mimetic theory of desire](https://en.wikipedia.org/wiki/Mimetic_theory), where students absorb each other's ambitions and anxieties until it becomes hard to tell what you actually want.
+
+Despite working hard, I did not clear the IIT exam. At 18, that failure felt crushing, like I had let everyone down after years of preparation. Even now, at 33, the memory still makes my body tense up.
 
 The lesson was not simply to work harder. I had already worked hard in Kota. I had to learn that effort can still end in failure, that a failure can feel physically real without becoming a permanent verdict, and that an absorbing escape like DOTA can be both refuge and trap. Resilience began to mean choosing what to do after the result, not denying how much the result hurt.
 
-## Undergrad at MIT Manipal
+## MIT Manipal
 
 I stayed back an extra year, prepared again, and eventually got accepted to MIT, Manipal. It was not an IIT, but it was a solid engineering school, and I had a chance to reset. I did not use that chance immediately. I stayed in my introverted shell, played even more DOTA, often 6-8 hours a day, and picked up smoking cigarettes, which is still the worst habit I have ever had. I skipped many classes during my first two years, and at one point my cumulative GPA was 0.74, not out of 4, but out of 10.
 
 Seeing 0.74 on my report card broke something inside me, but in a useful way. It was a wake-up call. I started going to class, made a few new friends, and began working seriously. I stopped missing lectures, stayed over the summer, and put in the kind of effort I had once reserved for games. By the end of my third year, I had raised my GPA from 0.74 to 7.8. I kept pushing, eventually earned the highest marks in the toughest subject in the course, and got a recommendation for grad school from the head of the department.
 
-My undergrad degree was in Mechatronics Engineering. The theory was fine, but the projects were what pulled me in. That is where I got my first real taste of robotics. In my final year, a couple of friends and I built an areca-nut harvesting robot for our thesis. Areca nut trees are about 30 feet tall, and many harvesters in India climb them by hand. The work is dangerous and causes accidents and fatalities every year. We wanted to make harvesting safer, so we built a rough prototype that could climb the tree and cut the nuts while being controlled with a PlayStation controller.
+My undergrad degree was in Mechatronics Engineering. The theory was fine, but the projects pulled me in. That is where I got my first real taste of robotics.
+
+In my final year, a couple of friends and I built an areca-nut harvesting robot for our thesis. Areca nut trees are about 30 feet tall, and many harvesters in India climb them by hand. The work is dangerous and causes accidents and fatalities every year. We wanted to make harvesting safer, so we built a rough prototype that could climb the tree and cut the nuts while being controlled with a PlayStation controller.
 
 In a bit of a comical twist, we accidentally broke the robot just before filming our final video. So, in a moment of resourcefulness, we filmed it descending the tree, then reversed the footage in editing, and submitted it as our final presentation. We ended up getting an A!
 
@@ -42,13 +47,11 @@ Undergrad changed my direction because the late start still compounded. The GPA 
 
 ## Depression
 
-I think it is as important to acknowledge the lows as it is to celebrate the highs. The lows often teach more, if you can look at them honestly. After college, I went through a period of depression. It was not easy. Depression is better understood in India today than it was a decade ago, but at the time people around me often had no language for it. More than once, when I said I did not feel like getting up or leaving my room, someone told me, "Just take a cold shower; you'll be fine." I wish I could have explained what was happening inside: my brain felt like it was on fire, I felt like screaming from the inside, and I could not see a way out. I am sharing this because someone reading it may need to know they are not alone.
+After college, I went through depression. It is better understood in India today than it was a decade ago, but people around me often had no language for it. More than once, when I said I did not feel like getting up or leaving my room, someone told me, "Just take a cold shower; you'll be fine." I wish I could have explained what was happening inside: my brain felt like it was on fire, I felt like screaming from the inside, and I could not see a way out. I am sharing this because someone reading it may need to know they are not alone.
 
-So, here goes...
+After graduation, I had my heart set on pursuing a master's degree in Germany. The education was free, and many of my friends were heading there—naturally, it seemed like the best reason to go. I returned to Jaipur for what was supposed to be a brief stay, with one goal: apply to colleges in Germany and leave within six months. I took the GRE, prepared my applications, and applied to a few universities, including an ultra-safe option to ensure I'd get in. When the day came, I mailed all five applications together, confident about my future.
 
-After graduation, I had my heart set on pursuing a master's degree in Germany. The education was free, and many of my friends were heading there - naturally, it seemed like the best reason to go. I returned to Jaipur for what was supposed to be a brief stay, with one goal: apply to colleges in Germany and leave within six months. I took the GRE, prepared my applications, and applied to a few universities, including an ultra-safe option to ensure I'd get in. When the day came, I mailed all five applications together, confident about my future.
-
-A month later, I was anxiously waiting for the results. Then, I received an email from my safe school. I opened it, expecting good news, only to read that I was being rejected for missing documents. To my horror, I realized I had accidentally sent the documents meant for the safe school to another university. Slowly, the rejection emails from all five universities trickled in, and the reality set in - I wasn't going to Germany.
+A month later, I was anxiously waiting for the results. Then, I received an email from my safe school. I opened it, expecting good news, only to read that I was being rejected for missing documents. To my horror, I realized I had accidentally sent the documents meant for the safe school to another university. Slowly, the rejection emails from all five universities trickled in, and the reality set in—I wasn't going to Germany.
 
 ![The missing-documents rejection notice that exposed my application mix-up](/assets/images/tuhh.png)
 _The rejection notice that exposed the document mix-up across my German university applications. Source: personal archive._
@@ -65,13 +68,17 @@ I was accepted into three schools. I still remember rereading the first acceptan
 
 Recovery did not arrive as one clean insight. Friends changed my immediate environment, loss changed my sense of time, and robotics supplied a direction concrete enough to act on. Purpose did not make depression trivial; it made the next application, course, or volunteer shift easier to choose. The application mix-up also left me with a practical habit I still keep: verify the mundane details and preserve a backup path, because an administrative error can be as consequential as an academic one.
 
-## Graduate school at Mines
+## Colorado School of Mines
 
 In 2016, I moved to the United States for a Master's degree in Robotics at the Colorado School of Mines (CSM). CSM is a relatively small STEM school, but the program was demanding. During the first few months I felt out of place. The culture was new, the academic environment was unfamiliar, and even the classroom style felt different. As an introvert, the adjustment was hard. Over time, I found my rhythm and began to genuinely enjoy learning.
 
-Before the start of the semester, I looked for on-campus opportunities to become self-reliant as soon as possible. I was persistent in checking the listing board and eventually landed a teaching assistant position. As a TA, I assisted the professor in grading and administrative tasks. It wasn't the most educational role, but it served its purpose. I was also intentional about my goals for the grad program. I knew I wanted to explore robotics and learn how to code, so I tailored my coursework accordingly. I worked hard in my first semester and took a challenging robotics course with Dr. Andrew Petruska, a new professor who was instrumental in building the robotics program at Mines. By excelling in his course, I secured a research assistant position in his lab.
+Before the semester started, I looked for on-campus work so I could become self-reliant. I checked the listing board persistently and eventually landed a teaching assistant position. The grading and administrative work was not especially educational, but the job served its purpose.
 
-In my second semester, I joined Dr. Petruska's lab as a research assistant. Initially, I worked on a project involving magnetic manipulation, but I quickly realized it wasn't something I was passionate about, and my lack of progress reflected that. In my free time, I spent countless hours tinkering with the Husky robot in the lab, even writing my own ROS packages to make it move. Dr. Petruska noticed my interest and transitioned me to that project. That change made all the difference. The lab became my second home, and I spent more time there than at my apartment. I focused on learning the basics and building a solid foundation in C++ programming and ROS. Curiosity was key. One funny story I remember is when we short-circuited the entire onboard compute stack and spent a couple of weeks putting it back together from scratch. It was a lot of fun and a great learning experience.
+I was more deliberate about the degree itself. I wanted to explore robotics and learn to code, so I tailored my coursework around those goals. In my first semester, I took a challenging robotics course with Dr. Andrew Petruska, who was helping build the robotics program at Mines. Excelling in his course earned me a research assistant position in his lab.
+
+In my second semester, I joined Dr. Petruska's lab as a research assistant. I first worked on magnetic manipulation, but the problem did not hold my interest, and my lack of progress showed it. In my free time, I spent countless hours tinkering with the Husky robot and writing my own Robot Operating System (ROS) packages to make it move. Dr. Petruska noticed and moved me onto that project. That change made all the difference.
+
+The lab became my second home. I focused on C++ and ROS, then tested what I learned on the physical system. We once short-circuited the entire onboard compute stack and spent two weeks rebuilding it from scratch. Even the failure was fun because every repair exposed another layer of the robot.
 
 ![Working beside the Clearpath Husky robot in the Colorado School of Mines lab](/assets/images/me_in_lab.jpeg)
 _Working with the Husky platform in the Colorado School of Mines robotics lab. Source: personal archive._
@@ -87,7 +94,7 @@ _The hexapod project paired a 1D LiDAR and Pixy camera with a small mobile platf
 
 Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grades mattered, but the projects I took on, the problems I solved, and the people I learned from shaped me more. My advice to current graduate students is simple: take on projects that stretch you, use the resources around you, and follow problems that genuinely excite you. That is how progress starts to compound.
 
-## Job search after graduate school
+## Getting hired
 
 Landing your first job out of grad school in the U.S. can be difficult, especially if you want the dream job immediately and you are not coming from a top university. Even if you spent grad school building skills, doing research, and working on relevant projects, the search can still be tough. These are the things that helped me:
 
@@ -124,6 +131,8 @@ One part of that work I am particularly proud of is where it began. Around the m
 
 That transition—from a side project to a team—also changed my role. Moving from an IC role back into technical leadership was intentional. By then, I had enough experience under my belt to be useful in both modes: I could go deep on the hard technical decisions, but I could also set direction, explain tradeoffs, and help other people execute. I also participate in a broader research committee across Zoox, which gives me exposure to technical direction outside my immediate area.
 
-## Looking Back
+> **Deep insight:** Confidence was usually the lagging indicator. I acted before I felt ready, and the evidence from small wins changed what I believed I could do.
 
-> The path was less a sequence of triumphs than a sequence of redirects: the IIT exam changed where I studied, a collapsed GPA forced a rebuild, and a mailing mistake eventually opened the United States. The transferable lesson is not that setbacks are secretly good; it is that a credible next attempt requires focused skill-building before confidence arrives.
+## Looking back
+
+Looking back, the path is less a sequence of triumphs than a sequence of redirects. Failing the IIT exam changed where I studied. A collapsed GPA forced me to rebuild. A mailing mistake closed Germany and eventually opened the United States. Work that initially felt beyond me became a patent, then a route into autonomous driving. The common thread is not that every setback was secretly good. Some were simply painful. What mattered was learning to attach intensity to a problem I cared about, build enough skill to make the next attempt credible, and let small wins accumulate before confidence arrived.

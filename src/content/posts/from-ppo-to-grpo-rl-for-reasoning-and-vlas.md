@@ -9,7 +9,7 @@ tags:
   - Reinforcement Learning
   - Reasoning
   - Robotics
-summary: 'A practical map of PPO, DPO, GRPO, and on-policy distillation.'
+summary: 'How PPO, DPO, GRPO, and on-policy distillation construct their learning signals—and which assumptions survive contact with physical action.'
 ---
 
 # PPO, DPO, GRPO, and On-Policy Distillation
@@ -18,13 +18,13 @@ Reinforcement learning for language models can look like a parade of acronyms. P
 
 The useful history is not the sequence of names. It is the sequence of compromises around one estimator:
 
-The governing question is: given behavior sampled from the current policy, what evidence should increase or decrease its probability, and relative to what baseline?
+> Given behavior sampled from the current policy, what evidence should increase or decrease its probability, and relative to what baseline?
 
 This essay follows that question from PPO through verifiable-reward reasoning and into VLA post-training. It is intentionally narrower than [Post-Training VLAs: A Reading Guide to Closed-Loop Improvement](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html). That guide covers the whole deployment loop: action interfaces, failure mining, feedback collection, critics, evaluation, and reproducibility. Here, those are held at the boundary. The subject is the update machinery itself—sampling distribution, advantage construction, likelihood ratio, and credit assignment.
 
 The evidence cutoff is July 27, 2026. PPO, DPO, DeepSeekMath/GRPO, GKD, DeepSeek-R1, and the early VLA-RL systems are reported evidence. The final hybrid design is synthesis: a falsifiable proposal, not a result already established across robots.
 
-## The policy-gradient objective
+## One gradient, four choices
 
 For a trajectory $\tau=(s_0,a_0,\ldots,s_T)$ sampled from policy $\pi_\theta$, a policy-gradient update has the form
 
@@ -57,7 +57,7 @@ The figure holds the prompt fixed and changes only the source of contrast. It is
 
 This controlled view explains why the methods are not interchangeable. PPO and GRPO need fresh policy samples because their advantages describe current behavior. DPO avoids generation because the contrast is already stored in the dataset. GKD is on-policy in state coverage but supervised in its target: teacher logits repair the student's visited prefixes without estimating future return. The later sections differ mainly in how expensive, noisy, or physically defensible each contrast becomes.
 
-## PPO: Value baselines and clipped updates
+## PPO: learn the baseline
 
 [Proximal Policy Optimization](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html) made actor-critic policy gradients operationally simple. The actor collects trajectories under $\pi_{\mathrm{old}}$. A value network estimates expected future return, and Generalized Advantage Estimation turns temporal-difference residuals into lower-variance $\hat A_t$. The actor then reuses the rollout for several minibatch epochs under a clipped surrogate:
 
@@ -80,7 +80,7 @@ That compromise fit early RLHF. A language model supplies tractable token log-pr
 
 PPO therefore established the durable skeleton—online sampling, relative probability updates, and reference control—while making the value model the obvious component to challenge.
 
-## DPO: Offline preference optimization
+## DPO: store the contrast
 
 [Direct Preference Optimization](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) is often placed between PPO and GRPO as if it were a newer policy-gradient algorithm. It changes the problem more radically. DPO assumes the evidence already arrives as fixed pairs: for prompt $x$, response $y_w$ is preferred to $y_l$. Under a Bradley–Terry preference model and KL-regularized reward optimum, the implicit reward can be expressed through policy-to-reference log-ratios. The training objective becomes
 
@@ -100,7 +100,7 @@ DPO belongs in the evolution because it clarified what online RL was buying. If 
 
 For VLAs, the “matched” condition is particularly fragile. Two text answers can share the same prompt. Two physical trajectories rarely share exactly the same camera pose, friction, object state, and intervention history. An apparent preference can encode an environment difference rather than an action difference. DPO remains useful for replayable simulations, local action alternatives from the same logged state, or carefully constructed intervention windows. It is not a generic conversion from “one robot rollout succeeded” and “another failed” into a clean preference pair.
 
-## GRPO: Group-relative baselines
+## GRPO: sample the contrast
 
 [DeepSeekMath](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html) makes a different trade. For each question, the current policy samples $G$ answers. An exact or learned verifier produces rewards $r_1,\ldots,r_G$, and GRPO normalizes them within that question:
 
@@ -123,9 +123,9 @@ This is an excellent bargain when three conditions hold:
 
 Math and code fit unusually well. A sampler can produce eight solutions without changing the problem, and an exact checker can often score the final answer. DeepSeekMath reports gains after GRPO-based training across GSM8K, MATH, and multilingual mathematics. [DeepSeek-R1](https://arxiv.org/abs/2501.12948) pushes the idea further: R1-Zero shows that verifiable-reward RL without supervised reasoning traces can elicit longer reasoning, self-checking, and strategy changes. Its language mixing and poor readability also show what correctness-only reward leaves unconstrained. The final R1 recipe adds cold-start data and staged training rather than treating pure RL as sufficient.
 
-GRPO removes a model, not the need for a baseline. The group is the baseline, which makes group composition part of optimization.
+> **Deep insight:** GRPO removes the critic, not the estimation problem. It moves that problem into the sampler because the group now defines the baseline.
 
-## GRPO's zero-gradient failure
+## When the group says nothing
 
 If all sampled answers are correct, every normalized reward is zero. If all are wrong, the same thing happens. Easy and impossible questions consume generation without supplying a gradient. Near-zero variance also makes normalization noisy. A fixed prompt distribution therefore becomes progressively inefficient as the policy improves.
 
@@ -165,7 +165,7 @@ Distillation and RL optimize different evidence:
 
 That hybrid has become more relevant as reasoning policies improve. [Self-Supervised On-Policy Distillation for Reasoning LMs](https://arxiv.org/abs/2605.17497) uses the correct answers inside mixed GRPO groups as teachers for incorrect answers, extracting dense supervision from rollouts that would otherwise provide only a binary contrast. The 2026 paper reports a 65.6 macro Avg@12 for Qwen3-8B, 1.6 points above its GRPO baseline. This is frontier evidence, not yet a settled recipe, but it reveals the direction: reuse on-policy computation to manufacture denser, state-matched targets.
 
-## Comparing feedback and estimation methods
+## The estimators compared
 
 | Method | Training states | Feedback unit | Baseline or anchor | Main cost | Native blind spot |
 | --- | --- | --- | --- | --- | --- |
@@ -177,7 +177,7 @@ That hybrid has become more relevant as reasoning policies improve. [Self-Superv
 
 The table prevents a common category error. DPO is not “GRPO but offline,” because its pairwise reference-relative margin encodes a different statistical object. On-policy distillation is not “RL with soft rewards,” because teacher logits supervise local action distributions without estimating future return. PPO and GRPO are closest: both weight policy ratios with advantages, but they construct the baseline differently.
 
-## Why VLA policies need different assumptions
+## Why robots change the assumptions
 
 Transferring these estimators to a VLA requires more than replacing “token” with “action.” Three assumptions change at once.
 
@@ -199,7 +199,7 @@ Copying one answer reward across 1,000 reasoning tokens is noisy. Copying one su
 
 VLA post-training therefore needs a feedback unit between token and episode: action chunk, skill segment, state transition, or critic-estimated progress. That unit must remain replayable or observable enough to compare alternatives. Otherwise denser reward only creates denser confidence, not better credit.
 
-## VLA reinforcement-learning methods
+## VLA methods
 
 The early VLA-RL literature can be organized by what replaces the critic and where high-quality trajectories come from.
 
@@ -223,7 +223,7 @@ The frontier is moving toward intermediate feedback. [LifeLong-RFT](https://arxi
 
 These systems are recent and heterogeneous. Their reward definitions, simulators, embodiments, action heads, and evaluation protocols differ, so their headline gains should not be ranked as if they were optimizer ablations. What they collectively support is narrower: VLA RL is becoming a joint design of rollout distribution, feedback granularity, and action likelihood.
 
-## Choosing an estimator
+## Choose by evidence
 
 The method decision can be made without starting from an acronym:
 
@@ -238,7 +238,7 @@ The method decision can be made without starting from an acronym:
 
 The last row is deliberately conservative. “On-policy” does not make evidence causal. If two robot episodes cannot be matched well enough for their reward difference to identify a policy decision, a relative advantage is numerically valid and scientifically weak.
 
-## A hybrid training hypothesis
+## A hybrid hypothesis
 
 The evolution suggests a shared endpoint: sparse external reward should select outcomes, while dense on-policy supervision should repair the trajectory states that produced them.
 
@@ -255,13 +255,13 @@ This hypothesis is falsifiable. Compare four methods under identical model initi
 
 Report success and safety, but also zero-variance group rate, critic/teacher calls, policy KL, action entropy, recovery success, real robot-hours, and performance after the teacher or simulator distribution shifts. The hybrid earns its complexity only if it improves reliable success per unit of interaction—not merely final reward after consuming more rollouts and teacher inference.
 
-## Where each method gets its learning signal
+## Where the signal comes from
 
 PPO learns a critic so each action can be compared with expected return. DPO assumes the contrast has already been collected as a chosen/rejected pair. GRPO obtains the contrast from other attempts at the same prompt. On-policy distillation replaces a scalar contrast with a teacher distribution at the learner's own states.
 
 Reasoning models made GRPO powerful because prompts reset perfectly and verifiers are cheap. VLAs expose the limits because physical state does not reset cleanly, action likelihood may pass through diffusion, and a terminal bit is far from the causal motion. The transferable object is therefore not GRPO itself. It is the estimator-design discipline:
 
-> Sample where the policy will act, compare only what the environment makes comparable, and make feedback no coarser than the decision it is supposed to credit. This is the estimator-design constraint that transfers from reasoning RL to VLAs.
+> Sample where the policy will act, compare only what the environment makes comparable, and make feedback no coarser than the decision it is supposed to credit.
 
 That principle explains the past decade of policy optimization better than the acronym sequence—and gives VLA post-training a testable path beyond copying language-model RL.
 
