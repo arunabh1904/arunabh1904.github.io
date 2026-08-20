@@ -45,7 +45,7 @@ This table is the first defense against vague claims. A retrieval model can be e
 
 The shared implementation pattern is simple. An image is converted into visual tokens or features. A connector maps those features into a space that can interact with text. A loss then decides what “interaction” means: contrastive agreement, next-token prediction, region grounding, denoising, or action imitation.
 
-> **Deep insight.** The loss is the contract. Architecture matters because it decides which evidence remains available to satisfy that contract, so a change in prediction target can invalidate an otherwise successful representation.
+> The loss is the contract. Architecture matters because it decides which evidence remains available to satisfy that contract, so a change in prediction target can invalidate an otherwise successful representation.
 
 The comparison below keeps one mug-and-tray scene fixed. Only the evaluated output changes. Watch which evidence becomes mandatory rather than assuming every later model is simply a larger version of the first.
 

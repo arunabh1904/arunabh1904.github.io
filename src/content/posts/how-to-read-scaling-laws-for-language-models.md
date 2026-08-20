@@ -92,7 +92,7 @@ Chinchilla used the same training-compute budget as Gopher, with 70B rather than
 
 The familiar shorthand of roughly twenty tokens per parameter needs the same qualification. Near-equal fitted exponents make $D/N$ approximately constant in that regime. Its numerical value is a coefficient-level property of those experiments, not a universal exponent or a law of nature.
 
-> **Deep insight.** Chinchilla's approximate token-to-parameter ratio is not an independent law. It follows from a particular fitted loss surface: near-equal data and parameter exponents make the ratio nearly constant, while the coefficients set its value. Change the training regime and the ratio is a hypothesis to remeasure, not a recipe to repeat.
+> Chinchilla's approximate token-to-parameter ratio is not an independent law. It follows from a particular fitted loss surface: near-equal data and parameter exponents make the ratio nearly constant, while the coefficients set its value. Change the training regime and the ratio is a hypothesis to remeasure, not a recipe to repeat.
 
 The Kaplan-versus-Chinchilla story is not simply “the old recipe was wrong.” [Porian et al. (2024)](https://arxiv.org/abs/2406.19146) reproduced the Kaplan-style result and traced much of the discrepancy to last-layer compute accounting, warmup duration, and scale-dependent optimizer tuning. A scaling law predicts the optimization frontier represented by its experiments. If the proxy runs are not comparably tuned, it can extrapolate the wrong frontier very cleanly.
 

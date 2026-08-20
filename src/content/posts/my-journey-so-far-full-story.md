@@ -126,4 +126,4 @@ That transition—from a side project to a team—also changed my role. Moving f
 
 ## Looking Back
 
-> **Deep insight.** The path was less a sequence of triumphs than a sequence of redirects: the IIT exam changed where I studied, a collapsed GPA forced a rebuild, and a mailing mistake eventually opened the United States. The transferable lesson is not that setbacks are secretly good; it is that a credible next attempt requires focused skill-building before confidence arrives.
+> The path was less a sequence of triumphs than a sequence of redirects: the IIT exam changed where I studied, a collapsed GPA forced a rebuild, and a mailing mistake eventually opened the United States. The transferable lesson is not that setbacks are secretly good; it is that a credible next attempt requires focused skill-building before confidence arrives.

@@ -137,7 +137,7 @@ _Agent manager — imagined by OpenAI ImageGen._
 
 Which one do you retain?
 
-> **Deep insight.** As code generation becomes abundant, the durable advantage moves upstream: deciding what should be built, why it should exist, what context changes the answer, and how to direct capable machines through the resulting constraints.
+> As code generation becomes abundant, the durable advantage moves upstream: deciding what should be built, why it should exist, what context changes the answer, and how to direct capable machines through the resulting constraints.
 
 Writing software was always about building. Code was a tool. Agents are tools too.
 

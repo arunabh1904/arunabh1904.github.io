@@ -494,7 +494,7 @@ Attention still answers one question: for this output position, which sources ma
 
 No variant dominates every regime. Full attention preserves exact access but grows expensive with context. Cache-sharing methods are simpler but reduce K/V capacity. Latent, sparse, and recurrent methods buy more efficiency with new approximation, tuning, kernel, or serving burdens. The right comparison is therefore not “which attention name is newest?” but “which bottleneck dominates this model, and which retrieval failure can it afford?”
 
-> **Deep insight.** Attention variants spend the same budget in different places: exact token retrieval, cache capacity, compressed memory, or fixed-size state. The right architecture follows the dominant bottleneck and the retrieval error the system can afford, not the newest name.
+> Attention variants spend the same budget in different places: exact token retrieval, cache capacity, compressed memory, or fixed-size state. The right architecture follows the dominant bottleneck and the retrieval error the system can afford, not the newest name.
 
 ## References
 

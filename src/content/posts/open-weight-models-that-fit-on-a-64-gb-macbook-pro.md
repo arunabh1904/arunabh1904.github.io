@@ -77,4 +77,4 @@ For this `64 GB` M5 Max, my order is:
 4. Treat `Nemotron 3 Nano` as a community-quant experiment unless an official compressed artifact appears.
 5. Serve `Mistral Small 4` and `DeepSeek V4 Flash` elsewhere instead of turning SSD swap into an inference strategy.
 
-> **Deep insight.** The practical limit on a `64 GB` Mac is not parameter count. It is the headroom left after weights for context and the surrounding application. That makes an official `8–20 GB` quant a better default than a larger model that pushes serving into swap.
+> The practical limit on a `64 GB` Mac is not parameter count. It is the headroom left after weights for context and the surrounding application. That makes an official `8–20 GB` quant a better default than a larger model that pushes serving into swap.

@@ -261,7 +261,7 @@ PPO learns a critic so each action can be compared with expected return. DPO ass
 
 Reasoning models made GRPO powerful because prompts reset perfectly and verifiers are cheap. VLAs expose the limits because physical state does not reset cleanly, action likelihood may pass through diffusion, and a terminal bit is far from the causal motion. The transferable object is therefore not GRPO itself. It is the estimator-design discipline:
 
-> **Deep insight.** Sample where the policy will act, compare only what the environment makes comparable, and make feedback no coarser than the decision it is supposed to credit. This is the estimator-design constraint that transfers from reasoning RL to VLAs.
+> Sample where the policy will act, compare only what the environment makes comparable, and make feedback no coarser than the decision it is supposed to credit. This is the estimator-design constraint that transfers from reasoning RL to VLAs.
 
 That principle explains the past decade of policy optimization better than the acronym sequence—and gives VLA post-training a testable path beyond copying language-model RL.
 
