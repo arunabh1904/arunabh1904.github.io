@@ -138,8 +138,6 @@ const indexedPapers = papers.map((paper) => {
   return byDate || left.title.localeCompare(right.title);
 });
 
-const years = [...new Set(indexedPapers.map((paper) => paper.year))].sort((a, b) => a - b);
-
 const fieldNodes = [
   { field: 'Vision Foundations', label: 'Vision', x: 280, y: 47 },
   { field: 'Vision-Language Models', label: 'VLMs', x: 343, y: 92 },
@@ -230,6 +228,7 @@ const formatDate = (date: Date) =>
             type="button"
             aria-pressed="false"
             data-topic-button={topic.id}
+            data-topic-label={topic.label}
             style={`--topic-color: ${topic.color}`}
           >
             {topic.shortLabel}
@@ -382,9 +381,27 @@ const formatDate = (date: Date) =>
       <div class="list-heading">
         <div>
           <p class="panel-kicker">Library</p>
-          <h2>All paper notes</h2>
+          <h2 data-list-heading>All paper notes</h2>
         </div>
-        <p><span data-visible-count>{indexedPapers.length}</span> results · oldest to newest</p>
+        <p><span data-visible-count>{indexedPapers.length}</span> results · <span data-sort-summary>newest first</span></p>
+      </div>
+
+      <div class="list-controls" aria-label="Paper list organization">
+        <label>
+          <span>Group by</span>
+          <select data-group-select>
+            <option value="topic">Topic</option>
+            <option value="category">Category</option>
+            <option value="year" selected>Year</option>
+          </select>
+        </label>
+        <label>
+          <span>Sort</span>
+          <select data-sort-select>
+            <option value="desc" selected>Newest first</option>
+            <option value="asc">Oldest first</option>
+          </select>
+        </label>
       </div>
 
       <div class="active-filter" data-active-filter hidden>
@@ -392,46 +409,44 @@ const formatDate = (date: Date) =>
         <button type="button" data-clear-field-filter aria-label="Clear field filter">×</button>
       </div>
 
-      <div class="paper-year-groups">
-        {
-          years.map((year) => (
-            <section class="paper-year-group" data-year-group={year}>
-              <h3>{year}</h3>
-              <ol>
-                {indexedPapers.filter((paper) => paper.year === year).map((paper) => (
-                  <li
-                    data-paper-row
-                    data-paper-topics={paper.topics.join(' ')}
-                    data-paper-field={paper.field}
-                    data-paper-search-text={`${paper.title} ${paper.summary} ${paper.field} ${paper.topics
-                      .map((topicId) => topicById.get(topicId)?.label ?? '')
-                      .join(' ')}`.toLowerCase()}
-                  >
-                    <time datetime={paper.date.toISOString()}>{formatDate(paper.date)}</time>
-                    <div class="paper-row__content">
-                      <a href={paper.href}>{paper.title}</a>
-                      <div class="paper-row__taxonomy">
-                        <button type="button" data-row-field={paper.field}>{paper.field}</button>
-                        {paper.topics.map((topicId) => {
-                          const topic = topicById.get(topicId);
-                          return topic ? (
-                            <button
-                              type="button"
-                              data-row-topic={topic.id}
-                              style={`--topic-color: ${topic.color}`}
-                            >
-                              {topic.shortLabel}
-                            </button>
-                          ) : null;
-                        })}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          ))
-        }
+      <div class="paper-list-groups" data-paper-list-groups></div>
+
+      <div hidden aria-hidden="true">
+        {indexedPapers.map((paper) => (
+          <template data-paper-template>
+            <li
+              data-paper-row
+              data-paper-date={paper.date.toISOString()}
+              data-paper-year={paper.year}
+              data-paper-title={paper.title}
+              data-paper-topics={paper.topics.join(' ')}
+              data-paper-field={paper.field}
+              data-paper-search-text={`${paper.title} ${paper.summary} ${paper.field} ${paper.topics
+                .map((topicId) => topicById.get(topicId)?.label ?? '')
+                .join(' ')}`.toLowerCase()}
+            >
+              <time datetime={paper.date.toISOString()}>{formatDate(paper.date)}</time>
+              <div class="paper-row__content">
+                <a href={paper.href}>{paper.title}</a>
+                <div class="paper-row__taxonomy">
+                  <button type="button" data-row-field={paper.field}>{paper.field}</button>
+                  {paper.topics.map((topicId) => {
+                    const topic = topicById.get(topicId);
+                    return topic ? (
+                      <button
+                        type="button"
+                        data-row-topic={topic.id}
+                        style={`--topic-color: ${topic.color}`}
+                      >
+                        {topic.shortLabel}
+                      </button>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+            </li>
+          </template>
+        ))}
       </div>
 
       <div class="empty-results" data-empty-results hidden>
@@ -450,17 +465,46 @@ const formatDate = (date: Date) =>
       const viewButtons = Array.from(root.querySelectorAll('[data-view-button]'));
       const viewPanels = Array.from(root.querySelectorAll('[data-view-panel]'));
       const topicButtons = Array.from(root.querySelectorAll('[data-topic-button]'));
-      const paperRows = Array.from(root.querySelectorAll('[data-paper-row]'));
-      const yearGroups = Array.from(root.querySelectorAll('[data-year-group]'));
+      const paperTemplates = Array.from(root.querySelectorAll('[data-paper-template]'));
+      const paperListGroups = root.querySelector('[data-paper-list-groups]');
       const searchInput = root.querySelector('[data-paper-search]');
+      const groupSelect = root.querySelector('[data-group-select]');
+      const sortSelect = root.querySelector('[data-sort-select]');
+      const listHeading = root.querySelector('[data-list-heading]');
       const visibleCount = root.querySelector('[data-visible-count]');
+      const sortSummary = root.querySelector('[data-sort-summary]');
       const emptyResults = root.querySelector('[data-empty-results]');
       const activeFilter = root.querySelector('[data-active-filter]');
       const activeFilterLabel = root.querySelector('[data-active-filter-label]');
 
+      const paperRecords = paperTemplates.flatMap((template) => {
+        if (!(template instanceof HTMLTemplateElement)) return [];
+        const row = template.content.querySelector('[data-paper-row]');
+        if (!(row instanceof HTMLElement)) return [];
+        return [{
+          template,
+          date: Date.parse(row.dataset.paperDate ?? ''),
+          year: Number(row.dataset.paperYear ?? 0),
+          title: row.dataset.paperTitle ?? '',
+          field: row.dataset.paperField ?? 'Other',
+          topics: (row.dataset.paperTopics ?? '').split(' ').filter(Boolean),
+          searchText: row.dataset.paperSearchText ?? '',
+        }];
+      });
+      const topicLabels = new Map(topicButtons.map((button) => [
+        button.getAttribute('data-topic-button') ?? '',
+        button.getAttribute('data-topic-label') ?? 'All research',
+      ]));
+      const topicOrder = new Map(topicButtons
+        .map((button) => button.getAttribute('data-topic-button') ?? '')
+        .filter((topic) => topic && topic !== 'all')
+        .map((topic, index) => [topic, index]));
+
       let activeView = 'map';
       let activeTopic = 'all';
       let activeField = '';
+      let activeGrouping = 'year';
+      let activeSort = 'desc';
 
       const setView = (view) => {
         activeView = view === 'list' ? 'list' : 'map';
@@ -486,9 +530,8 @@ const formatDate = (date: Date) =>
         });
         root.querySelectorAll('[data-field-node]').forEach((node) => {
           const field = node.getAttribute('data-field-node') ?? '';
-          const connected = activeTopic === 'all' || paperRows.some((row) =>
-            row.getAttribute('data-paper-field') === field &&
-            (row.getAttribute('data-paper-topics') ?? '').split(' ').includes(activeTopic)
+          const connected = activeTopic === 'all' || paperRecords.some((paper) =>
+            paper.field === field && paper.topics.includes(activeTopic)
           );
           node.classList.toggle('is-muted', !connected);
           node.classList.toggle('is-active', field === activeField);
@@ -506,29 +549,109 @@ const formatDate = (date: Date) =>
         });
       };
 
+      const groupLabel = (key) => {
+        if (activeGrouping === 'topic') return topicLabels.get(key) ?? 'Other topics';
+        return key;
+      };
+
+      const groupKeysForPaper = (paper) => {
+        if (activeGrouping === 'year') return [String(paper.year)];
+        if (activeGrouping === 'category') return [paper.field];
+        if (activeTopic !== 'all') return paper.topics.includes(activeTopic) ? [activeTopic] : [];
+        return paper.topics.length > 0 ? paper.topics : ['other'];
+      };
+
+      const compareGroups = ([left], [right]) => {
+        if (activeGrouping === 'year') {
+          const direction = activeSort === 'asc' ? 1 : -1;
+          return (Number(left) - Number(right)) * direction;
+        }
+        if (activeGrouping === 'topic') {
+          return (topicOrder.get(left) ?? Number.MAX_SAFE_INTEGER) -
+            (topicOrder.get(right) ?? Number.MAX_SAFE_INTEGER);
+        }
+        return left.localeCompare(right);
+      };
+
+      const createGroup = (key, papers, shouldOpen) => {
+        const details = document.createElement('details');
+        details.className = 'paper-list-group no-icon';
+        details.dataset.paperGroup = `${activeGrouping}:${key}`;
+        details.open = shouldOpen;
+
+        const summary = document.createElement('summary');
+        const heading = document.createElement('div');
+        heading.className = 'paper-list-group__heading';
+        const title = document.createElement('h3');
+        title.textContent = groupLabel(key);
+        const count = document.createElement('span');
+        count.textContent = `${papers.length} ${papers.length === 1 ? 'note' : 'notes'}`;
+        heading.append(title, count);
+
+        const action = document.createElement('span');
+        action.className = 'paper-list-group__action';
+        action.setAttribute('aria-hidden', 'true');
+        const closedLabel = document.createElement('span');
+        closedLabel.className = 'paper-list-group__action-label--closed';
+        closedLabel.textContent = 'View notes ↓';
+        const openLabel = document.createElement('span');
+        openLabel.className = 'paper-list-group__action-label--open';
+        openLabel.textContent = 'Hide notes ↑';
+        action.append(closedLabel, openLabel);
+        summary.append(heading, action);
+
+        const list = document.createElement('ol');
+        papers.forEach((paper) => {
+          const row = paper.template.content.querySelector('[data-paper-row]')?.cloneNode(true);
+          if (row instanceof HTMLElement) list.append(row);
+        });
+        details.append(summary, list);
+        return details;
+      };
+
       const applyFilters = () => {
         const query = searchInput instanceof HTMLInputElement ? searchInput.value.trim().toLowerCase() : '';
-        let count = 0;
+        const openGroups = new Set(Array.from(paperListGroups?.querySelectorAll('details[open]') ?? [])
+          .map((group) => group.getAttribute('data-paper-group') ?? ''));
+        const direction = activeSort === 'asc' ? 1 : -1;
+        const visiblePapers = paperRecords
+          .filter((paper) => activeTopic === 'all' || paper.topics.includes(activeTopic))
+          .filter((paper) => !activeField || paper.field === activeField)
+          .filter((paper) => !query || paper.searchText.includes(query))
+          .sort((left, right) => {
+            const byDate = (left.date - right.date) * direction;
+            return byDate || left.title.localeCompare(right.title);
+          });
 
-        paperRows.forEach((row) => {
-          const topics = (row.getAttribute('data-paper-topics') ?? '').split(' ');
-          const matchesTopic = activeTopic === 'all' || topics.includes(activeTopic);
-          const matchesField = !activeField || row.getAttribute('data-paper-field') === activeField;
-          const matchesSearch = !query || (row.getAttribute('data-paper-search-text') ?? '').includes(query);
-          const visible = matchesTopic && matchesField && matchesSearch;
-          row.toggleAttribute('hidden', !visible);
-          if (visible) count += 1;
+        const groups = new Map();
+        visiblePapers.forEach((paper) => {
+          groupKeysForPaper(paper).forEach((key) => {
+            const papers = groups.get(key) ?? [];
+            papers.push(paper);
+            groups.set(key, papers);
+          });
         });
 
-        yearGroups.forEach((group) => {
-          const hasVisibleRows = Array.from(group.querySelectorAll('[data-paper-row]')).some(
-            (row) => !row.hasAttribute('hidden'),
-          );
-          group.toggleAttribute('hidden', !hasVisibleRows);
-        });
+        if (paperListGroups instanceof HTMLElement) {
+          paperListGroups.replaceChildren();
+          Array.from(groups.entries())
+            .sort(compareGroups)
+            .forEach(([key, groupedPapers]) => {
+              const groupId = `${activeGrouping}:${key}`;
+              paperListGroups.append(createGroup(key, groupedPapers, Boolean(query) || openGroups.has(groupId)));
+            });
+        }
 
-        if (visibleCount) visibleCount.textContent = String(count);
-        emptyResults?.toggleAttribute('hidden', count !== 0);
+        if (visibleCount) visibleCount.textContent = String(visiblePapers.length);
+        if (sortSummary) sortSummary.textContent = activeSort === 'asc' ? 'oldest first' : 'newest first';
+        if (listHeading) {
+          listHeading.textContent = activeField
+            ? `${activeField} paper notes`
+            : activeTopic !== 'all'
+              ? `${topicLabels.get(activeTopic) ?? 'Selected topic'} paper notes`
+              : 'All paper notes';
+        }
+        emptyResults?.toggleAttribute('hidden', visiblePapers.length !== 0);
         activeFilter?.toggleAttribute('hidden', !activeField);
         if (activeFilterLabel) activeFilterLabel.textContent = activeField;
         updateMapState();
@@ -554,18 +677,14 @@ const formatDate = (date: Date) =>
           button.classList.toggle('is-active', isActive);
           button.setAttribute('aria-pressed', String(isActive));
         });
-        const fieldCount = paperRows.filter((row) => row.getAttribute('data-paper-field') === field).length;
+        const fieldCount = paperRecords.filter((paper) => paper.field === field).length;
         const fieldTopics = topicButtons
           .filter((button) => button.getAttribute('data-topic-button') !== 'all')
           .filter((button) => {
             const topic = button.getAttribute('data-topic-button') ?? '';
-            return paperRows.some(
-              (row) =>
-                row.getAttribute('data-paper-field') === field &&
-                (row.getAttribute('data-paper-topics') ?? '').split(' ').includes(topic),
-            );
+            return paperRecords.some((paper) => paper.field === field && paper.topics.includes(topic));
           })
-          .map((button) => button.textContent?.replace(/\d+\s*$/, '').trim())
+          .map((button) => button.getAttribute('data-topic-label'))
           .filter(Boolean);
 
         const name = root.querySelector('[data-selected-field-name]');
@@ -589,6 +708,10 @@ const formatDate = (date: Date) =>
         else url.searchParams.delete('topic');
         if (activeField) url.searchParams.set('field', activeField);
         else url.searchParams.delete('field');
+        if (activeGrouping !== 'year') url.searchParams.set('group', activeGrouping);
+        else url.searchParams.delete('group');
+        if (activeSort !== 'desc') url.searchParams.set('sort', activeSort);
+        else url.searchParams.delete('sort');
         window.history.replaceState({}, '', url);
       };
 
@@ -618,13 +741,20 @@ const formatDate = (date: Date) =>
           }
         });
       });
-      root.querySelectorAll('[data-inspector-field], [data-row-field]').forEach((button) => {
+      root.querySelectorAll('[data-inspector-field]').forEach((button) => {
         button.addEventListener('click', () => {
-          setField(button.getAttribute('data-inspector-field') ?? button.getAttribute('data-row-field') ?? '');
+          setField(button.getAttribute('data-inspector-field') ?? '');
         });
       });
-      root.querySelectorAll('[data-row-topic]').forEach((button) => {
-        button.addEventListener('click', () => setTopic(button.getAttribute('data-row-topic')));
+      paperListGroups?.addEventListener('click', (event) => {
+        if (!(event.target instanceof Element)) return;
+        const fieldButton = event.target.closest('[data-row-field]');
+        if (fieldButton) {
+          setField(fieldButton.getAttribute('data-row-field') ?? '');
+          return;
+        }
+        const topicButton = event.target.closest('[data-row-topic]');
+        if (topicButton) setTopic(topicButton.getAttribute('data-row-topic'));
       });
       root.querySelectorAll('[data-open-topic-list]').forEach((button) => {
         button.addEventListener('click', () => {
@@ -645,6 +775,18 @@ const formatDate = (date: Date) =>
         if (activeView !== 'list') setView('list');
         applyFilters();
       });
+      groupSelect?.addEventListener('change', () => {
+        if (!(groupSelect instanceof HTMLSelectElement)) return;
+        activeGrouping = ['topic', 'category', 'year'].includes(groupSelect.value)
+          ? groupSelect.value
+          : 'year';
+        applyFilters();
+      });
+      sortSelect?.addEventListener('change', () => {
+        if (!(sortSelect instanceof HTMLSelectElement)) return;
+        activeSort = sortSelect.value === 'asc' ? 'asc' : 'desc';
+        applyFilters();
+      });
       document.addEventListener('keydown', (event) => {
         if (event.key === '/' && document.activeElement !== searchInput) {
           event.preventDefault();
@@ -659,14 +801,24 @@ const formatDate = (date: Date) =>
       );
 
       const params = new URL(window.location.href).searchParams;
+      const initialGrouping = params.get('group');
+      const initialSort = params.get('sort');
       const initialTopic = params.get('topic');
       const initialField = params.get('field');
-      if (initialTopic && topicButtons.some((button) => button.getAttribute('data-topic-button') === initialTopic)) {
+      activeGrouping = initialGrouping && ['topic', 'category', 'year'].includes(initialGrouping)
+        ? initialGrouping
+        : 'year';
+      activeSort = initialSort === 'asc' ? 'asc' : 'desc';
+      if (groupSelect instanceof HTMLSelectElement) groupSelect.value = activeGrouping;
+      if (sortSelect instanceof HTMLSelectElement) sortSelect.value = activeSort;
+      if (initialField) {
+        setField(initialField);
+      } else if (initialTopic && topicButtons.some((button) => button.getAttribute('data-topic-button') === initialTopic)) {
         setTopic(initialTopic);
+      } else {
+        applyFilters();
       }
-      if (initialField) setField(initialField);
       setView(params.get('view') === 'list' ? 'list' : 'map');
-      applyFilters();
     })();
   </script>
 </PostLayout>
@@ -783,18 +935,19 @@ const formatDate = (date: Date) =>
 
   .topic-filter {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.4rem;
     padding: 0.65rem;
-    overflow-x: auto;
     border-radius: 10px;
-    scrollbar-width: thin;
   }
 
   .topic-filter button {
     display: flex;
-    flex: 0 0 auto;
+    flex: 1 1 8.75rem;
     gap: 0.45rem;
     align-items: center;
+    justify-content: space-between;
+    min-width: 0;
     padding: 0.48rem 0.62rem;
     border: 1px solid var(--button-border);
     border-radius: 999px;
@@ -1115,6 +1268,37 @@ const formatDate = (date: Date) =>
     text-transform: uppercase;
   }
 
+  .list-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    padding: 0.75rem 1.1rem;
+    border-bottom: 1px solid var(--button-border);
+  }
+
+  .list-controls label {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.69rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .list-controls select {
+    min-width: 8.5rem;
+    padding: 0.42rem 1.8rem 0.42rem 0.55rem;
+    border: 1px solid var(--button-border);
+    border-radius: 6px;
+    color: var(--text-color);
+    background: var(--panel-bg);
+    font: inherit;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
   .active-filter {
     display: flex;
     gap: 0.45rem;
@@ -1138,36 +1322,85 @@ const formatDate = (date: Date) =>
     background: color-mix(in srgb, var(--text-color) 8%, transparent);
   }
 
-  .paper-year-groups {
+  .paper-list-groups {
     padding: 0 1.1rem 1rem;
   }
 
-  .paper-year-group {
+  :global(.paper-list-group) {
+    border-bottom: 1px solid var(--button-border);
+  }
+
+  :global(.paper-list-group summary) {
     display: grid;
-    grid-template-columns: 4.5rem minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 1rem;
-    padding-top: 1.2rem;
-  }
-
-  .paper-year-group h3 {
-    position: sticky;
-    top: 1rem;
-    align-self: start;
-    margin: 0;
-    color: var(--text-secondary-color);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-
-  .paper-year-group ol {
-    min-width: 0;
-    margin: 0;
-    padding: 0;
+    align-items: center;
+    padding: 0.9rem 0;
+    cursor: pointer;
     list-style: none;
   }
 
-  .paper-year-group li {
+  :global(.paper-list-group summary::-webkit-details-marker) {
+    display: none;
+  }
+
+  :global(.paper-list-group summary:hover h3),
+  :global(.paper-list-group[open] summary h3) {
+    color: var(--accent-color);
+  }
+
+  :global(.paper-list-group summary:focus-visible) {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
+  }
+
+  :global(.paper-list-group__heading) {
+    display: flex;
+    gap: 0.65rem;
+    align-items: baseline;
+    min-width: 0;
+  }
+
+  :global(.paper-list-group__heading h3) {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+
+  :global(.paper-list-group__heading span),
+  :global(.paper-list-group__action) {
+    color: var(--text-secondary-color);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+
+  :global(.paper-list-group__action) {
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  :global(.paper-list-group__action-label--open) {
+    display: none;
+  }
+
+  :global(.paper-list-group[open] .paper-list-group__action-label--closed) {
+    display: none;
+  }
+
+  :global(.paper-list-group[open] .paper-list-group__action-label--open) {
+    display: inline;
+  }
+
+  :global(.paper-list-group ol) {
+    min-width: 0;
+    margin: 0;
+    padding: 0 0 0 1rem;
+    border-left: 1px solid var(--button-border);
+    list-style: none;
+  }
+
+  :global(.paper-list-group li) {
     display: grid;
     grid-template-columns: 7rem minmax(0, 1fr);
     gap: 0.9rem;
@@ -1176,7 +1409,7 @@ const formatDate = (date: Date) =>
     border-top: 1px solid var(--button-border);
   }
 
-  .paper-year-group time {
+  :global(.paper-list-group time) {
     padding-top: 0.12rem;
     color: var(--text-secondary-color);
     font-family: var(--font-mono);
@@ -1275,16 +1508,31 @@ const formatDate = (date: Date) =>
       min-height: 23rem;
     }
 
-    .paper-year-group {
+    .topic-filter button {
+      flex-basis: calc(50% - 0.4rem);
+    }
+
+    .list-controls {
+      display: grid;
       grid-template-columns: 1fr;
-      gap: 0.45rem;
     }
 
-    .paper-year-group h3 {
-      position: static;
+    .list-controls label {
+      display: grid;
+      grid-template-columns: 5rem minmax(0, 1fr);
     }
 
-    .paper-year-group li {
+    .list-controls select {
+      width: 100%;
+    }
+
+    :global(.paper-list-group__heading) {
+      align-items: start;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    :global(.paper-list-group li) {
       grid-template-columns: 1fr;
       gap: 0.3rem;
     }
