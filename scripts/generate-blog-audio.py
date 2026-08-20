@@ -54,13 +54,19 @@ REFERENCE_TEXT = (
 TEMPERATURE = 0.05
 TOP_P = 0.9
 SAMPLING_SEED_VERSION = "per-post-chunk-v1"
+# The ordinary ICL decode path reconstructs reference and generated codes together,
+# then estimates a waveform cut.  That estimate can leave the reference phrase at
+# the start of every article chunk.  The streaming decoder reconstructs generated
+# codes only; the deliberately high interval still returns one final result here.
+ICL_DECODE_MODE = "generated-only-streaming-v1"
+ICL_STREAMING_INTERVAL = 120.0
 SPEED = 1.0
 BITRATE = "64k"
 MAX_CHARS = 360  # Proven reliable bound; low-temperature seeded sampling prevents drift.
 SILENCE_THRESHOLD = 0.008  # -42 dBFS; matches the verification threshold below.
 BOUNDARY_SILENCE_SAMPLES = 1_200  # Retain 50 ms at 24 kHz, without a synthetic gap.
-LONG_SILENCE_DURATION = 0.8
-RETAINED_SILENCE_DURATION = 0.09
+LONG_SILENCE_DURATION = 0.6
+RETAINED_SILENCE_DURATION = 0.06
 SILENCE_FILTER = (
     "silenceremove="
     f"start_periods=1:start_duration=0.05:start_threshold={SILENCE_THRESHOLD}:"
@@ -292,6 +298,8 @@ def discover_posts() -> list[dict[str, Any]]:
                     "temperature": TEMPERATURE,
                     "top_p": TOP_P,
                     "sampling_seed_version": SAMPLING_SEED_VERSION,
+                    "icl_decode_mode": ICL_DECODE_MODE,
+                    "icl_streaming_interval": ICL_STREAMING_INTERVAL,
                     "speed": SPEED,
                     "bitrate": BITRATE,
                     "max_chars": MAX_CHARS,
@@ -403,15 +411,23 @@ def generate_post(
                             repetition_penalty=1.5,
                             split_pattern="",
                             max_tokens=max_tokens,
+                            stream=True,
+                            streaming_interval=ICL_STREAMING_INTERVAL,
                         )
                     )
-                    if results:
-                        results_by_index[0] = (
-                            np.concatenate(
-                                [trim_boundary_silence(result.audio) for result in results], axis=0
-                            ),
-                            results[0].sample_rate,
+                    if not results or any(
+                        not getattr(result, "is_streaming_chunk", False) for result in results
+                    ):
+                        raise RuntimeError(
+                            "Qwen ICL did not return generated-only streaming audio; refusing "
+                            "to export a reference-prefixed chunk."
                         )
+                    results_by_index[0] = (
+                        np.concatenate(
+                            [trim_boundary_silence(result.audio) for result in results], axis=0
+                        ),
+                        results[0].sample_rate,
+                    )
                 else:
                     for result in model.batch_generate(
                         texts=chunk_batch,
@@ -501,11 +517,11 @@ def main() -> int:
         "--batch-size",
         type=int,
         default=DEFAULT_BATCH_SIZE,
-        help=f"Concurrent Qwen TTS chunks per model step (default: {DEFAULT_BATCH_SIZE}).",
+        help="Must remain 1: generated-only Qwen ICL decoding is direct-only.",
     )
     args = parser.parse_args()
-    if args.batch_size < 1:
-        parser.error("--batch-size must be at least 1")
+    if args.batch_size != 1:
+        parser.error("--batch-size must be 1: generated-only Qwen ICL decoding is direct-only")
 
     posts = select_posts(discover_posts(), args.post)
     manifest = read_manifest()
@@ -561,6 +577,8 @@ def main() -> int:
                 "temperature": TEMPERATURE,
                 "top_p": TOP_P,
                 "sampling_seed_version": SAMPLING_SEED_VERSION,
+                "icl_decode_mode": ICL_DECODE_MODE,
+                "icl_streaming_interval": ICL_STREAMING_INTERVAL,
                 "speed": SPEED,
                 "bitrate": BITRATE,
                 "max_chars": MAX_CHARS,
