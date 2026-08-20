@@ -19,7 +19,7 @@ summary: How camera, LiDAR, and radar become a unified, temporal scene represent
 
 An autonomous vehicle receives several partial descriptions of the same scene. Cameras provide dense appearance and semantic detail, but depth has to be inferred and image quality falls under glare, darkness, rain, or fog. LiDAR measures range directly and resolves 3D shape well, but the point cloud becomes sparse with distance and can be degraded by weather, reflectivity, occlusion, and motion during a scan. Radar measures range and radial velocity at long distance and is comparatively tolerant of poor visibility, but its angle estimates are coarse and multipath produces ambiguous returns.
 
-> The architectural choice is not merely how to combine sensors. It determines where their differences survive, where geometry becomes shared, and where irrecoverable information is spent. The following progression follows that dependency:
+> The architectural choice is not merely how to combine sensors. It determines where their differences survive, where geometry becomes shared, and where irrecoverable information is spent. That dependency is:
 
 sensor-specific encoders → metric 3D representation → temporal state → task heads
 
@@ -51,6 +51,8 @@ u_i=\pi(K_i,R_i,t_i,X).
 $$
 
 The same point appears at a different pixel in each camera. If pyramid level $l$ has stride $s_l$, the feature is sampled at $u_i/s_l$. This projection is a correspondence rule, not a source of visual information: it can retrieve a fine boundary only if the backbone retained that boundary, and it can retrieve broad context only if the receptive field encoded it.
+
+> Projection is a correlated failure point. An error in depth, intrinsics, extrinsics, ego pose, or timestamp can move otherwise correct camera evidence into the wrong metric cell, after which every head that consumes the shared geometry may agree on the same wrong scene.
 
 [![Animation showing one metric 3D point projected to different pixels in two calibrated cameras and sampled at stride-adjusted feature-pyramid coordinates](/assets/images/autonomous-perception-vision-encoder.gif)](/assets/images/autonomous-perception-vision-encoder.gif)
 _A single 3D reference point lands at different pixels in different cameras and at different coordinates on each pyramid level. [DETR3D](/paper%20shorts/2021/10/14/detr3d-multiview-images-via-3d-to-2d-queries.html) uses this operation for object queries; [BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) uses it for BEV queries._
@@ -98,9 +100,7 @@ These forward-projection methods preserve dense image evidence, which is useful 
 ![Figure 1 from Lift, Splat, Shoot, showing multiview evidence represented in vehicle-centered BEV](/assets/images/lift-splat-shoot-paper-figure-1.png)
 _Lift, Splat, Shoot predicts depth along every camera ray and pools the lifted features into a vehicle-centered BEV grid. Source: [Lift, Splat, Shoot](/paper%20shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html), Figure 1._
 
-Pull-based methods start in metric space. [Simple-BEV](/paper%20shorts/2022/06/16/simple-bev-what-really-matters-for-multi-sensor-bev-perception.html) projects each 3D voxel into the cameras and bilinearly samples the visible image features. Its controlled experiments found that input resolution and effective batch size changed vehicle-segmentation IoU more than the lifting operator in that setup. The result is a useful warning against reading every benchmark gain as evidence for a better view transformer; training recipe, image resolution, and sensor inputs must be matched first.
-
-The metric representation can also be queried sparsely. That creates a second branch of the progression.
+Pull-based methods start in metric space. [Simple-BEV](/paper%20shorts/2022/06/16/simple-bev-what-really-matters-for-multi-sensor-bev-perception.html) projects each 3D voxel into the cameras and bilinearly samples the visible image features. Its controlled experiments found that input resolution and effective batch size changed vehicle-segmentation IoU more than the lifting operator in that setup. The result warns against reading every benchmark gain as evidence for a better view transformer; training recipe, image resolution, and sensor inputs must be matched first. The same metric representation can instead be queried sparsely.
 
 ## Sparse object-centric 3D: DETR3D, PETR, and StreamPETR
 
@@ -112,7 +112,7 @@ The difference from dense lifting is where the model spends its geometric budget
 
 [StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html) extends the object-query representation through time. Instead of rediscovering every actor from each frame, it retains a bounded queue of foreground queries, conditions them on ego pose, elapsed time, and velocity, and introduces fresh queries for newly visible actors. The temporal state is sparse and object-centric: it improves stability and occlusion handling without storing a full scene grid, but query birth, duplicate removal, aging, and stale false positives become part of the model.
 
-The sparse branch gives us an efficient answer for selected actors. Driving perception also needs a representation for everything between those actors: lanes, free space, occupancy, and map structure.
+Sparse queries represent selected actors efficiently. Driving perception also needs a representation for everything between those actors: lanes, free space, occupancy, and map structure.
 
 ## Dense scene-centric 3D: BEVFormer
 
@@ -151,9 +151,11 @@ BEV becomes a natural meeting room because a camera feature at $(x,y)$ and a LiD
 [![Animation showing the same actor and lane evidence entering point, object-query, and dense-BEV fusion](/assets/images/autonomous-perception-fusion-granularity.gif)](/assets/images/autonomous-perception-fusion-granularity.gif)
 _Point fusion retains camera features only at measured points. Query fusion gathers evidence around selected actors. Dense BEV fusion keeps actor evidence and the surrounding lane or occupancy field._
 
-## Proposal-conditioned fusion and deeper interaction
+### Proposal-conditioned fusion and deeper interaction
 
 The shared BEV path is not the only way to fuse. Proposal-based fusion spends compute selectively: [TransFusion](/paper%20shorts/2022/03/22/transfusion-robust-lidar-camera-fusion-with-transformers.html) uses LiDAR proposals to retrieve image evidence around candidate objects instead of trusting one calibrated pixel. This can be efficient and robust to small correspondence errors, but it exposes a structural failure mode. If LiDAR misses an object that the camera sees, a LiDAR-controlled proposal stage may never give the camera evidence a chance to recover it.
+
+> Proposal recall can become fusion recall. When one modality controls which hypotheses are allowed to gather cross-modal evidence, an upstream miss is no longer local to that sensor; it removes the recovery path from the rest of the model.
 
 [![Animation comparing LiDAR-controlled proposals, merged proposals from multiple modalities, and shared-BEV fusion before detection](/assets/images/autonomous-perception-proposal-recall.gif)](/assets/images/autonomous-perception-proposal-recall.gif)
 _Proposal-conditioned fusion is selective, but proposal recall can become a ceiling: a missed LiDAR proposal may prevent camera evidence from entering the refinement path. Multi-proposal fusion restores recall at the cost of matching and deduplication; shared BEV fusion preserves both modality fields before detection._
@@ -176,6 +178,41 @@ _Modality dropout covers discrete cases in which a stream is absent. A reliabili
 
 Sensor absence is only one failure mode. Blur, saturation, fog, reduced LiDAR beams, blocked fields of view, packet delay, and calibration drift leave a tensor present but unreliable. [Grace-BEV](/paper%20shorts/2026/05/29/grace-bev-graceful-degradation-under-sensor-failures.html) adds reliability-aware gating, while [MetaBEV](https://openaccess.thecvf.com/content/ICCV2023/html/Ge_MetaBEV_Solving_Sensor_Failures_for_3D_Detection_and_Map_Segmentation_ICCV_2023_paper.html) evaluates several corruptions in addition to missing streams. A production model needs both mechanisms: modality dropout for supported sensor configurations, and corruption training plus an observable health signal for partial degradation. Calibration noise should be included as a separate test because every projected association can be confidently wrong in the same direction.
 
+### Shared representations create shared failures
+
+A unified representation becomes most revealing when several outputs fail together. If detection, occupancy, and mapping break on the same frames—especially around construction zones, temporary lanes, unusual road geometry, or calibration perturbations—the shared projection into BEV is a stronger first hypothesis than three independent head bugs. The useful comparison is before and after that boundary: do LiDAR points still align with camera edges and object centers, does radar support the same actor locations, and does the disagreement appear inside each modality or only after projection and fusion? Correlated failures tell us where to look.
+
+> When several heads become wrong in the same place, ask which shared transformation could have made them agree on the wrong scene.
+
+That diagnosis changes what “more data” should mean. The model needs more examples of the geometry it misunderstands—construction zones, temporary lane layouts, unusual intersections—but it also needs examples in which the geometry is observed through imperfect calibration. A simple training perturbation replaces the nominal sensor-to-ego transform with
+
+$$
+T'_{\text{sensor}\rightarrow\text{ego}}
+=T_{\text{sensor}\rightarrow\text{ego}}\,\Delta T,
+$$
+
+where $\Delta T$ is a small sampled translation and rotation. The two interventions are complementary. More unusual roads do not teach tolerance to a shifted camera, and calibration noise on ordinary roads does not teach the topology of a temporary lane split.
+
+Data augmentation still leaves a conceptual problem: most projectors treat the destination of a feature as exact. We usually write
+
+$$
+p_{\text{BEV}}=\Pi(x;K,T),
+$$
+
+even though depth, calibration, ego pose, and timing all introduce uncertainty. The more honest object is
+
+$$
+p_{\text{BEV}}\sim P\!\left(p\mid x,K,T,\Sigma\right).
+$$
+
+This does not require a fully probabilistic projector. It requires the model to carry the evidence that projection may be wrong: depth confidence, calibration health, sensor-validity masks, timestamp uncertainty, and local agreement between modalities. Fusion can then treat cross-modal disagreement as information and reduce the influence of a feature whose geometry is inconsistent, rather than forcing every feature into a common grid with equal confidence.
+
+The same argument applies after fusion. A shared BEV saves compute and gives tasks a common scene, but it also gives one corrupted tensor a wide blast radius. Duplicating the full perception stack would throw away the benefit of sharing. A narrower compromise is to keep lightweight residual paths from modality-specific features or pre-fusion BEV maps into critical heads: enough camera or LiDAR evidence for a head to question the shared state, not enough to rebuild perception twice.
+
+> A shared representation should be an information interface, not a single point of unquestioned truth. Preserve confidence into fusion and a narrow independent path into critical tasks so one geometric error does not have to become every task's error.
+
+Those residual paths matter only if training makes them useful when the shared path is wrong. The result to watch is not merely average accuracy, but whether targeted geometry and calibration failures become less severe and less correlated across tasks. The next boundary makes this harder: once a bad fused feature enters temporal memory, a one-frame alignment error can outlive the sensor measurement that caused it.
+
 ## Time: sparse objects or a dense scene?
 
 Camera features and a single LiDAR sweep do not directly provide a complete object velocity, preserve evidence through an occlusion, or stabilize a noisy depth estimate. Radar supplies radial velocity, but not the full motion state of every actor. Temporal modeling fills the remaining gap by comparing evidence across frames. Old features must first be expressed in the current coordinate frame: ego-motion compensation aligns roads and static structures, while independently moving actors require velocity or learned motion updates. Timestamp error, pose error, and rolling-shutter effects appear as residual motion after alignment.
@@ -191,6 +228,8 @@ _Dense recurrence carries every BEV cell. Sparse4D v2 transforms recurrent objec
 _StreamPETR transforms selected object queries into the current frame, updates them from current images, and keeps the strongest foreground queries for the next step. Query selection saves memory but can discard weak evidence before an actor is confidently detected. Source: [StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html), Figure 3._
 
 [SparseBEV](/paper%20shorts/2023/08/18/sparsebev-high-performance-sparse-3d-object-detection.html) keeps sparse object support but retrieves from several stored frames, so its cost still grows with history length. “Sparse temporal” can therefore mean compressing history into recurrent state or retaining history and reading only selected locations; the two designs have different memory, latency, and error-accumulation behavior. StreamPETR remembers objects; SOLOFusion remembers the scene.
+
+> Temporal memory converts a transient error into persistent state. A stale query, bad ego-motion warp, or timestamp offset can survive after the originating measurement disappears, so every recurrent representation needs explicit freshness, aging, and reset behavior.
 
 Sparsity should be reported per component. A sparse LiDAR backbone avoids empty voxels; a sparse camera decoder avoids a full BEV field; a sparse temporal model avoids replaying every frame. None of them removes the dense surround-camera backbone. Sparse operators also pay for indexing, sorting, padding, gathers, and irregular memory access. FLOPs are therefore insufficient: the relevant deployment measurements are component latency, peak memory, P95/P99 end-to-end latency, active-token count in crowded scenes, and recall when the query budget saturates.
 
@@ -210,7 +249,7 @@ _Loss weighting changes gradient magnitude; GradNorm adjusts weights using relat
 
 ## Beyond BEV and queries: a compressed world state
 
-Dense BEV memory preserves a great deal of spatial structure, while sparse queries preserve selected actors. A natural next question is whether the world can be compressed into a smaller learned state without collapsing it into one undifferentiated vector.
+Dense BEV memory preserves spatial structure, while sparse queries preserve selected actors. The next compression step is a smaller learned state that does not collapse the scene into one undifferentiated vector.
 
 [![Animation comparing dense BEV memory, sparse object queries, learned latent tokens, and a single pooled embedding](/assets/images/autonomous-perception-latent-memory.gif)](/assets/images/autonomous-perception-latent-memory.gif)
 _The compression ladder keeps the scene fixed while changing what persists: every BEV cell, selected actors, a small learned token set, or one pooled vector. The further right the representation moves, the more the model must learn which spatial evidence is worth retaining._
