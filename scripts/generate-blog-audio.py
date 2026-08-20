@@ -15,8 +15,8 @@ The model is loaded once per invocation. Existing files whose source hash and
 voice settings are unchanged are skipped, so the command is safe to rerun
 after adding or editing posts. A built-in speaker avoids an in-context audio
 reference entirely, so no reference phrase can be replayed at a chunk
-boundary. Low-temperature sampling with a stable per-chunk seed keeps runs
-reproducible without relying on greedy decoding's unreliable long-form stop.
+boundary. One fixed delivery instruction and one shared seed keep the same
+narrator profile across every chunk and post.
 """
 
 from __future__ import annotations
@@ -41,17 +41,23 @@ ROOT = Path(__file__).resolve().parents[1]
 POSTS_DIR = ROOT / "src" / "content" / "posts"
 AUDIO_DIR = ROOT / "public" / "assets" / "audio" / "blog"
 MANIFEST_PATH = ROOT / "public" / "assets" / "audio" / "manifest.json"
-MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-8bit"
+MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-CustomVoice-8bit"
 VOICE = "Ryan"
 LANGUAGE = "English"
 LANGUAGE_CODE = "english"
 # Do not use Qwen ICL for static narration. Its spoken reference can be replayed
-# at each independently synthesized article chunk. Ryan is the model's built-in
-# English speaker, so every chunk is generated from its article text only.
-VOICE_MODE = "predefined-speaker-generated-only-v1"
+# at each independently synthesized article chunk. CustomVoice keeps Ryan's
+# built-in speaker identity and applies the same non-spoken delivery instruction
+# to every chunk, so identity and style do not have to be redesigned repeatedly.
+VOICE_MODE = "custom-voice-fixed-profile-v2"
+VOICE_INSTRUCT = (
+    "Use a calm, warm, measured technical-narration delivery. Keep a natural "
+    "low-mid register, close-miked clarity, restrained emphasis, and steady pacing."
+)
 TEMPERATURE = 0.05
 TOP_P = 0.9
-SAMPLING_SEED_VERSION = "per-post-chunk-v1"
+NARRATOR_SEED = 1904
+SAMPLING_SEED_VERSION = "single-narrator-v2"
 SPEED = 1.0
 BITRATE = "64k"
 MAX_CHARS = 360  # Proven reliable bound; low-temperature seeded sampling prevents drift.
@@ -70,6 +76,12 @@ EXTRACTION_VERSION = "markdown-prose-v5-narration"
 DEFAULT_BATCH_SIZE = 1
 MIN_GENERATION_TOKENS = 128
 MAX_TOKENS_PER_CHAR = 1.05
+FORBIDDEN_REFERENCE_FIELDS = {
+    "reference_audio_sha256",
+    "reference_text",
+    "icl_decode_mode",
+    "icl_streaming_interval",
+}
 
 
 def parse_frontmatter(source: str) -> dict[str, str]:
@@ -273,8 +285,10 @@ def discover_posts() -> list[dict[str, Any]]:
                     "language": LANGUAGE,
                     "language_code": LANGUAGE_CODE,
                     "voice_mode": VOICE_MODE,
+                    "voice_instruct": VOICE_INSTRUCT,
                     "temperature": TEMPERATURE,
                     "top_p": TOP_P,
+                    "narrator_seed": NARRATOR_SEED,
                     "sampling_seed_version": SAMPLING_SEED_VERSION,
                     "speed": SPEED,
                     "bitrate": BITRATE,
@@ -316,6 +330,29 @@ def write_manifest(manifest: dict[str, Any]) -> None:
     temporary.replace(MANIFEST_PATH)
 
 
+def narrator_profile_errors(posts: list[dict[str, Any]], manifest: dict[str, Any]) -> list[str]:
+    """Return manifest violations that could make the Blog sound multi-speaker."""
+
+    expected = {
+        "model": MODEL,
+        "voice": VOICE,
+        "voice_mode": VOICE_MODE,
+        "voice_instruct": VOICE_INSTRUCT,
+        "narrator_seed": NARRATOR_SEED,
+        "sampling_seed_version": SAMPLING_SEED_VERSION,
+    }
+    errors: list[str] = []
+    for post in posts:
+        record = manifest.get(post["slug"], {})
+        mismatched = [key for key, value in expected.items() if record.get(key) != value]
+        forbidden = sorted(FORBIDDEN_REFERENCE_FIELDS.intersection(record))
+        if mismatched:
+            errors.append(f"{post['slug']}: narrator fields differ: {', '.join(mismatched)}")
+        if forbidden:
+            errors.append(f"{post['slug']}: forbidden reference fields: {', '.join(forbidden)}")
+    return errors
+
+
 def verify_ffmpeg() -> None:
     if shutil.which("ffmpeg") is None:
         raise RuntimeError("ffmpeg is required; install it with `brew install ffmpeg`.")
@@ -340,13 +377,12 @@ def trim_boundary_silence(audio: Any) -> Any:
     return samples[start:end]
 
 
-def seed_chunk_generation(post_slug: str, chunk_index: int) -> None:
-    """Make low-temperature sampling reproducible without forcing greedy EOS behavior."""
+def seed_narrator_generation() -> None:
+    """Reset every chunk to one stable narrator sampling profile."""
 
     import mlx.core as mx
 
-    digest = hashlib.sha256(f"{post_slug}:{chunk_index}".encode("utf-8")).digest()
-    mx.random.seed(int.from_bytes(digest[:4], byteorder="big"))
+    mx.random.seed(NARRATOR_SEED)
 
 
 def generate_post(
@@ -371,7 +407,7 @@ def generate_post(
                 chunk_batch = chunks[batch_start : batch_start + batch_size]
                 results_by_index: dict[int, tuple[Any, int]] = {}
                 if len(chunk_batch) == 1:
-                    seed_chunk_generation(post["slug"], batch_start)
+                    seed_narrator_generation()
                     max_tokens = max(
                         MIN_GENERATION_TOKENS,
                         math.ceil(len(chunk_batch[0]) * MAX_TOKENS_PER_CHAR),
@@ -380,6 +416,7 @@ def generate_post(
                         model.generate(
                             text=chunk_batch[0],
                             voice=VOICE,
+                            instruct=VOICE_INSTRUCT,
                             lang_code=LANGUAGE_CODE,
                             temperature=TEMPERATURE,
                             top_p=TOP_P,
@@ -487,7 +524,13 @@ def main() -> int:
             for post in stale:
                 print(f"  {post['slug']}", file=sys.stderr)
             return 1
-        print(f"Audio check passed for {len(posts)} Blog posts.")
+        profile_errors = narrator_profile_errors(posts, manifest)
+        if profile_errors:
+            print("Blog narrator profile is inconsistent:", file=sys.stderr)
+            for error in profile_errors:
+                print(f"  {error}", file=sys.stderr)
+            return 1
+        print(f"Audio and narrator-profile checks passed for {len(posts)} Blog posts.")
         return 0
 
     if not stale and not args.force:
@@ -500,7 +543,7 @@ def main() -> int:
     targets = posts if args.force else stale
     print(
         f"Loading {MODEL} once for {len(targets)} post(s) "
-        f"with predefined speaker {VOICE} and no spoken reference..."
+        f"with fixed CustomVoice speaker {VOICE} and no spoken reference..."
     )
     model = load_model(MODEL)
     with tqdm(total=len(targets), desc="Blogs", unit="post", position=0) as blog_progress:
@@ -522,8 +565,10 @@ def main() -> int:
                 "language": LANGUAGE,
                 "language_code": LANGUAGE_CODE,
                 "voice_mode": VOICE_MODE,
+                "voice_instruct": VOICE_INSTRUCT,
                 "temperature": TEMPERATURE,
                 "top_p": TOP_P,
+                "narrator_seed": NARRATOR_SEED,
                 "sampling_seed_version": SAMPLING_SEED_VERSION,
                 "speed": SPEED,
                 "bitrate": BITRATE,
