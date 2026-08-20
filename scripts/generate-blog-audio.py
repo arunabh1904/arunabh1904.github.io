@@ -13,8 +13,9 @@ Usage:
 
 The model is loaded once per invocation. Existing files whose source hash and
 voice settings are unchanged are skipped, so the command is safe to rerun
-after adding or editing posts. The fixed synthetic ICL reference anchors one
-narrator; low-temperature sampling with a stable per-chunk seed keeps runs
+after adding or editing posts. A built-in speaker avoids an in-context audio
+reference entirely, so no reference phrase can be replayed at a chunk
+boundary. Low-temperature sampling with a stable per-chunk seed keeps runs
 reproducible without relying on greedy decoding's unreliable long-form stop.
 """
 
@@ -41,25 +42,16 @@ POSTS_DIR = ROOT / "src" / "content" / "posts"
 AUDIO_DIR = ROOT / "public" / "assets" / "audio" / "blog"
 MANIFEST_PATH = ROOT / "public" / "assets" / "audio" / "manifest.json"
 MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-8bit"
-VOICE = "synthetic-clean-warm-icl"
+VOICE = "Ryan"
 LANGUAGE = "English"
 LANGUAGE_CODE = "english"
-# This is a deliberately synthetic narrator reference, not a recording of a person.
-# The matching transcript is required by Qwen3-TTS in-context learning (ICL).
-REFERENCE_AUDIO_PATH = ROOT / "scripts" / "audio-assets" / "clean-warm-synthetic-reference.wav"
-REFERENCE_TEXT = (
-    "I will guide you through technical ideas with calm confidence. "
-    "The delivery is warm, clear, and measured."
-)
+# Do not use Qwen ICL for static narration. Its spoken reference can be replayed
+# at each independently synthesized article chunk. Ryan is the model's built-in
+# English speaker, so every chunk is generated from its article text only.
+VOICE_MODE = "predefined-speaker-generated-only-v1"
 TEMPERATURE = 0.05
 TOP_P = 0.9
 SAMPLING_SEED_VERSION = "per-post-chunk-v1"
-# The ordinary ICL decode path reconstructs reference and generated codes together,
-# then estimates a waveform cut.  That estimate can leave the reference phrase at
-# the start of every article chunk.  The streaming decoder reconstructs generated
-# codes only; the deliberately high interval still returns one final result here.
-ICL_DECODE_MODE = "generated-only-streaming-v1"
-ICL_STREAMING_INTERVAL = 120.0
 SPEED = 1.0
 BITRATE = "64k"
 MAX_CHARS = 360  # Proven reliable bound; low-temperature seeded sampling prevents drift.
@@ -91,17 +83,6 @@ def parse_frontmatter(source: str) -> dict[str, str]:
         if separator:
             values[key.strip()] = value.strip().strip("'\"")
     return values
-
-
-def reference_audio_sha256() -> str:
-    """Return a stable identity for the fixed synthetic narrator reference."""
-
-    if not REFERENCE_AUDIO_PATH.is_file():
-        raise FileNotFoundError(
-            f"Missing narrator reference: {REFERENCE_AUDIO_PATH}. "
-            "Restore the committed synthetic reference before exporting audio."
-        )
-    return hashlib.sha256(REFERENCE_AUDIO_PATH.read_bytes()).hexdigest()
 
 
 def _table_sentences(rows: list[str]) -> list[str]:
@@ -273,7 +254,6 @@ def split_for_tts(text: str, max_chars: int = MAX_CHARS) -> list[str]:
 
 def discover_posts() -> list[dict[str, Any]]:
     posts: list[dict[str, Any]] = []
-    reference_hash = reference_audio_sha256()
     for path in sorted(POSTS_DIR.glob("*.md")) + sorted(POSTS_DIR.glob("*.mdx")):
         source = path.read_text(encoding="utf-8")
         frontmatter = parse_frontmatter(source)
@@ -292,14 +272,10 @@ def discover_posts() -> list[dict[str, Any]]:
                     "voice": VOICE,
                     "language": LANGUAGE,
                     "language_code": LANGUAGE_CODE,
-                    "voice_mode": "in-context-learning",
-                    "reference_audio_sha256": reference_hash,
-                    "reference_text": REFERENCE_TEXT,
+                    "voice_mode": VOICE_MODE,
                     "temperature": TEMPERATURE,
                     "top_p": TOP_P,
                     "sampling_seed_version": SAMPLING_SEED_VERSION,
-                    "icl_decode_mode": ICL_DECODE_MODE,
-                    "icl_streaming_interval": ICL_STREAMING_INTERVAL,
                     "speed": SPEED,
                     "bitrate": BITRATE,
                     "max_chars": MAX_CHARS,
@@ -403,51 +379,25 @@ def generate_post(
                     results = list(
                         model.generate(
                             text=chunk_batch[0],
-                            ref_audio=str(REFERENCE_AUDIO_PATH),
-                            ref_text=REFERENCE_TEXT,
+                            voice=VOICE,
                             lang_code=LANGUAGE_CODE,
                             temperature=TEMPERATURE,
                             top_p=TOP_P,
                             repetition_penalty=1.5,
                             split_pattern="",
                             max_tokens=max_tokens,
-                            stream=True,
-                            streaming_interval=ICL_STREAMING_INTERVAL,
+                            stream=False,
                         )
                     )
-                    if not results or any(
-                        not getattr(result, "is_streaming_chunk", False) for result in results
-                    ):
+                    if len(results) != 1:
                         raise RuntimeError(
-                            "Qwen ICL did not return generated-only streaming audio; refusing "
-                            "to export a reference-prefixed chunk."
+                            "Qwen direct speaker synthesis did not return exactly one complete "
+                            "audio result; refusing to concatenate an ambiguous chunk."
                         )
                     results_by_index[0] = (
-                        np.concatenate(
-                            [trim_boundary_silence(result.audio) for result in results], axis=0
-                        ),
+                        trim_boundary_silence(results[0].audio),
                         results[0].sample_rate,
                     )
-                else:
-                    for result in model.batch_generate(
-                        texts=chunk_batch,
-                        voices=[None] * len(chunk_batch),
-                        ref_audio=str(REFERENCE_AUDIO_PATH),
-                        ref_text=REFERENCE_TEXT,
-                        temperature=TEMPERATURE,
-                        top_p=TOP_P,
-                        repetition_penalty=1.5,
-                        lang_code=LANGUAGE_CODE,
-                        max_tokens=max(
-                            max(MIN_GENERATION_TOKENS, math.ceil(len(chunk) * MAX_TOKENS_PER_CHAR))
-                            for chunk in chunk_batch
-                        ),
-                    ):
-                        # Non-streaming batch generation yields one complete audio
-                        # result per sequence. Current mlx-audio marks these events
-                        # as non-streaming rather than setting is_final_chunk.
-                        results_by_index[result.sequence_idx] = (result.audio, result.sample_rate)
-
                 missing = set(range(len(chunk_batch))) - results_by_index.keys()
                 if missing:
                     missing_chunks = ", ".join(str(batch_start + index + 1) for index in sorted(missing))
@@ -517,11 +467,11 @@ def main() -> int:
         "--batch-size",
         type=int,
         default=DEFAULT_BATCH_SIZE,
-        help="Must remain 1: generated-only Qwen ICL decoding is direct-only.",
+        help="Must remain 1: direct speaker synthesis is verified one chunk at a time.",
     )
     args = parser.parse_args()
     if args.batch_size != 1:
-        parser.error("--batch-size must be 1: generated-only Qwen ICL decoding is direct-only")
+        parser.error("--batch-size must be 1: direct speaker synthesis is verified one chunk at a time")
 
     posts = select_posts(discover_posts(), args.post)
     manifest = read_manifest()
@@ -550,7 +500,7 @@ def main() -> int:
     targets = posts if args.force else stale
     print(
         f"Loading {MODEL} once for {len(targets)} post(s) "
-        f"with the fixed synthetic narrator reference..."
+        f"with predefined speaker {VOICE} and no spoken reference..."
     )
     model = load_model(MODEL)
     with tqdm(total=len(targets), desc="Blogs", unit="post", position=0) as blog_progress:
@@ -571,14 +521,10 @@ def main() -> int:
                 "voice": VOICE,
                 "language": LANGUAGE,
                 "language_code": LANGUAGE_CODE,
-                "voice_mode": "in-context-learning",
-                "reference_audio_sha256": reference_audio_sha256(),
-                "reference_text": REFERENCE_TEXT,
+                "voice_mode": VOICE_MODE,
                 "temperature": TEMPERATURE,
                 "top_p": TOP_P,
                 "sampling_seed_version": SAMPLING_SEED_VERSION,
-                "icl_decode_mode": ICL_DECODE_MODE,
-                "icl_streaming_interval": ICL_STREAMING_INTERVAL,
                 "speed": SPEED,
                 "bitrate": BITRATE,
                 "max_chars": MAX_CHARS,
