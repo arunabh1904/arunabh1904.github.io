@@ -2,7 +2,7 @@
   "attention-mechanisms-demystified": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "97a3898a4b6b467389efab4304065e9f11cbd54981d5b31f5c7a827fbb627cff",
+    "digest": "56d1530288ebe0c9c16f658a8a1efb56aa1f5b29905fc7da198b92d3e4124ead",
     "file": "/assets/audio/blog/attention-mechanisms-demystified.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -27,7 +27,7 @@
   "building-local-blog-audio-with-qwen3-tts": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "3106a18bc16baf394fb98a7626d454a72c7a71fd1d250730903ed51dd37812e3",
+    "digest": "2725f9228acb5f2cbd1947647991658cfd0db040d19a89ec0908aca2699039ad",
     "file": "/assets/audio/blog/building-local-blog-audio-with-qwen3-tts.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -52,7 +52,7 @@
   "code-is-cheap-understanding-isnt": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "9e3accc1aa24a275b3f755246a20b50cfac80525df8791d500e7ee36c74b049a",
+    "digest": "bfeea4b204cca046ed9ccf8e7ee649637c29661e53ce7a3075dd08e252cb7f05",
     "file": "/assets/audio/blog/code-is-cheap-understanding-isnt.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -77,7 +77,7 @@
   "from-ppo-to-grpo-rl-for-reasoning-and-vlas": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "9bf240b7aed684466981e35093f49b1828bd90d83939bc881b14ba44a370ce83",
+    "digest": "a3a26c8b33a9bd947ae98b973525f924ad6292e5c5cd244987dbe25c23020944",
     "file": "/assets/audio/blog/from-ppo-to-grpo-rl-for-reasoning-and-vlas.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -102,7 +102,7 @@
   "from-seeing-to-doing-the-evolution-of-vision-language-models": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "ba406a94955fc842a8f357a92029edb947e3b96ee76fa83c971d24aee7e2cb33",
+    "digest": "89bb6f5a091d9ccc723d20bdb526b318491e4f046402dc6d07b36a1123785e48",
     "file": "/assets/audio/blog/from-seeing-to-doing-the-evolution-of-vision-language-models.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -127,7 +127,7 @@
   "how-to-read-scaling-laws-for-language-models": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "5d20c33a31f9e4789a6a0af6de6479e9f82d0b0cde75b89bb34c17aafb68a02d",
+    "digest": "59abea9f22e5780c27f1e6bc528c8af7f34f90f218796c3f6c69d2fbc82c288c",
     "file": "/assets/audio/blog/how-to-read-scaling-laws-for-language-models.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -152,7 +152,7 @@
   "how-unified-sensor-models-are-built-for-autonomous-driving": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "4ecd9671e807a8bcc6a405c3eaaca6d4141d13c007753c8f292426bd3a8514f6",
+    "digest": "34e509ccfee3778c7057dc741ee802bf253e5fe58acf465634491909b20661c7",
     "file": "/assets/audio/blog/how-unified-sensor-models-are-built-for-autonomous-driving.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -177,7 +177,7 @@
   "my-journey-so-far-full-story": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "facc449d2f48cd0df2bc8038ce6062bd8a9c7108dc7cf1eb2cdd1b172c0766e9",
+    "digest": "9f32be93703438d452ada560f9d39b8610dd68d6e1caebc0e075e68b752e48dd",
     "file": "/assets/audio/blog/my-journey-so-far-full-story.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -202,7 +202,7 @@
   "omni-model-pretraining-decisions": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "d29b118ba1a25525ebbb7add9f399372fc2cf26212bc5a40c454adb60b6da640",
+    "digest": "7a6f173ad612103f06ba6a276758bb60e897915a87fddfb89a3c9e7a630075e9",
     "file": "/assets/audio/blog/omni-model-pretraining-decisions.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -227,7 +227,7 @@
   "open-weight-models-that-fit-on-a-64-gb-macbook-pro": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "1ddfc2b0c334f42dfa7c5c28a97d7952dfdee6232e25efbad22d5b26a62b3aeb",
+    "digest": "2dc0db5a19aaf467693ccbf436b4665014fcd0290248ffb932409a765a5d81e8",
     "file": "/assets/audio/blog/open-weight-models-that-fit-on-a-64-gb-macbook-pro.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -252,7 +252,7 @@
   "post-training-vision-language-action-models-zero-to-hero": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "154e4b1a38be758f224e82b2c04c49d58ee1b4f5d367936e2f587270ba57789e",
+    "digest": "0db762d92826370ef446a57d4abecc07160270814053f702f1da28a844a826b7",
     "file": "/assets/audio/blog/post-training-vision-language-action-models-zero-to-hero.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -277,7 +277,7 @@
   "replacing-openclaw-with-hermes-agent-using-local-weights": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "1a1f80fdff3ce96e85ab99f91c452e7b66527317fc3c17dbdfc8eb554a2a82c3",
+    "digest": "5b187a46b319b462606472695eadc8c07578500a97b7122771af312d726ee758",
     "file": "/assets/audio/blog/replacing-openclaw-with-hermes-agent-using-local-weights.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -302,7 +302,7 @@
   "running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "83bff9825940ef22f78d804d8d0e60553df00048765ef6ad92573bbeb95a1207",
+    "digest": "b6b83d7c825d0a83a0528204d6ee790ebf5bbc6e81da1de1865d50e8502acb54",
     "file": "/assets/audio/blog/running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -327,7 +327,7 @@
   "running-gemma-4-locally-on-a-64-gb-macbook-pro": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "e0cf12ed482d966d8c40f2905b5d2aa0e6661bd1576de6888083fb569bf582e8",
+    "digest": "9e0b088e595c8bbebe84e735eff111d639b315571868cb65959e892c2698c7fa",
     "file": "/assets/audio/blog/running-gemma-4-locally-on-a-64-gb-macbook-pro.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -352,7 +352,7 @@
   "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "182d474c714e58dc653841d4a75088cae6dd2d95a3103bd35b3cbade4a9390e7",
+    "digest": "4ab0220f9e09c1091d07eca22178abf9f8d204c504a89b83fbd1b6acddc4dcb3",
     "file": "/assets/audio/blog/running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -377,7 +377,7 @@
   "running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "9dd5ef87606fe33ced763e0963e65dfea160fc011a68b292926b71491fdd6e06",
+    "digest": "67b72fb3089e37c83e3c1d9a8e862f0d2b37bb4b41a1b3c92f8cfac1c88618db",
     "file": "/assets/audio/blog/running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
@@ -402,7 +402,7 @@
   "thoughts-on-good-research-in-industry": {
     "bitrate": "64k",
     "boundary_silence_samples": 1200,
-    "digest": "4101a5be4f28ae0a050c63ccc488f58c1b22a34136b26b75612a9dda71eb045a",
+    "digest": "794a866854115a15441728cc982ab2e08080748833922ee30fd8065c180b71df",
     "file": "/assets/audio/blog/thoughts-on-good-research-in-industry.mp3",
     "icl_decode_mode": "generated-only-streaming-v1",
     "icl_streaming_interval": 120.0,
