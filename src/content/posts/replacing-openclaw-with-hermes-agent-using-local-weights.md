@@ -159,4 +159,4 @@ The architecture is now clean:
 - `llama.cpp` for the local serving layer
 - existing local weights for inference
 
-> **Deep insight.** Separating the agent layer, serving layer, and model artifacts prevents one tool's lifecycle from determining all three. It makes an agent replacement, runtime change, or weight update independently testable.
+> Separating the agent layer, serving layer, and model artifacts prevents one tool's lifecycle from determining all three. It makes an agent replacement, runtime change, or weight update independently testable.

@@ -151,4 +151,4 @@ If I cared about the fastest usable runtime on this machine, the answer is no lo
 2. `llama.cpp` second
 3. `Ollama` only after a fresh compatibility run
 
-> **Deep insight.** The best model, the best daily model, and the best runtime are different optimization targets. The measurements favor `31B` for maximum local capability, `26B A4B` for daily use, and `MLX` for speed on this machine.
+> The best model, the best daily model, and the best runtime are different optimization targets. The measurements favor `31B` for maximum local capability, `26B A4B` for daily use, and `MLX` for speed on this machine.

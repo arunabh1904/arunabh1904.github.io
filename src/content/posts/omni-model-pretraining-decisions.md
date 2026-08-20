@@ -16,7 +16,7 @@ summary: The key decisions behind pretraining multimodal robot policies.
 
 A robot can inherit the word “drawer” from the internet. The internet does not tell it how a sticky drawer feels, how far a particular arm can reach, or what to do after the gripper slips. Multimodal pretraining works because semantic and motor experience can transfer. It fails when “put everything in one model” becomes a substitute for deciding what should transfer, through which parameters, and under what evidence.
 
-> **Deep insight.** The decisive choices arrive before the large run: representation, prediction target, data-accounting unit, and gradient allocation. A shared trunk can enable transfer while a high-volume modality quietly controls every update, so “one model” is not evidence of balanced learning.
+> The decisive choices arrive before the large run: representation, prediction target, data-accounting unit, and gradient allocation. A shared trunk can enable transfer while a high-volume modality quietly controls every update, so “one model” is not evidence of balanced learning.
 
 This guide is about making those choices legible. Its central claim is that a VLA is not created by adding an action head to a VLM. It is created by combining three priors—semantic, visual, and motor—without letting the cheapest one erase the others.
 

@@ -21,7 +21,7 @@ A read-aloud control looks like a browser feature. The engineering problem is re
 
 I wanted the result to work on a commute. That ruled out a one-off desktop script and ruled out delegating the experience to whatever speech voice happens to be installed in a visitor's browser. The site now generates MP3s locally, commits them as ordinary static assets, and gives every Blog post a native player with play, pause, seeking, and speed controls. The browser only downloads audio. It never loads a model, sends post text to an API, or waits for synthesis.
 
-> **Deep insight.** The difficult part is not adding a player. It is preserving the boundary between an authored document and a coherent narration, so synthesis is reproducible and serving stays static.
+> The difficult part is not adding a player. It is preserving the boundary between an authored document and a coherent narration, so synthesis is reproducible and serving stays static.
 
 ## The architecture: export once, serve statically
 

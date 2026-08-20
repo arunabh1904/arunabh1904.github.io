@@ -145,4 +145,4 @@ For this measured snapshot, my practical recommendation is simple:
 3. Keep `Qwen 3.5 9B` in the mix if you specifically care about the 3.5 family behavior and do not mind the extra latency and memory overhead.
 4. Prefer `MLX` first on this Mac unless a specific `llama.cpp` model artifact or integration path gives you a reason to switch.
 
-> **Deep insight.** Local-model choice is a measured systems decision, not a parameter-count contest. On this machine, long-prompt latency and memory headroom change the recommendation more than the release notes do.
+> Local-model choice is a measured systems decision, not a parameter-count contest. On this machine, long-prompt latency and memory headroom change the recommendation more than the release notes do.

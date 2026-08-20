@@ -36,7 +36,7 @@ Neither prior guarantees that the deployed policy occupies familiar states. [DAg
 
 This is the first mental model to keep:
 
-> **Deep insight.** Supervised fine-tuning learns what to do in the states represented by its data. Interactive post-training changes which states become data, which is why a small set of recovery trajectories can be worth more than a large set of already-successful demonstrations.
+> Supervised fine-tuning learns what to do in the states represented by its data. Interactive post-training changes which states become data, which is why a small set of recovery trajectories can be worth more than a large set of already-successful demonstrations.
 
 That difference is why another million successful demonstrations may be worth less than ten thousand carefully selected recoveries.
 
