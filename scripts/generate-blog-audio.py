@@ -30,6 +30,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -58,9 +59,11 @@ TEMPERATURE = 0.05
 TOP_P = 0.9
 NARRATOR_SEED = 1904
 SAMPLING_SEED_VERSION = "single-narrator-v2"
-SPEED = 1.0
+SPEED = 1.10
 BITRATE = "64k"
 MAX_CHARS = 360  # Proven reliable bound; low-temperature seeded sampling prevents drift.
+SENTENCE_PAUSE_SECONDS = 0.18
+SENTENCE_PAUSE_POLICY = "explicit-after-sentence-v1"
 SILENCE_THRESHOLD = 0.008  # -42 dBFS; matches the verification threshold below.
 BOUNDARY_SILENCE_SAMPLES = 1_200  # Retain 50 ms at 24 kHz, without a synthetic gap.
 LONG_SILENCE_DURATION = 0.6
@@ -72,6 +75,7 @@ SILENCE_FILTER = (
     f"stop_periods=-1:stop_duration={LONG_SILENCE_DURATION}:"
     f"stop_threshold={SILENCE_THRESHOLD}:stop_silence={RETAINED_SILENCE_DURATION}"
 )
+AUDIO_FILTER = f"{SILENCE_FILTER},atempo={SPEED}"
 EXTRACTION_VERSION = "markdown-prose-v5-narration"
 DEFAULT_BATCH_SIZE = 1
 MIN_GENERATION_TOKENS = 128
@@ -82,6 +86,14 @@ FORBIDDEN_REFERENCE_FIELDS = {
     "icl_decode_mode",
     "icl_streaming_interval",
 }
+
+
+@dataclass(frozen=True)
+class NarrationChunk:
+    """One bounded synthesis unit and whether it ends a source sentence."""
+
+    text: str
+    pause_after: bool
 
 
 def parse_frontmatter(source: str) -> dict[str, str]:
@@ -226,12 +238,11 @@ def shape_narration(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def split_for_tts(text: str, max_chars: int = MAX_CHARS) -> list[str]:
-    """Split on sentence/paragraph boundaries while keeping model inputs bounded."""
+def split_for_tts(text: str, max_chars: int = MAX_CHARS) -> list[NarrationChunk]:
+    """Return sentence-scoped chunks, splitting only overlong sentences further."""
 
     sentences = re.split(r"(?<=[.!?])\s+", text)
-    chunks: list[str] = []
-    current = ""
+    chunks: list[NarrationChunk] = []
     for sentence in sentences:
         sentence = sentence.strip()
         if not sentence:
@@ -252,15 +263,13 @@ def split_for_tts(text: str, max_chars: int = MAX_CHARS) -> list[str]:
         else:
             sentence_parts = [sentence]
 
-        for part in sentence_parts:
-            candidate = f"{current} {part}".strip()
-            if current and len(candidate) > max_chars:
-                chunks.append(current)
-                current = part
-            else:
-                current = candidate
-    if current:
-        chunks.append(current)
+        for index, part in enumerate(sentence_parts):
+            chunks.append(
+                NarrationChunk(
+                    text=part,
+                    pause_after=index == len(sentence_parts) - 1,
+                )
+            )
     return chunks
 
 
@@ -291,6 +300,8 @@ def discover_posts() -> list[dict[str, Any]]:
                     "narrator_seed": NARRATOR_SEED,
                     "sampling_seed_version": SAMPLING_SEED_VERSION,
                     "speed": SPEED,
+                    "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
+                    "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
                     "bitrate": BITRATE,
                     "max_chars": MAX_CHARS,
                     "silence_threshold": SILENCE_THRESHOLD,
@@ -340,6 +351,9 @@ def narrator_profile_errors(posts: list[dict[str, Any]], manifest: dict[str, Any
         "voice_instruct": VOICE_INSTRUCT,
         "narrator_seed": NARRATOR_SEED,
         "sampling_seed_version": SAMPLING_SEED_VERSION,
+        "speed": SPEED,
+        "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
+        "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
     }
     errors: list[str] = []
     for post in posts:
@@ -402,6 +416,7 @@ def generate_post(
         temporary = Path(temporary_dir)
         manifest_file = temporary / "concat.txt"
         chunk_paths: list[Path] = []
+        pause_paths: dict[int, Path] = {}
         with manifest_file.open("w", encoding="utf-8") as listing:
             for batch_start in range(0, len(chunks), batch_size):
                 chunk_batch = chunks[batch_start : batch_start + batch_size]
@@ -410,11 +425,11 @@ def generate_post(
                     seed_narrator_generation()
                     max_tokens = max(
                         MIN_GENERATION_TOKENS,
-                        math.ceil(len(chunk_batch[0]) * MAX_TOKENS_PER_CHAR),
+                        math.ceil(len(chunk_batch[0].text) * MAX_TOKENS_PER_CHAR),
                     )
                     results = list(
                         model.generate(
-                            text=chunk_batch[0],
+                            text=chunk_batch[0].text,
                             voice=VOICE,
                             instruct=VOICE_INSTRUCT,
                             lang_code=LANGUAGE_CODE,
@@ -450,6 +465,24 @@ def generate_post(
                     audio_write(str(chunk_path), audio, sample_rate, format="wav")
                     chunk_paths.append(chunk_path)
                     listing.write(f"file '{chunk_path.as_posix()}'\n")
+                    if chunks[index].pause_after and index < len(chunks) - 1:
+                        pause_path = pause_paths.get(sample_rate)
+                        if pause_path is None:
+                            pause_path = temporary / f"sentence-pause-{sample_rate}.wav"
+                            # ffmpeg applies atempo to the concatenated stream. Make the
+                            # source pause proportionally longer so the delivered MP3 keeps
+                            # the requested pause duration after the 1.10x tempo increase.
+                            pause_samples = round(
+                                sample_rate * SENTENCE_PAUSE_SECONDS * SPEED
+                            )
+                            audio_write(
+                                str(pause_path),
+                                np.zeros(pause_samples, dtype=np.float32),
+                                sample_rate,
+                                format="wav",
+                            )
+                            pause_paths[sample_rate] = pause_path
+                        listing.write(f"file '{pause_path.as_posix()}'\n")
                     chunk_progress.update(1)
 
         temporary_mp3 = temporary / "audio.mp3"
@@ -467,7 +500,7 @@ def generate_post(
                 "-i",
                 str(manifest_file),
                 "-af",
-                SILENCE_FILTER,
+                AUDIO_FILTER,
                 "-ac",
                 "1",
                 "-ar",
@@ -571,6 +604,8 @@ def main() -> int:
                 "narrator_seed": NARRATOR_SEED,
                 "sampling_seed_version": SAMPLING_SEED_VERSION,
                 "speed": SPEED,
+                "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
+                "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
                 "bitrate": BITRATE,
                 "max_chars": MAX_CHARS,
                 "silence_threshold": SILENCE_THRESHOLD,
