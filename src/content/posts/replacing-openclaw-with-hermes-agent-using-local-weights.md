@@ -10,7 +10,8 @@ tags:
   - LLMs
   - Apple Silicon
 summary: >-
-  How to run Hermes Agent locally with llama.cpp and an existing GGUF.
+  How Hermes Agent, an OpenAI-compatible localhost endpoint, llama.cpp, and an
+  already-downloaded Gemma GGUF fit together.
 ---
 # Running Hermes Agent with a Local GGUF
 
@@ -42,7 +43,9 @@ The figure shows the boundary that resolved the setup. A prompt does not travel 
 
 This separation also changes how to debug. If Hermes cannot reach `/v1/chat/completions`, inspect the endpoint and configuration. If the endpoint returns HTTP `500` while loading a model, inspect the runtime, artifact, and hardware path. If text is generated but tools appear as plain text, inspect the server's chat template and tool-call support. Treating those as three different contracts avoids reinstalling the wrong layer.
 
-## Installing Hermes Agent
+> **Deep insight:** The API boundary is also the debugging boundary. Agent behavior, serving behavior, and model loading can fail independently, so each needs its own test.
+
+## Install Hermes
 
 The Hermes install was not the hard part:
 
@@ -60,7 +63,7 @@ That bootstrapped:
 
 The real question was what local model server Hermes should talk to.
 
-## Why Ollama did not work
+## Why Ollama failed
 
 Since I already had Ollama installed and local Gemma tags visible, I tried the most obvious route first.
 
@@ -68,7 +71,7 @@ Hermes could see the local endpoint. Ollama listed local Gemma models. But actua
 
 The key realization: Hermes was not the problem. My local model server choice was.
 
-## `llama-server` with a local Gemma GGUF
+## Serve the local GGUF
 
 The machine already had local Gemma GGUF artifacts in the Hugging Face cache, including:
 
@@ -108,7 +111,7 @@ http://127.0.0.1:18080/v1
 
 That split worked: Hermes stayed as the agent shell, and `llama.cpp` handled local serving.
 
-## Point Hermes at the local API
+## Point Hermes at localhost
 
 The current Hermes setup path is `hermes model`, then **Custom endpoint**. I originally pointed Hermes at `llama-server` by editing `~/.hermes/config.yaml` directly:
 
@@ -143,7 +146,7 @@ READY
 
 That was enough proof: Hermes was running locally against weights already on disk.
 
-## What the test establishes
+## What the test proves
 
 The `READY` response proves the inference path, not full agent quality. A useful next pass should separately test model loading, ordinary chat, structured tool calls, long-context behavior, and recovery when the local server restarts. Those checks locate regressions at the same boundaries shown in the figure.
 
@@ -159,4 +162,4 @@ The architecture is now clean:
 - `llama.cpp` for the local serving layer
 - existing local weights for inference
 
-> Separating the agent layer, serving layer, and model artifacts prevents one tool's lifecycle from determining all three. It makes an agent replacement, runtime change, or weight update independently testable.
+That split is cleaner than asking one tool to own the agent layer, serving layer, and model artifacts at once.

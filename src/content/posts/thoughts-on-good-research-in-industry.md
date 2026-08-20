@@ -1,5 +1,5 @@
 ---
-title: How Good Research Works in Industry
+title: Research That Survives Contact
 date: '2026-03-22T04:00:00.000Z'
 section: blog
 blogGroup: essays
@@ -9,16 +9,18 @@ tags:
   - Research
   - Career
 summary: >-
-  How taste, problem choice, collaboration, and experiment cadence produce good
-  research.
+  How research taste, problem choice, collaboration, controlled experiments,
+  and throughput combine into a reliable research system.
 ---
-# How Good Research Works in Industry
+# Research That Survives Contact
 
-[Eugene Vinitsky's guide to good research](https://emerge-lab.github.io/papers/an-unsolicited-guide-to-good-research.pdf) stayed with me because it treats research as a craft rather than a sequence of heroic breakthroughs. Eugene leads the [EMERGE Lab](https://emerge-lab.github.io/), but much of his advice transfers to industry, where research is entangled with engineering, product, deadlines, and organizational constraints.
+Industry research rarely fails because nobody had an idea. It fails because the question was vague, the experiment could not isolate a cause, a collaborator waited on hidden context, or the answer arrived after the decision. An idea has to survive contact with engineering, product, deadlines, and an organization before it can matter.
+
+[Eugene Vinitsky's guide to good research](https://emerge-lab.github.io/papers/an-unsolicited-guide-to-good-research.pdf) stayed with me because it treats that survival as a craft rather than a heroic breakthrough. Eugene leads the [EMERGE Lab](https://emerge-lab.github.io/), but his advice transfers cleanly to industry.
 
 Those constraints change the work without changing its central questions. A researcher still needs to decide what matters, design experiments that produce knowledge, and collaborate without losing momentum. Good ideas help. Clear judgment and reliable execution determine whether those ideas survive contact with an organization.
 
-## Build research taste
+## Build taste
 
 Research taste is the ability to decide what deserves attention. The literature grows faster than anyone can read it, while consequential ideas remain much rarer than papers. A new researcher experiences that gap as overload. An experienced one builds a compressed map: foundational results, useful extensions, unresolved questions, and noise.
 
@@ -26,21 +28,21 @@ Following researchers and labs with consistently strong work is a practical way 
 
 Virality works against this process. Social feeds reward visible consensus and rapid reaction, which pushes people toward the same papers and the same opinions. Taste develops more slowly, through sustained exposure and enough independent judgment to notice depth before the crowd supplies a verdict.
 
-## Choose motivating problems
+## Choose live problems
 
 The best work contains an element of play. The problem keeps pulling you back when nobody is asking for an update, not because it is easy, but because some part of it remains intrinsically interesting. Research is too uncertain to sustain on discipline alone.
 
 Interest is not the same as comfort. Work that teaches you something usually sits just beyond your current ability: difficult enough to force a new model of the problem, but bounded enough that effort can still produce feedback. Too little tension becomes routine; too much becomes paralysis.
 
-## Keep collaborators unblocked
+## Do not block
 
 Serious research increasingly depends on the same coordination as serious engineering. The relevant skill is not simply being agreeable. It is keeping information and decisions moving across people who hold different pieces of the system.
 
-> Surface constraints early, give honest timing, and leave enough context for someone else to proceed. An explicit blocker can be routed or planned around; a hidden one silently stalls every dependent decision.
+My simplest rule is: do not block. Surface constraints early, give honest timing, and leave enough context for someone else to proceed. An explicit blocker can be routed or planned around; a hidden one quietly stalls several people at once.
 
 Apply the same rule to yourself. Ask for help when someone else likely has the missing context. Do not spend days privately rediscovering an answer the team already knows. When the uncertainty is genuinely yours, step away long enough to stop repeating the same failed approach. A walk or a night's sleep often changes the representation of the problem, which is more useful than another hour of force.
 
-## Run interpretable experiments
+## Make experiments legible
 
 ML is empirical, so an experiment should change one interpretable decision whenever possible. Ablations turn a promising run into evidence about what caused the result. Without them, a team can produce plenty of activity and very little knowledge.
 
@@ -48,8 +50,10 @@ Documentation is part of the experiment. Future you needs to know what changed, 
 
 Visibility only helps when the work is legible. A presentation should maximize what the audience understands, not how much detail the author can display. Proving that you did the work and helping someone reason about it are different goals.
 
-## Treat throughput as part of rigor
+## Throughput is rigor
 
 Compute changes the value of good judgment because it determines how quickly a question can meet evidence. Keep the GPUs busy, but make each run interpretable. Velocity without rigor produces noise; rigor without enough throughput leaves important decisions unresolved. A good research system makes the two reinforce each other.
 
-That is what I took from Eugene's guide. Research improves through practices that can be trained: build taste, expose blockers, run controlled experiments, record decisions, and explain the result clearly. None of those practices guarantees a breakthrough. Together they create a system in which a good idea can survive long enough to meet evidence, become legible to collaborators, and influence a real decision. In industry, that system matters more than the romance of the isolated insight.
+> **Deep insight:** In industry, time-to-evidence is part of rigor. A perfect result that arrives after the decision is not influence; it is an archive.
+
+That is what I took from Eugene's guide. None of these practices guarantees a breakthrough. Together they give a good idea enough structure to meet evidence, become legible to collaborators, and influence a real decision. In industry, that system matters more than the romance of the isolated insight.

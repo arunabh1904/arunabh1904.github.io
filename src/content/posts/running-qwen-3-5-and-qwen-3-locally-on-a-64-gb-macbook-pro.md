@@ -9,7 +9,8 @@ tags:
   - LLMs
   - Apple Silicon
 summary: >-
-  Qwen 3.5 versus Qwen 3 latency and long-prompt performance on an M5 Max.
+  A dated comparison of Qwen 3.5 and Qwen 3 latency on a 64 GB M5 Max,
+  including why long-prompt prefill matters more than whether a model fits.
 ---
 # Benchmarking Qwen 3.5 and Qwen 3 on a 64 GB MacBook Pro
 
@@ -29,7 +30,7 @@ Within this benchmark snapshot:
 - `MLX` is the first runtime I would reach for on this Mac.
 - `4B` is the speed-first choice, but `14B` is where the local quality conversation starts getting more interesting.
 
-## Models included in the snapshot
+## Models in the snapshot
 
 The open lineup available on the measurement date narrowed the realistic local targets.
 
@@ -106,9 +107,11 @@ The animation holds every measured model/runtime row fixed and changes only the 
 
 [![Animation comparing short- and long-prompt time to first token and decode throughput for Qwen 3.5 and Qwen 3 on MLX and llama.cpp](/assets/images/local-qwen-long-prompt-latency.gif)](/assets/images/local-qwen-long-prompt-latency.gif)
 
-*The `4B` models remain the interactive tier. `Qwen 3 14B` still fits easily, but TTFT reaches `4.9 s` on MLX and `11.1 s` on llama.cpp in the `8K` suite. Custom visualization of the benchmark tables below; measurements are from one 64 GB M5 Max on April 4, 2026. Qwen 3.6 is intentionally absent because it was released after the run.*
+*The `4B` models remain the interactive tier. `Qwen 3 14B` still fits easily, but TTFT reaches `4.9 s` on MLX and `11.1 s` on llama.cpp in the `8K` suite. Custom visualization of this post's benchmark tables; measurements are from one 64 GB M5 Max on April 4, 2026. Qwen 3.6 is intentionally absent because it was released after the run.*
 
 The figure separates three decisions that parameter count often collapses. Memory determines whether a model loads. Decode throughput determines continuation speed. Prefill determines whether document-scale prompts feel responsive. On this machine, moving from `4B` to `14B` changes the third quantity most sharply, which is why the quality-versus-latency decision should be made with realistic prompt lengths.
+
+> **Deep insight:** A short-prompt benchmark prices generation. An agent workload also prices the history it must reread before every turn. That second bill can dominate the experience.
 
 ### Short-context results
 
@@ -145,4 +148,4 @@ For this measured snapshot, my practical recommendation is simple:
 3. Keep `Qwen 3.5 9B` in the mix if you specifically care about the 3.5 family behavior and do not mind the extra latency and memory overhead.
 4. Prefer `MLX` first on this Mac unless a specific `llama.cpp` model artifact or integration path gives you a reason to switch.
 
-> Local-model choice is a measured systems decision, not a parameter-count contest. On this machine, long-prompt latency and memory headroom change the recommendation more than the release notes do.
+That answer comes from this machine, not parameter counts or release notes.

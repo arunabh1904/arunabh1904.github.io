@@ -10,8 +10,8 @@ tags:
   - Apple Silicon
   - Inference
 summary: >-
-  Measured Muse Glimmer 30B latency, memory use, and long-context behavior on
-  an M5 Max.
+  A measured llama.cpp benchmark of Meta's official 17 GB Muse Glimmer 30B
+  quant on a 64 GB M5 Max, including reasoning latency and an 8K prompt test.
 ---
 # Benchmarking Muse Glimmer 30B on a 64 GB MacBook Pro
 
@@ -71,13 +71,15 @@ I report two first-token measurements. *First generated token* includes hidden r
 
 The largest correction was explicit placement. `--gpu-layers all` lifted the short decode rate from `9.92` to `27.90 tok/s`, a `2.8×` change before speculation entered the comparison. It also cut the long prompt's first generated token from `32.26 s` to `17.10 s`. A model that fits in unified memory can still run slowly if the engine chooses a conservative CPU/GPU split.
 
+> **Deep insight:** Fit is only the first threshold. Runtime placement decides whether resident weights become an interactive product or a slow systems demo.
+
 DFlash then changed decode rather than fit. With `--spec-type draft-dflash` active, the server accepted `87.9%` of proposed short-suite draft tokens and `79.8%` on the long suite. Short decode rose from `27.90` to `48.31 tok/s`; long decode rose from `26.62` to `35.47 tok/s`. The speedup is smaller at `8K` because prompt processing is unchanged by speculative generation and dominates more of the request.
 
 Reasoning creates a second latency boundary. In the short DFlash suite, the server began hidden generation at `1.01 s`, while the first visible integer arrived at `2.67 s`. A client that reports only transport-level time to first token still makes the chat experience look faster than it feels, although the gap is no longer severe.
 
 Meta reports `26.6 tok/s` without DFlash and `50.2 tok/s` with DFlash on an M5 Max, using ExecuTorch, batch size one, and greedy decoding. My short `llama.cpp` results of `27.90` and `48.31 tok/s` are remarkably close, but they remain separate measurements from a different runtime and harness. The agreement is useful evidence that the optimized local path is working; it is not a cross-runtime benchmark victory.
 
-## Serving Glimmer locally
+## Serve Glimmer locally
 
 The text-only OpenAI-compatible server I validated is:
 
@@ -107,7 +109,7 @@ The reusable harness for this run is in [`scripts/bench_llama_server_local.py`](
 
 ## Recommendation
 
-> The `17 GB` Q4_K_M quant makes Glimmer useful on a `64 GB` Mac because it leaves headroom for the application and context, not because the advertised maximum context is automatically usable. Add the projector only when vision is needed, then measure the workload before expanding context.
+I would run Glimmer locally when I want one current model that can cover text and images without putting pressure on a `64 GB` memory budget. I would start with the official `17 GB Q4_K_M`, add the projector only when the application needs vision, and keep the context well below the advertised maximum until the workload proves otherwise.
 
 I would use the full-Metal DFlash configuration for rapid local chat. Nearly `48 tok/s` on the short suite is fluid, and the model still leaves ample memory headroom. I would remain careful with agent loops that repeatedly inject `8K` of state: speculative decoding accelerates generation, not the entire prefill, so the long suite still took almost `18 s` to expose an answer. The next optimization target is prompt reuse or a smaller active context, not a larger quant.
 

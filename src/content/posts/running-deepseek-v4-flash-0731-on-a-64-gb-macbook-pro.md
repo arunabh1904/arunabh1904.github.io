@@ -10,13 +10,14 @@ tags:
   - Apple Silicon
   - Inference
 summary: >-
-  Why DeepSeek V4 Flash 0731 cannot fit in 64 GB—and what can.
+  Why DeepSeek V4 Flash 0731 does not fit in 64 GB unified memory, what its
+  13B active parameter count actually means, and the practical serving path.
 ---
 # Can DeepSeek V4 Flash 0731 Run on a 64 GB MacBook Pro?
 
 I wanted the same practical answer I measured for Qwen and Gemma: can I fit the exact `DeepSeek-V4-Flash-0731` checkpoint on my `64 GB` M5 Max MacBook Pro, and can I serve it at an interactive speed?
 
-> A `64 GB` Mac cannot run the official checkpoint: it is about `167 GB` on disk and its maintained vLLM recipe budgets `200 GB` of accelerator memory before runtime state and KV cache. The feasible architecture is local application plus hosted inference, not an imagined local-weight deployment.
+No. The official checkpoint is about `167 GB` on disk, and the maintained vLLM recipe assigns it a `200 GB` minimum accelerator-memory target. That is before leaving room for the inference runtime, activations, and KV cache. A `64 GB` Mac can call the hosted model and can serve a local application backed by that API, but it cannot load the official weights into unified memory.
 
 This is a sizing analysis dated August 13, 2026, not a benchmark. I did not manufacture latency numbers for a model that cannot load on the machine.
 
@@ -35,7 +36,9 @@ The official [`DeepSeek-V4-Flash-0731` repository](https://huggingface.co/deepse
 
 This table separates storage from inference. Downloading `167 GB` to the SSD proves only that the files fit on disk. It does not make them resident in memory, and macOS swap does not convert a `64 GB` laptop into a `200 GB` inference server. An experimental engine could offload experts and stream weights, but a deficit above `100 GB` moves the problem from GPU or unified-memory bandwidth to transfers from much slower storage. That is a systems experiment, not a sensible daily serving plan.
 
-## Why 13B active does not mean 13B resident
+> **Deep insight:** Active parameters price the arithmetic for one token. Total parameters price residency. Sparse experts change the first number, not the second.
+
+## Active is not resident
 
 The `13B` active count is still useful: it explains why DeepSeek can reduce the arithmetic performed for each token. It answers a compute question, not the fit question.
 
@@ -51,7 +54,7 @@ $$
 
 Active parameters mainly affect the work to generate the next token. Total stored parameters dominate whether the checkpoint can load at all.
 
-## What self-hosting actually requires
+## What self-hosting requires
 
 DeepSeek's model card demonstrates the exact `0731` checkpoint with vLLM on one `4 × GB300` node. The maintained vLLM recipe also documents hardware-specific deployments and requires vLLM `0.25.0` for the fused DSpark checkpoint. These are accelerator-server configurations, not Apple Silicon paths.
 
@@ -71,7 +74,7 @@ vllm serve deepseek-ai/DeepSeek-V4-Flash-0731 \
 
 That command is evidence of the intended serving stack, not a command to paste into the Mac. It assumes supported CUDA hardware, specialized MoE and sparse-attention kernels, and enough aggregate memory for the weights plus serving state. MLX and `llama.cpp` were meaningful choices in my Qwen and Gemma benchmarks because those checkpoints fit. Runtime preference is secondary when the DeepSeek checkpoint misses the machine's memory budget by more than `100 GB`.
 
-## The serving path I would use
+## The serving path
 
 On this laptop, I would treat DeepSeek as a remote inference backend. DeepSeek's API currently maps the model name `deepseek-v4-flash` to `DeepSeek-V4-Flash-0731`, exposes an OpenAI-compatible base URL, and supports the one-million-token context window. The model uses thinking mode by default, so I would set that behavior explicitly instead of allowing hidden reasoning work to distort latency and token cost.
 
@@ -103,7 +106,7 @@ print(response.choices[0].message.content)
 
 This still lets a local browser app expose a service on the Mac: the UI, retrieval, tools, logging, and request policy run locally, while model inference runs behind DeepSeek's endpoint. It is not private local inference, but it is the only practical way to use the exact `0731` checkpoint on this hardware without renting a large accelerator server.
 
-DeepSeek's pricing changes on August 16, 2026, so I would read the [live pricing page](https://api-docs.deepseek.com/quick_start/pricing/) rather than freeze a cost comparison that will be stale three days after publication. The durable comparison is architectural: API use converts a large fixed hardware commitment into metered requests, while self-hosting becomes rational only when privacy, sustained utilization, or deployment control repays a server with at least roughly `200 GB` of accelerator memory.
+DeepSeek's pricing changes on August 16, 2026, so I would read the [live pricing page](https://api-docs.deepseek.com/quick_start/pricing/) rather than freeze a comparison that will age within days. The durable comparison is architectural. API use converts a large fixed hardware commitment into metered requests. Self-hosting becomes rational only when privacy, sustained use, or deployment control repays a server with at least roughly `200 GB` of accelerator memory.
 
 ## Recommendation
 

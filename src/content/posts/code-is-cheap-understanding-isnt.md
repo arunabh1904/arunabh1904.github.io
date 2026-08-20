@@ -12,7 +12,8 @@ tags:
 topics:
   - language-systems
 summary: >-
-  What engineers should learn when AI makes writing code cheap.
+  What remains valuable when agents make implementation abundant: context,
+  judgment, task decomposition, efficient orchestration, and ownership.
 ---
 
 # Code Is Cheap. Understanding Isn't.
@@ -23,7 +24,7 @@ That sounds obvious, but software people are unusually easy to seduce by the art
 
 There is a reason needless refactoring has always been frowned upon. There is a reason nobody is nostalgic for punch cards. The interface changes; the work remains. Right now, that interface is changing very quickly.
 
-## From reasoning to action
+## From answers to action
 
 [Junyang Lin describes the transition](https://justinlin610.github.io/blog/from-reasoning-to-agentic-thinking/) as a move from “reasoning thinking” to “agentic thinking.” The first generation of reasoning models taught us to treat intelligence as inference-time compute: give a model a harder problem, let it deliberate for longer, and hope for a better answer. An agentic system changes the objective. The model is no longer thinking only to answer. It is thinking to act, observe what happened, and decide what to do next.
 
@@ -33,7 +34,7 @@ That changes what it means to be good at using AI for software. Most of us have 
 
 The scarce part is deciding what should exist.
 
-## Context becomes the scarce input
+## Context is scarce
 
 As implementation gets cheaper, context gets more valuable. An agent might remember more Kubernetes details than I do. It might know more C++ edge cases. It might produce a CUDA kernel in minutes that would have taken me half a day. What it does not automatically know is why a particular system looks the way it does.
 
@@ -42,6 +43,8 @@ Why is that ugly workaround still there? Which customer depends on that behavior
 That is context, and context engineering is not the same thing as putting more text into a prompt. I increasingly dislike giant base-level instruction files that every agent receives forever because one paragraph was useful for one task six weeks ago. More context is not necessarily better context. Irrelevant context pollutes reasoning in the same way that unnecessary shared state pollutes a software system.
 
 The real skill is deciding what an agent needs to know for this task, right now. Sometimes good context engineering means adding a design decision, production invariant, or failure trace. Sometimes it means deleting an obsolete instruction. The goal is not maximum context. It is the smallest context that preserves the decisions the agent cannot safely rediscover.
+
+> **Deep insight:** Good context engineering is selective memory. Preserve the decisions a system cannot safely rediscover; remove the history that only makes those decisions harder to see.
 
 ## Do not become a slop cannon
 
@@ -60,7 +63,7 @@ Technical debt generated in thirty seconds is still technical debt. A needless a
 
 The adult in the room asks a more boring question: why does this thing need to exist? Sometimes the most successful agentic coding session should end with less code than it started with.
 
-## Match intelligence to the task
+## Match model to task
 
 “Big-model smell” is not what happens when an overpowered model over-engineers a small change. In the model chatter around [Claude Fable 5](https://www.anthropic.com/claude/fable), the phrase is closer to a compliment: the model feels broad enough to understand an underspecified problem, exercise judgment, and keep making sensible decisions without having every intermediate step dictated. [Simon Willison described that impression](https://simonwillison.net/2026/Jun/9/claude-fable-5/) as a combination of slowness, expense, and an unusually deep store of knowledge. [Shlok Khemani's account](https://www.shloked.com/writing/fable-5-first-impressions) emphasizes the more important part for agentic work: given a vague objective, the model inferred the intended result and found a coherent path toward it.
 
@@ -78,7 +81,7 @@ Use the expensive model when ambiguity, consequence, or deep reasoning justifies
 
 This is not only thrift. It is architecture.
 
-## Treat tokens as a system resource
+## Tokens are a system resource
 
 We already reason about CPU, memory, bandwidth, latency, storage, GPU utilization, and cloud spend. Intelligence cost belongs in the same design conversation. Tokens are a resource.
 
@@ -88,7 +91,7 @@ The agent stack may end up looking familiar to anyone who has designed distribut
 
 A company will eventually notice the difference between an engineer who needs enormous amounts of frontier-model inference for every task and one who produces the same or better outcome with a well-designed hierarchy of models and agents. Efficiency will matter because it exposes the quality of the decomposition underneath the bill.
 
-## Parallelism changes the engineer's job
+## Parallel work changes the job
 
 Humans are mostly single-threaded. Agents do not have to be.
 
@@ -108,7 +111,9 @@ For most of programming history, doing the work and learning the work were incon
 
 The task gets completed. The learning never happens.
 
-In a 2026 conversation about the move from vibe coding to agentic engineering, [Andrej Karpathy returns to a useful distinction](https://www.youtube.com/watch?v=96jN2OCOfLs): thinking can be outsourced more readily than understanding. That distinction is the defense against passive competence. Do hard things sometimes. Read the implementation. Follow the stack trace yourself. Debug without immediately reaching for an agent. Go one abstraction lower. Learn enough that when a model proposes something stupid, some part of your brain feels the mismatch before the tests do.
+In a 2026 conversation about the move from vibe coding to agentic engineering, [Andrej Karpathy returns to a useful distinction](https://www.youtube.com/watch?v=96jN2OCOfLs): thinking can be outsourced more readily than understanding. That distinction is the defense against passive competence.
+
+Do hard things sometimes. Read the implementation. Follow the stack trace yourself. Debug without immediately reaching for an agent. Go one abstraction lower. Learn enough that when a model proposes something stupid, some part of your brain feels the mismatch before the tests do.
 
 The better agents become, the easier it becomes to stop learning. The less I learn, the worse I become at directing them. Learning is therefore not a nostalgic attachment to manual work; it is part of the control system.
 
@@ -124,7 +129,7 @@ There is something important in the friction itself. If a machine can generate c
 
 Speed is useful. Tenacity is different.
 
-## What remains valuable
+## What remains
 
 The amount of human labor required to produce software will probably fall. Pretending otherwise does not help anyone. If one engineer can direct five, ten, or twenty capable agents, the economics of engineering organizations change—perhaps unevenly and not all at once, but in a direction that is hard to ignore.
 
@@ -137,7 +142,7 @@ _Agent manager — imagined by OpenAI ImageGen._
 
 Which one do you retain?
 
-> As code generation becomes abundant, the durable advantage moves upstream: deciding what should be built, why it should exist, what context changes the answer, and how to direct capable machines through the resulting constraints.
+The answer says a great deal about where the profession is going. The future does not belong to whoever can generate the most code. Code is becoming abundant. The durable skill is understanding what should be built, why it should exist, what context matters, and how to marshal increasingly capable machines to build it well.
 
 Writing software was always about building. Code was a tool. Agents are tools too.
 
