@@ -3,6 +3,26 @@ import PostLayout from '../layouts/PostLayout.astro';
 
 const revisionGroups = [
   {
+    title: 'Trivia',
+    description: 'Mobile flash-card decks for fast interview recall: answer first, reveal the explanation, and keep the cards that need another pass.',
+    entries: [
+      {
+        title: 'Python interview trivia',
+        summary: 'Semantics, iteration, collections, object design, concurrency, typing, dataclasses, and Pydantic in short interview prompts.',
+        links: [
+          { label: 'Flash cards', href: '/revision notes/2026/08/21/python-interview-trivia.html' },
+        ],
+      },
+      {
+        title: 'PyTorch interview trivia',
+        summary: 'Tensor storage, autograd, modules, training loops, input pipelines, distributed execution, and accelerator performance.',
+        links: [
+          { label: 'Flash cards', href: '/revision notes/2026/08/21/pytorch-interview-trivia.html' },
+        ],
+      },
+    ],
+  },
+  {
     title: 'PyTorch',
     description: 'Tensor mechanics, autograd, and the systems that make training fast and scalable.',
     resource: { label: 'PyTorch documentation ↗', href: 'https://docs.pytorch.org/docs/2.13/' },
@@ -81,7 +101,9 @@ const revisionGroups = [
         </summary>
 
         <div class="compact-index-shelf">
-          <a class="compact-index-resource" href={group.resource.href}>{group.resource.label}</a>
+          {'resource' in group && group.resource && (
+            <a class="compact-index-resource" href={group.resource.href}>{group.resource.label}</a>
+          )}
           <ul class="compact-index-list">
             {group.entries.map((entry) => (
               <li>

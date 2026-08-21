@@ -1,0 +1,35 @@
+---
+title: 'PyTorch Interview Trivia'
+date: '2026-08-21T04:05:00.000Z'
+section: revision-notes
+postSlug: pytorch-interview-trivia
+legacyPath: /revision notes/2026/08/21/pytorch-interview-trivia.html
+tags:
+  - PyTorch
+summary: Mobile flash cards for PyTorch tensors, autograd, modules, training, data loading, distributed execution, and performance.
+---
+import TriviaDeck from '../../components/TriviaDeck';
+import { pytorchTriviaDeck } from '../../lib/trivia-decks';
+
+# PyTorch Interview Trivia
+
+This deck tests the contracts that sit underneath everyday PyTorch code: which operations alias storage, when autograd records work, what a module registers, where a training loop changes state, and why accelerator performance can disagree with Python timing.
+
+<TriviaDeck client:load deck={pytorchTriviaDeck} />
+
+## How to use the deck
+
+Start with **Tensors**, **Autograd**, and **Training**. Add data loading and distributed topics once the single-device path is automatic. For each answer, name the tensor shape, device, dtype, or state boundary when it matters; those details distinguish a usable engineering answer from a memorized slogan.
+
+Mark **Got it** only after answering before the reveal. Topic filters and progress stay on this device, which makes the deck suitable for short mobile sessions.
+
+## Sources and deeper notes
+
+- [PyTorch tensor documentation](https://docs.pytorch.org/docs/stable/tensors.html)
+- [Autograd mechanics](https://docs.pytorch.org/docs/stable/notes/autograd.html)
+- [Modules](https://docs.pytorch.org/docs/stable/notes/modules.html)
+- [Data loading](https://docs.pytorch.org/docs/stable/data.html)
+- [DistributedDataParallel](https://docs.pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html)
+- [PyTorch I: Tensors](/revision%20notes/2026/08/09/pytorch-tensor-revision-notes.html)
+- [PyTorch II: Autograd and Training](/revision%20notes/2026/08/10/pytorch-autograd-and-training.html)
+- [PyTorch III: Performance and Scale](/revision%20notes/2026/08/10/pytorch-systems-and-scale.html)

@@ -1,0 +1,32 @@
+---
+title: 'Python Interview Trivia'
+date: '2026-08-21T04:00:00.000Z'
+section: revision-notes
+postSlug: python-interview-trivia
+legacyPath: /revision notes/2026/08/21/python-interview-trivia.html
+tags:
+  - Python
+summary: Mobile flash cards for Python semantics, iteration, collections, object design, concurrency, typing, dataclasses, and Pydantic.
+---
+import TriviaDeck from '../../components/TriviaDeck';
+import { pythonTriviaDeck } from '../../lib/trivia-decks';
+
+# Python Interview Trivia
+
+This deck turns high-level Python interview questions into short retrieval prompts. Answer aloud before revealing the card. A strong screen answer usually needs three moves: state the rule, add the important qualification, then name one practical consequence.
+
+<TriviaDeck client:load deck={pythonTriviaDeck} />
+
+## How to use the deck
+
+Choose one topic for a focused pass or keep all topics mixed. Mark a card **Got it** only when you can explain the answer without relying on the wording shown here. **Again** removes that card from the completed count. Progress is stored only in this browser.
+
+The original preparation conversation supplied the Python question bank. The answers were tightened against the language and library documentation, with special care around identity, hashability, generators, the GIL, and runtime typing.
+
+## Sources
+
+- [Python language reference](https://docs.python.org/3/reference/)
+- [Python data model](https://docs.python.org/3/reference/datamodel.html)
+- [Python standard-library dataclasses](https://docs.python.org/3/library/dataclasses.html)
+- [Pydantic dataclasses](https://docs.pydantic.dev/latest/concepts/dataclasses/)
+- [Pydantic strict mode](https://docs.pydantic.dev/latest/concepts/strict_mode/)
