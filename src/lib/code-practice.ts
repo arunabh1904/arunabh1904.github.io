@@ -53,6 +53,7 @@ export interface CodePracticeProblem {
   starterCode: string;
   track?: 'fundamentals' | 'architecture';
   environment?: 'browser' | 'local-pytorch';
+  editorStart?: 'blank' | 'scaffold';
   interview?: CodePracticeInterviewFormat;
   reasoning?: readonly CodePracticeReasoningPoint[];
   packages?: readonly string[];
@@ -4332,6 +4333,8 @@ export const codePracticeProblems: readonly CodePracticeProblem[] = ALL_CODE_PRA
     ...ATTENTION_PROBLEM_ENRICHMENTS[problem.id],
     track: problem.track ?? 'fundamentals',
     environment: problem.environment ?? 'browser',
+    editorStart:
+      problem.editorStart ?? (problem.signature.trimStart().startsWith('def ') ? 'blank' : 'scaffold'),
     order: PROGRESSIVE_ORDER[problem.id] ?? problem.order,
     difficulty: PROGRESSIVE_DIFFICULTY[problem.id] ?? problem.difficulty,
     walkthroughCode: problem.walkthroughCode ?? problem.solutionCode,
