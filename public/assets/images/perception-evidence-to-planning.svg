@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="250" viewBox="0 0 1200 250" role="img" aria-labelledby="title desc">
+  <title id="title">The perception path from sensor evidence to planning</title>
+  <desc id="desc">Six connected stages: sensor-native evidence, calibrated metric support, cross-modal interaction, temporal world state, structured and latent outputs, then prediction and planning.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#09151f"/><stop offset="1" stop-color="#101d2b"/></linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#152b3b"/><stop offset="1" stop-color="#0d1d29"/></linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#6ee7c4"/></marker>
+    <style>text{font-family:Inter,Arial,sans-serif}.k{font-size:12px;font-weight:700;letter-spacing:1.7px;fill:#6ee7c4}.n{font-size:18px;font-weight:700;fill:#f2f7fa}.s{font-size:13px;font-weight:500;fill:#9eb4c3}.card{fill:url(#card);stroke:#29495c;stroke-width:1.2}.flow{stroke:#6ee7c4;stroke-width:2.4;fill:none;marker-end:url(#arrow)}</style>
+  </defs>
+  <rect width="1200" height="250" rx="22" fill="url(#bg)"/>
+  <text x="34" y="35" class="k">THE RUNTIME PATH</text>
+  <g>
+    <path class="flow" d="M188 132H218"/><path class="flow" d="M384 132H414"/><path class="flow" d="M580 132H610"/><path class="flow" d="M776 132H806"/><path class="flow" d="M972 132H1002"/>
+    <rect class="card" x="32" y="66" width="156" height="132" rx="16"/><rect class="card" x="228" y="66" width="156" height="132" rx="16"/><rect class="card" x="424" y="66" width="156" height="132" rx="16"/><rect class="card" x="620" y="66" width="156" height="132" rx="16"/><rect class="card" x="816" y="66" width="156" height="132" rx="16"/><rect class="card" x="1012" y="66" width="156" height="132" rx="16"/>
+  </g>
+  <g text-anchor="middle">
+    <text x="110" y="93" class="k">01 · PRESERVE</text><text x="110" y="124" class="n"><tspan x="110">Sensor-native</tspan><tspan x="110" dy="23">evidence</tspan></text><text x="110" y="178" class="s">pixels · points · Doppler</text>
+    <text x="306" y="93" class="k">02 · ALIGN</text><text x="306" y="124" class="n"><tspan x="306">Calibrated</tspan><tspan x="306" dy="23">metric support</tspan></text><text x="306" y="178" class="s">place · pose · time</text>
+    <text x="502" y="93" class="k">03 · INTERACT</text><text x="502" y="124" class="n"><tspan x="502">Cross-modal</tspan><tspan x="502" dy="23">interaction</tspan></text><text x="502" y="178" class="s">evidence changes evidence</text>
+    <text x="698" y="93" class="k">04 · PERSIST</text><text x="698" y="124" class="n"><tspan x="698">Temporal</tspan><tspan x="698" dy="23">world state</tspan></text><text x="698" y="178" class="s">age · update · occlusion</text>
+    <text x="894" y="93" class="k">05 · EXPOSE</text><text x="894" y="124" class="n"><tspan x="894">Structured +</tspan><tspan x="894" dy="23">latent outputs</tspan></text><text x="894" y="178" class="s">contracts + capacity</text>
+    <text x="1090" y="93" class="k">06 · ACT</text><text x="1090" y="124" class="n"><tspan x="1090">Prediction +</tspan><tspan x="1090" dy="23">planning</tspan></text><text x="1090" y="178" class="s">under a deadline</text>
+  </g>
+</svg>

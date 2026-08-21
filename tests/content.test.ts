@@ -179,6 +179,42 @@ describe('markdown authoring', () => {
       'Blog posts must contain a substantive callout.',
     ).toEqual([]);
   });
+
+  it('renders multi-stage Blog processes as diagrams instead of arrow chains', async () => {
+    const postFiles = await fg('**/*.{md,mdx}', {
+      cwd: postsDir,
+      absolute: true,
+    });
+
+    const offenders: string[] = [];
+    for (const filePath of postFiles) {
+      const source = await readFile(filePath, 'utf8');
+      if (!/^section:\s*['"]?blog['"]?\s*$/m.test(source)) {
+        continue;
+      }
+
+      let inFence = false;
+      source.split('\n').forEach((line, index) => {
+        if (/^\s*```/.test(line)) {
+          inFence = !inFence;
+          return;
+        }
+        if (inFence || /^\s*\|/.test(line)) {
+          return;
+        }
+
+        const arrowCount = line.match(/(?:→|←|↔|⇄|⇒|⇐|⟶|->|<-|=>)/g)?.length ?? 0;
+        if (arrowCount >= 3) {
+          offenders.push(`${path.relative(projectRoot, filePath)}:${index + 1}`);
+        }
+      });
+    }
+
+    expect(
+      offenders,
+      'Processes with four or more named stages should use a compact diagram, not an inline arrow chain.',
+    ).toEqual([]);
+  });
 });
 
 describe('content helpers', () => {
