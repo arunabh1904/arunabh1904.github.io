@@ -25,6 +25,10 @@ summary: "2025 – Alpamayo-R1: Bridging Reasoning and Action Prediction for Gen
 
 The system makes the reasoning-to-action interface explicit. A chain is supposed to represent causal driving factors; a diffusion decoder converts the resulting state into a dynamically feasible trajectory; reinforcement learning rewards consistency between the two. This is stronger than attaching a rationale to an already chosen plan, but it means the quality of the causal trace, the action decoder, and the reward model all jointly determine the apparent safety gain.
 
+![Alpamayo-R1: Bridging Reasoning and Action Prediction for Generalizable Autonomous Driving in the Long Tail source figure: Overview of Alpamayo-R1 architecture.](/assets/images/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail-paper-figure.webp)
+_Overview of Alpamayo-R1 architecture. Source: [Alpamayo-R1: Bridging Reasoning and Action Prediction for Generalizable Autonomous Driving in the Long Tail](https://arxiv.org/abs/2511.00088), Figure 1, via arXiv HTML._
+
+
 The paper also reports consistent gains from 0.5B to 7B parameters and on-vehicle urban tests. Those are encouraging deployment signals, though the abstract does not report sensor setup, route diversity, long-tail case prevalence, confidence intervals, or the fallback behavior when the reasoning and action disagree. A credible scaling claim needs matched model sizes, training data, and inference budgets, plus a severe-case test that does not overlap the auto-labeling pipeline.
 
 ## High-Level Takeaways

@@ -27,6 +27,10 @@ summary: '2026 – a planning-oriented taxonomy that treats evaluation protocol 
 
 Planning-oriented systems remain end to end when their intermediate objects are learned or jointly optimized toward driving behavior. A model may carry BEV features, object or map queries, route encodings, world-model latents, language tokens, or explicit safety constraints. The architectural question is whether those objects preserve the geometry, uncertainty, semantics, and action interface the planner needs—not whether the diagram contains named modules.
 
+![Planning-oriented end-to-end driving taxonomy organized by input representation, planning output, supervision, and evaluation](/assets/images/planning-oriented-e2e-structure.webp)
+
+_The survey classifies systems by the information and training contract supporting the final plan; learned BEV, object, world-model, or language structure remains compatible with end-to-end optimization. Source: [Planning-Oriented End-to-End Autonomous Driving](https://arxiv.org/abs/2608.20111), Figure 2._
+
 The survey's four-axis taxonomy prevents a backbone name from standing in for a driving formulation:
 
 | Axis | Representative choices | Decision exposed |
@@ -41,6 +45,10 @@ The progression is therefore not a clean replacement sequence. Direct behavior c
 ### Evaluation determines the scope of the architecture claim
 
 Open-loop evaluation scores a policy on states visited by the logged expert. It cannot test recovery after the policy causes a deviation, and it may penalize a safe alternative simply because it differs from the recorded path. NAVSIM-style non-reactive evaluation adds real sensor logs and planning-aware safety, progress, and comfort proxies at scale, but other agents do not react to the ego plan. Bench2Drive-style simulation tests interaction and recovery under the policy's induced state distribution, while inheriting CARLA's sim-to-real boundary. WOD-E2E adds rare scenarios and human preferences but remains open loop.
+
+![Comparison of open-loop, non-reactive real-log, and reactive closed-loop evaluation protocols for end-to-end driving](/assets/images/planning-oriented-e2e-open-closed-loop.webp)
+
+_Each protocol supports a different claim: replay measures predictions on expert states, non-reactive simulation scores plans against fixed logs, and reactive simulation exposes policy-induced states and recovery. Source: [Planning-Oriented End-to-End Autonomous Driving](https://arxiv.org/abs/2608.20111), Figure 7._
 
 The practical rule is to compare claims within protocols and triangulate across them. A low nuScenes L2 error does not imply a high closed-loop route score. A high NAVSIM score is stronger proxy evidence than displacement alone, but ranking inversions and saturated submetrics prevent it from replacing reactive evaluation. Small leaderboard differences are also uninterpretable without the benchmark version, controller, safety wrapper, sensor configuration, seeds, and metric implementation.
 

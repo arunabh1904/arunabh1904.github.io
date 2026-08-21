@@ -24,6 +24,10 @@ Driving on Registers introduces DrivoR, a camera-only planner built around a pre
 
 The architecture separates proposal from evaluation. That matters because multimodal planning needs both a diverse candidate set and a scorer that can reject unsafe or inefficient candidates. At inference, score weights can be changed to alter behavior without retraining the visual backbone.
 
+![Driving on Registers source figure: DrivoR architecture.](/assets/images/driving-on-registers-paper-figure.webp)
+_DrivoR architecture. Source: [Driving on Registers](https://arxiv.org/abs/2601.05083), Figure 1, via arXiv HTML._
+
+
 On the paper's NAVSIM-v2 efficiency comparison, DrivoR reports 48.3 EPDMS with 41 million parameters, 351 GFLOPs, 0.5 GB peak memory, and 110 ms throughput on a single A100. The trajectory heads account for roughly 3 ms; the image backbone still dominates runtime. On NAVSIM-v1, mapping one token to a complete trajectory reports 90.0 PDMS versus 83.9 when a separate token predicts each pose.
 
 | Design | Role |

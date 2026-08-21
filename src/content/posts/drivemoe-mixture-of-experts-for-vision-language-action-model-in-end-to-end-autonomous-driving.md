@@ -23,6 +23,10 @@ summary: "2025 – DriveMoE: Mixture-of-Experts for Vision-Language-Action Model
 
 The two routers act at different stages. Vision routing allocates perception compute across cameras; action routing allocates policy capacity across driving skills. That separation targets two sources of averaging: processing every view equally and asking one action function to cover heterogeneous maneuvers. It also creates two ways to fail: the system can suppress the camera that contains the hazard, or select an unsuitable action expert before the maneuver is fully visible.
 
+![DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving source figure: Framework of DriveMoE.](/assets/images/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving-paper-figure.webp)
+_Framework of DriveMoE. Source: [DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving](https://arxiv.org/abs/2505.16278), Figure 2, via arXiv HTML._
+
+
 The result cannot establish which router accounts for the reported improvement without controlled ablations. The abstract does not disclose routing regularization, load balance, expert utilization, data mixture, or whether rare maneuvers receive enough examples to train their specialist. A useful scale test would keep total active FLOPs and demonstrations fixed while comparing a dense model, vision-only routing, action-only routing, and both routers under long-tail route splits.
 
 ## High-Level Takeaways

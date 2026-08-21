@@ -26,6 +26,10 @@ Camera Radar Net uses radar twice: Radar-Assisted View Transformation supplies r
 
 Radar occupancy augments the camera depth distribution, while a top-k BEV-query scheme limits deformable-attention cost. The paper reports a 20 FPS real-time configuration and an offline model at 57.5 mAP and 62.4 NDS on nuScenes test. At 256×704 with a ResNet-50, its reported per-class mean is 49.0 mAP versus 34.8 for the cited BEVDepth configuration.
 
+![CRN: Camera Radar Net for 3D Perception source figure: The overall architecture of the proposed Camera Radar Net.](/assets/images/crn-camera-radar-net-for-3d-perception-paper-figure.webp)
+_The overall architecture of the proposed Camera Radar Net. Source: [CRN: Camera Radar Net for 3D Perception](https://arxiv.org/abs/2304.00670), Figure 2, via arXiv HTML._
+
+
 | Mechanism | Reported evidence | Tradeoff |
 | --- | --- | --- |
 | Radar-guided lifting | Large camera-baseline gain | Depends on radar-camera calibration. |

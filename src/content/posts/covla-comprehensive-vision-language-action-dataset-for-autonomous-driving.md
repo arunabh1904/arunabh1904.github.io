@@ -23,6 +23,10 @@ summary: "2024 – CoVLA: Comprehensive Vision-Language-Action Dataset for Auton
 
 The data pipeline starts from raw in-vehicle sensor records, then combines automated processing with caption generation to construct vision-language-action examples. That makes the example unit a driving clip with both an executable-looking trajectory and a text account of the scene. The scalable construction is the point: end-to-end VLA work needs examples where the rationale and action refer to the same temporal event.
 
+![CoVLA: Comprehensive Vision-Language-Action Dataset for Autonomous Driving source figure: Overview of the dataset generation pipeline .](/assets/images/covla-comprehensive-vision-language-action-dataset-for-autonomous-driving-paper-figure.webp)
+_Overview of the dataset generation pipeline . Source: [CoVLA: Comprehensive Vision-Language-Action Dataset for Autonomous Driving](https://arxiv.org/abs/2408.10845), Figure 2, via arXiv HTML._
+
+
 The trade-off is provenance. Automated captions and trajectory pairing can enlarge a corpus much faster than human annotation, but a model can inherit errors or shortcuts from both generators. The abstract does not report the caption model, trajectory-label source, temporal alignment tolerance, human validation rate, or a comparison with an equivalently sized human-authored subset. Those are the controls needed to distinguish scale from label quality.
 
 ## High-Level Takeaways

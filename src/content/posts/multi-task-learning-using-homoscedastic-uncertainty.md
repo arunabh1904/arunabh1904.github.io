@@ -24,6 +24,10 @@ Kendall, Gal, and Cipolla derive trainable weights for classification and regres
 
 The learned uncertainty is global for each task, not input-dependent. On the paper's Tiny Cityscapes experiment, joint semantic segmentation, instance regression, and depth reach 63.4 semantic IoU, 3.50 instance error, and 0.522 depth error; the semantic-only result is 59.4 IoU. The final relative task weighting is reported near 43:1:0.16, showing how far raw equal weighting can be from the learned scale.
 
+![Multi-Task Learning Using Homoscedastic Uncertainty source figure: Multi-task deep learning.](/assets/images/multi-task-learning-using-homoscedastic-uncertainty-paper-figure.webp)
+_Multi-task deep learning. Source: [Multi-Task Learning Using Homoscedastic Uncertainty](https://arxiv.org/abs/1705.07115), Figure 1, via arXiv HTML._
+
+
 | Mechanism | What it handles | What it does not handle |
 | --- | --- | --- |
 | Inverse-variance scaling | Loss units and average task noise | Per-example sensor quality. |

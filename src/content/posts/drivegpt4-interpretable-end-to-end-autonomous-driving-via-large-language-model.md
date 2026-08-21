@@ -21,6 +21,10 @@ summary: "2023 – DriveGPT4: Interpretable End-to-end Autonomous Driving via La
 
 The paper's central choice is to make the same model answer a question about a maneuver and predict the maneuver's low-level control. A custom visual-instruction dataset supplies the driving-specific supervision, while the paper's mix-finetuning recipe combines that data with the base model's broader capabilities. This is a tighter coupling than a VLM used only as a captioner, but it does not by itself establish that a fluent explanation caused the control output.
 
+![DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model source figure: DriveGPT4 overview.](/assets/images/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model-paper-figure.webp)
+_DriveGPT4 overview. Source: [DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](https://arxiv.org/abs/2310.01412), Fig. 2, via arXiv HTML._
+
+
 BDD-X makes the evaluation legible because it pairs driving video with human-facing explanations. The abstract does not report the action horizon, control representation, loss weighting, training-set size, or a matched ablation that removes explanation supervision while holding control data fixed. Those omissions matter: a shared decoder can correlate language and action without ensuring that its language evidence drives the control decision.
 
 ## High-Level Takeaways

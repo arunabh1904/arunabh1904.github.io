@@ -27,6 +27,10 @@ PETRv2 extends PETR's 3D position-aware image tokens across time and tasks. Ego 
 
 Coordinate alignment gives historical features the position they occupy in the current ego frame. A feature-guided position encoder modulates geometric embeddings with appearance so the same nominal coordinate can carry different evidence. In the main nuScenes test configuration, PETRv2 reports 49.0 mAP and 58.2 NDS; its multiscale variant reaches 50.8 mAP and 59.1 NDS. Average velocity error drops from PETR's 0.808 m/s to 0.343 m/s.
 
+![PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images source figure: The paradigm of the proposed PETRv2.](/assets/images/petrv2-unified-3d-perception-from-multicamera-images-paper-figure.webp)
+_The paradigm of the proposed PETRv2. Source: [PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](https://arxiv.org/abs/2206.01256), Figure 1, via arXiv HTML._
+
+
 | Added component | Validation effect | Interpretation |
 | --- | --- | --- |
 | Temporal frames without coordinate alignment | +2.7 NDS, +0.5 mAP | History helps, but unaligned geometry limits it. |

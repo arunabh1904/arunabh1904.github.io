@@ -21,6 +21,10 @@ summary: "2023 – ADriver-I: A General World Model for Autonomous Driving"
 
 The crucial representation is the interleaved vision-action pair. It makes control part of the temporal context that an MLLM and diffusion model can process, then lets generated controls influence future visual predictions. In principle, that structure exposes a useful consistency question: do actions lead to plausible visual consequences? In practice, rollout quality can degrade through both control error and image-generation error.
 
+![ADriver-I: A General World Model for Autonomous Driving source figure: Overview of of our ADriver-I framework.](/assets/images/adriver-i-a-general-world-model-for-autonomous-driving-paper-figure.webp)
+_Overview of of our ADriver-I framework. Source: [ADriver-I: A General World Model for Autonomous Driving](https://arxiv.org/abs/2311.13549), Figure 1, via arXiv HTML._
+
+
 The paper compares ADriver-I with constructed baselines and describes the result as favorable. The abstract gives neither the visual-token format, diffusion objective, action parameterization, data scale, nor a teacher-forced-versus-free-rollout ablation. A driving team would need those controls before treating a compelling imagined video as evidence that the world model is a safe planning model.
 
 ## High-Level Takeaways

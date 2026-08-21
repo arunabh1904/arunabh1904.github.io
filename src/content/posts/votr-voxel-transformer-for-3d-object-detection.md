@@ -25,6 +25,10 @@ VoTr replaces a sparse-convolutional LiDAR backbone with attention over occupied
 
 VoTr has sparse voxel modules that may create features at new active positions and submanifold modules that update only existing positions. Each query attends to a fixed-size set of local or dilated occupied voxels. The fixed budget keeps attention bounded even when the scene contains tens of thousands of active voxels.
 
+![VoTr: Voxel Transformer for 3D Object Detection source figure: The overall architecture of Voxel Transformer (VoTr).](/assets/images/votr-voxel-transformer-for-3d-object-detection-paper-figure.webp)
+_The overall architecture of Voxel Transformer (VoTr). Source: [VoTr: Voxel Transformer for 3D Object Detection](https://arxiv.org/abs/2109.02497), Figure 2, via arXiv HTML._
+
+
 Replacing SECOND's convolutional backbone with VoTr improves Waymo Level-1 vehicle mAP by 1.05 points. The gains grow with range: 1.42 points at 30–50 m and 1.72 beyond 50 m. On KITTI, adding dilated attention raises moderate car AP from 75.48 to 78.27. Increasing attended voxels from 24 to 48 adds 1.19 AP, which makes the accuracy-cost relationship explicit.
 
 | Backbone | KITTI speed | Moderate car AP | Interpretation |

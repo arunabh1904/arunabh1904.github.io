@@ -26,6 +26,10 @@ BEVFormer v2 asks why stronger 2D image backbones do not automatically produce s
 
 Across ResNet-50, DLA-34, ResNet-101, VoVNet-99, and InternImage-B backbones, adding perspective supervision improves nuScenes validation NDS by roughly three points and mAP by roughly two points. With InternImage-XL, the paper reports 63.4 NDS and 55.6 mAP on the nuScenes test set.
 
+![BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision source figure: Overall architecture of BEVFormer v2.](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-paper-figure.webp)
+_Overall architecture of BEVFormer v2. Source: [BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](https://arxiv.org/abs/2211.10439), Figure 1, via arXiv HTML._
+
+
 | Comparison | NDS | mAP |
 | --- | ---: | ---: |
 | BEV-only, ResNet-101 | 42.6 | 35.5 |

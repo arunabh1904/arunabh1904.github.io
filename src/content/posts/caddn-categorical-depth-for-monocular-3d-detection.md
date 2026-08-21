@@ -26,6 +26,10 @@ CaDDN predicts a categorical depth distribution for every image feature, takes a
 
 Depth bins turn a 2D feature into a probability-weighted ray. The detector loss and explicit depth loss train the same view transformation, connecting image semantics to metric geometry. On KITTI, the paper reports car BEV AP gains of 2.91, 1.59, and 2.22 points for easy, moderate, and hard splits over its cited prior baseline.
 
+![CaDDN architecture lifting image features through a categorical depth distribution into a frustum and then a voxel grid](/assets/images/caddn-categorical-depth-for-monocular-3d-detection-paper-figure.webp)
+
+_The categorical depth distribution keeps several ranges alive while image features are lifted into 3D, after which the frustum is resampled into a voxel grid for detection. Source: [CaDDN](https://arxiv.org/abs/2103.01100), Figure 2._
+
 | Choice | Benefit | Limit |
 | --- | --- | --- |
 | Categorical depth | Retains multi-bin uncertainty | Memory grows with bin count. |

@@ -24,6 +24,10 @@ UniBEV asks whether one trained detector can handle camera plus LiDAR, camera on
 
 CNW learns channel-wise modality weights and normalizes them across the modalities that are actually present. That detail prevents a missing stream from changing the scale of the fused representation. Modality dropout is equally important: a model trained only with both sensors reaches just 3.0 camera-only mAP in the paper's ablation, despite having a valid camera path.
 
+![UniBEV: Robust Multimodal Detection with Uniform BEV Encoders source figure: The overall architecture of the UniBEV framework.](/assets/images/unibev-robust-multimodal-detection-with-uniform-bev-encoders-paper-figure.webp)
+_The overall architecture of the UniBEV framework. Source: [UniBEV: Robust Multimodal Detection with Uniform BEV Encoders](https://arxiv.org/abs/2309.14516), Fig. 2, via arXiv HTML._
+
+
 | Evidence | Reported result | Interpretation |
 | --- | --- | --- |
 | Fused mode | 64.2 mAP | One model remains competitive when both sensors exist. |

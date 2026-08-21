@@ -21,6 +21,10 @@ summary: "2025 – AutoVLA: A Vision-Language-Action Model for End-to-End Autono
 
 The paper makes action tokenization the bridge between reasoning and control. A feasible trajectory becomes a sequence the same model can emit alongside language, which eliminates a separate planning decoder but introduces quantization and autoregressive latency. The two thinking modes make the design more specific: the system is supposed to spend more reasoning tokens only when the scene needs them, rather than paying a fixed chain-of-thought cost on every route.
 
+![AutoVLA: A Vision-Language-Action Model for End-to-End Autonomous Driving with Adaptive Reasoning and Reinforcement Fine-Tuning source figure: AutoVLA is an end-to-end autonomous driving framework based on vision-language models that integrates world knowledge into the driving policy.](/assets/images/autovla-a-vision-language-action-model-for-end-to-end-autonomous-driving-with-adaptive-reasoning-and-reinforcement-fine-tuning-paper-figure.webp)
+_AutoVLA is an end-to-end autonomous driving framework based on vision-language models that integrates world knowledge into the driving policy. Source: [AutoVLA: A Vision-Language-Action Model for End-to-End Autonomous Driving with Adaptive Reasoning and Reinforcement Fine-Tuning](https://arxiv.org/abs/2506.13757), Figure 1, via arXiv HTML._
+
+
 The abstract describes GRPO as the mechanism that encourages this economy, but does not disclose the reward design, thought-length constraint, action vocabulary, or a matched continuous-action baseline. It also does not establish that the selected amount of reasoning tracks actual driving difficulty rather than dataset artifacts. The needed test holds action quality and compute budgets fixed while comparing fixed short, fixed long, and learned adaptive reasoning under counterfactual scene complexity.
 
 ## High-Level Takeaways

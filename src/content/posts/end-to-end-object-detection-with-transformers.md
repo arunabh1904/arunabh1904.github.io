@@ -26,6 +26,10 @@ DETR reformulates detection as direct set prediction. A CNN produces image featu
 
 On COCO, DETR reports accuracy and runtime comparable to a heavily optimized Faster R-CNN baseline. It performs particularly well on large objects and extends to panoptic segmentation with a small mask head. The result established that anchors, proposal heuristics, and NMS were not essential components of a competitive detector.
 
+![End-to-End Object Detection with Transformers source figure: DETR directly predicts (in parallel) the final set of detections by combining a common CNN with a transformer architecture.](/assets/images/end-to-end-object-detection-with-transformers-paper-figure.webp)
+_DETR directly predicts (in parallel) the final set of detections by combining a common CNN with a transformer architecture. Source: [End-to-End Object Detection with Transformers](https://arxiv.org/abs/2005.12872), Figure 1, via arXiv HTML._
+
+
 The simplification moves complexity into optimization. The original model uses a long 500-epoch schedule, and the paper identifies slow convergence and weaker small-object performance as open problems. Doubling feature resolution helps small objects but makes encoder self-attention much more expensive.
 
 | Design choice | Function |

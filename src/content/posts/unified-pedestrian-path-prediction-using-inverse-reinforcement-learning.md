@@ -25,6 +25,10 @@ summary: "2026 – Unified Pedestrian Path Prediction Using Inverse Reinforcemen
 
 The technical change is in the learning contract. STGAT already represents pedestrians and their interactions as a graph over time; the paper changes what the network is asked to optimize. A state can encode the current graph and motion context, while actions represent the next path decision. That interface supports both policy-gradient methods and a deterministic policy, so the same predictor can be studied under multiple decision formulations.
 
+![Pedestrian trajectory-prediction overview comparing supervised sequence prediction with decision-oriented policy formulations](/assets/images/unified-pedestrian-path-prediction-paper-figure.webp)
+
+_The same social trajectory encoder can be trained under supervised, one-step, sequential, deterministic, or stochastic decision formulations; the paper studies the objective rather than replacing the perception backbone. Source: [Unified Pedestrian Path Prediction](https://arxiv.org/abs/2608.15929), Figure 1._
+
 The result is a comparative study rather than a new perception architecture. Its claim is that advanced graph predictors can still benefit from a decision-oriented objective, extending earlier formulation comparisons that used shallow models. The abstract does not report a single cross-dataset percentage gain in the available source summary, so the note should not invent one; the important evidence is the controlled comparison against supervised learning.
 
 The open decision is whether inverse reinforcement learning improves behavior because it captures a useful latent cost or because its rollout and objective choices regularize the predictor. A matched study should hold STGAT, data, horizon, and evaluation fixed while varying only state/action definitions and policy objective.

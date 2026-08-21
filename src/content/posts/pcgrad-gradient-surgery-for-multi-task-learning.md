@@ -24,6 +24,10 @@ Projected Conflicting Gradient modifies a task gradient when its dot product wit
 
 PCGrad is optimizer-adjacent and model-agnostic; it requires per-task gradients but no new inference module. Randomizing the task order matters because sequential projections are not commutative. In the paper's NYUv2 results, adding PCGrad to Cross-Stitch changes mIoU from 15.69 to 18.14 and depth error from 0.6277 to 0.5805; fixed projection order performs worse in its ablation.
 
+![PCGrad projection of conflicting task gradients onto one another's normal planes while leaving aligned gradients unchanged](/assets/images/pcgrad-gradient-surgery-for-multi-task-learning-paper-figure.webp)
+_When two task gradients have a negative cosine, PCGrad removes each conflicting component; non-conflicting gradients pass through unchanged. Source: [PCGrad](https://arxiv.org/abs/2001.06782), method figure._
+
+
 | Condition | PCGrad response | Limit |
 | --- | --- | --- |
 | Negative cosine | Remove conflicting component | Pairwise repair may not optimize all tasks globally. |

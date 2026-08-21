@@ -23,6 +23,10 @@ summary: '2026 – Hi-Token makes bounding-box coordinates coarse-to-fine sequen
 
 Flat coordinate vocabularies make nearby positions such as 323 and 324 unrelated symbols, often sharing one vocabulary across horizontal and vertical axes. Hi-Token instead emits three digit tokens for each coordinate and separates the $x$ and $y$ vocabularies. A box therefore uses 12 tokens drawn from 60 coordinate types. This increases output length, but it exposes place value and axis role while reusing each token far more often.
 
+![Hi-Token: Hierarchical Coordinate Tokenization for Generative Visual Grounding source figure: Overview of Hi-Token and the geometry-aware post-training framework.](/assets/images/hi-token-hierarchical-coordinate-tokenization-for-generative-visual-grounding-paper-figure.webp)
+_Overview of Hi-Token and the geometry-aware post-training framework. Source: [Hi-Token: Hierarchical Coordinate Tokenization for Generative Visual Grounding](https://arxiv.org/abs/2608.03471), Figure 1, via arXiv HTML._
+
+
 Under a matched Qwen2.5-VL-3B setup with 80,000 RefCOCO training examples, Hi-Token SFT raises RefCOCO P@0.95 from 23.0 for flat-token SFT to 31.7. The paper reports a 50-fold mean increase in raw supervision density per coordinate type. A separately tuned flat baseline reaches 26.3, so tuning narrows the gap but does not close it in the reported comparison.
 
 ### Hi-GAR targets broad geometric failures

@@ -24,6 +24,10 @@ Sparse-to-Dense feeds RGB and sparse depth into an encoder-decoder that predicts
 
 The network can use one joint encoder or separate RGB and depth branches. Sparse points anchor metric scale while image features interpolate structure between measurements. The paper reports that 100 samples roughly halve NYU depth error and reduce the cited KITTI error from about 7 m to about 3.5 m; at 500 samples, the fraction of reliable KITTI pixels rises from 59.1% to 93.5%.
 
+![Sparse-to-Dense encoder-decoder architectures for NYU Depth and KITTI with different input shapes and shared upsampling design](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-paper-figure.webp)
+_The source uses dataset-specific encoder widths but the same core contract: fuse RGB with sparse metric samples, compress through a ResNet encoder, and upsample to dense depth. Source: [Sparse-to-Dense](https://arxiv.org/abs/1709.07492), architecture figure._
+
+
 | Runtime input | Role | Failure consideration |
 | --- | --- | --- |
 | RGB | Boundaries and semantic priors | Lighting and texture shortcuts. |

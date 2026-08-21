@@ -21,6 +21,10 @@ summary: "2025 – TS-VLM: Text-Guided SoftSort Pooling for Vision-Language Mode
 
 The design asks a useful question before fusion: which camera views should matter for this query? Instead of paying attention cost across every token and view, TGSSP uses text semantics to order and aggregate features. The output is a query-adaptive view summary, so the model can favor a rear or side camera when the language task requires it without learning a full dense attention map.
 
+![TS-VLM: Text-Guided SoftSort Pooling for Vision-Language Models in Multi-View Driving Reasoning source figure: The overall architecture of TS-VLM.](/assets/images/ts-vlm-text-guided-softsort-pooling-for-vision-language-models-in-multi-view-driving-reasoning-paper-figure.webp)
+_The overall architecture of TS-VLM. Source: [TS-VLM: Text-Guided SoftSort Pooling for Vision-Language Models in Multi-View Driving Reasoning](https://arxiv.org/abs/2505.12670), Fig. 3, via arXiv HTML._
+
+
 The saving depends on the comparison contract. The abstract does not report the number of views, visual tokens per view, hardware, latency distribution, or a matched-parameter sparse-attention baseline. It also does not test whether pooling preserves low-probability but safety-critical views when the question does not explicitly name them. A robust driving interface should answer that latter question before treating average VQA efficiency as deployment readiness.
 
 ## High-Level Takeaways

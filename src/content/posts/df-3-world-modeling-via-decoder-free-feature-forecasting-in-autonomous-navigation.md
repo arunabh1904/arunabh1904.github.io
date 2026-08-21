@@ -23,6 +23,10 @@ summary: '2026 – DF³ forecasts future foundation-model features and reads tas
 
 The method injects learnable spatial prediction queries into terminal blocks of a frozen DINOv3 ViT. Motion-Aware Context Fusion combines coarse optical-flow warping with local latent cross-correlation to align history before those queries forecast the next frame's features. A second set of task queries reads semantic segmentation directly from the forecasted representation. Training uses feature-level cosine and Huber losses; no decoder is trained to map generated pixels or latents back to a task output.
 
+![DF$^3$: World Modeling via Decoder-Free Feature Forecasting in Autonomous Navigation source figure: Conceptual comparison of forecasting paradigms.](/assets/images/df-3-world-modeling-via-decoder-free-feature-forecasting-in-autonomous-navigation-paper-figure.webp)
+_Conceptual comparison of forecasting paradigms. Source: [DF$^3$: World Modeling via Decoder-Free Feature Forecasting in Autonomous Navigation](https://arxiv.org/abs/2608.02428), Fig. 1, via arXiv HTML._
+
+
 The design is not simply smaller. The ablation compares temporal fusion choices while holding query injection fixed: concatenation reaches 59.9 mIoU, cross-correlation alone 65.7, and the combined warp-plus-cross-correlation module 69.9 on short-term Cityscapes forecasting. The result supports using complementary coarse displacement and fine local matching, not a generic claim that any query interface removes the temporal modeling problem.
 
 ### The measured win is an accuracy-efficiency point

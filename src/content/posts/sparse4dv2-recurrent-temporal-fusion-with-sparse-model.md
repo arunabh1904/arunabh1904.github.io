@@ -27,6 +27,10 @@ Sparse4D v2 changes the first Sparse4D from explicit multi-frame image sampling 
 
 The decoder reserves one layer for fresh anchors and uses later layers for recurrent temporal instances. Camera-parameter encoding exposes calibration to the instance update. Dense LiDAR-derived depth supervision stabilizes the camera backbone during training but is absent from inference. Efficient Deformable Aggregation fuses sampling and weighted reduction into one operator.
 
+![Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model source figure: Overall Framework of Sparse4Dv2, which conforms to an encoder-decoder structure.](/assets/images/sparse4dv2-recurrent-temporal-fusion-with-sparse-model-paper-figure.webp)
+_Overall Framework of Sparse4Dv2, which conforms to an encoder-decoder structure. Source: [Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model](https://arxiv.org/abs/2305.14018), Figure 2, via arXiv HTML._
+
+
 | Change | Reported effect | Why it matters |
 | --- | --- | --- |
 | Efficient aggregation | 6.3→3.1 GB train memory; 13.7→20.3 FPS | Sparse algorithms still need fused kernels. |

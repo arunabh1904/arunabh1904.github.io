@@ -24,6 +24,10 @@ DriveWorld pretrains a 4D scene representation through a Memory State-Space Mode
 
 On the paper's OpenScene pretraining setup, reported downstream gains include 7.5 mAP for detection, 3 IoU for mapping, 5 AMOTA for tracking, 0.1 m lower minADE, 3 IoU for occupancy, and 0.34 m lower planning L2. The pretraining geometry comes from dense occupancy labels generated with fused LiDAR, so the framework uses rich automatic supervision rather than pure camera-only self-supervision.
 
+![DriveWorld: 4D Pre-Trained Scene Understanding source figure: Overall framework of the proposed DriveWorld.](/assets/images/driveworld-4d-pretrained-scene-understanding-paper-figure.webp)
+_Overall framework of the proposed DriveWorld. Source: [DriveWorld: 4D Pre-Trained Scene Understanding](https://arxiv.org/abs/2405.04390), Figure 2, via arXiv HTML._
+
+
 | State | Update rule | Consumer |
 | --- | --- | --- |
 | Dynamic memory | Learned state-space recurrence | Actors, tracking, prediction. |

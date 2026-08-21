@@ -27,6 +27,10 @@ NLSPN predicts an initial dense depth map, confidence, non-local neighbor offset
 
 Each pixel selects a small set of neighbors that can lie on the same object or plane even when they are not adjacent. Learnable normalization expands the feasible affinity space while maintaining stable iteration. Confidence jointly suppresses unreliable source pixels during propagation instead of masking them only after a dense estimate is formed.
 
+![NLSPN: Non-Local Spatial Propagation Network for Depth Completion source figure: Overview of the proposed algorithm .](/assets/images/nlspn-non-local-spatial-propagation-network-for-depth-completion-paper-figure.webp)
+_Overview of the proposed algorithm . Source: [NLSPN: Non-Local Spatial Propagation Network for Depth Completion](https://arxiv.org/abs/2007.10042), Figure 2, via arXiv HTML._
+
+
 On KITTI Depth Completion test, NLSPN reports 741.68 mm RMSE and 199.59 mm MAE, compared with 758.38 and 226.50 for DeepLiDAR in the cited table. On NYU Depth V2, it reports 0.092 m RMSE. The ablation attributes the improvement to all three choices:
 
 | Propagation choice | KITTI validation RMSE |

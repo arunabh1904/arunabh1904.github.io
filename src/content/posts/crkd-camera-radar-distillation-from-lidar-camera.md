@@ -26,6 +26,10 @@ CRKD uses a BEVFusion-style LiDAR-camera teacher to supervise a cheaper camera-r
 
 Cross-stage distillation aligns radar features with the teacher's LiDAR representation; mask scaling concentrates feature loss near foreground; relation loss preserves spatial structure; response loss transfers predictions with dynamic class weighting. The reported camera-radar baseline is 43.2 mAP / 54.1 NDS, gated fusion reaches 44.9 / 55.9, and full CRKD reaches 46.7 / 57.3. The teacher reports 66.1 mAP.
 
+![CRKD teacher-student framework transferring LiDAR-camera knowledge into a camera-radar detector](/assets/images/crkd-camera-radar-distillation-paper-figure.webp)
+
+_The runtime student keeps only camera and radar; LiDAR appears in the teacher and in feature-, relation-, and response-level training losses. Source: [CRKD](https://openaccess.thecvf.com/content/CVPR2024/html/Zhao_CRKD_Enhanced_Camera-Radar_Object_Detection_with_Cross-modality_Knowledge_Distillation_CVPR_2024_paper.html), Figure 2._
+
 | Knowledge path | Purpose | Risk |
 | --- | --- | --- |
 | LiDAR to radar | Stronger metric geometry | Student cannot reproduce all teacher cues. |

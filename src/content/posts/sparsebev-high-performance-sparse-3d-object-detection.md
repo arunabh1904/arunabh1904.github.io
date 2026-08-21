@@ -27,6 +27,10 @@ SparseBEV keeps the BEV prior without building a dense BEV map. Pillar-shaped qu
 
 Scale-adaptive attention gives each query head a learned BEV receptive field. Large classes learn broader neighborhoods. Adaptive sampling predicts support around the query, projects it across eight timestamps and visible cameras, and weights feature scales. Dynamic mixing lets the query decide how sampled points and channels should interact.
 
+![SparseBEV: High-Performance Sparse 3D Object Detection from Multi-Camera Videos source figure: The overall architecture of SparseBEV, a fully-sparse camera-only 3D object detector.](/assets/images/sparsebev-high-performance-sparse-3d-object-detection-paper-figure.webp)
+_The overall architecture of SparseBEV, a fully-sparse camera-only 3D object detector. Source: [SparseBEV: High-Performance Sparse 3D Object Detection from Multi-Camera Videos](https://arxiv.org/abs/2308.09244), Figure 2, via arXiv HTML._
+
+
 | Component | mAP | NDS | Contribution |
 | --- | ---: | ---: | --- |
 | Baseline without mixing | 38.6 | 49.1 | Sparse sampled features with fixed aggregation. |

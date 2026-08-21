@@ -21,6 +21,10 @@ summary: "2025 – ReCogDrive: A Reinforced Cognitive Framework for End-to-End A
 
 The design responds to a language-action mismatch: trajectory coordinates represented as text can be invalid, infeasible, or slow to decode. ReCogDrive retains an autoregressive model for driving understanding, but transfers its learned priors into a diffusion trajectory planner instead of asking the language model to serialize controls itself. The staged data pipeline is intended to give the VLM a more structured cognitive representation before that handoff.
 
+![ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving source figure: Overview of ReCogDrive.](/assets/images/recogdrive-a-reinforced-cognitive-framework-for-end-to-end-autonomous-driving-paper-figure.webp)
+_Overview of ReCogDrive. Source: [ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving](https://arxiv.org/abs/2506.08052), Figure 1, via arXiv HTML._
+
+
 The model changes three major variables at once—data curation, action interface, and reinforcement objective. The abstract does not specify the trajectory diffusion parameterization, the rewards used by DiffGRPO, the relative loss weights, or a matched continuous non-diffusion planner. A causal result would need to freeze the data and VLM, then independently swap the action decoder and the reinforcement stage while measuring safety, comfort, and wall-clock cost.
 
 ## High-Level Takeaways
