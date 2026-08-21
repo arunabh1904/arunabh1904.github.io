@@ -1,3 +1,5 @@
+import { ARCHITECTURE_CODE_PRACTICE_PROBLEMS } from './code-practice-architectures';
+
 export interface CodePracticeExample {
   label: string;
   lines: readonly string[];
@@ -8,6 +10,12 @@ export interface CodePracticeVisual {
   src: string;
   alt: string;
   caption: string;
+}
+
+export interface CodePracticeInterviewFormat {
+  durationMinutes: number;
+  evaluationCriteria: readonly string[];
+  followUps: readonly string[];
 }
 
 export interface CodePracticeProblem {
@@ -28,12 +36,15 @@ export interface CodePracticeProblem {
   visual?: CodePracticeVisual;
   solutionDiagram?: string;
   starterCode: string;
+  track?: 'fundamentals' | 'architecture';
+  environment?: 'browser' | 'local-pytorch';
+  interview?: CodePracticeInterviewFormat;
   packages?: readonly string[];
   tags?: readonly string[];
 }
 
 export const CODE_PRACTICE_SECTION_SUMMARY =
-  'Interview-style PyTorch and NumPy exercises with runnable starter code, editor-inserted hints, and reference solutions.';
+  'Practice the way you would code in an ML interview: clarify the contract, design a small API, implement it cleanly, test shapes, and defend the tradeoffs.';
 
 const PYTORCH_AND_NUMPY_PACKAGES = ['torch', 'numpy'] as const;
 
@@ -4289,9 +4300,16 @@ const PROGRESSIVE_DIFFICULTY: Readonly<Record<string, CodePracticeProblem['diffi
   'classic-mlp-forward-backward': 'Hard',
 };
 
-export const codePracticeProblems: readonly CodePracticeProblem[] = [...RAW_CODE_PRACTICE_PROBLEMS]
+const ALL_CODE_PRACTICE_PROBLEMS: readonly CodePracticeProblem[] = [
+  ...RAW_CODE_PRACTICE_PROBLEMS,
+  ...ARCHITECTURE_CODE_PRACTICE_PROBLEMS,
+];
+
+export const codePracticeProblems: readonly CodePracticeProblem[] = ALL_CODE_PRACTICE_PROBLEMS
   .map((problem) => ({
     ...problem,
+    track: problem.track ?? 'fundamentals',
+    environment: problem.environment ?? 'browser',
     order: PROGRESSIVE_ORDER[problem.id] ?? problem.order,
     difficulty: PROGRESSIVE_DIFFICULTY[problem.id] ?? problem.difficulty,
     walkthroughCode: problem.solutionCode,

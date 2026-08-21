@@ -49,6 +49,15 @@ function removeTodoCommentBlocks(source: string) {
 }
 
 export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
+  const isBrowserRunnable = (problem.environment ?? 'browser') === 'browser';
+  const interviewDuration =
+    problem.interview?.durationMinutes ??
+    ({ Easy: 20, Medium: 30, Hard: 45 } as const)[problem.difficulty];
+  const evaluationCriteria = problem.interview?.evaluationCriteria ?? [
+    'Clarify tensor shapes, return values, and failure cases before coding.',
+    'Keep the implementation small enough to explain while you write it.',
+    'Run the example and add one edge-case check before calling it done.',
+  ];
   const containerRef = useRef<HTMLElement | null>(null);
   const runtimeRef = useRef<PyodideRuntime | null>(null);
   const loadingRef = useRef(false);
@@ -57,8 +66,12 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const [code, setCode] = useState(() => removeTodoCommentBlocks(problem.starterCode));
   const [output, setOutput] = useState('');
   const [errorOutput, setErrorOutput] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
-  const [statusMessage, setStatusMessage] = useState('Loading Python...');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>(() =>
+    isBrowserRunnable ? 'idle' : 'ready',
+  );
+  const [statusMessage, setStatusMessage] = useState(() =>
+    isBrowserRunnable ? 'Loading Python...' : 'Local PyTorch',
+  );
   const [isRunning, setIsRunning] = useState(false);
   const [hasRun, setHasRun] = useState(false);
   const [editorTheme, setEditorTheme] = useState(() =>
@@ -88,8 +101,11 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
     [],
   );
   const editorExtensions = useMemo(
-    () => [...codeEditorExtensions, runShortcutExtension],
-    [runShortcutExtension],
+    () =>
+      isBrowserRunnable
+        ? [...codeEditorExtensions, runShortcutExtension]
+        : [...codeEditorExtensions],
+    [isBrowserRunnable, runShortcutExtension],
   );
 
   useEffect(() => {
@@ -101,6 +117,14 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
   useEffect(() => {
     let didCancel = false;
+
+    if (!isBrowserRunnable) {
+      setStatus('ready');
+      setStatusMessage('Local PyTorch');
+      return () => {
+        didCancel = true;
+      };
+    }
 
     async function bootstrapRuntime() {
       if (runtimeRef.current || loadingRef.current) {
@@ -170,7 +194,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
       didCancel = true;
       observer.disconnect();
     };
-  }, []);
+  }, [isBrowserRunnable]);
 
   useEffect(() => {
     setEditorTheme(
@@ -188,7 +212,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const hasExecutionResult = hasRun || Boolean(errorOutput);
 
   async function handleRun() {
-    if (isRunningRef.current) {
+    if (!isBrowserRunnable || isRunningRef.current) {
       return;
     }
 
@@ -239,7 +263,9 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   // The CodeMirror keymap is created once, so route it through a ref to the
   // current controlled editor state instead of rebuilding the editor on each keystroke.
   runHandlerRef.current = () => {
-    void handleRun();
+    if (isBrowserRunnable) {
+      void handleRun();
+    }
   };
 
   return (
@@ -256,11 +282,34 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
           <span className="code-practice-lab__difficulty">{problem.difficulty}</span>
         </header>
 
+        <p className="code-practice-lab__section-label">Interview prompt</p>
         <div className="code-practice-lab__copy">
           {problem.prompt.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
+
+        <section className="code-practice-lab__interview" aria-label="Interview format">
+          <div className="code-practice-lab__interview-heading">
+            <p className="code-practice-lab__section-label">What good looks like</p>
+            <strong>{interviewDuration} min</strong>
+          </div>
+          <ul className="code-practice-lab__list">
+            {evaluationCriteria.map((criterion) => (
+              <li key={criterion}>{criterion}</li>
+            ))}
+          </ul>
+          {problem.interview && problem.interview.followUps.length > 0 && (
+            <div className="code-practice-lab__follow-ups">
+              <p className="code-practice-lab__section-label">Likely follow-ups</p>
+              <ul className="code-practice-lab__list">
+                {problem.interview.followUps.map((followUp) => (
+                  <li key={followUp}>{followUp}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
 
         {problem.visual && (
           <figure className="code-practice-lab__visual">
@@ -271,7 +320,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
         <div className="code-practice-lab__specs">
           <section className="code-practice-lab__spec-card">
-            <p className="code-practice-lab__section-label">Implement</p>
+            <p className="code-practice-lab__section-label">API contract</p>
             <pre>
               <code>{problem.signature}</code>
             </pre>
@@ -287,7 +336,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
           </section>
 
           <section className="code-practice-lab__spec-card">
-            <p className="code-practice-lab__section-label">Examples</p>
+            <p className="code-practice-lab__section-label">Acceptance checks</p>
             <div className="code-practice-lab__examples">
               {problem.examples.map((example) => (
                 <div key={example.label} className="code-practice-lab__example">
@@ -302,7 +351,9 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
         </div>
       </article>
 
-      <article className="code-practice-lab__workspace">
+      <article
+        className={`code-practice-lab__workspace${isBrowserRunnable ? '' : ' code-practice-lab__workspace--local'}`}
+      >
         <header className="code-practice-lab__workspace-header">
           <div className="code-practice-lab__workspace-identity">
             <p
@@ -320,17 +371,19 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
             >
               Solution
             </button>
-            <button
-              className="code-practice-lab__button code-practice-lab__button--primary"
-              type="button"
-              aria-label="Run code"
-              aria-keyshortcuts="Control+Enter Meta+Enter"
-              onClick={() => void handleRun()}
-              disabled={status !== 'ready' || isRunning}
-            >
-              <span>{isRunning ? 'Running...' : 'Run'}</span>
-              {!isRunning && <kbd>Ctrl / Cmd + Enter</kbd>}
-            </button>
+            {isBrowserRunnable && (
+              <button
+                className="code-practice-lab__button code-practice-lab__button--primary"
+                type="button"
+                aria-label="Run code"
+                aria-keyshortcuts="Control+Enter Meta+Enter"
+                onClick={() => void handleRun()}
+                disabled={status !== 'ready' || isRunning}
+              >
+                <span>{isRunning ? 'Running...' : 'Run'}</span>
+                {!isRunning && <kbd>Ctrl / Cmd + Enter</kbd>}
+              </button>
+            )}
             <button
               className="code-practice-lab__button code-practice-lab__button--secondary"
               type="button"
@@ -340,6 +393,13 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
             </button>
           </div>
         </header>
+
+        {!isBrowserRunnable && (
+          <p className="code-practice-lab__runtime-note code-practice-lab__runtime-note--local">
+            This exercise uses the full <code>torch.nn</code> API. Write here, then copy
+            <code> solution.py </code> into a local PyTorch environment to run the included smoke test.
+          </p>
+        )}
 
         <div className="code-practice-lab__editor-layout">
           <div className="code-practice-lab__editor-column">
@@ -381,7 +441,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
           )}
         </div>
 
-        {hasExecutionResult && (
+        {isBrowserRunnable && hasExecutionResult && (
           <div className="code-practice-lab__output" aria-live="polite">
             <div>
               <p>{errorOutput ? 'Errors' : 'Output'}</p>

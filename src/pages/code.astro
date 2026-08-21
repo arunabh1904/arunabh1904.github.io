@@ -7,18 +7,38 @@ import {
 } from '../lib/code-practice';
 
 const problemCountLabel = String(codePracticeProblems.length).padStart(2, '0');
+const fundamentals = codePracticeProblems.filter((problem) => problem.track !== 'architecture');
+const architectures = codePracticeProblems.filter((problem) => problem.track === 'architecture');
+const practiceTracks = [
+  {
+    id: 'fundamentals',
+    eyebrow: 'Track 01',
+    title: 'ML coding fundamentals',
+    summary:
+      'Short interview problems for tensor operations, losses, geometry, attention, matching, and manual backprop. These run in the browser.',
+    problems: fundamentals,
+  },
+  {
+    id: 'architectures',
+    eyebrow: 'Track 02',
+    title: 'Architecture builds',
+    summary:
+      'Longer local-PyTorch exercises for designing clean module boundaries, tracking shapes, and testing a complete model.',
+    problems: architectures,
+  },
+];
 ---
 
 <PostLayout
   title="Code"
-  description="Coding interview practice problems with runnable Python workspaces."
+  description="ML coding interview practice with runnable fundamentals and clean PyTorch architecture builds."
   showSectionsNav={false}
 >
   <section class="code-index">
     <div class="code-index__header">
       <div>
         <p class="code-index__eyebrow">Code</p>
-        <h1>Interview practice</h1>
+        <h1>ML coding interviews</h1>
         <p>{CODE_PRACTICE_SECTION_SUMMARY}</p>
       </div>
 
@@ -28,37 +48,65 @@ const problemCountLabel = String(codePracticeProblems.length).padStart(2, '0');
       </div>
     </div>
 
+    <section class="code-index__interview-loop" aria-labelledby="code-interview-loop-title">
+      <div>
+        <p class="code-index__eyebrow">Interview loop</p>
+        <h2 id="code-interview-loop-title">Practice the whole answer</h2>
+      </div>
+      <ol>
+        <li><strong>Clarify.</strong> State shapes, return values, and failure cases.</li>
+        <li><strong>Design.</strong> Sketch the smallest useful API and its data flow.</li>
+        <li><strong>Implement.</strong> Write typed, readable code and narrate key choices.</li>
+        <li><strong>Test.</strong> Check the happy path, one edge case, and the main tradeoff.</li>
+      </ol>
+    </section>
+
     <section class="code-index__environment" aria-labelledby="code-environment-title">
       <div>
-        <p class="code-index__eyebrow">Browser workspace</p>
-        <h2 id="code-environment-title">Run each problem locally</h2>
+        <p class="code-index__eyebrow">Two workspaces</p>
+        <h2 id="code-environment-title">Use the right runtime</h2>
         <p>
-          Every problem opens a local Python editor powered by Pyodide. NumPy loads on demand;
-          <code>torch</code> is a lightweight, NumPy-backed compatibility layer for the tensor
-          operations used in these exercises—not the full PyTorch runtime.
+          Fundamentals run in a browser Python editor. Architecture builds use real
+          <code>torch.nn</code> code and include a local smoke test because the browser compatibility
+          layer is not a full PyTorch runtime.
         </p>
       </div>
       <ul>
-        <li><kbd>Ctrl / Cmd + Enter</kbd> runs the current editor contents.</li>
+        <li><kbd>Ctrl / Cmd + Enter</kbd> runs browser exercises.</li>
         <li>Hints insert comments into the editor, and Solution loads the reference code.</li>
-        <li>No autograd, CUDA, or <code>nn.Module</code>.</li>
+        <li>Architecture exercises use dataclasses, classes, <code>nn.Module</code>, and typed outputs.</li>
       </ul>
     </section>
 
-    <ul class="code-index__list">
-      {codePracticeProblems.map((problem) => (
-        <li>
-          <a class="code-index__card" href={getCodePracticeProblemPath(problem)}>
-            <div class="code-index__card-header">
-              <p>{`Problem ${String(problem.order).padStart(2, '0')}`}</p>
-              <span>{problem.difficulty}</span>
-            </div>
-            <h2>{problem.title}</h2>
-            <p>{problem.summary}</p>
-            <strong>Open problem</strong>
-          </a>
-        </li>
-      ))}
-    </ul>
+    {practiceTracks.map((track) => (
+      <section class="code-index__track" aria-labelledby={`code-track-${track.id}`}>
+        <div class="code-index__track-heading">
+          <div>
+            <p class="code-index__eyebrow">{track.eyebrow}</p>
+            <h2 id={`code-track-${track.id}`}>{track.title}</h2>
+          </div>
+          <p>{track.summary}</p>
+        </div>
+
+        <ul class="code-index__list">
+          {track.problems.map((problem) => (
+            <li>
+              <a class="code-index__card" href={getCodePracticeProblemPath(problem)}>
+                <div class="code-index__card-header">
+                  <p>{`Problem ${String(problem.order).padStart(2, '0')}`}</p>
+                  <div class="code-index__card-badges">
+                    <span>{problem.environment === 'local-pytorch' ? 'Local PyTorch' : 'Browser'}</span>
+                    <span>{problem.difficulty}</span>
+                  </div>
+                </div>
+                <h3>{problem.title}</h3>
+                <p>{problem.summary}</p>
+                <strong>Open problem</strong>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
   </section>
 </PostLayout>

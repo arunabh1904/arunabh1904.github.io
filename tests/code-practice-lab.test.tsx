@@ -233,6 +233,32 @@ describe('CodePracticeLab', () => {
     expect(container.textContent).toContain('Ctrl / Cmd + Enter');
   });
 
+  it('keeps full nn.Module exercises editable without booting the browser shim', async () => {
+    await render({
+      ...testProblem,
+      id: 'resnet-from-building-blocks',
+      title: 'Build a configurable ResNet',
+      environment: 'local-pytorch',
+      track: 'architecture',
+      starterCode: `from torch import nn
+
+class ResNet(nn.Module):
+    def forward(self, x):
+        raise NotImplementedError("Implement forward")`,
+      solutionCode: `from torch import nn
+
+class ResNet(nn.Module):
+    def forward(self, x):
+        return x`,
+    });
+
+    expect(loadPyodideRuntime).not.toHaveBeenCalled();
+    expect(container.textContent).toContain('Local PyTorch');
+    expect(container.textContent).toContain('full torch.nn API');
+    expect(container.querySelector('button[aria-label="Run code"]')).toBeNull();
+    expect(getEditor().textContent).toContain('class ResNet(nn.Module):');
+  });
+
   it('keeps the default workspace focused until a reference solution is loaded', async () => {
     loadPyodideRuntime.mockResolvedValueOnce({
       runPythonAsync: vi.fn(),
