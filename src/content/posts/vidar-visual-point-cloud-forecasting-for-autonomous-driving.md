@@ -26,6 +26,10 @@ ViDAR pretrains a multi-camera temporal encoder by forecasting future LiDAR poin
 
 The paper reports that ViDAR improves downstream 3D detection by 3.1 NDS, reduces motion-prediction error by about 10%, and transfers to occupancy, mapping, tracking, and planning. In its UniAD summary, ViDAR reaches 52.57 NDS, 42.33 mAP, 42.0 AMOTA, 0.67 minADE, and 0.91 m average planning L2, with gains across the baseline row.
 
+![ViDAR: Visual Point Cloud Forecasting for Autonomous Driving source figure: Comparisons among visual autonomous driving pre-training paradigms and our ViDAR architecture.](/assets/images/vidar-visual-point-cloud-forecasting-for-autonomous-driving-paper-figure.webp)
+_Comparisons among visual autonomous driving pre-training paradigms and our ViDAR architecture. Source: [ViDAR: Visual Point Cloud Forecasting for Autonomous Driving](https://arxiv.org/abs/2312.17655), Figure 2, via arXiv HTML._
+
+
 | Objective element | What it teaches | Ambiguity |
 | --- | --- | --- |
 | Historical images | Appearance and temporal context | Camera visibility limits. |

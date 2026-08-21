@@ -24,6 +24,10 @@ UniLION converts LiDAR, multi-view images, and temporal observations into sparse
 
 LiDAR and camera observations retain separate input encoders, but their voxels enter the same 3D backbone. Each UniLION block partitions sparse features along spatial axes, applies a linear group RNN for long-range interaction, and alternates voxel merging with voxel expansion. A learned 3D spatial descriptor restores positional structure that a linear recurrence alone models weakly. This replaces explicit camera-LiDAR and temporal fusion modules with one recurrent spatial operator; it does not eliminate calibration, view lifting, or modality-specific preprocessing.
 
+![UniLION: Towards a Unified Autonomous Driving Model with Linear Group RNNs source figure: (a) presents the mainstream methods in implementing multi-modal fusion or temporal fusion.](/assets/images/unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns-paper-figure.webp)
+_(a) presents the mainstream methods in implementing multi-modal fusion or temporal fusion. Source: [UniLION: Towards a Unified Autonomous Driving Model with Linear Group RNNs](https://arxiv.org/abs/2511.01768), Fig. 1, via arXiv HTML._
+
+
 The strongest unification test trains one LiDAR-camera-temporal model and removes inputs only at inference, without masked-modality training. Removing temporal history while retaining LiDAR and cameras is nearly neutral: 74.9 NDS and 50.7 RayIoU versus 75.4 and 51.3 with full temporal input. Removing both cameras and history drops the same model to 70.6 NDS and 43.4 RayIoU. A separately trained LiDAR-only model reaches 72.3 NDS and 46.8 RayIoU, so architectural compatibility does not erase the value of matching the training distribution to the deployed sensor set.
 
 | Inference configuration | NDS | Tracking AMOTA | Map mIoU | Occupancy RayIoU |

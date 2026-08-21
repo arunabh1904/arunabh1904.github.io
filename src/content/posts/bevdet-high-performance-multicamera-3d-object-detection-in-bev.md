@@ -27,6 +27,10 @@ BEVDet assembles an image backbone, Lift-Splat-style view transformer, BEV encod
 
 Image-space augmentation alone is insufficient because the detector's output lives in ego coordinates. BEVDet applies rotation, scaling, and flipping after view transformation, then uses a BEV encoder to build metric context. In the reported ablation, combining image and BEV augmentation raises peak mAP from 23.0 to 31.6 and largely removes late-training overfit.
 
+![BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View source figure: The framework of the proposed BEVDet paradigm.](/assets/images/bevdet-high-performance-multicamera-3d-object-detection-in-bev-paper-figure.webp)
+_The framework of the proposed BEVDet paradigm. Source: [BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View](https://arxiv.org/abs/2112.11790), Figure 1, via arXiv HTML._
+
+
 | Configuration | mAP | NDS | FPS | What changed |
 | --- | ---: | ---: | ---: | --- |
 | 704×256 images, 0.8 m BEV | 31.2 | 39.2 | 15.6 | Efficient baseline. |

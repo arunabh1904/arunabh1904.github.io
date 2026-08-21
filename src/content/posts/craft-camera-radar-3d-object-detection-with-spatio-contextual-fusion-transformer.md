@@ -25,6 +25,10 @@ CRAFT starts from camera-generated 3D proposals, associates nearby radar returns
 
 Soft Polar Association builds a proposal-specific radar set. A spatio-contextual fusion transformer then exchanges position and feature evidence between image tokens and radar returns. On nuScenes test, the paper reports 41.1 mAP and 52.3 NDS. Relative to its camera-only CRAFT-I baseline on validation, radar adds 7.9 mAP overall, with larger gains on reflective metal classes and distant objects.
 
+![CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer source figure: Overall architecture of CRAFT.](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-paper-figure.webp)
+_Overall architecture of CRAFT. Source: [CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer](https://arxiv.org/abs/2209.06535), Figure 2, via arXiv HTML._
+
+
 | Ablation | Car AP | Association recall | What it isolates |
 | --- | ---: | ---: | --- |
 | RoI pooling | 29.8 | 50.7 | Hard image regions miss valid returns under depth error. |

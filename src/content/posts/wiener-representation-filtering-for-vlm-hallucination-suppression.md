@@ -23,6 +23,10 @@ summary: '2026 – Wiener filtering suppresses hallucination-associated directio
 
 The method treats a hidden state as a truthful component plus a hallucination-associated distortion. From paired samples, it estimates their second-order statistics, solves a generalized eigendecomposition, and applies a Wiener-style gain that weakens modes with a high distortion-to-signal ratio. The edit is made only to down-projection matrices in selected deep feed-forward blocks. It is calibrated once with forward passes, then folded into the weights; it adds neither a second decoding pass nor an inference module.
 
+![Generalized eigenvalue spectrum used to identify representation directions associated with hallucination distortion](/assets/images/wiener-representation-filtering-paper-figure.webp)
+
+_The concentrated spectrum motivates direction-dependent attenuation: a small set of modes carries much more estimated distortion relative to truthful signal than the rest. Source: [Wiener Representation Filtering](https://arxiv.org/abs/2608.08167), Figure 4._
+
 That placement is the central empirical choice. On MiniGPT-4, the paper reports sentence-level CHAIR of 23.0 for the baseline, 14.0 when editing layers 14–24, and 13.0 for layers 24–32. Mean subtraction and uniform shrinkage do not reproduce that result, supporting the narrower claim that the useful signal is direction-dependent rather than a global bias or a generic reduction in activation magnitude.
 
 ### The evidence is broad, but the calibration contract matters

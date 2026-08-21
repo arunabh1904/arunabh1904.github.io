@@ -26,6 +26,10 @@ WPT uses a world model during training to forecast how candidate actions change 
 
 On nuScenes, the teacher reports 0.61 m average L2 error and 0.11% collision rate. The distilled student reports 0.66 m and 0.24%, compared with 0.88 m and 1.06% for the undistilled baseline. On Bench2Drive, the teacher reaches a 79.23 driving score and 54.54% success rate; the student retains 72.61 and 45.45%. The paper reports 64 ms planning latency for the student versus 312 ms for the teacher, a 4.9× difference.
 
+![WPT: World-to-Policy Transfer via Online World Model Distillation source figure: Overview of WPT framework.](/assets/images/wpt-world-to-policy-transfer-via-online-world-model-distillation-paper-figure.webp)
+_Overview of WPT framework. Source: [WPT: World-to-Policy Transfer via Online World Model Distillation](https://arxiv.org/abs/2511.20095), Figure 2, via arXiv HTML._
+
+
 | Model | Avg. L2 | Collision rate | Runtime role |
 | --- | ---: | ---: | --- |
 | Baseline policy | 0.88 m | 1.06% | Student architecture without transfer. |

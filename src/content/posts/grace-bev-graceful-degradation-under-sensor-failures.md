@@ -24,6 +24,10 @@ Grace-BEV treats sensor failure as a reliability-estimation problem rather than 
 
 The paper evaluates both complete removal and corruption on nuScenes-R and nuScenes-C. Its ablations show why concatenation is not a fallback policy: a concatenation baseline reports 66.9 clean mAP but 0.0 when LiDAR is removed. Reliability-aware routing trades a small amount of peak simplicity for usable degraded modes.
 
+![Grace-BEV architecture routing between vision-only and LiDAR-guided BEV experts before fail-safe fusion](/assets/images/grace-bev-graceful-degradation-under-sensor-failures-paper-figure.webp)
+_TrustGate predicts how strongly to use the LiDAR-guided expert, while a pure-vision expert and the raw LiDAR BEV path keep degraded modes available before final fusion. Source: [Grace-BEV](https://arxiv.org/abs/2605.30983), Figure 2._
+
+
 | Operating slice | Reported mAP | What it tests |
 | --- | ---: | --- |
 | Clean camera + LiDAR | 68.3 | Nominal fusion quality. |

@@ -26,6 +26,10 @@ BEVDet4D adds a simple temporal path to BEVDet: transform the previous frame's B
 
 Ego alignment is critical because a static scene otherwise appears to move with the vehicle. The extra encoder gives local convolutions a way to interpret paired features after warping. In the tiny configuration, the paper reports velocity error falling from 0.909 to 0.337 and NDS increasing from 39.2 to 47.6; the test result reaches 56.9 NDS.
 
+![BEVDet4D: Temporal Cues in Multi-Camera 3D Detection source figure: The framework of the proposed BEVDet4D paradigm.](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-paper-figure.webp)
+_The framework of the proposed BEVDet4D paradigm. Source: [BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](https://arxiv.org/abs/2203.17054), Figure 2, via arXiv HTML._
+
+
 | Component | Purpose | Failure mode |
 | --- | --- | --- |
 | Previous BEV | Supplies temporal evidence | Carries stale false positives. |

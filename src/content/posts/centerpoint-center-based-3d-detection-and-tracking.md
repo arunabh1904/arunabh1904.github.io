@@ -26,6 +26,10 @@ CenterPoint detects objects as center points in BEV, then regresses height, dime
 
 A class-specific heatmap supplies candidate centers; lightweight attribute heads complete the 3D state. The paper reports 58.0 mAP and 65.5 NDS for detection and 63.8 AMOTA for tracking on nuScenes. The center head adds roughly 3–4 mAP over the compared anchor formulation; refinement adds about 2 mAP with under 10% overhead in the reported setup.
 
+![CenterPoint: Center-Based 3D Detection and Tracking source figure: We present a center-based framework to represent, detect and track objects.](/assets/images/centerpoint-center-based-3d-detection-and-tracking-paper-figure.webp)
+_We present a center-based framework to represent, detect and track objects. Source: [CenterPoint: Center-Based 3D Detection and Tracking](https://arxiv.org/abs/2006.11275), Figure 1, via arXiv HTML._
+
+
 | Output | Representation | Downstream value |
 | --- | --- | --- |
 | Location | BEV center heatmap | Simple proposal and association unit. |

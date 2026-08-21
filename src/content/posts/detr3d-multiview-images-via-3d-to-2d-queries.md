@@ -27,6 +27,10 @@ DETR3D predicts a set of 3D boxes directly from multiview image features. Each o
 
 DETR3D treats all cameras jointly, which is especially useful where an object crosses camera boundaries. On nuScenes validation, its CBGS configuration reports 34.9 mAP and 43.4 NDS. In overlap regions, the FCOS3D-initialized model reaches 26.8 mAP and 38.4 NDS versus 22.9 mAP and 32.9 NDS for the compared FCOS3D setup.
 
+![DETR3D: 3D Object Detection from Multi-View Images via 3D-to-2D Queries source figure: Overview of our method.](/assets/images/detr3d-multiview-images-via-3d-to-2d-queries-paper-figure.webp)
+_Overview of our method. Source: [DETR3D: 3D Object Detection from Multi-View Images via 3D-to-2D Queries](https://arxiv.org/abs/2110.06922), Figure 1, via arXiv HTML._
+
+
 | Queries | mAP | NDS | Consequence |
 | ---: | ---: | ---: | --- |
 | 100 | 31.3 | 40.8 | Too few hypotheses constrain recall. |

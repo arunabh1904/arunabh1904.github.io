@@ -21,6 +21,10 @@ summary: "2024 – RAG-Driver: Generalisable Driving Explanations with Retrieval
 
 The paper moves adaptation from model weights to the prompt. A retrieval step selects expert demonstrations that the multimodal language model can condition on when interpreting the current driving scene. That is useful when annotations are scarce or data domains differ, because the system can change its evidence set without a training run. It also creates a new deployment dependency: irrelevant or misleading retrieval can change both the explanation and the predicted control.
 
+![RAG-Driver: Generalisable Driving Explanations with Retrieval-Augmented In-Context Learning in Multi-Modal Large Language Model source figure: RAG-Driver Overview: Given a query comprising a video of the current driving scenario and its corresponding control signal, the process starts with the input…](/assets/images/rag-driver-generalisable-driving-explanations-with-retrieval-augmented-in-context-learning-paper-figure.webp)
+_RAG-Driver Overview: Given a query comprising a video of the current driving scenario and its corresponding control signal, the process starts with the input… Source: [RAG-Driver: Generalisable Driving Explanations with Retrieval-Augmented In-Context Learning in Multi-Modal Large Language Model](https://arxiv.org/abs/2402.10828), Fig. 2, via arXiv HTML._
+
+
 The abstract frames expensive annotation, domain gaps, training cost, and catastrophic forgetting as the inherited constraints. It does not disclose the retrieval embedding, the number of demonstrations, the control representation, or an ablation that separates retrieval quality from in-context reasoning. The central claim would be stronger with a matched retrieval-free prompt, random demonstrations, and an oracle-retrieval condition evaluated on both explanation fidelity and action safety.
 
 ## High-Level Takeaways

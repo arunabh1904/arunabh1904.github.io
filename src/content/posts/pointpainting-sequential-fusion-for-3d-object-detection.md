@@ -25,6 +25,10 @@ PointPainting runs image semantic segmentation first, projects every LiDAR point
 
 The paper paints PointPillars, VoxelNet, and PointRCNN and reports gains across 24 of 27 KITTI validation comparisons. On nuScenes test, its strengthened PointPillars+ baseline rises from 40.1 to 46.4 mAP and from 55.0 to 58.1 NDS after painting. Every nuScenes class improves, with especially large gains for traffic cones, whose sparse LiDAR returns benefit from image semantics.
 
+![PointPainting: Sequential Fusion for 3D Object Detection source figure: PointPainting overview.](/assets/images/pointpainting-sequential-fusion-for-3d-object-detection-paper-figure.webp)
+_PointPainting overview. Source: [PointPainting: Sequential Fusion for 3D Object Detection](https://arxiv.org/abs/1911.10150), Figure 2, via arXiv HTML._
+
+
 | What PointPainting preserves | What it discards |
 | --- | --- |
 | Per-point geometry and LiDAR intensity | Image features between projected LiDAR samples |

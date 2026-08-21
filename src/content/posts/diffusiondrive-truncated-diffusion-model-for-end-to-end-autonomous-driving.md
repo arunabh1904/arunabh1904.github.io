@@ -26,6 +26,10 @@ DiffusionDrive uses diffusion to generate multiple ego trajectories without star
 
 With a matched ResNet-34 TransFuser backbone on NAVSIM, the paper reports 88.1 PDMS. Compared with a vanilla diffusion conversion, truncation reduces denoising from 20 steps to 2, and the complete model reports a six-fold FPS increase while improving planning quality and mode diversity. The paper also reports 45 FPS on an RTX 4090 for its real-time configuration.
 
+![DiffusionDrive: Truncated Diffusion Model for End-to-End Autonomous Driving source figure: Overall architecture of DiffusionDrive.](/assets/images/diffusiondrive-truncated-diffusion-model-for-end-to-end-autonomous-driving-paper-figure.webp)
+_Overall architecture of DiffusionDrive. Source: [DiffusionDrive: Truncated Diffusion Model for End-to-End Autonomous Driving](https://arxiv.org/abs/2411.15139), Figure 4, via arXiv HTML._
+
+
 | Variant | Denoising steps | Planning implication |
 | --- | ---: | --- |
 | Vanilla diffusion policy | 20 | Broad generation but high runtime. |

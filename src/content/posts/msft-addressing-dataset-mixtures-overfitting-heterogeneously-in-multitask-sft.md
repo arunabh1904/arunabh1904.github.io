@@ -27,11 +27,8 @@ summary: "2026 – mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously
 
 ## Core Insights
 
-![Figure 2a from mSFT: test accuracy curves peak at different epochs across sub-datasets](/assets/images/msft-arxiv-x2.png)
-_Figure 2a from the [mSFT paper](https://arxiv.org/abs/2603.21606), CC BY 4.0._
-
-![Figure 2b from mSFT: absolute peak-epoch differences across tasks](/assets/images/msft-arxiv-x3.png)
-_Figure 2b from the [mSFT paper](https://arxiv.org/abs/2603.21606), CC BY 4.0._
+![mSFT Figure 2 showing test-accuracy curves that peak at different epochs and the resulting peak-epoch differences across tasks](/assets/images/msft-heterogeneous-peak-epochs.webp)
+_Figure 2 from the [mSFT paper](https://arxiv.org/abs/2603.21606), CC BY 4.0. The two panels jointly establish the premise: sub-datasets do not share one useful stopping point._
 
 ### Method and reported result
 

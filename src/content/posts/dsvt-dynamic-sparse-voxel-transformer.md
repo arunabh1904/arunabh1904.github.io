@@ -26,6 +26,10 @@ DSVT partitions the variable number of occupied voxels in each window into fixed
 
 Rotated set partitioning lets tokens exchange information beyond one grouping without paying global attention cost. The paper applies the same backbone to voxel and pillar forms and reports a TensorRT implementation at 27 Hz, making deployment path part of the contribution.
 
+![DSVT: Dynamic Sparse Voxel Transformer source figure: Top : An illustration of the Dynamic Sparse Voxel Transformer block, including one X-Axis DSVT Layer and one Y-Axis DSVT Layer with different set…](/assets/images/dsvt-dynamic-sparse-voxel-transformer-paper-figure.webp)
+_Top : An illustration of the Dynamic Sparse Voxel Transformer block, including one X-Axis DSVT Layer and one Y-Axis DSVT Layer with different set… Source: [DSVT: Dynamic Sparse Voxel Transformer](https://arxiv.org/abs/2301.06051), Figure 3, via arXiv HTML._
+
+
 | Design | Purpose | Limit |
 | --- | --- | --- |
 | Fixed-size sparse sets | Bound attention work | Requires sorting and padding logic. |

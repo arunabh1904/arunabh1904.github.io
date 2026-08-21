@@ -24,6 +24,10 @@ UniWorld pretrains a camera encoder and BEV representation by predicting geometr
 
 Predicting several frames requires the representation to retain geometry and change, not only image semantics. In the reported BEVFormer transfer, mAP/NDS improve from 0.416/0.517 to 0.438/0.534. With 75% of labels, the pretrained model matches the 100%-label baseline. Three target frames perform best in the ablation; five degrade, which the paper attributes in part to dynamic-scene difficulty.
 
+![UniWorld: Autonomous Driving Pretraining via World Models source figure: The overall architecture of the proposed multi-camera unified pre-training method UniWorld.](/assets/images/uniworld-autonomous-driving-pretraining-via-world-models-paper-figure.webp)
+_The overall architecture of the proposed multi-camera unified pre-training method UniWorld. Source: [UniWorld: Autonomous Driving Pretraining via World Models](https://arxiv.org/abs/2308.07234), Figure 2, via arXiv HTML._
+
+
 | Stage | Sensor or target | Deployment status |
 | --- | --- | --- |
 | Data collection | Images + LiDAR sequences | Instrumented fleet only. |

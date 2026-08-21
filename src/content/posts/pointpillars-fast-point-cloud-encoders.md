@@ -24,6 +24,10 @@ PointPillars partitions a point cloud into vertical columns, learns a PointNet-s
 
 Each point is augmented with offsets from the pillar mean and pillar center before pointwise encoding and max pooling. Only non-empty pillars pass through the encoder, but the scattered BEV tensor is dense. The paper reports a 1.3 ms encoder, 16.2 ms full pipeline, 62 Hz model, and a 105 Hz faster variant on its hardware.
 
+![PointPillars network converting point-cloud pillars into a pseudo-image before a 2D backbone and detection head](/assets/images/pointpillars-fast-point-cloud-encoders-paper-figure.webp)
+
+_The pillar encoder collapses height early and scatters learned pillar features into a dense pseudo-image, allowing the expensive backbone to remain two-dimensional. Source: [PointPillars](https://arxiv.org/abs/1812.05784), Figure 2._
+
 | Knob | Effect | Failure mode |
 | --- | --- | --- |
 | Pillar width | Sets BEV resolution and active-pillar count | Wide pillars merge small actors. |

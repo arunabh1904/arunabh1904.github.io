@@ -25,6 +25,10 @@ summary: '2026 – ChronoVision trains a VLM to reconstruct latent visual states
 
 The paper introduces Vbvr-VQA by turning a video-reasoning problem into ordering six shuffled frames after an initial frame and prompt. Exact-match accuracy requires the entire sequence to be correct, which makes an answer based on only a plausible end state insufficient. During supervised fine-tuning, a Reconstructive Visual Head predicts the latent final state and an ROI Attention Locating module uses semantic span queries to focus attention on relevant regions. GRPO then receives outcome, latent-grounding, and focus rewards.
 
+![ChronoVision: Temporal Reasoning via Latent State Reconstruction source figure: Overall pipeline of ChronoVision.](/assets/images/chronovision-temporal-reasoning-via-latent-state-reconstruction-paper-figure.webp)
+_Overall pipeline of ChronoVision. Source: [ChronoVision: Temporal Reasoning via Latent State Reconstruction](https://arxiv.org/abs/2608.05631), Figure 2, via arXiv HTML._
+
+
 This is a representation-level auxiliary objective, not a visible image generator. The paper does not claim to render the imagined intermediate states, so its evidence is about the usefulness of latent reconstruction for ordering and physical-reasoning evaluations rather than about interpretable internal visual chains of thought.
 
 ### The ablations separate the training stages

@@ -24,6 +24,10 @@ SST argues that the conventional downsampling hierarchy is a poor fit for small 
 
 Sparse windows bound the quadratic attention cost by local token count. Empty locations never become tokens, while region shifts create cross-window context. The supplementary comparison reports 64.69 AP for a standard convolutional variant versus 51.57 for a submanifold sparse-convolution variant, illustrating how a sparse operator that never activates new sites can struggle to exchange context.
 
+![SST: Single-Stride Sparse Transformer for 3D Detection source figure: Architecture overview for Single-stride Sparse Transformer (SST).](/assets/images/sst-single-stride-sparse-transformer-for-3d-detection-paper-figure.webp)
+_Architecture overview for Single-stride Sparse Transformer (SST). Source: [SST: Single-Stride Sparse Transformer for 3D Detection](https://arxiv.org/abs/2112.06375), Figure 4, via arXiv HTML._
+
+
 | Property | SST choice | Consequence |
 | --- | --- | --- |
 | Spatial stride | One | Small-object detail survives. |

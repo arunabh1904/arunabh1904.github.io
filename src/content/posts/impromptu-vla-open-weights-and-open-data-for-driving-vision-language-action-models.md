@@ -23,6 +23,10 @@ summary: "2025 – Impromptu VLA: Open Weights and Open Data for Driving Vision-
 
 The paper's contribution is to make the example unit richer than a trajectory: a clip carries visual evidence, questions that probe perception, prediction, and planning, and an action target. This creates a diagnostic bridge between what a VLA says it sees and what it plans to do. The paper's four-category taxonomy is intended to concentrate data on unstructured cases where generic driving corpora provide weak coverage.
 
+![Impromptu VLA: Open Weights and Open Data for Driving Vision-Language-Action Models source figure: Visual Abstract of Impromptu VLA.](/assets/images/impromptu-vla-open-weights-and-open-data-for-driving-vision-language-action-models-paper-figure.webp)
+_Visual Abstract of Impromptu VLA. Source: [Impromptu VLA: Open Weights and Open Data for Driving Vision-Language-Action Models](https://arxiv.org/abs/2505.23757), Figure 1, via arXiv HTML._
+
+
 The key trade-off is curation versus distributional representativeness. Reducing over two million source clips to 80,000 targeted examples can improve coverage of difficult cases, but it can also bake the taxonomy and the question generator into the benchmark. The abstract does not report category balance, source-dataset overlap with evaluation, annotation provenance, or a matched random-subset control. Those are necessary to tell whether the gain comes from hard-case selection, more data, or benchmark alignment.
 
 ## High-Level Takeaways

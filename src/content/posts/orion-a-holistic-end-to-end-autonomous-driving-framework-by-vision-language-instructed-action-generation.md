@@ -21,6 +21,10 @@ summary: "2025 – ORION: A Holistic End-to-End Autonomous Driving Framework by 
 
 ORION is organized around a specific interface problem: semantic reasoning and numeric trajectories inhabit different spaces. The model aligns them while jointly optimizing VQA and planning, so the reasoning path can condition action generation instead of remaining a post-hoc explanation. QT-Former supplies longer temporal context before that reasoning step, which is important for interactive driving decisions that a single frame cannot determine.
 
+![ORION: A Holistic End-to-End Autonomous Driving Framework by Vision-Language Instructed Action Generation source figure: The comparison of different E2E paradigms.](/assets/images/orion-a-holistic-end-to-end-autonomous-driving-framework-by-vision-language-instructed-action-generation-paper-figure.webp)
+_The comparison of different E2E paradigms. Source: [ORION: A Holistic End-to-End Autonomous Driving Framework by Vision-Language Instructed Action Generation](https://arxiv.org/abs/2503.19755), Figure 1, via arXiv HTML._
+
+
 The reported closed-loop improvement is stronger evidence than an open-loop trajectory score, but it does not by itself isolate why the system wins. The abstract omits the training corpus, loss balance between VQA and planning, action representation, and a test that substitutes uninformative or counterfactual reasoning while preserving the visual input. Without those controls, semantic reasoning, history aggregation, and the generative planner remain coupled interventions.
 
 ## High-Level Takeaways

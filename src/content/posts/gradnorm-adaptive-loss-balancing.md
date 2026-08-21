@@ -26,6 +26,10 @@ GradNorm adapts task weights so gradient norms at a shared layer track each task
 
 The method computes per-task gradient norms, compares them with targets derived from normalized loss descent, and updates the task weights. On NYUv2 the paper reports roughly 5% training overhead. Across its sweep, most values between 0 and 3 improve over equal weighting, with alpha near 1.5 best in the reported setup.
 
+![GradNorm: Adaptive Loss Balancing source figure: Gradient Normalization.](/assets/images/gradnorm-adaptive-loss-balancing-paper-figure.webp)
+_Gradient Normalization. Source: [GradNorm: Adaptive Loss Balancing](https://arxiv.org/abs/1711.02257), Figure 1, via arXiv HTML._
+
+
 | Quantity | Meaning | Operational concern |
 | --- | --- | --- |
 | Loss ratio | Relative task training rate | Sensitive to noisy or plateaued losses. |

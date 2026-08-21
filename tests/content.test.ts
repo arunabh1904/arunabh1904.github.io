@@ -101,6 +101,7 @@ describe('markdown authoring', () => {
       const source = await readFile(filePath, 'utf8');
       if (
         /^section: paper-shorts$/m.test(source) &&
+        !/PAPER RADAR DRAFT/.test(source) &&
         !/^## Summary\n\n> /m.test(source)
       ) {
         offenders.push(path.relative(projectRoot, filePath));
@@ -108,6 +109,52 @@ describe('markdown authoring', () => {
     }
 
     expect(offenders, 'Paper-note summaries should render as callouts.').toEqual([]);
+  });
+
+  it('keeps one to three valid local images in every published paper note', async () => {
+    const postFiles = await fg('**/*.{md,mdx}', {
+      cwd: postsDir,
+      absolute: true,
+    });
+
+    const countOffenders: string[] = [];
+    const missingAssets: string[] = [];
+    for (const filePath of postFiles) {
+      const source = await readFile(filePath, 'utf8');
+      if (
+        !/^section: paper-shorts$/m.test(source) ||
+        /PAPER RADAR DRAFT/.test(source)
+      ) {
+        continue;
+      }
+
+      const imagePaths = Array.from(
+        source.matchAll(/^!\[[^\]]*\]\((\/assets\/images\/[^)]+)\)$/gm),
+        (match) => match[1],
+      );
+      if (imagePaths.length < 1 || imagePaths.length > 3) {
+        countOffenders.push(
+          `${path.relative(projectRoot, filePath)} (${imagePaths.length} images)`,
+        );
+      }
+
+      for (const imagePath of imagePaths) {
+        const assetPath = path.join(projectRoot, 'public', imagePath);
+        try {
+          await readFile(assetPath);
+        } catch {
+          missingAssets.push(
+            `${path.relative(projectRoot, filePath)} -> ${imagePath}`,
+          );
+        }
+      }
+    }
+
+    expect(
+      countOffenders,
+      'Published paper notes must contain one to three local explanatory images.',
+    ).toEqual([]);
+    expect(missingAssets, 'Every paper-note image must exist in public/.').toEqual([]);
   });
 
   it('keeps one substantive callout in every Blog post', async () => {

@@ -27,6 +27,10 @@ SOLOFusion frames temporal camera detection as stereo with a moving baseline. Sh
 
 The long-term path warps a running sequence of low-resolution BEV features into the present frame and builds a cost volume. The short-term path performs higher-resolution stereo around a few depth hypotheses chosen from the monocular depth distribution. Gaussian-spaced top-k sampling concentrates compute near likely depth while retaining nearby alternatives.
 
+![SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection source figure: The framework of SOLOFusion.](/assets/images/solofusion-temporal-multiview-3d-object-detection-paper-figure.webp)
+_The framework of SOLOFusion. Source: [SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection](https://arxiv.org/abs/2210.02443), Figure 7, via arXiv HTML._
+
+
 | Temporal design | FPS | Memory | mAP | NDS |
 | --- | ---: | ---: | ---: | ---: |
 | Single-frame BEVDepth | 17.6 | 3.3 GB | 32.1 | 34.9 |

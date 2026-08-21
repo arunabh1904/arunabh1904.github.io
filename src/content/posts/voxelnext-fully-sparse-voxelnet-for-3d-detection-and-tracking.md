@@ -27,6 +27,10 @@ VoxelNeXt keeps LiDAR detection sparse through the prediction head. Instead of c
 
 Extra downsampling stages enlarge the sparse receptive field without filling the grid. Feature-magnitude pruning removes up to half of selected voxels with little validation loss in the reported setting. Sparse height compression then combines a 3D backbone with a 2D sparse head, retaining vertical reasoning early while avoiding an expensive 3D prediction stage.
 
+![VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking source figure: Detailed structure of VoxelNeXt framework.](/assets/images/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking-paper-figure.webp)
+_Detailed structure of VoxelNeXt framework. Source: [VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking](https://arxiv.org/abs/2303.11301), Figure 4, via arXiv HTML._
+
+
 On nuScenes test, VoxelNeXt reports 64.5 mAP and 70.0 NDS at 66 ms; its double-flip variant reaches 66.2 mAP and 71.4 NDS. On tracking, the corresponding variants report 69.5 and 71.0 AMOTA. A controlled quarter-data comparison against CenterPoint improves mAP by 0.9 and NDS by 1.0.
 
 | Property | Reported evidence | Design consequence |

@@ -26,6 +26,10 @@ NVAutoNet is a camera-only, multi-task BEV system designed around the constraint
 
 The paper reports training on a proprietary dataset with 2.2 million scenes and a 200-meter detection range. The full network runs at 53 FPS, or roughly 18 ms, on NVIDIA DRIVE Orin. It also augments sensor mounting and camera parameters so one model can tolerate deviations across vehicles rather than overfit to a single calibration.
 
+![NVAutoNet: Fast and Accurate 360° 3D Visual Perception for Self Driving source figure: NVAutoNet overview.](/assets/images/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving-paper-figure.webp)
+_NVAutoNet overview. Source: [NVAutoNet: Fast and Accurate 360° 3D Visual Perception for Self Driving](https://arxiv.org/abs/2303.12976), Figure 1, via arXiv HTML._
+
+
 | Signal | Reported value | Interpretation |
 | --- | ---: | --- |
 | Camera inputs | 8 | Full surround coverage. |

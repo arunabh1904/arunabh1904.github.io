@@ -24,6 +24,10 @@ PanoOcc takes multi-frame, surround-view images and predicts one panoptic occupa
 
 The model first lifts image features into low-resolution 3D voxel queries. Voxel cross-attention gathers multi-view image evidence, voxel self-attention exchanges information inside the volume, and a temporal encoder aligns and concatenates historical voxel features. The decoder then upsamples the volume and optionally prunes predicted empty regions. Detection queries select features from the same voxel representation, so detection and segmentation update a shared geometric state.
 
+![PanoOcc: Unified Occupancy Representation for Camera-Based 3D Panoptic Segmentation source figure: The overall framework of PanoOcc.](/assets/images/panoocc-unified-occupancy-representation-for-camera-based-3d-panoptic-segmentation-paper-figure.webp)
+_The overall framework of PanoOcc. Source: [PanoOcc: Unified Occupancy Representation for Camera-Based 3D Panoptic Segmentation](https://arxiv.org/abs/2306.10013), Figure 2, via arXiv HTML._
+
+
 The controlled query-form ablation is the clearest reason to keep 3D voxels. At roughly 40,000 queries, PanoOcc's 50 x 50 x 16 voxel grid reports 70.7 mIoU, compared with 68.8 for TPVFormer's tri-plane queries and 56.2 for BEVFormer-style 2D BEV queries. Holding horizontal resolution at 50 x 50 and increasing vertical bins from 4 to 16 raises mIoU from 60.8 to 66.1, showing that height resolution carries information that a flat BEV map drops.
 
 | Representation or decoder | Train / inference memory | Latency | mIoU |
