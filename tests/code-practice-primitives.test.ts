@@ -20,6 +20,14 @@ const REQUIRED_PRIMITIVES = [
     fragments: ['torch.amax(', 'torch.exp(', 'torch.sum(', 'torch.log('],
   },
   {
+    id: 'class-weighted-cross-entropy',
+    fragments: [
+      'class_weight[labels]',
+      'torch.sum(losses * example_weight)',
+      '/ torch.sum(example_weight)',
+    ],
+  },
+  {
     id: 'causal-attention-mask',
     fragments: ['positions[:, None] >= positions[None, :]'],
   },
