@@ -58,6 +58,7 @@ const testProblem: CodePracticeProblem = {
 print("starter")`,
   packages: ['torch', 'numpy'],
   tags: ['PyTorch', 'NumPy'],
+  editorStart: 'blank',
 };
 
 describe('CodePracticeLab', () => {
@@ -145,6 +146,8 @@ describe('CodePracticeLab', () => {
     expect(container.textContent).not.toContain('Use a row-wise max shift before the exponentials.');
     expect(container.textContent).not.toContain('return "solution"');
     expect(getEditor().textContent).not.toContain('TODO');
+    expect(getEditor().textContent).not.toContain('def softmax_cross_entropy');
+    expect(getEditor().textContent).not.toContain('print("starter")');
 
     const buttons = Array.from(container.querySelectorAll('button'));
     const solutionButton = buttons.find((button) => button.textContent === 'Solution');
@@ -157,14 +160,11 @@ describe('CodePracticeLab', () => {
       solutionButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
 
-    expect(getEditor().textContent).toContain('print("starter")');
-    expect(getEditor().textContent).toContain('# Original placeholder: raise NotImplementedError');
     expect(getEditor().textContent).toContain('# Reference solution');
+    expect(getEditor().textContent).toContain('def softmax_cross_entropy');
     expect(getEditor().textContent).toContain('return "solution"');
     expect(container.querySelector('.code-practice-lab--reference')).not.toBeNull();
-    expect(getEditor().textContent).not.toMatch(
-      /^\s+raise NotImplementedError\("Implement softmax_cross_entropy"\)$/m,
-    );
+    expect(getEditor().textContent).not.toContain('raise NotImplementedError');
     expect(container.querySelector('.cm-solution-line-toggle')).toBeNull();
     expect(container.querySelector('.code-practice-lab__solution-notes')).not.toBeNull();
     expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
@@ -235,7 +235,7 @@ describe('CodePracticeLab', () => {
     expect(container.textContent).toContain('keyboard run');
   });
 
-  it('renders a CodeMirror editor with the starter code', async () => {
+  it('starts function-only exercises from an empty Python file', async () => {
     loadPyodideRuntime.mockResolvedValueOnce({
       runPythonAsync: vi.fn(),
     });
@@ -243,8 +243,31 @@ describe('CodePracticeLab', () => {
     await render();
 
     const editor = getEditor();
-    expect(editor.textContent).toContain('print("starter")');
+    expect(editor.textContent).not.toContain('def softmax_cross_entropy');
+    expect(editor.textContent).not.toContain('print("starter")');
     expect(container.textContent).toContain('Ctrl / Cmd + Enter');
+  });
+
+  it('resets a function-only exercise to an empty file', async () => {
+    loadPyodideRuntime.mockResolvedValueOnce({
+      runPythonAsync: vi.fn(),
+    });
+
+    await render();
+    const buttons = Array.from(container.querySelectorAll('button'));
+    const solutionButton = buttons.find((button) => button.textContent === 'Solution');
+    const resetButton = buttons.find((button) => button.textContent === 'Reset');
+
+    await act(async () => {
+      solutionButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(getEditor().textContent).toContain('def softmax_cross_entropy');
+
+    await act(async () => {
+      resetButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(getEditor().textContent).not.toContain('def softmax_cross_entropy');
+    expect(container.querySelector('.code-practice-lab--reference')).toBeNull();
   });
 
   it('keeps full nn.Module exercises editable without booting the browser shim', async () => {
@@ -254,6 +277,7 @@ describe('CodePracticeLab', () => {
       title: 'Build a configurable ResNet',
       environment: 'local-pytorch',
       track: 'architecture',
+      editorStart: 'scaffold',
       starterCode: `from torch import nn
 
 class ResNet(nn.Module):

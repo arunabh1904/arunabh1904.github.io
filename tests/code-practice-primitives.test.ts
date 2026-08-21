@@ -103,6 +103,21 @@ describe('code-practice primitive-first solutions', () => {
     }
   });
 
+  it('starts plain-function interviews blank while preserving class scaffolds', () => {
+    for (const problem of codePracticeProblems) {
+      const isPlainFunction = problem.signature.trimStart().startsWith('def ');
+      expect(problem.editorStart, problem.id).toBe(isPlainFunction ? 'blank' : 'scaffold');
+    }
+
+    expect(
+      codePracticeProblems.find((problem) => problem.id === 'incremental-kv-cache')?.editorStart,
+    ).toBe('scaffold');
+    expect(
+      codePracticeProblems.find((problem) => problem.id === 'simple-n-gram-language-model')
+        ?.editorStart,
+    ).toBe('scaffold');
+  });
+
   it('does not bypass a lesson with a matching PyTorch convenience helper', () => {
     const torchProblems = codePracticeProblems.filter(
       (problem) => problem.track === 'fundamentals' && problem.packages?.includes('torch'),

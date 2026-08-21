@@ -48,6 +48,22 @@ function removeTodoCommentBlocks(source: string) {
   return cleaned.join('\n');
 }
 
+function startsFromBlankFile(problem: CodePracticeProblem) {
+  return problem.editorStart === 'blank';
+}
+
+function getInitialEditorCode(problem: CodePracticeProblem) {
+  return startsFromBlankFile(problem) ? '' : removeTodoCommentBlocks(problem.starterCode);
+}
+
+function getReferenceEditorCode(problem: CodePracticeProblem, currentCode: string) {
+  if (startsFromBlankFile(problem)) {
+    return `# Reference solution\n${problem.solutionCode}`;
+  }
+
+  return augmentCodeWithSolution(problem, currentCode);
+}
+
 export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const isBrowserRunnable = (problem.environment ?? 'browser') === 'browser';
   const interviewDuration =
@@ -63,7 +79,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const loadingRef = useRef(false);
   const isRunningRef = useRef(false);
   const runHandlerRef = useRef<() => void>(() => {});
-  const [code, setCode] = useState(() => removeTodoCommentBlocks(problem.starterCode));
+  const [code, setCode] = useState(() => getInitialEditorCode(problem));
   const [output, setOutput] = useState('');
   const [errorOutput, setErrorOutput] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>(() =>
@@ -109,7 +125,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   );
 
   useEffect(() => {
-    setCode(removeTodoCommentBlocks(problem.starterCode));
+    setCode(getInitialEditorCode(problem));
     setOutput('');
     setErrorOutput('');
     setHasRun(false);
@@ -247,14 +263,14 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   }
 
   function handleReset() {
-    setCode(removeTodoCommentBlocks(problem.starterCode));
+    setCode(getInitialEditorCode(problem));
     setOutput('');
     setErrorOutput('');
     setHasRun(false);
   }
 
   function handleLoadSolution() {
-    setCode((currentCode) => augmentCodeWithSolution(problem, currentCode));
+    setCode((currentCode) => getReferenceEditorCode(problem, currentCode));
     setOutput('');
     setErrorOutput('');
     setHasRun(false);
