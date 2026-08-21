@@ -19,46 +19,9 @@ A distant cyclist at dusk may occupy only a few image pixels, two or three LiDAR
 
 It is tempting to call a model *unified* when it converts every sensor into one tensor as early as possible. That is usually the wrong goal. Early unification can erase the signal that made each sensor useful—image texture, LiDAR height structure, radar Doppler, measurement age, or sensor-specific confidence—and a larger downstream model cannot reconstruct evidence that the encoder has already averaged away.
 
-The real design problem is therefore about interfaces. Where does each measurement acquire geometry? When can modalities interact without losing their distinct evidence? What state survives from one frame to the next, and which parts of that state must remain explicit for prediction, planning, simulation, and validation? The article follows those contracts in order:
+The real design problem is therefore about interfaces. Each sensor begins with different evidence. The model must place that evidence in a common 3D frame before modalities can interact, decide what survives from one frame to the next, and expose enough world state for prediction, planning, simulation, and validation.
 
-<figure class="sensor-architecture-flow" aria-labelledby="sensor-architecture-flow-title">
-  <p class="sensor-architecture-flow__eyebrow" id="sensor-architecture-flow-title">The architecture contracts, in order</p>
-  <ol class="sensor-architecture-flow__stages">
-    <li class="sensor-architecture-flow__stage">
-      <span class="sensor-architecture-flow__number">01</span>
-      <strong>Sensor-specific evidence</strong>
-      <span>Camera · LiDAR · radar</span>
-    </li>
-    <li class="sensor-architecture-flow__stage">
-      <span class="sensor-architecture-flow__number">02</span>
-      <strong>Calibrated metric support</strong>
-      <span>Shared place and time in 3D</span>
-    </li>
-    <li class="sensor-architecture-flow__stage">
-      <span class="sensor-architecture-flow__number">03</span>
-      <strong>Cross-modal interaction</strong>
-      <span>Aligned evidence interacts</span>
-    </li>
-    <li class="sensor-architecture-flow__stage">
-      <span class="sensor-architecture-flow__number">04</span>
-      <strong>Temporal world state</strong>
-      <span>Scene memory across frames</span>
-    </li>
-    <li class="sensor-architecture-flow__stage sensor-architecture-flow__stage--split">
-      <span class="sensor-architecture-flow__number">05</span>
-      <strong>Two state interfaces</strong>
-      <span class="sensor-architecture-flow__split"><b>Materialized:</b> tracks · occupancy · roadgraph</span>
-      <span class="sensor-architecture-flow__split"><b>Latent:</b> features · tokens</span>
-    </li>
-    <li class="sensor-architecture-flow__stage sensor-architecture-flow__stage--outcome">
-      <span class="sensor-architecture-flow__number">06</span>
-      <strong>Prediction and planning</strong>
-      <span>Futures · scoring · validation</span>
-    </li>
-  </ol>
-</figure>
-
-This progression gives *unified* a stricter meaning. A system can share representations along several independent axes without forcing every component into the same architecture:
+This gives *unified* a stricter meaning. A system can share representations along several independent axes without forcing every component into the same architecture:
 
 | Axis of unification | What becomes shared | What can remain specialized |
 | --- | --- | --- |
@@ -70,14 +33,14 @@ This progression gives *unified* a stricter meaning. A system can share represen
 These axes answer different questions. Sharing a BEV backbone across detection and mapping does not mean that camera and radar should share an encoder. Backpropagating through perception and planning does not require every learned intermediate to remain opaque at runtime. A common foundation-model family across driving and simulation does not require the same graph to run onboard and offline. The design rule running through all four axes is this: **preserve sensor-native evidence until geometry makes interaction meaningful, then preserve enough structured and latent state to make the next decision both capable and testable.**
 
 ## The system contract
-The runtime path begins with encoders matched to each measurement process. Camera intrinsics map rays to pixels; sensor extrinsics place each camera, LiDAR, and radar relative to the vehicle; timestamps and ego poses bring their measurements to a common time. Only after these transformations can the model ask whether an image edge, a LiDAR return, and a radar detection could describe the same physical object.
+The runtime path begins with encoders matched to each measurement process. Camera intrinsics map 3D rays to pixels; sensor extrinsics place each camera, LiDAR, and radar in the vehicle frame; timestamps and ego poses align their measurements in time. Together, these operations ground every measurement in metric space: they determine where and when each piece of sensor evidence belongs. Only then can the model ask whether an image edge, a LiDAR return, and a radar detection could describe the same physical object.
 
 Calibration does not add information; it defines the correspondence rule. When that rule is wrong, fusion creates structured errors rather than independent noise. A vehicle may inherit image evidence from an adjacent lane, a lane boundary may shift across the bird's-eye-view (BEV) grid, and a small angular error may become a large lateral displacement at long range. Timing errors create the same problem for moving actors: two correct measurements can disagree because they describe different moments.
 
 Alignment makes interaction possible, but the model still needs a representation that can survive through time. A dense BEV field assigns a persistent cell to each ground-plane location, which suits occupancy, free space, lanes, and maps. Sparse queries allocate state to selected actors or map elements, which suits detection, tracking, motion prediction, and vectorized road structure. Learned latent tokens compress the scene further and ask the training objective to decide what is worth keeping. A practical system will usually combine these forms because each preserves a different part of the world.
 
-[![Autonomous-driving perception pipeline from sensor-specific encoders through calibrated metric representations, dense or sparse temporal state, and task heads, with learned latent tokens and a separate training-only graph](/assets/images/autonomous-driving-perception-system.svg)](/assets/images/autonomous-driving-perception-system.svg)
-_The runtime path moves from sensor-specific features to calibrated metric support, then into a dense field, sparse query set, or learned latent state. The lower path shows supervision and teacher models that can exist during training without becoming deployed sensor inputs._
+[![Autonomous-driving perception pipeline from sensor-specific encoders into a shared 3D frame, dense or sparse temporal state, and task heads, with learned latent tokens and a separate training-only graph](/assets/images/autonomous-driving-perception-system.svg)](/assets/images/autonomous-driving-perception-system.svg)
+_The runtime path places sensor-specific features in a shared vehicle-centered 3D frame, then carries a dense field, sparse query set, or learned latent state into downstream tasks. The lower path shows supervision and teacher models that can exist during training without becoming deployed sensor inputs._
 
 The word *fusion* often hides three separate operations:
 
