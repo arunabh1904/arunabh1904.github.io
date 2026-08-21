@@ -100,7 +100,7 @@ describe('markdown authoring', () => {
     for (const filePath of postFiles) {
       const source = await readFile(filePath, 'utf8');
       if (
-        /^section: paper-shorts$/m.test(source) &&
+        /^section:\s*['"]?paper-shorts['"]?\s*$/m.test(source) &&
         !/PAPER RADAR DRAFT/.test(source) &&
         !/^## Summary\n\n> /m.test(source)
       ) {
@@ -122,7 +122,7 @@ describe('markdown authoring', () => {
     for (const filePath of postFiles) {
       const source = await readFile(filePath, 'utf8');
       if (
-        !/^section: paper-shorts$/m.test(source) ||
+        !/^section:\s*['"]?paper-shorts['"]?\s*$/m.test(source) ||
         /PAPER RADAR DRAFT/.test(source)
       ) {
         continue;
