@@ -99,4 +99,16 @@ describe('augmentCodeWithSolution', () => {
     expect(annotatedCode).toContain('# Reference solution');
     expect(annotatedCode).toContain('return torch.mean(torch.log(normalizers)');
   });
+
+  it('preserves the full KV-cache layout invariant in the loaded solution', () => {
+    const problem = codePracticeProblems.find(
+      (candidate) => candidate.id === 'incremental-kv-cache',
+    );
+    const annotatedCode = augmentCodeWithSolution(problem!);
+
+    expect(annotatedCode).toContain(
+      'if cached_layout != update_layout: raise ValueError("cache layout changed")',
+    );
+    expect(annotatedCode).not.toContain('assert any(self.key.shape[axis] == key.shape[axis]');
+  });
 });

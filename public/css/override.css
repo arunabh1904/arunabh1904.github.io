@@ -4500,6 +4500,59 @@ html {
   border-top: 1px solid var(--code-border-color);
 }
 
+.code-practice-lab__reasoning {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.2rem;
+}
+
+.code-practice-lab__reasoning-heading h2 {
+  margin: 0.2rem 0 0;
+  color: inherit;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.code-practice-lab__reasoning-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.code-practice-lab__reasoning-card {
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--code-border-color);
+  border-radius: 0.65rem;
+  background: rgba(118, 169, 255, 0.06);
+}
+
+.code-practice-lab__reasoning-card h3,
+.code-practice-lab__reasoning-card p {
+  margin: 0;
+}
+
+.code-practice-lab__reasoning-card h3 {
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.code-practice-lab__reasoning-card p {
+  margin-top: 0.45rem;
+  color: var(--text-secondary-color);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+:root[data-theme="dark"] .code-practice-lab__reasoning-card {
+  background: rgba(255, 228, 92, 0.04);
+}
+
 .code-practice-lab__runtime-note--local {
   margin: 0;
   padding: 0.75rem 1rem;
@@ -7117,6 +7170,10 @@ html {
   }
 
   .code-index__environment {
+    grid-template-columns: 1fr;
+  }
+
+  .code-practice-lab__reasoning-grid {
     grid-template-columns: 1fr;
   }
 }

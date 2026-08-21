@@ -32,6 +32,16 @@ const testProblem: CodePracticeProblem = {
   ],
   hint: ['Subtract the row max first.'],
   solutionNotes: ['Use a row-wise max shift before the exponentials.'],
+  reasoning: [
+    {
+      axis: 'Tensor reasoning',
+      detail: 'Keep the row maximum shaped (N, 1) so it broadcasts across classes.',
+    },
+    {
+      axis: 'Memory / computation tradeoff',
+      detail: 'A fused kernel avoids materializing every intermediate tensor.',
+    },
+  ],
   visual: {
     src: '/assets/images/code-tensor-ops-broadcasting.gif',
     alt: 'Tensor operation visual',
@@ -128,6 +138,10 @@ describe('CodePracticeLab', () => {
 
     expect(container.textContent).toContain('Problem 01');
     expect(container.textContent).toContain('Stable softmax cross-entropy');
+    expect(container.textContent).toContain('Reason through the system');
+    expect(container.textContent).toContain('Tensor reasoning');
+    expect(container.textContent).toContain('Keep the row maximum shaped (N, 1)');
+    expect(container.querySelectorAll('.code-practice-lab__reasoning-card')).toHaveLength(2);
     expect(container.textContent).not.toContain('Use a row-wise max shift before the exponentials.');
     expect(container.textContent).not.toContain('return "solution"');
     expect(getEditor().textContent).not.toContain('TODO');
