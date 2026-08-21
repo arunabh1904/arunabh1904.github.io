@@ -1,4 +1,8 @@
 import { ARCHITECTURE_CODE_PRACTICE_PROBLEMS } from './code-practice-architectures';
+import {
+  ATTENTION_CODE_PRACTICE_PROBLEMS,
+  ATTENTION_PROBLEM_ENRICHMENTS,
+} from './code-practice-attention';
 
 export interface CodePracticeExample {
   label: string;
@@ -16,6 +20,17 @@ export interface CodePracticeInterviewFormat {
   durationMinutes: number;
   evaluationCriteria: readonly string[];
   followUps: readonly string[];
+}
+
+export type CodePracticeReasoningAxis =
+  | 'Inference efficiency'
+  | 'Tensor reasoning'
+  | 'Memory / computation tradeoff'
+  | 'Cache update correctness';
+
+export interface CodePracticeReasoningPoint {
+  axis: CodePracticeReasoningAxis;
+  detail: string;
 }
 
 export interface CodePracticeProblem {
@@ -39,6 +54,7 @@ export interface CodePracticeProblem {
   track?: 'fundamentals' | 'architecture';
   environment?: 'browser' | 'local-pytorch';
   interview?: CodePracticeInterviewFormat;
+  reasoning?: readonly CodePracticeReasoningPoint[];
   packages?: readonly string[];
   tags?: readonly string[];
 }
@@ -4253,13 +4269,15 @@ const PROGRESSIVE_ORDER: Readonly<Record<string, number>> = {
   'causal-attention-mask': 26,
   'rope-rotary-positional-embedding': 27,
   'scaled-dot-product-self-attention': 28,
-  'cross-attention': 29,
-  'simple-n-gram-language-model': 30,
-  'average-precision-from-matches': 31,
-  'greedy-detection-matching': 32,
-  'batched-best-iou-match': 33,
-  'manual-backprop-for-a-2-layer-mlp': 34,
-  'classic-mlp-forward-backward': 35,
+  'incremental-kv-cache': 29,
+  'grouped-query-and-multi-query-attention': 30,
+  'cross-attention': 31,
+  'simple-n-gram-language-model': 32,
+  'average-precision-from-matches': 33,
+  'greedy-detection-matching': 34,
+  'batched-best-iou-match': 35,
+  'manual-backprop-for-a-2-layer-mlp': 36,
+  'classic-mlp-forward-backward': 37,
 };
 
 const PROGRESSIVE_DIFFICULTY: Readonly<Record<string, CodePracticeProblem['difficulty']>> = {
@@ -4291,6 +4309,8 @@ const PROGRESSIVE_DIFFICULTY: Readonly<Record<string, CodePracticeProblem['diffi
   'causal-attention-mask': 'Medium',
   'rope-rotary-positional-embedding': 'Medium',
   'scaled-dot-product-self-attention': 'Hard',
+  'incremental-kv-cache': 'Hard',
+  'grouped-query-and-multi-query-attention': 'Hard',
   'cross-attention': 'Hard',
   'simple-n-gram-language-model': 'Hard',
   'average-precision-from-matches': 'Hard',
@@ -4302,17 +4322,19 @@ const PROGRESSIVE_DIFFICULTY: Readonly<Record<string, CodePracticeProblem['diffi
 
 const ALL_CODE_PRACTICE_PROBLEMS: readonly CodePracticeProblem[] = [
   ...RAW_CODE_PRACTICE_PROBLEMS,
+  ...ATTENTION_CODE_PRACTICE_PROBLEMS,
   ...ARCHITECTURE_CODE_PRACTICE_PROBLEMS,
 ];
 
 export const codePracticeProblems: readonly CodePracticeProblem[] = ALL_CODE_PRACTICE_PROBLEMS
   .map((problem) => ({
     ...problem,
+    ...ATTENTION_PROBLEM_ENRICHMENTS[problem.id],
     track: problem.track ?? 'fundamentals',
     environment: problem.environment ?? 'browser',
     order: PROGRESSIVE_ORDER[problem.id] ?? problem.order,
     difficulty: PROGRESSIVE_DIFFICULTY[problem.id] ?? problem.difficulty,
-    walkthroughCode: problem.solutionCode,
+    walkthroughCode: problem.walkthroughCode ?? problem.solutionCode,
     solutionCode: COMPACT_REFERENCE_SOLUTIONS[problem.id] ?? problem.solutionCode,
   }))
   .sort((left, right) => left.order - right.order);

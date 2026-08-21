@@ -3,7 +3,7 @@ import type { CodePracticeProblem } from './code-practice';
 export const ARCHITECTURE_CODE_PRACTICE_PROBLEMS = [
   {
     id: 'resnet-from-building-blocks',
-    order: 36,
+    order: 38,
     title: 'Build a configurable ResNet',
     difficulty: 'Hard',
     track: 'architecture',
@@ -220,7 +220,7 @@ if __name__ == "__main__":
   },
   {
     id: 'unet-encoder-decoder',
-    order: 37,
+    order: 39,
     title: 'Build a U-Net encoder-decoder',
     difficulty: 'Hard',
     track: 'architecture',
@@ -445,7 +445,7 @@ if __name__ == "__main__":
   },
   {
     id: 'centernet-style-detector',
-    order: 38,
+    order: 40,
     title: 'Build a CenterNet-style detector',
     difficulty: 'Hard',
     track: 'architecture',

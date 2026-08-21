@@ -52,6 +52,19 @@ const REQUIRED_PRIMITIVES = [
     fragments: ['torch.amax(', 'torch.exp(', 'torch.sum('],
   },
   {
+    id: 'incremental-kv-cache',
+    fragments: ['@dataclass', 'start_pos != self.length', 'torch.cat((self.key, key), dim=2)'],
+  },
+  {
+    id: 'grouped-query-and-multi-query-attention',
+    fragments: [
+      'query_heads % kv_heads != 0',
+      'torch.broadcast_to(',
+      'query_heads // kv_heads',
+      'torch.amax(',
+    ],
+  },
+  {
     id: 'cross-attention',
     fragments: ['torch.amax(', 'torch.exp(', 'torch.sum('],
   },
@@ -132,6 +145,43 @@ describe('code-practice primitive-first solutions', () => {
   it('supports tensor transpose methods used by 2D and attention references', () => {
     expect(TORCH_COMPAT_SOURCE).toContain('def permute(self, *dims):');
     expect(TORCH_COMPAT_SOURCE).toContain('def transpose(self, dim0, dim1):');
+  });
+
+  it('covers the inference-attention interview sequence and its reasoning axes', () => {
+    const ids = [
+      'stable-softmax-cross-entropy',
+      'causal-attention-mask',
+      'rope-rotary-positional-embedding',
+      'scaled-dot-product-self-attention',
+      'incremental-kv-cache',
+      'grouped-query-and-multi-query-attention',
+    ];
+    const attentionProblems = ids.map((id) =>
+      codePracticeProblems.find((problem) => problem.id === id),
+    );
+
+    expect(attentionProblems.every(Boolean)).toBe(true);
+    expect(attentionProblems[3]?.title).toContain('MHA');
+    expect(attentionProblems[4]?.solutionCode).toContain('class KVCache:');
+    expect(attentionProblems[4]?.solutionCode).toContain('cached_layout != update_layout');
+    expect(attentionProblems[5]?.title).toContain('GQA');
+    expect(attentionProblems[5]?.title).toContain('MQA');
+
+    const axes = new Set(
+      attentionProblems.flatMap((problem) => problem?.reasoning?.map((point) => point.axis) ?? []),
+    );
+    expect(axes).toEqual(
+      new Set([
+        'Inference efficiency',
+        'Tensor reasoning',
+        'Memory / computation tradeoff',
+        'Cache update correctness',
+      ]),
+    );
+
+    for (const problem of attentionProblems.slice(1)) {
+      expect(problem?.interview?.followUps.length, problem?.id).toBeGreaterThan(0);
+    }
   });
 
   it('keeps architecture interviews typed, modular, and local-PyTorch only', () => {

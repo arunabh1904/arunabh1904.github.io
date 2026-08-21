@@ -311,6 +311,26 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
           )}
         </section>
 
+        {problem.reasoning && problem.reasoning.length > 0 && (
+          <section
+            className="code-practice-lab__reasoning"
+            aria-labelledby={`${problem.id}-reasoning-title`}
+          >
+            <div className="code-practice-lab__reasoning-heading">
+              <p className="code-practice-lab__section-label">Reason through the system</p>
+              <h2 id={`${problem.id}-reasoning-title`}>Defend the tradeoffs</h2>
+            </div>
+            <div className="code-practice-lab__reasoning-grid">
+              {problem.reasoning.map((point) => (
+                <article key={point.axis} className="code-practice-lab__reasoning-card">
+                  <h3>{point.axis}</h3>
+                  <p>{point.detail}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
         {problem.visual && (
           <figure className="code-practice-lab__visual">
             <img src={problem.visual.src} alt={problem.visual.alt} loading="lazy" />
