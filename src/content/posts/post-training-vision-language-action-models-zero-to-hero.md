@@ -25,7 +25,10 @@ This is why “make the pretrained model behave better” is an inadequate descr
 
 The right object is therefore not an optimizer. It is a closed-loop policy improvement system:
 
-> Pretrained policy → task adaptation → deployment rollouts → failure mining → local supervision → conservative optimization → retention and safety evaluation → canary deployment → repeat.
+A pretrained policy is adapted to the task, deployed, and mined for consequential failures. Those failures become local supervision for a conservative update. Retention and safety evaluation decide whether the result earns a canary deployment, which creates the next round of evidence.
+
+<div class="compact-flow-diagram"><a href="/assets/images/robot-post-training-loop.svg"><img src="/assets/images/robot-post-training-loop.svg" alt="Compact robot post-training loop from a pretrained policy through adaptation, deployment, failure mining, local supervision, conservative optimization, safety evaluation, canary deployment, and new evidence"></a></div>
+_The loop closes only when a candidate fix survives the robot and produces evidence that can justify the next update._
 
 The loop is the product. SFT, DPO, critics, actor-critic RL, adapters, and distillation are replaceable components inside it.
 

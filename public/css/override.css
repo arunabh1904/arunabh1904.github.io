@@ -377,6 +377,32 @@ img:not(.float-right):not(.float-left) {
   margin: 1rem auto;
 }
 
+/* Process diagrams stay compact on wide screens and swipe at a legible scale on phones. */
+.compact-flow-diagram {
+  max-width: 100%;
+  margin: 1rem 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.compact-flow-diagram > a,
+.compact-flow-diagram img {
+  display: block;
+}
+
+.compact-flow-diagram img {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .compact-flow-diagram > a {
+    width: 54rem;
+  }
+}
+
 /* Slightly dim images in dark mode. */
 :root[data-theme="dark"] img {
   filter: brightness(0.85);
