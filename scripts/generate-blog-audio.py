@@ -34,12 +34,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-from tqdm.auto import tqdm
-
-
 ROOT = Path(__file__).resolve().parents[1]
 POSTS_DIR = ROOT / "src" / "content" / "posts"
+NARRATION_DIR = ROOT / "src" / "narrations" / "blog"
 AUDIO_DIR = ROOT / "public" / "assets" / "audio" / "blog"
 MANIFEST_PATH = ROOT / "public" / "assets" / "audio" / "manifest.json"
 MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-CustomVoice-8bit"
@@ -63,7 +60,13 @@ SPEED = 1.10
 BITRATE = "64k"
 MAX_CHARS = 360  # Proven reliable bound; low-temperature seeded sampling prevents drift.
 SENTENCE_PAUSE_SECONDS = 0.18
-SENTENCE_PAUSE_POLICY = "explicit-after-sentence-v1"
+HEADING_PAUSE_SECONDS = 0.65
+SENTENCE_PAUSE_POLICY = "sentence-180ms-heading-650ms-v2"
+TABLE_POLICY = "skip-rows-require-spoken-takeaway-v1"
+MAX_AUDIO_SECONDS = 30 * 60
+MAX_ABRIDGED_WORDS = 3_200
+HEADING_START = "[[BLOG_HEADING]]"
+HEADING_END = "[[/BLOG_HEADING]]"
 SILENCE_THRESHOLD = 0.008  # -42 dBFS; matches the verification threshold below.
 BOUNDARY_SILENCE_SAMPLES = 1_200  # Retain 50 ms at 24 kHz, without a synthetic gap.
 LONG_SILENCE_DURATION = 0.6
@@ -76,7 +79,7 @@ SILENCE_FILTER = (
     f"stop_threshold={SILENCE_THRESHOLD}:stop_silence={RETAINED_SILENCE_DURATION}"
 )
 AUDIO_FILTER = f"{SILENCE_FILTER},atempo={SPEED}"
-EXTRACTION_VERSION = "markdown-prose-v5-narration"
+EXTRACTION_VERSION = "markdown-prose-v6-abridged-audio"
 DEFAULT_BATCH_SIZE = 1
 MIN_GENERATION_TOKENS = 128
 MAX_TOKENS_PER_CHAR = 1.05
@@ -90,10 +93,10 @@ FORBIDDEN_REFERENCE_FIELDS = {
 
 @dataclass(frozen=True)
 class NarrationChunk:
-    """One bounded synthesis unit and whether it ends a source sentence."""
+    """One bounded synthesis unit and its explicit following pause."""
 
     text: str
-    pause_after: bool
+    pause_seconds: float
 
 
 def parse_frontmatter(source: str) -> dict[str, str]:
@@ -109,40 +112,14 @@ def parse_frontmatter(source: str) -> dict[str, str]:
     return values
 
 
-def _table_sentences(rows: list[str]) -> list[str]:
-    """Convert a Markdown table into labelled sentences for natural narration."""
-
-    parsed = [[cell.strip() for cell in row.strip().strip("|").split("|")] for row in rows]
-    parsed = [row for row in parsed if row and any(row)]
-    if not parsed:
-        return []
-
-    has_header = len(parsed) > 1 and all(re.fullmatch(r":?-{3,}:?", cell) for cell in parsed[1])
-    headers = parsed[0] if has_header else []
-    data_rows = parsed[2:] if has_header else parsed
-    sentences: list[str] = []
-    for row in data_rows:
-        if headers:
-            fields = [
-                f"{headers[index]}: {value}"
-                for index, value in enumerate(row)
-                if value and index < len(headers) and headers[index]
-            ]
-            sentence = "; ".join(fields)
-        else:
-            sentence = "; ".join(value for value in row if value)
-        if sentence:
-            sentences.append(f"{sentence.rstrip('.')}.")
-    return sentences
-
-
 def clean_markdown(source: str) -> str:
     """Extract only coherent blog prose, excluding code, images, and captions.
 
-    Headings and list items remain because they orient a listener. Tables are
-    rewritten as labelled rows. Display equations, image alt text, figure
-    captions, and the References bibliography are omitted because their raw
-    Markdown/LaTeX forms do not make useful spoken content.
+    Headings and list items remain because they orient a listener. Table rows,
+    display equations, image alt text, figure captions, and the References
+    bibliography are omitted because their raw forms do not make useful spoken
+    content. The surrounding prose or an abridged sidecar must state the table's
+    conclusion.
     """
 
     body = re.sub(r"\A---\n.*?\n---\n", "", source, count=1, flags=re.DOTALL)
@@ -156,9 +133,7 @@ def clean_markdown(source: str) -> str:
 
     def flush_table() -> None:
         nonlocal table_rows
-        if table_rows:
-            output.extend(_table_sentences(table_rows))
-            table_rows = []
+        table_rows = []
 
     for raw_line in lines:
         line = raw_line.strip()
@@ -177,7 +152,13 @@ def clean_markdown(source: str) -> str:
         if not line:
             flush_table()
             continue
-        if line.startswith(("import ", "export ")) or (line.startswith("<") and line.endswith(">")):
+        if line.startswith(("import ", "export ")):
+            continue
+        if line.startswith("<") and line.endswith(">"):
+            # Raw HTML image wrappers are visual-only. Mark their immediately
+            # following italic line as a caption just like Markdown images.
+            if "<img" in line or "compact-flow-diagram" in line:
+                skip_caption = True
             continue
         heading = re.match(r"^#{1,6}\s+(.+)$", line)
         if heading:
@@ -186,7 +167,8 @@ def clean_markdown(source: str) -> str:
             if heading_text.casefold() == "references":
                 skip_references = True
                 continue
-            output.append(heading_text.rstrip(".!?") + ".")
+            spoken_heading = heading_text.rstrip(".!?") + "."
+            output.append(f"{HEADING_START}{spoken_heading}{HEADING_END}")
             continue
         if (line.startswith("![") or line.startswith("[![")) and "](" in line:
             flush_table()
@@ -239,38 +221,93 @@ def shape_narration(text: str) -> str:
 
 
 def split_for_tts(text: str, max_chars: int = MAX_CHARS) -> list[NarrationChunk]:
-    """Return sentence-scoped chunks, splitting only overlong sentences further."""
+    """Return sentence-scoped chunks with stronger pauses after headings."""
 
-    sentences = re.split(r"(?<=[.!?])\s+", text)
     chunks: list[NarrationChunk] = []
-    for sentence in sentences:
-        sentence = sentence.strip()
-        if not sentence:
+    heading_pattern = re.compile(
+        f"({re.escape(HEADING_START)}.*?{re.escape(HEADING_END)})"
+    )
+    for segment in heading_pattern.split(text):
+        segment = segment.strip()
+        if not segment:
             continue
-        if len(sentence) > max_chars:
-            words = sentence.split()
-            sentence_parts: list[str] = []
-            part = ""
-            for word in words:
-                candidate = f"{part} {word}".strip()
-                if part and len(candidate) > max_chars:
-                    sentence_parts.append(part)
-                    part = word
-                else:
-                    part = candidate
-            if part:
-                sentence_parts.append(part)
+        is_heading = segment.startswith(HEADING_START)
+        if is_heading:
+            segment = segment.removeprefix(HEADING_START).removesuffix(HEADING_END).strip()
+            sentences = [segment]
         else:
-            sentence_parts = [sentence]
+            sentences = re.split(r"(?<=[.!?])\s+", segment)
 
-        for index, part in enumerate(sentence_parts):
-            chunks.append(
-                NarrationChunk(
-                    text=part,
-                    pause_after=index == len(sentence_parts) - 1,
-                )
-            )
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence:
+                continue
+            if len(sentence) > max_chars:
+                words = sentence.split()
+                sentence_parts: list[str] = []
+                part = ""
+                for word in words:
+                    candidate = f"{part} {word}".strip()
+                    if part and len(candidate) > max_chars:
+                        sentence_parts.append(part)
+                        part = word
+                    else:
+                        part = candidate
+                if part:
+                    sentence_parts.append(part)
+            else:
+                sentence_parts = [sentence]
+
+            for index, part in enumerate(sentence_parts):
+                pause_seconds = 0.0
+                if index == len(sentence_parts) - 1:
+                    pause_seconds = (
+                        HEADING_PAUSE_SECONDS if is_heading else SENTENCE_PAUSE_SECONDS
+                    )
+                chunks.append(NarrationChunk(text=part, pause_seconds=pause_seconds))
     return chunks
+
+
+def normalize_heading(value: str) -> str:
+    """Normalize a heading for explicit sidecar coverage checks."""
+
+    value = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", value)
+    value = re.sub(r"[`*_~]", "", value)
+    return re.sub(r"[^a-z0-9]+", " ", value.casefold()).strip()
+
+
+def source_section_headings(source: str) -> set[str]:
+    """Return every non-reference section heading that an abridgement must cover."""
+
+    body = re.sub(r"\A---\n.*?\n---\n", "", source, count=1, flags=re.DOTALL)
+    headings: set[str] = set()
+    in_fence = False
+    for raw_line in body.splitlines():
+        line = raw_line.strip()
+        if line.startswith(("```", "~~~")):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        match = re.match(r"^#{2,6}\s+(.+)$", line)
+        if not match:
+            continue
+        heading = normalize_heading(match.group(1))
+        if heading == "references":
+            break
+        headings.add(heading)
+    return headings
+
+
+def abridgement_coverage(source: str, narration_source: str) -> set[str]:
+    """Return source headings missing from an abridged narration's coverage map."""
+
+    covered = source_section_headings(narration_source)
+    for marker in re.findall(
+        r"<!--\s*covers:\s*(.*?)\s*-->", narration_source, flags=re.IGNORECASE | re.DOTALL
+    ):
+        covered.update(normalize_heading(item) for item in marker.split("|") if item.strip())
+    return source_section_headings(source) - covered
 
 
 def discover_posts() -> list[dict[str, Any]]:
@@ -284,11 +321,40 @@ def discover_posts() -> list[dict[str, Any]]:
         title = frontmatter.get("title", path.stem)
         if not post_slug:
             raise ValueError(f"Blog post is missing postSlug: {path}")
-        text = shape_narration(clean_markdown(source))
+        source_sha256 = hashlib.sha256(source.encode("utf-8")).hexdigest()
+        narration_path = NARRATION_DIR / f"{post_slug}.md"
+        narration_mode = "full-source"
+        narration_source = source
+        if narration_path.exists():
+            narration_source = narration_path.read_text(encoding="utf-8")
+            narration_frontmatter = parse_frontmatter(narration_source)
+            if narration_frontmatter.get("postSlug") != post_slug:
+                raise ValueError(f"Narration sidecar postSlug does not match {post_slug}")
+            if narration_frontmatter.get("sourceSha256") != source_sha256:
+                raise ValueError(
+                    f"Narration sidecar has not been reviewed against current source: {post_slug}"
+                )
+            missing_headings = abridgement_coverage(source, narration_source)
+            if missing_headings:
+                raise ValueError(
+                    f"Narration sidecar omits source sections for {post_slug}: "
+                    + ", ".join(sorted(missing_headings))
+                )
+            narration_mode = "section-complete-abridgement"
+
+        text = shape_narration(clean_markdown(narration_source))
+        narration_word_count = sum(len(chunk.text.split()) for chunk in split_for_tts(text))
+        if narration_mode != "full-source" and narration_word_count > MAX_ABRIDGED_WORDS:
+            raise ValueError(
+                f"Narration sidecar exceeds {MAX_ABRIDGED_WORDS} words for {post_slug}: "
+                f"{narration_word_count}"
+            )
         digest = hashlib.sha256(
             json.dumps(
                 {
+                    "source_sha256": source_sha256,
                     "text": text,
+                    "narration_mode": narration_mode,
                     "model": MODEL,
                     "voice": VOICE,
                     "language": LANGUAGE,
@@ -301,7 +367,11 @@ def discover_posts() -> list[dict[str, Any]]:
                     "sampling_seed_version": SAMPLING_SEED_VERSION,
                     "speed": SPEED,
                     "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
+                    "heading_pause_seconds": HEADING_PAUSE_SECONDS,
                     "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
+                    "table_policy": TABLE_POLICY,
+                    "max_audio_seconds": MAX_AUDIO_SECONDS,
+                    "max_abridged_words": MAX_ABRIDGED_WORDS,
                     "bitrate": BITRATE,
                     "max_chars": MAX_CHARS,
                     "silence_threshold": SILENCE_THRESHOLD,
@@ -321,6 +391,10 @@ def discover_posts() -> list[dict[str, Any]]:
                 "slug": post_slug,
                 "title": title,
                 "text": text,
+                "source_sha256": source_sha256,
+                "narration_mode": narration_mode,
+                "narration_word_count": narration_word_count,
+                "narration_path": narration_path if narration_path.exists() else None,
                 "digest": digest,
                 "output": AUDIO_DIR / f"{post_slug}.mp3",
             }
@@ -353,7 +427,9 @@ def narrator_profile_errors(posts: list[dict[str, Any]], manifest: dict[str, Any
         "sampling_seed_version": SAMPLING_SEED_VERSION,
         "speed": SPEED,
         "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
+        "heading_pause_seconds": HEADING_PAUSE_SECONDS,
         "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
+        "table_policy": TABLE_POLICY,
     }
     errors: list[str] = []
     for post in posts:
@@ -368,8 +444,33 @@ def narrator_profile_errors(posts: list[dict[str, Any]], manifest: dict[str, Any
 
 
 def verify_ffmpeg() -> None:
-    if shutil.which("ffmpeg") is None:
-        raise RuntimeError("ffmpeg is required; install it with `brew install ffmpeg`.")
+    missing = [tool for tool in ("ffmpeg", "ffprobe") if shutil.which(tool) is None]
+    if missing:
+        raise RuntimeError(
+            f"{', '.join(missing)} required; install the ffmpeg package with "
+            "`brew install ffmpeg`."
+        )
+
+
+def audio_duration_seconds(path: Path) -> float:
+    """Return an audio file's container duration using ffprobe."""
+
+    result = subprocess.run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            str(path),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return float(result.stdout.strip())
 
 
 def trim_boundary_silence(audio: Any) -> Any:
@@ -380,6 +481,8 @@ def trim_boundary_silence(audio: Any) -> Any:
     inspect the leading and trailing waveform boundaries. Deliberate pauses
     inside a spoken chunk are left untouched.
     """
+
+    import numpy as np
 
     samples = np.asarray(audio)
     active = np.flatnonzero(np.abs(samples) >= SILENCE_THRESHOLD)
@@ -403,8 +506,9 @@ def generate_post(
     model: Any,
     post: dict[str, Any],
     batch_size: int,
-    chunk_progress: tqdm,
-) -> None:
+    chunk_progress: Any,
+) -> float:
+    import numpy as np
     from mlx_audio.audio_io import write as audio_write
 
     chunks = split_for_tts(post["text"])
@@ -416,7 +520,7 @@ def generate_post(
         temporary = Path(temporary_dir)
         manifest_file = temporary / "concat.txt"
         chunk_paths: list[Path] = []
-        pause_paths: dict[int, Path] = {}
+        pause_paths: dict[tuple[int, float], Path] = {}
         with manifest_file.open("w", encoding="utf-8") as listing:
             for batch_start in range(0, len(chunks), batch_size):
                 chunk_batch = chunks[batch_start : batch_start + batch_size]
@@ -465,15 +569,20 @@ def generate_post(
                     audio_write(str(chunk_path), audio, sample_rate, format="wav")
                     chunk_paths.append(chunk_path)
                     listing.write(f"file '{chunk_path.as_posix()}'\n")
-                    if chunks[index].pause_after and index < len(chunks) - 1:
-                        pause_path = pause_paths.get(sample_rate)
+                    pause_seconds = chunks[index].pause_seconds
+                    if pause_seconds > 0 and index < len(chunks) - 1:
+                        pause_key = (sample_rate, pause_seconds)
+                        pause_path = pause_paths.get(pause_key)
                         if pause_path is None:
-                            pause_path = temporary / f"sentence-pause-{sample_rate}.wav"
+                            pause_milliseconds = round(pause_seconds * 1_000)
+                            pause_path = temporary / (
+                                f"pause-{pause_milliseconds}ms-{sample_rate}.wav"
+                            )
                             # ffmpeg applies atempo to the concatenated stream. Make the
                             # source pause proportionally longer so the delivered MP3 keeps
                             # the requested pause duration after the 1.10x tempo increase.
                             pause_samples = round(
-                                sample_rate * SENTENCE_PAUSE_SECONDS * SPEED
+                                sample_rate * pause_seconds * SPEED
                             )
                             audio_write(
                                 str(pause_path),
@@ -481,7 +590,7 @@ def generate_post(
                                 sample_rate,
                                 format="wav",
                             )
-                            pause_paths[sample_rate] = pause_path
+                            pause_paths[pause_key] = pause_path
                         listing.write(f"file '{pause_path.as_posix()}'\n")
                     chunk_progress.update(1)
 
@@ -513,8 +622,16 @@ def generate_post(
             ],
             check=True,
         )
+        duration_seconds = audio_duration_seconds(temporary_mp3)
+        if duration_seconds > MAX_AUDIO_SECONDS:
+            raise RuntimeError(
+                f"Generated audio for {post['slug']} is {duration_seconds / 60:.1f} minutes; "
+                f"shorten its section-complete narration instead of truncating at "
+                f"{MAX_AUDIO_SECONDS / 60:.0f} minutes."
+            )
         post["output"].parent.mkdir(parents=True, exist_ok=True)
         temporary_mp3.replace(post["output"])
+        return duration_seconds
 
 
 def select_posts(posts: list[dict[str, Any]], requested: list[str]) -> list[dict[str, Any]]:
@@ -563,7 +680,26 @@ def main() -> int:
             for error in profile_errors:
                 print(f"  {error}", file=sys.stderr)
             return 1
-        print(f"Audio and narrator-profile checks passed for {len(posts)} Blog posts.")
+        duration_errors: list[str] = []
+        for post in posts:
+            actual_duration = audio_duration_seconds(post["output"])
+            recorded_duration = manifest[post["slug"]].get("duration_seconds")
+            if actual_duration > MAX_AUDIO_SECONDS:
+                duration_errors.append(
+                    f"{post['slug']}: {actual_duration / 60:.1f} minutes exceeds 30 minutes"
+                )
+            if not isinstance(recorded_duration, (int, float)) or abs(
+                actual_duration - recorded_duration
+            ) > 1.0:
+                duration_errors.append(f"{post['slug']}: manifest duration is missing or stale")
+        if duration_errors:
+            print("Blog audio duration checks failed:", file=sys.stderr)
+            for error in duration_errors:
+                print(f"  {error}", file=sys.stderr)
+            return 1
+        print(
+            f"Audio, narrator-profile, and duration checks passed for {len(posts)} Blog posts."
+        )
         return 0
 
     if not stale and not args.force:
@@ -572,6 +708,7 @@ def main() -> int:
 
     verify_ffmpeg()
     from mlx_audio.tts.utils import load_model
+    from tqdm.auto import tqdm
 
     targets = posts if args.force else stale
     print(
@@ -590,7 +727,7 @@ def main() -> int:
                 position=1,
                 leave=False,
             ) as chunk_progress:
-                generate_post(model, post, args.batch_size, chunk_progress)
+                duration_seconds = generate_post(model, post, args.batch_size, chunk_progress)
             manifest[post["slug"]] = {
                 "digest": post["digest"],
                 "model": MODEL,
@@ -605,7 +742,14 @@ def main() -> int:
                 "sampling_seed_version": SAMPLING_SEED_VERSION,
                 "speed": SPEED,
                 "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
+                "heading_pause_seconds": HEADING_PAUSE_SECONDS,
                 "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
+                "table_policy": TABLE_POLICY,
+                "max_audio_seconds": MAX_AUDIO_SECONDS,
+                "narration_mode": post["narration_mode"],
+                "narration_word_count": post["narration_word_count"],
+                "source_sha256": post["source_sha256"],
+                "duration_seconds": duration_seconds,
                 "bitrate": BITRATE,
                 "max_chars": MAX_CHARS,
                 "silence_threshold": SILENCE_THRESHOLD,
