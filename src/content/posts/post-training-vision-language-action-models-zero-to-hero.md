@@ -15,11 +15,13 @@ summary: A systems guide to turning demonstrations, failures, interventions, cri
 
 # Post-Training for Robotics
 
+Post-training for robotics is the machinery that turns deployment evidence into a justified policy update. The name sounds like one stage after pretraining. In practice, it is a loop: adapt the policy, deploy it, find consequential failures, decide what those failures actually teach, update conservatively, and test whether the fix survives contact with the robot.
+
 A robot fails while closing a drawer.
 
 The rollout gives us an outcome: failure. It does not tell us whether the camera missed the handle, the model chose the wrong subtask, the trajectory approached at a bad angle, the gripper slipped, the controller lagged, or the success detector fired too early. Post-training begins in the gap between outcome and explanation.
 
-This is why “make the pretrained model behave better” is an inadequate description. A robot's action changes its next observation. One small error can create an unfamiliar state, an irreversible contact, or a recovery opportunity that no offline demonstration contains. The hard part is not taking another gradient step. It is deciding what the gradient is justified to say.
+This is why “make the pretrained model behave better” is an inadequate description. A robot's action changes its next observation. One small error can create an unfamiliar state, an irreversible contact, or a recovery opportunity that no offline demonstration contains. The part I find hardest is not taking another gradient step. It is deciding what the gradient is justified to say.
 
 The right object is therefore not an optimizer. It is a closed-loop policy improvement system:
 

@@ -112,7 +112,7 @@ I think about each person’s work as a mixture of leverage, stretch, and stewar
 
 Everyone will do some stewardship work, but nobody should receive only stewardship while someone else gets all the ambiguous, visible, and exciting problems. Over time, access to ownership, learning, and meaningful work should be distributed intentionally.
 
-That being said, autonomy does not mean isolation. People should be able to make progress without constant approval, but they should also escalate early when blocked. A useful request for help includes the goal, what has been tried, what was observed, the current hypothesis, and the specific help needed. I want asking for help to be emotionally inexpensive but intellectually serious.
+Autonomy does not mean isolation. People should be able to make progress without constant approval, but they should also escalate early when blocked. A useful request for help includes the goal, what has been tried, what was observed, the current hypothesis, and the specific help needed. I want asking for help to be emotionally inexpensive but intellectually serious.
 
 The manager remains accountable but should become less central. The test of delegation is not whether work disappeared from my plate. It is whether judgment appeared somewhere else on the team.
 
