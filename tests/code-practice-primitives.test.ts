@@ -79,7 +79,9 @@ describe('code-practice primitive-first solutions', () => {
   });
 
   it('keeps learner-facing reference implementations concise', () => {
-    for (const problem of codePracticeProblems) {
+    const fundamentals = codePracticeProblems.filter((problem) => problem.track === 'fundamentals');
+
+    for (const problem of fundamentals) {
       expect(problem.solutionCode.split('\n').length, problem.id).toBeLessThanOrEqual(45);
       expect(
         problem.solutionCode.split('\n').filter((line) => line.trimStart().startsWith('#')),
@@ -89,7 +91,9 @@ describe('code-practice primitive-first solutions', () => {
   });
 
   it('does not bypass a lesson with a matching PyTorch convenience helper', () => {
-    const torchProblems = codePracticeProblems.filter((problem) => problem.packages?.includes('torch'));
+    const torchProblems = codePracticeProblems.filter(
+      (problem) => problem.track === 'fundamentals' && problem.packages?.includes('torch'),
+    );
 
     for (const problem of torchProblems) {
       for (const call of BANNED_CONVENIENCE_CALLS) {
@@ -128,5 +132,31 @@ describe('code-practice primitive-first solutions', () => {
   it('supports tensor transpose methods used by 2D and attention references', () => {
     expect(TORCH_COMPAT_SOURCE).toContain('def permute(self, *dims):');
     expect(TORCH_COMPAT_SOURCE).toContain('def transpose(self, dim0, dim1):');
+  });
+
+  it('keeps architecture interviews typed, modular, and local-PyTorch only', () => {
+    const architectures = codePracticeProblems.filter((problem) => problem.track === 'architecture');
+
+    expect(architectures.map((problem) => problem.id)).toEqual([
+      'resnet-from-building-blocks',
+      'unet-encoder-decoder',
+      'centernet-style-detector',
+    ]);
+
+    for (const problem of architectures) {
+      expect(problem.environment, problem.id).toBe('local-pytorch');
+      expect(problem.interview?.durationMinutes, problem.id).toBeGreaterThanOrEqual(45);
+      expect(problem.solutionCode, problem.id).toContain('@dataclass');
+      expect(problem.solutionCode, problem.id).toContain('nn.Module');
+      expect(problem.solutionCode, problem.id).toContain('def smoke_test()');
+      expect(problem.solutionCode, problem.id).toContain('with torch.inference_mode():');
+    }
+
+    expect(architectures[0].solutionCode).toContain('nn.AdaptiveAvgPool2d(1)');
+    expect(architectures[1].solutionCode).toContain('F.interpolate(');
+    expect(architectures[1].solutionCode).toContain('nn.ModuleList(');
+    expect(architectures[2].solutionCode).toContain('class CenterNetOutput:');
+    expect(architectures[2].solutionCode).toContain('nn.init.constant_');
+    expect(architectures[2].solutionCode).toContain('-2.19');
   });
 });
