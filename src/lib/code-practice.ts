@@ -172,6 +172,107 @@ print(f"{softmax_cross_entropy(sample_logits, sample_labels).item():.5f}")`,
     tags: ['PyTorch', 'Numerical Stability', 'Interview Practice'],
   },
   {
+    id: 'class-weighted-cross-entropy',
+    order: 35,
+    title: 'Class-weighted cross-entropy',
+    difficulty: 'Medium',
+    summary:
+      'Extend multiclass cross-entropy with one weight per class and PyTorch-compatible mean reduction.',
+    prompt: [
+      'Write `class_weighted_cross_entropy(logits, labels, class_weight)` for class scores shaped `(N, C)`, target class ids shaped `(N,)`, and one non-negative weight per class shaped `(C,)`.',
+      'Compute cross-entropy from logits with a stable log-sum-exp path. Weight each example by its target class, then divide the weighted loss sum by the sum of the selected class weights.',
+    ],
+    signature: `def class_weighted_cross_entropy(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+    class_weight: torch.Tensor,
+) -> torch.Tensor:
+    ...`,
+    requirements: [
+      '`logits` has shape `(N, C)`, `labels` has shape `(N,)`, and `class_weight` has shape `(C,)`.',
+      'Labels contain integer class ids in `[0, C - 1]`.',
+      'Class weights are finite and non-negative, and the selected target weights have a positive sum.',
+      'Use a numerically stable cross-entropy calculation from logits.',
+      'Return `sum_i w[y_i] * loss_i / sum_i w[y_i]`, matching PyTorch weighted mean reduction.',
+    ],
+    examples: [
+      {
+        label: 'Example',
+        lines: [
+          'logits = [[2.0, 1.0, 0.1], [0.5, 1.5, -0.5]]',
+          'labels = [0, 1]',
+          'class_weight = [1.0, 2.0, 0.5]',
+        ],
+        result: '0.41075',
+      },
+    ],
+    hint: [
+      'Subtract each row maximum before exponentiating, as in stable softmax cross-entropy.',
+      'Use `class_weight[labels]` to gather one scalar weight per batch row.',
+      'Normalize by the gathered weights’ sum, not by `N`.',
+    ],
+    solutionNotes: [
+      'For row `i`, first compute `loss_i = log(sum_c exp(z_i,c - m_i)) - (z_i,y_i - m_i)`, where `m_i` is the largest logit in that row. Subtracting `m_i` leaves the softmax unchanged and prevents overflow.',
+      'The class vector has shape `(C,)`; indexing it with labels shaped `(N,)` produces `example_weight` shaped `(N,)`. The final loss is `sum_i w[y_i] loss_i / sum_i w[y_i]`. This denominator preserves PyTorch’s weighted-mean behavior when a batch contains different class mixtures.',
+    ],
+    solutionCode: `import torch
+
+def class_weighted_cross_entropy(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+    class_weight: torch.Tensor,
+) -> torch.Tensor:
+    logits = torch.as_tensor(logits, dtype=torch.float64)
+    labels = torch.as_tensor(labels)
+    class_weight = torch.as_tensor(class_weight, dtype=logits.dtype)
+    if logits.ndim != 2 or logits.shape[0] == 0 or logits.shape[1] == 0:
+        raise ValueError("logits must have non-empty shape (N, C)")
+    if labels.ndim != 1 or labels.shape[0] != logits.shape[0]:
+        raise ValueError("labels must have shape (N,)")
+    if torch.is_floating_point(labels):
+        raise ValueError("labels must contain integer class ids")
+    if class_weight.shape != (logits.shape[1],):
+        raise ValueError("class_weight must have shape (C,)")
+    if not bool(torch.all(torch.isfinite(logits))) or not bool(torch.all(torch.isfinite(class_weight))):
+        raise ValueError("logits and class_weight must be finite")
+    if bool(torch.any(class_weight < 0)):
+        raise ValueError("class_weight must be non-negative")
+    labels = torch.as_tensor(labels, dtype=torch.long)
+    if bool(torch.any(labels < 0)) or bool(torch.any(labels >= logits.shape[1])):
+        raise ValueError("labels contain out-of-range class ids")
+
+    shifted = logits - torch.amax(logits, dim=1, keepdim=True)
+    log_normalizers = torch.log(torch.sum(torch.exp(shifted), dim=1))
+    rows = torch.arange(logits.shape[0], dtype=torch.long)
+    per_example_loss = log_normalizers - shifted[rows, labels]
+    example_weight = class_weight[labels]
+    weight_sum = torch.sum(example_weight)
+    if float(weight_sum.item()) <= 0:
+        raise ValueError("selected class weights must have a positive sum")
+    return torch.sum(per_example_loss * example_weight) / weight_sum
+
+logits = torch.tensor([[2.0, 1.0, 0.1], [0.5, 1.5, -0.5]])
+labels = torch.tensor([0, 1])
+class_weight = torch.tensor([1.0, 2.0, 0.5])
+print(class_weighted_cross_entropy(logits, labels, class_weight).item())`,
+    starterCode: `import torch
+
+def class_weighted_cross_entropy(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+    class_weight: torch.Tensor,
+) -> torch.Tensor:
+    # TODO: compute stable per-example cross-entropy, gather target weights, and weighted-mean reduce.
+    raise NotImplementedError("Implement class_weighted_cross_entropy")
+
+logits = torch.tensor([[2.0, 1.0, 0.1], [0.5, 1.5, -0.5]])
+labels = torch.tensor([0, 1])
+class_weight = torch.tensor([1.0, 2.0, 0.5])
+print(class_weighted_cross_entropy(logits, labels, class_weight).item())`,
+    packages: PYTORCH_AND_NUMPY_PACKAGES,
+    tags: ['PyTorch', 'Classification', 'Losses', 'Class Imbalance'],
+  },
+  {
     id: 'non-maximum-suppression',
     order: 2,
     title: 'Non-maximum suppression',
@@ -3847,6 +3948,15 @@ def softmax_cross_entropy(logits: torch.Tensor, labels: torch.Tensor) -> torch.T
     normalizers = torch.sum(exp_logits, dim=1)
     rows = torch.arange(logits.shape[0], dtype=torch.long)
     return torch.mean(torch.log(normalizers) - shifted[rows, labels])`,
+  'class-weighted-cross-entropy': `import torch
+
+def class_weighted_cross_entropy(logits: torch.Tensor, labels: torch.Tensor, class_weight: torch.Tensor) -> torch.Tensor:
+    shifted = logits - torch.amax(logits, dim=1, keepdim=True)
+    log_normalizers = torch.log(torch.sum(torch.exp(shifted), dim=1))
+    rows = torch.arange(logits.shape[0], dtype=torch.long)
+    losses = log_normalizers - shifted[rows, labels]
+    example_weight = class_weight[labels]
+    return torch.sum(losses * example_weight) / torch.sum(example_weight)`,
   'non-maximum-suppression': `import torch
 
 def _pairwise_iou(box, boxes):
@@ -4113,31 +4223,32 @@ const PROGRESSIVE_ORDER: Readonly<Record<string, number>> = {
   'wrapped-angular-difference': 7,
   'smooth-l1-huber-loss': 8,
   'stable-softmax-cross-entropy': 9,
-  'temperature-scaling-of-logits': 10,
-  'pairwise-squared-distance': 11,
-  'pairwise-cosine-similarity': 12,
-  'nearest-centroid-classifier': 13,
-  'iou-matrix': 14,
-  'non-maximum-suppression': 15,
-  'weighted-box-regression-loss': 16,
-  'dice-loss': 17,
-  'segmentation-iou-loss': 18,
-  'focal-loss': 19,
-  'top-k-gather': 20,
-  'homogeneous-coordinate-transform': 21,
-  '2d-patchify-for-images': 22,
-  'unpatchify-back-to-image': 23,
-  'sinusoidal-positional-encoding': 24,
-  'causal-attention-mask': 25,
-  'rope-rotary-positional-embedding': 26,
-  'scaled-dot-product-self-attention': 27,
-  'cross-attention': 28,
-  'simple-n-gram-language-model': 29,
-  'average-precision-from-matches': 30,
-  'greedy-detection-matching': 31,
-  'batched-best-iou-match': 32,
-  'manual-backprop-for-a-2-layer-mlp': 33,
-  'classic-mlp-forward-backward': 34,
+  'class-weighted-cross-entropy': 10,
+  'temperature-scaling-of-logits': 11,
+  'pairwise-squared-distance': 12,
+  'pairwise-cosine-similarity': 13,
+  'nearest-centroid-classifier': 14,
+  'iou-matrix': 15,
+  'non-maximum-suppression': 16,
+  'weighted-box-regression-loss': 17,
+  'dice-loss': 18,
+  'segmentation-iou-loss': 19,
+  'focal-loss': 20,
+  'top-k-gather': 21,
+  'homogeneous-coordinate-transform': 22,
+  '2d-patchify-for-images': 23,
+  'unpatchify-back-to-image': 24,
+  'sinusoidal-positional-encoding': 25,
+  'causal-attention-mask': 26,
+  'rope-rotary-positional-embedding': 27,
+  'scaled-dot-product-self-attention': 28,
+  'cross-attention': 29,
+  'simple-n-gram-language-model': 30,
+  'average-precision-from-matches': 31,
+  'greedy-detection-matching': 32,
+  'batched-best-iou-match': 33,
+  'manual-backprop-for-a-2-layer-mlp': 34,
+  'classic-mlp-forward-backward': 35,
 };
 
 const PROGRESSIVE_DIFFICULTY: Readonly<Record<string, CodePracticeProblem['difficulty']>> = {
@@ -4150,6 +4261,7 @@ const PROGRESSIVE_DIFFICULTY: Readonly<Record<string, CodePracticeProblem['diffi
   'wrapped-angular-difference': 'Easy',
   'smooth-l1-huber-loss': 'Medium',
   'stable-softmax-cross-entropy': 'Medium',
+  'class-weighted-cross-entropy': 'Medium',
   'temperature-scaling-of-logits': 'Medium',
   'pairwise-squared-distance': 'Medium',
   'pairwise-cosine-similarity': 'Medium',
