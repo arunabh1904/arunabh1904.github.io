@@ -15,9 +15,14 @@ topics:
 summary: How modern autonomous-driving systems preserve sensor-specific evidence, establish metric geometry, fuse modalities, carry world state through time, and connect perception to planning, simulation, and validation.
 ---
 # Autonomous-Vehicle Perception, circa 2026
-A distant cyclist at dusk may appear as a few image pixels, two or three LiDAR returns, and a noisy radar detection with radial velocity. None of those measurements is the scene. Each is partial evidence with a different sampling pattern, uncertainty, and failure mode.
 
-The tempting definition of a unified sensor model is one that converts every sensor into one tensor as early as possible. That is usually the wrong objective. Early unification can erase the very signal that made a sensor useful: image texture, LiDAR height structure, radar Doppler, measurement age, or sensor-specific confidence. Once that information has been averaged away, a larger downstream model cannot reconstruct it.
+Autonomous-vehicle perception has one job: turn raw sensor measurements into a world state that the rest of the autonomy stack can use. Cameras, LiDAR, radar, calibration, fusion, and tracking are mechanisms, not the output. The output is a timely geometric account of what surrounds the vehicle, how it is moving, and how much the system should trust it—soon enough for prediction and planning to act.
+
+That job sounds clean until the evidence becomes thin. A distant cyclist at dusk may appear as a few image pixels, two or three LiDAR returns, and a noisy radar detection with radial velocity. None of those measurements is the cyclist. Each is partial evidence with a different sampling pattern, uncertainty, and failure mode.
+
+What still makes this problem interesting to me is that more unification can make the model worse. The tempting definition of a unified sensor model is one that converts every sensor into one tensor as early as possible. That is usually the wrong objective.
+
+Early unification can erase the very signal that made a sensor useful: image texture, LiDAR height structure, radar Doppler, measurement age, or sensor-specific confidence. Once that information has been averaged away, a larger downstream model cannot reconstruct it.
 
 The real architectural problem is deciding where each measurement becomes geometry, where different modalities are allowed to interact, what state survives through time, and which parts of that state are made explicit for prediction, planning, simulation, and validation. The progression is:
 

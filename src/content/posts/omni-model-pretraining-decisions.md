@@ -15,9 +15,11 @@ summary: A systems guide to how semantics, geometry, dynamics, and motor priors 
 
 _Updated August 21, 2026._
 
+Pre-training for robotics tries to give a policy useful priors before it has enough experience in one robot, task, or deployment. The promise is transfer: learn semantics, geometry, time, interaction, and action from several data sources, then reuse those priors when robot data is scarce.
+
 A robot can inherit the word “drawer” from the internet. It can learn what drawers look like, where handles usually are, and which instruction refers to which object. The internet does not tell it how a sticky drawer feels, how far a particular arm can reach, what force closes the gripper, or what to do after the object slips.
 
-That gap is the reason robotics pretraining is both promising and easy to misunderstand. Internet-scale data supplies broad semantics. Human video supplies temporal and interaction structure. Robot trajectories supply actions, contact, embodiment, and recovery. These sources are useful precisely because they are different. Treating them as interchangeable tokens inside one large model does not make the differences disappear.
+That gap is what makes robotics pretraining exciting to me, and what makes it easy to misunderstand. Internet-scale data supplies broad semantics. Human video supplies temporal and interaction structure. Robot trajectories supply actions, contact, embodiment, and recovery. These sources are useful precisely because they are different. Treating them as interchangeable tokens inside one large model does not make the differences disappear.
 
 The central design problem is therefore not simply **how to pretrain a large multimodal model**. It is:
 

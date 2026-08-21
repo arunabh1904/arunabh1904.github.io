@@ -12,7 +12,11 @@ summary: A technical history of how vision-language models moved from task-speci
 ---
 # Tracing the VLM Progression
 
-A model can name the mug, explain that mugs hold liquid, and still drive a gripper into the table beside it. The contradiction disappears once we stop treating “vision-language” as a single capability. Recognizing a mug, binding the word *mug* to pixels, estimating its pose, predicting contact, and controlling a wrist are different output contracts. Each tolerates a different amount of lost information.
+A vision-language model is not one capability. It is an interface that decides which parts of an image survive into a language-conditioned output. The VLM progression is therefore a progression in output contracts: recognition, alignment, generation, grounding, temporal reasoning, and finally action.
+
+That progression matters because a model can name a mug, explain that mugs hold liquid, and still drive a gripper into the table beside it. Recognizing the mug, binding the word *mug* to pixels, estimating its pose, predicting contact, and controlling a wrist are different jobs. Each tolerates a different amount of lost information.
+
+This is the history I care about. A new model can look like a clean capability jump while quietly inheriting an older compression boundary. Once location, time, or geometry disappears, a fluent language model cannot talk it back into existence.
 
 The usual timeline, CLIP to LLaVA to video to robotics, is useful but incomplete. It hides two important transitions. First, CLIP did not begin vision-language learning. Earlier systems already learned joint representations through region-level fusion. CLIP changed the scaling economics and the interface: natural language became an open vocabulary for visual recognition. Second, visual chat did not emerge directly from contrastive alignment. A generation of models learned how to connect pretrained visual encoders and language models before instruction tuning turned that machinery into an assistant.
 

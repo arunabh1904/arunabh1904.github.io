@@ -16,9 +16,11 @@ import { attentionMechanismsPlayground } from '../../lib/python-playground-examp
 
 # How Attention Stores and Retrieves Context
 
-Attention began as an escape hatch from a fixed-size memory. An encoder-decoder recurrent neural network had to compress a source sentence into a hidden state and ask that state to preserve everything the decoder might need. Attention let each decoding step reach back to the encoder states directly. The Transformer made a larger move in 2017: it removed recurrence from the main sequence path and used attention itself to route information between positions.
+Attention is a learned memory interface. Keys say what stored content can be matched, values carry the content itself, and a query retrieves the mixture needed at the current position. That separation is how attention stores and retrieves context.
 
-The core operation has survived. A query describes the current information need, keys determine which sources match it, and values carry the content returned by those sources. Most later variants do not replace that idea; they change where the keys and values come from, how much of them must be cached, which positions are eligible, or whether the past is stored token by token at all.
+The mechanism began as an escape hatch from a fixed-size memory. An encoder-decoder recurrent neural network had to compress a source sentence into one hidden state and ask that state to preserve everything the decoder might need. Attention let each decoding step reach back to the encoder states directly. The Transformer made the larger move in 2017: it removed recurrence from the main sequence path and used attention itself to route information between positions.
+
+What I find interesting is how much of the original idea survived. Most later variants do not replace query-key matching and value retrieval. They change where the keys and values come from, how much must be cached, which positions are eligible, or whether the past remains stored token by token at all.
 
 ## The encoder-decoder bottleneck
 

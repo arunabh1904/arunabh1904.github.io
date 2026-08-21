@@ -15,11 +15,17 @@ summary: Kaplan, Chinchilla, data constraints, inference economics, and why ever
 
 # How to Read Scaling Laws for Language Models
 
-This post is long overdue. I kept it in my backlog because I wanted to understand what Kaplan and Chinchilla mean now, not because either result is obscure.
+[Jie Tang's post about GLM-5.3](https://x.com/jietang/status/2089941544581403107) finally pulled this out of my backlog. Z.ai kept the GLM-5.2 base fixed, then spent another month scaling long-horizon environments and reinforcement-learning post-training. Tang's point was not that parameter scaling had ended. It was that scaling has several dials, and the dial with the largest return can change.
 
-Scaling laws appear in almost every model-release discussion. They justify larger models, fixed token-to-parameter ratios, and vague claims that progress is inevitable. None of those versions survives a close reading.
+That post begs for a refresher. If the base model stayed fixed, what exactly scaled? What did Kaplan and Chinchilla actually establish about where the next unit of compute should go? And which parts of their conclusions were empirical observations rather than permanent laws?
+
+Understanding those distinctions matters more now because a modern model budget no longer ends at pretraining. Parameters, data mixture, post-training environments, reinforcement-learning compute, serving cost, and test-time search can all be the binding constraint. Treating *scaling* as shorthand for *make the base model larger* hides the decision we now have to make.
+
+Scaling laws still appear in almost every model-release discussion. They justify larger models, fixed token-to-parameter ratios, and vague claims that progress is inevitable. None of those versions survives a close reading.
 
 A scaling law does not say that a model becomes intelligent if we make it larger. It makes a narrower claim. Inside a measured regime, a chosen error metric changes predictably as we spend more parameters, data, or compute.
+
+I still find that regularity remarkable. Neural-network training is messy, yet the expensive end of a training family can sometimes be forecast from much cheaper runs. In [Dario Amodei's discussion with Lex Fridman](https://lexfridman.com/dario-amodei-transcript/), he describes the confidence behind scaling as inductive: the pattern has repeated across domains even though its theoretical explanation remains incomplete.
 
 That regularity turns a large pretraining run from one heroic bet into a resource-allocation problem. A cheap sweep can tell us whether the next dollar should buy a larger model, more tokens, a different mixture, or a better evaluation.
 
@@ -126,7 +132,7 @@ The objective widens again after pretraining. A smaller model trained longer can
 
 Test-time search adds another coordinate. A smaller model with selective search can beat a larger single-pass model on some tasks. The measurement must include the search policy, verifier, latency, and failures.
 
-[Jie Tang's GLM-5.3 note](https://x.com/jietang/status/2089941544581403107) makes the same point from post-training. Z.ai kept the GLM-5.2 base fixed, then spent another month on long-horizon environments and reinforcement-learning post-training. [The release report](https://z.ai/blog/glm-5.3) attributes the gains to that stage. The controlled intervention is informative. It is not yet a post-training scaling law: one before-and-after release gives no response surface, held-out forecast, or compute-optimal valley.
+Tang's GLM-5.3 note makes the same point from post-training. Z.ai kept the GLM-5.2 base fixed, then spent another month on long-horizon environments and reinforcement-learning post-training. [The release report](https://z.ai/blog/glm-5.3) attributes the gains to that stage. The controlled intervention is informative. It is not yet a post-training scaling law: one before-and-after release gives no response surface, held-out forecast, or compute-optimal valley.
 
 The modern scaling problem is therefore not one curve. It is an allocation across pretraining data, model capacity, post-training environments, serving cost, and test-time effort. The right coordinate is the one that removes the current bottleneck under a measured constraint.
 
