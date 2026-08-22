@@ -10,6 +10,7 @@ import {
   pytorchTriviaDeck,
   type TriviaDeckData,
 } from '../src/lib/trivia-decks';
+import { triviaExplanations } from '../src/lib/trivia-explanations';
 
 const deck: TriviaDeckData = {
   id: 'test-deck',
@@ -270,5 +271,32 @@ describe('published trivia data', () => {
       'If `cache.get(key)` finds nothing, what value does this code check for?',
     );
     expect(cacheCard?.answer).toBe('`None`');
+  });
+
+  it('publishes one focused explanation for every visible card', () => {
+    const publishedIds = [...pythonTriviaDeck.cards, ...pytorchTriviaDeck.cards]
+      .map((card) => card.id)
+      .sort();
+    expect(Object.keys(triviaExplanations).sort()).toEqual(publishedIds);
+  });
+
+  it('explains the visible truthiness question instead of the old answer bundle', () => {
+    const emptyListCard = pythonTriviaDeck.cards.find(
+      (card) => card.id === 'python-empty-list-truthiness',
+    );
+    expect(emptyListCard?.explanation).toBe(
+      'An empty list is falsy, so `bool([])` returns `False`.',
+    );
+  });
+
+  it('asks tuple mutability in concrete terms', () => {
+    const tupleCard = pythonTriviaDeck.cards.find(
+      (card) => card.id === 'python-tuple-deep-immutable',
+    );
+    expect(tupleCard).toMatchObject({
+      question: 'Can a mutable object inside a tuple still change?',
+      answer: 'Yes',
+      explanation: 'A tuple’s slots cannot be reassigned, but a mutable object stored in a slot can still change.',
+    });
   });
 });

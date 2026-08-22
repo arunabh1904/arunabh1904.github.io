@@ -3,6 +3,7 @@ import {
   pytorchAtomicSpecs,
   type AtomicTriviaSpec,
 } from './trivia-atomic-specs';
+import { triviaExplanations } from './trivia-explanations';
 
 export interface TriviaCard {
   id: string;
@@ -786,6 +787,8 @@ function buildAtomicDeck(
   const cards = specs.flatMap((spec): TriviaCard[] => {
     const source = sourceCards.get(spec.sourceId);
     if (!source) throw new Error(`Unknown trivia source card: ${spec.sourceId}`);
+    const explanation = triviaExplanations[spec.id];
+    if (!explanation) throw new Error(`Trivia card missing a focused explanation: ${spec.id}`);
 
     const conceptCard: TriviaCard = {
       id: spec.id,
@@ -793,7 +796,7 @@ function buildAtomicDeck(
       question: spec.question,
       answer: spec.answer,
       acceptedAnswers: spec.acceptedAnswers,
-      explanation: source.answer,
+      explanation,
       detail: source.detail,
     };
 
@@ -801,16 +804,21 @@ function buildAtomicDeck(
     if (!spec.codeQuestion || !spec.codeAnswer) {
       throw new Error(`Code trivia spec missing a question or answer: ${spec.id}`);
     }
+    const codeId = `${spec.id}-code`;
+    const codeExplanation = triviaExplanations[codeId];
+    if (!codeExplanation) {
+      throw new Error(`Code trivia card missing a focused explanation: ${codeId}`);
+    }
 
     return [
       conceptCard,
       {
-        id: `${spec.id}-code`,
+        id: codeId,
         topic: 'Code scenarios',
         question: spec.codeQuestion,
         answer: spec.codeAnswer,
         acceptedAnswers: spec.codeAcceptedAnswers,
-        explanation: spec.codeExplanation ?? source.answer,
+        explanation: codeExplanation,
         code: spec.code,
       },
     ];
