@@ -13,22 +13,26 @@ import { pythonTriviaDeck } from '../../lib/trivia-decks';
 
 # Python Interview Trivia
 
-This deck turns high-level Python interview questions into short retrieval prompts. Answer aloud before revealing the card. A strong screen answer usually needs three moves: state the rule, add the important qualification, then name one practical consequence.
+This deck uses short recall to build a deep Python revision path. Each card asks for one term, operator, output, or decision in one or two words. The reveal then explains the full rule, its boundary case, and the production consequence.
 
 <TriviaDeck client:load deck={pythonTriviaDeck} />
 
 ## How to use the deck
 
-Choose one topic for a focused pass or keep all topics mixed. Type or outline your response, then select **Grade answer**. The deck reports **Correct**, **Close**, or **Needs work**, identifies concepts to review, and updates the correct-over-attempted score automatically. The topic filter scopes the score to the visible cards.
+Choose one topic for a focused pass or keep all topics mixed. Enter the one- or two-word answer, then select **Grade answer**. Exact answers score **Correct**; partial terms or a one-character typo score **Close**; other responses score **Needs work**. The score updates automatically and follows the selected topic.
 
-Grading runs on this device and looks for the core ideas in the reference answer rather than exact wording. It is deliberately conservative: an unfamiliar but valid paraphrase may receive **Close**, but a one-word overlap will not pass. Typed answers and progress are stored only in this browser.
+Code scenarios are separate cards marked **Code**. Read the snippet before answering, predict its output or contract, and use the reveal to connect that behavior to the underlying Python model. This second pass is where a memorized term becomes a production decision.
 
-The original preparation conversation supplied the Python question bank. The answers were tightened against the language and library documentation, with special care around identity, hashability, generators, the GIL, and runtime typing.
+Grading and progress storage stay in this browser. The deck covers semantics, iteration, scope, collections, the object model, resource handling, structured concurrency, runtime typing, dataclasses, and Pydantic.
 
 ## Sources
 
 - [Python language reference](https://docs.python.org/3/reference/)
 - [Python data model](https://docs.python.org/3/reference/datamodel.html)
 - [Python standard-library dataclasses](https://docs.python.org/3/library/dataclasses.html)
+- [Python coroutines and tasks](https://docs.python.org/3/library/asyncio-task.html)
+- [Python context variables](https://docs.python.org/3/library/contextvars.html)
+- [Python `functools`](https://docs.python.org/3/library/functools.html)
 - [Pydantic dataclasses](https://docs.pydantic.dev/latest/concepts/dataclasses/)
+- [Pydantic models](https://docs.pydantic.dev/latest/concepts/models/)
 - [Pydantic strict mode](https://docs.pydantic.dev/latest/concepts/strict_mode/)

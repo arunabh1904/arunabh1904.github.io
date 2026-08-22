@@ -1,18 +1,18 @@
-export interface TriviaGradingConcept {
-  label: string;
-  anyOf: string[];
-}
+import {
+  pythonAtomicSpecs,
+  pytorchAtomicSpecs,
+  type AtomicTriviaSpec,
+} from './trivia-atomic-specs';
 
 export interface TriviaCard {
   id: string;
   topic: string;
   question: string;
   answer: string;
+  acceptedAnswers?: string[];
+  explanation?: string;
   code?: string;
   detail?: string;
-  grading?: {
-    concepts: TriviaGradingConcept[];
-  };
 }
 
 export interface TriviaDeckData {
@@ -21,7 +21,22 @@ export interface TriviaDeckData {
   cards: TriviaCard[];
 }
 
-export const pythonTriviaDeck: TriviaDeckData = {
+interface TriviaSourceCard {
+  id: string;
+  topic: string;
+  question: string;
+  answer: string;
+  code?: string;
+  detail?: string;
+}
+
+interface TriviaSourceDeck {
+  id: string;
+  title: string;
+  cards: TriviaSourceCard[];
+}
+
+const pythonTriviaSourceDeck: TriviaSourceDeck = {
   id: 'python-interview-trivia-v1',
   title: 'Python interview trivia',
   cards: [
@@ -30,38 +45,6 @@ export const pythonTriviaDeck: TriviaDeckData = {
       topic: 'Semantics',
       question: 'Are Python arguments passed by value or by reference?',
       answer: 'Python uses pass-by-assignment, also called object sharing. A function receives another binding to the same object. Mutating that object can affect the caller; rebinding the local name cannot.',
-      grading: {
-        concepts: [
-          {
-            label: 'pass-by-assignment or object sharing',
-            anyOf: [
-              'pass by assignment',
-              'object sharing',
-              'binding same object',
-              'reference same object',
-            ],
-          },
-          {
-            label: 'mutation can affect the caller',
-            anyOf: [
-              'mutation affect caller',
-              'mutation visible caller',
-              'mutation visible outside',
-              'change affect caller',
-              'change visible outside',
-            ],
-          },
-          {
-            label: 'rebinding stays local',
-            anyOf: [
-              'rebinding local',
-              'reassign local',
-              'assignment new object local',
-              'rebinding not affect caller',
-            ],
-          },
-        ],
-      },
     },
     {
       id: 'python-is-equality',
@@ -397,10 +380,40 @@ export const pythonTriviaDeck: TriviaDeckData = {
       question: 'Does `@dataclass(frozen=True)` make the full object graph immutable?',
       answer: 'No. It blocks normal field reassignment on the instance, but a field can still reference a mutable list, dictionary, or custom object. Frozen is shallow, and hashability still depends on generated-method rules and field values.',
     },
+    {
+      id: 'python-task-group',
+      topic: 'Concurrency',
+      question: 'What production guarantees does `asyncio.TaskGroup` add?',
+      answer: 'A task group provides structured concurrency: the context waits for every child task. If one child fails with a non-cancellation exception, the remaining children are cancelled and the failures are raised as an exception group.',
+    },
+    {
+      id: 'python-cancelled-error',
+      topic: 'Concurrency',
+      question: 'How should a coroutine handle `asyncio.CancelledError`?',
+      answer: '`CancelledError` is a `BaseException` subclass. A coroutine may catch it to perform cleanup, but should normally re-raise it so task groups, timeouts, and callers preserve cancellation semantics.',
+    },
+    {
+      id: 'python-contextvar',
+      topic: 'Concurrency',
+      question: 'Why use `ContextVar` for request-scoped async state?',
+      answer: 'A context variable holds context-local state that async tasks propagate without sharing one mutable thread-local value. Create it at module scope and reset temporary values with the token returned by `set`.',
+    },
+    {
+      id: 'python-lru-cache-hashable',
+      topic: 'Collections',
+      question: 'What constraint does `functools.lru_cache` place on arguments?',
+      answer: 'Cached function arguments must be hashable because the cache indexes calls by their argument keys. Mutable lists and dictionaries must be converted or kept outside the cached boundary.',
+    },
+    {
+      id: 'python-exception-group',
+      topic: 'Errors & resources',
+      question: 'What handles selected failures inside an `ExceptionGroup`?',
+      answer: 'The `except*` syntax handles matching subgroups while allowing unrelated exceptions to continue propagating. It is useful when structured concurrency reports several child failures together.',
+    },
   ],
 };
 
-export const pytorchTriviaDeck: TriviaDeckData = {
+const pytorchTriviaSourceDeck: TriviaSourceDeck = {
   id: 'pytorch-interview-trivia-v1',
   title: 'PyTorch interview trivia',
   cards: [
@@ -711,5 +724,109 @@ export const pytorchTriviaDeck: TriviaDeckData = {
       question: 'Why can optimizer state use more memory than model weights?',
       answer: 'Optimizers may keep one or more full-sized tensors per parameter, such as Adam’s first and second moments, often in higher precision. Gradients, activations, and temporary workspaces add further peaks.',
     },
+    {
+      id: 'torch-activation-checkpoint',
+      topic: 'Performance',
+      question: 'What trade-off does activation checkpointing make?',
+      answer: 'Activation checkpointing saves memory by discarding selected forward intermediates and recomputing them during backward. The current API recommends passing `use_reentrant=False` explicitly.',
+    },
+    {
+      id: 'torch-ddp-no-sync',
+      topic: 'Distributed',
+      question: 'How should DDP gradient accumulation avoid redundant synchronization?',
+      answer: '`DDP.no_sync()` defers gradient synchronization inside its context. The forward pass must also occur inside the context, and the first forward-backward outside it performs the synchronization.',
+    },
+    {
+      id: 'torch-load-weights-only',
+      topic: 'Modules & state',
+      question: 'How should tensor checkpoints from outside the trust boundary be loaded?',
+      answer: 'Use `torch.load(..., weights_only=True)` and never treat pickle-based loading as safe for untrusted data. The restricted loader accepts tensors, primitive types, dictionaries, and explicitly allowlisted types.',
+    },
+    {
+      id: 'torch-load-map-location',
+      topic: 'Modules & state',
+      question: 'Why load a GPU checkpoint with `map_location="cpu"`?',
+      answer: 'Mapping storages to CPU avoids restoring them directly onto their saved CUDA devices and can prevent a GPU-memory surge. Move the reconstructed model to its target device after loading state.',
+    },
+    {
+      id: 'torch-anomaly-detection',
+      topic: 'Autograd',
+      question: 'When should autograd anomaly detection be enabled?',
+      answer: 'Use anomaly detection to debug the forward operation that produced a failing backward or NaN. It adds substantial bookkeeping and synchronization overhead, so it should not remain enabled in normal training.',
+    },
+    {
+      id: 'torch-zero-grad-none',
+      topic: 'Training',
+      question: 'Why use `zero_grad(set_to_none=True)`?',
+      answer: 'Setting gradients to `None` can reduce memory writes and lets the optimizer distinguish parameters that received no gradient from parameters whose gradient is zero.',
+    },
+    {
+      id: 'torch-softmax-dim',
+      topic: 'Tensors',
+      question: 'Why must softmax specify the class dimension?',
+      answer: 'Softmax normalizes along the selected dimension. Choosing the wrong axis produces probabilities that sum to one over the wrong objects while preserving a plausible tensor shape.',
+    },
   ],
 };
+
+function buildAtomicDeck(
+  sourceDeck: TriviaSourceDeck,
+  specs: AtomicTriviaSpec[],
+): TriviaDeckData {
+  const sourceCards = new Map(sourceDeck.cards.map((card) => [card.id, card]));
+  const coveredSourceIds = new Set(specs.map((spec) => spec.sourceId));
+  const uncoveredSourceIds = sourceDeck.cards
+    .map((card) => card.id)
+    .filter((id) => !coveredSourceIds.has(id));
+
+  if (uncoveredSourceIds.length > 0) {
+    throw new Error(`Atomic trivia specs missing source cards: ${uncoveredSourceIds.join(', ')}`);
+  }
+
+  const cards = specs.flatMap((spec): TriviaCard[] => {
+    const source = sourceCards.get(spec.sourceId);
+    if (!source) throw new Error(`Unknown trivia source card: ${spec.sourceId}`);
+
+    const conceptCard: TriviaCard = {
+      id: spec.id,
+      topic: source.topic,
+      question: spec.question,
+      answer: spec.answer,
+      acceptedAnswers: spec.acceptedAnswers,
+      explanation: source.answer,
+      detail: source.detail,
+    };
+
+    if (!spec.code) return [conceptCard];
+    if (!spec.codeQuestion || !spec.codeAnswer) {
+      throw new Error(`Code trivia spec missing a question or answer: ${spec.id}`);
+    }
+
+    return [
+      conceptCard,
+      {
+        id: `${spec.id}-code`,
+        topic: 'Code scenarios',
+        question: spec.codeQuestion,
+        answer: spec.codeAnswer,
+        acceptedAnswers: spec.codeAcceptedAnswers,
+        explanation: spec.codeExplanation ?? source.answer,
+        code: spec.code,
+      },
+    ];
+  });
+
+  const ids = cards.map((card) => card.id);
+  if (new Set(ids).size !== ids.length) {
+    throw new Error(`Atomic trivia card IDs must be unique in ${sourceDeck.title}`);
+  }
+
+  return {
+    id: sourceDeck.id.replace(/-v\d+$/, '-v2'),
+    title: sourceDeck.title,
+    cards,
+  };
+}
+
+export const pythonTriviaDeck = buildAtomicDeck(pythonTriviaSourceDeck, pythonAtomicSpecs);
+export const pytorchTriviaDeck = buildAtomicDeck(pytorchTriviaSourceDeck, pytorchAtomicSpecs);

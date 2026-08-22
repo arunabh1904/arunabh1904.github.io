@@ -13,17 +13,17 @@ import { pytorchTriviaDeck } from '../../lib/trivia-decks';
 
 # PyTorch Interview Trivia
 
-This deck tests the contracts that sit underneath everyday PyTorch code: which operations alias storage, when autograd records work, what a module registers, where a training loop changes state, and why accelerator performance can disagree with Python timing.
+This deck uses short recall to build a deep PyTorch revision path. Each card asks for one API, dtype, shape, state boundary, or system behavior in one or two words. The reveal then explains the tensor or runtime contract that makes the answer true.
 
 <TriviaDeck client:load deck={pytorchTriviaDeck} />
 
 ## How to use the deck
 
-Start with **Tensors**, **Autograd**, and **Training**. Add data loading and distributed topics once the single-device path is automatic. For each answer, name the tensor shape, device, dtype, or state boundary when it matters; those details distinguish a usable engineering answer from a memorized slogan.
+Start with **Tensors**, **Autograd**, and **Training**. Add modules, data loading, distributed execution, and performance once the single-device path is automatic. The deck includes checkpoint safety, activation recomputation, distributed accumulation, and inference state because those details separate a toy loop from a production system.
 
-Type or outline your response, then select **Grade answer**. The deck reports **Correct**, **Close**, or **Needs work**, identifies concepts to review, and updates the correct-over-attempted score automatically for the selected topic.
+Enter the one- or two-word answer, then select **Grade answer**. Exact answers score **Correct**; partial terms or a one-character typo score **Close**; other responses score **Needs work**. The score updates automatically for the selected topic.
 
-Grading runs on this device and looks for the core ideas in the reference answer rather than exact wording. It is deliberately conservative: an unfamiliar but valid paraphrase may receive **Close**, but a one-word overlap will not pass. Typed answers and progress stay on this device, which makes the deck suitable for short mobile sessions.
+Code scenarios are separate cards marked **Code**. Track shapes, devices, dtypes, aliasing, graph state, and synchronization before answering. The reveal explains the production consequence. Grading and progress storage stay in this browser, which keeps short mobile sessions private and available offline after the page loads.
 
 ## Sources and deeper notes
 
@@ -32,6 +32,8 @@ Grading runs on this device and looks for the core ideas in the reference answer
 - [Modules](https://docs.pytorch.org/docs/stable/notes/modules.html)
 - [Data loading](https://docs.pytorch.org/docs/stable/data.html)
 - [DistributedDataParallel](https://docs.pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html)
+- [Activation checkpointing](https://docs.pytorch.org/docs/stable/checkpoint.html)
+- [`torch.load`](https://docs.pytorch.org/docs/stable/generated/torch.load.html)
 - [PyTorch I: Tensors](/revision%20notes/2026/08/09/pytorch-tensor-revision-notes.html)
 - [PyTorch II: Autograd and Training](/revision%20notes/2026/08/10/pytorch-autograd-and-training.html)
 - [PyTorch III: Performance and Scale](/revision%20notes/2026/08/10/pytorch-systems-and-scale.html)

@@ -38,10 +38,15 @@ function clampPosition(position: number, length: number) {
 
 export default function TriviaDeck({ deck }: TriviaDeckProps) {
   const storageKey = `trivia-progress:${deck.id}`;
-  const topics = useMemo(
-    () => ['All topics', ...Array.from(new Set(deck.cards.map((card) => card.topic)))],
-    [deck.cards],
-  );
+  const topics = useMemo(() => {
+    const deckTopics = Array.from(new Set(deck.cards.map((card) => card.topic)));
+    const conceptTopics = deckTopics.filter((item) => item !== 'Code scenarios');
+    return [
+      'All topics',
+      ...conceptTopics,
+      ...(deckTopics.includes('Code scenarios') ? ['Code scenarios'] : []),
+    ];
+  }, [deck.cards]);
   const [topic, setTopic] = useState('All topics');
   const [orderedIds, setOrderedIds] = useState(() => deck.cards.map((card) => card.id));
   const [position, setPosition] = useState(0);
@@ -233,6 +238,11 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
 
       <article className={`trivia-card${revealed ? ' trivia-card--revealed' : ''}`} aria-live="polite">
         <p className="trivia-card__topic">{card.topic}</p>
+        {card.code && (
+          <pre className="trivia-card__prompt-code" aria-label="Production code scenario">
+            <code>{card.code}</code>
+          </pre>
+        )}
         <p className="trivia-card__question" role="heading" aria-level={2}>
           {inlineCode(card.question)}
         </p>
@@ -240,12 +250,20 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
         {!revealed ? (
           <div className="trivia-card__response">
             <label htmlFor={`${deck.id}-${card.id}-answer`}>Your answer</label>
-            <textarea
+            <input
+              type="text"
               id={`${deck.id}-${card.id}-answer`}
               value={currentAnswer}
               onChange={(event) => updateAnswer(event.target.value)}
-              placeholder="Write or outline your answer here…"
-              rows={4}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  gradeAnswer();
+                }
+              }}
+              placeholder="One or two words…"
+              autoComplete="off"
+              autoCapitalize="none"
             />
             <button
               type="button"
@@ -285,9 +303,14 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
               </p>
             </section>
             <section className="trivia-card__answer" aria-label="Reference answer">
-              <h3>Reference answer</h3>
+              <h3>Short answer</h3>
               <p>{inlineCode(card.answer)}</p>
-              {card.code && <pre><code>{card.code}</code></pre>}
+              {card.explanation && (
+                <div className="trivia-card__explanation">
+                  <h4>Why it matters</h4>
+                  <p>{inlineCode(card.explanation)}</p>
+                </div>
+              )}
               {card.detail && <p className="trivia-card__detail">{inlineCode(card.detail)}</p>}
             </section>
           </div>
@@ -312,7 +335,7 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
       </div>
 
       <div className="trivia-deck__footer">
-        <span>Space grades · arrows move</span>
+        <span>Enter grades · arrows move</span>
         <button type="button" onClick={resetProgress}>Reset progress</button>
       </div>
     </section>

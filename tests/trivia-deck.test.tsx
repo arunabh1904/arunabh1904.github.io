@@ -19,15 +19,18 @@ const deck: TriviaDeckData = {
       id: 'one',
       topic: 'Semantics',
       question: 'Question `one`?',
-      answer: 'A complete answer covers object identity and value equality.',
-      grading: {
-        concepts: [
-          { label: 'object identity', anyOf: ['object identity'] },
-          { label: 'value equality', anyOf: ['value equality'] },
-        ],
-      },
+      answer: 'Object identity',
+      acceptedAnswers: ['identity'],
+      explanation: 'Identity asks whether two names refer to the same object.',
     },
-    { id: 'two', topic: 'Runtime', question: 'Question two?', answer: 'Answer two.' },
+    {
+      id: 'two',
+      topic: 'Runtime',
+      question: 'Question two?',
+      answer: 'Runtime',
+      explanation: 'The runtime executes the program.',
+      code: 'result = service.run()',
+    },
   ],
 };
 
@@ -60,15 +63,15 @@ describe('TriviaDeck', () => {
   }
 
   function enterAnswer(answer: string) {
-    const textarea = container.querySelector('textarea');
-    expect(textarea).not.toBeNull();
+    const input = container.querySelector('input');
+    expect(input).not.toBeNull();
     act(() => {
       const valueSetter = Object.getOwnPropertyDescriptor(
-        HTMLTextAreaElement.prototype,
+        HTMLInputElement.prototype,
         'value',
       )?.set;
-      valueSetter?.call(textarea, answer);
-      textarea?.dispatchEvent(new Event('input', { bubbles: true }));
+      valueSetter?.call(input, answer);
+      input?.dispatchEvent(new Event('input', { bubbles: true }));
     });
   }
 
@@ -76,30 +79,45 @@ describe('TriviaDeck', () => {
     await renderDeck();
 
     expect(container.textContent).toContain('Question one?');
-    expect(container.textContent).not.toContain('complete answer');
+    expect(container.textContent).not.toContain('same object');
     expect(container.querySelector('[role="heading"] code')?.textContent).toBe('one');
-    expect(container.querySelector('textarea')).not.toBeNull();
+    expect(container.querySelector('input')).not.toBeNull();
 
     enterAnswer('My candidate answer.');
 
     click('Grade answer');
 
-    expect(container.textContent).toContain('complete answer');
+    expect(container.textContent).toContain('same object');
     expect(container.textContent).toContain('My candidate answer.');
     expect(container.querySelector('[aria-label="Automatic grade"]')).not.toBeNull();
   });
 
   it('marks a passing answer correct and persists the automatic score', async () => {
     await renderDeck();
-    enterAnswer('Object identity is distinct from value equality.');
+    enterAnswer('identity');
     click('Grade answer');
 
     expect(container.textContent).toContain('Correct');
     expect(container.textContent).toContain('1/1 right');
     const saved = window.localStorage.getItem('trivia-progress:test-deck');
-    expect(saved).toContain('Object identity');
+    expect(saved).toContain('identity');
     expect(saved).toContain('"attemptedCardIds":["one"]');
     expect(saved).toContain('"correctCardIds":["one"]');
+  });
+
+  it('shows a production snippet on the front of its own card', async () => {
+    await renderDeck();
+    click('Next');
+
+    expect(container.querySelector('[aria-label="Production code scenario"]')?.textContent)
+      .toContain('service.run()');
+    expect(container.textContent).not.toContain('The runtime executes the program.');
+
+    enterAnswer('Runtime');
+    click('Grade answer');
+
+    expect(container.textContent).toContain('The runtime executes the program.');
+    expect(container.querySelectorAll('[aria-label="Production code scenario"]')).toHaveLength(1);
   });
 
   it('rejects a vague answer and identifies concepts to review', async () => {
@@ -109,7 +127,7 @@ describe('TriviaDeck', () => {
 
     expect(container.textContent).toContain('Needs work');
     expect(container.textContent).toContain('Review:');
-    expect(container.textContent).toContain('object identity');
+    expect(container.textContent).toContain('Object identity');
     expect(container.textContent).toContain('0/1 right');
   });
 
@@ -141,7 +159,7 @@ describe('TriviaDeck', () => {
 
   it('scopes the score to the selected topic', async () => {
     await renderDeck();
-    enterAnswer('Object identity differs from value equality.');
+    enterAnswer('Object identity');
     click('Grade answer');
 
     const select = container.querySelector('select');
@@ -170,68 +188,47 @@ describe('automatic trivia grading', () => {
     },
   );
 
-  it('rejects the one-word answer from the reported Python example', () => {
+  it('accepts configured short-answer aliases', () => {
     const card = pythonTriviaDeck.cards.find(
-      (candidate) => candidate.id === 'python-pass-by-assignment',
+      (candidate) => candidate.id === 'python-argument-model',
     );
     expect(card).toBeDefined();
 
-    const grade = gradeTriviaAnswer(card!, 'reference');
-
-    expect(grade.status).toBe('needs-work');
-    expect(grade.missingConcepts).toContain('pass-by-assignment or object sharing');
-    expect(grade.missingConcepts).toContain('rebinding stays local');
-  });
-
-  it('accepts a strong paraphrase of pass-by-assignment', () => {
-    const card = pythonTriviaDeck.cards.find(
-      (candidate) => candidate.id === 'python-pass-by-assignment',
-    );
-    expect(card).toBeDefined();
-
-    const grade = gradeTriviaAnswer(
-      card!,
-      'Python passes a reference to the same object. Mutation is visible outside, but reassignment stays local.',
-    );
+    const grade = gradeTriviaAnswer(card!, 'pass-by-assignment');
 
     expect(grade.status).toBe('correct');
   });
 
-  it('marks a partial explanation close and names the missing distinction', () => {
+  it('marks a partial two-word term close', () => {
     const card = pythonTriviaDeck.cards.find(
-      (candidate) => candidate.id === 'python-pass-by-assignment',
+      (candidate) => candidate.id === 'python-argument-model',
     );
     expect(card).toBeDefined();
 
-    const grade = gradeTriviaAnswer(card!, 'Python uses object sharing with the same object.');
+    const grade = gradeTriviaAnswer(card!, 'object');
 
     expect(grade.status).toBe('close');
-    expect(grade.missingConcepts).toContain('mutation can affect the caller');
-    expect(grade.missingConcepts).toContain('rebinding stays local');
+    expect(grade.missingConcepts).toContain('Object sharing');
   });
 
-  it('accepts concise Python identity and equality terminology', () => {
-    const card = pythonTriviaDeck.cards.find(
-      (candidate) => candidate.id === 'python-is-equality',
-    );
-    expect(card).toBeDefined();
-
-    expect(gradeTriviaAnswer(card!, '`is` checks identity; `==` checks equality.').status)
-      .toBe('correct');
-  });
-
-  it('accepts the core PyTorch cross-entropy contract', () => {
+  it('marks a one-character typo close', () => {
     const card = pytorchTriviaDeck.cards.find(
-      (candidate) => candidate.id === 'torch-cross-entropy-logits',
+      (candidate) => candidate.id === 'torch-contiguous-copy',
     );
     expect(card).toBeDefined();
 
-    const grade = gradeTriviaAnswer(
-      card!,
-      'Pass logits, not softmax probabilities. The loss fuses log-softmax with NLL for numerical stability.',
-    );
+    const grade = gradeTriviaAnswer(card!, 'contigous');
 
-    expect(grade.status).toBe('correct');
+    expect(grade.status).toBe('close');
+  });
+
+  it('rejects an unrelated short answer', () => {
+    const card = pythonTriviaDeck.cards.find(
+      (candidate) => candidate.id === 'python-argument-model',
+    );
+    expect(card).toBeDefined();
+
+    expect(gradeTriviaAnswer(card!, 'reference').status).toBe('needs-work');
   });
 });
 
@@ -242,13 +239,26 @@ describe('published trivia data', () => {
       const ids = publishedDeck.cards.map((card) => card.id);
       expect(new Set(ids).size).toBe(ids.length);
       expect(publishedDeck.cards.every((card) => card.question && card.answer && card.topic)).toBe(true);
+      expect(publishedDeck.cards.every((card) => card.answer.trim().split(/\s+/).length <= 2))
+        .toBe(true);
+      expect(publishedDeck.cards.every((card) => Boolean(card.explanation))).toBe(true);
+    },
+  );
+
+  it.each([pythonTriviaDeck, pytorchTriviaDeck])(
+    'publishes production snippets only as standalone code cards in $title',
+    (publishedDeck) => {
+      const codeCards = publishedDeck.cards.filter((card) => card.code);
+      expect(codeCards.length).toBeGreaterThanOrEqual(15);
+      expect(codeCards.every((card) => card.id.endsWith('-code'))).toBe(true);
+      expect(codeCards.every((card) => card.topic === 'Code scenarios')).toBe(true);
     },
   );
 
   it('does not describe Pydantic coercion as strict-by-default validation', () => {
     const comparison = pythonTriviaDeck.cards.find(
-      (card) => card.id === 'python-pydantic-dataclass',
+      (card) => card.id === 'python-pydantic-validation',
     );
-    expect(comparison?.answer).toContain('Strict rejection is configurable—not the default.');
+    expect(comparison?.explanation).toContain('Strict rejection is configurable—not the default.');
   });
 });
