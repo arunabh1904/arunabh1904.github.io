@@ -7,7 +7,10 @@ interface TriviaDeckProps {
 }
 
 interface SavedProgress {
-  knownCardIds: string[];
+  answers?: Record<string, string>;
+  attemptedCardIds?: string[];
+  correctCardIds?: string[];
+  knownCardIds?: string[];
 }
 
 function inlineCode(text: string): ReactNode[] {
@@ -42,7 +45,9 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
   const [orderedIds, setOrderedIds] = useState(() => deck.cards.map((card) => card.id));
   const [position, setPosition] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const [knownCardIds, setKnownCardIds] = useState<Set<string>>(() => new Set());
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [attemptedCardIds, setAttemptedCardIds] = useState<Set<string>>(() => new Set());
+  const [correctCardIds, setCorrectCardIds] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
     try {
@@ -50,7 +55,24 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
       if (!saved) return;
       const parsed = JSON.parse(saved) as SavedProgress;
       const validIds = new Set(deck.cards.map((card) => card.id));
-      setKnownCardIds(new Set(parsed.knownCardIds.filter((id) => validIds.has(id))));
+      const legacyKnownIds = Array.isArray(parsed.knownCardIds) ? parsed.knownCardIds : [];
+      const savedCorrectIds = Array.isArray(parsed.correctCardIds)
+        ? parsed.correctCardIds
+        : legacyKnownIds;
+      const savedAttemptedIds = Array.isArray(parsed.attemptedCardIds)
+        ? parsed.attemptedCardIds
+        : savedCorrectIds;
+      const savedAnswers = parsed.answers && typeof parsed.answers === 'object'
+        ? Object.fromEntries(
+          Object.entries(parsed.answers).filter(
+            ([id, answer]) => validIds.has(id) && typeof answer === 'string',
+          ),
+        )
+        : {};
+
+      setAnswers(savedAnswers);
+      setAttemptedCardIds(new Set(savedAttemptedIds.filter((id) => validIds.has(id))));
+      setCorrectCardIds(new Set(savedCorrectIds.filter((id) => validIds.has(id))));
     } catch {
       // A corrupt or unavailable local store should never block the study deck.
     }
@@ -69,14 +91,22 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
   );
   const currentPosition = clampPosition(position, visibleCards.length);
   const card = visibleCards[currentPosition];
-  const knownVisibleCount = visibleCards.filter((item) => knownCardIds.has(item.id)).length;
+  const attemptedVisibleCount = visibleCards.filter((item) => attemptedCardIds.has(item.id)).length;
+  const correctVisibleCount = visibleCards.filter((item) => correctCardIds.has(item.id)).length;
 
-  function persist(nextKnown: Set<string>) {
-    setKnownCardIds(nextKnown);
+  function persist(
+    nextAnswers: Record<string, string>,
+    nextAttempted: Set<string>,
+    nextCorrect: Set<string>,
+  ) {
     try {
       window.localStorage.setItem(
         storageKey,
-        JSON.stringify({ knownCardIds: Array.from(nextKnown) } satisfies SavedProgress),
+        JSON.stringify({
+          answers: nextAnswers,
+          attemptedCardIds: Array.from(nextAttempted),
+          correctCardIds: Array.from(nextCorrect),
+        } satisfies SavedProgress),
       );
     } catch {
       // Progress persistence is optional in private or storage-restricted browsing modes.
@@ -94,12 +124,22 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
     setRevealed(false);
   }
 
-  function markKnown(isKnown: boolean) {
+  function updateAnswer(answer: string) {
     if (!card) return;
-    const nextKnown = new Set(knownCardIds);
-    if (isKnown) nextKnown.add(card.id);
-    else nextKnown.delete(card.id);
-    persist(nextKnown);
+    const nextAnswers = { ...answers, [card.id]: answer };
+    setAnswers(nextAnswers);
+    persist(nextAnswers, attemptedCardIds, correctCardIds);
+  }
+
+  function markAnswer(isCorrect: boolean) {
+    if (!card) return;
+    const nextAttempted = new Set(attemptedCardIds).add(card.id);
+    const nextCorrect = new Set(correctCardIds);
+    if (isCorrect) nextCorrect.add(card.id);
+    else nextCorrect.delete(card.id);
+    setAttemptedCardIds(nextAttempted);
+    setCorrectCardIds(nextCorrect);
+    persist(answers, nextAttempted, nextCorrect);
     move(1);
   }
 
@@ -130,7 +170,14 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
   }
 
   function resetProgress() {
-    persist(new Set());
+    setAnswers({});
+    setAttemptedCardIds(new Set());
+    setCorrectCardIds(new Set());
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch {
+      // Progress persistence is optional in private or storage-restricted browsing modes.
+    }
     setPosition(0);
     setRevealed(false);
   }
@@ -139,7 +186,8 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
 
   const progressPercent = visibleCards.length === 0
     ? 0
-    : Math.round((knownVisibleCount / visibleCards.length) * 100);
+    : Math.round((correctVisibleCount / visibleCards.length) * 100);
+  const currentAnswer = answers[card.id] ?? '';
 
   return (
     <section
@@ -162,15 +210,15 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
 
       <div className="trivia-deck__status">
         <span>Card {currentPosition + 1} of {visibleCards.length}</span>
-        <span>{knownVisibleCount} got it</span>
+        <span>{correctVisibleCount}/{attemptedVisibleCount} right</span>
       </div>
       <div
         className="trivia-deck__progress"
         role="progressbar"
-        aria-label="Cards marked got it"
+        aria-label="Cards answered correctly"
         aria-valuemin={0}
         aria-valuemax={visibleCards.length}
-        aria-valuenow={knownVisibleCount}
+        aria-valuenow={correctVisibleCount}
       >
         <span style={{ width: `${progressPercent}%` }} />
       </div>
@@ -182,19 +230,38 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
         </p>
 
         {!revealed ? (
-          <button
-            type="button"
-            className="trivia-card__reveal"
-            onClick={() => setRevealed(true)}
-            aria-expanded="false"
-          >
-            Show answer
-          </button>
+          <div className="trivia-card__response">
+            <label htmlFor={`${deck.id}-${card.id}-answer`}>Your answer</label>
+            <textarea
+              id={`${deck.id}-${card.id}-answer`}
+              value={currentAnswer}
+              onChange={(event) => updateAnswer(event.target.value)}
+              placeholder="Write or outline your answer here…"
+              rows={4}
+            />
+            <button
+              type="button"
+              className="trivia-card__reveal"
+              onClick={() => setRevealed(true)}
+              aria-expanded="false"
+            >
+              Show answer
+            </button>
+          </div>
         ) : (
-          <div className="trivia-card__answer">
-            <p>{inlineCode(card.answer)}</p>
-            {card.code && <pre><code>{card.code}</code></pre>}
-            {card.detail && <p className="trivia-card__detail">{inlineCode(card.detail)}</p>}
+          <div className="trivia-card__comparison">
+            <section aria-label="Your answer">
+              <h3>Your answer</h3>
+              <p className={currentAnswer.trim() ? '' : 'trivia-card__empty-answer'}>
+                {currentAnswer.trim() || 'No answer entered.'}
+              </p>
+            </section>
+            <section className="trivia-card__answer" aria-label="Reference answer">
+              <h3>Reference answer</h3>
+              <p>{inlineCode(card.answer)}</p>
+              {card.code && <pre><code>{card.code}</code></pre>}
+              {card.detail && <p className="trivia-card__detail">{inlineCode(card.detail)}</p>}
+            </section>
           </div>
         )}
       </article>
@@ -205,9 +272,9 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
         </button>
         {revealed ? (
           <div className="trivia-deck__rating" aria-label="Rate this answer">
-            <button type="button" onClick={() => markKnown(false)}>Again</button>
-            <button type="button" className="trivia-deck__primary" onClick={() => markKnown(true)}>
-              Got it
+            <button type="button" onClick={() => markAnswer(false)}>Not quite</button>
+            <button type="button" className="trivia-deck__primary" onClick={() => markAnswer(true)}>
+              Got it right
             </button>
           </div>
         ) : (
