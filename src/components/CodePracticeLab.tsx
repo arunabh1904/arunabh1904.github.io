@@ -58,7 +58,13 @@ function getInitialEditorCode(problem: CodePracticeProblem) {
 
 function getReferenceEditorCode(problem: CodePracticeProblem, currentCode: string) {
   if (startsFromBlankFile(problem)) {
-    return `# Reference solution\n${problem.solutionCode}`;
+    // Blank-start exercises should still reveal a complete runnable file. Use
+    // the stored scaffold only at reveal time so the sample inputs and print
+    // calls remain available without giving the learner an initial template.
+    return augmentCodeWithSolution(problem, removeTodoCommentBlocks(problem.starterCode))
+      .split('\n')
+      .filter((line) => !line.trimStart().startsWith('# Original placeholder:'))
+      .join('\n');
   }
 
   return augmentCodeWithSolution(problem, currentCode);

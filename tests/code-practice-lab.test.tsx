@@ -131,8 +131,11 @@ describe('CodePracticeLab', () => {
   }
 
   it('keeps a direct solution action in the workspace and applies it to the editor', async () => {
+    const runPythonAsync = vi.fn().mockResolvedValue({
+      toJs: () => ['solution output\n', ''],
+    });
     loadPyodideRuntime.mockResolvedValueOnce({
-      runPythonAsync: vi.fn(),
+      runPythonAsync,
     });
 
     await render();
@@ -163,6 +166,7 @@ describe('CodePracticeLab', () => {
     expect(getEditor().textContent).toContain('# Reference solution');
     expect(getEditor().textContent).toContain('def softmax_cross_entropy');
     expect(getEditor().textContent).toContain('return "solution"');
+    expect(getEditor().textContent).toContain('print("starter")');
     expect(container.querySelector('.code-practice-lab--reference')).not.toBeNull();
     expect(getEditor().textContent).not.toContain('raise NotImplementedError');
     expect(container.querySelector('.cm-solution-line-toggle')).toBeNull();
@@ -173,6 +177,16 @@ describe('CodePracticeLab', () => {
     );
     expect(container.querySelector('.code-practice-lab__solution-diagram')).not.toBeNull();
     expect(container.textContent).toContain('(N, 1) × (1, M) → (N, M)');
+
+    const runButton = container.querySelector<HTMLButtonElement>('button[aria-label="Run code"]');
+    await act(async () => {
+      runButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    await flushAsyncWork();
+
+    expect(runPythonAsync).toHaveBeenCalledOnce();
+    expect(runPythonAsync.mock.calls[0][0]).toContain('print("starter")');
+    expect(container.textContent).toContain('solution output');
   });
 
   it('loads required packages and prints run output', async () => {
