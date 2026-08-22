@@ -261,4 +261,14 @@ describe('published trivia data', () => {
     );
     expect(comparison?.explanation).toContain('Strict rejection is configurable—not the default.');
   });
+
+  it('asks the cache lookup question in concrete terms', () => {
+    const cacheCard = pythonTriviaDeck.cards.find(
+      (card) => card.id === 'python-is-operator-code',
+    );
+    expect(cacheCard?.question).toBe(
+      'If `cache.get(key)` finds nothing, what value does this code check for?',
+    );
+    expect(cacheCard?.answer).toBe('`None`');
+  });
 });
