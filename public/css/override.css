@@ -8239,7 +8239,11 @@ html {
 .code-practice-lab__solution-notes {
   align-self: stretch;
   min-width: 0;
+  min-height: 0;
   padding: 1.2rem 0 1rem 1.25rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   border-left: 1px solid rgba(255, 228, 92, 0.24);
 }
 
@@ -8328,6 +8332,8 @@ html {
 
   .code-practice-lab__solution-notes {
     padding: 1.25rem 0 0;
+    overflow-y: visible;
+    scrollbar-gutter: auto;
     border-top: 1px solid rgba(255, 228, 92, 0.24);
     border-left: 0;
   }
