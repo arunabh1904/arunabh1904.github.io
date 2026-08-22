@@ -47,27 +47,67 @@ describe('TriviaDeck', () => {
     act(() => button?.dispatchEvent(new MouseEvent('click', { bubbles: true })));
   }
 
+  function enterAnswer(answer: string) {
+    const textarea = container.querySelector('textarea');
+    expect(textarea).not.toBeNull();
+    act(() => {
+      const valueSetter = Object.getOwnPropertyDescriptor(
+        HTMLTextAreaElement.prototype,
+        'value',
+      )?.set;
+      valueSetter?.call(textarea, answer);
+      textarea?.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  }
+
   it('hides the answer until reveal and renders inline code accessibly', async () => {
     await renderDeck();
 
     expect(container.textContent).toContain('Question one?');
     expect(container.textContent).not.toContain('Answer one.');
     expect(container.querySelector('[role="heading"] code')?.textContent).toBe('one');
+    expect(container.querySelector('textarea')).not.toBeNull();
+
+    enterAnswer('My candidate answer.');
 
     click('Show answer');
 
     expect(container.textContent).toContain('Answer one.');
+    expect(container.textContent).toContain('My candidate answer.');
     expect(container.querySelector('.trivia-card__answer code')?.textContent).toBe('one');
   });
 
-  it('marks a card complete, persists progress, and advances', async () => {
+  it('marks a card correct, persists the answer and score, and advances', async () => {
     await renderDeck();
+    enterAnswer('My answer.');
     click('Show answer');
-    click('Got it');
+    click('Got it right');
 
     expect(container.textContent).toContain('Question two?');
-    expect(container.textContent).toContain('1 got it');
-    expect(window.localStorage.getItem('trivia-progress:test-deck')).toContain('one');
+    expect(container.textContent).toContain('1/1 right');
+    const saved = window.localStorage.getItem('trivia-progress:test-deck');
+    expect(saved).toContain('My answer.');
+    expect(saved).toContain('"attemptedCardIds":["one"]');
+    expect(saved).toContain('"correctCardIds":["one"]');
+  });
+
+  it('counts an incorrect self-grade as attempted but not correct', async () => {
+    await renderDeck();
+    click('Show answer');
+    click('Not quite');
+
+    expect(container.textContent).toContain('0/1 right');
+  });
+
+  it('migrates the previous got-it progress into the new score', async () => {
+    window.localStorage.setItem(
+      'trivia-progress:test-deck',
+      JSON.stringify({ knownCardIds: ['one'] }),
+    );
+
+    await renderDeck();
+
+    expect(container.textContent).toContain('1/1 right');
   });
 
   it('filters by topic and resets the visible position', async () => {
@@ -83,6 +123,21 @@ describe('TriviaDeck', () => {
 
     expect(container.textContent).toContain('Card 1 of 1');
     expect(container.textContent).toContain('Question one?');
+  });
+
+  it('scopes the score to the selected topic', async () => {
+    await renderDeck();
+    click('Show answer');
+    click('Got it right');
+
+    const select = container.querySelector('select');
+    await act(async () => {
+      if (!select) return;
+      select.value = 'Runtime';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain('0/0 right');
   });
 });
 
