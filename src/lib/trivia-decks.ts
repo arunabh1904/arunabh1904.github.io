@@ -1,3 +1,8 @@
+export interface TriviaGradingConcept {
+  label: string;
+  anyOf: string[];
+}
+
 export interface TriviaCard {
   id: string;
   topic: string;
@@ -5,6 +10,9 @@ export interface TriviaCard {
   answer: string;
   code?: string;
   detail?: string;
+  grading?: {
+    concepts: TriviaGradingConcept[];
+  };
 }
 
 export interface TriviaDeckData {
@@ -22,6 +30,38 @@ export const pythonTriviaDeck: TriviaDeckData = {
       topic: 'Semantics',
       question: 'Are Python arguments passed by value or by reference?',
       answer: 'Python uses pass-by-assignment, also called object sharing. A function receives another binding to the same object. Mutating that object can affect the caller; rebinding the local name cannot.',
+      grading: {
+        concepts: [
+          {
+            label: 'pass-by-assignment or object sharing',
+            anyOf: [
+              'pass by assignment',
+              'object sharing',
+              'binding same object',
+              'reference same object',
+            ],
+          },
+          {
+            label: 'mutation can affect the caller',
+            anyOf: [
+              'mutation affect caller',
+              'mutation visible caller',
+              'mutation visible outside',
+              'change affect caller',
+              'change visible outside',
+            ],
+          },
+          {
+            label: 'rebinding stays local',
+            anyOf: [
+              'rebinding local',
+              'reassign local',
+              'assignment new object local',
+              'rebinding not affect caller',
+            ],
+          },
+        ],
+      },
     },
     {
       id: 'python-is-equality',

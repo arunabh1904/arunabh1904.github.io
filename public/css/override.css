@@ -2605,6 +2605,33 @@ h3,
   font-style: italic;
 }
 
+.trivia-card__comparison .trivia-card__grade {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--button-border);
+  border-left-width: 4px;
+  border-radius: 7px;
+  background: var(--panel-bg);
+}
+
+.trivia-card__comparison .trivia-card__grade[data-status="correct"] {
+  border-left-color: #2f9e63;
+}
+
+.trivia-card__comparison .trivia-card__grade[data-status="close"] {
+  border-left-color: #d08a16;
+}
+
+.trivia-card__comparison .trivia-card__grade[data-status="needs-work"] {
+  border-left-color: #c94b52;
+}
+
+.trivia-card__comparison .trivia-card__grade-detail {
+  margin-top: 0.55rem;
+  color: var(--text-secondary-color);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
 .trivia-card__answer pre {
   width: 100%;
   max-width: 100%;
