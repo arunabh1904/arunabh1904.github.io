@@ -2559,13 +2559,13 @@ h3,
   text-transform: uppercase;
 }
 
-.trivia-card__response textarea {
+.trivia-card__response input {
   width: 100%;
-  min-height: 7rem;
+  min-height: 2.9rem;
   padding: 0.75rem;
-  resize: vertical;
   box-sizing: border-box;
   font-family: var(--font-reading);
+  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -2632,10 +2632,10 @@ h3,
   line-height: 1.5;
 }
 
-.trivia-card__answer pre {
+.trivia-card__prompt-code {
   width: 100%;
   max-width: 100%;
-  margin: 1rem 0 0;
+  margin: 0 0 1.2rem;
   padding: 0.85rem;
   overflow-x: auto;
   border: 1px solid var(--button-border);
@@ -2645,9 +2645,24 @@ h3,
   white-space: pre;
 }
 
-.trivia-card__answer pre code {
+.trivia-card__prompt-code code {
   padding: 0;
   background: transparent;
+}
+
+.trivia-card__answer .trivia-card__explanation {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--button-border);
+}
+
+.trivia-card__answer .trivia-card__explanation h4 {
+  margin: 0 0 0.45rem;
+  color: var(--text-secondary-color);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .trivia-card__answer .trivia-card__detail {
