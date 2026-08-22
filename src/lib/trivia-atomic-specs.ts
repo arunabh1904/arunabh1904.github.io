@@ -8,7 +8,6 @@ export interface AtomicTriviaSpec {
   codeQuestion?: string;
   codeAnswer?: string;
   codeAcceptedAnswers?: string[];
-  codeExplanation?: string;
 }
 
 export const pythonAtomicSpecs: AtomicTriviaSpec[] = [
@@ -49,7 +48,7 @@ export const pythonAtomicSpecs: AtomicTriviaSpec[] = [
   { sourceId: 'python-shallow-deep-copy', id: 'python-shallow-copy', question: 'Which copy preserves nested aliases?', answer: 'Shallow copy' },
   { sourceId: 'python-shallow-deep-copy', id: 'python-deep-copy', question: 'Which copy recursively duplicates nested state?', answer: 'Deep copy' },
   { sourceId: 'python-assignment-copy', id: 'python-assignment-copy', question: 'Does `b = a` copy the object?', answer: 'No' },
-  { sourceId: 'python-tuple-mutability', id: 'python-tuple-deep-immutable', question: 'Is tuple immutability deep?', answer: 'No' },
+  { sourceId: 'python-tuple-mutability', id: 'python-tuple-deep-immutable', question: 'Can a mutable object inside a tuple still change?', answer: 'Yes' },
   { sourceId: 'python-tuple-mutability', id: 'python-tuple-list-hashable', question: 'Is a tuple containing a list hashable?', answer: 'No' },
   { sourceId: 'python-truthiness', id: 'python-empty-list-truthiness', question: '`bool([])`?', answer: '`False`' },
   { sourceId: 'python-truthiness', id: 'python-string-false-truthiness', question: '`bool("False")`?', answer: '`True`' },
