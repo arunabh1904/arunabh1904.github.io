@@ -13,10 +13,10 @@ Usage:
 
 The model is loaded once per invocation. Existing files whose source hash and
 voice settings are unchanged are skipped, so the command is safe to rerun
-after adding or editing posts. A built-in speaker avoids an in-context audio
-reference entirely, so no reference phrase can be replayed at a chunk
-boundary. One fixed delivery instruction and one shared seed keep the same
-narrator profile across every chunk and post.
+after adding or editing posts. A fixed generated voice anchor preserves the
+same narrator identity across posts. Each authored heading section is decoded
+as generated audio only, preventing the anchor phrase from entering the output.
+Streaming bounds decoder memory without resetting the voice inside a section.
 """
 
 from __future__ import annotations
@@ -24,13 +24,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import math
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -39,64 +37,86 @@ POSTS_DIR = ROOT / "src" / "content" / "posts"
 NARRATION_DIR = ROOT / "src" / "narrations" / "blog"
 AUDIO_DIR = ROOT / "public" / "assets" / "audio" / "blog"
 MANIFEST_PATH = ROOT / "public" / "assets" / "audio" / "manifest.json"
-MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-CustomVoice-8bit"
-VOICE = "Ryan"
+MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-8bit"
+VOICE = "Warm Indian English"
 LANGUAGE = "English"
 LANGUAGE_CODE = "english"
 # Do not use Qwen ICL for static narration. Its spoken reference can be replayed
-# at each independently synthesized article chunk. CustomVoice keeps Ryan's
-# built-in speaker identity and applies the same non-spoken delivery instruction
-# to every chunk, so identity and style do not have to be redesigned repeatedly.
-VOICE_MODE = "custom-voice-fixed-profile-v2"
+# by a faulty non-streaming decode path. The chosen VoiceDesign sample is used
+# only as an encoder anchor. Streaming ICL decodes generated codes alone, while
+# section-scoped requests bound long-form generation without changing identity.
+VOICE_MODE = "voice-anchor-section-streaming-v1"
 VOICE_INSTRUCT = (
-    "Use a calm, warm, measured technical-narration delivery. Keep a natural "
-    "low-mid register, close-miked clarity, restrained emphasis, and steady pacing."
+    "An English-speaking Indian woman with a warm, thoughtful technical-presenter voice "
+    "and a low-mid pitch. Composed and slightly sombre, with controlled energy, subtle "
+    "natural inflection, precise diction, and a conversational pace. Never theatrical. "
+    "Keep commas connected and articulate every word."
 )
-TEMPERATURE = 0.05
+TEMPERATURE = 0.3
 TOP_P = 0.9
+REPETITION_PENALTY = 1.05
 NARRATOR_SEED = 1904
-SAMPLING_SEED_VERSION = "single-narrator-v2"
+SAMPLING_SEED_VERSION = "voice-anchor-sections-v1"
 SPEED = 1.10
 BITRATE = "64k"
-MAX_CHARS = 360  # Proven reliable bound; low-temperature seeded sampling prevents drift.
-SENTENCE_PAUSE_SECONDS = 0.18
-HEADING_PAUSE_SECONDS = 0.65
-SENTENCE_PAUSE_POLICY = "sentence-180ms-heading-650ms-v2"
+SENTENCE_PAUSE_SECONDS = 0.0
+PARAGRAPH_PAUSE_SECONDS = 0.0
+HEADING_PAUSE_SECONDS = 0.0
+SENTENCE_PAUSE_POLICY = "model-natural-structural-newlines-v4"
+CHUNKING_POLICY = "source-heading-sections-with-continuous-stream-v1"
+STREAMING_INTERVAL_SECONDS = 20.0
+SECTION_MAX_CHARS = 4_000
+SECTION_PAUSE_SECONDS = 0.65
+SECTION_POLICY = "source-heading-sections-v1"
 TABLE_POLICY = "skip-rows-require-spoken-takeaway-v1"
 MAX_AUDIO_SECONDS = 30 * 60
 MAX_ABRIDGED_WORDS = 3_200
 HEADING_START = "[[BLOG_HEADING]]"
 HEADING_END = "[[/BLOG_HEADING]]"
+PARAGRAPH_BREAK = "[[BLOG_PARAGRAPH]]"
 SILENCE_THRESHOLD = 0.008  # -42 dBFS; matches the verification threshold below.
-BOUNDARY_SILENCE_SAMPLES = 1_200  # Retain 50 ms at 24 kHz, without a synthetic gap.
-LONG_SILENCE_DURATION = 0.6
-RETAINED_SILENCE_DURATION = 0.06
-SILENCE_FILTER = (
+BOUNDARY_SILENCE_SECONDS = 0.1
+# Trim only the beginning and end of the completed stream. Reversing for the
+# second pass avoids touching any natural silence inside the narration.
+BOUNDARY_TRIM_FILTER = (
     "silenceremove="
     f"start_periods=1:start_duration=0.05:start_threshold={SILENCE_THRESHOLD}:"
-    "start_silence=0.05:"
-    f"stop_periods=-1:stop_duration={LONG_SILENCE_DURATION}:"
-    f"stop_threshold={SILENCE_THRESHOLD}:stop_silence={RETAINED_SILENCE_DURATION}"
+    f"start_silence={BOUNDARY_SILENCE_SECONDS},"
+    "areverse,"
+    "silenceremove="
+    f"start_periods=1:start_duration=0.05:start_threshold={SILENCE_THRESHOLD}:"
+    f"start_silence={BOUNDARY_SILENCE_SECONDS},"
+    "areverse"
 )
-AUDIO_FILTER = f"{SILENCE_FILTER},atempo={SPEED}"
-EXTRACTION_VERSION = "markdown-prose-v6-abridged-audio"
-DEFAULT_BATCH_SIZE = 1
-MIN_GENERATION_TOKENS = 128
-MAX_TOKENS_PER_CHAR = 1.05
+AUDIO_FILTER = f"{BOUNDARY_TRIM_FILTER},atempo={SPEED}"
+EXTRACTION_VERSION = "markdown-prose-v8-continuous-stream-audio"
+MAX_GENERATION_TOKENS = 6_000
+MIN_SECONDS_PER_WORD = 0.16
+VOICE_ANCHOR_PATH = ROOT / "scripts" / "assets" / "blog-narrator-warm-indian-english-reference.mp3"
+VOICE_ANCHOR_TEXT = (
+    "That clean description breaks as soon as evidence conflicts, an actor is occluded, "
+    "time stamps drift or one sensor degrades. A distant sike-list at dusk may occupy a few "
+    "image pixels, two or three lie-dar returns, and one noisy radar detection with radial velocity."
+)
+VOICE_ANCHOR_SHA256 = hashlib.sha256(VOICE_ANCHOR_PATH.read_bytes()).hexdigest()
+DECODE_POLICY = "generated-codes-only-streaming-v1"
+PRONUNCIATION_LEXICON = {
+    "cyclists": "sike-lists",
+    "cyclist": "sike-list",
+    "timestamps": "time stamps",
+    "timestamp": "time stamp",
+    "lidar": "lie-dar",
+}
+AUDIO_PROSODY_REWRITES = {
+    "time stamps drift, or one sensor": "time stamps drift or one sensor",
+}
+PRONUNCIATION_POLICY = "audio-only-phonetic-and-prosody-lexicon-v2"
 FORBIDDEN_REFERENCE_FIELDS = {
     "reference_audio_sha256",
     "reference_text",
     "icl_decode_mode",
     "icl_streaming_interval",
 }
-
-
-@dataclass(frozen=True)
-class NarrationChunk:
-    """One bounded synthesis unit and its explicit following pause."""
-
-    text: str
-    pause_seconds: float
 
 
 def parse_frontmatter(source: str) -> dict[str, str]:
@@ -151,6 +171,8 @@ def clean_markdown(source: str) -> str:
             continue
         if not line:
             flush_table()
+            if output and output[-1] != PARAGRAPH_BREAK:
+                output.append(PARAGRAPH_BREAK)
             continue
         if line.startswith(("import ", "export ")):
             continue
@@ -168,7 +190,10 @@ def clean_markdown(source: str) -> str:
                 skip_references = True
                 continue
             spoken_heading = heading_text.rstrip(".!?") + "."
+            if output and output[-1] != PARAGRAPH_BREAK:
+                output.append(PARAGRAPH_BREAK)
             output.append(f"{HEADING_START}{spoken_heading}{HEADING_END}")
+            output.append(PARAGRAPH_BREAK)
             continue
         if (line.startswith("![") or line.startswith("[![")) and "](" in line:
             flush_table()
@@ -199,7 +224,14 @@ def clean_markdown(source: str) -> str:
             output.append(line)
 
     flush_table()
+    while output and output[-1] == PARAGRAPH_BREAK:
+        output.pop()
     text = " ".join(output)
+    text = re.sub(
+        rf"(?:\s*{re.escape(PARAGRAPH_BREAK)}\s*)+",
+        f" {PARAGRAPH_BREAK} ",
+        text,
+    )
     text = re.sub(r"\s+([,.!?;:])", r"\1", text)
     return re.sub(r"\.{2,}", ".", text).strip()
 
@@ -220,52 +252,55 @@ def shape_narration(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def split_for_tts(text: str, max_chars: int = MAX_CHARS) -> list[NarrationChunk]:
-    """Return sentence-scoped chunks with stronger pauses after headings."""
+def apply_pronunciation_hints(text: str) -> str:
+    """Apply audio-only phonetic hints without changing the authored post."""
 
-    chunks: list[NarrationChunk] = []
-    heading_pattern = re.compile(
-        f"({re.escape(HEADING_START)}.*?{re.escape(HEADING_END)})"
+    for written, spoken in PRONUNCIATION_LEXICON.items():
+        text = re.sub(rf"\b{re.escape(written)}\b", spoken, text, flags=re.IGNORECASE)
+    for written, spoken in AUDIO_PROSODY_REWRITES.items():
+        text = re.sub(re.escape(written), spoken, text, flags=re.IGNORECASE)
+    return text
+
+
+def render_for_tts(text: str) -> str:
+    """Render structural markers as one continuous, human-readable prompt.
+
+    Newlines give Qwen paragraph and heading context without creating paragraph-
+    or sentence-level requests. Heading sections remain long enough for natural
+    prosody while the fixed anchor preserves narrator identity between them.
+    """
+
+    text = text.replace(HEADING_START, "").replace(HEADING_END, "")
+    text = re.sub(
+        rf"\s*{re.escape(PARAGRAPH_BREAK)}\s*",
+        "\n",
+        text,
     )
-    for segment in heading_pattern.split(text):
-        segment = segment.strip()
-        if not segment:
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{2,}", "\n", text)
+    return apply_pronunciation_hints(text.strip())
+
+
+def section_prompts_for_tts(text: str) -> list[str]:
+    """Group narration by authored headings, bounding unusually long sections."""
+
+    raw_sections = re.split(rf"(?={re.escape(HEADING_START)})", text)
+    sections: list[str] = []
+    for raw_section in raw_sections:
+        rendered = render_for_tts(raw_section)
+        if not rendered:
             continue
-        is_heading = segment.startswith(HEADING_START)
-        if is_heading:
-            segment = segment.removeprefix(HEADING_START).removesuffix(HEADING_END).strip()
-            sentences = [segment]
-        else:
-            sentences = re.split(r"(?<=[.!?])\s+", segment)
-
-        for sentence in sentences:
-            sentence = sentence.strip()
-            if not sentence:
-                continue
-            if len(sentence) > max_chars:
-                words = sentence.split()
-                sentence_parts: list[str] = []
-                part = ""
-                for word in words:
-                    candidate = f"{part} {word}".strip()
-                    if part and len(candidate) > max_chars:
-                        sentence_parts.append(part)
-                        part = word
-                    else:
-                        part = candidate
-                if part:
-                    sentence_parts.append(part)
+        current = ""
+        for paragraph in rendered.splitlines():
+            candidate = f"{current}\n{paragraph}".strip()
+            if current and len(candidate) > SECTION_MAX_CHARS:
+                sections.append(current)
+                current = paragraph
             else:
-                sentence_parts = [sentence]
-
-            for index, part in enumerate(sentence_parts):
-                pause_seconds = 0.0
-                if index == len(sentence_parts) - 1:
-                    pause_seconds = (
-                        HEADING_PAUSE_SECONDS if is_heading else SENTENCE_PAUSE_SECONDS
-                    )
-                chunks.append(NarrationChunk(text=part, pause_seconds=pause_seconds))
-    return chunks
+                current = candidate
+        if current:
+            sections.append(current)
+    return sections
 
 
 def normalize_heading(value: str) -> str:
@@ -343,7 +378,9 @@ def discover_posts() -> list[dict[str, Any]]:
             narration_mode = "section-complete-abridgement"
 
         text = shape_narration(clean_markdown(narration_source))
-        narration_word_count = sum(len(chunk.text.split()) for chunk in split_for_tts(text))
+        tts_sections = section_prompts_for_tts(text)
+        tts_text = "\n".join(tts_sections)
+        narration_word_count = len(tts_text.split())
         if narration_mode != "full-source" and narration_word_count > MAX_ABRIDGED_WORDS:
             raise ValueError(
                 f"Narration sidecar exceeds {MAX_ABRIDGED_WORDS} words for {post_slug}: "
@@ -363,23 +400,32 @@ def discover_posts() -> list[dict[str, Any]]:
                     "voice_instruct": VOICE_INSTRUCT,
                     "temperature": TEMPERATURE,
                     "top_p": TOP_P,
+                    "repetition_penalty": REPETITION_PENALTY,
                     "narrator_seed": NARRATOR_SEED,
                     "sampling_seed_version": SAMPLING_SEED_VERSION,
                     "speed": SPEED,
                     "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
+                    "paragraph_pause_seconds": PARAGRAPH_PAUSE_SECONDS,
                     "heading_pause_seconds": HEADING_PAUSE_SECONDS,
                     "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
+                    "chunking_policy": CHUNKING_POLICY,
+                    "section_policy": SECTION_POLICY,
+                    "section_max_chars": SECTION_MAX_CHARS,
+                    "section_pause_seconds": SECTION_PAUSE_SECONDS,
+                    "voice_anchor_sha256": VOICE_ANCHOR_SHA256,
+                    "decode_policy": DECODE_POLICY,
+                    "pronunciation_policy": PRONUNCIATION_POLICY,
+                    "pronunciation_lexicon": PRONUNCIATION_LEXICON,
+                    "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
                     "table_policy": TABLE_POLICY,
                     "max_audio_seconds": MAX_AUDIO_SECONDS,
                     "max_abridged_words": MAX_ABRIDGED_WORDS,
                     "bitrate": BITRATE,
-                    "max_chars": MAX_CHARS,
                     "silence_threshold": SILENCE_THRESHOLD,
-                    "boundary_silence_samples": BOUNDARY_SILENCE_SAMPLES,
-                    "long_silence_duration": LONG_SILENCE_DURATION,
-                    "retained_silence_duration": RETAINED_SILENCE_DURATION,
-                    "min_generation_tokens": MIN_GENERATION_TOKENS,
-                    "max_tokens_per_char": MAX_TOKENS_PER_CHAR,
+                    "boundary_silence_seconds": BOUNDARY_SILENCE_SECONDS,
+                    "streaming_interval_seconds": STREAMING_INTERVAL_SECONDS,
+                    "max_generation_tokens": MAX_GENERATION_TOKENS,
+                    "min_seconds_per_word": MIN_SECONDS_PER_WORD,
                     "extraction_version": EXTRACTION_VERSION,
                 },
                 sort_keys=True,
@@ -391,6 +437,8 @@ def discover_posts() -> list[dict[str, Any]]:
                 "slug": post_slug,
                 "title": title,
                 "text": text,
+                "tts_text": tts_text,
+                "tts_sections": tts_sections,
                 "source_sha256": source_sha256,
                 "narration_mode": narration_mode,
                 "narration_word_count": narration_word_count,
@@ -423,12 +471,25 @@ def narrator_profile_errors(posts: list[dict[str, Any]], manifest: dict[str, Any
         "voice": VOICE,
         "voice_mode": VOICE_MODE,
         "voice_instruct": VOICE_INSTRUCT,
+        "temperature": TEMPERATURE,
+        "top_p": TOP_P,
+        "repetition_penalty": REPETITION_PENALTY,
         "narrator_seed": NARRATOR_SEED,
         "sampling_seed_version": SAMPLING_SEED_VERSION,
         "speed": SPEED,
         "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
+        "paragraph_pause_seconds": PARAGRAPH_PAUSE_SECONDS,
         "heading_pause_seconds": HEADING_PAUSE_SECONDS,
         "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
+        "chunking_policy": CHUNKING_POLICY,
+        "section_policy": SECTION_POLICY,
+        "section_max_chars": SECTION_MAX_CHARS,
+        "section_pause_seconds": SECTION_PAUSE_SECONDS,
+        "voice_anchor_sha256": VOICE_ANCHOR_SHA256,
+        "decode_policy": DECODE_POLICY,
+        "pronunciation_policy": PRONUNCIATION_POLICY,
+        "pronunciation_lexicon": PRONUNCIATION_LEXICON,
+        "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
         "table_policy": TABLE_POLICY,
     }
     errors: list[str] = []
@@ -473,29 +534,8 @@ def audio_duration_seconds(path: Path) -> float:
     return float(result.stdout.strip())
 
 
-def trim_boundary_silence(audio: Any) -> Any:
-    """Remove model-generated dead air while preserving a tiny natural release.
-
-    VoiceDesign can occasionally emit seconds of trailing silence after a chunk.
-    Concatenating those tails makes a static export sound broken, so we only
-    inspect the leading and trailing waveform boundaries. Deliberate pauses
-    inside a spoken chunk are left untouched.
-    """
-
-    import numpy as np
-
-    samples = np.asarray(audio)
-    active = np.flatnonzero(np.abs(samples) >= SILENCE_THRESHOLD)
-    if active.size == 0:
-        raise RuntimeError("Model generated a silent audio chunk.")
-
-    start = max(0, int(active[0]) - BOUNDARY_SILENCE_SAMPLES)
-    end = min(samples.size, int(active[-1]) + 1 + BOUNDARY_SILENCE_SAMPLES)
-    return samples[start:end]
-
-
 def seed_narrator_generation() -> None:
-    """Reset every chunk to one stable narrator sampling profile."""
+    """Seed the one continuous narrator generation for a post."""
 
     import mlx.core as mx
 
@@ -505,94 +545,99 @@ def seed_narrator_generation() -> None:
 def generate_post(
     model: Any,
     post: dict[str, Any],
-    batch_size: int,
-    chunk_progress: Any,
+    stream_progress: Any,
 ) -> float:
     import numpy as np
     from mlx_audio.audio_io import write as audio_write
 
-    chunks = split_for_tts(post["text"])
-    if not chunks:
+    sections = post["tts_sections"]
+    if not sections:
         raise ValueError(f"No speakable text found in {post['path']}")
+    if not VOICE_ANCHOR_PATH.exists():
+        raise FileNotFoundError(f"Missing narrator voice anchor: {VOICE_ANCHOR_PATH}")
 
     AUDIO_DIR.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=f"tts-{post['slug']}-") as temporary_dir:
         temporary = Path(temporary_dir)
         manifest_file = temporary / "concat.txt"
-        chunk_paths: list[Path] = []
-        pause_paths: dict[tuple[int, float], Path] = {}
+        stream_parts = 0
+        pause_path: Path | None = None
         with manifest_file.open("w", encoding="utf-8") as listing:
-            for batch_start in range(0, len(chunks), batch_size):
-                chunk_batch = chunks[batch_start : batch_start + batch_size]
-                results_by_index: dict[int, tuple[Any, int]] = {}
-                if len(chunk_batch) == 1:
-                    seed_narrator_generation()
-                    max_tokens = max(
-                        MIN_GENERATION_TOKENS,
-                        math.ceil(len(chunk_batch[0].text) * MAX_TOKENS_PER_CHAR),
-                    )
-                    results = list(
-                        model.generate(
-                            text=chunk_batch[0].text,
-                            voice=VOICE,
-                            instruct=VOICE_INSTRUCT,
-                            lang_code=LANGUAGE_CODE,
-                            temperature=TEMPERATURE,
-                            top_p=TOP_P,
-                            repetition_penalty=1.5,
-                            split_pattern="",
-                            max_tokens=max_tokens,
-                            stream=False,
-                        )
-                    )
-                    if len(results) != 1:
-                        raise RuntimeError(
-                            "Qwen direct speaker synthesis did not return exactly one complete "
-                            "audio result; refusing to concatenate an ambiguous chunk."
-                        )
-                    results_by_index[0] = (
-                        trim_boundary_silence(results[0].audio),
-                        results[0].sample_rate,
-                    )
-                missing = set(range(len(chunk_batch))) - results_by_index.keys()
-                if missing:
-                    missing_chunks = ", ".join(str(batch_start + index + 1) for index in sorted(missing))
+            for section_index, text in enumerate(sections):
+                generated_tokens = 0
+                pieces: list[Any] = []
+                sample_rate = 0
+                seed_narrator_generation()
+                for result in model.generate(
+                    text=text,
+                    ref_audio=str(VOICE_ANCHOR_PATH),
+                    ref_text=VOICE_ANCHOR_TEXT,
+                    lang_code=LANGUAGE_CODE,
+                    temperature=TEMPERATURE,
+                    top_p=TOP_P,
+                    repetition_penalty=REPETITION_PENALTY,
+                    split_pattern="",
+                    max_tokens=MAX_GENERATION_TOKENS,
+                    stream=True,
+                    streaming_interval=STREAMING_INTERVAL_SECONDS,
+                ):
+                    pieces.append(np.asarray(result.audio))
+                    sample_rate = result.sample_rate
+                    generated_tokens += result.token_count
+                    stream_parts += 1
+                    stream_progress.update(1)
+
+                if not pieces:
                     raise RuntimeError(
-                        f"Model returned no final audio for chunk(s) {missing_chunks} of {post['slug']}"
+                        f"Model generated no audio for section {section_index + 1} "
+                        f"of {post['slug']}"
+                    )
+                if generated_tokens >= MAX_GENERATION_TOKENS:
+                    raise RuntimeError(
+                        f"Model hit its {MAX_GENERATION_TOKENS}-token safety cap for "
+                        f"section {section_index + 1} of {post['slug']}; refusing a "
+                        "potentially truncated narration."
                     )
 
-                for batch_index in range(len(chunk_batch)):
-                    index = batch_start + batch_index
-                    audio, sample_rate = results_by_index[batch_index]
-                    audio = trim_boundary_silence(audio)
-                    chunk_path = temporary / f"chunk-{index:05d}.wav"
-                    audio_write(str(chunk_path), audio, sample_rate, format="wav")
-                    chunk_paths.append(chunk_path)
-                    listing.write(f"file '{chunk_path.as_posix()}'\n")
-                    pause_seconds = chunks[index].pause_seconds
-                    if pause_seconds > 0 and index < len(chunks) - 1:
-                        pause_key = (sample_rate, pause_seconds)
-                        pause_path = pause_paths.get(pause_key)
-                        if pause_path is None:
-                            pause_milliseconds = round(pause_seconds * 1_000)
-                            pause_path = temporary / (
-                                f"pause-{pause_milliseconds}ms-{sample_rate}.wav"
-                            )
-                            # ffmpeg applies atempo to the concatenated stream. Make the
-                            # source pause proportionally longer so the delivered MP3 keeps
-                            # the requested pause duration after the 1.10x tempo increase.
-                            pause_samples = round(
-                                sample_rate * pause_seconds * SPEED
-                            )
-                            audio_write(
-                                str(pause_path),
-                                np.zeros(pause_samples, dtype=np.float32),
-                                sample_rate,
-                                format="wav",
-                            )
-                            pause_paths[pause_key] = pause_path
-                        listing.write(f"file '{pause_path.as_posix()}'\n")
-                    chunk_progress.update(1)
+                audio = np.concatenate(pieces)
+                active = np.flatnonzero(np.abs(audio) >= SILENCE_THRESHOLD)
+                if active.size == 0:
+                    raise RuntimeError(
+                        f"Model generated silence for section {section_index + 1} "
+                        f"of {post['slug']}"
+                    )
+                retained = round(sample_rate * BOUNDARY_SILENCE_SECONDS)
+                start = max(0, int(active[0]) - retained)
+                end = min(audio.size, int(active[-1]) + 1 + retained)
+                audio = audio[start:end]
+                delivered_seconds = audio.size / sample_rate / SPEED
+                minimum_seconds = len(text.split()) * MIN_SECONDS_PER_WORD
+                if delivered_seconds < minimum_seconds:
+                    raise RuntimeError(
+                        f"Section {section_index + 1} of {post['slug']} is implausibly "
+                        f"short ({delivered_seconds:.1f}s for {len(text.split())} words); "
+                        "refusing possible early EOS truncation."
+                    )
+
+                section_path = temporary / f"section-{section_index:03d}.wav"
+                audio_write(str(section_path), audio, sample_rate, format="wav")
+                listing.write(f"file '{section_path.as_posix()}'\n")
+                if section_index < len(sections) - 1:
+                    if pause_path is None:
+                        pause_path = temporary / "section-pause.wav"
+                        pause_samples = round(
+                            sample_rate * SECTION_PAUSE_SECONDS * SPEED
+                        )
+                        audio_write(
+                            str(pause_path),
+                            np.zeros(pause_samples, dtype=np.float32),
+                            sample_rate,
+                            format="wav",
+                        )
+                    listing.write(f"file '{pause_path.as_posix()}'\n")
+
+        if stream_parts == 0:
+            raise RuntimeError(f"Model generated no audio for {post['slug']}")
 
         temporary_mp3 = temporary / "audio.mp3"
         subprocess.run(
@@ -650,15 +695,7 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="Verify every Blog post has current audio.")
     parser.add_argument("--force", action="store_true", help="Regenerate selected audio even when unchanged.")
     parser.add_argument("--post", action="append", default=[], help="Only process this postSlug; repeatable.")
-    parser.add_argument(
-        "--batch-size",
-        type=int,
-        default=DEFAULT_BATCH_SIZE,
-        help="Must remain 1: direct speaker synthesis is verified one chunk at a time.",
-    )
     args = parser.parse_args()
-    if args.batch_size != 1:
-        parser.error("--batch-size must be 1: direct speaker synthesis is verified one chunk at a time")
 
     posts = select_posts(discover_posts(), args.post)
     manifest = read_manifest()
@@ -713,21 +750,20 @@ def main() -> int:
     targets = posts if args.force else stale
     print(
         f"Loading {MODEL} once for {len(targets)} post(s) "
-        f"with fixed CustomVoice speaker {VOICE} and no spoken reference..."
+        f"with generated-audio-only voice anchor {VOICE}..."
     )
     model = load_model(MODEL)
     with tqdm(total=len(targets), desc="Blogs", unit="post", position=0) as blog_progress:
         for index, post in enumerate(targets, start=1):
-            chunks = split_for_tts(post["text"])
             blog_progress.set_postfix_str(f"{index}/{len(targets)} {post['title'][:42]}")
             with tqdm(
-                total=len(chunks),
-                desc="  Chunks",
-                unit="chunk",
+                total=None,
+                desc="  Section streams",
+                unit="part",
                 position=1,
                 leave=False,
-            ) as chunk_progress:
-                duration_seconds = generate_post(model, post, args.batch_size, chunk_progress)
+            ) as stream_progress:
+                duration_seconds = generate_post(model, post, stream_progress)
             manifest[post["slug"]] = {
                 "digest": post["digest"],
                 "model": MODEL,
@@ -738,12 +774,23 @@ def main() -> int:
                 "voice_instruct": VOICE_INSTRUCT,
                 "temperature": TEMPERATURE,
                 "top_p": TOP_P,
+                "repetition_penalty": REPETITION_PENALTY,
                 "narrator_seed": NARRATOR_SEED,
                 "sampling_seed_version": SAMPLING_SEED_VERSION,
                 "speed": SPEED,
                 "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
+                "paragraph_pause_seconds": PARAGRAPH_PAUSE_SECONDS,
                 "heading_pause_seconds": HEADING_PAUSE_SECONDS,
                 "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
+                "chunking_policy": CHUNKING_POLICY,
+                "section_policy": SECTION_POLICY,
+                "section_max_chars": SECTION_MAX_CHARS,
+                "section_pause_seconds": SECTION_PAUSE_SECONDS,
+                "voice_anchor_sha256": VOICE_ANCHOR_SHA256,
+                "decode_policy": DECODE_POLICY,
+                "pronunciation_policy": PRONUNCIATION_POLICY,
+                "pronunciation_lexicon": PRONUNCIATION_LEXICON,
+                "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
                 "table_policy": TABLE_POLICY,
                 "max_audio_seconds": MAX_AUDIO_SECONDS,
                 "narration_mode": post["narration_mode"],
@@ -751,13 +798,11 @@ def main() -> int:
                 "source_sha256": post["source_sha256"],
                 "duration_seconds": duration_seconds,
                 "bitrate": BITRATE,
-                "max_chars": MAX_CHARS,
                 "silence_threshold": SILENCE_THRESHOLD,
-                "boundary_silence_samples": BOUNDARY_SILENCE_SAMPLES,
-                "long_silence_duration": LONG_SILENCE_DURATION,
-                "retained_silence_duration": RETAINED_SILENCE_DURATION,
-                "min_generation_tokens": MIN_GENERATION_TOKENS,
-                "max_tokens_per_char": MAX_TOKENS_PER_CHAR,
+                "boundary_silence_seconds": BOUNDARY_SILENCE_SECONDS,
+                "streaming_interval_seconds": STREAMING_INTERVAL_SECONDS,
+                "max_generation_tokens": MAX_GENERATION_TOKENS,
+                "min_seconds_per_word": MIN_SECONDS_PER_WORD,
                 "file": f"/assets/audio/blog/{post['slug']}.mp3",
             }
             write_manifest(manifest)
