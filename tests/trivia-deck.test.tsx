@@ -268,9 +268,24 @@ describe('published trivia data', () => {
       (card) => card.id === 'python-is-operator-code',
     );
     expect(cacheCard?.question).toBe(
-      'If `cache.get(key)` finds nothing, what value does this code check for?',
+      'What value does this code check when `cache.get(key)` finds nothing?',
     );
     expect(cacheCard?.answer).toBe('`None`');
+  });
+
+  it('publishes every prompt as a complete question', () => {
+    const completeQuestion = /^(What|Which|When|Where|How|Why|Does|Do|Is|Are|Can|Will|Should)\b.*\?$/;
+    const incompleteQuestions = [...pythonTriviaDeck.cards, ...pytorchTriviaDeck.cards]
+      .filter((card) => !completeQuestion.test(card.question) || card.question.includes('…'))
+      .map((card) => `${card.id}: ${card.question}`);
+    expect(incompleteQuestions).toEqual([]);
+  });
+
+  it('asks the argument-passing prompt as a natural sentence', () => {
+    const argumentCard = pythonTriviaDeck.cards.find(
+      (card) => card.id === 'python-argument-model',
+    );
+    expect(argumentCard?.question).toBe('What argument-passing model does Python use?');
   });
 
   it('publishes one focused explanation for every visible card', () => {
