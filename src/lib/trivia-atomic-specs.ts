@@ -31,7 +31,7 @@ export const pythonAtomicSpecs: AtomicTriviaSpec[] = [
     question: 'Which operator checks object identity?',
     answer: '`is`',
     code: 'cached = cache.get(key)\nif cached is None:\n    cached = build_value(key)',
-    codeQuestion: 'Which cache-miss sentinel is tested?',
+    codeQuestion: 'If `cache.get(key)` finds nothing, what value does this code check for?',
     codeAnswer: '`None`',
   },
   { sourceId: 'python-is-equality', id: 'python-equality-operator', question: 'Which operator checks value equality?', answer: '`==`', acceptedAnswers: ['equals'] },
