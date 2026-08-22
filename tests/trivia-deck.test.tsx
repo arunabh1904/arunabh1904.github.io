@@ -4,6 +4,7 @@ import React, { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import TriviaDeck from '../src/components/TriviaDeck';
+import { gradeTriviaAnswer } from '../src/lib/trivia-grader';
 import {
   pythonTriviaDeck,
   pytorchTriviaDeck,
@@ -14,7 +15,18 @@ const deck: TriviaDeckData = {
   id: 'test-deck',
   title: 'Test trivia',
   cards: [
-    { id: 'one', topic: 'Semantics', question: 'Question `one`?', answer: 'Answer `one`.' },
+    {
+      id: 'one',
+      topic: 'Semantics',
+      question: 'Question `one`?',
+      answer: 'A complete answer covers object identity and value equality.',
+      grading: {
+        concepts: [
+          { label: 'object identity', anyOf: ['object identity'] },
+          { label: 'value equality', anyOf: ['value equality'] },
+        ],
+      },
+    },
     { id: 'two', topic: 'Runtime', question: 'Question two?', answer: 'Answer two.' },
   ],
 };
@@ -60,42 +72,44 @@ describe('TriviaDeck', () => {
     });
   }
 
-  it('hides the answer until reveal and renders inline code accessibly', async () => {
+  it('hides the answer until grading and renders the automatic result accessibly', async () => {
     await renderDeck();
 
     expect(container.textContent).toContain('Question one?');
-    expect(container.textContent).not.toContain('Answer one.');
+    expect(container.textContent).not.toContain('complete answer');
     expect(container.querySelector('[role="heading"] code')?.textContent).toBe('one');
     expect(container.querySelector('textarea')).not.toBeNull();
 
     enterAnswer('My candidate answer.');
 
-    click('Show answer');
+    click('Grade answer');
 
-    expect(container.textContent).toContain('Answer one.');
+    expect(container.textContent).toContain('complete answer');
     expect(container.textContent).toContain('My candidate answer.');
-    expect(container.querySelector('.trivia-card__answer code')?.textContent).toBe('one');
+    expect(container.querySelector('[aria-label="Automatic grade"]')).not.toBeNull();
   });
 
-  it('marks a card correct, persists the answer and score, and advances', async () => {
+  it('marks a passing answer correct and persists the automatic score', async () => {
     await renderDeck();
-    enterAnswer('My answer.');
-    click('Show answer');
-    click('Got it right');
+    enterAnswer('Object identity is distinct from value equality.');
+    click('Grade answer');
 
-    expect(container.textContent).toContain('Question two?');
+    expect(container.textContent).toContain('Correct');
     expect(container.textContent).toContain('1/1 right');
     const saved = window.localStorage.getItem('trivia-progress:test-deck');
-    expect(saved).toContain('My answer.');
+    expect(saved).toContain('Object identity');
     expect(saved).toContain('"attemptedCardIds":["one"]');
     expect(saved).toContain('"correctCardIds":["one"]');
   });
 
-  it('counts an incorrect self-grade as attempted but not correct', async () => {
+  it('rejects a vague answer and identifies concepts to review', async () => {
     await renderDeck();
-    click('Show answer');
-    click('Not quite');
+    enterAnswer('reference');
+    click('Grade answer');
 
+    expect(container.textContent).toContain('Needs work');
+    expect(container.textContent).toContain('Review:');
+    expect(container.textContent).toContain('object identity');
     expect(container.textContent).toContain('0/1 right');
   });
 
@@ -127,8 +141,8 @@ describe('TriviaDeck', () => {
 
   it('scopes the score to the selected topic', async () => {
     await renderDeck();
-    click('Show answer');
-    click('Got it right');
+    enterAnswer('Object identity differs from value equality.');
+    click('Grade answer');
 
     const select = container.querySelector('select');
     await act(async () => {
@@ -138,6 +152,86 @@ describe('TriviaDeck', () => {
     });
 
     expect(container.textContent).toContain('0/0 right');
+  });
+});
+
+describe('automatic trivia grading', () => {
+  it.each([...pythonTriviaDeck.cards, ...pytorchTriviaDeck.cards])(
+    'accepts the full reference answer for $id',
+    (card) => {
+      expect(gradeTriviaAnswer(card, card.answer).status).toBe('correct');
+    },
+  );
+
+  it.each([...pythonTriviaDeck.cards, ...pytorchTriviaDeck.cards])(
+    'never passes a one-word response for $id',
+    (card) => {
+      expect(gradeTriviaAnswer(card, 'reference').status).not.toBe('correct');
+    },
+  );
+
+  it('rejects the one-word answer from the reported Python example', () => {
+    const card = pythonTriviaDeck.cards.find(
+      (candidate) => candidate.id === 'python-pass-by-assignment',
+    );
+    expect(card).toBeDefined();
+
+    const grade = gradeTriviaAnswer(card!, 'reference');
+
+    expect(grade.status).toBe('needs-work');
+    expect(grade.missingConcepts).toContain('pass-by-assignment or object sharing');
+    expect(grade.missingConcepts).toContain('rebinding stays local');
+  });
+
+  it('accepts a strong paraphrase of pass-by-assignment', () => {
+    const card = pythonTriviaDeck.cards.find(
+      (candidate) => candidate.id === 'python-pass-by-assignment',
+    );
+    expect(card).toBeDefined();
+
+    const grade = gradeTriviaAnswer(
+      card!,
+      'Python passes a reference to the same object. Mutation is visible outside, but reassignment stays local.',
+    );
+
+    expect(grade.status).toBe('correct');
+  });
+
+  it('marks a partial explanation close and names the missing distinction', () => {
+    const card = pythonTriviaDeck.cards.find(
+      (candidate) => candidate.id === 'python-pass-by-assignment',
+    );
+    expect(card).toBeDefined();
+
+    const grade = gradeTriviaAnswer(card!, 'Python uses object sharing with the same object.');
+
+    expect(grade.status).toBe('close');
+    expect(grade.missingConcepts).toContain('mutation can affect the caller');
+    expect(grade.missingConcepts).toContain('rebinding stays local');
+  });
+
+  it('accepts concise Python identity and equality terminology', () => {
+    const card = pythonTriviaDeck.cards.find(
+      (candidate) => candidate.id === 'python-is-equality',
+    );
+    expect(card).toBeDefined();
+
+    expect(gradeTriviaAnswer(card!, '`is` checks identity; `==` checks equality.').status)
+      .toBe('correct');
+  });
+
+  it('accepts the core PyTorch cross-entropy contract', () => {
+    const card = pytorchTriviaDeck.cards.find(
+      (candidate) => candidate.id === 'torch-cross-entropy-logits',
+    );
+    expect(card).toBeDefined();
+
+    const grade = gradeTriviaAnswer(
+      card!,
+      'Pass logits, not softmax probabilities. The loss fuses log-softmax with NLL for numerical stability.',
+    );
+
+    expect(grade.status).toBe('correct');
   });
 });
 

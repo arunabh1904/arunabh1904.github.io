@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import type { TriviaCard, TriviaDeckData } from '../lib/trivia-decks';
+import { gradeTriviaAnswer, type TriviaGrade } from '../lib/trivia-grader';
 
 interface TriviaDeckProps {
   deck: TriviaDeckData;
@@ -45,6 +46,7 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
   const [orderedIds, setOrderedIds] = useState(() => deck.cards.map((card) => card.id));
   const [position, setPosition] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [grade, setGrade] = useState<TriviaGrade | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [attemptedCardIds, setAttemptedCardIds] = useState<Set<string>>(() => new Set());
   const [correctCardIds, setCorrectCardIds] = useState<Set<string>>(() => new Set());
@@ -122,6 +124,7 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
       return next;
     });
     setRevealed(false);
+    setGrade(null);
   }
 
   function updateAnswer(answer: string) {
@@ -131,23 +134,25 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
     persist(nextAnswers, attemptedCardIds, correctCardIds);
   }
 
-  function markAnswer(isCorrect: boolean) {
+  function gradeAnswer() {
     if (!card) return;
+    const nextGrade = gradeTriviaAnswer(card, answers[card.id] ?? '');
     const nextAttempted = new Set(attemptedCardIds).add(card.id);
     const nextCorrect = new Set(correctCardIds);
-    if (isCorrect) nextCorrect.add(card.id);
+    if (nextGrade.status === 'correct') nextCorrect.add(card.id);
     else nextCorrect.delete(card.id);
+    setGrade(nextGrade);
+    setRevealed(true);
     setAttemptedCardIds(nextAttempted);
     setCorrectCardIds(nextCorrect);
     persist(answers, nextAttempted, nextCorrect);
-    move(1);
   }
 
   function handleDeckKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.target !== event.currentTarget) return;
     if (event.key === ' ' || event.key === 'Enter') {
       event.preventDefault();
-      setRevealed(true);
+      gradeAnswer();
     } else if (event.key === 'ArrowLeft') {
       event.preventDefault();
       move(-1);
@@ -161,12 +166,14 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
     setTopic(nextTopic);
     setPosition(0);
     setRevealed(false);
+    setGrade(null);
   }
 
   function shuffleCards() {
     setOrderedIds((ids) => shuffled(ids));
     setPosition(0);
     setRevealed(false);
+    setGrade(null);
   }
 
   function resetProgress() {
@@ -180,6 +187,7 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
     }
     setPosition(0);
     setRevealed(false);
+    setGrade(null);
   }
 
   if (!card) return null;
@@ -242,14 +250,34 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
             <button
               type="button"
               className="trivia-card__reveal"
-              onClick={() => setRevealed(true)}
+              onClick={gradeAnswer}
               aria-expanded="false"
             >
-              Show answer
+              Grade answer
             </button>
           </div>
         ) : (
           <div className="trivia-card__comparison">
+            {grade && (
+              <section
+                className="trivia-card__grade"
+                data-status={grade.status}
+                aria-label="Automatic grade"
+              >
+                <h3>{grade.label}</h3>
+                <p>{grade.explanation}</p>
+                {grade.matchedConcepts.length > 0 && (
+                  <p className="trivia-card__grade-detail">
+                    <strong>Matched:</strong> {grade.matchedConcepts.join(' · ')}
+                  </p>
+                )}
+                {grade.missingConcepts.length > 0 && (
+                  <p className="trivia-card__grade-detail">
+                    <strong>Review:</strong> {grade.missingConcepts.join(' · ')}
+                  </p>
+                )}
+              </section>
+            )}
             <section aria-label="Your answer">
               <h3>Your answer</h3>
               <p className={currentAnswer.trim() ? '' : 'trivia-card__empty-answer'}>
@@ -271,10 +299,9 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
           Previous
         </button>
         {revealed ? (
-          <div className="trivia-deck__rating" aria-label="Rate this answer">
-            <button type="button" onClick={() => markAnswer(false)}>Not quite</button>
-            <button type="button" className="trivia-deck__primary" onClick={() => markAnswer(true)}>
-              Got it right
+          <div className="trivia-deck__rating">
+            <button type="button" className="trivia-deck__primary" onClick={() => move(1)}>
+              Next card
             </button>
           </div>
         ) : (
@@ -285,7 +312,7 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
       </div>
 
       <div className="trivia-deck__footer">
-        <span>Space reveals · arrows move</span>
+        <span>Space grades · arrows move</span>
         <button type="button" onClick={resetProgress}>Reset progress</button>
       </div>
     </section>
