@@ -207,24 +207,24 @@ function vlmFrame(frame) {
   const encode = phase(t, 0.04, 0.38);
   const preserve = phase(t, 0.34, 0.76);
   const shimmer = 0.55 + 0.45 * pulse(t * 1.4);
-  let b = header('02', 'CLIP · LLAVA · MOLMO · PI0', 'Each output contract must preserve different evidence');
+  let b = header('02', 'IMAGE-TEXT · MULTIMODAL LLM · GROUNDING · VLA', 'The output changes what vision must preserve');
   const xs = [26, 260, 494, 728];
   const colors = [C.cyan, C.violet, C.amber, C.green];
-  const names = ['CLIP · ALIGN', 'LLAVA · GENERATE', 'MOLMO · GROUND', 'PI0 · ACT'];
+  const names = ['CLIP · IMAGE-TEXT', 'LLAVA · MULTIMODAL LLM', 'MOLMO · GROUNDING', 'PI0 · VLA'];
   xs.forEach((x, i) => { b += panel(x, 123, 206, 340, names[i], colors[i]); b += scene(x + 14, 166, colors[i], 1); });
 
   // CLIP collapses the scene to a global semantic vector; location is not required by the objective.
   b += arrow(129, 300, 129, 326, C.cyan, 1.6, 0.72);
   for (let i = 0; i < 7; i++) b += rect(67 + i * 18, 340, 12, 54 * (0.35 + ((i * 7) % 5) / 8), C.cyan, 3, 0.06 + 0.18 * encode, C.cyan, 0.6);
   b += label('“mug” ↔ image', 129, 413, 11, C.ink, 'middle', 620);
-  b += label('global identity is sufficient', 129, 438, 10, C.muted, 'middle', 500);
+  b += label('image-text similarity', 129, 438, 10, C.muted, 'middle', 500);
 
   // LLaVA projects a grid of visual features into an autoregressive language model.
   b += arrow(363, 300, 363, 322, C.violet, 1.6, 0.72);
   b += dotGrid(314, 334, 7, 3, C.violet, Math.max(1, Math.floor(encode * 21)), 14);
   b += arrow(410, 355, 438, 355, C.violet, 1.5, 0.32 + 0.44 * preserve);
   ['put', 'the', 'mug'].forEach((w, i) => { b += token(298 + i * 53, 389, w, C.violet, 0.55 + 0.45 * preserve, 47); });
-  b += label('tokens support an answer', 363, 438, 10, C.muted, 'middle', 500);
+  b += label('visual tokens → text', 363, 438, 10, C.muted, 'middle', 500);
 
   // Point supervision forces an inspectable spatial binding.
   b += arrow(597, 300, 597, 326, C.amber, 1.6, 0.72);
@@ -233,7 +233,7 @@ function vlmFrame(frame) {
   b += circle(622, 359, 11 + 4 * shimmer, C.amber, 0.07, C.amber, 1.4);
   b += glow(622, 359, 11, C.amber, 0.35 + 0.55 * preserve);
   b += label('(x, y)', 622, 386, 9, C.amber, 'middle', 650);
-  b += label('the phrase binds to a point', 597, 438, 10, C.muted, 'middle', 500);
+  b += label('phrase → point', 597, 438, 10, C.muted, 'middle', 500);
 
   // A VLA must preserve state through time and emit an embodiment-specific action.
   b += arrow(831, 300, 831, 323, C.green, 1.6, 0.72);
@@ -244,10 +244,10 @@ function vlmFrame(frame) {
   }
   b += path('M 770 412 C 802 390 843 390 877 410', C.green, 2.2, 0.35 + 0.45 * preserve);
   b += circle(mix(770, 877, preserve), 412 - 20 * Math.sin(preserve * Math.PI), 5, C.green, 0.9);
-  b += label('state + action must survive', 831, 438, 10, C.muted, 'middle', 500);
+  b += label('observations → actions', 831, 438, 10, C.muted, 'middle', 500);
 
-  b += label('An objective cannot recover evidence its representation made unnecessary.', 480, 501, 13, C.green, 'middle', 620);
-  return svg(b, 'The same mug-and-tray scene is compressed differently as the output contract moves from CLIP image-text alignment to LLaVA generation, Molmo point grounding, and Pi0 robot action; each stage must retain evidence the next output requires.');
+  b += label('The task decides which visual evidence training must preserve.', 480, 501, 13, C.green, 'middle', 620);
+  return svg(b, 'The same mug-and-tray scene produces image-text similarity in CLIP, generated text in LLaVA, a grounded point in Molmo, and robot actions in Pi0; each task requires different visual evidence.');
 }
 
 function pretrainingFrame(frame) {

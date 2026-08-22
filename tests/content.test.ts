@@ -157,7 +157,7 @@ describe('markdown authoring', () => {
     expect(missingAssets, 'Every paper-note image must exist in public/.').toEqual([]);
   });
 
-  it('keeps one substantive callout in every Blog post', async () => {
+  it('keeps Blog callouts sparse instead of enforcing a quota', async () => {
     const postFiles = await fg('**/*.{md,mdx}', {
       cwd: postsDir,
       absolute: true,
@@ -166,17 +166,24 @@ describe('markdown authoring', () => {
     const offenders: string[] = [];
     for (const filePath of postFiles) {
       const source = await readFile(filePath, 'utf8');
-      if (
-        /^section: blog$/m.test(source) &&
-        !/^> .+/m.test(source)
-      ) {
-        offenders.push(path.relative(projectRoot, filePath));
+      if (!/^section: blog$/m.test(source)) {
+        continue;
+      }
+
+      const calloutCount = source
+        .split(/\n{2,}/)
+        .filter((block) => block.trimStart().startsWith('> ')).length;
+
+      if (calloutCount > 3) {
+        offenders.push(
+          `${path.relative(projectRoot, filePath)} (${calloutCount} callouts)`,
+        );
       }
     }
 
     expect(
       offenders,
-      'Blog posts must contain a substantive callout.',
+      'Blog callouts should remain sparse and earned.',
     ).toEqual([]);
   });
 
