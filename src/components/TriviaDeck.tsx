@@ -261,7 +261,7 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
                   gradeAnswer();
                 }
               }}
-              placeholder="One or two words…"
+              placeholder="Short answer…"
               autoComplete="off"
               autoCapitalize="none"
             />

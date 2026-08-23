@@ -10,7 +10,6 @@ import {
   pytorchTriviaDeck,
   type TriviaDeckData,
 } from '../src/lib/trivia-decks';
-import { triviaExplanations } from '../src/lib/trivia-explanations';
 
 const deck: TriviaDeckData = {
   id: 'test-deck',
@@ -191,25 +190,25 @@ describe('automatic trivia grading', () => {
 
   it('accepts configured short-answer aliases', () => {
     const card = pythonTriviaDeck.cards.find(
-      (candidate) => candidate.id === 'python-argument-model',
+      (candidate) => candidate.id === 'python-shared-mutable-default',
     );
     expect(card).toBeDefined();
 
-    const grade = gradeTriviaAnswer(card!, 'pass-by-assignment');
+    const grade = gradeTriviaAnswer(card!, 'default evaluated once');
 
     expect(grade.status).toBe('correct');
   });
 
   it('marks a partial two-word term close', () => {
     const card = pythonTriviaDeck.cards.find(
-      (candidate) => candidate.id === 'python-argument-model',
+      (candidate) => candidate.id === 'python-shared-mutable-default',
     );
     expect(card).toBeDefined();
 
-    const grade = gradeTriviaAnswer(card!, 'object');
+    const grade = gradeTriviaAnswer(card!, 'mutable');
 
     expect(grade.status).toBe('close');
-    expect(grade.missingConcepts).toContain('Object sharing');
+    expect(grade.missingConcepts).toContain('Shared mutable default');
   });
 
   it('marks a one-character typo close', () => {
@@ -223,9 +222,17 @@ describe('automatic trivia grading', () => {
     expect(grade.status).toBe('close');
   });
 
+  it('grades an empty-list literal as a real answer', () => {
+    const card = pythonTriviaDeck.cards.find(
+      (candidate) => candidate.id === 'python-generator-exhaustion',
+    );
+    expect(card).toBeDefined();
+    expect(gradeTriviaAnswer(card!, '[]').status).toBe('correct');
+  });
+
   it('rejects an unrelated short answer', () => {
     const card = pythonTriviaDeck.cards.find(
-      (candidate) => candidate.id === 'python-argument-model',
+      (candidate) => candidate.id === 'python-shared-mutable-default',
     );
     expect(card).toBeDefined();
 
@@ -240,37 +247,61 @@ describe('published trivia data', () => {
       const ids = publishedDeck.cards.map((card) => card.id);
       expect(new Set(ids).size).toBe(ids.length);
       expect(publishedDeck.cards.every((card) => card.question && card.answer && card.topic)).toBe(true);
-      expect(publishedDeck.cards.every((card) => card.answer.trim().split(/\s+/).length <= 2))
-        .toBe(true);
+      expect(publishedDeck.cards.every((card) => !card.answer.includes('\n'))).toBe(true);
       expect(publishedDeck.cards.every((card) => Boolean(card.explanation))).toBe(true);
     },
   );
 
-  it.each([pythonTriviaDeck, pytorchTriviaDeck])(
-    'publishes production snippets only as standalone code cards in $title',
-    (publishedDeck) => {
-      const codeCards = publishedDeck.cards.filter((card) => card.code);
-      expect(codeCards.length).toBeGreaterThanOrEqual(15);
-      expect(codeCards.every((card) => card.id.endsWith('-code'))).toBe(true);
-      expect(codeCards.every((card) => card.topic === 'Code scenarios')).toBe(true);
-    },
-  );
+  it('publishes the 88-card practical Python core', () => {
+    expect(pythonTriviaDeck).toMatchObject({
+      id: 'python-interview-trivia-v3',
+      title: 'Practical Python for ML engineering',
+    });
+    expect(pythonTriviaDeck.cards).toHaveLength(88);
+    expect(new Set(pythonTriviaDeck.cards.map((card) => card.topic))).toEqual(new Set([
+      'References & values',
+      'Collections',
+      'Functions & iteration',
+      'Classes & interfaces',
+      'Typing',
+      'Dataclasses',
+      'Pydantic v2',
+      'Reliability & I/O',
+    ]));
+  });
+
+  it('keeps code and concept on the same practical Python card', () => {
+    const codeCards = pythonTriviaDeck.cards.filter((card) => card.code);
+    expect(codeCards.length).toBeGreaterThanOrEqual(8);
+    expect(codeCards.every((card) => !card.id.endsWith('-code'))).toBe(true);
+    expect(pythonTriviaDeck.cards.every((card) => card.topic !== 'Code scenarios')).toBe(true);
+  });
+
+  it('grounds most Python prompts in code or a named API', () => {
+    const concreteCards = pythonTriviaDeck.cards.filter(
+      (card) => Boolean(card.code) || card.question.includes('`'),
+    );
+    expect(concreteCards.length / pythonTriviaDeck.cards.length).toBeGreaterThanOrEqual(0.65);
+  });
 
   it('does not describe Pydantic coercion as strict-by-default validation', () => {
     const comparison = pythonTriviaDeck.cards.find(
-      (card) => card.id === 'python-pydantic-validation',
+      (card) => card.id === 'python-pydantic-default-coercion',
     );
-    expect(comparison?.explanation).toContain('Strict rejection is configurable—not the default.');
+    expect(comparison).toMatchObject({
+      answer: '`10` as an `int`',
+      explanation: expect.stringContaining('coercive validation by default'),
+    });
   });
 
-  it('asks the cache lookup question in concrete terms', () => {
-    const cacheCard = pythonTriviaDeck.cards.find(
-      (card) => card.id === 'python-is-operator-code',
+  it('distinguishes Pydantic arbitrary-type checks from tensor validation', () => {
+    const tensorCard = pythonTriviaDeck.cards.find(
+      (card) => card.id === 'python-pydantic-arbitrary-tensor',
     );
-    expect(cacheCard?.question).toBe(
-      'What value does this code check when `cache.get(key)` finds nothing?',
-    );
-    expect(cacheCard?.answer).toBe('`None`');
+    expect(tensorCard).toMatchObject({
+      answer: '`isinstance` only',
+      explanation: expect.stringContaining('not tensor shape, dtype, values, layout, or device'),
+    });
   });
 
   it('publishes every prompt as a complete question', () => {
@@ -281,37 +312,28 @@ describe('published trivia data', () => {
     expect(incompleteQuestions).toEqual([]);
   });
 
-  it('asks the argument-passing prompt as a natural sentence', () => {
-    const argumentCard = pythonTriviaDeck.cards.find(
-      (card) => card.id === 'python-argument-model',
+  it('keeps falsy values distinct from missing configuration', () => {
+    const missingValueCard = pythonTriviaDeck.cards.find(
+      (card) => card.id === 'python-falsy-valid-value',
     );
-    expect(argumentCard?.question).toBe('What argument-passing model does Python use?');
-  });
-
-  it('publishes one focused explanation for every visible card', () => {
-    const publishedIds = [...pythonTriviaDeck.cards, ...pytorchTriviaDeck.cards]
-      .map((card) => card.id)
-      .sort();
-    expect(Object.keys(triviaExplanations).sort()).toEqual(publishedIds);
-  });
-
-  it('explains the visible truthiness question instead of the old answer bundle', () => {
-    const emptyListCard = pythonTriviaDeck.cards.find(
-      (card) => card.id === 'python-empty-list-truthiness',
-    );
-    expect(emptyListCard?.explanation).toBe(
-      'An empty list is falsy, so `bool([])` returns `False`.',
-    );
-  });
-
-  it('asks tuple mutability in concrete terms', () => {
-    const tupleCard = pythonTriviaDeck.cards.find(
-      (card) => card.id === 'python-tuple-deep-immutable',
-    );
-    expect(tupleCard).toMatchObject({
-      question: 'Can a mutable object inside a tuple still change?',
-      answer: 'Yes',
-      explanation: 'A tuple’s slots cannot be reassigned, but a mutable object stored in a slot can still change.',
+    expect(missingValueCard).toMatchObject({
+      answer: 'Explicit `None` check',
+      explanation: expect.stringContaining('valid value `0.0`'),
     });
+  });
+
+  it('keeps the dangerous serialization boundary explicit', () => {
+    const pickleCard = pythonTriviaDeck.cards.find(
+      (card) => card.id === 'python-untrusted-pickle',
+    );
+    expect(pickleCard?.answer).toBe('No');
+    expect(pickleCard?.explanation).toContain('execute attacker-controlled code');
+  });
+
+  it('leaves PyTorch mechanics to the separate deck', () => {
+    const pythonText = pythonTriviaDeck.cards
+      .map((card) => `${card.question} ${card.explanation}`)
+      .join(' ');
+    expect(pythonText).not.toMatch(/\bautograd\b|\bDataLoader\b|distributed training/i);
   });
 });
