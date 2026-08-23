@@ -271,12 +271,12 @@ describe('published trivia data', () => {
     },
   );
 
-  it('publishes the 88-card practical Python core', () => {
+  it('publishes the comprehensive practical Python core', () => {
     expect(pythonTriviaDeck).toMatchObject({
-      id: 'python-interview-trivia-v3',
+      id: 'python-interview-trivia-v4',
       title: 'Practical Python for ML engineering',
     });
-    expect(pythonTriviaDeck.cards).toHaveLength(88);
+    expect(pythonTriviaDeck.cards).toHaveLength(230);
     expect(new Set(pythonTriviaDeck.cards.map((card) => card.topic))).toEqual(new Set([
       'References & values',
       'Collections',
@@ -286,7 +286,47 @@ describe('published trivia data', () => {
       'Dataclasses',
       'Pydantic v2',
       'Reliability & I/O',
+      'Syntax & control flow',
+      'Collections & algorithms',
+      'Object model & OOP',
+      'Concurrency & parallelism',
+      'Performance & optimization',
+      'Runtime, imports & testing',
     ]));
+  });
+
+  it('covers the requested Python revision domains with substantial topic depth', () => {
+    const minimumCardsByTopic: Record<string, number> = {
+      'References & values': 10,
+      Collections: 10,
+      'Functions & iteration': 20,
+      'Classes & interfaces': 10,
+      Typing: 20,
+      Dataclasses: 8,
+      'Pydantic v2': 30,
+      'Reliability & I/O': 20,
+      'Syntax & control flow': 12,
+      'Collections & algorithms': 14,
+      'Object model & OOP': 15,
+      'Concurrency & parallelism': 20,
+      'Performance & optimization': 10,
+      'Runtime, imports & testing': 10,
+    };
+
+    for (const [topic, minimum] of Object.entries(minimumCardsByTopic)) {
+      expect(
+        pythonTriviaDeck.cards.filter((card) => card.topic === topic).length,
+        `${topic} coverage`,
+      ).toBeGreaterThanOrEqual(minimum);
+    }
+  });
+
+  it('keeps every expanded Python card concrete and explanatory', () => {
+    const expandedCards = pythonTriviaDeck.cards.slice(88);
+    expect(expandedCards.length).toBeGreaterThanOrEqual(110);
+    expect(expandedCards.every((card) => Boolean(card.code) || card.question.includes('`'))).toBe(true);
+    expect(expandedCards.every((card) => (card.explanation?.split(/\s+/).length ?? 0) >= 8)).toBe(true);
+    expect(expandedCards.every((card) => (card.detail?.split(/\s+/).length ?? 0) >= 20)).toBe(true);
   });
 
   it('keeps code and concept on the same practical Python card', () => {
