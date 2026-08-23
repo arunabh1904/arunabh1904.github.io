@@ -12,6 +12,7 @@ export interface TriviaGrade {
 
 function answerWords(value: string): string[] {
   const literal = value.trim().replaceAll('`', '');
+  if (literal === '[]') return ['emptylist'];
   if (literal === '==') return ['doubleequals'];
   if (literal === '/') return ['slash'];
   if (literal === '*') return ['star'];
@@ -81,7 +82,7 @@ export function gradeTriviaAnswer(card: TriviaCard, answer: string): TriviaGrade
       label: 'Close',
       explanation: nearMiss
         ? 'That looks like a one-character typo. Check the reference spelling.'
-        : 'You recalled part of the term. Supply the complete one- or two-word answer.',
+        : 'You recalled part of the term. Supply the complete short answer.',
       matchedConcepts: sharedWords,
       missingConcepts: [card.answer],
     };
