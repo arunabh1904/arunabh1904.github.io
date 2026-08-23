@@ -1,4 +1,5 @@
 import type { TriviaDeckData } from './trivia-decks';
+import { pythonTriviaDetails } from './python-trivia-details';
 
 /**
  * Practical Python recall for ML engineering work.
@@ -6,14 +7,15 @@ import type { TriviaDeckData } from './trivia-decks';
  * Each card keeps the scenario and concept together: `answer` is the short
  * phrase the grader checks, while `explanation` supplies the production rule.
  */
-export const practicalPythonTriviaDeck = {
+const practicalPythonTriviaSourceDeck = {
   id: 'python-interview-trivia-v3',
   title: 'Practical Python for ML engineering',
   cards: [
     {
       id: 'python-aliasing-append',
       topic: 'References & values',
-      question: 'What is `b` after `a = []; b = a; a.append("sample")`?',
+      code: 'a: list[str] = []\nb = a\na.append("sample")',
+      question: 'What value does `b` contain?',
       answer: '`["sample"]`',
       acceptedAnswers: ['[sample]'],
       explanation: 'Assignment aliases the same list instead of copying it, so mutation is visible through both names.',
@@ -30,7 +32,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-identity-vs-equality',
       topic: 'References & values',
-      question: 'Which operators belong in `cached ___ None` and `prediction ___ target`?',
+      code: 'cached ___ None\nprediction ___ target',
+      question: 'Which operator belongs in each blank?',
       answer: '`is` / `==`',
       acceptedAnswers: ['is and ==', 'is, =='],
       explanation: 'Use identity for `None` and sentinels, and equality for values.',
@@ -38,6 +41,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-missing-sentinel',
       topic: 'References & values',
+      code: 'MISSING = object()\n\ndef load(value: object = MISSING) -> object:\n    ...',
       question: 'What should represent “not supplied” when `None` is a valid value?',
       answer: 'Sentinel',
       acceptedAnswers: ['MISSING', 'object sentinel'],
@@ -55,7 +59,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-repeated-inner-list',
       topic: 'References & values',
-      question: 'What is `rows` after `rows = [[]] * 3; rows[0].append(1)`?',
+      code: 'rows: list[list[int]] = [[]] * 3\nrows[0].append(1)',
+      question: 'What value does `rows` contain?',
       answer: '`[[1], [1], [1]]`',
       acceptedAnswers: ['[[1],[1],[1]]'],
       explanation: 'List repetition copied one reference three times, so every row names the same inner list.',
@@ -72,13 +77,15 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-tuple-shallow-immutability',
       topic: 'References & values',
-      question: 'Does `cfg = ({"lr": 1e-3},); cfg[0]["lr"] = 1e-4` succeed?',
+      code: 'cfg = ({"lr": 1e-3},)\ncfg[0]["lr"] = 1e-4',
+      question: 'Does the assignment succeed?',
       answer: 'Yes',
       explanation: 'A tuple fixes its references but does not freeze the mutable objects stored in its slots.',
     },
     {
       id: 'python-falsy-valid-value',
       topic: 'References & values',
+      code: 'lr = 1e-3 if supplied_lr is None else supplied_lr',
       question: 'How should `lr` default when `0.0` is valid and `None` means missing?',
       answer: 'Explicit `None` check',
       acceptedAnswers: ['if lr is None', 'is None'],
@@ -87,14 +94,16 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-nan-equality',
       topic: 'References & values',
-      question: 'What does `x == x` return after `x = float("nan")`?',
+      code: 'x = float("nan")\nresult = x == x',
+      question: 'What value does `result` contain?',
       answer: '`False`',
       explanation: 'NaN is not equal to itself; detect it with `math.isnan(x)`.',
     },
     {
       id: 'python-float-comparison',
       topic: 'References & values',
-      question: 'How should code compare `0.1 + 0.2` with `0.3`?',
+      code: 'actual = 0.1 + 0.2\nexpected = 0.3',
+      question: 'How should code compare `actual` with `expected`?',
       answer: '`math.isclose()`',
       acceptedAnswers: ['math.isclose', 'isclose'],
       explanation: 'Binary floating-point arithmetic is approximate, so equality checks need explicit relative and absolute tolerances.',
@@ -103,7 +112,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-list-vs-tuple',
       topic: 'Collections',
-      question: 'Which types fit a mutable transform pipeline and a fixed `(scene_id, frame_id)` key?',
+      code: 'pipeline = [decode, resize, normalize]\ncache_key = (scene_id, frame_id)',
+      question: 'Which collection contract fits each value?',
       answer: 'List / tuple',
       acceptedAnswers: ['list and tuple', 'list, tuple'],
       explanation: 'Use a list for a mutable sequence and a tuple for a fixed record or hashable composite key.',
@@ -127,7 +137,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-split-leakage-intersection',
       topic: 'Collections',
-      question: 'What does `train_ids & val_ids` reveal when both values are sets?',
+      code: 'overlap = train_ids & val_ids',
+      question: 'What does a nonempty `overlap` reveal?',
       answer: 'Split leakage',
       acceptedAnswers: ['set intersection', 'overlapping ids', 'intersection'],
       explanation: 'Set intersection returns the IDs present in both dataset splits.',
@@ -142,7 +153,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-sort-vs-sorted',
       topic: 'Collections',
-      question: 'How do `xs.sort()` and `sorted(xs)` differ?',
+      code: 'in_place_result = xs.sort()\nnew_list = sorted(xs)',
+      question: 'How do the two operations differ?',
       answer: 'In-place / new list',
       acceptedAnswers: ['mutates / copies', 'in place and copy'],
       explanation: '`sort()` mutates and returns `None`; `sorted()` returns a stable new list.',
@@ -150,6 +162,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-zip-strict',
       topic: 'Collections',
+      code: 'for label, prediction in zip(labels, predictions, strict=True):\n    evaluate(label, prediction)',
       question: 'How should labels and predictions be zipped when their lengths must match?',
       answer: '`zip(..., strict=True)`',
       acceptedAnswers: ['strict zip', 'zip strict true'],
@@ -200,7 +213,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-eager-vs-lazy-comprehension',
       topic: 'Functions & iteration',
-      question: 'How do `[decode(p) for p in paths]` and `(decode(p) for p in paths)` evaluate?',
+      code: 'eager = [decode(path) for path in paths]\nlazy = (decode(path) for path in paths)',
+      question: 'How do `eager` and `lazy` evaluate?',
       answer: 'Eager / lazy',
       acceptedAnswers: ['list eager generator lazy'],
       explanation: 'The list computes and stores every result immediately; the generator computes during iteration.',
@@ -208,7 +222,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-yield-generator-function',
       topic: 'Functions & iteration',
-      question: 'What does calling a function that contains `yield batch` return?',
+      code: 'def batches(loader: Loader) -> Iterator[Batch]:\n    for batch in loader:\n        yield batch\n\nresult = batches(loader)',
+      question: 'What kind of object is `result`?',
       answer: 'Generator iterator',
       acceptedAnswers: ['generator'],
       explanation: 'Calling a generator function returns an iterator whose local frame resumes after each `yield`.',
@@ -216,7 +231,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-first-match',
       topic: 'Functions & iteration',
-      question: 'What does `next((s for s in samples if s.id == target), None)` return?',
+      code: 'match = next(\n    (sample for sample in samples if sample.id == target),\n    None,\n)',
+      question: 'What value does `match` receive?',
       answer: 'First match or `None`',
       acceptedAnswers: ['match or none', 'first match'],
       explanation: 'The generator stops at the first match and avoids constructing a temporary list.',
@@ -233,7 +249,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-closure-late-binding',
       topic: 'Functions & iteration',
-      question: 'What does `[f() for f in [lambda: i for i in range(3)]]` return?',
+      code: 'functions = [lambda: i for i in range(3)]\nresult = [function() for function in functions]',
+      question: 'What value does `result` contain?',
       answer: '`[2, 2, 2]`',
       acceptedAnswers: ['[2,2,2]'],
       explanation: 'Closures look up `i` when called; capture each loop value with `lambda i=i: i`.',
@@ -241,7 +258,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-partial-callable',
       topic: 'Functions & iteration',
-      question: 'What does `partial(resize, size=224)` create?',
+      code: 'resize_224 = partial(resize, size=224)',
+      question: 'What kind of object is `resize_224`?',
       answer: 'Pre-bound callable',
       acceptedAnswers: ['partial function', 'functools.partial', 'callable'],
       explanation: '`functools.partial` creates a callable with selected arguments already bound.',
@@ -257,7 +275,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-lru-cache-contract',
       topic: 'Functions & iteration',
-      question: 'When is `@lru_cache` appropriate for `load_schema(path)`?',
+      code: '@lru_cache(maxsize=128)\ndef load_schema(path: Path) -> Schema:\n    ...',
+      question: 'When is this cache safe and useful?',
       answer: 'Pure, hashable calls',
       acceptedAnswers: ['pure function', 'hashable arguments'],
       explanation: 'Memoization assumes equivalent hashable arguments produce reusable results, and the cache retains arguments and return values.',
@@ -284,7 +303,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-bound-method-self',
       topic: 'Classes & interfaces',
-      question: 'What does accessing `obj.run` bind automatically?',
+      code: 'bound_run = obj.run',
+      question: 'What argument does `bound_run` carry automatically?',
       answer: '`self`',
       acceptedAnswers: ['instance'],
       explanation: 'Instance attribute access turns the function on the class into a bound method carrying `obj` as `self`.',
@@ -292,7 +312,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-classmethod-constructor',
       topic: 'Classes & interfaces',
-      question: 'What pattern does `@classmethod def from_dict(cls, data) -> Self` implement?',
+      code: '@classmethod\ndef from_dict(cls, data: Mapping[str, object]) -> Self:\n    return cls(**data)',
+      question: 'What construction pattern does this method implement?',
       answer: 'Alternative constructor',
       acceptedAnswers: ['factory method'],
       explanation: 'Constructing through `cls` preserves the correct runtime class for subclasses.',
@@ -308,7 +329,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-property-boundary',
       topic: 'Classes & interfaces',
-      question: 'When is `@property def num_samples(self)` a good interface?',
+      code: '@property\ndef num_samples(self) -> int:\n    return len(self.samples)',
+      question: 'When is this property a good interface?',
       answer: 'Cheap derived state',
       acceptedAnswers: ['computed attribute', 'cheap computation'],
       explanation: 'Properties fit cheap, unsurprising derived values; hidden expensive I/O should remain an explicit method.',
@@ -316,7 +338,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-callable-transform',
       topic: 'Classes & interfaces',
-      question: 'Which method lets a configured transform object support `transform(sample)`?',
+      code: 'output = transform(sample)',
+      question: 'Which method lets a configured object support this call?',
       answer: '`__call__`',
       explanation: '`__call__` makes an instance callable while keeping its configuration and state on the object.',
     },
@@ -331,7 +354,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-protocol-interface',
       topic: 'Classes & interfaces',
-      question: 'Which typing construct accepts any object with `transform(sample)` without inheritance?',
+      code: 'class Transform(Protocol):\n    def __call__(self, sample: Sample) -> Sample:\n        ...',
+      question: 'Which typing construct accepts matching objects without inheritance?',
       answer: '`Protocol`',
       acceptedAnswers: ['typing.Protocol', 'structural protocol'],
       explanation: 'A protocol defines a structural static interface based on available members.',
@@ -339,7 +363,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-super-mro',
       topic: 'Classes & interfaces',
-      question: 'Where does `super().run()` dispatch?',
+      code: 'class TimedStage(Stage):\n    def run(self) -> Result:\n        start_timer()\n        return super().run()',
+      question: 'Where does the final call dispatch?',
       answer: 'Next in the MRO',
       acceptedAnswers: ['method resolution order', 'next MRO implementation'],
       explanation: '`super()` continues after the current class in the runtime method resolution order, not necessarily at the textual parent.',
@@ -348,7 +373,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-annotations-runtime',
       topic: 'Typing',
-      question: 'Does `def train(epochs: int): ...; train("10")` fail because of the annotation?',
+      code: 'def train(epochs: int) -> None:\n    ...\n\ntrain("10")',
+      question: 'Does Python reject the call because of the annotation?',
       answer: 'No',
       explanation: 'Python stores annotations but does not enforce them at runtime unless another tool participates.',
     },
@@ -363,7 +389,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-nullable-not-optional',
       topic: 'Typing',
-      question: 'Does `cache_dir: Path | None` make the function argument optional?',
+      code: 'def load(cache_dir: Path | None) -> Dataset:\n    ...',
+      question: 'Does the signature let the caller omit `cache_dir`?',
       answer: 'No',
       explanation: 'The annotation permits `None`; the argument becomes optional to callers only when the signature also supplies a default.',
     },
@@ -378,7 +405,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-iterable-vs-iterator-type',
       topic: 'Typing',
-      question: 'What extra contract does `Iterator[Sample]` add beyond `Iterable[Sample]`?',
+      code: 'source: Iterable[Sample]\ncursor: Iterator[Sample]',
+      question: 'What extra contract does `cursor` add beyond `source`?',
       answer: '`next()` and consumption',
       acceptedAnswers: ['next', 'stateful cursor'],
       explanation: 'An iterator is its own advancing traversal cursor, while an iterable only needs to produce an iterator.',
@@ -394,7 +422,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-callable-signature',
       topic: 'Typing',
-      question: 'What does `Callable[[Sample], Sample]` require?',
+      code: 'transform: Callable[[Sample], Sample]',
+      question: 'What input-output contract does `transform` have?',
       answer: 'Sample-to-Sample callable',
       acceptedAnswers: ['callable from Sample to Sample', 'function signature'],
       explanation: 'The value must be callable with one `Sample` and statically return a `Sample`.',
@@ -409,7 +438,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-literal-optimizer',
       topic: 'Typing',
-      question: 'Which type restricts `optimizer` to the exact strings `"adam"` and `"sgd"`?',
+      code: 'optimizer: Literal["adam", "sgd"]',
+      question: 'Which type restricts `optimizer` to these exact strings?',
       answer: '`Literal["adam", "sgd"]`',
       acceptedAnswers: ['Literal', 'typing.Literal'],
       explanation: '`Literal` lets a static checker reject other string values.',
@@ -417,7 +447,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-annotated-field',
       topic: 'Typing',
-      question: 'What does `Annotated[int, Field(gt=0)]` communicate?',
+      code: 'batch_size: Annotated[int, Field(gt=0)]',
+      question: 'What does this annotation communicate?',
       answer: '`int` plus metadata',
       acceptedAnswers: ['Annotated metadata', 'int with validation metadata'],
       explanation: 'Static type checkers see `int`, while Pydantic consumes the attached runtime constraint.',
@@ -435,6 +466,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-dataclass-generated-methods',
       topic: 'Dataclasses',
+      code: '@dataclass\nclass RunConfig:\n    epochs: int\n    lr: float',
       question: 'What does plain `@dataclass` normally generate?',
       answer: '`__init__`, `__repr__`, `__eq__`',
       acceptedAnswers: ['init repr eq'],
@@ -443,6 +475,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-dataclass-mutable-default',
       topic: 'Dataclasses',
+      code: '@dataclass\nclass Sample:\n    tags: list[str] = field(default_factory=list)',
       question: 'How should a dataclass declare `tags` with a fresh empty list per instance?',
       answer: '`field(default_factory=list)`',
       acceptedAnswers: ['default_factory=list', 'default factory'],
@@ -451,6 +484,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-dataclass-post-init',
       topic: 'Dataclasses',
+      code: 'def __post_init__(self) -> None:\n    if self.warmup_steps >= self.total_steps:\n        raise ValueError("warmup must end before training")',
       question: 'Where should a dataclass enforce `warmup_steps < total_steps`?',
       answer: '`__post_init__`',
       acceptedAnswers: ['post init'],
@@ -459,7 +493,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-dataclass-classvar',
       topic: 'Dataclasses',
-      question: 'What does `VERSION: ClassVar[str] = "v2"` declare in a dataclass?',
+      code: 'VERSION: ClassVar[str] = "v2"',
+      question: 'What kind of dataclass attribute is `VERSION`?',
       answer: 'Class variable',
       acceptedAnswers: ['ClassVar'],
       explanation: '`ClassVar` excludes the name from dataclass fields and the generated initializer.',
@@ -467,14 +502,16 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-dataclass-frozen-shallow',
       topic: 'Dataclasses',
-      question: 'Can a list field inside `@dataclass(frozen=True)` still mutate?',
+      code: '@dataclass(frozen=True)\nclass Config:\n    tags: list[str]',
+      question: 'Can the `tags` list still mutate?',
       answer: 'Yes',
       explanation: 'Frozen dataclasses block normal field rebinding but do not recursively freeze referenced objects.',
     },
     {
       id: 'python-dataclass-kw-only',
       topic: 'Dataclasses',
-      question: 'What does `@dataclass(kw_only=True)` require at construction?',
+      code: '@dataclass(kw_only=True)\nclass RunConfig:\n    epochs: int\n    lr: float',
+      question: 'How must callers provide the generated initializer arguments?',
       answer: 'Named fields',
       acceptedAnswers: ['keyword arguments', 'keyword-only fields'],
       explanation: 'Every generated initializer parameter must be supplied by keyword.',
@@ -482,7 +519,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-dataclass-slots',
       topic: 'Dataclasses',
-      question: 'What is the usual effect of `@dataclass(slots=True)`?',
+      code: '@dataclass(slots=True)\nclass Point:\n    x: float\n    y: float',
+      question: 'What is the usual effect of enabling `slots`?',
       answer: 'Generated slots',
       acceptedAnswers: ['__slots__', 'lower instance overhead'],
       explanation: 'The decorator generates slots, which usually reduce per-instance overhead and prevent undeclared attributes.',
@@ -490,6 +528,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-dataclass-replace',
       topic: 'Dataclasses',
+      code: 'updated = replace(config, lr=1e-4)',
       question: 'How should code create a modified configuration without mutating the dataclass instance?',
       answer: '`dataclasses.replace()`',
       acceptedAnswers: ['replace', 'dataclasses.replace'],
@@ -498,7 +537,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-dataclass-asdict',
       topic: 'Dataclasses',
-      question: 'Why can `asdict(state)` be risky when fields hold large runtime objects?',
+      code: 'payload = asdict(training_state)',
+      question: 'Why can this conversion be risky when fields hold large runtime objects?',
       answer: 'Recursive deep copy',
       acceptedAnswers: ['deep copy', 'recursive conversion'],
       explanation: '`asdict` recurses through nested containers and deep-copies other objects; serialize selected metadata instead.',
@@ -515,7 +555,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-dataclass',
       topic: 'Pydantic v2',
-      question: 'What does `@pydantic.dataclasses.dataclass` add to dataclass ergonomics?',
+      code: '@pydantic.dataclasses.dataclass\nclass RunConfig:\n    epochs: int',
+      question: 'What does the Pydantic decorator add?',
       answer: 'Runtime validation',
       acceptedAnswers: ['validated dataclass', 'Pydantic validation'],
       explanation: 'Pydantic validates construction; use `TypeAdapter` when model-style validation, dump, or schema APIs are needed.',
@@ -523,7 +564,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-default-coercion',
       topic: 'Pydantic v2',
-      question: 'What is `RunConfig(epochs="10").epochs` under default Pydantic settings?',
+      code: 'config = RunConfig(epochs="10")\nresult = config.epochs',
+      question: 'What value and runtime type does `result` have under default settings?',
       answer: '`10` as an `int`',
       acceptedAnswers: ['10', 'integer 10', 'int 10'],
       explanation: 'Pydantic uses coercive validation by default and converts compatible strings to integers.',
@@ -531,6 +573,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-strict-mode',
       topic: 'Pydantic v2',
+      code: 'class RunConfig(BaseModel):\n    model_config = ConfigDict(strict=True)\n    epochs: int',
       question: 'How should a model reject the string `"10"` for an integer field?',
       answer: 'Strict mode',
       acceptedAnswers: ['strict=True', 'ConfigDict(strict=True)'],
@@ -539,6 +582,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-extra-forbid',
       topic: 'Pydantic v2',
+      code: 'class RunConfig(BaseModel):\n    model_config = ConfigDict(extra="forbid")\n    batch_size: int',
       question: 'Which configuration catches a misspelled key such as `batch_szie`?',
       answer: '`ConfigDict(extra="forbid")`',
       acceptedAnswers: ['extra forbid', 'extra="forbid"'],
@@ -547,7 +591,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-positive-field',
       topic: 'Pydantic v2',
-      question: 'How should a Pydantic field require `batch_size > 0`?',
+      code: 'batch_size: int = Field(gt=0)',
+      question: 'How does this field require a positive value?',
       answer: '`Field(gt=0)`',
       acceptedAnswers: ['gt=0', 'Field greater than zero'],
       explanation: 'A declarative field constraint produces validation and schema metadata from the same rule.',
@@ -555,6 +600,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-default-factory',
       topic: 'Pydantic v2',
+      code: 'tags: list[str] = Field(default_factory=list)',
       question: 'How should a Pydantic model give every instance a fresh `tags` list?',
       answer: '`Field(default_factory=list)`',
       acceptedAnswers: ['default_factory=list', 'default factory'],
@@ -563,6 +609,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-field-validator',
       topic: 'Pydantic v2',
+      code: '@field_validator("model_name")\n@classmethod\ndef normalize_name(cls, value: str) -> str:\n    return value.strip().lower()',
       question: 'Which validator should normalize one field such as `model_name`?',
       answer: '`@field_validator`',
       acceptedAnswers: ['field_validator', 'field validator'],
@@ -571,6 +618,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-model-validator',
       topic: 'Pydantic v2',
+      code: '@model_validator(mode="after")\ndef validate_schedule(self) -> Self:\n    if self.warmup_steps >= self.total_steps:\n        raise ValueError("invalid schedule")\n    return self',
       question: 'Which validator should enforce `warmup_steps < total_steps`?',
       answer: '`@model_validator`',
       acceptedAnswers: ['model_validator', 'model validator'],
@@ -579,7 +627,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-assignment-validation',
       topic: 'Pydantic v2',
-      question: 'Which configuration revalidates `cfg.batch_size = "bad"` after construction?',
+      code: 'class RunConfig(BaseModel):\n    model_config = ConfigDict(validate_assignment=True)\n    batch_size: int\n\nconfig.batch_size = "bad"',
+      question: 'Which configuration revalidates the final assignment?',
       answer: '`validate_assignment=True`',
       acceptedAnswers: ['validate assignment', 'ConfigDict(validate_assignment=True)'],
       explanation: 'Pydantic does not revalidate ordinary field assignment unless assignment validation is enabled.',
@@ -587,6 +636,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-io-api',
       topic: 'Pydantic v2',
+      code: 'config = RunConfig.model_validate(payload)\nnormalized = config.model_dump()',
       question: 'Which Pydantic v2 API pair validates Python input and returns Python output?',
       answer: '`model_validate` / `model_dump`',
       acceptedAnswers: ['model_validate and model_dump', 'validate / dump'],
@@ -595,7 +645,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-type-adapter',
       topic: 'Pydantic v2',
-      question: 'How should code validate `list[Sample]` without a wrapper model?',
+      code: 'samples_adapter = TypeAdapter(list[Sample])\nsamples = samples_adapter.validate_python(payload)',
+      question: 'Which object validates the list without a wrapper model?',
       answer: '`TypeAdapter(list[Sample])`',
       acceptedAnswers: ['TypeAdapter', 'type adapter'],
       explanation: 'A reusable `TypeAdapter` validates, serializes, and produces schemas for arbitrary annotated types.',
@@ -603,6 +654,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-private-attr',
       topic: 'Pydantic v2',
+      code: '_cache: dict[str, Tensor] = PrivateAttr(default_factory=dict)',
       question: 'How should a model store a runtime-only cache or database client?',
       answer: '`PrivateAttr`',
       acceptedAnswers: ['private attribute'],
@@ -611,7 +663,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-arbitrary-tensor',
       topic: 'Pydantic v2',
-      question: 'What does `arbitrary_types_allowed=True` validate for a `torch.Tensor` field?',
+      code: 'model_config = ConfigDict(arbitrary_types_allowed=True)\nfeatures: torch.Tensor',
+      question: 'What does this configuration validate about `features`?',
       answer: '`isinstance` only',
       acceptedAnswers: ['instance type only', 'type only'],
       explanation: 'The setting checks the runtime class, not tensor shape, dtype, values, layout, or device.',
@@ -619,6 +672,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-model-construct',
       topic: 'Pydantic v2',
+      code: 'config = RunConfig.model_construct(**trusted_payload)',
       question: 'Which API constructs a model from already trusted data without validation?',
       answer: '`model_construct()`',
       acceptedAnswers: ['model_construct'],
@@ -627,13 +681,15 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-pydantic-model-copy',
       topic: 'Pydantic v2',
-      question: 'Does `cfg.model_copy()` normally copy nested model state deeply?',
+      code: 'copied = config.model_copy()',
+      question: 'Does `copied` contain deep copies of nested model state by default?',
       answer: 'No',
       explanation: '`model_copy()` is shallow by default; pass `deep=True` when nested objects must be copied.',
     },
     {
       id: 'python-pydantic-discriminated-union',
       topic: 'Pydantic v2',
+      code: 'OptimizerConfig = Annotated[\n    AdamConfig | SGDConfig,\n    Field(discriminator="type"),\n]',
       question: 'Which construct models Adam and SGD configurations with different required fields?',
       answer: 'Discriminated union',
       acceptedAnswers: ['tagged union', 'Field discriminator'],
@@ -650,7 +706,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-explicit-exception-cause',
       topic: 'Reliability & I/O',
-      question: 'What does `raise ConfigError(path) from exc` preserve?',
+      code: 'try:\n    payload = read_config(path)\nexcept OSError as exc:\n    raise ConfigError(path) from exc',
+      question: 'What does the final statement preserve?',
       answer: 'Explicit cause',
       acceptedAnswers: ['exception cause', 'traceback chain', '__cause__'],
       explanation: 'Exception chaining preserves the original failure and its traceback while adding boundary-specific context.',
@@ -658,7 +715,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-context-manager-cleanup',
       topic: 'Reliability & I/O',
-      question: 'What guarantee does `with open(path) as handle:` provide?',
+      code: 'with path.open("rb") as handle:\n    payload = handle.read()',
+      question: 'What cleanup guarantee does the context manager provide?',
       answer: 'Exit-time cleanup',
       acceptedAnswers: ['file cleanup', 'close on exit', 'context manager'],
       explanation: 'The context manager runs its exit logic on both normal completion and exceptions.',
@@ -681,7 +739,8 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-sorted-glob',
       topic: 'Reliability & I/O',
-      question: 'How should reproducible ingestion consume `Path(root).glob("*.json")`?',
+      code: 'paths = sorted(Path(root).glob("*.json"))',
+      question: 'Why is the explicit sort required for reproducible ingestion?',
       answer: '`sorted(...)`',
       acceptedAnswers: ['sort the paths', 'sorted'],
       explanation: 'Filesystem enumeration order is not a reproducibility guarantee.',
@@ -696,6 +755,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-stable-experiment-id',
       topic: 'Reliability & I/O',
+      code: 'digest = hashlib.sha256(canonical_config_bytes).hexdigest()',
       question: 'How should code derive a persistent experiment ID from canonical configuration bytes?',
       answer: '`hashlib` digest',
       acceptedAnswers: ['cryptographic hash', 'stable digest', 'hashlib'],
@@ -704,6 +764,7 @@ export const practicalPythonTriviaDeck = {
     {
       id: 'python-multiprocessing-entrypoint',
       topic: 'Reliability & I/O',
+      code: 'def worker(item: Item) -> Result:\n    ...\n\nif __name__ == "__main__":\n    run_pool(worker)',
       question: 'What makes a multiprocessing script safe under the spawn start method?',
       answer: 'Main guard and top-level worker',
       acceptedAnswers: ['if __name__ main', 'main guard', 'spawn-safe entrypoint'],
@@ -718,4 +779,20 @@ export const practicalPythonTriviaDeck = {
       explanation: 'Threads overlap blocking I/O, processes bypass the traditional GIL for Python CPU work, and `asyncio` coordinates nonblocking I/O.',
     },
   ],
+} satisfies TriviaDeckData;
+
+const missingDetailIds = practicalPythonTriviaSourceDeck.cards
+  .map((card) => card.id)
+  .filter((id) => !pythonTriviaDetails[id]);
+
+if (missingDetailIds.length > 0) {
+  throw new Error(`Python trivia cards missing mental models: ${missingDetailIds.join(', ')}`);
+}
+
+export const practicalPythonTriviaDeck = {
+  ...practicalPythonTriviaSourceDeck,
+  cards: practicalPythonTriviaSourceDeck.cards.map((card) => ({
+    ...card,
+    detail: pythonTriviaDetails[card.id],
+  })),
 } satisfies TriviaDeckData;

@@ -111,13 +111,13 @@ const pytorchTriviaSourceDeck: TriviaSourceDeck = {
       id: 'torch-leaf-grad',
       topic: 'Autograd',
       question: 'Which tensors receive a populated `.grad` after backward?',
-      answer: 'Leaf tensors with `requires_grad=True` accumulate gradients by default. Intermediates need `retain_grad()` if their `.grad` field must be inspected.',
+      answer: 'Leaf tensors with `requires_grad=True` accumulate gradients by default. Intermediates need `retain_grad()` if their `.grad` field must be inspected. This default keeps retained gradient state focused on optimization inputs.',
     },
     {
       id: 'torch-grad-accumulation',
       topic: 'Autograd',
       question: 'Does `backward()` overwrite existing parameter gradients?',
-      answer: 'No. It accumulates into `.grad`. Clear gradients at the intended accumulation boundary, commonly with `optimizer.zero_grad(set_to_none=True)`.',
+      answer: 'No. It accumulates into `.grad`. Clear gradients at the intended accumulation boundary, commonly with `optimizer.zero_grad(set_to_none=True)`. Accumulation enables larger effective batches but makes stale gradients dangerous.',
     },
     {
       id: 'torch-none-zero-grad',
@@ -195,7 +195,7 @@ const pytorchTriviaSourceDeck: TriviaSourceDeck = {
       id: 'torch-forward-call',
       topic: 'Modules & state',
       question: 'Why call `model(x)` instead of `model.forward(x)`?',
-      answer: '`nn.Module.__call__` wraps `forward` with framework behavior such as hooks and compiled-call machinery. Directly calling `forward` bypasses that wrapper.',
+      answer: '`nn.Module.__call__` wraps `forward` with framework behavior such as hooks and compiled-call machinery. Directly calling `forward` bypasses that wrapper. Treat `model(...)` as the module’s public invocation boundary.',
     },
     {
       id: 'torch-cross-entropy-logits',
@@ -420,7 +420,7 @@ function buildAtomicDeck(
       answer: spec.answer,
       acceptedAnswers: spec.acceptedAnswers,
       explanation,
-      detail: source.detail,
+      detail: source.detail ?? source.answer,
     };
 
     if (!spec.code) return [conceptCard];
@@ -443,6 +443,7 @@ function buildAtomicDeck(
         acceptedAnswers: spec.codeAcceptedAnswers,
         explanation: codeExplanation,
         code: spec.code,
+        detail: source.detail ?? source.answer,
       },
     ];
   });

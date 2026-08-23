@@ -216,7 +216,11 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
             {topics.map((item) => <option key={item}>{item}</option>)}
           </select>
         </label>
-        <button type="button" className="trivia-deck__quiet-action" onClick={shuffleCards}>
+        <button
+          type="button"
+          className="trivia-deck__action trivia-deck__toolbar-action"
+          onClick={shuffleCards}
+        >
           Shuffle
         </button>
       </div>
@@ -239,9 +243,12 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
       <article className={`trivia-card${revealed ? ' trivia-card--revealed' : ''}`} aria-live="polite">
         <p className="trivia-card__topic">{card.topic}</p>
         {card.code && (
-          <pre className="trivia-card__prompt-code" aria-label="Production code scenario">
-            <code>{card.code}</code>
-          </pre>
+          <section className="trivia-card__scenario" aria-label="Code scenario">
+            <p>Code scenario</p>
+            <pre className="trivia-card__prompt-code">
+              <code>{card.code}</code>
+            </pre>
+          </section>
         )}
         <p className="trivia-card__question" role="heading" aria-level={2}>
           {inlineCode(card.question)}
@@ -267,7 +274,7 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
             />
             <button
               type="button"
-              className="trivia-card__reveal"
+              className="trivia-deck__action trivia-card__reveal"
               onClick={gradeAnswer}
               aria-expanded="false"
             >
@@ -307,23 +314,33 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
               <p>{inlineCode(card.answer)}</p>
               {card.explanation && (
                 <div className="trivia-card__explanation">
-                  <h4>Why it matters</h4>
+                  <h4>Why it works</h4>
                   <p>{inlineCode(card.explanation)}</p>
                 </div>
               )}
-              {card.detail && <p className="trivia-card__detail">{inlineCode(card.detail)}</p>}
+              {card.detail && (
+                <div className="trivia-card__detail">
+                  <h4>Mental model</h4>
+                  <p>{inlineCode(card.detail)}</p>
+                </div>
+              )}
             </section>
           </div>
         )}
       </article>
 
       <div className="trivia-deck__navigation">
-        <button type="button" onClick={() => move(-1)} aria-label="Previous trivia card">
+        <button
+          type="button"
+          className="trivia-deck__action"
+          onClick={() => move(-1)}
+          aria-label="Previous trivia card"
+        >
           Previous
         </button>
         <button
           type="button"
-          className="trivia-deck__primary"
+          className="trivia-deck__action"
           onClick={() => move(1)}
           aria-label="Next trivia card"
         >
@@ -334,7 +351,9 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
 
       <div className="trivia-deck__footer">
         <span>Enter grades · arrows move</span>
-        <button type="button" onClick={resetProgress}>Reset progress</button>
+        <button type="button" className="trivia-deck__action" onClick={resetProgress}>
+          Reset progress
+        </button>
       </div>
     </section>
   );
