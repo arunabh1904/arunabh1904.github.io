@@ -22,6 +22,7 @@ const deck: TriviaDeckData = {
       answer: 'Object identity',
       acceptedAnswers: ['identity'],
       explanation: 'Identity asks whether two names refer to the same object.',
+      detail: 'Names are labels for objects, so identity compares the referenced objects instead of comparing their values.',
     },
     {
       id: 'two',
@@ -91,7 +92,19 @@ describe('TriviaDeck', () => {
 
     expect(container.textContent).toContain('same object');
     expect(container.textContent).toContain('My candidate answer.');
+    expect(container.textContent).toContain('Why it works');
+    expect(container.textContent).toContain('Mental model');
+    expect(container.textContent).toContain('Names are labels for objects');
     expect(container.querySelector('[aria-label="Automatic grade"]')).not.toBeNull();
+  });
+
+  it('uses one consistent treatment for every deck action', async () => {
+    await renderDeck();
+
+    const buttons = Array.from(container.querySelectorAll('button'));
+    expect(buttons).toHaveLength(5);
+    expect(buttons.every((button) => button.classList.contains('trivia-deck__action')))
+      .toBe(true);
   });
 
   it('marks a passing answer correct and persists the automatic score', async () => {
@@ -111,7 +124,7 @@ describe('TriviaDeck', () => {
     await renderDeck();
     click('Next trivia card');
 
-    expect(container.querySelector('[aria-label="Production code scenario"]')?.textContent)
+    expect(container.querySelector('[aria-label="Code scenario"]')?.textContent)
       .toContain('service.run()');
     expect(container.textContent).not.toContain('The runtime executes the program.');
 
@@ -119,7 +132,7 @@ describe('TriviaDeck', () => {
     click('Grade answer');
 
     expect(container.textContent).toContain('The runtime executes the program.');
-    expect(container.querySelectorAll('[aria-label="Production code scenario"]')).toHaveLength(1);
+    expect(container.querySelectorAll('[aria-label="Code scenario"]')).toHaveLength(1);
   });
 
   it('rejects a vague answer and identifies concepts to review', async () => {
@@ -251,6 +264,10 @@ describe('published trivia data', () => {
       expect(publishedDeck.cards.every((card) => card.question && card.answer && card.topic)).toBe(true);
       expect(publishedDeck.cards.every((card) => !card.answer.includes('\n'))).toBe(true);
       expect(publishedDeck.cards.every((card) => Boolean(card.explanation))).toBe(true);
+      const shallowMentalModels = publishedDeck.cards
+        .filter((card) => (card.detail?.trim().split(/\s+/).length ?? 0) < 20)
+        .map((card) => card.id);
+      expect(shallowMentalModels).toEqual([]);
     },
   );
 
@@ -274,7 +291,7 @@ describe('published trivia data', () => {
 
   it('keeps code and concept on the same practical Python card', () => {
     const codeCards = pythonTriviaDeck.cards.filter((card) => card.code);
-    expect(codeCards.length).toBeGreaterThanOrEqual(8);
+    expect(codeCards.length).toBeGreaterThanOrEqual(60);
     expect(codeCards.every((card) => !card.id.endsWith('-code'))).toBe(true);
     expect(pythonTriviaDeck.cards.every((card) => card.topic !== 'Code scenarios')).toBe(true);
   });
