@@ -1,6 +1,6 @@
 ---
 postSlug: how-unified-sensor-models-are-built-for-autonomous-driving
-sourceSha256: e62cce271a3ae13867d92bbfe37b168959ce9c0679d0938f66e1eba269dab1cc
+sourceSha256: 73dffa62b6213478328de9d8cb72d32198d4ce957b0dab9a1ec432354e565826
 ---
 
 # Autonomous-Vehicle Perception, circa 2026
