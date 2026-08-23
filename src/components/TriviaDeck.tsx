@@ -321,17 +321,15 @@ export default function TriviaDeck({ deck }: TriviaDeckProps) {
         <button type="button" onClick={() => move(-1)} aria-label="Previous trivia card">
           Previous
         </button>
-        {revealed ? (
-          <div className="trivia-deck__rating">
-            <button type="button" className="trivia-deck__primary" onClick={() => move(1)}>
-              Next card
-            </button>
-          </div>
-        ) : (
-          <button type="button" className="trivia-deck__primary" onClick={() => move(1)}>
-            Next
-          </button>
-        )}
+        <button
+          type="button"
+          className="trivia-deck__primary"
+          onClick={() => move(1)}
+          aria-label="Next trivia card"
+        >
+          <span>Next card</span>
+          <span aria-hidden="true">→</span>
+        </button>
       </div>
 
       <div className="trivia-deck__footer">

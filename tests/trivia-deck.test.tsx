@@ -57,7 +57,9 @@ describe('TriviaDeck', () => {
 
   function click(label: string) {
     const button = Array.from(container.querySelectorAll('button'))
-      .find((candidate) => candidate.textContent === label);
+      .find((candidate) => (
+        candidate.textContent === label || candidate.getAttribute('aria-label') === label
+      ));
     expect(button).not.toBeUndefined();
     act(() => button?.dispatchEvent(new MouseEvent('click', { bubbles: true })));
   }
@@ -107,7 +109,7 @@ describe('TriviaDeck', () => {
 
   it('shows a production snippet on the front of its own card', async () => {
     await renderDeck();
-    click('Next');
+    click('Next trivia card');
 
     expect(container.querySelector('[aria-label="Production code scenario"]')?.textContent)
       .toContain('service.run()');
@@ -144,7 +146,7 @@ describe('TriviaDeck', () => {
 
   it('filters by topic and resets the visible position', async () => {
     await renderDeck();
-    click('Next');
+    click('Next trivia card');
 
     const select = container.querySelector('select');
     await act(async () => {
