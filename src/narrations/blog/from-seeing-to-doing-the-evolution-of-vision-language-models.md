@@ -1,6 +1,6 @@
 ---
 postSlug: from-seeing-to-doing-the-evolution-of-vision-language-models
-sourceSha256: eb61d3b044197fa426b5b3c69fd0ca1a1f5e4650caa9bd52057db0bac6b3a121
+sourceSha256: 4ebe4f486dbc4439def4d189ad342832ed8ad24bed85eee6bb5e2651d4761a9e
 ---
 
 # Tracing the VLM Progression
