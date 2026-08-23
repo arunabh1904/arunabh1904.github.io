@@ -34,7 +34,7 @@ This is a fit guide dated August 13, 2026. File sizes are from the linked model 
 
 “Comfortable” does not mean “load a 128K context for free.” It means the weights leave a credible working budget. The KV cache, Metal buffers, multimodal projector, speculative draft model, application processes, and macOS all draw from the same physical memory. A model whose files consume `60+ GB` is not a `64 GB` laptop model merely because the operating system can swap.
 
-> **Deep insight:** Model fit is an application budget, not a weight-file test. The useful model is the one that leaves memory for its context, runtime, tools, and the rest of the machine.
+Model fit is an application budget, not a weight-file test. The useful model is the one that leaves memory for its context, runtime, tools, and the rest of the machine.
 
 I am using *open-weight* deliberately. These releases do not all use the same license, publish the same training information, or provide equally official Mac artifacts. A downloadable checkpoint is a deployment property, not a blanket claim that every part of the model is open source.
 

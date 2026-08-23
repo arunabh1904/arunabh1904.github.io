@@ -22,7 +22,7 @@ I do not measure management by the number of meetings I attend, the decisions th
 
 Management, at its best, is a compounding system. Good decisions create progress. Progress creates information. Information improves judgment. Better judgment produces greater autonomy, which allows the team to take on harder problems. My job is to keep that loop moving.
 
-## Code Is Only as Good as the Problem It Solves
+## Code is only as good as the problem it solves
 
 I love writing code. Building things is still one of the best ways to understand them. But code is only as good as the problem it solves.
 
@@ -40,7 +40,7 @@ Staying technical keeps those instincts honest. That might mean reviewing a diff
 
 Leading by example is different from leading through dependency. If I always take over the hardest problems, the team learns that important work eventually routes through me. The goal is not to prove that I can still be the strongest engineer in the room. It is to create more people who can solve problems I could not solve alone.
 
-## Go Slow to Go Fast
+## Go slow to go fast
 
 Engineering has two distinct modes: deciding where to go and moving in the chosen direction. Confusing them creates waste.
 
@@ -54,7 +54,7 @@ Expensive decisions deserve cheap evidence. A prototype, benchmark, ablation, tr
 
 Exploration still needs an exit condition. Research becomes procrastination when nobody knows what evidence would be sufficient to act. Before investigating, we should know what uncertainty we are trying to reduce, how much time we will spend, and what result would change the decision. Careful thinking should make execution more decisive, not postpone it.
 
-## Argue Before the Decision, Rebase After It
+## Argue before the decision, rebase after it
 
 Before a decision, I want lots of voices. I want engineers to challenge the framing, question the data, expose missing assumptions, and propose alternatives. Silence is not alignment. It may simply mean that people do not believe disagreement is worth the cost.
 
@@ -68,7 +68,7 @@ Disagree and commit only works when commitment is earned. People are more willin
 
 Then we execute. A team that learns from reality will usually beat one that is still defending its forecast. Time in execution often beats an incredibly smart prior.
 
-## Make Progress Tangible
+## Make progress tangible
 
 Progress is not merely a reporting concern. It is a management primitive.
 
@@ -80,7 +80,7 @@ This is why I break large efforts into meaningful milestones. The goal is not to
 
 Small, repeated wins also build confidence. Give people problems they can own, make the goal clear, let the result be visible, and then increase the scope. Growth often looks like a sequence of small wins long before it looks like a promotion.
 
-## Trust Is Consistency Over Time
+## Trust is consistency over time
 
 Trust is not built through a single vulnerable conversation, a team offsite, or a well-written values document. Trust is consistency over time: between what a manager says and does, across people and standards, and between calm periods and schedule pressure.
 
@@ -90,7 +90,7 @@ Trust creates speed. People spend less time protecting themselves, interpreting 
 
 High trust does not mean low accountability. Expectations should be clear: what good work looks like, where people have autonomy, when they need to escalate, and how performance will be evaluated. Hidden standards make every outcome feel political. Culture is not what we say we value. It is the pattern of consequences people observe.
 
-## One-on-Ones
+## One-on-ones
 
 One-on-ones are an incredible coaching tool if used correctly. But I have often seen them boil down to status meetings. Status can usually be communicated asynchronously or discussed in a project forum. A one-on-one should focus on the person, the relationship, and the conditions under which that person is doing their work.
 
@@ -102,7 +102,7 @@ Good one-on-ones are not passive listening sessions. A manager should bring obse
 
 One-on-ones also require follow-through. If someone raises the same concern three times and nothing happens, the meeting teaches them that candor is performative. Trust grows when a person can see that being honest changed something.
 
-## Delegate Opportunity, Not Just Work
+## Delegate opportunity, not just work
 
 Delegation is not unloading tasks. It is designing ownership.
 
@@ -116,7 +116,7 @@ Autonomy does not mean isolation. People should be able to make progress without
 
 The manager remains accountable but should become less central. The test of delegation is not whether work disappeared from my plate. It is whether judgment appeared somewhere else on the team.
 
-## Empathy by Default, Firmness When Required
+## Empathy by default, firmness when required
 
 My default is empathy. I want to understand the situation before prescribing a solution because the same visible problem can have different causes: missing context, excessive parallel work, a skill gap, burnout, or avoidance. Good management begins with diagnosis.
 
@@ -126,7 +126,7 @@ Firmness means being clear when something needs to change. Feedback should be ti
 
 It is kinder to have a difficult conversation early than to let uncertainty accumulate for months. Someone can be capable and still be struggling. Someone can have good intentions and still create a harmful pattern. The purpose of firmness is not punishment. It is clarity.
 
-## Innovation Needs Capacity
+## Innovation needs capacity
 
 Managers often say they want innovation while planning every engineer at full utilization, rewarding only predictable delivery, and treating failed experiments as wasted time. Teams learn what is valued from what managers fund, review, celebrate, and protect.
 
@@ -138,7 +138,7 @@ Continuous improvement should be a reflex. What slowed us down this week? What r
 
 A high-performing team should not merely deliver more over time. It should become better at delivering. Its tools improve, its decisions become clearer, its operational burden falls, and its engineers take on broader ownership. Every few months, the team should be capable of work that would previously have overwhelmed it.
 
-## What I Am Trying to Build
+## What I am trying to build
 
 My management style can be summarized as high context, high ownership, high standards, and low ego.
 
@@ -146,7 +146,7 @@ I want people to understand what matters and why, and to have enough context to 
 
 Lots of voices, one direction.
 
-I want progress to be visible because it improves learning and builds confidence. I want people to receive exciting work as well as necessary overhead. I want one-on-ones to cover judgment, growth, motivation, and friction—not project status. I want engineers to ask for help before a small blockage becomes a large surprise.
+I want progress to be visible because it improves learning and builds confidence. I want people to receive exciting work as well as necessary overhead. I want one-on-ones to cover judgment, growth, motivation, and friction, not project status. I want engineers to ask for help before a small blockage becomes a large surprise.
 
 I want trust to come from consistency. I want to understand circumstances with empathy and protect standards with firmness. I want to lead by example without making myself indispensable.
 

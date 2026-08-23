@@ -175,7 +175,7 @@ If latency, data access, or evaluation reliability is the bottleneck, more compu
 
 **Use loss to choose a pretraining frontier; use a capability vector to accept a system.** NLL is the right dense signal for deciding whether one pretraining recipe is more sample- or compute-efficient. It cannot decide whether the resulting system is acceptable for a target domain, latency budget, safety envelope, or tool-use task. Keep those evaluations separate, and treat a divergence between loss and capability as evidence that the scalar training objective is no longer the bottleneck you care about.
 
-> **The law is not the strategy.** It is a local map of where marginal return currently lives. The strategy is choosing which map describes the system we are building—and knowing when to redraw it.
+> **The law is not the strategy.** It is a local map of where marginal return currently lives. The strategy is choosing which map describes the system we are building and knowing when to redraw it.
 
 ## A reading map
 

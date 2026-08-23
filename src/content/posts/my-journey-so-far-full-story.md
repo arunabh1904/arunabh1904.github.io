@@ -43,15 +43,15 @@ Even with that ridiculous ending, the concept was real. A similar design is now 
 ![The areca-nut harvesting robot built for my undergraduate thesis](/assets/images/IMG_8842.jpg)
 _Our undergraduate prototype climbed an areca palm and used a remotely controlled cutter. Source: personal project archive._
 
-Undergrad changed my direction because the late start still compounded. The GPA recovery proved I could rebuild after wasting time; the robot proved that I cared most when engineering had a physical consequence for someone else. The reversed video was classic *jugaad*—funny in retrospect and not a substitute for a working demonstration—but the underlying problem made robotics feel worth pursuing.
+Undergrad changed my direction because the late start still compounded. The GPA recovery proved I could rebuild after wasting time; the robot proved that I cared most when engineering had a physical consequence for someone else. The reversed video was classic *jugaad*. It is funny in retrospect and was not a substitute for a working demonstration, but the underlying problem made robotics feel worth pursuing.
 
 ## Depression
 
 After college, I went through depression. It is better understood in India today than it was a decade ago, but people around me often had no language for it. More than once, when I said I did not feel like getting up or leaving my room, someone told me, "Just take a cold shower; you'll be fine." I wish I could have explained what was happening inside: my brain felt like it was on fire, I felt like screaming from the inside, and I could not see a way out. I am sharing this because someone reading it may need to know they are not alone.
 
-After graduation, I had my heart set on pursuing a master's degree in Germany. The education was free, and many of my friends were heading there—naturally, it seemed like the best reason to go. I returned to Jaipur for what was supposed to be a brief stay, with one goal: apply to colleges in Germany and leave within six months. I took the GRE, prepared my applications, and applied to a few universities, including an ultra-safe option to ensure I'd get in. When the day came, I mailed all five applications together, confident about my future.
+After graduation, I had my heart set on pursuing a master's degree in Germany. The education was free, and many of my friends were heading there. Naturally, it seemed like the best reason to go. I returned to Jaipur for what was supposed to be a brief stay, with one goal: apply to colleges in Germany and leave within six months. I took the GRE, prepared my applications, and applied to a few universities, including an ultra-safe option to ensure I'd get in. When the day came, I mailed all five applications together, confident about my future.
 
-A month later, I was anxiously waiting for the results. Then, I received an email from my safe school. I opened it, expecting good news, only to read that I was being rejected for missing documents. To my horror, I realized I had accidentally sent the documents meant for the safe school to another university. Slowly, the rejection emails from all five universities trickled in, and the reality set in—I wasn't going to Germany.
+A month later, I was anxiously waiting for the results. Then, I received an email from my safe school. I opened it, expecting good news, only to read that I was being rejected for missing documents. To my horror, I realized I had accidentally sent the documents meant for the safe school to another university. Slowly, the rejection emails from all five universities trickled in. I wasn't going to Germany.
 
 ![The missing-documents rejection notice that exposed my application mix-up](/assets/images/tuhh.png)
 _The rejection notice that exposed the document mix-up across my German university applications. Source: personal archive._
@@ -94,20 +94,19 @@ _The hexapod project paired a 1D LiDAR and Pixy camera with a small mobile platf
 
 Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grades mattered, but the projects I took on, the problems I solved, and the people I learned from shaped me more. My advice to current graduate students is simple: take on projects that stretch you, use the resources around you, and follow problems that genuinely excite you. That is how progress starts to compound.
 
-## Getting hired
+## Breaking into robotics
 
-Landing your first job out of grad school in the U.S. can be difficult, especially if you want the dream job immediately and you are not coming from a top university. Even if you spent grad school building skills, doing research, and working on relevant projects, the search can still be tough. These are the things that helped me:
+Landing my first job after graduate school was difficult. I wanted a robotics role in the United States, had no industry experience, and was not graduating from a university that would carry the application by itself. Research and projects helped me become credible. They did not remove the need to learn the interview process as its own skill.
 
-**Interviewing** is a slightly different beast than actually doing the job. There is a certain progression to it, and you have to prepare for every level.
+Five habits made the search more tractable:
 
-- **Resume Preparation**: The first step is your resume. Aim for a simple one-pager. Make sure to highlight key projects tailored to the specific role you’re applying for.
-- **Code Screen**: Spend time learning the fundamentals of the primary language required for the role (C++ and Python for robotics). Brush up on data structures and algorithms with a curated list like Blind 75.
-- **Onsite Interview**: Multiple rounds, including algorithms, behavioral questions, and domain knowledge. Be able to expand on anything on your resume and dive deep if asked.
-- **Apply Broadly**: Quantity often beats quality for fresh grads. Keep a spreadsheet with details of your applications.
-- **Start Early**: Begin before your final semester, look for research projects or internships.
-- **Get Experience First**: Don’t be overly selective about your first role; initial experience can make it easier to pivot later.
-- **Career Fairs**: These can be helpful, but don’t rely on them exclusively.
-- **Honesty**: Never lie on your resume.
+- Keep the resume to one page and make the relevant projects easy to find. Be ready to explain every line in depth.
+- Practice the actual screening format. For robotics, that meant C++, Python, data structures, algorithms, behavioral questions, and domain fundamentals.
+- Start before the final semester. Research projects, internships, and career fairs can create leads, but no single channel is reliable enough on its own.
+- Apply broadly and track every application. For a new graduate, a larger honest funnel often matters more than perfecting a few dream applications.
+- Optimize the first role for useful experience. The first job does not need to be the final destination, but the resume must remain truthful.
+
+The process felt mechanical compared with the work I wanted to do. That was the point. Interview preparation turned the projects I had already completed into evidence a hiring team could evaluate.
 
 ## DEKA
 
@@ -125,13 +124,13 @@ DEKA opened the door to my dream job. The projects taught me technical skills, b
 
 ## Zoox
 
-Joining Zoox realized a long-held goal: working on autonomous driving. I am now a technical lead on the Perception team, where I lead a broader initiative to make our autonomy systems more capable and efficient. But I also had imposter syndrome when I moved into the role. I was surrounded by incredibly talented people and felt out of place at first. The way through it was not one dramatic breakthrough; it was small wins—understanding the system, making good technical decisions, and helping the team ship. The work has to improve a system that runs on real vehicles, so technical quality and production usefulness are inseparable.
+Joining Zoox realized a long-held goal: working on autonomous driving. I am now a technical lead on the Perception team, where I lead a broader initiative to make our autonomy systems more capable and efficient. But I also had imposter syndrome when I moved into the role. I was surrounded by incredibly talented people and felt out of place at first. The way through it was not one dramatic breakthrough. It was a series of small wins: understanding the system, making good technical decisions, and helping the team ship. The work has to improve a system that runs on real vehicles, so technical quality and production usefulness are inseparable.
 
 One part of that work I am particularly proud of is where it began. Around the middle of last year, I started prototyping the idea as a small side project. At first, it was simply something I wanted to test. Once we had enough evidence that the approach could work, the project grew into a dedicated team and roadmap. Over the last couple of quarters, we turned it into a production improvement that made the system more efficient while improving quality, and we shipped the result earlier this year.
 
-That transition—from a side project to a team—also changed my role. Moving from an IC role back into technical leadership was intentional. By then, I had enough experience under my belt to be useful in both modes: I could go deep on the hard technical decisions, but I could also set direction, explain tradeoffs, and help other people execute. I also participate in a broader research committee across Zoox, which gives me exposure to technical direction outside my immediate area.
+That transition from a side project to a team also changed my role. Moving from an IC role back into technical leadership was intentional. By then, I had enough experience under my belt to be useful in both modes: I could go deep on the hard technical decisions, but I could also set direction, explain tradeoffs, and help other people execute. I also participate in a broader research committee across Zoox, which gives me exposure to technical direction outside my immediate area.
 
-> **Deep insight:** Confidence was usually the lagging indicator. I acted before I felt ready, and the evidence from small wins changed what I believed I could do.
+Confidence was usually the lagging indicator. I acted before I felt ready, and the evidence from small wins changed what I believed I could do.
 
 ## Looking back
 

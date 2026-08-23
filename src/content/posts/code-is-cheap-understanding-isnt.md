@@ -44,7 +44,7 @@ That is context, and context engineering is not the same thing as putting more t
 
 The real skill is deciding what an agent needs to know for this task, right now. Sometimes good context engineering means adding a design decision, production invariant, or failure trace. Sometimes it means deleting an obsolete instruction. The goal is not maximum context. It is the smallest context that preserves the decisions the agent cannot safely rediscover.
 
-> **Deep insight:** Good context engineering is selective memory. Preserve the decisions a system cannot safely rediscover; remove the history that only makes those decisions harder to see.
+Good context engineering is selective memory. Preserve the decisions a system cannot safely rediscover; remove the history that only makes those decisions harder to see.
 
 ## Do not become a slop cannon
 
@@ -131,14 +131,14 @@ Speed is useful. Tenacity is different.
 
 ## What remains
 
-The amount of human labor required to produce software will probably fall. Pretending otherwise does not help anyone. If one engineer can direct five, ten, or twenty capable agents, the economics of engineering organizations change—perhaps unevenly and not all at once, but in a direction that is hard to ignore.
+The amount of human labor required to produce software will probably fall. Pretending otherwise does not help anyone. If one engineer can direct five, ten, or twenty capable agents, the economics of engineering organizations change. The shift may be uneven and gradual, but its direction is hard to ignore.
 
 Imagine two engineers in that organization. One has become extraordinarily good at generating things. Every task invokes the largest model. Every problem becomes a giant agent run. The engineer produces enormous diffs, consumes enormous amounts of inference, and understands a shrinking fraction of what ships.
 
 The other understands the system and the business. They decompose ambiguous problems, know when a small model will do, keep context clean, run independent work in parallel, delete aggressively, challenge the output, and take responsibility for what reaches production.
 
 [![An engineer routes distinct tasks to small specialist robots while reserving one large machine for the hardest work.](/assets/images/agentic-engineering-orchestration.png)](/assets/images/agentic-engineering-orchestration.png)
-_Agent manager — imagined by OpenAI ImageGen._
+_Agent manager, imagined by OpenAI ImageGen._
 
 Which one do you retain?
 

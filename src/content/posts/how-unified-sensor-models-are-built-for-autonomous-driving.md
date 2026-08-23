@@ -196,7 +196,7 @@ One response is to let each modality generate proposals and merge them before re
 
 This creates a general diagnostic question for any fusion architecture: **which modality controls admission into the shared representation?** If the answer is one sensor's proposals, points, or confidence threshold, then that sensor's recall becomes a ceiling unless another path explicitly bypasses it.
 
-> **Deep insight:** In multimodal fusion, the hidden bottleneck is often admission rather than attention. The sensor that creates the proposals, points, or thresholds decides which evidence becomes eligible for downstream computation; without a bypass, its recall becomes the system's ceiling.
+In multimodal fusion, the hidden bottleneck is often admission rather than attention. The sensor that creates the proposals, points, or thresholds decides which evidence becomes eligible for downstream computation; without a bypass, its recall becomes the system's ceiling.
 
 ### Interaction can occur before either stream is finished
 A simple architecture runs a camera encoder and a LiDAR encoder to completion, then applies one fusion block. [DeepInteraction](/paper%20shorts/2022/08/23/deepinteraction-3d-object-detection-via-modality-interaction.html) lets the streams update one another across representation stages. [UniTR](/paper%20shorts/2023/08/15/unitr-unified-efficient-multimodal-transformer-for-bev.html) applies shared transformer blocks after modality-specific tokenization.

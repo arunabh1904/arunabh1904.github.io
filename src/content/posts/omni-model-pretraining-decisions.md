@@ -189,7 +189,7 @@ These questions usually expose what changed:
 
 A frozen encoder tests whether the pretrained features already contain what the robot needs. Full fine-tuning tests whether those weights are a useful starting point. World-model reconstruction tests prediction. Closed-loop planning tests whether that prediction helps the robot. These claims should not be collapsed into one transfer score.
 
-## So.... let's recap
+## What pretraining must preserve
 
 | Leap | What the model learned to predict | What it bought | What remained unresolved |
 | --- | --- | --- | --- |
@@ -202,32 +202,8 @@ A frozen encoder tests whether the pretrained features already contain what the 
 | Video and latent-action pretraining | temporal change before robot labels | cheap interaction and motion priors | latent change is not yet executable action |
 | Action-conditioned world models | consequences under proposed actions | planning and counterfactual ranking | causal fidelity over long rollouts |
 
-The pattern mirrors Part I. Every new target asks the model to preserve more: first semantics, then geometry, motion, actions, and consequences. The action representation decides how much of that knowledge reaches the controller.
-
-## A testable thesis
-
-I would start with a strong vision-language model for semantics, dense visual features that persist through time, and a continuous action expert for control. Discrete action tokens are useful when they make web and robot data easier to train together. I would not assume those same tokens should run the robot. The motor path should be pretrained too, unless an ablation shows that random initialization is good enough.
+Every new target asks the model to preserve more: first semantics, then geometry, motion, actions, and consequences. The action representation decides how much of that knowledge reaches the controller. I would start with a strong vision-language model for semantics, dense visual features that persist through time, and a continuous action expert for control. Discrete action tokens are useful when they make web and robot data easier to train together. I would not assume those same tokens should run the robot. The motor path should be pretrained too, unless an ablation shows that random initialization is good enough.
 
 If the model claims to plan, train it to predict action-conditioned futures and check that a changed action changes the future. If it claims cross-robot transfer, define the shared physical quantity before pooling controls. If it claims scale, report independent decisions and few-shot transfer, not only token count and training loss.
 
-The VLM can know what a drawer is. The temporal model can track that it moved. The world model must preserve what the robot caused. The policy must choose and execute the action before the deadline.
-
-Pretraining succeeds when these components transfer useful structure into the policy without removing the geometric, temporal, and control distinctions required during execution.
-
-## Selected references
-
-- [PaLM-E: An Embodied Multimodal Language Model](/paper%20shorts/2023/03/06/palm-e-embodied-multimodal-language-model.html)
-- [RT-1: Robotics Transformer for Real-World Control at Scale](/paper%20shorts/2022/12/13/rt-1-robotics-transformer-for-real-world-control-at-scale.html)
-- [RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html)
-- [Open X-Embodiment: Robotic Learning Datasets and RT-X Models](/paper%20shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html)
-- [Octo: An Open-Source Generalist Robot Policy](/paper%20shorts/2024/05/20/octo-an-open-source-generalist-robot-policy.html)
-- [OpenVLA: An Open-Source Vision-Language-Action Model](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html)
-- [Action Chunking with Transformers](/paper%20shorts/2023/04/23/action-chunking-with-transformers-act.html)
-- [Diffusion Policy](/paper%20shorts/2023/03/07/diffusion-policy-visuomotor-policy-learning-via-action-diffusion.html)
-- [FAST: Efficient Action Tokenization for Vision-Language-Action Models](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html)
-- [Pi0: A Vision-Language-Action Flow Model for General Robot Control](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html)
-- [Pi0.5: A Vision-Language-Action Model with Open-World Generalization](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html)
-- [GR00T N1: An Open Foundation Model for Humanoid Robots](/paper%20shorts/2025/03/18/groot-n1-open-foundation-model-for-humanoid-robots.html)
-- [Genie: Generative Interactive Environments](/paper%20shorts/2024/02/23/genie-generative-interactive-environments.html)
-- [V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning](/paper%20shorts/2025/06/11/v-jepa-2-self-supervised-video-models.html)
-- [Xiaomi-Robotics-1: Scaling VLA Models with Real-World Trajectories](/paper%20shorts/2026/07/16/xiaomi-robotics-1-scaling-vla-with-real-world-trajectories.html)
+The VLM can know what a drawer is. The temporal model can track that it moved. The world model must preserve what the robot caused. The policy must choose and execute the action before the deadline. Pretraining succeeds when those components transfer useful structure without removing the geometric, temporal, and control distinctions required during execution.
