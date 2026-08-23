@@ -6,14 +6,14 @@ postSlug: python-interview-trivia
 legacyPath: /revision notes/2026/08/21/python-interview-trivia.html
 tags:
   - Python
-summary: Practical Python flash cards grounded in ML configuration, data pipelines, evaluation, inference, dataclasses, and Pydantic v2.
+summary: A comprehensive Python 3.11+ and Pydantic v2 recall deck covering semantics, collections, OOP, typing, concurrency, I/O, reliability, and performance.
 ---
 import TriviaDeck from '../../components/TriviaDeck';
 import { pythonTriviaDeck } from '../../lib/trivia-decks';
 
 # Python Interview Trivia
 
-This 88-card deck reviews Python through work that recurs in ML engineering. The scenarios cover configuration boundaries, dataset plumbing, preprocessing, evaluation, and inference services. Each card keeps the code or design scenario with the concept it tests. Enter the short canonical answer, then use the reveal to check the rule and its production consequence.
+This 230-card deck reviews the practical Python core through work that recurs in ML engineering and production services. It starts with references, syntax, collections, functions, and object-oriented design. It then moves through typing, dataclasses, Pydantic v2, concurrency, performance, imports, testing, serialization, and failure handling. Each card isolates one decision or gotcha. Enter the short canonical answer, then use the reveal to check the immediate rule and the deeper mental model.
 
 The scope is Python 3.11+ and Pydantic v2. Tensor operations, autograd, device placement, distributed training, and `DataLoader` behavior stay in the separate PyTorch deck.
 
@@ -23,9 +23,20 @@ The scope is Python 3.11+ and Pydantic v2. Tensor operations, autograd, device p
 
 Choose one engineering topic for a focused pass or keep all topics mixed. Enter the short answer, then select **Grade answer**. Exact answers and listed aliases score **Correct**; partial terms or a one-character typo score **Close**; other responses score **Needs work**. The score updates automatically and follows the selected topic.
 
-Most prompts ask you to predict code, diagnose a bug, or choose an interface. Read any snippet before answering and recall the smallest phrase that identifies the behavior or decision. The explanation then connects that phrase to the underlying Python model.
+Most prompts ask you to predict code, diagnose a bug, compare costs, or choose an interface. Read any snippet before answering and recall the smallest phrase that identifies the behavior or decision. **Why it works** resolves the scenario; **Mental model** explains ownership, complexity, lifetime, trust, or concurrency so the rule transfers to unfamiliar code.
 
-Grading and progress storage stay in this browser. The core deck excludes lower-frequency internals such as descriptors, metaclasses, advanced generator methods, exception groups, `ContextVar`, and detailed GIL behavior.
+Grading and progress storage stay in this browser. “Comprehensive” here means the practical interview and production Python core, not every standard-library module or CPython implementation detail. PyTorch tensor semantics, autograd, modules, distributed training, and data loading remain in the separate PyTorch deck.
+
+## Coverage map
+
+| Area | What the deck makes you retrieve |
+| --- | --- |
+| Syntax and values | Binding, aliasing, truthiness, comparison, unpacking, comprehensions, pattern matching, and numeric gotchas |
+| Collections and iteration | Contracts, complexity, views, stable sorting, heaps, generators, `itertools`, caching, and short-circuiting |
+| Object-oriented Python | Attribute lookup, descriptors, methods, MRO, composition, protocols, slots, equality, hashing, and class creation |
+| Types and data models | Generics, narrowing, callable types, dataclasses, validation boundaries, Pydantic v2 parsing, serialization, and schemas |
+| Concurrency | GIL and free-threaded builds, locks, conditions, queues, futures, processes, `asyncio`, cancellation, and structured concurrency |
+| Production behavior | Profiling, allocation, imports, testing seams, exceptions, files, serialization, time, subprocesses, and security boundaries |
 
 ## Sources
 
@@ -36,12 +47,22 @@ Grading and progress storage stay in this browser. The core deck excludes lower-
 - [Python built-in types](https://docs.python.org/3/library/stdtypes.html)
 - [Python `collections`](https://docs.python.org/3/library/collections.html)
 - [Python `functools`](https://docs.python.org/3/library/functools.html)
+- [Python `itertools`](https://docs.python.org/3/library/itertools.html)
+- [Python `heapq`](https://docs.python.org/3/library/heapq.html)
 - [Python `typing`](https://docs.python.org/3/library/typing.html)
+- [Python `threading`](https://docs.python.org/3/library/threading.html)
+- [Python `queue`](https://docs.python.org/3/library/queue.html)
+- [Python `concurrent.futures`](https://docs.python.org/3/library/concurrent.futures.html)
+- [Python `asyncio`](https://docs.python.org/3/library/asyncio.html)
+- [Python free-threading guide](https://docs.python.org/3/howto/free-threading-python.html)
 - [Python `pickle`](https://docs.python.org/3/library/pickle.html)
 - [Python multiprocessing](https://docs.python.org/3/library/multiprocessing.html)
 - [Pydantic dataclasses](https://docs.pydantic.dev/latest/concepts/dataclasses/)
 - [Pydantic models](https://docs.pydantic.dev/latest/concepts/models/)
 - [Pydantic strict mode](https://docs.pydantic.dev/latest/concepts/strict_mode/)
 - [Pydantic validators](https://docs.pydantic.dev/latest/concepts/validators/)
+- [Pydantic serialization](https://docs.pydantic.dev/latest/concepts/serialization/)
+- [Pydantic fields](https://docs.pydantic.dev/latest/concepts/fields/)
+- [Pydantic configuration](https://docs.pydantic.dev/latest/concepts/config/)
 - [Pydantic type adapters](https://docs.pydantic.dev/latest/concepts/type_adapter/)
 - [Pydantic unions](https://docs.pydantic.dev/latest/concepts/unions/)

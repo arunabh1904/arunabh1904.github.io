@@ -1,4 +1,5 @@
 import type { TriviaDeckData } from './trivia-decks';
+import { expandedPythonTriviaCards } from './python-expanded-trivia';
 import { pythonTriviaDetails } from './python-trivia-details';
 
 /**
@@ -8,7 +9,7 @@ import { pythonTriviaDetails } from './python-trivia-details';
  * phrase the grader checks, while `explanation` supplies the production rule.
  */
 const practicalPythonTriviaSourceDeck = {
-  id: 'python-interview-trivia-v3',
+  id: 'python-interview-trivia-v4',
   title: 'Practical Python for ML engineering',
   cards: [
     {
@@ -778,12 +779,13 @@ const practicalPythonTriviaSourceDeck = {
       acceptedAnswers: ['threads, processes, asyncio', 'threads processes asyncio'],
       explanation: 'Threads overlap blocking I/O, processes bypass the traditional GIL for Python CPU work, and `asyncio` coordinates nonblocking I/O.',
     },
+    ...expandedPythonTriviaCards,
   ],
 } satisfies TriviaDeckData;
 
 const missingDetailIds = practicalPythonTriviaSourceDeck.cards
-  .map((card) => card.id)
-  .filter((id) => !pythonTriviaDetails[id]);
+  .filter((card) => !('detail' in card && card.detail) && !pythonTriviaDetails[card.id])
+  .map((card) => card.id);
 
 if (missingDetailIds.length > 0) {
   throw new Error(`Python trivia cards missing mental models: ${missingDetailIds.join(', ')}`);
@@ -793,6 +795,6 @@ export const practicalPythonTriviaDeck = {
   ...practicalPythonTriviaSourceDeck,
   cards: practicalPythonTriviaSourceDeck.cards.map((card) => ({
     ...card,
-    detail: pythonTriviaDetails[card.id],
+    detail: 'detail' in card && card.detail ? card.detail : pythonTriviaDetails[card.id],
   })),
 } satisfies TriviaDeckData;
