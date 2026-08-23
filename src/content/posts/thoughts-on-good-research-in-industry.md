@@ -54,6 +54,6 @@ Visibility only helps when the work is legible. A presentation should maximize w
 
 Compute changes the value of good judgment because it determines how quickly a question can meet evidence. Keep the GPUs busy, but make each run interpretable. Velocity without rigor produces noise; rigor without enough throughput leaves important decisions unresolved. A good research system makes the two reinforce each other.
 
-> **Deep insight:** In industry, time-to-evidence is part of rigor. A perfect result that arrives after the decision is not influence; it is an archive.
+In industry, time-to-evidence is part of rigor. A perfect result that arrives after the decision is not influence; it is an archive.
 
 That is what I took from Eugene's guide. None of these practices guarantees a breakthrough. Together they give a good idea enough structure to meet evidence, become legible to collaborators, and influence a real decision. In industry, that system matters more than the romance of the isolated insight.

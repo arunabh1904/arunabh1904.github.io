@@ -42,7 +42,7 @@ My model recommendation is simple:
 - If you want the best Gemma 4 model that comfortably fits, start with `31B`.
 - If you want the model I would actually pay the most attention to for daily use, it is `26B A4B`.
 
-## Benchmark setup
+## Benchmark design
 
 I ran everything on:
 
@@ -69,9 +69,7 @@ The output task was intentionally boring and deterministic: read background text
 
 One important caveat: this is a fastest-practical-path comparison, not a perfect same-weights lab setup. I used the most direct current artifact for each runtime. That means the `E2B` comparison is not perfectly apples-to-apples: official `llama.cpp` GGUF for `E2B` is `Q8_0`, while the MLX and Ollama paths use 4-bit artifacts.
 
-## Benchmark controls
-
-These details kept the comparison about runtime behavior rather than hidden work:
+The remaining controls kept the comparison about runtime behavior rather than hidden work:
 
 - I disabled Gemma's thinking mode anywhere I could, because otherwise you are partly benchmarking extra reasoning tokens instead of raw runtime behavior.
 - I kept the benchmark text-only, which meant running `llama.cpp` without a multimodal projector. That was the cleanest way to measure prompt processing and decode speed instead of image overhead.
@@ -95,7 +93,7 @@ The animation keeps the model/runtime rows fixed while the input grows from `512
 
 This is the distinction the memory table cannot show. Capacity answers whether a model can load. Decode throughput answers how quickly it continues once generation has started. Prefill latency answers whether an `8K` document or agent state feels interactive at all. For daily use, the last quantity makes `26B A4B` a different product from `31B` even though both fit comfortably.
 
-> **Deep insight:** Local inference has three thresholds: load, start, and continue. Weight memory controls the first; prefill controls the second; decode throughput controls the third.
+Local inference has three thresholds: load, start, and continue. Weight memory controls the first; prefill controls the second; decode throughput controls the third.
 
 ### Short-context results
 

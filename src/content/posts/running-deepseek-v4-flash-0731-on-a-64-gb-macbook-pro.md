@@ -21,7 +21,7 @@ No. The official checkpoint is about `167 GB` on disk, and the maintained vLLM r
 
 This is a sizing analysis dated August 13, 2026, not a benchmark. I did not manufacture latency numbers for a model that cannot load on the machine.
 
-## The fit decision
+## Why active parameters do not determine fit
 
 DeepSeek V4 Flash is a mixture-of-experts model with `284B` total parameters and `13B` active parameters per generated token. The second number makes inference compute much smaller than a dense `284B` model, but it does not turn the checkpoint into a `13B` model. The router may choose only a small subset of experts for one token while choosing a different subset for the next, so the serving process still needs access to the full expert bank.
 
@@ -36,9 +36,7 @@ The official [`DeepSeek-V4-Flash-0731` repository](https://huggingface.co/deepse
 
 This table separates storage from inference. Downloading `167 GB` to the SSD proves only that the files fit on disk. It does not make them resident in memory, and macOS swap does not convert a `64 GB` laptop into a `200 GB` inference server. An experimental engine could offload experts and stream weights, but a deficit above `100 GB` moves the problem from GPU or unified-memory bandwidth to transfers from much slower storage. That is a systems experiment, not a sensible daily serving plan.
 
-> **Deep insight:** Active parameters price the arithmetic for one token. Total parameters price residency. Sparse experts change the first number, not the second.
-
-## Active is not resident
+Active parameters price the arithmetic for one token. Total parameters price residency. Sparse experts change the first number, not the second.
 
 The `13B` active count is still useful: it explains why DeepSeek can reduce the arithmetic performed for each token. It answers a compute question, not the fit question.
 

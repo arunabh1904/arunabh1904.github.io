@@ -221,7 +221,7 @@ Start with what happened on the robot, not the optimizer name. Ask how local the
 
 The optimizer follows from these answers. PPO cannot correct a reward that assigns the wrong credit. DPO cannot create a matched counterfactual, and a process critic cannot infer contact from observations that do not contain it.
 
-## So.... let's recap
+## What the feedback can support
 
 | Leap | New feedback unit | What it changed | Remaining risk |
 | --- | --- | --- | --- |
@@ -235,37 +235,10 @@ The optimizer follows from these answers. PPO cannot correct a reward that assig
 | Interactive RL | fresh rollout group and environment reward | improved the data distribution while learning | reward exploitation and rollout cost |
 | Specialist distillation | improved specialist trajectory | protected the generalist from direct RL instability | loss of specialist behavior during distillation |
 
-The feedback becomes more precise as we move down the table. A terminal bit says the rollout ended badly. An intervention says behavior crossed a boundary near this state. A correction says what to do from the reached state. A process critic marks which transition made progress. A matched replay is the rare case that can show what another action would have caused.
-
-The update should use the most specific feedback supported by the deployment event, rather than the most complex objective available in the training stack.
-
-## A testable thesis
-
-The central requirement for VLA post-training is accurate attribution. Each feedback event should identify the state, action, or transition it provides evidence about before that evidence changes the policy.
+The feedback becomes more precise as we move down the table. A terminal bit says the rollout ended badly. An intervention says behavior crossed a boundary near this state. A correction says what to do from the reached state. A process critic marks which transition made progress. A matched replay is the rare case that can show what another action would have caused. The central requirement is accurate attribution: each event should identify the state, action, or transition it provides evidence about before that evidence changes the policy.
 
 I would start with an action representation that matches the controller and use SFT as the baseline. Corrections should be collected in states reached by the policy. Preference optimization requires a defensible comparison, while RL requires a reward and rollout system that have been validated through cheaper evaluations.
 
 My strongest bet is a process critic conditioned on persistent objects, geometry, contact, controller state, and task progress. It should identify the earliest defensible failure window and support a conservative update. That update must then be tested for physical success and retention of older skills before deployment.
 
-A policy can learn reliably from deployment only when the update remains no broader than the evidence. Every consequence must also be traceable to the policy that created it.
-
-## Selected references
-
-- [DAgger: A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning](/paper%20shorts/2011/04/11/dagger-reduction-of-imitation-learning-to-no-regret-online-learning.html)
-- [OpenVLA-OFT: Fine-Tuning VLAs for High-Throughput Robot Control](/paper%20shorts/2025/02/27/openvla-oft-optimizing-speed-and-success.html)
-- [FAST: Efficient Action Tokenization for Vision-Language-Action Models](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html)
-- [Pi0.5: A Vision-Language-Action Model with Open-World Generalization](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html)
-- [Alpamayo-R1: Bridging Reasoning and Action Prediction](/paper%20shorts/2025/10/30/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail.html)
-- [Direct Preference Optimization](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html)
-- [KTO: Model Alignment as Prospect Theoretic Optimization](/paper%20shorts/2024/02/02/kto-model-alignment-as-prospect-theoretic-optimization.html)
-- [Action Preference Optimization for Robotic Policy Refinement](/paper%20shorts/2025/06/08/action-preference-optimization-for-robotic-policy-refinement.html)
-- [VisualPRM: Process Reward Models for Multimodal Reasoning](/paper%20shorts/2025/03/13/visualprm-process-reward-model-for-multimodal-reasoning.html)
-- [VLAC: Vision-Language-Action Critic for Real-World RL](/paper%20shorts/2025/09/19/vlac-vision-language-action-critic-for-real-world-rl.html)
-- [DPPO: Diffusion Policy Policy Optimization](/paper%20shorts/2024/09/01/dppo-diffusion-policy-policy-optimization.html)
-- [RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models](/paper%20shorts/2025/05/22/ript-vla-interactive-post-training-for-vision-language-action-models.html)
-- [SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning](/paper%20shorts/2025/09/11/simplevla-rl-scaling-vla-training-via-reinforcement-learning.html)
-- [RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning](/paper%20shorts/2024/12/13/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning.html)
-- [RobustVLA: Robustness-Aware Reinforcement Post-Training](/paper%20shorts/2025/11/03/robustvla-robustness-aware-reinforcement-post-training.html)
-- [LIBERO-Para: Paraphrase Robustness in VLA Models](/paper%20shorts/2026/03/30/libero-para-paraphrase-robustness-in-vla-models.html)
-- [SIMPLER: Evaluating Real-World Robot Policies in Simulation](/paper%20shorts/2024/05/09/simpler-evaluating-real-world-robot-policies-in-simulation.html)
-- [VLA-REPLICA: Reproducible Real-World Evaluation](/paper%20shorts/2026/05/20/vla-replica-low-cost-reproducible-real-world-evaluation.html)
+A policy can learn reliably from deployment only when the update remains no broader than the evidence and every consequence is traceable to the policy that created it.

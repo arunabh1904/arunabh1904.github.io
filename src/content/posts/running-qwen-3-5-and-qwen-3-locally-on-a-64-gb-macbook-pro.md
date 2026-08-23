@@ -52,7 +52,7 @@ The two big family-level differences that matter for local use are:
 - [`Qwen 3.5`](https://huggingface.co/Qwen/Qwen3.5-9B) defaults to thinking mode and exposes a `262,144` token default context window, so if you do not explicitly disable thinking you are partly benchmarking chain-of-thought overhead instead of plain inference behavior.
 - [`Qwen 3`](https://huggingface.co/Qwen/Qwen3-14B-GGUF) supports both thinking and non-thinking modes in the same model, and the official GGUF releases make `llama.cpp` comparisons much easier for that family.
 
-## Benchmark setup
+## Benchmark design
 
 I ran everything on:
 
@@ -81,9 +81,7 @@ The task was intentionally boring and deterministic: read repeated background te
 
 I also kept the app and the benchmark harness text-only for this pass. No images, no multimodal prompts, and no hidden reasoning tokens if I could turn them off.
 
-## Benchmark controls
-
-These details kept the benchmark from measuring hidden work:
+The remaining controls kept the benchmark from measuring hidden work:
 
 - I forced `Qwen 3.5` into non-thinking mode anywhere I could. Otherwise the benchmark stops being about raw runtime behavior.
 - I kept the local chat app text-only even though `Qwen 3.5` ships as an image-text model family. I wanted clean text-generation comparisons first.
@@ -111,7 +109,7 @@ The animation holds every measured model/runtime row fixed and changes only the 
 
 The figure separates three decisions that parameter count often collapses. Memory determines whether a model loads. Decode throughput determines continuation speed. Prefill determines whether document-scale prompts feel responsive. On this machine, moving from `4B` to `14B` changes the third quantity most sharply, which is why the quality-versus-latency decision should be made with realistic prompt lengths.
 
-> **Deep insight:** A short-prompt benchmark prices generation. An agent workload also prices the history it must reread before every turn. That second bill can dominate the experience.
+A short-prompt benchmark prices generation. An agent workload also prices the history it must reread before every turn. That second bill can dominate the experience.
 
 ### Short-context results
 

@@ -61,7 +61,7 @@ The fix belongs in the article first. I do not ask the voice model to invent a b
 
 This project did not converge through one parameter sweep. Each failure invalidated an assumption in the design.
 
-The first assumption was that a good voice description creates a stable speaker. I used Qwen3-TTS VoiceDesign and repeated the same request—warm, measured, close-miked, restrained—for every chunk. The broad style survived. The person did not. Each chunk redesigned the voice, so timbre, pitch, register, and energy moved across an article.
+The first assumption was that a good voice description creates a stable speaker. I used Qwen3-TTS VoiceDesign and repeated the same request for every chunk: warm, measured, close-miked, and restrained. The broad style survived. The person did not. Each chunk redesigned the voice, so timbre, pitch, register, and energy moved across an article.
 
 The second assumption was that a shared reference waveform solves identity. Qwen3-TTS Base can condition on a reference WAV and its transcript. Giving every chunk the same synthetic sample did anchor one speaker. It also created the most obvious bug in the entire feature: “the delivery is warm” appeared before chunk after chunk.
 
@@ -170,20 +170,8 @@ The interval between the two PRs is an incomplete Blog release. It is not a reas
 
 The technical work ended up changing the prose more than I expected. A listener cannot glance back at a table, infer that “this” names the left panel, or hold five unexplained acronyms while a sentence detours through a citation. The spoken path makes missing transitions obvious.
 
-That pressure is useful. The page can remain the richer artifact—with code, equations, figures, links, tables, and references—while the prose itself carries a complete argument. The narration compiler removes objects that require vision. It should not remove the reasoning those objects support.
+That pressure is useful. The page can remain the richer artifact, with code, equations, figures, links, tables, and references, while the prose itself carries a complete argument. The narration compiler removes objects that require vision. It should not remove the reasoning those objects support.
 
 I started with a player. What I actually built is a second rendering contract for the Blog. The source must be final. The narrator must be versioned. The generation boundary must preserve enough context to sound human. Duration limits must reshape the script rather than cut the ending. And production must serve the exact waveform that passed both machine checks and a listener's ear.
 
 That is the part I would carry into any generated-media feature. A model call creates an artifact. A product needs a compiler, a release protocol, and evidence that the artifact people receive is the one you meant to make.
-
-## References
-
-- [Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)
-- [MLX-Audio](https://github.com/Blaizzy/mlx-audio)
-- [Astro content collections](https://docs.astro.build/en/guides/content-collections/)
-- [Initial local read-aloud release](https://github.com/arunabh1904/arunabh1904.github.io/commit/693eb337f81ff93aaa0c998584fffd9bfd2e628f)
-- [ICL preface repair](https://github.com/arunabh1904/arunabh1904.github.io/pull/198)
-- [Reference-free corpus release](https://github.com/arunabh1904/arunabh1904.github.io/pull/204)
-- [Non-truncating 30-minute compiler](https://github.com/arunabh1904/arunabh1904.github.io/pull/223)
-- [Bounded narration corpus](https://github.com/arunabh1904/arunabh1904.github.io/pull/228)
-- [Selected-voice corpus release](https://github.com/arunabh1904/arunabh1904.github.io/pull/233)

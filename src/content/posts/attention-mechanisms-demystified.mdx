@@ -197,7 +197,7 @@ The table is the map: these methods are not one flat list because they solve dif
 
 The irreversible choice is the memory carrier. GQA preserves token-addressable K/V vectors but reduces how many independent copies exist. MLA keeps a token-indexed cache but compresses each token through learned latent projections. Delta-rule models stop retaining a token-indexed history at all: later writes share finite state, so targeted update and forgetting become part of retrieval quality. A hybrid does not erase that distinction; it spends most layers on bounded memory and inserts occasional layers that can still inspect explicit positions.
 
-> **Deep insight:** Attention variants are memory policies. Each one decides what remains addressable after a write, and its characteristic failure follows from what that policy discards.
+Attention variants are memory policies. Each one decides what remains addressable after a write, and its characteristic failure follows from what that policy discards.
 
 ### Share the cache
 
@@ -497,23 +497,3 @@ Attention still answers one question: for this output position, which sources ma
 - Hybrid models spend most layers on cheap memory updates and reserve some layers for stronger retrieval.
 
 No variant dominates every regime. Full attention preserves exact access but grows expensive with context. Cache-sharing methods are simpler but reduce K/V capacity. Latent, sparse, and recurrent methods buy more efficiency with new approximation, tuning, kernel, or serving burdens. The right comparison is therefore not “which attention name is newest?” but “which bottleneck dominates this model, and which retrieval failure can it afford?”
-
-## References
-
-- Ali (`@waterloo_intern`), [“22580: From GPT2 to Kimi3, Explained”](https://x.com/i/status/2081762065392541951)
-- Sebastian Raschka, [“A Visual Guide to Attention Variants in Modern LLMs”](https://magazine.sebastianraschka.com/p/visual-attention-variants)
-- Bahdanau, Cho, and Bengio, [“Neural Machine Translation by Jointly Learning to Align and Translate”](https://arxiv.org/abs/1409.0473)
-- Vaswani et al., [“Attention Is All You Need”](https://arxiv.org/abs/1706.03762)
-- Shazeer, [“Fast Transformer Decoding: One Write-Head is All You Need”](https://arxiv.org/abs/1911.02150)
-- Katharopoulos et al., [“Transformers are RNNs: Fast Autoregressive Transformers with Linear Attention”](https://arxiv.org/abs/2006.16236)
-- Ainslie et al., [“GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints”](https://arxiv.org/abs/2305.13245)
-- DeepSeek-AI, [“DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model”](https://arxiv.org/abs/2405.04434)
-- Yang et al., [“Parallelizing Linear Transformers with the Delta Rule over Sequence Length”](https://arxiv.org/abs/2406.06484)
-- Yang et al., [“Gated Delta Networks: Improving Mamba2 with Delta Rule”](https://arxiv.org/abs/2412.06464)
-- Gemma Team, [“Gemma 3 Technical Report”](https://arxiv.org/abs/2503.19786)
-- Qiu et al., [“Gated Attention for Large Language Models: Non-linearity, Sparsity, and Attention-Sink-Free”](https://arxiv.org/abs/2505.06708)
-- Kimi Team, [“Kimi Linear: An Expressive, Efficient Attention Architecture”](https://arxiv.org/abs/2510.26692)
-- Kimi Team, [“Attention Residuals”](https://arxiv.org/abs/2603.15031)
-- DeepSeek-AI, [“DeepSeek-V3.2: Pushing the Frontier of Open Large Language Models”](https://arxiv.org/abs/2512.02556)
-- PyTorch, [`torch.nn.functional.scaled_dot_product_attention`](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention)
-- PyTorch, [`torch.nn.attention.flex_attention`](https://docs.pytorch.org/docs/stable/nn.attention.flex_attention.html)

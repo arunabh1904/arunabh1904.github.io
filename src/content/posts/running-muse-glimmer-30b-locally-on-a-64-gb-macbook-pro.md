@@ -17,7 +17,7 @@ summary: >-
 
 `Muse Glimmer 30B` fits comfortably on a `64 GB` M5 Max MacBook Pro and serves through `llama.cpp`. The official `Q4_K_M` GGUF occupies `16.76 GB`. With all layers explicitly placed on Metal, it generated at `27.9 tokens/s`; adding Meta's official `1.63 GB` DFlash drafter raised short-prompt decode to `48.3 tokens/s`.
 
-The first run was much slower—about `10 tokens/s`—because I had left GPU-layer placement on the runtime's automatic setting. The controlled reruns make the practical lesson clearer than the initial number: use full Metal offload, then enable DFlash. That gets close to Meta's reported M5 Max speed on short generation. Long prompts remain the constraint: the `8K` DFlash run needed `16.4 s` to begin reasoning and `17.9 s` to show the answer.
+The first run was much slower, about `10 tokens/s`, because I had left GPU-layer placement on the runtime's automatic setting. The controlled reruns make the practical lesson clearer than the initial number: use full Metal offload, then enable DFlash. That gets close to Meta's reported M5 Max speed on short generation. Long prompts remain the constraint: the `8K` DFlash run needed `16.4 s` to begin reasoning and `17.9 s` to show the answer.
 
 This is a hardware-and-software snapshot from August 13, 2026. Muse Glimmer and its `llama.cpp` support are new enough that runtime releases may change the result materially.
 
@@ -71,7 +71,7 @@ I report two first-token measurements. *First generated token* includes hidden r
 
 The largest correction was explicit placement. `--gpu-layers all` lifted the short decode rate from `9.92` to `27.90 tok/s`, a `2.8×` change before speculation entered the comparison. It also cut the long prompt's first generated token from `32.26 s` to `17.10 s`. A model that fits in unified memory can still run slowly if the engine chooses a conservative CPU/GPU split.
 
-> **Deep insight:** Fit is only the first threshold. Runtime placement decides whether resident weights become an interactive product or a slow systems demo.
+Fit is only the first threshold. Runtime placement decides whether resident weights become an interactive product or a slow systems demo.
 
 DFlash then changed decode rather than fit. With `--spec-type draft-dflash` active, the server accepted `87.9%` of proposed short-suite draft tokens and `79.8%` on the long suite. Short decode rose from `27.90` to `48.31 tok/s`; long decode rose from `26.62` to `35.47 tok/s`. The speedup is smaller at `8K` because prompt processing is unchanged by speculative generation and dominates more of the request.
 

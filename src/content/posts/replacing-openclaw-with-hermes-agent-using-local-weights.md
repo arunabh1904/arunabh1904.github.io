@@ -43,7 +43,7 @@ The figure shows the boundary that resolved the setup. A prompt does not travel 
 
 This separation also changes how to debug. If Hermes cannot reach `/v1/chat/completions`, inspect the endpoint and configuration. If the endpoint returns HTTP `500` while loading a model, inspect the runtime, artifact, and hardware path. If text is generated but tools appear as plain text, inspect the server's chat template and tool-call support. Treating those as three different contracts avoids reinstalling the wrong layer.
 
-> **Deep insight:** The API boundary is also the debugging boundary. Agent behavior, serving behavior, and model loading can fail independently, so each needs its own test.
+The API boundary is also the debugging boundary. Agent behavior, serving behavior, and model loading can fail independently, so each needs its own test.
 
 ## Install Hermes
 
@@ -101,7 +101,7 @@ A few details mattered in that run:
 - `--parallel 1` kept the memory footprint reasonable while still leaving enough room for the larger context window.
 - `--reasoning off` matched what I wanted anyway: no extra thinking overhead for a local smoke test.
 
-The context value is the main dated part of this recipe. Current Hermes documentation requires at least `64,000` tokens for agent use with tools because the system prompt, schemas, and working conversation already consume substantial context. A new setup should therefore size both Hermes and `llama-server` consistently—typically `65536` or higher if the model and available memory support it—instead of copying the older `32768` value blindly.
+The context value is the main dated part of this recipe. Current Hermes documentation requires at least `64,000` tokens for agent use with tools because the system prompt, schemas, and working conversation already consume substantial context. A new setup should therefore size both Hermes and `llama-server` consistently, typically at `65536` or higher if the model and available memory support it, instead of copying the older `32768` value blindly.
 
 Once that server was up, it exposed the OpenAI-compatible endpoint Hermes wanted at:
 
@@ -130,7 +130,7 @@ After that, `hermes status --deep` showed exactly what I wanted:
 - provider set to `Custom endpoint`
 - no cloud API keys required
 
-## Verification
+## Verify the full path
 
 The test I cared about was extremely boring on purpose:
 
@@ -145,8 +145,6 @@ READY
 ```
 
 That was enough proof: Hermes was running locally against weights already on disk.
-
-## What the test proves
 
 The `READY` response proves the inference path, not full agent quality. A useful next pass should separately test model loading, ordinary chat, structured tool calls, long-context behavior, and recovery when the local server restarts. Those checks locate regressions at the same boundaries shown in the figure.
 

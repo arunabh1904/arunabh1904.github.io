@@ -9,7 +9,7 @@ tags:
   - Reinforcement Learning
   - Reasoning
   - Robotics
-summary: 'How PPO, DPO, GRPO, and on-policy distillation construct their learning signals—and which assumptions survive contact with physical action.'
+summary: 'How PPO, DPO, GRPO, and on-policy distillation construct their learning signals, and which assumptions survive contact with physical action.'
 ---
 
 # PPO, DPO, GRPO, and On-Policy Distillation
@@ -20,7 +20,7 @@ The useful history is not the sequence of names. It is the sequence of compromis
 
 > Given behavior sampled from the current policy, what evidence should increase or decrease its probability, and relative to what baseline?
 
-This essay follows that question from PPO through verifiable-reward reasoning and into VLA post-training. It is intentionally narrower than [Post-Training VLAs: A Reading Guide to Closed-Loop Improvement](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html). That guide covers the whole deployment loop: action interfaces, failure mining, feedback collection, critics, evaluation, and reproducibility. Here, those are held at the boundary. The subject is the update machinery itself—sampling distribution, advantage construction, likelihood ratio, and credit assignment.
+This essay follows that question from PPO through verifiable-reward reasoning and into VLA post-training. It is intentionally narrower than [Post-Training VLAs: A Reading Guide to Closed-Loop Improvement](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html). That guide covers the whole deployment loop: action interfaces, failure mining, feedback collection, critics, evaluation, and reproducibility. Here, those are held at the boundary. The subject is the update machinery itself: sampling distribution, advantage construction, likelihood ratio, and credit assignment.
 
 The evidence cutoff is July 27, 2026. PPO, DPO, DeepSeekMath/GRPO, GKD, DeepSeek-R1, and the early VLA-RL systems are reported evidence. The final hybrid design is synthesis: a falsifiable proposal, not a result already established across robots.
 
@@ -78,7 +78,7 @@ The clipping rule answers a narrow question: how much should the optimizer trust
 
 That compromise fit early RLHF. A language model supplies tractable token log-probabilities; a learned reward model scores a completion; a value model predicts return; and a frozen reference policy supplies a KL anchor. But the complete training stack can require the actor, reference, reward model, and critic in memory, while generation dominates wall-clock time. The critic is especially awkward for sparse sequence rewards: it must predict the eventual quality of a long answer from every partial prefix.
 
-PPO therefore established the durable skeleton—online sampling, relative probability updates, and reference control—while making the value model the obvious component to challenge.
+PPO therefore established the durable skeleton: online sampling, relative probability updates, and reference control. It also made the value model the obvious component to challenge.
 
 ## DPO: store the contrast
 
@@ -123,7 +123,7 @@ This is an excellent bargain when three conditions hold:
 
 Math and code fit unusually well. A sampler can produce eight solutions without changing the problem, and an exact checker can often score the final answer. DeepSeekMath reports gains after GRPO-based training across GSM8K, MATH, and multilingual mathematics. [DeepSeek-R1](https://arxiv.org/abs/2501.12948) pushes the idea further: R1-Zero shows that verifiable-reward RL without supervised reasoning traces can elicit longer reasoning, self-checking, and strategy changes. Its language mixing and poor readability also show what correctness-only reward leaves unconstrained. The final R1 recipe adds cold-start data and staged training rather than treating pure RL as sufficient.
 
-> **Deep insight:** GRPO removes the critic, not the estimation problem. It moves that problem into the sampler because the group now defines the baseline.
+GRPO removes the critic, not the estimation problem. It moves that problem into the sampler because the group now defines the baseline.
 
 ## When the group says nothing
 
@@ -253,7 +253,7 @@ This hypothesis is falsifiable. Compare four methods under identical model initi
 3. on-policy distillation from a privileged teacher;
 4. the hybrid of sparse RL and segment-level distillation.
 
-Report success and safety, but also zero-variance group rate, critic/teacher calls, policy KL, action entropy, recovery success, real robot-hours, and performance after the teacher or simulator distribution shifts. The hybrid earns its complexity only if it improves reliable success per unit of interaction—not merely final reward after consuming more rollouts and teacher inference.
+Report success and safety, but also zero-variance group rate, critic/teacher calls, policy KL, action entropy, recovery success, real robot-hours, and performance after the teacher or simulator distribution shifts. The hybrid earns its complexity only if it improves reliable success per unit of interaction, not merely final reward after consuming more rollouts and teacher inference.
 
 ## Where the signal comes from
 
@@ -263,21 +263,4 @@ Reasoning models made GRPO powerful because prompts reset perfectly and verifier
 
 > Sample where the policy will act, compare only what the environment makes comparable, and make feedback no coarser than the decision it is supposed to credit.
 
-That principle explains the past decade of policy optimization better than the acronym sequence—and gives VLA post-training a testable path beyond copying language-model RL.
-
-## References
-
-- [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347)
-- [Direct Preference Optimization](https://arxiv.org/abs/2305.18290)
-- [On-Policy Distillation of Language Models](https://arxiv.org/abs/2306.13649)
-- [DeepSeekMath / GRPO](https://arxiv.org/abs/2402.03300)
-- [DeepSeek-R1](https://arxiv.org/abs/2501.12948)
-- [DAPO](https://arxiv.org/abs/2503.14476)
-- [Diffusion Policy Policy Optimization](https://arxiv.org/abs/2409.00588)
-- [RLDG](https://arxiv.org/abs/2412.09858)
-- [RIPT-VLA](https://arxiv.org/abs/2505.17016)
-- [SimpleVLA-RL](https://arxiv.org/abs/2509.09674)
-- [RobustVLA](https://arxiv.org/abs/2511.01331)
-- [LifeLong-RFT](https://arxiv.org/abs/2602.10503)
-- [Self-Supervised On-Policy Distillation for Reasoning LMs](https://arxiv.org/abs/2605.17497)
-- [Advantage Collapse in GRPO](https://arxiv.org/abs/2605.21125)
+That principle explains the past decade of policy optimization better than the acronym sequence and gives VLA post-training a testable path beyond copying language-model RL.

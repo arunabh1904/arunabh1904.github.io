@@ -216,7 +216,7 @@ The video-language models above still turn visual evidence into words. JEPA chan
 
 A useful exchange between [Rohan Anil](https://x.com/_arohan_/status/2007597891381031029) and [Yann LeCun](https://x.com/ylecun/status/2007907701989232684) gets at the deeper point. JEPA is not defined by opposition to language models or generative decoders. It changes where the predictive burden sits. Instead of asking a decoder to reproduce every unpredictable detail in input space, the encoder learns a latent target that keeps what is useful and suppresses what is not. Preventing that latent space from collapsing is therefore part of the learning problem, not an implementation detail.
 
-> **Deep insight:** A predictive representation is a learned bottleneck. Its value comes from throwing away variation that does not help prediction. Its risk is throwing away the local geometry and motion that a later controller needs.
+A predictive representation is a learned bottleneck. Its value comes from throwing away variation that does not help prediction. Its risk is throwing away the local geometry and motion that a later controller needs.
 
 The global-versus-local problem therefore returns even without language. A strong video embedding can still be poor at depth or local motion. [V-JEPA 2.1](/paper%20shorts/2026/03/15/v-jepa-2-1-dense-video-features.html) adds dense prediction and self-supervision at intermediate layers so depth, anticipation, and interaction do not have to survive only through a global target.
 
