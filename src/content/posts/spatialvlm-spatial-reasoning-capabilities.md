@@ -20,7 +20,14 @@ summary: '2024 – SpatialVLM: Endowing Vision-Language Models with Spatial Reas
 ## Core Insights
 
 ![SpatialVLM pipeline lifting internet images into synthetic 3D spatial questions](/assets/images/spatialvlm-paper-figure-2.png)
-_The pipeline combines segmentation, depth, captions, and geometric rules to produce spatial supervision at scale. Source: [SpatialVLM](https://arxiv.org/abs/2401.12168), Figure 2._
+*The pipeline combines segmentation, depth, captions, and geometric rules to produce spatial supervision at scale. source: [SpatialVLM](https://arxiv.org/abs/2401.12168)*
+
+![Figure 6 from SpatialVLM: Endowing Vision-Language Models with Spatial Reasoning](/assets/images/spatialvlm-spatial-reasoning-capabilities-source-figure-6.webp)
+*Figure 6 SpatialVLM as reward generator for robotics tasks. SpatialVLM provides a “natural-language queriable" distance estimation tool, and can be used for robotics tasks. For example, for the task “pick orange tea bottle", the reward/cost function can be the a function of the response of “What is the distance between the yellow gripper fingers and the orange tea bottle". source: [SpatialVLM: Endowing Vision-Language Models with Spatial Reasoning](https://arxiv.org/abs/2401.12168)*
+
+![Figure 2 from SpatialVLM: Endowing Vision-Language Models with Spatial Reasoning](/assets/images/spatialvlm-spatial-reasoning-capabilities-source-figure-2.webp)
+*Figure 2 An overview of our data synthesis pipeline. (a) We use CLIP to filter noisy internet images and only keep scene-level photos. (b) We apply pre-trained expert models on internet-scale images so that we get object-centric segmentation, depth and caption. (c) We lift the 2D image into 3D point clouds, which can be parsed by shape analysis rules to extract useful properties like 3D bounding box. source: [SpatialVLM: Endowing Vision-Language Models with Spatial Reasoning](https://arxiv.org/abs/2401.12168)*
+
 
 The paper addresses a data problem. Captions rarely state metric relationships, while manual 3D annotations are expensive. SpatialVLM uses pretrained experts to generate the missing targets, then teaches a language model to answer spatial questions.
 

@@ -20,7 +20,14 @@ summary: '2025 – GR00T N1: An Open Foundation Model for Generalist Humanoid Ro
 ## Core Insights
 
 ![GR00T N1 data pyramid from broad human video to embodiment-specific robot trajectories](/assets/images/groot-n1-paper-figure-1.png)
-_Data volume falls as embodiment specificity rises. Broad video supplies coverage, while robot trajectories supply the action details needed by the policy. Source: [GR00T N1](https://arxiv.org/abs/2503.14734), Figure 1._
+*Data volume falls as embodiment specificity rises. Broad video supplies coverage, while robot trajectories supply the action details needed by the policy. source: [GR00T N1](https://arxiv.org/abs/2503.14734)*
+
+![Figure 1 from GR00T N1: An Open Foundation Model for Generalist Humanoid Robots](/assets/images/groot-n1-open-foundation-model-for-humanoid-robots-source-figure-1.webp)
+*Figure 1 Data Pyramid for Robot Foundation Model Training. GR00T N1’s heterogeneous training corpora can be represented as a pyramid: data quantity decreases, and embodiment-specificity increases, moving from the bottom to the top. source: [GR00T N1: An Open Foundation Model for Generalist Humanoid Robots](https://arxiv.org/abs/2503.14734)*
+
+![Figure 7 from GR00T N1: An Open Foundation Model for Generalist Humanoid Robots](/assets/images/groot-n1-open-foundation-model-for-humanoid-robots-source-figure-7.webp)
+*Figure 7 Simulation Tasks. Our simulation experiments use tasks from two open-source benchmarks (RoboCasa ( Nasiriany et al. 2024 ) in the top row and DexMimicGen ( Jiang et al. 2024 ) in the middle row) and a newly developed suite of tabletop manipulation tasks that closely resemble our real-world tasks (bottom row). We provide Omniverse renderings of the tasks above. source: [GR00T N1: An Open Foundation Model for Generalist Humanoid Robots](https://arxiv.org/abs/2503.14734)*
+
 
 The dual-system architecture assigns different jobs to different rates. The vision-language module interprets the scene and instruction. The diffusion action module produces fluid motor commands. Joint training connects semantics to control without forcing language tokens to represent every action detail.
 

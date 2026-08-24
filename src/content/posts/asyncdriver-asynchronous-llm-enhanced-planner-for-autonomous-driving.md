@@ -26,7 +26,14 @@ AsyncDriver addresses a practical problem: LLMs are too slow to sit directly in 
 AsyncDriver uses an LLM as a high-level driving advisor without putting that LLM directly in the synchronous planning loop. The planner keeps generating trajectories while the language model asynchronously contributes scene reasoning or strategic guidance. This design tries to preserve real-time control while still benefiting from language-level interpretation of traffic context. The key tradeoff is staleness: asynchronous advice can reduce latency, but the system must know when guidance no longer matches the current scene. The paper matters as a pattern for using foundation models near safety-critical loops instead of making every control update wait on them.
 
 ![Figure 2: Overview of our proposed AsyncDriver framework from AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving](/assets/images/asyncdriver-asynchronous-llm-enhanced-planner-for-autonomous-driving-paper-figure.png)
-_Figure 2: Overview of our proposed AsyncDriver framework. From the [AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving paper](https://arxiv.org/abs/2406.14556), via arXiv HTML._
+*Figure 2: Overview of our proposed AsyncDriver framework. From the [AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving paper](https://arxiv.org/abs/2406.14556). source: [AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving paper](https://arxiv.org/abs/2406.14556)*
+
+![Figure 5 from AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving](/assets/images/asyncdriver-asynchronous-llm-enhanced-planner-for-autonomous-driving-source-figure-5.webp)
+*Figure 5 Figure S5 : Prompt template for fine-tuning stage. source: [AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving](https://arxiv.org/abs/2406.14556)*
+
+![Figure 1 from AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving](/assets/images/asyncdriver-asynchronous-llm-enhanced-planner-for-autonomous-driving-source-figure-1.webp)
+*Figure 1 Comparative Overview of Learning-based Autonomous Driving Planning Frameworks. (a) Real-time planner: Offers quick inference but has limited controllability. (b) LLM-based planner: Produces linguistic descriptions and controls, offering high interactivity and interpretability at the expense of inference speed. (c) AsyncDriver: While leveraging the reasoning capabilities of LLM, a balance between performance and inference speed is achieved through asynchronous control. source: [AsyncDriver: Asynchronous Large Language Model Enhanced Planner for Autonomous Driving](https://arxiv.org/abs/2406.14556)*
+
 
 **What to look at:**
 - The key design is two clocks: fast planner, slow LLM.

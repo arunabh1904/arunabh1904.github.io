@@ -26,7 +26,14 @@ TOD3Cap turns outdoor driving scenes into a dense captioning problem. Given mult
 TOD3Cap introduces outdoor 3D dense captioning: localize objects in 3D scenes and generate grounded descriptions for them. The dataset contains 850 scenes, 64.3k objects, and 2.3M captions, making it much larger and more driving-relevant than small indoor captioning setups. The task requires geometry, object detection, and language generation together. It matters for autonomous driving because planners and assistants need grounded object descriptions, not just boxes. The caveat is evaluation: a fluent caption can still miss safety-critical geometry.
 
 ![Figure 1: We introduce the task of 3D dense captioning in outdoor scenes (right) from TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes](/assets/images/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes-paper-figure.png)
-_Figure 1: We introduce the task of 3D dense captioning in outdoor scenes (right). From the [TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes paper](https://arxiv.org/abs/2403.19589), via arXiv HTML._
+*Figure 1: We introduce the task of 3D dense captioning in outdoor scenes (right). From the [TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes paper](https://arxiv.org/abs/2403.19589). source: [TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes paper](https://arxiv.org/abs/2403.19589)*
+
+![Figure 3 from TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes](/assets/images/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes-source-figure-3.webp)
+*Figure 3 Architecture of our proposed Cap network. Firstly, BEV features are extracted from 3D LiDAR point cloud and 2D multi-view images, followed by a query-based detection head that generates a set of 3D object proposals from the BEV features. Secondly, to capture the relationship information, we utilize a Relation Q-Former where the objects interact with other objects and the surrounding environment to get the context-aware features. source: [TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes](https://arxiv.org/abs/2403.19589)*
+
+![Figure 13 from TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes](/assets/images/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes-source-figure-13.webp)
+*Figure 13 Qualitative results of driving QA. source: [TOD3Cap: Towards 3D Dense Captioning in Outdoor Scenes](https://arxiv.org/abs/2403.19589)*
+
 
 **What to look at:**
 - The task combines 3D localization with object-level captions.

@@ -30,7 +30,14 @@ The paper reviews the path from modular perception-decision-action stacks to VA 
 That taxonomy complements the other VLA4AD survey. Where the earlier survey is a broad architecture-and-bibliography map, this one is helpful for reasoning about system boundaries: should language be inside the action generator, or should it guide a separate spatial planner?
 
 ![Figure 2 from the VLA-for-AD survey summarizing representative VA and VLA models across end-to-end models, world models, and dual systems](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-paper-figure.png)
-_Figure 2 summarizes representative VA and VLA models across end-to-end, world-model, and dual-system families. From the [survey paper](https://arxiv.org/abs/2512.16760), via arXiv HTML._
+*Figure 2 summarizes representative VA and VLA models across end-to-end, world-model, and dual-system families. From the [survey paper](https://arxiv.org/abs/2512.16760). source: [survey paper](https://arxiv.org/abs/2512.16760)*
+
+![Figure 7 from Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-source-figure-7.webp)
+*Figure 7 Visualization examples of the AutoVLA [ 340 ] reasoning/planning results on WOD-E2E [ 283 ] dataset. source: [Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future](https://arxiv.org/abs/2512.16760)*
+
+![Figure 1 from Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-source-figure-1.webp)
+*Figure 1 Outline. This work aims to provide a structured roadmap of the VLA paradigm for autonomous driving. We begin with Preliminary Foundations (Section 2 ), which formalize the general formulation of VLA models and detail their three core components: the multi-modal input modalities, the VLM backbone, and the action prediction head. source: [Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future](https://arxiv.org/abs/2512.16760)*
+
 
 **What to look at:**
 - End-to-end VLA and dual-system VLA are treated as distinct design paradigms.

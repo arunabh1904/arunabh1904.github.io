@@ -30,7 +30,14 @@ DriveVLA-W0 frames the issue as a "supervision deficit." It instantiates world m
 The conceptual contribution is broader than one architecture. Dense future-scene prediction can train representations of traffic dynamics, counterfactual actions, and scene evolution before the action head has to emit sparse driving outputs. The tradeoff is that image prediction is expensive and can optimize visual fidelity that is not always planner-critical.
 
 ![Figure 2 from DriveVLA-W0 showing autoregressive and diffusion world-model variants for future-scene supervision](/assets/images/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving-paper-figure.png)
-_Figure 2 shows the two world-modeling variants: autoregressive discrete visual-token prediction and diffusion over continuous latent features. From the [DriveVLA-W0 paper](https://arxiv.org/abs/2510.12796), via arXiv HTML._
+*Figure 2 shows the two world-modeling variants: autoregressive discrete visual-token prediction and diffusion over continuous latent features. From the [DriveVLA-W0 paper](https://arxiv.org/abs/2510.12796). source: [DriveVLA-W0 paper](https://arxiv.org/abs/2510.12796)*
+
+![Figure 1 from DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving](/assets/images/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving-source-figure-1.webp)
+*Figure 1 World modeling as a catalyst for VLA data scalability. (a): Unlike standard VLAs trained solely on action supervision, our DriveVLA-W0 is trained to predict both future actions and visual scenes. (b): This world modeling task provides a dense source of supervision, enabling our model to better harness the benefits of large-scale data. source: [DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving](https://arxiv.org/abs/2510.12796)*
+
+![Figure 3 from DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving](/assets/images/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving-source-figure-3.webp)
+*Figure 3 (a) Our Mixture-of-Experts (MoE) architecture pairs a large VLA Expert with a lightweight Action Expert for efficient inference. (b-d) This framework serves as a testbed for comparing three action decoding schemes: query-based, autoregressive, and flow matching. source: [DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving](https://arxiv.org/abs/2510.12796)*
+
 
 **What to look at:**
 - Sparse action labels are treated as an insufficient supervision signal.

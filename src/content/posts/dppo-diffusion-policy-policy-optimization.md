@@ -24,7 +24,14 @@ summary: "2024 – DPPO: Diffusion Policy Policy Optimization"
 ## Core Insights
 
 ![Diffusion Policy MDP unrolling denoising states inside each environment action step for policy-gradient optimization](/assets/images/dppo-diffusion-policy-policy-optimization-paper-figure.png)
-_Figure 3 provides the key reduction: every denoising chain becomes an inner MDP with tractable Gaussian transitions, so environment reward can train the diffusion policy with ordinary policy gradients. Source: [DPPO](https://arxiv.org/abs/2409.00588)._
+*Figure 3 provides the key reduction: every denoising chain becomes an inner MDP with tractable Gaussian transitions, so environment reward can train the diffusion policy with ordinary policy gradients. source: [DPPO](https://arxiv.org/abs/2409.00588)*
+
+![Figure 7 from DPPO: Diffusion Policy Policy Optimization](/assets/images/dppo-diffusion-policy-policy-optimization-source-figure-7.webp)
+*Figure 7 Comparing to other policy parameterizations in the more challenging Square and Transport tasks from Robomimic , with state (left) or pixel (right) observation. Results are averaged over three seeds. source: [DPPO: Diffusion Policy Policy Optimization](https://arxiv.org/abs/2409.00588)*
+
+![Figure 4 from DPPO: Diffusion Policy Policy Optimization](/assets/images/dppo-diffusion-policy-policy-optimization-source-figure-4.webp)
+*Figure 4 Long-horizon robot manipulations tasks including (left) the bimanual Transport from Robomimic and (right) Furniture - Bench tasks (full rollouts visualized in Fig. A12 ). source: [DPPO: Diffusion Policy Policy Optimization](https://arxiv.org/abs/2409.00588)*
+
 
 Starting from an imitation-trained diffusion policy, DPPO fine-tunes with PPO-style machinery and a set of stability choices. The paper finds that the diffusion parameterization encourages structured, on-manifold exploration and stable updates, outperforming the compared RL methods for diffusion policies and several other policy classes. It also demonstrates zero-shot deployment of a simulation-trained policy on hardware for a long-horizon task.
 

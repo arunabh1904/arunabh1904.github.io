@@ -28,7 +28,14 @@ summary: "2020 – EfficientDet: Scalable and Efficient Object Detection"
 ## Core Insights
 
 ![Figure 2 from EfficientDet: feature pyramid variants compared against BiFPN](/assets/images/efficientdet-paper-figure-2-bifpn.png)
-_Figure 2 from the [EfficientDet paper](https://arxiv.org/abs/1911.09070), via ar5iv._
+*Figure 2 from the [EfficientDet paper](https://arxiv.org/abs/1911.09070), via ar5iv. source: [EfficientDet paper](https://arxiv.org/abs/1911.09070)*
+
+![Figure 1 from EfficientDet: Scalable and Efficient Object Detection](/assets/images/efficientdet-scalable-and-efficient-object-detection-source-figure-1.webp)
+*Figure 1 Model FLOPs vs. COCO accuracy – All numbers are for single-model single-scale. Our EfficientDet achieves new state-of-the-art 55.1% COCO AP with much fewer parameters and FLOPs than previous detectors. More studies on different backbones and FPN/NAS-FPN/BiFPN are in Table 4 and 5 . Complete results are in Table 2. source: [EfficientDet: Scalable and Efficient Object Detection](https://arxiv.org/abs/1911.09070)*
+
+![Figure 7 from EfficientDet: Scalable and Efficient Object Detection](/assets/images/efficientdet-scalable-and-efficient-object-detection-source-figure-7.webp)
+*Figure 7 Accuracy vs. Training Epochs. source: [EfficientDet: Scalable and Efficient Object Detection](https://arxiv.org/abs/1911.09070)*
+
 
 ### Method and reported result
 

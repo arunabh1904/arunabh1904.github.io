@@ -26,7 +26,14 @@ Cambrian-1 is less a single model trick and more a careful design study. It asks
 Cambrian-1 studies the vision components of multimodal LLMs instead of treating the visual encoder as a fixed detail. It compares many visual encoders, examines supervised and self-supervised representations, and introduces CV-Bench to focus on visual grounding. The paper's contribution is both a model family and an evaluation framework for understanding which visual choices actually improve MLLM behavior. The main lesson is that a stronger language model cannot fully compensate for weak perception. The caveat is benchmark interpretation: multimodal scores often mix language priors, OCR, grounding, and reasoning, so improvements need careful attribution.
 
 ![Figure 8 from Cambrian-1: Spatial Vision Aggregator connects multiple vision encoders to the LLM](/assets/images/cambrian-1-paper-figure-8-sva.png)
-_Figure 8 from the [Cambrian-1 paper](https://arxiv.org/abs/2406.16860), cropped from the arXiv PDF._
+*Figure 8 from the [Cambrian-1 paper](https://arxiv.org/abs/2406.16860). source: [Cambrian-1 paper](https://arxiv.org/abs/2406.16860)*
+
+![Figure 5 from Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs](/assets/images/cambrian-1-vision-centric-exploration-of-multimodal-llms-source-figure-5.webp)
+*Figure 5 Effect of Training Recipe on Model Performance . Boxplots display the distribution of benchmark scores across benchmark categories for different training recipes and types of visual encoders (Language-Supervised, Self-Supervised, and Other). The four training recipes include freezing the visual encoder with various amounts of adapter data (0M , 0.5M , 1.2M ) as well as unfreezing it with 1.2M adapter data. source: [Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs](https://arxiv.org/abs/2406.16860)*
+
+![Figure 3 from Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs](/assets/images/cambrian-1-vision-centric-exploration-of-multimodal-llms-source-figure-3.webp)
+*Figure 3 Left: Performance comparison of MLLMs with visual input enabled and disabled across various benchmarks. Benchmarks are sorted by the difference between the average score with vision enabled and disabled. Right: Principal component analysis displaying clusters of benchmarks based on performance metrics, with bubble size corresponding to benchmark size. We label the clusters as “General” in green , “Knowledge” in yellow , “Chart & OCR” in red , and “Vision-Centric” in blue. source: [Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs](https://arxiv.org/abs/2406.16860)*
+
 
 **What to look at:**
 - Vision encoder choice and connector design are treated as first-order variables.

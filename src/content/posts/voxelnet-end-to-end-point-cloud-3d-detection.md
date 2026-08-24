@@ -25,7 +25,13 @@ VoxelNet replaces hand-designed point-cloud descriptors with a learned Voxel Fea
 VFE alternates pointwise transformation with symmetric aggregation, so the representation is invariant to point ordering while still encoding local shape. Random point sampling and a fixed maximum number of points per voxel bound cost. The detector then densifies the voxel tensor for 3D convolutions—an expensive choice because the paper notes that more than 90% of voxels are empty.
 
 ![VoxelNet: End-to-End Point Cloud 3D Detection source figure: VoxelNet architecture.](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-paper-figure.webp)
-_VoxelNet architecture. Source: [VoxelNet: End-to-End Point Cloud 3D Detection](https://arxiv.org/abs/1711.06396), Figure 2, via arXiv HTML._
+*VoxelNet architecture. source: [VoxelNet: End-to-End Point Cloud 3D Detection](https://arxiv.org/abs/1711.06396)*
+
+![Figure 1 from VoxelNet: End-to-End Point Cloud 3D Detection](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-source-figure-1.webp)
+*Figure 1 VoxelNet directly operates on the raw point cloud (no need for feature engineering) and produces the 3D detection results using a single end-to-end trainable network. source: [VoxelNet: End-to-End Point Cloud 3D Detection](https://arxiv.org/abs/1711.06396)*
+
+![Figure 3 from VoxelNet: End-to-End Point Cloud 3D Detection](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-source-figure-3.webp)
+*Figure 3 Voxel feature encoding layer. source: [VoxelNet: End-to-End Point Cloud 3D Detection](https://arxiv.org/abs/1711.06396)*
 
 
 | Design choice | Benefit | Cost or limit |

@@ -28,7 +28,13 @@ PETR assigns each multiview image feature a 3D position embedding derived from t
 PETR discretizes points along each camera ray, transforms them into the ego frame, normalizes the resulting coordinates over a region of interest, and maps them through a small network into a positional tensor. Learnable 3D anchor points initialize the object queries.
 
 ![PETR: Position Embedding Transformation for Multi-View 3D Object Detection source figure: The architecture of the proposed PETR paradigm.](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-paper-figure.webp)
-_The architecture of the proposed PETR paradigm. Source: [PETR: Position Embedding Transformation for Multi-View 3D Object Detection](https://arxiv.org/abs/2203.05625), Figure 2, via arXiv HTML._
+*The architecture of the proposed PETR paradigm. source: [PETR: Position Embedding Transformation for Multi-View 3D Object Detection](https://arxiv.org/abs/2203.05625)*
+
+![Figure 6 from PETR: Position Embedding Transformation for Multi-View 3D Object Detection](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-source-figure-6.webp)
+*Figure 6 Qualitative analysis of detection results in BEV and image views. The score threshold is 0.25, while the backbone is ResNet-101. The 3D bounding boxes are drawn with different colors to distinguish different classes. source: [PETR: Position Embedding Transformation for Multi-View 3D Object Detection](https://arxiv.org/abs/2203.05625)*
+
+![Figure 7 from PETR: Position Embedding Transformation for Multi-View 3D Object Detection](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-source-figure-7.webp)
+*Figure 7 Visualization of attention maps, generated from an object query (corresponding to the truck) on multi-view images. Both front-left and back-left views have a high response on the attention map. source: [PETR: Position Embedding Transformation for Multi-View 3D Object Detection](https://arxiv.org/abs/2203.05625)*
 
 
 The central ablation is unusually clear. Standard 2D positional encoding reaches only 6.9 mAP; 3D positional encoding reaches 30.5 mAP in the same reported setup. A simple $1\times1$ position encoder raises mAP from 25.6 to 30.9, while $3\times3$ convolutions collapse training because they mix a feature with neighboring coordinates and break correspondence.

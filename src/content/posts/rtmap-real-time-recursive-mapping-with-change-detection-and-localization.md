@@ -30,7 +30,14 @@ The online module encodes current sensors and the crowdsourced HD map, then uses
 The offline module gathers local maps from multiple traversals and fuses them into a better prior map. Uncertainty-aware element modeling is important here: probabilistic densities help the system localize more accurately and avoid treating every vector map observation as equally reliable.
 
 ![Figure 2 from RTMap showing online mapping, localization, change detection, and offline crowdsourced map fusion](/assets/images/rtmap-real-time-recursive-mapping-with-change-detection-and-localization-paper-figure.png)
-_Figure 2 shows RTMap's loop: encode sensors and the crowdsourced HD map, match current and prior elements, estimate pose, detect changes, and fuse local maps offline. From the [RTMap paper](https://arxiv.org/abs/2507.00980), via arXiv HTML._
+*Figure 2 shows RTMap's loop: encode sensors and the crowdsourced HD map, match current and prior elements, estimate pose, detect changes, and fuse local maps offline. From the [RTMap paper](https://arxiv.org/abs/2507.00980). source: [RTMap paper](https://arxiv.org/abs/2507.00980)*
+
+![Figure 4 from RTMap: Real-Time Recursive Mapping with Change Detection and Localization](/assets/images/rtmap-real-time-recursive-mapping-with-change-detection-and-localization-source-figure-4.webp)
+*Figure 4 Qualitative comparison of the localization performance between two configurations on TbV [ 18 ] , we show deviations of our estimated trajectory w.r.t. the ground truth, to illustrate the effectiveness of leveraging state optimization ( ) and map changing events ( ) for further improving the accuracy. source: [RTMap: Real-Time Recursive Mapping with Change Detection and Localization](https://arxiv.org/abs/2507.00980)*
+
+![Figure 3 from RTMap: Real-Time Recursive Mapping with Change Detection and Localization](/assets/images/rtmap-real-time-recursive-mapping-with-change-detection-and-localization-source-figure-3.webp)
+*Figure 3 Trend of queries in different decoder layers. , , are colorized in blue, red, and green, respectively. The ellipsoid reflects their uncertainty. Hence, outdated map elements are gradually filtered from matched map elements. source: [RTMap: Real-Time Recursive Mapping with Change Detection and Localization](https://arxiv.org/abs/2507.00980)*
+
 
 **What to look at:**
 - Hybrid queries distinguish current observations from prior-map elements.

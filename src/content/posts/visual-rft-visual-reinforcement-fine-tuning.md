@@ -20,7 +20,14 @@ summary: '2025 – Visual-RFT: Visual Reinforcement Fine-Tuning'
 ## Core Insights
 
 ![Visual-RFT comparison with supervised fine-tuning across classification, detection, and grounding](/assets/images/visual-rft-paper-figure-1.png)
-_Verifiable visual rewards let one post-training framework optimize several perception tasks without relying only on answer text. Source: [Visual-RFT](https://arxiv.org/abs/2503.01785), Figure 1._
+*Verifiable visual rewards let one post-training framework optimize several perception tasks without relying only on answer text. source: [Visual-RFT](https://arxiv.org/abs/2503.01785)*
+
+![Figure 4 from Visual-RFT: Visual Reinforcement Fine-Tuning](/assets/images/visual-rft-visual-reinforcement-fine-tuning-source-figure-4.webp)
+*Figure 4 Qualitative results of Fine-Grained Image Classification. The thinking process significantly improves the reasoning ability of LVLMs, leading to higher image classification performance. source: [Visual-RFT: Visual Reinforcement Fine-Tuning](https://arxiv.org/abs/2503.01785)*
+
+![Figure 1 from Visual-RFT: Visual Reinforcement Fine-Tuning](/assets/images/visual-rft-visual-reinforcement-fine-tuning-source-figure-1.webp)
+*Figure 1 Our Visual R einforcement F ine- T uning (Visual-RFT) performs better than previous Supervised Fine-Tuning (SFT) on a variety of tasks, such as Open Vocabulary(OV)/Few-shot Detection, Reasoning Grounding, and Fine-grained Classification. source: [Visual-RFT: Visual Reinforcement Fine-Tuning](https://arxiv.org/abs/2503.01785)*
+
 
 The method samples reasoning and answers, scores outputs with task-specific visual checks, then updates the model with group-relative policy optimization. This makes location or category correctness part of the reward rather than an incidental property of fluent text.
 

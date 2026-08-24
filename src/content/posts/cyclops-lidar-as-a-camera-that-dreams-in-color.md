@@ -27,7 +27,11 @@ The method treats the modality gap as a generative translation problem rather th
 The paper evaluates near-dark and varied-light conditions on semantic segmentation, lane detection, and point-cloud colorization. It reports that the synthesized images outperform both LiDAR-only baselines and conventional cameras on the evaluated tasks. That result is a downstream usability claim: it does not mean the generated colors are photometrically faithful or that a camera-free system is safer under all weather.
 
 ![Cyclops two-stage pipeline from sparse LiDAR intensity to synthesized RGB perception input](/assets/images/cyclops-overview-paper-figure.png)
-_Cyclops densifies LiDAR intensity before a few-step latent bridge transports it toward RGB space. Source: [Cyclops](https://arxiv.org/abs/2608.16264)._
+*Cyclops densifies LiDAR intensity before a few-step latent bridge transports it toward RGB space. source: [Cyclops](https://arxiv.org/abs/2608.16264)*
+
+![Figure 4 from Cyclops: LiDAR as a Camera That Dreams in Color](/assets/images/cyclops-lidar-as-a-camera-that-dreams-in-color-source-figure-4.webp)
+*Figure 4 Qualitative comparison. The top row shows baseline results; the bottom row presents ablation variants. Each group includes the full image at frame and zoomed-in patches from frames to to visualize temporal consistency. Our full model produces the most realistic colors with faithful geometry and strong temporal coherence. source: [Cyclops: LiDAR as a Camera That Dreams in Color](https://arxiv.org/abs/2608.16264)*
+
 
 ## High-Level Takeaways
 

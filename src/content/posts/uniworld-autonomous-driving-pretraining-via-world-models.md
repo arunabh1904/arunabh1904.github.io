@@ -25,7 +25,10 @@ UniWorld pretrains a camera encoder and BEV representation by predicting geometr
 Predicting several frames requires the representation to retain geometry and change, not only image semantics. In the reported BEVFormer transfer, mAP/NDS improve from 0.416/0.517 to 0.438/0.534. With 75% of labels, the pretrained model matches the 100%-label baseline. Three target frames perform best in the ablation; five degrade, which the paper attributes in part to dynamic-scene difficulty.
 
 ![UniWorld: Autonomous Driving Pretraining via World Models source figure: The overall architecture of the proposed multi-camera unified pre-training method UniWorld.](/assets/images/uniworld-autonomous-driving-pretraining-via-world-models-paper-figure.webp)
-_The overall architecture of the proposed multi-camera unified pre-training method UniWorld. Source: [UniWorld: Autonomous Driving Pretraining via World Models](https://arxiv.org/abs/2308.07234), Figure 2, via arXiv HTML._
+*The overall architecture of the proposed multi-camera unified pre-training method UniWorld. source: [UniWorld: Autonomous Driving Pretraining via World Models](https://arxiv.org/abs/2308.07234)*
+
+![Figure 2 from UniWorld: Autonomous Driving Pretraining via World Models](/assets/images/uniworld-autonomous-driving-pretraining-via-world-models-source-figure-2.webp)
+*Figure 2 The overall architecture of the proposed multi-camera unified pre-training method UniWorld. We first transform the multi-frame large-scale irregular LiDAR point clouds into volumetric representations as the 4D geometric occupancy labels, then add an occupancy decoder with some layers of 3D convolutions to the BEV encoder. We apply binary occupancy classification as the pretext task to distinguish whether the 4D voxel contains points. source: [UniWorld: Autonomous Driving Pretraining via World Models](https://arxiv.org/abs/2308.07234)*
 
 
 | Stage | Sensor or target | Deployment status |

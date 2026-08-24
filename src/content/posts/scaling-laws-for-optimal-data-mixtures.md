@@ -25,7 +25,14 @@ Scaling Laws for Optimal Data Mixtures predicts loss from model size $N$, traini
 ## Core Insights
 
 ![Scaling-law extrapolation from small models to unseen data mixtures and predicted optimal mixture at larger scale](/assets/images/scaling-laws-for-optimal-data-mixtures-paper-figure.png)
-_Figure 1 shows the decision workflow: fit mixture-aware loss curves on small runs, extrapolate to larger models and unseen weights, then minimize the fitted law to choose a target-scale mixture. Source: [Scaling Laws for Optimal Data Mixtures](https://arxiv.org/abs/2507.09404)._
+*Figure 1 shows the decision workflow: fit mixture-aware loss curves on small runs, extrapolate to larger models and unseen weights, then minimize the fitted law to choose a target-scale mixture. source: [Scaling Laws for Optimal Data Mixtures](https://arxiv.org/abs/2507.09404)*
+
+![Figure 5 from Scaling Laws for Optimal Data Mixtures](/assets/images/scaling-laws-for-optimal-data-mixtures-source-figure-5.webp)
+*Figure 5 Evolution of optimal domain weights with compute budget on the multimodal data, as predicted by the joint scaling law ( equation 2.5 ). source: [Scaling Laws for Optimal Data Mixtures](https://arxiv.org/abs/2507.09404)*
+
+![Figure 2 from Scaling Laws for Optimal Data Mixtures](/assets/images/scaling-laws-for-optimal-data-mixtures-source-figure-2.webp)
+*Figure 2 Value of the Huber loss ( 2.6 ) as a function of the number of L-BFGS calls to fit equation 2.5 on the Interleaved domain from the multimodal experiment ( input-target pairs, domains). We repeat 100 random trials, the bold line is the median, and the shaded regions are the - % quantiles. The Basin-hopping method with L-BFGS subroutine converges faster than repeated calls to L-BFGS. source: [Scaling Laws for Optimal Data Mixtures](https://arxiv.org/abs/2507.09404)*
+
 
 | Input | Use |
 | --- | --- |

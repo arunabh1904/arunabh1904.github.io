@@ -28,7 +28,14 @@ summary: "2026 – mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously
 ## Core Insights
 
 ![mSFT Figure 2 showing test-accuracy curves that peak at different epochs and the resulting peak-epoch differences across tasks](/assets/images/msft-heterogeneous-peak-epochs.webp)
-_Figure 2 from the [mSFT paper](https://arxiv.org/abs/2603.21606), CC BY 4.0. The two panels jointly establish the premise: sub-datasets do not share one useful stopping point._
+*Figure 2 from the [mSFT paper](https://arxiv.org/abs/2603.21606), CC BY 4.0. The two panels jointly establish the premise: sub-datasets do not share one useful stopping point. source: [mSFT paper](https://arxiv.org/abs/2603.21606)*
+
+![Figure 3 from mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-3.webp)
+*Figure 3 (b) Mean absolute shift in optimal compute across various model architectures and scales. source: [mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](https://arxiv.org/abs/2603.21606)*
+
+![Figure 3 from mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-3.webp)
+*Figure 3 (a) ( Optimal Compute) for individual benchmarks on Qwen3 8B. source: [mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](https://arxiv.org/abs/2603.21606)*
+
 
 ### Method and reported result
 
@@ -41,11 +48,11 @@ The proposed algorithm makes the mixture overfitting-aware. It trains on the act
 - Figure 3 is the reason the naive single-rollout fix is unstable: once one dataset is removed, the remaining tasks' optimal stopping points move.
 - Figure 6 is the practical claim: under a low compute budget, dataset exclusion can improve accuracy while reducing net FLOPs.
 
-![Figure 3 from mSFT: optimal compute shifts after excluding part of the data mixture](/assets/images/msft-arxiv-x4.png)
-_Figure 3a from the [mSFT paper](https://arxiv.org/abs/2603.21606), CC BY 4.0._
+_optimal compute shifts after excluding part of the data mixture source: [mSFT paper](https://arxiv.org/abs/2603.21606)_
+_optimal compute shifts after excluding part of the data mixture. source: [mSFT paper](https://arxiv.org/abs/2603.21606)_
 
-![Figure 6 from mSFT: accuracy and FLOPs trade off across compute budgets](/assets/images/msft-arxiv-x9.png)
-_Figure 6 from the [mSFT paper](https://arxiv.org/abs/2603.21606), CC BY 4.0._
+_accuracy and FLOPs trade off across compute budgets source: [mSFT paper](https://arxiv.org/abs/2603.21606)_
+_accuracy and FLOPs trade off across compute budgets. source: [mSFT paper](https://arxiv.org/abs/2603.21606)_
 
 ### Reported evidence
 

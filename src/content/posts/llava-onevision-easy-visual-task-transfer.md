@@ -20,7 +20,14 @@ summary: '2024 – LLaVA-OneVision: Easy Visual Task Transfer'
 ## Core Insights
 
 ![LLaVA-OneVision architecture for single-image, multi-image, and video inputs](/assets/images/llava-onevision-paper-figure-1.png)
-_The same projector-based architecture consumes different visual signals by changing how images and frames are encoded and packed. Source: [LLaVA-OneVision](https://arxiv.org/abs/2408.03326), Figure 1._
+*The same projector-based architecture consumes different visual signals by changing how images and frames are encoded and packed. source: [LLaVA-OneVision](https://arxiv.org/abs/2408.03326)*
+
+![Figure 2 from LLaVA-OneVision: Easy Visual Task Transfer](/assets/images/llava-onevision-easy-visual-task-transfer-source-figure-2.webp)
+*Figure 2 The visual representations. Top: The new Higher AnyRes scheme with Bilinear Interpolation to deal with images of higher resolution; Bottom: the original AnyRes in [ 82 ]. source: [LLaVA-OneVision: Easy Visual Task Transfer](https://arxiv.org/abs/2408.03326)*
+
+![Figure 1 from LLaVA-OneVision: Easy Visual Task Transfer](/assets/images/llava-onevision-easy-visual-task-transfer-source-figure-1.webp)
+*Figure 1 LLaVA-OneVision network architecture. Left: The current model instantiation; Right: the general form of LLaVA architecture in [ 83 ] , but is extended to support more visual signals. source: [LLaVA-OneVision: Easy Visual Task Transfer](https://arxiv.org/abs/2408.03326)*
+
 
 The model tests how far a common visual-language interface can travel across input formats. Image tasks provide dense supervision and broad semantics. Multi-image and video tasks reuse that base while adding comparison and temporal context.
 

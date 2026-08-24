@@ -27,7 +27,14 @@ summary: '2024 – DeepSeekMath: Group Relative Policy Optimization (GRPO)'
 ## Core Insights
 
 ![DeepSeekMath contrasts PPO's actor, reference, reward, and value models with GRPO's critic-free group baseline](/assets/images/deepseekmath-grpo-paper-figure.png)
-_PPO estimates advantages with a learned value model. GRPO samples several answers for one question and computes advantages relative to that group, eliminating the value network while retaining clipped policy ratios and a reference-policy KL penalty. Source: [DeepSeekMath](https://arxiv.org/abs/2402.03300)._
+*PPO estimates advantages with a learned value model. GRPO samples several answers for one question and computes advantages relative to that group, eliminating the value network while retaining clipped policy ratios and a reference-policy KL penalty. source: [DeepSeekMath](https://arxiv.org/abs/2402.03300)*
+
+![Figure 3 from DeepSeekMath: Group Relative Policy Optimization (GRPO)](/assets/images/deepseekmath-group-relative-policy-optimization-grpo-source-figure-3.webp)
+*Figure 3 Benchmark curves of DeepSeek-LLM 1.3B trained on different mathematical corpora. source: [DeepSeekMath: Group Relative Policy Optimization (GRPO)](https://arxiv.org/abs/2402.03300)*
+
+![Figure 7 from DeepSeekMath: Group Relative Policy Optimization (GRPO)](/assets/images/deepseekmath-group-relative-policy-optimization-grpo-source-figure-7.webp)
+*Figure 7 The Maj@K and Pass@K of SFT and RL DeepSeekMath 7B on GSM8K and MATH (temperature ). It was noted that RL enhances Maj@K but not Pass@K. source: [DeepSeekMath: Group Relative Policy Optimization (GRPO)](https://arxiv.org/abs/2402.03300)*
+
 
 For rewards $\{r_1,\ldots,r_G\}$ from $G$ completions of prompt $q$, outcome-supervised GRPO uses
 

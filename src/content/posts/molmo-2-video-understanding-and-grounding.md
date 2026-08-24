@@ -20,7 +20,14 @@ summary: '2026 – Molmo 2: Video Understanding and Grounding'
 ## Core Insights
 
 ![Molmo 2 data and output interfaces for video captioning, pointing, and tracking](/assets/images/molmo-2-paper-figure-1.png)
-_The model produces language, points, and tracks across images and video, making temporal grounding part of the output contract. Source: [Molmo 2](https://arxiv.org/abs/2601.10611), Figure 1._
+*The model produces language, points, and tracks across images and video, making temporal grounding part of the output contract. source: [Molmo 2](https://arxiv.org/abs/2601.10611)*
+
+![Figure 3 from Molmo 2: Video Understanding and Grounding](/assets/images/molmo-2-video-understanding-and-grounding-source-figure-3.webp)
+*Figure 3 Attention mask for a packed sequence with two examples. The first contains two QA pairs for one image. Frame tokens ( dark pink ) have forward attention, while masking blocks cross-attention between different examples (lower-left empty block) and between distinct QA pairs within the same example (upper empty block). source: [Molmo 2: Video Understanding and Grounding](https://arxiv.org/abs/2601.10611)*
+
+![Figure 1 from Molmo 2: Video Understanding and Grounding](/assets/images/molmo-2-video-understanding-and-grounding-source-figure-1.webp)
+*Figure 1 Molmo2 is trained on one of the largest fully open video-centric multimodal corpus to date, including nine new datasets for dense video captioning, long-form and long-video QA, and open-vocabulary pointing and tracking over images, multi-images, and videos. Molmo2 accepts single images, image sets, and videos as input and can produce both free-form language and grounded outputs such as spatio-temporal points, object tracks, and grounded chain-of-thoughts that localize objects and events over time. source: [Molmo 2: Video Understanding and Grounding](https://arxiv.org/abs/2601.10611)*
+
 
 Molmo 2 makes temporal evidence inspectable. A caption can summarize an event, but a point or track must identify where the relevant entity appears across time. The training recipe adds bidirectional attention over visual tokens and token weighting for dense grounded outputs.
 

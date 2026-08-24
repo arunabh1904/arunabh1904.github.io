@@ -27,7 +27,13 @@ ViDAR pretrains a multi-camera temporal encoder by forecasting future LiDAR poin
 The paper reports that ViDAR improves downstream 3D detection by 3.1 NDS, reduces motion-prediction error by about 10%, and transfers to occupancy, mapping, tracking, and planning. In its UniAD summary, ViDAR reaches 52.57 NDS, 42.33 mAP, 42.0 AMOTA, 0.67 minADE, and 0.91 m average planning L2, with gains across the baseline row.
 
 ![ViDAR: Visual Point Cloud Forecasting for Autonomous Driving source figure: Comparisons among visual autonomous driving pre-training paradigms and our ViDAR architecture.](/assets/images/vidar-visual-point-cloud-forecasting-for-autonomous-driving-paper-figure.webp)
-_Comparisons among visual autonomous driving pre-training paradigms and our ViDAR architecture. Source: [ViDAR: Visual Point Cloud Forecasting for Autonomous Driving](https://arxiv.org/abs/2312.17655), Figure 2, via arXiv HTML._
+*Comparisons among visual autonomous driving pre-training paradigms and our ViDAR architecture. source: [ViDAR: Visual Point Cloud Forecasting for Autonomous Driving](https://arxiv.org/abs/2312.17655)*
+
+![Figure 3 from ViDAR: Visual Point Cloud Forecasting for Autonomous Driving](/assets/images/vidar-visual-point-cloud-forecasting-for-autonomous-driving-source-figure-3.webp)
+*Figure 3 Ray-shaped Features vs . Geometric Features. Ray-shaped features show similar feature responses on BEV grids along the same ray; while geometric features from the Latent Rendering maintain discriminative 3D geometry and can describe the 3D world in latent space. source: [ViDAR: Visual Point Cloud Forecasting for Autonomous Driving](https://arxiv.org/abs/2312.17655)*
+
+![Figure 5 from ViDAR: Visual Point Cloud Forecasting for Autonomous Driving](/assets/images/vidar-visual-point-cloud-forecasting-for-autonomous-driving-source-figure-5.webp)
+*Figure 5 Future Decoder iteratively predicts the next BEV features, , from the conditions of ego-motion and the last BEV features, to enable specific future predictions with any ego-control. source: [ViDAR: Visual Point Cloud Forecasting for Autonomous Driving](https://arxiv.org/abs/2312.17655)*
 
 
 | Objective element | What it teaches | Ambiguity |

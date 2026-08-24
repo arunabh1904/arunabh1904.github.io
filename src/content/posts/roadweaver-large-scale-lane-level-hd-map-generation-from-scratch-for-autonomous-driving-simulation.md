@@ -27,7 +27,11 @@ The paper treats a synthetic HD map as a graph-and-geometry object with a global
 Compared with MetaDrive, RoadGen, and HDMapGen, the reported endpoint alignment error is 0.24 m, versus 8.17, 4.80, and 4.32 m respectively. Reachability is 99.8% and the dead-end ratio is 10.7%; the paper also reports an 85.2% cycle ratio. The result is a simulation asset benchmark, not evidence that traffic behavior on the generated graphs is realistic.
 
 ![RoadWeaver coarse-to-fine lane-level map generation pipeline](/assets/images/roadweaver-pipeline-paper-figure.png)
-_The pipeline expands a global road layout into connected road geometry and lane topology. Source: [RoadWeaver](https://arxiv.org/abs/2608.11580)._
+*The pipeline expands a global road layout into connected road geometry and lane topology. source: [RoadWeaver](https://arxiv.org/abs/2608.11580)*
+
+![Figure 1 from RoadWeaver: Large-Scale Lane-Level HD Map Generation from Scratch for Autonomous Driving Simulation](/assets/images/roadweaver-large-scale-lane-level-hd-map-generation-from-scratch-for-autonomous-driving-simulation-source-figure-1.webp)
+*Figure 1 Fig. 1: t-SNE visualization of driving behavior analysis collected from multiple autonomous driving datasets, colored by scenario type. source: [RoadWeaver: Large-Scale Lane-Level HD Map Generation from Scratch for Autonomous Driving Simulation](https://arxiv.org/abs/2608.11580)*
+
 
 The expensive decision is where to put controllability. A global map generator can create large evaluation spaces, but its road-layout prior determines the scenarios available to a driving policy. The next experiment should evaluate policy rankings across generated and real map distributions, with human or rule-based validity checks for lane semantics and traffic control.
 

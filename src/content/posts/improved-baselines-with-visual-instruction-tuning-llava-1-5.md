@@ -27,8 +27,14 @@ summary: '2023 – Improved Baselines with Visual Instruction Tuning (LLaVA-1.5)
 The original LLaVA projects every selected CLIP patch feature into the language model with one linear layer. LLaVA-1.5 replaces that layer with a two-layer MLP. The connector still preserves the patch-token sequence, but it can now learn a nonlinear mapping between the vision encoder and Vicuna's embedding space.
 
 ![LLaVA-1.5 benchmark comparison, training sample counts, and MLP projector architecture](/assets/images/improved-baselines-visual-instruction-tuning-paper-figure-1.png)
+*Figure 1 combines the final benchmark comparison with the architecture and training-sample counts. The connector is a small part of the system, while the complete recipe also changes data, prompting, visual resolution, and language-model scale. source: [Improved Baselines with Visual Instruction Tuning](https://openaccess.thecvf.com/content/CVPR2024/papers/Liu_Improved_Baselines_with_Visual_Instruction_Tuning_CVPR_2024_paper.pdf)*
 
-*Figure 1 combines the final benchmark comparison with the architecture and training-sample counts. The connector is a small part of the system, while the complete recipe also changes data, prompting, visual resolution, and language-model scale. Source: [Improved Baselines with Visual Instruction Tuning](https://openaccess.thecvf.com/content/CVPR2024/papers/Liu_Improved_Baselines_with_Visual_Instruction_Tuning_CVPR_2024_paper.pdf), Figure 1.*
+![Figure 3 from Improved Baselines with Visual Instruction Tuning (LLaVA-1.5)](/assets/images/improved-baselines-with-visual-instruction-tuning-llava-1-5-source-figure-3.webp)
+*Figure 3 Ablation on LLM choices . Data points represent the relative performance of the best performing variant for each dataset. source: [Improved Baselines with Visual Instruction Tuning (LLaVA-1.5)](https://arxiv.org/abs/2310.03744)*
+
+![Figure 2 from Improved Baselines with Visual Instruction Tuning (LLaVA-1.5)](/assets/images/improved-baselines-with-visual-instruction-tuning-llava-1-5-source-figure-2.webp)
+*Figure 2 LLaVA-1.5-HD. Scaling LLaVA-1.5 to higher resolutions by splitting the image into grids and encoding them independently. This allows the model to scale to any resolution, without performing positional embedding interpolation for ViTs. We additionally concatenate the feature of a downsampled image to provide the LLM with a global context. source: [Improved Baselines with Visual Instruction Tuning (LLaVA-1.5)](https://arxiv.org/abs/2310.03744)*
+
 
 The paper builds the recipe one change at a time. Adding a response-format prompt improves MME from 1197.0 to 1323.8 while slightly reducing GQA and MM-Vet. Replacing the linear connector with the MLP then improves all three reported metrics. Later rows add OCR and open-knowledge VQA data, region-level examples, higher resolution, GQA, ShareGPT, and a 13B language model. The final checkpoint is therefore evidence for the whole recipe, while the MLP row isolates a smaller connector gain.
 

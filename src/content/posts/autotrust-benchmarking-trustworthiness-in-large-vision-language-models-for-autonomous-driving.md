@@ -26,7 +26,11 @@ AutoTrust asks whether driving VLMs can be trusted, not merely whether they answ
 AutoTrust reframes driving VLM evaluation around trustworthiness. It tests truthfulness, safety, robustness, privacy, and fairness over more than 10k scenes and 18k queries. The benchmark is designed to expose hallucination, unsafe advice, sensitive-information leakage, adversarial brittleness, and unfair or inconsistent behavior across driving contexts. One important finding is that driving specialization does not automatically improve trustworthiness; general VLMs can outperform specialist driving models on some axes. The limitation is that VQA-style trust tests still do not replace closed-loop validation, but they reveal failures ordinary accuracy benchmarks miss.
 
 ![Figure 1 from AutoTrust: benchmark overview for DriveVLM trustworthiness](/assets/images/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driv-paper-figure.png)
-_Figure 1 from the [AutoTrust paper](https://arxiv.org/abs/2412.15206), via arXiv HTML._
+*Figure 1 from the [AutoTrust paper](https://arxiv.org/abs/2412.15206). source: [AutoTrust paper](https://arxiv.org/abs/2412.15206)*
+
+![Figure 3 from AutoTrust: Benchmarking Trustworthiness in Large Vision Language Models for Autonomous Driving](/assets/images/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving-source-figure-3.webp)
+*Figure 3 Scene Fairness Evaluation Results: Heat map of model performance (Accuracy %) across type and color of surrounding vehicles object. source: [AutoTrust: Benchmarking Trustworthiness in Large Vision Language Models for Autonomous Driving](https://arxiv.org/abs/2412.15206)*
+
 
 **What to look at:**
 - Trustworthiness is split into truthfulness, safety, robustness, privacy, and fairness.

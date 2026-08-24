@@ -30,7 +30,14 @@ The paper frames online HD map construction as structured set prediction. Map el
 The reported evidence is strong for its time: with camera input on nuScenes, MapTR achieved better accuracy and efficiency than prior vector-map construction methods. The abstract highlights MapTR-nano at 25.1 FPS on an RTX 3090, 8x faster than the existing camera-based state of the art while improving mAP by 5.0. The caveat is that MapTR's clean vector output still depends on supervised map annotations and benchmark geometry, not closed-loop planner value.
 
 ![Figure 4 from MapTR showing the encoder-decoder architecture for online vectorized HD map construction](/assets/images/maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-construction-paper-figure.png)
-_Figure 4 shows the structured MapTR pipeline: sensor inputs become BEV features, hierarchical queries decode vector map elements, and matching handles point-level ambiguity. From the [MapTR paper](https://arxiv.org/abs/2208.14437), via ar5iv._
+*Figure 4 shows the structured MapTR pipeline: sensor inputs become BEV features, hierarchical queries decode vector map elements, and matching handles point-level ambiguity. From the [MapTR paper](https://arxiv.org/abs/2208.14437), via ar5iv. source: [MapTR paper](https://arxiv.org/abs/2208.14437)*
+
+![Figure 2 from MapTR: Structured Modeling and Learning for Online Vectorized HD Map Construction](/assets/images/maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-construction-source-figure-2.webp)
+*Figure 2 Typical cases for illustrating the ambiguity of map element about start point and direction. (a) Polyline: for the lane divider between two opposite lanes, defining its direction is difficult. Both endpoints of the lane divider can be regarded as the start point and the point set can be organized in two directions. (b) Polygon: for the pedestrian crossing, each point of the polygon can be regarded as the start point, and the polygon can be connected in two opposite directions (counter-clockwise and clockwise). source: [MapTR: Structured Modeling and Learning for Online Vectorized HD Map Construction](https://arxiv.org/abs/2208.14437)*
+
+
+_hierarchical queries decode vector map elements, and matching handles point-level ambiguity. source: [MapTR paper](https://arxiv.org/abs/2208.14437)
+
 
 **What to look at:**
 - Map elements are point sets with multiple equivalent orderings.

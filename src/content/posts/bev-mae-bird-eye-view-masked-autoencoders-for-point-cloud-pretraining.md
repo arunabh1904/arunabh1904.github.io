@@ -28,7 +28,10 @@ BEV-MAE pretrains a sparse LiDAR encoder by masking vertical BEV columns and pre
 BEV-guided masking removes an entire vertical column rather than independent occupied voxels. That choice lets the model keep a sparse encoder and use a one-layer convolutional decoder. The coordinate target describes local geometry; density supplies a coarse location cue. On Waymo with 20% labeled fine-tuning data, the paper reports 1.42 mAP and 1.34 mAPH over training from scratch.
 
 ![BEV-MAE: Bird's-Eye-View Masked Autoencoders for Point-Cloud Pretraining source figure: Overall pipeline of BEV-MAE.](/assets/images/bev-mae-bird-eye-view-masked-autoencoders-for-point-cloud-pretraining-paper-figure.webp)
-_Overall pipeline of BEV-MAE. Source: [BEV-MAE: Bird's-Eye-View Masked Autoencoders for Point-Cloud Pretraining](https://arxiv.org/abs/2212.05758), Figure 3, via arXiv HTML._
+*Overall pipeline of BEV-MAE. source: [BEV-MAE: Bird's-Eye-View Masked Autoencoders for Point-Cloud Pretraining](https://arxiv.org/abs/2212.05758)*
+
+![Figure 1 from BEV-MAE: Bird](/assets/images/bev-mae-bird-eye-view-masked-autoencoders-for-point-cloud-pretraining-source-figure-1.webp)
+*Figure 1 Performance improvement vs. Pre-training time trade-off. All entries are benchmarked by a P40 GPU. The 3D object detector is CenterPoint ( Yin, Zhou, and Krahenbuhl 2021 ) . All models are pre-trained on full Waymo and then fine-tuned with 20% training samples on Waymo. source: [BEV-MAE: Bird](https://arxiv.org/abs/2212.05758)*
 
 
 | Pretraining design | L2 mAP | Memory | Training cost |

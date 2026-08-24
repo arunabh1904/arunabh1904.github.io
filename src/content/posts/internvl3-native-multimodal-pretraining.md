@@ -20,7 +20,14 @@ summary: '2025 – InternVL3: Native Multimodal Pretraining'
 ## Core Insights
 
 ![InternVL3 benchmark comparison with open and closed multimodal models](/assets/images/internvl3-paper-figure-1.svg)
-_The reported comparison places InternVL3 across a broad multimodal benchmark suite. Source: [InternVL3](https://arxiv.org/abs/2504.10479), Figure 1._
+*The reported comparison places InternVL3 across a broad multimodal benchmark suite. source: [InternVL3](https://arxiv.org/abs/2504.10479)*
+
+![Figure 1 from InternVL3: Native Multimodal Pretraining](/assets/images/internvl3-native-multimodal-pretraining-source-figure-1.webp)
+*Figure 1 Multimodal performance of the InternVL series and other advanced MLLMs. The InternVL series has consistently exhibited progressive enhancements in multimodal capabilities. The newly released InternVL3 significantly outperforms existing open-source MLLMs. Moreover, even in comparison with state-of-the-art closed-source commercial models, InternVL3 continues to demonstrate highly competitive performance. source: [InternVL3: Native Multimodal Pretraining](https://arxiv.org/abs/2504.10479)*
+
+![Figure 2 from InternVL3: Native Multimodal Pretraining](/assets/images/internvl3-native-multimodal-pretraining-source-figure-2.webp)
+*Figure 2 Performance of various MLLMs on the OpenCompass multimodal academic leaderboard. The enhanced InternVL series—InternVL3—demonstrates outstanding multimodal capabilities, significantly outperforming both the Qwen2.5-VL series and closed-source models such as Step-1o, GLM-4v-Plus, and GPT-4o. Remarkably, InternVL3-78B also remains highly competitive with the state-of-the-art Gemini-2.5-Pro. source: [InternVL3: Native Multimodal Pretraining](https://arxiv.org/abs/2504.10479)*
+
 
 Here, native multimodal pretraining describes the training schedule. Multimodal and text data appear together during the main pretraining stage, though the system still initializes strong pretrained components. Vision is no longer confined to a small adapter trained after the language model is complete.
 

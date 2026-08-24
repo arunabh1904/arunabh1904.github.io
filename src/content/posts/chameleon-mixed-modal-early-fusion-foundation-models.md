@@ -25,7 +25,14 @@ Chameleon trains token-based, early-fusion models that can understand and genera
 ## Core Insights
 
 ![Chameleon early-fusion transformer representing text and images as one interleaved discrete token sequence](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-paper-figure.png)
-_Figure 1 shows Chameleon's defining constraint: one autoregressive transformer consumes and emits interleaved text and image tokens rather than delegating generation to a separate decoder. Source: [Chameleon](https://arxiv.org/abs/2405.09818)._
+*Figure 1 shows Chameleon's defining constraint: one autoregressive transformer consumes and emits interleaved text and image tokens rather than delegating generation to a separate decoder. source: [Chameleon](https://arxiv.org/abs/2405.09818)*
+
+![Figure 23 from Chameleon: Mixed-Modal Early-Fusion Foundation Models](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-source-figure-23.webp)
+*Figure 23 The inter-annotator agreement on the questions in the absolute evaluation. source: [Chameleon: Mixed-Modal Early-Fusion Foundation Models](https://arxiv.org/abs/2405.09818)*
+
+![Figure 19 from Chameleon: Mixed-Modal Early-Fusion Foundation Models](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-source-figure-19.webp)
+*Figure 19 Task categories and examples of prompts. Image attributions: Seguin 2010 ; Agriflanders 2009 ; Tuszyński 2015 ; Sokolov 2022. source: [Chameleon: Mixed-Modal Early-Fusion Foundation Models](https://arxiv.org/abs/2405.09818)*
+
 
 | Decision | Chameleon's answer | Tradeoff |
 | --- | --- | --- |

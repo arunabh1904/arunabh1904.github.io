@@ -26,7 +26,14 @@ DriveBench measures VLM reliability for autonomous driving through scene questio
 DriveBench asks whether VLMs remain reliable under driving-specific stress rather than stopping at clean-image question answering. It evaluates visual grounding, robustness, and task metrics across perception, prediction, planning, and text QA. The benchmark corrupts driving inputs with brightness shifts, fog, snow, rain, blur, zoom, compression, and bit errors. VLMs can look capable on normal scenes while failing under realistic sensor degradation or poor grounding. DriveBench therefore moves the evaluation target from capability demos to reliability.
 
 ![Figure 1 from DriveBench: benchmark overview across perception, prediction, behavior, and planning](/assets/images/drivebench-paper-figure-1-overview.png)
-_Figure 1 from the [DriveBench paper](https://arxiv.org/abs/2501.04003), cropped from the arXiv PDF._
+*Figure 1 from the [DriveBench paper](https://arxiv.org/abs/2501.04003). source: [DriveBench paper](https://arxiv.org/abs/2501.04003)*
+
+![Figure 2 from Are VLMs Ready for Autonomous Driving?](/assets/images/are-vlms-ready-for-autonomous-driving-drivebench-source-figure-2.webp)
+*Figure 2 Do VLMs provide reliable explanations based on visual cues in driving? We study this from perspectives on reliability, data, and metrics. We find VLMs can fabricate quality answers to driving questions when visual information is absent. The fabricated answers can bypass current metrics, even GPT scores, due to imbalance, lack of context dataset, and problematical evaluation protocols. source: [Are VLMs Ready for Autonomous Driving?](https://arxiv.org/abs/2501.04003)*
+
+![Figure 8 from Are VLMs Ready for Autonomous Driving?](/assets/images/are-vlms-ready-for-autonomous-driving-drivebench-source-figure-8.webp)
+*Figure 8 Illustration of performance degradation . After applying each corruption, we evaluate the MCQs accuracy changes compared with clean inputs. We observe that human performance largely decreases while most VLMs remain unchanged. source: [Are VLMs Ready for Autonomous Driving?](https://arxiv.org/abs/2501.04003)*
+
 
 **What to look at:**
 - DriveBench compares clean, corrupted, and text-only conditions.

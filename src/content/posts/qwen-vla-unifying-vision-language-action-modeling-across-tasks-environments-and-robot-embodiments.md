@@ -30,7 +30,14 @@ The model combines a Qwen3.5-4B vision-language backbone with a 1.15B DiT flow-m
 That mixture lets the authors frame manipulation, navigation, and trajectory prediction as variants of the same action-and-trajectory prediction problem. The caveat is operational: this is a large generalist policy, so the compelling evidence is not only language understanding but closed-loop and real-world success under embodiment changes.
 
 ![Qwen-VLA overview showing the Qwen vision-language backbone, DiT action decoder, and unified embodied task interface](/assets/images/qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments-paper-figure.png)
-_The Qwen-VLA overview shows the shared vision-language backbone feeding a DiT action decoder for manipulation, navigation, and trajectory tasks. From the [official Qwen-VLA repository](https://github.com/QwenLM/Qwen-VLA)._
+*The Qwen-VLA overview shows the shared vision-language backbone feeding a DiT action decoder for manipulation, navigation, and trajectory tasks. From the [official Qwen-VLA repository](https://github.com/QwenLM/Qwen-VLA). source: [official Qwen-VLA repository](https://github.com/QwenLM/Qwen-VLA)*
+
+![Figure 2 from Qwen-VLA: Unifying Vision-Language-Action Modeling across Tasks, Environments, and Robot Embodiments](/assets/images/qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments-source-figure-2.webp)
+*Figure 2 Training recipe of Qwen-VLA. Stage I (T2A) trains the DiT action decoder to reconstruct actions from text alone, building a structured action prior without visual input. Stage II (CPT) unfreezes both modules to ground this prior in visual observations. Stage III (SFT) branches into multi-task and real-robot tracks, and Stage IV (RL) optimizes closed-loop task success via environment rewards. source: [Qwen-VLA: Unifying Vision-Language-Action Modeling across Tasks, Environments, and Robot Embodiments](https://arxiv.org/abs/2605.30280)*
+
+![Figure 3 from Qwen-VLA: Unifying Vision-Language-Action Modeling across Tasks, Environments, and Robot Embodiments](/assets/images/qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments-source-figure-3.webp)
+*Figure 3 Examples of data generated through RoboInF . The top row shows a short-horizon task, “Place the two green staplers side by side,” which consists of a compact sequence of reaching, grasping, transporting, and placing. The bottom row shows a long-horizon task, “Group the drinks together and leave the cleaning sponge by itself,” which requires multiple object manipulations and can be decomposed into subtask segments such as picking and placing each drink. source: [Qwen-VLA: Unifying Vision-Language-Action Modeling across Tasks, Environments, and Robot Embodiments](https://arxiv.org/abs/2605.30280)*
+
 
 **What to look at:**
 - Qwen-VLA uses a DiT flow-matching decoder for continuous actions.

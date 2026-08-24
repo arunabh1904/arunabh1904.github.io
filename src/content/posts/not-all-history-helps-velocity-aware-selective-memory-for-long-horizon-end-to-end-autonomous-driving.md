@@ -27,7 +27,14 @@ Long-horizon planners often feed their own previous predictions back as context.
 The displayed ablation separates the pieces. An endpoint SMM variant has average L2 2.00 and collision 1.24%; adding the training scaffold gives L2 1.89 but collision 1.35%; the fixed midpoint reaches L2 1.83, collision 1.19%, and TPC 1.20. The paper also reports 23.3% lower average collision rate, 30.9% lower TPC, and 11.8% lower L2 relative to the best prior values in its nuScenes comparison.
 
 ![StableDrive framework with selective cross-cycle memory and motion-stage training scaffold](/assets/images/stabledrive-framework-paper-figure.png)
-_The scaffold supervises stage-aware planning during training, while selective memory remains in the deployed planner. Source: [StableDrive](https://arxiv.org/abs/2608.15573)._
+*The scaffold supervises stage-aware planning during training, while selective memory remains in the deployed planner. source: [StableDrive](https://arxiv.org/abs/2608.15573)*
+
+![Figure 2 from Not All History Helps: Velocity-Aware Selective Memory for Long-Horizon End-to-End Autonomous Driving](/assets/images/not-all-history-helps-velocity-aware-selective-memory-for-long-horizon-end-to-end-autonomous-driving-source-figure-2.webp)
+*Figure 2 Fig. 2: Overall framework of StableDrive. StableDrive combines selective cross-cycle planning memory with a train-and-retire motion-stage scaffold. Multi-view images are encoded into a sparse scene representation, and joint scene interaction generates command-conditioned planning queries. SMM selectively updates the current queries using score-modulated one-cycle history before candidate generation and selection. MSTS provides horizon-wise motion-stage supervision during training and is removed at inference. source: [Not All History Helps: Velocity-Aware Selective Memory for Long-Horizon End-to-End Autonomous Driving](https://arxiv.org/abs/2608.15573)*
+
+![Figure 1 from Not All History Helps: Velocity-Aware Selective Memory for Long-Horizon End-to-End Autonomous Driving](/assets/images/not-all-history-helps-velocity-aware-selective-memory-for-long-horizon-end-to-end-autonomous-driving-source-figure-1.webp)
+*Figure 1 Fig. 1: Selective planning memory enables safer long-horizon planning. (a) A nuScenes example comparing MomAD [ 45 ] and StableDrive with the ground-truth future trajectory. (b) Retaining a stale planning prior causes MomAD [ 45 ] to diverge after and collide at . (c) StableDrive suppresses unreliable history and remains collision-free. (d) StableDrive improves six-second L2, Col. Rate, and TPC by 5.83%, 13.11%, and 11.34%, respectively, over our local MomAD [ 45 ] reproduction under the same evaluation protocol. source: [Not All History Helps: Velocity-Aware Selective Memory for Long-Horizon End-to-End Autonomous Driving](https://arxiv.org/abs/2608.15573)*
+
 
 ## High-Level Takeaways
 

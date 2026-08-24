@@ -29,7 +29,7 @@ The system also separates denoising clocks. Video prediction and action predicti
 The result is a case for structured coordination, not proof that semantic and dynamic branches must always be separate. The NAVSIM protocol is non-reactive and the asynchronous schedule changes the computation contract. A matched-latency closed-loop test would determine whether the action-space interface improves safety or only the offline score.
 
 ![BrainWAM framework coordinating semantic and predictive action pathways](/assets/images/brainwam-framework-paper-figure.png)
-_BrainWAM keeps semantic and predictive pathways separate until coordination in action space. Source: [BrainWAM](https://arxiv.org/abs/2608.12854)._
+*BrainWAM keeps semantic and predictive pathways separate until coordination in action space. source: [BrainWAM](https://arxiv.org/abs/2608.12854)*
 
 ## High-Level Takeaways
 

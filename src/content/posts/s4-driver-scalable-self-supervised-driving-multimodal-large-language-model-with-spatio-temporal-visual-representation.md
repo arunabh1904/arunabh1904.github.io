@@ -24,7 +24,10 @@ summary: "2025 – S4-Driver: Scalable Self-Supervised Driving Multimodal Large 
 The paper's hypothesis is that 2D reasoning features are a poor native interface for 3D planning. Its sparse volume connects views and time in a spatial representation before the planner produces a trajectory. The intervention is therefore not a language-model decoder trick; it is the carrier used between the pretrained vision model and the action output. Freezing the visual encoder keeps the scaling path focused on driving logs and the new 3D representation.
 
 ![S4-Driver: Scalable Self-Supervised Driving Multimodal Large Language Model with Spatio-Temporal Visual Representation source figure: Overview of our proposed S4-Driver algorithm.](/assets/images/s4-driver-scalable-self-supervised-driving-multimodal-large-language-model-with-spatio-temporal-visual-representation-paper-figure.webp)
-_Overview of our proposed S4-Driver algorithm. Source: [S4-Driver: Scalable Self-Supervised Driving Multimodal Large Language Model with Spatio-Temporal Visual Representation](https://arxiv.org/abs/2505.24139), Figure 2, via arXiv HTML._
+*Overview of our proposed S4-Driver algorithm. source: [S4-Driver: Scalable Self-Supervised Driving Multimodal Large Language Model with Spatio-Temporal Visual Representation](https://arxiv.org/abs/2505.24139)*
+
+![Figure 9 from S4-Driver: Scalable Self-Supervised Driving Multimodal Large Language Model with Spatio-Temporal Visual Representation](/assets/images/s4-driver-scalable-self-supervised-driving-multimodal-large-language-model-with-spatio-temporal-visual-representation-source-figure-9.webp)
+*Figure 9 Example input prompt and target output on WOMD-Planning-ADE. source: [S4-Driver: Scalable Self-Supervised Driving Multimodal Large Language Model with Spatio-Temporal Visual Representation](https://arxiv.org/abs/2505.24139)*
 
 
 Self-supervision removes the cost of object, map, and motion labels, but it does not remove the need for a planning target or a reliable geometric convention. The abstract does not report how the sparse volume is constructed, temporal alignment, trajectory loss, camera coverage, or a matched frozen-encoder 2D baseline. A useful test would hold all image data and planning targets fixed while varying only the representation carrier—2D tokens, BEV features, and the sparse volume.

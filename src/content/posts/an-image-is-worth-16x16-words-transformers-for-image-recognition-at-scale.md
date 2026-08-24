@@ -28,7 +28,14 @@ summary: "2020 – An Image Is Worth 16×16 Words: Transformers for Image Recogn
 ## Core Insights
 
 ![Figure 1: Model overview from An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale](/assets/images/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale-paper-figure.png)
-_Figure 1: Model overview. From the [An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale paper](https://arxiv.org/abs/2010.11929), via arXiv HTML._
+*Figure 1: Model overview. From the [An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale paper](https://arxiv.org/abs/2010.11929). source: [An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale paper](https://arxiv.org/abs/2010.11929)*
+
+![Figure 2 from An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale](/assets/images/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale-source-figure-2.webp)
+*Figure 2 Breakdown of VTAB performance in Natural , Specialized , and Structured task groups. source: [An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)*
+
+![Figure 6 from An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale](/assets/images/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale-source-figure-6.webp)
+*Figure 6 Representative examples of attention from the output token to the input space. See Appendix D.7 for details. source: [An Image Is Worth 16×16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)*
+
 
 ### Method and reported result
 

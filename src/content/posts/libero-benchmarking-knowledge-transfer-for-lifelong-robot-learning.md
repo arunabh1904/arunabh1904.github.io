@@ -24,7 +24,14 @@ summary: "2023 – LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Le
 ## Core Insights
 
 ![LIBERO benchmark overview with four task suites and five lifelong-learning research axes](/assets/images/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning-paper-figure.png)
-_Figure 1 organizes LIBERO as more than a task list: four controlled suites vary objects, spatial relations, goals, and task count while the benchmark probes distribution shift, architecture, ordering, and pretraining effects. Source: [LIBERO](https://arxiv.org/abs/2306.03310)._
+*Figure 1 organizes LIBERO as more than a task list: four controlled suites vary objects, spatial relations, goals, and task count while the benchmark probes distribution shift, architecture, ordering, and pretraining effects. source: [LIBERO](https://arxiv.org/abs/2306.03310)*
+
+![Figure 3 from LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning](/assets/images/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning-source-figure-3.webp)
+*Figure 3 Metrics for LLDM. source: [LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning](https://arxiv.org/abs/2306.03310)*
+
+![Figure 2 from LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning](/assets/images/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning-source-figure-2.webp)
+*Figure 2 LIBERO ’s procedural generation pipeline: Extracting behavioral templates from a large-scale human activity dataset (1) , Ego4D, for generating task instructions (2) ; Based on the task description, selecting the scene and generating the PDDL description file (3) that specifies the objects and layouts (A) , the initial object configurations (B) , and the task goal (C). source: [LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Learning](https://arxiv.org/abs/2306.03310)*
+
 
 LIBERO-Spatial, Object, and Goal each isolate a type of transfer across ten tasks; LIBERO-100 mixes them at larger scale. The benchmark also varies task order, policy architecture, lifelong-learning algorithm, and visual pretraining. Its initial experiments include counterintuitive results: sequential fine-tuning can beat specialized lifelong methods on forward transfer, and naive supervised pretraining can hurt later learning.
 

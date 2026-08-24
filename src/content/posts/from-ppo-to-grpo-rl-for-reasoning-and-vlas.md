@@ -113,7 +113,7 @@ $$
 The normalized completion reward replaces the learned value model. PPO-style likelihood ratios, clipping, and a reference-policy KL penalty remain. The baseline is no longer “what return did the critic expect from this prefix?” It is “how did this answer compare with the other answers sampled for the same question?”
 
 ![PPO uses a learned value model; GRPO removes it and uses a same-prompt group baseline](/assets/images/deepseekmath-grpo-paper-figure.png)
-_GRPO keeps the actor, reference model, and reward signal while removing PPO's critic. The saved model is exchanged for multiple completions per prompt. Source: [DeepSeekMath](https://arxiv.org/abs/2402.03300)._
+*GRPO keeps the actor, reference model, and reward signal while removing PPO's critic. The saved model is exchanged for multiple completions per prompt. source: [DeepSeekMath](https://arxiv.org/abs/2402.03300)*
 
 This is an excellent bargain when three conditions hold:
 
@@ -154,8 +154,8 @@ $$
 
 The state distribution is on-policy; the learning signal is dense supervised imitation. This distinction changes the error being corrected. Offline distillation teaches the student on teacher-written prefixes. At inference, one student mistake creates a prefix the teacher never wrote, and subsequent errors compound. GKD deliberately visits those student-created states and supplies a teacher distribution there.
 
-![On-policy GKD consistently improves students more than fixed-data distillation across three generation tasks](/assets/images/on-policy-distillation-language-models-paper-figure.png)
-_The source figure compares distillation methods on summarization, translation, and arithmetic. On-policy targets are useful across tasks, although the best divergence and mixture remain task-dependent. Source: [GKD](https://arxiv.org/abs/2306.13649)._
+_The source figure compares distillation methods on summarization, translation, and arithmetic. On-policy targets are useful across tasks, although the best divergence and mixture remain task-dependent source: [GKD](https://arxiv.org/abs/2306.13649)_
+_The source figure compares distillation methods on summarization, translation, and arithmetic. On-policy targets are useful across tasks, although the best divergence and mixture remain task-dependent. source: [GKD](https://arxiv.org/abs/2306.13649)._
 
 Distillation and RL optimize different evidence:
 

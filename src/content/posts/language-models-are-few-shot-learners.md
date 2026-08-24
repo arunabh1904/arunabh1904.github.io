@@ -26,7 +26,14 @@ summary: "2020 – Language Models are Few-Shot Learners"
 ## Core Insights
 
 ![Figure 2.1 from GPT-3: zero-shot, one-shot, few-shot, and fine-tuning evaluation strategies](/assets/images/gpt3-paper-figure-2-1-eval-strategies.png)
-_Figure 2.1 from the [GPT-3 paper](https://arxiv.org/abs/2005.14165), via ar5iv._
+*Figure 2.1 from the [GPT-3 paper](https://arxiv.org/abs/2005.14165), via ar5iv. source: [GPT-3 paper](https://arxiv.org/abs/2005.14165)*
+
+![Figure 1 from Language Models are Few-Shot Learners](/assets/images/language-models-are-few-shot-learners-source-figure-1.webp)
+*Figure 1 1: Language model meta-learning. During unsupervised pre-training, a language model develops a broad set of skills and pattern recognition abilities. It then uses these abilities at inference time to rapidly adapt to or recognize the desired task. We use the term “in-context learning” to describe the inner loop of this process, which occurs within the forward-pass upon each sequence. source: [Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165)*
+
+![Figure 1 from Language Models are Few-Shot Learners](/assets/images/language-models-are-few-shot-learners-source-figure-1.webp)
+*Figure 1 1: Smooth scaling of performance with compute. Performance (measured in terms of cross-entropy validation loss) follows a power-law trend with the amount of compute used for training. The power-law behavior observed in [ 57 ] continues for an additional two orders of magnitude with only small deviations from the predicted curve. For this figure, we exclude embedding parameters from compute and parameter counts. source: [Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165)*
+
 
 ### Method and reported result
 

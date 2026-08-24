@@ -24,7 +24,14 @@ summary: "2023 – RT-2: Vision-Language-Action Models Transfer Web Knowledge to
 ## Core Insights
 
 ![RT-2 co-fine-tuning pipeline mixing internet-scale vision-language examples with tokenized robot actions for closed-loop control](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-paper-figure.png)
-_Figure 1 shows the transfer interface: robot actions are serialized into the language model's token space, allowing web vision-language data and robot trajectories to co-train one model that is decoded back into closed-loop control. Source: [RT-2](https://arxiv.org/abs/2307.15818)._
+*Figure 1 shows the transfer interface: robot actions are serialized into the language model's token space, allowing web vision-language data and robot trajectories to co-train one model that is decoded back into closed-loop control. source: [RT-2](https://arxiv.org/abs/2307.15818)*
+
+![Figure 3 from RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-source-figure-3.webp)
+*Figure 3 Example generalization scenarios used for evaluation in Figures 4 and 8(b) and Tables 6 and 8. source: [RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control](https://arxiv.org/abs/2307.15818)*
+
+![Figure 8 from RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-source-figure-8.webp)
+*Figure 8 (b) Ablations of RT-2-PaLI-X showcasing the impact of parameter count and training strategy on generalization. source: [RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control](https://arxiv.org/abs/2307.15818)*
+
 
 The shared token interface allows semantic knowledge from web data to influence action selection. Across roughly 6,000 evaluation trials, RT-2 improves generalization to novel objects and instructions and exhibits behaviors such as selecting an improvised tool. The system demonstrates transfer from semantic pretraining into control, not a general solution to contact dynamics.
 

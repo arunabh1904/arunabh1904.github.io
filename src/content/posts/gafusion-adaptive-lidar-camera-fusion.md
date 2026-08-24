@@ -25,8 +25,7 @@ GAFusion uses LiDAR to guide camera geometry through Sparse Depth Guidance and L
 On nuScenes, the paper reports 72.1 mAP / 73.5 NDS on validation and 73.6 / 74.9 on test. In its ablations, combining depth and occupancy guidance adds about 1.4 mAP and 0.8 NDS; adaptive local-global fusion improves over addition or concatenation; the temporal module contributes about 0.3 mAP and 0.1 NDS.
 
 ![GAFusion architecture with LiDAR-guided depth and occupancy, local-global adaptive fusion, and temporal aggregation](/assets/images/gafusion-adaptive-lidar-camera-fusion-paper-figure.webp)
-
-_LiDAR guides the camera branch twice—through sparse depth and occupancy—before adaptive local-global fusion and short temporal aggregation. Source: [GAFusion](https://openaccess.thecvf.com/content/CVPR2024/html/Li_GAFusion_Adaptive_Fusing_LiDAR_and_Camera_with_Multiple_Guidance_for_CVPR_2024_paper.html), Figure 2._
+*LiDAR guides the camera branch twice—through sparse depth and occupancy—before adaptive local-global fusion and short temporal aggregation. source: [GAFusion](https://openaccess.thecvf.com/content/CVPR2024/html/Li_GAFusion_Adaptive_Fusing_LiDAR_and_Camera_with_Multiple_Guidance_for_CVPR_2024_paper.html)*
 
 | Component | Intended repair | Reported signal |
 | --- | --- | --- |

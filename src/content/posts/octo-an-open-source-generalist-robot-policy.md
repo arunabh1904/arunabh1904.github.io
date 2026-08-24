@@ -24,7 +24,14 @@ summary: "2024 – Octo: An Open-Source Generalist Robot Policy"
 ## Core Insights
 
 ![Octo architecture tokenizing task and observation inputs with flexible blockwise attention and readout action heads](/assets/images/octo-an-open-source-generalist-robot-policy-paper-figure.png)
-_Figure 0 shows Octo's adaptation interface: task and observation tokens share one transformer, while blockwise attention and readout tokens let fine-tuning add observations or action spaces without rewriting the pretrained backbone. Source: [Octo](https://arxiv.org/abs/2405.12213)._
+*Figure 0 shows Octo's adaptation interface: task and observation tokens share one transformer, while blockwise attention and readout tokens let fine-tuning add observations or action spaces without rewriting the pretrained backbone. source: [Octo](https://arxiv.org/abs/2405.12213)*
+
+![Figure 4 from Octo: An Open-Source Generalist Robot Policy](/assets/images/octo-an-open-source-generalist-robot-policy-source-figure-4.webp)
+*Figure 4 Fig. 4: Model Scaling. The performance of Octo improves with larger model sizes on both UR5 and WidowX tasks. Success rates are averaged over 10 trials on one language-conditioned task per robot. source: [Octo: An Open-Source Generalist Robot Policy](https://arxiv.org/abs/2405.12213)*
+
+![Figure 2 from Octo: An Open-Source Generalist Robot Policy](/assets/images/octo-an-open-source-generalist-robot-policy-source-figure-2.webp)
+*Figure 2 Fig. 2: Evaluation Tasks. We evaluate Octo on 9 real robot setups across 4 institutions. Our evaluations capture diverse object interactions (e.g., “WidowX BridgeV2”), long task horizons (e.g., “Stanford Coffee”) and precise manipulation (e.g., “Berkeley Peg Insertion”). We evaluate Octo’s capabilities to control robots in environments from the pretraining data out-of-the-box and to efficiently finetune to new tasks and environments with small target domain datasets. source: [Octo: An Open-Source Generalist Robot Policy](https://arxiv.org/abs/2405.12213)*
+
 
 Octo uses tokenized observations and tasks but a diffusion action head, separating semantic/temporal representation from continuous action generation. Its modular tokenizers and readouts allow new sensors or controllers without rebuilding the backbone. Experiments across nine platforms study both out-of-the-box behavior and downstream adaptation.
 

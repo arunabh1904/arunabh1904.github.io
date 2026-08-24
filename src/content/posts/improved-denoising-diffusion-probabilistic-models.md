@@ -26,7 +26,14 @@ summary: "2021 – Improved Denoising Diffusion Probabilistic Models"
 ## Core Insights
 
 ![Figure 3 from Improved DDPM: linear and cosine noise schedules preserve signal at different rates](/assets/images/improved-ddpm-paper-figure-3-noise-schedule.png)
-_Figure 3 from the [Improved DDPM paper](https://arxiv.org/abs/2102.09672), via ar5iv._
+*Figure 3 from the [Improved DDPM paper](https://arxiv.org/abs/2102.09672), via ar5iv. source: [Improved DDPM paper](https://arxiv.org/abs/2102.09672)*
+
+![Figure 5 from Improved Denoising Diffusion Probabilistic Models](/assets/images/improved-denoising-diffusion-probabilistic-models-source-figure-5.webp)
+*Figure 5 throughout diffusion in the linear schedule and our proposed cosine schedule. source: [Improved Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2102.09672)*
+
+![Figure 1 from Improved Denoising Diffusion Probabilistic Models](/assets/images/improved-denoising-diffusion-probabilistic-models-source-figure-1.webp)
+*Figure 1 The ratio for every diffusion step for diffusion processes of different lengths. source: [Improved Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2102.09672)*
+
 
 ### Method and reported result
 

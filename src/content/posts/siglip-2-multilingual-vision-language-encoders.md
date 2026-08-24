@@ -24,7 +24,14 @@ summary: '2025 – SigLIP 2: Multilingual Vision-Language Encoders with Dense Fe
 ## Core Insights
 
 ![SigLIP 2 training recipe combining sigmoid alignment with captioning and self-supervised objectives](/assets/images/siglip-2-paper-figure-1.svg)
-_SigLIP 2 does not replace the dual encoder. It broadens what the visual encoder must preserve by adding captioning and dense self-supervised signals to the original sigmoid loss. Source: [SigLIP 2](https://arxiv.org/abs/2502.14786), Figure 1._
+*SigLIP 2 does not replace the dual encoder. It broadens what the visual encoder must preserve by adding captioning and dense self-supervised signals to the original sigmoid loss. source: [SigLIP 2](https://arxiv.org/abs/2502.14786)*
+
+![Figure 3 from SigLIP 2: Multilingual Vision-Language Encoders with Dense Features](/assets/images/siglip-2-multilingual-vision-language-encoders-source-figure-3.webp)
+*Figure 3 Comparing the NaFlex (a single checkpoint per model size supporting native aspect ratio and variable sequence length/resolution) and the standard square-input SigLIP 2 variants which use a separate checkpoint for each sequence length/resolution. The sequence lengths annotated on the x-axis correspond to training sequence lengths for NaFlex. NaFlex interpolates fairly well between training resolutions, but does not extrapolate well (not shown). source: [SigLIP 2: Multilingual Vision-Language Encoders with Dense Features](https://arxiv.org/abs/2502.14786)*
+
+![Figure 2 from SigLIP 2: Multilingual Vision-Language Encoders with Dense Features](/assets/images/siglip-2-multilingual-vision-language-encoders-source-figure-2.webp)
+*Figure 2 Per-language image-text retrieval performance for SigLIP, SigLIP 2 and mSigLIP on Crossmodal-3600 [ 58 ] . SigLIP 2 almost matches the performance of mSigLIP (SigLIP trained on multilingual data) despite performing substantially better on English vision-language tasks (Table 1 ). source: [SigLIP 2: Multilingual Vision-Language Encoders with Dense Features](https://arxiv.org/abs/2502.14786)*
+
 
 [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html) changed how image-text pairs compete. SigLIP 2 changes the supervision mixture. Captioning adds token-level language pressure. Self-distillation and masked prediction add local visual pressure. Online curation changes which examples survive training.
 

@@ -41,7 +41,7 @@ In a bit of a comical twist, we accidentally broke the robot just before filming
 Even with that ridiculous ending, the concept was real. A similar design is now in production, helping farmers harvest more safely. That is what made robotics click for me: machines can make difficult, dangerous work safer and more efficient.
 
 ![The areca-nut harvesting robot built for my undergraduate thesis](/assets/images/IMG_8842.jpg)
-_Our undergraduate prototype climbed an areca palm and used a remotely controlled cutter. Source: personal project archive._
+*Our undergraduate prototype climbed an areca palm and used a remotely controlled cutter. source: personal project archive*
 
 Undergrad changed my direction because the late start still compounded. The GPA recovery proved I could rebuild after wasting time; the robot proved that I cared most when engineering had a physical consequence for someone else. The reversed video was classic *jugaad*. It is funny in retrospect and was not a substitute for a working demonstration, but the underlying problem made robotics feel worth pursuing.
 
@@ -54,7 +54,7 @@ After graduation, I had my heart set on pursuing a master's degree in Germany. T
 A month later, I was anxiously waiting for the results. Then, I received an email from my safe school. I opened it, expecting good news, only to read that I was being rejected for missing documents. To my horror, I realized I had accidentally sent the documents meant for the safe school to another university. Slowly, the rejection emails from all five universities trickled in. I wasn't going to Germany.
 
 ![The missing-documents rejection notice that exposed my application mix-up](/assets/images/tuhh.png)
-_The rejection notice that exposed the document mix-up across my German university applications. Source: personal archive._
+*The rejection notice that exposed the document mix-up across my German university applications. source: personal archive*
 
 I was devastated, and it plunged me into a deep depression. For about nine months, my life became a bleak cycle: I'd get up, barely eat, play DOTA 2 in a dark room for 12 hours, smoke heavily, and then go back to sleep, only to repeat the same routine the next day. It was a dark time.
 
@@ -81,7 +81,7 @@ In my second semester, I joined Dr. Petruska's lab as a research assistant. I fi
 The lab became my second home. I focused on C++ and ROS, then tested what I learned on the physical system. We once short-circuited the entire onboard compute stack and spent two weeks rebuilding it from scratch. Even the failure was fun because every repair exposed another layer of the robot.
 
 ![Working beside the Clearpath Husky robot in the Colorado School of Mines lab](/assets/images/me_in_lab.jpeg)
-_Working with the Husky platform in the Colorado School of Mines robotics lab. Source: personal archive._
+*Working with the Husky platform in the Colorado School of Mines robotics lab. source: personal archive*
 
 The third semester at CSM was a turning point in my career. I spent much of it conducting independent research and programming a Husky robot for autonomous navigation in GPS-denied environments. My collaborators and I covered the lab whiteboards with optimal-control equations, then implemented them late into the night.
 
@@ -90,7 +90,7 @@ Robotics courses gave me more ways to test the theory. I got my first taste of m
 We eventually deployed the Husky inside CSM's Edgar Mine, where it navigated without GPS using our model-predictive controller. The mine was freezing, but watching the robot move without hitting anything made the long nights worthwhile.
 
 ![The hexapod robot used for a graduate robotics project](/assets/images/hexy.jpg)
-_The hexapod project paired a 1D LiDAR and Pixy camera with a small mobile platform. Source: personal project archive._
+*The hexapod project paired a 1D LiDAR and Pixy camera with a small mobile platform. source: personal project archive*
 
 Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grades mattered, but the projects I took on, the problems I solved, and the people I learned from shaped me more. My advice to current graduate students is simple: take on projects that stretch you, use the resources around you, and follow problems that genuinely excite you. That is how progress starts to compound.
 

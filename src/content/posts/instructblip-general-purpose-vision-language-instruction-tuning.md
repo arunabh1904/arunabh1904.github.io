@@ -22,7 +22,14 @@ summary: '2023 – InstructBLIP: General-Purpose Vision-Language Instruction Tun
 ## Core Insights
 
 ![InstructBLIP examples across visual understanding, reasoning, description, and dialogue](/assets/images/instructblip-paper-figure-1.png)
-_The same model follows different visual instructions without changing its external interface. Source: [InstructBLIP](https://arxiv.org/abs/2305.06500), Figure 1._
+*The same model follows different visual instructions without changing its external interface. source: [InstructBLIP](https://arxiv.org/abs/2305.06500)*
+
+![Figure 4 from InstructBLIP: General-Purpose Vision-Language Instruction Tuning](/assets/images/instructblip-general-purpose-vision-language-instruction-tuning-source-figure-4.webp)
+*Figure 4 Comparison of instruction tuning and multitask training based on BLIP-2 FlanT5 XL backbone. For held-in evaluation, we compute the average score across all held-in datasets. For held-out evaluation, we compute the average score across GQA, TextVQA, VSR, HatefulMemes, IconQA, ScienceQA, iVQA, VizWiz. source: [InstructBLIP: General-Purpose Vision-Language Instruction Tuning](https://arxiv.org/abs/2305.06500)*
+
+![Figure 2 from InstructBLIP: General-Purpose Vision-Language Instruction Tuning](/assets/images/instructblip-general-purpose-vision-language-instruction-tuning-source-figure-2.webp)
+*Figure 2 Tasks and their corresponding datasets used for vision-language instruction tuning. The held-in datasets are indicated by yellow and the held-out datasets by white. source: [InstructBLIP: General-Purpose Vision-Language Instruction Tuning](https://arxiv.org/abs/2305.06500)*
+
 
 The key change from BLIP-2 is that the instruction reaches the visual connector. The Q-Former does not extract one generic image summary before reading the task. It selects visual features in the context of what the user asks.
 

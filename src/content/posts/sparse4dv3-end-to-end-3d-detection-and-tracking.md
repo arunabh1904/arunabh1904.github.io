@@ -30,7 +30,14 @@ Temporal denoising creates groups of noisy anchors, including anchors propagated
 Quality estimation predicts localization and orientation quality so ranking need not treat classification confidence as a proxy for box accuracy. Decoupled attention separates instance-feature and anchor-embedding interactions, reducing spurious correlations between nearby but unrelated actors. With ResNet-50, the paper reports 46.9 mAP, 56.1 NDS, and 49.0 AMOTA; its strongest test model reports 71.9 NDS and 67.7 AMOTA.
 
 ![Figure 4 from Sparse4D v3, showing temporal instance denoising groups, pre-matching, recurrent projection, and masked self-attention](/assets/images/sparse4dv3-paper-figure-4.png)
-_Denoising follows the same temporal path as deployed queries, so training exposes the decoder to errors that recurrent state can accumulate. Source: [Sparse4D v3](https://arxiv.org/abs/2311.11722), Figure 4._
+*Denoising follows the same temporal path as deployed queries, so training exposes the decoder to errors that recurrent state can accumulate. source: [Sparse4D v3](https://arxiv.org/abs/2311.11722)*
+
+![Figure 2 from Sparse4D v3: Advancing End-to-End 3D Detection and Tracking](/assets/images/sparse4dv3-end-to-end-3d-detection-and-tracking-source-figure-2.webp)
+*Figure 2 Overview of Sparse4D framework, which input mutli-view video and output the perception results of all frames. source: [Sparse4D v3: Advancing End-to-End 3D Detection and Tracking](https://arxiv.org/abs/2311.11722)*
+
+![Figure 2 from Sparse4D v3: Advancing End-to-End 3D Detection and Tracking](/assets/images/sparse4dv3-end-to-end-3d-detection-and-tracking-source-figure-2.webp)
+*Figure 2 Inference efficiency (FPS) - perception performance (mAP) on nuScenes validation dataset of different algorithms. source: [Sparse4D v3: Advancing End-to-End 3D Detection and Tracking](https://arxiv.org/abs/2311.11722)*
+
 
 | Addition over the sparse recurrent baseline | Training or inference job | Why it matters |
 | --- | --- | --- |

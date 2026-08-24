@@ -85,6 +85,7 @@ $$
 The same point appears at a different pixel in each camera. If pyramid level $l$ has stride $s_l$, its feature is sampled at $u_i/s_l$. Projection can retrieve a fine boundary only if the backbone retained that boundary, and it can retrieve broad context only if the receptive field encoded it.
 
 [![Animation showing one metric 3D point projected to different pixels in two calibrated cameras and sampled at stride-adjusted feature-pyramid coordinates](/assets/images/autonomous-perception-vision-encoder.gif)](/assets/images/autonomous-perception-vision-encoder.gif)
+_A single 3D reference point lands at different pixels in different cameras and at different coordinates on each pyramid level. applies this operation to object queries; [BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) applies it to BEV queries source: [DETR3D](/paper%20shorts/2021/10/14/detr3d-multiview-images-via-3d-to-2d-queries.html)_
 _A single 3D reference point lands at different pixels in different cameras and at different coordinates on each pyramid level. [DETR3D](/paper%20shorts/2021/10/14/detr3d-multiview-images-via-3d-to-2d-queries.html) applies this operation to object queries; [BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) applies it to BEV queries._
 
 The camera encoder is strongest where appearance matters. Its main 3D weakness is not missing semantics but uncertain depth. More image resolution or a larger backbone can improve recognition without resolving where along a ray the evidence belongs.
@@ -96,7 +97,7 @@ A LiDAR sweep is already metric, but it is irregular, sparse, and strongly range
 
 Sparse convolution is effective because it shares local kernels over occupied cells, but coordinate-map construction and irregular memory access are real system costs. Sparse attention changes how occupied cells communicate. [DSVT](/paper%20shorts/2023/01/15/dsvt-dynamic-sparse-voxel-transformer.html) partitions variable-density voxels into bounded local sets, applies attention inside each set, and rotates the partition between layers so information crosses set boundaries. Attention can connect non-adjacent occupied cells more directly than a small convolutional kernel, while bounded sets keep the workload controlled. Sorting, padding, token density, and the eventual height compression still determine latency.
 
-[![Animation comparing early densification in PointPillars, late BEV densification in SECOND and DSVT, and box prediction from active voxels in VoxelNeXt](/assets/images/autonomous-perception-lidar-encoder.gif)](/assets/images/autonomous-perception-lidar-encoder.gif)
+_PointPillars compresses height before its dense 2D backbone. SECOND and DSVT retain sparse 3D cells for longer, then construct BEV. keeps the active-voxel representation through the prediction head source: [VoxelNeXt](/paper%20shorts/2023/03/20/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking.html)_
 _PointPillars compresses height before its dense 2D backbone. SECOND and DSVT retain sparse 3D cells for longer, then construct BEV. [VoxelNeXt](/paper%20shorts/2023/03/20/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking.html) keeps the active-voxel representation through the prediction head._
 
 The right encoder depends on the operating envelope. Pillars are a strong latency baseline on mostly planar roads. Sparse voxels are preferable when vertical separation, long range, or dense 3D structure matters. Fully sparse heads save BEV work when occupied cells remain rare, but a large FLOP reduction may yield a modest wall-clock gain on hardware with weak sparse-kernel support.
@@ -112,7 +113,7 @@ Three encoder families correspond to three fusion strategies. A point encoder ke
 
 Rasterizing too early into binary occupancy removes Doppler, RCS, confidence, and return-level ambiguity. Those are precisely the signals needed to distinguish motion from clutter.
 
-[![Animation comparing camera-radar interaction at the proposal, depth, and BEV stages in CRAFT, CRN, and RCBEVDet](/assets/images/autonomous-perception-radar-encoder.gif)](/assets/images/autonomous-perception-radar-encoder.gif)
+_associates a soft set of radar returns with each camera proposal. [CRN](/paper%20shorts/2023/04/03/crn-camera-radar-net-for-3d-perception.html) uses radar to refine camera depth before lifting and aligns both BEV maps with deformable attention. [RCBEVDet](/paper%20shorts/2024/03/25/rcbevdet-radar-camera-fusion-in-bev.html) combines point and transformer radar paths before BEV fusion source: [CRAFT](/paper%20shorts/2022/09/14/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer.html)_
 _[CRAFT](/paper%20shorts/2022/09/14/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer.html) associates a soft set of radar returns with each camera proposal. [CRN](/paper%20shorts/2023/04/03/crn-camera-radar-net-for-3d-perception.html) uses radar to refine camera depth before lifting and aligns both BEV maps with deformable attention. [RCBEVDet](/paper%20shorts/2024/03/25/rcbevdet-radar-camera-fusion-in-bev.html) combines point and transformer radar paths before BEV fusion._
 
 Recent camera-radar systems improve less by treating radar as an extra image channel than by deciding where range and Doppler should change the computation. [Simple-BEV](/paper%20shorts/2022/06/16/simple-bev-what-really-matters-for-multi-sensor-bev-perception.html) found that retaining radar metadata, disabling an aggressive outlier filter, and accumulating aligned sweeps all affected performance. [Doppler-Aware LiDAR–Radar Fusion](/paper%20shorts/2025/10/23/doppler-aware-lidar-radar-fusion-for-weather-robust-3d-detection.html) processes radar power and Doppler as distinct signals during multimodal interaction. [DinoRADE](/paper%20shorts/2026/04/09/dinorade-full-spectral-radar-camera-fusion.html) combines dense radar tensors with DINOv3 image features for adverse-weather detection.
@@ -138,8 +139,8 @@ LiDAR can therefore be present during training and disappear at inference. That 
 
 Forward lifting preserves dense image evidence and is a natural fit for occupancy and maps. Its failure is equally direct: a depth error writes the feature into the wrong metric cell.
 
-![Figure 1 from Lift, Splat, Shoot, showing multiview evidence represented in vehicle-centered BEV](/assets/images/lift-splat-shoot-paper-figure-1.png)
-_Lift, Splat, Shoot predicts depth along every camera ray and pools the lifted features into a vehicle-centered BEV grid. Source: [Lift, Splat, Shoot](/paper%20shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html), Figure 1._
+_Lift, Splat, Shoot predicts depth along every camera ray and pools the lifted features into a vehicle-centered BEV grid source: [Lift, Splat, Shoot](/paper%20shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html)_
+_Lift, Splat, Shoot predicts depth along every camera ray and pools the lifted features into a vehicle-centered BEV grid. source: [Lift, Splat, Shoot](/paper%20shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html)._
 
 ### Pull image evidence from metric space
 Pull-based methods begin with a hypothesis in physical space and ask the images for supporting evidence. [Simple-BEV](/paper%20shorts/2022/06/16/simple-bev-what-really-matters-for-multi-sensor-bev-perception.html) projects each 3D voxel into the cameras and bilinearly samples visible image features. Its controlled experiments found that input resolution and effective batch size changed vehicle-segmentation IoU more than the lifting operator in that setup. This is a useful warning: before attributing a benchmark gain to a new view transformer, match the backbone, image resolution, training schedule, batch size, and sensor inputs.
@@ -203,8 +204,8 @@ A simple architecture runs a camera encoder and a LiDAR encoder to completion, t
 
 The important distinction is not merely that cross-attention exists. It is whether one modality can change what another stream chooses to preserve before feature extraction is complete. Repeated interaction can improve complementarity, but it also makes failure attribution harder. A corrupted stream may contaminate several layers instead of one terminal block, so deeper fusion increases the need for health-aware routing and modality-specific diagnostics.
 
-![Figure 2 from BEVFusion, showing modality-specific encoders converging on a shared BEV and task-specific heads](/assets/images/bevfusion-unified-bev-paper-figure-2.png)
-_BEVFusion keeps camera and LiDAR encoding separate until both modalities occupy the same BEV grid, then shares that grid across detection and map heads. Source: [BEVFusion](/paper%20shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html), Figure 2._
+_BEVFusion keeps camera and LiDAR encoding separate until both modalities occupy the same BEV grid, then shares that grid across detection and map heads source: [BEVFusion](/paper%20shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html)_
+_BEVFusion keeps camera and LiDAR encoding separate until both modalities occupy the same BEV grid, then shares that grid across detection and map heads. source: [BEVFusion](/paper%20shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html)._
 
 ### Missing, degraded, and misaligned sensors
 A fusion network trained only with all sensors often becomes dependent on its strongest stream. Zeroing LiDAR at inference does not turn such a network into a competent camera-only model.
@@ -252,8 +253,8 @@ Sparse memory is lighter and naturally object-centric, but query birth, duplicat
 [![Animation comparing a warped dense BEV field, transformed recurrent instances with fresh anchors, and a bounded foreground-query queue](/assets/images/autonomous-perception-temporal-memory.gif)](/assets/images/autonomous-perception-temporal-memory.gif)
 _Dense recurrence carries every BEV cell. Sparse4D v2 transforms recurrent object instances and adds fresh anchors. StreamPETR carries a bounded foreground-query queue and introduces new queries for actors not already in memory._
 
-[![Figure 3 from StreamPETR, showing object queries propagated through a temporal memory queue](/assets/images/streampetr-paper-figure-3.png)](/assets/images/streampetr-paper-figure-3.png)
-_StreamPETR transforms selected object queries into the current frame, updates them from current images, and keeps the strongest foreground queries for the next step. Query selection saves memory but can discard weak evidence before an actor is confidently detected. Source: [StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html), Figure 3._
+_StreamPETR transforms selected object queries into the current frame, updates them from current images, and keeps the strongest foreground queries for the next step. Query selection saves memory but can discard weak evidence before an actor is confidently detected source: [StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html)_
+_StreamPETR transforms selected object queries into the current frame, updates them from current images, and keeps the strongest foreground queries for the next step. Query selection saves memory but can discard weak evidence before an actor is confidently detected. source: [StreamPETR](/paper%20shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html)._
 
 [SparseBEV](/paper%20shorts/2023/08/18/sparsebev-high-performance-sparse-3d-object-detection.html) keeps sparse object support but retrieves from several stored frames, so its cost still grows with history. “Sparse temporal” can mean either compressing history into recurrent state or retaining history and reading selected locations. Those designs have different memory, latency, and error-accumulation behavior. StreamPETR remembers selected objects; SOLOFusion remembers a scene field.
 
@@ -344,8 +345,8 @@ Waymo has publicly described one version of this system-level design. In [Waymo 
 
 This is an architecture overview, not a complete specification of the deployed online graph. It establishes the public interfaces and training philosophy, but not the execution frequency, model sizes, exact state schema, or all safety checks.
 
-![The Waymo Foundation Model diagram with sensor fusion, a driving VLM, and a generative world decoder](/assets/images/waymo-foundation-model-architecture.png)
-_Waymo's diagram separates a fast sensor-fusion path from a slower semantic-reasoning path, then joins both inside a World Decoder. Source: [Dmitri Dolgov's Waymo talk](https://www.youtube.com/watch?v=Gp4zrV3-6N8); see Waymo's public [architecture description](https://waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/) and earlier [foundation-model overview](https://waymo.com/blog/2024/10/ai-and-ml-at-waymo/)._
+_Waymo's diagram separates a fast sensor-fusion path from a slower semantic-reasoning path, then joins both inside a World Decoder source: [Dmitri Dolgov's Waymo talk](https://www.youtube.com/watch?v=Gp4zrV3-6N8)_
+_Waymo's diagram separates a fast sensor-fusion path from a slower semantic-reasoning path, then joins both inside a World Decoder. source: [Dmitri Dolgov's Waymo talk](https://www.youtube.com/watch?v=Gp4zrV3-6N8); see Waymo's public [architecture description](https://waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/) and earlier [foundation-model overview](https://waymo.com/blog/2024/10/ai-and-ml-at-waymo/)._
 
 | Component | Publicly described input and state | Publicly described role |
 | --- | --- | --- |

@@ -27,7 +27,14 @@ Temporal map failures are not always per-frame recognition failures. A lane divi
 For vector maps, BVCL matches historical and current instances bidirectionally and penalizes both geometric and semantic discrepancy. For raster features, RCL compares dense map representations over a memory buffer, with larger weight for temporally closer frames. These are training-only consistency terms; the deployment architecture remains the baseline mapper with its existing temporal memory.
 
 ![MapTCL pipeline for vector and raster temporal consistency learning](/assets/images/maptcl-pipeline-paper-figure.png)
-_MapTCL stores vector and raster predictions in a temporal buffer and applies consistency losses during training. Source: [MapTCL](https://arxiv.org/abs/2608.05209)._
+*MapTCL stores vector and raster predictions in a temporal buffer and applies consistency losses during training. source: [MapTCL](https://arxiv.org/abs/2608.05209)*
+
+![Figure 2 from MapTCL: Temporal Consistency Learning via Bidirectional Alignment for Vectorized HD Map Construction](/assets/images/maptcl-temporal-consistency-learning-via-bidirectional-alignment-for-vectorized-hd-map-construction-source-figure-2.webp)
+*Figure 2 Fig. 2: Overall pipeline of MapTCL. The pipeline takes multi-view images as input, encodes them into BEV features, and employs a map decoder to regress vectorized HD maps. The vector and raster maps are stored in the memory buffer at each iteration and subsequently utilized in both BVCL and RCL. These processes are removed during inference. source: [MapTCL: Temporal Consistency Learning via Bidirectional Alignment for Vectorized HD Map Construction](https://arxiv.org/abs/2608.05209)*
+
+![Figure 4 from MapTCL: Temporal Consistency Learning via Bidirectional Alignment for Vectorized HD Map Construction](/assets/images/maptcl-temporal-consistency-learning-via-bidirectional-alignment-for-vectorized-hd-map-construction-source-figure-4.webp)
+*Figure 4 Fig. 4: Qualitative comparisons on newsplit of nuScenes validation within perception range. StreamMapNet + MapTCL is compared with other baselines (StreamMapNet [ 28 ] , SQD-MapNet [ 26 ] , MapTracker [ 5 ] ) and ground truth. The red dashed boxes indicate occlusions caused by surrounding objects, which lead to temporal inconsistency. source: [MapTCL: Temporal Consistency Learning via Bidirectional Alignment for Vectorized HD Map Construction](https://arxiv.org/abs/2608.05209)*
+
 
 | Benchmark | mAP gain | C-mAP gain | Inference overhead |
 | --- | ---: | ---: | --- |

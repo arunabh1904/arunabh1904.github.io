@@ -27,7 +27,13 @@ Camera Radar Net uses radar twice: Radar-Assisted View Transformation supplies r
 Radar occupancy augments the camera depth distribution, while a top-k BEV-query scheme limits deformable-attention cost. The paper reports a 20 FPS real-time configuration and an offline model at 57.5 mAP and 62.4 NDS on nuScenes test. At 256×704 with a ResNet-50, its reported per-class mean is 49.0 mAP versus 34.8 for the cited BEVDepth configuration.
 
 ![CRN: Camera Radar Net for 3D Perception source figure: The overall architecture of the proposed Camera Radar Net.](/assets/images/crn-camera-radar-net-for-3d-perception-paper-figure.webp)
-_The overall architecture of the proposed Camera Radar Net. Source: [CRN: Camera Radar Net for 3D Perception](https://arxiv.org/abs/2304.00670), Figure 2, via arXiv HTML._
+*The overall architecture of the proposed Camera Radar Net. source: [CRN: Camera Radar Net for 3D Perception](https://arxiv.org/abs/2304.00670)*
+
+![Figure 7 from CRN: Camera Radar Net for 3D Perception](/assets/images/crn-camera-radar-net-for-3d-perception-source-figure-7.webp)
+*Figure 7 Additional qualitative results of 3D object detection on nuScenes val set: from left to right, day, rainy, and night scenarios. Green boxes are ground truths, blue boxes are our prediction results, and black dots are radar points. We also show the failure cases and highlight them with red circles on the bottom row. Ground truth maps on the background are used for visualization. Best viewed in color with zoom in. source: [CRN: Camera Radar Net for 3D Perception](https://arxiv.org/abs/2304.00670)*
+
+![Figure 4 from CRN: Camera Radar Net for 3D Perception](/assets/images/crn-camera-radar-net-for-3d-perception-source-figure-4.webp)
+*Figure 4 Visualization of feature maps trained on detection task. In image, a vehicle heavily occluded (white) or hardly visible at a long distance (blue) is not detected. In radar, clutters from the wall (black) or pedestrian with row RCS (red) lead to failure. Our MFA generates a more reliable BEV feature map by fusion. Note that BEV feature maps are cropped for better visualization. source: [CRN: Camera Radar Net for 3D Perception](https://arxiv.org/abs/2304.00670)*
 
 
 | Mechanism | Reported evidence | Tradeoff |

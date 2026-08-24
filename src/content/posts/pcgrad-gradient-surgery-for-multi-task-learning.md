@@ -25,7 +25,10 @@ Projected Conflicting Gradient modifies a task gradient when its dot product wit
 PCGrad is optimizer-adjacent and model-agnostic; it requires per-task gradients but no new inference module. Randomizing the task order matters because sequential projections are not commutative. In the paper's NYUv2 results, adding PCGrad to Cross-Stitch changes mIoU from 15.69 to 18.14 and depth error from 0.6277 to 0.5805; fixed projection order performs worse in its ablation.
 
 ![PCGrad projection of conflicting task gradients onto one another's normal planes while leaving aligned gradients unchanged](/assets/images/pcgrad-gradient-surgery-for-multi-task-learning-paper-figure.webp)
-_When two task gradients have a negative cosine, PCGrad removes each conflicting component; non-conflicting gradients pass through unchanged. Source: [PCGrad](https://arxiv.org/abs/2001.06782), method figure._
+*When two task gradients have a negative cosine, PCGrad removes each conflicting component; non-conflicting gradients pass through unchanged. source: [PCGrad](https://arxiv.org/abs/2001.06782)*
+
+![Figure 3 from PCGrad: Gradient Surgery for Multi-Task Learning](/assets/images/pcgrad-gradient-surgery-for-multi-task-learning-source-figure-3.webp)
+*Figure 3 For the two plots on the left, we show learning curves on MT10 and MT50 respectively. PCGrad significantly outperforms the other methods in terms of both success rates and data efficiency. In the rightmost plot, we present the ablation study on only using the magnitude and the direction of gradients modified by PCGrad and a comparison to GradNorm [ 8 ] . PCGrad outperforms both ablations and GradNorm, indicating the importance of modifying both the gradient directions and magnitudes in multi-task learning. source: [PCGrad: Gradient Surgery for Multi-Task Learning](https://arxiv.org/abs/2001.06782)*
 
 
 | Condition | PCGrad response | Limit |

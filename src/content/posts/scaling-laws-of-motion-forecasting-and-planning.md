@@ -30,7 +30,11 @@ The problem is scaling strategy for joint motion forecasting and planning. The s
 The report finds power-law improvement with training compute and a strong correlation between training loss and evaluation metrics. One concrete scaling result is that as training compute grows, the compute-optimal recipe increases model size 1.5x as fast as dataset size. For inference, sampling and clustering can make smaller models competitive until a crossover point where a larger model becomes more compute-efficient. The caveat is that this is a large internal Waymo study, so the exact curves may not transfer to smaller public datasets.
 
 ![Figure 2 from Scaling Laws of Motion Forecasting and Planning showing training loss as a function of FLOPs](/assets/images/scaling-laws-of-motion-forecasting-and-planning-paper-figure.png)
-_Figure 2 is the core scaling-law evidence: training loss improves predictably as total compute increases across the model family. From the [Scaling Laws of Motion Forecasting and Planning paper](https://arxiv.org/abs/2506.08228), via arXiv HTML._
+*Figure 2 is the core scaling-law evidence: training loss improves predictably as total compute increases across the model family. From the [Scaling Laws of Motion Forecasting and Planning paper](https://arxiv.org/abs/2506.08228). source: [Scaling Laws of Motion Forecasting and Planning paper](https://arxiv.org/abs/2506.08228)*
+
+![Figure 1 from Scaling Laws of Motion Forecasting and Planning](/assets/images/scaling-laws-of-motion-forecasting-and-planning-source-figure-1.webp)
+*Figure 1 The model architecture is a pair of encoder/decoder Transformer networks. This model takes multimodal scene data as input and produces a series of motion tokens autoregressively. source: [Scaling Laws of Motion Forecasting and Planning](https://arxiv.org/abs/2506.08228)*
+
 
 **What to look at:**
 - Closed-loop metrics improve with scale, not only open-loop forecasting metrics.

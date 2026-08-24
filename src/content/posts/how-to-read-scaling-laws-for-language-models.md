@@ -75,8 +75,7 @@ Kaplan et al. varied non-embedding parameters $N$, training-data tokens $D$, and
 Each right-hand panel keeps the other constraints loose enough for one resource to dominate. The nearly straight line on log-log axes is the signature of a power law. It does not say that loss falls linearly with the resource.
 
 ![Kaplan et al. 2020 Figure 1: validation loss as a function of compute, dataset size, and non-embedding parameters](/assets/images/kaplan-2020-simple-power-laws-paper-figure.png)
-
-*Original Figure 1 from [Kaplan et al., “Scaling Laws for Neural Language Models”](https://arxiv.org/abs/2001.08361), rendered without alteration from the authors’ arXiv source. The three panels show the measured loss curves against training compute, dataset size, and non-embedding parameters.*
+*. The three panels show the measured loss curves against training compute, dataset size, and non-embedding parameters. source: [Kaplan et al., “Scaling Laws for Neural Language Models”](https://arxiv.org/abs/2001.08361)*
 
 The compact mental model is a loss surface with three kinds of limitation:
 
@@ -101,8 +100,7 @@ Chinchilla revisited the allocation rather than disputing the premise. Hoffmann 
 All three fitting approaches placed the compute-optimal solution near equal exponents: $N_{\mathrm{opt}} \propto C^{0.5}$ and $D_{\mathrm{opt}} \propto C^{0.5}$. Each scale step should fund both parameters and tokens, not primarily parameters.
 
 ![Chinchilla paper Figure 1: compute-optimal parameter counts against training FLOPs, including the Kaplan prediction and named language models](/assets/images/chinchilla-compute-frontier-paper-figure.png)
-
-*Original Figure 1 from [Hoffmann et al., “Training Compute-Optimal Large Language Models”](https://arxiv.org/abs/2203.15556), rendered without alteration from the authors’ arXiv source. The solid curves are three Chinchilla fitting approaches; the dashed line is the Kaplan prediction. The plot is a recipe comparison at fixed training FLOPs, not a benchmark leaderboard.*
+*. The solid curves are three Chinchilla fitting approaches; the dashed line is the Kaplan prediction. The plot is a recipe comparison at fixed training FLOPs, not a benchmark leaderboard. source: [Hoffmann et al., “Training Compute-Optimal Large Language Models”](https://arxiv.org/abs/2203.15556)*
 
 The figure makes the revision concrete. At a given budget, the Chinchilla curves select fewer parameters than Kaplan and spend the released FLOPs on more training.
 

@@ -28,7 +28,11 @@ Recognition-pretrained image features can preserve semantics while leaving metri
 On the displayed nuScenes detection table, GeoUP with the listed multi-frame configuration reaches 59.2 mAP and 65.3 NDS, compared with 52.1 mAP and 60.8 NDS for StreamPETR. The appendix reports an efficiency cost: the ViT-L model runs at 2.18 FPS for one frame and 0.81 FPS for four frames at the displayed input size. The accuracy result therefore does not imply a ready-made real-time stack.
 
 ![GeoUP pipeline for geometry-aware tokens from calibrated streaming multi-view input](/assets/images/geoup-pipeline-paper-figure.jpg)
-_GeoUP combines image patches, raymaps, and camera tokens before decoding depth, boxes, and occupancy from one latent. Source: [GeoUP](https://arxiv.org/abs/2608.13147)._
+*GeoUP combines image patches, raymaps, and camera tokens before decoding depth, boxes, and occupancy from one latent. source: [GeoUP](https://arxiv.org/abs/2608.13147)*
+
+![Figure 1 from Geometry-Grounded Unified 3D Perception for Autonomous Driving](/assets/images/geometry-grounded-unified-3d-perception-for-autonomous-driving-source-figure-1.webp)
+*Figure 1 Comparison of pretraining paradigms for camera-based autonomous driving perception. (a) Recognition pretraining, e.g., ImageNet [ Deng et al.(2009)Deng, Dong, Socher, Li, Li, and Fei-Fei ] classification with ResNet-50 [ He et al.(2016)He, Zhang, Ren, and Sun ] , learns semantic features but lacks geometry and multi-view consistency. (b) Geometry pretraining, e.g., monocular depth with VoVNet-99 [ Lee et al.(2019)Lee, Hwang, Lee, Bae, and Park ] , adds geometric awareness but lacks cross-view and temporal modeling. source: [Geometry-Grounded Unified 3D Perception for Autonomous Driving](https://arxiv.org/abs/2608.13147)*
+
 
 ## High-Level Takeaways
 

@@ -25,7 +25,14 @@ Transfusion combines next-token prediction for discrete data with diffusion for 
 ## Core Insights
 
 ![Transfusion transformer jointly processing autoregressive text tokens and continuous image patches trained with diffusion](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-paper-figure.png)
-_Figure 1 shows the mixed objective at sequence level: text positions use next-token prediction, image blocks use parallel diffusion denoising, and boundary tokens let one transformer attend across both. Source: [Transfusion](https://arxiv.org/abs/2408.11039)._
+*Figure 1 shows the mixed objective at sequence level: text positions use next-token prediction, image blocks use parallel diffusion denoising, and boundary tokens let one transformer attend across both. source: [Transfusion](https://arxiv.org/abs/2408.11039)*
+
+![Figure 5 from Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-source-figure-5.webp)
+*Figure 5 ((c)) Llama 2 Eval Suite Accuracy. source: [Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model](https://arxiv.org/abs/2408.11039)*
+
+![Figure 4 from Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-source-figure-4.webp)
+*Figure 4 We convert images to and from latent representations using a pretrained VAE, and then into patch representations with either a simple linear layer or U-Net down blocks. source: [Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model](https://arxiv.org/abs/2408.11039)*
+
 
 | Design choice | Why it is useful |
 | --- | --- |

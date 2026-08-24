@@ -25,7 +25,10 @@ UniBEV asks whether one trained detector can handle camera plus LiDAR, camera on
 CNW learns channel-wise modality weights and normalizes them across the modalities that are actually present. That detail prevents a missing stream from changing the scale of the fused representation. Modality dropout is equally important: a model trained only with both sensors reaches just 3.0 camera-only mAP in the paper's ablation, despite having a valid camera path.
 
 ![UniBEV: Robust Multimodal Detection with Uniform BEV Encoders source figure: The overall architecture of the UniBEV framework.](/assets/images/unibev-robust-multimodal-detection-with-uniform-bev-encoders-paper-figure.webp)
-_The overall architecture of the UniBEV framework. Source: [UniBEV: Robust Multimodal Detection with Uniform BEV Encoders](https://arxiv.org/abs/2309.14516), Fig. 2, via arXiv HTML._
+*The overall architecture of the UniBEV framework. source: [UniBEV: Robust Multimodal Detection with Uniform BEV Encoders](https://arxiv.org/abs/2309.14516)*
+
+![Figure 1 from UniBEV: Robust Multimodal Detection with Uniform BEV Encoders](/assets/images/unibev-robust-multimodal-detection-with-uniform-bev-encoders-source-figure-1.webp)
+*Figure 1 Fig. 1: Comparison of our UniBEV with other relevant works. (a). BEVFusion [ 3 ] fuses multi-modal BEV features extracted from two separate branches with concatenation. (b) MetaBEV [ 4 ] fuses multi-modal BEV features extracted from two separate branches with a fusion module consisting of several deformable attention layers. (c) Our UniBEV extracts multi-modal BEV features from their original coordinate systems with uniform BEV encoders and fuses the BEV features with the CNW module. source: [UniBEV: Robust Multimodal Detection with Uniform BEV Encoders](https://arxiv.org/abs/2309.14516)*
 
 
 | Evidence | Reported result | Interpretation |

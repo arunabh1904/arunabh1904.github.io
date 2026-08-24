@@ -26,7 +26,14 @@ summary: "2014 – Auto-Encoding Variational Bayes"
 ## Core Insights
 
 ![Figure from Auto-Encoding Variational Bayes: AEVB improves the variational lower bound over wake-sleep](/assets/images/vae-paper-figure-1.png)
-_Figure from the [AEVB paper](https://arxiv.org/abs/1312.6114), via ar5iv._
+*Figure from the [AEVB paper](https://arxiv.org/abs/1312.6114), via ar5iv. source: [AEVB paper](https://arxiv.org/abs/1312.6114)*
+
+![Figure 2 from Auto-Encoding Variational Bayes](/assets/images/auto-encoding-variational-bayes-source-figure-2.webp)
+*Figure 2 Comparison of our AEVB method to the wake-sleep algorithm, in terms of optimizing the lower bound, for different dimensionality of latent space ( ). Our method converged considerably faster and reached a better solution in all experiments. Interestingly enough, more latent variables does not result in more overfitting, which is explained by the regularizing effect of the lower bound. Vertical axis: the estimated average variational lower bound per datapoint. The estimator variance was small ( ) and omitted. source: [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114)*
+
+![Figure 3 from Auto-Encoding Variational Bayes](/assets/images/auto-encoding-variational-bayes-source-figure-3.webp)
+*Figure 3 Comparison of AEVB to the wake-sleep algorithm and Monte Carlo EM, in terms of the estimated marginal likelihood, for a different number of training points. Monte Carlo EM is not an on-line algorithm, and (unlike AEVB and the wake-sleep method) can’t be applied efficiently for the full MNIST dataset. source: [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114)*
+
 
 ### Method and reported result
 

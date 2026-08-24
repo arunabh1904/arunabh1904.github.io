@@ -24,7 +24,13 @@ summary: "2025 – DriveMoE: Mixture-of-Experts for Vision-Language-Action Model
 The two routers act at different stages. Vision routing allocates perception compute across cameras; action routing allocates policy capacity across driving skills. That separation targets two sources of averaging: processing every view equally and asking one action function to cover heterogeneous maneuvers. It also creates two ways to fail: the system can suppress the camera that contains the hazard, or select an unsuitable action expert before the maneuver is fully visible.
 
 ![DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving source figure: Framework of DriveMoE.](/assets/images/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving-paper-figure.webp)
-_Framework of DriveMoE. Source: [DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving](https://arxiv.org/abs/2505.16278), Figure 2, via arXiv HTML._
+*Framework of DriveMoE. source: [DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving](https://arxiv.org/abs/2505.16278)*
+
+![Figure 3 from DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving](/assets/images/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving-source-figure-3.webp)
+*Figure 3 The Scene-Specialized Vision Mixture-of-Experts. source: [DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving](https://arxiv.org/abs/2505.16278)*
+
+![Figure 1 from DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving](/assets/images/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving-source-figure-1.webp)
+*Figure 1 Comparison of Different Vision and Action Modeling Strategies in VLA-based End-to-End Driving. (a) Vanilla visual token encoding 47 processes all surround-view images through a vision tower, leading to token redundancy and increased computational cost. (b) Query-based token extraction 53 (e.g., Q-Former 35 ) selects a subset of visual tokens from each image, but loses spatial structure and requires additional pretraining. source: [DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving](https://arxiv.org/abs/2505.16278)*
 
 
 The result cannot establish which router accounts for the reported improvement without controlled ablations. The abstract does not disclose routing regularization, load balance, expert utilization, data mixture, or whether rare maneuvers receive enough examples to train their specialist. A useful scale test would keep total active FLOPs and demonstrations fixed while comparing a dense model, vision-only routing, action-only routing, and both routers under long-tail route splits.

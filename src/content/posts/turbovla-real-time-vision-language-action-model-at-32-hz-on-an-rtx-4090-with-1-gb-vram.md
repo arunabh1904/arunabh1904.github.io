@@ -33,7 +33,14 @@ On LIBERO, the 0.2B-parameter configuration reaches 97.7% average success with 3
 TurboVLA preserves token-level instruction features rather than compressing language to a task ID. Each camera produces spatial visual tokens with positional and view embeddings. The interaction stack alternates visual-to-instruction and instruction-to-visual cross-attention, so scene evidence can refine the instruction representation while language selects relevant visual features. Robot state bypasses this fusion stack and enters only at the action decoder.
 
 ![TurboVLA architecture with compact vision and language encoders, bidirectional feature interaction, and parallel action-chunk decoding](/assets/images/turbovla-architecture.png)
-_TurboVLA replaces the LLM-centered $V\to L\to A$ path with compact modality encoders, bidirectional cross-attention, and a continuous action-chunk decoder. Cropped from Figure 3 of the [paper](https://arxiv.org/abs/2607.27205)._
+*TurboVLA replaces the LLM-centered $V\to L\to A$ path with compact modality encoders, bidirectional cross-attention, and a continuous action-chunk decoder. org/abs/2607.27205). source: [paper](https://arxiv.org/abs/2607.27205)*
+
+![Figure 2 from TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with <1 GB VRAM](/assets/images/turbovla-real-time-vision-language-action-model-at-32-hz-on-an-rtx-4090-with-1-gb-vram-source-figure-2.webp)
+*Figure 2 From LLM-centric VLA to TurboVLA. (a) LLM-centric VLA predicts actions from large-language-model representations, whereas TurboVLA directly fuses visual and instruction features for continuous control. (b) TurboVLA achieves highly competitive LIBERO performance with substantially lower latency and model scale. source: [TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with <1 GB VRAM](https://arxiv.org/abs/2607.27205)*
+
+![Figure 4 from TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with <1 GB VRAM](/assets/images/turbovla-real-time-vision-language-action-model-at-32-hz-on-an-rtx-4090-with-1-gb-vram-source-figure-4.webp)
+*Figure 4 Real-world evaluation on the AgileX Piper platform. Left: our single-arm setup with a wrist-view RGB-D camera and a third-view RGB-D camera, together with the objects used in the four tasks. Right top: success-rate comparison between TurboVLA and on four real-world manipulation tasks. Right bottom: qualitative execution examples of TurboVLA. source: [TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with <1 GB VRAM](https://arxiv.org/abs/2607.27205)*
+
 
 The policy is trained by behavior cloning with an $\ell_1$ loss on expert action chunks; it uses no language-modeling loss and no robot-data pretraining beyond each target benchmark. LIBERO training mixes all four suites for 80,000 steps and evaluates 50 rollouts for each of 40 tasks. RoboTwin uses one multitask model trained on the official clean demonstrations for 50 bimanual tasks. The real-world model starts from LIBERO, fine-tunes on 65 demonstrations per task, and runs 40 trials on each of four AgileX Piper tasks.
 

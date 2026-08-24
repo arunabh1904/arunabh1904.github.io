@@ -27,7 +27,13 @@ BEVFormer v2 asks why stronger 2D image backbones do not automatically produce s
 Across ResNet-50, DLA-34, ResNet-101, VoVNet-99, and InternImage-B backbones, adding perspective supervision improves nuScenes validation NDS by roughly three points and mAP by roughly two points. With InternImage-XL, the paper reports 63.4 NDS and 55.6 mAP on the nuScenes test set.
 
 ![BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision source figure: Overall architecture of BEVFormer v2.](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-paper-figure.webp)
-_Overall architecture of BEVFormer v2. Source: [BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](https://arxiv.org/abs/2211.10439), Figure 1, via arXiv HTML._
+*Overall architecture of BEVFormer v2. source: [BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](https://arxiv.org/abs/2211.10439)*
+
+![Figure 2 from BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-source-figure-2.webp)
+*Figure 2 Comparison of perspective supervision (a) and BEV supervision (B). The supervision signals of the perspective detector are dense and direct to the image feature, while those of the BEV detector are sparse and indirect. source: [BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](https://arxiv.org/abs/2211.10439)*
+
+![Figure 3 from BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-source-figure-3.webp)
+*Figure 3 The decoder of the BEV head in BEVFromer v2. The projected centers of the first-stage proposals are used as per-image reference points (purple ones), and they are combined with per-dataset learnded content queries and positional embeddings (blue ones) as hybrid object queries. source: [BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](https://arxiv.org/abs/2211.10439)*
 
 
 | Comparison | NDS | mAP |
