@@ -27,6 +27,7 @@ Early unification can erase the very signal that made a sensor useful: image tex
 The real architectural problem is deciding where each measurement becomes geometry, where different modalities are allowed to interact, what state survives through time, and which parts of that state are made explicit for prediction, planning, simulation, and validation. The path I keep coming back to is to preserve native evidence, establish metric support, let modalities interact, carry the resulting world state through time, and expose both structured and latent outputs before prediction and planning act.
 
 <div class="compact-flow-diagram"><a href="/assets/images/perception-evidence-to-planning.svg"><img src="/assets/images/perception-evidence-to-planning.svg" alt="Compact six-stage perception path from sensor-native evidence to calibrated metric support, cross-modal interaction, temporal state, structured and latent outputs, and finally prediction and planning"></a></div>
+
 _The stages name information obligations, not mandatory modules. A model can merge implementations, but it still has to preserve, align, interact, persist, expose, and act under a deadline._
 
 This gives a stricter meaning to *unified*. A system can be unified along several independent axes:
@@ -131,6 +132,7 @@ The main camera-to-3D families differ in where the metric hypothesis begins.
 A pixel fixes a ray through the camera center, not a distance along that ray. [Lift, Splat, Shoot](/paper%20shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html) predicts a categorical depth distribution for each image location, copies the image feature along the candidate depth bins, and pools those lifted features into BEV.
 
 <div class="compact-flow-diagram"><a href="/assets/images/camera-lift-to-bev.svg"><img src="/assets/images/camera-lift-to-bev.svg" alt="Compact diagram of an image pixel becoming a camera ray, depth distribution, 3D feature cloud, and BEV grid"></a></div>
+
 _LSS pushes image evidence into metric space. The depth distribution decides where along the ray that evidence can land; pooling then writes it into the vehicle-centered BEV grid._
 
 The depth distribution in the original LSS is latent. It is not directly supervised; downstream BEV losses push it toward geometry that helps detection and other tasks. [BEVDepth](/paper%20shorts/2022/06/21/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection.html) adds projected LiDAR depth supervision, so the camera branch receives both a direct geometric signal and a downstream task signal.
@@ -180,6 +182,7 @@ For heterogeneous driving sensors, intermediate fusion is the most useful defaul
 [BEVFusion](/paper%20shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html) gives each modality an appropriate encoder, transforms the resulting features into a shared BEV grid, and fuses there. Camera images become camera BEV through an image encoder; LiDAR points become LiDAR BEV through a point or voxel encoder. Only then do the aligned representations meet before the task heads.
 
 <div class="compact-flow-diagram"><a href="/assets/images/bevfusion-data-paths.svg"><img src="/assets/images/bevfusion-data-paths.svg" alt="Compact BEVFusion diagram with separate camera and LiDAR encoder paths meeting only after both streams reach aligned BEV coordinates"></a></div>
+
 _The useful unification happens at the metric interface. Each encoder keeps its sensor's native evidence until camera and LiDAR features refer to comparable physical support._
 
 BEV is a natural meeting room because a camera feature at $(x,y)$ and a LiDAR feature at $(x,y)$ refer to approximately the same physical support. The model does not need to make the camera behave like LiDAR or LiDAR behave like a camera. It preserves their inductive biases until physical alignment makes interaction meaningful.
@@ -287,6 +290,7 @@ A 2025 preprint, [UniLION](/paper%20shorts/2025/11/03/unilion-towards-unified-au
 The compression ladder runs from a dense scene field, through sparse structured entities and learned latent registers, to one pooled embedding.
 
 <div class="compact-flow-diagram"><a href="/assets/images/world-state-compression-ladder.svg"><img src="/assets/images/world-state-compression-ladder.svg" alt="Compact compression ladder from dense scene fields to sparse entities, learned latent registers, and a single pooled embedding"></a></div>
+
 _Each move to the right saves memory and compute while asking the learning objective to preserve more information in fewer carriers._
 
 Moving right saves memory and compute. It also increases the burden on the objective to preserve the right information. The design question is still the same: what is discarded, when is it discarded, and can any downstream component recover it?
@@ -442,6 +446,7 @@ The Critic should evaluate both trajectories and representation failures. It sho
 The closed loop begins with a real or simulated failure. The Critic diagnoses it; the system turns that diagnosis into a targeted scenario and labels, improves the teacher, distills the student, runs closed-loop regression, and reviews the result before deployment creates new evidence.
 
 <div class="compact-flow-diagram"><a href="/assets/images/driving-failure-learning-loop.svg"><img src="/assets/images/driving-failure-learning-loop.svg" alt="Compact closed-loop diagram connecting a driving failure to Critic diagnosis, targeted data, teacher improvement, student distillation, regression, deployment review, and new evidence"></a></div>
+
 _The loop matters only if the meaning of the original failure survives every handoff. Otherwise the system produces more training activity without producing a reliable fix._
 
 A shared foundation-model family helps only if this loop preserves the semantics of the failure. A larger common encoder is not itself a learning flywheel.
