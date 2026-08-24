@@ -20,7 +20,14 @@ summary: '2026 – V-JEPA 2.1: Dense Features in Video Self-Supervised Learning'
 ## Core Insights
 
 ![Dense V-JEPA 2.1 patch features compared with V-JEPA 2 across video frames](/assets/images/v-jepa-2-1-paper-figure-1.png)
-_Patch-feature projections remain spatially and temporally coherent in V-JEPA 2.1, while the earlier model is more globally semantic. Source: [V-JEPA 2.1](https://arxiv.org/abs/2603.14482), Figure 1._
+*Patch-feature projections remain spatially and temporally coherent in V-JEPA 2.1, while the earlier model is more globally semantic. source: [V-JEPA 2.1](https://arxiv.org/abs/2603.14482)*
+
+![Figure 10 from V-JEPA 2.1: Dense Features in Video Self-Supervised Learning](/assets/images/v-jepa-2-1-dense-video-features-source-figure-10.webp)
+*Figure 10 Depth estimation comparison on NYU and KITTI datasets. While V-JEPA 2 captures the overall scene geometry, its predictions lack local consistency and precise boundary structure. In contrast, our V-JEPA 2.1 produces sharper, more coherent, and fine-grained depth maps. source: [V-JEPA 2.1: Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482)*
+
+![Figure 9 from V-JEPA 2.1: Dense Features in Video Self-Supervised Learning](/assets/images/v-jepa-2-1-dense-video-features-source-figure-9.webp)
+*Figure 9 Planning Navigation Trajectories in Latent Space. V-JEPA 2.1 enables faster and more accurate navigation planning compared to ( Bar et al. 2025 ) . We show PCA visualizations of 8 denoising steps of the planned latent trajectory between a start frame and a goal frame. source: [V-JEPA 2.1: Dense Features in Video Self-Supervised Learning](https://arxiv.org/abs/2603.14482)*
+
 
 The dense loss trains both visible and masked tokens instead of concentrating prediction on a global target. Deep self-supervision applies the objective at intermediate layers, where local structure has not yet been compressed into the final representation.
 

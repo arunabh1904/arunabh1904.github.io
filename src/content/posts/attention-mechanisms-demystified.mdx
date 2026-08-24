@@ -31,8 +31,7 @@ Bahdanau, Cho, and Bengio changed the interface. At every output step, the decod
 The paper's learned alignment maps make that retrieval visible. Each row corresponds to a generated French token, each column to an English source token, and brighter cells carry more attention weight.
 
 ![Four English-to-French attention alignment heatmaps learned by the Bahdanau encoder-decoder model](/assets/images/attention-history-bahdanau-learned-alignments.png)
-
-*Figure 3 from [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473) shows four soft alignments learned without word-level alignment labels. The diagonal structure tracks mostly monotonic translation, while off-diagonal bands capture phrases whose word order changes between English and French. Source: Bahdanau, Cho, and Bengio, Figure 3.*
+*Figure 3 shows four soft alignments learned without word-level alignment labels. The diagonal structure tracks mostly monotonic translation, while off-diagonal bands capture phrases whose word order changes between English and French. source: [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473)*
 
 The bright cells are not a hand-written dictionary or a hard one-to-one match. They are the learned distribution used to construct the context vector for each output step. That differentiable lookup is the object the Transformer later promoted from a translation aid to the main sequence operation.
 
@@ -60,8 +59,7 @@ $$
 $$
 
 ![Figure 2 from Attention Is All You Need, showing scaled dot-product attention and parallel attention heads](/assets/images/attention-paper-figure-2-scaled-dot-product-and-multi-head.png)
-
-*Figure 2 puts the operations in dependency order: compare queries with keys, scale and normalize the scores, then mix values. Its multi-head diagram repeats that operation across learned projections before concatenating the results. Source: [Attention Is All You Need](https://arxiv.org/abs/1706.03762), Figure 2.*
+*Figure 2 puts the operations in dependency order: compare queries with keys, scale and normalize the scores, then mix values. Its multi-head diagram repeats that operation across learned projections before concatenating the results. source: [Attention Is All You Need](https://arxiv.org/abs/1706.03762)*
 
 Each term has one job:
 
@@ -204,8 +202,7 @@ Attention variants are memory policies. Each one decides what remains addressabl
 Standard MHA gives every query head its own key and value heads. Multi-query attention (MQA) takes the most aggressive sharing choice: all query heads use one K/V set. Grouped-query attention (GQA) lies between MHA and MQA, with groups of query heads sharing K/V projections.
 
 ![Comparison of multi-head, grouped-query, and multi-query attention showing how query heads share key and value heads](/assets/images/attention-variants-mha-gqa-mqa.png)
-
-*Figure 2 from [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints](https://arxiv.org/abs/2305.13245) places the three cache layouts on one spectrum. MHA keeps one K/V pair per query head, GQA shares K/V within groups, and MQA shares one K/V pair across all query heads. Source: Ainslie et al., Figure 2.*
+*Figure 2 places the three cache layouts on one spectrum. MHA keeps one K/V pair per query head, GQA shares K/V within groups, and MQA shares one K/V pair across all query heads. source: [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints](https://arxiv.org/abs/2305.13245)*
 
 The benefit appears during inference. Reducing the number of KV heads reduces the cache stored per token and the memory traffic required to read it, while leaving the surrounding decoder architecture close to standard attention. The trade-off is a spectrum: MHA preserves the most independent K/V capacity, MQA compresses most aggressively, and GQA chooses an intermediate point that often retains more modeling quality.
 
@@ -461,8 +458,7 @@ Fixed-size recurrent memory is efficient but necessarily capacity-limited. Moder
 The Gated DeltaNet paper shows the same design choice at two scales. Its H1 and H2 stacks interleave recurrent modules with sliding-window attention; the block diagram then exposes the query, key, value, update, and output-gate paths.
 
 ![Gated DeltaNet hybrid stacks and the internal gated delta-rule block](/assets/images/attention-hybrid-gated-deltanet.png)
-
-*Figure 1 from [Gated Delta Networks: Improving Mamba2 with Delta Rule](https://arxiv.org/abs/2412.06464) shows two hybrid stacks and the Gated DeltaNet block. H1 alternates Gated DeltaNet with sliding-window attention; H2 additionally uses Mamba2. The block produces $q$, $k$, $v$, a decay gate $\alpha$, and a write gate $\beta$ before applying the gated delta rule. Source: Yang et al., Figure 1.*
+*Figure 1 shows two hybrid stacks and the Gated DeltaNet block. H1 alternates Gated DeltaNet with sliding-window attention; H2 additionally uses Mamba2. The block produces $q$, $k$, $v$, a decay gate $\alpha$, and a write gate $\beta$ before applying the gated delta rule. source: [Gated Delta Networks: Improving Mamba2 with Delta Rule](https://arxiv.org/abs/2412.06464)*
 
 The figure exposes why “hybrid attention” names a composition strategy rather than one attention equation. A model can choose a different cheap mixer, a different periodic retrieval layer, and a different ratio while preserving the same division of labor.
 

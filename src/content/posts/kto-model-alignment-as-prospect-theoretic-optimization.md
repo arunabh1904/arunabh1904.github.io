@@ -26,7 +26,14 @@ summary: "2024 – KTO: Model Alignment as Prospect Theoretic Optimization"
 ## Core Insights
 
 ![KTO implied human value curves showing loss aversion and a reference point for preferred and rejected outcomes](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-paper-figure.png)
-_Figure 1 makes KTO's prospect-theory motivation concrete: desirable and undesirable outcomes are valued relative to a reference point, with asymmetric sensitivity to gains and losses. Source: [KTO](https://arxiv.org/abs/2402.01306)._
+*Figure 1 makes KTO's prospect-theory motivation concrete: desirable and undesirable outcomes are valued relative to a reference point, with asymmetric sensitivity to gains and losses. source: [KTO](https://arxiv.org/abs/2402.01306)*
+
+![Figure 2 from KTO: Model Alignment as Prospect Theoretic Optimization](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-2.webp)
+*Figure 2 HALOs (DPO, offline PPO variant) outperform non-HALOs (SLiC, CSFT), as measured by the GPT-4-0613 -judged winrate of the aligned model’s generations against a hard-to-beat baseline: the outputs that would have been used as the targets for SFT. The -axis here plots the winrate above chance (i.e., the winrate – 50%). The difference between methods is only significant at 13B+ parameters, and only the HALO-aligned Llama-{13B, 30B} models are able to match the baseline and yield a winrate at or above chance. source: [KTO: Model Alignment as Prospect Theoretic Optimization](https://arxiv.org/abs/2402.01306)*
+
+![Figure 3 from KTO: Model Alignment as Prospect Theoretic Optimization](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-3.webp)
+*Figure 3 KTO is as good or better than DPO at all scales, as measured by the GPT-4-0613 -judged winrate of the aligned model’s generations against the outputs that would have been used for SFT. In fact, for the Llama models, KTO alone matches the performance of SFT+DPO and is significantly better than DPO alone. Error bars denote a 90% binomial confidence interval. source: [KTO: Model Alignment as Prospect Theoretic Optimization](https://arxiv.org/abs/2402.01306)*
+
 
 KTO measures each completion relative to a reference point estimated from the policy and reference model. Desirable examples receive a gain-shaped objective; undesirable examples receive a loss-shaped objective. The asymmetry encodes loss aversion, while a KL term keeps the policy from moving arbitrarily far from its reference.
 

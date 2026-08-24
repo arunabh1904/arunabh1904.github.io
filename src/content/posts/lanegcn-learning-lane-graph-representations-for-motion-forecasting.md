@@ -30,7 +30,14 @@ LaneGCN builds a lane graph with several adjacency types and uses dilated lane c
 The paper argues that vector maps should keep their graph structure through the model. Raster encoders can represent road context, but they must infer topology from pixels. LaneGCN exposes topology directly and reports state-of-the-art motion forecasting on Argoverse at publication time. The caveat is that the model assumes access to reasonably accurate lane graph data.
 
 ![Figure 1 from LaneGCN showing lane graph construction, actor encoding, actor-map fusion, and trajectory prediction](/assets/images/lanegcn-learning-lane-graph-representations-for-motion-forecasting-paper-figure.png)
-_Figure 1 shows the full LaneGCN pipeline: a lane graph and actor trajectories are encoded separately, fused through structured actor-map interactions, and decoded into future trajectories. From the [LaneGCN paper](https://arxiv.org/abs/2007.13732), via ar5iv._
+*Figure 1 shows the full LaneGCN pipeline: a lane graph and actor trajectories are encoded separately, fused through structured actor-map interactions, and decoded into future trajectories. From the [LaneGCN paper](https://arxiv.org/abs/2007.13732), via ar5iv. source: [LaneGCN paper](https://arxiv.org/abs/2007.13732)*
+
+![Figure 3 from LaneGCN: Learning Lane Graph Representations for Motion Forecasting](/assets/images/lanegcn-learning-lane-graph-representations-for-motion-forecasting-source-figure-3.webp)
+*Figure 3 Lane graph construction from vectorized map data . Left : The lane centerline of interest, its predecessor, successor, left and right neighbor are denoted with red, orange, blue, purple, and green lines, respectively. Each centerline is given as a sequence of BEV points (hollow circles). Right : Derived lane graph with an example lane node. The lane node of interest, its predecessor, successor, left and right neighbor are denoted with red, orange, blue, purple and green circles respectively. See Section 3. source: [LaneGCN: Learning Lane Graph Representations for Motion Forecasting](https://arxiv.org/abs/2007.13732)*
+
+![Figure 2 from LaneGCN: Learning Lane Graph Representations for Motion Forecasting](/assets/images/lanegcn-learning-lane-graph-representations-for-motion-forecasting-source-figure-2.webp)
+*Figure 2 Overall architecture: Our model is composed of four modules. (1) ActorNet receives the past actor trajectories as input, and uses 1D convolution to extract actor node features. (2) MapNet constructs a lane graph from HD maps, and uses a LaneGCN to exact lane node features. (3) FusionNet is a stack of 4 interaction blocks. The actor to lane block fuses real-time traffic information from actor nodes to lane nodes. The lane to lane block propagates information over the lane graph and updates lane features. source: [LaneGCN: Learning Lane Graph Representations for Motion Forecasting](https://arxiv.org/abs/2007.13732)*
+
 
 **What to look at:**
 - Lane graph edges preserve topology that raster features can blur.

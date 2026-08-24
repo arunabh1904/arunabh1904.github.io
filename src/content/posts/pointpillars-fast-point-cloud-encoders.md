@@ -25,8 +25,14 @@ PointPillars partitions a point cloud into vertical columns, learns a PointNet-s
 Each point is augmented with offsets from the pillar mean and pillar center before pointwise encoding and max pooling. Only non-empty pillars pass through the encoder, but the scattered BEV tensor is dense. The paper reports a 1.3 ms encoder, 16.2 ms full pipeline, 62 Hz model, and a 105 Hz faster variant on its hardware.
 
 ![PointPillars network converting point-cloud pillars into a pseudo-image before a 2D backbone and detection head](/assets/images/pointpillars-fast-point-cloud-encoders-paper-figure.webp)
+*The pillar encoder collapses height early and scatters learned pillar features into a dense pseudo-image, allowing the expensive backbone to remain two-dimensional. source: [PointPillars](https://arxiv.org/abs/1812.05784)*
 
-_The pillar encoder collapses height early and scatters learned pillar features into a dense pseudo-image, allowing the expensive backbone to remain two-dimensional. Source: [PointPillars](https://arxiv.org/abs/1812.05784), Figure 2._
+![Figure 1 from PointPillars: Fast Point Cloud Encoders](/assets/images/pointpillars-fast-point-cloud-encoders-source-figure-1.webp)
+*Figure 1 Bird’s eye view performance vs speed for our proposed PointPillars, PP method on the KITTI kitti test set. Lidar-only methods drawn as blue circles; lidar & vision methods drawn as red squares. Also drawn are top methods from the KITTI leaderboard: M : MV3D mv3d , A AVOD avod , C : ContFuse contfuse , V : VoxelNet voxelnet , F : Frustum PointNet frustum , S : SECOND second , P+ PIXOR++ hdnet . PointPillars outperforms all other lidar-only methods in terms of both speed and accuracy by a large margin. source: [PointPillars: Fast Point Cloud Encoders](https://arxiv.org/abs/1812.05784)*
+
+![Figure 4 from PointPillars: Fast Point Cloud Encoders](/assets/images/pointpillars-fast-point-cloud-encoders-source-figure-4.webp)
+*Figure 4 Failure cases on KITTI. Same visualize setup from Figure 3 but focusing on several common failure modes. source: [PointPillars: Fast Point Cloud Encoders](https://arxiv.org/abs/1812.05784)*
+
 
 | Knob | Effect | Failure mode |
 | --- | --- | --- |

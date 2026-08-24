@@ -30,7 +30,14 @@ The propagation transformer combines three inputs: memory queries, current image
 The paper reports 67.6 NDS and 65.3 AMOTA for its strongest online nuScenes configuration. Its lightweight ResNet-50 model reports 45.0 mAP at 31.7 FPS on an RTX 3090, 2.3 mAP above and 1.8× faster than the cited SOLOFusion comparison. Those results establish a strong accuracy-throughput point; they do not measure worst-case latency or the safety cost of dropping a low-confidence object from memory.
 
 ![Figure 3 from StreamPETR, showing historical object queries transformed, updated with current images, and filtered into a recurrent memory queue](/assets/images/streampetr-paper-figure-3.png)
-_Only top foreground queries survive into the next frame, so query selection is both the efficiency mechanism and a temporal recall risk. Source: [StreamPETR](https://arxiv.org/abs/2303.11926), Figure 3._
+*Only top foreground queries survive into the next frame, so query selection is both the efficiency mechanism and a temporal recall risk. source: [StreamPETR](https://arxiv.org/abs/2303.11926)*
+
+![Figure 1 from StreamPETR: Object-Centric Temporal Modeling for Efficient Multi-View 3D Object Detection](/assets/images/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection-source-figure-1.webp)
+*Figure 1 Different temporal fusion methods from bird-eye-view (BEV) space, perspective view, and our proposed object-centric. RF indicates receptive field. The solid lines and dotted lines represent spatial and temporal operations respectively. source: [StreamPETR: Object-Centric Temporal Modeling for Efficient Multi-View 3D Object Detection](https://arxiv.org/abs/2303.11926)*
+
+![Figure 6 from StreamPETR: Object-Centric Temporal Modeling for Efficient Multi-View 3D Object Detection](/assets/images/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection-source-figure-6.webp)
+*Figure 6 Visualization results of StreamPETR. On the BEV plane (right), the groud-truth and predictions are drawn in green and blue rectangles respectively. The failure cases are marked by red circles. source: [StreamPETR: Object-Centric Temporal Modeling for Efficient Multi-View 3D Object Detection](https://arxiv.org/abs/2303.11926)*
+
 
 | Temporal design | State carried forward | Primary tradeoff |
 | --- | --- | --- |

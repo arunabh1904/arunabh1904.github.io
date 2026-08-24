@@ -26,7 +26,14 @@ TokenFlow is a unified image tokenizer built around two aligned codebooks: one f
 ## Core Insights
 
 ![TokenFlow dual semantic and pixel encoders with a shared discrete mapping and separate reconstruction objectives](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-paper-figure.png)
-_Figure 3 shows how TokenFlow keeps one discrete index useful for two jobs: semantic and pixel distances jointly select the code, while separate decoders preserve meaning and reconstruction detail. Source: [TokenFlow](https://arxiv.org/abs/2412.03069)._
+*Figure 3 shows how TokenFlow keeps one discrete index useful for two jobs: semantic and pixel distances jointly select the code, while separate decoders preserve meaning and reconstruction detail. source: [TokenFlow](https://arxiv.org/abs/2412.03069)*
+
+![Figure 5 from TokenFlow: Unified Image Tokenizer for Multimodal Understanding and Generation](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-source-figure-5.webp)
+*Figure 5 Qualitative comparison of different sampling strategies in our framework. (a) Single-pass top- ( =1200) and top- ( =0.8) sampling exhibits inconsistent patterns and artifacts. (b) Our proposed multi-step sampling strategy produces more coherent and visually appealing results. Best zoomed in for details. source: [TokenFlow: Unified Image Tokenizer for Multimodal Understanding and Generation](https://arxiv.org/abs/2412.03069)*
+
+![Figure 1 from TokenFlow: Unified Image Tokenizer for Multimodal Understanding and Generation](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-source-figure-1.webp)
+*Figure 1 Multimodal Understanding Results with TokenFlow. We demonstrate for the first time that discrete visual input can surpass LLaVA-1.5 13B in understanding performance, achieving a 7.2% average improvement. source: [TokenFlow: Unified Image Tokenizer for Multimodal Understanding and Generation](https://arxiv.org/abs/2412.03069)*
+
 
 | Signal | Reported value | Why it matters |
 | --- | --- | --- |

@@ -70,8 +70,7 @@ The action representation is part of the policy. Change it, and the same physica
 FAST compresses the temporal redundancy in a trajectory before tokenization. It transforms a continuous action chunk into frequency coefficients and quantizes them. Broad low-frequency motion appears before finer corrections, after which byte-pair encoding compresses recurring patterns. Smooth trajectories therefore become shorter token sequences for an autoregressive VLM.
 
 ![FAST action tokenization transforms a trajectory into frequency coefficients and compact tokens](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-paper-figure.jpg)
-
-*FAST transforms continuous action chunks into frequency coefficients and compresses the resulting discrete sequence before autoregressive prediction. Source: [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html).*
+*FAST transforms continuous action chunks into frequency coefficients and compresses the resulting discrete sequence before autoregressive prediction. source: [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html)*
 
 FAST exposes a categorical token likelihood that fits directly into SFT and preference objectives. Its token order also affects credit assignment: early low-frequency tokens define the broad motion, while later tokens refine it. A sequence-level preference can therefore penalize an otherwise valid approach because one high-frequency correction is wrong.
 
@@ -84,8 +83,7 @@ I would evaluate the tokenizer in closed loop, reporting reconstruction error an
 Driving provides a different division between discrete and continuous outputs. [Alpamayo-R1](/paper%20shorts/2025/10/30/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail.html) generates a tokenized Chain of Causation that names the relevant actors, causal factors, and decision. A diffusion decoder then uses that state to produce a continuous, dynamically feasible trajectory.
 
 ![Alpamayo-R1 separates tokenized causal reasoning from continuous diffusion trajectory prediction](/assets/images/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail-paper-figure.webp)
-
-*Alpamayo-R1 generates a tokenized Chain of Causation and conditions a diffusion decoder that produces the continuous driving trajectory. Source: [Alpamayo-R1](/paper%20shorts/2025/10/30/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail.html).*
+*Alpamayo-R1 generates a tokenized Chain of Causation and conditions a diffusion decoder that produces the continuous driving trajectory. source: [Alpamayo-R1](/paper%20shorts/2025/10/30/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail.html)*
 
 Post-training must align both outputs. SFT teaches the causal trace, a large reasoning critic scores its quality, and RL rewards consistency between the explanation and action. The trace must describe the scene correctly, and the diffusion decoder must produce a feasible plan. The reward must also detect disagreement between them.
 

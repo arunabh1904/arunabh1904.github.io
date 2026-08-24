@@ -26,7 +26,14 @@ summary: "2014 – Generative Adversarial Networks"
 ## Core Insights
 
 ![Figure 1 from GAN: generator samples move through latent space while the discriminator separates real and generated data](/assets/images/generative-adversarial-networks-paper-figure.png)
-_Figure 1 from the [GAN paper](https://arxiv.org/abs/1406.2661), via arXiv HTML._
+*Figure 1 from the [GAN paper](https://arxiv.org/abs/1406.2661). source: [GAN paper](https://arxiv.org/abs/1406.2661)*
+
+![Figure 2 from Generative Adversarial Networks](/assets/images/generative-adversarial-networks-source-figure-2.webp)
+*Figure 2 Visualization of samples from the model. Rightmost column shows the nearest training example of the neighboring sample, in order to demonstrate that the model has not memorized the training set. Samples are fair random draws, not cherry-picked. Unlike most other visualizations of deep generative models, these images show actual samples from the model distributions, not conditional means given samples of hidden units. source: [Generative Adversarial Networks](https://arxiv.org/abs/1406.2661)*
+
+![Figure 3 from Generative Adversarial Networks](/assets/images/generative-adversarial-networks-source-figure-3.webp)
+*Figure 3 Digits obtained by linearly interpolating between coordinates in space of the full model. source: [Generative Adversarial Networks](https://arxiv.org/abs/1406.2661)*
+
 
 ### Method and reported result
 

@@ -27,7 +27,14 @@ The comparison is controlled at the backbone level: the base VLM and action-trai
 The layer profile matters more than the aggregate drop. The base VLM's depth decodability improves toward its final layers, whereas the VLA's late-layer decodability falls. Ablating the late MLP writes recovers most of that terminal loss; matched attention ablations do not produce comparable recovery. Module decomposition points to accumulated MLP writes as the channel where the base model makes depth most accessible and action post-training overwrites it.
 
 ![Depth probing setup for comparing a VLM and VLA at every decoder layer](/assets/images/vla-depth-probing-paper-figure.jpg)
-_A capacity-matched depth probe reads visual-token representations at each decoder layer. Source: [Drop-off to Recovery](https://arxiv.org/abs/2608.08904)._
+*A capacity-matched depth probe reads visual-token representations at each decoder layer. source: [Drop-off to Recovery](https://arxiv.org/abs/2608.08904)*
+
+![Figure 2 from From Recovery to Drop-off: How Action Post-training Reduces a VLM](/assets/images/from-recovery-to-drop-off-how-action-post-training-reduces-a-vlms-late-layer-depth-decodability-source-figure-2.webp)
+*Figure 2 Dense Prediction Transformer probing schematic. A LIBERO observation is fed to the VLM/VLA backbone; a capacity-matched DPT head decodes depth from the visual tokens at every decoder layer, supervised by a Depth-Anything-3 teacher. One probe is trained per layer and per model. source: [From Recovery to Drop-off: How Action Post-training Reduces a VLM](https://arxiv.org/abs/2608.08904)*
+
+![Figure 1 from From Recovery to Drop-off: How Action Post-training Reduces a VLM](/assets/images/from-recovery-to-drop-off-how-action-post-training-reduces-a-vlms-late-layer-depth-decodability-source-figure-1.webp)
+*Figure 1 The cliff, qualitatively. DPT-probe depth readouts of the same LIBERO observation (Obs.; Depth-Anything-3; Molmo2-ER DPT head, MolmoAct2-LIBERO DPT head) at the first and final decoder layer. Between the first and final layer, the base VLM’s readout sharpens while the VLA’s collapses. source: [From Recovery to Drop-off: How Action Post-training Reduces a VLM](https://arxiv.org/abs/2608.08904)*
+
 
 The result does not mean that a VLA loses all geometry or that late MLPs are universally harmful. It establishes a causal failure mode for one weight-matched pair and one depth probe. The next question is whether action objectives can preserve useful spatial features through routing, auxiliary losses, or selective parameter updates without reducing control quality.
 

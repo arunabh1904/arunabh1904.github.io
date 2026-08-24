@@ -28,7 +28,13 @@ DETR3D predicts a set of 3D boxes directly from multiview image features. Each o
 DETR3D treats all cameras jointly, which is especially useful where an object crosses camera boundaries. On nuScenes validation, its CBGS configuration reports 34.9 mAP and 43.4 NDS. In overlap regions, the FCOS3D-initialized model reaches 26.8 mAP and 38.4 NDS versus 22.9 mAP and 32.9 NDS for the compared FCOS3D setup.
 
 ![DETR3D: 3D Object Detection from Multi-View Images via 3D-to-2D Queries source figure: Overview of our method.](/assets/images/detr3d-multiview-images-via-3d-to-2d-queries-paper-figure.webp)
-_Overview of our method. Source: [DETR3D: 3D Object Detection from Multi-View Images via 3D-to-2D Queries](https://arxiv.org/abs/2110.06922), Figure 1, via arXiv HTML._
+*Overview of our method. source: [DETR3D: 3D Object Detection from Multi-View Images via 3D-to-2D Queries](https://arxiv.org/abs/2110.06922)*
+
+![Figure 2 from DETR3D: 3D Object Detection from Multi-View Images via 3D-to-2D Queries](/assets/images/detr3d-multiview-images-via-3d-to-2d-queries-source-figure-2.webp)
+*Figure 2 Detection results from layer 1 to layer 5 in the DETR3D head. We visualize the bounding boxes in the BEV and overlay the point clouds from lidar_top . The predictions get closer to the ground-truth in the deeper layers. source: [DETR3D: 3D Object Detection from Multi-View Images via 3D-to-2D Queries](https://arxiv.org/abs/2110.06922)*
+
+![Figure 1 from DETR3D: 3D Object Detection from Multi-View Images via 3D-to-2D Queries](/assets/images/detr3d-multiview-images-via-3d-to-2d-queries-source-figure-1.webp)
+*Figure 1 Overview of our method. The inputs to the model are a set of multi-view images, which are encoded by a ResNet and a FPN. Then, our model operates on a set of sparse object queries in which each query is decoded to a 3D reference point. 2D features are transformed to refine the object queries by projecting the 3D reference point into the image space. Our model makes per-query predictions and uses a set-to-set loss. source: [DETR3D: 3D Object Detection from Multi-View Images via 3D-to-2D Queries](https://arxiv.org/abs/2110.06922)*
 
 
 | Queries | mAP | NDS | Consequence |

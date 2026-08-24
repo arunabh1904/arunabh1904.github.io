@@ -27,8 +27,11 @@ summary: '2026 – a survey of one-stage detector design and the limits of cross
 The original distinction was procedural: two-stage detectors generate proposals before classification and box refinement, while one-stage detectors predict dense classes and boxes directly. The survey shows how much diversity now sits inside the second category. SSD and RetinaNet use default boxes; early YOLO variants use grid-based anchors; FCOS predicts per-location boxes with centerness; CenterNet turns objects into keypoints; YOLOX combines an anchor-free head with dynamic assignment; and YOLOv10 removes non-maximum suppression through consistent one-to-many and one-to-one training assignments.
 
 ![Timeline of one-stage detector families from early YOLO and SSD through anchor-free and NMS-free designs](/assets/images/one-stage-detectors-timeline.webp)
+*The chronology is best read as branching design decisions—assignment, feature fusion, loss, post-processing, and scaling—not as one model family replacing another. source: [One-Stage Object Detectors](https://arxiv.org/abs/2608.19014)*
 
-_The chronology is best read as branching design decisions—assignment, feature fusion, loss, post-processing, and scaling—not as one model family replacing another. Source: [One-Stage Object Detectors](https://arxiv.org/abs/2608.19014), Figure 2._
+![Figure 4 from One-Stage Object Detectors in Autonomous Driving](/assets/images/one-stage-object-detectors-in-autonomous-driving-source-figure-4.webp)
+*Figure 4 Fig. 4: Radar chart comparing representative one-stage detectors across multiple dimensions. source: [One-Stage Object Detectors in Autonomous Driving](https://arxiv.org/abs/2608.19014)*
+
 
 Feature fusion and optimization often matter as much as the output parameterization. [EfficientDet](/paper%20shorts/2020/04/01/efficientdet-scalable-and-efficient-object-detection.html) couples BiFPN with compound scaling, RetinaNet introduces focal loss for foreground-background imbalance, GFL represents box coordinates as distributions, and VFNet aligns classification confidence with localization quality. These changes move the deployment frontier without making anchor-based versus anchor-free a sufficient selection rule.
 
@@ -45,8 +48,7 @@ Feature fusion and optimization often matter as much as the output parameterizat
 The survey explicitly marks its performance table as cross-paper reporting rather than a controlled benchmark. For example, it places YOLO and EfficientDet COCO numbers beside SSD and DSSD Pascal VOC numbers, with several missing FPS and parameter entries. Its qualitative radar chart is also a survey-derived five-point assessment, not a new measurement. The defensible use is to shortlist mechanisms and baselines before running a hardware- and dataset-matched evaluation.
 
 ![Cross-paper speed-accuracy scatter for one-stage detectors collected by the survey](/assets/images/one-stage-detectors-speed-accuracy.webp)
-
-_This plot is a reading aid, not a leaderboard: points mix datasets, input sizes, hardware, runtimes, and reporting conventions, so their relative positions do not establish a matched speed-accuracy frontier. Source: [One-Stage Object Detectors](https://arxiv.org/abs/2608.19014), Figure 6._
+*This plot is a reading aid, not a leaderboard: points mix datasets, input sizes, hardware, runtimes, and reporting conventions, so their relative positions do not establish a matched speed-accuracy frontier. source: [One-Stage Object Detectors](https://arxiv.org/abs/2608.19014)*
 
 The survey's autonomous-driving discussion identifies the right failure categories—small and distant objects, occlusion, adverse weather, edge compute, and missing deployment-centric metrics—but it does not quantify them under one protocol. A detector choice for driving should therefore be driven by critical-class recall, calibration, degradation tests, and end-to-end latency, not a global AP/FPS pair copied from unrelated papers.
 

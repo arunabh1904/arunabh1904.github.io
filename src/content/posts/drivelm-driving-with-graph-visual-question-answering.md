@@ -32,7 +32,14 @@ The paper contributes a task formulation, dataset, metrics, and a baseline agent
 The paper's important move is making language reasoning structured rather than single-round. The risk is that graph QA can improve interpretability without solving all geometry and latency constraints. It is best understood as language-grounded scene reasoning that can complement conventional spatial modules.
 
 ![Figure 1 from DriveLM showing graph visual question answering, DriveLM-Data, DriveLM-Agent, metrics, and generalization](/assets/images/drivelm-driving-with-graph-visual-question-answering-paper-figure.png)
-_Figure 1 shows DriveLM's task and artifacts: graph VQA, data construction, the DriveLM-Agent baseline, metrics, and generalization tests. From the [DriveLM paper](https://arxiv.org/abs/2312.14150), via the arXiv PDF._
+*Figure 1 shows DriveLM's task and artifacts: graph VQA, data construction, the DriveLM-Agent baseline, metrics, and generalization tests. From the [DriveLM paper](https://arxiv.org/abs/2312.14150). source: [DriveLM paper](https://arxiv.org/abs/2312.14150)*
+
+![Figure 2 from DriveLM: Driving with Graph Visual Question Answering](/assets/images/drivelm-driving-with-graph-visual-question-answering-source-figure-2.webp)
+*Figure 2 Annotation Pipeline: In DriveLM-nuScenes, we adopt a semi-rule-based QA labeling pipeline, where both the ground truth annotation in nuScenes/OpenLane-V2 and feedback from human annotators are used. A critical part of our pipeline is the multi-round quality check, which guarantees high data quality at reasonable costs. In DriveLM-CARLA, we meet the same standards while exploiting a fully rule-based QA labeling pipeline instead, using a new expert algorithm called PDM-Lite. source: [DriveLM: Driving with Graph Visual Question Answering](https://arxiv.org/abs/2312.14150)*
+
+![Figure 5 from DriveLM: Driving with Graph Visual Question Answering](/assets/images/drivelm-driving-with-graph-visual-question-answering-source-figure-5.webp)
+*Figure 5 Overall Composition of DriveLM-nuScenes . The dataset comprises scene-level descriptions and frame-level QA, which can be divided into three parts: Perception , Prediction , and Planning . Objects are encoded using c tags , which contain identifiers, camera affiliations, and center coordinates of its 2D bounding box in the corresponding camera frame. source: [DriveLM: Driving with Graph Visual Question Answering](https://arxiv.org/abs/2312.14150)*
+
 
 **What to look at:**
 - Questions are nodes in a logical graph, not isolated prompts.

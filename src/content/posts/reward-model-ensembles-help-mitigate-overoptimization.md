@@ -24,7 +24,14 @@ summary: "2023 – Reward Model Ensembles Help Mitigate Overoptimization"
 ## Core Insights
 
 ![RLHF pipeline comparing a single proxy reward model with an ensemble used during policy optimization](/assets/images/reward-model-ensembles-help-mitigate-overoptimization-paper-figure.png)
-_Figure 1 highlights the intervention: keep the ordinary SFT and preference-data stages, but optimize the policy against an ensemble of proxy reward models instead of one proxy. Source: [Reward Model Ensembles Help Mitigate Overoptimization](https://arxiv.org/abs/2310.02743)._
+*Figure 1 highlights the intervention: keep the ordinary SFT and preference-data stages, but optimize the policy against an ensemble of proxy reward models instead of one proxy. source: [Reward Model Ensembles Help Mitigate Overoptimization](https://arxiv.org/abs/2310.02743)*
+
+![Figure 2 from Reward Model Ensembles Help Mitigate Overoptimization](/assets/images/reward-model-ensembles-help-mitigate-overoptimization-source-figure-2.webp)
+*Figure 2 An example of overoptimization. The KL divergence is the distance between the initial and current policy, measuring the degree of optimization. source: [Reward Model Ensembles Help Mitigate Overoptimization](https://arxiv.org/abs/2310.02743)*
+
+![Figure 3 from Reward Model Ensembles Help Mitigate Overoptimization](/assets/images/reward-model-ensembles-help-mitigate-overoptimization-source-figure-3.webp)
+*Figure 3 (a) With no label noise. source: [Reward Model Ensembles Help Mitigate Overoptimization](https://arxiv.org/abs/2310.02743)*
+
 
 The evaluation extends the synthetic gold-reward setup used by the reward-overoptimization scaling paper and adds 25% label noise. For best-of-$n$, conservative ensemble objectives nearly eliminate overoptimization in the reported setting and improve performance by as much as 70%. For PPO, ensembles consistently reduce overoptimization; combining them with a small KL penalty prevents it in the studied runs without sacrificing performance.
 

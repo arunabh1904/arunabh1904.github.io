@@ -31,7 +31,14 @@ The strongest result is not the composite driving score. Running the same expert
 The slow path turns instruction text and visual history into a persistent per-layer key-value cache. Every four control ticks, it appends four tokens for the latest frame. At every tick, the action expert contributes ten tokens—current-frame features, ego state, previous predictions, and learned waypoint queries—which cross-attend to the frozen cache at all 32 layers before a small head regresses five waypoints. The split gives language and history a slower update rate without forcing the control path to consume a stale action.
 
 ![Fast-slow driving architecture with a frozen 5 Hz backbone, persistent per-layer cache, and 20 Hz action expert](/assets/images/fast-slow-vla-architecture.png)
-_The slow backbone updates a cached scene representation every four ticks; the small expert reads that cache and current state every tick. Source: Figure 2 in the [paper](https://arxiv.org/abs/2607.15621)._
+*The slow backbone updates a cached scene representation every four ticks; the small expert reads that cache and current state every tick. source: [paper](https://arxiv.org/abs/2607.15621)*
+
+![Figure 5 from Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-Language-Action Inference for Closed-Loop Driving](/assets/images/think-at-5-hz-act-at-20-hz-asynchronous-fast-slow-vision-language-action-inference-for-closed-loop-d-source-figure-5.webp)
+*Figure 5 Left: per-step model latency versus history length. The legacy path re-encodes the full history each step and exceeds the 50 ms tick budget at every history length, while our per-tick cost stays flat at 32 ms. Right: validation waypoint L1 across training epochs; the randomized- expert leads its twin at every epoch and both leave the frozen backbone head far behind. source: [Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-Language-Action Inference for Closed-Loop Driving](https://arxiv.org/abs/2607.15621)*
+
+![Figure 3 from Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-Language-Action Inference for Closed-Loop Driving](/assets/images/think-at-5-hz-act-at-20-hz-asynchronous-fast-slow-vision-language-action-inference-for-closed-loop-d-source-figure-3.webp)
+*Figure 3 The four evaluation towns. The expert is trained on short routes from town05 only; towns 01, 02, and 03 are never seen during expert training, and town03 is evaluated on the long-route tier. source: [Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-Language-Action Inference for Closed-Loop Driving](https://arxiv.org/abs/2607.15621)*
+
 
 Asynchrony changes the training distribution. At deployment, the cache may lag the current frame by zero to three ticks, so training randomly truncates the visible prefix by a sampled delay. Previous waypoints also receive noise and dropout. This randomized-staleness expert reaches 0.031 m validation waypoint L1 under a synchronous test, compared with 0.037 m for the same expert trained only at zero delay and 0.123 m for the frozen backbone head. The gain is therefore partly robustness regularization, not only tolerance of an old cache.
 
@@ -44,8 +51,8 @@ Training is deliberately narrow: 27,485 LMDrive instruction clips from CARLA tow
 | Same expert at 10 Hz vs 20 Hz | Route completion: 82.1% → 94.0% | Control freshness, holding the learned expert fixed. |
 | Unseen town01 / town02 | Completion: 84.3% / 94.4% vs baseline 40.5% / 30.7% | The expert transfers across short-route layouts seen only by the frozen representation stack. |
 
-![Latency versus history length for full recomputation and the cached action-expert path](/assets/images/fast-slow-vla-latency.png)
-_Full recomputation exceeds the 50 ms control budget even at short histories, while cached per-tick inference remains nearly flat around 32 ms. Source: Figure 5 (left) in the [paper](https://arxiv.org/abs/2607.15621)._
+_Full recomputation exceeds the 50 ms control budget even at short histories, while cached per-tick inference remains nearly flat around 32 ms. Figure 5 (left) in the source: [paper](https://arxiv.org/abs/2607.15621)_
+_Full recomputation exceeds the 50 ms control budget even at short histories, while cached per-tick inference remains nearly flat around 32 ms. source: Figure 5 (left) in the [paper](https://arxiv.org/abs/2607.15621)._
 
 Latency accounting needs one qualification. On an RTX 3090 Ti, median model compute is 32.4 ms per tick, including amortized cache maintenance, but the measured end-to-end agent step is 58 ms after sensor formatting and harness overhead. CARLA’s synchronous simulator still receives a new command every tick; wall-clock execution is about 17 Hz, not a demonstrated real-time 20 Hz physical system.
 

@@ -28,7 +28,14 @@ OpenVLA is a 7B-parameter vision-language-action model trained on real robot dem
 OpenVLA adapts a pretrained vision-language model into an action-generating robot policy and releases the result as an open baseline. The model takes robot observations and language instructions, then predicts actions for manipulation tasks. Its contribution is partly technical and partly ecosystem-oriented: provide an inspectable VLA recipe rather than leaving robot foundation policies closed. The evidence tests generalization across robot tasks and datasets. The caveat is action representation: a VLM backbone helps semantic grounding, but precise continuous control and embodiment transfer still require robot-specific data and validation.
 
 ![Figure 1: OpenVLA model architecture from OpenVLA: An Open-Source Vision-Language-Action Model](/assets/images/openvla-open-source-vision-language-action-model-paper-figure.png)
-_Figure 1: OpenVLA model architecture. From the [OpenVLA: An Open-Source Vision-Language-Action Model paper](https://arxiv.org/abs/2406.09246), via arXiv HTML._
+*Figure 1: OpenVLA model architecture. From the [OpenVLA: An Open-Source Vision-Language-Action Model paper](https://arxiv.org/abs/2406.09246). source: [OpenVLA: An Open-Source Vision-Language-Action Model paper](https://arxiv.org/abs/2406.09246)*
+
+![Figure 2 from OpenVLA: An Open-Source Vision-Language-Action Model](/assets/images/openvla-open-source-vision-language-action-model-source-figure-2.webp)
+*Figure 2 BridgeData V2 WidowX robot evaluation tasks and results. We evaluate OpenVLA and prior state-of-the-art generalist robot policies on a comprehensive suite of tasks covering several axes of generalization, as well as tasks that specifically assess language conditioning ability. OpenVLA achieves highest overall performance and even outperforms closed-source model RT-2-X in all categories except for semantic generalization. Average success rates StdErr are computed across 170 total rollouts per approach. source: [OpenVLA: An Open-Source Vision-Language-Action Model](https://arxiv.org/abs/2406.09246)*
+
+![Figure 3 from OpenVLA: An Open-Source Vision-Language-Action Model](/assets/images/openvla-open-source-vision-language-action-model-source-figure-3.webp)
+*Figure 3 Google robot evaluation results. We evaluate generalist robot policies on in-distribution and out-of-distribution (OOD) tasks on the mobile manipulator used in RT-1 and RT-2 evaluations [ 2 , 7 ] . We find that OpenVLA and RT-2-X attain comparable performance and significantly outperform RT-1-X and Octo overall. Average success rates StdErr are computed across 60 total rollouts per approach. See Table 6 for detailed results. source: [OpenVLA: An Open-Source Vision-Language-Action Model](https://arxiv.org/abs/2406.09246)*
+
 
 **What to look at:**
 - The visual encoder fuses SigLIP and DINOv2 features.

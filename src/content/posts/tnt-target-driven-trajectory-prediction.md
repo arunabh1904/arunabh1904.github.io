@@ -32,7 +32,11 @@ The paper decomposes trajectory prediction into target uncertainty and control u
 TNT uses VectorNet as the HD-map context encoder when maps are available and a ResNet image encoder for the Stanford Drone Dataset. The important modeling assumption is that once the target is fixed, the remaining trajectory distribution is close enough to unimodal for a simple regression head. That assumption is reasonable for short and moderate horizons, but the paper itself notes that longer horizons may need intermediate targets.
 
 ![Figure 2 from TNT showing context encoding, target prediction, target-conditioned motion estimation, and trajectory scoring](/assets/images/tnt-target-driven-trajectory-prediction-paper-figure.png)
-_Figure 2 shows the three-stage TNT pipeline: encode the scene, score candidate target states, decode a trajectory for each selected target, then score and select a compact set. From the [TNT paper](https://arxiv.org/abs/2008.08294), via the arXiv PDF._
+*Figure 2 shows the three-stage TNT pipeline: encode the scene, score candidate target states, decode a trajectory for each selected target, then score and select a compact set. From the [TNT paper](https://arxiv.org/abs/2008.08294). source: [TNT paper](https://arxiv.org/abs/2008.08294)*
+
+![Figure 4 from TNT: Target-driveN Trajectory Prediction](/assets/images/tnt-target-driven-trajectory-prediction-source-figure-4.webp)
+*Figure 4 Qualitative results on the Argoverse validation set. Lane centerlines are shown in grey, agent’s past trajectory in blue, ground truth future trajectory is in light blue. (Left) Top predicted targets, where darker color corresponds to higher scores. (Middle) Trajectory regression conditioned on the targets. (Right) Predicted trajectories after scoring and selection. The examples show TNT predicting a diverse set of vehicle behaviors, among them turning, changing lanes, going straight at different speeds, etc. source: [TNT: Target-driveN Trajectory Prediction](https://arxiv.org/abs/2008.08294)*
+
 
 **What to look at:**
 - Targets make intent interpretable: turning, lane changes, and speed choices become endpoint hypotheses.

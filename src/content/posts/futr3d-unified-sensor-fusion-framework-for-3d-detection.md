@@ -28,7 +28,14 @@ Each object query carries a 3D reference point. For camera features, the sampler
 The sensor sweep is the useful evidence. The paper evaluates cameras, radar, 1-, 4-, and 32-beam LiDAR, and their combinations on nuScenes. Its headline low-cost result reports 58.0 mAP for cameras plus simulated 4-beam LiDAR, compared with 56.6 mAP for the cited 32-beam LiDAR CenterPoint baseline. Beyond 30 meters, the paper reports 10.4 mAP for camera-only, 16.1 for 4-beam LiDAR, and 27.4 for their fusion. The comparison exposes complementarity rather than treating “multimodal” as one opaque setting.
 
 ![Figure 2 from FUTR3D, showing camera, LiDAR, and radar features sampled by a modality-agnostic object query](/assets/images/futr3d-paper-figure-2.png)
-_FUTR3D keeps each sensor in its native representation and uses a 3D query to retrieve available evidence. Source: [FUTR3D](https://arxiv.org/abs/2203.10642), Figure 2._
+*FUTR3D keeps each sensor in its native representation and uses a 3D query to retrieve available evidence. source: [FUTR3D](https://arxiv.org/abs/2203.10642)*
+
+![Figure 2 from FUTR3D: A Unified Sensor Fusion Framework for 3D Detection](/assets/images/futr3d-unified-sensor-fusion-framework-for-3d-detection-source-figure-2.webp)
+*Figure 2 Overview of FUTR3D. Each sensor modality is encoded individually in its own coordinate. Then a query-based Modality-Agnostic Feature Sampler (MAFS) extracts features from all available modalities according to the 3D reference point of each query. Finally a transformer decoder predicts 3D bounding boxes from queries. The predicted boxes can be iteratively fed back into MAFS and transformer decoder to refine the predictions. source: [FUTR3D: A Unified Sensor Fusion Framework for 3D Detection](https://arxiv.org/abs/2203.10642)*
+
+![Figure 1 from FUTR3D: A Unified Sensor Fusion Framework for 3D Detection](/assets/images/futr3d-unified-sensor-fusion-framework-for-3d-detection-source-figure-1.webp)
+*Figure 1 Results visualization in BEV. On the left is 1-beam LiDAR with cameras, in the middle is 4-beam LiDAR with cameras and on the right is 32-beam LiDAR with cameras. source: [FUTR3D: A Unified Sensor Fusion Framework for 3D Detection](https://arxiv.org/abs/2203.10642)*
+
 
 | Sensor setting reported in the paper | mAP | What the comparison isolates |
 | --- | ---: | --- |

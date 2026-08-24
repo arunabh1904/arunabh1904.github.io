@@ -30,7 +30,14 @@ UniAD uses a BEV backbone followed by a sequence of modules: TrackFormer for obj
 The important modeling claim is coordination. Modular stacks can accumulate errors across task boundaries; naive multi-task stacks can optimize tasks that do not help planning. UniAD tries to make the intermediate tasks useful for the final driving decision. The caveat is that the dense BEV pipeline is heavy, which is one reason later work such as VAD and SparseDrive pushes sparse/vectorized alternatives.
 
 ![Figure 2 from UniAD showing the planning-oriented pipeline from multi-view images to perception, prediction, occupancy, and planning](/assets/images/uniad-planning-oriented-autonomous-driving-paper-figure.png)
-_Figure 2 shows UniAD's pipeline: BEV features feed tracking and mapping, those queries support motion and occupancy, and the planner consumes the resulting scene knowledge. From the [UniAD paper](https://arxiv.org/abs/2212.10156), via the arXiv PDF._
+*Figure 2 shows UniAD's pipeline: BEV features feed tracking and mapping, those queries support motion and occupancy, and the planner consumes the resulting scene knowledge. From the [UniAD paper](https://arxiv.org/abs/2212.10156). source: [UniAD paper](https://arxiv.org/abs/2212.10156)*
+
+![Figure 3 from UniAD: Planning-oriented Autonomous Driving](/assets/images/uniad-planning-oriented-autonomous-driving-source-figure-3.webp)
+*Figure 3 Visualization results. We show results for all tasks in surround-view images and BEV. Predictions from motion and occupancy modules are consistent, and the ego vehicle is yielding to the front black car in this case. Each agent is illustrated with a unique color. Only top-1 and top-3 trajectories from motion forecasting are selected for visualization on image-view and BEV respectively. source: [UniAD: Planning-oriented Autonomous Driving](https://arxiv.org/abs/2212.10156)*
+
+![Figure 1 from UniAD: Planning-oriented Autonomous Driving](/assets/images/uniad-planning-oriented-autonomous-driving-source-figure-1.webp)
+*Figure 1 Comparison on the various designs of autonomous driving framework. (a) Most industrial solutions deploy separate models for different tasks. (b) The multi-task learning scheme shares a backbone with divided task heads. (c) The end-to-end paradigm unites modules in perception and prediction. Previous attempts either adopt a direct optimization on planning in (c.1) or devise the system with partial components in (c.2). Instead, we argue in (c. source: [UniAD: Planning-oriented Autonomous Driving](https://arxiv.org/abs/2212.10156)*
+
 
 **What to look at:**
 - Planning is the organizing objective, not an afterthought.

@@ -30,7 +30,14 @@ The problem is architectural specialization. Standard networks bake in assumptio
 The evidence spans language, visual understanding, multimodal reasoning, optical flow, and StarCraft II. The headline examples include outperforming a Transformer-based BERT baseline on GLUE without input tokenization and reaching state-of-the-art Sintel optical-flow performance without explicit multiscale correspondence machinery. The caveat is that generality does not remove representation design; good positional encodings, queries, and training recipes still matter.
 
 ![Figure 2 from Perceiver IO showing encode, latent processing, and output-query decoding](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-paper-figure.png)
-_Figure 2 shows the Perceiver IO template: arbitrary inputs enter a latent workspace, then output queries decode task-specific structured outputs. From the [Perceiver IO paper](https://arxiv.org/abs/2107.14795), via ar5iv._
+*Figure 2 shows the Perceiver IO template: arbitrary inputs enter a latent workspace, then output queries decode task-specific structured outputs. From the [Perceiver IO paper](https://arxiv.org/abs/2107.14795), via ar5iv. source: [Perceiver IO paper](https://arxiv.org/abs/2107.14795)*
+
+![Figure 1 from Perceiver IO: A General Architecture for Structured Inputs & Outputs](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-1.webp)
+*Figure 1 The Perceiver IO architecture can be used on domains with a wide variety of input and output spaces, including multi-task language understanding, dense visual tasks like optical flow, hybrid dense/sparse multimodal tasks such as video+audio+class autoencoding, and tasks with symbolic outputs like StarCraft II. See Tables 5 and 6 for details of all domains considered here. source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs](https://arxiv.org/abs/2107.14795)*
+
+![Figure 4 from Perceiver IO: A General Architecture for Structured Inputs & Outputs](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-4.webp)
+*Figure 4 Multimodal audio-video-label autoencoding with 88x compression. Side-by-side: inputs on left, reconstructions right. See the supplemental material for example output video and audio. source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs](https://arxiv.org/abs/2107.14795)*
+
 
 **What to look at:**
 - Cross-attention moves arbitrary inputs into a fixed latent workspace.

@@ -22,7 +22,14 @@ summary: "2022 – Scaling Laws for Reward Model Overoptimization"
 ## Core Insights
 
 ![Best-of-n and reinforcement-learning curves showing proxy reward rising while gold reward eventually falls for smaller reward models](/assets/images/scaling-laws-for-reward-model-overoptimization-paper-figure.png)
-_Figure 1 shows the Goodharting pattern behind the scaling law: optimization continues to improve proxy reward while the held-out gold reward peaks and then declines, with the failure arriving earlier for smaller reward models. Source: [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)._
+*Figure 1 shows the Goodharting pattern behind the scaling law: optimization continues to improve proxy reward while the held-out gold reward peaks and then declines, with the failure arriving earlier for smaller reward models. source: [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)*
+
+![Figure 2 from Scaling Laws for Reward Model Overoptimization](/assets/images/scaling-laws-for-reward-model-overoptimization-source-figure-2.webp)
+*Figure 2 Diagram of the real and synthetic RM training setups. Human labellers generate comparison data. In the real RLHF setting, this data is used to train a proxy RM that is optimized by RL/BoN. In our synthetic setting, we instead use a “Gold RM” as our ground truth. In both settings, the proxy RM is a proxy for the ground truth process generating the labels (either the human or gold RM). source: [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)*
+
+![Figure 6 from Scaling Laws for Reward Model Overoptimization](/assets/images/scaling-laws-for-reward-model-overoptimization-source-figure-6.webp)
+*Figure 6 RM validation loss vs BoN RM score @ n=1000. Most points in this figure are already averaged over multiple seeds. source: [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)*
+
 
 The paper parameterizes optimization pressure by distance from the initial policy, using $d=\sqrt{D_{KL}(\pi\|\pi_{init})}$. The fitted gold-reward curves differ by optimizer: best-of-$n$ is well described by $d(\alpha-\beta d)$, while RL follows $d(\alpha-\beta\log d)$ in the synthetic setup. Larger reward models and more reward data change the coefficients smoothly, which makes the location of the peak somewhat predictable.
 

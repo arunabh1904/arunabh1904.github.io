@@ -34,7 +34,14 @@ The system attacks four different contracts. Streaming inference encodes only th
 The result is a systems co-design claim. The latency reductions compound, but the table also shows that minADE@6 worsens slightly even as minADE@1 improves. The paper reports better closed-loop collision and off-road rates in simulation, yet real-time vehicle behavior and hardware portability remain outside the evidence boundary.
 
 ![FlashDrive streaming inference reusing visual context across driving frames](/assets/images/flashdrive-streaming-paper-figure.png)
-_The streaming path encodes only new frame tokens and reuses the previous context cache. Source: [FlashDrive](https://arxiv.org/abs/2608.12932)._
+*The streaming path encodes only new frame tokens and reuses the previous context cache. source: [FlashDrive](https://arxiv.org/abs/2608.12932)*
+
+![Figure 1 from FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving](/assets/images/flashdrive-flash-vision-language-action-inference-for-autonomous-driving-source-figure-1.webp)
+*Figure 1 Reasoning VLA models for autonomous driving, such as Alpamayo 1.5, exhibit prohibitive end-to-end inference latency: 717 ms on an RTX PRO 6000, far exceeding real-time requirements. FlashDrive achieves a latency reduction (down to 151 ms) while incurring negligible degradation on @6.4s and even improving @6.4s. source: [FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving](https://arxiv.org/abs/2608.12932)*
+
+![Figure 3 from FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving](/assets/images/flashdrive-flash-vision-language-action-inference-for-autonomous-driving-source-figure-3.webp)
+*Figure 3 (b) Accuracy with streaming fine-tuning. source: [FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving](https://arxiv.org/abs/2608.12932)*
+
 
 ## High-Level Takeaways
 

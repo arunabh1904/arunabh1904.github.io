@@ -22,7 +22,7 @@ summary: '2019 – ViLBERT: Pretraining Task-Agnostic Visiolinguistic Representa
 ## Core Insights
 
 ![ViLBERT architecture with separate visual and language streams connected by co-attention](/assets/images/vilbert-paper-figure-1.png)
-_The two streams can have different depths and communicate only through co-attention blocks. This preserves modality-specific processing while still learning region-word interactions. Source: [ViLBERT](https://arxiv.org/abs/1908.02265), Figure 1._
+*The two streams can have different depths and communicate only through co-attention blocks. This preserves modality-specific processing while still learning region-word interactions. source: [ViLBERT](https://arxiv.org/abs/1908.02265)*
 
 The architectural decision is separation before fusion. A detector converts the image into region features. A language transformer processes word tokens. Co-attention lets each stream query the other without forcing both modalities through one shared stack from the start.
 

@@ -29,8 +29,11 @@ summary: '2026 – CAViAR tests whether driving VLMs can ground accident respons
 CAViAR adds a reviewed responsibility layer to 1,500 Car Crash Dataset clips and 749 Nexar clips. The fixed tasks ask what happened, which visible road user initiated the unsafe interaction, who was affected, and which of eleven jurisdiction-agnostic rule families best describes the visible behavior. Ambiguous or off-screen responsibility cases are excluded from responsibility evaluation instead of being forced into a single label. That decision makes the target narrower than legal fault, but also more defensible from dashcam evidence.
 
 ![CAViAR example showing a dashcam accident and question-answer targets for context, agent roles, and rule-relevant behavior](/assets/images/caviar-causal-question-answering.webp)
+*CAViAR decomposes one accident clip into visible context, accident type, apparent at-fault and affected agents, and an apparent rule-violation category. source: [CAViAR](https://arxiv.org/abs/2608.19380)*
 
-_CAViAR decomposes one accident clip into visible context, accident type, apparent at-fault and affected agents, and an apparent rule-violation category. Source: [CAViAR](https://arxiv.org/abs/2608.19380), Figure 2._
+![Figure 2 from CAViAR: A Causal Video Dataset for Fine-Grained Accident Reasoning in Real-World Scenarios](/assets/images/caviar-a-causal-video-dataset-for-fine-grained-accident-reasoning-in-real-world-scenarios-source-figure-2.webp)
+*Figure 2 Row-normalized accident-type confusion matrices, aggregated over all six models (base vs. fine-tuned) at 16 FPS ( predictions each). Both regimes collapse onto Rear-End and rarely recover Side-by-Side or Head-on (quantitative details in text). source: [CAViAR: A Causal Video Dataset for Fine-Grained Accident Reasoning in Real-World Scenarios](https://arxiv.org/abs/2608.19380)*
+
 
 The split is deliberately cross-corpus: CCD supplies training data and Nexar supplies the test set, with no shared videos, scenes, or devices. Three model families—Cosmos-Reason2, Qwen3-VL, and InternVL3—are evaluated at 2B and 8B scales before and after language-backbone LoRA fine-tuning. The vision encoder and projector remain frozen, so the experiment tests whether language-side adaptation can map existing visual evidence to the new task rather than whether better visual grounding can be learned end to end.
 
@@ -43,8 +46,7 @@ The split is deliberately cross-corpus: CCD supplies training data and Nexar sup
 | Same-source CCD holdout | 31.12–39.60 BERTScore-F1 | Removing the CCD-to-Nexar shift does not remove the reasoning gap. |
 
 ![CAViAR confusion matrices contrasting easy lighting recognition with difficult accident and responsibility categories](/assets/images/caviar-human-model-gap.webp)
-
-_The class-level pattern matters more than aggregate accuracy: tested VLMs nearly saturate lighting recognition but collapse toward common accident and responsibility labels. Source: [CAViAR](https://arxiv.org/abs/2608.19380), Figure 5._
+*The class-level pattern matters more than aggregate accuracy: tested VLMs nearly saturate lighting recognition but collapse toward common accident and responsibility labels. source: [CAViAR](https://arxiv.org/abs/2608.19380)*
 
 The comparison with existing site benchmarks is instructive. [DriveBench](/paper%20shorts/2025/01/01/are-vlms-ready-for-autonomous-driving-drivebench.html) tests whether driving answers remain grounded under visual corruption, while [NARRATE](/paper%20shorts/2026/08/14/narrate-a-multimodal-real-world-australian-driving-dataset-for-human-centred-explanations-in-automated-driving.html) records explanations from the drivers who performed ordinary maneuvers. CAViAR changes the evaluated object: a model must connect an observed accident sequence to agent roles and a rule-relevant behavior.
 

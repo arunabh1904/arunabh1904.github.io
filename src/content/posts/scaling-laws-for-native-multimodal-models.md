@@ -25,7 +25,11 @@ Scaling Laws for Native Multimodal Models trains 457 models across different arc
 ## Core Insights
 
 ![Scaling curves comparing early fusion late fusion and mixture-of-experts native multimodal models](/assets/images/scaling-laws-for-native-multimodal-models-paper-figure.png)
-_Figure 1 summarizes the architecture trade-off: early and late fusion reach similar loss scaling, but allocate compute differently between parameters and tokens; sparse early fusion shifts that allocation further toward data. Source: [Scaling Laws for Native Multimodal Models](https://arxiv.org/abs/2504.07951)._
+*Figure 1 summarizes the architecture trade-off: early and late fusion reach similar loss scaling, but allocate compute differently between parameters and tokens; sparse early fusion shifts that allocation further toward data. source: [Scaling Laws for Native Multimodal Models](https://arxiv.org/abs/2504.07951)*
+
+![Figure 12 from Scaling Laws for Native Multimodal Models](/assets/images/scaling-laws-for-native-multimodal-models-source-figure-12.webp)
+*Figure 12 MoE specialization frequency. Percentage of text and image tokens routed to each expert on interleaved data from Obelics. Experts are ordered for better visualization. The first layer shows the highest amount of unimodal experts. source: [Scaling Laws for Native Multimodal Models](https://arxiv.org/abs/2504.07951)*
+
 
 | Decision | Evidence in the paper |
 | --- | --- |

@@ -30,7 +30,11 @@ The paper targets online vectorized HD map construction. The method introduces a
 The evidence centers on improvements over baselines across input modalities, with the abstract reporting roughly 10 mAP gains and stronger robustness/generalization. The tradeoff is extra structure in the decoder: MGMap buys accuracy by adding mask prediction and point refinement machinery on top of the vector-map pipeline.
 
 ![MGMap framework diagram showing BEV extraction, mask-activated instance decoding, and position-guided mask patch refinement](/assets/images/mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction-paper-figure.png)
-_The MGMap overview shows where the mask guidance enters the vector-map pipeline: BEV extraction, MAI decoding, and PG-MPR point refinement. From the [MGMap official repository](https://github.com/xiaolul2/MGMap)._
+*The MGMap overview shows where the mask guidance enters the vector-map pipeline: BEV extraction, MAI decoding, and PG-MPR point refinement. From the [MGMap official repository](https://github.com/xiaolul2/MGMap). source: [MGMap official repository](https://github.com/xiaolul2/MGMap)*
+
+![Figure 1 from MGMap: Mask-Guided Learning for Online Vectorized HD Map Construction](/assets/images/mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction-source-figure-1.webp)
+*Figure 1 For some detailed structures, our proposed MGMap achieves effective map element localization by highlighting the informative regions through the learned masks. source: [MGMap: Mask-Guided Learning for Online Vectorized HD Map Construction](https://arxiv.org/abs/2404.00876)*
+
 
 **What to look at:**
 - Learned masks tell the model which BEV regions belong to each map element.

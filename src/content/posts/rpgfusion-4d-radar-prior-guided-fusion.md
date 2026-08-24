@@ -25,8 +25,7 @@ RPGFusion uses 4D-radar confidence and depth as priors for image-BEV query initi
 On View-of-Delft, the paper reports 69.31 EAA and 86.20 DCA; on TJ4DRadSet it reports 43.05 3D AP and 46.86 BEV AP. Its modality ablation reports 56.09 for camera, 45.71 for radar, 63.25 for concatenation, and 69.31 for the complete fusion measure. Removing densification causes a large drop in the reported ablations.
 
 ![RPGFusion framework using densified radar priors to initialize and sample camera BEV queries before unified fusion](/assets/images/rpgfusion-paper-figure.webp)
-
-_Radar confidence and depth priors narrow camera sampling, while spatial alignment and semantic fusion repair the remaining mismatch. Source: [RPGFusion](https://openaccess.thecvf.com/content/CVPR2026/html/Qiu_RPGFusion_4D_Radar_Prior-Guided_Multi-Modal_Fusion_for_3D_Detection_CVPR_2026_paper.html), Figure 2._
+*Radar confidence and depth priors narrow camera sampling, while spatial alignment and semantic fusion repair the remaining mismatch. source: [RPGFusion](https://openaccess.thecvf.com/content/CVPR2026/html/Qiu_RPGFusion_4D_Radar_Prior-Guided_Multi-Modal_Fusion_for_3D_Detection_CVPR_2026_paper.html)*
 
 | Mechanism | Benefit | Risk |
 | --- | --- | --- |

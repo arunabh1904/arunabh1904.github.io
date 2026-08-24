@@ -36,8 +36,7 @@ One early approach expressed robot control as sequence modeling. [RT-1](/paper%2
 [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html) combines both directions. The VLM conditions on images and instructions, robot actions are represented as output tokens, and web vision-language examples remain in the training mixture. The same autoregressive decoder can therefore produce a textual answer or a robot command.
 
 ![RT-2 co-fine-tunes web vision-language examples and robot trajectories through one token interface](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-paper-figure.png)
-
-*RT-2 turns actions into text-shaped targets, so web knowledge and robot behavior can update one decoder. Source: [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html).*
+*RT-2 turns actions into text-shaped targets, so web knowledge and robot behavior can update one decoder. source: [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html)*
 
 Action tokenization made robot demonstrations compatible with a decoder already pretrained on images and language. This allowed a robot command such as *move the gripper left* to reuse semantic representations rather than learning the policy entirely from robot data. The representation is convenient for transfer, but it does not remove the structure of continuous control. Per-dimension bins quantize metric motion, and autoregressive decoding adds one serial step for every action token. The shared training objective therefore introduces quantization and control-latency costs.
 
@@ -48,8 +47,7 @@ A policy trained on one robot can absorb its camera pose, controller, gripper, a
 [Open X-Embodiment](/paper%20shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html) pooled data from 22 embodiments and trained RT-X across them. [Octo](/paper%20shorts/2024/05/20/octo-an-open-source-generalist-robot-policy.html) treated a new sensor or action space as an adaptation problem. [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html) combined a pretrained vision-language backbone with 970,000 demonstrations from the same corpus. At this scale, the action schema becomes part of the model. A joint delta, a camera-frame end-effector delta, and a torque command cannot be treated as interchangeable labels.
 
 ![Open X-Embodiment pools tasks, scenes, and robot morphologies into a shared training corpus](/assets/images/open-x-embodiment-robotic-learning-datasets-and-rt-x-models-paper-figure.png)
-
-*Cross-embodiment training made the dataset itself an architectural decision. The shared model still needs a schema that says what each robot observation and action means. Source: [Open X-Embodiment](/paper%20shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html).*
+*Cross-embodiment training made the dataset itself an architectural decision. The shared model still needs a schema that says what each robot observation and action means. source: [Open X-Embodiment](/paper%20shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html)*
 
 Normalization is not enough. Mapping every action dimension into $[-1,1]$ does not make a joint delta, a camera-frame end-effector delta, and a torque command physically equivalent. A usable cross-robot corpus must record coordinate frame, units, control mode, frequency, horizon, joint topology, gripper semantics, sensor availability, and calibration.
 
@@ -64,14 +62,12 @@ Single-step behavior cloning predicts a new action at every control step. This k
 [ACT](/paper%20shorts/2023/04/23/action-chunking-with-transformers-act.html) changes the target from one command to a short sequence of future actions. Each prediction represents a coherent movement rather than a single instant, while temporal ensembling smooths overlapping chunks. The policy therefore makes fewer independent high-level decisions across the same physical trajectory.
 
 ![ACT predicts coherent action chunks instead of one control target at a time](/assets/images/action-chunking-with-transformers-act-paper-figure.png)
-
-*Action chunking changes one training target from a scalar command into a short trajectory. Source: [ACT](/paper%20shorts/2023/04/23/action-chunking-with-transformers-act.html).*
+*Action chunking changes one training target from a scalar command into a short trajectory. source: [ACT](/paper%20shorts/2023/04/23/action-chunking-with-transformers-act.html)*
 
 Chunking alone does not handle several valid futures. If the robot can pass an obstacle on the left or the right, ordinary regression may average both paths into a collision. [Diffusion Policy](/paper%20shorts/2023/03/07/diffusion-policy-visuomotor-policy-learning-via-action-diffusion.html) instead denoises a complete continuous trajectory, preserving multiple possible action chunks.
 
 ![Diffusion Policy denoises a continuous action trajectory under visual conditioning](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-paper-figure.png)
-
-*Diffusion preserves a multimodal distribution over continuous action chunks, but it introduces an iterative sampling path. Source: [Diffusion Policy](/paper%20shorts/2023/03/07/diffusion-policy-visuomotor-policy-learning-via-action-diffusion.html).*
+*Diffusion preserves a multimodal distribution over continuous action chunks, but it introduces an iterative sampling path. source: [Diffusion Policy](/paper%20shorts/2023/03/07/diffusion-policy-visuomotor-policy-learning-via-action-diffusion.html)*
 
 Longer chunks can improve temporal coherence and reduce the number of decoder calls. They also commit the robot further before incorporating a new observation. Receding-horizon control predicts a longer chunk and executes only its prefix, trading additional inference for a shorter open-loop commitment.
 
@@ -84,8 +80,7 @@ Action chunks made the target longer. A naive tokenizer assigns one bin to every
 [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html) compresses the trajectory as a time series before presenting it to the language model. A discrete cosine transform separates broad motion from high-frequency corrections, quantization converts the coefficients into integers, and byte-pair encoding compresses recurring patterns. The resulting action sequence is substantially shorter than per-dimension tokenization over every timestep.
 
 ![FAST converts an action chunk into frequency coefficients and compact autoregressive tokens](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-paper-figure.jpg)
-
-*FAST spends tokens on the shape of a trajectory rather than every value at every timestep. Source: [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html).*
+*FAST spends tokens on the shape of a trajectory rather than every value at every timestep. source: [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html)*
 
 Low-frequency coefficients describe the broad motion, while higher frequencies capture abrupt corrections. The autoregressive policy therefore predicts the overall trajectory shape before its finer details. This ordering introduces a smoothness prior. Common low-frequency motion is represented compactly, while a rare high-frequency correction may require more tokens or be attenuated by compression.
 
@@ -96,16 +91,14 @@ The tokenizer therefore affects the policy beyond output formatting. It determin
 A separate branch retained the pretrained VLM for images and instructions while moving motor generation outside the language vocabulary. [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html) adds a continuous action expert trained with flow matching. The shared trunk provides semantic context, while the action expert produces continuous chunks at a bandwidth suited to control.
 
 ![Pi0 uses a pretrained vision-language trunk to condition a flow-based action expert](/assets/images/pi0-vision-language-action-flow-model-for-general-robot-control-paper-figure.jpeg)
-
-*Pi0 uses a pretrained vision-language trunk to condition a separate continuous action expert trained with flow matching. Source: [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html).*
+*Pi0 uses a pretrained vision-language trunk to condition a separate continuous action expert trained with flow matching. source: [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html)*
 
 Separating semantic processing from motor generation also allows the action path to change with the platform. [GR00T N1](/paper%20shorts/2025/03/18/groot-n1-open-foundation-model-for-humanoid-robots.html) uses a related fast-slow design for humanoids. [OpenVLA-OFT](/paper%20shorts/2025/02/27/openvla-oft-optimizing-speed-and-success.html) replaces the original autoregressive token head during adaptation. In its experiments, parallel continuous chunks trained with an L1 loss improve both inference speed and task success.
 
 [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html) uses both representations at different stages. FAST tokens allow web and robot tasks to share a discrete pretraining objective. A continuous expert added during post-training provides finer control and faster inference. This separates the representation used to scale heterogeneous training from the representation used to execute actions.
 
 ![Pi0.5 combines tokenized high-level outputs with a continuous low-level action expert](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-paper-figure.png)
-
-*Pi0.5 uses FAST tokens during mixture pretraining and adds a continuous action expert during post-training. Source: [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html).*
+*Pi0.5 uses FAST tokens during mixture pretraining and adds a continuous action expert during post-training. source: [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html)*
 
 I would retain this separation when the action space has physical units, control bandwidth, geometry, or latency requirements that differ from language. The semantic trunk can remain shared, while the motor path is specialized for execution.
 
@@ -120,8 +113,7 @@ One approach separates abundant video pretraining from scarce action-conditioned
 A second approach collects human manipulation through an interface closer to robot operation. [Xiaomi-Robotics-1](/paper%20shorts/2026/07/16/xiaomi-robotics-1-scaling-vla-with-real-world-trajectories.html) records UMI trajectories and labels the state change in each sequence. A later cross-embodiment stage aligns those behaviors with robot controls. The collection stage increases task and scene diversity, while the robot stage maps that behavior into executable actions.
 
 ![Xiaomi-Robotics-1 separates scalable human-operated capture from robot embodiment alignment](/assets/images/xiaomi-robotics-1-paper-figure-1.png)
-
-*Xiaomi-Robotics-1 collects human manipulation through UMI, labels the observed state change, and later aligns those trajectories with robot commands. Source: [Xiaomi-Robotics-1](/paper%20shorts/2026/07/16/xiaomi-robotics-1-scaling-vla-with-real-world-trajectories.html).*
+*Xiaomi-Robotics-1 collects human manipulation through UMI, labels the observed state change, and later aligns those trajectories with robot commands. source: [Xiaomi-Robotics-1](/paper%20shorts/2026/07/16/xiaomi-robotics-1-scaling-vla-with-real-world-trajectories.html)*
 
 The transfer claim should therefore be evaluated by the amount of robot data required for adaptation. That adaptation should produce executable commands across new tasks, scenes, and embodiments. Video reconstruction alone does not establish the transfer.
 

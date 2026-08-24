@@ -32,7 +32,14 @@ Talk2BEV turns BEV maps into a language-addressable representation. Objects in t
 The contribution is not a low-level driving controller. It is an interface layer that tests whether language models can reason over a spatial driving scene. The caveat is that good answers over a benchmark do not by themselves prove closed-loop planning reliability.
 
 ![Figure 2 from Talk2BEV showing BEV map generation, language-enhanced object features, and LVLM question answering](/assets/images/talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving-paper-figure.png)
-_Figure 2 shows how Talk2BEV turns generated BEV maps into language-enhanced maps that can answer object-level and scene-level questions. From the [Talk2BEV paper](https://arxiv.org/abs/2310.02251), via ar5iv._
+*Figure 2 shows how Talk2BEV turns generated BEV maps into language-enhanced maps that can answer object-level and scene-level questions. From the [Talk2BEV paper](https://arxiv.org/abs/2310.02251), via ar5iv. source: [Talk2BEV paper](https://arxiv.org/abs/2310.02251)*
+
+![Figure 3 from Talk2BEV: Language-enhanced Bird](/assets/images/talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving-source-figure-3.webp)
+*Figure 3 Fig. 3: LLM System Prompts: (a) Generic question generation prompt for the LLM [ 9 ] . (b) System prompt for response generation. (c) Details the type-specific commands added to generate questions along each evaluation dimension. (d) Displays the response format JSON with a brief explanation provided to LLM as to how it should fill each key of the JSON. source: [Talk2BEV: Language-enhanced Bird](https://arxiv.org/abs/2310.02251)*
+
+![Figure 8 from Talk2BEV: Language-enhanced Bird](/assets/images/talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving-source-figure-8.webp)
+*Figure 8 Fig. 8: Qualitative Results: A BEV corresponding to a scene with multiple vehicles at an interchange. Talk2BEV is able to identify emergency vehicles (such as the police car shown here). The captions for a police car and a construction vehicle from Language Enhanced maps constructed with with different LVLMs (BLIP-2, InstructBLIP-2, MiniGPT-4) have been visualized. source: [Talk2BEV: Language-enhanced Bird](https://arxiv.org/abs/2310.02251)*
+
 
 **What to look at:**
 - BEV gives the language model an explicit spatial substrate.

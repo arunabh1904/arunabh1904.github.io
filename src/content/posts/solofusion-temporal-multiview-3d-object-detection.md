@@ -28,7 +28,13 @@ SOLOFusion frames temporal camera detection as stereo with a moving baseline. Sh
 The long-term path warps a running sequence of low-resolution BEV features into the present frame and builds a cost volume. The short-term path performs higher-resolution stereo around a few depth hypotheses chosen from the monocular depth distribution. Gaussian-spaced top-k sampling concentrates compute near likely depth while retaining nearby alternatives.
 
 ![SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection source figure: The framework of SOLOFusion.](/assets/images/solofusion-temporal-multiview-3d-object-detection-paper-figure.webp)
-_The framework of SOLOFusion. Source: [SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection](https://arxiv.org/abs/2210.02443), Figure 7, via arXiv HTML._
+*The framework of SOLOFusion. source: [SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection](https://arxiv.org/abs/2210.02443)*
+
+![Figure 5 from SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection](/assets/images/solofusion-temporal-multiview-3d-object-detection-source-figure-5.webp)
+*Figure 5 Visualization of relative increase in localization potential from using multiple timesteps. Note that each camera heatmap has a different scale. source: [SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection](https://arxiv.org/abs/2210.02443)*
+
+![Figure 1 from SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection](/assets/images/solofusion-temporal-multiview-3d-object-detection-source-figure-1.webp)
+*Figure 1 The depth hypothesis projections onto the source view are further apart, making multi-view depth estimation easier when compared to the source view. source: [SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection](https://arxiv.org/abs/2210.02443)*
 
 
 | Temporal design | FPS | Memory | mAP | NDS |

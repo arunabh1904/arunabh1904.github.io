@@ -27,8 +27,7 @@ IS-Fusion argues that one fusion granularity cannot serve both scene context and
 Scene fusion uses hierarchical interaction to strengthen BEV context; instance fusion combines point-to-grid and grid-to-region transformations around proposals. On nuScenes validation, the full model reports 72.8 mAP and 74.0 NDS. The paper's ablation reports simple image-LiDAR fusion at 69.4/71.6, scene fusion adding about 2.2 mAP and 1.6 NDS, and the instance path contributing further gains.
 
 ![IS-Fusion framework with hierarchical scene fusion and proposal-centered instance fusion](/assets/images/is-fusion-paper-figure.webp)
-
-_The scene path builds global BEV context, while proposal-selected instance features preserve object detail before both representations are decoded together. Source: [IS-Fusion](https://openaccess.thecvf.com/content/CVPR2024/html/Yin_IS-Fusion_Instance-Scene_Collaborative_Fusion_for_Multimodal_3D_Object_Detection_CVPR_2024_paper.html), Figure 2._
+*The scene path builds global BEV context, while proposal-selected instance features preserve object detail before both representations are decoded together. source: [IS-Fusion](https://openaccess.thecvf.com/content/CVPR2024/html/Yin_IS-Fusion_Instance-Scene_Collaborative_Fusion_for_Multimodal_3D_Object_Detection_CVPR_2024_paper.html)*
 
 | Fusion scale | Shared unit | Strength | Risk |
 | --- | --- | --- | --- |

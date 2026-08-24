@@ -30,7 +30,14 @@ summary: '2026 – VoLN: Vision-Only Long-Horizon Navigation—Paradigm, Benchma
 VoLN-UAV makes this concrete with 7,210 simulated episodes across 17 AirSim environments. The reference VoLN-MLLM policy leads the tested baselines, but absolute success on held-out environments is only 7.4% for Easy routes, 4.5% for Normal, and 1.8% for Hard. The benchmark is therefore more valuable as a diagnosis of long-horizon grounding failure than as evidence that the proposed policy solves it.
 
 ![VoLN two-phase method aligning visual goals with semantics before predicting short-horizon waypoints and stopping decisions](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-paper-figure.png)
-_Figure 5 separates representation learning from control: phase I aligns visual goal views without exposing route language, then phase II predicts closed-loop waypoint chunks and when to stop. Source: [VoLN](https://arxiv.org/abs/2607.21400)._
+*Figure 5 separates representation learning from control: phase I aligns visual goal views without exposing route language, then phase II predicts closed-loop waypoint chunks and when to stop. source: [VoLN](https://arxiv.org/abs/2607.21400)*
+
+![Figure 6 from VoLN: Vision-Only Long-Horizon Navigation—Paradigm, Benchmark, and Method](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-source-figure-6.webp)
+*Figure 6 Successful and failed rollouts. Top: the trajectory passes the active-beacon locations and enters the goal region. Bottom: the trajectory diverges near the passive billboards and terminates outside the goal region. source: [VoLN: Vision-Only Long-Horizon Navigation—Paradigm, Benchmark, and Method](https://arxiv.org/abs/2607.21400)*
+
+![Figure 1 from VoLN: Vision-Only Long-Horizon Navigation—Paradigm, Benchmark, and Method](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-source-figure-1.webp)
+*Figure 1 The instruction-based setting exposes route-level information through language and global guidance, whereas VoLN specifies the destination visually and presents route-relevant cues within the observable scene. source: [VoLN: Vision-Only Long-Horizon Navigation—Paradigm, Benchmark, and Method](https://arxiv.org/abs/2607.21400)*
+
 
 Each route contains three to five active semantic beacons placed at decision points. Roughly 150 passive beacons per environment create clutter. Direction signs, warnings, environmental distractors, and context-dependent cues appear only through the onboard camera; world-frame position and GPS are excluded from the policy. The final three reference observations define the visual goal.
 

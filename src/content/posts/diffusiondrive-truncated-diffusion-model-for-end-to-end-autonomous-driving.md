@@ -27,7 +27,13 @@ DiffusionDrive uses diffusion to generate multiple ego trajectories without star
 With a matched ResNet-34 TransFuser backbone on NAVSIM, the paper reports 88.1 PDMS. Compared with a vanilla diffusion conversion, truncation reduces denoising from 20 steps to 2, and the complete model reports a six-fold FPS increase while improving planning quality and mode diversity. The paper also reports 45 FPS on an RTX 4090 for its real-time configuration.
 
 ![DiffusionDrive: Truncated Diffusion Model for End-to-End Autonomous Driving source figure: Overall architecture of DiffusionDrive.](/assets/images/diffusiondrive-truncated-diffusion-model-for-end-to-end-autonomous-driving-paper-figure.webp)
-_Overall architecture of DiffusionDrive. Source: [DiffusionDrive: Truncated Diffusion Model for End-to-End Autonomous Driving](https://arxiv.org/abs/2411.15139), Figure 4, via arXiv HTML._
+*Overall architecture of DiffusionDrive. source: [DiffusionDrive: Truncated Diffusion Model for End-to-End Autonomous Driving](https://arxiv.org/abs/2411.15139)*
+
+![Figure 2 from DiffusionDrive: Truncated Diffusion Model for End-to-End Autonomous Driving](/assets/images/diffusiondrive-truncated-diffusion-model-for-end-to-end-autonomous-driving-source-figure-2.webp)
+*Figure 2 (a) Top-1’s going straight and diverse top-10’s lane changing. source: [DiffusionDrive: Truncated Diffusion Model for End-to-End Autonomous Driving](https://arxiv.org/abs/2411.15139)*
+
+![Figure 1 from DiffusionDrive: Truncated Diffusion Model for End-to-End Autonomous Driving](/assets/images/diffusiondrive-truncated-diffusion-model-for-end-to-end-autonomous-driving-source-figure-1.webp)
+*Figure 1 The comparison of different end-to-end paradigms. (a) Single mode regression Jiang et al. 2023a ; Hu et al. 2023 ; Chitta et al. 2022 . (b) Sampling from vocabulary Chen et al. 2024a ; Li et al. 2024b . (c) Vanilla diffusion policy Chi et al. 2023 ; Janner et al. 2022 . (d) The proposed truncated diffusion policy. source: [DiffusionDrive: Truncated Diffusion Model for End-to-End Autonomous Driving](https://arxiv.org/abs/2411.15139)*
 
 
 | Variant | Denoising steps | Planning implication |

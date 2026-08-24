@@ -25,7 +25,13 @@ Grace-BEV treats sensor failure as a reliability-estimation problem rather than 
 The paper evaluates both complete removal and corruption on nuScenes-R and nuScenes-C. Its ablations show why concatenation is not a fallback policy: a concatenation baseline reports 66.9 clean mAP but 0.0 when LiDAR is removed. Reliability-aware routing trades a small amount of peak simplicity for usable degraded modes.
 
 ![Grace-BEV architecture routing between vision-only and LiDAR-guided BEV experts before fail-safe fusion](/assets/images/grace-bev-graceful-degradation-under-sensor-failures-paper-figure.webp)
-_TrustGate predicts how strongly to use the LiDAR-guided expert, while a pure-vision expert and the raw LiDAR BEV path keep degraded modes available before final fusion. Source: [Grace-BEV](https://arxiv.org/abs/2605.30983), Figure 2._
+*TrustGate predicts how strongly to use the LiDAR-guided expert, while a pure-vision expert and the raw LiDAR BEV path keep degraded modes available before final fusion. source: [Grace-BEV](https://arxiv.org/abs/2605.30983)*
+
+![Figure 2 from Grace-BEV: Graceful Degradation under Sensor Failures](/assets/images/grace-bev-graceful-degradation-under-sensor-failures-source-figure-2.webp)
+*Figure 2 Overview of the Grace-BEV Framework. The system consists of two parallel experts: a LiDAR-Guided Expert (Expert A) for precision and a Pure Vision Expert (Expert B) for robustness. A TrustGate Router actively evaluates the geometric integrity from the Voxel Encoder to generate a trust score . Features are then integrated via the FFB, which employs element-wise Sigmoid gating to prevent feature distribution collapse under modality failures. source: [Grace-BEV: Graceful Degradation under Sensor Failures](https://arxiv.org/abs/2605.30983)*
+
+![Figure 4 from Grace-BEV: Graceful Degradation under Sensor Failures](/assets/images/grace-bev-graceful-degradation-under-sensor-failures-source-figure-4.webp)
+*Figure 4 Qualitative Comparison under Sensor Corruptions. Visual comparison between Ground Truth (Top), BEVFusion-MIT (Middle), and our Grace-BEV (Bottom) under clean and modality-corrupted scenarios. source: [Grace-BEV: Graceful Degradation under Sensor Failures](https://arxiv.org/abs/2605.30983)*
 
 
 | Operating slice | Reported mAP | What it tests |

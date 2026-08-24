@@ -27,7 +27,11 @@ Existing WAMs learn from 2D projections of a 4D scene. 4D-WAM keeps the generati
 The second intervention changes where compute is spent during denoising. An ablation on NAVSIM shows a WAM base at 88.8 EPDMS, history at 89.6, feature loss at 90.1, depth loss at 90.4, and the proposed sampling strategy at 90.6. The incremental table supports both components, but the gains are benchmark-level and the geometric teacher remains an external dependency.
 
 ![4D-WAM overview with geometric foundation-model supervision and decision-oriented timestep sampling](/assets/images/4d-wam-overview-paper-figure.png)
-_A frozen geometric foundation model supervises predicted future frames during training; the deployed WAM keeps the original inference path. Source: [4D-WAM](https://arxiv.org/abs/2608.10107)._
+*A frozen geometric foundation model supervises predicted future frames during training; the deployed WAM keeps the original inference path. source: [4D-WAM](https://arxiv.org/abs/2608.10107)*
+
+![Figure 3 from 4D-WAM: 4D Consistent World Modeling for Autonomous Driving](/assets/images/4d-wam-4d-consistent-world-modeling-for-autonomous-driving-source-figure-3.webp)
+*Figure 3 Early decision phenomenon in WAMs. (a) Both video and action branches finalize driving decisions in an extremely high-noise region. (b) The action-to-final MSE rapidly decreases and plateaus at , marking the driving decision point that separates the decision and refinement regions. source: [4D-WAM: 4D Consistent World Modeling for Autonomous Driving](https://arxiv.org/abs/2608.10107)*
+
 
 The paper's central limitation is that a foundation model's 4D response is treated as a useful proxy for physical consistency. It does not establish that the proxy aligns with closed-loop safety in rare interactions. The important experiment is therefore a held-out geometric and closed-loop evaluation, not another improvement on the same NAVSIM score.
 

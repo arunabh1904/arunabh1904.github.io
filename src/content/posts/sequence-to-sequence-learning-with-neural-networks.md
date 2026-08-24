@@ -28,7 +28,13 @@ summary: "2014 – Sequence to Sequence Learning with Neural Networks"
 ## Core Insights
 
 ![Figure 1: Our model reads an input sentence “ABC” and produces “WXYZ” as the output sentence from Sequence to Sequence Learning with Neural Networks](/assets/images/sequence-to-sequence-learning-with-neural-networks-paper-figure.png)
-_Figure 1: Our model reads an input sentence “ABC” and produces “WXYZ” as the output sentence. From the [Sequence to Sequence Learning with Neural Networks paper](https://arxiv.org/abs/1409.3215), via arXiv HTML._
+*Figure 1: Our model reads an input sentence “ABC” and produces “WXYZ” as the output sentence. From the [Sequence to Sequence Learning with Neural Networks paper](https://arxiv.org/abs/1409.3215). source: [Sequence to Sequence Learning with Neural Networks paper](https://arxiv.org/abs/1409.3215)*
+
+![Figure 2 from Sequence to Sequence Learning with Neural Networks](/assets/images/sequence-to-sequence-learning-with-neural-networks-source-figure-2.webp)
+*Figure 2 The figure shows a 2-dimensional PCA projection of the LSTM hidden states that are obtained after processing the phrases in the figures. The phrases are clustered by meaning, which in these examples is primarily a function of word order, which would be difficult to capture with a bag-of-words model. Notice that both clusters have similar internal structure. source: [Sequence to Sequence Learning with Neural Networks](https://arxiv.org/abs/1409.3215)*
+
+![Figure 3 from Sequence to Sequence Learning with Neural Networks](/assets/images/sequence-to-sequence-learning-with-neural-networks-source-figure-3.webp)
+*Figure 3 The left plot shows the performance of our system as a function of sentence length, where the x-axis corresponds to the test sentences sorted by their length and is marked by the actual sequence lengths. There is no degradation on sentences with less than 35 words, there is only a minor degradation on the longest sentences. The right plot shows the LSTM’s performance on sentences with progressively more rare words, where the x-axis corresponds to the test sentences sorted by their “average word frequency rank”. source: [Sequence to Sequence Learning with Neural Networks](https://arxiv.org/abs/1409.3215)*
 
 
 ### Method and reported result

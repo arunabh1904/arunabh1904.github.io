@@ -27,7 +27,13 @@ GradNorm adapts task weights so gradient norms at a shared layer track each task
 The method computes per-task gradient norms, compares them with targets derived from normalized loss descent, and updates the task weights. On NYUv2 the paper reports roughly 5% training overhead. Across its sweep, most values between 0 and 3 improve over equal weighting, with alpha near 1.5 best in the reported setup.
 
 ![GradNorm: Adaptive Loss Balancing source figure: Gradient Normalization.](/assets/images/gradnorm-adaptive-loss-balancing-paper-figure.webp)
-_Gradient Normalization. Source: [GradNorm: Adaptive Loss Balancing](https://arxiv.org/abs/1711.02257), Figure 1, via arXiv HTML._
+*Gradient Normalization. source: [GradNorm: Adaptive Loss Balancing](https://arxiv.org/abs/1711.02257)*
+
+![Figure 1 from GradNorm: Adaptive Loss Balancing](/assets/images/gradnorm-adaptive-loss-balancing-source-figure-1.webp)
+*Figure 1 Gradient Normalization. Imbalanced gradient norms across tasks (left) result in suboptimal training within a multitask network. We implement GradNorm through computing a novel gradient loss (right) which tunes the loss weights to fix such imbalances in gradient norms. We illustrate here a simplified case where such balancing results in equalized gradient norms, but in general there may be tasks that require relatively high or low gradient magnitudes for optimal training (discussed further in Section 3 ). source: [GradNorm: Adaptive Loss Balancing](https://arxiv.org/abs/1711.02257)*
+
+![Figure 8 from GradNorm: Adaptive Loss Balancing](/assets/images/gradnorm-adaptive-loss-balancing-source-figure-8.webp)
+*Figure 8 Examples from the Multi-Task Facial Landmark (MTFL) dataset. source: [GradNorm: Adaptive Loss Balancing](https://arxiv.org/abs/1711.02257)*
 
 
 | Quantity | Meaning | Operational concern |

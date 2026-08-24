@@ -25,7 +25,7 @@ MM1 is a large ablation study of multimodal LLM pre-training. It varies the imag
 ## Core Insights
 
 ![MM1 recipe diagram showing the image encoder vision-language connector decoder-only language model and the main ablation axes](/assets/images/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training-paper-figure.png)
-_Figure 3 turns MM1 into an experimental recipe: hold the decoder-only LLM fixed while varying the visual encoder, connector, resolution, pretraining objective, and data mixture. Source: [MM1](https://arxiv.org/abs/2403.09611)._
+*Figure 3 turns MM1 into an experimental recipe: hold the decoder-only LLM fixed while varying the visual encoder, connector, resolution, pretraining objective, and data mixture. source: [MM1](https://arxiv.org/abs/2403.09611)*
 
 | Decision | Signal from MM1 | Why it matters |
 | --- | --- | --- |

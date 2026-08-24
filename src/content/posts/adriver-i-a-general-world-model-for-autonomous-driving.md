@@ -22,7 +22,13 @@ summary: "2023 – ADriver-I: A General World Model for Autonomous Driving"
 The crucial representation is the interleaved vision-action pair. It makes control part of the temporal context that an MLLM and diffusion model can process, then lets generated controls influence future visual predictions. In principle, that structure exposes a useful consistency question: do actions lead to plausible visual consequences? In practice, rollout quality can degrade through both control error and image-generation error.
 
 ![ADriver-I: A General World Model for Autonomous Driving source figure: Overview of of our ADriver-I framework.](/assets/images/adriver-i-a-general-world-model-for-autonomous-driving-paper-figure.webp)
-_Overview of of our ADriver-I framework. Source: [ADriver-I: A General World Model for Autonomous Driving](https://arxiv.org/abs/2311.13549), Figure 1, via arXiv HTML._
+*Overview of of our ADriver-I framework. source: [ADriver-I: A General World Model for Autonomous Driving](https://arxiv.org/abs/2311.13549)*
+
+![Figure 3 from ADriver-I: A General World Model for Autonomous Driving](/assets/images/adriver-i-a-general-world-model-for-autonomous-driving-source-figure-3.webp)
+*Figure 3 An example of conversation used for guiding GPT3.5 to generate the corresponding motion prompt. The control signals of the historical frame and current frame are used as inputs, while GPT3.5 outputs potential motion states. source: [ADriver-I: A General World Model for Autonomous Driving](https://arxiv.org/abs/2311.13549)*
+
+![Figure 1 from ADriver-I: A General World Model for Autonomous Driving](/assets/images/adriver-i-a-general-world-model-for-autonomous-driving-source-figure-1.webp)
+*Figure 1 Overview of of our ADriver-I framework. It takes the historical interleaved vision-action pairs { , } and current visual token as inputs. The multi-modal large language model (MLLM) reasons out the control signal of current frame. The predicted action is further used as the condition prior of video latent diffusion model (VDM) to generate the future four frames. The predicted next frame is selected and further input to the MLLM to produce the control signal. source: [ADriver-I: A General World Model for Autonomous Driving](https://arxiv.org/abs/2311.13549)*
 
 
 The paper compares ADriver-I with constructed baselines and describes the result as favorable. The abstract gives neither the visual-token format, diffusion objective, action parameterization, data scale, nor a teacher-forced-versus-free-rollout ablation. A driving team would need those controls before treating a compelling imagined video as evidence that the world model is a safe planning model.

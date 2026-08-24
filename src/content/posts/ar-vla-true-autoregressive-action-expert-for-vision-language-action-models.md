@@ -30,7 +30,14 @@ summary: '2026 – AR-VLA: True Autoregressive Action Expert for Vision-Language
 That distinction matters in the paper’s matched BridgeV2 experiment. With the same PaliGemma-3B backbone and roughly 300M-parameter action module, AR-VLA reaches 61.5% average success in SIMPLER, versus 49.0% for the reproduced FAST-token head and 51.0% for the reproduced flow-matching head. Its advantage is not universal: Diffusion Policy remains better on PushT, and ACT is better on human-demonstration ALOHA insertion.
 
 ![AR-VLA framework re-anchoring vision-language keys into a rolling hybrid cache used by an autoregressive action expert](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-paper-figure.png)
-_Figure 2 shows the persistent-controller mechanism: refreshed visual-language keys are timestamped onto the action timeline, while the action expert retains rolling kinematic history and predicts one future action at a time. Source: [AR-VLA](https://arxiv.org/abs/2603.10126)._
+*Figure 2 shows the persistent-controller mechanism: refreshed visual-language keys are timestamped onto the action timeline, while the action expert retains rolling kinematic history and predicts one future action at a time. source: [AR-VLA](https://arxiv.org/abs/2603.10126)*
+
+![Figure 3 from AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-source-figure-3.webp)
+*Figure 3 Fig. 3: The AR-VLA Framework . The system bridges an VLM backbone with a autoregressive Action Expert asynchronously. Atemporal features from the VLM are explicitly injected with temporal context via Dynamic Temporal Re-anchoring (DTR). Within the Hybrid KV Cache, re-anchored VL tokens (green) serve as a semantic prefix to the rolling kinematic history (orange). The Action Expert generates future action sequences by querying this shared cache using incrementally advancing step embeddings. source: [AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](https://arxiv.org/abs/2603.10126)*
+
+![Figure 5 from AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-source-figure-5.webp)
+*Figure 5 Fig. 5: Simulation benchmarks setups. We do simulation evaluation spanning generalist and specialist policies, with diverse embodiment, action space, and task. source: [AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](https://arxiv.org/abs/2603.10126)*
+
 
 The action expert is a causal Transformer over continuous robot states and actions. A linear layer maps each action vector to one token, and a deterministic regression head maps the next hidden state back to an action. Its hybrid key-value cache has two update rules: a token-wise FIFO retains recent proprioception and executed actions, while a single visual-language block is replaced whenever the backbone produces a new observation embedding.
 

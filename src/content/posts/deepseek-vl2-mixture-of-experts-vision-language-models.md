@@ -28,7 +28,14 @@ DeepSeek-VL2 improves both halves of the VLM stack. On the vision side, dynamic 
 DeepSeek-VL2 combines high-resolution visual processing with a sparse MoE language backbone. Dynamic tiling lets the vision encoder preserve detail across different image sizes and aspect ratios, which helps OCR, documents, tables, charts, and grounding. DeepSeekMoE with Multi-head Latent Attention improves inference efficiency by activating only part of the model and compressing KV cache information. The paper evaluates a family of model sizes across broad multimodal tasks. The tradeoff is serving complexity: dynamic visual tokens and MoE routing improve capability per active parameter, but they make implementation, batching, and latency management harder.
 
 ![Figure 1 from DeepSeek-VL2: average performance versus activated parameters](/assets/images/deepseek-vl2-mixture-of-experts-vision-language-models-paper-figure.png)
-_Figure 1 from the [DeepSeek-VL2 paper](https://arxiv.org/abs/2412.10302), via arXiv HTML._
+*Figure 1 from the [DeepSeek-VL2 paper](https://arxiv.org/abs/2412.10302). source: [DeepSeek-VL2 paper](https://arxiv.org/abs/2412.10302)*
+
+![Figure 2 from DeepSeek-VL2: Mixture-of-Experts Vision-Language Models for Advanced Multimodal Understanding](/assets/images/deepseek-vl2-mixture-of-experts-vision-language-models-source-figure-2.webp)
+*Figure 2 Overview of DeepSeek-VL2 . The overall structure is a llava-style architecture, which includes a vision encoder, a VL adaptor, and a MoE-based LLM. source: [DeepSeek-VL2: Mixture-of-Experts Vision-Language Models for Advanced Multimodal Understanding](https://arxiv.org/abs/2412.10302)*
+
+![Figure 3 from DeepSeek-VL2: Mixture-of-Experts Vision-Language Models for Advanced Multimodal Understanding](/assets/images/deepseek-vl2-mixture-of-experts-vision-language-models-source-figure-3.webp)
+*Figure 3 Illustration of dynamic tiling strategy in DeepSeek-VL2 . By dividing images into multiple tiles, DeepSeek-VL2 achieves stronger fine-grained understanding capabilities compared to DeepSeek-VL. source: [DeepSeek-VL2: Mixture-of-Experts Vision-Language Models for Advanced Multimodal Understanding](https://arxiv.org/abs/2412.10302)*
+
 
 **What to look at:**
 - Dynamic tiling keeps high-resolution images readable.

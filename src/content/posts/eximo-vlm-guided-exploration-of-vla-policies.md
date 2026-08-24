@@ -23,7 +23,14 @@ summary: '2026 – EXIMO: VLM-Guided Exploration of VLA Policies'
 ## Core Insights
 
 ![EXIMO pipeline with VLM-guided exploration, filtered supervised fine-tuning, and residual reinforcement learning](/assets/images/eximo-vlm-guided-exploration-pipeline.png)
-_EXIMO assigns a different learning problem to each stage. The VLM decomposes a task during data collection, successful episodes train a standalone VLA, and a small residual policy then corrects the VLA online. Cropped from Figure 1 of the [EXIMO paper](https://arxiv.org/abs/2608.19891)._
+*EXIMO assigns a different learning problem to each stage. The VLM decomposes a task during data collection, successful episodes train a standalone VLA, and a small residual policy then corrects the VLA online. org/abs/2608.19891). source: [EXIMO paper](https://arxiv.org/abs/2608.19891)*
+
+![Figure 2 from EXIMO: VLM-Guided Exploration of VLA Policies](/assets/images/eximo-vlm-guided-exploration-of-vla-policies-source-figure-2.webp)
+*Figure 2 Success rate (top), time to success (middle), and episode length (bottom) of VLM orchestrated GROD, GROD with no orchestration, and GROD finetuned on the data collected from VLM orchestration. The baselines and the per-task legend (shared across all three plots) are shown on the right. Across the tasks, we observe that VLM orchestration achieves higher success rate than the model without orchestration. This illustrates the benefits of semantically guided exploration from the VLM. source: [EXIMO: VLM-Guided Exploration of VLA Policies](https://arxiv.org/abs/2608.19891)*
+
+![Figure 1 from EXIMO: VLM-Guided Exploration of VLA Policies](/assets/images/eximo-vlm-guided-exploration-of-vla-policies-source-figure-1.webp)
+*Figure 1 Example interaction of the VLM during the explore phase of Eximo . The VLM is given a sequence of images from the environment along with the task description in the prompt. The VLM analyzes the provided information within a <think> </think> block and provides an instruction in the <answer></answer> block for the VLA to execute. source: [EXIMO: VLM-Guided Exploration of VLA Policies](https://arxiv.org/abs/2608.19891)*
+
 
 ### The VLM improves the data before RL begins
 

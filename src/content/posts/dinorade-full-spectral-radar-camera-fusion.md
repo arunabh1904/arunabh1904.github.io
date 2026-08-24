@@ -29,7 +29,10 @@ DinoRADE starts from dense range-azimuth-Doppler radar tensors, not a sparse poi
 On K-RADAR v2.1 across five classes and all weather conditions, the paper reports 36.99 3D mAP and 39.61 BEV mAP. Against RADE-Net on the same table, the absolute gain is 16.06 3D mAP. For the sedan-only K-RADAR v1.1 comparison, the paper reports a 12.1-point 3D AP gain over recent radar-camera methods. Replacing DINOv3 with a fine-tuned ResNet-50 reduces both 3D and BEV AP by about three points.
 
 ![DinoRADE: Full Spectral Radar-Camera Fusion with Vision Foundation Model Features for Multi-class Object Detection in Adverse Weather source figure: Overview of the DinoRADE architecture.](/assets/images/dinorade-full-spectral-radar-camera-fusion-paper-figure.webp)
-_Overview of the DinoRADE architecture. Source: [DinoRADE: Full Spectral Radar-Camera Fusion with Vision Foundation Model Features for Multi-class Object Detection in Adverse Weather](https://arxiv.org/abs/2604.08074), Figure 1, via arXiv HTML._
+*Overview of the DinoRADE architecture. source: [DinoRADE: Full Spectral Radar-Camera Fusion with Vision Foundation Model Features for Multi-class Object Detection in Adverse Weather](https://arxiv.org/abs/2604.08074)*
+
+![Figure 4 from DinoRADE: Full Spectral Radar-Camera Fusion with Vision Foundation Model Features for Multi-class Object Detection in Adverse Weather](/assets/images/dinorade-full-spectral-radar-camera-fusion-source-figure-4.webp)
+*Figure 4 Examples for partially occluded (1), heavily occluded (2), and fully occluded (3). source: [DinoRADE: Full Spectral Radar-Camera Fusion with Vision Foundation Model Features for Multi-class Object Detection in Adverse Weather](https://arxiv.org/abs/2604.08074)*
 
 
 | Configuration | 3D AP | BEV AP |

@@ -26,7 +26,14 @@ FAST tackles a low-level but important bottleneck in vision-language-action mode
 FAST improves action tokenization for autoregressive VLA policies. Simple per-timestep, per-dimension bins create long token sequences and handle high-frequency dexterous actions poorly. FAST compresses action chunks in frequency space using a discrete cosine transform, then quantizes the compact coefficients into action tokens. This preserves smooth temporal structure while shortening the sequence the model must generate. The evidence is better training and task performance for high-frequency robot behaviors. The caveat is compression design: too much compression loses control detail, while too little gives up the efficiency benefit.
 
 ![Figure 1: We propose FAST, a simple yet effective approach for tokenization of robot action trajectories via time-series compression from FAST: Efficient Action Tokenization for Vision-Language-Action Models](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-paper-figure.jpg)
-_Figure 1: We propose FAST, a simple yet effective approach for tokenization of robot action trajectories via time-series compression. From the [FAST: Efficient Action Tokenization for Vision-Language-Action Models paper](https://arxiv.org/abs/2501.09747), via arXiv HTML._
+*Figure 1: We propose FAST, a simple yet effective approach for tokenization of robot action trajectories via time-series compression. From the [FAST: Efficient Action Tokenization for Vision-Language-Action Models paper](https://arxiv.org/abs/2501.09747). source: [FAST: Efficient Action Tokenization for Vision-Language-Action Models paper](https://arxiv.org/abs/2501.09747)*
+
+![Figure 2 from FAST: Efficient Action Tokenization for Vision-Language-Action Models](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-source-figure-2.webp)
+*Figure 2 Fig. 2 : Left : FAST tokenization enables training of autoregressive Transformers for dexterous robot control via simple next token prediction. Right : FAST outperforms popular binning tokenization schemes, e.g., used in OpenVLA [ 39 ] , particularly for high-frequency robot data. source: [FAST: Efficient Action Tokenization for Vision-Language-Action Models](https://arxiv.org/abs/2501.09747)*
+
+![Figure 8 from FAST: Efficient Action Tokenization for Vision-Language-Action Models](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-source-figure-8.webp)
+*Figure 8 Fig. 8 : Universal tokenizer. We test the compression rate achieved by our FAST+ tokenizer vs. naïve tokenization across diverse robot datasets, unseen during tokenizer training. We find that FAST is effective across a wide range of robot morphologies, action spaces and control frequencies. source: [FAST: Efficient Action Tokenization for Vision-Language-Action Models](https://arxiv.org/abs/2501.09747)*
+
 
 **What to look at:**
 - FAST compresses dense action trajectories into discrete tokens.

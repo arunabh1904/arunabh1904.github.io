@@ -25,7 +25,13 @@ DriveWorld pretrains a 4D scene representation through a Memory State-Space Mode
 On the paper's OpenScene pretraining setup, reported downstream gains include 7.5 mAP for detection, 3 IoU for mapping, 5 AMOTA for tracking, 0.1 m lower minADE, 3 IoU for occupancy, and 0.34 m lower planning L2. The pretraining geometry comes from dense occupancy labels generated with fused LiDAR, so the framework uses rich automatic supervision rather than pure camera-only self-supervision.
 
 ![DriveWorld: 4D Pre-Trained Scene Understanding source figure: Overall framework of the proposed DriveWorld.](/assets/images/driveworld-4d-pretrained-scene-understanding-paper-figure.webp)
-_Overall framework of the proposed DriveWorld. Source: [DriveWorld: 4D Pre-Trained Scene Understanding](https://arxiv.org/abs/2405.04390), Figure 2, via arXiv HTML._
+*Overall framework of the proposed DriveWorld. source: [DriveWorld: 4D Pre-Trained Scene Understanding](https://arxiv.org/abs/2405.04390)*
+
+![Figure 7 from DriveWorld: 4D Pre-Trained Scene Understanding](/assets/images/driveworld-4d-pretrained-scene-understanding-source-figure-7.webp)
+*Figure 7 Qualitative example of 3D occupancy predictions, for 2 seconds in the future. source: [DriveWorld: 4D Pre-Trained Scene Understanding](https://arxiv.org/abs/2405.04390)*
+
+![Figure 1 from DriveWorld: 4D Pre-Trained Scene Understanding](/assets/images/driveworld-4d-pretrained-scene-understanding-source-figure-1.webp)
+*Figure 1 Comparison on different pre-training methods for vision-centric autonomous driving. (a) Monocular 2D pre-training with 2D pre-text tasks ( e.g . , 2D classification and depth estimation). (b) Multi-camera 3D pre-training via 3D scene reconstruction or 3D object detection. (c) The proposed 4D pre-training based on world models learns unified spatio-temporal representations. source: [DriveWorld: 4D Pre-Trained Scene Understanding](https://arxiv.org/abs/2405.04390)*
 
 
 | State | Update rule | Consumer |

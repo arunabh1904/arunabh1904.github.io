@@ -32,7 +32,14 @@ The paper studies why coordinate MLPs struggle when the target function contains
 The empirical evidence comes from image regression and low-dimensional vision and graphics tasks. The important caveat is that the frequency scale is a real modeling choice. Too little bandwidth leaves the MLP smooth; too much bandwidth can overfit or make optimization brittle.
 
 ![Figure 2 from Fourier Features showing how Fourier mappings change the MLP neural tangent kernel](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-paper-figure.png)
-_Figure 2 shows why the input mapping matters: Fourier features reshape the effective NTK into a frequency-aware kernel. From the [Fourier Features paper](https://arxiv.org/abs/2006.10739), via ar5iv._
+*Figure 2 shows why the input mapping matters: Fourier features reshape the effective NTK into a frequency-aware kernel. From the [Fourier Features paper](https://arxiv.org/abs/2006.10739), via ar5iv. source: [Fourier Features paper](https://arxiv.org/abs/2006.10739)*
+
+![Figure 4 from Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-source-figure-4.webp)
+*Figure 4 We find that a sparse random sampling of Fourier features can perform as well as a dense set of features and that the width of the distribution matters more than the shape. Here, we generate random 1D signals from noise and report the test-set accuracy of different trained models that use a sparse set (16 out of 1024) of random Fourier features sampled from different distributions. Each subplot represents a different family of 1D signals. source: [Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains](https://arxiv.org/abs/2006.10739)*
+
+![Figure 1 from Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-source-figure-1.webp)
+*Figure 1 Fourier features improve the results of coordinate-based MLPs for a variety of high-frequency low-dimensional regression tasks, both with direct (b, c) and indirect (d, e) supervision. We visualize an example MLP (a) for an image regression task (b), where the input to the network is a pixel coordinate and the output is that pixel’s color. source: [Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains](https://arxiv.org/abs/2006.10739)*
+
 
 **What to look at:**
 - The contribution is an input representation, not a new network family.

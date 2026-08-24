@@ -39,8 +39,7 @@ $$
 where $\tau$ controls how sharply the model separates the similarities. At inference, class names are written as prompts and embedded by the text encoder. The predicted class is the prompt with the highest similarity to the image.
 
 ![Figure 1 from the CLIP paper, showing contrastive pretraining and zero-shot transfer through text prompts](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
-
-*CLIP aligns image and text encoders during pretraining, then replaces the fixed classifier head with written class prompts. Source: [Learning Transferable Visual Models From Natural Language Supervision](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html), Figure 1.*
+*CLIP aligns image and text encoders during pretraining, then replaces the fixed classifier head with written class prompts. source: [Learning Transferable Visual Models From Natural Language Supervision](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html)*
 
 CLIP's loss still couples every example in the batch. Each image competes against every caption, and every unmatched pair is treated as a negative. Larger batches give the model harder comparisons, but they also require heavy synchronization across devices. They can even create false negatives when two captions describe compatible images.
 
@@ -61,8 +60,7 @@ The first approach was to keep the language model frozen. [Multimodal Few-Shot L
 [BLIP](/paper%20shorts/2022/01/28/blip-bootstrapping-language-image-pretraining.html) trained more of the path and cleaned the data at the same time. The same encoder-decoder handles image-text contrast, image-text matching, and caption generation under different attention masks. Its CapFilt pipeline generates better captions for noisy web images and filters weak pairs. Captioning now does two jobs: it trains the model to generate text and improves the data used for the next round of training.
 
 ![BLIP's shared encoder-decoder and three pretraining objectives](/assets/images/blip-paper-figure-2.png)
-
-*BLIP uses the same core model in three modes. Contrastive loss aligns image and text, matching loss learns pairwise interaction, and language-modeling loss trains the decoder to turn visual evidence into words. Source: [BLIP](/paper%20shorts/2022/01/28/blip-bootstrapping-language-image-pretraining.html), Figure 2.*
+*BLIP uses the same core model in three modes. Contrastive loss aligns image and text, matching loss learns pairwise interaction, and language-modeling loss trains the decoder to turn visual evidence into words. source: [BLIP](/paper%20shorts/2022/01/28/blip-bootstrapping-language-image-pretraining.html)*
 
 These models differ mainly in where they spend the training. Flamingo keeps both large endpoints frozen and learns the bridge. BLIP lets the multimodal path adapt. [PaLI](/paper%20shorts/2022/09/14/pali-jointly-scaled-multilingual-language-image-model.html) trains the visual encoder and language encoder-decoder across many tasks and languages. Underneath the model names are three choices: turn the image into a short prefix, expose it through cross-attention, or train vision and language together.
 
@@ -81,8 +79,7 @@ BLIP-2 trains the Q-Former with three objectives. Image-text contrast aligns the
 The second stage maps the query outputs into the language model's embedding space through a linear projection. The projected queries act as soft visual prompt tokens, while the language model remains frozen. This design made it possible to reuse two strong unimodal models without updating either one. The cost is a fixed bottleneck: every image is reduced to 32 query outputs before the language model receives it.
 
 ![BLIP-2's two-stage Q-Former training recipe](/assets/images/blip-2-paper-figure-1.png)
-
-*BLIP-2 first teaches the Q-Former to select visual evidence that matches text. The second stage maps those query outputs into a frozen language model. Source: [BLIP-2](/paper%20shorts/2023/01/30/blip-2-bootstrapping-language-image-pretraining.html), Figure 1.*
+*BLIP-2 first teaches the Q-Former to select visual evidence that matches text. The second stage maps those query outputs into a frozen language model. source: [BLIP-2](/paper%20shorts/2023/01/30/blip-2-bootstrapping-language-image-pretraining.html)*
 
 [InstructBLIP](/paper%20shorts/2023/05/11/instructblip-general-purpose-vision-language-instruction-tuning.html) also conditions the Q-Former on the user's instruction before visual compression. A counting question, a description request, and a localization prompt can therefore select different evidence through the same 32-query bottleneck. The instruction affects both the visual features passed to the language model and the response generated from them.
 
@@ -96,8 +93,7 @@ $$
 This change also came with a different training contract. LLaVA first freezes the vision encoder and language model while training the projector on 595,000 filtered CC3M image-caption pairs. It then keeps the vision encoder frozen and updates both the projector and language model on 158,000 image-instruction-response examples. BLIP-2 concentrates multimodal learning inside a pretrained query module because both large endpoints remain frozen. LLaVA gives the language model room to adapt during instruction tuning, so the connector does not have to carry the entire alignment problem.
 
 ![The LLaVA paper's visual instruction-tuning pipeline](/assets/images/visual-instruction-tuning-llava-paper-figure.png)
-
-*LLaVA separates data generation from model adaptation: GPT-4 first converts image metadata into instruction data, then those examples tune the projected vision-language model. Source: [Visual Instruction Tuning](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html).*
+*LLaVA separates data generation from model adaptation: GPT-4 first converts image metadata into instruction data, then those examples tune the projected vision-language model. source: [Visual Instruction Tuning](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html)*
 
 LLaVA did not invent image-conditioned generation. Frozen, Flamingo, BLIP, PaLI, and BLIP-2 had already built that machinery. Its contribution was a much simpler interface and a practical instruction-tuning recipe. A frozen vision encoder, a projector, and an adaptable language model were enough to produce a capable visual assistant.
 
@@ -110,14 +106,12 @@ $$
 The added layer gives the connector more capacity to transform each patch feature before it enters the language model. In the paper's stepwise ablation, changing only the connector improved GQA from 46.8 to 47.3, MME from 1323.8 to 1355.2, and MM-Vet from 26.3 to 27.8. The full LLaVA-1.5 improvement was larger, but it also included a 336-pixel vision encoder, more academic VQA data, response-format prompts, and a larger language model. The experiment supports the MLP over a linear projector within this recipe. It does not show that an MLP alone explains the final model.
 
 ![LLaVA-1.5 combines a CLIP vision encoder, an MLP projector, and a Vicuna language model](/assets/images/improved-baselines-visual-instruction-tuning-paper-figure-1.png)
-
-*LLaVA-1.5 keeps the direct projector architecture and strengthens the surrounding recipe with higher visual resolution and academic VQA data. Source: [Improved Baselines with Visual Instruction Tuning](/paper%20shorts/2023/10/05/improved-baselines-with-visual-instruction-tuning-llava-1-5.html), Figure 1.*
+*LLaVA-1.5 keeps the direct projector architecture and strengthens the surrounding recipe with higher visual resolution and academic VQA data. source: [Improved Baselines with Visual Instruction Tuning](/paper%20shorts/2023/10/05/improved-baselines-with-visual-instruction-tuning-llava-1-5.html)*
 
 A direct projection also supports tasks beyond chat. [PaliGemma](/paper%20shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html) sends SigLIP patch features directly into a Gemma decoder and expresses captioning, VQA, detection, and segmentation as prefix-to-suffix generation. It is first trained as a compact base VLM, then extended from 224 to 448 and 896 pixel inputs before task-specific transfer. Its results show how much capability can come from the data mixture, target format, and visual resolution without adding a more complex connector.
 
 ![PaliGemma projects SigLIP patch features directly into a Gemma decoder](/assets/images/paligemma-a-versatile-3b-vlm-for-transfer-paper-figure.png)
-
-*PaliGemma keeps the interface direct: projected image tokens and text tokens enter one decoder sequence. The model is a transferable base VLM rather than primarily a chat assistant. Source: [PaliGemma](/paper%20shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html), Figure 1.*
+*PaliGemma keeps the interface direct: projected image tokens and text tokens enter one decoder sequence. The model is a transferable base VLM rather than primarily a chat assistant. source: [PaliGemma](/paper%20shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html)*
 
 Controlled experiments in [MM1](/paper%20shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html) put the connector result in context. MM1 compared average pooling followed by a linear projection, learned attention pooling, and a convolutional mapping while also varying image resolution and visual-token count. Resolution and token count had the larger effect in its experiments, while connector type had little conclusive effect. MLP projectors became a strong default because they are cheap, preserve the patch-token interface, and train well with the language model. More elaborate compression is still useful when the visual-token budget is the actual constraint.
 
@@ -164,8 +158,7 @@ This design allows one context to mix text and images in any order, with one tra
 The same conflict appears in visual encoding. [Janus](/paper%20shorts/2024/10/17/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation.html) uses separate visual encoders for understanding and image generation, then shares the autoregressive transformer. Fully tokenized models remain an active branch, but they have not displaced connector-based visual assistants. Current systems more often share semantic context while specializing the encoder, loss, or output head for modality-specific requirements.
 
 ![Janus shares one transformer while separating the visual paths for understanding and image generation](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-paper-figure.png)
-
-*Janus keeps the autoregressive transformer shared but gives visual understanding and image generation separate encoders. Source: [Janus](/paper%20shorts/2024/10/17/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation.html), Figure 1.*
+*Janus keeps the autoregressive transformer shared but gives visual understanding and image generation separate encoders. source: [Janus](/paper%20shorts/2024/10/17/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation.html)*
 
 This branch changes what the model generates. The main VLM line still has an unresolved problem on the input side: can the words in an answer be tied back to the visual evidence that produced them?
 
@@ -176,8 +169,7 @@ Grounding means attaching a word or phrase to the part of the image that support
 Location-aware captioning provided one bridge from generation to grounding. An ordinary caption may say *two dogs playing* without specifying which dog is on the left. [LocCa](/paper%20shorts/2024/03/28/locca-visual-pretraining-with-location-aware-captioners.html) also asks the decoder to describe a region and emit its box, or to generate text for a specified region. The caption now has to preserve which pixels support which words.
 
 ![LocCa trains captioning, referring expressions, and grounded captions through one decoder](/assets/images/locca-visual-pretraining-with-location-aware-captioners-paper-figure.png)
-
-*LocCa asks one encoder-decoder to caption the image, describe a boxed region, and ground a phrase with coordinates. Each caption now carries more information about location. Source: [LocCa](/paper%20shorts/2024/03/28/locca-visual-pretraining-with-location-aware-captioners.html), Figure 1.*
+*LocCa asks one encoder-decoder to caption the image, describe a boxed region, and ground a phrase with coordinates. Each caption now carries more information about location. source: [LocCa](/paper%20shorts/2024/03/28/locca-visual-pretraining-with-location-aware-captioners.html)*
 
 [MDETR](/paper%20shorts/2021/04/26/mdetr-modulated-detection-for-end-to-end-multimodal-understanding.html) aligns phrases with detected objects end to end. [GLIP](/paper%20shorts/2021/12/07/glip-grounded-language-image-pretraining.html) expresses detection categories through language. [Kosmos-2](/paper%20shorts/2023/06/26/kosmos-2-grounding-multimodal-language-models.html) places coordinates inside generated text, so one autoregressive response can alternate between words and locations. [Molmo](/paper%20shorts/2024/09/01/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models.html) uses pointing data to teach the same association directly, and [Molmo 2](/paper%20shorts/2026/01/15/molmo-2-video-understanding-and-grounding.html) carries those points into video as tracks and timestamps.
 
@@ -211,8 +203,7 @@ The video-language models above still turn visual evidence into words. JEPA chan
 [V-JEPA 2](/paper%20shorts/2025/06/11/v-jepa-2-self-supervised-video-models.html) first learns this objective from video without action labels. It then trains a smaller action-conditioned predictor on robot trajectories and uses that predictor for image-goal planning. The video data teaches how scenes tend to change. The robot data teaches which changes an action can cause.
 
 ![V-JEPA 2 moves from action-free video prediction to an action-conditioned robot world model](/assets/images/v-jepa-2-paper-figure-1.png)
-
-*V-JEPA 2 first learns a predictive video representation, then adds an action-conditioned predictor for planning. Source: [V-JEPA 2](/paper%20shorts/2025/06/11/v-jepa-2-self-supervised-video-models.html), Figure 1.*
+*V-JEPA 2 first learns a predictive video representation, then adds an action-conditioned predictor for planning. source: [V-JEPA 2](/paper%20shorts/2025/06/11/v-jepa-2-self-supervised-video-models.html)*
 
 A useful exchange between [Rohan Anil](https://x.com/_arohan_/status/2007597891381031029) and [Yann LeCun](https://x.com/ylecun/status/2007907701989232684) gets at the deeper point. JEPA is not defined by opposition to language models or generative decoders. It changes where the predictive burden sits. Instead of asking a decoder to reproduce every unpredictable detail in input space, the encoder learns a latent target that keeps what is useful and suppresses what is not. Preventing that latent space from collapsing is therefore part of the learning problem, not an implementation detail.
 

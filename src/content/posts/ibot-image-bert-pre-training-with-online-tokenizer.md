@@ -28,7 +28,14 @@ summary: '2021 – iBOT: Image BERT Pre-Training with Online Tokenizer'
 ## Core Insights
 
 ![iBOT combines cross-view class-token self-distillation with masked patch-token prediction from an online teacher](/assets/images/ibot-image-bert-pre-training-online-tokenizer-paper-figure.png)
-_The class-token branch preserves DINO-style cross-view alignment; the masked-image branch asks student patch tokens to match teacher patch distributions at the hidden locations. Source: [iBOT](https://arxiv.org/abs/2111.07832)._
+*The class-token branch preserves DINO-style cross-view alignment; the masked-image branch asks student patch tokens to match teacher patch distributions at the hidden locations. source: [iBOT](https://arxiv.org/abs/2111.07832)*
+
+![Figure 2 from iBOT: Image BERT Pre-Training with Online Tokenizer](/assets/images/ibot-image-bert-pre-training-with-online-tokenizer-source-figure-2.webp)
+*Figure 2 Masked image modeling. denotes an image and Tok. denotes a visual tokenizer. source: [iBOT: Image BERT Pre-Training with Online Tokenizer](https://arxiv.org/abs/2111.07832)*
+
+![Figure 1 from iBOT: Image BERT Pre-Training with Online Tokenizer](/assets/images/ibot-image-bert-pre-training-with-online-tokenizer-source-figure-1.webp)
+*Figure 1 Linear probing accuracy on ImageNet. We compare iBOT with other unsupervised baselines. source: [iBOT: Image BERT Pre-Training with Online Tokenizer](https://arxiv.org/abs/2111.07832)*
+
 
 The student and teacher share a ViT architecture. The student receives a corrupted view; the exponential-moving-average teacher receives the corresponding unmasked view. A class-token loss aligns different crops of the same image, while a masked-image loss aligns the student's hidden patch tokens with the teacher's soft patch distributions at the same spatial positions. The two heads share parameters, tying global semantics to local prediction.
 

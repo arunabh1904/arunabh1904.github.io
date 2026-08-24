@@ -29,7 +29,14 @@ summary: '2023 – Direct Preference Optimization: Your Language Model Is Secret
 ## Core Insights
 
 ![DPO trains directly on preferred and rejected responses instead of fitting a reward model and running PPO](/assets/images/direct-preference-optimization-dpo-paper-figure.png)
-_The source comparison isolates the pipeline change: DPO uses a classification-style preference objective where RLHF would train a reward model and then optimize it with reinforcement learning. Source: [DPO](https://arxiv.org/abs/2305.18290)._
+*The source comparison isolates the pipeline change: DPO uses a classification-style preference objective where RLHF would train a reward model and then optimize it with reinforcement learning. source: [DPO](https://arxiv.org/abs/2305.18290)*
+
+![Figure 2 from Direct Preference Optimization](/assets/images/direct-preference-optimization-dpo-source-figure-2.webp)
+*Figure 2 Left. The frontier of expected reward vs KL to the reference policy. DPO provides the highest expected reward for all KL values, demonstrating the quality of the optimization. Right. TL;DR summarization win rates vs. human-written summaries, using GPT-4 as evaluator. DPO exceeds PPO’s best-case performance on summarization, while being more robust to changes in the sampling temperature. source: [Direct Preference Optimization](https://arxiv.org/abs/2305.18290)*
+
+![Figure 1 from Direct Preference Optimization](/assets/images/direct-preference-optimization-dpo-source-figure-1.webp)
+*Figure 1 DPO optimizes for human preferences while avoiding reinforcement learning. Existing methods for fine-tuning language models with human feedback first fit a reward model to a dataset of prompts and human preferences over pairs of responses, and then use RL to find a policy that maximizes the learned reward. source: [Direct Preference Optimization](https://arxiv.org/abs/2305.18290)*
+
 
 For prompt $x$, preferred response $y_w$, rejected response $y_l$, policy $\pi_\theta$, and frozen reference $\pi_{\mathrm{ref}}$, DPO minimizes
 

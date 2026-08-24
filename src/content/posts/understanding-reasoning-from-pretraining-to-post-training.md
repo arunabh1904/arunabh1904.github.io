@@ -34,19 +34,26 @@ Across 36 pretraining-to-RL runs, two different pretraining properties predict t
 The study pretrains decoder-only Transformers from 5M to 1B parameters on decontaminated Lichess games. A proposal model then generates candidate continuations for chess positions; the continuations are merged into a serialized search tree for supervised fine-tuning. RL operates on 156,000 puzzles with a binary verifiable reward: the model must choose the unique correct move sequence while the environment supplies opponent moves.
 
 ![Controlled chess pipeline from human-game pretraining through synthetic reasoning SFT and verifiable-reward RL](/assets/images/pretraining-posttraining-overview.png)
-_Chess exposes the whole pretraining–SFT–RL pipeline while keeping actions and correctness inspectable. Source: Figure 1 in the [paper](https://arxiv.org/abs/2607.16097)._
+*Chess exposes the whole pretraining–SFT–RL pipeline while keeping actions and correctness inspectable. source: [paper](https://arxiv.org/abs/2607.16097)*
+
+![Figure 3 from Understanding Reasoning from Pretraining to Post-Training](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-3.webp)
+*Figure 3 Pretraining properties predict local RL scaling behavior. (a) , the fitted post-RL performance (pass@1 metric) at a reference RL compute level, versus pretraining validation loss. Each curve corresponds to a different reference compute level; the fit tightens as RL compute increases ( to ). (b) , the local slope measuring performance gain per decade of RL compute, versus pretraining tokens. More tokens predict faster RL improvement. (c) Joint fit of the slope using both and , achieving higher. source: [Understanding Reasoning from Pretraining to Post-Training](https://arxiv.org/abs/2607.16097)*
+
+![Figure 5 from Understanding Reasoning from Pretraining to Post-Training](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-5.webp)
+*Figure 5 RL reshapes the move policy in qualitatively different ways across puzzle difficulty. Each panel shows the proportion of puzzle states assigned to one policy-update category (Table 14 ) across difficulty bins B1-B5, at RL training steps until 750. On easy puzzles, ground-truth amplification (a) dominates. On harder puzzles, tail discovery (b) and wrong-mode amplification (c) both increase, showing that RL simultaneously surfaces previously absent correct moves and reinforces incorrect ones. source: [Understanding Reasoning from Pretraining to Post-Training](https://arxiv.org/abs/2607.16097)*
+
 
 For the joint analysis, the authors use 20M, 50M, 200M, and 680M checkpoints from pretraining compute sweeps and fit each run’s pass@1 reward as a linear function of log RL compute. The reference reward at $10^{20}$ RL FLOPs is strongly ordered by pretraining loss: Spearman correlation tightens from -0.93 at $10^{16}$ to -0.99 at $10^{20}$ reference FLOPs. The fitted slope correlates with log pretraining tokens at Pearson $r=0.84$; a joint token-and-model-size fit reaches $R^2=0.84$.
 
-![Pretraining loss predicts reference post-RL reward while pretraining tokens predict the local RL slope](/assets/images/pretraining-rl-scaling.png)
-_Left: lower pretraining loss predicts higher fitted reward at fixed RL compute. Middle and right: more tokens, with a smaller model-size correction, predict the local RL slope. Source: Figure 3 in the [paper](https://arxiv.org/abs/2607.16097)._
+_Left: lower pretraining loss predicts higher fitted reward at fixed RL compute. Middle and right: more tokens, with a smaller model-size correction, predict the local RL slope. Figure 3 in the source: [paper](https://arxiv.org/abs/2607.16097)_
+_Left: lower pretraining loss predicts higher fitted reward at fixed RL compute. Middle and right: more tokens, with a smaller model-size correction, predict the local RL slope. source: Figure 3 in the [paper](https://arxiv.org/abs/2607.16097)._
 
 Combining these regressions with a Chinchilla-style pretraining-loss model produces a simulated compute frontier. Within the fitted range, the estimated optimal RL share rises from about 20% at 50M parameters to 28% at 680M, while the selected pretraining token counts remain close to Chinchilla allocation. This is an extrapolated recipe derived from the same local fit; it should guide a prospective sweep, not substitute for one.
 
 The mechanism analysis adds an important counterweight to the aggregate curve. RL is not a single global sharpening temperature. On easy puzzles, it mostly amplifies a correct move already near the top of the SFT distribution. On harder puzzles, it sometimes promotes a correct move whose initial probability is below 0.05 into the top three, but it increasingly reinforces the leading wrong move as well. That mixture helps explain why pass@1 can improve without a consistent pass@$k$ gain.
 
-![Rates of correct-mode amplification, tail discovery, and wrong-mode amplification across chess-puzzle difficulty](/assets/images/rl-policy-modes.png)
-_With increasing difficulty, correct-mode amplification declines and wrong-mode amplification rises; genuine tail discovery occurs, but remains relatively rare. Source: Figure 5 in the [paper](https://arxiv.org/abs/2607.16097)._
+_With increasing difficulty, correct-mode amplification declines and wrong-mode amplification rises; genuine tail discovery occurs, but remains relatively rare. Figure 5 in the source: [paper](https://arxiv.org/abs/2607.16097)_
+_With increasing difficulty, correct-mode amplification declines and wrong-mode amplification rises; genuine tail discovery occurs, but remains relatively rare. source: Figure 5 in the [paper](https://arxiv.org/abs/2607.16097)._
 
 | Finding | Evidence | Boundary |
 | --- | --- | --- |

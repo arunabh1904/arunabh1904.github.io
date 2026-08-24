@@ -25,7 +25,10 @@ SST argues that the conventional downsampling hierarchy is a poor fit for small 
 Sparse windows bound the quadratic attention cost by local token count. Empty locations never become tokens, while region shifts create cross-window context. The supplementary comparison reports 64.69 AP for a standard convolutional variant versus 51.57 for a submanifold sparse-convolution variant, illustrating how a sparse operator that never activates new sites can struggle to exchange context.
 
 ![SST: Single-Stride Sparse Transformer for 3D Detection source figure: Architecture overview for Single-stride Sparse Transformer (SST).](/assets/images/sst-single-stride-sparse-transformer-for-3d-detection-paper-figure.webp)
-_Architecture overview for Single-stride Sparse Transformer (SST). Source: [SST: Single-Stride Sparse Transformer for 3D Detection](https://arxiv.org/abs/2112.06375), Figure 4, via arXiv HTML._
+*Architecture overview for Single-stride Sparse Transformer (SST). source: [SST: Single-Stride Sparse Transformer for 3D Detection](https://arxiv.org/abs/2112.06375)*
+
+![Figure 2 from SST: Single-Stride Sparse Transformer for 3D Detection](/assets/images/sst-single-stride-sparse-transformer-for-3d-detection-source-figure-2.webp)
+*Figure 2 Distribution of the relative object size in COCO dataset coco and Waymo Open Dataset (WOD). is defined as , where denotes the area of 2D objects (COCO) and the BEV area of 3D objects (WOD). is the image area in COCO, and in WOD. In COCO 73.03% objects in COCO have a larger than 0.04, while only 0.54% objects in WOD have a larger than 0.04. source: [SST: Single-Stride Sparse Transformer for 3D Detection](https://arxiv.org/abs/2112.06375)*
 
 
 | Property | SST choice | Consequence |

@@ -30,7 +30,11 @@ Camera and LiDAR encoders produce separate BEV features. The BEV-Evolving decode
 The training recipe samples full and missing modalities instead of expecting zeroed tensors to generalize. In the paper's reported nuScenes experiments, MetaBEV improves over vanilla BEVFusion by 35.5 NDS and 17.7 mIoU when LiDAR is absent. When cameras are absent, it reports 69.2 NDS and 53.7 mIoU; with full sensors it remains competitive and reports 70.4 mIoU for BEV map segmentation. Those numbers compare specific trained protocols, so they should not be read as proof of safety under every physical corruption.
 
 ![Figure 3 from MetaBEV, showing modality-specific encoders and a query decoder that can attend to camera, LiDAR, or both](/assets/images/metabev-paper-figure-3.png)
-_MetaBEV makes sensor availability part of the computation path rather than silently replacing a failed modality with zeros. Source: [MetaBEV](https://arxiv.org/abs/2304.09801), Figure 3._
+*MetaBEV makes sensor availability part of the computation path rather than silently replacing a failed modality with zeros. source: [MetaBEV](https://arxiv.org/abs/2304.09801)*
+
+![Figure 5 from MetaBEV: Solving Sensor Failures for BEV Detection and Map Segmentation](/assets/images/metabev-solving-sensor-failures-for-bev-perception-source-figure-5.webp)
+*Figure 5 Map Segmentation results comparison under camera noises. We show the map segmentation mIoU ( left ) and the corresponding retention ( right ) under different weather, blur and digital conditions to show the zero-shot performance in the real-world environment. Details could be found in Table 7 and better view in color on screen. source: [MetaBEV: Solving Sensor Failures for BEV Detection and Map Segmentation](https://arxiv.org/abs/2304.09801)*
+
 
 | Failure or sharing problem | MetaBEV mechanism | Remaining boundary |
 | --- | --- | --- |

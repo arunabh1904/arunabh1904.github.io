@@ -24,8 +24,7 @@ summary: "2025 – FutureSightDrive: Thinking Visually with Spatio-Temporal CoT 
 The representation choice is deliberate. Textual reasoning can discard geometry and temporal relations before planning, whereas a predicted future scene can carry lanes, actors, and motion in one visual object. FSDrive expands the vocabulary with visual tokens and jointly trains VQA and future-frame prediction. Its progressive curriculum predicts structural priors before rendering the whole scene, which makes physical constraints part of the generation target rather than an after-the-fact caption.
 
 ![FutureSightDrive: Thinking Visually with Spatio-Temporal CoT for Autonomous Driving source figure: Overview of FSDrive.](/assets/images/futuresightdrive-thinking-visually-with-spatio-temporal-cot-for-autonomous-driving-paper-figure.webp)
-_Overview of FSDrive. Source: [FutureSightDrive: Thinking Visually with Spatio-Temporal CoT for Autonomous Driving](https://arxiv.org/abs/2505.17685), Figure 2, via arXiv HTML._
-
+*Overview of FSDrive. source: [FutureSightDrive: Thinking Visually with Spatio-Temporal CoT for Autonomous Driving](https://arxiv.org/abs/2505.17685)*
 
 The cost is prediction error. The planner consumes a generated scene, so errors in lanes, boxes, or background can become action errors even when the current camera view is clear. The abstract does not disclose the visual-token budget, forecast horizon, loss weights, or a teacher-forced imagined-scene comparison. The key safety test should measure how action quality changes as forecast error is injected independently into map structure, moving actors, and scene appearance.
 

@@ -20,7 +20,11 @@ summary: '2025 – Qwen2.5-VL Technical Report'
 ## Core Insights
 
 ![Qwen2.5-VL architecture with dynamic image resolution and absolute video time](/assets/images/qwen2-5-vl-paper-figure-1.jpg)
-_Native-resolution inputs receive variable token budgets, while video position IDs encode absolute time before visual tokens reach the language decoder. Source: [Qwen2.5-VL](https://arxiv.org/abs/2502.13923), Figure 1._
+*Native-resolution inputs receive variable token budgets, while video position IDs encode absolute time before visual tokens reach the language decoder. source: [Qwen2.5-VL](https://arxiv.org/abs/2502.13923)*
+
+![Figure 1 from Qwen2.5-VL Technical Report](/assets/images/qwen2-5-vl-technical-report-source-figure-1.webp)
+*Figure 1 The Qwen2.5-VL framework demonstrates the integration of a vision encoder and a language model decoder to process multimodal inputs, including images and videos. The vision encoder is designed to handle inputs at their native resolution and supports dynamic FPS sampling. Images of varying sizes and video frames with different FPS rates are dynamically mapped to token sequences of varying lengths. source: [Qwen2.5-VL Technical Report](https://arxiv.org/abs/2502.13923)*
+
 
 The design treats visual token count as input-dependent compute. Larger or denser images keep more detail. Video sampling can vary while timestamps preserve the duration represented by each token.
 

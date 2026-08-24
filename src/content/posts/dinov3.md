@@ -26,7 +26,14 @@ summary: '2025 – DINOv3'
 ## Core Insights
 
 ![DINOv3 ablations show Gram anchoring restoring dense prediction while retaining ImageNet classification](/assets/images/dinov3-gram-anchoring-paper-figure.png)
-_Long training improves global recognition but erodes dense features. Matching the student's patch Gram matrix to an earlier teacher restores segmentation and depth performance with little classification loss. Source: [DINOv3](https://arxiv.org/abs/2508.10104)._
+*Long training improves global recognition but erodes dense features. Matching the student's patch Gram matrix to an earlier teacher restores segmentation and depth performance with little classification loss. source: [DINOv3](https://arxiv.org/abs/2508.10104)*
+
+![Figure 1 from DINOv3](/assets/images/dinov3-source-figure-1.webp)
+*Figure 1 (a) Evolution of linear probing results on ImageNet1k (IN1k) over the years, comparing fully- (SL), weakly- (WSL) and self-supervised learning (SSL) methods. Despite coming into the picture later, SSL has quickly progressed and now reached the Imagenet accuracy plateau of recent years. On the other hand, we demonstrate that SSL offers the unique promise of high-quality dense features. source: [DINOv3](https://arxiv.org/abs/2508.10104)*
+
+![Figure 3 from DINOv3](/assets/images/dinov3-source-figure-3.webp)
+*Figure 3 High-resolution dense features. We visualize the cosine similarity maps obtained with DINOv3 output features between the patches marked with a red cross and all other patches. Input image at 4096×4096. Please zoom in , do you agree with DINOv3?. source: [DINOv3](https://arxiv.org/abs/2508.10104)*
+
 
 DINOv3 retains the DINO global loss, iBOT patch loss, Sinkhorn target centering, and feature-spreading regularization. The new diagnosis is representational: patch tokens increasingly encode the same global information instead of preserving local relations. The authors save an earlier teacher whose dense features remain strong and add a loss between teacher and student patch Gram matrices,
 

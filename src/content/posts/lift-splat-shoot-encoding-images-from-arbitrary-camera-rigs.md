@@ -30,7 +30,14 @@ LSS separates appearance from depth uncertainty. A pixel does not choose one dep
 That factorization explains both the method's influence and its cost. A dense depth distribution preserves alternatives but creates a large frustum tensor. The paper introduces a cumulative-sum pooling trick to reduce aggregation cost; later systems such as BEVFusion make the pooling path much faster. The source paper also tests camera dropout, calibration noise, unseen camera rigs, and a planning probe. It reports that the camera model trails a LiDAR PointPillars baseline, especially at night and at increasing range, so learned lifting does not erase camera depth limits.
 
 ![Figure 1 from Lift, Splat, Shoot, showing surround-camera images mapped into a vehicle-centered BEV prediction](/assets/images/lift-splat-shoot-paper-figure-1.png)
-_Figure 1 shows the contract LSS establishes: evidence from an arbitrary multi-camera rig lands in one vehicle-centered semantic map. Source: [Lift, Splat, Shoot](https://arxiv.org/abs/2008.05711), Figure 1._
+*Figure 1 shows the contract LSS establishes: evidence from an arbitrary multi-camera rig lands in one vehicle-centered semantic map. source: [Lift, Splat, Shoot](https://arxiv.org/abs/2008.05711)*
+
+![Figure 2 from Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rigs by Implicitly Unprojecting to 3D](/assets/images/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs-source-figure-2.webp)
+*Figure 2 (left, from SegNet [ 1 ] ) Traditionally, computer vision tasks such as semantic segmentation involve making predictions in the same coordinate frame as the input image. (right, from Neural Motion Planner [ 41 ] ) In contrast, planning for self-driving generally operates in the bird’s-eye-view frame. Our model directly makes predictions in a given bird’s-eye-view frame for end-to-end planning from multi-view images. source: [Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rigs by Implicitly Unprojecting to 3D](https://arxiv.org/abs/2008.05711)*
+
+![Figure 7 from Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rigs by Implicitly Unprojecting to 3D](/assets/images/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs-source-figure-7.webp)
+*Figure 7 We measure intersection-over-union of car segmentation when each of the cameras is missing. The backwards camera on the nuScenes camera rig has a wider field of view so it is intuitive that losing this camera causes the biggest decrease in performance relative to performance given the full camera rig (labeled “full” on the right). source: [Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rigs by Implicitly Unprojecting to 3D](https://arxiv.org/abs/2008.05711)*
+
 
 | Design object | Choice | Consequence |
 | --- | --- | --- |

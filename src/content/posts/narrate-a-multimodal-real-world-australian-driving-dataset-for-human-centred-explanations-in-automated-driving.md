@@ -28,7 +28,11 @@ The dataset's contribution is the collection contract. Each event has a 15-secon
 The benchmark is deliberately diagnostic rather than a new end-to-end model. Text baselines recover much of the SA structure, but fine-grained context recognition and explanation generation remain difficult. The dataset is also long-tailed: slow down accounts for 47.6% of actions, while the less frequent projection label appears in about 69–70% of explanations depending on timing.
 
 ![NARRATE data-collection protocol combining instrumented driving and post-drive explanation elicitation](/assets/images/narrate-data-collection-paper-figure.png)
-_The protocol combines in-vehicle narration, event tagging, and video-cued post-drive interviews. Source: [NARRATE](https://arxiv.org/abs/2608.14767)._
+*The protocol combines in-vehicle narration, event tagging, and video-cued post-drive interviews. source: [NARRATE](https://arxiv.org/abs/2608.14767)*
+
+![Figure 2 from NARRATE: A Multimodal Real-World Australian Driving Dataset for Human-Centred Explanations in Automated Driving](/assets/images/narrate-a-multimodal-real-world-australian-driving-dataset-for-human-centred-explanations-in-automated-driving-source-figure-2.webp)
+*Figure 2 Representative events from NARRATE. Each panel shows an annotated driving event with its driver-action label, high-level and fine-grained scenario-context tags, three front-centre camera frames sampled around the tagged event time, and the corresponding driver explanations. The middle frame marks the tagged event, while the neighbouring frames provide pre- and post-event visual context. In-vehicle explanations were recorded during driving, whereas post-drive explanations were recalled during the video-cued debrief. source: [NARRATE: A Multimodal Real-World Australian Driving Dataset for Human-Centred Explanations in Automated Driving](https://arxiv.org/abs/2608.14767)*
+
 
 ## High-Level Takeaways
 

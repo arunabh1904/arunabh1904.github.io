@@ -28,7 +28,14 @@ summary: "2019 – EfficientNet — Rethinking Model Scaling for ConvNets"
 ## Core Insights
 
 ![Figure 2 from EfficientNet: compound scaling balances network width, depth, and resolution](/assets/images/efficientnet-paper-figure-2-model-scaling.png)
-_Figure 2 from the [EfficientNet paper](https://arxiv.org/abs/1905.11946), via ar5iv._
+*Figure 2 from the [EfficientNet paper](https://arxiv.org/abs/1905.11946), via ar5iv. source: [EfficientNet paper](https://arxiv.org/abs/1905.11946)*
+
+![Figure 1 from EfficientNet — Rethinking Model Scaling for ConvNets](/assets/images/efficientnet-rethinking-model-scaling-for-convnets-source-figure-1.webp)
+*Figure 1 Model Size vs. ImageNet Accuracy. All numbers are for single-crop, single-model. Our EfficientNets significantly outperform other ConvNets. In particular, EfficientNet-B7 achieves new state-of-the-art 84.3% top-1 accuracy but being 8.4x smaller and 6.1x faster than GPipe. EfficientNet-B1 is 7.6x smaller and 5.7x faster than ResNet-152. Details are in Table 2 and 4. source: [EfficientNet — Rethinking Model Scaling for ConvNets](https://arxiv.org/abs/1905.11946)*
+
+![Figure 3 from EfficientNet — Rethinking Model Scaling for ConvNets](/assets/images/efficientnet-rethinking-model-scaling-for-convnets-source-figure-3.webp)
+*Figure 3 Scaling Up a Baseline Model with Different Network Width ( ), Depth ( ), and Resolution ( ) Coefficients. Bigger networks with larger width, depth, or resolution tend to achieve higher accuracy, but the accuracy gain quickly saturate after reaching 80%, demonstrating the limitation of single dimension scaling. Baseline network is described in Table 1. source: [EfficientNet — Rethinking Model Scaling for ConvNets](https://arxiv.org/abs/1905.11946)*
+
 
 ### Method and reported result
 

@@ -24,7 +24,14 @@ summary: "2026 – LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness
 ## Core Insights
 
 ![LIBERO-Para controlled evaluation design varying action and object paraphrases between fine-tuning and testing](/assets/images/libero-para-paraphrase-robustness-in-vla-models-paper-figure.png)
-_Figure 2 shows why the benchmark is diagnostic: action wording and object wording vary on separate axes, letting a failure be localized to linguistic generalization rather than task execution alone. Source: [LIBERO-Para](https://arxiv.org/abs/2603.28301)._
+*Figure 2 shows why the benchmark is diagnostic: action wording and object wording vary on separate axes, letting a failure be localized to linguistic generalization rather than task execution alone. source: [LIBERO-Para](https://arxiv.org/abs/2603.28301)*
+
+![Figure 1 from LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models](/assets/images/libero-para-paraphrase-robustness-in-vla-models-source-figure-1.webp)
+*Figure 1 Illustration of paraphrase robustness gap under data-scarce fine-tuning: VLA models can overfit to seen instruction phrasings during fine-tuning and fail to generalize to paraphrased variants at deployment. source: [LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models](https://arxiv.org/abs/2603.28301)*
+
+![Figure 3 from LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models](/assets/images/libero-para-paraphrase-robustness-in-vla-models-source-figure-3.webp)
+*Figure 3 Examples of axis-specific paraphrases. Object variations modify target object references (e.g., same-polarity substitution, addition), while action variations cover lexical, structural, and pragmatic realizations grounded in established taxonomies. source: [LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models](https://arxiv.org/abs/2603.28301)*
+
 
 Across seven VLA configurations from 0.6B to 7.5B parameters, the paper reports 22–52 percentage-point drops under paraphrasing. Object-level lexical substitutions drive much of the degradation, and 80–96% of failures arise from planning-level trajectory divergence rather than low-level execution. The policy often identifies the wrong task before motor control begins.
 

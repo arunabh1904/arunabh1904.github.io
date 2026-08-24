@@ -28,7 +28,14 @@ The problem is forecasting plausible, interactive futures for multiple road agen
 The main evidence is performance on the Waymo Open Motion Dataset. The paper reports state-of-the-art multi-agent motion prediction and a first-place rank on the interactive challenge leaderboard. The caveat is shared with most tokenized forecasting systems: discretization simplifies the objective, but token design and decoding strategy become part of the modeling assumptions.
 
 ![Figure 2 from MotionLM showing scene encoding, autoregressive motion-token decoding, and rollout aggregation](/assets/images/motionlm-multi-agent-motion-forecasting-as-language-modeling-paper-figure.png)
-_Figure 2 shows the language-model analogy concretely: scene features condition an autoregressive decoder that rolls out discrete motion tokens. From the [MotionLM paper](https://arxiv.org/abs/2309.16534), via ar5iv._
+*Figure 2 shows the language-model analogy concretely: scene features condition an autoregressive decoder that rolls out discrete motion tokens. From the [MotionLM paper](https://arxiv.org/abs/2309.16534), via ar5iv. source: [MotionLM paper](https://arxiv.org/abs/2309.16534)*
+
+![Figure 4 from MotionLM: Multi-Agent Motion Forecasting as Language Modeling](/assets/images/motionlm-multi-agent-motion-forecasting-as-language-modeling-source-figure-4.webp)
+*Figure 4 (a) Causal Bayesian Network for joint rollouts. source: [MotionLM: Multi-Agent Motion Forecasting as Language Modeling](https://arxiv.org/abs/2309.16534)*
+
+![Figure 1 from MotionLM: Multi-Agent Motion Forecasting as Language Modeling](/assets/images/motionlm-multi-agent-motion-forecasting-as-language-modeling-source-figure-1.webp)
+*Figure 1 Our model autoregressively generates sequences of discrete motion tokens for a set of agents to produce consistent interactive trajectory forecasts. source: [MotionLM: Multi-Agent Motion Forecasting as Language Modeling](https://arxiv.org/abs/2309.16534)*
+
 
 **What to look at:**
 - Motion tokens replace anchors and manually specified multimodal heads.

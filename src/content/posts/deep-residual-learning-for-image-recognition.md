@@ -26,7 +26,14 @@ summary: "2015 – Deep Residual Learning for Image Recognition"
 ## Core Insights
 
 ![Residual block schematic](/assets/images/resnet.png)
-_The residual block makes the paper's intervention explicit: learn a residual branch $F(x)$ and add the identity $x$ before the next nonlinearity. Source: [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)._
+*The residual block makes the paper's intervention explicit: learn a residual branch $F(x)$ and add the identity $x$ before the next nonlinearity. source: [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)*
+
+![Figure 3 from Deep Residual Learning for Image Recognition](/assets/images/deep-residual-learning-for-image-recognition-source-figure-3.webp)
+*Figure 3 Example network architectures for ImageNet. Left : the VGG-19 model Simonyan2015 (19.6 billion FLOPs) as a reference. Middle : a plain network with 34 parameter layers (3.6 billion FLOPs). Right : a residual network with 34 parameter layers (3.6 billion FLOPs). The dotted shortcuts increase dimensions. Table 1 shows more details and other variants. source: [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)*
+
+![Figure 1 from Deep Residual Learning for Image Recognition](/assets/images/deep-residual-learning-for-image-recognition-source-figure-1.webp)
+*Figure 1 Training error (left) and test error (right) on CIFAR-10 with 20-layer and 56-layer “plain” networks. The deeper network has higher training error, and thus test error. Similar phenomena on ImageNet is presented in Fig. 4. source: [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)*
+
 
 ### Method and reported result
 

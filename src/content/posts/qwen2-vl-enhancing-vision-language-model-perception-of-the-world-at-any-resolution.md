@@ -28,7 +28,14 @@ Qwen2-VL focuses on a practical weakness in many VLMs: images are forced into fi
 Qwen2-VL makes resolution handling a core VLM design choice. Naive Dynamic Resolution converts images of different sizes into different numbers of visual tokens, preserving detail for OCR, documents, charts, and high-resolution scenes. M-RoPE extends positional encoding across text, image, and video so spatial and temporal positions stay aligned. The evaluation covers image understanding, video understanding, multilingual OCR, and reasoning. The tradeoff is token cost: dynamic resolution gives more detail when needed, but large inputs still consume context and compute.
 
 ![Figure 1: Qwen2-VL capabilities: Multilingual image text understanding, code/math reasoning, video analysis, live chat, agent potential, and more from Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-paper-figure.jpg)
-_Figure 1: Qwen2-VL capabilities: Multilingual image text understanding, code/math reasoning, video analysis, live chat, agent potential, and more. From the [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution paper](https://arxiv.org/abs/2409.12191), via arXiv HTML._
+*Figure 1: Qwen2-VL capabilities: Multilingual image text understanding, code/math reasoning, video analysis, live chat, agent potential, and more. From the [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution paper](https://arxiv.org/abs/2409.12191). source: [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution paper](https://arxiv.org/abs/2409.12191)*
+
+![Figure 2 from Qwen2-VL: Enhancing Vision-Language Model](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-source-figure-2.webp)
+*Figure 2 Qwen2-VL is capable of accurately identifying and comprehending the content within images, regardless of their clarity, resolution, or extreme aspect ratios. source: [Qwen2-VL: Enhancing Vision-Language Model](https://arxiv.org/abs/2409.12191)*
+
+![Figure 3 from Qwen2-VL: Enhancing Vision-Language Model](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-source-figure-3.webp)
+*Figure 3 A demonstration of M-RoPE. By decomposing rotary embedding into temporal, height, and width components, M-RoPE can explicitly model the positional information of text, images, and video in LLM. source: [Qwen2-VL: Enhancing Vision-Language Model](https://arxiv.org/abs/2409.12191)*
+
 
 **What to look at:**
 - Naive dynamic resolution makes visual token count follow the input rather than a fixed resize.

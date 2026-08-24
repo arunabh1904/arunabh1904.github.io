@@ -24,7 +24,11 @@ summary: '2019 – LXMERT: Learning Cross-Modality Encoder Representations from 
 ## Core Insights
 
 ![LXMERT architecture with object, language, and cross-modality encoders](/assets/images/lxmert-paper-figure-1.png)
-_Object and language encoders first build modality-specific context. Cross-attention layers then exchange evidence before a joint output is formed. Source: [LXMERT](https://arxiv.org/abs/1908.07490), Figure 1._
+*Object and language encoders first build modality-specific context. Cross-attention layers then exchange evidence before a joint output is formed. source: [LXMERT](https://arxiv.org/abs/1908.07490)*
+
+![Figure 1 from LXMERT: Learning Cross-Modality Encoder Representations from Transformers](/assets/images/lxmert-learning-cross-modality-encoder-representations-source-figure-1.webp)
+*Figure 1 The LXMERT model for learning vision-and-language cross-modality representations. ‘Self’ and ‘Cross’ are abbreviations for self-attention sub-layers and cross-attention sub-layers, respectively. ‘FF’ denotes a feed-forward sub-layer. source: [LXMERT: Learning Cross-Modality Encoder Representations from Transformers](https://arxiv.org/abs/1908.07490)*
+
 
 LXMERT makes the supervision mixture explicit. Masked language modeling teaches the text side. Masked object feature regression and label prediction teach the visual side. Cross-modal matching and image question answering pressure the two streams to interact.
 

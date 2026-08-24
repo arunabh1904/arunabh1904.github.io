@@ -24,7 +24,14 @@ summary: "2025 – SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning
 ## Core Insights
 
 ![SimpleVLA-RL loop comparing limited offline supervised trajectories with on-policy rollouts grouped for advantage estimation](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-paper-figure.png)
-_Figure 2 shows where the additional signal comes from: the SFT policy interacts with the environment, produces groups of trajectories and rewards, and updates from relative advantages instead of remaining bounded by the offline demonstrations. Source: [SimpleVLA-RL](https://arxiv.org/abs/2509.09674)._
+*Figure 2 shows where the additional signal comes from: the SFT policy interacts with the environment, produces groups of trajectories and rewards, and updates from relative advantages instead of remaining bounded by the offline demonstrations. source: [SimpleVLA-RL](https://arxiv.org/abs/2509.09674)*
+
+![Figure 1 from SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-source-figure-1.webp)
+*Figure 1 Overview of SimpleVLA-RL . SimpleVLA-RL is an efficient RL framework for VLA that improves long-horizon planning under data scarcity, outperforms SFT in simulation and real-world tasks, reveals a “ pushcut ” new-action phenomenon, and strengthens spatial/object/goal generalization. source: [SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning](https://arxiv.org/abs/2509.09674)*
+
+![Figure 4 from SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-source-figure-4.webp)
+*Figure 4 (c) Higher Rollout Temperature. source: [SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning](https://arxiv.org/abs/2509.09674)*
+
 
 The framework reports state-of-the-art results on LIBERO and strong RoboTwin 1.0/2.0 performance, including large gains when SFT data are scarce. The paper also reports a “pushcut” behavior not present in the demonstrations, using it as evidence that RL can discover action patterns beyond imitation.
 

@@ -27,7 +27,14 @@ Natural-language CoT is a poor control interface when it must be decoded autoreg
 The supervision mixture is unusually explicit: 3.1 million automatically labeled samples, 200,000 human-annotated Reason–Action samples, and 320,000 targeted lane-change samples. The reported comparison reduces longitudinal ADE from 1.645 to 1.323 and lateral FDE from 1.616 to 0.648 in lane-change cases. XCPO is an optional policy-optimization extension in the same executable-token space, not required for the basic representation claim.
 
 ![XCoT-VLA deterministic token-function routing for reasoning and trajectory queries](/assets/images/xcot-vla-overview-paper-figure.png)
-_Executable reasoning tokens and trajectory queries share multimodal context but use separate Reason and Control FFNs. Source: [XCoT-VLA](https://arxiv.org/abs/2608.10976)._
+*Executable reasoning tokens and trajectory queries share multimodal context but use separate Reason and Control FFNs. source: [XCoT-VLA](https://arxiv.org/abs/2608.10976)*
+
+![Figure 2 from XCoT-VLA: Executable Chain-of-Thought for Vision-Language-Action Driving](/assets/images/xcot-vla-executable-chain-of-thought-for-vision-language-action-driving-source-figure-2.webp)
+*Figure 2 Offline XCoT training-data construction pipeline. The logged future trajectory provides longitudinal and lateral action evidence, while scene context supplies navigation-, rule-, interaction-, and safety-related causes. The selected Reason–Action pair is then mapped to a canonical XCoT sequence. source: [XCoT-VLA: Executable Chain-of-Thought for Vision-Language-Action Driving](https://arxiv.org/abs/2608.10976)*
+
+![Figure 4 from XCoT-VLA: Executable Chain-of-Thought for Vision-Language-Action Driving](/assets/images/xcot-vla-executable-chain-of-thought-for-vision-language-action-driving-source-figure-4.webp)
+*Figure 4 Qualitative comparison between XCoT (blue) and the trajectory-only SFT baseline (red). Compared with SFT, XCoT consistently exhibits more proactive driving behaviors, including earlier lane changes in dense traffic and navigation-guided scenarios, proactive compliance with traffic-light constraints, and efficiency-driven lane changes with traffic-adaptive acceleration, leading to smoother and more efficient trajectory planning. source: [XCoT-VLA: Executable Chain-of-Thought for Vision-Language-Action Driving](https://arxiv.org/abs/2608.10976)*
+
 
 The open question is whether the tokens carry causal driving state or merely a compressed behavior class. A lane-change-focused gain can arise from targeted supervision even without reusable reasoning. The decisive experiment is cross-route and cross-command transfer with equal data, plus a token ablation that preserves action-head capacity.
 

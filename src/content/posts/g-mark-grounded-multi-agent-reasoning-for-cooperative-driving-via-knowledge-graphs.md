@@ -25,7 +25,14 @@ summary: '2026 – G-MARK: Grounded Multi-Agent Reasoning for Cooperative Drivin
 ## Core Insights
 
 ![G-MARK pipeline from per-agent evidence graphs through conservative association and context enrichment to task heads](/assets/images/g-mark-cooperative-knowledge-graph-framework.png)
-_G-MARK preserves agent, observation, and hypothesis nodes through association, then adds provenance and planning context before task-specific inference. This makes delayed fusion inspectable instead of collapsing evidence into one object list. Cropped from Figure 1 of the [G-MARK paper](https://arxiv.org/abs/2608.19964)._
+*G-MARK preserves agent, observation, and hypothesis nodes through association, then adds provenance and planning context before task-specific inference. This makes delayed fusion inspectable instead of collapsing evidence into one object list. org/abs/2608.19964). source: [G-MARK paper](https://arxiv.org/abs/2608.19964)*
+
+![Figure 1 from G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-1.webp)
+*Figure 1 Fig. 1: Overview of the G-MARK cooperative KG reasoning framework. source: [G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](https://arxiv.org/abs/2608.19964)*
+
+![Figure 2 from G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-2.webp)
+*Figure 2 Fig. 2: Planning accuracy versus communication cost. source: [G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](https://arxiv.org/abs/2608.19964)*
+
 
 ### The graph preserves how an object became believable
 

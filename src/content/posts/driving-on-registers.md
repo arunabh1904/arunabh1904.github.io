@@ -25,7 +25,13 @@ Driving on Registers introduces DrivoR, a camera-only planner built around a pre
 The architecture separates proposal from evaluation. That matters because multimodal planning needs both a diverse candidate set and a scorer that can reject unsafe or inefficient candidates. At inference, score weights can be changed to alter behavior without retraining the visual backbone.
 
 ![Driving on Registers source figure: DrivoR architecture.](/assets/images/driving-on-registers-paper-figure.webp)
-_DrivoR architecture. Source: [Driving on Registers](https://arxiv.org/abs/2601.05083), Figure 1, via arXiv HTML._
+*DrivoR architecture. source: [Driving on Registers](https://arxiv.org/abs/2601.05083)*
+
+![Figure 4 from Driving on Registers](/assets/images/driving-on-registers-source-figure-4.webp)
+*Figure 4 Cosine similarity between scene tokens. Darker indicates lower cosine similarity. Note the specialized tokens in the front cam, and collapsed tokens in the back cam, showing relative camera compression. Averaged on navval. source: [Driving on Registers](https://arxiv.org/abs/2601.05083)*
+
+![Figure 1 from Driving on Registers](/assets/images/driving-on-registers-source-figure-1.webp)
+*Figure 1 DrivoR architecture. The proposed architecture is composed of three transformer blocks: one encoder (perception) and two decoders (trajectory and scoring). The perception encoder compresses perceptual information in camera-aware registers for lightweight subsequent processing in the trajectory and scoring decoders. The decoded trajectories are re-embedded and detached from the gradient computation graph to disentangle scoring and generation. source: [Driving on Registers](https://arxiv.org/abs/2601.05083)*
 
 
 On the paper's NAVSIM-v2 efficiency comparison, DrivoR reports 48.3 EPDMS with 41 million parameters, 351 GFLOPs, 0.5 GB peak memory, and 110 ms throughput on a single A100. The trajectory heads account for roughly 3 ms; the image backbone still dominates runtime. On NAVSIM-v1, mapping one token to a complete trajectory reports 90.0 PDMS versus 83.9 when a separate token predicts each pose.

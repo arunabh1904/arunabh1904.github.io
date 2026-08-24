@@ -24,7 +24,13 @@ summary: "2025 – LangCoop: Collaborative Driving with Language"
 The paper changes what travels across the vehicle-to-vehicle link. Rather than transmitting raw images or dense learned features, one agent packages a language description intended to preserve decision-relevant evidence for another. This is attractive for bandwidth and heterogeneous sensor stacks because language is compact and semantically structured. It also gives the receiver a lossy, generated representation whose omissions and ambiguities can change a maneuver.
 
 ![LangCoop: Collaborative Driving with Language source figure: Overview of the LangCoop framework.](/assets/images/langcoop-collaborative-driving-with-language-paper-figure.webp)
-_Overview of the LangCoop framework. Source: [LangCoop: Collaborative Driving with Language](https://arxiv.org/abs/2504.13406), Figure 1, via arXiv HTML._
+*Overview of the LangCoop framework. source: [LangCoop: Collaborative Driving with Language](https://arxiv.org/abs/2504.13406)*
+
+![Figure 2 from LangCoop: Collaborative Driving with Language](/assets/images/langcoop-collaborative-driving-with-language-source-figure-2.webp)
+*Figure 2 Visualization of a natural-language-based collaborative driving scenario. CAV 2 slows down upon receiving the ‘slow down’ intent description from CAV 1. The context is slightly paraphrased for better visualization. source: [LangCoop: Collaborative Driving with Language](https://arxiv.org/abs/2504.13406)*
+
+![Figure 1 from LangCoop: Collaborative Driving with Language](/assets/images/langcoop-collaborative-driving-with-language-source-figure-1.webp)
+*Figure 1 Overview of the LangCoop framework. source: [LangCoop: Collaborative Driving with Language](https://arxiv.org/abs/2504.13406)*
 
 
 The abstract couples message selection, language generation, and driving evaluation. It does not disclose the message vocabulary, length distribution, decoding delay, receiver model, or a matched semantic-token baseline at equal bandwidth. A communication result should test not only mean driving score but also whether a corrupted, delayed, or confidently wrong message produces detectable uncertainty rather than a confident unsafe action.

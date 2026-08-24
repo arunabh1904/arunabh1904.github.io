@@ -24,7 +24,14 @@ summary: "2025 – Fine-Tuning Vision-Language-Action Models: Optimizing Speed a
 ## Core Insights
 
 ![OpenVLA-OFT comparison of autoregressive versus parallel decoding and discrete versus continuous action prediction](/assets/images/openvla-oft-optimizing-speed-and-success-paper-figure.png)
-_Figure 2 isolates the fine-tuning choices: OpenVLA-OFT replaces sequential discrete token generation with parallel action decoding and continuous regression or diffusion objectives. Source: [OpenVLA-OFT](https://arxiv.org/abs/2502.19645)._
+*Figure 2 isolates the fine-tuning choices: OpenVLA-OFT replaces sequential discrete token generation with parallel action decoding and continuous regression or diffusion objectives. source: [OpenVLA-OFT](https://arxiv.org/abs/2502.19645)*
+
+![Figure 1 from Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success (OpenVLA-OFT)](/assets/images/openvla-oft-optimizing-speed-and-success-source-figure-1.webp)
+*Figure 1 Fig. 1: OpenVLA-OFT+ on the bimanual ALOHA robot. Our Optimized Fine-Tuning (OFT) recipe enhances fine-tuned OpenVLA policies through improved inference efficiency, model quality, and input-output flexibility. The resulting OpenVLA-OFT+ policies execute diverse dexterous manipulation tasks on a real-world bimanual robot at high control frequencies (25 Hz). source: [Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success (OpenVLA-OFT)](https://arxiv.org/abs/2502.19645)*
+
+![Figure 3 from Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success (OpenVLA-OFT)](/assets/images/openvla-oft-optimizing-speed-and-success-source-figure-3.webp)
+*Figure 3 Fig. 3: LIBERO simulation benchmark [ 26 ] task suites. We study VLA fine-tuning design decisions using four representative task suites. Here we depict two of ten tasks per suite. source: [Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success (OpenVLA-OFT)](https://arxiv.org/abs/2502.19645)*
+
 
 The paper ablates three coupled decisions: serial versus parallel decoding, discrete versus continuous actions, and next-token versus regression/diffusion objectives. The resulting recipe raises OpenVLA's reported LIBERO average from 76.5% to 97.1% and increases action-generation throughput by 26×. In real ALOHA evaluations it supports higher-frequency bimanual control and beats the compared default VLA recipes and from-scratch imitation policies.
 
