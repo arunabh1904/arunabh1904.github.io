@@ -32,6 +32,7 @@ The website never runs a speech model. The source of truth remains the Markdown 
 The release path is now explicit. The writing lands first. A clean worktree then reads that exact `origin/main`, compiles the narration, and ships the MP3 in a second pull request. GitHub Pages deploys the audio, and the release ends only when the live route returns successfully and the cache-busted MP3 has the same SHA-256 hash as the committed file.
 
 <div class="compact-flow-diagram"><a href="/assets/images/blog-audio-release-pipeline.svg"><img src="/assets/images/blog-audio-release-pipeline.svg" alt="Compact Blog audio release pipeline from source pull request to clean main, narration compilation with the fixed voice, a focused audio pull request, and GitHub Pages route and hash verification"></a></div>
+
 _The prose PR fixes the source revision. The audio PR compiles from that revision. Production verification closes the loop by checking the exact file listeners receive._
 
 This architecture keeps inference cost and latency away from readers. There is no per-listen API request, visitor text upload, runtime model service, or browser-dependent narrator. My machine pays the synthesis cost once. GitHub Pages serves the result like an image.
