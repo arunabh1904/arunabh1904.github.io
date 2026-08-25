@@ -73,6 +73,44 @@ function sectionPromptsForTts(source: string) {
 }
 
 describe('Blog audio extraction', () => {
+  it('preserves authored prose in order while omitting visual-only material', () => {
+    const source = [
+      '# Evidence',
+      '',
+      'The first paragraph introduces the argument.',
+      '',
+      '| Sensor | Contribution |',
+      '| --- | --- |',
+      '| Camera | Semantics |',
+      '',
+      'The second paragraph develops it after the table.',
+      '',
+      '![A comparison of fusion architectures](/fusion.svg)',
+      '_The figure contrasts point, query, and dense fusion._',
+      '',
+      '$$',
+      'x = y + z',
+      '$$',
+      '',
+      'The final paragraph completes the argument.',
+      '',
+      '## References',
+      '',
+      '- A paper that should not be narrated.',
+    ].join('\n');
+
+    const narration = cleanMarkdown(source);
+    expect(narration).toBe([
+      '[[BLOG_HEADING]]Evidence.[[/BLOG_HEADING]]',
+      '[[BLOG_PARAGRAPH]]',
+      'The first paragraph introduces the argument.',
+      '[[BLOG_PARAGRAPH]]',
+      'The second paragraph develops it after the table.',
+      '[[BLOG_PARAGRAPH]]',
+      'The final paragraph completes the argument.',
+    ].join(' '));
+  });
+
   it('skips raw HTML diagrams and their captions while preserving the spoken path', () => {
     const source = [
       '---',

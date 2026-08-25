@@ -138,8 +138,7 @@ def clean_markdown(source: str) -> str:
     Headings and list items remain because they orient a listener. Table rows,
     display equations, image alt text, figure captions, and the References
     bibliography are omitted because their raw forms do not make useful spoken
-    content. The surrounding prose or an abridged sidecar must state the table's
-    conclusion.
+    content. All authored headings and prose remain in source order.
     """
 
     body = re.sub(r"\A---\n.*?\n---\n", "", source, count=1, flags=re.DOTALL)
