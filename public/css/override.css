@@ -397,9 +397,71 @@ img:not(.float-right):not(.float-left) {
   margin: 0;
 }
 
+/* Dense system maps use the viewport on desktop and a swipeable canvas on phones. */
+.system-architecture-diagram {
+  position: relative;
+  left: 50%;
+  width: min(75rem, calc(100vw - 19rem));
+  max-width: none;
+  margin: 1.5rem 0;
+  transform: translateX(-50%);
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.system-architecture-diagram > a,
+.system-architecture-diagram img {
+  display: block;
+}
+
+.system-architecture-diagram img {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+@media (max-width: 1099px) {
+  .system-architecture-diagram {
+    left: auto;
+    width: 100%;
+    max-width: 100%;
+    margin: 1rem 0;
+    transform: none;
+  }
+
+  .system-architecture-diagram > a {
+    width: 75rem;
+  }
+}
+
+/* Multi-panel technical comparisons keep their designed type size on phones. */
+.architecture-comparison {
+  max-width: 100%;
+  margin: 1rem 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.architecture-comparison > a,
+.architecture-comparison img {
+  display: block;
+}
+
+.architecture-comparison img {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
 @media (max-width: 640px) {
   .compact-flow-diagram > a {
     width: 54rem;
+  }
+
+  .architecture-comparison > a {
+    width: 60rem;
   }
 }
 
