@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="820" viewBox="0 0 1600 820" role="img" aria-labelledby="title desc">
   <title id="title">Autonomous-driving perception pipeline</title>
-  <desc id="desc">Camera, LiDAR, and radar retain sensor-specific measurements through separate encoders. Calibrated geometry converts them into dense bird's-eye-view fields, sparse object queries, or compact learned latent tokens. Temporal state carries dense scene context, selected actors, or compressed world state into task-specific heads. LiDAR labels, teacher models, and future frames appear only in the training graph.</desc>
+  <desc id="desc">Camera, LiDAR, and radar retain sensor-specific measurements through separate encoders. Calibration, camera-to-3D conversion, timing, and ego motion align those features in dense bird's-eye-view fields, sparse object queries, or compact learned latent tokens. Temporal state carries dense scene context, selected actors, or compressed world state into task-specific heads. LiDAR labels, teacher models, and future frames appear only in the training graph.</desc>
   <defs>
     <radialGradient id="bg" cx="52%" cy="0%" r="96%"><stop offset="0%" stop-color="#173248"/><stop offset="54%" stop-color="#081019"/><stop offset="100%" stop-color="#050a10"/></radialGradient>
     <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#142737"/><stop offset="55%" stop-color="#0e1c28"/><stop offset="100%" stop-color="#09131d"/></linearGradient>
@@ -23,12 +23,12 @@
 
   <text x="58" y="64" class="kicker" fill="#78e0a5">SYSTEM MAP</text>
   <text x="58" y="111" class="title">Autonomous-driving perception pipeline</text>
-  <text x="58" y="143" class="small">Sensors become comparable only after calibrated metric conversion.</text>
+  <text x="58" y="143" class="small">Sensor-specific encoders preserve native evidence; the shared carrier determines what survives.</text>
   <line x1="58" y1="168" x2="1542" y2="168" stroke="#26394a" stroke-width="1.2"/>
 
   <text x="168" y="205" class="kicker" text-anchor="middle">SENSORS</text>
   <text x="431" y="205" class="kicker" text-anchor="middle">SENSOR ENCODERS</text>
-  <text x="795" y="205" class="kicker" text-anchor="middle">METRIC REPRESENTATION</text>
+  <text x="795" y="205" class="kicker" text-anchor="middle">COORDINATE ALIGNMENT</text>
   <text x="1139" y="205" class="kicker" text-anchor="middle">TEMPORAL STATE</text>
   <text x="1434" y="205" class="kicker" text-anchor="middle">TASK HEADS</text>
 
@@ -61,7 +61,7 @@
 
   <!-- Metric representation -->
   <g filter="url(#shadow)"><rect x="630" y="234" width="330" height="384" rx="20" class="node metric"/></g>
-  <text x="656" y="270" class="micro" fill="#78e0a5">CALIBRATED 3D INTERFACE</text>
+  <text x="656" y="270" class="micro" fill="#78e0a5">SHARED 3D INTERFACE</text>
   <rect x="656" y="292" width="278" height="92" rx="15" class="chip metric"/>
   <rect x="678" y="310" width="84" height="58" rx="8" fill="url(#bev)" stroke="#78e0a5" stroke-width="1.2"/><path d="M690 357Q718 331 752 319" fill="none" stroke="#58d8ff" stroke-width="4" opacity=".35"/><rect x="720" y="334" width="24" height="15" rx="4" fill="#ffc15a" opacity=".72"/>
   <text x="790" y="328" class="label">Dense BEV</text><text x="790" y="350" class="small">roads · free space</text><text x="790" y="370" class="small">occupancy · maps</text>
@@ -71,7 +71,7 @@
   <rect x="656" y="500" width="278" height="92" rx="15" class="chip metric"/>
   <g transform="translate(684 526)" fill="none" stroke="#b19aff" stroke-width="2"><circle cx="14" cy="20" r="9" fill="#0c1622"/><circle cx="52" cy="8" r="9" fill="#0c1622"/><circle cx="70" cy="42" r="9" fill="#0c1622"/><path d="M22 17 43 11M54 16 65 34M22 26 62 40"/></g>
   <text x="790" y="536" class="label">Latent tokens</text><text x="790" y="558" class="small">compressed state</text><text x="790" y="578" class="small">learned bottleneck</text>
-  <text x="795" y="608" class="small" text-anchor="middle">carrier sets surviving evidence</text>
+  <text x="795" y="608" class="small" text-anchor="middle">the carrier determines what survives</text>
 
   <!-- Temporal state -->
   <g filter="url(#shadow)"><rect x="1018" y="234" width="242" height="384" rx="20" class="node task"/></g>
