@@ -18,11 +18,11 @@ summary: >-
 
 # Code Is Cheap. Understanding Isn't.
 
-Software engineering has always been about building things. Code was the tool we happened to use.
+Software engineering has always been about building useful things. Code is how we do it.
 
-That sounds obvious, but software people are unusually easy to seduce by the artifact itself: beautiful abstractions, elegant APIs, clever type systems, perfectly factored code. I love that stuff too. Craft matters. But nobody hired us because the source looked beautiful in a diff. We were hired to build something useful.
+That sounds obvious, but software people are unusually easy to seduce by the artifact itself: beautiful abstractions, elegant APIs, clever type systems, perfectly factored code. I love that stuff too. Craft matters. But nobody hired us because the source looked beautiful in a diff. We were hired to solve a problem.
 
-There is a reason needless refactoring has always been frowned upon. There is a reason nobody is nostalgic for punch cards. The interface changes; the work remains. Right now, that interface is changing very quickly.
+There is a reason needless refactoring has always been frowned upon. There is a reason nobody is nostalgic for punch cards. The tools change, but we still have to decide what is worth building. Right now, those tools are changing very quickly.
 
 ## From answers to action
 
@@ -42,11 +42,9 @@ Why is that ugly workaround still there? Which customer depends on that behavior
 
 That is context, and context engineering is not the same thing as putting more text into a prompt. I increasingly dislike giant base-level instruction files that every agent receives forever because one paragraph was useful for one task six weeks ago. More context is not necessarily better context. Irrelevant context pollutes reasoning in the same way that unnecessary shared state pollutes a software system.
 
-The real skill is deciding what an agent needs to know for this task, right now. Sometimes good context engineering means adding a design decision, production invariant, or failure trace. Sometimes it means deleting an obsolete instruction. The goal is not maximum context. It is the smallest context that preserves the decisions the agent cannot safely rediscover.
+The real skill is deciding what an agent needs to know for this task, right now. Sometimes good context engineering means adding a design decision, production invariant, or failure trace. Sometimes it means deleting an obsolete instruction. The goal is not maximum context. Good context engineering is selective memory. Preserve the decisions a system cannot safely rediscover; remove the history that only makes those decisions harder to see.
 
-Good context engineering is selective memory. Preserve the decisions a system cannot safely rediscover; remove the history that only makes those decisions harder to see.
-
-## Do not become a slop cannon
+## Slop cannon
 
 A new developer archetype is emerging: the slop cannon.
 
@@ -57,9 +55,7 @@ Everyone has been extremely busy. Then somebody has to own it.
 [![A cannon creates a tangled heap while an engineer builds a small bridge that carries a real load.](/assets/images/agentic-engineering-slop-cannon.png)](/assets/images/agentic-engineering-slop-cannon.png)
 _The adult in the room builds the bridge. The slop cannon calls the pile velocity. Imagined by OpenAI ImageGen._
 
-There is a large difference between using a model to extend a deep understanding of your tools and using it to generate a system you do not understand. If I would be uncomfortable maintaining an unfamiliar codebase handed to me by a developer I have never met, I should be equally uncomfortable maintaining thousands of generated lines whose decisions I never examined.
-
-Technical debt generated in thirty seconds is still technical debt. A needless abstraction written by a frontier model is still a needless abstraction. A giant diff is not evidence of productivity.
+There is a large difference between using a model to extend a deep understanding of your tools and using it to generate a system you do not understand. If I would be uncomfortable maintaining an unfamiliar codebase handed to me by a developer I have never met, I should be equally uncomfortable maintaining thousands of generated lines whose decisions I never examined. Technical debt generated in thirty seconds is still technical debt. A needless abstraction written by a frontier model is still a needless abstraction. A giant diff is not evidence of productivity.
 
 The adult in the room asks a more boring question: why does this thing need to exist? Sometimes the most successful agentic coding session should end with less code than it started with.
 
@@ -69,33 +65,23 @@ The adult in the room asks a more boring question: why does this thing need to e
 
 That smell is real, and sometimes it is exactly what I want. Difficult architecture, deep synthesis, and long-running work benefit from a model that can resolve ambiguity instead of merely executing instructions. But capability does not imply universal deployment. A two-line utility fix can still be a poor place to spend the slowest, most expensive form of judgment.
 
-Even then, I do not need Fable to do my job. Much of engineering does not require maximum intelligence.
-
 My workflow is increasingly heterogeneous, but there are two separate choices hiding inside that statement: the working environment and the model. I use [Cursor](https://www.cursor.com/) when I want to stay close to the implementation and [Claude Code](https://www.anthropic.com/claude-code) when a bounded job can run more independently. Within either kind of harness, I can route execution among models such as [GLM-5.2](https://z.ai/blog/glm-5.2), [Grok 4.5](https://x.ai/news/grok-4-5), or OpenAI's deliberately tiered [Terra and Sol](https://openai.com/index/previewing-gpt-5-6-sol/) according to the task's ambiguity, duration, latency, and cost.
 
 The most useful practitioner pattern I found in the surrounding X discussion is not a new leaderboard winner but a division of cognitive labor. [Willison reports](https://simonwillison.net/2026/Jul/3/judgement/) telling Fable to use its own judgment to send routine coding to lower-power subagents. The frontier model spends its scarce capability deciding what the work is, how to decompose it, and what deserves review; cheaper models perform the bounded execution. That is the model stack I want: not one brain applied indiscriminately, but a manager that knows when the task needs judgment and when it only needs throughput.
 
-Those exact names will age. That is fine. The principle will not: match the intelligence to the task.
-
-Use the expensive model when ambiguity, consequence, or deep reasoning justifies it. Use faster and cheaper models for execution after the problem has been reduced to something mechanical. Use subagents when work is genuinely independent. Do not send a genius to alphabetize a list.
+Those exact names will age. That is fine. Use the expensive model when ambiguity, consequence, or deep reasoning justifies it. Use faster and cheaper models for execution after the problem has been reduced to something mechanical. Use subagents when work is genuinely independent. Do not send a genius to alphabetize a list.
 
 This is not only thrift. It is architecture.
 
 ## Tokens are a system resource
 
-We already reason about CPU, memory, bandwidth, latency, storage, GPU utilization, and cloud spend. Intelligence cost belongs in the same design conversation. Tokens are a resource.
-
-Good agentic engineering does not give every worker the full history of the repository. It does not pay a frontier model to rediscover what another investigation already established. It keeps context boundaries clean, routes easy work to cheaper models, and escalates hard decisions. It distinguishes an extra million tokens buying useful thought from an extra million tokens buying beautifully articulated wandering.
+We already reason about CPU, memory, bandwidth, latency, storage, GPU utilization, and cloud spend. Intelligence cost belongs in the same design conversation. Tokens are a resource. Good agentic engineering does not give every worker the full history of the repository. It does not pay a frontier model to rediscover what another investigation already established. It keeps context boundaries clean, routes easy work to cheaper models, and escalates hard decisions. It distinguishes an extra million tokens buying useful thought from an extra million tokens buying beautifully articulated wandering.
 
 The agent stack may end up looking familiar to anyone who has designed distributed systems: specialized components, constrained interfaces, careful information flow, isolation where useful, observability, retries, escalation paths, and expensive resources reserved for the places that require them. The point is not to minimize token use at all costs. The point is to spend intelligence deliberately.
 
-A company will eventually notice the difference between an engineer who needs enormous amounts of frontier-model inference for every task and one who produces the same or better outcome with a well-designed hierarchy of models and agents. Efficiency will matter because it exposes the quality of the decomposition underneath the bill.
-
 ## Parallel work changes the job
 
-Humans are mostly single-threaded. Agents do not have to be.
-
-Instead of researching, designing, implementing, testing, and debugging in a serial loop, one engineer can run several independent investigations at once. One agent can trace an unfamiliar call path while another studies an upstream dependency. A third can implement a bounded component. A fourth can test assumptions against telemetry or review the resulting diff.
+Humans are mostly single-threaded. Agents do not have to be. Instead of researching, designing, implementing, testing, and debugging in a serial loop, one engineer can run several independent investigations at once. One agent can trace an unfamiliar call path while another studies an upstream dependency. A third can implement a bounded component. A fourth can test assumptions against telemetry or review the resulting diff.
 
 This is where the agent manager becomes more than a metaphor. The engineer moves up one level: understand the problem, decompose it, decide what can safely run in parallel, give each agent a purpose, protect its context, route hard decisions upward, inspect the output, integrate the pieces, and kill bad branches early.
 
@@ -119,23 +105,17 @@ The better agents become, the easier it becomes to stop learning. The less I lea
 
 ## Some things still take time
 
-AI can compress implementation time. It cannot compress experience in the same way.
-
-In [“Some Things Just Take Time,”](https://lucumr.pocoo.org/2026/3/20/some-things-just-take-time/) Armin Ronacher uses an old tree to make the distinction concrete. A person can buy a sapling but cannot buy decades of growth. Software has equivalents: trust, taste, community, and the knowledge earned by operating a system after the excitement of creating it has disappeared.
+AI can compress implementation time. It cannot compress experience in the same way. In [“Some Things Just Take Time,”](https://lucumr.pocoo.org/2026/3/20/some-things-just-take-time/) Armin Ronacher uses an old tree to make the distinction concrete. A person can buy a sapling but cannot buy decades of growth. Software has equivalents: trust, taste, community, and the knowledge earned by operating a system after the excitement of creating it has disappeared.
 
 I can generate ten architectures overnight. I cannot generate ten years of operating one. I cannot manufacture the judgment that comes from outages, migrations, failed launches, organizational mistakes, ugly compromises, and maintenance that continues long after the original authors move on.
 
 There is something important in the friction itself. If a machine can generate code instantly, it becomes tempting to ask why review should take so long, why design needs discussion, or why deployment requires permission systems and rollout plans. Sometimes friction is waste. Sometimes friction is the mechanism by which people notice what they are about to do. Engineering judgment includes knowing the difference.
 
-Speed is useful. Tenacity is different.
-
 ## What remains
 
 The amount of human labor required to produce software will probably fall. Pretending otherwise does not help anyone. If one engineer can direct five, ten, or twenty capable agents, the economics of engineering organizations change. The shift may be uneven and gradual, but its direction is hard to ignore.
 
-Imagine two engineers in that organization. One has become extraordinarily good at generating things. Every task invokes the largest model. Every problem becomes a giant agent run. The engineer produces enormous diffs, consumes enormous amounts of inference, and understands a shrinking fraction of what ships.
-
-The other understands the system and the business. They decompose ambiguous problems, know when a small model will do, keep context clean, run independent work in parallel, delete aggressively, challenge the output, and take responsibility for what reaches production.
+Imagine two engineers in that organization. One has become extraordinarily good at generating things. Every task invokes the largest model. Every problem becomes a giant agent run. The engineer produces enormous diffs, consumes enormous amounts of inference, and understands a shrinking fraction of what ships. The other understands the system and the business. They decompose ambiguous problems, know when a small model will do, keep context clean, run independent work in parallel, delete aggressively, challenge the output, and take responsibility for what reaches production.
 
 [![An engineer routes distinct tasks to small specialist robots while reserving one large machine for the hardest work.](/assets/images/agentic-engineering-orchestration.png)](/assets/images/agentic-engineering-orchestration.png)
 _Agent manager, imagined by OpenAI ImageGen._
@@ -144,7 +124,7 @@ Which one do you retain?
 
 The answer says a great deal about where the profession is going. The future does not belong to whoever can generate the most code. Code is becoming abundant. The durable skill is understanding what should be built, why it should exist, what context matters, and how to marshal increasingly capable machines to build it well.
 
-Writing software was always about building. Code was a tool. Agents are tools too.
+Writing software was always about building. Code is how we do it. Agents are tools too.
 
 Do not become a slop cannon. Do not worship the largest model. Do not outsource your learning. Spend intelligence deliberately. Understand the system. Understand the business. Build things that deserve to survive.
 
