@@ -36,6 +36,8 @@ export interface CodePracticeReasoningPoint {
 export interface CodePracticeNumpyAlternative {
   /** Compact, standalone NumPy reference for interview recall. */
   code: string;
+  /** Small runnable example appended when the reference is shown. */
+  exampleCode: string;
   /** One or two syntax or shape cues worth memorizing. */
   memory: readonly string[];
 }
@@ -4271,6 +4273,9 @@ def l1_loss(prediction: np.ndarray, target: np.ndarray) -> float:
     prediction = np.asarray(prediction, dtype=float)
     target = np.asarray(target, dtype=float)
     return np.mean(np.abs(prediction - target))`,
+    exampleCode: `prediction = np.array([1.0, 2.0, 10.0])
+target = np.array([2.0, 2.0, 7.0])
+print(l1_loss(prediction, target))`,
     memory: ['Mean absolute error is `np.mean(np.abs(prediction - target))`.'],
   },
   'binary-cross-entropy-from-probabilities': {
@@ -4290,6 +4295,9 @@ def binary_cross_entropy(
     probability = np.clip(probability, eps, 1 - eps)
     loss = -target * np.log(probability) - (1 - target) * np.log(1 - probability)
     return np.mean(loss)`,
+    exampleCode: `probability = np.array([0.9, 0.2])
+target = np.array([1.0, 0.0])
+print(binary_cross_entropy(probability, target))`,
     memory: [
       'Reject a label when `(target != 0) & (target != 1)` is true; the two comparisons must both mean “not equal.”',
       'This version accepts probabilities. For logits, use the stable softplus form instead of sigmoid → clamp → log.',
@@ -4304,6 +4312,9 @@ def masked_mean(features: np.ndarray, mask: np.ndarray) -> np.ndarray:
     total = np.sum(features * weights, axis=1)
     count = np.maximum(np.sum(weights, axis=1), 1)
     return total / count`,
+    exampleCode: `features = np.array([[[1.0, 2.0], [3.0, 4.0], [0.0, 0.0]]])
+mask = np.array([[1, 1, 0]])
+print(masked_mean(features, mask))`,
     memory: ['`mask[..., None]` changes `(B, N)` to `(B, N, 1)` so it broadcasts over features.'],
   },
   'binary-classification-metrics': {
@@ -4323,6 +4334,9 @@ def binary_classification_metrics(
     f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
     return {'precision': precision, 'recall': recall, 'f1': f1,
             'accuracy': (tp + tn) / y_true.size}`,
+    exampleCode: `y_true = np.array([1, 0, 1, 0])
+y_pred = np.array([1, 0, 0, 1])
+print(binary_classification_metrics(y_true, y_pred))`,
     memory: ['Count each confusion-matrix cell with a boolean expression followed by `np.sum`.'],
   },
   'top-k-accuracy': {
@@ -4334,6 +4348,9 @@ def top_k_accuracy(logits: np.ndarray, labels: np.ndarray, k: int) -> float:
     ranked = np.argsort(logits, axis=1)[:, ::-1]
     candidates = ranked[:, :top_k]
     return np.mean(np.any(candidates == labels[:, None], axis=1))`,
+    exampleCode: `logits = np.array([[0.1, 0.9, 0.2], [3.0, 1.0, 2.0]])
+labels = np.array([1, 2])
+print(top_k_accuracy(logits, labels, k=1))`,
     memory: ['NumPy `argsort` is ascending, so use `[:, ::-1]` before slicing the first `k`.'],
   },
   'single-box-iou': {
@@ -4349,6 +4366,9 @@ def box_iou(box_a: np.ndarray, box_b: np.ndarray) -> float:
     area_b = np.prod(box_b[2:] - box_b[:2])
     union = area_a + area_b - intersection
     return intersection / union if union > 0 else 0.0`,
+    exampleCode: `box_a = np.array([0.0, 0.0, 2.0, 2.0])
+box_b = np.array([1.0, 1.0, 3.0, 3.0])
+print(box_iou(box_a, box_b))`,
     memory: ['IoU is `intersection / (area_a + area_b - intersection)`; clip overlap widths at zero.'],
   },
   'wrapped-angular-difference': {
@@ -4357,6 +4377,9 @@ def box_iou(box_a: np.ndarray, box_b: np.ndarray) -> float:
 def angular_difference(prediction: np.ndarray, target: np.ndarray) -> np.ndarray:
     difference = np.asarray(prediction) - np.asarray(target)
     return np.arctan2(np.sin(difference), np.cos(difference))`,
+    exampleCode: `prediction = np.deg2rad(179.0)
+target = np.deg2rad(-179.0)
+print(np.rad2deg(angular_difference(prediction, target)))`,
     memory: ['Wrap an angle with `atan2(sin(delta), cos(delta))` instead of modulo casework.'],
   },
   'smooth-l1-huber-loss': {
@@ -4372,6 +4395,9 @@ def huber_loss(
     quadratic = 0.5 * error ** 2
     linear = delta * (magnitude - 0.5 * delta)
     return np.mean(np.where(magnitude <= delta, quadratic, linear))`,
+    exampleCode: `prediction = np.array([0.0, 2.0, 4.0])
+target = np.zeros(3)
+print(huber_loss(prediction, target))`,
     memory: ['For elementwise branches, compute both sides and select with `np.where(condition, a, b)`.'],
   },
   'stable-softmax-cross-entropy': {
@@ -4383,6 +4409,9 @@ def softmax_cross_entropy(logits: np.ndarray, labels: np.ndarray) -> float:
     shifted = logits - np.max(logits, axis=1, keepdims=True)
     log_normalizers = np.log(np.sum(np.exp(shifted), axis=1))
     return np.mean(log_normalizers - shifted[np.arange(logits.shape[0]), labels])`,
+    exampleCode: `logits = np.array([[2.0, 1.0, 0.1]])
+labels = np.array([0])
+print(f"{softmax_cross_entropy(logits, labels):.5f}")`,
     memory: ['Stability comes from the row max; `keepdims=True` preserves `(N, 1)` for broadcasting.'],
   },
   'class-weighted-cross-entropy': {
@@ -4400,6 +4429,10 @@ def class_weighted_cross_entropy(
     losses -= shifted[np.arange(logits.shape[0]), labels]
     example_weight = np.asarray(class_weight)[labels]
     return np.sum(losses * example_weight) / np.sum(example_weight)`,
+    exampleCode: `logits = np.array([[2.0, 1.0, 0.1], [0.5, 1.5, -0.5]])
+labels = np.array([0, 1])
+class_weight = np.array([1.0, 2.0, 0.5])
+print(class_weighted_cross_entropy(logits, labels, class_weight))`,
     memory: ['Turn class weights into per-example weights with `class_weight[labels]`.'],
   },
   'temperature-scaling-of-logits': {
@@ -4410,6 +4443,8 @@ def temperature_scaled_probs(logits: np.ndarray, temperature: float) -> np.ndarr
     shifted = scaled - np.max(scaled, axis=-1, keepdims=True)
     exp_logits = np.exp(shifted)
     return exp_logits / np.sum(exp_logits, axis=-1, keepdims=True)`,
+    exampleCode: `logits = np.array([[1000.0, 1001.0, 1002.0]])
+print(temperature_scaled_probs(logits, temperature=1.0))`,
     memory: ['Temperature divides logits before the usual stable softmax.'],
   },
   'pairwise-squared-distance': {
@@ -4421,6 +4456,9 @@ def pairwise_squared_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     y_squared = np.sum(y * y, axis=1)[None, :]
     distances = x_squared + y_squared - 2 * x @ y.T
     return np.maximum(distances, 0)`,
+    exampleCode: `x = np.array([[0.0, 0.0], [1.0, 1.0]])
+y = np.array([[1.0, 0.0], [2.0, 2.0]])
+print(pairwise_squared_distance(x, y))`,
     memory: ['Use `||x||² + ||y||² - 2xyᵀ` to avoid allocating an `(N, M, D)` difference array.'],
   },
   'pairwise-cosine-similarity': {
@@ -4438,6 +4476,9 @@ def pairwise_cosine_similarity(
     denominator = x_norm[:, None] * y_norm[None, :]
     return np.divide(numerator, np.maximum(denominator, eps),
                      out=np.zeros_like(numerator), where=denominator > 0)`,
+    exampleCode: `x = np.array([[1.0, 0.0], [0.0, 0.0]])
+y = np.array([[1.0, 0.0], [1.0, 1.0]])
+print(pairwise_cosine_similarity(x, y))`,
     memory: ['`x_norm[:, None] * y_norm[None, :]` broadcasts `(N,)` and `(M,)` into `(N, M)`.'],
   },
   'nearest-centroid-classifier': {
@@ -4453,6 +4494,10 @@ def nearest_centroid_predict(
     centroids = np.stack([train_X[train_y == label].mean(axis=0) for label in labels])
     distances = np.sum((test_X[:, None, :] - centroids[None, :, :]) ** 2, axis=-1)
     return labels[np.argmin(distances, axis=1)]`,
+    exampleCode: `train_X = np.array([[0.0], [2.0], [10.0], [12.0]])
+train_y = np.array([0, 0, 1, 1])
+test_X = np.array([[0.0], [6.0], [12.0]])
+print(nearest_centroid_predict(train_X, train_y, test_X))`,
     memory: ['Boolean indexing builds each centroid; two singleton axes build all test-to-centroid pairs.'],
   },
   'iou-matrix': {
@@ -4468,6 +4513,9 @@ def box_iou_matrix(boxes1: np.ndarray, boxes2: np.ndarray) -> np.ndarray:
     area2 = np.prod(boxes2[:, 2:] - boxes2[:, :2], axis=1)
     union = area1[:, None] + area2[None, :] - intersection
     return np.divide(intersection, union, out=np.zeros_like(union, dtype=float), where=union > 0)`,
+    exampleCode: `boxes1 = np.array([[0.0, 0.0, 2.0, 2.0], [0.0, 0.0, 1.0, 1.0]])
+boxes2 = np.array([[1.0, 1.0, 3.0, 3.0], [0.0, 0.0, 2.0, 2.0]])
+print(box_iou_matrix(boxes1, boxes2))`,
     memory: ['Insert the pair axes first: `(N, 1, 2)` against `(1, M, 2)` produces `(N, M, 2)`.'],
   },
   'non-maximum-suppression': {
@@ -4489,6 +4537,13 @@ def nms(boxes: np.ndarray, scores: np.ndarray, iou_threshold: float) -> list[int
         iou = intersection / np.maximum(area_current + area_other - intersection, 1e-8)
         order = order[iou <= iou_threshold]
     return keep`,
+    exampleCode: `boxes = np.array([
+    [0.0, 0.0, 2.0, 2.0],
+    [0.5, 0.5, 2.5, 2.5],
+    [5.0, 5.0, 7.0, 7.0],
+])
+scores = np.array([0.9, 0.8, 0.7])
+print(nms(boxes, scores, iou_threshold=0.3))`,
     memory: ['NMS is one stable descending sort followed by a greedy filter of boxes above the IoU threshold.'],
   },
   'dice-loss': {
@@ -4504,6 +4559,9 @@ def dice_loss(
     intersection = np.sum(probability * target, axis=axes)
     total = np.sum(probability, axis=axes) + np.sum(target, axis=axes)
     return np.mean(1 - (2 * intersection + eps) / (total + eps))`,
+    exampleCode: `prediction = np.array([[[1.0, 0.0], [0.0, 1.0]]])
+target = np.array([[[1.0, 0.0], [1.0, 0.0]]])
+print(dice_loss(prediction, target))`,
     memory: ['Dice is `1 - (2 * overlap + eps) / (prediction mass + target mass + eps)`.'],
   },
   'segmentation-iou-loss': {
@@ -4519,24 +4577,34 @@ def segmentation_iou_loss(
     intersection = np.sum(probability * target, axis=axes)
     union = np.sum(probability + target - probability * target, axis=axes)
     return np.mean(1 - (intersection + eps) / (union + eps))`,
+    exampleCode: `prediction = np.array([[[1.0, 0.0], [0.0, 1.0]]])
+target = np.array([[[1.0, 0.0], [1.0, 0.0]]])
+print(segmentation_iou_loss(prediction, target))`,
     memory: ['Soft IoU uses `union = prediction + target - prediction * target` before reducing.'],
   },
   'focal-loss': {
     code: `import numpy as np
 
 def focal_loss(
-    probability: np.ndarray,
+    logits: np.ndarray,
     target: np.ndarray,
-    alpha: float = 0.25,
     gamma: float = 2.0,
     eps: float = 1e-8,
 ) -> float:
-    probability = np.clip(np.asarray(probability), eps, 1 - eps)
-    target = np.asarray(target)
+    logits = np.asarray(logits, dtype=float)
+    target = np.asarray(target, dtype=float)
+    if logits.shape != target.shape or gamma < 0:
+        raise ValueError("logits and target must match and gamma must be non-negative")
+    if np.any((target != 0) & (target != 1)):
+        raise ValueError("target must contain only 0 and 1")
+    probability = 1 / (1 + np.exp(-np.clip(logits, -60.0, 60.0)))
     p_t = np.where(target == 1, probability, 1 - probability)
-    alpha_t = np.where(target == 1, alpha, 1 - alpha)
-    return np.mean(-alpha_t * (1 - p_t) ** gamma * np.log(p_t))`,
-    memory: ['Build `p_t` once, then focal loss is `-alpha_t * (1 - p_t)^gamma * log(p_t)`.'],
+    p_t = np.clip(p_t, eps, 1.0)
+    return np.mean(-((1 - p_t) ** gamma) * np.log(p_t))`,
+    exampleCode: `logits = np.array([4.0, -0.4])
+target = np.array([1.0, 0.0])
+print(focal_loss(logits, target))`,
+    memory: ['Build `p_t` once, then focal loss is `-(1 - p_t)^gamma * log(p_t)`.'],
   },
   'top-k-gather': {
     code: `import numpy as np
@@ -4547,6 +4615,9 @@ def topk_features(scores: np.ndarray, features: np.ndarray, k: int) -> np.ndarra
     gather_indices = np.broadcast_to(indices[:, :, None],
                                      (*indices.shape, features.shape[2]))
     return np.take_along_axis(features, gather_indices, axis=1)`,
+    exampleCode: `scores = np.array([[0.2, 0.9, 0.4]])
+features = np.array([[[2.0, 0.0], [9.0, 0.0], [4.0, 0.0]]])
+print(topk_features(scores, features, k=2))`,
     memory: ['NumPy’s counterpart to `torch.gather` is `np.take_along_axis`.'],
   },
   'homogeneous-coordinate-transform': {
@@ -4556,6 +4627,14 @@ def transform_points(points: np.ndarray, transform: np.ndarray) -> np.ndarray:
     points, transform = np.asarray(points), np.asarray(transform)
     homogeneous = np.concatenate([points, np.ones((points.shape[0], 1))], axis=1)
     return (transform @ homogeneous.T).T[:, :3]`,
+    exampleCode: `points = np.array([[1.0, 2.0, 3.0]])
+transform = np.array([
+    [1.0, 0.0, 0.0, 10.0],
+    [0.0, 1.0, 0.0, 20.0],
+    [0.0, 0.0, 1.0, 30.0],
+    [0.0, 0.0, 0.0, 1.0],
+])
+print(transform_points(points, transform))`,
     memory: ['Append ones, multiply `transform @ homogeneous.T`, transpose back, then keep XYZ.'],
   },
   '2d-patchify-for-images': {
@@ -4567,6 +4646,10 @@ def patchify(images: np.ndarray, patch_size: int) -> np.ndarray:
     grid = images.reshape(batch, channels, grid_h, patch_size, grid_w, patch_size)
     grid = grid.transpose(0, 2, 4, 1, 3, 5)
     return grid.reshape(batch, grid_h * grid_w, channels * patch_size ** 2)`,
+    exampleCode: `images = np.array([[
+    [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+]])
+print(patchify(images, patch_size=2))`,
     memory: ['Patchify is `reshape -> transpose -> reshape`; write the six intermediate axes first.'],
   },
   'unpatchify-back-to-image': {
@@ -4583,6 +4666,11 @@ def unpatchify(
     grid = patches.reshape(batch, grid_h, grid_w, channels, patch_size, patch_size)
     grid = grid.transpose(0, 3, 1, 4, 2, 5)
     return grid.reshape(batch, channels, height, width)`,
+    exampleCode: `patches = np.array([[
+    [1, 2, 3, 4], [5, 6, 7, 8],
+    [9, 10, 11, 12], [13, 14, 15, 16],
+]])
+print(unpatchify(patches, image_shape=(1, 4, 4), patch_size=2))`,
     memory: ['Unpatchify reverses the patch axis order before the final image reshape.'],
   },
   'sinusoidal-positional-encoding': {
@@ -4597,6 +4685,7 @@ def sinusoidal_positional_encoding(length: int, dim: int) -> np.ndarray:
     encoding[:, 0::2] = np.sin(angles)
     encoding[:, 1::2] = np.cos(angles[:, :encoding[:, 1::2].shape[1]])
     return encoding`,
+    exampleCode: `print(sinusoidal_positional_encoding(length=4, dim=5))`,
     memory: ['Even columns use sine, odd columns use cosine, and positions broadcast against frequencies.'],
   },
   'causal-attention-mask': {
@@ -4612,6 +4701,8 @@ def make_causal_attention_mask(
     valid = positions[None, :] < seq_lens[:, None]
     causal = positions[:, None] >= positions[None, :]
     return (causal[None] & valid[:, :, None] & valid[:, None, :]).astype(int)`,
+    exampleCode: `seq_lens = np.array([3, 1])
+print(make_causal_attention_mask(seq_lens, max_len=4))`,
     memory: ['Compare row and column positions to build `(L, L)`, then combine it with batch validity masks.'],
   },
   'rope-rotary-positional-embedding': {
@@ -4627,6 +4718,11 @@ def apply_rope(x: np.ndarray) -> np.ndarray:
     output[..., 0::2] = even * cos - odd * sin
     output[..., 1::2] = even * sin + odd * cos
     return output`,
+    exampleCode: `x = np.array([[
+    [[1.0, 0.0, 1.0, 0.0]],
+    [[1.0, 0.0, 1.0, 0.0]],
+]])
+print(apply_rope(x))`,
     memory: ['Treat every adjacent feature pair as a 2D rotation: `(x_even, x_odd)` times sine and cosine.'],
   },
   'scaled-dot-product-self-attention': {
@@ -4653,6 +4749,9 @@ def self_attention(
     weights /= np.sum(weights, axis=-1, keepdims=True)
     context = (weights @ v).transpose(0, 2, 1, 3).reshape(batch, length, model_dim)
     return context @ W_o`,
+    exampleCode: `x = np.array([[[1.0, 0.0], [0.0, 1.0]]])
+weight = np.eye(2)
+print(self_attention(x, weight, weight, weight, weight, num_heads=1))`,
     memory: ['Memorize the path: project, split heads, `QKᵀ / sqrt(d)`, softmax, weighted sum, merge heads.'],
   },
   'average-precision-from-matches': {
@@ -4669,6 +4768,9 @@ def average_precision(
     ranks = np.arange(1, scores.size + 1)
     precision = cumulative_tp / ranks
     return np.sum(precision * matches) / num_ground_truth`,
+    exampleCode: `scores = np.array([0.9, 0.8, 0.7])
+matches = np.array([True, False, True])
+print(average_precision(scores, matches, num_ground_truth=2))`,
     memory: ['Sort by confidence, compute cumulative precision, and add precision only at true-positive ranks.'],
   },
   'manual-backprop-for-a-2-layer-mlp': {
@@ -4697,6 +4799,13 @@ def mlp_loss_and_grads(
     dhidden = (dlogits @ W2.T) * (hidden_pre > 0)
     dW1, db1 = X.T @ dhidden, np.sum(dhidden, axis=0)
     return {'loss': loss, 'dW1': dW1, 'db1': db1, 'dW2': dW2, 'db2': db2}`,
+    exampleCode: `X = np.array([[1.0, 2.0]])
+y = np.array([1])
+W1 = np.eye(2)
+b1 = np.zeros(2)
+W2 = np.eye(2)
+b2 = np.zeros(2)
+print(mlp_loss_and_grads(X, y, W1, b1, W2, b2))`,
     memory: ['Backprop order is output gradient, second layer, ReLU mask, then first layer.'],
   },
 };

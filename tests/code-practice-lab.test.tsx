@@ -53,6 +53,9 @@ const testProblem: CodePracticeProblem = {
 
 def softmax_cross_entropy(logits: np.ndarray, labels: np.ndarray) -> float:
     return np.asarray(logits)[0, labels[0]]`,
+    exampleCode: `logits = np.array([[2.0, 1.0, 0.1]])
+labels = np.array([0])
+print(softmax_cross_entropy(logits, labels))`,
     memory: ['Keep the row axis when subtracting the maximum.'],
   },
   solutionCode: `def softmax_cross_entropy(logits, labels):
@@ -255,6 +258,7 @@ describe('CodePracticeLab', () => {
     });
     expect(container.textContent).toContain('Torch reference');
     expect(container.textContent).toContain('NumPy reference');
+    expect(container.textContent).toContain('print(softmax_cross_entropy(logits, labels))');
     expect(container.textContent).toContain('What to test and explain');
     expect(container.textContent).toContain('Step 4 of 4');
 
@@ -286,6 +290,7 @@ describe('CodePracticeLab', () => {
 
     expect(getEditor().textContent).toContain('import numpy as np');
     expect(getEditor().textContent).toContain('logits: np.ndarray');
+    expect(getEditor().textContent).toContain('print(softmax_cross_entropy(logits, labels))');
     expect(getEditor().textContent).not.toContain('# Reference solution');
     expect(container.querySelector('[role="dialog"]')).toBeNull();
 
