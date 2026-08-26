@@ -245,6 +245,7 @@ class KVCache:
     },
     solutionNotes: [
       'The cache has one critical invariant:\n`start_pos == current_cache_length`\nA smaller position overwrites history; a larger one leaves a gap. Reject both.',
+      'Keys and values use the same layout and grow only on the token axis:\n`(B, H_kv, T_past, D_head) + (B, H_kv, T_new, D_head)`\n`→ (B, H_kv, T_past + T_new, D_head)`\nBatch, KV-head count, and head width must remain fixed.',
       'All validation happens before mutation. That ordering matters because an exception after writing keys but before writing values would leave an unusable cache.',
       'Concatenation keeps the interview implementation readable. A serving system would normally preallocate, use blocks, or use paged attention so repeated appends do not copy the full prefix.',
     ],
@@ -276,15 +277,21 @@ class KVCache:
         # TODO: validate the whole append, mutate both tensors, then advance length.
         raise NotImplementedError("Implement update")
 
+def smoke_test() -> None:
+    cache = KVCache()
+    first = torch.ones(1, 2, 2, 4)
+    second = torch.zeros(1, 2, 1, 4)
+    cache.update(first, first, start_pos=0)
+    keys, values = cache.update(second, second, start_pos=2)
+    assert keys.shape == values.shape == (1, 2, 3, 4) and cache.length == 3
+    try:
+        cache.update(second, second, start_pos=2)
+        raise AssertionError("stale writes must fail")
+    except ValueError:
+        pass
+    print("KV cache smoke test passed:", tuple(keys.shape))
 
-cache = KVCache()
-k0 = torch.ones(1, 2, 2, 4, dtype=torch.float64)
-v0 = torch.zeros(1, 2, 2, 4, dtype=torch.float64)
-k1 = torch.ones(1, 2, 1, 4, dtype=torch.float64)
-v1 = torch.zeros(1, 2, 1, 4, dtype=torch.float64)
-cache.update(k0, v0, start_pos=0)
-keys, values = cache.update(k1, v1, start_pos=2)
-print(tuple(keys.shape), tuple(values.shape), cache.length)`,
+smoke_test()`,
     solutionCode: `from dataclasses import dataclass
 import torch
 
@@ -310,7 +317,23 @@ class KVCache:
             next_key, next_value = key.clone(), value.clone()
         self.key, self.value = next_key, next_value
         self.length = start_pos + key.shape[2]
-        return self.key, self.value`,
+        return self.key, self.value
+
+def smoke_test():
+    cache = KVCache()
+    first = torch.ones(1, 2, 2, 4)
+    second = torch.zeros(1, 2, 1, 4)
+    cache.update(first, first, start_pos=0)
+    keys, values = cache.update(second, second, start_pos=2)
+    assert keys.shape == values.shape == (1, 2, 3, 4) and cache.length == 3
+    try:
+        cache.update(second, second, start_pos=2)
+        raise AssertionError("stale writes must fail")
+    except ValueError:
+        pass
+    print("KV cache smoke test passed:", tuple(keys.shape))
+
+smoke_test()`,
     walkthroughCode: `from dataclasses import dataclass
 import torch
 
@@ -357,38 +380,49 @@ class KVCache:
     title: 'Implement GQA and MQA',
     difficulty: 'Hard',
     summary:
-      'Implement one grouped-query attention kernel whose KV-head count covers MHA, GQA, and MQA.',
+      'Implement one configurable attention module whose KV-head count explicitly covers MHA, GQA, and MQA.',
     prompt: [
-      'Implement `grouped_query_attention(query, key, value, mask=None)` for pre-split tensors. Queries have shape `(B, H_q, T_q, D_head)` while keys and values have shape `(B, H_kv, T_k, D_head)`.',
-      'Require `H_q` to be divisible by `H_kv`. Repeat each KV head across its query-head group, compute stable masked attention, and return `(B, H_q, T_q, D_head)`. Explain how `H_kv = H_q`, `1 < H_kv < H_q`, and `H_kv = 1` correspond to MHA, GQA, and MQA.',
+      'Implement `GroupedQueryAttention` as an `nn.Module` with separate query-head and KV-head counts.',
+      'The module should project a token sequence, repeat compact K/V heads only for the reference calculation, and explicitly report whether its config is MHA, GQA, or MQA.',
     ],
-    signature: `def grouped_query_attention(
-    query: torch.Tensor,
-    key: torch.Tensor,
-    value: torch.Tensor,
-    mask: torch.Tensor | None = None,
-) -> torch.Tensor:
-    ...`,
+    signature: `@dataclass(frozen=True, slots=True)
+class GQAConfig:
+    model_dim: int
+    num_query_heads: int
+    num_kv_heads: int
+
+class GroupedQueryAttention(nn.Module):
+    def __init__(self, config: GQAConfig):
+        ...
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        mask: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        ...`,
     requirements: [
-      '`query` has shape `(B, H_q, T_q, D_head)`; `key` and `value` share `(B, H_kv, T_k, D_head)`.',
-      '`H_q % H_kv == 0`; each KV head serves `H_q / H_kv` adjacent query heads.',
-      '`mask`, if supplied, is broadcastable to `(B, H_q, T_q, T_k)` with `1` for visible positions.',
+      '`x` has shape `(B, T, model_dim)` and `num_query_heads` divides `model_dim`.',
+      '`num_query_heads % num_kv_heads == 0`; each compact KV head serves an adjacent query-head group.',
+      '`config.mode` returns `"mha"`, `"gqa"`, or `"mqa"` for the three KV-head boundaries.',
+      '`mask`, if supplied, is broadcastable to `(B, H_q, T, T)` with `1` for visible positions.',
       'Use scaled dot-product attention and a numerically stable masked softmax.',
-      'Return `(B, H_q, T_q, D_head)` and reject incompatible shapes.',
+      'Return `(B, T, model_dim)` and include smoke tests for all three modes.',
     ],
     examples: [
       {
-        label: 'Grouped-query attention',
-        lines: ['query.shape = (2, 8, 1, 64)', 'key.shape = value.shape = (2, 2, 128, 64)'],
-        result: 'output.shape == (2, 8, 1, 64); each KV head serves four query heads',
-      },
-      {
-        label: 'Variant boundary',
-        lines: ['H_q = 8'],
-        result: 'H_kv = 8 is MHA; H_kv = 2 is GQA; H_kv = 1 is MQA',
+        label: 'One module, three modes',
+        lines: [
+          'GQAConfig(model_dim=32, num_query_heads=8, num_kv_heads=8).mode == "mha"',
+          'GQAConfig(model_dim=32, num_query_heads=8, num_kv_heads=2).mode == "gqa"',
+          'GQAConfig(model_dim=32, num_query_heads=8, num_kv_heads=1).mode == "mqa"',
+        ],
+        result: 'all three configs return output shaped like the input',
       },
     ],
     hint: [
+      'Let the config own head divisibility and the MHA/GQA/MQA mode boundary.',
+      'Q projects to `H_q * D_head`; K and V project only to `H_kv * D_head`.',
       'Insert a group axis: `(B, H_kv, 1, T_k, D_head)`, broadcast it to the group count, then merge KV-head and group axes.',
       'After repetition, Q/K/V all expose `H_q` heads, so the score shape is `(B, H_q, T_q, T_k)`.',
       'Set blocked logits to negative infinity before the stable softmax.',
@@ -431,6 +465,7 @@ class KVCache:
     },
     solutionNotes: [
       'MHA, GQA, and MQA differ only in the number of stored key/value heads:\n`repeat = H_q / H_kv`\nEach KV head serves that many query heads.',
+      'A module is the right boundary because projection weights and head configuration are reusable state. `config.mode` makes the three variants testable instead of leaving MQA as a sentence in the prompt.',
       'The reference broadcasts then reshapes K/V so the matrix multiplications are easy to inspect. Optimized kernels keep the compact KV representation and perform the mapping inside the attention kernel.',
       'Store the compact cache:\n`KV cache: (B, H_kv, T_k, D_head)`\nDo not store the repeated query-head view; the compact head axis is where GQA and MQA save decode memory.',
     ],
@@ -443,55 +478,135 @@ scores: (B, Hq, Tq, Tk) -> output: (B, Hq, Tq, Dh)
 Hkv = Hq: MHA   |   1 < Hkv < Hq: GQA   |   Hkv = 1: MQA`,
     starterCode: `from __future__ import annotations
 
+from dataclasses import dataclass
 import torch
+from torch import nn
 
+@dataclass(frozen=True, slots=True)
+class GQAConfig:
+    model_dim: int
+    num_query_heads: int
+    num_kv_heads: int
 
-def grouped_query_attention(
-    query: torch.Tensor,
-    key: torch.Tensor,
-    value: torch.Tensor,
-    mask: torch.Tensor | None = None,
-) -> torch.Tensor:
-    # TODO: validate heads, expose each KV head to its query group, then attend stably.
-    raise NotImplementedError("Implement grouped_query_attention")
+    def __post_init__(self) -> None:
+        valid = self.model_dim > 0 and self.num_query_heads > 0 and self.num_kv_heads > 0
+        if not valid or self.model_dim % self.num_query_heads or self.num_query_heads % self.num_kv_heads:
+            raise ValueError("query heads must divide model_dim and KV heads must divide query heads")
 
+    @property
+    def head_dim(self) -> int:
+        return self.model_dim // self.num_query_heads
 
-query = torch.ones(1, 4, 1, 2, dtype=torch.float64)
-key = torch.ones(1, 2, 3, 2, dtype=torch.float64)
-value = torch.tensor(
-    [[[[1.0, 0.0], [2.0, 0.0], [3.0, 0.0]],
-      [[0.0, 1.0], [0.0, 2.0], [0.0, 3.0]]]],
-    dtype=torch.float64,
-)
-print(grouped_query_attention(query, key, value).shape)`,
-    solutionCode: `import torch
+    @property
+    def mode(self) -> str:
+        if self.num_kv_heads == self.num_query_heads:
+            return "mha"
+        return "mqa" if self.num_kv_heads == 1 else "gqa"
 
-def _repeat_kv(tensor, repeats):
-    batch, heads, length, dim = tensor.shape
-    expanded = torch.broadcast_to(
-        tensor[:, :, None, :, :], (batch, heads, repeats, length, dim)
-    )
-    return torch.reshape(expanded, (batch, heads * repeats, length, dim))
+class GroupedQueryAttention(nn.Module):
+    def __init__(self, config: GQAConfig):
+        super().__init__()
+        self.config = config
+        self.q_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        kv_dim = config.num_kv_heads * config.head_dim
+        self.k_proj = nn.Linear(config.model_dim, kv_dim, bias=False)
+        self.v_proj = nn.Linear(config.model_dim, kv_dim, bias=False)
+        self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
 
-def _stable_masked_softmax(scores):
-    valid = torch.isfinite(scores)
-    scores = torch.where(valid, scores, torch.zeros_like(scores))
-    scores = scores - torch.amax(scores, dim=-1, keepdim=True)
-    weights = torch.exp(scores) * torch.as_tensor(valid, dtype=scores.dtype)
-    return weights / torch.clamp(torch.sum(weights, dim=-1, keepdim=True), min=1e-8)
+    def _split(self, tensor: torch.Tensor, heads: int) -> torch.Tensor:
+        # TODO: reshape (B, T, heads * D_head) into (B, heads, T, D_head).
+        raise NotImplementedError("Implement _split")
 
-def grouped_query_attention(query, key, value, mask=None):
-    if query.ndim != 4 or key.ndim != 4 or value.shape != key.shape: raise ValueError("expected Q and matching K/V tensors with rank four")
-    batch, query_heads, query_len, head_dim = query.shape
-    kv_batch, kv_heads, key_len, kv_dim = key.shape
-    if batch != kv_batch or head_dim != kv_dim or query_heads % kv_heads != 0: raise ValueError("incompatible batch, head, or feature dimensions")
-    repeats = query_heads // kv_heads
-    key, value = _repeat_kv(key, repeats), _repeat_kv(value, repeats)
-    scores = query @ key.transpose(-1, -2) / (head_dim ** 0.5)
-    if mask is not None:
-        mask = torch.broadcast_to(torch.as_tensor(mask), scores.shape)
-        scores = torch.where(mask != 0, scores, torch.full_like(scores, float("-inf")))
-    return _stable_masked_softmax(scores) @ value`,
+    def _repeat_kv(self, tensor: torch.Tensor) -> torch.Tensor:
+        # TODO: expose each compact KV head to its adjacent query-head group.
+        raise NotImplementedError("Implement _repeat_kv")
+
+    def forward(self, x: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
+        # TODO: split Q and compact K/V, repeat KV groups, attend, merge, and project out.
+        raise NotImplementedError("Implement forward")
+
+def smoke_test() -> None:
+    torch.manual_seed(0)
+    x = torch.randn(2, 5, 32)
+    for kv_heads, expected_mode in ((8, "mha"), (2, "gqa"), (1, "mqa")):
+        layer = GroupedQueryAttention(GQAConfig(32, 8, kv_heads))
+        output = layer(x)
+        assert layer.config.mode == expected_mode and output.shape == x.shape
+        print(expected_mode, tuple(output.shape))
+
+smoke_test()`,
+    solutionCode: `from dataclasses import dataclass
+import torch
+from torch import nn
+
+@dataclass(frozen=True, slots=True)
+class GQAConfig:
+    model_dim: int
+    num_query_heads: int
+    num_kv_heads: int
+
+    def __post_init__(self):
+        valid = self.model_dim > 0 and self.num_query_heads > 0 and self.num_kv_heads > 0
+        if not valid or self.model_dim % self.num_query_heads or self.num_query_heads % self.num_kv_heads:
+            raise ValueError("query heads must divide model_dim and KV heads must divide query heads")
+
+    @property
+    def head_dim(self):
+        return self.model_dim // self.num_query_heads
+
+    @property
+    def mode(self):
+        if self.num_kv_heads == self.num_query_heads:
+            return "mha"
+        return "mqa" if self.num_kv_heads == 1 else "gqa"
+
+class GroupedQueryAttention(nn.Module):
+    def __init__(self, config: GQAConfig):
+        super().__init__()
+        self.config = config
+        self.q_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        kv_dim = config.num_kv_heads * config.head_dim
+        self.k_proj = nn.Linear(config.model_dim, kv_dim, bias=False)
+        self.v_proj = nn.Linear(config.model_dim, kv_dim, bias=False)
+        self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+
+    def _split(self, tensor, heads):
+        batch, length, _ = tensor.shape
+        return tensor.reshape(batch, length, heads, self.config.head_dim).permute(0, 2, 1, 3)
+
+    def _repeat_kv(self, tensor):
+        batch, heads, length, dim = tensor.shape
+        groups = self.config.num_query_heads // heads
+        expanded = torch.broadcast_to(tensor[:, :, None], (batch, heads, groups, length, dim))
+        return torch.reshape(expanded, (batch, heads * groups, length, dim))
+
+    def forward(self, x, mask=None):
+        q = self._split(self.q_proj(x), self.config.num_query_heads)
+        k = self._repeat_kv(self._split(self.k_proj(x), self.config.num_kv_heads))
+        v = self._repeat_kv(self._split(self.v_proj(x), self.config.num_kv_heads))
+        scores = q @ k.transpose(-1, -2) / (self.config.head_dim ** 0.5)
+        if mask is not None:
+            mask = torch.broadcast_to(torch.as_tensor(mask), scores.shape)
+            scores = torch.where(mask != 0, scores, torch.full_like(scores, float("-inf")))
+        valid = torch.isfinite(scores)
+        safe = torch.where(valid, scores, torch.zeros_like(scores))
+        shifted = safe - torch.amax(safe, dim=-1, keepdim=True)
+        weights = torch.exp(shifted) * torch.as_tensor(valid, dtype=scores.dtype)
+        weights = weights / torch.clamp(torch.sum(weights, dim=-1, keepdim=True), min=1e-8)
+        context = (weights @ v).permute(0, 2, 1, 3)
+        context = context.reshape(x.shape[0], x.shape[1], self.config.model_dim)
+        return self.out_proj(context)
+
+def smoke_test():
+    torch.manual_seed(0)
+    x = torch.randn(2, 5, 32)
+    for kv_heads, expected_mode in ((8, "mha"), (2, "gqa"), (1, "mqa")):
+        layer = GroupedQueryAttention(GQAConfig(32, 8, kv_heads))
+        output = layer(x)
+        assert layer.config.mode == expected_mode and output.shape == x.shape
+        print(expected_mode, tuple(output.shape))
+
+smoke_test()`,
     walkthroughCode: `import torch
 
 def _repeat_kv(tensor, repeats):
