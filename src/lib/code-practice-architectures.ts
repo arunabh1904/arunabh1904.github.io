@@ -7,7 +7,6 @@ export const ARCHITECTURE_CODE_PRACTICE_PROBLEMS = [
     title: 'Build a configurable ResNet',
     difficulty: 'Hard',
     track: 'architecture',
-    environment: 'local-pytorch',
     summary:
       'Implement a typed residual block and assemble a configurable ResNet with explicit downsampling rules.',
     prompt: [
@@ -121,11 +120,16 @@ class ResNet(nn.Module):
 
 def smoke_test() -> None:
     device = torch.device("cpu")
-    model = ResNet(ResNetConfig(num_classes=10)).to(device=device, dtype=torch.float32)
-    images = torch.randn(2, 3, 225, 229, device=device, dtype=torch.float32)
+    config = ResNetConfig(
+        num_classes=10,
+        stage_channels=(4, 8),
+        blocks_per_stage=(1, 1),
+    )
+    model = ResNet(config).to(device=device, dtype=torch.float32).eval()
+    images = torch.randn(1, 3, 17, 19, device=device, dtype=torch.float32)
     with torch.inference_mode():
         logits = model(images)
-    assert logits.shape == (2, 10)
+    assert logits.shape == (1, 10)
     print(tuple(logits.shape))
 
 
@@ -209,11 +213,16 @@ class ResNet(nn.Module):
 
 def smoke_test() -> None:
     device = torch.device("cpu")
-    model = ResNet(ResNetConfig(num_classes=10)).to(device=device, dtype=torch.float32)
-    images = torch.randn(2, 3, 225, 229, device=device, dtype=torch.float32)
+    config = ResNetConfig(
+        num_classes=10,
+        stage_channels=(4, 8),
+        blocks_per_stage=(1, 1),
+    )
+    model = ResNet(config).to(device=device, dtype=torch.float32).eval()
+    images = torch.randn(1, 3, 17, 19, device=device, dtype=torch.float32)
     with torch.inference_mode():
         logits = model(images)
-    assert logits.shape == (2, 10)
+    assert logits.shape == (1, 10)
     print(tuple(logits.shape))
 
 
@@ -228,7 +237,6 @@ if __name__ == "__main__":
     title: 'Build a U-Net encoder-decoder',
     difficulty: 'Hard',
     track: 'architecture',
-    environment: 'local-pytorch',
     summary:
       'Implement a configurable U-Net with reusable blocks, skip connections, and robust odd-size handling.',
     prompt: [
@@ -341,12 +349,12 @@ class UNet(nn.Module):
 
 def smoke_test() -> None:
     device = torch.device("cpu")
-    config = UNetConfig(out_channels=4, channels=(32, 64, 128))
-    model = UNet(config).to(device=device, dtype=torch.float32)
-    images = torch.randn(2, 3, 127, 131, device=device, dtype=torch.float32)
+    config = UNetConfig(out_channels=4, channels=(4, 8))
+    model = UNet(config).to(device=device, dtype=torch.float32).eval()
+    images = torch.randn(1, 3, 17, 19, device=device, dtype=torch.float32)
     with torch.inference_mode():
         logits = model(images)
-    assert logits.shape == (2, 4, 127, 131)
+    assert logits.shape == (1, 4, 17, 19)
     print(tuple(logits.shape))
 
 
@@ -436,12 +444,12 @@ class UNet(nn.Module):
 
 def smoke_test() -> None:
     device = torch.device("cpu")
-    config = UNetConfig(out_channels=4, channels=(32, 64, 128))
-    model = UNet(config).to(device=device, dtype=torch.float32)
-    images = torch.randn(2, 3, 127, 131, device=device, dtype=torch.float32)
+    config = UNetConfig(out_channels=4, channels=(4, 8))
+    model = UNet(config).to(device=device, dtype=torch.float32).eval()
+    images = torch.randn(1, 3, 17, 19, device=device, dtype=torch.float32)
     with torch.inference_mode():
         logits = model(images)
-    assert logits.shape == (2, 4, 127, 131)
+    assert logits.shape == (1, 4, 17, 19)
     print(tuple(logits.shape))
 
 
@@ -456,7 +464,6 @@ if __name__ == "__main__":
     title: 'Build a CenterNet-style detector',
     difficulty: 'Hard',
     track: 'architecture',
-    environment: 'local-pytorch',
     summary:
       'Implement a compact keypoint detector with typed outputs and separate heatmap, size, and offset heads.',
     prompt: [
@@ -580,12 +587,13 @@ class CenterNetDetector(nn.Module):
 
 def smoke_test() -> None:
     device = torch.device("cpu")
-    model = CenterNetDetector(CenterNetConfig(num_classes=6)).to(device=device, dtype=torch.float32)
-    images = torch.randn(2, 3, 128, 160, device=device, dtype=torch.float32)
+    config = CenterNetConfig(num_classes=6, feature_channels=8, head_channels=4)
+    model = CenterNetDetector(config).to(device=device, dtype=torch.float32).eval()
+    images = torch.randn(1, 3, 16, 20, device=device, dtype=torch.float32)
     with torch.inference_mode():
         output = model(images)
-    assert output.heatmap_logits.shape == (2, 6, 32, 40)
-    assert output.size.shape == output.offset.shape == (2, 2, 32, 40)
+    assert output.heatmap_logits.shape == (1, 6, 4, 5)
+    assert output.size.shape == output.offset.shape == (1, 2, 4, 5)
     print(tuple(output.heatmap_logits.shape), tuple(output.size.shape), tuple(output.offset.shape))
 
 
@@ -671,12 +679,13 @@ class CenterNetDetector(nn.Module):
 
 def smoke_test() -> None:
     device = torch.device("cpu")
-    model = CenterNetDetector(CenterNetConfig(num_classes=6)).to(device=device, dtype=torch.float32)
-    images = torch.randn(2, 3, 128, 160, device=device, dtype=torch.float32)
+    config = CenterNetConfig(num_classes=6, feature_channels=8, head_channels=4)
+    model = CenterNetDetector(config).to(device=device, dtype=torch.float32).eval()
+    images = torch.randn(1, 3, 16, 20, device=device, dtype=torch.float32)
     with torch.inference_mode():
         output = model(images)
-    assert output.heatmap_logits.shape == (2, 6, 32, 40)
-    assert output.size.shape == output.offset.shape == (2, 2, 32, 40)
+    assert output.heatmap_logits.shape == (1, 6, 4, 5)
+    assert output.size.shape == output.offset.shape == (1, 2, 4, 5)
     print(tuple(output.heatmap_logits.shape), tuple(output.size.shape), tuple(output.offset.shape))
 
 

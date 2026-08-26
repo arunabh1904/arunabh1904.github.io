@@ -178,6 +178,13 @@ def _shape(size):
 def _shape_args(sizes):
     return _shape(sizes[0]) if len(sizes) == 1 else tuple(int(v) for v in sizes)
 
+def _pair(value):
+    if isinstance(value, (int, _np.integer)):
+        return (int(value), int(value))
+    if len(value) != 2:
+        raise ValueError('expected an int or a pair')
+    return (int(value[0]), int(value[1]))
+
 def _axis(dim):
     return dim
 
@@ -636,6 +643,12 @@ class _Sequential(_Module):
     def __iter__(self):
         return iter(self._modules.values())
 
+    def __len__(self):
+        return len(self._modules)
+
+    def __getitem__(self, index):
+        return list(self._modules.values())[index]
+
 class _Linear(_Module):
     def __init__(self, in_features, out_features, bias=True):
         super().__init__()
@@ -649,8 +662,239 @@ class _Linear(_Module):
             output = output + self.bias
         return _wrap(output)
 
-class _ReLU(_Module):
+class _Conv2d(_Module):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        kernel_size,
+        stride=1,
+        padding=0,
+        dilation=1,
+        groups=1,
+        bias=True,
+        **_kwargs,
+    ):
+        super().__init__()
+        self.in_channels = int(in_channels)
+        self.out_channels = int(out_channels)
+        self.kernel_size = _pair(kernel_size)
+        self.stride = _pair(stride)
+        self.padding = _pair(padding)
+        self.dilation = _pair(dilation)
+        self.groups = int(groups)
+        if self.in_channels % self.groups or self.out_channels % self.groups:
+            raise ValueError('in_channels and out_channels must be divisible by groups')
+        kernel_elements = (self.in_channels // self.groups) * _np.prod(self.kernel_size)
+        scale = 1.0 / max(1, int(kernel_elements)) ** 0.5
+        self.weight = _Parameter(_np.random.uniform(
+            -scale,
+            scale,
+            (self.out_channels, self.in_channels // self.groups, *self.kernel_size),
+        ).astype(_np.float32))
+        self.bias = (
+            _Parameter(_np.random.uniform(-scale, scale, self.out_channels).astype(_np.float32))
+            if bias
+            else None
+        )
+
     def forward(self, value):
+        value = _np.asarray(value)
+        if value.ndim != 4 or value.shape[1] != self.in_channels:
+            raise ValueError('Conv2d expects input shaped (B, in_channels, H, W)')
+        kh, kw = self.kernel_size
+        sh, sw = self.stride
+        ph, pw = self.padding
+        dh, dw = self.dilation
+        effective_h = dh * (kh - 1) + 1
+        effective_w = dw * (kw - 1) + 1
+        padded = _np.pad(value, ((0, 0), (0, 0), (ph, ph), (pw, pw)))
+        windows = _np.lib.stride_tricks.sliding_window_view(
+            padded,
+            (effective_h, effective_w),
+            axis=(-2, -1),
+        )[:, :, ::sh, ::sw, ::dh, ::dw]
+        out_per_group = self.out_channels // self.groups
+        in_per_group = self.in_channels // self.groups
+        outputs = []
+        for group in range(self.groups):
+            group_windows = windows[:, group * in_per_group:(group + 1) * in_per_group]
+            group_weight = self.weight[group * out_per_group:(group + 1) * out_per_group]
+            outputs.append(_np.einsum('bchwij,ocij->bohw', group_windows, group_weight))
+        output = _np.concatenate(outputs, axis=1)
+        if self.bias is not None:
+            output = output + self.bias[None, :, None, None]
+        return _wrap(output)
+
+class _ConvTranspose2d(_Module):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        kernel_size,
+        stride=1,
+        padding=0,
+        output_padding=0,
+        groups=1,
+        bias=True,
+        dilation=1,
+        **_kwargs,
+    ):
+        super().__init__()
+        self.in_channels = int(in_channels)
+        self.out_channels = int(out_channels)
+        self.kernel_size = _pair(kernel_size)
+        self.stride = _pair(stride)
+        self.padding = _pair(padding)
+        self.output_padding = _pair(output_padding)
+        self.dilation = _pair(dilation)
+        self.groups = int(groups)
+        if self.in_channels % self.groups or self.out_channels % self.groups:
+            raise ValueError('in_channels and out_channels must be divisible by groups')
+        kernel_elements = (self.out_channels // self.groups) * _np.prod(self.kernel_size)
+        scale = 1.0 / max(1, int(kernel_elements)) ** 0.5
+        self.weight = _Parameter(_np.random.uniform(
+            -scale,
+            scale,
+            (self.in_channels, self.out_channels // self.groups, *self.kernel_size),
+        ).astype(_np.float32))
+        self.bias = (
+            _Parameter(_np.random.uniform(-scale, scale, self.out_channels).astype(_np.float32))
+            if bias
+            else None
+        )
+
+    def forward(self, value):
+        value = _np.asarray(value)
+        if value.ndim != 4 or value.shape[1] != self.in_channels:
+            raise ValueError('ConvTranspose2d expects input shaped (B, in_channels, H, W)')
+        batch, _, height, width = value.shape
+        kh, kw = self.kernel_size
+        sh, sw = self.stride
+        ph, pw = self.padding
+        oph, opw = self.output_padding
+        dh, dw = self.dilation
+        full_h = (height - 1) * sh + dh * (kh - 1) + 1 + oph
+        full_w = (width - 1) * sw + dw * (kw - 1) + 1 + opw
+        output = _np.zeros((batch, self.out_channels, full_h, full_w), dtype=_np.result_type(value, self.weight))
+        in_per_group = self.in_channels // self.groups
+        out_per_group = self.out_channels // self.groups
+        for group in range(self.groups):
+            group_value = value[:, group * in_per_group:(group + 1) * in_per_group]
+            group_weight = self.weight[group * in_per_group:(group + 1) * in_per_group]
+            for kernel_y in range(kh):
+                for kernel_x in range(kw):
+                    contribution = _np.einsum(
+                        'bihw,io->bohw',
+                        group_value,
+                        group_weight[:, :, kernel_y, kernel_x],
+                    )
+                    start_y = kernel_y * dh
+                    start_x = kernel_x * dw
+                    output[
+                        :,
+                        group * out_per_group:(group + 1) * out_per_group,
+                        start_y:start_y + sh * height:sh,
+                        start_x:start_x + sw * width:sw,
+                    ] += contribution
+        if ph or pw:
+            output = output[:, :, ph:full_h - ph, pw:full_w - pw]
+        if self.bias is not None:
+            output = output + self.bias[None, :, None, None]
+        return _wrap(output)
+
+class _BatchNorm2d(_Module):
+    def __init__(self, num_features, eps=1e-5, momentum=0.1, affine=True, track_running_stats=True, **_kwargs):
+        super().__init__()
+        self.num_features = int(num_features)
+        self.eps = float(eps)
+        self.momentum = float(momentum)
+        self.affine = bool(affine)
+        self.track_running_stats = bool(track_running_stats)
+        self.weight = _Parameter(_np.ones(self.num_features, dtype=_np.float32)) if affine else None
+        self.bias = _Parameter(_np.zeros(self.num_features, dtype=_np.float32)) if affine else None
+        self.register_buffer('running_mean', _np.zeros(self.num_features, dtype=_np.float32))
+        self.register_buffer('running_var', _np.ones(self.num_features, dtype=_np.float32))
+        self.register_buffer('num_batches_tracked', _np.zeros((), dtype=_np.int64))
+
+    def forward(self, value):
+        value = _np.asarray(value)
+        if value.ndim != 4 or value.shape[1] != self.num_features:
+            raise ValueError('BatchNorm2d expects input shaped (B, num_features, H, W)')
+        if self.training or not self.track_running_stats:
+            mean = _np.mean(value, axis=(0, 2, 3))
+            variance = _np.var(value, axis=(0, 2, 3))
+            if self.track_running_stats:
+                self.running_mean[...] = (1.0 - self.momentum) * self.running_mean + self.momentum * mean
+                self.running_var[...] = (1.0 - self.momentum) * self.running_var + self.momentum * variance
+                self.num_batches_tracked[...] += 1
+        else:
+            mean = self.running_mean
+            variance = self.running_var
+        output = (value - mean[None, :, None, None]) / _np.sqrt(variance[None, :, None, None] + self.eps)
+        if self.affine:
+            output = output * self.weight[None, :, None, None] + self.bias[None, :, None, None]
+        return _wrap(output)
+
+class _MaxPool2d(_Module):
+    def __init__(self, kernel_size, stride=None, padding=0, dilation=1, **_kwargs):
+        super().__init__()
+        self.kernel_size = _pair(kernel_size)
+        self.stride = _pair(kernel_size if stride is None else stride)
+        self.padding = _pair(padding)
+        self.dilation = _pair(dilation)
+
+    def forward(self, value):
+        value = _np.asarray(value)
+        kh, kw = self.kernel_size
+        sh, sw = self.stride
+        ph, pw = self.padding
+        dh, dw = self.dilation
+        effective_h = dh * (kh - 1) + 1
+        effective_w = dw * (kw - 1) + 1
+        padded = _np.pad(
+            value,
+            ((0, 0), (0, 0), (ph, ph), (pw, pw)),
+            constant_values=-_np.inf,
+        )
+        windows = _np.lib.stride_tricks.sliding_window_view(
+            padded,
+            (effective_h, effective_w),
+            axis=(-2, -1),
+        )[:, :, ::sh, ::sw, ::dh, ::dw]
+        return _wrap(_np.max(windows, axis=(-2, -1)))
+
+class _AdaptiveAvgPool2d(_Module):
+    def __init__(self, output_size):
+        super().__init__()
+        self.output_size = _pair(output_size)
+
+    def forward(self, value):
+        value = _np.asarray(value)
+        output_h, output_w = self.output_size
+        height, width = value.shape[-2:]
+        output = _np.empty((*value.shape[:-2], output_h, output_w), dtype=value.dtype)
+        for output_y in range(output_h):
+            start_y = int(_np.floor(output_y * height / output_h))
+            end_y = int(_np.ceil((output_y + 1) * height / output_h))
+            for output_x in range(output_w):
+                start_x = int(_np.floor(output_x * width / output_w))
+                end_x = int(_np.ceil((output_x + 1) * width / output_w))
+                output[..., output_y, output_x] = _np.mean(
+                    value[..., start_y:end_y, start_x:end_x],
+                    axis=(-2, -1),
+                )
+        return _wrap(output)
+
+class _ReLU(_Module):
+    def __init__(self, inplace=False):
+        super().__init__()
+        self.inplace = bool(inplace)
+
+    def forward(self, value):
+        if self.inplace:
+            value[...] = _np.maximum(value, 0)
+            return value
         return _wrap(_np.maximum(value, 0))
 
 class _Dropout(_Module):
@@ -676,6 +920,11 @@ _nn.ParameterList = _ParameterList
 _nn.ParameterDict = _ParameterDict
 _nn.Sequential = _Sequential
 _nn.Linear = _Linear
+_nn.Conv2d = _Conv2d
+_nn.ConvTranspose2d = _ConvTranspose2d
+_nn.BatchNorm2d = _BatchNorm2d
+_nn.MaxPool2d = _MaxPool2d
+_nn.AdaptiveAvgPool2d = _AdaptiveAvgPool2d
 _nn.ReLU = _ReLU
 _nn.Dropout = _Dropout
 _nn.Identity = _Identity
@@ -685,7 +934,52 @@ _functional.log_softmax = _log_softmax
 _functional.cross_entropy = _cross_entropy
 _functional.relu = lambda value, inplace=False: _wrap(_np.maximum(value, 0))
 _functional.linear = lambda value, weight, bias=None: _wrap(_np.matmul(value, weight.T) + (0 if bias is None else bias))
+
+def _interpolate(value, size=None, scale_factor=None, mode='nearest', align_corners=None, **_kwargs):
+    value = _np.asarray(value)
+    if value.ndim != 4:
+        raise ValueError('interpolate expects input shaped (B, C, H, W)')
+    input_h, input_w = value.shape[-2:]
+    if size is None:
+        if isinstance(scale_factor, (int, float, _np.number)):
+            scale_h = scale_w = float(scale_factor)
+        else:
+            scale_h, scale_w = (float(scale_factor[0]), float(scale_factor[1]))
+        output_h, output_w = int(input_h * scale_h), int(input_w * scale_w)
+    else:
+        output_h, output_w = _pair(size)
+    if mode == 'nearest':
+        y = _np.minimum((_np.arange(output_h) * input_h / output_h).astype(int), input_h - 1)
+        x = _np.minimum((_np.arange(output_w) * input_w / output_w).astype(int), input_w - 1)
+        return _wrap(value[:, :, y[:, None], x[None, :]])
+    if mode != 'bilinear':
+        raise NotImplementedError("browser interpolate supports 'nearest' and 'bilinear'")
+    if align_corners:
+        source_y = _np.linspace(0, input_h - 1, output_h) if output_h > 1 else _np.zeros(1)
+        source_x = _np.linspace(0, input_w - 1, output_w) if output_w > 1 else _np.zeros(1)
+    else:
+        source_y = (_np.arange(output_h) + 0.5) * input_h / output_h - 0.5
+        source_x = (_np.arange(output_w) + 0.5) * input_w / output_w - 0.5
+        source_y = _np.clip(source_y, 0, input_h - 1)
+        source_x = _np.clip(source_x, 0, input_w - 1)
+    y0 = _np.floor(source_y).astype(int)
+    x0 = _np.floor(source_x).astype(int)
+    y1 = _np.minimum(y0 + 1, input_h - 1)
+    x1 = _np.minimum(x0 + 1, input_w - 1)
+    wy = source_y - y0
+    wx = source_x - x0
+    top = value[:, :, y0[:, None], x0[None, :]] * (1.0 - wx)[None, None, None, :]
+    top += value[:, :, y0[:, None], x1[None, :]] * wx[None, None, None, :]
+    bottom = value[:, :, y1[:, None], x0[None, :]] * (1.0 - wx)[None, None, None, :]
+    bottom += value[:, :, y1[:, None], x1[None, :]] * wx[None, None, None, :]
+    return _wrap(top * (1.0 - wy)[None, None, :, None] + bottom * wy[None, None, :, None])
+
+_functional.interpolate = _interpolate
 _nn.functional = _functional
+
+_init = _types.ModuleType('torch.nn.init')
+_init.constant_ = lambda tensor, value: tensor.fill_(value)
+_nn.init = _init
 torch.nn = _nn
 
 class _Dataset:
@@ -777,6 +1071,7 @@ torch.linalg = _linalg
 _sys.modules['torch'] = torch
 _sys.modules['torch.nn'] = _nn
 _sys.modules['torch.nn.functional'] = _functional
+_sys.modules['torch.nn.init'] = _init
 _sys.modules['torch.linalg'] = _linalg
 _sys.modules['torch.cuda'] = _cuda
 _sys.modules['torch.utils'] = _utils

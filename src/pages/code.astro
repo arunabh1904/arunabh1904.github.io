@@ -23,7 +23,7 @@ const practiceTracks = [
     eyebrow: 'Track 02',
     title: 'Architecture builds',
     summary:
-      'Longer local-PyTorch exercises for designing clean module boundaries, tracking shapes, and testing a complete model.',
+      'Longer browser-runnable exercises for designing clean module boundaries, tracking shapes, and testing a complete model.',
     problems: architectures,
   },
 ];
@@ -31,7 +31,7 @@ const practiceTracks = [
 
 <PostLayout
   title="Code"
-  description="ML coding interview practice with runnable fundamentals and clean PyTorch architecture builds."
+  description="Browser-runnable ML coding interview practice, from tensor fundamentals to clean PyTorch architecture builds."
   showSectionsNav={false}
 >
   <section class="code-index">
@@ -61,23 +61,6 @@ const practiceTracks = [
       </ol>
     </section>
 
-    <section class="code-index__environment" aria-labelledby="code-environment-title">
-      <div>
-        <p class="code-index__eyebrow">Two workspaces</p>
-        <h2 id="code-environment-title">Use the right runtime</h2>
-        <p>
-          Fundamentals run in a browser Python editor. Architecture builds use real
-          <code>torch.nn</code> code and include a local smoke test because the browser compatibility
-          layer is not a full PyTorch runtime.
-        </p>
-      </div>
-      <ul>
-        <li><kbd>Ctrl / Cmd + Enter</kbd> runs browser exercises.</li>
-        <li>Hints insert comments into the editor, and Solution loads the reference code.</li>
-        <li>Architecture exercises use dataclasses, classes, <code>nn.Module</code>, and typed outputs.</li>
-      </ul>
-    </section>
-
     {practiceTracks.map((track) => (
       <section class="code-index__track" aria-labelledby={`code-track-${track.id}`}>
         <div class="code-index__track-heading">
@@ -95,7 +78,6 @@ const practiceTracks = [
                 <div class="code-index__card-header">
                   <p>{`Problem ${String(problem.order).padStart(2, '0')}`}</p>
                   <div class="code-index__card-badges">
-                    <span>{problem.environment === 'local-pytorch' ? 'Local PyTorch' : 'Browser'}</span>
                     <span>{problem.difficulty}</span>
                   </div>
                 </div>

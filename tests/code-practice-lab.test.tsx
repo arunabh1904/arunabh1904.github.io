@@ -404,12 +404,15 @@ describe('CodePracticeLab', () => {
     expect(container.querySelector('.code-practice-lab--reference')).toBeNull();
   });
 
-  it('keeps full nn.Module exercises editable without booting the browser shim', async () => {
+  it('runs full nn.Module exercises in the same browser workspace', async () => {
+    loadPyodideRuntime.mockResolvedValueOnce({
+      runPythonAsync: vi.fn(),
+    });
+
     await render({
       ...testProblem,
       id: 'resnet-from-building-blocks',
       title: 'Build a configurable ResNet',
-      environment: 'local-pytorch',
       track: 'architecture',
       numpyAlternative: undefined,
       editorStart: 'scaffold',
@@ -425,10 +428,9 @@ class ResNet(nn.Module):
         return x`,
     });
 
-    expect(loadPyodideRuntime).not.toHaveBeenCalled();
-    expect(container.textContent).toContain('Local PyTorch');
-    expect(container.textContent).toContain('full torch.nn API');
-    expect(container.querySelector('button[aria-label="Run code"]')).toBeNull();
+    expect(loadPyodideRuntime).toHaveBeenCalledOnce();
+    expect(container.textContent).not.toContain('Local PyTorch');
+    expect(container.querySelector('button[aria-label="Run code"]')).not.toBeNull();
     expect(getEditor().textContent).toContain('class ResNet(nn.Module):');
   });
 

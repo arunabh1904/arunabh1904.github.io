@@ -68,7 +68,7 @@ _execution_result = None
 
 with contextlib.redirect_stdout(_stdout_buffer), contextlib.redirect_stderr(_stderr_buffer):
     try:
-        exec("""${escapedCode}""", {})
+        exec("""${escapedCode}""", {"__name__": "__main__"})
     except Exception:
         traceback.print_exc()
 
