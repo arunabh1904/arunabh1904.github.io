@@ -206,7 +206,7 @@ The diagram below turns those unspecified boundaries into one design proposal.
 <div class="source-explainer-comparison source-explainer-comparison--architecture">
   <figure>
     <div class="comparison-label">02 · Proposed implementation</div>
-    <a href="/assets/images/autonomous-driving-two-speed-stack.svg"><img src="/assets/images/autonomous-driving-two-speed-stack.svg" alt="Proposed implementation arranged like the Waymo source figure: sensor fusion in the upper branch and a triggered Driving VLM in the lower branch feed trajectory proposal, followed by scoring, independent validation, trajectory selection, and vehicle control"></a>
+    <a href="/assets/images/autonomous-driving-two-speed-stack.svg"><img src="/assets/images/autonomous-driving-two-speed-stack.svg" alt="Proposed implementation arranged like the Waymo source figure: separate camera, LiDAR, and radar encoders fuse measured and learned state in the upper branch; a triggered Driving VLM adds bounded context in the lower branch; drawn candidate paths then pass through learned ranking and independent checks before vehicle control"></a>
   </figure>
 </div>
 
