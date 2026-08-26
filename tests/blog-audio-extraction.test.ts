@@ -72,6 +72,33 @@ function sectionPromptsForTts(source: string) {
   return JSON.parse(result.stdout) as string[];
 }
 
+function paragraphChunksForTts(source: string) {
+  const program = [
+    'import dataclasses, importlib.util, json, pathlib, sys',
+    'path = pathlib.Path(sys.argv[1])',
+    'spec = importlib.util.spec_from_file_location("blog_audio", path)',
+    'module = importlib.util.module_from_spec(spec)',
+    'sys.modules[spec.name] = module',
+    'spec.loader.exec_module(module)',
+    'cleaned = module.shape_narration(module.clean_markdown(sys.stdin.read()))',
+    'chunks = module.paragraph_chunks_for_tts(cleaned)',
+    'print(json.dumps([dataclasses.asdict(chunk) for chunk in chunks]))',
+  ].join('; ');
+  const result = spawnSync('python3', ['-c', program, exporterPath], {
+    cwd: projectRoot,
+    encoding: 'utf8',
+    input: source,
+  });
+
+  expect(result.stderr).toBe('');
+  expect(result.status).toBe(0);
+  return JSON.parse(result.stdout) as Array<{
+    text: string;
+    pause_seconds: number;
+    kind: 'heading' | 'paragraph';
+  }>;
+}
+
 describe('Blog audio extraction', () => {
   it('preserves authored prose in order while omitting visual-only material', () => {
     const source = [
@@ -184,6 +211,40 @@ describe('Blog audio extraction', () => {
     expect(sections).toEqual([
       'Perception.\nFirst paragraph. Second sentence.\nSecond paragraph stays in the same request.',
       'Geometry.\nA new heading starts the next request.',
+    ]);
+  });
+
+  it('gives the human profile explicit heading and paragraph pauses', () => {
+    const chunks = paragraphChunksForTts([
+      '# Perception',
+      '',
+      'First paragraph. Second sentence.',
+      '',
+      'Second paragraph stays a separate synthesis request.',
+      '',
+      '## Geometry',
+      '',
+      'The final paragraph has no trailing synthetic silence.',
+    ].join('\n'));
+
+    expect(chunks).toEqual([
+      { text: 'Perception.', pause_seconds: 0.65, kind: 'heading' },
+      {
+        text: 'First paragraph. Second sentence.',
+        pause_seconds: 0.35,
+        kind: 'paragraph',
+      },
+      {
+        text: 'Second paragraph stays a separate synthesis request.',
+        pause_seconds: 0.35,
+        kind: 'paragraph',
+      },
+      { text: 'Geometry.', pause_seconds: 0.65, kind: 'heading' },
+      {
+        text: 'The final paragraph has no trailing synthetic silence.',
+        pause_seconds: 0,
+        kind: 'paragraph',
+      },
     ]);
   });
 });
