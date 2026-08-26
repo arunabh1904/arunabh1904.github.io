@@ -1,6 +1,15 @@
+import { execFileSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 import { codePracticeProblems } from '../src/lib/code-practice';
 import { TORCH_COMPAT_SOURCE } from '../src/lib/torch-compat';
+
+function compilePython(code: string) {
+  execFileSync(
+    'python3',
+    ['-c', 'import sys; compile(sys.stdin.read(), "solution.py", "exec")'],
+    { encoding: 'utf8', input: code },
+  );
+}
 
 // These helpers solve the operation being taught instead of exposing its tensor steps.
 const BANNED_CONVENIENCE_CALLS = [
@@ -88,6 +97,10 @@ describe('code-practice primitive-first solutions', () => {
       expect(problem.order, problem.id).toBe(index + 1);
       expect(problem.solutionNotes.length, problem.id).toBeGreaterThan(0);
       expect(problem.solutionCode.trim(), problem.id).not.toBe('');
+      expect(problem.prompt.length, problem.id).toBeGreaterThan(0);
+      expect(problem.requirements.length, problem.id).toBeGreaterThan(0);
+      expect(problem.examples.length, problem.id).toBeGreaterThan(0);
+      expect(problem.hint.length, problem.id).toBeGreaterThan(0);
     }
   });
 
@@ -101,6 +114,87 @@ describe('code-practice primitive-first solutions', () => {
         problem.id,
       ).toHaveLength(0);
     }
+  });
+
+  it('offers NumPy only for concise array-math interviews', () => {
+    const expectedIds = [
+      'l1-regression-loss',
+      'binary-cross-entropy-from-probabilities',
+      'masked-mean',
+      'binary-classification-metrics',
+      'top-k-accuracy',
+      'single-box-iou',
+      'wrapped-angular-difference',
+      'smooth-l1-huber-loss',
+      'stable-softmax-cross-entropy',
+      'class-weighted-cross-entropy',
+      'temperature-scaling-of-logits',
+      'pairwise-squared-distance',
+      'pairwise-cosine-similarity',
+      'nearest-centroid-classifier',
+      'iou-matrix',
+      'non-maximum-suppression',
+      'dice-loss',
+      'segmentation-iou-loss',
+      'focal-loss',
+      'top-k-gather',
+      'homogeneous-coordinate-transform',
+      '2d-patchify-for-images',
+      'unpatchify-back-to-image',
+      'sinusoidal-positional-encoding',
+      'causal-attention-mask',
+      'rope-rotary-positional-embedding',
+      'scaled-dot-product-self-attention',
+      'average-precision-from-matches',
+      'manual-backprop-for-a-2-layer-mlp',
+    ];
+    const numpyProblems = codePracticeProblems.filter((problem) => problem.numpyAlternative);
+
+    expect(numpyProblems.map((problem) => problem.id)).toEqual(expectedIds);
+
+    for (const problem of numpyProblems) {
+      const alternative = problem.numpyAlternative!;
+      expect(problem.tags, problem.id).toContain('NumPy');
+      expect(alternative.code, problem.id).toContain('import numpy as np');
+      expect(alternative.code, problem.id).not.toContain('torch');
+      expect(alternative.code.split('\n').length, problem.id).toBeLessThanOrEqual(30);
+      expect(alternative.memory.length, problem.id).toBeGreaterThan(0);
+      expect(alternative.memory.length, problem.id).toBeLessThanOrEqual(2);
+      expect(() => compilePython(alternative.code), problem.id).not.toThrow();
+    }
+
+    for (const id of [
+      'incremental-kv-cache',
+      'grouped-query-and-multi-query-attention',
+      'simple-n-gram-language-model',
+      'resnet-from-building-blocks',
+      'unet-encoder-decoder',
+      'centernet-style-detector',
+    ]) {
+      expect(codePracticeProblems.find((problem) => problem.id === id)?.numpyAlternative, id).toBeUndefined();
+    }
+  });
+
+  it('keeps representative NumPy formulas and shape transforms explicit', () => {
+    const getAlternative = (id: string) =>
+      codePracticeProblems.find((problem) => problem.id === id)!.numpyAlternative!.code;
+
+    expect(getAlternative('stable-softmax-cross-entropy')).toContain(
+      'np.max(logits, axis=1, keepdims=True)',
+    );
+    expect(getAlternative('pairwise-squared-distance')).toContain(
+      'x_squared + y_squared - 2 * x @ y.T',
+    );
+    expect(getAlternative('top-k-gather')).toContain('np.take_along_axis');
+    expect(getAlternative('2d-patchify-for-images')).toContain(
+      'transpose(0, 2, 4, 1, 3, 5)',
+    );
+    expect(getAlternative('unpatchify-back-to-image')).toContain(
+      'transpose(0, 3, 1, 4, 2, 5)',
+    );
+    expect(getAlternative('manual-backprop-for-a-2-layer-mlp')).toContain(
+      'dhidden = (dlogits @ W2.T) * (hidden_pre > 0)',
+    );
   });
 
   it('starts plain-function interviews blank while preserving class scaffolds', () => {
@@ -151,10 +245,18 @@ describe('code-practice primitive-first solutions', () => {
   it('handles the two audited edge cases in the reference code', () => {
     const ngram = codePracticeProblems.find((problem) => problem.id === 'simple-n-gram-language-model');
     const matching = codePracticeProblems.find((problem) => problem.id === 'greedy-detection-matching');
+    const bce = codePracticeProblems.find(
+      (problem) => problem.id === 'binary-cross-entropy-from-probabilities',
+    );
 
     expect(ngram?.solutionCode).toContain('key = tuple(context[-size:]) if size else ()');
     expect(matching?.solutionCode).toContain('candidate_ious = torch.where(available');
     expect(matching?.solutionCode).not.toContain('best_gt not in used');
+    expect(bce?.solutionCode).toContain('(target != 0) & (target != 1)');
+    expect(bce?.solutionCode).toContain('(probability < 0) | (probability > 1)');
+    expect(bce?.solutionNotes.join(' ')).toContain('max(z, 0) - z*y + log(1 + exp(-|z|))');
+    expect(bce?.solutionNotes.join(' ')).not.toContain('sigmoid, then clamp, then log is stable');
+    expect(bce?.visual?.src).toBe('/assets/images/code-bce-probabilities-vs-logits.gif');
   });
 
   it('supports tensor transpose methods used by 2D and attention references', () => {

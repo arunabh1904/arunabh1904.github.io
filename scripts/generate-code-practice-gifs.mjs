@@ -114,6 +114,50 @@ function patchFrames() {
   ];
 }
 
+function bceFrames() {
+  return [
+    shell('A logit becomes a probability', 'Start by naming the input. z is unbounded; p must lie between 0 and 1.', [
+      text(92, 205, 'z = raw model output', 28, colors.blue, 700),
+      arrow(355, 196, 625, 196, 'sigmoid'),
+      text(690, 205, 'p = 1 / (1 + exp(-z))', 26, colors.green, 700),
+      line(120, 480, 880, 480, colors.muted, 2),
+      line(500, 140, 500, 505, colors.muted, 2),
+      '<line x1="120" y1="310" x2="880" y2="310" stroke="#526573" stroke-width="2" stroke-dasharray="9 9"/>',
+      '<path d="M135 450 C390 450 390 170 865 170" fill="none" stroke="#75c9ff" stroke-width="9" stroke-linecap="round"/>',
+      '<circle cx="500" cy="310" r="10" fill="#ffd166"/>',
+      text(525, 318, 'z = 0  →  p = 0.5', 22, colors.accent, 700),
+    ].join('')),
+    shell('The target selects one log term', 'The full equation is easier to remember as two label cases.', [
+      rect(90, 180, 365, 260, '#122b24', colors.green, 20),
+      text(125, 235, 'target y = 1', 27, colors.green, 700),
+      text(125, 310, 'loss = -log(p)', 36, colors.text, 700),
+      text(125, 370, 'high p  →  small loss', 23, colors.muted),
+      rect(545, 180, 365, 260, '#302018', colors.pink, 20),
+      text(580, 235, 'target y = 0', 27, colors.pink, 700),
+      text(580, 310, 'loss = -log(1 - p)', 36, colors.text, 700),
+      text(580, 370, 'low p  →  small loss', 23, colors.muted),
+      text(500, 510, 'BCE = -[y log(p) + (1-y) log(1-p)]', 29, colors.accent, 700, 'middle'),
+    ].join('')),
+    shell('Probability-input BCE', 'This function receives p. Do not apply sigmoid a second time.', [
+      rect(105, 170, 790, 300, colors.panel, colors.accent, 22),
+      text(150, 235, '1', 26, colors.accent, 700),
+      text(205, 235, 'validate 0 ≤ p ≤ 1 and y ∈ {0, 1}', 27, colors.text, 700),
+      text(150, 315, '2', 26, colors.accent, 700),
+      text(205, 315, 'p_safe = clip(p, eps, 1 - eps)', 27, colors.text, 700),
+      text(150, 395, '3', 26, colors.accent, 700),
+      text(205, 395, 'evaluate the two log terms, then mean', 27, colors.text, 700),
+      text(500, 535, 'clipping protects log(0); it does not convert logits', 23, colors.green, 700, 'middle'),
+    ].join('')),
+    shell('Logits-input BCE uses a different path', 'Keep the algebra stable instead of forming sigmoid → clamp → log.', [
+      rect(100, 165, 800, 305, colors.panel, colors.blue, 22),
+      text(500, 235, 'z may be any real number', 27, colors.blue, 700, 'middle'),
+      text(500, 325, 'loss = max(z, 0) - z·y', 34, colors.text, 700, 'middle'),
+      text(500, 385, '+ log(1 + exp(-|z|))', 34, colors.text, 700, 'middle'),
+      text(500, 530, 'PyTorch: binary_cross_entropy_with_logits', 25, colors.accent, 700, 'middle'),
+    ].join('')),
+  ];
+}
+
 async function rasterize(svg, path) {
   await sharp(Buffer.from(svg)).png().toFile(path);
 }
@@ -131,6 +175,14 @@ async function saveGif(svgs, filename, durationMs) {
   return pngPaths;
 }
 
-await saveGif(tensorFrames(), 'code-tensor-ops-broadcasting.gif', 1800);
-await saveGif(patchFrames(), 'code-patchify-layout.gif', 2200);
+const target = process.argv[2] ?? 'all';
+if (target === 'all' || target === 'tensor') {
+  await saveGif(tensorFrames(), 'code-tensor-ops-broadcasting.gif', 1800);
+}
+if (target === 'all' || target === 'patch') {
+  await saveGif(patchFrames(), 'code-patchify-layout.gif', 2200);
+}
+if (target === 'all' || target === 'bce') {
+  await saveGif(bceFrames(), 'code-bce-probabilities-vs-logits.gif', 2300);
+}
 rmSync(frames, { recursive: true, force: true });

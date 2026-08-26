@@ -111,4 +111,16 @@ describe('augmentCodeWithSolution', () => {
     );
     expect(annotatedCode).not.toContain('assert any(self.key.shape[axis] == key.shape[axis]');
   });
+
+  it('negates compound binary-label guards without rewriting either inequality', () => {
+    const problem = codePracticeProblems.find(
+      (candidate) => candidate.id === 'binary-cross-entropy-from-probabilities',
+    );
+    const annotatedCode = augmentCodeWithSolution(problem!);
+
+    expect(annotatedCode).toContain(
+      'assert not (bool(torch.any((target != 0) & (target != 1))))',
+    );
+    expect(annotatedCode).not.toContain('(target == 0) & (target != 1)');
+  });
 });
