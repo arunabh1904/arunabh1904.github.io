@@ -397,42 +397,46 @@ img:not(.float-right):not(.float-left) {
   margin: 0;
 }
 
-/* Dense system maps use the viewport on desktop and a swipeable canvas on phones. */
-.system-architecture-diagram {
-  position: relative;
-  left: 50%;
-  width: min(75rem, calc(100vw - 19rem));
-  max-width: none;
+/* Pair a primary-source architecture with a compact explanatory synthesis. */
+.source-explainer-comparison {
+  display: grid;
+  gap: 1.5rem;
   margin: 1.5rem 0;
-  transform: translateX(-50%);
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  scrollbar-width: thin;
 }
 
-.system-architecture-diagram > a,
-.system-architecture-diagram img {
-  display: block;
-}
-
-.system-architecture-diagram img {
-  width: 100%;
-  max-width: none;
+.source-explainer-comparison figure {
+  min-width: 0;
   margin: 0;
 }
 
-@media (max-width: 1099px) {
-  .system-architecture-diagram {
-    left: auto;
-    width: 100%;
-    max-width: 100%;
-    margin: 1rem 0;
-    transform: none;
-  }
+.source-explainer-comparison a,
+.source-explainer-comparison img {
+  display: block;
+}
 
-  .system-architecture-diagram > a {
-    width: 75rem;
-  }
+.source-explainer-comparison img {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: 0.75rem;
+}
+
+.source-explainer-comparison .comparison-label {
+  margin-bottom: 0.45rem;
+  color: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  opacity: 0.68;
+  text-transform: uppercase;
+}
+
+.source-explainer-comparison figcaption {
+  margin-top: 0.55rem;
+  color: inherit;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  opacity: 0.72;
 }
 
 /* Multi-panel technical comparisons keep their designed type size on phones. */
