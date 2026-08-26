@@ -29,6 +29,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
@@ -117,6 +118,82 @@ FORBIDDEN_REFERENCE_FIELDS = {
     "icl_decode_mode",
     "icl_streaming_interval",
 }
+
+# The first two posts on the human-narration profile are deliberate canaries.
+# Keeping the assignment explicit lets us validate long-form quality before a
+# corpus-wide migration, without making every existing MP3 stale at once.
+HUMAN_NARRATION_POSTS = frozenset(
+    {
+        "from-seeing-to-doing-the-evolution-of-vision-language-models",
+        "how-unified-sensor-models-are-built-for-autonomous-driving",
+    }
+)
+HUMAN_MODEL = "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16"
+HUMAN_VOICE = "hi_female"
+HUMAN_VOICE_MODE = "voxtral-fixed-preset-paragraph-streaming-v1"
+HUMAN_TEMPERATURE = 0.65
+HUMAN_TOP_K = 50
+HUMAN_TOP_P = 0.9
+HUMAN_NARRATOR_SEED = 1904
+HUMAN_SAMPLING_SEED_VERSION = "voxtral-human-canary-v1"
+# Chunk-level ASR rejected the first deterministic samples below for invented
+# clauses, repetitions, or badly slurred headings. Keep reviewed rerolls
+# reproducible instead of relying on whichever sample happens to run next.
+HUMAN_CHUNK_SEED_OVERRIDES = {
+    "from-seeing-to-doing-the-evolution-of-vision-language-models": {
+        "2": 1905,
+        "4": 1905,
+        "21": 1905,
+        "24": 1905,
+        "26": 1906,
+        "40": 1905,
+        "55": 1905,
+    },
+    "how-unified-sensor-models-are-built-for-autonomous-driving": {
+        "5": 1905,
+        "11": 1906,
+        "31": 1905,
+        "39": 1905,
+        "55": 1905,
+        "61": 1906,
+        "63": 1905,
+        "70": 1905,
+    },
+}
+HUMAN_POST_PRONUNCIATION_LEXICONS = {
+    "how-unified-sensor-models-are-built-for-autonomous-driving": {
+        "BEVDet4D": "B E V Det four D",
+        # The shared phonetic spelling is helpful in prose but unstable as a
+        # two-word Voxtral prompt. Restore the written form for this heading.
+        "lie-dar encoders": "Lidar encoders",
+    },
+}
+# Full-source coverage was an explicit editorial decision for this post. Its
+# accepted human-paced rendering is 31:36, so it gets a narrow 32-minute cap.
+HUMAN_MAX_AUDIO_SECONDS = {
+    "how-unified-sensor-models-are-built-for-autonomous-driving": 32 * 60,
+}
+HUMAN_SPEED = 1.0
+HUMAN_PARAGRAPH_PAUSE_SECONDS = 0.35
+HUMAN_HEADING_PAUSE_SECONDS = 0.65
+HUMAN_SENTENCE_PAUSE_POLICY = "model-natural-with-explicit-structure-v1"
+HUMAN_CHUNKING_POLICY = "source-paragraphs-with-bounded-sentence-groups-v1"
+HUMAN_CHUNK_MAX_CHARS = 1_200
+HUMAN_STREAMING_INTERVAL_SECONDS = 8.0
+HUMAN_MAX_GENERATION_TOKENS = 1_600
+HUMAN_MIN_SECONDS_PER_WORD = 0.24
+HUMAN_MAX_SECONDS_PER_WORD = 0.72
+HUMAN_DECODE_POLICY = "overlap-context-streaming-v1"
+HUMAN_EXTRACTION_VERSION = "markdown-prose-v9-human-paragraph-audio"
+
+
+@dataclass(frozen=True)
+class NarrationChunk:
+    """A bounded synthesis unit and its explicit structural pause."""
+
+    text: str
+    pause_seconds: float
+    kind: str
 
 
 def parse_frontmatter(source: str) -> dict[str, str]:
@@ -251,11 +328,18 @@ def shape_narration(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def apply_pronunciation_hints(text: str) -> str:
-    """Apply audio-only phonetic hints without changing the authored post."""
+def apply_pronunciation_lexicon(text: str, lexicon: dict[str, str]) -> str:
+    """Apply one audio-only phonetic lexicon without changing authored prose."""
 
-    for written, spoken in PRONUNCIATION_LEXICON.items():
+    for written, spoken in lexicon.items():
         text = re.sub(rf"\b{re.escape(written)}\b", spoken, text, flags=re.IGNORECASE)
+    return text
+
+
+def apply_pronunciation_hints(text: str) -> str:
+    """Apply shared audio-only phonetic and prosody hints."""
+
+    text = apply_pronunciation_lexicon(text, PRONUNCIATION_LEXICON)
     for written, spoken in AUDIO_PROSODY_REWRITES.items():
         text = re.sub(re.escape(written), spoken, text, flags=re.IGNORECASE)
     return text
@@ -300,6 +384,89 @@ def section_prompts_for_tts(text: str) -> list[str]:
         if current:
             sections.append(current)
     return sections
+
+
+def split_bounded_sentences(text: str, max_chars: int) -> list[str]:
+    """Group complete sentences without exceeding the model's safe prompt size."""
+
+    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
+    groups: list[str] = []
+    current = ""
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+        if len(sentence) > max_chars:
+            # Technical prose can contain an unusually long semicolon-heavy
+            # sentence. Fall back to word boundaries without dropping text.
+            words = sentence.split()
+            parts: list[str] = []
+            part = ""
+            for word in words:
+                candidate = f"{part} {word}".strip()
+                if part and len(candidate) > max_chars:
+                    parts.append(part)
+                    part = word
+                else:
+                    part = candidate
+            if part:
+                parts.append(part)
+        else:
+            parts = [sentence]
+
+        for part in parts:
+            candidate = f"{current} {part}".strip()
+            if current and len(candidate) > max_chars:
+                groups.append(current)
+                current = part
+            else:
+                current = candidate
+    if current:
+        groups.append(current)
+    return groups
+
+
+def paragraph_chunks_for_tts(text: str) -> list[NarrationChunk]:
+    """Compile headings and paragraphs into stable, human-paced requests.
+
+    A fixed Voxtral voice embedding keeps speaker identity stable when the
+    generation resets. Paragraph-sized requests bound acoustic drift, while
+    explicit pauses make heading and paragraph timing deterministic.
+    """
+
+    chunks: list[NarrationChunk] = []
+    blocks = re.split(rf"\s*{re.escape(PARAGRAPH_BREAK)}\s*", text)
+    for block in blocks:
+        block = block.strip()
+        if not block:
+            continue
+        is_heading = block.startswith(HEADING_START) and block.endswith(HEADING_END)
+        rendered = render_for_tts(block)
+        groups = split_bounded_sentences(rendered, HUMAN_CHUNK_MAX_CHARS)
+        for index, group in enumerate(groups):
+            is_last = index == len(groups) - 1
+            pause = 0.0
+            if is_last:
+                pause = (
+                    HUMAN_HEADING_PAUSE_SECONDS
+                    if is_heading
+                    else HUMAN_PARAGRAPH_PAUSE_SECONDS
+                )
+            chunks.append(
+                NarrationChunk(
+                    text=group,
+                    pause_seconds=pause,
+                    kind="heading" if is_heading else "paragraph",
+                )
+            )
+    if chunks:
+        final = chunks[-1]
+        chunks[-1] = NarrationChunk(
+            text=final.text,
+            pause_seconds=0.0,
+            kind=final.kind,
+        )
+    return chunks
 
 
 def normalize_heading(value: str) -> str:
@@ -377,17 +544,76 @@ def discover_posts() -> list[dict[str, Any]]:
             narration_mode = "section-complete-abridgement"
 
         text = shape_narration(clean_markdown(narration_source))
-        tts_sections = section_prompts_for_tts(text)
-        tts_text = "\n".join(tts_sections)
+        uses_human_profile = post_slug in HUMAN_NARRATION_POSTS
+        narration_chunks = paragraph_chunks_for_tts(text) if uses_human_profile else []
+        post_pronunciations = HUMAN_POST_PRONUNCIATION_LEXICONS.get(post_slug, {})
+        if narration_chunks and post_pronunciations:
+            narration_chunks = [
+                NarrationChunk(
+                    text=apply_pronunciation_lexicon(chunk.text, post_pronunciations),
+                    pause_seconds=chunk.pause_seconds,
+                    kind=chunk.kind,
+                )
+                for chunk in narration_chunks
+            ]
+        tts_sections = [] if uses_human_profile else section_prompts_for_tts(text)
+        tts_text = (
+            "\n".join(chunk.text for chunk in narration_chunks)
+            if uses_human_profile
+            else "\n".join(tts_sections)
+        )
         narration_word_count = len(tts_text.split())
         if narration_mode != "full-source" and narration_word_count > MAX_ABRIDGED_WORDS:
             raise ValueError(
                 f"Narration sidecar exceeds {MAX_ABRIDGED_WORDS} words for {post_slug}: "
                 f"{narration_word_count}"
             )
-        digest = hashlib.sha256(
-            json.dumps(
-                {
+        if uses_human_profile:
+            digest_payload = {
+                "source_sha256": source_sha256,
+                "text": text,
+                "narration_mode": narration_mode,
+                "model": HUMAN_MODEL,
+                "voice": HUMAN_VOICE,
+                "language": LANGUAGE,
+                "voice_mode": HUMAN_VOICE_MODE,
+                "temperature": HUMAN_TEMPERATURE,
+                "top_k": HUMAN_TOP_K,
+                "top_p": HUMAN_TOP_P,
+                "narrator_seed": HUMAN_NARRATOR_SEED,
+                "sampling_seed_version": HUMAN_SAMPLING_SEED_VERSION,
+                "chunk_seed_overrides": HUMAN_CHUNK_SEED_OVERRIDES.get(post_slug, {}),
+                "speed": HUMAN_SPEED,
+                "paragraph_pause_seconds": HUMAN_PARAGRAPH_PAUSE_SECONDS,
+                "heading_pause_seconds": HUMAN_HEADING_PAUSE_SECONDS,
+                "sentence_pause_policy": HUMAN_SENTENCE_PAUSE_POLICY,
+                "chunking_policy": HUMAN_CHUNKING_POLICY,
+                "chunk_max_chars": HUMAN_CHUNK_MAX_CHARS,
+                "streaming_interval_seconds": HUMAN_STREAMING_INTERVAL_SECONDS,
+                "max_generation_tokens": HUMAN_MAX_GENERATION_TOKENS,
+                "min_seconds_per_word": HUMAN_MIN_SECONDS_PER_WORD,
+                "max_seconds_per_word": HUMAN_MAX_SECONDS_PER_WORD,
+                "decode_policy": HUMAN_DECODE_POLICY,
+                "narration_chunks": [asdict(chunk) for chunk in narration_chunks],
+                "pronunciation_policy": PRONUNCIATION_POLICY,
+                "pronunciation_lexicon": PRONUNCIATION_LEXICON,
+                "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
+                "table_policy": TABLE_POLICY,
+                "max_audio_seconds": HUMAN_MAX_AUDIO_SECONDS.get(
+                    post_slug, MAX_AUDIO_SECONDS
+                ),
+                "max_abridged_words": MAX_ABRIDGED_WORDS,
+                "bitrate": BITRATE,
+                "silence_threshold": SILENCE_THRESHOLD,
+                "boundary_silence_seconds": BOUNDARY_SILENCE_SECONDS,
+                "extraction_version": HUMAN_EXTRACTION_VERSION,
+            }
+            if post_pronunciations:
+                digest_payload["post_pronunciation_lexicon"] = post_pronunciations
+        else:
+            # Keep the legacy digest byte-for-byte compatible so a two-post
+            # canary does not force an unrelated corpus regeneration.
+            digest_payload = {
                     "source_sha256": source_sha256,
                     "text": text,
                     "narration_mode": narration_mode,
@@ -426,9 +652,9 @@ def discover_posts() -> list[dict[str, Any]]:
                     "max_generation_tokens": MAX_GENERATION_TOKENS,
                     "min_seconds_per_word": MIN_SECONDS_PER_WORD,
                     "extraction_version": EXTRACTION_VERSION,
-                },
-                sort_keys=True,
-            ).encode("utf-8")
+            }
+        digest = hashlib.sha256(
+            json.dumps(digest_payload, sort_keys=True).encode("utf-8")
         ).hexdigest()
         posts.append(
             {
@@ -438,6 +664,8 @@ def discover_posts() -> list[dict[str, Any]]:
                 "text": text,
                 "tts_text": tts_text,
                 "tts_sections": tts_sections,
+                "narration_chunks": narration_chunks,
+                "synthesis_profile": "human" if uses_human_profile else "legacy",
                 "source_sha256": source_sha256,
                 "narration_mode": narration_mode,
                 "narration_word_count": narration_word_count,
@@ -465,7 +693,7 @@ def write_manifest(manifest: dict[str, Any]) -> None:
 def narrator_profile_errors(posts: list[dict[str, Any]], manifest: dict[str, Any]) -> list[str]:
     """Return manifest violations that could make the Blog sound multi-speaker."""
 
-    expected = {
+    legacy_expected = {
         "model": MODEL,
         "voice": VOICE,
         "voice_mode": VOICE_MODE,
@@ -491,9 +719,50 @@ def narrator_profile_errors(posts: list[dict[str, Any]], manifest: dict[str, Any
         "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
         "table_policy": TABLE_POLICY,
     }
+    human_expected = {
+        "model": HUMAN_MODEL,
+        "voice": HUMAN_VOICE,
+        "voice_mode": HUMAN_VOICE_MODE,
+        "temperature": HUMAN_TEMPERATURE,
+        "top_k": HUMAN_TOP_K,
+        "top_p": HUMAN_TOP_P,
+        "narrator_seed": HUMAN_NARRATOR_SEED,
+        "sampling_seed_version": HUMAN_SAMPLING_SEED_VERSION,
+        "speed": HUMAN_SPEED,
+        "paragraph_pause_seconds": HUMAN_PARAGRAPH_PAUSE_SECONDS,
+        "heading_pause_seconds": HUMAN_HEADING_PAUSE_SECONDS,
+        "sentence_pause_policy": HUMAN_SENTENCE_PAUSE_POLICY,
+        "chunking_policy": HUMAN_CHUNKING_POLICY,
+        "chunk_max_chars": HUMAN_CHUNK_MAX_CHARS,
+        "streaming_interval_seconds": HUMAN_STREAMING_INTERVAL_SECONDS,
+        "max_generation_tokens": HUMAN_MAX_GENERATION_TOKENS,
+        "min_seconds_per_word": HUMAN_MIN_SECONDS_PER_WORD,
+        "max_seconds_per_word": HUMAN_MAX_SECONDS_PER_WORD,
+        "decode_policy": HUMAN_DECODE_POLICY,
+        "pronunciation_policy": PRONUNCIATION_POLICY,
+        "pronunciation_lexicon": PRONUNCIATION_LEXICON,
+        "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
+        "table_policy": TABLE_POLICY,
+    }
     errors: list[str] = []
     for post in posts:
         record = manifest.get(post["slug"], {})
+        expected = (
+            {
+                **human_expected,
+                "chunk_seed_overrides": HUMAN_CHUNK_SEED_OVERRIDES.get(
+                    post["slug"], {}
+                ),
+                "post_pronunciation_lexicon": HUMAN_POST_PRONUNCIATION_LEXICONS.get(
+                    post["slug"], {}
+                ),
+                "max_audio_seconds": HUMAN_MAX_AUDIO_SECONDS.get(
+                    post["slug"], MAX_AUDIO_SECONDS
+                ),
+            }
+            if post["synthesis_profile"] == "human"
+            else legacy_expected
+        )
         mismatched = [key for key, value in expected.items() if record.get(key) != value]
         forbidden = sorted(FORBIDDEN_REFERENCE_FIELDS.intersection(record))
         if mismatched:
@@ -533,15 +802,15 @@ def audio_duration_seconds(path: Path) -> float:
     return float(result.stdout.strip())
 
 
-def seed_narrator_generation() -> None:
+def seed_narrator_generation(seed: int = NARRATOR_SEED) -> None:
     """Seed the one continuous narrator generation for a post."""
 
     import mlx.core as mx
 
-    mx.random.seed(NARRATOR_SEED)
+    mx.random.seed(seed)
 
 
-def generate_post(
+def generate_legacy_post(
     model: Any,
     post: dict[str, Any],
     stream_progress: Any,
@@ -678,6 +947,212 @@ def generate_post(
         return duration_seconds
 
 
+def generate_human_post(
+    model: Any,
+    post: dict[str, Any],
+    stream_progress: Any,
+) -> float:
+    """Generate a fixed-voice, paragraph-bounded Voxtral narration."""
+
+    import numpy as np
+    from mlx_audio.audio_io import write as audio_write
+
+    chunks: list[NarrationChunk] = post["narration_chunks"]
+    if not chunks:
+        raise ValueError(f"No speakable text found in {post['path']}")
+
+    AUDIO_DIR.mkdir(parents=True, exist_ok=True)
+    chunk_cache = (
+        Path(tempfile.gettempdir()) / "blog-audio-chunks" / post["digest"]
+    )
+    chunk_cache.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=f"tts-{post['slug']}-") as temporary_dir:
+        temporary = Path(temporary_dir)
+        manifest_file = temporary / "concat.txt"
+        pause_paths: dict[tuple[int, float], Path] = {}
+        stream_parts = 0
+
+        with manifest_file.open("w", encoding="utf-8") as listing:
+            for chunk_index, chunk in enumerate(chunks):
+                chunk_path = temporary / f"chunk-{chunk_index:03d}.wav"
+                cached_chunk = chunk_cache / chunk_path.name
+                if cached_chunk.exists():
+                    shutil.copy2(cached_chunk, chunk_path)
+                    sample_rate = 24_000
+                    stream_progress.update(1)
+                    listing.write(f"file '{chunk_path.as_posix()}'\n")
+                    if chunk.pause_seconds > 0 and chunk_index < len(chunks) - 1:
+                        pause_key = (sample_rate, chunk.pause_seconds)
+                        pause_path = pause_paths.get(pause_key)
+                        if pause_path is None:
+                            pause_path = temporary / (
+                                f"pause-{sample_rate}-{round(chunk.pause_seconds * 1000)}ms.wav"
+                            )
+                            pause_samples = round(sample_rate * chunk.pause_seconds)
+                            audio_write(
+                                str(pause_path),
+                                np.zeros(pause_samples, dtype=np.float32),
+                                sample_rate,
+                                format="wav",
+                            )
+                            pause_paths[pause_key] = pause_path
+                        listing.write(f"file '{pause_path.as_posix()}'\n")
+                    continue
+
+                pieces: list[Any] = []
+                generated_tokens = 0
+                sample_rate = 0
+                chunk_seed = HUMAN_CHUNK_SEED_OVERRIDES.get(post["slug"], {}).get(
+                    str(chunk_index), HUMAN_NARRATOR_SEED
+                )
+                seed_narrator_generation(chunk_seed)
+                for result in model.generate(
+                    text=chunk.text,
+                    voice=HUMAN_VOICE,
+                    temperature=HUMAN_TEMPERATURE,
+                    top_k=HUMAN_TOP_K,
+                    top_p=HUMAN_TOP_P,
+                    max_tokens=HUMAN_MAX_GENERATION_TOKENS,
+                    stream=True,
+                    streaming_interval=HUMAN_STREAMING_INTERVAL_SECONDS,
+                ):
+                    audio_piece = np.asarray(result.audio)
+                    if audio_piece.size:
+                        pieces.append(audio_piece)
+                    sample_rate = result.sample_rate
+                    generated_tokens += result.token_count
+                    stream_parts += 1
+                    stream_progress.update(1)
+
+                if not pieces:
+                    raise RuntimeError(
+                        f"Model generated no audio for chunk {chunk_index + 1} "
+                        f"of {post['slug']}"
+                    )
+                if generated_tokens >= HUMAN_MAX_GENERATION_TOKENS:
+                    raise RuntimeError(
+                        f"Model hit its {HUMAN_MAX_GENERATION_TOKENS}-token safety cap "
+                        f"for chunk {chunk_index + 1} of {post['slug']}"
+                    )
+
+                audio = np.concatenate(pieces)
+                active = np.flatnonzero(np.abs(audio) >= SILENCE_THRESHOLD)
+                if active.size == 0:
+                    raise RuntimeError(
+                        f"Model generated silence for chunk {chunk_index + 1} "
+                        f"of {post['slug']}"
+                    )
+                retained = round(sample_rate * BOUNDARY_SILENCE_SECONDS)
+                start = max(0, int(active[0]) - retained)
+                end = min(audio.size, int(active[-1]) + 1 + retained)
+                audio = audio[start:end]
+
+                delivered_seconds = audio.size / sample_rate
+                word_count = len(chunk.text.split())
+                minimum_seconds = word_count * HUMAN_MIN_SECONDS_PER_WORD
+                # Short headings need a fixed allowance. This coarse ceiling
+                # catches only major runaways; the post-generation ASR audit
+                # distinguishes expressive slow delivery from extra speech.
+                fixed_allowance = 20.0 if chunk.kind == "heading" else 12.0
+                maximum_seconds = max(
+                    fixed_allowance,
+                    word_count * HUMAN_MAX_SECONDS_PER_WORD + 2.0,
+                )
+                if delivered_seconds < minimum_seconds:
+                    raise RuntimeError(
+                        f"Chunk {chunk_index + 1} of {post['slug']} is implausibly "
+                        f"short ({delivered_seconds:.1f}s for {word_count} words)"
+                    )
+                if delivered_seconds > maximum_seconds:
+                    raise RuntimeError(
+                        f"Chunk {chunk_index + 1} of {post['slug']} is implausibly "
+                        f"long ({delivered_seconds:.1f}s for {word_count} words); "
+                        "refusing a likely continuation or repetition artifact"
+                    )
+
+                audio_write(str(chunk_path), audio, sample_rate, format="wav")
+                shutil.copy2(chunk_path, cached_chunk)
+                listing.write(f"file '{chunk_path.as_posix()}'\n")
+
+                if chunk.pause_seconds > 0 and chunk_index < len(chunks) - 1:
+                    pause_key = (sample_rate, chunk.pause_seconds)
+                    pause_path = pause_paths.get(pause_key)
+                    if pause_path is None:
+                        pause_path = temporary / (
+                            f"pause-{sample_rate}-{round(chunk.pause_seconds * 1000)}ms.wav"
+                        )
+                        pause_samples = round(sample_rate * chunk.pause_seconds)
+                        audio_write(
+                            str(pause_path),
+                            np.zeros(pause_samples, dtype=np.float32),
+                            sample_rate,
+                            format="wav",
+                        )
+                        pause_paths[pause_key] = pause_path
+                    listing.write(f"file '{pause_path.as_posix()}'\n")
+
+        missing_chunks = [
+            index
+            for index in range(len(chunks))
+            if not (temporary / f"chunk-{index:03d}.wav").exists()
+        ]
+        if missing_chunks:
+            raise RuntimeError(
+                f"Missing generated chunks for {post['slug']}: {missing_chunks}"
+            )
+
+        temporary_mp3 = temporary / "audio.mp3"
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-y",
+                "-f",
+                "concat",
+                "-safe",
+                "0",
+                "-i",
+                str(manifest_file),
+                "-af",
+                BOUNDARY_TRIM_FILTER,
+                "-ac",
+                "1",
+                "-ar",
+                "24000",
+                "-codec:a",
+                "libmp3lame",
+                "-b:a",
+                BITRATE,
+                str(temporary_mp3),
+            ],
+            check=True,
+        )
+        duration_seconds = audio_duration_seconds(temporary_mp3)
+        max_audio_seconds = HUMAN_MAX_AUDIO_SECONDS.get(
+            post["slug"], MAX_AUDIO_SECONDS
+        )
+        if duration_seconds > max_audio_seconds:
+            raise RuntimeError(
+                f"Generated audio for {post['slug']} is {duration_seconds / 60:.1f} "
+                f"minutes; shorten its narration instead of truncating it"
+            )
+        post["output"].parent.mkdir(parents=True, exist_ok=True)
+        temporary_mp3.replace(post["output"])
+        return duration_seconds
+
+
+def generate_post(
+    model: Any,
+    post: dict[str, Any],
+    stream_progress: Any,
+) -> float:
+    if post["synthesis_profile"] == "human":
+        return generate_human_post(model, post, stream_progress)
+    return generate_legacy_post(model, post, stream_progress)
+
+
 def select_posts(posts: list[dict[str, Any]], requested: list[str]) -> list[dict[str, Any]]:
     if not requested:
         return posts
@@ -687,6 +1162,85 @@ def select_posts(posts: list[dict[str, Any]], requested: list[str]) -> list[dict
     if missing:
         raise ValueError(f"Unknown postSlug(s): {', '.join(sorted(missing))}")
     return selected
+
+
+def manifest_record(post: dict[str, Any], duration_seconds: float) -> dict[str, Any]:
+    common = {
+        "digest": post["digest"],
+        "language": LANGUAGE,
+        "pronunciation_policy": PRONUNCIATION_POLICY,
+        "pronunciation_lexicon": PRONUNCIATION_LEXICON,
+        "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
+        "table_policy": TABLE_POLICY,
+        "max_audio_seconds": MAX_AUDIO_SECONDS,
+        "narration_mode": post["narration_mode"],
+        "narration_word_count": post["narration_word_count"],
+        "source_sha256": post["source_sha256"],
+        "duration_seconds": duration_seconds,
+        "bitrate": BITRATE,
+        "silence_threshold": SILENCE_THRESHOLD,
+        "boundary_silence_seconds": BOUNDARY_SILENCE_SECONDS,
+        "file": f"/assets/audio/blog/{post['slug']}.mp3",
+    }
+    if post["synthesis_profile"] == "human":
+        return {
+            **common,
+            "synthesis_profile": "human",
+            "model": HUMAN_MODEL,
+            "voice": HUMAN_VOICE,
+            "voice_mode": HUMAN_VOICE_MODE,
+            "temperature": HUMAN_TEMPERATURE,
+            "top_k": HUMAN_TOP_K,
+            "top_p": HUMAN_TOP_P,
+            "narrator_seed": HUMAN_NARRATOR_SEED,
+            "sampling_seed_version": HUMAN_SAMPLING_SEED_VERSION,
+            "chunk_seed_overrides": HUMAN_CHUNK_SEED_OVERRIDES.get(post["slug"], {}),
+            "post_pronunciation_lexicon": HUMAN_POST_PRONUNCIATION_LEXICONS.get(
+                post["slug"], {}
+            ),
+            "narration_chunk_count": len(post["narration_chunks"]),
+            "max_audio_seconds": HUMAN_MAX_AUDIO_SECONDS.get(
+                post["slug"], MAX_AUDIO_SECONDS
+            ),
+            "speed": HUMAN_SPEED,
+            "paragraph_pause_seconds": HUMAN_PARAGRAPH_PAUSE_SECONDS,
+            "heading_pause_seconds": HUMAN_HEADING_PAUSE_SECONDS,
+            "sentence_pause_policy": HUMAN_SENTENCE_PAUSE_POLICY,
+            "chunking_policy": HUMAN_CHUNKING_POLICY,
+            "chunk_max_chars": HUMAN_CHUNK_MAX_CHARS,
+            "streaming_interval_seconds": HUMAN_STREAMING_INTERVAL_SECONDS,
+            "max_generation_tokens": HUMAN_MAX_GENERATION_TOKENS,
+            "min_seconds_per_word": HUMAN_MIN_SECONDS_PER_WORD,
+            "max_seconds_per_word": HUMAN_MAX_SECONDS_PER_WORD,
+            "decode_policy": HUMAN_DECODE_POLICY,
+        }
+    return {
+        **common,
+        "model": MODEL,
+        "voice": VOICE,
+        "language_code": LANGUAGE_CODE,
+        "voice_mode": VOICE_MODE,
+        "voice_instruct": VOICE_INSTRUCT,
+        "temperature": TEMPERATURE,
+        "top_p": TOP_P,
+        "repetition_penalty": REPETITION_PENALTY,
+        "narrator_seed": NARRATOR_SEED,
+        "sampling_seed_version": SAMPLING_SEED_VERSION,
+        "speed": SPEED,
+        "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
+        "paragraph_pause_seconds": PARAGRAPH_PAUSE_SECONDS,
+        "heading_pause_seconds": HEADING_PAUSE_SECONDS,
+        "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
+        "chunking_policy": CHUNKING_POLICY,
+        "section_policy": SECTION_POLICY,
+        "section_max_chars": SECTION_MAX_CHARS,
+        "section_pause_seconds": SECTION_PAUSE_SECONDS,
+        "voice_anchor_sha256": VOICE_ANCHOR_SHA256,
+        "decode_policy": DECODE_POLICY,
+        "streaming_interval_seconds": STREAMING_INTERVAL_SECONDS,
+        "max_generation_tokens": MAX_GENERATION_TOKENS,
+        "min_seconds_per_word": MIN_SECONDS_PER_WORD,
+    }
 
 
 def main() -> int:
@@ -720,9 +1274,15 @@ def main() -> int:
         for post in posts:
             actual_duration = audio_duration_seconds(post["output"])
             recorded_duration = manifest[post["slug"]].get("duration_seconds")
-            if actual_duration > MAX_AUDIO_SECONDS:
+            max_audio_seconds = (
+                HUMAN_MAX_AUDIO_SECONDS.get(post["slug"], MAX_AUDIO_SECONDS)
+                if post["synthesis_profile"] == "human"
+                else MAX_AUDIO_SECONDS
+            )
+            if actual_duration > max_audio_seconds:
                 duration_errors.append(
-                    f"{post['slug']}: {actual_duration / 60:.1f} minutes exceeds 30 minutes"
+                    f"{post['slug']}: {actual_duration / 60:.1f} minutes exceeds "
+                    f"{max_audio_seconds / 60:.0f} minutes"
                 )
             if not isinstance(recorded_duration, (int, float)) or abs(
                 actual_duration - recorded_duration
@@ -747,13 +1307,17 @@ def main() -> int:
     from tqdm.auto import tqdm
 
     targets = posts if args.force else stale
-    print(
-        f"Loading {MODEL} once for {len(targets)} post(s) "
-        f"with generated-audio-only voice anchor {VOICE}..."
-    )
-    model = load_model(MODEL)
+    loaded_models: dict[str, Any] = {}
     with tqdm(total=len(targets), desc="Blogs", unit="post", position=0) as blog_progress:
         for index, post in enumerate(targets, start=1):
+            model_name = (
+                HUMAN_MODEL if post["synthesis_profile"] == "human" else MODEL
+            )
+            model = loaded_models.get(model_name)
+            if model is None:
+                print(f"Loading {model_name} for the {post['synthesis_profile']} profile...")
+                model = load_model(model_name)
+                loaded_models[model_name] = model
             blog_progress.set_postfix_str(f"{index}/{len(targets)} {post['title'][:42]}")
             with tqdm(
                 total=None,
@@ -763,47 +1327,7 @@ def main() -> int:
                 leave=False,
             ) as stream_progress:
                 duration_seconds = generate_post(model, post, stream_progress)
-            manifest[post["slug"]] = {
-                "digest": post["digest"],
-                "model": MODEL,
-                "voice": VOICE,
-                "language": LANGUAGE,
-                "language_code": LANGUAGE_CODE,
-                "voice_mode": VOICE_MODE,
-                "voice_instruct": VOICE_INSTRUCT,
-                "temperature": TEMPERATURE,
-                "top_p": TOP_P,
-                "repetition_penalty": REPETITION_PENALTY,
-                "narrator_seed": NARRATOR_SEED,
-                "sampling_seed_version": SAMPLING_SEED_VERSION,
-                "speed": SPEED,
-                "sentence_pause_seconds": SENTENCE_PAUSE_SECONDS,
-                "paragraph_pause_seconds": PARAGRAPH_PAUSE_SECONDS,
-                "heading_pause_seconds": HEADING_PAUSE_SECONDS,
-                "sentence_pause_policy": SENTENCE_PAUSE_POLICY,
-                "chunking_policy": CHUNKING_POLICY,
-                "section_policy": SECTION_POLICY,
-                "section_max_chars": SECTION_MAX_CHARS,
-                "section_pause_seconds": SECTION_PAUSE_SECONDS,
-                "voice_anchor_sha256": VOICE_ANCHOR_SHA256,
-                "decode_policy": DECODE_POLICY,
-                "pronunciation_policy": PRONUNCIATION_POLICY,
-                "pronunciation_lexicon": PRONUNCIATION_LEXICON,
-                "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
-                "table_policy": TABLE_POLICY,
-                "max_audio_seconds": MAX_AUDIO_SECONDS,
-                "narration_mode": post["narration_mode"],
-                "narration_word_count": post["narration_word_count"],
-                "source_sha256": post["source_sha256"],
-                "duration_seconds": duration_seconds,
-                "bitrate": BITRATE,
-                "silence_threshold": SILENCE_THRESHOLD,
-                "boundary_silence_seconds": BOUNDARY_SILENCE_SECONDS,
-                "streaming_interval_seconds": STREAMING_INTERVAL_SECONDS,
-                "max_generation_tokens": MAX_GENERATION_TOKENS,
-                "min_seconds_per_word": MIN_SECONDS_PER_WORD,
-                "file": f"/assets/audio/blog/{post['slug']}.mp3",
-            }
+            manifest[post["slug"]] = manifest_record(post, duration_seconds)
             write_manifest(manifest)
             blog_progress.update(1)
     print(f"Generated {len(targets)} Blog audio file(s).")
