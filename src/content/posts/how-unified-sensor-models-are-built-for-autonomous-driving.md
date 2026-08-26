@@ -193,7 +193,7 @@ Waymo's [December 2025 description](https://waymo.com/blog/2025/12/demonstrably-
 
 Two components feed the World Decoder. The Sensor Fusion Encoder combines camera, LiDAR, and radar observations over time and produces objects, semantics, and learned embeddings. The Driving VLM uses camera context and is trained using Gemini for rare or semantically difficult scenes. The World Decoder predicts road-user behavior, produces high-definition maps and vehicle trajectories, and supplies signals for trajectory validation. Waymo calls this a Think Fast and Think Slow architecture, but its public description does not specify execution rates, triggers, or the exact tensors passed between components.
 
-<div class="source-explainer-comparison">
+<div class="source-explainer-comparison source-explainer-comparison--architecture">
   <figure>
     <div class="comparison-label">01 · Source architecture</div>
     <a href="/assets/images/waymo-foundation-model-architecture.png"><img src="/assets/images/waymo-foundation-model-architecture.png" alt="Waymo Foundation Model architecture with a sensor-fusion encoder and Driving VLM feeding a generative world decoder"></a>
@@ -203,10 +203,10 @@ Two components feed the World Decoder. The Sensor Fusion Encoder combines camera
 
 The diagram below turns those unspecified boundaries into one design proposal.
 
-<div class="source-explainer-comparison">
+<div class="source-explainer-comparison source-explainer-comparison--architecture">
   <figure>
-    <div class="comparison-label">02 · Design synthesis</div>
-    <a href="/assets/images/autonomous-driving-two-speed-stack.svg"><img src="/assets/images/autonomous-driving-two-speed-stack.svg" alt="Design synthesis of a two-speed autonomous-driving architecture with a fast sensor-fusion path and a triggered Driving VLM path converging at a world decoder, followed by separate scoring, validation, trajectory selection, and vehicle control"></a>
+    <div class="comparison-label">02 · Proposed implementation</div>
+    <a href="/assets/images/autonomous-driving-two-speed-stack.svg"><img src="/assets/images/autonomous-driving-two-speed-stack.svg" alt="Proposed implementation arranged like the Waymo source figure: sensor fusion in the upper branch and a triggered Driving VLM in the lower branch feed trajectory proposal, followed by scoring, independent validation, trajectory selection, and vehicle control"></a>
   </figure>
 </div>
 

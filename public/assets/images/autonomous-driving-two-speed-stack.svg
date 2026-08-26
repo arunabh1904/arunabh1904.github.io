@@ -1,148 +1,112 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
-  <title id="title">Two-speed autonomous-driving perception and planning architecture</title>
-  <desc id="desc">A fast sensor-fusion path maintains materialized and latent world state. A slower triggered driving VLM contributes grounded hypotheses with confidence and expiry. A world decoder uses both paths to propose agent futures and ego trajectories. A learned scorer ranks candidates, an independent validator checks them against materialized state, and only an accepted trajectory reaches the vehicle controller.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="860" viewBox="0 0 1600 860" role="img" aria-labelledby="title desc">
+  <title id="title">Sensor fusion and a triggered Driving VLM feeding trajectory proposal and independent validation</title>
+  <desc id="desc">The layout follows the Waymo source figure. Camera, LiDAR, and radar enter the upper sensor-fusion branch. Selected camera history, route context, and an uncertainty trigger enter the lower Driving VLM branch. Both branches feed a trajectory proposal model on the right. A scorer ranks candidate trajectories, while an independent validator checks geometry, dynamics, traffic rules, uncertainty limits, and fallback requirements before the vehicle controller receives a trajectory.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#07131d"/>
-      <stop offset="1" stop-color="#111d2a"/>
-    </linearGradient>
-    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#122331"/>
-      <stop offset="1" stop-color="#0c1823"/>
-    </linearGradient>
-    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
-      <path d="M32 0H0V32" fill="none" stroke="#173044" stroke-width="1" opacity=".35"/>
-    </pattern>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0 0 10 5 0 10Z" fill="context-stroke"/>
-    </marker>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07131d"/><stop offset="1" stop-color="#111f2d"/></linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102331"/><stop offset="1" stop-color="#0b1823"/></linearGradient>
+    <marker id="cyan-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#58d8ff"/></marker>
+    <marker id="pink-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#ff6fae"/></marker>
+    <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#78e0a5"/></marker>
+    <marker id="violet-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#b19aff"/></marker>
     <style>
-      text{font-family:"SF Pro Display","SF Pro Text",Inter,Arial,sans-serif;fill:#f2f7fa}.title{font-size:38px;font-weight:680;letter-spacing:-.7px}.subtitle{font-size:16px;font-weight:520;fill:#9db2c1}.kicker{font-size:13px;font-weight:700;letter-spacing:2px}.lane-title{font-size:14px;font-weight:700;letter-spacing:1.8px}.node-title{font-size:18px;font-weight:680}.node-copy{font-size:13px;font-weight:520;fill:#9db2c1}.micro{font-size:11px;font-weight:650;letter-spacing:.5px}.flow{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow)}.dash{stroke-dasharray:7 7}.lane{fill:url(#panel);stroke-width:1.4}.node{fill:#0c1823;stroke-width:1.3}.chip{fill:#0a151f;stroke-width:1}.cyan{stroke:#58d8ff}.amber{stroke:#ffc15a}.pink{stroke:#ff6fae}.green{stroke:#78e0a5}.violet{stroke:#b19aff}.red{stroke:#ff7a76}.muted{stroke:#466174}
+      text{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+      .kicker{font-size:15px;font-weight:750;letter-spacing:2.2px;fill:#78e0a5}
+      .title{font-size:42px;font-weight:760;fill:#f2f7fa}
+      .subtitle{font-size:19px;font-weight:520;fill:#a8bbc7}
+      .branch-title{font-size:18px;font-weight:760;letter-spacing:1.8px;fill:#f2f7fa}
+      .node-title{font-size:23px;font-weight:720;fill:#f2f7fa}
+      .copy{font-size:18px;font-weight:520;fill:#a8bbc7}
+      .small{font-size:16px;font-weight:560;fill:#a8bbc7}
+      .micro{font-size:15px;font-weight:760;letter-spacing:1px;fill:#f2f7fa}
+      .panel{fill:url(#panel);stroke-width:1.5}
+      .cyan{stroke:#58d8ff}.pink{stroke:#ff6fae}.violet{stroke:#b19aff}.green{stroke:#78e0a5}.red{stroke:#ff7a76}
+      .chip{fill:#0b1823;stroke-width:1.2}
+      .flow{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
     </style>
   </defs>
 
-  <rect width="1600" height="1000" rx="26" fill="url(#bg)"/>
-  <rect width="1600" height="1000" rx="26" fill="url(#grid)" opacity=".42"/>
+  <rect width="1600" height="860" rx="24" fill="url(#bg)"/>
+  <text x="52" y="52" class="kicker">PROPOSED IMPLEMENTATION OF THE PUBLISHED ARCHITECTURE</text>
+  <text x="52" y="102" class="title">Sensor fusion and Driving VLM inputs converge before trajectory validation</text>
+  <text x="52" y="136" class="subtitle">The layout mirrors the source figure: sensor fusion above, Driving VLM below, shared trajectory proposal on the right.</text>
 
-  <text x="54" y="52" class="kicker" fill="#78e0a5">DESIGN SYNTHESIS</text>
-  <text x="54" y="101" class="title">Two-speed perception, one checked trajectory</text>
-  <text x="54" y="136" class="subtitle">The fast path maintains metric state. The triggered semantic path adds bounded hypotheses. Neither reaches control directly.</text>
+  <rect x="40" y="176" width="748" height="272" rx="22" class="panel cyan"/>
+  <text x="66" y="211" class="branch-title" fill="#58d8ff">SENSOR FUSION ENCODER · UPDATED EVERY PLANNING CYCLE</text>
+  <rect x="66" y="239" width="156" height="178" rx="16" class="chip cyan"/>
+  <text x="86" y="273" class="node-title">Sensors</text>
+  <circle cx="88" cy="307" r="5" fill="#58d8ff"/><text x="105" y="313" class="copy">Camera</text>
+  <circle cx="88" cy="347" r="5" fill="#ffc15a"/><text x="105" y="353" class="copy">LiDAR</text>
+  <circle cx="88" cy="387" r="5" fill="#ff6fae"/><text x="105" y="393" class="copy">Radar</text>
+  <path d="M222 328H262" class="flow cyan" marker-end="url(#cyan-arrow)"/>
+  <rect x="272" y="229" width="226" height="188" rx="16" class="chip green"/>
+  <text x="294" y="267" class="node-title">Align and fuse</text>
+  <text x="294" y="304" class="copy">Calibration and depth</text>
+  <text x="294" y="333" class="copy">Time and ego motion</text>
+  <text x="294" y="362" class="copy">Sensor health and age</text>
+  <text x="294" y="393" class="micro" fill="#78e0a5">SHARED VEHICLE FRAME</text>
+  <path d="M498 328H538" class="flow green" marker-end="url(#green-arrow)"/>
+  <rect x="548" y="229" width="214" height="188" rx="16" class="chip violet"/>
+  <text x="570" y="267" class="node-title">Driving state</text>
+  <text x="570" y="302" class="micro" fill="#78e0a5">EXPLICIT</text>
+  <text x="570" y="328" class="copy">tracks · occupancy</text>
+  <text x="570" y="353" class="copy">map · uncertainty</text>
+  <text x="570" y="383" class="micro" fill="#b19aff">LEARNED</text>
+  <text x="570" y="407" class="copy">dense features · tokens</text>
 
-  <!-- Fast perception path -->
-  <rect x="42" y="178" width="914" height="348" rx="22" class="lane cyan"/>
-  <text x="70" y="211" class="lane-title" fill="#58d8ff">FAST PATH · FRESH METRIC STATE</text>
-  <text x="926" y="211" class="micro" text-anchor="end" fill="#58d8ff">RUNS AT CONTROL-RELEVANT FREQUENCY</text>
+  <rect x="40" y="482" width="748" height="284" rx="22" class="panel pink"/>
+  <text x="66" y="517" class="branch-title" fill="#ff6fae">DRIVING VLM · RUNS FOR RARE OR UNCERTAIN SCENES</text>
+  <rect x="66" y="547" width="210" height="174" rx="16" class="chip pink"/>
+  <text x="88" y="583" class="node-title">Selected context</text>
+  <text x="88" y="619" class="copy">camera history</text>
+  <text x="88" y="648" class="copy">route context</text>
+  <text x="88" y="677" class="copy">rare / uncertain scene</text>
+  <text x="88" y="706" class="copy">selected state features</text>
+  <path d="M276 634H316" class="flow pink" marker-end="url(#pink-arrow)"/>
+  <rect x="326" y="547" width="190" height="174" rx="16" class="chip pink"/>
+  <text x="348" y="583" class="node-title">Driving VLM</text>
+  <text x="348" y="621" class="copy">Interpret unusual</text>
+  <text x="348" y="650" class="copy">objects + signals</text>
+  <text x="348" y="679" class="copy">and road events</text>
+  <path d="M516 634H546" class="flow pink" marker-end="url(#pink-arrow)"/>
+  <rect x="556" y="547" width="206" height="174" rx="16" class="chip pink"/>
+  <text x="578" y="580" class="node-title">VLM output</text>
+  <text x="578" y="611" class="copy">scene interpretation</text>
+  <text x="578" y="640" class="copy">linked region or actor</text>
+  <text x="578" y="669" class="copy">confidence + time</text>
+  <text x="578" y="698" class="copy">expiration rule</text>
 
-  <rect x="70" y="244" width="156" height="220" rx="16" class="node cyan"/>
-  <text x="92" y="275" class="node-title">Sensors</text>
-  <rect x="92" y="298" width="112" height="38" rx="19" class="chip cyan"/><circle cx="111" cy="317" r="5" fill="#58d8ff"/><text x="126" y="322" class="node-copy" fill="#f2f7fa">Camera</text>
-  <rect x="92" y="348" width="112" height="38" rx="19" class="chip amber"/><circle cx="111" cy="367" r="5" fill="#ffc15a"/><text x="126" y="372" class="node-copy" fill="#f2f7fa">LiDAR</text>
-  <rect x="92" y="398" width="112" height="38" rx="19" class="chip pink"/><circle cx="111" cy="417" r="5" fill="#ff6fae"/><text x="126" y="422" class="node-copy" fill="#f2f7fa">Radar</text>
+  <rect x="836" y="176" width="724" height="590" rx="22" class="panel violet"/>
+  <text x="864" y="211" class="branch-title" fill="#b19aff">TRAJECTORY PROPOSAL + INDEPENDENT VALIDATION</text>
+  <path d="M762 314H880" class="flow green" marker-end="url(#green-arrow)"/>
+  <path d="M762 634C820 634 826 326 880 326" class="flow pink" marker-end="url(#pink-arrow)"/>
+  <rect x="890" y="236" width="630" height="126" rx="17" class="chip violet"/>
+  <text x="916" y="276" class="node-title">Trajectory proposal model</text>
+  <text x="916" y="311" class="copy">Inputs: tracks, map, learned features, and VLM scene interpretation</text>
+  <text x="916" y="340" class="copy">Output: predicted actor futures and candidate ego trajectories</text>
+  <path d="M1205 362V398" class="flow violet" marker-end="url(#violet-arrow)"/>
+  <rect x="918" y="408" width="574" height="76" rx="16" class="chip violet"/>
+  <text x="944" y="442" class="node-title">Candidate trajectories</text>
+  <text x="944" y="470" class="copy">several feasible paths for the ego vehicle</text>
+  <path d="M1080 484V516" class="flow violet" marker-end="url(#violet-arrow)"/>
+  <path d="M1340 484V516" class="flow" stroke="#ff7a76" marker-end="url(#pink-arrow)"/>
+  <rect x="884" y="526" width="286" height="112" rx="16" class="chip violet"/>
+  <text x="906" y="562" class="node-title">Trajectory scorer</text>
+  <text x="906" y="594" class="copy">Ranks safety, progress,</text>
+  <text x="906" y="620" class="copy">comfort, and compliance</text>
+  <rect x="1226" y="526" width="306" height="112" rx="16" class="chip red"/>
+  <text x="1248" y="562" class="node-title">Independent validator</text>
+  <text x="1248" y="594" class="copy">Geometry, dynamics, and rules</text>
+  <text x="1248" y="620" class="copy">Uncertainty limits and fallback</text>
+  <path d="M762 365H808V501H1508V526" class="flow green" stroke-dasharray="8 7" marker-end="url(#green-arrow)"/>
+  <text x="1160" y="495" class="micro" text-anchor="middle" fill="#78e0a5">EXPLICIT SENSOR STATE ALSO FEEDS THE VALIDATOR</text>
+  <path d="M1027 638V668H1178" class="flow violet" marker-end="url(#violet-arrow)"/>
+  <path d="M1379 638V668H1232" class="flow" stroke="#ff7a76" marker-end="url(#pink-arrow)"/>
+  <rect x="1024" y="678" width="388" height="62" rx="16" class="chip green"/>
+  <text x="1218" y="707" class="node-title" text-anchor="middle">Select a valid trajectory</text>
+  <text x="1218" y="730" class="small" text-anchor="middle">highest-scoring trajectory that passes every check</text>
+  <path d="M1218 740V796" class="flow green" marker-end="url(#green-arrow)"/>
+  <rect x="1082" y="798" width="272" height="44" rx="22" class="chip green"/>
+  <text x="1218" y="826" class="node-title" text-anchor="middle">Vehicle controller</text>
 
-  <path d="M226 354H258" class="flow cyan"/>
-  <rect x="260" y="270" width="170" height="168" rx="16" class="node cyan"/>
-  <text x="282" y="304" class="node-title">Sensor-specific</text>
-  <text x="282" y="328" class="node-title">encoders</text>
-  <text x="282" y="363" class="node-copy">Preserve appearance,</text>
-  <text x="282" y="384" class="node-copy">3D geometry, Doppler,</text>
-  <text x="282" y="405" class="node-copy">and uncertainty</text>
-
-  <path d="M430 354H462" class="flow cyan"/>
-  <rect x="464" y="250" width="214" height="208" rx="16" class="node green"/>
-  <text x="486" y="284" class="node-title">Align and fuse</text>
-  <text x="486" y="318" class="node-copy">Calibration + depth</text>
-  <text x="486" y="341" class="node-copy">Time + ego motion</text>
-  <text x="486" y="364" class="node-copy">Sensor health + age</text>
-  <path d="M490 389H650" stroke="#203b4e" stroke-width="1"/>
-  <text x="486" y="416" class="micro" fill="#78e0a5">SHARED VEHICLE FRAME</text>
-
-  <path d="M678 354H710" class="flow green"/>
-  <rect x="712" y="230" width="216" height="248" rx="16" class="node violet"/>
-  <text x="734" y="264" class="node-title">Recurrent world state</text>
-  <rect x="734" y="287" width="172" height="75" rx="12" class="chip green"/>
-  <text x="750" y="313" class="micro" fill="#78e0a5">MATERIALIZED</text>
-  <text x="750" y="337" class="node-copy">tracks · occupancy</text>
-  <text x="750" y="354" class="node-copy">roadgraph · uncertainty</text>
-  <rect x="734" y="375" width="172" height="75" rx="12" class="chip violet"/>
-  <text x="750" y="401" class="micro" fill="#b19aff">LATENT</text>
-  <text x="750" y="426" class="node-copy">dense features · scene tokens</text>
-  <path d="M820 478V503" class="flow violet dash"/>
-  <text x="910" y="499" class="micro" text-anchor="end" fill="#b19aff">COMPACT STATE SUMMARY</text>
-
-  <!-- Slow semantic path -->
-  <rect x="42" y="558" width="914" height="246" rx="22" class="lane pink"/>
-  <text x="70" y="591" class="lane-title" fill="#ff6fae">TRIGGERED PATH · SEMANTIC HYPOTHESES</text>
-  <text x="926" y="591" class="micro" text-anchor="end" fill="#ff6fae">LOWER FREQUENCY OR UNCERTAINTY-TRIGGERED</text>
-
-  <rect x="70" y="624" width="230" height="126" rx="16" class="node pink"/>
-  <text x="92" y="656" class="node-title">Selected context</text>
-  <text x="92" y="686" class="node-copy">camera history · route</text>
-  <text x="92" y="709" class="node-copy">rare-event or uncertainty trigger</text>
-  <text x="92" y="732" class="node-copy">compact fast-path summary</text>
-
-  <path d="M300 687H338" class="flow pink"/>
-  <rect x="340" y="624" width="176" height="126" rx="16" class="node pink"/>
-  <text x="362" y="668" class="node-title">Driving VLM</text>
-  <text x="362" y="699" class="node-copy">Interpret unusual</text>
-  <text x="362" y="720" class="node-copy">semantic context</text>
-
-  <path d="M516 687H554" class="flow pink"/>
-  <rect x="556" y="610" width="372" height="154" rx="16" class="node pink"/>
-  <text x="578" y="644" class="node-title">Grounded hypotheses</text>
-  <text x="578" y="675" class="node-copy">temporary lane closure · traffic director</text>
-  <text x="578" y="700" class="node-copy">linked region or entity · confidence</text>
-  <text x="578" y="725" class="node-copy">timestamp · expiry condition</text>
-  <text x="578" y="748" class="micro" fill="#ff7a76">CANNOT OVERWRITE METRIC STATE</text>
-
-  <!-- Decision path -->
-  <rect x="992" y="178" width="566" height="762" rx="22" class="lane violet"/>
-  <text x="1022" y="211" class="lane-title" fill="#b19aff">DECISION PATH · PROPOSE, RANK, CHECK</text>
-
-  <path d="M928 318H1018" class="flow green"/>
-  <path d="M928 420H980Q1018 420 1018 356" class="flow violet"/>
-  <path d="M928 687H972Q1018 687 1018 376" class="flow pink"/>
-
-  <rect x="1020" y="240" width="508" height="152" rx="16" class="node violet"/>
-  <text x="1044" y="273" class="node-title">World decoder</text>
-  <rect x="1044" y="294" width="136" height="34" rx="17" class="chip green"/><text x="1112" y="316" class="micro" text-anchor="middle" fill="#78e0a5">MATERIALIZED</text>
-  <rect x="1192" y="294" width="100" height="34" rx="17" class="chip violet"/><text x="1242" y="316" class="micro" text-anchor="middle" fill="#b19aff">LATENT</text>
-  <rect x="1304" y="294" width="194" height="34" rx="17" class="chip pink"/><text x="1401" y="316" class="micro" text-anchor="middle" fill="#ff6fae">GROUNDED HYPOTHESES</text>
-  <text x="1044" y="359" class="node-copy">Decode several plausible world evolutions and ego actions</text>
-
-  <path d="M1274 392V424" class="flow violet"/>
-  <rect x="1050" y="426" width="448" height="92" rx="16" class="node violet"/>
-  <text x="1074" y="458" class="node-title">Candidate set</text>
-  <text x="1074" y="488" class="node-copy">multimodal agent futures + diverse ego trajectories</text>
-
-  <path d="M1184 518V550H1128V572" class="flow violet"/>
-  <path d="M1364 518V550H1420V572" class="flow red"/>
-  <rect x="1020" y="574" width="220" height="116" rx="16" class="node violet"/>
-  <text x="1042" y="607" class="node-title">Learned scorer</text>
-  <text x="1042" y="637" class="node-copy">Ranks safety, progress,</text>
-  <text x="1042" y="659" class="node-copy">comfort, and compliance</text>
-  <rect x="1308" y="574" width="220" height="116" rx="16" class="node red"/>
-  <text x="1330" y="607" class="node-title">Independent validator</text>
-  <text x="1330" y="637" class="node-copy">Checks geometry, dynamics,</text>
-  <text x="1330" y="659" class="node-copy">rules, uncertainty, fallback</text>
-
-  <!-- Checkable-state bypass to validation -->
-  <path d="M908 325H970V548H1544V632H1528" class="flow green dash"/>
-  <rect x="1112" y="532" width="288" height="31" rx="15" fill="#0b1821" stroke="#78e0a5"/>
-  <text x="1256" y="553" class="micro" text-anchor="middle" fill="#78e0a5">CHECKABLE STATE BYPASSES THE GENERATOR</text>
-
-  <path d="M1130 690V724H1224V748" class="flow violet"/>
-  <path d="M1418 690V724H1324V748" class="flow red"/>
-  <rect x="1124" y="750" width="300" height="72" rx="16" class="node green"/>
-  <text x="1274" y="780" class="node-title" text-anchor="middle">Select best valid trajectory</text>
-  <text x="1274" y="803" class="node-copy" text-anchor="middle">ranking ∩ admissible set</text>
-
-  <path d="M1274 822V858" class="flow green"/>
-  <path d="M1020 850H1528" stroke="#466174" stroke-width="1.2" stroke-dasharray="6 7"/>
-  <text x="1034" y="875" class="micro" fill="#9db2c1">PLANNING OUTPUT</text>
-  <text x="1514" y="875" class="micro" text-anchor="end" fill="#9db2c1">VEHICLE CONTROL</text>
-  <rect x="1138" y="884" width="272" height="60" rx="30" class="node green"/>
-  <text x="1274" y="911" class="node-title" text-anchor="middle">Vehicle controller</text>
-  <text x="1274" y="932" class="node-copy" text-anchor="middle">tracks the accepted trajectory</text>
-
-  <text x="54" y="966" class="subtitle">The VLM changes decision context. The validator independently controls which proposed trajectory may reach the controller.</text>
+  <text x="52" y="826" class="subtitle">The VLM adds scene context but cannot overwrite sensor state. Only the independent validator can admit a trajectory.</text>
 </svg>

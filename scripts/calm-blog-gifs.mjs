@@ -97,7 +97,8 @@ function token(label, x, y, opacity = 1, accent = C.amber, width = 92) {
 }
 
 function top(index, total, title, opacity) {
-  return `${text(`${String(index).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, 62, 65, 12, C.amber, 'start', 650, opacity, 1.9)}${text(title, 480, 86, 30, C.ink, 'middle', 620, opacity)}`;
+  const titleSize = title.length > 62 ? 24 : title.length > 50 ? 26 : 30;
+  return `${text(`${String(index).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, 62, 65, 12, C.amber, 'start', 650, opacity, 1.9)}${text(title, 480, 86, titleSize, C.ink, 'middle', 620, opacity)}`;
 }
 
 function footer(value, opacity, color = C.muted) {
@@ -105,7 +106,7 @@ function footer(value, opacity, color = C.muted) {
 }
 
 function labelPair(left, right, y, opacity, color = C.teal) {
-  return `${text(left, 160, y, 16, color, 'start', 650, opacity)}${text(right, 352, y, 16, C.ink, 'start', 520, opacity)}${line(112, y + 17, 848, y + 17, C.faint, 1, opacity)}`;
+  return `${text(left, 160, y, 16, color, 'start', 650, opacity)}${text(right, 390, y, 16, C.ink, 'start', 520, opacity)}${line(112, y + 17, 848, y + 17, C.faint, 1, opacity)}`;
 }
 
 function sceneAlpha(elapsed, duration, transitionSeconds) {
@@ -183,7 +184,7 @@ function summary(rows, opacity, footerText) {
 function drawAttention(mode, local, opacity) {
   const p = reveal(local);
   if (mode === 'intro') {
-    return `${sequenceTokens(205, opacity * p)}${arrow(480, 265, 480, 322, C.teal, 2, opacity * reveal(local, 0.38, 0.58))}${text('What remains addressable after each write?', 480, 372, 18, C.muted, 'middle', 520, opacity * reveal(local, 0.48, 0.68))}`;
+    return `${sequenceTokens(205, opacity * p)}${arrow(480, 265, 480, 322, C.teal, 2, opacity * reveal(local, 0.38, 0.58))}${text('Which past tokens remain individually retrievable?', 480, 372, 18, C.muted, 'middle', 520, opacity * reveal(local, 0.48, 0.68))}`;
   }
   if (mode === 'mha') {
     let out = '';
@@ -206,7 +207,7 @@ function drawAttention(mode, local, opacity) {
       out += text(`KV group ${group + 1}`, 352, y + 18, 13, C.muted, 'start', 600, opacity);
       ['the', 'key', 'was', 'blue'].forEach((label, col) => { out += token(label, 352 + col * 112, y + 30, opacity * reveal(local, 0.26 + col * 0.04, 0.42 + col * 0.04), C.teal, 94); });
     });
-    return out + footer('Fewer full histories. Every token remains addressable.', opacity * reveal(local, 0.64, 0.78), C.teal);
+    return out + footer('Fewer K/V histories are stored; every token keeps its index.', opacity * reveal(local, 0.64, 0.78), C.teal);
   }
   if (mode === 'mla') {
     let out = '';
@@ -219,7 +220,7 @@ function drawAttention(mode, local, opacity) {
       out += text(`z${i + 1}`, 629, y + 27, 15, C.teal, 'middle', 650, opacity * p);
       out += text(`token ${i + 1}`, 700, y + 26, 13, C.muted, 'start', 520, opacity * p);
     });
-    return out + footer('Token index survives. The representation is reconstructed later.', opacity * reveal(local, 0.64, 0.78), C.teal);
+    return out + footer('Each token keeps an index; its key and value are reconstructed from zᵢ.', opacity * reveal(local, 0.64, 0.78), C.teal);
   }
   if (mode === 'delta') {
     let out = '';
@@ -238,7 +239,7 @@ function drawAttention(mode, local, opacity) {
     ['GQA', 'fewer shared histories · fewer K/V maps'],
     ['MLA', 'compressed latent per token · reconstruction bottleneck'],
     ['DeltaNet', 'one recurrent state · bounded, lossy memory'],
-  ], opacity, 'The memory carrier predicts the failure.');
+  ], opacity, 'Storage format sets cache size and which past details can be retrieved.');
 }
 
 function sameScene(opacity) {
@@ -248,12 +249,12 @@ function sameScene(opacity) {
 function drawVlm(mode, local, opacity) {
   const p = reveal(local);
   let out = sameScene(opacity);
-  if (mode === 'intro') return out + arrow(452, 275, 542, 275, C.teal, 2, opacity * p) + text('The output decides what vision must preserve.', 684, 268, 20, C.ink, 'middle', 600, opacity * p) + text('identity · language · location · action', 684, 309, 15, C.muted, 'middle', 520, opacity * p);
+  if (mode === 'intro') return out + arrow(452, 275, 542, 275, C.teal, 2, opacity * p) + text('The required output changes which details are retained.', 684, 268, 18, C.ink, 'middle', 600, opacity * p) + text('identity · language · location · action', 684, 309, 15, C.muted, 'middle', 520, opacity * p);
   if (mode === 'clip') {
     out += arrow(452, 275, 574, 275, C.teal, 2, opacity * p);
     out += grid(609, 215, 8, 3, 25, C.teal, p, opacity);
     out += text('one global embedding', 710, 327, 17, C.teal, 'middle', 620, opacity);
-    return out + footer('CLIP needs semantic identity, not exact object location.', opacity * reveal(local, 0.62, 0.77));
+    return out + footer('CLIP needs features for image-text matching, not exact object coordinates.', opacity * reveal(local, 0.62, 0.77));
   }
   if (mode === 'llava') {
     out += arrow(452, 275, 548, 275, C.blue, 2, opacity * p);
@@ -261,7 +262,7 @@ function drawVlm(mode, local, opacity) {
     out += arrow(730, 250, 796, 250, C.blue, 2, opacity * p);
     out += text('“put the mug', 812, 252, 16, C.ink, 'middle', 560, opacity * p);
     out += text('on the tray”', 812, 281, 16, C.ink, 'middle', 560, opacity * p);
-    return out + footer('LLaVA preserves visual evidence that supports generated text.', opacity * reveal(local, 0.62, 0.77));
+    return out + footer('LLaVA retains image features used to generate the answer text.', opacity * reveal(local, 0.62, 0.77));
   }
   if (mode === 'molmo') {
     out += arrow(452, 275, 610, 275, C.amber, 2, opacity * p);
@@ -277,14 +278,14 @@ function drawVlm(mode, local, opacity) {
     out += path('M 594 333 C 640 240 716 215 820 175', C.green, 4, opacity * p);
     for (let i = 0; i < 5; i++) out += circle(mix(594, 820, i / 4), mix(333, 175, i / 4) - Math.sin(i / 4 * Math.PI) * 24, 6, C.green, opacity * p);
     out += text('action trajectory', 708, 369, 17, C.green, 'middle', 620, opacity);
-    return out + footer('π0 must preserve state through time and emit embodied action.', opacity * reveal(local, 0.62, 0.77));
+    return out + footer('π0 retains scene state across time and predicts robot actions.', opacity * reveal(local, 0.62, 0.77));
   }
   return summary([
-    ['CLIP', 'identity survives'],
-    ['LLaVA', 'evidence for language survives'],
-    ['Molmo', 'phrase-to-location binding survives'],
-    ['π0', 'state, time, and action survive'],
-  ], opacity, 'A shared visual encoder is not a shared output contract.');
+    ['CLIP', 'features for image-text matching'],
+    ['LLaVA', 'features used to generate text'],
+    ['Molmo', 'phrase-to-location coordinates'],
+    ['π0', 'time-indexed state for action prediction'],
+  ], opacity, 'Different outputs require different visual details.');
 }
 
 function modalityRows(opacity, values, unit) {
@@ -303,17 +304,17 @@ function modalityRows(opacity, values, unit) {
 
 function drawBudget(mode, local, opacity) {
   const p = reveal(local);
-  if (mode === 'examples') return modalityRows(opacity, [8, 8, 8, 8], 'examples') + footer('Equal sample share looks balanced.', opacity * reveal(local, 0.58, 0.74), C.teal);
+  if (mode === 'examples') return modalityRows(opacity, [8, 8, 8, 8], 'examples') + footer('Each modality contributes the same number of sampled examples.', opacity * reveal(local, 0.58, 0.74), C.teal);
   if (mode === 'units') return modalityRows(opacity, [5, 10, 24, 16].map((v) => Math.max(1, Math.round(v * p))), 'predicted units') + footer('Each example expands into a different number of training units.', opacity * reveal(local, 0.58, 0.74), C.blue);
   if (mode === 'flops') return bars([['text', 18], ['image', 42], ['video', 94], ['action', 61]], 145, 160, 430, 100, opacity * p, C.rose, '%') + footer('Equal example share can hide unequal compute.', opacity * reveal(local, 0.58, 0.74), C.rose);
-  if (mode === 'updates') return bars([['text', 22], ['image', 38], ['video', 82], ['action', 57]], 145, 160, 430, 100, opacity * p, C.green, '') + footer('Shared parameters feel update norm, not the sampling label.', opacity * reveal(local, 0.58, 0.74), C.green);
+  if (mode === 'updates') return bars([['text', 22], ['image', 38], ['video', 82], ['action', 57]], 145, 160, 430, 100, opacity * p, C.green, '') + footer('Gradient norm measures how strongly each modality updates shared parameters.', opacity * reveal(local, 0.58, 0.74), C.green);
   if (mode === 'ledgers') return summary([
     ['1', 'sampled examples'],
     ['2', 'predicted training units'],
     ['3', 'forward and backward FLOPs'],
     ['4', 'update norm at shared parameters'],
-  ], opacity, 'One mixture needs four ledgers.');
-  return `${sequenceTokens(208, opacity * p, C.blue, ['text', 'image', 'video', 'action'])}${arrow(480, 270, 480, 329, C.teal, 2, opacity * p)}${text('same percentage ≠ same training pressure', 480, 374, 19, C.ink, 'middle', 620, opacity * p)}`;
+  ], opacity, 'Report all four quantities; sample percentage alone is incomplete.');
+  return `${sequenceTokens(208, opacity * p, C.blue, ['text', 'image', 'video', 'action'])}${arrow(480, 270, 480, 329, C.teal, 2, opacity * p)}${text('same sample share ≠ same optimization load', 480, 374, 19, C.ink, 'middle', 620, opacity * p)}`;
 }
 
 function timeline(opacity, activeStart, activeEnd, color, progress = 1) {
@@ -327,20 +328,20 @@ function timeline(opacity, activeStart, activeEnd, color, progress = 1) {
 
 function drawFeedback(mode, local, opacity) {
   const p = reveal(local);
-  if (mode === 'failure') return timeline(opacity, 6, 7, C.red, p) + text('camera misses handle', 580, 226, 15, C.red, 'middle', 600, opacity * p) + text('human takes over', 646, 329, 15, C.amber, 'middle', 600, opacity * p) + footer('One rollout reveals a failure, not its counterfactual.', opacity * reveal(local, 0.62, 0.78));
+  if (mode === 'failure') return timeline(opacity, 6, 7, C.red, p) + text('camera misses handle', 580, 226, 15, C.red, 'middle', 600, opacity * p) + text('human takes over', 646, 329, 15, C.amber, 'middle', 600, opacity * p) + footer('The rollout shows the failed action, not which alternative would succeed.', opacity * reveal(local, 0.62, 0.78));
   if (mode === 'episode') return timeline(opacity, 0, 9, C.red, p) + footer('Episode outcome copies one failure bit across every action.', opacity * reveal(local, 0.62, 0.78), C.red);
-  if (mode === 'apo') return timeline(opacity, 6, 7, C.amber, p) + text('undesirable', 580, 226, 14, C.red, 'middle', 600, opacity * p) + text('corrective', 646, 329, 14, C.green, 'middle', 600, opacity * p) + footer('Action Preference Optimization localizes the intervention.', opacity * reveal(local, 0.62, 0.78), C.amber);
+  if (mode === 'apo') return timeline(opacity, 6, 7, C.amber, p) + text('failed action', 580, 226, 14, C.red, 'middle', 600, opacity * p) + text('corrected action', 646, 329, 14, C.green, 'middle', 600, opacity * p) + footer('Action Preference Optimization compares the failed and corrected actions.', opacity * reveal(local, 0.62, 0.78), C.amber);
   if (mode === 'process') return timeline(opacity, 4, 7, C.green, p) + line(514, 221, 514, 329, C.amber, 1.5, opacity * p, '5 5') + text('matched state?', 514, 205, 14, C.amber, 'middle', 600, opacity * p) + footer('Process feedback is valid only across comparable states.', opacity * reveal(local, 0.62, 0.78), C.green);
   return summary([
     ['Outcome', 'labels the whole trajectory'],
     ['APO', 'uses the local intervention and correction'],
     ['Process', 'needs progress or matched states'],
-  ], opacity, 'A cleaner objective cannot invent an unobserved counterfactual.');
+  ], opacity, 'The loss cannot supply an alternative action that was never observed.');
 }
 
 function drawLearning(mode, local, opacity) {
   const p = reveal(local);
-  if (mode === 'intro') return `${token('prompt x', 414, 190, opacity, C.blue, 132)}${arrow(480, 248, 480, 324, C.teal, 2, opacity * p)}${text('Which contrast creates the gradient?', 480, 373, 20, C.ink, 'middle', 620, opacity * p)}`;
+  if (mode === 'intro') return `${token('prompt x', 414, 190, opacity, C.blue, 132)}${arrow(480, 248, 480, 324, C.teal, 2, opacity * p)}${text('Which samples and reference signal define the loss?', 480, 373, 19, C.ink, 'middle', 620, opacity * p)}`;
   if (mode === 'ppo') {
     let out = sequenceTokens(176, opacity, C.teal, ['a₁', 'a₂', 'a₃', 'a₄']);
     out += line(240, 351, 720, 351, C.faint, 2, opacity);
@@ -366,7 +367,7 @@ function drawLearning(mode, local, opacity) {
     ['DPO', 'fixed chosen and rejected pair'],
     ['GRPO', 'current-policy prompt group'],
     ['GKD', 'teacher distribution at student states'],
-  ], opacity, 'Ask for the sampled state, feedback unit, and baseline.');
+  ], opacity, 'Compare methods by sampled data, feedback unit, and reference signal.');
 }
 
 function pipelineBlocks(opacity, activeCount = 4) {
@@ -397,7 +398,7 @@ function drawHermes(mode, local, opacity) {
     ['API', 'stable localhost contract'],
     ['Server', 'sampling and KV cache'],
     ['GGUF', 'weights and tokenizer'],
-  ], opacity, 'A model-load error belongs below the API boundary.');
+  ], opacity, 'A model-load error originates in llama-server or the GGUF file, not Hermes.');
 }
 
 const gemmaLong = [
@@ -450,8 +451,8 @@ function drawBenchmark(family, mode, local, opacity) {
   }
   if (mode === 'decision') {
     return isGemma
-      ? summary([['E2B', 'sub-second long-prompt TTFT on MLX'], ['E4B', '1.68 s long-prompt TTFT on MLX'], ['26B A4B', '2.18 s long-prompt TTFT on MLX'], ['31B', '13.50 s long-prompt TTFT on MLX']], opacity, 'Weights can fit before interaction feels responsive.')
-      : summary([['4B', '1.74–2.10 s long-prompt TTFT on MLX'], ['9B', '2.89 s MLX · 5.16 s llama.cpp'], ['14B', '4.93 s MLX · 11.11 s llama.cpp']], opacity, 'The 4B models stay interactive; 14B pays mainly in prefill.');
+      ? summary([['E2B', 'sub-second long-prompt TTFT on MLX'], ['E4B', '1.68 s long-prompt TTFT on MLX'], ['26B A4B', '2.18 s long-prompt TTFT on MLX'], ['31B', '13.50 s long-prompt TTFT on MLX']], opacity, 'A model can fit in memory and still have slow first-token latency.')
+      : summary([['4B', '1.74–2.10 s long-prompt TTFT on MLX'], ['9B', '2.89 s MLX · 5.16 s llama.cpp'], ['14B', '4.93 s MLX · 11.11 s llama.cpp']], opacity, 'The 4B models have the lowest measured first-token latency.');
   }
   return '';
 }
@@ -468,11 +469,11 @@ function featurePyramid(opacity, p) {
 
 function drawCameraEncoder(mode, local, opacity) {
   const p = reveal(local);
-  if (mode === 'input') return cameraView(260, 150, 440, 270, opacity) + footer('The encoder must keep distant actors and scene context.', opacity * reveal(local, 0.58, 0.74));
+  if (mode === 'input') return cameraView(260, 150, 440, 270, opacity) + footer('The encoder must retain small distant actors and wide scene context.', opacity * reveal(local, 0.58, 0.74));
   if (mode === 'coarse') return `${cameraView(110, 175, 300, 210, opacity)}${arrow(432, 280, 542, 280, C.red, 2, opacity * p)}${grid(590, 205, 5, 4, 38, C.red, p, opacity)}${footer('One coarse map is cheap, but small actors can disappear.', opacity * reveal(local, 0.60, 0.76), C.red)}`;
   if (mode === 'pyramid') return featurePyramid(opacity, p) + footer('A feature pyramid carries precise detail and broad context together.', opacity * reveal(local, 0.60, 0.76), C.teal);
   if (mode === 'supervision') return `${cameraView(120, 175, 300, 210, opacity)}${arrow(444, 280, 542, 280, C.green, 2, opacity * p)}${bev(590, 190, 240, 170, opacity * p, C.green)}${text('2D + 3D loss', 710, 390, 16, C.green, 'middle', 620, opacity * p)}${footer('Perspective-view supervision protects features needed after BEV lifting.', opacity * reveal(local, 0.60, 0.76), C.green)}`;
-  return summary([['Coarse map', 'lowest cost · weakest small-object detail'], ['Feature pyramid', 'detail plus scene context'], ['Perspective loss', 'keeps evidence useful for later 3D tasks']], opacity, 'The encoder decides which evidence survives conversion.');
+  return summary([['Coarse map', 'lowest cost · weakest small-object detail'], ['Feature pyramid', 'detail plus scene context'], ['Perspective loss', 'supervises image features before BEV projection']], opacity, 'Resolution, pyramid levels, and auxiliary loss set compute and retained detail.');
 }
 
 function drawLidar(mode, local, opacity) {
@@ -482,7 +483,7 @@ function drawLidar(mode, local, opacity) {
   if (mode === 'voxels') return `${pointCloud(96, 175, 300, 200, opacity, C.amber)}${arrow(420, 275, 538, 275, C.blue, 2, opacity * p)}${grid(585, 180, 7, 5, 35, C.blue, 0.58 * p, opacity)}${footer('SECOND keeps occupied voxels sparse before producing BEV features.', opacity * reveal(local, 0.60, 0.76), C.blue)}`;
   if (mode === 'dsvt') return `${grid(205, 165, 11, 7, 42, C.blue, 0.58, opacity)}${rect(248, 208, 168, 126, C.bg, 8, opacity * p, C.teal, 2)}${rect(458, 208, 168, 126, C.bg, 8, opacity * p, C.teal, 2)}${footer('DSVT attends inside sparse windows without densifying the full volume.', opacity * reveal(local, 0.60, 0.76), C.teal)}`;
   if (mode === 'voxelnext') return `${grid(255, 165, 11, 7, 42, C.green, 0.46, opacity)}${circle(413, 250, 17, C.amber, opacity * p, C.amber, 1)}${circle(623, 292, 17, C.amber, opacity * p, C.amber, 1)}${footer('VoxelNeXt keeps detection sparse instead of adding a dense BEV head.', opacity * reveal(local, 0.60, 0.76), C.green)}`;
-  return summary([['PointPillars', 'collapse height early'], ['SECOND', 'sparse voxels, then dense BEV'], ['DSVT', 'attention inside sparse windows'], ['VoxelNeXt', 'sparse backbone and sparse head']], opacity, 'The key choice is where sparsity is discarded.');
+  return summary([['PointPillars', 'collapse height early'], ['SECOND', 'sparse voxels, then dense BEV'], ['DSVT', 'attention inside sparse windows'], ['VoxelNeXt', 'sparse backbone and sparse head']], opacity, 'Each encoder converts sparse features to dense features at a different stage.');
 }
 
 function radarReturns(opacity) {
@@ -497,7 +498,7 @@ function drawRadar(mode, local, opacity) {
   if (mode === 'proposal') return `${cameraView(105, 178, 300, 205, opacity)}${radarReturns(opacity * 0.55)}${arrow(702, 286, 821, 286, C.rose, 2, opacity * p)}${rect(806, 240, 78, 78, C.bg, 8, opacity * p, C.amber, 1.5)}${footer('Proposal-stage fusion lets radar confirm camera candidates.', opacity * reveal(local, 0.60, 0.76), C.rose)}`;
   if (mode === 'depth') return `${cameraView(104, 178, 300, 205, opacity)}${arrow(428, 282, 544, 282, C.rose, 2, opacity * p)}${line(585, 350, 790, 191, C.amber, 3, opacity)}${[0,1,2,3,4].map((i)=>circle(607+i*42,333-i*32,6,i===3?C.rose:C.faint,opacity*(i===3?p:0.7))).join('')}${footer('Depth-stage fusion uses radar to sharpen where image evidence lands.', opacity * reveal(local, 0.60, 0.76), C.amber)}`;
   if (mode === 'bev') return `${radarReturns(opacity)}${arrow(480, 425, 480, 455, C.teal, 2, opacity * p)}${footer('An independent radar BEV preserves radar evidence before fusion.', opacity * reveal(local, 0.60, 0.76), C.teal)}`;
-  return summary([['Proposal', 'confirm camera candidates'], ['Depth', 'sharpen geometric placement'], ['Independent BEV', 'preserve radar-native evidence']], opacity, 'Fusion stage decides what radar can still correct.');
+  return summary([['Proposal', 'confirm camera candidates'], ['Depth', 'change estimated object depth'], ['Independent BEV', 'retain radar range and radial velocity']], opacity, 'Fusion stage determines whether radar can move an estimate or only confirm it.');
 }
 
 function cameraRay(opacity) {
@@ -510,7 +511,7 @@ function drawLifting(mode, local, opacity) {
   if (mode === 'lss') { let out = cameraRay(opacity); for (let i=0;i<7;i++) out += circle(472+i*48,264-i*7,7,i===4?C.teal:C.faint,opacity*(i===4?p:0.8)); return out + footer('LSS predicts a depth distribution along each image ray.', opacity * reveal(local, 0.60, 0.76), C.teal); }
   if (mode === 'detr3d') return `${cameraView(90, 175, 280, 205, opacity)}${circle(670, 250, 18, C.blue, 0.08 * opacity, C.blue, 1.5)}${line(370, 278, 670, 250, C.blue, 2, opacity * p)}${text('3D reference point', 670, 302, 16, C.blue, 'middle', 620, opacity)}${footer('DETR3D projects one object query into the camera views.', opacity * reveal(local, 0.60, 0.76), C.blue)}`;
   if (mode === 'bevformer') { let out = `${cameraView(90, 175, 280, 205, opacity)}${bev(590, 175, 250, 205, opacity, C.teal)}`; for(let i=0;i<5;i++){out += circle(680,326-i*35,6,C.teal,opacity*p); out += line(370,278,680,326-i*35,C.teal,1,opacity*p);} return out + footer('BEVFormer samples vertical reference points from each BEV cell.', opacity * reveal(local, 0.60, 0.76), C.teal); }
-  return summary([['LSS', 'pixel ray + depth distribution'], ['DETR3D', 'object query + 3D reference point'], ['BEVFormer', 'BEV cell + vertical reference points']], opacity, 'The query defines which geometry is reconstructed.');
+  return summary([['LSS', 'pixel ray + depth distribution'], ['DETR3D', 'object query + 3D reference point'], ['BEVFormer', 'BEV cell + vertical reference points']], opacity, 'Each method chooses different 3D sample locations for image features.');
 }
 
 function actorEvidence(opacity) {
@@ -519,11 +520,11 @@ function actorEvidence(opacity) {
 
 function drawFusion(mode, local, opacity) {
   const p = reveal(local);
-  if (mode === 'input') return actorEvidence(opacity) + text('same actor · three evidence streams', 480, 352, 19, C.ink, 'middle', 620, opacity * p);
+  if (mode === 'input') return actorEvidence(opacity) + text('one actor · camera, LiDAR, and radar features', 480, 352, 19, C.ink, 'middle', 620, opacity * p);
   if (mode === 'point') return `${actorEvidence(opacity)}${[266,480,694].map((x)=>arrow(x,285,480,372,x===266?C.blue:x===480?C.amber:C.rose,1.7,opacity*p)).join('')}${circle(480,385,22,C.teal,0.12*opacity,C.teal,1.5)}${footer('Point fusion aligns evidence at explicit 3D samples.', opacity * reveal(local, 0.60, 0.76), C.teal)}`;
   if (mode === 'query') return `${actorEvidence(opacity)}${[266,480,694].map((x)=>arrow(x,285,480,356,x===266?C.blue:x===480?C.amber:C.rose,1.7,opacity*p)).join('')}${token('object query', 414, 368, opacity, C.green, 132)}${footer('Object-query fusion asks each modality about one candidate actor.', opacity * reveal(local, 0.60, 0.76), C.green)}`;
   if (mode === 'bev') return `${actorEvidence(opacity)}${[266,480,694].map((x)=>arrow(x,285,480,325,x===266?C.blue:x===480?C.amber:C.rose,1.7,opacity*p)).join('')}${bev(342,335,276,110,opacity*p,C.teal)}${footer('Dense-BEV fusion keeps a shared spatial field for downstream tasks.', opacity * reveal(local, 0.60, 0.76), C.teal)}`;
-  return summary([['Point', 'precise local alignment'], ['Object query', 'candidate-centered evidence'], ['Dense BEV', 'shared spatial field']], opacity, 'Fusion granularity determines which disagreements remain visible.');
+  return summary([['Point', 'combine features at one 3D sample'], ['Object query', 'combine features for one candidate actor'], ['Dense BEV', 'combine features in every spatial cell']], opacity, 'Fusion unit determines where sensor disagreements can be detected.');
 }
 
 function modalityChips(opacity, levels = [1, 1, 1]) {
@@ -533,11 +534,11 @@ function modalityChips(opacity, levels = [1, 1, 1]) {
 
 function drawDropout(mode, local, opacity) {
   const p = reveal(local);
-  if (mode === 'failure') return modalityChips(opacity, [1, 0.08, 1]) + line(420, 176, 536, 256, C.red, 4, opacity * p) + line(536, 176, 420, 256, C.red, 4, opacity * p) + footer('A missing modality is different from a misleading modality.', opacity * reveal(local, 0.58, 0.74), C.red);
+  if (mode === 'failure') return modalityChips(opacity, [1, 0.08, 1]) + line(420, 176, 536, 256, C.red, 4, opacity * p) + line(536, 176, 420, 256, C.red, 4, opacity * p) + footer('A missing sensor has no input; a corrupted sensor supplies incorrect input.', opacity * reveal(local, 0.58, 0.74), C.red);
   if (mode === 'unibev') return `${modalityChips(opacity, [1, 0, 1])}${text('availability mask', 480, 315, 18, C.teal, 'middle', 620, opacity * p)}${footer('UniBEV trains the shared representation under modality dropout.', opacity * reveal(local, 0.60, 0.76), C.teal)}`;
   if (mode === 'metabev') return `${modalityChips(opacity, [1, 0.2, 1])}${arrow(315,258,480,355,C.blue,1.7,opacity*p)}${arrow(485,258,480,355,C.amber,1.7,opacity*p)}${arrow(655,258,480,355,C.rose,1.7,opacity*p)}${circle(480,375,25,C.green,0.12*opacity,C.green,1.5)}${footer('MetaBEV learns one task representation across available sensor sets.', opacity * reveal(local, 0.60, 0.76), C.green)}`;
   if (mode === 'grace') return `${modalityChips(opacity, [1, 0.35 + 0.65 * p, 0.5])}${text('1.00',315,280,15,C.blue,'middle',650,opacity)}${text((0.35+0.65*p).toFixed(2),485,280,15,C.amber,'middle',650,opacity)}${text('0.50',655,280,15,C.rose,'middle',650,opacity)}${footer('Grace-BEV gates each modality by estimated reliability.', opacity * reveal(local, 0.60, 0.76), C.amber)}`;
-  return summary([['Availability', 'which sensors are present'], ['Reliability', 'how much each present sensor should count'], ['Shared task state', 'what downstream prediction consumes']], opacity, 'Robust fusion must represent absence and trust separately.');
+  return summary([['Availability', 'which sensors supplied input'], ['Reliability', 'weight assigned to each supplied input'], ['Fused task state', 'representation passed to prediction heads']], opacity, 'Track sensor availability separately from estimated sensor reliability.');
 }
 
 function framesRow(opacity, count = 4) {
@@ -551,11 +552,11 @@ function framesRow(opacity, count = 4) {
 
 function drawTemporal(mode, local, opacity) {
   const p = reveal(local);
-  if (mode === 'input') return framesRow(opacity, 4) + footer('Temporal state must survive ego motion, occlusion, and new evidence.', opacity * reveal(local, 0.58, 0.74));
+  if (mode === 'input') return framesRow(opacity, 4) + footer('Temporal memory must align past features after ego motion and retain occluded actors.', opacity * reveal(local, 0.58, 0.74));
   if (mode === 'warp') return `${bev(150,175,260,190,opacity,C.blue)}${arrow(432,270,542,270,C.blue,2,opacity*p)}${bev(570,175,260,190,opacity*p,C.teal)}${path('M 608 320 Q 700 232 796 206',C.amber,3,opacity*p)}${footer('BEVFormer warps the previous dense field into the new ego frame.', opacity * reveal(local, 0.60, 0.76), C.blue)}`;
   if (mode === 'instances') { let out = bev(210,160,540,220,opacity*0.35,C.faint); [[320,225],[480,298],[650,210]].forEach(([x,y],i)=>{out += circle(x,y,16,C.green,0.08*opacity,C.green,1.5); out += arrow(x-35,y+25,x,y,C.green,1.5,opacity*p); out += text(`q${i+1}`,x,y+5,13,C.green,'middle',650,opacity);}); return out + footer('StreamPETR transforms recurrent instances and adds fresh anchors.', opacity * reveal(local, 0.60, 0.76), C.green); }
   if (mode === 'queue') { let out = ''; for(let i=0;i<6;i++){out += token(`q${i+1}`,165+i*108,225,opacity*(i<4?1:0.35),i<4?C.teal:C.faint,82);} out += arrow(180,304,752,304,C.teal,2,opacity*p); return out + footer('Sparse4D keeps a bounded queue of foreground queries.', opacity * reveal(local, 0.60, 0.76), C.teal); }
-  return summary([['Warped field', 'dense scene memory'], ['Recurrent instances', 'actor state plus fresh anchors'], ['Bounded queue', 'selected foreground history']], opacity, 'The memory unit determines what can persist.');
+  return summary([['Warped field', 'dense spatial history'], ['Recurrent instances', 'tracked actor state plus new anchors'], ['Bounded queue', 'fixed number of foreground queries']], opacity, 'Dense maps, actor instances, and bounded queues retain different history.');
 }
 
 function drawLidarContract(mode, local, opacity) {
@@ -600,71 +601,71 @@ function buildStory(titleSteps, draw) {
 
 export const CALM_BLOG_STORIES = {
   'blog-attention-memory.gif': buildStory([
-    { title: 'One sequence. Four ways to remember it.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'How four attention variants store the same token sequence.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
     { title: 'MHA stores a full token history for every head.', mode: 'mha', seconds: 9 },
     { title: 'GQA shares fewer full histories across query heads.', mode: 'gqa', seconds: 9 },
-    { title: 'MLA compresses each token before caching it.', mode: 'mla', seconds: 9 },
-    { title: 'DeltaNet folds every write into one fixed-size state.', mode: 'delta', seconds: 8.5 },
-    { title: 'The memory carrier predicts the trade-off.', mode: 'summary', seconds: 12 },
+    { title: 'MLA stores one compressed latent vector per token.', mode: 'mla', seconds: 9 },
+    { title: 'DeltaNet updates one fixed-size recurrent state.', mode: 'delta', seconds: 8.5 },
+    { title: 'Storage format sets cache size and retrieval limits.', mode: 'summary', seconds: 12 },
   ], drawAttention),
   'blog-vlm-evidence-contract.gif': buildStory([
-    { title: 'The same scene can demand four different outputs.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
-    { title: 'CLIP compresses the scene into semantic identity.', mode: 'clip', seconds: 8 },
-    { title: 'LLaVA keeps evidence that supports generated text.', mode: 'llava', seconds: 8.5 },
-    { title: 'Molmo binds language to an inspectable point.', mode: 'molmo', seconds: 9 },
-    { title: 'π0 carries the scene forward into robot action.', mode: 'pi0', seconds: 9 },
-    { title: 'The output contract determines what vision preserves.', mode: 'summary', seconds: 11.5 },
+    { title: 'Different outputs require different visual details.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'CLIP retains features for image-text matching.', mode: 'clip', seconds: 8 },
+    { title: 'LLaVA retains features used to generate text.', mode: 'llava', seconds: 8.5 },
+    { title: 'Molmo retains phrase-to-location coordinates.', mode: 'molmo', seconds: 9 },
+    { title: 'π0 retains time-indexed state for action prediction.', mode: 'pi0', seconds: 9 },
+    { title: 'The required output determines which details are retained.', mode: 'summary', seconds: 11.5 },
   ], drawVlm),
   'blog-multimodal-gradient-budget.gif': buildStory([
-    { title: 'Equal mixture percentages can hide unequal training.', mode: 'intro', seconds: 7, buildSeconds: 2.6 },
-    { title: 'Start with the sampled-example ledger.', mode: 'examples', seconds: 8 },
+    { title: 'Equal sample percentages can produce unequal optimization load.', mode: 'intro', seconds: 7, buildSeconds: 2.6 },
+    { title: 'First count sampled examples by modality.', mode: 'examples', seconds: 8 },
     { title: 'Examples expand into different numbers of units.', mode: 'units', seconds: 8.5 },
     { title: 'Those units consume different amounts of compute.', mode: 'flops', seconds: 9 },
-    { title: 'Shared parameters receive unequal update pressure.', mode: 'updates', seconds: 9 },
-    { title: 'A multimodal mixture needs four ledgers.', mode: 'ledgers', seconds: 11.5 },
+    { title: 'Gradient norms show unequal updates to shared parameters.', mode: 'updates', seconds: 9 },
+    { title: 'Report examples, units, FLOPs, and gradient norms.', mode: 'ledgers', seconds: 11.5 },
   ], drawBudget),
   'blog-vla-feedback-attribution.gif': buildStory([
-    { title: 'One robot failure exposes only part of the cause.', mode: 'failure', seconds: 7, buildSeconds: 2.6 },
+    { title: 'One failed rollout does not reveal a successful alternative.', mode: 'failure', seconds: 7, buildSeconds: 2.6 },
     { title: 'Episode outcomes label the whole trajectory.', mode: 'episode', seconds: 8 },
-    { title: 'APO localizes the intervention and correction.', mode: 'apo', seconds: 9 },
-    { title: 'Process feedback needs comparable states.', mode: 'process', seconds: 9 },
-    { title: 'Feedback can claim only what the rollout reveals.', mode: 'summary', seconds: 11 },
+    { title: 'APO compares the failed action with the human correction.', mode: 'apo', seconds: 9 },
+    { title: 'Process feedback requires progress or matched states.', mode: 'process', seconds: 9 },
+    { title: 'Observed feedback limits which labels the loss can use.', mode: 'summary', seconds: 11 },
   ], drawFeedback),
   'blog-rl-learning-signals.gif': buildStory([
-    { title: 'One gradient can be built from four contrasts.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
-    { title: 'PPO learns the baseline.', mode: 'ppo', seconds: 8 },
-    { title: 'DPO stores the contrast.', mode: 'dpo', seconds: 8 },
-    { title: 'GRPO samples the contrast.', mode: 'grpo', seconds: 9 },
-    { title: 'GKD asks a teacher on student states.', mode: 'gkd', seconds: 9 },
-    { title: 'The acronym matters less than the evidence path.', mode: 'summary', seconds: 11.5 },
+    { title: 'Four methods define their training comparisons differently.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'PPO compares sampled actions with value estimates.', mode: 'ppo', seconds: 8 },
+    { title: 'DPO compares a fixed chosen and rejected response.', mode: 'dpo', seconds: 8 },
+    { title: 'GRPO compares rewards within one sampled prompt group.', mode: 'grpo', seconds: 9 },
+    { title: 'GKD matches teacher probabilities on student states.', mode: 'gkd', seconds: 9 },
+    { title: 'Compare sampled data, feedback unit, and reference signal.', mode: 'summary', seconds: 11.5 },
   ], drawLearning),
   'blog-hermes-local-stack.gif': buildStory([
     { title: 'The agent shell and model runtime are separate.', mode: 'separate', seconds: 7, buildSeconds: 2.6 },
     { title: 'Hermes sends one request across a local API.', mode: 'request', seconds: 8 },
     { title: 'llama-server loads and runs the GGUF.', mode: 'weights', seconds: 8.5 },
-    { title: 'Generated tokens return through the same boundary.', mode: 'return', seconds: 8 },
-    { title: 'The boundary tells you where a failure belongs.', mode: 'summary', seconds: 10.5 },
+    { title: 'llama-server returns generated tokens through the local API.', mode: 'return', seconds: 8 },
+    { title: 'Map each failure to the agent, API, server, or model file.', mode: 'summary', seconds: 10.5 },
   ], drawHermes),
   'local-gemma-long-prompt-latency.gif': buildStory([
     { title: 'The benchmark changes one variable: prompt length.', mode: 'design', seconds: 7, buildSeconds: 2.6 },
     { title: 'Long prompts separate Gemma 4 models in prefill.', mode: 'long', seconds: 9.5 },
     { title: 'Runtime choice compounds long-prompt latency.', mode: 'runtime', seconds: 9.5 },
     { title: 'Decode speed moves less than first-token latency.', mode: 'decode', seconds: 9 },
-    { title: 'Fit and interactivity are different constraints.', mode: 'decision', seconds: 11 },
+    { title: 'Memory fit does not guarantee low first-token latency.', mode: 'decision', seconds: 11 },
   ], (mode, local, opacity) => drawBenchmark('gemma', mode, local, opacity)),
   'local-qwen-long-prompt-latency.gif': buildStory([
     { title: 'The benchmark changes one variable: prompt length.', mode: 'design', seconds: 7, buildSeconds: 2.6 },
     { title: 'Long prompts expose the Qwen prefill cost.', mode: 'long', seconds: 9.5 },
     { title: 'MLX and llama.cpp diverge as models grow.', mode: 'runtime', seconds: 9.5 },
     { title: 'Decode remains steadier than first-token latency.', mode: 'decode', seconds: 9 },
-    { title: 'The 4B models remain the interactive choice.', mode: 'decision', seconds: 11 },
+    { title: 'The 4B models have the lowest measured first-token latency.', mode: 'decision', seconds: 11 },
   ], (mode, local, opacity) => drawBenchmark('qwen', mode, local, opacity)),
   'autonomous-perception-camera-encoder.gif': buildStory([
-    { title: 'The camera encoder decides which evidence survives.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Camera resolution determines which scene details are retained.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
     { title: 'One coarse map can erase small actors.', mode: 'coarse', seconds: 8 },
     { title: 'A feature pyramid carries detail and context.', mode: 'pyramid', seconds: 8.5 },
-    { title: 'Perspective losses protect later 3D evidence.', mode: 'supervision', seconds: 9 },
-    { title: 'Encoder cost buys a specific kind of evidence.', mode: 'summary', seconds: 11 },
+    { title: 'Perspective losses supervise features before BEV projection.', mode: 'supervision', seconds: 9 },
+    { title: 'Resolution and pyramid levels trade compute for retained detail.', mode: 'summary', seconds: 11 },
   ], drawCameraEncoder),
   'autonomous-perception-lidar-encoder.gif': buildStory([
     { title: 'LiDAR begins as sparse points in continuous 3D.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
@@ -672,48 +673,48 @@ export const CALM_BLOG_STORIES = {
     { title: 'SECOND keeps occupied voxels sparse first.', mode: 'voxels', seconds: 8.5 },
     { title: 'DSVT attends inside sparse windows.', mode: 'dsvt', seconds: 8.5 },
     { title: 'VoxelNeXt keeps the detection head sparse.', mode: 'voxelnext', seconds: 8.5 },
-    { title: 'The key choice is where sparsity disappears.', mode: 'summary', seconds: 11.5 },
+    { title: 'Each LiDAR encoder discards sparsity at a different stage.', mode: 'summary', seconds: 11.5 },
   ], drawLidar),
   'autonomous-perception-radar-encoder.gif': buildStory([
-    { title: 'Radar supplies sparse range and velocity evidence.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Radar supplies sparse range and radial-velocity measurements.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
     { title: 'Proposal fusion confirms camera candidates.', mode: 'proposal', seconds: 8 },
     { title: 'Depth fusion sharpens geometric placement.', mode: 'depth', seconds: 8.5 },
-    { title: 'An independent BEV preserves radar-native evidence.', mode: 'bev', seconds: 9 },
-    { title: 'Fusion stage decides what radar can correct.', mode: 'summary', seconds: 11 },
+    { title: 'A separate radar BEV retains range and radial velocity.', mode: 'bev', seconds: 9 },
+    { title: 'Fusion stage limits whether radar can move or confirm estimates.', mode: 'summary', seconds: 11 },
   ], drawRadar),
   'autonomous-perception-camera-lifting.gif': buildStory([
     { title: 'A camera pixel defines a ray, not a 3D point.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
     { title: 'LSS distributes evidence along depth bins.', mode: 'lss', seconds: 8.5 },
     { title: 'DETR3D projects an object reference point.', mode: 'detr3d', seconds: 8.5 },
     { title: 'BEVFormer samples vertical references from BEV.', mode: 'bevformer', seconds: 9 },
-    { title: 'The query defines which geometry is reconstructed.', mode: 'summary', seconds: 11 },
+    { title: 'Each method chooses different 3D sample locations.', mode: 'summary', seconds: 11 },
   ], drawLifting),
   'autonomous-perception-fusion-granularity.gif': buildStory([
-    { title: 'Hold the actor fixed. Change the fusion unit.', mode: 'input', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'Compare how one actor is fused across three sensor streams.', mode: 'input', seconds: 6.5, buildSeconds: 2.4 },
     { title: 'Point fusion aligns evidence at 3D samples.', mode: 'point', seconds: 8 },
     { title: 'Object queries gather candidate-centered evidence.', mode: 'query', seconds: 8.5 },
     { title: 'Dense BEV fusion keeps a shared spatial field.', mode: 'bev', seconds: 8.5 },
-    { title: 'Fusion granularity controls visible disagreement.', mode: 'summary', seconds: 11 },
+    { title: 'Fusion unit determines where sensor disagreement is detected.', mode: 'summary', seconds: 11 },
   ], drawFusion),
   'autonomous-perception-modality-dropout.gif': buildStory([
-    { title: 'A missing sensor and a bad sensor are different.', mode: 'failure', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Missing and corrupted sensors require different handling.', mode: 'failure', seconds: 7, buildSeconds: 2.6 },
     { title: 'UniBEV trains with explicit modality dropout.', mode: 'unibev', seconds: 8 },
     { title: 'MetaBEV learns one state across sensor sets.', mode: 'metabev', seconds: 8.5 },
     { title: 'Grace-BEV gates present sensors by reliability.', mode: 'grace', seconds: 9 },
-    { title: 'Availability and trust need separate controls.', mode: 'summary', seconds: 11 },
+    { title: 'Track sensor availability separately from sensor reliability.', mode: 'summary', seconds: 11 },
   ], drawDropout),
   'autonomous-perception-temporal-memory.gif': buildStory([
-    { title: 'Temporal state must survive motion and occlusion.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Temporal memory must align motion and retain occluded actors.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
     { title: 'BEVFormer warps a dense field into the new frame.', mode: 'warp', seconds: 9 },
     { title: 'StreamPETR carries recurrent actor instances.', mode: 'instances', seconds: 9 },
     { title: 'Sparse4D keeps a bounded foreground-query queue.', mode: 'queue', seconds: 9 },
-    { title: 'The memory unit determines what can persist.', mode: 'summary', seconds: 11 },
+    { title: 'Dense maps, actor instances, and queues retain different history.', mode: 'summary', seconds: 11 },
   ], drawTemporal),
   'autonomous-perception-lidar-training-contracts.gif': buildStory([
     { title: 'One LiDAR scan can play three training roles.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
-    { title: 'Depth labels can disappear after training.', mode: 'labels', seconds: 8 },
+    { title: 'LiDAR may create depth labels used only during training.', mode: 'labels', seconds: 8 },
     { title: 'Runtime sparse depth becomes a sensor dependency.', mode: 'runtime', seconds: 9 },
-    { title: 'A LiDAR-camera teacher can be distilled away.', mode: 'teacher', seconds: 9 },
+    { title: 'A LiDAR teacher can supervise a camera-only deployed model.', mode: 'teacher', seconds: 9 },
     { title: 'Training input is not always deployment input.', mode: 'summary', seconds: 11 },
   ], drawLidarContract),
 };

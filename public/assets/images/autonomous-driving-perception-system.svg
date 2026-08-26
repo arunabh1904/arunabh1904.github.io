@@ -21,9 +21,9 @@
   <rect width="1600" height="820" fill="url(#micro)" opacity=".32"/>
   <circle cx="1480" cy="70" r="260" fill="#58d8ff" opacity=".025"/><circle cx="80" cy="690" r="250" fill="#78e0a5" opacity=".02"/>
 
-  <text x="58" y="64" class="kicker" fill="#78e0a5">SYSTEM MAP</text>
+  <text x="58" y="64" class="kicker" fill="#78e0a5">PERCEPTION PIPELINE</text>
   <text x="58" y="111" class="title">Autonomous-driving perception pipeline</text>
-  <text x="58" y="143" class="small">Sensor-specific encoders preserve native evidence; the shared carrier determines what survives.</text>
+  <text x="58" y="143" class="small">Separate encoders retain each sensor's measurements; alignment converts them into shared 3D representations.</text>
   <line x1="58" y1="168" x2="1542" y2="168" stroke="#26394a" stroke-width="1.2"/>
 
   <text x="168" y="205" class="kicker" text-anchor="middle">SENSORS</text>
@@ -70,8 +70,8 @@
   <text x="790" y="432" class="label">Sparse queries</text><text x="790" y="454" class="small">actors · tracks</text><text x="790" y="474" class="small">map elements</text>
   <rect x="656" y="500" width="278" height="92" rx="15" class="chip metric"/>
   <g transform="translate(684 526)" fill="none" stroke="#b19aff" stroke-width="2"><circle cx="14" cy="20" r="9" fill="#0c1622"/><circle cx="52" cy="8" r="9" fill="#0c1622"/><circle cx="70" cy="42" r="9" fill="#0c1622"/><path d="M22 17 43 11M54 16 65 34M22 26 62 40"/></g>
-  <text x="790" y="536" class="label">Latent tokens</text><text x="790" y="558" class="small">compressed state</text><text x="790" y="578" class="small">learned bottleneck</text>
-  <text x="795" y="608" class="small" text-anchor="middle">the carrier determines what survives</text>
+  <text x="790" y="536" class="label">Learned tokens</text><text x="790" y="558" class="small">compact scene state</text><text x="790" y="578" class="small">no explicit spatial grid</text>
+  <text x="795" y="608" class="small" text-anchor="middle">representation choice sets spatial detail and memory cost</text>
 
   <!-- Temporal state -->
   <g filter="url(#shadow)"><rect x="1018" y="234" width="242" height="384" rx="20" class="node task"/></g>
@@ -103,5 +103,5 @@
   <rect x="458" y="692" width="184" height="52" rx="26" class="chip task"/><text x="550" y="724" class="small" text-anchor="middle" fill="#b19aff">teacher features</text>
   <rect x="666" y="692" width="184" height="52" rx="26" class="chip metric"/><text x="758" y="724" class="small" text-anchor="middle" fill="#78e0a5">future frames</text>
   <path d="M342 692V650H604V350H630" class="train" marker-end="url(#arrow-radar)"/><path d="M550 692V650H795V618" class="train" marker-end="url(#arrow-radar)"/><path d="M758 692V650H1139V618" class="train" marker-end="url(#arrow-radar)"/>
-  <text x="1538" y="724" class="small" text-anchor="end">runtime and label-generation graphs are separate contracts</text>
+  <text x="1538" y="724" class="small" text-anchor="end">LiDAR labels, teacher features, and future frames are used only during training</text>
 </svg>
