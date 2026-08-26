@@ -2,9 +2,11 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { CALM_BLOG_STORIES } from '../scripts/calm-blog-gifs.mjs';
+import { CALM_BLOG_STORIES, PERCEPTION_BLOG_GIFS } from '../scripts/calm-blog-gifs.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+type VisualStep = { title: string; seconds: number };
+const perceptionStories = CALM_BLOG_STORIES as Record<string, { steps: VisualStep[] }>;
 const authoredSvgFiles = [
   'blog-audio-release-pipeline.svg',
   'autonomous-driving-perception-system.svg',
@@ -25,6 +27,9 @@ const bannedPhrases = [
   'evidence path',
   'shared parameters feel',
   'cleaner objective',
+  'StreamPETR carries recurrent actor instances',
+  'StreamPETR transforms recurrent instances',
+  'Temporal memory must align motion',
 ];
 
 describe('authored Blog visual language', () => {
@@ -49,6 +54,17 @@ describe('authored Blog visual language', () => {
     }
   });
 
+  it('grounds every perception GIF in observable road events', () => {
+    const concreteRoadTerms = /cyclist|lead car|van|curb|road|crosswalk|rain|camera|LiDAR|radar/i;
+
+    for (const filename of PERCEPTION_BLOG_GIFS) {
+      const story = perceptionStories[filename];
+      const groundedSteps = story.steps.filter((step) => concreteRoadTerms.test(step.title));
+      expect(groundedSteps.length, filename).toBeGreaterThanOrEqual(3);
+      expect(new Set(story.steps.map((step) => step.seconds)).size, filename).toBeGreaterThan(1);
+    }
+  });
+
   it('draws one encoder lane per driving sensor before fusion', async () => {
     const source = await readFile(
       path.join(projectRoot, 'public', 'assets', 'images', 'autonomous-driving-two-speed-stack.svg'),
@@ -61,6 +77,9 @@ describe('authored Blog visual language', () => {
     for (const visualCue of ['Candidate paths', 'Learned scorer', 'Independent checks']) {
       expect(source).toContain(visualCue);
     }
+    expect(source).toContain('top-k maneuvers');
+    expect(source).not.toContain('three maneuvers');
+    expect(source).not.toContain('safety · progress · comfort');
     expect(source).toContain('id="measured-state-to-validator"');
     expect(source).toContain('id="learned-features-to-generator"');
     expect(source).not.toContain('id="learned-features-to-validator"');

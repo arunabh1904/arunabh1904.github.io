@@ -35,13 +35,13 @@ Cameras, LiDAR, and radar produce measurements with different structure, uncerta
 
 Cameras capture color and texture at high spatial resolution. That makes them useful for reading traffic lights, distinguishing lane paint from road cracks, and tracing object boundaries. Their geometric weakness is depth: a pixel identifies a ray through the camera, not a distance along it.
 
-The encoder must retain a distant pedestrian without losing the context of the surrounding intersection. Convolutional backbones remain attractive because their local computation maps well to optimized inference libraries. [NVAutoNet](/paper%20shorts/2023/03/23/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving.html), for example, combines efficient CNN backbones with precomputed camera-to-BEV geometry and reports 53 FPS for the full multitask network on NVIDIA DRIVE Orin. Feature pyramids combine high-resolution maps that retain precise spatial detail with lower-resolution maps whose larger receptive fields capture more of the scene; [EfficientDet](/paper%20shorts/2020/04/01/efficientdet-scalable-and-efficient-object-detection.html) makes this exchange bidirectional and learns how strongly to weight each input. Vision transformers can connect distant image regions directly, but full attention across every token from every surround camera is too expensive. [Deformable DETR](/paper%20shorts/2020/10/08/deformable-detr-deformable-transformers-for-end-to-end-object-detection.html) replaces dense attention over image features with a small set of learned samples around each query's reference point.
+The encoder must retain a distant cyclist without losing the context of the surrounding intersection. Convolutional backbones remain attractive because their local computation maps well to optimized inference libraries. [NVAutoNet](/paper%20shorts/2023/03/23/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving.html), for example, combines efficient CNN backbones with precomputed camera-to-BEV geometry and reports 53 FPS for the full multitask network on NVIDIA DRIVE Orin. Feature pyramids combine high-resolution maps that retain precise spatial detail with lower-resolution maps whose larger receptive fields capture more of the scene; [EfficientDet](/paper%20shorts/2020/04/01/efficientdet-scalable-and-efficient-object-detection.html) makes this exchange bidirectional and learns how strongly to weight each input. Vision transformers can connect distant image regions directly, but full attention across every token from every surround camera is too expensive. [Deformable DETR](/paper%20shorts/2020/10/08/deformable-detr-deformable-transformers-for-end-to-end-object-detection.html) replaces dense attention over image features with a small set of learned samples around each query's reference point.
 
 The camera backbone also has to learn which evidence will matter after projection. When supervision arrives only after camera features have been projected into 3D, that learning signal is indirect. [BEVFormer v2](/paper%20shorts/2022/11/18/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition.html) adds perspective-view supervision before projection, giving the backbone a direct reason to preserve image evidence that fusion cannot recover later.
 
-<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-camera-encoder.gif"><img src="/assets/images/autonomous-perception-camera-encoder.gif" alt="Animation comparing a single coarse camera feature map, a multiscale feature pyramid, and perspective-view supervision before BEV conversion"></a></div>
+<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-camera-encoder.gif"><img src="/assets/images/autonomous-perception-camera-encoder.gif" alt="Animation of an ego car approaching a cyclist beside a parked van, showing how a coarse camera feature map loses the small actor while a feature pyramid and image supervision preserve it"></a></div>
 
-_The scene stays fixed while the image representation changes. A coarse map loses the distant cyclist. A feature pyramid retains both the cyclist and the wider road context, while perspective-view supervision gives the backbone a direct reason to preserve them before BEV conversion._
+_As the ego car closes distance, the cyclist grows from a few pixels into a clear object. The comparison shows the concrete failure: a coarse map can erase the early observation, while a pyramid and perspective-view supervision preserve it before BEV conversion._
 
 ### LiDAR encoders
 
@@ -51,9 +51,9 @@ LiDAR measures range directly, but its point cloud is sparse, irregular, and acq
 
 PointPillars trades vertical detail for regular 2D computation. Sparse voxel models retain more of the 3D structure, but every layer must map active input voxels to active outputs, then gather and scatter their features through memory. That bookkeeping and irregular access can erase part of the arithmetic savings. The right point to become dense depends on the hardware and the outputs the model must support.
 
-<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-lidar-encoder.gif"><img src="/assets/images/autonomous-perception-lidar-encoder.gif" alt="Animation comparing where PointPillars, SECOND and DSVT, and VoxelNeXt collapse height or densify LiDAR features"></a></div>
+<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-lidar-encoder.gif"><img src="/assets/images/autonomous-perception-lidar-encoder.gif" alt="Animation of an ego car moving during a LiDAR sweep, followed by motion compensation and concrete pillar, sparse-voxel, and sparse-window encodings of the cyclist and road"></a></div>
 
-_PointPillars collapses height before a dense 2D backbone. SECOND and DSVT retain sparse 3D cells until a later BEV stage. VoxelNeXt keeps prediction sparse. The change is where the model gives up explicit 3D structure in exchange for regular computation._
+_The first operation is temporal: compensate the vehicle's motion so static curbs align across the sweep while independently moving actors do not. Pillars then keep horizontal location but collapse height; sparse voxels and windows retain more of the cyclist's 3D structure while avoiding work in empty road volume._
 
 ### Radar encoders
 
@@ -65,9 +65,9 @@ Radar has gained influence by intervening earlier. [CRAFT](/paper%20shorts/2022/
 
 There is a second, more interesting shift: using more of what radar actually measures. [Simple-BEV](/paper%20shorts/2022/06/16/simple-bev-what-really-matters-for-multi-sensor-bev-perception.html) showed that metadata retention, accumulated sweeps, and outlier filtering materially affect fusion; preprocessing is part of the model. [Doppler-Aware LiDAR–Radar Fusion](/paper%20shorts/2025/10/23/doppler-aware-lidar-radar-fusion-for-weather-robust-3d-detection.html) keeps power and Doppler separate during interaction. [DinoRADE](/paper%20shorts/2026/04/09/dinorade-full-spectral-radar-camera-fusion.html) moves toward dense spectral tensors rather than LiDAR-like points. Radar becomes more valuable as the encoder stops forcing it to imitate another sensor.
 
-<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-radar-encoder.gif"><img src="/assets/images/autonomous-perception-radar-encoder.gif" alt="Animation comparing radar intervention at the camera-proposal, depth-estimation, and independent-BEV stages"></a></div>
+<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-radar-encoder.gif"><img src="/assets/images/autonomous-perception-radar-encoder.gif" alt="Animation of three radar sweeps measuring a lead car at 34, 30, and 26 meters with a 5 meter-per-second closing speed, then comparing proposal, depth, and radar-BEV fusion"></a></div>
 
-_CRAFT admits radar through camera proposals. CRN uses radar earlier to refine camera depth. RCBEVDet builds an independent radar BEV. Earlier intervention gives radar more influence, but also gives multipath and ghost returns more paths into the shared state._
+_Across three sweeps, the lead-car range falls from 34 m to 26 m while Doppler stays near a 5 m/s closing speed. Proposal fusion can confirm a camera detection but cannot move a misplaced box; depth fusion can change its range. An independent radar BEV retains the moving return and stationary clutter until later fusion resolves identity._
 
 The encoders now contain complementary evidence, but their features are still tied to different coordinate systems and acquisition times.
 
@@ -87,9 +87,9 @@ Query-based methods start with a 3D hypothesis and retrieve image evidence for i
 
 Controlled comparisons complicate claims that one projection operator is intrinsically better. In [Simple-BEV](/paper%20shorts/2022/06/16/simple-bev-what-really-matters-for-multi-sensor-bev-perception.html), image resolution and effective batch size changed vehicle-segmentation performance more than the lifting choice in the tested setup. A meaningful comparison must hold the backbone, resolution, schedule, batch size, and sensor inputs fixed. Otherwise, the training recipe is being credited to the geometry module.
 
-<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-camera-lifting.gif"><img src="/assets/images/autonomous-perception-camera-lifting.gif" alt="Animation comparing depth along an image ray in LSS, a 3D object-query reference point in DETR3D, and vertical reference points from a BEV cell in BEVFormer"></a></div>
+<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-camera-lifting.gif"><img src="/assets/images/autonomous-perception-camera-lifting.gif" alt="Animation tracing the cyclist image patch along a 3D ray, then showing LSS depth bins, an object-query reference, and vertical samples from one BEV cell"></a></div>
 
-_LSS pushes each image feature across candidate depths. DETR3D pulls image evidence into selected actor queries. BEVFormer pulls it into every BEV cell. The starting representation determines coverage, compute, and which evidence can disappear before fusion._
+_The cyclist occupies one image patch but could lie at several ranges along its ray. LSS spreads the feature over predicted depth bins. Object queries and BEV cells instead test selected 3D locations against the image. A wrong depth does not merely lower confidence; it writes the cyclist into the wrong metric cell._
 
 ## Choosing where to fuse sensor evidence
 
@@ -99,9 +99,9 @@ Fusion can happen before encoding, between sensor encoders, or after each modali
 
 [FUTR3D](/paper%20shorts/2022/03/20/futr3d-unified-sensor-fusion-framework-for-3d-detection.html) makes the object query modality-agnostic. Each query projects its 3D reference point into the cameras, samples LiDAR and radar features at the same BEV location, and combines the results to predict a box. [BEVFusion](/paper%20shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html) removes the object-query limit by fusing aligned camera and LiDAR features at every BEV cell before the task heads.
 
-<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-fusion-granularity.gif"><img src="/assets/images/autonomous-perception-fusion-granularity.gif" alt="Animation showing the same actor and lane evidence entering point, object-query, and dense-BEV fusion"></a></div>
+<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-fusion-granularity.gif"><img src="/assets/images/autonomous-perception-fusion-granularity.gif" alt="Animation combining camera identification and lane evidence, a LiDAR box at 24 meters, and radar closing speed at point, object-query, and dense-BEV granularity"></a></div>
 
-_Point fusion uses camera features only at LiDAR returns, so the camera-only actor is absent. Query fusion represents selected actors but not the lane field. Dense BEV retains actors, lanes, and free space across the grid, at higher computational cost._
+_The camera identifies the cyclist and lane; LiDAR supplies a 3D box at 24 m; radar supplies closing speed. Point fusion combines those measurements at one location. Query fusion retains one compact actor state. Dense BEV also preserves the lane, crosswalk, and free space, at higher computational cost._
 
 BEVFusion combines two completed BEV branches once. [DeepInteraction](/paper%20shorts/2022/08/23/deepinteraction-3d-object-detection-via-modality-interaction.html) instead keeps separate image and LiDAR representations, exchanges features in both directions during encoding, and alternates object queries between the two streams during decoding. [UniTR](/paper%20shorts/2023/08/15/unitr-unified-efficient-multimodal-transformer-for-bev.html) shares the transformer weights themselves. Its image and LiDAR tokenizers remain separate, while 2D and 3D neighborhood partitions control which tokens interact. Moving fusion into the backbone lets camera semantics reshape LiDAR features and LiDAR geometry reshape camera features before detection. A degraded stream can now alter the other branch across several layers rather than at one final fusion block.
 
@@ -109,9 +109,9 @@ A missing sensor changes the input distribution and the scale of the fused featu
 
 Both methods condition on whether a sensor is present. A degraded sensor passes that binary check while supplying unreliable features. [Grace-BEV](/paper%20shorts/2026/05/29/grace-bev-graceful-degradation-under-sensor-failures.html) estimates a continuous trust score from the LiDAR features, uses it to balance a LiDAR-guided expert against a vision-only expert, and gates the fused BEV features. An absent stream can be masked; a degraded stream must first be detected and down-weighted.
 
-<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-modality-dropout.gif"><img src="/assets/images/autonomous-perception-modality-dropout.gif" alt="Animation contrasting modality availability in UniBEV and MetaBEV with reliability gating in Grace-BEV"></a></div>
+<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-modality-dropout.gif"><img src="/assets/images/autonomous-perception-modality-dropout.gif" alt="Animation of rain degrading the camera while LiDAR and radar remain useful, separating sensor availability from continuous reliability weights"></a></div>
 
-_UniBEV and MetaBEV learn discrete camera-only, LiDAR-only, and fused modes. Grace-BEV adds a continuous trust score, so the LiDAR-guided path can be down-weighted without removing it entirely._
+_Rain degrades the camera before the stream disappears. An availability mask can represent a missing sensor, but it cannot say that a present image is unreliable. Continuous gating reduces the camera contribution while LiDAR and radar stabilize the same cyclist state._
 
 Once the sensors have been fused, the next problem is carrying that evidence across time.
 
@@ -133,9 +133,9 @@ Object-centric models carry a bounded set of 3D hypotheses instead of the full f
 
 [SparseBEV](/paper%20shorts/2023/08/18/sparsebev-high-performance-sparse-3d-object-detection.html) makes a different trade. It retains camera features from several frames, then lets each pillar query sample a small set of 3D locations across that history. This avoids a dense BEV memory without compressing the past into recurrent object state, although inference cost still grows with the number of stored frames.
 
-<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-temporal-memory.gif"><img src="/assets/images/autonomous-perception-temporal-memory.gif" alt="Animation comparing a warped dense BEV field, transformed recurrent instances with fresh anchors, and a bounded foreground-query queue"></a></div>
+<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-temporal-memory.gif"><img src="/assets/images/autonomous-perception-temporal-memory.gif" alt="Animation of a cyclist observed at a crosswalk, hidden behind a parked van, predicted with growing uncertainty, and corrected after reappearing"></a></div>
 
-_Dense recurrence preserves the road field and weak evidence through the occlusion, but can retain stale clutter. Sparse recurrence preserves selected actors at lower cost, but must decide when an actor is born, aged, or deleted._
+_At $t_0$, the model observes the cyclist and estimates velocity. At $t_1$, the van blocks the pixels: dense memory carries the aligned region, while an object track or bounded queue predicts the cyclist's position and increases uncertainty. At $t_2$, fresh pixels correct the state and contract uncertainty. Memory is useful only if current evidence can revise it._
 
 A hybrid memory can retain a coarse BEV field for free space and uncertain geometry while tracking actors and map elements as explicit instances. The field and the instances should carry age and uncertainty. Compute is only part of the tradeoff; latency, memory, query saturation in crowded scenes, and accuracy after long occlusions matter too.
 
@@ -163,9 +163,9 @@ The deployed model defines what must run on the vehicle; training can use additi
 
 The deployed sensor set does not determine which signals can be used during training. [Sparse-to-Dense](/paper%20shorts/2017/09/21/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb.html) consumes sparse depth at inference. [BEVDepth](/paper%20shorts/2022/06/21/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection.html) instead uses projected LiDAR returns only to supervise camera depth. [CRKD](/paper%20shorts/2024/06/17/crkd-camera-radar-distillation-from-lidar-camera.html) moves LiDAR one step further away by using a camera-LiDAR teacher to train a camera-radar student.
 
-<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-lidar-training-contracts.gif"><img src="/assets/images/autonomous-perception-lidar-training-contracts.gif" alt="Animation separating LiDAR depth labels, runtime sparse-depth input, and a LiDAR-camera teacher"></a></div>
+<div class="architecture-comparison"><a href="/assets/images/autonomous-perception-lidar-training-contracts.gif"><img src="/assets/images/autonomous-perception-lidar-training-contracts.gif" alt="Animation using the same cyclist scan to distinguish LiDAR depth labels used during training, live LiDAR input required at inference, and a LiDAR-camera teacher for a camera-only student"></a></div>
 
-_LiDAR enters at a different stage in each design: inference, label generation, or teacher training._
+_The same cyclist scan creates three different deployment contracts. It can provide a training-only depth label, a live input that every deployed vehicle must supply, or richer teacher state that transfers geometry into a camera-only student._
 
 BEVDepth and CRKD remove LiDAR from the vehicle, not from data collection. If LiDAR is unavailable altogether, metric supervision must come from radar range, stereo or temporal correspondence with a known baseline, simulation, map or occupancy labels, or an external teacher. Monocular images without a metric reference determine geometry only up to scale. The replacement signal then becomes the source of scale, calibration, and domain error.
 
