@@ -21,7 +21,7 @@ Local Blog audio means that every post has a static MP3 generated on my Mac and 
 
 I learned that distinction by shipping the wrong thing several times. One release changed voices between chunks. Another repeated part of its voice-reference sentence before nearly every chunk. A later version removed that preface but sounded too excited, flipped register around thirty-five seconds, skipped near forty-two seconds, and pronounced *cyclist* badly. The next system passed its manifest and waveform checks yet still inserted strange phrases, repeated clauses, and rushed through transitions. The files were technically valid. They did not sound human.
 
-The human narration profile now uses Voxtral 4B TTS with its fixed `hi_female` voice. It generates bounded paragraphs at natural speed, adds 350 milliseconds after paragraphs and 650 milliseconds after headings, and audits every synthesis chunk with local speech recognition. The VLM and autonomous-driving posts were the first long-form canaries. Their final files run for 22 minutes 33 seconds and 31 minutes 28 seconds, with word error rates of 4.77% and 5.41%, no invented insertion longer than two words, and no high-error chunk.
+The human narration profile now uses Voxtral 4B TTS with its fixed `casual_female` voice. Adjacent short paragraphs share one bounded request, each request is decoded as one waveform, and the compiler normalizes its edges before assembly. Local speech recognition still audits every request, but a seam audit now checks for suspicious silence inside prose. The VLM and autonomous-driving posts remain the long-form canaries because they expose voice, pacing, pronunciation, and continuity failures quickly.
 
 > The central lesson was uncomfortable: provenance checks can prove which inputs produced a file, and waveform checks can prove that its samples are valid. Neither can prove that the voice said the right words with believable timing. Audio needs compiler invariants, speech-content audits, and a listener's ear.
 
@@ -98,37 +98,37 @@ The table is the compact record. The deeper pattern changed over time. Early des
 
 Qwen3-TTS Base solved a real problem: one reference clip could anchor a reusable speaker. It did not solve delivery control. VoiceDesign and CustomVoice expose instruction control; Base does not. The lesson is narrower than “use a better model.” Choose the checkpoint whose control surface matches the job, then verify that every declared setting reaches inference.
 
-I tested three preset voices from [Voxtral 4B TTS](https://huggingface.co/mistralai/Voxtral-4B-TTS-2603) on the same technical passage. `hi_female` read it in 54 seconds with 18 natural pauses and no transcription error. `casual_female` finished in 46 seconds with only five pauses and felt rushed. `neutral_female` ran for 68 seconds and repeated a phrase for roughly 20 seconds. Model choice did not remove the need for an artifact gate; it gave the gate a better candidate to work with.
+I tested three preset voices from [Voxtral 4B TTS](https://huggingface.co/mistralai/Voxtral-4B-TTS-2603) on the same technical passage. `hi_female` read it accurately, but the `hi` preset carries the Indian-English identity that its name implies. That was the wrong default for this corpus even though the transcript passed. `neutral_female` repeated a phrase for roughly 20 seconds. `casual_female` was quicker, but sounded the most conversational once the compiler supplied the missing structural pauses. Model choice did not remove the need for an artifact gate; it gave the gate a better candidate to work with.
 
 The accepted human profile is fixed:
 
 ```python
 HUMAN_MODEL = "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16"
-HUMAN_VOICE = "hi_female"
+HUMAN_VOICE = "casual_female"
 HUMAN_NARRATOR_SEED = 1904
 HUMAN_TEMPERATURE = 0.65
 HUMAN_TOP_K = 50
 HUMAN_TOP_P = 0.9
 HUMAN_SPEED = 1.0
-HUMAN_PARAGRAPH_PAUSE_SECONDS = 0.35
-HUMAN_HEADING_PAUSE_SECONDS = 0.65
+HUMAN_PARAGRAPH_PAUSE_SECONDS = 0.24
+HUMAN_HEADING_PAUSE_SECONDS = 0.55
 ```
 
 The model, preset, sampling settings, chunk seeds, speed, pause policy, pronunciation lexicon, and source digest enter the manifest profile. Change the article and that post becomes stale. Change a generation setting and every assigned post becomes stale. A rejected chunk receives a reviewed seed override, so rerunning the exporter reproduces the accepted sample instead of rolling the dice again.
 
 There is also a deployment boundary. Mistral's model card says the supplied reference voices and model inherit CC BY-NC 4.0. That fits this non-commercial personal site. A commercial product would need a model and voice license that permits its use; acoustic quality does not override licensing.
 
-## Authored paragraphs are the failure boundary
+## Paragraph groups are the failure boundary
 
-A whole long-form article is too large for one reliable request. A sentence is too small to carry stable delivery. A full heading section can still be long enough for repetition or acoustic drift to hide inside one successful return. The useful boundary is the authored paragraph.
+A whole long-form article is too large for one reliable request. A sentence is too small to carry stable delivery. One request per paragraph still resets the delivery often enough for the joins to become audible. A full heading section, meanwhile, can be long enough for repetition or acoustic drift to hide inside one successful return. The useful boundary is a small group of adjacent authored paragraphs.
 
-The exporter preserves headings and paragraphs as separate requests, then splits only when a block exceeds 1,200 characters. Voxtral's fixed preset holds the speaker identity while each request contains enough syntax to shape emphasis. The MLX-Audio implementation streams eight-second pieces and joins them with overlap-aware decoding; its [release notes](https://github.com/Blaizzy/mlx-audio/releases) record the Voxtral overlap-add streaming support.
+The exporter packs adjacent paragraphs up to 1,200 characters while keeping headings separate. That gives the model enough syntax to carry a thought across a paragraph break without giving a failure room to spread across an entire section. Voxtral's fixed preset holds the speaker identity, and newlines inside the request preserve authored structure.
 
-The exporter keeps the generated speech at `1.0x`, trims only chunk boundaries, and inserts 350 milliseconds after paragraphs and 650 milliseconds after headings. Those pauses are structural. Punctuation still controls timing inside a paragraph. No filter is allowed to search the finished speech for silence and rewrite it.
+The first Voxtral exporter requested streamed output in eight-second pieces. MLX-Audio includes overlap-aware decoding, but direct concatenation still left audible seams inside some paragraphs. The static-site compiler does not need low-latency playback, so it now asks Voxtral to decode each bounded request as one waveform. The exporter then trims excess edge silence, keeps the speech at `1.0x`, and inserts 240 milliseconds after a paragraph group and 550 milliseconds after a heading. No filter is allowed to search the finished speech for silence and rewrite it.
 
 Short headings were unexpectedly brittle because two or three words give the model little linguistic context. The ASR audit caught headings that began with “man man saw,” “one of these,” or other invented setup. I rerolled only those chunks, recorded their accepted seeds, and left the other accepted waveforms untouched.
 
-This boundary improves both sound and debugging. A failed paragraph is cheap to identify and replace. A whole-file transcript can say that the average error is acceptable while hiding one repeated clause; a chunk transcript points to the exact request that produced it.
+This boundary improves both sound and debugging. A failed paragraph group is cheap to identify and replace. A whole-file transcript can say that the average error is acceptable while hiding one repeated clause; a request transcript points to the exact generation that produced it.
 
 ## Pronunciation fixes belong to the audio compiler
 
@@ -158,11 +158,11 @@ First, deterministic checks validate source SHA, narration-sidecar pinning, H2 c
 
 Second, local Whisper transcribes every cached synthesis chunk. The audit compares each transcript with the exact text sent to TTS, normalizes harmless spelled acronyms such as `C L I P`, and then applies three gates: aggregate word error rate must stay below 8%, no invented insertion may exceed two words, and no chunk may exceed 50% error. The insertion rule caught fluent hallucinations that average WER hid. The chunk rule caught short headings whose two important words were both wrong.
 
-Third, waveform checks reject NaNs, infinities, denormals, and clipping. These checks remain separate from speech-content QA because a repeated phrase can have a perfectly clean waveform. I then listen at the opening, paragraph and heading joins, every rerolled chunk, difficult pronunciations, and the ending. ASR is useful evidence. It is not an ear.
+Third, waveform checks reject NaNs, infinities, denormals, clipping, and suspicious internal silence that can reveal a decoder seam. These checks remain separate from speech-content QA because a repeated phrase can have a perfectly clean waveform. I then listen at the opening, inside long requests, at paragraph and heading joins, around every rerolled request, at difficult pronunciations, and at the ending. ASR is useful evidence. It is not an ear.
 
 Fourth, the ordinary site gates still run: targeted exporter tests, `git diff --check`, the full repository CI command, GitHub checks, and the Pages deployment. The live route must return HTTP 200. Each changed MP3 is fetched with a cache-busting query and its SHA-256 must match the committed asset.
 
-The two canaries passed that full stack. The VLM narration scored 4.77% WER across 64 chunks. The autonomous-driving narration scored 5.41% across 75 chunks. Both had zero multi-word insertion artifacts and zero high-error chunks. Their production MP3 hashes matched the committed files exactly. Those results are release evidence, not a claim that no sentence can ever sound better.
+The first two canaries passed the content and deployment gates: low aggregate WER, no multi-word insertion artifacts, no high-error chunks, and exact production hashes. Listening still rejected them. One used an accent-specific preset that should never have been the unexamined corpus default; both exposed joins inside prose. That result changed the gate itself. A passing transcript and hash are release evidence, not proof that a long-form narration sounds continuous or appropriate.
 
 ## Blog shipping now means two pull requests
 
