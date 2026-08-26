@@ -358,7 +358,7 @@ describe('published trivia data', () => {
       (card) => card.id === 'python-pydantic-arbitrary-tensor',
     );
     expect(tensorCard).toMatchObject({
-      answer: '`isinstance` only',
+      answer: 'No',
       explanation: expect.stringContaining('not tensor shape, dtype, values, layout, or device'),
     });
   });
