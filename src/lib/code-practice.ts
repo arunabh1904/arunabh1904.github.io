@@ -33,6 +33,13 @@ export interface CodePracticeReasoningPoint {
   detail: string;
 }
 
+export interface CodePracticeNumpyAlternative {
+  /** Compact, standalone NumPy reference for interview recall. */
+  code: string;
+  /** One or two syntax or shape cues worth memorizing. */
+  memory: readonly string[];
+}
+
 export interface CodePracticeProblem {
   id: string;
   order: number;
@@ -50,6 +57,7 @@ export interface CodePracticeProblem {
   walkthroughCode?: string;
   visual?: CodePracticeVisual;
   solutionDiagram?: string;
+  numpyAlternative?: CodePracticeNumpyAlternative;
   starterCode: string;
   track?: 'fundamentals' | 'architecture';
   environment?: 'browser' | 'local-pytorch';
@@ -2911,9 +2919,15 @@ print(huber_loss(prediction, target).item())`,
     title: 'Binary cross-entropy from probabilities',
     difficulty: 'Easy',
     summary: 'Compute binary cross-entropy from probabilities while keeping logarithms finite.',
+    visual: {
+      src: '/assets/images/code-bce-probabilities-vs-logits.gif',
+      alt: 'Diagram comparing binary cross-entropy from probabilities with the stable logits formulation.',
+      caption:
+        'First identify the input: probabilities use the two-log BCE formula with endpoint clipping, while raw logits use the stable softplus form without an explicit sigmoid-to-log chain.',
+    },
     prompt: [
       'Write `binary_cross_entropy(probability, target)` for elementwise binary targets in `{0, 1}`.',
-      'Clamp probabilities before taking logarithms, then return the mean loss. In production, explain why logits plus `binary_cross_entropy_with_logits` are usually preferable.',
+      '`probability` already contains probabilities, so do not apply sigmoid inside this function. Validate the range, clamp only to protect the logarithms at 0 and 1, then return the mean loss.',
     ],
     signature: `def binary_cross_entropy(
     probability: torch.Tensor,
@@ -2923,6 +2937,7 @@ print(huber_loss(prediction, target).item())`,
     ...`,
     requirements: [
       '`probability` and `target` have the same shape.',
+      'Probabilities lie in `[0, 1]`.',
       'Targets contain only `0` and `1`.',
       'Clamp probabilities to `[eps, 1 - eps]` before taking logs.',
       'Return the mean binary cross-entropy.',
@@ -2936,11 +2951,13 @@ print(huber_loss(prediction, target).item())`,
     ],
     hint: [
       'Use `-(target * log(p) + (1 - target) * log(1 - p))`.',
+      'An invalid binary label satisfies `(target != 0) & (target != 1)`; reject when `torch.any` finds one.',
       'Clamp once before both logarithms.',
     ],
     solutionNotes: [
       'Binary cross-entropy is `L = -(1 / K) Σ_i [y_i log(p_i) + (1 - y_i) log(1 - p_i)]`. When `y_i = 1`, only `-log(p_i)` remains; when `y_i = 0`, only `-log(1 - p_i)` remains.',
-      'The clamp prevents `log(0)` before either logarithm is evaluated. For model training, logits are normally better because the fused logits loss avoids explicitly forming probabilities.',
+      'The invalid-label mask is `(target != 0) & (target != 1)`: it is true only for a value that is neither valid label. Reject when any mask entry is true. Equivalently, require every entry to satisfy `(target == 0) | (target == 1)`.',
+      'This function accepts probabilities, not logits. For raw logits `z`, a manual interview derivation should use the stable form `max(z, 0) - z*y + log(1 + exp(-|z|))`; applying sigmoid, then clamp, then log throws away that numerical advantage. In PyTorch training, use `binary_cross_entropy_with_logits`.',
     ],
     solutionCode: `import torch
 
@@ -2955,6 +2972,8 @@ def binary_cross_entropy(
         raise ValueError("probability and target must have the same shape")
     if bool(torch.any((target != 0) & (target != 1))):
         raise ValueError("target must contain only 0 and 1")
+    if bool(torch.any((probability < 0) | (probability > 1))):
+        raise ValueError("probability must lie in [0, 1]")
     probability = torch.clamp(probability, min=eps, max=1 - eps)
     loss = -target * torch.log(probability) - (1 - target) * torch.log(1 - probability)
     return torch.mean(loss)
@@ -2969,7 +2988,7 @@ def binary_cross_entropy(
     target: torch.Tensor,
     eps: float = 1e-8,
 ) -> torch.Tensor:
-    # TODO: clamp probabilities, apply the binary cross-entropy formula, and mean-reduce.
+    # TODO: validate probabilities and binary targets, clamp, apply BCE, and mean-reduce.
     raise NotImplementedError("Implement binary_cross_entropy")
 
 probability = torch.tensor([0.9, 0.2])
@@ -4238,7 +4257,385 @@ class NGramModel:
                 break
             tokens, weights = zip(*probs.items())
             output.append(rng.choices(tokens, weights=weights, k=1)[0])
-        return output`,
+    return output`,
+};
+
+// NumPy is useful here when it reinforces the same formula with a smaller array API.
+// Keep these alternatives standalone and short: they are syntax recall cards, not a
+// second framework-specific implementation to memorize.
+const NUMPY_ALTERNATIVES: Readonly<Record<string, CodePracticeNumpyAlternative>> = {
+  'l1-regression-loss': {
+    code: `import numpy as np
+
+def l1_loss(prediction, target):
+    prediction = np.asarray(prediction, dtype=float)
+    target = np.asarray(target, dtype=float)
+    return np.mean(np.abs(prediction - target))`,
+    memory: ['Mean absolute error is `np.mean(np.abs(prediction - target))`.'],
+  },
+  'binary-cross-entropy-from-probabilities': {
+    code: `import numpy as np
+
+def binary_cross_entropy(probability, target, eps=1e-8):
+    probability = np.asarray(probability, dtype=float)
+    target = np.asarray(target, dtype=float)
+    if np.any((target != 0) & (target != 1)):
+        raise ValueError("target must contain only 0 and 1")
+    if np.any((probability < 0) | (probability > 1)):
+        raise ValueError("probability must lie in [0, 1]")
+    probability = np.clip(probability, eps, 1 - eps)
+    loss = -target * np.log(probability) - (1 - target) * np.log(1 - probability)
+    return np.mean(loss)`,
+    memory: [
+      'Reject a label when `(target != 0) & (target != 1)` is true; the two comparisons must both mean “not equal.”',
+      'This version accepts probabilities. For logits, use the stable softplus form instead of sigmoid → clamp → log.',
+    ],
+  },
+  'masked-mean': {
+    code: `import numpy as np
+
+def masked_mean(features, mask):
+    features = np.asarray(features, dtype=float)
+    weights = np.asarray(mask, dtype=float)[..., None]
+    total = np.sum(features * weights, axis=1)
+    count = np.maximum(np.sum(weights, axis=1), 1)
+    return total / count`,
+    memory: ['`mask[..., None]` changes `(B, N)` to `(B, N, 1)` so it broadcasts over features.'],
+  },
+  'binary-classification-metrics': {
+    code: `import numpy as np
+
+def binary_classification_metrics(y_true, y_pred):
+    y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
+    tp = int(np.sum((y_true == 1) & (y_pred == 1)))
+    tn = int(np.sum((y_true == 0) & (y_pred == 0)))
+    fp = int(np.sum((y_true == 0) & (y_pred == 1)))
+    fn = int(np.sum((y_true == 1) & (y_pred == 0)))
+    precision = tp / (tp + fp) if tp + fp else 0.0
+    recall = tp / (tp + fn) if tp + fn else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+    return {'precision': precision, 'recall': recall, 'f1': f1,
+            'accuracy': (tp + tn) / y_true.size}`,
+    memory: ['Count each confusion-matrix cell with a boolean expression followed by `np.sum`.'],
+  },
+  'top-k-accuracy': {
+    code: `import numpy as np
+
+def top_k_accuracy(logits, labels, k):
+    logits, labels = np.asarray(logits), np.asarray(labels)
+    top_k = min(k, logits.shape[1])
+    ranked = np.argsort(logits, axis=1)[:, ::-1]
+    candidates = ranked[:, :top_k]
+    return np.mean(np.any(candidates == labels[:, None], axis=1))`,
+    memory: ['NumPy `argsort` is ascending, so use `[:, ::-1]` before slicing the first `k`.'],
+  },
+  'single-box-iou': {
+    code: `import numpy as np
+
+def box_iou(box_a, box_b):
+    box_a, box_b = np.asarray(box_a, dtype=float), np.asarray(box_b, dtype=float)
+    top_left = np.maximum(box_a[:2], box_b[:2])
+    bottom_right = np.minimum(box_a[2:], box_b[2:])
+    intersection_size = np.clip(bottom_right - top_left, 0, None)
+    intersection = np.prod(intersection_size)
+    area_a = np.prod(box_a[2:] - box_a[:2])
+    area_b = np.prod(box_b[2:] - box_b[:2])
+    union = area_a + area_b - intersection
+    return intersection / union if union > 0 else 0.0`,
+    memory: ['IoU is `intersection / (area_a + area_b - intersection)`; clip overlap widths at zero.'],
+  },
+  'wrapped-angular-difference': {
+    code: `import numpy as np
+
+def angular_difference(prediction, target):
+    difference = np.asarray(prediction) - np.asarray(target)
+    return np.arctan2(np.sin(difference), np.cos(difference))`,
+    memory: ['Wrap an angle with `atan2(sin(delta), cos(delta))` instead of modulo casework.'],
+  },
+  'smooth-l1-huber-loss': {
+    code: `import numpy as np
+
+def huber_loss(prediction, target, delta=1.0):
+    error = np.asarray(prediction, dtype=float) - np.asarray(target, dtype=float)
+    magnitude = np.abs(error)
+    quadratic = 0.5 * error ** 2
+    linear = delta * (magnitude - 0.5 * delta)
+    return np.mean(np.where(magnitude <= delta, quadratic, linear))`,
+    memory: ['For elementwise branches, compute both sides and select with `np.where(condition, a, b)`.'],
+  },
+  'stable-softmax-cross-entropy': {
+    code: `import numpy as np
+
+def softmax_cross_entropy(logits, labels):
+    logits = np.asarray(logits, dtype=float)
+    labels = np.asarray(labels, dtype=int)
+    shifted = logits - np.max(logits, axis=1, keepdims=True)
+    log_normalizers = np.log(np.sum(np.exp(shifted), axis=1))
+    return np.mean(log_normalizers - shifted[np.arange(logits.shape[0]), labels])`,
+    memory: ['Stability comes from the row max; `keepdims=True` preserves `(N, 1)` for broadcasting.'],
+  },
+  'class-weighted-cross-entropy': {
+    code: `import numpy as np
+
+def class_weighted_cross_entropy(logits, labels, class_weight):
+    logits = np.asarray(logits, dtype=float)
+    labels = np.asarray(labels, dtype=int)
+    shifted = logits - np.max(logits, axis=1, keepdims=True)
+    losses = np.log(np.sum(np.exp(shifted), axis=1))
+    losses -= shifted[np.arange(logits.shape[0]), labels]
+    example_weight = np.asarray(class_weight)[labels]
+    return np.sum(losses * example_weight) / np.sum(example_weight)`,
+    memory: ['Turn class weights into per-example weights with `class_weight[labels]`.'],
+  },
+  'temperature-scaling-of-logits': {
+    code: `import numpy as np
+
+def temperature_scaled_probs(logits, temperature):
+    scaled = np.asarray(logits, dtype=float) / temperature
+    shifted = scaled - np.max(scaled, axis=-1, keepdims=True)
+    exp_logits = np.exp(shifted)
+    return exp_logits / np.sum(exp_logits, axis=-1, keepdims=True)`,
+    memory: ['Temperature divides logits before the usual stable softmax.'],
+  },
+  'pairwise-squared-distance': {
+    code: `import numpy as np
+
+def pairwise_squared_distance(x, y):
+    x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
+    x_squared = np.sum(x * x, axis=1, keepdims=True)
+    y_squared = np.sum(y * y, axis=1)[None, :]
+    distances = x_squared + y_squared - 2 * x @ y.T
+    return np.maximum(distances, 0)`,
+    memory: ['Use `||x||² + ||y||² - 2xyᵀ` to avoid allocating an `(N, M, D)` difference array.'],
+  },
+  'pairwise-cosine-similarity': {
+    code: `import numpy as np
+
+def pairwise_cosine_similarity(x, y, eps=1e-8):
+    x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
+    numerator = x @ y.T
+    x_norm = np.sqrt(np.sum(x * x, axis=1))
+    y_norm = np.sqrt(np.sum(y * y, axis=1))
+    denominator = x_norm[:, None] * y_norm[None, :]
+    return np.divide(numerator, np.maximum(denominator, eps),
+                     out=np.zeros_like(numerator), where=denominator > 0)`,
+    memory: ['`x_norm[:, None] * y_norm[None, :]` broadcasts `(N,)` and `(M,)` into `(N, M)`.'],
+  },
+  'nearest-centroid-classifier': {
+    code: `import numpy as np
+
+def nearest_centroid_predict(train_X, train_y, test_X):
+    train_X, train_y, test_X = map(np.asarray, (train_X, train_y, test_X))
+    labels = np.unique(train_y)
+    centroids = np.stack([train_X[train_y == label].mean(axis=0) for label in labels])
+    distances = np.sum((test_X[:, None, :] - centroids[None, :, :]) ** 2, axis=-1)
+    return labels[np.argmin(distances, axis=1)]`,
+    memory: ['Boolean indexing builds each centroid; two singleton axes build all test-to-centroid pairs.'],
+  },
+  'iou-matrix': {
+    code: `import numpy as np
+
+def box_iou_matrix(boxes1, boxes2):
+    boxes1, boxes2 = np.asarray(boxes1), np.asarray(boxes2)
+    top_left = np.maximum(boxes1[:, None, :2], boxes2[None, :, :2])
+    bottom_right = np.minimum(boxes1[:, None, 2:], boxes2[None, :, 2:])
+    size = np.clip(bottom_right - top_left, 0, None)
+    intersection = size[..., 0] * size[..., 1]
+    area1 = np.prod(boxes1[:, 2:] - boxes1[:, :2], axis=1)
+    area2 = np.prod(boxes2[:, 2:] - boxes2[:, :2], axis=1)
+    union = area1[:, None] + area2[None, :] - intersection
+    return np.divide(intersection, union, out=np.zeros_like(union, dtype=float), where=union > 0)`,
+    memory: ['Insert the pair axes first: `(N, 1, 2)` against `(1, M, 2)` produces `(N, M, 2)`.'],
+  },
+  'non-maximum-suppression': {
+    code: `import numpy as np
+
+def nms(boxes, scores, iou_threshold):
+    boxes, scores = np.asarray(boxes, dtype=float), np.asarray(scores)
+    order = np.argsort(scores, kind='stable')[::-1]
+    keep = []
+    while order.size:
+        current, order = order[0], order[1:]
+        keep.append(int(current))
+        top_left = np.maximum(boxes[current, :2], boxes[order, :2])
+        bottom_right = np.minimum(boxes[current, 2:], boxes[order, 2:])
+        size = np.clip(bottom_right - top_left, 0, None)
+        intersection = size[:, 0] * size[:, 1]
+        area_current = np.prod(boxes[current, 2:] - boxes[current, :2])
+        area_other = np.prod(boxes[order, 2:] - boxes[order, :2], axis=1)
+        iou = intersection / np.maximum(area_current + area_other - intersection, 1e-8)
+        order = order[iou <= iou_threshold]
+    return keep`,
+    memory: ['NMS is one stable descending sort followed by a greedy filter of boxes above the IoU threshold.'],
+  },
+  'dice-loss': {
+    code: `import numpy as np
+
+def dice_loss(probability, target, eps=1e-8):
+    probability, target = np.asarray(probability), np.asarray(target)
+    axes = tuple(range(1, probability.ndim))
+    intersection = np.sum(probability * target, axis=axes)
+    total = np.sum(probability, axis=axes) + np.sum(target, axis=axes)
+    return np.mean(1 - (2 * intersection + eps) / (total + eps))`,
+    memory: ['Dice is `1 - (2 * overlap + eps) / (prediction mass + target mass + eps)`.'],
+  },
+  'segmentation-iou-loss': {
+    code: `import numpy as np
+
+def segmentation_iou_loss(probability, target, eps=1e-8):
+    probability, target = np.asarray(probability), np.asarray(target)
+    axes = tuple(range(1, probability.ndim))
+    intersection = np.sum(probability * target, axis=axes)
+    union = np.sum(probability + target - probability * target, axis=axes)
+    return np.mean(1 - (intersection + eps) / (union + eps))`,
+    memory: ['Soft IoU uses `union = prediction + target - prediction * target` before reducing.'],
+  },
+  'focal-loss': {
+    code: `import numpy as np
+
+def focal_loss(probability, target, alpha=0.25, gamma=2.0, eps=1e-8):
+    probability = np.clip(np.asarray(probability), eps, 1 - eps)
+    target = np.asarray(target)
+    p_t = np.where(target == 1, probability, 1 - probability)
+    alpha_t = np.where(target == 1, alpha, 1 - alpha)
+    return np.mean(-alpha_t * (1 - p_t) ** gamma * np.log(p_t))`,
+    memory: ['Build `p_t` once, then focal loss is `-alpha_t * (1 - p_t)^gamma * log(p_t)`.'],
+  },
+  'top-k-gather': {
+    code: `import numpy as np
+
+def topk_features(scores, features, k):
+    scores, features = np.asarray(scores), np.asarray(features)
+    indices = np.argsort(scores, axis=1)[:, ::-1][:, :k]
+    gather_indices = np.broadcast_to(indices[:, :, None],
+                                     (*indices.shape, features.shape[2]))
+    return np.take_along_axis(features, gather_indices, axis=1)`,
+    memory: ['NumPy’s counterpart to `torch.gather` is `np.take_along_axis`.'],
+  },
+  'homogeneous-coordinate-transform': {
+    code: `import numpy as np
+
+def transform_points(points, transform):
+    points, transform = np.asarray(points), np.asarray(transform)
+    homogeneous = np.concatenate([points, np.ones((points.shape[0], 1))], axis=1)
+    return (transform @ homogeneous.T).T[:, :3]`,
+    memory: ['Append ones, multiply `transform @ homogeneous.T`, transpose back, then keep XYZ.'],
+  },
+  '2d-patchify-for-images': {
+    code: `import numpy as np
+
+def patchify(images, patch_size):
+    batch, channels, height, width = images.shape
+    grid_h, grid_w = height // patch_size, width // patch_size
+    grid = images.reshape(batch, channels, grid_h, patch_size, grid_w, patch_size)
+    grid = grid.transpose(0, 2, 4, 1, 3, 5)
+    return grid.reshape(batch, grid_h * grid_w, channels * patch_size ** 2)`,
+    memory: ['Patchify is `reshape -> transpose -> reshape`; write the six intermediate axes first.'],
+  },
+  'unpatchify-back-to-image': {
+    code: `import numpy as np
+
+def unpatchify(patches, image_shape, patch_size):
+    channels, height, width = image_shape
+    grid_h, grid_w = height // patch_size, width // patch_size
+    batch = patches.shape[0]
+    grid = patches.reshape(batch, grid_h, grid_w, channels, patch_size, patch_size)
+    grid = grid.transpose(0, 3, 1, 4, 2, 5)
+    return grid.reshape(batch, channels, height, width)`,
+    memory: ['Unpatchify reverses the patch axis order before the final image reshape.'],
+  },
+  'sinusoidal-positional-encoding': {
+    code: `import numpy as np
+
+def sinusoidal_positional_encoding(length, dim):
+    positions = np.arange(length)[:, None]
+    indices = np.arange(0, dim, 2)
+    frequencies = np.exp(-np.log(10000.0) * indices / dim)
+    angles = positions * frequencies[None, :]
+    encoding = np.zeros((length, dim))
+    encoding[:, 0::2] = np.sin(angles)
+    encoding[:, 1::2] = np.cos(angles[:, :encoding[:, 1::2].shape[1]])
+    return encoding`,
+    memory: ['Even columns use sine, odd columns use cosine, and positions broadcast against frequencies.'],
+  },
+  'causal-attention-mask': {
+    code: `import numpy as np
+
+def make_causal_attention_mask(seq_lens, max_len=None):
+    seq_lens = np.asarray(seq_lens, dtype=int)
+    length = int(seq_lens.max()) if max_len is None else max(int(seq_lens.max()), max_len)
+    positions = np.arange(length)
+    valid = positions[None, :] < seq_lens[:, None]
+    causal = positions[:, None] >= positions[None, :]
+    return (causal[None] & valid[:, :, None] & valid[:, None, :]).astype(int)`,
+    memory: ['Compare row and column positions to build `(L, L)`, then combine it with batch validity masks.'],
+  },
+  'rope-rotary-positional-embedding': {
+    code: `import numpy as np
+
+def apply_rope(x):
+    _, seq_len, _, dim = x.shape
+    pair = np.arange(dim // 2)
+    angles = np.arange(seq_len)[:, None] * (10000.0 ** (-2 * pair / dim))[None, :]
+    sin, cos = np.sin(angles)[None, :, None, :], np.cos(angles)[None, :, None, :]
+    even, odd = x[..., 0::2], x[..., 1::2]
+    output = np.empty_like(x, dtype=float)
+    output[..., 0::2] = even * cos - odd * sin
+    output[..., 1::2] = even * sin + odd * cos
+    return output`,
+    memory: ['Treat every adjacent feature pair as a 2D rotation: `(x_even, x_odd)` times sine and cosine.'],
+  },
+  'scaled-dot-product-self-attention': {
+    code: `import numpy as np
+
+def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+    batch, length, model_dim = x.shape
+    head_dim = model_dim // num_heads
+    split = lambda z: z.reshape(batch, length, num_heads, head_dim).transpose(0, 2, 1, 3)
+    q, k, v = split(x @ W_q), split(x @ W_k), split(x @ W_v)
+    scores = q @ k.swapaxes(-1, -2) / np.sqrt(head_dim)
+    if mask is not None:
+        scores = np.where(mask, scores, -np.inf)
+    shifted = scores - np.max(scores, axis=-1, keepdims=True)
+    weights = np.exp(shifted)
+    weights /= np.sum(weights, axis=-1, keepdims=True)
+    context = (weights @ v).transpose(0, 2, 1, 3).reshape(batch, length, model_dim)
+    return context @ W_o`,
+    memory: ['Memorize the path: project, split heads, `QKᵀ / sqrt(d)`, softmax, weighted sum, merge heads.'],
+  },
+  'average-precision-from-matches': {
+    code: `import numpy as np
+
+def average_precision(scores, is_true_positive, num_ground_truth):
+    scores = np.asarray(scores)
+    matches = np.asarray(is_true_positive, dtype=float)[np.argsort(scores)[::-1]]
+    cumulative_tp = np.cumsum(matches)
+    ranks = np.arange(1, scores.size + 1)
+    precision = cumulative_tp / ranks
+    return np.sum(precision * matches) / num_ground_truth`,
+    memory: ['Sort by confidence, compute cumulative precision, and add precision only at true-positive ranks.'],
+  },
+  'manual-backprop-for-a-2-layer-mlp': {
+    code: `import numpy as np
+
+def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
+    hidden_pre = X @ W1 + b1
+    hidden = np.maximum(hidden_pre, 0)
+    logits = hidden @ W2 + b2
+    shifted = logits - np.max(logits, axis=1, keepdims=True)
+    exp_logits = np.exp(shifted)
+    probs = exp_logits / np.sum(exp_logits, axis=1, keepdims=True)
+    rows = np.arange(X.shape[0])
+    loss = np.mean(-np.log(probs[rows, y]))
+    dlogits = probs.copy()
+    dlogits[rows, y] -= 1
+    dlogits /= X.shape[0]
+    dW2, db2 = hidden.T @ dlogits, np.sum(dlogits, axis=0)
+    dhidden = (dlogits @ W2.T) * (hidden_pre > 0)
+    dW1, db1 = X.T @ dhidden, np.sum(dhidden, axis=0)
+    return {'loss': loss, 'dW1': dW1, 'db1': db1, 'dW2': dW2, 'db2': db2}`,
+    memory: ['Backprop order is output gradient, second layer, ReLU mask, then first layer.'],
+  },
 };
 
 const PROGRESSIVE_ORDER: Readonly<Record<string, number>> = {
@@ -4328,16 +4725,23 @@ const ALL_CODE_PRACTICE_PROBLEMS: readonly CodePracticeProblem[] = [
 ];
 
 export const codePracticeProblems: readonly CodePracticeProblem[] = ALL_CODE_PRACTICE_PROBLEMS
-  .map((problem) => ({
-    ...problem,
-    ...ATTENTION_PROBLEM_ENRICHMENTS[problem.id],
-    track: problem.track ?? 'fundamentals',
-    environment: problem.environment ?? 'browser',
-    editorStart:
-      problem.editorStart ?? (problem.signature.trimStart().startsWith('def ') ? 'blank' : 'scaffold'),
-    order: PROGRESSIVE_ORDER[problem.id] ?? problem.order,
-    difficulty: PROGRESSIVE_DIFFICULTY[problem.id] ?? problem.difficulty,
-    walkthroughCode: problem.walkthroughCode ?? problem.solutionCode,
-    solutionCode: COMPACT_REFERENCE_SOLUTIONS[problem.id] ?? problem.solutionCode,
-  }))
+  .map((problem) => {
+    const numpyAlternative = NUMPY_ALTERNATIVES[problem.id];
+    const tags = problem.tags ?? [];
+
+    return {
+      ...problem,
+      ...ATTENTION_PROBLEM_ENRICHMENTS[problem.id],
+      track: problem.track ?? 'fundamentals',
+      environment: problem.environment ?? 'browser',
+      editorStart:
+        problem.editorStart ?? (problem.signature.trimStart().startsWith('def ') ? 'blank' : 'scaffold'),
+      order: PROGRESSIVE_ORDER[problem.id] ?? problem.order,
+      difficulty: PROGRESSIVE_DIFFICULTY[problem.id] ?? problem.difficulty,
+      walkthroughCode: problem.walkthroughCode ?? problem.solutionCode,
+      solutionCode: COMPACT_REFERENCE_SOLUTIONS[problem.id] ?? problem.solutionCode,
+      numpyAlternative,
+      tags: numpyAlternative && !tags.includes('NumPy') ? [...tags, 'NumPy'] : tags,
+    };
+  })
   .sort((left, right) => left.order - right.order);

@@ -112,7 +112,9 @@ function negateCondition(condition: string) {
   }
 
   const inequality = trimmed.match(/^(.+?)\s*!=\s*(.+)$/);
-  if (inequality && !/\s(?:and|or)\s/.test(trimmed)) {
+  const hasOneInequality = (trimmed.match(/!=/g) ?? []).length === 1;
+  const hasBooleanComposition = /(?:\s(?:and|or)\s|[&|])/.test(trimmed);
+  if (inequality && hasOneInequality && !hasBooleanComposition) {
     return `${inequality[1]} == ${inequality[2]}`;
   }
 
