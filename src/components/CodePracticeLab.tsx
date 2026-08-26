@@ -114,7 +114,6 @@ function renderExplanationNote(text: string) {
 }
 
 export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
-  const isBrowserRunnable = (problem.environment ?? 'browser') === 'browser';
   const containerRef = useRef<HTMLElement | null>(null);
   const runtimeRef = useRef<PyodideRuntime | null>(null);
   const loadingRef = useRef(false);
@@ -123,12 +122,8 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const [code, setCode] = useState(() => getInitialEditorCode(problem));
   const [output, setOutput] = useState('');
   const [errorOutput, setErrorOutput] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>(() =>
-    isBrowserRunnable ? 'idle' : 'ready',
-  );
-  const [statusMessage, setStatusMessage] = useState(() =>
-    isBrowserRunnable ? 'Loading Python...' : 'Local PyTorch',
-  );
+  const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [statusMessage, setStatusMessage] = useState('Loading Python...');
   const [isRunning, setIsRunning] = useState(false);
   const [hasRun, setHasRun] = useState(false);
   const [solutionLanguage, setSolutionLanguage] = useState<'torch' | 'numpy' | null>(null);
@@ -160,11 +155,8 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
     [],
   );
   const editorExtensions = useMemo(
-    () =>
-      isBrowserRunnable
-        ? [...codeEditorExtensions, runShortcutExtension]
-        : [...codeEditorExtensions],
-    [isBrowserRunnable, runShortcutExtension],
+    () => [...codeEditorExtensions, runShortcutExtension],
+    [runShortcutExtension],
   );
 
   useEffect(() => {
@@ -199,14 +191,6 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
   useEffect(() => {
     let didCancel = false;
-
-    if (!isBrowserRunnable) {
-      setStatus('ready');
-      setStatusMessage('Local PyTorch');
-      return () => {
-        didCancel = true;
-      };
-    }
 
     async function bootstrapRuntime() {
       if (runtimeRef.current || loadingRef.current) {
@@ -276,7 +260,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
       didCancel = true;
       observer.disconnect();
     };
-  }, [isBrowserRunnable]);
+  }, []);
 
   useEffect(() => {
     setEditorTheme(
@@ -294,7 +278,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const hasExecutionResult = hasRun || Boolean(errorOutput);
 
   async function handleRun() {
-    if (!isBrowserRunnable || isRunningRef.current) {
+    if (isRunningRef.current) {
       return;
     }
 
@@ -355,11 +339,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
   // The CodeMirror keymap is created once, so route it through a ref to the
   // current controlled editor state instead of rebuilding the editor on each keystroke.
-  runHandlerRef.current = () => {
-    if (isBrowserRunnable) {
-      void handleRun();
-    }
-  };
+  runHandlerRef.current = () => void handleRun();
 
   return (
     <section
@@ -413,12 +393,10 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
         </div>
       </article>
 
-      <article
-        className={`code-practice-lab__workspace${isBrowserRunnable ? '' : ' code-practice-lab__workspace--local'}`}
-      >
+      <article className="code-practice-lab__workspace">
         <header className="code-practice-lab__workspace-header">
           <div className="code-practice-lab__workspace-identity">
-            {(!isBrowserRunnable || status !== 'ready') && (
+            {status !== 'ready' && (
               <p
                 className={`code-practice-lab__status code-practice-lab__status--${status}`}
                 aria-live="polite"
@@ -462,19 +440,17 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
             >
               Explanation
             </button>
-            {isBrowserRunnable && (
-              <button
-                className="code-practice-lab__button code-practice-lab__button--primary"
-                type="button"
-                aria-label="Run code"
-                aria-keyshortcuts="Control+Enter Meta+Enter"
-                onClick={() => void handleRun()}
-                disabled={status !== 'ready' || isRunning}
-              >
-                <span>{isRunning ? 'Running...' : 'Run'}</span>
-                {!isRunning && <kbd>Ctrl / Cmd + Enter</kbd>}
-              </button>
-            )}
+            <button
+              className="code-practice-lab__button code-practice-lab__button--primary"
+              type="button"
+              aria-label="Run code"
+              aria-keyshortcuts="Control+Enter Meta+Enter"
+              onClick={() => void handleRun()}
+              disabled={status !== 'ready' || isRunning}
+            >
+              <span>{isRunning ? 'Running...' : 'Run'}</span>
+              {!isRunning && <kbd>Ctrl / Cmd + Enter</kbd>}
+            </button>
             <button
               className="code-practice-lab__button code-practice-lab__button--secondary"
               type="button"
@@ -484,13 +460,6 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
             </button>
           </div>
         </header>
-
-        {!isBrowserRunnable && (
-          <p className="code-practice-lab__runtime-note code-practice-lab__runtime-note--local">
-            This exercise uses the full <code>torch.nn</code> API. Write here, then copy
-            <code> solution.py </code> into a local PyTorch environment to run the included smoke test.
-          </p>
-        )}
 
         <div className="code-practice-lab__editor-layout">
           <div className="code-practice-lab__editor-column">
@@ -516,7 +485,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
         </div>
 
-        {isBrowserRunnable && hasExecutionResult && (
+        {hasExecutionResult && (
           <div className="code-practice-lab__output" aria-live="polite">
             <div>
               <p>{errorOutput ? 'Errors' : 'Output'}</p>

@@ -395,6 +395,20 @@ describe('code-practice primitive-first solutions', () => {
     expect(TORCH_COMPAT_SOURCE).toContain('def transpose(self, dim0, dim1):');
   });
 
+  it('supports the inference layers used by browser architecture builds', () => {
+    for (const layer of [
+      '_nn.Conv2d = _Conv2d',
+      '_nn.ConvTranspose2d = _ConvTranspose2d',
+      '_nn.BatchNorm2d = _BatchNorm2d',
+      '_nn.MaxPool2d = _MaxPool2d',
+      '_nn.AdaptiveAvgPool2d = _AdaptiveAvgPool2d',
+      '_functional.interpolate = _interpolate',
+      '_init.constant_',
+    ]) {
+      expect(TORCH_COMPAT_SOURCE).toContain(layer);
+    }
+  });
+
   it('covers the inference-attention interview sequence and its reasoning axes', () => {
     const ids = [
       'stable-softmax-cross-entropy',
@@ -434,7 +448,7 @@ describe('code-practice primitive-first solutions', () => {
     }
   });
 
-  it('keeps architecture interviews typed, modular, and local-PyTorch only', () => {
+  it('keeps architecture interviews typed, modular, and browser-runnable', () => {
     const architectures = codePracticeProblems.filter((problem) => problem.track === 'architecture');
 
     expect(architectures.map((problem) => problem.id)).toEqual([
@@ -444,12 +458,13 @@ describe('code-practice primitive-first solutions', () => {
     ]);
 
     for (const problem of architectures) {
-      expect(problem.environment, problem.id).toBe('local-pytorch');
+      expect(problem.packages, problem.id).toContain('torch');
       expect(problem.interview?.durationMinutes, problem.id).toBeGreaterThanOrEqual(45);
       expect(problem.solutionCode, problem.id).toContain('@dataclass');
       expect(problem.solutionCode, problem.id).toContain('nn.Module');
       expect(problem.solutionCode, problem.id).toContain('def smoke_test()');
       expect(problem.solutionCode, problem.id).toContain('with torch.inference_mode():');
+      expect(problem.solutionCode, problem.id).toContain('.eval()');
     }
 
     expect(architectures[0].solutionCode).toContain('nn.AdaptiveAvgPool2d(1)');

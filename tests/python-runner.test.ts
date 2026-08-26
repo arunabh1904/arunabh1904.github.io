@@ -17,6 +17,7 @@ describe('runPythonSnippet', () => {
     expect(loadPackage).toHaveBeenCalledWith(['numpy']);
     expect(runPythonAsync).toHaveBeenCalledTimes(1);
     expect(runPythonAsync.mock.calls[0][0]).toContain("torch = _types.ModuleType('torch')");
+    expect(runPythonAsync.mock.calls[0][0]).toContain('{"__name__": "__main__"}');
     expect(result).toEqual({ stdout: 'ready\n', stderr: '' });
   });
 
