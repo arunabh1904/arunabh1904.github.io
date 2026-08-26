@@ -134,8 +134,8 @@ const RAW_CODE_PRACTICE_PROBLEMS = [
       'Validate `ndim`, matching batch size, integer labels, non-empty shapes, and label range.',
     ],
     solutionNotes: [
-      'The stable trick is to shift each row by its maximum value before applying `exp`, which preserves the softmax probabilities while avoiding overflow.',
-      'The solution spells out the row-wise `amax`, `exp`, `sum`, and `log` operations so the stable cross-entropy calculation stays visible instead of being hidden behind a softmax helper.',
+      'Shift every row by its largest logit before exponentiating:\n`shifted = logits - row_max`\nSoftmax is unchanged because the same constant is removed from every class.',
+      'Then compute log-sum-exp and subtract the target logit:\n`loss_i = log(Σ_c exp(shifted_i,c)) - shifted_i,target`\nAverage the per-row losses at the end.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -256,8 +256,8 @@ print(f"{softmax_cross_entropy(sample_logits, sample_labels).item():.5f}")`,
       'Normalize by the gathered weights’ sum, not by `N`.',
     ],
     solutionNotes: [
-      'For row `i`, first compute `loss_i = log(sum_c exp(z_i,c - m_i)) - (z_i,y_i - m_i)`, where `m_i` is the largest logit in that row. Subtracting `m_i` leaves the softmax unchanged and prevents overflow.',
-      'The class vector has shape `(C,)`; indexing it with labels shaped `(N,)` produces `example_weight` shaped `(N,)`. The final loss is `sum_i w[y_i] loss_i / sum_i w[y_i]`. This denominator preserves PyTorch’s weighted-mean behavior when a batch contains different class mixtures.',
+      'First compute the stable cross-entropy for each row:\n`loss_i = log(Σ_c exp(z_i,c - m_i)) - (z_i,y_i - m_i)`\nHere `m_i` is the row maximum, so subtracting it prevents overflow without changing softmax.',
+      'Indexing class weights `(C,)` with labels `(N,)` gives one weight per example `(N,)`. Use PyTorch’s weighted-mean denominator:\n`L = Σ_i w[y_i] loss_i / Σ_i w[y_i]`',
     ],
     solutionCode: `import torch
 
@@ -369,8 +369,8 @@ print(class_weighted_cross_entropy(logits, labels, class_weight).item())`,
       'Validate the box coordinates before you start suppressing anything.',
     ],
     solutionNotes: [
-      'The clean approach is greedy: sort indices by descending score with index-based tie-breaking, repeatedly keep the first remaining box, and compare it against the rest.',
-      'Using a vectorized IoU helper lets the loop filter the remaining candidates in one shot while still keeping the implementation short and readable.',
+      'NMS is a greedy loop:\n`sort by score → keep best box → suppress high-IoU boxes → repeat`',
+      'Compute IoU between the kept box and all remaining boxes at once. Keep candidates whose IoU is at most the threshold; index-based tie-breaking makes equal scores deterministic.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -498,8 +498,8 @@ print(nms(sample_boxes, sample_scores, iou_threshold=0.3))`,
       'Validate the rank of `seq_lens`, integer lengths, non-negative values, and `max_len` when it is provided.',
     ],
     solutionNotes: [
-      'The problem is really two masks multiplied together: the causal rule (`j <= i`) and the per-example validity rule (`i, j < seq_len[b]`).',
-      'Comparing query and key indices constructs that lower-triangular template from primitives, and broadcasting it against the batch-wise validity mask gives the full `(B, T, T)` answer without explicit Python loops.',
+      'Combine two boolean rules:\n`causal: key_index <= query_index`\n`valid: query_index < length and key_index < length`',
+      'Build the lower-triangular causal template once, then broadcast it against each example’s validity mask to produce `(B, T, T)` without Python loops.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -607,8 +607,8 @@ print(make_causal_attention_mask(sample_seq_lens, max_len=4))`,
       'Validate that both inputs are 1D, the same length, non-empty, and restricted to `0` or `1`.',
     ],
     solutionNotes: [
-      'This is mostly a confusion-matrix exercise: once the four counts are correct, the derived metrics are straightforward ratios.',
-      'The subtle part is the edge handling. Returning `0.0` for undefined metrics keeps the function predictable when there are no predicted positives or no actual positives.',
+      'Build the confusion matrix first:\n`TP: prediction = 1 and target = 1`\n`FP: prediction = 1 and target = 0`\n`FN: prediction = 0 and target = 1`\n`TN: prediction = 0 and target = 0`',
+      'Then compute the ratios:\n`precision = TP / (TP + FP)`\n`recall = TP / (TP + FN)`\n`F1 = 2 · precision · recall / (precision + recall)`\nReturn `0.0` when a denominator is zero.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -731,9 +731,9 @@ print(binary_classification_metrics(sample_true, sample_pred))`,
       'Validate that both inputs are 2D and share the same feature dimension before doing any math.',
     ],
     solutionNotes: [
-      'Cosine similarity is just a dot product divided by the product of L2 norms. The solution constructs each norm from squared entries, a sum, and a square root before broadcasting the whole pairwise matrix.',
-      'For `x.shape == (N, D)` and `y.shape == (M, D)`, `x_norms` has shape `(N,)` and `y_norms` has shape `(M,)`. `x_norms[:, None]` changes the first vector to `(N, 1)`, while `y_norms[None, :]` changes the second to `(1, M)`.',
-      'That makes `denominator = x_norms[:, None] * y_norms[None, :]` a broadcasted outer product: entry `[i, j]` is `||x[i]|| * ||y[j]||`, and the whole denominator has shape `(N, M)` to match `x @ y.T`. The key edge case is a zero vector, so those positions are explicitly returned as `0.0`.',
+      'Cosine similarity is a normalized dot product:\n`similarity[i, j] = (x_i · y_j) / (||x_i|| ||y_j||)`',
+      'The norm views broadcast into every pair:\n`x_norms[:, None]: (N, 1)`\n`y_norms[None, :]: (1, M)`\nTheir product matches the dot-product matrix `(N, M)`.',
+      'A zero vector makes the denominator zero. Return `0.0` for those pairs instead of dividing by zero.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -848,8 +848,8 @@ print(pairwise_cosine_similarity(sample_x, sample_y))`,
       'Validate that `logits` is 2D, `labels` is 1D, the batch sizes match, the labels are in range, and `k` is positive.',
     ],
     solutionNotes: [
-      'The implementation is straightforward once the inputs are validated: rank each row from largest to smallest with a descending sort, take the first `k` class ids, and check whether the true label appears in that slice.',
-      'Because the check is fully vectorized, the result is a simple mean over a boolean mask, which keeps the code short and easy to read.',
+      'For each row, sort class scores from largest to smallest and keep the first `k` indices:\n`correct_i = target_i appears in top_k_indices_i`',
+      'The final accuracy is the mean of that boolean vector:\n`top_k_accuracy = mean(correct)`',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -956,8 +956,8 @@ print(top_k_accuracy(sample_logits, sample_labels, k=1).item())`,
       'Validate that each box has `x2 >= x1` and `y2 >= y1` before computing anything else.',
     ],
     solutionNotes: [
-      'The main trick is to form all pairwise overlap rectangles with broadcasting. If `boxes1.shape == (N, 4)` and `boxes2.shape == (M, 4)`, then `boxes1[:, None, :2]` is `(N, 1, 2)` and `boxes2[None, :, :2]` is `(1, M, 2)`; `torch.maximum` broadcasts them to `(N, M, 2)`, one top-left corner for every box pair.',
-      'The same pattern gives bottom-right corners `(N, M, 2)`, intersection areas `(N, M)`, and union `area1[:, None] + area2[None, :] - intersection`, where `(N, 1)` and `(1, M)` broadcast into an `(N, M)` matrix. Every reduction removes only the coordinate axis, so the final output still has one IoU per pair.',
+      'Insert singleton axes so every box in the first set meets every box in the second:\n`boxes1[:, None, :2]: (N, 1, 2)`\n`boxes2[None, :, :2]: (1, M, 2)`\n`pairwise top-left corners: (N, M, 2)`',
+      'Reducing only the coordinate axis keeps one value per pair:\n`intersection: (N, M)`\n`area1[:, None]: (N, 1)`\n`area2[None, :]: (1, M)`\n`union and IoU: (N, M)`',
       'Once the pairwise union is known, a `torch.where` denominator mask keeps the implementation stable and handles degenerate boxes cleanly.',
     ],
     solutionDiagram: `boxes1 (N, 4)      boxes2 (M, 4)
@@ -1089,9 +1089,9 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
       'Use squared Euclidean distance to avoid an unnecessary square root.',
     ],
     solutionNotes: [
-      'The nearest-centroid rule compresses each class into one vector. `class_points` has shape `(number_of_points_in_class, D)`, summing over `dim=0` leaves a `(D,)` vector, and `torch.stack` turns all class vectors into `centroids.shape == (K, D)`.',
-      'With `test_X.shape == (M, D)` and `centroids.shape == (K, D)`, `test_X[:, None, :]` is `(M, 1, D)` and `centroids[None, :, :]` is `(1, K, D)`. Subtraction broadcasts to `(M, K, D)`; summing over `D` gives one squared distance per test-point/class pair, `(M, K)`.',
-      'Squared Euclidean distance preserves the same ordering as Euclidean distance, and keeping the class labels sorted makes `argmin` deterministic when two centroids are equally close.',
+      'Represent each class by the mean of its training points:\n`class points: (n_k, D)  →  centroid: (D,)`\nStacking all class means gives `centroids: (K, D)`.',
+      'Broadcast every test point against every centroid:\n`test_X[:, None, :]: (M, 1, D)`\n`centroids[None, :, :]: (1, K, D)`\n`difference: (M, K, D)  →  squared distance: (M, K)`',
+      'Squared distance has the same nearest-centroid ordering as Euclidean distance, so no square root is needed. Sorted class labels make ties deterministic.',
     ],
     solutionDiagram: `train_X (N, D) + train_y (N,)
         └─ group rows by class → one centroid per class
@@ -1218,8 +1218,8 @@ print(nearest_centroid_predict(sample_train_X, sample_train_y, sample_test_X))`,
       'Reject non-2D logits and any temperature that is not a positive scalar.',
     ],
     solutionNotes: [
-      'Temperature scaling applies `p_i(T) = exp(z_i / T) / Σ_j exp(z_j / T)`. Dividing by `T` changes the gaps between logits before softmax: at `T = 1` the distribution is unchanged, a low temperature makes the largest class more dominant and the distribution sharper, and a high temperature makes probabilities flatter and more uniform.',
-      'The implementation subtracts the maximum scaled logit in each row before `exp`; this does not change the ratio because the same constant is subtracted from every class. After exponentiation, `normalizers.shape == (N, 1)` broadcasts across the class axis `(N, C)` during the final division.',
+      'Divide the logits by temperature before softmax:\n`p_i(T) = exp(z_i / T) / Σ_j exp(z_j / T)`\n`T = 1` changes nothing, `T < 1` sharpens the distribution, and `T > 1` flattens it.',
+      'Subtract each row maximum before `exp`. Summing with `keepdim=True` leaves normalizers shaped `(N, 1)`, which broadcast across logits shaped `(N, C)`.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -1319,8 +1319,8 @@ print(temperature_scaled_probs(sample_logits, temperature=1.0))`,
       'If `dim` is odd, the last column still belongs to the even-column branch.',
     ],
     solutionNotes: [
-      'Sinusoidal positional encoding is a deterministic lookup table. For position `pos` and pair index `k`, `PE(pos, 2k) = sin(pos / 10000^(2k / dim))` and `PE(pos, 2k + 1) = cos(pos / 10000^(2k / dim))`; adjacent columns therefore share a frequency but use different phases.',
-      'The implementation makes the shape arithmetic visible: positions has shape `(length, 1)`, the paired frequency table has shape `(1, ceil(dim / 2))`, and their broadcasted product creates one angle per position/frequency pair. Interleaving sine into `0::2` and cosine into `1::2` then returns `(length, dim)`, including the final unpaired sine column when `dim` is odd.',
+      'Each adjacent channel pair shares a frequency but uses sine and cosine phases:\n`PE(pos, 2k) = sin(pos / 10000^(2k / dim))`\n`PE(pos, 2k + 1) = cos(pos / 10000^(2k / dim))`',
+      'The broadcast is:\n`positions: (length, 1)`\n`frequencies: (1, ceil(dim / 2))`\n`angles: (length, ceil(dim / 2))`\nWrite sine into `0::2` and cosine into `1::2` to return `(length, dim)`.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -1421,8 +1421,8 @@ print(sinusoidal_positional_encoding(sample_length, sample_dim))`,
       'The row-major assumption means the patch index should map to `(row, column)` in standard nested-loop order.',
     ],
     solutionNotes: [
-      'This problem is the inverse of patch extraction. Starting from `patches.shape == (B, N, C * P * P)`, reshape to `(B, grid_h, grid_w, C, P, P)` so the flat token index becomes explicit grid row and grid column axes.',
-      'The permutation `(0, 3, 1, 4, 2, 5)` changes that layout to `(B, C, grid_h, P, grid_w, P)`: each grid axis now sits next to its local pixel axis. The final reshape collapses `(grid_h, P)` into `H` and `(grid_w, P)` into `W`, producing `(B, C, H, W)`.',
+      'Undo patch extraction by making the grid axes explicit again:\n`(B, N, C·P·P)  →  (B, grid_h, grid_w, C, P, P)`',
+      'Move each grid axis next to its local pixel axis, then collapse them:\n`(B, grid_h, grid_w, C, P, P)`\n`→ (B, C, grid_h, P, grid_w, P)`\n`→ (B, C, H, W)`',
     ],
     solutionDiagram: `patches (B, N, C·P·P)
   reshape → (B, grid_h, grid_w, C, P, P)
@@ -1546,8 +1546,8 @@ print(unpatchify(sample_patches, sample_image_shape, patch_size=2))`,
       'Validate that `patch_size` is positive and divides both spatial dimensions.',
     ],
     solutionNotes: [
-      'The core trick is to expose the image grid as `(B, C, grid_h, P, grid_w, P)`. The original image shape `(B, C, H, W)` is only being re-labeled because `H = grid_h * P` and `W = grid_w * P`.',
-      'The permutation `(0, 2, 4, 1, 3, 5)` produces `(B, grid_h, grid_w, C, P, P)`, which places the row-major patch grid before each patch’s channel and local-pixel data. Flattening the last four axes yields `(B, N, C * P * P)` without mixing neighboring patches.',
+      'Expose the patch grid without changing any values:\n`(B, C, H, W)  →  (B, C, grid_h, P, grid_w, P)`',
+      'Move the two grid axes before the patch contents, then flatten:\n`(B, C, grid_h, P, grid_w, P)`\n`→ (B, grid_h, grid_w, C, P, P)`\n`→ (B, N, C·P·P)`\nThis preserves row-major patch order.',
     ],
     solutionDiagram: `images (B, C, H, W)
   reshape → (B, C, grid_h, P, grid_w, P)
@@ -1649,10 +1649,10 @@ print(patchify(sample_images, patch_size=2))`,
       'A helper like `rotate_half` can make the final formula easier to read.',
     ],
     solutionNotes: [
-      'RoPE treats each adjacent pair of channels as a 2D vector and rotates it by an angle that depends on the token position. That preserves the vector norm while injecting relative position information into attention.',
-      'The angle line comes from the standard RoPE frequency schedule: `angles = torch.arange(seq_len, dtype=torch.float64)[:, None] * (10000.0 ** (-2 * pair / dim))[None, :]`. `torch.arange(seq_len)[:, None]` has shape `(T, 1)` and the inverse-frequency term has shape `(1, D / 2)`, so broadcasting creates `angles.shape == (T, D / 2)`: every position gets one angle for every adjacent feature pair.',
-      'The slices use Python’s `start:stop:step` convention on the last axis. `x[..., 0::2]` starts at index `0` and takes every second value, so it selects indices `0, 2, 4, 6, 8, ...`—the even positions. `x[..., 1::2]` starts at index `1` and takes every second value, so it selects indices `1, 3, 5, 7, 9, ...`—the odd positions. Pairing those two views lets the code apply the 2D rotation formula to each neighboring pair.',
-      'The sine and cosine tables are reshaped to `(1, T, 1, D / 2)` so the same position-dependent rotation broadcasts over batch and head dimensions.',
+      'Treat each adjacent channel pair as a 2D vector and rotate it by a position-dependent angle. Rotation preserves the pair’s norm while adding relative position information.',
+      'Build one angle for every position and channel pair:\n`positions: (T, 1)`\n`inverse frequencies: (1, D / 2)`\n`angles: (T, D / 2)`',
+      'Split the adjacent pairs with ordinary Python slicing:\n`x[..., 0::2]  →  even channels 0, 2, 4, ...`\n`x[..., 1::2]  →  odd channels 1, 3, 5, ...`',
+      'Reshape sine and cosine to `(1, T, 1, D / 2)` so the same table broadcasts over batch and head axes.',
     ],
     solutionDiagram: `For each position t and pair k:
   angle[t, k] = t · 10000^(-2k / D)
@@ -1771,8 +1771,8 @@ print(apply_rope(sample_x))`,
       'After attention, transpose the heads back and concatenate them before the final output projection.',
     ],
     solutionNotes: [
-      'Both exercises use the same core equation: `Attention(Q, K, V) = softmax(QKᵀ / √D_head) V`. The code projects inputs, reshapes `(B, T, D_model)` into `(B, H, T, D_head)`, computes scores `(B, H, query_length, key_length)`, applies the mask before softmax, mixes values, then permutes and reshapes back to `(B, T, D_model)`.',
-      'For self-attention, the same sequence supplies all three inputs: `Q, K, V` come from `x`, so `query_length = key_length = T` and scores have shape `(B, H, T, T)`. A token can read from other tokens in that sequence, subject to the mask.',
+      'Scaled dot-product attention is:\n`Attention(Q, K, V) = softmax(QKᵀ / √D_head) V`',
+      'For self-attention, `Q`, `K`, and `V` all come from `x`:\n`x: (B, T, D_model)`\n`Q, K, V: (B, H, T, D_head)`\n`scores: (B, H, T, T)`\n`output: (B, T, D_model)`',
       'The mask and stable softmax are the important implementation details: blocked scores become `-inf`, and subtracting a row maximum prevents overflow. The final output projection preserves the original model width.',
     ],
     solutionDiagram: `Self-attention:
@@ -1967,9 +1967,9 @@ print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads
       'If a mask is provided, broadcast it to the score tensor and zero out blocked positions before softmax.',
     ],
     solutionNotes: [
-      'Cross-attention is the same primitive as self-attention, with one deliberate change: `Q` comes from `query_x`, while `K` and `V` come from `context_x`. That lets one sequence read another sequence—for example, decoder tokens reading encoder outputs.',
-      'The equation and most shapes are unchanged: `Attention(Q, K, V) = softmax(QKᵀ / √D_head) V`, but `query_x.shape == (B, Tq, D)` and `context_x.shape == (B, Tk, D)`. Therefore `Q` is `(B, H, Tq, D_head)`, `K,V` are `(B, H, Tk, D_head)`, scores are `(B, H, Tq, Tk)`, and the output is `(B, Tq, D)`.',
-      'That shape contrast is the whole distinction: self-attention compares every token with the same sequence length `T`, while cross-attention compares each query token with all `Tk` context tokens. Masking still happens on the score matrix before the stable softmax.',
+      'Cross-attention uses the same equation as self-attention:\n`Attention(Q, K, V) = softmax(QKᵀ / √D_head) V`\nThe difference is where the three inputs come from: `Q` uses `query_x`; `K` and `V` use `context_x`.',
+      'The two sequence lengths stay separate:\n`Q: (B, H, Tq, D_head)`\n`K, V: (B, H, Tk, D_head)`\n`scores: (B, H, Tq, Tk)`\n`output: (B, Tq, D)`',
+      'Each query token can read all `Tk` context tokens. Apply any mask to the score matrix before the stable softmax.',
     ],
     solutionDiagram: `Self:  Q,K,V ← one sequence x
       scores: (B, H, T, T)
@@ -2183,8 +2183,8 @@ print(cross_attention(sample_query, sample_context, sample_w, sample_w, sample_w
       'Return the gradients in a dictionary so the caller can inspect each parameter separately.',
     ],
     solutionNotes: [
-      'The forward pass is affine, ReLU, affine, and a manually expanded stable softmax cross-entropy. After the max shift, exponentials, and row normalization produce `probs`, the logits gradient is the usual `probs - one_hot` term divided by the batch size.',
-      'From there, the remaining gradients follow by the chain rule: the second affine layer gives `dW2` and `db2`, and the upstream gradient passes through the ReLU mask before producing `dW1` and `db1`.',
+      'Cache the forward path because every backward step needs one of these values:\n`X → z1 → ReLU → hidden → z2 → softmax → loss`',
+      'Start backprop from the softmax-cross-entropy shortcut:\n`dlogits = (probs - one_hot(y)) / N`\nThen move backward through the second affine layer, the ReLU mask, and the first affine layer.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -2374,8 +2374,8 @@ print(mlp_loss_and_grads(sample_X, sample_y, sample_W1, sample_b1, sample_W2, sa
       'Return the gradients in a dictionary so the caller can inspect each parameter separately.',
     ],
     solutionNotes: [
-      'The forward pass is affine, ReLU, affine, and a manually expanded stable softmax cross-entropy. After the max shift, exponentials, and row normalization produce `probs`, the logits gradient is the usual `probs - one_hot` term divided by the batch size.',
-      'From there, the remaining gradients follow by the chain rule: the second affine layer gives `dW2` and `db2`, and the upstream gradient passes through the ReLU mask before producing `dW1` and `db1`.',
+      'Cache the forward path because every backward step needs one of these values:\n`X → z1 → ReLU → hidden → z2 → softmax → loss`',
+      'Start backprop from the softmax-cross-entropy shortcut:\n`dlogits = (probs - one_hot(y)) / N`\nThen move backward through the second affine layer, the ReLU mask, and the first affine layer.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -2560,8 +2560,9 @@ generated = ['a', 'b', 'a', 'b', 'a']`,
       'Keep corpus loading and tokenization outside the class so the n-gram model stays reusable for any token source.',
     ],
     solutionNotes: [
-      'The simplest clean design is to treat each context as a tuple and map it to a counter of next-token counts. While fitting, update every available suffix length for each position, which gives you unigram counts, bigram counts, and so on up to order `n` in one pass.',
-      'At inference time, truncate the supplied context to at most `n - 1` tokens and repeatedly back off to shorter suffixes until a seen context appears. Normalizing the matching counter gives the probability distribution, and `generate` can repeatedly sample from that distribution with a local `random.Random(seed)` instance for deterministic behavior.',
+      'Map each context tuple to counts of the tokens observed after it:\n`context tuple → next-token counts → normalized probabilities`\nDuring fitting, update every suffix length up to order `n`.',
+      'At inference time, keep at most `n - 1` context tokens and back off through shorter suffixes until one was seen during fitting. Normalize that context’s counts into probabilities.',
+      'Generation repeats lookup and sampling. A local `random.Random(seed)` keeps the sequence deterministic without changing global random state.',
       'Because `fit` only cares about tokens, a tiny helper can load a slice of Tiny Shakespeare, split it into word tokens, and pass those tokens directly into the same model implementation.',
     ],
     solutionCode: `from __future__ import annotations
@@ -2803,8 +2804,8 @@ print(" ".join(str(token) for token in model.generate(12, seed=7)))`,
       'Reduce all residuals with a mean.',
     ],
     solutionNotes: [
-      'L1 loss is `L = (1 / K) Σ_i |prediction_i - target_i|`, where `K` is the number of entries. The implementation computes the residual elementwise, takes its absolute value, then reduces every entry to one scalar with `torch.mean`.',
-      'Its penalty grows linearly rather than quadratically, which makes a large residual matter without allowing it to dominate as strongly as L2 loss.',
+      'Take the absolute error at every position, then average all entries:\n`L = (1 / K) Σ_i |prediction_i - target_i|`\nHere `K` is the total number of elements, not just the batch size.',
+      'The penalty grows linearly, so a large residual matters without dominating as strongly as it would under squared error.',
     ],
     solutionCode: `import torch
 
@@ -2870,8 +2871,8 @@ print(l1_loss(prediction, target).item())`,
       '`torch.where` selects the branch elementwise without a Python loop.',
     ],
     solutionNotes: [
-      'With error `e = prediction - target`, Huber loss is `L_delta(e) = 0.5 e²` when `|e| <= delta`, and `delta (|e| - 0.5 delta)` otherwise. The returned scalar is the mean of this piecewise value over all entries.',
-      'Huber loss keeps L2’s smooth gradient for small errors but switches to L1-like growth after `delta`, limiting the influence of large mistakes. Compute both branches once, select with `torch.where`, and reduce at the end.',
+      'Let the elementwise error be:\n`e = prediction - target`\nThen use the piecewise penalty:\n`loss(e) = 0.5 e²                         if |e| <= delta`\n`loss(e) = delta (|e| - 0.5 delta)       otherwise`',
+      'Small errors get L2’s smooth gradient; large errors switch to L1-like growth. Compute both branches, select with `torch.where`, then average all entries.',
     ],
     solutionCode: `import torch
 
@@ -3022,8 +3023,8 @@ print(binary_cross_entropy(probability, target).item())`,
       'Union is `area_a + area_b - intersection` because overlap was counted twice.',
     ],
     solutionNotes: [
-      'The geometry is two reductions: intersect the corners, then compute each box area and subtract the overlap once from the sum.',
-      'Clamping the intersection dimensions handles disjoint boxes; guarding the union gives a defined zero result for degenerate boxes.',
+      'Intersect the boxes by taking the later top-left corner and earlier bottom-right corner:\n`intersection_wh = clamp(min(br1, br2) - max(tl1, tl2), min=0)`',
+      'Then divide intersection by union:\n`IoU = intersection / (area1 + area2 - intersection)`\nReturn zero when the union is zero, so degenerate boxes stay defined.',
     ],
     solutionCode: `import torch
 
@@ -3099,9 +3100,9 @@ print(box_iou(box_a, box_b).item())`,
       'For a lower-memory version, use `||x||^2 + ||y||^2 - 2 x y^T`.',
     ],
     solutionNotes: [
-      'The target is `D[i, j] = ||x_i - y_j||²`. Expanding the square gives `||x_i||² + ||y_j||² - 2 x_i · y_j`, which lets one matrix multiplication compute all pairwise dot products at once.',
-      'Here `x_squared` has shape `(N, 1)`, `y_squared` is reshaped to `(1, M)`, and `x @ y.T` has shape `(N, M)`. Therefore `distances = x_squared + y_squared - 2 * x @ torch.transpose(y, 0, 1)` broadcasts the two norm terms into an `(N, M)` matrix and subtracts twice the dot product for each `(i, j)` pair.',
-      'The norm identity avoids materializing the direct broadcasted difference `(N, M, D)`, so it is the better production implementation when the point sets are large. Small negative values from floating-point roundoff are clamped to zero.',
+      'Expand squared distance so one matrix multiplication handles every pair:\n`D[i, j] = ||x_i||² + ||y_j||² - 2 x_i · y_j`',
+      'The three terms have shapes:\n`x_squared: (N, 1)`\n`y_squared: (1, M)`\n`x @ y.T: (N, M)`\nBroadcasting produces the final distance matrix `(N, M)`.',
+      'This avoids materializing direct differences shaped `(N, M, D)`. Clamp tiny negative results to zero because floating-point roundoff can make a theoretical squared distance slightly negative.',
     ],
     solutionCode: `import torch
 
@@ -3168,8 +3169,8 @@ print(pairwise_squared_distance(x, y))`,
       'Sum masked features and masked counts over the same axis.',
     ],
     solutionNotes: [
-      'The mask is a selector, not a new reduction rule: cast it to the feature dtype, multiply it into `(B, N, D)`, and reduce over `N`.',
-      'Keeping the count as `(B, 1)` makes the final division broadcast across `D`; clamping only the denominator makes empty batches return zero.',
+      'Treat the mask as a selector. Expand it over features, multiply, then reduce only the item axis:\n`values: (B, N, D)`\n`mask[..., None]: (B, N, 1)`\n`masked sum: (B, D)`',
+      'Keep the valid count shaped `(B, 1)` so division broadcasts across `D`. Clamp only the count; an all-false mask then returns a zero row.',
     ],
     solutionCode: `import torch
 
@@ -3238,7 +3239,7 @@ print(masked_mean(features, mask))`,
       'Turn `(B, k)` indices into `(B, k, D)` indices before gathering along dimension `1`.',
     ],
     solutionNotes: [
-      'The scores produce row indices, but `gather` needs an index for every feature channel. Adding a last axis and broadcasting it from `(B, k, 1)` to `(B, k, D)` supplies exactly that shape.',
+      'The scores produce row indices, but `gather` needs an index for every feature channel:\n`top_indices: (B, k)`\n`top_indices[..., None]: (B, k, 1)`\n`expanded indices: (B, k, D)`',
       'The batch axis is preserved throughout, so each example can choose different rows without flattening or looping.',
     ],
     solutionCode: `import torch
@@ -3310,8 +3311,8 @@ print(topk_features(scores, features, k=2))`,
       'Elementwise multiplication gives the soft intersection.',
     ],
     solutionNotes: [
-      'For each batch item, Dice is `Dice = (2 · Σ(prediction · target) + eps) / (Σ prediction + Σ target + eps)`, and the loss is `1 - mean(Dice)`. The factor of `2` rewards shared foreground mass while the denominator counts the predicted and target mass separately.',
-      'Dice measures overlap directly, so it is less dominated by abundant background pixels than raw accuracy. Flattening each example makes the reduction independent of spatial rank, and `eps` keeps empty or nearly empty masks finite.',
+      'Compute one soft overlap score per batch item:\n`Dice = (2 · Σ(prediction · target) + eps) / (Σ prediction + Σ target + eps)`\nThen return `1 - mean(Dice)`.',
+      'The factor `2` rewards shared foreground mass. Flatten each example so the same reduction works for any spatial rank; `eps` keeps empty masks finite.',
     ],
     solutionCode: `import torch
 
@@ -3383,8 +3384,8 @@ print(dice_loss(prediction, target).item())`,
       'Keep the batch axis while flattening all remaining dimensions.',
     ],
     solutionNotes: [
-      'For each batch item, soft IoU is `IoU = (Σ(prediction · target) + eps) / (Σ prediction + Σ target - Σ(prediction · target) + eps)`, and the loss is `mean(1 - IoU)`. The union subtracts the intersection once because the overlap appears in both sums.',
-      'Soft IoU replaces set membership with probabilities, so the loss remains usable in gradient-based training. Flattening keeps one score per example, and smoothing only prevents an undefined empty union.',
+      'Compute one soft IoU per batch item:\n`intersection = Σ(prediction · target)`\n`union = Σ prediction + Σ target - intersection`\n`IoU = (intersection + eps) / (union + eps)`',
+      'Return `mean(1 - IoU)`. Probabilities replace hard set membership, so the score remains differentiable; `eps` only prevents an undefined empty union.',
     ],
     solutionCode: `import torch
 
@@ -3456,8 +3457,8 @@ print(iou_loss(prediction, target).item())`,
       'The modulating factor is close to zero for an easy example with `p_t` near one.',
     ],
     solutionNotes: [
-      'For a sigmoid probability `p = sigmoid(logit)`, define `p_t = p` when `target = 1` and `p_t = 1 - p` when `target = 0`. Focal loss is `L = -(1 / K) Σ_i (1 - p_t,i)^gamma log(p_t,i)`.',
-      'The factor `(1 - p_t)^gamma` is close to zero for a correct, easy example with `p_t` near one, while hard examples retain more weight. In production, use a fused logits-based implementation to avoid explicitly materializing probabilities.',
+      'Convert each logit into the probability assigned to its true label:\n`p_t = p          when target = 1`\n`p_t = 1 - p      when target = 0`',
+      'Down-weight easy examples with:\n`L = -(1 / K) Σ_i (1 - p_t,i)^gamma log(p_t,i)`\nWhen `p_t` is near one, the modulating factor is near zero. In production, prefer a fused logits-based implementation.',
     ],
     solutionCode: `import torch
 
@@ -3530,8 +3531,8 @@ print(focal_loss(logits, target).item())`,
       'The last-axis weight vector broadcasts across every leading dimension.',
     ],
     solutionNotes: [
-      'Different box coordinates can have different units and importance, so a single unweighted error can let one group dominate. A final-axis weight vector makes that tradeoff explicit.',
-      'The code keeps the weighting separate from the reduction: broadcast the weights over the coordinate axis, then mean all weighted residuals.',
+      'Apply one weight per box coordinate:\n`weighted_error = coordinate_weight * |prediction - target|`',
+      'A weight vector shaped `(D,)` broadcasts over every leading box dimension. Average only after weighting so the coordinate tradeoff stays explicit.',
     ],
     solutionCode: `import torch
 
@@ -3602,8 +3603,8 @@ print(weighted_box_regression_loss(prediction, target, weights).item())`,
       '`atan2(sin(difference), cos(difference))` wraps it to the principal interval.',
     ],
     solutionNotes: [
-      'Angles live on a circle, so ordinary subtraction mistakes the seam at `±π` for a long physical rotation.',
-      'The sine and cosine preserve the direction on that circle, and `atan2` recovers the equivalent angle in the principal interval.',
+      'Angles live on a circle, so ordinary subtraction mistakes the seam at `±π` for a long rotation.',
+      'Wrap the raw difference back to the principal interval:\n`delta = atan2(sin(prediction - target), cos(prediction - target))`\nThe result lies in `[-π, π]`.',
     ],
     solutionCode: `import torch
 
@@ -3670,8 +3671,8 @@ print(angular_difference(prediction, target) * 180 / 3.141592653589793)`,
       'A true positive contributes the precision at its rank; false positives only increase the denominator.',
     ],
     solutionNotes: [
-      'After sorting detections by descending confidence, let `TP(k)` be the number of true positives in the first `k` predictions and let `m_k` be `1` only when rank `k` is a true positive. Then `precision(k) = TP(k) / k`, and `AP = (1 / num_ground_truth) Σ_k m_k · precision(k)`.',
-      'The code follows that equation directly: `cumulative_tp` has one count per rank, `ranks` is `1..N`, and the boolean match mask selects only the ranks that contribute precision. False positives still increase the rank denominator, so they lower later precision even though they add no numerator.',
+      'Sort detections by descending confidence, then compute precision at every rank:\n`precision(k) = TP(k) / k`',
+      'Only true-positive ranks contribute to AP:\n`AP = (1 / num_ground_truth) Σ_k m_k · precision(k)`\nA false positive adds no numerator but still increases later rank denominators.',
       'The ground-truth count normalizes the sum and makes the metric comparable across images or classes. Full mAP additionally averages this AP across classes and IoU thresholds.',
     ],
     solutionCode: `import torch
@@ -3752,8 +3753,8 @@ print(average_precision(scores, matches, num_ground_truth=2).item())`,
       'Do not let a second high-overlap prediction become a second true positive.',
     ],
     solutionNotes: [
-      'Detection evaluation is not independent per prediction: once a ground-truth object is claimed by the highest-confidence matching prediction, later duplicates are false positives.',
-      'The vectorized IoU calculation handles geometry; the small greedy loop handles the one-to-one assignment rule and keeps the confidence ordering explicit.',
+      'Match in descending confidence order:\n`prediction → best unmatched ground truth → threshold check → claim or false positive`',
+      'Once a ground-truth object is claimed, later duplicates are false positives. Vectorized IoU handles the geometry; the small loop enforces the one-to-one rule.',
     ],
     solutionCode: `import torch
 
@@ -3850,9 +3851,9 @@ print(match_predictions(predictions, scores, ground_truth, 0.5))`,
       'Multiply `transform @ points_h.T`, transpose back, and discard the fourth coordinate.',
     ],
     solutionNotes: [
-      'The ordinary affine equation is `p′ = R p + t`. Homogeneous coordinates rewrite it as `[p′; 1] = [[R, t], [0, 1]] [p; 1]`, so translation becomes part of the same matrix multiplication as rotation.',
-      'For `points.shape == (N, 3)`, `ones.shape == (N, 1)` and `torch.cat([points, ones], dim=1)` creates `homogeneous.shape == (N, 4)`. The transform expects points as columns, so `transform (4, 4) @ homogeneous.T (4, N)` produces `(4, N)`; transposing back gives `(N, 4)`, and `[:, :3]` removes the padding coordinate.',
-      'The padding value is `1`, not `0`: multiplying the last transform column by one adds the translation vector `t` to every point. The final homogeneous coordinate is discarded because the task asks for XYZ only.',
+      'Homogeneous coordinates fold translation into the same multiplication as rotation:\n`p′ = R p + t`\n`[p′; 1] = [[R, t], [0, 1]] [p; 1]`',
+      'The shape flow is:\n`points: (N, 3)  →  pad ones: (N, 4)`\n`transform (4, 4) @ points.T (4, N)  →  (4, N)`\n`transpose and slice  →  (N, 3)`',
+      'Pad with `1`, not `0`: that activates the transform’s translation column for every point.',
     ],
     solutionDiagram: `point row:        [x, y, z]
 pad one column:  [x, y, z, 1]   ← homogeneous point
@@ -3932,7 +3933,7 @@ print(transform_points(points, transform))`,
     ],
     solutionNotes: [
       'This is the full pattern in one exercise: batch-aware broadcasting creates every prediction–ground-truth pair, and the last axis is reduced to the best match.',
-      'The shapes make the logic auditable: IoUs are `(B, N, M)`, so `argmax(-1)` and gather both naturally return `(B, N)`.',
+      'The shape flow is:\n`pairwise IoU: (B, N, M)`\n`argmax over M: (B, N)`\n`gather best IoU: (B, N)`',
     ],
     solutionCode: `import torch
 

@@ -88,6 +88,35 @@ const REQUIRED_PRIMITIVES = [
 ] as const;
 
 describe('code-practice primitive-first solutions', () => {
+  it('keeps every explanation scannable and puts key expressions on their own lines', () => {
+    expect(codePracticeProblems).toHaveLength(40);
+
+    for (const problem of codePracticeProblems) {
+      const hasStandaloneExpression = problem.solutionNotes.some((note) =>
+        note.split('\n').some((line) => /^`[^`]+`$/.test(line)),
+      );
+      expect(hasStandaloneExpression, problem.id).toBe(true);
+
+      for (const note of problem.solutionNotes) {
+        expect(note.length, `${problem.id} has a dense explanation paragraph`).toBeLessThanOrEqual(
+          360,
+        );
+
+        for (const match of note.matchAll(/`([^`]+)`/g)) {
+          const expression = match[1];
+          const isKeyExpression =
+            expression.length >= 24 && (/[=Σ@]/.test(expression) || expression.includes('shape'));
+
+          if (isKeyExpression) {
+            expect(note, `${problem.id} embeds a key expression in prose`).toContain(
+              `\n\`${expression}\``,
+            );
+          }
+        }
+      }
+    }
+  });
+
   it('gives every exercise a reference walkthrough and unique ordered route', () => {
     const ids = new Set<string>();
 

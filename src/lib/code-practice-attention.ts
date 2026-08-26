@@ -244,7 +244,7 @@ class KVCache:
       ],
     },
     solutionNotes: [
-      'The cache is a small state machine. `length` is the next legal absolute position, so equality with `start_pos` rejects both overwrites and gaps.',
+      'The cache has one critical invariant:\n`start_pos == current_cache_length`\nA smaller position overwrites history; a larger one leaves a gap. Reject both.',
       'All validation happens before mutation. That ordering matters because an exception after writing keys but before writing values would leave an unusable cache.',
       'Concatenation keeps the interview implementation readable. A serving system would normally preallocate, use blocks, or use paged attention so repeated appends do not copy the full prefix.',
     ],
@@ -430,9 +430,9 @@ class KVCache:
       ],
     },
     solutionNotes: [
-      'MHA, GQA, and MQA differ only in the number of KV heads. The query-head count stays fixed, and `repeat = H_q / H_kv` maps each stored KV head to its query-head group.',
+      'MHA, GQA, and MQA differ only in the number of stored key/value heads:\n`repeat = H_q / H_kv`\nEach KV head serves that many query heads.',
       'The reference broadcasts then reshapes K/V so the matrix multiplications are easy to inspect. Optimized kernels keep the compact KV representation and perform the mapping inside the attention kernel.',
-      'The cache stores `(B, H_kv, T_k, D_head)`, not the repeated view. That is where GQA and MQA save decode memory and bandwidth.',
+      'Store the compact cache:\n`KV cache: (B, H_kv, T_k, D_head)`\nDo not store the repeated query-head view; the compact head axis is where GQA and MQA save decode memory.',
     ],
     solutionDiagram: `Q: (B, Hq,  Tq, Dh)
 K: (B, Hkv, Tk, Dh) ─ repeat groups=Hq/Hkv ┐

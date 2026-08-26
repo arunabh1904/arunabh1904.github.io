@@ -57,7 +57,7 @@ class ResNet(nn.Module): ...`,
       ],
     },
     solutionNotes: [
-      'The projection is a shape adapter, not an optional flourish. A `1x1` convolution with the stage stride makes the skip path match both the spatial resolution and channel count of the residual path.',
+      'A residual block can add its two paths only when their shapes match:\n`output = ReLU(residual_path(x) + skip_path(x))`\nUse a stride-matched `1x1` projection when spatial size or channel count changes.',
       'The config owns architecture choices while `_make_stage` owns repetition. That separation keeps the forward pass short and makes a second ResNet variant a data change instead of a copy-and-edit exercise.',
     ],
     solutionDiagram: `input
@@ -273,7 +273,7 @@ class UNet(nn.Module): ...`,
       ],
     },
     solutionNotes: [
-      'The encoder stores high-resolution features before each pool. The decoder upsamples its current representation, aligns it to the matching skip tensor, concatenates along channels, and uses `DoubleConv` to fuse the two sources.',
+      'Each decoder stage follows the same shape flow:\n`upsample decoder → align to skip size → concatenate channels → DoubleConv`\nThe encoder must save each high-resolution feature before pooling.',
       'Odd sizes expose a common hidden assumption: repeated division by two is not exactly reversible. Aligning to `skip.shape[-2:]` makes the spatial contract explicit and avoids hard-coded crop arithmetic.',
     ],
     solutionDiagram: `input -> enc 32 -> pool -> enc 64 -> pool -> enc 128 -> bottleneck 256
@@ -501,7 +501,7 @@ class CenterNetDetector(nn.Module): ...`,
       ],
     },
     solutionNotes: [
-      'The detector shares one stride-four feature map, then branches into three small heads. The heatmap answers which class center occupies each cell; the regression maps answer how large the box is and how far the continuous center lies from the integer cell.',
+      'One stride-four feature map feeds three heads:\n`heatmap logits: (B, classes, H/4, W/4)`\n`box size: (B, 2, H/4, W/4)`\n`center offset: (B, 2, H/4, W/4)`',
       'Returning raw heatmap logits keeps loss computation stable and leaves thresholding, local-maximum suppression, top-k selection, and coordinate decoding outside the model boundary.',
     ],
     solutionDiagram: `image (B, 3, H, W)
