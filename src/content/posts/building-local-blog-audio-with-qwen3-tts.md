@@ -1,5 +1,5 @@
 ---
-title: Building Local Blog Audio with Qwen3-TTS
+title: Building Local Blog Audio That Sounds Human
 date: '2026-08-13T23:30:00.000Z'
 section: blog
 blogGroup: projects
@@ -11,19 +11,19 @@ tags:
   - Apple Silicon
   - Audio
 summary: >-
-  What it took to turn Qwen3-TTS into a source-pinned, one-voice, under-30-minute
-  audio release for every Blog post.
+  Why clean waveforms and source hashes were not enough, and how bounded
+  synthesis plus chunk-level ASR caught the artifacts listeners could hear.
 ---
 
-# Building Local Blog Audio with Qwen3-TTS
+# Building Local Blog Audio That Sounds Human
 
 Local Blog audio means that every post has a static MP3 generated on my Mac and served from GitHub Pages. That sounds like a text-to-speech feature. It became a publishing compiler: one system has to decide what the article says aloud, hold a voice steady for thousands of words, reject incomplete output, and prove that the file a listener receives was built from the prose on the page.
 
-I learned that distinction by shipping the wrong thing several times. One release changed voices between chunks. Another repeated part of its voice-reference sentence before nearly every chunk. A later version removed that preface but sounded too excited, flipped register around thirty-five seconds, skipped near forty-two seconds, and pronounced *cyclist* badly. The manifest was fresh. The waveform was not good.
+I learned that distinction by shipping the wrong thing several times. One release changed voices between chunks. Another repeated part of its voice-reference sentence before nearly every chunk. A later version removed that preface but sounded too excited, flipped register around thirty-five seconds, skipped near forty-two seconds, and pronounced *cyclist* badly. The next system passed its manifest and waveform checks yet still inserted strange phrases, repeated clauses, and rushed through transitions. The files were technically valid. They did not sound human.
 
-The current system uses Qwen3-TTS Base with one committed synthetic voice anchor: a warm Indian English woman with a low-mid pitch, restrained inflection, controlled energy, and a slightly sombre technical-presenter delivery. It generates one authored heading section at a time, splitting only unusually long sections, decodes generated acoustic codes only, keeps natural timing inside sentences, and applies a small pause only between sections. Eighteen Blog posts now share that profile. Together they contain almost 200 minutes of audio, and the longest file is 18 minutes and 4 seconds.
+The human narration profile now uses Voxtral 4B TTS with its fixed `hi_female` voice. It generates bounded paragraphs at natural speed, adds 350 milliseconds after paragraphs and 650 milliseconds after headings, and audits every synthesis chunk with local speech recognition. The VLM and autonomous-driving posts were the first long-form canaries. Their final files run for 22 minutes 33 seconds and 31 minutes 28 seconds, with word error rates of 4.77% and 5.41%, no invented insertion longer than two words, and no high-error chunk.
 
-> The central lesson was uncomfortable: provenance checks can prove which inputs produced a file, but they cannot prove that the file sounds right. Audio needs both compiler invariants and perceptual tests.
+> The central lesson was uncomfortable: provenance checks can prove which inputs produced a file, and waveform checks can prove that its samples are valid. Neither can prove that the voice said the right words with believable timing. Audio needs compiler invariants, speech-content audits, and a listener's ear.
 
 ## What “local” means
 
@@ -74,6 +74,10 @@ I then removed the reference and used the built-in Ryan CustomVoice speaker. Tha
 
 Explicit pauses created another trap. Inserting silence after every sentence made technical prose slow and mechanical. A residual-silence filter then tried to compress long gaps across the concatenated file. That filter could eat a legitimate pause or word boundary and produce an audible skip. The skip near forty-two seconds made one rule clear even though the exact boundary failure was difficult to attribute afterward: post-processing must not rewrite time inside speech.
 
+The Qwen Base profile then exposed a subtler control bug. The exporter declared a detailed `VOICE_INSTRUCT` string, recorded it in the manifest, and never passed it to generation. Even if it had, the official [Qwen3-TTS model matrix](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base) lists instruction control for VoiceDesign and CustomVoice, not Base. Base is the voice-cloning checkpoint. A configuration value can look like part of the narrator contract while having no acoustic effect.
+
+The last Qwen exports also ran at `1.10x` tempo. That choice shortened the files, but it compressed the pauses that technical prose uses to separate a claim from its consequence. Long heading-sized requests could still drift or repeat before the duration guard noticed. The fix was not a larger speed penalty or another silence filter. It was a model and generation boundary that matched the delivery I wanted.
+
 | Failure | Wrong assumption | Architectural correction |
 | --- | --- | --- |
 | Voice changed between chunks | One VoiceDesign prompt implies one speaker | Commit one concrete synthetic voice anchor. |
@@ -82,50 +86,55 @@ Explicit pauses created another trap. Inserting silence after every sentence mad
 | Delivery became too excited | A generic built-in voice is good enough | Select and version the actual narrator as an asset. |
 | Sentences sounded slow and rigid | More explicit silence sounds more human | Let punctuation and model context carry local timing. |
 | Audio skipped | Silence cleanup is harmless | Trim boundaries only; never rewrite silence inside speech. |
+| Style settings changed nothing | A declared voice instruction controls every checkpoint | Verify the model variant supports each requested control and that generation receives it. |
+| Pauses felt rushed | Final tempo is harmless packaging | Generate at `1.0x`; treat pace as part of the narrator contract. |
+| A paragraph invented or repeated speech | Clean samples imply correct speech | Bound generation and audit each chunk against its expected text. |
 | *Cyclist* sounded wrong | Written spelling always supplies enough phonetic guidance | Apply a tested audio-only pronunciation lexicon. |
 | A file ended early | Successful model return implies complete narration | Enforce token, duration-per-word, ending, and ASR checks. |
 
-The table is the compact record. The deeper pattern is that every rejected design tried to recover continuity after splitting the generation into pieces that were too small. The final design moves the continuity boundary up to the article section and makes the remaining joins intentional.
+The table is the compact record. The deeper pattern changed over time. Early designs split the generation into pieces that were too small, then tried to repair continuity afterward. The section-sized Qwen design moved too far in the other direction: it gave the model enough room to drift before any check could localize the failure. The useful unit is large enough to carry one thought and small enough to reject independently.
 
-## The narrator is a versioned asset
+## The model contract must match the requested control
 
-I eventually generated several voice candidates and chose the one that sounded closest to the Blog: female, Indian English, thoughtful, composed, slightly sombre, and precise without becoming theatrical. That selected sample is 18.6 seconds long and lives at `scripts/assets/blog-narrator-warm-indian-english-reference.mp3`.
+Qwen3-TTS Base solved a real problem: one reference clip could anchor a reusable speaker. It did not solve delivery control. VoiceDesign and CustomVoice expose instruction control; Base does not. The lesson is narrower than “use a better model.” Choose the checkpoint whose control surface matches the job, then verify that every declared setting reaches inference.
 
-The word *reference* can be misleading here. The sample still conditions Qwen3-TTS Base, but the decoder never renders its acoustic codes into the output. It encodes identity; the streaming path decodes generated codes only. The anchor's transcript is an inference input, not prose to be spliced and trimmed from the finished file.
+I tested three preset voices from [Voxtral 4B TTS](https://huggingface.co/mistralai/Voxtral-4B-TTS-2603) on the same technical passage. `hi_female` read it in 54 seconds with 18 natural pauses and no transcription error. `casual_female` finished in 46 seconds with only five pauses and felt rushed. `neutral_female` ran for 68 seconds and repeated a phrase for roughly 20 seconds. Model choice did not remove the need for an artifact gate; it gave the gate a better candidate to work with.
 
-The production profile is fixed:
+The accepted human profile is fixed:
 
 ```python
-MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-8bit"
-VOICE = "Warm Indian English"
-NARRATOR_SEED = 1904
-TEMPERATURE = 0.3
-TOP_P = 0.9
-REPETITION_PENALTY = 1.05
-SPEED = 1.10
+HUMAN_MODEL = "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16"
+HUMAN_VOICE = "hi_female"
+HUMAN_NARRATOR_SEED = 1904
+HUMAN_TEMPERATURE = 0.65
+HUMAN_TOP_K = 50
+HUMAN_TOP_P = 0.9
+HUMAN_SPEED = 1.0
+HUMAN_PARAGRAPH_PAUSE_SECONDS = 0.35
+HUMAN_HEADING_PAUSE_SECONDS = 0.65
 ```
 
-The anchor SHA-256, model, sampling settings, seed, speed, decoding policy, sectioning policy, pause policy, pronunciation lexicon, and source digest all enter the manifest profile. Change the article and one post becomes stale. Change the narrator contract and the affected corpus becomes stale.
+The model, preset, sampling settings, chunk seeds, speed, pause policy, pronunciation lexicon, and source digest enter the manifest profile. Change the article and that post becomes stale. Change a generation setting and every assigned post becomes stale. A rejected chunk receives a reviewed seed override, so rerunning the exporter reproduces the accepted sample instead of rolling the dice again.
 
-That distinction matters. The MP3s do not merely happen to sound similar today. The repository can reject a mixed corpus in which one post silently falls back to Ryan, an old chunking rule, or another anchor.
+There is also a deployment boundary. Mistral's model card says the supplied reference voices and model inherit CC BY-NC 4.0. That fits this non-commercial personal site. A commercial product would need a model and voice license that permits its use; acoustic quality does not override licensing.
 
-## Authored sections are the continuity unit
+## Authored paragraphs are the failure boundary
 
-A whole long-form article is too large for one reliable generation request. A sentence is too small to carry a stable delivery. The useful boundary is the authored heading section.
+A whole long-form article is too large for one reliable request. A sentence is too small to carry stable delivery. A full heading section can still be long enough for repetition or acoustic drift to hide inside one successful return. The useful boundary is the authored paragraph.
 
-The exporter preserves paragraph breaks as structural newlines, groups prose under each heading, and sends up to 4,000 characters in one request. Qwen streams that section in roughly twenty-second decoder pieces, but those pieces share one model context and are concatenated before the section is written. Streaming limits decoder memory; it does not redesign the speaker every twenty seconds.
+The exporter preserves headings and paragraphs as separate requests, then splits only when a block exceeds 1,200 characters. Voxtral's fixed preset holds the speaker identity while each request contains enough syntax to shape emphasis. The MLX-Audio implementation streams eight-second pieces and joins them with overlap-aware decoding; its [release notes](https://github.com/Blaizzy/mlx-audio/releases) record the Voxtral overlap-add streaming support.
 
-Every section starts from the same committed anchor and narrator seed. The anchor holds identity across sections. The longer request lets the model hear enough local argument to shape emphasis, connect commas, and vary sentence length without an explicit pause file after every period.
+The exporter keeps the generated speech at `1.0x`, trims only chunk boundaries, and inserts 350 milliseconds after paragraphs and 650 milliseconds after headings. Those pauses are structural. Punctuation still controls timing inside a paragraph. No filter is allowed to search the finished speech for silence and rewrite it.
 
-The exporter inserts 650 milliseconds only between completed heading sections. It preserves the model's timing inside each section, trims silence only at generated boundaries, concatenates the sections, and applies `1.10x` tempo once to the final stream. The result is faster than the earlier voice without making each sentence race.
+Short headings were unexpectedly brittle because two or three words give the model little linguistic context. The ASR audit caught headings that began with “man man saw,” “one of these,” or other invented setup. I rerolled only those chunks, recorded their accepted seeds, and left the other accepted waveforms untouched.
 
-This is the current compromise. One request for an entire post would offer more global continuity but is slow and can fail late. One request per sentence is resumable but sounds assembled. One request per authored section gives the model enough context to sound intentional while keeping failure local and bounded.
+This boundary improves both sound and debugging. A failed paragraph is cheap to identify and replace. A whole-file transcript can say that the average error is acceptable while hiding one repeated clause; a chunk transcript points to the exact request that produced it.
 
 ## Pronunciation fixes belong to the audio compiler
 
 Speech models occasionally need spelling help, but the Blog should not read like a phonetic script. I do not want to publish *sike-list* to make *cyclist* sound right.
 
-The exporter therefore applies pronunciation hints after extracting the authored prose and before synthesis. The current lexicon maps *cyclist* to `sike-list`, *LiDAR* to `lie-dar`, and *timestamp* to `time stamp`. A narrow prosody rewrite also removes the comma in “timestamps drift, or one sensor degrades,” because the voice treated that comma as a larger break than the sentence intended.
+The exporter therefore applies pronunciation hints after extracting the authored prose and before synthesis. The shared lexicon maps *cyclist* to `sike-list`, *LiDAR* to `lie-dar`, and *timestamp* to `time stamp`. The autonomous-driving post adds a local spelling for `BEVDet4D`. It also restores `Lidar encoders` for one short heading because the otherwise useful `lie-dar` spelling became unstable when spoken alone. A narrow prosody rewrite removes the comma in “timestamps drift, or one sensor degrades,” because the voice treated that comma as a larger break than the sentence intended.
 
 The visible Markdown does not change. Tests assert both sides: the extracted article retains the author's spelling, while the synthesis prompt contains the phonetic form. A new exception needs a targeted test. Otherwise a local fix can become a corpus-wide pronunciation regression.
 
@@ -133,11 +142,11 @@ The visible Markdown does not change. Tests assert both sides: the extracted art
 
 I wanted a maximum listening time of thirty minutes. Cutting every MP3 at thirty minutes would satisfy a duration check and destroy the argument's ending. Speeding the voice until the file fit would make a dense post harder to follow. Skipping material blindly would move the missing content to an arbitrary point in the article.
 
-The default remains full-source narration. When a post would exceed the limit, I write a reviewed narration sidecar under `src/narrations/blog`. The sidecar is pinned to the exact source SHA-256 and must cover every authored H2 section. It preserves the governing claims, evidence, motive, and conclusion while removing repeated examples, raw visual material, table rows, and detail that the page can carry better than audio.
+The default remains full-source narration. A reviewed narration sidecar is available when the editorial decision is to create a shorter audio view. It is pinned to the exact source SHA-256 and must cover every authored H2 section. The VLM progression uses that path. It preserves the governing claims, evidence, motive, and conclusion while removing repeated examples and detail that the page can carry better than audio.
 
-Three current posts use this section-complete narration view: the VLM progression, omni-model pretraining, and autonomous-driving perception. The other fifteen speak the full extracted source. No exporter is allowed to crop the final MP3. If the generated file exceeds thirty minutes, generation fails and the existing asset remains in place.
+The autonomous-driving survey made the opposite editorial choice: keep the complete 3,840-word narration. Its human-paced render is 31 minutes 28 seconds, so the compiler gives that post a narrow 32-minute cap. This is not a loophole that silently expands every asset. The source, manifest, and per-post limit record the exception. No exporter is allowed to crop the final MP3.
 
-The same refusal applies to incomplete synthesis. Each section has a 6,000-token acoustic ceiling. Reaching that ceiling is an error, not a successful result. The exporter also compares delivered duration with word count and rejects a section shorter than a conservative 0.16 seconds per word. Those checks cannot judge prose, but they catch a model that returned early or produced silence while claiming success.
+The same refusal applies to incomplete synthesis. Each human-profile chunk has a 1,600-token acoustic ceiling. The exporter rejects chunks that are implausibly short or long for their word count. Those checks cannot judge prose, but they catch silence, early endings, and large continuation loops before assembly.
 
 ## Freshness is necessary and insufficient
 
@@ -145,23 +154,23 @@ The manifest digest answers a precise question: did this MP3 come from the curre
 
 The release gate now has four layers.
 
-First, deterministic checks validate source SHA, narration-sidecar pinning, H2 coverage, narrator profile, forbidden manifest fields, measured duration, and MP3 presence. The compiler refuses a profile mismatch or an asset longer than thirty minutes.
+First, deterministic checks validate source SHA, narration-sidecar pinning, H2 coverage, narrator profile, measured duration, chunk count, and MP3 presence. The compiler refuses a profile mismatch or an asset beyond its reviewed limit.
 
-Second, full-file automatic speech recognition audits the spoken artifact. I compare the transcript with the expected beginning and ending, check the ratio of spoken to source words, and search unrelated posts for phrases from the voice anchor. This caught the distinction that source hashes could not: a file may be fresh and still repeat conditioning text.
+Second, local Whisper transcribes every cached synthesis chunk. The audit compares each transcript with the exact text sent to TTS, normalizes harmless spelled acronyms such as `C L I P`, and then applies three gates: aggregate word error rate must stay below 8%, no invented insertion may exceed two words, and no chunk may exceed 50% error. The insertion rule caught fluent hallucinations that average WER hid. The chunk rule caught short headings whose two important words were both wrong.
 
-Third, I listen where the system is most likely to lie. That means the opening, heading joins, the middle of long sections, reported timestamps such as thirty-five and forty-two seconds, difficult pronunciations, and the final paragraph. ASR is useful evidence. It is not an ear.
+Third, waveform checks reject NaNs, infinities, denormals, and clipping. These checks remain separate from speech-content QA because a repeated phrase can have a perfectly clean waveform. I then listen at the opening, paragraph and heading joins, every rerolled chunk, difficult pronunciations, and the ending. ASR is useful evidence. It is not an ear.
 
 Fourth, the ordinary site gates still run: targeted exporter tests, `git diff --check`, the full repository CI command, GitHub checks, and the Pages deployment. The live route must return HTTP 200. Each changed MP3 is fetched with a cache-busting query and its SHA-256 must match the committed asset.
 
-For the current 18-post corpus, the mechanical profile and duration checks passed, the ASR audit found every beginning and ending, no unrelated post contained the anchor phrase, every live Blog route returned 200, and every live MP3 hash matched. Those results are release evidence, not a claim that no sentence can ever sound better.
+The two canaries passed that full stack. The VLM narration scored 4.77% WER across 64 chunks. The autonomous-driving narration scored 5.41% across 75 chunks. Both had zero multi-word insertion artifacts and zero high-error chunks. Their production MP3 hashes matched the committed files exactly. Those results are release evidence, not a claim that no sentence can ever sound better.
 
 ## Blog shipping now means two pull requests
 
 The most expensive stale-audio mistake came from compiling in a worktree whose prose had not reached production. The MP3 matched that checkout perfectly. The website served different words.
 
-A Blog release now has two stages. The first pull request contains the writing and ordinary page assets. After it merges and deploys, a clean worktree starts from the resulting `origin/main` and regenerates audio for each changed `postSlug`. The second pull request contains the MP3, manifest, and a narration sidecar only when the post needs one. Exporter code and tests enter that PR only when the compiler itself changed.
+A Blog release now has two stages. The first pull request contains the writing and ordinary page assets. After it merges and deploys, a clean worktree starts from the resulting `origin/main` and regenerates audio for each changed `postSlug`. The second pull request contains the MP3 and manifest, plus a narration sidecar only when the post has an explicitly reviewed shorter audio view. Exporter code and tests enter that PR only when the compiler or human-profile assignment changed.
 
-If the compiler changes corpus-wide, I use the autonomous-driving Perception post as a canary. Its length, many headings, diagrams, and pronunciation edge cases expose voice drift, repeated prefaces, bad joins, stale visual narration, early endings, and duration mistakes quickly. Once that canary passes, one foreground exporter handles the remaining stale posts with the model loaded once.
+The VLM and autonomous-driving posts were the migration canaries. The VLM post stresses acronyms and model names. The autonomous-driving survey stresses length, headings, visual omissions, pronunciation, and the duration policy. Existing Qwen assets remain valid until their source changes; every new or changed Blog post moves to the human profile and must pass the chunk-level audit before merge. That incremental boundary avoids regenerating the corpus before the new contract has enough evidence.
 
 Before the audio PR is committed, the worktree fetches `origin/main` again. A concurrent Blog edit can make a completed MP3 stale during a long corpus run. Only assets whose source and profile digests still match are eligible to ship.
 
