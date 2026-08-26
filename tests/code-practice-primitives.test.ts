@@ -160,9 +160,15 @@ describe('code-practice primitive-first solutions', () => {
       expect(alternative.code, problem.id).toMatch(/\) -> [^:]+:/);
       expect(alternative.code, problem.id).not.toContain('torch');
       expect(alternative.code.split('\n').length, problem.id).toBeLessThanOrEqual(30);
+      expect(alternative.exampleCode, problem.id).toContain('print(');
+      expect(alternative.exampleCode, problem.id).not.toContain('torch');
+      expect(alternative.exampleCode.split('\n').length, problem.id).toBeLessThanOrEqual(12);
       expect(alternative.memory.length, problem.id).toBeGreaterThan(0);
       expect(alternative.memory.length, problem.id).toBeLessThanOrEqual(2);
-      expect(() => compilePython(alternative.code), problem.id).not.toThrow();
+      expect(
+        () => compilePython(`${alternative.code}\n\n${alternative.exampleCode}`),
+        problem.id,
+      ).not.toThrow();
     }
 
     for (const id of [

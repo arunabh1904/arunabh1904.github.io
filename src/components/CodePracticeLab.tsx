@@ -82,6 +82,11 @@ function getReferenceEditorCode(problem: CodePracticeProblem, currentCode: strin
   return removeReferenceAnnotations(augmentCodeWithSolution(problem, currentCode));
 }
 
+function getNumpyReferenceCode(problem: CodePracticeProblem) {
+  const alternative = problem.numpyAlternative;
+  return alternative ? `${alternative.code}\n\n${alternative.exampleCode}` : '';
+}
+
 function getFunctionSignature(code: string) {
   const lines = code.split('\n');
   const start = lines.findIndex((line) => line.trimStart().startsWith('def '));
@@ -281,7 +286,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const isReferenceLoaded = solutionLanguage !== null;
   const hasExecutionResult = hasRun || Boolean(errorOutput);
   const torchExplanationCode = getReferenceEditorCode(problem, getInitialEditorCode(problem));
-  const numpyExplanationCode = problem.numpyAlternative?.code;
+  const numpyExplanationCode = getNumpyReferenceCode(problem);
   const numpySignature = numpyExplanationCode ? getFunctionSignature(numpyExplanationCode) : '';
   const explanationNotes = [...problem.solutionNotes, ...(problem.numpyAlternative?.memory ?? [])];
   const outputSummary =
@@ -336,7 +341,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
   function handleLoadSolution(language: 'torch' | 'numpy') {
     if (language === 'numpy' && problem.numpyAlternative) {
-      setCode(problem.numpyAlternative.code);
+      setCode(getNumpyReferenceCode(problem));
     } else {
       setCode(getReferenceEditorCode(problem, getInitialEditorCode(problem)));
     }
