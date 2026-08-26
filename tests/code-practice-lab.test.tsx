@@ -31,7 +31,9 @@ const testProblem: CodePracticeProblem = {
     },
   ],
   hint: ['Subtract the row max first.'],
-  solutionNotes: ['Use a row-wise max shift before the exponentials.'],
+  solutionNotes: [
+    'Use a row-wise max shift before the exponentials:\n`shifted = logits - row_max`',
+  ],
   reasoning: [
     {
       axis: 'Tensor reasoning',
@@ -160,7 +162,11 @@ describe('CodePracticeLab', () => {
     expect(dialog?.querySelector('h2')?.textContent).toBe('Explanation');
     expect(dialog?.textContent).not.toContain('torch.Tensor');
     expect(dialog?.textContent).not.toContain('np.ndarray');
-    expect(dialog?.textContent).toContain('Use a row-wise max shift before the exponentials.');
+    expect(dialog?.textContent).toContain('Use a row-wise max shift before the exponentials');
+    expect(dialog?.querySelectorAll('.code-practice-lab__standalone-expression')).toHaveLength(1);
+    expect(dialog?.querySelector('.code-practice-lab__standalone-expression')?.textContent).toBe(
+      'shifted = logits - row_max',
+    );
     expect(dialog?.textContent).not.toContain('Keep the row axis when subtracting the maximum.');
     expect(dialog?.textContent).not.toContain('Subtract the row max first.');
     expect(dialog?.textContent).not.toContain('Prompt copy');
@@ -190,7 +196,7 @@ describe('CodePracticeLab', () => {
     expect(container.textContent).not.toContain('Reason through the system');
     expect(container.textContent).not.toContain('Tensor reasoning');
     expect(container.querySelector('.code-practice-lab__visual')).toBeNull();
-    expect(container.textContent).not.toContain('Use a row-wise max shift before the exponentials.');
+    expect(container.textContent).not.toContain('Use a row-wise max shift before the exponentials');
     expect(container.textContent).not.toContain('How the NumPy version works');
     expect(container.textContent).not.toContain('Python ready');
     expect(container.querySelector('[role="dialog"]')).toBeNull();
@@ -234,7 +240,7 @@ describe('CodePracticeLab', () => {
       '/assets/images/code-glance-stable-softmax-cross-entropy.svg',
     );
     expect(container.querySelector('[role="dialog"] h2')?.textContent).toBe('Explanation');
-    expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
+    expect(container.textContent).toContain('Use a row-wise max shift before the exponentials');
     expect(container.querySelector('[role="dialog"]')?.textContent).not.toContain(
       'Keep the row axis when subtracting the maximum.',
     );
@@ -287,7 +293,7 @@ describe('CodePracticeLab', () => {
 
     expect(container.querySelector('[role="dialog"]')).not.toBeNull();
     expect(container.querySelector('[role="dialog"] h2')?.textContent).toBe('Explanation');
-    expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
+    expect(container.textContent).toContain('Use a row-wise max shift before the exponentials');
     expect(container.querySelector('[role="dialog"]')?.textContent).not.toContain(
       'Keep the row axis when subtracting the maximum.',
     );

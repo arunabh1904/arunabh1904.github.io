@@ -262,7 +262,13 @@ describe('code-practice primitive-first solutions', () => {
     expect(matching?.solutionCode).not.toContain('best_gt not in used');
     expect(bce?.solutionCode).toContain('(target != 0) & (target != 1)');
     expect(bce?.solutionCode).toContain('(probability < 0) | (probability > 1)');
-    expect(bce?.solutionNotes.join(' ')).toContain('max(z, 0) - z*y + log(1 + exp(-|z|))');
+    expect(bce?.solutionNotes).toHaveLength(6);
+    expect(bce?.solutionNotes.join(' ')).toContain(
+      'max(z_i, 0) - z_i y_i + log(1 + exp(-|z_i|))',
+    );
+    expect(bce?.solutionNotes.join('\n')).toContain(
+      '\n`L = -(1 / K) Σ_i [y_i log(p_i) + (1 - y_i) log(1 - p_i)]`',
+    );
     expect(bce?.solutionNotes.join(' ')).not.toContain('sigmoid, then clamp, then log is stable');
     expect(bce?.visual?.src).toBe(
       '/assets/images/code-glance-binary-cross-entropy-from-probabilities.svg',
