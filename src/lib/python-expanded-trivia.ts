@@ -166,11 +166,14 @@ def no_op() -> None:
   {
     id: 'python-list-append-amortized',
     topic: 'Collections & algorithms',
-    question: 'Why is `list.append` amortized `O(1)` rather than worst-case `O(1)`?',
-    answer: 'Occasional resize is `O(n)`',
-    acceptedAnswers: ['dynamic array resize', 'resizing'],
-    explanation: 'Most appends use spare capacity, but an occasional growth allocation copies all stored references.',
-    detail: 'Dynamic-array over-allocation spreads rare linear resizes across many cheap appends. The average stays constant over a sequence, while latency-sensitive code can still observe a costly individual append.',
+    code: `items = []
+for sample in stream:
+    items.append(sample)`,
+    question: 'Why can an occasional `append` take much longer than the surrounding appends?',
+    answer: 'The list must resize and copy its references',
+    acceptedAnswers: ['dynamic array resize', 'resizing', 'it reallocates and copies'],
+    explanation: 'A list is a dynamic array with spare capacity. Most appends fill one free slot, but a full array must allocate a larger block and copy its existing references before adding the new one.',
+    detail: 'That over-allocation spreads rare linear resizes across many cheap appends, so a sequence of appends averages constant time per item. “Amortized `O(1)`” describes that average; it does not promise constant latency for every individual call.',
   },
   {
     id: 'python-list-front-pop',
@@ -186,11 +189,13 @@ def no_op() -> None:
   {
     id: 'python-membership-complexity',
     topic: 'Collections & algorithms',
-    question: 'Which default membership costs apply to `list`, `set`, and `dict`?',
-    answer: '`O(n)` / average `O(1)` / average `O(1)`',
-    acceptedAnswers: ['linear constant constant'],
-    explanation: 'Lists scan values; sets and dictionaries use hashes, with linear worst cases still possible.',
-    detail: 'Choose a hashed collection when repeated membership dominates and elements have a stable hash contract. Building the index costs time and memory, so a one-off scan can still be simpler.',
+    code: `blocked_ids = load_blocked_ids()
+kept = [sample for sample in samples if sample.id not in blocked_ids]`,
+    question: 'Which container should `blocked_ids` usually be when this performs many membership checks?',
+    answer: 'A `set`',
+    acceptedAnswers: ['set', 'a set'],
+    explanation: 'A list scans its elements for each `in` check, while a set uses a hash table and usually finds a value in average constant time. Converting once can avoid repeating a linear scan for every sample.',
+    detail: 'Build a set when repeated membership dominates and IDs have a stable hash contract. The conversion itself costs time and memory, so a tiny collection used once may still be clearer as a list.',
   },
   {
     id: 'python-dict-view-live',
@@ -281,10 +286,11 @@ records.sort(key=lambda row: row.priority)`,
   {
     id: 'python-heap-top-k',
     topic: 'Collections & algorithms',
-    question: 'Which approach avoids sorting all `n` scores when only the largest `k` are needed?',
-    answer: '`heapq.nlargest(k, scores)`',
+    code: `top_100 = sorted(scores, reverse=True)[:100]`,
+    question: 'What should replace this full sort when `scores` is huge and only 100 values are needed?',
+    answer: '`heapq.nlargest(100, scores)`',
     acceptedAnswers: ['heapq nlargest', 'bounded heap'],
-    explanation: '`heapq.nlargest` can retain a small candidate heap instead of paying for a complete ordering.',
+    explanation: '`heapq.nlargest(100, scores)` keeps only the strongest candidates instead of ordering every score. It avoids work when the requested `k` is much smaller than the total input size.',
     detail: 'A full sort costs `O(n log n)`. Heap selection is attractive when `k` is much smaller than `n`; for large `k`, implementation constants can make sorting competitive.',
   },
   {
@@ -299,9 +305,11 @@ records.sort(key=lambda row: row.priority)`,
   {
     id: 'python-frozenset-key',
     topic: 'Collections & algorithms',
-    question: 'Which built-in collection can represent an unordered group as a `dict` key?',
+    code: `cache_key = {"decode", "resize"}
+result = cache[cache_key]`,
+    question: 'What immutable collection should replace `cache_key` so the unordered group can be used as a dictionary key?',
     answer: '`frozenset`',
-    explanation: 'A frozenset is immutable and hashable when its members are hashable, unlike a mutable `set`.',
+    explanation: 'A mutable set is unhashable because changing its members would change its identity as a key. A `frozenset` fixes the members at construction and is hashable when those members are hashable.',
     detail: 'Use a tuple when order carries meaning and a frozenset when membership alone defines identity. Duplicate source elements disappear, so it is not a multiset key.',
   },
   {
@@ -317,10 +325,13 @@ records.sort(key=lambda row: row.priority)`,
   {
     id: 'python-memoryview-zero-copy',
     topic: 'Collections & algorithms',
-    question: 'What does `memoryview(buffer)` avoid for binary parsing?',
-    answer: 'Copying the underlying bytes',
-    acceptedAnswers: ['zero-copy view', 'data copy'],
-    explanation: 'A memory view exposes the buffer protocol so slices can share the original binary storage.',
+    code: `buffer = bytearray(b"abcd")
+view = memoryview(buffer)[1:3]
+view[0] = ord("X")`,
+    question: 'What value does `buffer` contain after the write through `view`?',
+    answer: '`bytearray(b"aXcd")`',
+    acceptedAnswers: ['aXcd', 'bytearray(b"aXcd")'],
+    explanation: 'A memory view exposes an existing binary buffer without copying it. The slice still refers to `buffer`, so changing the first byte of the view changes the original bytearray.',
     detail: 'Zero-copy access reduces allocation and bandwidth, but it extends the source buffer lifetime and preserves aliasing. Consumers must respect mutability, format, shape, and contiguity constraints.',
   },
 
@@ -329,20 +340,28 @@ records.sort(key=lambda row: row.priority)`,
     id: 'python-positional-only-parameter',
     topic: 'Functions & iteration',
     code: `def normalize(value, /, *, mean=0.0, scale=1.0):
-    ...`,
-    question: 'What contracts do `/` and `*` impose?',
-    answer: 'Positional-only / keyword-only',
-    acceptedAnswers: ['value positional only mean and scale keyword only'],
-    explanation: '`value` cannot be passed by name; `mean` and `scale` cannot be passed positionally.',
+    ...
+
+a = normalize(batch, mean=0.5, scale=0.2)
+b = normalize(value=batch, mean=0.5, scale=0.2)
+c = normalize(batch, 0.5, 0.2)`,
+    question: 'Which call is valid: `a`, `b`, or `c`?',
+    answer: '`a`',
+    acceptedAnswers: ['a', 'only a'],
+    explanation: 'The `/` makes `value` positional-only, so naming it makes `b` invalid. The `*` makes `mean` and `scale` keyword-only, so passing them by position makes `c` invalid.',
     detail: 'Binding markers protect an API from ambiguous calls. Positional-only hides an implementation parameter name; keyword-only makes control names visible and prevents same-typed arguments from being swapped.',
   },
   {
     id: 'python-args-kwargs-shape',
     topic: 'Functions & iteration',
-    question: 'What runtime types do `*args` and `**kwargs` receive?',
-    answer: '`tuple` / `dict`',
-    acceptedAnswers: ['tuple and dict'],
-    explanation: 'Extra positional arguments are collected into a tuple and extra keyword arguments into a dictionary.',
+    code: `def capture(*args, **kwargs):
+    return args, kwargs
+
+result = capture("train", 32, shuffle=True)`,
+    question: 'What value does `result` contain?',
+    answer: '`(("train", 32), {"shuffle": True})`',
+    acceptedAnswers: ['((train, 32), {shuffle: true})', 'tuple and dict'],
+    explanation: '`*args` collects extra positional arguments into a tuple. `**kwargs` collects extra named arguments into a dictionary, so the call separates the two positional values from `shuffle=True`.',
     detail: 'Variadic parameters trade a closed, inspectable signature for forwarding flexibility. Preserve explicit parameters for important controls, and validate forwarded keyword names at the boundary that owns them.',
   },
   {
@@ -369,10 +388,10 @@ result = train()`,
         value += 1
         return value
     return increment`,
-    question: 'Why is `nonlocal value` required?',
-    answer: 'Rebind the enclosing name',
-    acceptedAnswers: ['modify closure binding', 'enclosing scope'],
-    explanation: 'Assignment would otherwise make `value` local to `increment` and read it before that local assignment.',
+    question: 'What error would `increment()` raise if `nonlocal value` were removed?',
+    answer: '`UnboundLocalError`',
+    acceptedAnswers: ['UnboundLocalError', 'unbound local error'],
+    explanation: 'Assignment normally makes `value` local to `increment`, so `value += 1` would try to read that uninitialized local name. `nonlocal` redirects the assignment to the `value` binding in `counter` instead.',
     detail: '`nonlocal` changes compile-time scope resolution for writes. Mutation of an enclosing mutable object needs no declaration because the binding itself is not being replaced.',
   },
   {
@@ -426,10 +445,12 @@ result = train()`,
   {
     id: 'python-any-all-short-circuit',
     topic: 'Functions & iteration',
-    question: 'Why should `any(predicate(x) for x in items)` usually use a generator?',
-    answer: 'Lazy short-circuiting',
-    acceptedAnswers: ['stops at first true', 'no temporary list'],
-    explanation: '`any` stops at the first truthy result, and a generator avoids computing or storing later values.',
+    code: `items = [2, 4, 5, 8]
+result = any(is_odd(item) for item in items)`,
+    question: 'Which item causes `any` to stop calling `is_odd`?',
+    answer: '`5`',
+    acceptedAnswers: ['5', 'after 5', 'the first true result'],
+    explanation: '`any` requests generator values until one is truthy, then stops. It tests `2`, `4`, and `5`; it never evaluates `8` or builds a temporary list of every predicate result.',
     detail: '`all` similarly stops at the first falsy result. Passing a prebuilt list defeats the compute and memory savings because every predicate runs before the reduction begins.',
   },
   {
@@ -501,10 +522,15 @@ result = len(obj)`,
   {
     id: 'python-eq-disables-hash',
     topic: 'Object model & OOP',
-    question: 'What happens when a class defines value-based `__eq__` but no `__hash__`?',
-    answer: 'Instances become unhashable',
-    acceptedAnswers: ['__hash__ is None'],
-    explanation: 'Python sets `__hash__ = None` to protect dictionaries and sets from an inconsistent equality-hash contract.',
+    code: `class Sample:
+    def __eq__(self, other):
+        return self.id == other.id
+
+seen = {Sample()}`,
+    question: 'What happens when Python tries to create `seen`?',
+    answer: '`TypeError`: `Sample` is unhashable',
+    acceptedAnswers: ['TypeError', 'unhashable', 'Sample is unhashable'],
+    explanation: 'Defining value equality without a matching hash makes Python set `Sample.__hash__ = None`. Set insertion therefore raises `TypeError` rather than allowing equal objects to occupy inconsistent hash locations.',
     detail: 'Equal objects must have equal hashes, and a stored hash must remain stable. Value objects can hash the immutable fields used by equality; mutable value objects should remain unhashable.',
   },
   {
@@ -558,10 +584,26 @@ result = len(obj)`,
   {
     id: 'python-property-setter-validation',
     topic: 'Object model & OOP',
-    question: 'What invariant can a `property` setter enforce that a public attribute cannot?',
-    answer: 'Validation on every assignment',
-    acceptedAnswers: ['controlled writes', 'assignment validation'],
-    explanation: 'A data descriptor can validate or normalize a value before storing the underlying state.',
+    code: `class Run:
+    def __init__(self) -> None:
+        self._progress = 0.0
+
+    @property
+    def progress(self) -> float:
+        return self._progress
+
+    @progress.setter
+    def progress(self, value: float) -> None:
+        if not 0.0 <= value <= 1.0:
+            raise ValueError("progress must be between 0 and 1")
+        self._progress = value
+
+run = Run()
+run.progress = 1.5`,
+    question: 'Does the final assignment change `run._progress`?',
+    answer: 'No; it raises `ValueError` first',
+    acceptedAnswers: ['no', 'ValueError', 'the setter rejects it'],
+    explanation: 'A property setter runs code whenever callers assign through the public attribute. This setter checks the range before updating `_progress`, so an invalid value cannot enter the object through `run.progress`.',
     detail: 'A property preserves attribute syntax while owning access. Keep the cost and failure mode attribute-like; an operation involving remote I/O or substantial work should be an explicit method.',
   },
   {
@@ -579,28 +621,56 @@ def index(self) -> Index:
   {
     id: 'python-slots-inheritance',
     topic: 'Object model & OOP',
-    question: 'Why can a slotted subclass still have an instance `__dict__`?',
-    answer: 'The subclass must also declare `__slots__`',
-    acceptedAnswers: ['subclass without slots gets dict'],
-    explanation: 'A subclass without its own slots normally receives a dictionary even when its parent is slotted.',
+    code: `class Point:
+    __slots__ = ("x", "y")
+
+class LabeledPoint(Point):
+    pass
+
+point = LabeledPoint()
+point.label = "origin"`,
+    question: 'Does the final assignment succeed?',
+    answer: 'Yes',
+    acceptedAnswers: ['yes', 'yes, the subclass has __dict__'],
+    explanation: 'Slots apply to one class layout, not automatically to every subclass. Because `LabeledPoint` does not declare its own `__slots__`, Python normally gives its instances a `__dict__`, allowing new names such as `label`.',
     detail: 'Slots are a per-class layout decision, not a deep immutability guarantee. Inheritance, weak references, dynamic attributes, and multiple slotted bases complicate the memory benefit.',
   },
   {
     id: 'python-context-manager-suppression',
     topic: 'Object model & OOP',
-    question: 'When does `__exit__` suppress an exception raised inside a `with` block?',
-    answer: 'When it returns truthy',
-    acceptedAnswers: ['truthy return'],
-    explanation: 'The exit method receives exception details and suppresses propagation only with a truthy return.',
+    code: `class IgnoreErrors:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return True
+
+with IgnoreErrors():
+    raise ValueError("bad sample")
+
+continue_training()`,
+    question: 'Does execution reach `continue_training()`?',
+    answer: 'Yes',
+    acceptedAnswers: ['yes', 'the exception is suppressed'],
+    explanation: '`__exit__` receives the exception details when the `with` block exits. Returning a truthy value tells Python that the manager handled the error, so the `ValueError` is suppressed and execution continues.',
     detail: 'Cleanup and suppression are separate decisions. Most resource managers release state and return false so failures remain visible; suppress only a narrow exception the abstraction genuinely handles.',
   },
   {
     id: 'python-iterator-protocol-class',
     topic: 'Object model & OOP',
-    question: 'Which `Iterator` protocol methods make an object its own iterator?',
-    answer: '`__iter__` and `__next__`',
-    acceptedAnswers: ['iter returns self next raises StopIteration'],
-    explanation: '`__iter__` returns the iterator, and `__next__` advances or raises `StopIteration` at exhaustion.',
+    code: `class BatchCursor:
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        ...  # return next batch or raise StopIteration
+
+cursor = BatchCursor()
+same_object = iter(cursor) is cursor`,
+    question: 'What value does `same_object` contain?',
+    answer: '`True`',
+    acceptedAnswers: ['true', 'True'],
+    explanation: 'An iterator implements `__next__` and returns itself from `__iter__`. It is therefore one advancing cursor; iterating it again does not create an independent traversal.',
     detail: 'An iterable may instead create a fresh iterator each time. Separating container from cursor enables independent passes; returning `self` makes traversal state shared and normally one-shot.',
   },
   {
@@ -647,19 +717,34 @@ user_id = UserId(7)`,
   {
     id: 'python-type-alias-vs-newtype',
     topic: 'Typing',
-    question: 'How does a type alias differ from `NewType`?',
-    answer: 'Synonym / distinct static type',
-    acceptedAnswers: ['alias is equivalent NewType is distinct'],
-    explanation: 'An alias gives another name to the same type; `NewType` asks a checker to treat the value as a subtype.',
+    code: `ExperimentId: TypeAlias = int
+UserId = NewType("UserId", int)
+
+def load_user(user_id: UserId) -> User: ...
+
+experiment_id: ExperimentId = 7
+load_user(experiment_id)`,
+    question: 'Which declaration lets a type checker flag the final call?',
+    answer: '`NewType`',
+    acceptedAnswers: ['NewType', 'UserId'],
+    explanation: 'A type alias is only another name for the same static type, so `ExperimentId` remains equivalent to `int`. `NewType` creates a distinct checked identity, allowing the checker to reject an ordinary integer where `UserId` is required.',
     detail: 'Use aliases to explain a complex shape and new types to prevent category mistakes. Neither mechanism validates external data, and both erase to ordinary Python behavior at runtime.',
   },
   {
     id: 'python-overload-implementation',
     topic: 'Typing',
-    question: 'What runtime implementation must follow a group of `@overload` signatures?',
-    answer: 'One concrete implementation',
-    acceptedAnswers: ['non-overload implementation'],
-    explanation: 'Overload declarations describe call variants to the checker; the final undecorated function executes at runtime.',
+    code: `@overload
+def load(raw: bytes) -> Image: ...
+
+@overload
+def load(raw: Path) -> Image: ...
+
+def load(raw: bytes | Path) -> Image:
+    return decode(raw)`,
+    question: 'Which function body executes when `load(path)` runs?',
+    answer: 'The final undecorated implementation',
+    acceptedAnswers: ['the last load', 'the concrete implementation', 'decode(raw)'],
+    explanation: '`@overload` declarations exist for static call checking and have no usable runtime implementation. The final undecorated function accepts every declared case and is the only body Python calls.',
     detail: 'Overloads are useful when return type depends on arguments in ways a union cannot express. The implementation must accept every declared case and still validate unexpected runtime calls as needed.',
   },
   {
@@ -686,10 +771,17 @@ user_id = UserId(7)`,
   {
     id: 'python-never-exhaustiveness',
     topic: 'Typing',
-    question: 'How can `assert_never(value)` help with a closed union?',
-    answer: 'Check exhaustiveness',
-    acceptedAnswers: ['unreachable branch', 'exhaustive match'],
-    explanation: 'A checker reports an error if a supposedly unreachable branch can still receive a union member.',
+    code: `Mode = Literal["train", "eval"]
+
+def run(mode: Mode) -> None:
+    if mode == "train":
+        train()
+    else:
+        assert_never(mode)`,
+    question: 'Why does a type checker report the final line as an error?',
+    answer: '`"eval"` can still reach it',
+    acceptedAnswers: ['eval is unhandled', 'the branches are not exhaustive', 'mode can be eval'],
+    explanation: '`assert_never` marks a branch that should be statically unreachable. Because the function handles only `"train"`, the remaining `"eval"` member proves that the decision is incomplete.',
     detail: 'The check converts future union growth into a static failure at every incomplete decision site. At runtime, `assert_never` also raises if the impossible path is reached.',
   },
   {
@@ -704,10 +796,19 @@ user_id = UserId(7)`,
   {
     id: 'python-runtime-checkable-protocol-limit',
     topic: 'Typing',
-    question: 'What does `@runtime_checkable` verify for `isinstance(value, ProtocolType)`?',
-    answer: 'Required attribute presence',
-    acceptedAnswers: ['members only', 'not signatures'],
-    explanation: 'Runtime protocol checks inspect required members but do not validate their type signatures.',
+    code: `@runtime_checkable
+class Transform(Protocol):
+    def __call__(self, sample: Sample) -> Sample: ...
+
+class Broken:
+    def __call__(self) -> int:
+        return 0
+
+result = isinstance(Broken(), Transform)`,
+    question: 'What value can `result` contain despite the incompatible call signature?',
+    answer: '`True`',
+    acceptedAnswers: ['true', 'True'],
+    explanation: 'A runtime-checkable protocol tests whether required attribute names exist, not whether their annotations or signatures match. `Broken` has `__call__`, so the coarse runtime check can pass even though static checking should reject it as a `Transform`.',
     detail: 'A successful check is weaker than static protocol conformance. Use it for coarse feature detection, not as proof that argument types, return types, or semantic behavior match.',
   },
   {
@@ -724,10 +825,15 @@ user_id = UserId(7)`,
   {
     id: 'python-generic-invariance',
     topic: 'Typing',
-    question: 'Why is a mutable `list[Dog]` not safely usable as `list[Animal]`?',
-    answer: 'Mutable lists are invariant',
-    acceptedAnswers: ['invariance', 'could insert another Animal'],
-    explanation: 'The wider reference could append a non-dog animal and violate the original list element contract.',
+    code: `def add_pet(animals: list[Animal]) -> None:
+    animals.append(Cat())
+
+dogs: list[Dog] = [Dog()]
+add_pet(dogs)`,
+    question: 'Why does a type checker reject the final call?',
+    answer: '`add_pet` could insert a `Cat` into `dogs`',
+    acceptedAnswers: ['list is invariant', 'it could append a Cat', 'dogs would no longer contain only dogs'],
+    explanation: '`list` is mutable: the function can both read animals and insert new ones. Treating `list[Dog]` as `list[Animal]` would allow `Cat()` into a list promised to contain only dogs, so mutable lists are invariant.',
     detail: 'Read-only producers can often be covariant because consumers only observe values. Mutable containers both produce and consume their element type, forcing a stricter invariant relationship.',
   },
   {
@@ -744,10 +850,15 @@ user_id = UserId(7)`,
   {
     id: 'python-pydantic-output-guarantee',
     topic: 'Pydantic v2',
-    question: 'Does Pydantic `BaseModel` primarily guarantee the input type or the validated output type?',
-    answer: 'Validated output type',
-    acceptedAnswers: ['output', 'result type'],
-    explanation: 'Lax validation may copy or coerce input so the resulting model conforms to declared fields and constraints.',
+    code: `class RunConfig(BaseModel):
+    epochs: int
+
+raw_epochs = "10"
+config = RunConfig(epochs=raw_epochs)`,
+    question: 'Why can `raw_epochs` be a `str` while `config.epochs` is an `int`?',
+    answer: 'Pydantic guarantees the validated output, not an unchanged input',
+    acceptedAnswers: ['Pydantic coerces input', 'validated output type', 'validation converts the string'],
+    explanation: 'Default Pydantic validation may parse, copy, or coerce incoming values. Its contract is that the stored model value matches the declared field after validation, not that the original representation remains unchanged.',
     detail: 'This distinction explains why “validation” can transform data. If preserving exact input representation matters, select strict fields or retain the raw payload separately rather than assuming validation is observation-only.',
   },
   {
@@ -763,60 +874,87 @@ user_id = UserId(7)`,
   {
     id: 'python-pydantic-validate-default',
     topic: 'Pydantic v2',
-    code: `retries: int = Field(default="ten", validate_default=True)`,
-    question: 'Why is `validate_default=True` important here?',
-    answer: 'Defaults are otherwise not validated by default',
-    acceptedAnswers: ['validate the default', 'default validation'],
-    explanation: 'The option runs the declared default through the field validation pipeline when it is used.',
+    code: `class RetryPolicy(BaseModel):
+    retries: int = Field(default="ten", validate_default=True)
+
+policy = RetryPolicy()`,
+    question: 'What happens when the caller omits `retries`?',
+    answer: '`ValidationError`',
+    acceptedAnswers: ['ValidationError', 'the invalid default is rejected'],
+    explanation: '`validate_default=True` sends the declared default through the normal field validator when callers omit that field. Because `"ten"` cannot become an integer, even the no-argument construction fails.',
     detail: 'A default is authored code but can still drift away from its annotation during refactoring. Validating defaults closes the gap between explicitly supplied and omitted values at some construction cost.',
   },
   {
     id: 'python-pydantic-alias-boundary',
     topic: 'Pydantic v2',
-    code: `model_name: str = Field(validation_alias="modelName", serialization_alias="model_name")`,
-    question: 'What boundary distinction do the two aliases express?',
-    answer: 'Input name / output name',
-    acceptedAnswers: ['validation vs serialization alias'],
-    explanation: 'The validation alias selects accepted input keys; the serialization alias controls the emitted key when aliases are requested.',
+    code: `class Config(BaseModel):
+    model_name: str = Field(
+        validation_alias="modelName",
+        serialization_alias="model_name",
+    )
+
+config = Config.model_validate({"modelName": "resnet"})
+payload = config.model_dump(by_alias=True)`,
+    question: 'Which key appears in `payload`: `modelName` or `model_name`?',
+    answer: '`model_name`',
+    acceptedAnswers: ['model_name', '"model_name"'],
+    explanation: 'A validation alias names the key accepted on input; a serialization alias names the key emitted when dumping by alias. The model can therefore read the old external spelling while writing the new one.',
     detail: 'Separate aliases are useful during schema migration because read and write contracts can move independently. Test both directions and avoid ambiguous alias collisions between fields.',
   },
   {
     id: 'python-pydantic-exclude-unset',
     topic: 'Pydantic v2',
-    question: 'What does `model_dump(exclude_unset=True)` preserve for a PATCH-style payload?',
-    answer: 'Only explicitly supplied fields',
-    acceptedAnswers: ['fields set by caller', 'model_fields_set'],
-    explanation: 'It omits fields that merely received defaults rather than being provided during validation.',
+    code: `class Patch(BaseModel):
+    lr: float = 1e-3
+    batch_size: int = 32
+
+patch = Patch(lr=1e-4)
+payload = patch.model_dump(exclude_unset=True)`,
+    question: 'What value does `payload` contain?',
+    answer: '`{"lr": 1e-4}`',
+    acceptedAnswers: ['{"lr": 0.0001}', 'lr only', '{"lr": 1e-4}'],
+    explanation: '`exclude_unset=True` keeps fields explicitly provided by the caller and omits fields that only received defaults. That preserves the PATCH distinction between “change `lr`” and “also overwrite `batch_size` with its default.”',
     detail: 'A partial update must distinguish “leave unchanged” from “write the default.” Explicit-field tracking preserves that intent, though later assignment can change which fields count as set.',
   },
   {
     id: 'python-pydantic-python-json-mode',
     topic: 'Pydantic v2',
-    question: 'How do `model_dump(mode="python")` and `model_dump(mode="json")` differ?',
-    answer: 'Python objects / JSON-compatible values',
-    acceptedAnswers: ['native vs serializable'],
-    explanation: 'Python mode can retain objects such as datetimes; JSON mode converts supported values to JSON-compatible representations.',
+    code: `event = Event(created_at=datetime(2026, 8, 26, tzinfo=UTC))
+python_value = event.model_dump(mode="python")["created_at"]
+json_value = event.model_dump(mode="json")["created_at"]`,
+    question: 'What runtime types do `python_value` and `json_value` have?',
+    answer: '`datetime` and `str`',
+    acceptedAnswers: ['datetime, string', 'datetime and str'],
+    explanation: 'Python mode retains native Python objects such as `datetime`. JSON mode converts supported fields to JSON-compatible values, so the same timestamp becomes a string suitable for a JSON encoder.',
     detail: 'Serialization mode is a representation boundary, not merely formatting. Choose it from the next consumer rather than dumping to JSON and parsing back to obtain normalized Python data.',
   },
   {
     id: 'python-pydantic-root-model',
     topic: 'Pydantic v2',
     code: `class Labels(RootModel[list[str]]):
-    pass`,
-    question: 'When is `RootModel` preferable to a wrapper field?',
-    answer: 'The payload itself is one root value',
-    acceptedAnswers: ['custom root type', 'bare list payload'],
-    explanation: 'A root model validates and serializes a list, mapping, or scalar as the document root without an extra object key.',
+    pass
+
+labels = Labels.model_validate(["cat", "dog"])
+payload = labels.model_dump()`,
+    question: 'What value does `payload` contain?',
+    answer: '`["cat", "dog"]`',
+    acceptedAnswers: ['[cat, dog]', '["cat", "dog"]'],
+    explanation: 'A root model validates one list, mapping, or scalar as the model itself. Dumping `Labels` therefore returns the bare list rather than wrapping it in an object such as `{"labels": [...]}`.',
     detail: 'Use a root model only when the wire schema truly is the contained value. A named field is easier to extend later with sibling metadata without breaking the payload shape.',
   },
   {
     id: 'python-pydantic-from-attributes',
     topic: 'Pydantic v2',
-    code: `model_config = ConfigDict(from_attributes=True)`,
-    question: 'What input style does `from_attributes=True` enable?',
-    answer: 'Object attribute extraction',
-    acceptedAnswers: ['ORM mode', 'attributes rather than mapping'],
-    explanation: 'Model validation may populate fields from object attributes, including nested objects, instead of requiring mappings.',
+    code: `class UserSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    name: str
+
+row = UserRow(name="Arun")
+user = UserSchema.model_validate(row)`,
+    question: 'Where does Pydantic read the value for `user.name`?',
+    answer: 'From `row.name`',
+    acceptedAnswers: ['row.name', 'the object attribute', 'from the attribute'],
+    explanation: '`from_attributes=True` lets model validation read named attributes from an object instead of requiring a dictionary. This is useful for ORM rows, but attribute access may trigger lazy I/O or descriptor code.',
     detail: 'Attribute access can trigger descriptors, lazy database loads, or exceptions. Treat ORM-to-schema conversion as an I/O boundary and control what has already been loaded.',
   },
   {
@@ -831,10 +969,20 @@ user_id = UserId(7)`,
   {
     id: 'python-pydantic-validator-order',
     topic: 'Pydantic v2',
-    question: 'Which input does a `mode="before"` field validator receive?',
-    answer: 'Raw input',
-    acceptedAnswers: ['unparsed value'],
-    explanation: 'Before validators run prior to Pydantic type parsing; after validators receive the validated field value.',
+    code: `class Config(BaseModel):
+    epochs: int
+
+    @field_validator("epochs", mode="before")
+    @classmethod
+    def inspect_epochs(cls, value):
+        print(type(value).__name__)
+        return value
+
+Config(epochs="10")`,
+    question: 'What does the validator print?',
+    answer: '`str`',
+    acceptedAnswers: ['str', 'string'],
+    explanation: 'A before-validator receives the raw input before Pydantic parses the annotated type. An after-validator would instead receive the converted integer `10`.',
     detail: 'Raw input can have any shape, so before validators must be defensive. Prefer after validators for type-safe invariants and use before mode only when normalization must precede parsing.',
   },
   {
@@ -849,10 +997,20 @@ user_id = UserId(7)`,
   {
     id: 'python-pydantic-computed-field',
     topic: 'Pydantic v2',
-    question: 'What does `@computed_field` add to a property?',
-    answer: 'Serialization and schema participation',
-    acceptedAnswers: ['include computed property in dump'],
-    explanation: 'The decorated property can appear in serialized model output and its serialization schema.',
+    code: `class Rectangle(BaseModel):
+    width: float
+    height: float
+
+    @computed_field
+    @property
+    def area(self) -> float:
+        return self.width * self.height
+
+payload = Rectangle(width=3, height=4).model_dump()`,
+    question: 'What value does `payload["area"]` contain?',
+    answer: '`12.0`',
+    acceptedAnswers: ['12', '12.0'],
+    explanation: '`@computed_field` makes a derived property participate in serialization and the serialization schema. `area` is calculated from validated fields when the model is dumped; callers do not supply it as input state.',
     detail: 'A computed field derives output rather than accepting validated input. Keep it deterministic and cheap enough for serialization, and avoid pretending a derived value is caller-controlled state.',
   },
   {
@@ -876,10 +1034,14 @@ user_id = UserId(7)`,
   {
     id: 'python-pydantic-concrete-collections',
     topic: 'Pydantic v2',
-    question: 'Why does Pydantic recommend `list[int]` over an abstract `Sequence[int]` for many fields?',
-    answer: 'Clear output type and faster validation',
-    acceptedAnswers: ['concrete collection performance', 'list conversion'],
-    explanation: 'Pydantic can coerce compatible inputs to a list without the broader checks required by an abstract container type.',
+    code: `class Batch(BaseModel):
+    sample_ids: list[int]
+
+batch = Batch(sample_ids=(1, 2, 3))`,
+    question: 'What concrete runtime type does `batch.sample_ids` have?',
+    answer: '`list`',
+    acceptedAnswers: ['list', 'a list'],
+    explanation: 'The field annotation describes Pydantic\'s normalized output as well as acceptable input. Pydantic can accept the tuple and convert it to a concrete list without the broader checks needed to preserve an abstract `Sequence` result.',
     detail: 'Field annotations describe the normalized result as well as accepted input. A concrete collection reduces ambiguity and validation work; use an abstraction only when preserving that broader output contract matters.',
   },
 
