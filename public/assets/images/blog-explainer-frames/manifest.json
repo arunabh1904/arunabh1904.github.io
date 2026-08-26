@@ -1,0 +1,588 @@
+{
+  "blog-attention-memory.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-01.webp",
+        "title": "How four attention variants store the same token sequence.",
+        "source": "Papers: Attention Is All You Need · GQA · DeepSeek-V2 · Gated DeltaNet",
+        "description": "How four attention variants store the same token sequence."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-02.webp",
+        "title": "MHA stores a full token history for every head.",
+        "source": "Baseline: Attention Is All You Need (2017)",
+        "description": "MHA stores a full token history for every head."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-03.webp",
+        "title": "GQA shares fewer full histories across query heads.",
+        "source": "Paper: GQA — Ainslie et al. (2023)",
+        "description": "GQA shares fewer full histories across query heads."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-04.webp",
+        "title": "MLA stores one compressed latent vector per token.",
+        "source": "Paper: DeepSeek-V2 (2024)",
+        "description": "MLA stores one compressed latent vector per token."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-05.webp",
+        "title": "DeltaNet updates one fixed-size recurrent state.",
+        "source": "Paper: Gated DeltaNet (2024)",
+        "description": "DeltaNet updates one fixed-size recurrent state."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-06.webp",
+        "title": "Storage format sets cache size and retrieval limits.",
+        "source": "Comparison: MHA · GQA · DeepSeek-V2 MLA · Gated DeltaNet",
+        "description": "Storage format sets cache size and retrieval limits."
+      }
+    ]
+  },
+  "blog-vlm-evidence-contract.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-01.webp",
+        "title": "Different outputs require different visual details.",
+        "source": "Papers: CLIP · LLaVA · Molmo · π0",
+        "description": "Different outputs require different visual details."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-02.webp",
+        "title": "CLIP retains features for image-text matching.",
+        "source": "Paper: CLIP (2021)",
+        "description": "CLIP retains features for image-text matching."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-03.webp",
+        "title": "LLaVA retains features used to generate text.",
+        "source": "Paper: LLaVA (2023)",
+        "description": "LLaVA retains features used to generate text."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-04.webp",
+        "title": "Molmo retains phrase-to-location coordinates.",
+        "source": "Paper: Molmo and PixMo (2024)",
+        "description": "Molmo retains phrase-to-location coordinates."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-05.webp",
+        "title": "π0 retains time-indexed state for action prediction.",
+        "source": "Paper: π0 (2024)",
+        "description": "π0 retains time-indexed state for action prediction."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-06.webp",
+        "title": "The required output determines which details are retained.",
+        "source": "Comparison: CLIP · LLaVA · Molmo · π0",
+        "description": "The required output determines which details are retained."
+      }
+    ]
+  },
+  "blog-multimodal-gradient-budget.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-01.webp",
+        "title": "Equal sample percentages can produce unequal optimization load.",
+        "source": "Illustrative synthesis: OpenVLA · FAST · π0",
+        "description": "Equal sample percentages can produce unequal optimization load."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-02.webp",
+        "title": "First count sampled examples by modality.",
+        "source": "Illustrative synthesis: OpenVLA · FAST · π0",
+        "description": "First count sampled examples by modality."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-03.webp",
+        "title": "Examples expand into different numbers of units.",
+        "source": "Illustrative synthesis: OpenVLA · FAST · π0",
+        "description": "Examples expand into different numbers of units."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-04.webp",
+        "title": "Those units consume different amounts of compute.",
+        "source": "Illustrative values — not reported paper measurements",
+        "description": "Those units consume different amounts of compute."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-05.webp",
+        "title": "Gradient norms show unequal updates to shared parameters.",
+        "source": "Proposed audit — not reported paper measurements",
+        "description": "Gradient norms show unequal updates to shared parameters."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-06.webp",
+        "title": "Report five ledgers, including independent decisions.",
+        "source": "Author synthesis from OpenVLA · FAST · π0 interfaces",
+        "description": "Report five ledgers, including independent decisions."
+      }
+    ]
+  },
+  "blog-vla-feedback-attribution.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-01.webp",
+        "title": "One failed rollout does not reveal a successful alternative.",
+        "source": "Shared example for APO · VLAC · RIPT-VLA",
+        "description": "One failed rollout does not reveal a successful alternative."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-02.webp",
+        "title": "Episode outcomes label the whole trajectory.",
+        "source": "Baseline: terminal-outcome supervision",
+        "description": "Episode outcomes label the whole trajectory."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-03.webp",
+        "title": "APO compares the failed action with the human correction.",
+        "source": "Paper: Action Preference Optimization (2025)",
+        "description": "APO compares the failed action with the human correction."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-04.webp",
+        "title": "Process feedback requires progress or matched states.",
+        "source": "Papers: VLAC (2025) · RIPT-VLA (2025)",
+        "description": "Process feedback requires progress or matched states."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-05.webp",
+        "title": "Observed feedback limits which labels the loss can use.",
+        "source": "Comparison: terminal outcome · APO · VLAC · RIPT-VLA",
+        "description": "Observed feedback limits which labels the loss can use."
+      }
+    ]
+  },
+  "blog-rl-learning-signals.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-01.webp",
+        "title": "Four methods define their training comparisons differently.",
+        "source": "Papers: PPO · DPO · DeepSeekMath (GRPO) · GKD",
+        "description": "Four methods define their training comparisons differently."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-02.webp",
+        "title": "PPO compares sampled actions with value estimates.",
+        "source": "Paper: Proximal Policy Optimization (2017)",
+        "description": "PPO compares sampled actions with value estimates."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-03.webp",
+        "title": "DPO compares a fixed chosen and rejected response.",
+        "source": "Paper: Direct Preference Optimization (2023)",
+        "description": "DPO compares a fixed chosen and rejected response."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-04.webp",
+        "title": "GRPO compares rewards within one sampled prompt group.",
+        "source": "Paper: DeepSeekMath (2024)",
+        "description": "GRPO compares rewards within one sampled prompt group."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-05.webp",
+        "title": "GKD matches teacher probabilities on student states.",
+        "source": "Paper: On-Policy Distillation / GKD (2023)",
+        "description": "GKD matches teacher probabilities on student states."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-06.webp",
+        "title": "Compare sampled data, feedback unit, and reference signal.",
+        "source": "Comparison: PPO · DPO · DeepSeekMath GRPO · GKD",
+        "description": "Compare sampled data, feedback unit, and reference signal."
+      }
+    ]
+  },
+  "blog-hermes-local-stack.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-01.webp",
+        "title": "The agent shell and model runtime are separate.",
+        "source": "System in this post: Hermes Agent · llama.cpp",
+        "description": "The agent shell and model runtime are separate."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-02.webp",
+        "title": "Hermes sends one request across a local API.",
+        "source": "Component: Hermes Agent",
+        "description": "Hermes sends one request across a local API."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-03.webp",
+        "title": "llama-server loads and runs the GGUF.",
+        "source": "Component: llama.cpp llama-server",
+        "description": "llama-server loads and runs the GGUF."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-04.webp",
+        "title": "llama-server returns generated tokens through the local API.",
+        "source": "Interface: OpenAI-compatible localhost endpoint",
+        "description": "llama-server returns generated tokens through the local API."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-05.webp",
+        "title": "Map each failure to the agent, API, server, or model file.",
+        "source": "System in this post: Hermes Agent · llama.cpp",
+        "description": "Map each failure to the agent, API, server, or model file."
+      }
+    ]
+  },
+  "local-gemma-long-prompt-latency.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-01.webp",
+        "title": "The benchmark changes one variable: prompt length.",
+        "source": "Measurements reported in this post",
+        "description": "The benchmark changes one variable: prompt length."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-02.webp",
+        "title": "Long prompts separate Gemma 4 models in prefill.",
+        "source": "Models: Gemma 4 · runtimes: MLX and llama.cpp",
+        "description": "Long prompts separate Gemma 4 models in prefill."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-03.webp",
+        "title": "Runtime choice compounds long-prompt latency.",
+        "source": "Measurements reported in this post",
+        "description": "Runtime choice compounds long-prompt latency."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-04.webp",
+        "title": "Decode speed moves less than first-token latency.",
+        "source": "Measurements reported in this post",
+        "description": "Decode speed moves less than first-token latency."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-05.webp",
+        "title": "Memory fit does not guarantee low first-token latency.",
+        "source": "Decision from this post’s local benchmark",
+        "description": "Memory fit does not guarantee low first-token latency."
+      }
+    ]
+  },
+  "local-qwen-long-prompt-latency.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-01.webp",
+        "title": "The benchmark changes one variable: prompt length.",
+        "source": "Measurements reported in this post",
+        "description": "The benchmark changes one variable: prompt length."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-02.webp",
+        "title": "Long prompts expose the Qwen prefill cost.",
+        "source": "Models: Qwen 3.5 and Qwen 3 · runtimes: MLX and llama.cpp",
+        "description": "Long prompts expose the Qwen prefill cost."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-03.webp",
+        "title": "MLX and llama.cpp diverge as models grow.",
+        "source": "Measurements reported in this post",
+        "description": "MLX and llama.cpp diverge as models grow."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-04.webp",
+        "title": "Decode remains steadier than first-token latency.",
+        "source": "Measurements reported in this post",
+        "description": "Decode remains steadier than first-token latency."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-05.webp",
+        "title": "The 4B models have the lowest measured first-token latency.",
+        "source": "Decision from this post’s local benchmark",
+        "description": "The 4B models have the lowest measured first-token latency."
+      }
+    ]
+  },
+  "autonomous-perception-camera-encoder.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-encoder/frame-01.webp",
+        "title": "The ego car closes on a cyclist emerging beside a parked van.",
+        "source": "Shared scene for NVAutoNet · EfficientDet · Deformable DETR · BEVFormer v2",
+        "description": "The ego car closes on a cyclist emerging beside a parked van."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-encoder/frame-02.webp",
+        "title": "A coarse feature map can erase the distant cyclist.",
+        "source": "Failure baseline: coarse single-scale camera features",
+        "description": "A coarse feature map can erase the distant cyclist."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-encoder/frame-03.webp",
+        "title": "Fine maps keep the cyclist; coarse maps keep road context.",
+        "source": "Paper: EfficientDet — bidirectional feature pyramid",
+        "description": "Fine maps keep the cyclist; coarse maps keep road context."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-encoder/frame-04.webp",
+        "title": "Image and BEV losses protect the same cyclist evidence.",
+        "source": "Paper: BEVFormer v2 — perspective-view supervision",
+        "description": "Image and BEV losses protect the same cyclist evidence."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-encoder/frame-05.webp",
+        "title": "Which camera approach preserves the distant cyclist?",
+        "source": "Comparison: EfficientDet · Deformable DETR · BEVFormer v2",
+        "description": "Which camera approach preserves the distant cyclist?"
+      }
+    ]
+  },
+  "autonomous-perception-lidar-encoder.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-01.webp",
+        "title": "The ego car moves while one LiDAR sweep is being measured.",
+        "source": "Shared scan for PointPillars · SECOND · DSVT · VoxelNeXt",
+        "description": "The ego car moves while one LiDAR sweep is being measured."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-02.webp",
+        "title": "Compensation aligns the curb, not the independently moving cyclist.",
+        "source": "Shared preprocessing: per-return time plus ego motion",
+        "description": "Compensation aligns the curb, not the independently moving cyclist."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-03.webp",
+        "title": "Pillars keep x-y location but collapse height inside each cell.",
+        "source": "Paper: PointPillars (2018)",
+        "description": "Pillars keep x-y location but collapse height inside each cell."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-04.webp",
+        "title": "Sparse voxels retain the cyclist height structure.",
+        "source": "Papers: SECOND (2018) · VoxelNeXt (2023)",
+        "description": "Sparse voxels retain the cyclist height structure."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-05.webp",
+        "title": "Alternating attention sets cross one sparse-window boundary.",
+        "source": "Paper: DSVT (2023)",
+        "description": "Alternating attention sets cross one sparse-window boundary."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-06.webp",
+        "title": "Which LiDAR encoder preserves the cyclist geometry?",
+        "source": "Comparison: PointPillars · SECOND · DSVT · VoxelNeXt",
+        "description": "Which LiDAR encoder preserves the cyclist geometry?"
+      }
+    ]
+  },
+  "autonomous-perception-radar-encoder.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-radar-encoder/frame-01.webp",
+        "title": "Three radar sweeps show the lead car closing from 34 m to 26 m.",
+        "source": "Shared returns for CRAFT · CRN · RCBEVDet",
+        "description": "Three radar sweeps show the lead car closing from 34 m to 26 m."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-radar-encoder/frame-02.webp",
+        "title": "Late radar fusion can confirm a camera proposal.",
+        "source": "Paper: CRAFT (2022) — proposal association",
+        "description": "Late radar fusion can confirm a camera proposal."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-radar-encoder/frame-03.webp",
+        "title": "Earlier radar fusion can move the proposal to the measured range.",
+        "source": "Paper: CRN (2023) — radar-assisted depth",
+        "description": "Earlier radar fusion can move the proposal to the measured range."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-radar-encoder/frame-04.webp",
+        "title": "Radar BEV retains moving and stationary returns separately.",
+        "source": "Paper: RCBEVDet (2024) — independent radar BEV",
+        "description": "Radar BEV retains moving and stationary returns separately."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-radar-encoder/frame-05.webp",
+        "title": "Where does each paper let radar change the geometry?",
+        "source": "Comparison: CRAFT · CRN · RCBEVDet",
+        "description": "Where does each paper let radar change the geometry?"
+      }
+    ]
+  },
+  "autonomous-perception-camera-lifting.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-01.webp",
+        "title": "The cyclist image patch could lie anywhere along one 3D ray.",
+        "source": "Shared ray for LSS · PETR · DETR3D · BEVFormer",
+        "description": "The cyclist image patch could lie anywhere along one 3D ray."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-02.webp",
+        "title": "LSS spreads the cyclist feature across predicted depth bins.",
+        "source": "Paper: Lift, Splat, Shoot (2020)",
+        "description": "LSS spreads the cyclist feature across predicted depth bins."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-03.webp",
+        "title": "An object query tests one candidate cyclist position.",
+        "source": "Paper: DETR3D (2021)",
+        "description": "An object query tests one candidate cyclist position."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-04.webp",
+        "title": "PETR attaches sampled 3D ray positions to image features.",
+        "source": "Paper: PETR (2022)",
+        "description": "PETR attaches sampled 3D ray positions to image features."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-05.webp",
+        "title": "A BEV cell samples several heights against the camera image.",
+        "source": "Paper: BEVFormer (2022)",
+        "description": "A BEV cell samples several heights against the camera image."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-06.webp",
+        "title": "How does each paper place the same cyclist in 3D?",
+        "source": "Comparison: LSS · PETR · DETR3D · BEVFormer",
+        "description": "How does each paper place the same cyclist in 3D?"
+      }
+    ]
+  },
+  "autonomous-perception-fusion-granularity.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-fusion-granularity/frame-01.webp",
+        "title": "Three sensors describe the same cyclist differently.",
+        "source": "Shared evidence for PointPainting · TransFusion · FUTR3D · BEVFusion",
+        "description": "Three sensors describe the same cyclist differently."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-fusion-granularity/frame-02.webp",
+        "title": "Point fusion keeps measurements at the cyclist location.",
+        "source": "Paper: PointPainting (2019)",
+        "description": "Point fusion keeps measurements at the cyclist location."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-fusion-granularity/frame-03.webp",
+        "title": "An object query keeps one compact cyclist state.",
+        "source": "Papers: TransFusion (2022) · FUTR3D (2022)",
+        "description": "An object query keeps one compact cyclist state."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-fusion-granularity/frame-04.webp",
+        "title": "Dense BEV also keeps lane, crosswalk, and free space.",
+        "source": "Paper: BEVFusion (2022)",
+        "description": "Dense BEV also keeps lane, crosswalk, and free space."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-fusion-granularity/frame-05.webp",
+        "title": "What spatial unit does each fusion paper preserve?",
+        "source": "Comparison: PointPainting · TransFusion / FUTR3D · BEVFusion",
+        "description": "What spatial unit does each fusion paper preserve?"
+      }
+    ]
+  },
+  "autonomous-perception-modality-dropout.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-modality-dropout/frame-01.webp",
+        "title": "Rain degrades the camera before the camera disappears.",
+        "source": "Shared failure for MetaBEV · UniBEV · Grace-BEV",
+        "description": "Rain degrades the camera before the camera disappears."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-modality-dropout/frame-02.webp",
+        "title": "Availability records which sensor streams are present.",
+        "source": "Paper: UniBEV (2023) — normalized available-stream weights",
+        "description": "Availability records which sensor streams are present."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-modality-dropout/frame-03.webp",
+        "title": "Training across sensor sets preserves one cyclist state.",
+        "source": "Paper: MetaBEV (2023) — sensor-subset training",
+        "description": "Training across sensor sets preserves one cyclist state."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-modality-dropout/frame-04.webp",
+        "title": "Reliability weights reduce the rain-damaged camera input.",
+        "source": "Paper: Grace-BEV (2026) — continuous trust gating",
+        "description": "Reliability weights reduce the rain-damaged camera input."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-modality-dropout/frame-05.webp",
+        "title": "Which paper handles absence, and which handles degradation?",
+        "source": "Comparison: MetaBEV · UniBEV · Grace-BEV",
+        "description": "Which paper handles absence, and which handles degradation?"
+      }
+    ]
+  },
+  "autonomous-perception-temporal-memory.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-01.webp",
+        "title": "The cyclist is observed, occluded by the van, then observed again.",
+        "source": "Shared sequence for BEVDet4D · BEVFormer · StreamPETR · Sparse4D v2",
+        "description": "The cyclist is observed, occluded by the van, then observed again."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-02.webp",
+        "title": "A warped field carries the cyclist region after ego motion.",
+        "source": "Papers: BEVDet4D (2022) · BEVFormer (2022)",
+        "description": "A warped field carries the cyclist region after ego motion."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-03.webp",
+        "title": "A recurrent track predicts the hidden cyclist and grows uncertainty.",
+        "source": "Paper: Sparse4D v2 (2023)",
+        "description": "A recurrent track predicts the hidden cyclist and grows uncertainty."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-04.webp",
+        "title": "A bounded query queue retains the hidden cyclist.",
+        "source": "Paper: StreamPETR (2023)",
+        "description": "A bounded query queue retains the hidden cyclist."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-05.webp",
+        "title": "Fresh pixels correct the cyclist track when it reappears.",
+        "source": "Shared requirement: current evidence must revise memory",
+        "description": "Fresh pixels correct the cyclist track when it reappears."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-06.webp",
+        "title": "What state does each temporal paper carry forward?",
+        "source": "Comparison: BEVDet4D / BEVFormer · StreamPETR · Sparse4D v2",
+        "description": "What state does each temporal paper carry forward?"
+      }
+    ]
+  },
+  "autonomous-perception-lidar-training-contracts.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-training-contracts/frame-01.webp",
+        "title": "One cyclist scan can give LiDAR three different roles.",
+        "source": "Comparison: Sparse-to-Dense · BEVDepth · CRKD",
+        "description": "One cyclist scan can give LiDAR three different roles."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-training-contracts/frame-02.webp",
+        "title": "LiDAR can label cyclist depth during camera training only.",
+        "source": "Paper: BEVDepth (2022)",
+        "description": "LiDAR can label cyclist depth during camera training only."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-training-contracts/frame-03.webp",
+        "title": "Live LiDAR input creates a deployed sensor dependency.",
+        "source": "Paper: Sparse-to-Dense (2017)",
+        "description": "Live LiDAR input creates a deployed sensor dependency."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-training-contracts/frame-04.webp",
+        "title": "A LiDAR teacher can train a camera-radar student.",
+        "source": "Paper: CRKD (2024)",
+        "description": "A LiDAR teacher can train a camera-radar student."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-training-contracts/frame-05.webp",
+        "title": "Where does each paper place the LiDAR tensor?",
+        "source": "Comparison: Sparse-to-Dense · BEVDepth · CRKD",
+        "description": "Where does each paper place the LiDAR tensor?"
+      }
+    ]
+  }
+}

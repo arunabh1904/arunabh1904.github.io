@@ -5,8 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { CALM_BLOG_STORIES, PERCEPTION_BLOG_GIFS } from '../scripts/calm-blog-gifs.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-type VisualStep = { title: string; seconds: number };
-const perceptionStories = CALM_BLOG_STORIES as Record<string, { steps: VisualStep[] }>;
+type VisualStep = { title: string; source: string; seconds: number };
+type VisualStory = { steps: VisualStep[]; snapshot(index: number): { svg: string } };
+const perceptionStories = CALM_BLOG_STORIES as Record<string, VisualStory>;
 const authoredSvgFiles = [
   'blog-audio-release-pipeline.svg',
   'autonomous-driving-perception-system.svg',
@@ -50,6 +51,16 @@ describe('authored Blog visual language', () => {
     for (const [filename, story] of Object.entries(CALM_BLOG_STORIES)) {
       for (const step of story.steps) {
         expect(step.title.length, `${filename}: ${step.title}`).toBeLessThanOrEqual(72);
+        expect(step.source.length, `${filename}: ${step.source}`).toBeLessThanOrEqual(84);
+      }
+    }
+  });
+
+  it('keeps paper or system provenance inside every explainer frame', () => {
+    for (const [filename, story] of Object.entries(CALM_BLOG_STORIES)) {
+      for (const [index, step] of story.steps.entries()) {
+        expect(step.source.trim(), `${filename}: frame ${index + 1}`).not.toBe('');
+        expect(story.snapshot(index).svg, `${filename}: frame ${index + 1}`).toContain(step.source.toUpperCase());
       }
     }
   });
@@ -62,6 +73,15 @@ describe('authored Blog visual language', () => {
       const groundedSteps = story.steps.filter((step) => concreteRoadTerms.test(step.title));
       expect(groundedSteps.length, filename).toBeGreaterThanOrEqual(3);
       expect(new Set(story.steps.map((step) => step.seconds)).size, filename).toBeGreaterThan(1);
+    }
+  });
+
+  it('keeps the concrete road actor visible in every perception takeaway frame', () => {
+    for (const filename of PERCEPTION_BLOG_GIFS) {
+      const story = perceptionStories[filename];
+      const finalSvg = story.snapshot(story.steps.length - 1).svg;
+      expect(finalSvg, filename).toMatch(/cyclist|lead car/i);
+      expect(finalSvg, filename).not.toMatch(/Observed change|Useful contract|Failure mode/);
     }
   });
 

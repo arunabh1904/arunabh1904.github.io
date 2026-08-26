@@ -101,9 +101,9 @@ The first bigger model result, `Qwen 3.5 9B`, is useful because it shows where t
 
 The cross-runtime results sharpened the runtime recommendation. On `Qwen 3.5 9B`, `MLX` beat `llama.cpp` on both suites by a healthy margin, especially once prompt length hit the `8K` range. On `Qwen 3 14B`, the short prompt was much closer, but MLX still pulled ahead on the long prompt where prompt processing dominates the experience.
 
-The animation holds every measured model/runtime row fixed and changes only the input length. The important motion is horizontal: long prompts create a much larger time-to-first-token penalty than the decode column alone suggests.
+The frame-by-frame comparison holds every measured model/runtime row fixed and changes only the input length. Long prompts create a much larger time-to-first-token penalty than the decode column alone suggests.
 
-[![Animation comparing short- and long-prompt time to first token and decode throughput for Qwen 3.5 and Qwen 3 on MLX and llama.cpp](/assets/images/local-qwen-long-prompt-latency.gif)](/assets/images/local-qwen-long-prompt-latency.gif)
+<div class="architecture-comparison blog-frame-explainer" data-blog-frame-explainer="local-qwen-long-prompt-latency.gif"><div class="blog-frame-explainer__viewport"><a href="/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-01.webp"><img src="/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-01.webp" alt="Manual explainer comparing short- and long-prompt time to first token and decode throughput for Qwen 3.5 and Qwen 3 on MLX and llama.cpp"></a></div></div>
 
 *The `4B` models remain the interactive tier. `Qwen 3 14B` still fits easily, but TTFT reaches `4.9 s` on MLX and `11.1 s` on llama.cpp in the `8K` suite. Custom visualization of this post's benchmark tables; measurements are from one 64 GB M5 Max on April 4, 2026. Qwen 3.6 is intentionally absent because it was released after the run.*
 

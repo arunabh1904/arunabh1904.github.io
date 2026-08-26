@@ -356,6 +356,115 @@ function initBlogImageViewer(signal) {
   }, { once: true });
 }
 
+async function initBlogFrameExplainers(signal) {
+  const explainers = Array.from(document.querySelectorAll('[data-blog-frame-explainer]')).filter(
+    (node) => node instanceof HTMLElement && node.dataset.frameExplainerReady !== 'true',
+  );
+  if (explainers.length === 0) {
+    return;
+  }
+
+  let manifest;
+  try {
+    const response = await fetch('/assets/images/blog-explainer-frames/manifest.json', { signal });
+    if (!response.ok) {
+      throw new Error(`Explainer manifest returned ${response.status}`);
+    }
+    manifest = await response.json();
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return;
+    }
+    console.error('Could not initialize Blog frame explainers.', error);
+    return;
+  }
+
+  explainers.forEach((explainer) => {
+    const storyName = explainer.dataset.blogFrameExplainer;
+    const story = manifest[storyName];
+    const image = explainer.querySelector('img');
+    const link = explainer.querySelector('a');
+    if (!storyName || !story || !Array.isArray(story.frames) || story.frames.length === 0 || !(image instanceof HTMLImageElement)) {
+      return;
+    }
+
+    const baseAlt = image.alt.trim() || 'Technical explainer';
+    const controls = document.createElement('div');
+    controls.className = 'blog-frame-explainer__controls';
+
+    const previous = document.createElement('button');
+    previous.type = 'button';
+    previous.className = 'blog-frame-explainer__button';
+    previous.textContent = '←';
+    previous.setAttribute('aria-label', 'Previous explainer frame');
+
+    const range = document.createElement('input');
+    range.className = 'blog-frame-explainer__range';
+    range.type = 'range';
+    range.min = '0';
+    range.max = String(story.frames.length - 1);
+    range.step = '1';
+    range.value = '0';
+    range.setAttribute('aria-label', 'Explainer frame');
+
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.className = 'blog-frame-explainer__button';
+    next.textContent = '→';
+    next.setAttribute('aria-label', 'Next explainer frame');
+
+    const status = document.createElement('output');
+    status.className = 'blog-frame-explainer__status';
+    status.setAttribute('aria-live', 'polite');
+
+    const hint = document.createElement('span');
+    hint.className = 'blog-frame-explainer__hint';
+    hint.textContent = 'Use the slider or ← → keys';
+
+    let index = 0;
+    const update = (nextIndex) => {
+      index = clamp(nextIndex, 0, story.frames.length - 1);
+      const frame = story.frames[index];
+      image.src = frame.src;
+      image.alt = `${baseAlt} Frame ${index + 1}: ${frame.description || frame.title}`;
+      if (link instanceof HTMLAnchorElement) {
+        link.href = frame.src;
+      }
+      range.value = String(index);
+      range.setAttribute('aria-valuetext', `${index + 1} of ${story.frames.length}: ${frame.title}`);
+      status.textContent = `${index + 1} / ${story.frames.length}`;
+      previous.disabled = index === 0;
+      next.disabled = index === story.frames.length - 1;
+
+      [story.frames[index - 1], story.frames[index + 1]].forEach((adjacentFrame) => {
+        if (adjacentFrame?.src) {
+          const preload = new Image();
+          preload.src = adjacentFrame.src;
+        }
+      });
+    };
+
+    previous.addEventListener('click', () => update(index - 1), { signal });
+    next.addEventListener('click', () => update(index + 1), { signal });
+    range.addEventListener('input', () => update(Number(range.value)), { signal });
+    explainer.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+        return;
+      }
+      event.preventDefault();
+      update(index + (event.key === 'ArrowRight' ? 1 : -1));
+    }, { signal });
+
+    controls.append(previous, range, next, status, hint);
+    explainer.append(controls);
+    explainer.dataset.frameExplainerReady = 'true';
+    explainer.tabIndex = 0;
+    explainer.setAttribute('role', 'group');
+    explainer.setAttribute('aria-label', `${baseAlt}. Manual frame-by-frame explainer.`);
+    update(0);
+  });
+}
+
 function initSiteControls() {
   siteControlsAbortController?.abort();
   siteControlsAbortController = new AbortController();
@@ -370,6 +479,7 @@ function initSiteControls() {
   });
 
   buildSectionsNav(signal);
+  initBlogFrameExplainers(signal);
   initBlogImageViewer(signal);
 }
 
