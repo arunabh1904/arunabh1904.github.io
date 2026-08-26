@@ -2,6 +2,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { PERCEPTION_BLOG_GIFS, renderCalmBlogGifs } from './calm-blog-gifs.mjs';
 
 const require = createRequire(import.meta.url);
 let sharp;
@@ -1005,20 +1006,29 @@ function latentMemoryFrame(frame){
   return svg(b,'A compression ladder keeps the same driving scene while moving from a dense BEV field to sparse object queries, a compact set of learned latent tokens, and finally one pooled embedding that loses explicit spatial separation.');
 }
 
-const animations = [
-  ['autonomous-perception-camera-encoder.gif', cameraEncoderFrame],
+const legacyAnimations = [
   ['autonomous-perception-vision-encoder.gif', visionFrame],
+  ['autonomous-perception-proposal-recall.gif', proposalRecallFrame],
+  ['autonomous-perception-multitask-gradients.gif', multitaskFrame],
+  ['autonomous-perception-latent-memory.gif', latentMemoryFrame],
+];
+
+// Keep the original renderers as implementation references while the calm
+// storyboards replace their Blog-facing outputs. This parity check prevents a
+// referenced perception GIF from being omitted from either visual system.
+const replacedBlogAnimations = new Map([
+  ['autonomous-perception-camera-encoder.gif', cameraEncoderFrame],
   ['autonomous-perception-lidar-encoder.gif', lidarFrame],
   ['autonomous-perception-radar-encoder.gif', radarFrame],
   ['autonomous-perception-camera-lifting.gif', liftingFrame],
   ['autonomous-perception-fusion-granularity.gif', fusionFrame],
-  ['autonomous-perception-proposal-recall.gif', proposalRecallFrame],
   ['autonomous-perception-modality-dropout.gif', dropoutFrame],
-  ['autonomous-perception-multitask-gradients.gif', multitaskFrame],
   ['autonomous-perception-lidar-training-contracts.gif', lidarContractFrame],
   ['autonomous-perception-temporal-memory.gif', temporalFrame],
-  ['autonomous-perception-latent-memory.gif', latentMemoryFrame],
-];
+]);
+if (!PERCEPTION_BLOG_GIFS.every((filename) => replacedBlogAnimations.has(filename))) {
+  throw new Error('The calm perception storyboard set is incomplete.');
+}
 
 async function renderAnimation(filename, renderer) {
   const key = filename.replace(/\.gif$/, '');
@@ -1047,5 +1057,6 @@ async function renderAnimation(filename, renderer) {
 
 mkdirSync(OUTPUT, { recursive: true });
 mkdirSync(SCRATCH, { recursive: true });
-for (const [filename, renderer] of animations) await renderAnimation(filename, renderer);
+for (const [filename, renderer] of legacyAnimations) await renderAnimation(filename, renderer);
 rmSync(SCRATCH, { recursive: true, force: true });
+await renderCalmBlogGifs(PERCEPTION_BLOG_GIFS, { root: ROOT, outputDir: OUTPUT });
