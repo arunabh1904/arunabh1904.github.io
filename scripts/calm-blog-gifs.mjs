@@ -100,9 +100,12 @@ function token(label, x, y, opacity = 1, accent = C.amber, width = 92) {
   return `${rect(x, y, width, 42, C.bg, 9, opacity, accent, 1.2)}${text(label, x + width / 2, y + 27, 15, C.ink, 'middle', 560, opacity)}`;
 }
 
-function top(index, total, title, opacity) {
+function top(index, total, title, source, opacity) {
   const titleSize = title.length > 62 ? 24 : title.length > 50 ? 26 : 30;
-  return `${text(`${String(index).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, 62, 65, 12, C.amber, 'start', 650, opacity, 1.9)}${text(title, 480, 86, titleSize, C.ink, 'middle', 620, opacity)}`;
+  const sourceLine = source
+    ? text(source.toUpperCase(), 480, 116, 12, C.teal, 'middle', 700, opacity, 1.15)
+    : '';
+  return `${text(`${String(index).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, 62, 38, 12, C.amber, 'start', 650, opacity, 1.9)}${text(title, 480, 82, titleSize, C.ink, 'middle', 620, opacity)}${sourceLine}`;
 }
 
 function footer(value, opacity, color = C.muted) {
@@ -241,7 +244,7 @@ function drawAttention(mode, local, opacity) {
     out += arrow(532, 285, 646, 285, C.teal, 2, opacity * p);
     out += rect(676, 185, 170, 170, C.bg, 16, opacity, C.teal, 1.4);
     out += grid(697, 207, 5, 5, 28, C.teal, p, opacity);
-    out += text('Sₜ', 761, 390, 18, C.teal, 'middle', 650, opacity);
+    out += text('S_t', 761, 390, 18, C.teal, 'middle', 650, opacity);
     return out + footer('State size stays fixed. Individual token records disappear.', opacity * reveal(local, 0.66, 0.80), C.teal);
   }
   let out = '';
@@ -249,7 +252,7 @@ function drawAttention(mode, local, opacity) {
     ['MHA', C.teal, '4 separate K/V histories'],
     ['GQA', C.blue, '2 shared K/V histories'],
     ['MLA', C.amber, 'one zᵢ per token'],
-    ['DeltaNet', C.green, 'one fixed state Sₜ'],
+    ['DeltaNet', C.green, 'one fixed state S_t'],
   ];
   rows.forEach(([name, color, result], row) => {
     const y = 142 + row * 72;
@@ -599,13 +602,20 @@ function sensorEvidenceCards(opacity) {
   }).join('');
 }
 
+function methodCard(x, y, width, height, paper, mechanism, result, color, opacity, actor = 'cyclist') {
+  const actorMark = actor === 'car'
+    ? vehicle(x + width - 48, y + 19, 24, 34, color, opacity)
+    : cyclist(x + width - 36, y + 28, opacity, C.green);
+  return `${rect(x, y, width, height, C.bg, 10, opacity, color, 1.2)}${text(paper, x + 18, y + 22, 14, color, 'start', 750, opacity)}${text(mechanism, x + 18, y + 44, 14, C.ink, 'start', 600, opacity)}${text(result, x + 18, y + height - 10, 12, C.muted, 'start', 560, opacity)}${actorMark}`;
+}
+
 function drawCameraEncoder(mode, local, opacity) {
   const p = reveal(local);
   if (mode === 'input') return `${forwardDrivingScene(64, 180, 250, 190, 0.08, opacity, { boxActor: true })}${forwardDrivingScene(355, 180, 250, 190, 0.36, opacity, { boxActor: true })}${forwardDrivingScene(646, 180, 250, 190, 0.78, opacity, { boxActor: true })}${text('distant · a few pixels', 189, 405, 15, C.red, 'middle', 650, opacity)}${text('approaching', 480, 405, 15, C.amber, 'middle', 650, opacity)}${text('close · clear shape', 771, 405, 15, C.green, 'middle', 650, opacity)}${footer('The same cyclist grows in the image as the ego car closes distance.', opacity, C.green)}`;
   if (mode === 'coarse') return `${forwardDrivingScene(70, 170, 340, 220, 0.31, opacity, { boxActor: true })}${ring(290, 291, 24, C.green, opacity, 1.8)}${text('CYCLIST', 290, 334, 14, C.green, 'middle', 700, opacity)}${arrow(434, 280, 528, 280, C.red, 2, opacity * p)}${spatialGrid(566, 188, 286, 188, 5, 4, opacity, C.red, { col: 3, row: 1, color: C.red, crossed: true })}${text('one stride-16 cell mixes actor + background', 709, 409, 15, C.red, 'middle', 650, opacity)}${footer('The coarse map has no separate cyclist cell for later geometry to recover.', opacity, C.red)}`;
   if (mode === 'pyramid') return `${forwardDrivingScene(60, 172, 310, 210, 0.31, opacity, { boxActor: true })}${ring(260, 288, 23, C.green, opacity, 1.8)}${text('CYCLIST', 260, 329, 13, C.green, 'middle', 700, opacity)}${arrow(392, 278, 470, 278, C.teal, 2, opacity * p)}${text('FINE MAP · actor boundary', 632, 169, 14, C.green, 'middle', 700, opacity)}${spatialGrid(486, 184, 292, 112, 10, 4, opacity, C.green, { col: 7, row: 1, color: C.green })}${text('COARSE MAP · intersection context', 676, 329, 14, C.teal, 'middle', 700, opacity)}${spatialGrid(562, 344, 228, 66, 5, 2, opacity, C.teal)}${footer('The pyramid keeps a cyclist cell and a wider view of the lane and crosswalk.', opacity, C.teal)}`;
   if (mode === 'supervision') return `${forwardDrivingScene(70, 170, 340, 220, 0.31, opacity, { boxActor: true })}${ring(290, 291, 24, C.green, opacity, 1.8)}${arrow(434, 280, 520, 280, C.green, 2, opacity * p)}${rect(548, 176, 310, 92, C.bg, 10, opacity, C.green, 1.2)}${text('IMAGE LOSS', 703, 208, 14, C.green, 'middle', 700, opacity)}${text('cyclist remains separable in the image map', 703, 244, 15, C.ink, 'middle', 560, opacity)}${rect(548, 286, 310, 92, C.bg, 10, opacity, C.teal, 1.2)}${text('BEV LOSS', 703, 318, 14, C.teal, 'middle', 700, opacity)}${text('cyclist lands in the correct metric cell', 703, 354, 15, C.ink, 'middle', 560, opacity)}${footer('Perspective supervision gives the backbone a direct reason to keep the small actor.', opacity, C.green)}`;
-  return `${forwardDrivingScene(62, 170, 330, 220, 0.31, opacity, { boxActor: true })}${ring(275, 291, 25, C.green, opacity, 2)}${text('CYCLIST', 275, 335, 14, C.green, 'middle', 750, opacity)}${arrow(415, 280, 490, 280, C.teal, 2, opacity)}${text('COARSE ONLY', 630, 172, 14, C.red, 'middle', 700, opacity)}${spatialGrid(506, 188, 248, 82, 5, 2, opacity, C.red, { col: 3, row: 0, color: C.red, crossed: true })}${text('actor merged', 782, 235, 14, C.red, 'start', 650, opacity)}${text('FINE + COARSE PYRAMID', 660, 316, 14, C.green, 'middle', 700, opacity)}${spatialGrid(506, 332, 248, 82, 10, 3, opacity, C.green, { col: 7, row: 1, color: C.green })}${text('actor retained', 782, 379, 14, C.green, 'start', 650, opacity)}${footer('If the camera encoder erases the cyclist, projection and fusion cannot recreate it.', opacity, C.amber)}`;
+  return `${forwardDrivingScene(52, 166, 330, 230, 0.31, opacity, { boxActor: true })}${ring(265, 291, 25, C.green, opacity, 2)}${text('same distant cyclist', 217, 427, 14, C.green, 'middle', 700, opacity)}${arrow(404, 280, 472, 280, C.teal, 2, opacity)}${methodCard(494, 142, 388, 82, 'EFFICIENTDET', 'bidirectional feature pyramid', 'fine actor + coarse scene context', C.green, opacity)}${methodCard(494, 242, 388, 82, 'DEFORMABLE DETR', 'sparse samples around a query', 'preserves selected image evidence', C.blue, opacity)}${methodCard(494, 342, 388, 82, 'BEVFORMER V2', 'perspective-view image loss', 'directly supervises the cyclist feature', C.teal, opacity)}${footer('The papers preserve the same cyclist through different mechanisms.', opacity, C.amber)}`;
 }
 
 function drawLidar(mode, local, opacity) {
@@ -615,7 +625,7 @@ function drawLidar(mode, local, opacity) {
   if (mode === 'pillars') return `${roadScene(75, 175, 330, 210, p, opacity, { sensor: 'lidar' })}${arrow(428, 280, 518, 280, C.amber, 2, opacity * p)}${bev(565, 178, 285, 210, opacity, C.amber)}${rect(720, 248, 36, 42, C.bg, 4, opacity, C.green, 1.5)}${text('one x-y cell', 707, 414, 16, C.amber, 'middle', 650, opacity)}${footer('Pillars keep horizontal location but collapse the height structure inside each cell.', opacity * reveal(local, 0.62, 0.78), C.amber)}`;
   if (mode === 'voxels') return `${roadScene(75, 175, 330, 210, p, opacity, { sensor: 'lidar' })}${arrow(428, 280, 518, 280, C.blue, 2, opacity * p)}${grid(565, 178, 8, 6, 35, C.blue, 0.38 * p, opacity)}${text('occupied 3D cells only', 705, 414, 16, C.blue, 'middle', 650, opacity)}${footer('Sparse voxels preserve height and spend compute only where the scan has returns.', opacity * reveal(local, 0.62, 0.78), C.blue)}`;
   if (mode === 'windows') return `${text('LAYER 1 · vertical sets', 290, 161, 14, C.blue, 'middle', 700, opacity)}${spatialGrid(140, 178, 300, 190, 6, 5, opacity, C.blue, { col: 2, row: 2, color: C.green })}${line(290, 178, 290, 368, C.amber, 3, opacity)}${cyclist(265, 273, opacity, C.green)}${text('cyclist at set edge', 290, 401, 14, C.green, 'middle', 650, opacity)}${arrow(464, 273, 536, 273, C.teal, 2, opacity * p)}${text('LAYER 2 · horizontal sets', 690, 161, 14, C.teal, 'middle', 700, opacity)}${spatialGrid(540, 178, 300, 190, 6, 5, opacity, C.teal, { col: 2, row: 2, color: C.green })}${line(540, 292, 840, 292, C.amber, 3, opacity)}${cyclist(665, 273, opacity, C.green)}${arrow(646, 271, 706, 325, C.green, 1.8, opacity)}${text('next layer crosses the old boundary', 690, 401, 14, C.green, 'middle', 650, opacity)}${footer('Alternating set directions let nearby occupied voxels exchange context without global attention.', opacity, C.teal)}`;
-  return `${roadScene(62, 166, 330, 230, 0.72, opacity, { sensor: 'lidar', labels: true })}${ring(275, 232, 25, C.green, opacity, 1.8)}${text('same cyclist returns', 227, 427, 14, C.green, 'middle', 650, opacity)}${arrow(416, 281, 486, 281, C.teal, 2, opacity)}${rect(512, 154, 360, 112, C.bg, 10, opacity, C.amber, 1.2)}${text('PILLAR', 536, 187, 14, C.amber, 'start', 700, opacity)}${text('x-y cell retained', 536, 222, 16, C.ink, 'start', 600, opacity)}${text('height pooled', 842, 222, 16, C.red, 'end', 650, opacity)}${rect(512, 286, 360, 112, C.bg, 10, opacity, C.blue, 1.2)}${text('SPARSE VOXELS', 536, 319, 14, C.blue, 'start', 700, opacity)}${text('x-y-z cells retained', 536, 354, 16, C.ink, 'start', 600, opacity)}${text('occupied cells only', 842, 354, 16, C.green, 'end', 650, opacity)}${footer('Keep the cyclist geometry until the downstream task no longer needs its height.', opacity, C.amber)}`;
+  return `${roadScene(52, 166, 330, 230, 0.72, opacity, { sensor: 'lidar', labels: true })}${ring(265, 232, 25, C.green, opacity, 1.8)}${text('same cyclist returns', 217, 427, 14, C.green, 'middle', 650, opacity)}${arrow(404, 280, 472, 280, C.teal, 2, opacity)}${methodCard(494, 142, 388, 82, 'POINTPILLARS', 'pool each vertical column', 'fast 2D grid; cyclist height is lost', C.amber, opacity)}${methodCard(494, 242, 388, 82, 'SECOND / VOXELNEXT', 'retain occupied x-y-z voxels', 'cyclist height survives sparsely', C.blue, opacity)}${methodCard(494, 342, 388, 82, 'DSVT', 'alternate sparse attention sets', 'context crosses window boundaries', C.teal, opacity)}${footer('Each paper chooses where geometry is compressed and how sparse cells communicate.', opacity, C.amber)}`;
 }
 
 function radarSweeps(opacity, progress) {
@@ -661,7 +671,7 @@ function drawRadar(mode, local, opacity) {
   if (mode === 'proposal') return `${radarPlacementLane(274, opacity, false)}${text('PROPOSAL FUSION', 480, 158, 15, C.red, 'middle', 750, opacity)}${footer('The radar confirms that a lead car exists, but the camera branch still controls its placement.', opacity, C.rose)}`;
   if (mode === 'depth') return `${radarPlacementLane(274, opacity, true)}${text('DEPTH FUSION', 480, 158, 15, C.green, 'middle', 750, opacity)}${footer('The radar measurement moves the camera feature to the supported 26 m range.', opacity, C.green)}`;
   if (mode === 'bev') return `${roadScene(150, 155, 660, 255, p, opacity, { sensor: 'radar', labels: true })}${text('LEAD CAR · 26 m · −5 m/s', 480, 184, 15, C.rose, 'middle', 700, opacity)}${text('GUARDRAIL RETURN · 0 m/s', 682, 384, 14, C.muted, 'middle', 600, opacity)}${footer('A radar BEV keeps moving and stationary returns separate until other sensors resolve identity.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
-  return `${text('PROPOSAL FUSION · box stays wrong', 480, 150, 14, C.red, 'middle', 700, opacity)}${radarPlacementLane(238, opacity, false)}${text('DEPTH FUSION · box moves to 26 m', 480, 331, 14, C.green, 'middle', 700, opacity)}${radarPlacementLane(397, opacity, true)}${footer('Fuse radar before box placement if range must change the geometry.', opacity, C.amber)}`;
+  return `${radarSweeps(opacity, 1)}${text('same lead car returns', 480, 432, 14, C.rose, 'middle', 700, opacity)}${methodCard(78, 132, 252, 88, 'CRAFT', 'associate radar to proposal', 'confirms; box stays camera-led', C.red, opacity, 'car')}${methodCard(354, 132, 252, 88, 'CRN', 'refine camera depth', 'moves box to measured range', C.green, opacity, 'car')}${methodCard(630, 132, 252, 88, 'RCBEVDET', 'encode radar in BEV first', 'retains range + Doppler field', C.teal, opacity, 'car')}${footer('The fusion point decides whether radar can confirm, reposition, or independently represent the car.', opacity, C.amber)}`;
 }
 
 function drawLifting(mode, local, opacity) {
@@ -669,8 +679,9 @@ function drawLifting(mode, local, opacity) {
   if (mode === 'input') return `${forwardDrivingScene(72, 170, 350, 220, p, opacity, { boxActor: true })}${arrow(447, 280, 532, 280, C.amber, 2, opacity * p)}${roadScene(558, 170, 330, 220, p, opacity, {})}${line(590, 355, 818, 214, C.amber, 2, opacity)}${[0,1,2,3].map((i)=>circle(620+i*54,336-i*32,7,C.faint,opacity)).join('')}${footer('The cyclist occupies one image patch, but could lie at several positions along its 3D ray.', opacity * reveal(local, 0.62, 0.78))}`;
   if (mode === 'lss') { let out = `${forwardDrivingScene(72, 170, 350, 220, p, opacity, { boxActor: true })}${arrow(447, 280, 532, 280, C.teal, 2, opacity * p)}${roadScene(558, 170, 330, 220, p, opacity, {})}${line(590, 355, 818, 214, C.faint, 2, opacity)}`; for (let i=0;i<6;i++) out += circle(608+i*42,344-i*25,8,i===3?C.green:C.teal,opacity*(i===3?1:0.35)); return out + text('depth probability along ray', 712, 408, 16, C.teal, 'middle', 650, opacity) + footer('LSS spreads the cyclist feature over depth bins, then accumulates those bins into BEV.', opacity * reveal(local, 0.62, 0.78), C.teal); }
   if (mode === 'detr3d') return `${forwardDrivingScene(72, 170, 350, 220, p, opacity, { boxActor: true })}${arrow(447, 280, 532, 280, C.blue, 2, opacity * p)}${roadScene(558, 170, 330, 220, p, opacity, {})}${circle(705, 252, 19, C.blue, 0.10 * opacity, C.blue, 1.6)}${line(590, 355, 705, 252, C.blue, 2, opacity * p)}${text('candidate actor at 24 m', 715, 414, 16, C.blue, 'middle', 650, opacity)}${footer('An object query starts from a 3D reference, then asks whether the camera supports it.', opacity * reveal(local, 0.62, 0.78), C.blue)}`;
+  if (mode === 'petr') { let out = `${forwardDrivingScene(72, 170, 350, 220, p, opacity, { boxActor: true })}${arrow(447, 280, 532, 280, C.amber, 2, opacity * p)}${roadScene(558, 170, 330, 220, p, opacity, {})}${line(590, 355, 818, 214, C.faint, 2, opacity)}`; for (let i = 0; i < 5; i++) { const x = 608 + i * 47; const y = 344 - i * 28; out += circle(x, y, 7, i === 2 ? C.green : C.amber, opacity * (i === 2 ? 1 : 0.45)); out += text(`p${i + 1}`, x, y - 15, 11, C.muted, 'middle', 600, opacity); } return out + text('3D ray positions become image-feature coordinates', 714, 409, 15, C.amber, 'middle', 650, opacity) + footer('PETR encodes sampled 3D positions along the ray into each image feature.', opacity * reveal(local, 0.62, 0.78), C.amber); }
   if (mode === 'bevformer') { let out = `${forwardDrivingScene(72, 170, 350, 220, p, opacity, { boxActor: true })}${arrow(447, 280, 532, 280, C.teal, 2, opacity * p)}${roadScene(558, 170, 330, 220, p, opacity, {})}`; for(let i=0;i<4;i++){out += circle(705,326-i*31,6,C.teal,opacity*p); out += line(590,355,705,326-i*31,C.teal,1,opacity*p);} return out + text('vertical samples in one BEV cell', 715, 414, 16, C.teal, 'middle', 650, opacity) + footer('A BEV cell projects several height references into the camera and gathers matching evidence.', opacity * reveal(local, 0.62, 0.78), C.teal); }
-  return `${forwardDrivingScene(64, 174, 330, 214, 0.31, opacity, { boxActor: true })}${ring(277, 291, 24, C.green, opacity, 2)}${text('one cyclist image patch', 229, 421, 14, C.green, 'middle', 650, opacity)}${arrow(418, 278, 512, 278, C.amber, 2, opacity)}${text('BEV CELLS ALONG THE VIEWING RAY', 704, 161, 14, C.amber, 'middle', 700, opacity)}${spatialGrid(548, 178, 312, 210, 6, 4, opacity, C.teal)}${path('M 568 360 L 832 198', C.amber, 2, opacity, 'none', '7 6')}${rect(754, 182, 48, 48, C.red, 3, opacity * 0.22, C.red, 1.5)}${line(761, 189, 795, 223, C.red, 2, opacity)}${line(795, 189, 761, 223, C.red, 2, opacity)}${text('wrong depth', 778, 250, 13, C.red, 'middle', 700, opacity)}${rect(650, 285, 48, 48, C.green, 3, opacity * 0.22, C.green, 1.5)}${cyclist(674, 307, opacity, C.green)}${text('correct cyclist cell', 674, 361, 13, C.green, 'middle', 700, opacity)}${footer('Depth is placement: an error writes real image evidence into the wrong metric location.', opacity, C.amber)}`;
+  return `${forwardDrivingScene(46, 166, 322, 230, 0.31, opacity, { boxActor: true })}${ring(253, 291, 24, C.green, opacity, 2)}${text('same cyclist image patch', 207, 427, 14, C.green, 'middle', 650, opacity)}${arrow(390, 280, 458, 280, C.amber, 2, opacity)}${methodCard(478, 132, 404, 68, 'LIFT, SPLAT, SHOOT', 'push feature across predicted depth bins', 'dense BEV coverage', C.teal, opacity)}${methodCard(478, 210, 404, 68, 'PETR', 'attach sampled 3D ray positions', 'image tokens carry 3D hypotheses', C.amber, opacity)}${methodCard(478, 288, 404, 68, 'DETR3D', 'project one 3D object reference', 'query retrieves supporting pixels', C.blue, opacity)}${methodCard(478, 366, 404, 68, 'BEVFORMER', 'project heights from one BEV cell', 'dense field retrieves image evidence', C.green, opacity)}${footer('All four place the same pixel evidence in 3D, but they choose different query directions.', opacity, C.amber)}`;
 }
 
 function drawFusion(mode, local, opacity) {
@@ -679,7 +690,7 @@ function drawFusion(mode, local, opacity) {
   if (mode === 'point') return `${sensorEvidenceCards(opacity)}${arrow(201, 300, 480, 352, C.blue, 1.7, opacity * p)}${arrow(459, 300, 480, 352, C.amber, 1.7, opacity * p)}${arrow(717, 300, 480, 352, C.rose, 1.7, opacity * p)}${circle(480, 372, 24, C.teal, 0.12 * opacity, C.teal, 1.5)}${text('actor point', 480, 420, 16, C.teal, 'middle', 650, opacity)}${footer('Point fusion combines the three measurements at the cyclist, but keeps no camera-only lane field.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
   if (mode === 'query') return `${sensorEvidenceCards(opacity)}${arrow(201, 300, 480, 346, C.blue, 1.7, opacity * p)}${arrow(459, 300, 480, 346, C.amber, 1.7, opacity * p)}${arrow(717, 300, 480, 346, C.rose, 1.7, opacity * p)}${rect(353, 357, 254, 68, C.bg, 12, opacity, C.green, 1.4)}${text('CYCLIST QUERY', 480, 386, 14, C.green, 'middle', 700, opacity)}${text('type · 24 m · −5 m/s', 480, 414, 16, C.ink, 'middle', 600, opacity)}${footer('Object-query fusion keeps a compact cyclist state, but not the whole road surface.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
   if (mode === 'bev') return `${sensorEvidenceCards(opacity)}${arrow(201, 300, 480, 326, C.blue, 1.7, opacity * p)}${arrow(459, 300, 480, 326, C.amber, 1.7, opacity * p)}${arrow(717, 300, 480, 326, C.rose, 1.7, opacity * p)}${roadScene(350, 336, 260, 108, p, opacity, {})}${footer('Dense BEV keeps the cyclist, lane boundary, crosswalk, and free space in one spatial field.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
-  return `${sensorEvidenceCards(opacity)}${arrow(201, 297, 214, 333, C.blue, 1.6, opacity)}${arrow(459, 297, 480, 333, C.amber, 1.6, opacity)}${arrow(717, 297, 746, 333, C.rose, 1.6, opacity)}${rect(92, 334, 244, 96, C.bg, 11, opacity, C.teal, 1.2)}${text('POINT', 214, 362, 13, C.teal, 'middle', 700, opacity)}${circle(214, 393, 9, C.green, opacity)}${text('one measured location', 214, 420, 13, C.muted, 'middle', 560, opacity)}${rect(358, 334, 244, 96, C.bg, 11, opacity, C.green, 1.2)}${text('OBJECT QUERY', 480, 362, 13, C.green, 'middle', 700, opacity)}${text('cyclist · 24 m · −5 m/s', 480, 397, 15, C.ink, 'middle', 620, opacity)}${rect(624, 334, 244, 96, C.bg, 11, opacity, C.blue, 1.2)}${text('DENSE BEV', 746, 362, 13, C.blue, 'middle', 700, opacity)}${roadScene(680, 374, 132, 45, 0.72, opacity, {})}${footer('The fusion unit decides whether prediction receives one point, one actor, or the surrounding road field.', opacity, C.amber)}`;
+  return `${sensorEvidenceCards(opacity)}${arrow(201, 297, 214, 333, C.blue, 1.6, opacity)}${arrow(459, 297, 480, 333, C.amber, 1.6, opacity)}${arrow(717, 297, 746, 333, C.rose, 1.6, opacity)}${rect(92, 334, 244, 96, C.bg, 11, opacity, C.teal, 1.2)}${text('POINTPAINTING', 214, 360, 13, C.teal, 'middle', 700, opacity)}${circle(214, 390, 9, C.green, opacity)}${text('point-attached semantics', 214, 420, 13, C.muted, 'middle', 560, opacity)}${rect(358, 334, 244, 96, C.bg, 11, opacity, C.green, 1.2)}${text('TRANSFUSION / FUTR3D', 480, 360, 13, C.green, 'middle', 700, opacity)}${text('cyclist object query', 480, 395, 15, C.ink, 'middle', 620, opacity)}${rect(624, 334, 244, 96, C.bg, 11, opacity, C.blue, 1.2)}${text('BEVFUSION', 746, 360, 13, C.blue, 'middle', 700, opacity)}${roadScene(680, 374, 132, 45, 0.72, opacity, {})}${footer('The papers preserve a point, an actor query, or the surrounding road field.', opacity, C.amber)}`;
 }
 
 function drawDropout(mode, local, opacity) {
@@ -688,7 +699,7 @@ function drawDropout(mode, local, opacity) {
   if (mode === 'unibev') return `${roadScene(92, 170, 330, 220, p, opacity, { sensor: 'all', rain: true })}${rect(548, 178, 300, 198, C.bg, 12, opacity, C.teal, 1.3)}${text('AVAILABLE INPUTS', 698, 211, 14, C.teal, 'middle', 700, opacity)}${text('camera', 585, 253, 16, C.muted, 'start', 600, opacity)}${text('degraded, still present', 815, 253, 16, C.amber, 'end', 600, opacity)}${text('LiDAR', 585, 294, 16, C.muted, 'start', 600, opacity)}${text('present', 815, 294, 16, C.green, 'end', 600, opacity)}${text('radar', 585, 335, 16, C.muted, 'start', 600, opacity)}${text('present', 815, 335, 16, C.green, 'end', 600, opacity)}${footer('An availability mask can represent a missing sensor, but not how trustworthy a present sensor is.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
   if (mode === 'metabev') return `${roadScene(92, 170, 330, 220, p, opacity, { sensor: 'all', rain: true })}${arrow(446, 280, 520, 280, C.green, 2, opacity * p)}${rect(548, 178, 300, 198, C.bg, 12, opacity, C.green, 1.3)}${text('SHARED SCENE STATE', 698, 213, 14, C.green, 'middle', 700, opacity)}${text('cyclist: 24 m', 585, 260, 17, C.ink, 'start', 600, opacity)}${text('lead car: closing', 585, 302, 17, C.ink, 'start', 600, opacity)}${text('crosswalk: occupied', 585, 344, 17, C.ink, 'start', 600, opacity)}${footer('Training across sensor subsets teaches one scene state to survive a missing input stream.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
   if (mode === 'grace') return `${roadScene(92, 170, 330, 220, p, opacity, { sensor: 'all', rain: true })}${rect(548, 178, 300, 198, C.bg, 12, opacity, C.amber, 1.3)}${text('RELIABILITY WEIGHTS', 698, 213, 14, C.amber, 'middle', 700, opacity)}${text('camera', 585, 257, 16, C.blue, 'start', 650, opacity)}${text('0.25', 815, 257, 17, C.ink, 'end', 650, opacity)}${rect(650, 241, 110 * 0.25, 18, C.blue, 4, opacity * 0.45)}${text('LiDAR', 585, 302, 16, C.amber, 'start', 650, opacity)}${text('0.95', 815, 302, 17, C.ink, 'end', 650, opacity)}${rect(650, 286, 110 * 0.95, 18, C.amber, 4, opacity * 0.45)}${text('radar', 585, 347, 16, C.rose, 'start', 650, opacity)}${text('0.85', 815, 347, 17, C.ink, 'end', 650, opacity)}${rect(650, 331, 110 * 0.85, 18, C.rose, 4, opacity * 0.45)}${footer('Reliability gating lowers the rain-damaged camera contribution without pretending it vanished.', opacity * reveal(local, 0.62, 0.78), C.amber)}`;
-  return `${roadScene(58, 166, 350, 230, 0.72, opacity, { sensor: 'all', labels: true, rain: true })}${text('same cyclist · rain + glare', 233, 426, 14, C.green, 'middle', 650, opacity)}${arrow(431, 279, 506, 279, C.amber, 2, opacity)}${rect(532, 160, 340, 104, C.bg, 11, opacity, C.teal, 1.2)}${text('AVAILABILITY MASK', 556, 193, 14, C.teal, 'start', 700, opacity)}${text('camera = present', 556, 231, 17, C.ink, 'start', 620, opacity)}${text('cannot express degraded', 846, 231, 14, C.red, 'end', 650, opacity)}${rect(532, 286, 340, 104, C.bg, 11, opacity, C.amber, 1.2)}${text('RELIABILITY WEIGHT', 556, 319, 14, C.amber, 'start', 700, opacity)}${text('camera = 0.25', 556, 357, 17, C.ink, 'start', 620, opacity)}${rect(716, 341, 112, 18, C.faint, 4, opacity)}${rect(716, 341, 28, 18, C.blue, 4, opacity * 0.62)}${footer('A present camera can still be unreliable; continuous gating can down-weight it.', opacity, C.amber)}`;
+  return `${roadScene(52, 166, 330, 230, 0.72, opacity, { sensor: 'all', labels: true, rain: true })}${text('same cyclist · rain + glare', 217, 426, 14, C.green, 'middle', 650, opacity)}${arrow(404, 280, 472, 280, C.amber, 2, opacity)}${methodCard(494, 142, 388, 82, 'UNIBEV', 'normalize weights over present streams', 'handles camera absent; not camera degraded', C.teal, opacity)}${methodCard(494, 242, 388, 82, 'METABEV', 'train camera, LiDAR, and fused modes', 'keeps one state across missing streams', C.green, opacity)}${methodCard(494, 342, 388, 82, 'GRACE-BEV', 'estimate continuous sensor trust', 'down-weights the degraded camera', C.amber, opacity)}${footer('MetaBEV and UniBEV train for absence; Grace-BEV explicitly estimates degradation.', opacity, C.amber)}`;
 }
 
 function temporalPanels(opacity, progress) {
@@ -712,7 +723,7 @@ function drawTemporal(mode, local, opacity) {
   if (mode === 'instances') return `${roadScene(76, 175, 340, 215, 0.38, opacity, { hideCyclist: true, showPrediction: true })}${arrow(441, 280, 520, 280, C.green, 2, opacity * p)}${rect(548, 176, 310, 215, C.bg, 12, opacity, C.green, 1.3)}${text('CYCLIST TRACK', 703, 210, 14, C.green, 'middle', 700, opacity)}${text('last seen: t₀', 580, 252, 16, C.muted, 'start', 560, opacity)}${text('velocity: 4.2 m/s left', 580, 291, 16, C.ink, 'start', 600, opacity)}${text('predicted position: crosswalk', 580, 330, 16, C.ink, 'start', 600, opacity)}${text('uncertainty: growing', 580, 369, 16, C.amber, 'start', 650, opacity)}${footer('Recurrent instances carry the cyclist state forward and expand uncertainty while no pixels support it.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
   if (mode === 'queue') return `${roadScene(76, 175, 340, 215, 0.38, opacity, { hideCyclist: true, showPrediction: true })}${arrow(441, 280, 520, 280, C.teal, 2, opacity * p)}${rect(548, 176, 310, 215, C.bg, 12, opacity, C.teal, 1.3)}${text('BOUNDED FOREGROUND QUEUE', 703, 210, 14, C.teal, 'middle', 700, opacity)}${text('1  cyclist · occluded', 580, 256, 16, C.green, 'start', 650, opacity)}${text('2  lead car · observed', 580, 298, 16, C.rose, 'start', 650, opacity)}${text('3  delivery van · static', 580, 340, 16, C.amber, 'start', 650, opacity)}${text('new low-score clutter dropped', 580, 376, 15, C.muted, 'start', 560, opacity)}${footer('A bounded queue keeps the important hidden cyclist while replacing lower-value foreground entries.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
   if (mode === 'correct') return `${roadScene(160, 155, 640, 260, 0.82, opacity, { labels: true })}${ring(482, 226, 32 * (1 - 0.55 * p), C.green, opacity, 1.4)}${text('prediction corrected by current evidence', 480, 445, 16, C.green, 'middle', 650, opacity)}${footer('When the cyclist reappears, the new observation corrects position and contracts uncertainty.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
-  return `${temporalPanels(opacity, 1)}${footer('The track is useful because the t₂ observation corrects the t₁ prediction.', opacity, C.amber)}`;
+  return `${roadScene(52, 166, 330, 230, 0.38, opacity, { hideCyclist: true, showPrediction: true, labels: true })}${text('same cyclist · occluded at t₁', 217, 426, 14, C.green, 'middle', 650, opacity)}${arrow(404, 280, 472, 280, C.teal, 2, opacity)}${methodCard(494, 142, 388, 82, 'BEVDET4D / BEVFORMER', 'carry an ego-aligned BEV field', 'dense road + actor region', C.blue, opacity)}${methodCard(494, 242, 388, 82, 'STREAMPETR', 'carry a bounded foreground query queue', 'hidden cyclist query survives', C.teal, opacity)}${methodCard(494, 342, 388, 82, 'SPARSE4D V2', 'recur 3D instance anchors + features', 'track predicts with growing uncertainty', C.green, opacity)}${footer('The papers differ in whether memory carries a field, a query queue, or recurrent instances.', opacity, C.amber)}`;
 }
 
 function drawLidarContract(mode, local, opacity) {
@@ -720,8 +731,8 @@ function drawLidarContract(mode, local, opacity) {
   if (mode === 'input') return `${roadScene(180, 145, 600, 280, p, opacity, { sensor: 'all', labels: true })}${footer('The same cyclist scan can supervise training, feed inference, or belong only to a teacher.', opacity * reveal(local, 0.62, 0.78))}`;
   if (mode === 'labels') return `${forwardDrivingScene(70, 170, 340, 220, p, opacity, { boxActor: true })}${arrow(435, 280, 520, 280, C.amber, 2, opacity * p)}${rect(548, 178, 310, 198, C.bg, 12, opacity, C.amber, 1.3)}${text('TRAINING LABEL', 703, 212, 14, C.amber, 'middle', 700, opacity)}${text('cyclist depth = 24 m', 703, 260, 18, C.ink, 'middle', 650, opacity)}${text('camera predicts depth', 703, 310, 16, C.muted, 'middle', 560, opacity)}${text('LiDAR absent at runtime', 703, 348, 16, C.green, 'middle', 650, opacity)}${footer('LiDAR can label camera depth during training without becoming a deployed sensor dependency.', opacity * reveal(local, 0.62, 0.78), C.amber)}`;
   if (mode === 'runtime') return `${forwardDrivingScene(70, 170, 340, 220, p, opacity, { boxActor: true })}${roadScene(550, 170, 340, 220, p, opacity, { sensor: 'lidar' })}${arrow(410, 280, 534, 280, C.teal, 2, opacity * p)}${text('CAMERA', 240, 415, 15, C.blue, 'middle', 700, opacity)}${text('LiDAR AT INFERENCE', 720, 415, 15, C.amber, 'middle', 700, opacity)}${footer('If live LiDAR points enter the model, every deployed vehicle must supply calibrated LiDAR.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
-  if (mode === 'teacher') return `${roadScene(70, 170, 340, 220, p, opacity, { sensor: 'all' })}${arrow(435, 280, 520, 280, C.green, 2, opacity * p)}${forwardDrivingScene(550, 170, 340, 220, p, opacity, { boxActor: true })}${text('CAMERA + LiDAR TEACHER', 240, 415, 15, C.amber, 'middle', 700, opacity)}${text('CAMERA-ONLY STUDENT', 720, 415, 15, C.green, 'middle', 700, opacity)}${footer('The teacher transfers cyclist geometry during training; the deployed student uses camera only.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
-  return `${roadScene(54, 166, 330, 230, 0.72, opacity, { sensor: 'lidar', labels: true })}${text('same cyclist scan', 219, 426, 14, C.green, 'middle', 650, opacity)}${arrow(406, 279, 472, 279, C.teal, 2, opacity)}${rect(500, 142, 380, 82, C.bg, 10, opacity, C.amber, 1.2)}${text('DEPTH LABEL', 522, 174, 14, C.amber, 'start', 700, opacity)}${text('dataset only', 522, 204, 15, C.ink, 'start', 600, opacity)}${text('runtime LiDAR: NO', 852, 204, 15, C.green, 'end', 700, opacity)}${rect(500, 242, 380, 82, C.bg, 10, opacity, C.red, 1.2)}${text('LIVE MODEL INPUT', 522, 274, 14, C.red, 'start', 700, opacity)}${text('deployed graph', 522, 304, 15, C.ink, 'start', 600, opacity)}${text('runtime LiDAR: YES', 852, 304, 15, C.red, 'end', 700, opacity)}${rect(500, 342, 380, 82, C.bg, 10, opacity, C.blue, 1.2)}${text('TEACHER SIGNAL', 522, 374, 14, C.blue, 'start', 700, opacity)}${text('training graph only', 522, 404, 15, C.ink, 'start', 600, opacity)}${text('runtime LiDAR: NO', 852, 404, 15, C.green, 'end', 700, opacity)}${footer('The same scan creates three different deployment contracts.', opacity, C.amber)}`;
+  if (mode === 'teacher') return `${roadScene(70, 170, 340, 220, p, opacity, { sensor: 'all' })}${arrow(435, 280, 520, 280, C.green, 2, opacity * p)}${roadScene(550, 170, 340, 220, p, opacity, { sensor: 'radar' })}${text('CAMERA + LiDAR TEACHER', 240, 415, 15, C.amber, 'middle', 700, opacity)}${text('CAMERA + RADAR STUDENT', 720, 415, 15, C.green, 'middle', 700, opacity)}${footer('CRKD transfers LiDAR geometry during training; the deployed student uses camera and radar.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
+  return `${roadScene(52, 166, 330, 230, 0.72, opacity, { sensor: 'lidar', labels: true })}${text('same cyclist scan', 217, 426, 14, C.green, 'middle', 650, opacity)}${arrow(404, 280, 472, 280, C.teal, 2, opacity)}${methodCard(494, 142, 388, 82, 'BEVDEPTH', 'LiDAR supplies depth labels only', 'runtime LiDAR: no', C.amber, opacity)}${methodCard(494, 242, 388, 82, 'SPARSE-TO-DENSE', 'sparse depth enters the deployed model', 'runtime LiDAR: yes', C.red, opacity)}${methodCard(494, 342, 388, 82, 'CRKD', 'camera-LiDAR teacher distills geometry', 'student runtime: camera + radar', C.blue, opacity)}${footer('The paper name now makes each LiDAR deployment contract explicit.', opacity, C.amber)}`;
 }
 
 function buildStory(titleSteps, draw) {
@@ -737,10 +748,11 @@ function buildStory(titleSteps, draw) {
     snapshot(index) {
       const step = titleSteps[index];
       if (!step) throw new Error(`No storyboard step ${index}`);
-      const body = `${top(index + 1, titleSteps.length, step.title, 1)}${draw(step.mode, 1, 1)}`;
+      const body = `${top(index + 1, titleSteps.length, step.title, step.source, 1)}${draw(step.mode, 1, 1)}`;
       return {
         svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" role="img" aria-label="${esc(step.description ?? step.title)}"><rect width="${WIDTH}" height="${HEIGHT}" fill="${C.bg}"/>${body}</svg>`,
         title: step.title,
+        source: step.source,
         description: step.description ?? step.title,
       };
     },
@@ -760,9 +772,9 @@ function buildStory(titleSteps, draw) {
       const previousStep = titleSteps[previousIndex];
       const previousOpacity = elapsed < transitionSeconds ? 1 - opacity : 0;
       const previousBody = previousOpacity > 0
-        ? `${top(previousIndex + 1, titleSteps.length, previousStep.title, previousOpacity)}${draw(previousStep.mode, 1, previousOpacity)}`
+        ? `${top(previousIndex + 1, titleSteps.length, previousStep.title, previousStep.source, previousOpacity)}${draw(previousStep.mode, 1, previousOpacity)}`
         : '';
-      const body = `${previousBody}${top(index + 1, titleSteps.length, step.title, opacity)}${draw(step.mode, drawProgress, opacity)}`;
+      const body = `${previousBody}${top(index + 1, titleSteps.length, step.title, step.source, opacity)}${draw(step.mode, drawProgress, opacity)}`;
       return {
         svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" role="img" aria-label="${esc(step.description ?? step.title)}"><rect width="${WIDTH}" height="${HEIGHT}" fill="${C.bg}"/>${body}</svg>`,
         totalFrames,
@@ -773,122 +785,123 @@ function buildStory(titleSteps, draw) {
 
 export const CALM_BLOG_STORIES = {
   'blog-attention-memory.gif': buildStory([
-    { title: 'How four attention variants store the same token sequence.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
-    { title: 'MHA stores a full token history for every head.', mode: 'mha', seconds: 9 },
-    { title: 'GQA shares fewer full histories across query heads.', mode: 'gqa', seconds: 9 },
-    { title: 'MLA stores one compressed latent vector per token.', mode: 'mla', seconds: 9 },
-    { title: 'DeltaNet updates one fixed-size recurrent state.', mode: 'delta', seconds: 8.5 },
-    { title: 'Storage format sets cache size and retrieval limits.', mode: 'summary', seconds: 12 },
+    { title: 'How four attention variants store the same token sequence.', source: 'Papers: Attention Is All You Need · GQA · DeepSeek-V2 · Gated DeltaNet', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'MHA stores a full token history for every head.', source: 'Baseline: Attention Is All You Need (2017)', mode: 'mha', seconds: 9 },
+    { title: 'GQA shares fewer full histories across query heads.', source: 'Paper: GQA — Ainslie et al. (2023)', mode: 'gqa', seconds: 9 },
+    { title: 'MLA stores one compressed latent vector per token.', source: 'Paper: DeepSeek-V2 (2024)', mode: 'mla', seconds: 9 },
+    { title: 'DeltaNet updates one fixed-size recurrent state.', source: 'Paper: Gated DeltaNet (2024)', mode: 'delta', seconds: 8.5 },
+    { title: 'Storage format sets cache size and retrieval limits.', source: 'Comparison: MHA · GQA · DeepSeek-V2 MLA · Gated DeltaNet', mode: 'summary', seconds: 12 },
   ], drawAttention),
   'blog-vlm-evidence-contract.gif': buildStory([
-    { title: 'Different outputs require different visual details.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
-    { title: 'CLIP retains features for image-text matching.', mode: 'clip', seconds: 8 },
-    { title: 'LLaVA retains features used to generate text.', mode: 'llava', seconds: 8.5 },
-    { title: 'Molmo retains phrase-to-location coordinates.', mode: 'molmo', seconds: 9 },
-    { title: 'π0 retains time-indexed state for action prediction.', mode: 'pi0', seconds: 9 },
-    { title: 'The required output determines which details are retained.', mode: 'summary', seconds: 11.5 },
+    { title: 'Different outputs require different visual details.', source: 'Papers: CLIP · LLaVA · Molmo · π0', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'CLIP retains features for image-text matching.', source: 'Paper: CLIP (2021)', mode: 'clip', seconds: 8 },
+    { title: 'LLaVA retains features used to generate text.', source: 'Paper: LLaVA (2023)', mode: 'llava', seconds: 8.5 },
+    { title: 'Molmo retains phrase-to-location coordinates.', source: 'Paper: Molmo and PixMo (2024)', mode: 'molmo', seconds: 9 },
+    { title: 'π0 retains time-indexed state for action prediction.', source: 'Paper: π0 (2024)', mode: 'pi0', seconds: 9 },
+    { title: 'The required output determines which details are retained.', source: 'Comparison: CLIP · LLaVA · Molmo · π0', mode: 'summary', seconds: 11.5 },
   ], drawVlm),
   'blog-multimodal-gradient-budget.gif': buildStory([
-    { title: 'Equal sample percentages can produce unequal optimization load.', mode: 'intro', seconds: 7, buildSeconds: 2.6 },
-    { title: 'First count sampled examples by modality.', mode: 'examples', seconds: 8 },
-    { title: 'Examples expand into different numbers of units.', mode: 'units', seconds: 8.5 },
-    { title: 'Those units consume different amounts of compute.', mode: 'flops', seconds: 9 },
-    { title: 'Gradient norms show unequal updates to shared parameters.', mode: 'updates', seconds: 9 },
-    { title: 'Report five ledgers, including independent decisions.', mode: 'ledgers', seconds: 11.5 },
+    { title: 'Equal sample percentages can produce unequal optimization load.', source: 'Illustrative synthesis: OpenVLA · FAST · π0', mode: 'intro', seconds: 7, buildSeconds: 2.6 },
+    { title: 'First count sampled examples by modality.', source: 'Illustrative synthesis: OpenVLA · FAST · π0', mode: 'examples', seconds: 8 },
+    { title: 'Examples expand into different numbers of units.', source: 'Illustrative synthesis: OpenVLA · FAST · π0', mode: 'units', seconds: 8.5 },
+    { title: 'Those units consume different amounts of compute.', source: 'Illustrative values — not reported paper measurements', mode: 'flops', seconds: 9 },
+    { title: 'Gradient norms show unequal updates to shared parameters.', source: 'Proposed audit — not reported paper measurements', mode: 'updates', seconds: 9 },
+    { title: 'Report five ledgers, including independent decisions.', source: 'Author synthesis from OpenVLA · FAST · π0 interfaces', mode: 'ledgers', seconds: 11.5 },
   ], drawBudget),
   'blog-vla-feedback-attribution.gif': buildStory([
-    { title: 'One failed rollout does not reveal a successful alternative.', mode: 'failure', seconds: 7, buildSeconds: 2.6 },
-    { title: 'Episode outcomes label the whole trajectory.', mode: 'episode', seconds: 8 },
-    { title: 'APO compares the failed action with the human correction.', mode: 'apo', seconds: 9 },
-    { title: 'Process feedback requires progress or matched states.', mode: 'process', seconds: 9 },
-    { title: 'Observed feedback limits which labels the loss can use.', mode: 'summary', seconds: 11 },
+    { title: 'One failed rollout does not reveal a successful alternative.', source: 'Shared example for APO · VLAC · RIPT-VLA', mode: 'failure', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Episode outcomes label the whole trajectory.', source: 'Baseline: terminal-outcome supervision', mode: 'episode', seconds: 8 },
+    { title: 'APO compares the failed action with the human correction.', source: 'Paper: Action Preference Optimization (2025)', mode: 'apo', seconds: 9 },
+    { title: 'Process feedback requires progress or matched states.', source: 'Papers: VLAC (2025) · RIPT-VLA (2025)', mode: 'process', seconds: 9 },
+    { title: 'Observed feedback limits which labels the loss can use.', source: 'Comparison: terminal outcome · APO · VLAC · RIPT-VLA', mode: 'summary', seconds: 11 },
   ], drawFeedback),
   'blog-rl-learning-signals.gif': buildStory([
-    { title: 'Four methods define their training comparisons differently.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
-    { title: 'PPO compares sampled actions with value estimates.', mode: 'ppo', seconds: 8 },
-    { title: 'DPO compares a fixed chosen and rejected response.', mode: 'dpo', seconds: 8 },
-    { title: 'GRPO compares rewards within one sampled prompt group.', mode: 'grpo', seconds: 9 },
-    { title: 'GKD matches teacher probabilities on student states.', mode: 'gkd', seconds: 9 },
-    { title: 'Compare sampled data, feedback unit, and reference signal.', mode: 'summary', seconds: 11.5 },
+    { title: 'Four methods define their training comparisons differently.', source: 'Papers: PPO · DPO · DeepSeekMath (GRPO) · GKD', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'PPO compares sampled actions with value estimates.', source: 'Paper: Proximal Policy Optimization (2017)', mode: 'ppo', seconds: 8 },
+    { title: 'DPO compares a fixed chosen and rejected response.', source: 'Paper: Direct Preference Optimization (2023)', mode: 'dpo', seconds: 8 },
+    { title: 'GRPO compares rewards within one sampled prompt group.', source: 'Paper: DeepSeekMath (2024)', mode: 'grpo', seconds: 9 },
+    { title: 'GKD matches teacher probabilities on student states.', source: 'Paper: On-Policy Distillation / GKD (2023)', mode: 'gkd', seconds: 9 },
+    { title: 'Compare sampled data, feedback unit, and reference signal.', source: 'Comparison: PPO · DPO · DeepSeekMath GRPO · GKD', mode: 'summary', seconds: 11.5 },
   ], drawLearning),
   'blog-hermes-local-stack.gif': buildStory([
-    { title: 'The agent shell and model runtime are separate.', mode: 'separate', seconds: 7, buildSeconds: 2.6 },
-    { title: 'Hermes sends one request across a local API.', mode: 'request', seconds: 8 },
-    { title: 'llama-server loads and runs the GGUF.', mode: 'weights', seconds: 8.5 },
-    { title: 'llama-server returns generated tokens through the local API.', mode: 'return', seconds: 8 },
-    { title: 'Map each failure to the agent, API, server, or model file.', mode: 'summary', seconds: 10.5 },
+    { title: 'The agent shell and model runtime are separate.', source: 'System in this post: Hermes Agent · llama.cpp', mode: 'separate', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Hermes sends one request across a local API.', source: 'Component: Hermes Agent', mode: 'request', seconds: 8 },
+    { title: 'llama-server loads and runs the GGUF.', source: 'Component: llama.cpp llama-server', mode: 'weights', seconds: 8.5 },
+    { title: 'llama-server returns generated tokens through the local API.', source: 'Interface: OpenAI-compatible localhost endpoint', mode: 'return', seconds: 8 },
+    { title: 'Map each failure to the agent, API, server, or model file.', source: 'System in this post: Hermes Agent · llama.cpp', mode: 'summary', seconds: 10.5 },
   ], drawHermes),
   'local-gemma-long-prompt-latency.gif': buildStory([
-    { title: 'The benchmark changes one variable: prompt length.', mode: 'design', seconds: 7, buildSeconds: 2.6 },
-    { title: 'Long prompts separate Gemma 4 models in prefill.', mode: 'long', seconds: 9.5 },
-    { title: 'Runtime choice compounds long-prompt latency.', mode: 'runtime', seconds: 9.5 },
-    { title: 'Decode speed moves less than first-token latency.', mode: 'decode', seconds: 9 },
-    { title: 'Memory fit does not guarantee low first-token latency.', mode: 'decision', seconds: 11 },
+    { title: 'The benchmark changes one variable: prompt length.', source: 'Measurements reported in this post', mode: 'design', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Long prompts separate Gemma 4 models in prefill.', source: 'Models: Gemma 4 · runtimes: MLX and llama.cpp', mode: 'long', seconds: 9.5 },
+    { title: 'Runtime choice compounds long-prompt latency.', source: 'Measurements reported in this post', mode: 'runtime', seconds: 9.5 },
+    { title: 'Decode speed moves less than first-token latency.', source: 'Measurements reported in this post', mode: 'decode', seconds: 9 },
+    { title: 'Memory fit does not guarantee low first-token latency.', source: 'Decision from this post’s local benchmark', mode: 'decision', seconds: 11 },
   ], (mode, local, opacity) => drawBenchmark('gemma', mode, local, opacity)),
   'local-qwen-long-prompt-latency.gif': buildStory([
-    { title: 'The benchmark changes one variable: prompt length.', mode: 'design', seconds: 7, buildSeconds: 2.6 },
-    { title: 'Long prompts expose the Qwen prefill cost.', mode: 'long', seconds: 9.5 },
-    { title: 'MLX and llama.cpp diverge as models grow.', mode: 'runtime', seconds: 9.5 },
-    { title: 'Decode remains steadier than first-token latency.', mode: 'decode', seconds: 9 },
-    { title: 'The 4B models have the lowest measured first-token latency.', mode: 'decision', seconds: 11 },
+    { title: 'The benchmark changes one variable: prompt length.', source: 'Measurements reported in this post', mode: 'design', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Long prompts expose the Qwen prefill cost.', source: 'Models: Qwen 3.5 and Qwen 3 · runtimes: MLX and llama.cpp', mode: 'long', seconds: 9.5 },
+    { title: 'MLX and llama.cpp diverge as models grow.', source: 'Measurements reported in this post', mode: 'runtime', seconds: 9.5 },
+    { title: 'Decode remains steadier than first-token latency.', source: 'Measurements reported in this post', mode: 'decode', seconds: 9 },
+    { title: 'The 4B models have the lowest measured first-token latency.', source: 'Decision from this post’s local benchmark', mode: 'decision', seconds: 11 },
   ], (mode, local, opacity) => drawBenchmark('qwen', mode, local, opacity)),
   'autonomous-perception-camera-encoder.gif': buildStory([
-    { title: 'The ego car closes on a cyclist emerging beside a parked van.', mode: 'input', seconds: 9, buildSeconds: 4.2 },
-    { title: 'A coarse feature map can erase the distant cyclist.', mode: 'coarse', seconds: 9.5, buildSeconds: 4 },
-    { title: 'Fine maps keep the cyclist; coarse maps keep road context.', mode: 'pyramid', seconds: 10, buildSeconds: 4 },
-    { title: 'Image and BEV losses protect the same cyclist evidence.', mode: 'supervision', seconds: 10, buildSeconds: 4 },
-    { title: 'Design the encoder around the smallest actor that must survive.', mode: 'summary', seconds: 12 },
+    { title: 'The ego car closes on a cyclist emerging beside a parked van.', source: 'Shared scene for NVAutoNet · EfficientDet · Deformable DETR · BEVFormer v2', mode: 'input', seconds: 9, buildSeconds: 4.2 },
+    { title: 'A coarse feature map can erase the distant cyclist.', source: 'Failure baseline: coarse single-scale camera features', mode: 'coarse', seconds: 9.5, buildSeconds: 4 },
+    { title: 'Fine maps keep the cyclist; coarse maps keep road context.', source: 'Paper: EfficientDet — bidirectional feature pyramid', mode: 'pyramid', seconds: 10, buildSeconds: 4 },
+    { title: 'Image and BEV losses protect the same cyclist evidence.', source: 'Paper: BEVFormer v2 — perspective-view supervision', mode: 'supervision', seconds: 10, buildSeconds: 4 },
+    { title: 'Which camera approach preserves the distant cyclist?', source: 'Comparison: EfficientDet · Deformable DETR · BEVFormer v2', mode: 'summary', seconds: 12 },
   ], drawCameraEncoder),
   'autonomous-perception-lidar-encoder.gif': buildStory([
-    { title: 'The ego car moves while one LiDAR sweep is being measured.', mode: 'input', seconds: 9.5, buildSeconds: 4.2 },
-    { title: 'Compensation aligns the curb, not the independently moving cyclist.', mode: 'compensate', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Pillars keep x-y location but collapse height inside each cell.', mode: 'pillars', seconds: 9.5, buildSeconds: 4 },
-    { title: 'Sparse voxels retain the cyclist height structure.', mode: 'voxels', seconds: 9.5, buildSeconds: 4 },
-    { title: 'Alternating attention sets cross one sparse-window boundary.', mode: 'windows', seconds: 9.5, buildSeconds: 4 },
-    { title: 'Preserve the geometry that separates cyclist, van, curb, and road.', mode: 'summary', seconds: 12.5 },
+    { title: 'The ego car moves while one LiDAR sweep is being measured.', source: 'Shared scan for PointPillars · SECOND · DSVT · VoxelNeXt', mode: 'input', seconds: 9.5, buildSeconds: 4.2 },
+    { title: 'Compensation aligns the curb, not the independently moving cyclist.', source: 'Shared preprocessing: per-return time plus ego motion', mode: 'compensate', seconds: 10, buildSeconds: 4.2 },
+    { title: 'Pillars keep x-y location but collapse height inside each cell.', source: 'Paper: PointPillars (2018)', mode: 'pillars', seconds: 9.5, buildSeconds: 4 },
+    { title: 'Sparse voxels retain the cyclist height structure.', source: 'Papers: SECOND (2018) · VoxelNeXt (2023)', mode: 'voxels', seconds: 9.5, buildSeconds: 4 },
+    { title: 'Alternating attention sets cross one sparse-window boundary.', source: 'Paper: DSVT (2023)', mode: 'windows', seconds: 9.5, buildSeconds: 4 },
+    { title: 'Which LiDAR encoder preserves the cyclist geometry?', source: 'Comparison: PointPillars · SECOND · DSVT · VoxelNeXt', mode: 'summary', seconds: 12.5 },
   ], drawLidar),
   'autonomous-perception-radar-encoder.gif': buildStory([
-    { title: 'Three radar sweeps show the lead car closing from 34 m to 26 m.', mode: 'input', seconds: 11, buildSeconds: 5.5 },
-    { title: 'Late radar fusion can confirm a camera proposal.', mode: 'proposal', seconds: 9.5, buildSeconds: 4 },
-    { title: 'Earlier radar fusion can move the proposal to the measured range.', mode: 'depth', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Radar BEV retains moving and stationary returns separately.', mode: 'bev', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Fuse radar early if its range must change object geometry.', mode: 'summary', seconds: 12 },
+    { title: 'Three radar sweeps show the lead car closing from 34 m to 26 m.', source: 'Shared returns for CRAFT · CRN · RCBEVDet', mode: 'input', seconds: 11, buildSeconds: 5.5 },
+    { title: 'Late radar fusion can confirm a camera proposal.', source: 'Paper: CRAFT (2022) — proposal association', mode: 'proposal', seconds: 9.5, buildSeconds: 4 },
+    { title: 'Earlier radar fusion can move the proposal to the measured range.', source: 'Paper: CRN (2023) — radar-assisted depth', mode: 'depth', seconds: 10, buildSeconds: 4.2 },
+    { title: 'Radar BEV retains moving and stationary returns separately.', source: 'Paper: RCBEVDet (2024) — independent radar BEV', mode: 'bev', seconds: 10, buildSeconds: 4.2 },
+    { title: 'Where does each paper let radar change the geometry?', source: 'Comparison: CRAFT · CRN · RCBEVDet', mode: 'summary', seconds: 12 },
   ], drawRadar),
   'autonomous-perception-camera-lifting.gif': buildStory([
-    { title: 'The cyclist image patch could lie anywhere along one 3D ray.', mode: 'input', seconds: 9.5, buildSeconds: 4 },
-    { title: 'LSS spreads the cyclist feature across predicted depth bins.', mode: 'lss', seconds: 10, buildSeconds: 4.2 },
-    { title: 'An object query tests one candidate cyclist position.', mode: 'detr3d', seconds: 9.5, buildSeconds: 4 },
-    { title: 'A BEV cell samples several heights against the camera image.', mode: 'bevformer', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Wrong depth writes cyclist evidence into the wrong BEV cell.', mode: 'summary', seconds: 12 },
+    { title: 'The cyclist image patch could lie anywhere along one 3D ray.', source: 'Shared ray for LSS · PETR · DETR3D · BEVFormer', mode: 'input', seconds: 9.5, buildSeconds: 4 },
+    { title: 'LSS spreads the cyclist feature across predicted depth bins.', source: 'Paper: Lift, Splat, Shoot (2020)', mode: 'lss', seconds: 10, buildSeconds: 4.2 },
+    { title: 'An object query tests one candidate cyclist position.', source: 'Paper: DETR3D (2021)', mode: 'detr3d', seconds: 9.5, buildSeconds: 4 },
+    { title: 'PETR attaches sampled 3D ray positions to image features.', source: 'Paper: PETR (2022)', mode: 'petr', seconds: 9.5, buildSeconds: 4 },
+    { title: 'A BEV cell samples several heights against the camera image.', source: 'Paper: BEVFormer (2022)', mode: 'bevformer', seconds: 10, buildSeconds: 4.2 },
+    { title: 'How does each paper place the same cyclist in 3D?', source: 'Comparison: LSS · PETR · DETR3D · BEVFormer', mode: 'summary', seconds: 12 },
   ], drawLifting),
   'autonomous-perception-fusion-granularity.gif': buildStory([
-    { title: 'Three sensors describe the same cyclist differently.', mode: 'input', seconds: 9, buildSeconds: 4 },
-    { title: 'Point fusion keeps measurements at the cyclist location.', mode: 'point', seconds: 9.5, buildSeconds: 4 },
-    { title: 'An object query keeps one compact cyclist state.', mode: 'query', seconds: 9.5, buildSeconds: 4 },
-    { title: 'Dense BEV also keeps lane, crosswalk, and free space.', mode: 'bev', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Choose the fusion unit from what prediction must inspect.', mode: 'summary', seconds: 12 },
+    { title: 'Three sensors describe the same cyclist differently.', source: 'Shared evidence for PointPainting · TransFusion · FUTR3D · BEVFusion', mode: 'input', seconds: 9, buildSeconds: 4 },
+    { title: 'Point fusion keeps measurements at the cyclist location.', source: 'Paper: PointPainting (2019)', mode: 'point', seconds: 9.5, buildSeconds: 4 },
+    { title: 'An object query keeps one compact cyclist state.', source: 'Papers: TransFusion (2022) · FUTR3D (2022)', mode: 'query', seconds: 9.5, buildSeconds: 4 },
+    { title: 'Dense BEV also keeps lane, crosswalk, and free space.', source: 'Paper: BEVFusion (2022)', mode: 'bev', seconds: 10, buildSeconds: 4.2 },
+    { title: 'What spatial unit does each fusion paper preserve?', source: 'Comparison: PointPainting · TransFusion / FUTR3D · BEVFusion', mode: 'summary', seconds: 12 },
   ], drawFusion),
   'autonomous-perception-modality-dropout.gif': buildStory([
-    { title: 'Rain degrades the camera before the camera disappears.', mode: 'failure', seconds: 10, buildSeconds: 4.5 },
-    { title: 'Availability records which sensor streams are present.', mode: 'unibev', seconds: 9.5, buildSeconds: 4 },
-    { title: 'Training across sensor sets preserves one cyclist state.', mode: 'metabev', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Reliability weights reduce the rain-damaged camera input.', mode: 'grace', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Missing input and degraded input are different failures.', mode: 'summary', seconds: 12 },
+    { title: 'Rain degrades the camera before the camera disappears.', source: 'Shared failure for MetaBEV · UniBEV · Grace-BEV', mode: 'failure', seconds: 10, buildSeconds: 4.5 },
+    { title: 'Availability records which sensor streams are present.', source: 'Paper: UniBEV (2023) — normalized available-stream weights', mode: 'unibev', seconds: 9.5, buildSeconds: 4 },
+    { title: 'Training across sensor sets preserves one cyclist state.', source: 'Paper: MetaBEV (2023) — sensor-subset training', mode: 'metabev', seconds: 10, buildSeconds: 4.2 },
+    { title: 'Reliability weights reduce the rain-damaged camera input.', source: 'Paper: Grace-BEV (2026) — continuous trust gating', mode: 'grace', seconds: 10, buildSeconds: 4.2 },
+    { title: 'Which paper handles absence, and which handles degradation?', source: 'Comparison: MetaBEV · UniBEV · Grace-BEV', mode: 'summary', seconds: 12 },
   ], drawDropout),
   'autonomous-perception-temporal-memory.gif': buildStory([
-    { title: 'The cyclist is observed, occluded by the van, then observed again.', mode: 'input', seconds: 11, buildSeconds: 5.5 },
-    { title: 'A warped field carries the cyclist region after ego motion.', mode: 'warp', seconds: 10, buildSeconds: 4.2 },
-    { title: 'A recurrent track predicts the hidden cyclist and grows uncertainty.', mode: 'instances', seconds: 10.5, buildSeconds: 4.2 },
-    { title: 'A bounded queue retains the hidden cyclist over weaker clutter.', mode: 'queue', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Fresh pixels correct the cyclist track when it reappears.', mode: 'correct', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Observe, predict through occlusion, then correct with evidence.', mode: 'summary', seconds: 12.5 },
+    { title: 'The cyclist is observed, occluded by the van, then observed again.', source: 'Shared sequence for BEVDet4D · BEVFormer · StreamPETR · Sparse4D v2', mode: 'input', seconds: 11, buildSeconds: 5.5 },
+    { title: 'A warped field carries the cyclist region after ego motion.', source: 'Papers: BEVDet4D (2022) · BEVFormer (2022)', mode: 'warp', seconds: 10, buildSeconds: 4.2 },
+    { title: 'A recurrent track predicts the hidden cyclist and grows uncertainty.', source: 'Paper: Sparse4D v2 (2023)', mode: 'instances', seconds: 10.5, buildSeconds: 4.2 },
+    { title: 'A bounded query queue retains the hidden cyclist.', source: 'Paper: StreamPETR (2023)', mode: 'queue', seconds: 10, buildSeconds: 4.2 },
+    { title: 'Fresh pixels correct the cyclist track when it reappears.', source: 'Shared requirement: current evidence must revise memory', mode: 'correct', seconds: 10, buildSeconds: 4.2 },
+    { title: 'What state does each temporal paper carry forward?', source: 'Comparison: BEVDet4D / BEVFormer · StreamPETR · Sparse4D v2', mode: 'summary', seconds: 12.5 },
   ], drawTemporal),
   'autonomous-perception-lidar-training-contracts.gif': buildStory([
-    { title: 'One cyclist scan can give LiDAR three different roles.', mode: 'input', seconds: 9, buildSeconds: 4 },
-    { title: 'LiDAR can label cyclist depth during camera training only.', mode: 'labels', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Live LiDAR input creates a deployed sensor dependency.', mode: 'runtime', seconds: 10, buildSeconds: 4.2 },
-    { title: 'A LiDAR teacher can train a camera-only deployed student.', mode: 'teacher', seconds: 10, buildSeconds: 4.2 },
-    { title: 'Locate the LiDAR tensor in dataset, deployed graph, or teacher.', mode: 'summary', seconds: 12 },
+    { title: 'One cyclist scan can give LiDAR three different roles.', source: 'Comparison: Sparse-to-Dense · BEVDepth · CRKD', mode: 'input', seconds: 9, buildSeconds: 4 },
+    { title: 'LiDAR can label cyclist depth during camera training only.', source: 'Paper: BEVDepth (2022)', mode: 'labels', seconds: 10, buildSeconds: 4.2 },
+    { title: 'Live LiDAR input creates a deployed sensor dependency.', source: 'Paper: Sparse-to-Dense (2017)', mode: 'runtime', seconds: 10, buildSeconds: 4.2 },
+    { title: 'A LiDAR teacher can train a camera-radar student.', source: 'Paper: CRKD (2024)', mode: 'teacher', seconds: 10, buildSeconds: 4.2 },
+    { title: 'Where does each paper place the LiDAR tensor?', source: 'Comparison: Sparse-to-Dense · BEVDepth · CRKD', mode: 'summary', seconds: 12 },
   ], drawLidarContract),
 };
 
@@ -916,6 +929,7 @@ export async function renderBlogExplainerFrames(names = CALM_BLOG_GIFS, options 
       frames.push({
         src: `/assets/images/blog-explainer-frames/${storyDirName}/${filename}`,
         title: snapshot.title,
+        source: snapshot.source,
         description: snapshot.description,
       });
     }

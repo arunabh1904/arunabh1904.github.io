@@ -17,9 +17,10 @@ const postsDir = path.join(projectRoot, 'src', 'content', 'posts');
 const imageDir = path.join(projectRoot, 'public', 'assets', 'images');
 type StoryStep = {
   title: string;
+  source: string;
 };
 const stories = CALM_BLOG_STORIES as Record<string, { steps: StoryStep[] }>;
-type ExplainerManifest = Record<string, { frames: Array<{ src: string; title: string; description: string }> }>;
+type ExplainerManifest = Record<string, { frames: Array<{ src: string; title: string; source: string; description: string }> }>;
 
 describe('Blog GIF visual system', () => {
   it('replaces every Blog GIF with a manual frame explainer', async () => {
@@ -54,6 +55,8 @@ describe('Blog GIF visual system', () => {
 
       for (const [index, frame] of frames.entries()) {
         expect(frame.title, `${filename}: frame ${index + 1}`).toBe(story.steps[index].title);
+        expect(frame.source, `${filename}: frame ${index + 1}`).toBe(story.steps[index].source);
+        expect(frame.source.trim(), `${filename}: frame ${index + 1}`).not.toBe('');
         const filePath = path.join(projectRoot, 'public', frame.src.replace(/^\//, ''));
         const [metadata, file] = await Promise.all([sharp(filePath).metadata(), stat(filePath)]);
         expect(metadata.width, frame.src).toBe(WIDTH);
