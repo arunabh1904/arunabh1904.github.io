@@ -140,7 +140,7 @@ describe('CodePracticeLab', () => {
     return editor as HTMLElement;
   }
 
-  it('opens one shared Torch and NumPy explanation without changing a blank editor', async () => {
+  it('opens one coherent explanation without repeating the prompt or code', async () => {
     loadPyodideRuntime.mockResolvedValueOnce({
       runPythonAsync: vi.fn(),
     });
@@ -155,10 +155,19 @@ describe('CodePracticeLab', () => {
     });
 
     expect(getEditor().textContent).not.toContain('def softmax_cross_entropy');
-    expect(container.querySelector('[role="dialog"]')).not.toBeNull();
-    expect(container.textContent).toContain('Torch + NumPy explanation');
-    expect(container.textContent).toContain('torch.Tensor');
-    expect(container.textContent).toContain('np.ndarray');
+    const dialog = container.querySelector('[role="dialog"]');
+    expect(dialog).not.toBeNull();
+    expect(dialog?.querySelector('h2')?.textContent).toBe('Explanation');
+    expect(dialog?.textContent).toContain('torch.Tensor');
+    expect(dialog?.textContent).toContain('np.ndarray');
+    expect(dialog?.textContent).toContain('Use a row-wise max shift before the exponentials.');
+    expect(dialog?.textContent).not.toContain('Keep the row axis when subtracting the maximum.');
+    expect(dialog?.textContent).not.toContain('Subtract the row max first.');
+    expect(dialog?.textContent).not.toContain('Prompt copy');
+    expect(dialog?.textContent).not.toContain('Explanation-only detail.');
+    expect(dialog?.textContent).not.toContain('def softmax_cross_entropy');
+    expect(dialog?.querySelector('.code-practice-lab__explanation-steps')).toBeNull();
+    expect(dialog?.querySelector('.code-practice-lab__explanation-footer')).toBeNull();
   });
 
   it('switches between clean Torch and NumPy solutions with matching explanations', async () => {
@@ -218,49 +227,24 @@ describe('CodePracticeLab', () => {
     });
 
     expect(container.querySelector('[role="dialog"]')).not.toBeNull();
-    expect(container.textContent).toContain('Torch + NumPy explanation');
-    expect(container.textContent).toContain('Name the input and output first');
-    expect(container.textContent).toContain('Explanation-only detail.');
-    expect(container.textContent).toContain('The contract, formula, and shapes stay the same.');
-    expect(container.textContent).toContain('Step 1 of 4');
-
-    const mechanismButton = Array.from(container.querySelectorAll('button')).find(
-      (button) => button.textContent?.includes('Mechanism'),
-    );
-    await act(async () => {
-      mechanismButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
     expect(container.querySelector('.code-practice-lab__explanation-visual img')?.getAttribute('src')).toBe(
       '/assets/images/code-tensor-ops-broadcasting.gif',
     );
-    expect(container.textContent).toContain('Build the result once, then map the syntax');
+    expect(container.querySelector('[role="dialog"] h2')?.textContent).toBe('Explanation');
     expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
-    expect(container.textContent).toContain('Keep the row axis when subtracting the maximum.');
-    expect(container.textContent).toContain('Step 2 of 4');
-
-    const shapesButton = Array.from(container.querySelectorAll('button')).find(
-      (button) => button.textContent?.includes('Shapes'),
+    expect(container.querySelector('[role="dialog"]')?.textContent).not.toContain(
+      'Keep the row axis when subtracting the maximum.',
     );
-    await act(async () => {
-      shapesButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
     expect(container.querySelector('.code-practice-lab__solution-diagram')).not.toBeNull();
     expect(container.textContent).toContain('(N, 1) × (1, M) → (N, M)');
     expect(container.textContent).toContain('Tensor reasoning');
     expect(container.textContent).toContain('Keep the row maximum shaped (N, 1)');
-    expect(container.querySelectorAll('.code-practice-lab__explanation-reasoning article')).toHaveLength(2);
-
-    const codeButton = Array.from(container.querySelectorAll('button')).find(
-      (button) => button.textContent?.includes('Code & checks'),
+    expect(container.querySelectorAll('.code-practice-lab__explanation-reasoning p')).toHaveLength(2);
+    expect(container.querySelector('[role="dialog"]')?.textContent).not.toContain('Torch reference');
+    expect(container.querySelector('[role="dialog"]')?.textContent).not.toContain('NumPy reference');
+    expect(container.querySelector('[role="dialog"]')?.textContent).not.toContain(
+      'print(softmax_cross_entropy(logits, labels))',
     );
-    await act(async () => {
-      codeButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
-    expect(container.textContent).toContain('Torch reference');
-    expect(container.textContent).toContain('NumPy reference');
-    expect(container.textContent).toContain('print(softmax_cross_entropy(logits, labels))');
-    expect(container.textContent).toContain('What to test and explain');
-    expect(container.textContent).toContain('Step 4 of 4');
 
     const closeButton = Array.from(container.querySelectorAll('button')).find(
       (button) => button.textContent === 'Close',
@@ -299,18 +283,11 @@ describe('CodePracticeLab', () => {
     });
 
     expect(container.querySelector('[role="dialog"]')).not.toBeNull();
-    expect(container.textContent).toContain('Torch + NumPy explanation');
-    expect(container.textContent).toContain('Name the input and output first');
-
-    const numpyMechanismButton = Array.from(container.querySelectorAll('button')).find(
-      (button) => button.textContent?.includes('Mechanism'),
-    );
-    await act(async () => {
-      numpyMechanismButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
-    expect(container.textContent).toContain('Build the result once, then map the syntax');
+    expect(container.querySelector('[role="dialog"] h2')?.textContent).toBe('Explanation');
     expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
-    expect(container.textContent).toContain('Keep the row axis when subtracting the maximum.');
+    expect(container.querySelector('[role="dialog"]')?.textContent).not.toContain(
+      'Keep the row axis when subtracting the maximum.',
+    );
 
     const runButton = container.querySelector<HTMLButtonElement>('button[aria-label="Run code"]');
     await act(async () => {

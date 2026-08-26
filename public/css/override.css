@@ -8468,56 +8468,6 @@ html {
   color: #f8fafc;
 }
 
-.code-practice-lab__explanation-steps {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.35rem;
-  padding: 0.6rem 1.25rem;
-  border-bottom: 1px solid rgba(127, 197, 255, 0.16);
-  background: rgba(9, 19, 34, 0.96);
-}
-
-.code-practice-lab__explanation-steps button {
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  min-height: 2.2rem;
-  padding: 0.35rem 0.55rem;
-  border: 1px solid transparent;
-  border-radius: 9px;
-  background: transparent;
-  color: rgba(203, 213, 225, 0.72);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 750;
-}
-
-.code-practice-lab__explanation-steps button span {
-  display: grid;
-  width: 1.35rem;
-  height: 1.35rem;
-  place-items: center;
-  border: 1px solid rgba(127, 197, 255, 0.28);
-  border-radius: 50%;
-  font-size: 0.68rem;
-}
-
-.code-practice-lab__explanation-steps button:hover,
-.code-practice-lab__explanation-steps button[aria-current='step'] {
-  border-color: rgba(127, 197, 255, 0.28);
-  background: rgba(37, 76, 126, 0.24);
-  color: #e0f2fe;
-}
-
-.code-practice-lab__explanation-steps button[aria-current='step'] span {
-  border-color: #60a5fa;
-  background: #2563eb;
-  color: #ffffff;
-}
-
 .code-practice-lab__explanation-header {
   display: flex;
   align-items: center;
@@ -8550,8 +8500,6 @@ html {
 }
 
 .code-practice-lab__explanation-scroll {
-  display: grid;
-  gap: 1.6rem;
   min-height: 0;
   padding: clamp(1rem, 2.5vw, 1.75rem);
   flex: 1;
@@ -8560,67 +8508,23 @@ html {
   scrollbar-gutter: stable;
 }
 
-.code-practice-lab__explanation-step {
-  animation: code-explanation-enter 160ms ease-out;
-}
-
-@keyframes code-explanation-enter {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.code-practice-lab__explanation-scroll > section {
-  min-width: 0;
-}
-
-.code-practice-lab__explanation-scroll h3 {
-  margin: 0.25rem 0 0.85rem;
-  color: #dbeafe;
-  font-family: var(--font-body);
-  font-size: 1.12rem;
-}
-
-.code-practice-lab__concept-flow {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: stretch;
-  gap: 0.65rem;
-}
-
-.code-practice-lab__concept-flow > span {
-  align-self: center;
-  color: #60a5fa;
-  font-size: 1.35rem;
-}
-
-.code-practice-lab__concept-flow article {
-  min-width: 0;
-  padding: 0.9rem;
-  border: 1px solid rgba(127, 197, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(19, 36, 61, 0.78);
-}
-
-.code-practice-lab__concept-flow article > span {
-  color: #93c5fd;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.code-practice-lab__concept-flow p,
 .code-practice-lab__explanation-copy p,
 .code-practice-lab__explanation-lead {
-  margin: 0.45rem 0 0;
+  margin: 0;
   color: rgba(226, 232, 240, 0.88);
   line-height: 1.55;
+}
+
+.code-practice-lab__explanation-walkthrough {
+  display: grid;
+  gap: 1.25rem;
+  width: min(58rem, 100%);
+  margin: 0 auto;
+}
+
+.code-practice-lab__explanation-lead {
+  color: #dbeafe;
+  font-size: 1.03rem;
 }
 
 .code-practice-lab__explanation-copy {
@@ -8629,7 +8533,7 @@ html {
 }
 
 .code-practice-lab__explanation-visual {
-  margin: 0;
+  margin: 0.15rem 0;
   padding: 0.75rem;
   border: 1px solid rgba(127, 197, 255, 0.2);
   border-radius: 14px;
@@ -8650,70 +8554,11 @@ html {
   line-height: 1.5;
 }
 
-.code-practice-lab__explanation-code,
-.code-practice-lab__explanation-signature,
-.code-practice-lab__explanation-example pre {
-  max-width: 100%;
-  margin: 0;
-  padding: 1rem;
-  overflow-x: auto;
-  border: 1px solid rgba(127, 197, 255, 0.18);
-  border-radius: 12px;
-  background: #07101d;
-  color: #e2e8f0;
-  font-size: 0.82rem;
-  line-height: 1.55;
-  white-space: pre;
-}
-
-.code-practice-lab__explanation-signature {
-  margin-top: 1rem;
-}
-
-.code-practice-lab__api-signatures {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.code-practice-lab__api-signatures article {
-  min-width: 0;
-}
-
-.code-practice-lab__api-signatures strong {
-  display: block;
-  margin-bottom: 0.4rem;
-  color: #93c5fd;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.code-practice-lab__api-signatures .code-practice-lab__explanation-signature {
-  height: calc(100% - 1.5rem);
-  margin: 0;
-}
-
-.code-practice-lab__shape-checklist {
-  padding: 1rem 1rem 1rem 2rem;
-  border: 1px solid rgba(127, 197, 255, 0.18);
-  border-radius: 12px;
-  background: rgba(19, 36, 61, 0.58);
-}
-
 .code-practice-lab__explanation-reasoning {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.code-practice-lab__explanation-reasoning article {
-  padding: 0.9rem;
-  border: 1px solid rgba(127, 197, 255, 0.18);
-  border-radius: 12px;
-  background: rgba(19, 36, 61, 0.58);
+  gap: 0.65rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(96, 165, 250, 0.55);
 }
 
 .code-practice-lab__explanation-reasoning strong {
@@ -8721,59 +8566,9 @@ html {
 }
 
 .code-practice-lab__explanation-reasoning p {
-  margin: 0.45rem 0 0;
+  margin: 0;
   color: rgba(226, 232, 240, 0.82);
   line-height: 1.5;
-}
-
-.code-practice-lab__explanation-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.7rem 1.25rem;
-  border-top: 1px solid rgba(127, 197, 255, 0.16);
-  background: rgba(9, 19, 34, 0.98);
-}
-
-.code-practice-lab__explanation-footer > span {
-  color: rgba(203, 213, 225, 0.72);
-  font-size: 0.78rem;
-  font-weight: 750;
-}
-
-.code-practice-lab__explanation-footer div {
-  display: flex;
-  gap: 0.45rem;
-}
-
-.code-practice-lab__explanation-footer button {
-  appearance: none;
-  min-height: 2.15rem;
-  padding: 0.35rem 0.75rem;
-  border: 1px solid rgba(127, 197, 255, 0.28);
-  border-radius: 9px;
-  background: rgba(37, 76, 126, 0.24);
-  color: #e0f2fe;
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 750;
-}
-
-.code-practice-lab__explanation-footer button:disabled {
-  cursor: default;
-  opacity: 0.35;
-}
-
-.code-practice-lab__explanation-example {
-  display: grid;
-  gap: 0.55rem;
-  margin-top: 1rem;
-}
-
-.code-practice-lab__explanation-example strong {
-  color: #bfdbfe;
 }
 
 :root[data-theme="light"] .code-practice-lab__explanation-backdrop {
@@ -8781,16 +8576,13 @@ html {
 }
 
 :root[data-theme="light"] .code-practice-lab__explanation-popout,
-:root[data-theme="light"] .code-practice-lab__explanation-header,
-:root[data-theme="light"] .code-practice-lab__explanation-steps,
-:root[data-theme="light"] .code-practice-lab__explanation-footer {
+:root[data-theme="light"] .code-practice-lab__explanation-header {
   border-color: var(--code-border-color);
   background: #ffffff;
   color: var(--text-color);
 }
 
-:root[data-theme="light"] .code-practice-lab__explanation-header h2,
-:root[data-theme="light"] .code-practice-lab__explanation-scroll h3 {
+:root[data-theme="light"] .code-practice-lab__explanation-header h2 {
   color: var(--text-color);
 }
 
@@ -8800,51 +8592,20 @@ html {
   color: var(--text-color);
 }
 
-:root[data-theme="light"] .code-practice-lab__concept-flow article {
-  border-color: var(--code-border-color);
-  background: rgba(239, 246, 255, 0.72);
-}
-
-:root[data-theme="light"] .code-practice-lab__explanation-steps button {
-  color: var(--text-secondary-color);
-}
-
-:root[data-theme="light"] .code-practice-lab__explanation-steps button:hover,
-:root[data-theme="light"] .code-practice-lab__explanation-steps button[aria-current='step'] {
-  border-color: rgba(37, 99, 235, 0.24);
-  background: rgba(219, 234, 254, 0.72);
-  color: #1e3a8a;
-}
-
-:root[data-theme="light"] .code-practice-lab__concept-flow p,
 :root[data-theme="light"] .code-practice-lab__explanation-copy p,
 :root[data-theme="light"] .code-practice-lab__explanation-lead,
 :root[data-theme="light"] .code-practice-lab__explanation-visual figcaption {
   color: var(--text-secondary-color);
 }
 
-:root[data-theme="light"] .code-practice-lab__explanation-visual,
-:root[data-theme="light"] .code-practice-lab__explanation-code,
-:root[data-theme="light"] .code-practice-lab__explanation-signature,
-:root[data-theme="light"] .code-practice-lab__explanation-example pre {
+:root[data-theme="light"] .code-practice-lab__explanation-visual {
   border-color: var(--code-border-color);
   background: #f8fafc;
   color: #0f172a;
 }
 
-:root[data-theme="light"] .code-practice-lab__shape-checklist,
-:root[data-theme="light"] .code-practice-lab__explanation-reasoning article {
-  border-color: var(--code-border-color);
-  background: rgba(239, 246, 255, 0.62);
-}
-
-:root[data-theme="light"] .code-practice-lab__api-signatures strong {
-  color: #1d4ed8;
-}
-
 :root[data-theme="light"] .code-practice-lab__explanation-reasoning strong,
-:root[data-theme="light"] .code-practice-lab__explanation-reasoning p,
-:root[data-theme="light"] .code-practice-lab__explanation-footer > span {
+:root[data-theme="light"] .code-practice-lab__explanation-reasoning p {
   color: var(--text-color);
 }
 
@@ -8923,30 +8684,6 @@ html {
   .code-practice-lab__explanation-scroll {
     max-height: none;
     scrollbar-gutter: auto;
-  }
-
-  .code-practice-lab__explanation-steps {
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(7.5rem, 1fr);
-    overflow-x: auto;
-  }
-
-  .code-practice-lab__explanation-footer {
-    padding-inline: 1rem;
-  }
-
-  .code-practice-lab__concept-flow {
-    grid-template-columns: 1fr;
-  }
-
-  .code-practice-lab__api-signatures {
-    grid-template-columns: 1fr;
-  }
-
-  .code-practice-lab__concept-flow > span {
-    justify-self: center;
-    transform: rotate(90deg);
   }
 
   .code-practice-lab__solution-notes {
