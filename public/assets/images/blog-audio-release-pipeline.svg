@@ -19,19 +19,19 @@
   <g filter="url(#shadow)" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" text-anchor="middle">
     <g>
       <rect x="24" y="42" width="180" height="106" rx="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
-      <text x="114" y="82" font-size="19" font-weight="700" fill="#0f172a">Source PR</text>
-      <text x="114" y="111" font-size="15" fill="#334155">final prose + visuals</text>
+      <text x="114" y="82" font-size="19" font-weight="700" fill="#0f172a">Published post</text>
+      <text x="114" y="111" font-size="15" fill="#334155">final prose and figures</text>
     </g>
     <g>
       <rect x="234" y="42" width="190" height="106" rx="14" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
-      <text x="329" y="82" font-size="19" font-weight="700" fill="#0f172a">Clean main</text>
-      <text x="329" y="111" font-size="15" fill="#334155">pinned source digest</text>
+      <text x="329" y="82" font-size="19" font-weight="700" fill="#0f172a">Merged source</text>
+      <text x="329" y="111" font-size="13" fill="#334155">commit SHA and text hash</text>
     </g>
     <g>
       <rect x="454" y="32" width="212" height="126" rx="14" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
-      <text x="560" y="74" font-size="19" font-weight="700" fill="#0f172a">Narration compiler</text>
-      <text x="560" y="104" font-size="15" fill="#334155">fixed voice anchor</text>
-      <text x="560" y="128" font-size="15" fill="#334155">generated-only H2 streams</text>
+      <text x="560" y="74" font-size="19" font-weight="700" fill="#0f172a">Audio generator</text>
+      <text x="560" y="104" font-size="15" fill="#334155">fixed voice sample</text>
+      <text x="560" y="128" font-size="15" fill="#334155">one stream per section</text>
     </g>
     <g>
       <rect x="696" y="42" width="190" height="106" rx="14" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
@@ -40,9 +40,9 @@
     </g>
     <g>
       <rect x="916" y="42" width="180" height="106" rx="14" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
-      <text x="1006" y="82" font-size="19" font-weight="700" fill="#0f172a">Pages verify</text>
-      <text x="1006" y="106" font-size="15" fill="#334155">route + live SHA-256</text>
-      <text x="1006" y="130" font-size="15" fill="#334155">ASR + listening checks</text>
+      <text x="1006" y="82" font-size="19" font-weight="700" fill="#0f172a">Live verification</text>
+      <text x="1006" y="106" font-size="13" fill="#334155">page and audio HTTP 200</text>
+      <text x="1006" y="130" font-size="13" fill="#334155">SHA-256 + listening check</text>
     </g>
   </g>
 </svg>

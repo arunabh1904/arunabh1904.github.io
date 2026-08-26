@@ -459,13 +459,68 @@ img:not(.float-right):not(.float-left) {
   margin: 0;
 }
 
+/* Dense authored Blog visuals use the full article column plus a modest desktop breakout. */
+[data-post-section="blog"] p:has(> a[href$=".gif"]),
+[data-post-section="blog"] p:has(> a[href$=".svg"]),
+[data-post-section="blog"] .compact-flow-diagram,
+[data-post-section="blog"] .architecture-comparison,
+[data-post-section="blog"] .source-explainer-comparison {
+  box-sizing: border-box;
+}
+
+[data-post-section="blog"] p:has(> a[href$=".gif"]),
+[data-post-section="blog"] p:has(> a[href$=".svg"]),
+[data-post-section="blog"] .source-explainer-comparison--architecture {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+[data-post-section="blog"] p:has(> a[href$=".gif"]) > a,
+[data-post-section="blog"] p:has(> a[href$=".svg"]) > a,
+[data-post-section="blog"] p:has(> a[href$=".gif"]) img,
+[data-post-section="blog"] p:has(> a[href$=".svg"]) img {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+}
+
+[data-post-section="blog"] .compact-flow-diagram img,
+[data-post-section="blog"] .architecture-comparison img,
+[data-post-section="blog"] .source-explainer-comparison img {
+  box-sizing: border-box;
+}
+
+@media (min-width: 1200px) {
+  .page-layout:has(.page-content [data-post-section="blog"]) {
+    width: min(100%, 88rem);
+  }
+
+  [data-post-section="blog"] p:has(> a[href$=".gif"]),
+  [data-post-section="blog"] p:has(> a[href$=".svg"]),
+  [data-post-section="blog"] .compact-flow-diagram,
+  [data-post-section="blog"] .architecture-comparison,
+  [data-post-section="blog"] .source-explainer-comparison {
+    width: min(68rem, calc(100vw - 20rem));
+    max-width: none;
+    margin-left: 0;
+    transform: none;
+  }
+}
+
 @media (max-width: 640px) {
   .compact-flow-diagram > a {
     width: 54rem;
   }
 
-  .architecture-comparison > a {
+  .architecture-comparison > a,
+  [data-post-section="blog"] p:has(> a[href$=".gif"]) > a,
+  [data-post-section="blog"] p:has(> a[href$=".svg"]) > a {
     width: 60rem;
+  }
+
+  .source-explainer-comparison--architecture figure {
+    width: 68rem;
   }
 }
 
