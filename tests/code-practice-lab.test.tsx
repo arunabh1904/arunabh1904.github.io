@@ -20,7 +20,7 @@ const testProblem: CodePracticeProblem = {
   title: 'Stable softmax cross-entropy',
   difficulty: 'Medium',
   summary: 'Implement a stable softmax loss.',
-  prompt: ['Prompt copy'],
+  prompt: ['Prompt copy', 'Explanation-only detail.'],
   signature: 'def softmax_cross_entropy(logits, labels):\n    ...',
   requirements: ['Do the thing'],
   examples: [
@@ -51,7 +51,7 @@ const testProblem: CodePracticeProblem = {
   numpyAlternative: {
     code: `import numpy as np
 
-def softmax_cross_entropy(logits, labels):
+def softmax_cross_entropy(logits: np.ndarray, labels: np.ndarray) -> float:
     return np.asarray(logits)[0, labels[0]]`,
     memory: ['Keep the row axis when subtracting the maximum.'],
   },
@@ -137,6 +137,27 @@ describe('CodePracticeLab', () => {
     return editor as HTMLElement;
   }
 
+  it('opens one shared Torch and NumPy explanation without changing a blank editor', async () => {
+    loadPyodideRuntime.mockResolvedValueOnce({
+      runPythonAsync: vi.fn(),
+    });
+
+    await render();
+
+    const explanationButton = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Explanation',
+    );
+    await act(async () => {
+      explanationButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(getEditor().textContent).not.toContain('def softmax_cross_entropy');
+    expect(container.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(container.textContent).toContain('Torch + NumPy explanation');
+    expect(container.textContent).toContain('torch.Tensor');
+    expect(container.textContent).toContain('np.ndarray');
+  });
+
   it('switches between clean Torch and NumPy solutions with matching explanations', async () => {
     const runPythonAsync = vi.fn().mockResolvedValue({
       toJs: () => ['solution output\n', ''],
@@ -149,10 +170,11 @@ describe('CodePracticeLab', () => {
 
     expect(container.textContent).toContain('Problem 01');
     expect(container.textContent).toContain('Stable softmax cross-entropy');
-    expect(container.textContent).toContain('Reason through the system');
-    expect(container.textContent).toContain('Tensor reasoning');
-    expect(container.textContent).toContain('Keep the row maximum shaped (N, 1)');
-    expect(container.querySelectorAll('.code-practice-lab__reasoning-card')).toHaveLength(2);
+    expect(container.textContent).not.toContain('What good looks like');
+    expect(container.textContent).not.toContain('Explanation-only detail.');
+    expect(container.textContent).not.toContain('Reason through the system');
+    expect(container.textContent).not.toContain('Tensor reasoning');
+    expect(container.querySelector('.code-practice-lab__visual')).toBeNull();
     expect(container.textContent).not.toContain('Use a row-wise max shift before the exponentials.');
     expect(container.textContent).not.toContain('How the NumPy version works');
     expect(container.textContent).not.toContain('Python ready');
@@ -183,12 +205,20 @@ describe('CodePracticeLab', () => {
     expect(container.querySelector('.code-practice-lab--reference')).not.toBeNull();
     expect(getEditor().textContent).not.toContain('raise NotImplementedError');
     expect(container.querySelector('.cm-solution-line-toggle')).toBeNull();
-    expect(container.querySelector('[role="dialog"]')).not.toBeNull();
-    expect(container.querySelector('.code-practice-lab__visual img')?.getAttribute('src')).toBe(
-      '/assets/images/code-tensor-ops-broadcasting.gif',
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
+
+    const explanationButton = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Explanation',
     );
-    expect(container.textContent).toContain('Torch explanation');
+    await act(async () => {
+      explanationButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(container.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(container.textContent).toContain('Torch + NumPy explanation');
     expect(container.textContent).toContain('Name the input and output first');
+    expect(container.textContent).toContain('Explanation-only detail.');
+    expect(container.textContent).toContain('The contract, formula, and shapes stay the same.');
     expect(container.textContent).toContain('Step 1 of 4');
 
     const mechanismButton = Array.from(container.querySelectorAll('button')).find(
@@ -197,7 +227,12 @@ describe('CodePracticeLab', () => {
     await act(async () => {
       mechanismButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
+    expect(container.querySelector('.code-practice-lab__explanation-visual img')?.getAttribute('src')).toBe(
+      '/assets/images/code-tensor-ops-broadcasting.gif',
+    );
+    expect(container.textContent).toContain('Build the result once, then map the syntax');
     expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
+    expect(container.textContent).toContain('Keep the row axis when subtracting the maximum.');
     expect(container.textContent).toContain('Step 2 of 4');
 
     const shapesButton = Array.from(container.querySelectorAll('button')).find(
@@ -208,6 +243,9 @@ describe('CodePracticeLab', () => {
     });
     expect(container.querySelector('.code-practice-lab__solution-diagram')).not.toBeNull();
     expect(container.textContent).toContain('(N, 1) × (1, M) → (N, M)');
+    expect(container.textContent).toContain('Tensor reasoning');
+    expect(container.textContent).toContain('Keep the row maximum shaped (N, 1)');
+    expect(container.querySelectorAll('.code-practice-lab__explanation-reasoning article')).toHaveLength(2);
 
     const codeButton = Array.from(container.querySelectorAll('button')).find(
       (button) => button.textContent?.includes('Code & checks'),
@@ -216,6 +254,7 @@ describe('CodePracticeLab', () => {
       codeButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
     expect(container.textContent).toContain('Torch reference');
+    expect(container.textContent).toContain('NumPy reference');
     expect(container.textContent).toContain('What to test and explain');
     expect(container.textContent).toContain('Step 4 of 4');
 
@@ -228,21 +267,34 @@ describe('CodePracticeLab', () => {
     expect(container.querySelector('[role="dialog"]')).toBeNull();
     expect(getEditor().textContent).toContain('return "solution"');
 
-    const explanationButton = Array.from(container.querySelectorAll('button')).find(
-      (button) => button.textContent === 'Explanation',
-    );
     await act(async () => {
       explanationButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
     expect(container.querySelector('[role="dialog"]')).not.toBeNull();
+
+    const secondCloseButton = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Close',
+    );
+    await act(async () => {
+      secondCloseButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
 
     await act(async () => {
       numpyButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
 
     expect(getEditor().textContent).toContain('import numpy as np');
+    expect(getEditor().textContent).toContain('logits: np.ndarray');
     expect(getEditor().textContent).not.toContain('# Reference solution');
-    expect(container.textContent).toContain('NumPy explanation');
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
+
+    await act(async () => {
+      explanationButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(container.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(container.textContent).toContain('Torch + NumPy explanation');
     expect(container.textContent).toContain('Name the input and output first');
 
     const numpyMechanismButton = Array.from(container.querySelectorAll('button')).find(
@@ -251,7 +303,7 @@ describe('CodePracticeLab', () => {
     await act(async () => {
       numpyMechanismButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
-    expect(container.textContent).toContain('Build the NumPy version from the same math');
+    expect(container.textContent).toContain('Build the result once, then map the syntax');
     expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
     expect(container.textContent).toContain('Keep the row axis when subtracting the maximum.');
 
