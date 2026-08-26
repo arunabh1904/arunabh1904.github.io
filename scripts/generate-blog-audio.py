@@ -13,10 +13,9 @@ Usage:
 
 The model is loaded once per invocation. Existing files whose source hash and
 voice settings are unchanged are skipped, so the command is safe to rerun
-after adding or editing posts. A fixed generated voice anchor preserves the
-same narrator identity across posts. Each authored heading section is decoded
-as generated audio only, preventing the anchor phrase from entering the output.
-Streaming bounds decoder memory without resetting the voice inside a section.
+after adding or editing posts. The human profile uses one fixed preset voice,
+packs each heading with following prose, and decodes every bounded request as
+one waveform before assembling the static MP3.
 """
 
 from __future__ import annotations
@@ -35,7 +34,6 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 POSTS_DIR = ROOT / "src" / "content" / "posts"
-NARRATION_DIR = ROOT / "src" / "narrations" / "blog"
 AUDIO_DIR = ROOT / "public" / "assets" / "audio" / "blog"
 MANIFEST_PATH = ROOT / "public" / "assets" / "audio" / "manifest.json"
 MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-8bit"
@@ -71,6 +69,7 @@ SECTION_PAUSE_SECONDS = 0.65
 SECTION_POLICY = "source-heading-sections-v1"
 TABLE_POLICY = "skip-rows-require-spoken-takeaway-v1"
 MAX_AUDIO_SECONDS = 30 * 60
+# Retained only in legacy digests so untouched Qwen assets stay current.
 MAX_ABRIDGED_WORDS = 3_200
 HEADING_START = "[[BLOG_HEADING]]"
 HEADING_END = "[[/BLOG_HEADING]]"
@@ -119,48 +118,50 @@ FORBIDDEN_REFERENCE_FIELDS = {
     "icl_streaming_interval",
 }
 
-# The first two posts on the human-narration profile are deliberate canaries.
-# Keeping the assignment explicit lets us validate long-form quality before a
-# corpus-wide migration, without making every existing MP3 stale at once.
+# Keep profile assignment explicit so every new or changed Blog moves to the
+# reviewed human voice without invalidating untouched legacy MP3s.
 HUMAN_NARRATION_POSTS = frozenset(
     {
+        "building-local-blog-audio-with-qwen3-tts",
         "from-seeing-to-doing-the-evolution-of-vision-language-models",
         "how-unified-sensor-models-are-built-for-autonomous-driving",
     }
 )
 HUMAN_MODEL = "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16"
-HUMAN_VOICE = "hi_female"
-HUMAN_VOICE_MODE = "voxtral-fixed-preset-paragraph-streaming-v1"
-HUMAN_TEMPERATURE = 0.65
+HUMAN_VOICE = "casual_female"
+HUMAN_VOICE_MODE = "voxtral-fixed-preset-heading-context-full-decode-v3"
+# The casual preset already supplies expressive delivery. Higher sampling
+# temperatures made it improvise fillers and even laughter around short
+# headings, so keep acoustic sampling conservative.
+HUMAN_TEMPERATURE = 0.3
 HUMAN_TOP_K = 50
 HUMAN_TOP_P = 0.9
 HUMAN_NARRATOR_SEED = 1904
-HUMAN_SAMPLING_SEED_VERSION = "voxtral-human-canary-v1"
-# Chunk-level ASR rejected the first deterministic samples below for invented
-# clauses, repetitions, or badly slurred headings. Keep reviewed rerolls
-# reproducible instead of relying on whichever sample happens to run next.
-HUMAN_CHUNK_SEED_OVERRIDES = {
+HUMAN_SAMPLING_SEED_VERSION = "voxtral-casual-heading-context-v3"
+# Seed overrides are voice- and chunk-policy-specific. Record only deterministic
+# rerolls that pass the complete request-level audit.
+HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
+    "building-local-blog-audio-with-qwen3-tts": {
+        "8": 1906,
+        "22": 1905,
+        "31": 1905,
+    },
     "from-seeing-to-doing-the-evolution-of-vision-language-models": {
-        "2": 1905,
         "4": 1905,
-        "21": 1905,
-        "24": 1905,
-        "26": 1906,
-        "40": 1905,
-        "55": 1905,
+        "26": 1905,
+        "28": 1905,
+        "41": 1905,
     },
     "how-unified-sensor-models-are-built-for-autonomous-driving": {
-        "5": 1905,
-        "11": 1906,
-        "31": 1905,
-        "39": 1905,
-        "55": 1905,
-        "61": 1906,
-        "63": 1905,
-        "70": 1905,
+        "0": 1905,
+        "4": 1905,
+        "20": 1905,
     },
 }
 HUMAN_POST_PRONUNCIATION_LEXICONS = {
+    "building-local-blog-audio-with-qwen3-tts": {
+        "BEVDet4D": "B E V Det four D",
+    },
     "how-unified-sensor-models-are-built-for-autonomous-driving": {
         "BEVDet4D": "B E V Det four D",
         # The shared phonetic spelling is helpful in prose but unstable as a
@@ -168,23 +169,25 @@ HUMAN_POST_PRONUNCIATION_LEXICONS = {
         "lie-dar encoders": "Lidar encoders",
     },
 }
-# Full-source coverage was an explicit editorial decision for this post. Its
-# accepted human-paced rendering is 31:36, so it gets a narrow 32-minute cap.
+# These long-form canaries keep complete source narration. Their narrow caps
+# allow a human pace without weakening the corpus-wide default.
 HUMAN_MAX_AUDIO_SECONDS = {
+    "from-seeing-to-doing-the-evolution-of-vision-language-models": 40 * 60,
     "how-unified-sensor-models-are-built-for-autonomous-driving": 32 * 60,
 }
 HUMAN_SPEED = 1.0
-HUMAN_PARAGRAPH_PAUSE_SECONDS = 0.35
-HUMAN_HEADING_PAUSE_SECONDS = 0.65
+HUMAN_OUTPUT_GAIN_DB = -1.0
+HUMAN_PARAGRAPH_PAUSE_SECONDS = 0.24
+HUMAN_HEADING_PAUSE_SECONDS = 0.55
 HUMAN_SENTENCE_PAUSE_POLICY = "model-natural-with-explicit-structure-v1"
-HUMAN_CHUNKING_POLICY = "source-paragraphs-with-bounded-sentence-groups-v1"
-HUMAN_CHUNK_MAX_CHARS = 1_200
-HUMAN_STREAMING_INTERVAL_SECONDS = 8.0
+HUMAN_CHUNKING_POLICY = "heading-with-following-paragraph-groups-v3"
+HUMAN_CHUNK_MAX_CHARS = 900
 HUMAN_MAX_GENERATION_TOKENS = 1_600
 HUMAN_MIN_SECONDS_PER_WORD = 0.24
 HUMAN_MAX_SECONDS_PER_WORD = 0.72
-HUMAN_DECODE_POLICY = "overlap-context-streaming-v1"
-HUMAN_EXTRACTION_VERSION = "markdown-prose-v9-human-paragraph-audio"
+HUMAN_BOUNDARY_SILENCE_SECONDS = 0.04
+HUMAN_DECODE_POLICY = "whole-request-codec-decode-v2"
+HUMAN_EXTRACTION_VERSION = "markdown-prose-v11-heading-context-audio"
 
 
 @dataclass(frozen=True)
@@ -427,14 +430,48 @@ def split_bounded_sentences(text: str, max_chars: int) -> list[str]:
 
 
 def paragraph_chunks_for_tts(text: str) -> list[NarrationChunk]:
-    """Compile headings and paragraphs into stable, human-paced requests.
+    """Compile bounded requests while keeping every heading in prose context.
 
-    A fixed Voxtral voice embedding keeps speaker identity stable when the
-    generation resets. Paragraph-sized requests bound acoustic drift, while
-    explicit pauses make heading and paragraph timing deterministic.
+    Short standalone heading prompts encouraged the casual voice to improvise
+    fillers, laughs, and exaggerated pauses. A heading therefore starts the
+    next buffer and is decoded with the prose that follows it. The hard
+    character ceiling still localizes failures without resetting the narrator
+    at every paragraph.
     """
 
     chunks: list[NarrationChunk] = []
+    buffer: list[str] = []
+    buffer_starts_section = False
+    buffer_has_prose = False
+
+    def flush_buffer(pause_seconds: float) -> None:
+        nonlocal buffer_has_prose, buffer_starts_section
+        if not buffer:
+            return
+        chunks.append(
+            NarrationChunk(
+                text="\n\n".join(buffer),
+                pause_seconds=pause_seconds,
+                kind="section" if buffer_starts_section else "paragraph",
+            )
+        )
+        buffer.clear()
+        buffer_starts_section = False
+        buffer_has_prose = False
+
+    def append_bounded(rendered: str) -> None:
+        nonlocal buffer_has_prose
+        available = HUMAN_CHUNK_MAX_CHARS
+        if buffer and not buffer_has_prose:
+            heading_chars = len("\n\n".join(buffer)) + 2
+            available = max(200, HUMAN_CHUNK_MAX_CHARS - heading_chars)
+        for group in split_bounded_sentences(rendered, available):
+            candidate = "\n\n".join([*buffer, group])
+            if buffer and len(candidate) > HUMAN_CHUNK_MAX_CHARS:
+                flush_buffer(HUMAN_PARAGRAPH_PAUSE_SECONDS)
+            buffer.append(group)
+            buffer_has_prose = True
+
     blocks = re.split(rf"\s*{re.escape(PARAGRAPH_BREAK)}\s*", text)
     for block in blocks:
         block = block.strip()
@@ -442,23 +479,18 @@ def paragraph_chunks_for_tts(text: str) -> list[NarrationChunk]:
             continue
         is_heading = block.startswith(HEADING_START) and block.endswith(HEADING_END)
         rendered = render_for_tts(block)
-        groups = split_bounded_sentences(rendered, HUMAN_CHUNK_MAX_CHARS)
-        for index, group in enumerate(groups):
-            is_last = index == len(groups) - 1
-            pause = 0.0
-            if is_last:
-                pause = (
-                    HUMAN_HEADING_PAUSE_SECONDS
-                    if is_heading
-                    else HUMAN_PARAGRAPH_PAUSE_SECONDS
-                )
-            chunks.append(
-                NarrationChunk(
-                    text=group,
-                    pause_seconds=pause,
-                    kind="heading" if is_heading else "paragraph",
-                )
-            )
+        if is_heading:
+            # Nested or consecutive headings share the first prose request.
+            # Never give the expressive voice a tiny heading-only prompt.
+            if buffer_has_prose:
+                flush_buffer(HUMAN_HEADING_PAUSE_SECONDS)
+            buffer.append(rendered)
+            buffer_starts_section = True
+            continue
+
+        append_bounded(rendered)
+
+    flush_buffer(0.0)
     if chunks:
         final = chunks[-1]
         chunks[-1] = NarrationChunk(
@@ -469,46 +501,51 @@ def paragraph_chunks_for_tts(text: str) -> list[NarrationChunk]:
     return chunks
 
 
-def normalize_heading(value: str) -> str:
-    """Normalize a heading for explicit sidecar coverage checks."""
+def human_chunk_seed(post_slug: str, chunk_index: int) -> int:
+    """Return the reproducible seed assigned to one bounded request."""
 
-    value = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", value)
-    value = re.sub(r"[`*_~]", "", value)
-    return re.sub(r"[^a-z0-9]+", " ", value.casefold()).strip()
-
-
-def source_section_headings(source: str) -> set[str]:
-    """Return every non-reference section heading that an abridgement must cover."""
-
-    body = re.sub(r"\A---\n.*?\n---\n", "", source, count=1, flags=re.DOTALL)
-    headings: set[str] = set()
-    in_fence = False
-    for raw_line in body.splitlines():
-        line = raw_line.strip()
-        if line.startswith(("```", "~~~")):
-            in_fence = not in_fence
-            continue
-        if in_fence:
-            continue
-        match = re.match(r"^#{2,6}\s+(.+)$", line)
-        if not match:
-            continue
-        heading = normalize_heading(match.group(1))
-        if heading == "references":
-            break
-        headings.add(heading)
-    return headings
+    return HUMAN_CHUNK_SEED_OVERRIDES.get(post_slug, {}).get(
+        str(chunk_index), HUMAN_NARRATOR_SEED
+    )
 
 
-def abridgement_coverage(source: str, narration_source: str) -> set[str]:
-    """Return source headings missing from an abridged narration's coverage map."""
+def human_chunk_cache_path(post: dict[str, Any], chunk_index: int) -> Path:
+    """Return a content-addressed cache path for one generated waveform.
 
-    covered = source_section_headings(narration_source)
-    for marker in re.findall(
-        r"<!--\s*covers:\s*(.*?)\s*-->", narration_source, flags=re.IGNORECASE | re.DOTALL
-    ):
-        covered.update(normalize_heading(item) for item in marker.split("|") if item.strip())
-    return source_section_headings(source) - covered
+    Post-level digests change when a source edit or reviewed seed override is
+    recorded. Keying the waveform by its actual request and acoustic profile
+    lets an audit reroll one rejected request without regenerating every
+    accepted request in the article.
+    """
+
+    chunk: NarrationChunk = post["narration_chunks"][chunk_index]
+    payload = {
+        "text": chunk.text,
+        "model": HUMAN_MODEL,
+        "voice": HUMAN_VOICE,
+        "temperature": HUMAN_TEMPERATURE,
+        "top_k": HUMAN_TOP_K,
+        "top_p": HUMAN_TOP_P,
+        "seed": human_chunk_seed(post["slug"], chunk_index),
+        "max_generation_tokens": HUMAN_MAX_GENERATION_TOKENS,
+        "boundary_silence_seconds": HUMAN_BOUNDARY_SILENCE_SECONDS,
+        "decode_policy": HUMAN_DECODE_POLICY,
+    }
+    digest = hashlib.sha256(
+        json.dumps(payload, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+    return Path(tempfile.gettempdir()) / "blog-audio-chunks" / "by-request" / f"{digest}.wav"
+
+
+def legacy_human_chunk_cache_path(post: dict[str, Any], chunk_index: int) -> Path:
+    """Return the former post-digest cache path for one request."""
+
+    return (
+        Path(tempfile.gettempdir())
+        / "blog-audio-chunks"
+        / post["digest"]
+        / f"chunk-{chunk_index:03d}.wav"
+    )
 
 
 def discover_posts() -> list[dict[str, Any]]:
@@ -523,27 +560,8 @@ def discover_posts() -> list[dict[str, Any]]:
         if not post_slug:
             raise ValueError(f"Blog post is missing postSlug: {path}")
         source_sha256 = hashlib.sha256(source.encode("utf-8")).hexdigest()
-        narration_path = NARRATION_DIR / f"{post_slug}.md"
         narration_mode = "full-source"
-        narration_source = source
-        if narration_path.exists():
-            narration_source = narration_path.read_text(encoding="utf-8")
-            narration_frontmatter = parse_frontmatter(narration_source)
-            if narration_frontmatter.get("postSlug") != post_slug:
-                raise ValueError(f"Narration sidecar postSlug does not match {post_slug}")
-            if narration_frontmatter.get("sourceSha256") != source_sha256:
-                raise ValueError(
-                    f"Narration sidecar has not been reviewed against current source: {post_slug}"
-                )
-            missing_headings = abridgement_coverage(source, narration_source)
-            if missing_headings:
-                raise ValueError(
-                    f"Narration sidecar omits source sections for {post_slug}: "
-                    + ", ".join(sorted(missing_headings))
-                )
-            narration_mode = "section-complete-abridgement"
-
-        text = shape_narration(clean_markdown(narration_source))
+        text = shape_narration(clean_markdown(source))
         uses_human_profile = post_slug in HUMAN_NARRATION_POSTS
         narration_chunks = paragraph_chunks_for_tts(text) if uses_human_profile else []
         post_pronunciations = HUMAN_POST_PRONUNCIATION_LEXICONS.get(post_slug, {})
@@ -563,11 +581,6 @@ def discover_posts() -> list[dict[str, Any]]:
             else "\n".join(tts_sections)
         )
         narration_word_count = len(tts_text.split())
-        if narration_mode != "full-source" and narration_word_count > MAX_ABRIDGED_WORDS:
-            raise ValueError(
-                f"Narration sidecar exceeds {MAX_ABRIDGED_WORDS} words for {post_slug}: "
-                f"{narration_word_count}"
-            )
         if uses_human_profile:
             digest_payload = {
                 "source_sha256": source_sha256,
@@ -584,12 +597,12 @@ def discover_posts() -> list[dict[str, Any]]:
                 "sampling_seed_version": HUMAN_SAMPLING_SEED_VERSION,
                 "chunk_seed_overrides": HUMAN_CHUNK_SEED_OVERRIDES.get(post_slug, {}),
                 "speed": HUMAN_SPEED,
+                "output_gain_db": HUMAN_OUTPUT_GAIN_DB,
                 "paragraph_pause_seconds": HUMAN_PARAGRAPH_PAUSE_SECONDS,
                 "heading_pause_seconds": HUMAN_HEADING_PAUSE_SECONDS,
                 "sentence_pause_policy": HUMAN_SENTENCE_PAUSE_POLICY,
                 "chunking_policy": HUMAN_CHUNKING_POLICY,
                 "chunk_max_chars": HUMAN_CHUNK_MAX_CHARS,
-                "streaming_interval_seconds": HUMAN_STREAMING_INTERVAL_SECONDS,
                 "max_generation_tokens": HUMAN_MAX_GENERATION_TOKENS,
                 "min_seconds_per_word": HUMAN_MIN_SECONDS_PER_WORD,
                 "max_seconds_per_word": HUMAN_MAX_SECONDS_PER_WORD,
@@ -602,10 +615,9 @@ def discover_posts() -> list[dict[str, Any]]:
                 "max_audio_seconds": HUMAN_MAX_AUDIO_SECONDS.get(
                     post_slug, MAX_AUDIO_SECONDS
                 ),
-                "max_abridged_words": MAX_ABRIDGED_WORDS,
                 "bitrate": BITRATE,
                 "silence_threshold": SILENCE_THRESHOLD,
-                "boundary_silence_seconds": BOUNDARY_SILENCE_SECONDS,
+                "boundary_silence_seconds": HUMAN_BOUNDARY_SILENCE_SECONDS,
                 "extraction_version": HUMAN_EXTRACTION_VERSION,
             }
             if post_pronunciations:
@@ -669,7 +681,6 @@ def discover_posts() -> list[dict[str, Any]]:
                 "source_sha256": source_sha256,
                 "narration_mode": narration_mode,
                 "narration_word_count": narration_word_count,
-                "narration_path": narration_path if narration_path.exists() else None,
                 "digest": digest,
                 "output": AUDIO_DIR / f"{post_slug}.mp3",
             }
@@ -729,16 +740,17 @@ def narrator_profile_errors(posts: list[dict[str, Any]], manifest: dict[str, Any
         "narrator_seed": HUMAN_NARRATOR_SEED,
         "sampling_seed_version": HUMAN_SAMPLING_SEED_VERSION,
         "speed": HUMAN_SPEED,
+        "output_gain_db": HUMAN_OUTPUT_GAIN_DB,
         "paragraph_pause_seconds": HUMAN_PARAGRAPH_PAUSE_SECONDS,
         "heading_pause_seconds": HUMAN_HEADING_PAUSE_SECONDS,
         "sentence_pause_policy": HUMAN_SENTENCE_PAUSE_POLICY,
         "chunking_policy": HUMAN_CHUNKING_POLICY,
         "chunk_max_chars": HUMAN_CHUNK_MAX_CHARS,
-        "streaming_interval_seconds": HUMAN_STREAMING_INTERVAL_SECONDS,
         "max_generation_tokens": HUMAN_MAX_GENERATION_TOKENS,
         "min_seconds_per_word": HUMAN_MIN_SECONDS_PER_WORD,
         "max_seconds_per_word": HUMAN_MAX_SECONDS_PER_WORD,
         "decode_policy": HUMAN_DECODE_POLICY,
+        "boundary_silence_seconds": HUMAN_BOUNDARY_SILENCE_SECONDS,
         "pronunciation_policy": PRONUNCIATION_POLICY,
         "pronunciation_lexicon": PRONUNCIATION_LEXICON,
         "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
@@ -952,7 +964,7 @@ def generate_human_post(
     post: dict[str, Any],
     stream_progress: Any,
 ) -> float:
-    """Generate a fixed-voice, paragraph-bounded Voxtral narration."""
+    """Generate a fixed-voice, paragraph-grouped Voxtral narration."""
 
     import numpy as np
     from mlx_audio.audio_io import write as audio_write
@@ -962,10 +974,6 @@ def generate_human_post(
         raise ValueError(f"No speakable text found in {post['path']}")
 
     AUDIO_DIR.mkdir(parents=True, exist_ok=True)
-    chunk_cache = (
-        Path(tempfile.gettempdir()) / "blog-audio-chunks" / post["digest"]
-    )
-    chunk_cache.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=f"tts-{post['slug']}-") as temporary_dir:
         temporary = Path(temporary_dir)
         manifest_file = temporary / "concat.txt"
@@ -975,7 +983,11 @@ def generate_human_post(
         with manifest_file.open("w", encoding="utf-8") as listing:
             for chunk_index, chunk in enumerate(chunks):
                 chunk_path = temporary / f"chunk-{chunk_index:03d}.wav"
-                cached_chunk = chunk_cache / chunk_path.name
+                cached_chunk = human_chunk_cache_path(post, chunk_index)
+                legacy_cached_chunk = legacy_human_chunk_cache_path(post, chunk_index)
+                if not cached_chunk.exists() and legacy_cached_chunk.exists():
+                    cached_chunk.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(legacy_cached_chunk, cached_chunk)
                 if cached_chunk.exists():
                     shutil.copy2(cached_chunk, chunk_path)
                     sample_rate = 24_000
@@ -1002,9 +1014,7 @@ def generate_human_post(
                 pieces: list[Any] = []
                 generated_tokens = 0
                 sample_rate = 0
-                chunk_seed = HUMAN_CHUNK_SEED_OVERRIDES.get(post["slug"], {}).get(
-                    str(chunk_index), HUMAN_NARRATOR_SEED
-                )
+                chunk_seed = human_chunk_seed(post["slug"], chunk_index)
                 seed_narrator_generation(chunk_seed)
                 for result in model.generate(
                     text=chunk.text,
@@ -1013,8 +1023,10 @@ def generate_human_post(
                     top_k=HUMAN_TOP_K,
                     top_p=HUMAN_TOP_P,
                     max_tokens=HUMAN_MAX_GENERATION_TOKENS,
-                    stream=True,
-                    streaming_interval=HUMAN_STREAMING_INTERVAL_SECONDS,
+                    # Static export does not benefit from low-latency streaming.
+                    # Decoding the bounded request once prevents audible seams
+                    # between intermediate streaming waveforms.
+                    stream=False,
                 ):
                     audio_piece = np.asarray(result.audio)
                     if audio_piece.size:
@@ -1042,7 +1054,7 @@ def generate_human_post(
                         f"Model generated silence for chunk {chunk_index + 1} "
                         f"of {post['slug']}"
                     )
-                retained = round(sample_rate * BOUNDARY_SILENCE_SECONDS)
+                retained = round(sample_rate * HUMAN_BOUNDARY_SILENCE_SECONDS)
                 start = max(0, int(active[0]) - retained)
                 end = min(audio.size, int(active[-1]) + 1 + retained)
                 audio = audio[start:end]
@@ -1050,10 +1062,10 @@ def generate_human_post(
                 delivered_seconds = audio.size / sample_rate
                 word_count = len(chunk.text.split())
                 minimum_seconds = word_count * HUMAN_MIN_SECONDS_PER_WORD
-                # Short headings need a fixed allowance. This coarse ceiling
-                # catches only major runaways; the post-generation ASR audit
-                # distinguishes expressive slow delivery from extra speech.
-                fixed_allowance = 20.0 if chunk.kind == "heading" else 12.0
+                # This coarse ceiling catches only major runaways; the
+                # post-generation ASR audit distinguishes expressive delivery
+                # from extra speech and non-verbal artifacts.
+                fixed_allowance = 12.0
                 maximum_seconds = max(
                     fixed_allowance,
                     word_count * HUMAN_MAX_SECONDS_PER_WORD + 2.0,
@@ -1071,6 +1083,7 @@ def generate_human_post(
                     )
 
                 audio_write(str(chunk_path), audio, sample_rate, format="wav")
+                cached_chunk.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(chunk_path, cached_chunk)
                 listing.write(f"file '{chunk_path.as_posix()}'\n")
 
@@ -1116,7 +1129,7 @@ def generate_human_post(
                 "-i",
                 str(manifest_file),
                 "-af",
-                BOUNDARY_TRIM_FILTER,
+                f"{BOUNDARY_TRIM_FILTER},volume={HUMAN_OUTPUT_GAIN_DB}dB",
                 "-ac",
                 "1",
                 "-ar",
@@ -1203,16 +1216,17 @@ def manifest_record(post: dict[str, Any], duration_seconds: float) -> dict[str, 
                 post["slug"], MAX_AUDIO_SECONDS
             ),
             "speed": HUMAN_SPEED,
+            "output_gain_db": HUMAN_OUTPUT_GAIN_DB,
             "paragraph_pause_seconds": HUMAN_PARAGRAPH_PAUSE_SECONDS,
             "heading_pause_seconds": HUMAN_HEADING_PAUSE_SECONDS,
             "sentence_pause_policy": HUMAN_SENTENCE_PAUSE_POLICY,
             "chunking_policy": HUMAN_CHUNKING_POLICY,
             "chunk_max_chars": HUMAN_CHUNK_MAX_CHARS,
-            "streaming_interval_seconds": HUMAN_STREAMING_INTERVAL_SECONDS,
             "max_generation_tokens": HUMAN_MAX_GENERATION_TOKENS,
             "min_seconds_per_word": HUMAN_MIN_SECONDS_PER_WORD,
             "max_seconds_per_word": HUMAN_MAX_SECONDS_PER_WORD,
             "decode_policy": HUMAN_DECODE_POLICY,
+            "boundary_silence_seconds": HUMAN_BOUNDARY_SILENCE_SECONDS,
         }
     return {
         **common,
