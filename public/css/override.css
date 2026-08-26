@@ -8590,6 +8590,29 @@ html {
   overflow-wrap: anywhere;
 }
 
+.code-practice-lab__explanation-line {
+  display: block;
+}
+
+.code-practice-lab__explanation-line +
+.code-practice-lab__explanation-line,
+.code-practice-lab__explanation-line +
+.code-practice-lab__standalone-expression,
+.code-practice-lab__standalone-expression +
+.code-practice-lab__explanation-line,
+.code-practice-lab__standalone-expression +
+.code-practice-lab__standalone-expression {
+  margin-top: 0.55rem;
+}
+
+.code-practice-lab__explanation-copy .code-practice-lab__standalone-expression {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.42rem 0.62rem;
+  white-space: normal;
+}
+
 .code-practice-lab__explanation-visual {
   width: min(40rem, 100%);
   margin: 0 auto;

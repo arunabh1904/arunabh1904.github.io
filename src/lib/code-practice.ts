@@ -2945,9 +2945,12 @@ print(huber_loss(prediction, target).item())`,
       'Clamp once before both logarithms.',
     ],
     solutionNotes: [
-      'Binary cross-entropy is `L = -(1 / K) Σ_i [y_i log(p_i) + (1 - y_i) log(1 - p_i)]`. When `y_i = 1`, only `-log(p_i)` remains; when `y_i = 0`, only `-log(1 - p_i)` remains.',
-      'The invalid-label mask is `(target != 0) & (target != 1)`: it is true only for a value that is neither valid label. Reject when any mask entry is true. Equivalently, require every entry to satisfy `(target == 0) | (target == 1)`.',
-      'This function accepts probabilities, not logits. For raw logits `z`, a manual interview derivation should use the stable form `max(z, 0) - z*y + log(1 + exp(-|z|))`; applying sigmoid, then clamp, then log throws away that numerical advantage. In PyTorch training, use `binary_cross_entropy_with_logits`.',
+      'The target chooses which mistake to penalize:\n`y_i = 1  →  loss_i = -log(p_i)`\n`y_i = 0  →  loss_i = -log(1 - p_i)`',
+      'Average those elementwise losses:\n`L = -(1 / K) Σ_i [y_i log(p_i) + (1 - y_i) log(1 - p_i)]`',
+      'A target is invalid only when it is neither `0` nor `1`:\n`invalid = (target != 0) & (target != 1)`\nReject the input if any entry in this mask is true.',
+      'This function receives probabilities, so do not apply sigmoid. Clamp `p` only to avoid `log(0)` at the endpoints.',
+      'If the input is a raw logit `z`, use the stable logits form instead:\n`loss_i = max(z_i, 0) - z_i y_i + log(1 + exp(-|z_i|))`',
+      'In PyTorch training, call `binary_cross_entropy_with_logits` for raw logits.',
     ],
     solutionCode: `import torch
 

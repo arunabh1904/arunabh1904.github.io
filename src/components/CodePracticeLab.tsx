@@ -97,6 +97,22 @@ function renderInlineCode(text: string) {
   );
 }
 
+function renderExplanationNote(text: string) {
+  return text.split('\n').map((line, index) => {
+    const standaloneExpression = line.match(/^`([^`]+)`$/);
+
+    return standaloneExpression ? (
+      <code className="code-practice-lab__standalone-expression" key={`${line}-${index}`}>
+        {standaloneExpression[1]}
+      </code>
+    ) : (
+      <span className="code-practice-lab__explanation-line" key={`${line}-${index}`}>
+        {renderInlineCode(line)}
+      </span>
+    );
+  });
+}
+
 export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const isBrowserRunnable = (problem.environment ?? 'browser') === 'browser';
   const containerRef = useRef<HTMLElement | null>(null);
@@ -547,7 +563,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
                 <div className="code-practice-lab__explanation-copy">
                   {problem.solutionNotes.map((note) => (
-                    <p key={note}>{renderInlineCode(note)}</p>
+                    <p key={note}>{renderExplanationNote(note)}</p>
                   ))}
                 </div>
 
