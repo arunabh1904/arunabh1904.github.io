@@ -57,8 +57,12 @@ class ResNet(nn.Module): ...`,
       ],
     },
     solutionNotes: [
-      'A residual block can add its two paths only when their shapes match:\n`output = ReLU(residual_path(x) + skip_path(x))`\nUse a stride-matched `1x1` projection when spatial size or channel count changes.',
-      'The config owns architecture choices while `_make_stage` owns repetition. That separation keeps the forward pass short and makes a second ResNet variant a data change instead of a copy-and-edit exercise.',
+      'A residual block learns a correction to the input, then adds the original signal back:\n`output = ReLU(residual_path(x) + skip_path(x))`\nIf both paths already have the same shape, the skip is the identity and adds no parameters.',
+      'Addition requires identical shapes. The first block of a new stage usually halves height and width while increasing channels, so its skip path needs a stride-matched `1x1` convolution. Later blocks keep the shape and return to the identity skip.',
+      'Track the spatial path before coding:\n`stem: H × W → H/4 × W/4`\n`later stages: /8 → /16 → /32`\nOnly the first block in each later stage downsamples; accidentally applying stride to every block collapses the feature map.',
+      '`_make_stage` owns the repetitive construction and updates `self.in_channels` after each block. The config supplies widths and block counts, so changing from `(2, 2, 2, 2)` to another depth does not require rewriting `forward`.',
+      'Adaptive average pooling removes the remaining spatial axes regardless of input image size:\n`(B, C, Hf, Wf) → (B, C, 1, 1) → (B, C) → logits (B, K)`',
+      'The smoke test checks an odd image size as well as the final class shape. In an interview, that catches fixed-size pooling, incorrect stage strides, and projection shortcuts whose output cannot be added to the residual path.',
     ],
     solutionDiagram: `input
   -> stem / 4
@@ -118,7 +122,7 @@ class ResNet(nn.Module):
 def smoke_test() -> None:
     device = torch.device("cpu")
     model = ResNet(ResNetConfig(num_classes=10)).to(device=device, dtype=torch.float32)
-    images = torch.randn(2, 3, 224, 224, device=device, dtype=torch.float32)
+    images = torch.randn(2, 3, 225, 229, device=device, dtype=torch.float32)
     with torch.inference_mode():
         logits = model(images)
     assert logits.shape == (2, 10)
@@ -206,7 +210,7 @@ class ResNet(nn.Module):
 def smoke_test() -> None:
     device = torch.device("cpu")
     model = ResNet(ResNetConfig(num_classes=10)).to(device=device, dtype=torch.float32)
-    images = torch.randn(2, 3, 224, 224, device=device, dtype=torch.float32)
+    images = torch.randn(2, 3, 225, 229, device=device, dtype=torch.float32)
     with torch.inference_mode():
         logits = model(images)
     assert logits.shape == (2, 10)
@@ -273,8 +277,11 @@ class UNet(nn.Module): ...`,
       ],
     },
     solutionNotes: [
-      'Each decoder stage follows the same shape flow:\n`upsample decoder → align to skip size → concatenate channels → DoubleConv`\nThe encoder must save each high-resolution feature before pooling.',
-      'Odd sizes expose a common hidden assumption: repeated division by two is not exactly reversible. Aligning to `skip.shape[-2:]` makes the spatial contract explicit and avoids hard-coded crop arithmetic.',
+      'The encoder builds semantics while reducing resolution. Save each block output before pooling; those saved tensors carry the fine boundaries that would otherwise be lost in the bottleneck.',
+      'Each decoder stage repeats one shape operation:\n`upsample decoder → align to skip size → concatenate channels → DoubleConv`\nConcatenation happens on channels, so the first decoder convolution receives `decoder_channels + skip_channels`.',
+      'The channel ledger is easiest to derive backward from the encoder widths. If the deepest skip has `C` channels, the bottleneck has `2C`; after upsampling to `C`, concatenating the `C`-channel skip produces `2C` input channels for `DoubleConv`.',
+      'Odd sizes expose a common hidden assumption: repeated division by two is not exactly reversible. Resize to the actual skip shape:\n`target_size = skip.shape[-2:]`\nThis avoids brittle crop arithmetic and restores the exact input resolution.',
+      'The final `1x1` convolution changes channels without changing spatial size:\n`(B, C, H, W) → (B, classes, H, W)`\nReturn logits; sigmoid or softmax belongs with the chosen loss or inference post-processing.',
     ],
     solutionDiagram: `input -> enc 32 -> pool -> enc 64 -> pool -> enc 128 -> bottleneck 256
             |                    |                     |
@@ -502,7 +509,10 @@ class CenterNetDetector(nn.Module): ...`,
     },
     solutionNotes: [
       'One stride-four feature map feeds three heads:\n`heatmap logits: (B, classes, H/4, W/4)`\n`box size: (B, 2, H/4, W/4)`\n`center offset: (B, 2, H/4, W/4)`',
-      'Returning raw heatmap logits keeps loss computation stable and leaves thresholding, local-maximum suppression, top-k selection, and coordinate decoding outside the model boundary.',
+      'Each output cell corresponds to a stride-four location in the input image. The heatmap asks which class center occupies that cell; size predicts box width and height; offset repairs the sub-cell error caused by mapping a continuous center onto a discrete grid.',
+      'The backbone is shared because all three tasks need the same local feature map. Separate small heads let each task learn its own final representation without duplicating the expensive image encoder.',
+      'Initialize the final heatmap bias to `-2.19`, so the initial sigmoid probability is about `0.1`. Starting with a low foreground prior prevents the many background locations from producing confident positives before training.',
+      'Return raw heatmap logits for a stable focal-style loss. Thresholding, local-maximum suppression, top-k selection, and decoding back to image coordinates are inference steps, so they stay outside `forward`.',
     ],
     solutionDiagram: `image (B, 3, H, W)
   -> stride-4 backbone (B, C, H/4, W/4)

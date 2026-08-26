@@ -69,6 +69,26 @@ describe('augmentCodeWithSolution', () => {
     expect(temperatureCode).not.toContain('raise ValueError');
   });
 
+  it('inserts class helper methods required by attention forward passes', () => {
+    const expectedHelpers = new Map([
+      ['scaled-dot-product-self-attention', ['_split_heads']],
+      ['cross-attention', ['_split_heads']],
+      ['grouped-query-and-multi-query-attention', ['_split', '_repeat_kv']],
+    ]);
+
+    for (const [id, helpers] of expectedHelpers) {
+      const problem = codePracticeProblems.find((candidate) => candidate.id === id)!;
+      const annotatedCode = augmentCodeWithSolution(problem);
+
+      for (const helper of helpers) {
+        expect(annotatedCode, id).toContain(`def ${helper}(`);
+        expect(annotatedCode, id).not.toMatch(
+          new RegExp(`^\\s+raise NotImplementedError\\("Implement ${helper}"\\)$`, 'm'),
+        );
+      }
+    }
+  });
+
   it('keeps reference snippets short and leaves validation in the prompt', () => {
     const problem = codePracticeProblems.find(
       (candidate) => candidate.id === 'stable-softmax-cross-entropy',

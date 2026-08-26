@@ -11,6 +11,25 @@ function compilePython(code: string) {
   );
 }
 
+function runPython(code: string) {
+  return execFileSync('python3', ['-c', code], {
+    encoding: 'utf8',
+    timeout: 15_000,
+  });
+}
+
+const CLASS_BASED_PROBLEMS = new Set([
+  'nearest-centroid-classifier',
+  'scaled-dot-product-self-attention',
+  'incremental-kv-cache',
+  'grouped-query-and-multi-query-attention',
+  'cross-attention',
+  'simple-n-gram-language-model',
+  'resnet-from-building-blocks',
+  'unet-encoder-decoder',
+  'centernet-style-detector',
+]);
+
 // These helpers solve the operation being taught instead of exposing its tensor steps.
 const BANNED_CONVENIENCE_CALLS = [
   'torch.softmax(',
@@ -67,10 +86,10 @@ const REQUIRED_PRIMITIVES = [
   {
     id: 'grouped-query-and-multi-query-attention',
     fragments: [
-      'query_heads % kv_heads != 0',
       'torch.broadcast_to(',
-      'query_heads // kv_heads',
+      'self.config.num_query_heads // heads',
       'torch.amax(',
+      'return "mqa" if self.num_kv_heads == 1 else "gqa"',
     ],
   },
   {
@@ -117,6 +136,34 @@ describe('code-practice primitive-first solutions', () => {
     }
   });
 
+  it('lets explanation depth follow the problem instead of a fixed template', () => {
+    const explanationBundles = new Set<string>();
+
+    for (const problem of codePracticeProblems) {
+      const bundle = problem.solutionNotes.join('\n');
+      expect(explanationBundles.has(bundle), `${problem.id} repeats another explanation`).toBe(false);
+      explanationBundles.add(bundle);
+
+      const minimumSteps =
+        problem.track === 'architecture' ? 5 : problem.difficulty === 'Hard' ? 4 : 2;
+      expect(problem.solutionNotes.length, problem.id).toBeGreaterThanOrEqual(minimumSteps);
+    }
+
+    const resnet = codePracticeProblems.find(
+      (problem) => problem.id === 'resnet-from-building-blocks',
+    )!;
+    expect(resnet.solutionNotes.join(' ')).toContain('identity skip');
+    expect(resnet.solutionNotes.join(' ')).toContain('1x1');
+    expect(resnet.solutionNotes.join(' ')).toContain('_make_stage');
+    expect(resnet.solutionNotes.join(' ')).toContain('Adaptive average pooling');
+
+    const ngram = codePracticeProblems.find(
+      (problem) => problem.id === 'simple-n-gram-language-model',
+    )!;
+    expect(ngram.solutionNotes.join(' ')).toContain('runs offline');
+    expect(ngram.prompt.join(' ')).not.toContain('Tiny Shakespeare');
+  });
+
   it('gives every exercise a reference walkthrough and unique ordered route', () => {
     const ids = new Set<string>();
 
@@ -137,12 +184,51 @@ describe('code-practice primitive-first solutions', () => {
     const fundamentals = codePracticeProblems.filter((problem) => problem.track === 'fundamentals');
 
     for (const problem of fundamentals) {
-      expect(problem.solutionCode.split('\n').length, problem.id).toBeLessThanOrEqual(45);
+      const lineLimit = CLASS_BASED_PROBLEMS.has(problem.id) ? 80 : 45;
+      expect(problem.solutionCode.split('\n').length, problem.id).toBeLessThanOrEqual(lineLimit);
       expect(
         problem.solutionCode.split('\n').filter((line) => line.trimStart().startsWith('#')),
         problem.id,
       ).toHaveLength(0);
     }
+  });
+
+  it('uses classes only when the interview problem owns reusable state', () => {
+    expect(
+      codePracticeProblems
+        .filter((problem) => !problem.signature.trimStart().startsWith('def '))
+        .map((problem) => problem.id),
+    ).toEqual([...CLASS_BASED_PROBLEMS]);
+
+    for (const problem of codePracticeProblems) {
+      if (CLASS_BASED_PROBLEMS.has(problem.id)) {
+        expect(problem.solutionCode, problem.id).toContain('class ');
+        expect(problem.solutionCode, problem.id).toContain('def smoke_test()');
+        expect(problem.solutionCode.trimEnd(), problem.id).toMatch(/smoke_test\(\)$/);
+      } else {
+        expect(problem.signature.trimStart(), problem.id).toMatch(/^def /);
+      }
+    }
+
+    for (const id of [
+      'scaled-dot-product-self-attention',
+      'grouped-query-and-multi-query-attention',
+      'cross-attention',
+      'resnet-from-building-blocks',
+      'unet-encoder-decoder',
+      'centernet-style-detector',
+    ]) {
+      expect(codePracticeProblems.find((problem) => problem.id === id)?.solutionCode, id).toContain(
+        'nn.Module',
+      );
+    }
+  });
+
+  it('runs the n-gram reference solution end to end', () => {
+    const ngram = codePracticeProblems.find(
+      (problem) => problem.id === 'simple-n-gram-language-model',
+    )!;
+    expect(runPython(ngram.solutionCode)).toContain('n-gram smoke test passed');
   });
 
   it('offers NumPy only for concise array-math interviews', () => {
@@ -324,10 +410,12 @@ describe('code-practice primitive-first solutions', () => {
 
     expect(attentionProblems.every(Boolean)).toBe(true);
     expect(attentionProblems[3]?.title).toContain('MHA');
+    expect(attentionProblems[3]?.solutionCode).toContain('class MultiHeadSelfAttention(nn.Module):');
     expect(attentionProblems[4]?.solutionCode).toContain('class KVCache:');
     expect(attentionProblems[4]?.solutionCode).toContain('cached_layout != update_layout');
     expect(attentionProblems[5]?.title).toContain('GQA');
     expect(attentionProblems[5]?.title).toContain('MQA');
+    expect(attentionProblems[5]?.solutionCode).toContain('for kv_heads, expected_mode in');
 
     const axes = new Set(
       attentionProblems.flatMap((problem) => problem?.reasoning?.map((point) => point.axis) ?? []),

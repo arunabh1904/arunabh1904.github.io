@@ -1045,20 +1045,25 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
     summary:
       'Compute one centroid per class and predict each test point by the nearest Euclidean centroid.',
     prompt: [
-      'Imagine the training rows as points in a feature space: `train_X[i]` is one point and `train_y[i]` says which class owns it. Write `nearest_centroid_predict(train_X, train_y, test_X)` to label each new row in `test_X`.',
-      'For each distinct class, average its training points to make one representative point—the class centroid. Compare every test point with every centroid using Euclidean distance, then return the label of the closest centroid. If distances tie, choose the smaller class label.',
+      'Implement a `NearestCentroidClassifier` with separate `fit(train_X, train_y)` and `predict(test_X)` methods.',
+      'Fitting stores one mean vector per class. Prediction compares new rows with those learned centroids and chooses the nearest class; ties go to the smaller label.',
     ],
-    signature: `def nearest_centroid_predict(
-    train_X: torch.Tensor,
-    train_y: torch.Tensor,
-    test_X: torch.Tensor,
-) -> torch.Tensor:
-    ...`,
+    signature: `@dataclass(slots=True)
+class NearestCentroidClassifier:
+    labels: torch.Tensor | None = None
+    centroids: torch.Tensor | None = None
+
+    def fit(self, train_X: torch.Tensor, train_y: torch.Tensor) -> NearestCentroidClassifier:
+        ...
+
+    def predict(self, test_X: torch.Tensor) -> torch.Tensor:
+        ...`,
     requirements: [
       '`train_X` is an `(N, D)` array or list.',
       '`train_y` is a 1D array or list of length `N` containing class labels.',
       '`test_X` is an `(M, D)` array or list.',
-      'Return predictions as a 1D array.',
+      '`fit` stores sorted labels and a `(K, D)` centroid tensor, then returns `self`.',
+      '`predict` returns a 1D label tensor and rejects use before fitting.',
       'If distances tie, choose the smaller class label.',
       'Raise `ValueError` for invalid shapes or invalid labels.',
     ],
@@ -1066,9 +1071,10 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
       {
         label: 'Example 1',
         lines: [
+          'model = NearestCentroidClassifier()',
           'train_X = [[0.0], [2.0], [10.0], [12.0]]',
           'train_y = [0, 0, 1, 1]',
-          'test_X = [[0.0], [6.0], [12.0]]',
+          'model.fit(train_X, train_y).predict([[0.0], [6.0], [12.0]])',
         ],
         result: '[0, 0, 1]',
       },
@@ -1083,12 +1089,14 @@ print(box_iou_matrix(sample_boxes1, sample_boxes2))`,
       },
     ],
     hint: [
+      'A class is useful here because `fit` creates state that later `predict` calls reuse.',
       'Group `train_X` by label, then divide each class-wise feature sum by its count to form the centroids.',
       'Sort the unique labels so that ties fall to the smaller class label when you take an argmin.',
       'Broadcast `test_X` against the centroid matrix to compute all distances at once.',
       'Use squared Euclidean distance to avoid an unnecessary square root.',
     ],
     solutionNotes: [
+      'This is stateful, unlike a one-shot loss: `fit` learns labels and centroids, while `predict` reuses them. A small dataclass makes that lifecycle explicit.',
       'Represent each class by the mean of its training points:\n`class points: (n_k, D)  →  centroid: (D,)`\nStacking all class means gives `centroids: (K, D)`.',
       'Broadcast every test point against every centroid:\n`test_X[:, None, :]: (M, 1, D)`\n`centroids[None, :, :]: (1, K, D)`\n`difference: (M, K, D)  →  squared distance: (M, K)`',
       'Squared distance has the same nearest-centroid ordering as Euclidean distance, so no square root is needed. Sorted class labels make ties deterministic.',
@@ -1151,24 +1159,29 @@ def nearest_centroid_predict(
     return labels[nearest_indices]`,
     starterCode: `from __future__ import annotations
 
+from dataclasses import dataclass
 import torch
 
-def nearest_centroid_predict(
-    train_X: torch.Tensor,
-    train_y: torch.Tensor,
-    test_X: torch.Tensor,
-) -> torch.Tensor:
-    # TODO:
-    # 1. Validate feature dimensions and integer labels.
-    # 2. Build each sorted class centroid as its feature sum divided by its count.
-    # 3. Broadcast squared distances and choose the nearest centroid.
-    raise NotImplementedError("Implement nearest_centroid_predict")
+@dataclass(slots=True)
+class NearestCentroidClassifier:
+    labels: torch.Tensor | None = None
+    centroids: torch.Tensor | None = None
 
-sample_train_X = torch.tensor([[0.0], [2.0], [10.0], [12.0]], dtype=torch.float64)
-sample_train_y = torch.tensor([0, 0, 1, 1], dtype=torch.long)
-sample_test_X = torch.tensor([[0.0], [6.0], [12.0]], dtype=torch.float64)
+    def fit(self, train_X: torch.Tensor, train_y: torch.Tensor) -> NearestCentroidClassifier:
+        # TODO: compute and store one centroid per sorted class label.
+        raise NotImplementedError("Implement fit")
 
-print(nearest_centroid_predict(sample_train_X, sample_train_y, sample_test_X))`,
+    def predict(self, test_X: torch.Tensor) -> torch.Tensor:
+        # TODO: reject an unfitted model, then return the nearest stored label.
+        raise NotImplementedError("Implement predict")
+
+def smoke_test() -> None:
+    model = NearestCentroidClassifier().fit([[0.0], [2.0], [10.0], [12.0]], [0, 0, 1, 1])
+    prediction = model.predict([[0.0], [6.0], [12.0]])
+    assert prediction.tolist() == [0, 0, 1]
+    print("Nearest-centroid smoke test passed:", prediction.tolist())
+
+smoke_test()`,
     packages: PYTORCH_AND_NUMPY_PACKAGES,
     tags: ['PyTorch', 'Classification', 'Centroids'],
   },
@@ -1722,49 +1735,53 @@ print(apply_rope(sample_x))`,
     summary:
       'Compute single-call multi-head self-attention with scaled dot-product scores, optional masking, and an output projection.',
     prompt: [
-      'Implement single-call multi-head self-attention for a tensor of shape `(B, T, D_model)`.',
-      'Project the input into query, key, and value spaces, split into `num_heads` heads, apply scaled dot-product attention with an optional mask, then project the concatenated heads back to `(B, T, D_model)`.',
+      'Implement `MultiHeadSelfAttention` as an `nn.Module` for inputs shaped `(B, T, D_model)`.',
+      'Store the four learned projections on the module, split Q/K/V into heads, apply stable masked attention, merge the heads, and project back to `(B, T, D_model)`.',
     ],
-    signature: `def self_attention(
-    x: torch.Tensor,
-    W_q: torch.Tensor,
-    W_k: torch.Tensor,
-    W_v: torch.Tensor,
-    W_o: torch.Tensor,
-    num_heads: int,
-    mask: torch.Tensor | None = None,
-) -> torch.Tensor:
-    ...`,
+    signature: `@dataclass(frozen=True, slots=True)
+class MHAConfig:
+    model_dim: int
+    num_heads: int
+
+class MultiHeadSelfAttention(nn.Module):
+    def __init__(self, config: MHAConfig):
+        ...
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        mask: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        ...`,
     requirements: [
       '`x` has shape `(B, T, D_model)`.',
-      'Projection matrices `W_q`, `W_k`, `W_v`, and `W_o` all have shape `(D_model, D_model)`.',
-      '`num_heads` divides `D_model`.',
+      '`MHAConfig` validates positive dimensions and requires `num_heads` to divide `model_dim`.',
+      'The module owns learned Q, K, V, and output projections.',
       '`mask`, if provided, is broadcastable to `(B, H, T, T)` and contains `1` for allowed positions and `0` for blocked positions.',
       'Return an output of shape `(B, T, D_model)`.',
-      'Raise `ValueError` on invalid input.',
+      'Include a runnable smoke test for shape, masking, and finite output.',
     ],
     examples: [
       {
         label: 'Example 1',
         lines: [
-          'x = [[[1.0, 0.0], [0.0, 1.0]]]',
-          'W_q = W_k = W_v = W_o = [[1.0, 0.0], [0.0, 1.0]]',
-          'num_heads = 1',
+          'layer = MultiHeadSelfAttention(MHAConfig(model_dim=8, num_heads=2))',
+          'x.shape = (2, 4, 8)',
         ],
-        result: '[[[0.66976, 0.33024], [0.33024, 0.66976]]]',
+        result: 'layer(x).shape == (2, 4, 8)',
       },
       {
         label: 'Example 2',
         lines: [
-          'x = [[[1.0, 0.0], [0.0, 1.0]]]',
-          'W_q = W_k = W_v = W_o = [[1.0, 0.0], [0.0, 1.0]]',
-          'num_heads = 1',
-          'mask = [[[1, 0], [1, 1]]]',
+          'positions = torch.arange(4)',
+          'causal_mask = positions[:, None] >= positions[None, :]',
+          'output = layer(x, causal_mask)',
         ],
-        result: '[[[1.0, 0.0], [0.33024, 0.66976]]]',
+        result: 'output.shape == x.shape and every output value is finite',
       },
     ],
     hint: [
+      'Put learned projections in `__init__`; tensor shape work belongs in `forward`.',
       'Reshape the projected tensors into `(B, H, T, D_head)` before computing attention scores.',
       'Use the scaled dot-product formula `Q K^T / sqrt(D_head)` and a numerically stable softmax over the last axis.',
       'If a mask is provided, broadcast it to the score tensor and zero out blocked positions before softmax.',
@@ -1772,6 +1789,7 @@ print(apply_rope(sample_x))`,
     ],
     solutionNotes: [
       'Scaled dot-product attention is:\n`Attention(Q, K, V) = softmax(QKᵀ / √D_head) V`',
+      'Use an `nn.Module` here because Q, K, V, and output projections are learned state reused on every call. The frozen config keeps the head divisibility invariant next to construction.',
       'For self-attention, `Q`, `K`, and `V` all come from `x`:\n`x: (B, T, D_model)`\n`Q, K, V: (B, H, T, D_head)`\n`scores: (B, H, T, T)`\n`output: (B, T, D_model)`',
       'The mask and stable softmax are the important implementation details: blocked scores become `-inf`, and subtracting a row maximum prevents overflow. The final output projection preserves the original model width.',
     ],
@@ -1882,27 +1900,50 @@ def self_attention(
     return torch.matmul(context, W_o)`,
     starterCode: `from __future__ import annotations
 
+from dataclasses import dataclass
 import torch
+from torch import nn
 
-def self_attention(
-    x: torch.Tensor,
-    W_q: torch.Tensor,
-    W_k: torch.Tensor,
-    W_v: torch.Tensor,
-    W_o: torch.Tensor,
-    num_heads: int,
-    mask: torch.Tensor | None = None,
-) -> torch.Tensor:
-    # TODO:
-    # 1. Validate BCHD projection shapes and the head divisibility invariant.
-    # 2. Project, reshape into heads, and compute scaled dot-product scores.
-    # 3. Apply the optional binary mask, normalize stably, merge heads, and project out.
-    raise NotImplementedError("Implement self_attention")
+@dataclass(frozen=True, slots=True)
+class MHAConfig:
+    model_dim: int
+    num_heads: int
 
-sample_x = torch.tensor([[[1.0, 0.0], [0.0, 1.0]]], dtype=torch.float64)
-sample_w = torch.eye(2, dtype=torch.float64)
+    def __post_init__(self) -> None:
+        if self.model_dim <= 0 or self.num_heads <= 0 or self.model_dim % self.num_heads:
+            raise ValueError("num_heads must divide a positive model_dim")
 
-print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads=1))`,
+    @property
+    def head_dim(self) -> int:
+        return self.model_dim // self.num_heads
+
+class MultiHeadSelfAttention(nn.Module):
+    def __init__(self, config: MHAConfig):
+        super().__init__()
+        self.config = config
+        self.q_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.k_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.v_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+
+    def _split_heads(self, tensor: torch.Tensor) -> torch.Tensor:
+        # TODO: reshape (B, T, D_model) into (B, H, T, D_head).
+        raise NotImplementedError("Implement _split_heads")
+
+    def forward(self, x: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
+        # TODO: project, split heads, attend stably, merge heads, and project out.
+        raise NotImplementedError("Implement forward")
+
+def smoke_test() -> None:
+    torch.manual_seed(0)
+    layer = MultiHeadSelfAttention(MHAConfig(model_dim=8, num_heads=2))
+    x = torch.randn(2, 4, 8)
+    positions = torch.arange(4)
+    output = layer(x, positions[:, None] >= positions[None, :])
+    assert output.shape == x.shape and bool(torch.all(torch.isfinite(output)))
+    print("MHA smoke test passed:", tuple(output.shape))
+
+smoke_test()`,
     packages: PYTORCH_AND_NUMPY_PACKAGES,
     tags: ['PyTorch', 'Attention', 'Transformers'],
   },
@@ -1914,53 +1955,52 @@ print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads
     summary:
       'Compute multi-head cross-attention from a query sequence and a separate context sequence, with scaled dot-product scores and an output projection.',
     prompt: [
-      'Implement multi-head cross-attention for a query tensor and a separate context tensor.',
-      'Project the query sequence into queries, project the context sequence into keys and values, split into heads, apply scaled dot-product attention with an optional mask, then project the concatenated heads back to `(B, Tq, D_model)`.',
+      'Implement `CrossAttention` as an `nn.Module` for a query sequence and a separate context sequence.',
+      'Store the learned projections on the module, build Q from the query and K/V from the context, then return `(B, Tq, D_model)`.',
     ],
-    signature: `def cross_attention(
-    query_x: torch.Tensor,
-    context_x: torch.Tensor,
-    W_q: torch.Tensor,
-    W_k: torch.Tensor,
-    W_v: torch.Tensor,
-    W_o: torch.Tensor,
-    num_heads: int,
-    mask: torch.Tensor | None = None,
-) -> torch.Tensor:
-    ...`,
+    signature: `@dataclass(frozen=True, slots=True)
+class CrossAttentionConfig:
+    model_dim: int
+    num_heads: int
+
+class CrossAttention(nn.Module):
+    def forward(
+        self,
+        query_x: torch.Tensor,
+        context_x: torch.Tensor,
+        mask: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        ...`,
     requirements: [
       '`query_x` has shape `(B, Tq, D_model)`.',
       '`context_x` has shape `(B, Tk, D_model)`.',
-      'Projection matrices `W_q`, `W_k`, `W_v`, and `W_o` all have shape `(D_model, D_model)`.',
-      '`num_heads` divides `D_model`.',
+      'The config requires `num_heads` to divide `model_dim`.',
+      'The module owns Q, K, V, and output projections.',
       '`mask`, if provided, is broadcastable to `(B, H, Tq, Tk)` and contains `1` for allowed positions and `0` for blocked positions.',
       'Return an output of shape `(B, Tq, D_model)`.',
-      'Raise `ValueError` on invalid input.',
+      'Include a runnable smoke test with different query and context lengths.',
     ],
     examples: [
       {
         label: 'Example 1',
         lines: [
-          'query_x = [[[1.0, 0.0]]]',
-          'context_x = [[[1.0, 0.0], [0.0, 1.0]]]',
-          'W_q = W_k = W_v = W_o = [[1.0, 0.0], [0.0, 1.0]]',
-          'num_heads = 1',
+          'layer = CrossAttention(CrossAttentionConfig(model_dim=8, num_heads=2))',
+          'query_x.shape = (2, 3, 8)',
+          'context_x.shape = (2, 5, 8)',
         ],
-        result: '[[[0.66976, 0.33024]]]',
+        result: 'layer(query_x, context_x).shape == (2, 3, 8)',
       },
       {
         label: 'Example 2',
         lines: [
-          'query_x = [[[1.0, 0.0], [0.0, 1.0]]]',
-          'context_x = [[[1.0, 0.0], [0.0, 1.0]]]',
-          'W_q = W_k = W_v = W_o = [[1.0, 0.0], [0.0, 1.0]]',
-          'num_heads = 1',
-          'mask = [[[1, 0], [1, 1]]]',
+          'mask.shape = (3, 5)',
+          'output = layer(query_x, context_x, mask)',
         ],
-        result: '[[[1.0, 0.0], [0.33024, 0.66976]]]',
+        result: 'output.shape == query_x.shape and every value is finite',
       },
     ],
     hint: [
+      'Put learned projections in `__init__`; keep query/context tensor flow in `forward`.',
       'The only difference from self-attention is that queries come from `query_x`, while keys and values come from `context_x`.',
       'Reshape the projected tensors into `(B, H, Tq, D_head)` for queries and `(B, H, Tk, D_head)` for keys and values.',
       'Use the scaled dot-product formula `Q K^T / sqrt(D_head)` and a numerically stable softmax over the last axis.',
@@ -1968,6 +2008,7 @@ print(self_attention(sample_x, sample_w, sample_w, sample_w, sample_w, num_heads
     ],
     solutionNotes: [
       'Cross-attention uses the same equation as self-attention:\n`Attention(Q, K, V) = softmax(QKᵀ / √D_head) V`\nThe difference is where the three inputs come from: `Q` uses `query_x`; `K` and `V` use `context_x`.',
+      'Use a module because the projections are learned parameters reused across calls. The config owns the model/head divisibility invariant.',
       'The two sequence lengths stay separate:\n`Q: (B, H, Tq, D_head)`\n`K, V: (B, H, Tk, D_head)`\n`scores: (B, H, Tq, Tk)`\n`output: (B, Tq, D)`',
       'Each query token can read all `Tk` context tokens. Apply any mask to the score matrix before the stable softmax.',
     ],
@@ -2084,29 +2125,49 @@ def cross_attention(
     return torch.matmul(context, W_o)`,
     starterCode: `from __future__ import annotations
 
+from dataclasses import dataclass
 import torch
+from torch import nn
 
-def cross_attention(
-    query_x: torch.Tensor,
-    context_x: torch.Tensor,
-    W_q: torch.Tensor,
-    W_k: torch.Tensor,
-    W_v: torch.Tensor,
-    W_o: torch.Tensor,
-    num_heads: int,
-    mask: torch.Tensor | None = None,
-) -> torch.Tensor:
-    # TODO:
-    # 1. Validate query/context dimensions and head divisibility.
-    # 2. Project queries from query_x and keys/values from context_x.
-    # 3. Apply masked scaled dot-product attention and merge the heads.
-    raise NotImplementedError("Implement cross_attention")
+@dataclass(frozen=True, slots=True)
+class CrossAttentionConfig:
+    model_dim: int
+    num_heads: int
 
-sample_query = torch.tensor([[[1.0, 0.0]]], dtype=torch.float64)
-sample_context = torch.tensor([[[1.0, 0.0], [0.0, 1.0]]], dtype=torch.float64)
-sample_w = torch.eye(2, dtype=torch.float64)
+    def __post_init__(self) -> None:
+        if self.model_dim <= 0 or self.num_heads <= 0 or self.model_dim % self.num_heads:
+            raise ValueError("num_heads must divide a positive model_dim")
 
-print(cross_attention(sample_query, sample_context, sample_w, sample_w, sample_w, sample_w, num_heads=1))`,
+    @property
+    def head_dim(self) -> int:
+        return self.model_dim // self.num_heads
+
+class CrossAttention(nn.Module):
+    def __init__(self, config: CrossAttentionConfig):
+        super().__init__()
+        self.config = config
+        self.q_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.k_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.v_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+
+    def _split_heads(self, tensor: torch.Tensor) -> torch.Tensor:
+        # TODO: reshape (B, T, D_model) into (B, H, T, D_head).
+        raise NotImplementedError("Implement _split_heads")
+
+    def forward(self, query_x: torch.Tensor, context_x: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
+        # TODO: project two sources, split heads, attend stably, merge, and project out.
+        raise NotImplementedError("Implement forward")
+
+def smoke_test() -> None:
+    torch.manual_seed(0)
+    layer = CrossAttention(CrossAttentionConfig(model_dim=8, num_heads=2))
+    query, context = torch.randn(2, 3, 8), torch.randn(2, 5, 8)
+    output = layer(query, context, torch.ones(3, 5))
+    assert output.shape == query.shape and bool(torch.all(torch.isfinite(output)))
+    print("Cross-attention smoke test passed:", tuple(output.shape))
+
+smoke_test()`,
     packages: PYTORCH_AND_NUMPY_PACKAGES,
     tags: ['PyTorch', 'Attention', 'Transformers'],
   },
@@ -2185,6 +2246,9 @@ print(cross_attention(sample_query, sample_context, sample_w, sample_w, sample_w
     solutionNotes: [
       'Cache the forward path because every backward step needs one of these values:\n`X → z1 → ReLU → hidden → z2 → softmax → loss`',
       'Start backprop from the softmax-cross-entropy shortcut:\n`dlogits = (probs - one_hot(y)) / N`\nThen move backward through the second affine layer, the ReLU mask, and the first affine layer.',
+      'The output-layer gradients follow directly from the affine rule:\n`dW2 = hidden.T @ dlogits`\n`db2 = sum(dlogits, axis=0)`\n`dhidden = dlogits @ W2.T`',
+      'ReLU passes gradient only where its pre-activation was positive:\n`dz1 = dhidden * (z1 > 0)`\nThen finish with `dW1 = X.T @ dz1` and `db1 = sum(dz1, axis=0)`.',
+      'The most common interview mistakes are forgetting the batch division in `dlogits`, using the post-ReLU tensor for the ReLU mask, or transposing the wrong operand. Check each gradient shape against its parameter shape.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -2376,6 +2440,9 @@ print(mlp_loss_and_grads(sample_X, sample_y, sample_W1, sample_b1, sample_W2, sa
     solutionNotes: [
       'Cache the forward path because every backward step needs one of these values:\n`X → z1 → ReLU → hidden → z2 → softmax → loss`',
       'Start backprop from the softmax-cross-entropy shortcut:\n`dlogits = (probs - one_hot(y)) / N`\nThen move backward through the second affine layer, the ReLU mask, and the first affine layer.',
+      'Keep a shape ledger beside the derivation:\n`X: (N, Din), W1: (Din, H), hidden: (N, H)`\n`W2: (H, C), logits: (N, C)`\nEvery returned gradient must have the same shape as its corresponding parameter.',
+      'For an affine layer `Y = XW + b`, memorize the three backward rules:\n`dW = X.T @ dY`\n`db = sum(dY, axis=0)`\n`dX = dY @ W.T`',
+      'Run the chain in reverse order and do not update parameters inside this function. The interview target is the derivation: stable forward loss, cached intermediates, and explicit gradients that can be compared with autograd later.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -2490,11 +2557,11 @@ print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, 
     title: 'Simple n-gram language model',
     difficulty: 'Medium',
     summary:
-      'Build a tiny backoff n-gram model that learns token counts, then fit it on a real corpus slice such as Tiny Shakespeare.',
+      'Build a runnable backoff n-gram model that learns token counts and samples deterministic continuations.',
     prompt: [
       'Implement a simple n-gram language model class with `__init__`, `fit`, `next_token_probs`, and `generate` methods.',
       'Train on a list of tokens, return next-token probability distributions from observed counts, sample autoregressively, and back off gracefully when a context has not been seen before.',
-      'Use the provided Tiny Shakespeare loader to pull in real text, tokenize it, and build the model from more than a hand-written toy sequence.',
+      'Keep corpus loading outside the model. The supplied smoke test uses a tiny sequence so every expected probability is easy to verify in an interview.',
     ],
     signature: `class NGramModel:
     def __init__(self, n: int):
@@ -2511,7 +2578,7 @@ print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, 
     requirements: [
       '`n` is an integer with `n >= 1`.',
       '`fit(tokens)` trains on a 1D list of tokens, where each token is a string or int.',
-      'The same `fit(tokens)` method should work for toy token lists and for tokens derived from a real text corpus.',
+      'The same `fit(tokens)` method should work for any iterable of string or integer tokens.',
       'Store the observed counts needed to answer next-token queries for orders up to `n`.',
       '`next_token_probs(context)` returns a dictionary mapping candidate next tokens to probabilities that sum to `1.0`.',
       'If a context is unseen, back off to progressively shorter suffixes until a seen context is found.',
@@ -2540,30 +2607,19 @@ print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, 
         result: `backoff probs = {'a': 0.5, 'b': 0.25, 'c': 0.25}
 generated = ['a', 'b', 'a', 'b', 'a']`,
       },
-      {
-        label: 'Example 3',
-        lines: [
-          'text = load_tiny_shakespeare(max_chars=4000)',
-          'tokens = tokenize_words(text)',
-          'model = NGramModel(3)',
-          'model.fit(tokens)',
-          'model.next_token_probs(["Before", "we"])',
-        ],
-        result: `{'proceed': 1.0}`,
-      },
     ],
     hint: [
       'A dictionary keyed by context tuples works for both string and integer tokens.',
       'During training, update counts for every suffix length from `0` up to `n - 1`, not just the longest context.',
       'To back off gracefully, keep shortening the context suffix until you find a context with observed counts.',
       'Use a dedicated seeded RNG inside `generate` so sampling is repeatable without touching global random state.',
-      'Keep corpus loading and tokenization outside the class so the n-gram model stays reusable for any token source.',
+      'Keep corpus loading and tokenization outside the class so the model stays reusable and the interview solution runs offline.',
     ],
     solutionNotes: [
       'Map each context tuple to counts of the tokens observed after it:\n`context tuple → next-token counts → normalized probabilities`\nDuring fitting, update every suffix length up to order `n`.',
       'At inference time, keep at most `n - 1` context tokens and back off through shorter suffixes until one was seen during fitting. Normalize that context’s counts into probabilities.',
       'Generation repeats lookup and sampling. A local `random.Random(seed)` keeps the sequence deterministic without changing global random state.',
-      'Because `fit` only cares about tokens, a tiny helper can load a slice of Tiny Shakespeare, split it into word tokens, and pass those tokens directly into the same model implementation.',
+      'The class owns fitted counts because `next_token_probs` and `generate` reuse them. Corpus loading is deliberately outside this interview implementation; the smoke test uses a tiny token list so the whole solution runs offline and the probability checks are exact.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -2706,42 +2762,6 @@ import random
 
 Token = str | int
 
-TINY_SHAKESPEARE_PATH = "/datasets/tiny-shakespeare.txt"
-TINY_SHAKESPEARE_URL = (
-    "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
-)
-TINY_SHAKESPEARE_FALLBACK = """First Citizen: Before we proceed any further, hear me speak.
-All: Speak, speak.
-First Citizen: You are all resolved rather to die than to famish?
-All: Resolved. resolved.
-First Citizen: First, you know Caius Marcius is chief enemy to the people.
-All: We know't, we know't.
-"""
-
-def load_tiny_shakespeare(max_chars: int = 12000) -> str:
-    if isinstance(max_chars, bool) or not isinstance(max_chars, int) or max_chars <= 0:
-        raise ValueError("max_chars must be a positive integer")
-
-    try:
-        from pyodide.http import open_url
-
-        text = open_url(TINY_SHAKESPEARE_PATH).read()
-    except Exception:
-        try:
-            from urllib.request import urlopen
-
-            with urlopen(TINY_SHAKESPEARE_URL, timeout=10) as response:
-                text = response.read().decode("utf-8")
-        except Exception:
-            text = TINY_SHAKESPEARE_FALLBACK
-
-    return str(text[:max_chars])
-
-def tokenize_words(text: str) -> list[str]:
-    if not isinstance(text, str) or not text.strip():
-        raise ValueError("text must be a non-empty string")
-    return text.split()
-
 def _coerce_tokens(values: Iterable[Token], name: str) -> list[Token]:
     # TODO: reject strings as containers and validate each token type.
     raise NotImplementedError("Implement _coerce_tokens")
@@ -2763,13 +2783,15 @@ class NGramModel:
         # TODO: use a local seeded RNG and sample autoregressively.
         raise NotImplementedError("Implement generate")
 
-text = load_tiny_shakespeare(max_chars=12000)
-tokens = tokenize_words(text)
-model = NGramModel(3).fit(tokens)
+def smoke_test() -> None:
+    model = NGramModel(2).fit(["a", "b", "a", "c"])
+    assert model.next_token_probs(["a"]) == {"b": 0.5, "c": 0.5}
+    assert model.next_token_probs(["unseen"]) == {"a": 0.5, "b": 0.25, "c": 0.25}
+    generated = model.generate(5, seed=4)
+    assert len(generated) == 5
+    print("n-gram smoke test passed:", generated)
 
-print(f"loaded {len(tokens)} tokens")
-print(model.next_token_probs(["Before", "we"]))
-print(" ".join(str(token) for token in model.generate(12, seed=7)))`,
+smoke_test()`,
     tags: ['Language Models', 'Probability', 'Hash Maps'],
   },
   {
@@ -3674,6 +3696,7 @@ print(angular_difference(prediction, target) * 180 / 3.141592653589793)`,
       'Sort detections by descending confidence, then compute precision at every rank:\n`precision(k) = TP(k) / k`',
       'Only true-positive ranks contribute to AP:\n`AP = (1 / num_ground_truth) Σ_k m_k · precision(k)`\nA false positive adds no numerator but still increases later rank denominators.',
       'The ground-truth count normalizes the sum and makes the metric comparable across images or classes. Full mAP additionally averages this AP across classes and IoU thresholds.',
+      'This exercise uses the non-interpolated precision-at-true-positive form. Real benchmarks may interpolate the precision curve or average multiple IoU thresholds, so state the convention before comparing AP numbers.',
     ],
     solutionCode: `import torch
 
@@ -3755,6 +3778,8 @@ print(average_precision(scores, matches, num_ground_truth=2).item())`,
     solutionNotes: [
       'Match in descending confidence order:\n`prediction → best unmatched ground truth → threshold check → claim or false positive`',
       'Once a ground-truth object is claimed, later duplicates are false positives. Vectorized IoU handles the geometry; the small loop enforces the one-to-one rule.',
+      'The output must return to original prediction order even though matching happens in score order. Write each decision into `matches[prediction_index]` instead of appending decisions to a new list.',
+      'Mask already-used ground truths before `argmax`. Choosing the best ground truth first and checking availability afterward can miss the next-best legal match.',
     ],
     solutionCode: `import torch
 
@@ -3934,6 +3959,8 @@ print(transform_points(points, transform))`,
     solutionNotes: [
       'This is the full pattern in one exercise: batch-aware broadcasting creates every prediction–ground-truth pair, and the last axis is reduced to the best match.',
       'The shape flow is:\n`pairwise IoU: (B, N, M)`\n`argmax over M: (B, N)`\n`gather best IoU: (B, N)`',
+      'The singleton axes keep batches isolated:\n`predictions[:, :, None, :]: (B, N, 1, 4)`\n`ground_truth[:, None, :, :]: (B, 1, M, 4)`\nBroadcasting forms `(B, N, M, 4)` without comparing boxes across images.',
+      '`argmax` returns the winning ground-truth index, while `gather` retrieves the IoU at that index. This is independent best matching; unlike greedy detection matching, it does not prevent several predictions from choosing the same ground truth.',
     ],
     solutionCode: `import torch
 
@@ -4067,17 +4094,39 @@ def box_iou_matrix(boxes1: torch.Tensor, boxes2: torch.Tensor) -> torch.Tensor:
     area2 = (boxes2[:, 2] - boxes2[:, 0]) * (boxes2[:, 3] - boxes2[:, 1])
     union = area1[:, None] + area2[None, :] - intersection
     return intersection / torch.clamp(union, min=1e-8)`,
-  'nearest-centroid-classifier': `import torch
+  'nearest-centroid-classifier': `from dataclasses import dataclass
+import torch
 
-def nearest_centroid_predict(train_X: torch.Tensor, train_y: torch.Tensor, test_X: torch.Tensor) -> torch.Tensor:
-    labels = torch.unique(train_y, sorted=True)
-    centroids = []
-    for label in labels:
-        class_points = train_X[train_y == label]
-        centroids.append(torch.sum(class_points, dim=0) / class_points.shape[0])
-    centroids = torch.stack(centroids)
-    distances = torch.sum((test_X[:, None, :] - centroids[None, :, :]) ** 2, dim=-1)
-    return labels[torch.argmin(distances, dim=1)]`,
+@dataclass(slots=True)
+class NearestCentroidClassifier:
+    labels: torch.Tensor | None = None
+    centroids: torch.Tensor | None = None
+
+    def fit(self, train_X, train_y):
+        train_X = torch.as_tensor(train_X, dtype=torch.float64)
+        train_y = torch.as_tensor(train_y, dtype=torch.long)
+        self.labels = torch.unique(train_y, sorted=True)
+        rows = []
+        for label in self.labels:
+            class_points = train_X[train_y == label]
+            rows.append(torch.sum(class_points, dim=0) / class_points.shape[0])
+        self.centroids = torch.stack(rows)
+        return self
+
+    def predict(self, test_X):
+        if self.labels is None or self.centroids is None:
+            raise ValueError("fit must be called before predict")
+        test_X = torch.as_tensor(test_X, dtype=self.centroids.dtype)
+        distances = torch.sum((test_X[:, None] - self.centroids[None]) ** 2, dim=-1)
+        return self.labels[torch.argmin(distances, dim=1)]
+
+def smoke_test():
+    model = NearestCentroidClassifier().fit([[0.0], [2.0], [10.0], [12.0]], [0, 0, 1, 1])
+    prediction = model.predict([[0.0], [6.0], [12.0]])
+    assert prediction.tolist() == [0, 0, 1]
+    print("Nearest-centroid smoke test passed:", prediction.tolist())
+
+smoke_test()`,
   'temperature-scaling-of-logits': `import torch
 
 def temperature_scaled_probs(logits: torch.Tensor, temperature: float) -> torch.Tensor:
@@ -4126,50 +4175,122 @@ def apply_rope(x: torch.Tensor) -> torch.Tensor:
     output[..., 0::2] = even * cos - odd * sin
     output[..., 1::2] = even * sin + odd * cos
     return output`,
-  'scaled-dot-product-self-attention': `import torch
+  'scaled-dot-product-self-attention': `from dataclasses import dataclass
+import torch
+from torch import nn
 
-def _masked_softmax(scores):
-    valid = torch.isfinite(scores)
-    scores = torch.where(valid, scores, torch.zeros_like(scores))
-    scores = scores - torch.amax(scores, dim=-1, keepdim=True)
-    weights = torch.exp(scores) * torch.as_tensor(valid, dtype=scores.dtype)
-    return weights / torch.clamp(torch.sum(weights, dim=-1, keepdim=True), min=1e-8)
+@dataclass(frozen=True, slots=True)
+class MHAConfig:
+    model_dim: int
+    num_heads: int
 
-def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
-    batch_size, seq_len, model_dim = x.shape
-    head_dim = model_dim // num_heads
-    split = lambda z: z.reshape(batch_size, seq_len, num_heads, head_dim).permute(0, 2, 1, 3)
-    q, k, v = split(x @ W_q), split(x @ W_k), split(x @ W_v)
-    scores = q @ k.transpose(-1, -2) / (head_dim ** 0.5)
-    if mask is not None:
-        scores = torch.where(mask != 0, scores, torch.full_like(scores, float('-inf')))
-    context = _masked_softmax(scores) @ v
-    context = context.permute(0, 2, 1, 3).reshape(batch_size, seq_len, model_dim)
-    return context @ W_o`,
-  'cross-attention': `import torch
+    def __post_init__(self):
+        if self.model_dim <= 0 or self.num_heads <= 0 or self.model_dim % self.num_heads:
+            raise ValueError("num_heads must divide a positive model_dim")
 
-def _masked_softmax(scores):
-    valid = torch.isfinite(scores)
-    scores = torch.where(valid, scores, torch.zeros_like(scores))
-    scores = scores - torch.amax(scores, dim=-1, keepdim=True)
-    weights = torch.exp(scores) * torch.as_tensor(valid, dtype=scores.dtype)
-    return weights / torch.clamp(torch.sum(weights, dim=-1, keepdim=True), min=1e-8)
+    @property
+    def head_dim(self):
+        return self.model_dim // self.num_heads
 
-def cross_attention(query_x, context_x, W_q, W_k, W_v, W_o, num_heads, mask=None):
-    batch_size, query_len, model_dim = query_x.shape
-    context_len = context_x.shape[1]
-    head_dim = model_dim // num_heads
-    def split(z, length):
-        return z.reshape(batch_size, length, num_heads, head_dim).permute(0, 2, 1, 3)
-    q = split(query_x @ W_q, query_len)
-    k = split(context_x @ W_k, context_len)
-    v = split(context_x @ W_v, context_len)
-    scores = q @ k.transpose(-1, -2) / (head_dim ** 0.5)
-    if mask is not None:
-        scores = torch.where(mask != 0, scores, torch.full_like(scores, float('-inf')))
-    context = _masked_softmax(scores) @ v
-    context = context.permute(0, 2, 1, 3).reshape(batch_size, query_len, model_dim)
-    return context @ W_o`,
+class MultiHeadSelfAttention(nn.Module):
+    def __init__(self, config: MHAConfig):
+        super().__init__()
+        self.config = config
+        self.q_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.k_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.v_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+
+    def _split_heads(self, tensor):
+        batch, length, _ = tensor.shape
+        tensor = tensor.reshape(batch, length, self.config.num_heads, self.config.head_dim)
+        return tensor.permute(0, 2, 1, 3)
+
+    def forward(self, x, mask=None):
+        q = self._split_heads(self.q_proj(x))
+        k = self._split_heads(self.k_proj(x))
+        v = self._split_heads(self.v_proj(x))
+        scores = q @ k.transpose(-1, -2) / (self.config.head_dim ** 0.5)
+        if mask is not None:
+            mask = torch.broadcast_to(torch.as_tensor(mask), scores.shape)
+            scores = torch.where(mask != 0, scores, torch.full_like(scores, float('-inf')))
+        valid = torch.isfinite(scores)
+        safe = torch.where(valid, scores, torch.zeros_like(scores))
+        shifted = safe - torch.amax(safe, dim=-1, keepdim=True)
+        weights = torch.exp(shifted) * torch.as_tensor(valid, dtype=scores.dtype)
+        weights = weights / torch.clamp(torch.sum(weights, dim=-1, keepdim=True), min=1e-8)
+        context = (weights @ v).permute(0, 2, 1, 3)
+        context = context.reshape(x.shape[0], x.shape[1], self.config.model_dim)
+        return self.out_proj(context)
+
+def smoke_test():
+    torch.manual_seed(0)
+    layer = MultiHeadSelfAttention(MHAConfig(model_dim=8, num_heads=2))
+    x = torch.randn(2, 4, 8)
+    positions = torch.arange(4)
+    mask = positions[:, None] >= positions[None, :]
+    output = layer(x, mask)
+    assert output.shape == x.shape and bool(torch.all(torch.isfinite(output)))
+    print("MHA smoke test passed:", tuple(output.shape))
+
+smoke_test()`,
+  'cross-attention': `from dataclasses import dataclass
+import torch
+from torch import nn
+
+@dataclass(frozen=True, slots=True)
+class CrossAttentionConfig:
+    model_dim: int
+    num_heads: int
+
+    def __post_init__(self):
+        if self.model_dim <= 0 or self.num_heads <= 0 or self.model_dim % self.num_heads:
+            raise ValueError("num_heads must divide a positive model_dim")
+
+    @property
+    def head_dim(self):
+        return self.model_dim // self.num_heads
+
+class CrossAttention(nn.Module):
+    def __init__(self, config: CrossAttentionConfig):
+        super().__init__()
+        self.config = config
+        self.q_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.k_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.v_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+
+    def _split_heads(self, tensor):
+        batch, length, _ = tensor.shape
+        tensor = tensor.reshape(batch, length, self.config.num_heads, self.config.head_dim)
+        return tensor.permute(0, 2, 1, 3)
+
+    def forward(self, query_x, context_x, mask=None):
+        q = self._split_heads(self.q_proj(query_x))
+        k = self._split_heads(self.k_proj(context_x))
+        v = self._split_heads(self.v_proj(context_x))
+        scores = q @ k.transpose(-1, -2) / (self.config.head_dim ** 0.5)
+        if mask is not None:
+            mask = torch.broadcast_to(torch.as_tensor(mask), scores.shape)
+            scores = torch.where(mask != 0, scores, torch.full_like(scores, float('-inf')))
+        valid = torch.isfinite(scores)
+        safe = torch.where(valid, scores, torch.zeros_like(scores))
+        shifted = safe - torch.amax(safe, dim=-1, keepdim=True)
+        weights = torch.exp(shifted) * torch.as_tensor(valid, dtype=scores.dtype)
+        weights = weights / torch.clamp(torch.sum(weights, dim=-1, keepdim=True), min=1e-8)
+        context = (weights @ v).permute(0, 2, 1, 3)
+        context = context.reshape(query_x.shape[0], query_x.shape[1], self.config.model_dim)
+        return self.out_proj(context)
+
+def smoke_test():
+    torch.manual_seed(0)
+    layer = CrossAttention(CrossAttentionConfig(model_dim=8, num_heads=2))
+    query, context = torch.randn(2, 3, 8), torch.randn(2, 5, 8)
+    output = layer(query, context, torch.ones(3, 5))
+    assert output.shape == query.shape and bool(torch.all(torch.isfinite(output)))
+    print("Cross-attention smoke test passed:", tuple(output.shape))
+
+smoke_test()`,
   'manual-backprop-for-a-2-layer-mlp': `import torch
 
 def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
@@ -4216,10 +4337,14 @@ def mlp_forward_backward(X, y, W1, b1, W2, b2):
 import random
 
 def _coerce_tokens(values, name):
+    if isinstance(values, (str, bytes)):
+        raise ValueError(f"{name} must be an iterable of tokens")
     return list(values)
 
 class NGramModel:
     def __init__(self, n):
+        if isinstance(n, bool) or not isinstance(n, int) or n < 1:
+            raise ValueError("n must be an integer >= 1")
         self.n = n
         self.counts = defaultdict(Counter)
 
@@ -4251,7 +4376,17 @@ class NGramModel:
                 break
             tokens, weights = zip(*probs.items())
             output.append(rng.choices(tokens, weights=weights, k=1)[0])
-    return output`,
+        return output
+
+def smoke_test():
+    model = NGramModel(2).fit(["a", "b", "a", "c"])
+    assert model.next_token_probs(["a"]) == {"b": 0.5, "c": 0.5}
+    assert model.next_token_probs(["unseen"]) == {"a": 0.5, "b": 0.25, "c": 0.25}
+    generated = model.generate(5, seed=4)
+    assert len(generated) == 5
+    print("n-gram smoke test passed:", generated)
+
+smoke_test()`,
 };
 
 // NumPy is useful here when it reinforces the same formula with a smaller array API.
@@ -4476,21 +4611,27 @@ print(pairwise_cosine_similarity(x, y))`,
   'nearest-centroid-classifier': {
     code: `import numpy as np
 
-def nearest_centroid_predict(
-    train_X: np.ndarray,
-    train_y: np.ndarray,
-    test_X: np.ndarray,
-) -> np.ndarray:
-    train_X, train_y, test_X = map(np.asarray, (train_X, train_y, test_X))
-    labels = np.unique(train_y)
-    centroids = np.stack([train_X[train_y == label].mean(axis=0) for label in labels])
-    distances = np.sum((test_X[:, None, :] - centroids[None, :, :]) ** 2, axis=-1)
-    return labels[np.argmin(distances, axis=1)]`,
+class NearestCentroidClassifier:
+    def __init__(self) -> None:
+        self.labels: np.ndarray | None = None
+        self.centroids: np.ndarray | None = None
+
+    def fit(self, train_X: np.ndarray, train_y: np.ndarray) -> "NearestCentroidClassifier":
+        train_X, train_y = np.asarray(train_X), np.asarray(train_y)
+        self.labels = np.unique(train_y)
+        self.centroids = np.stack([train_X[train_y == label].mean(axis=0) for label in self.labels])
+        return self
+
+    def predict(self, test_X: np.ndarray) -> np.ndarray:
+        test_X = np.asarray(test_X)
+        distances = np.sum((test_X[:, None] - self.centroids[None]) ** 2, axis=-1)
+        return self.labels[np.argmin(distances, axis=1)]`,
     exampleCode: `train_X = np.array([[0.0], [2.0], [10.0], [12.0]])
 train_y = np.array([0, 0, 1, 1])
 test_X = np.array([[0.0], [6.0], [12.0]])
-print(nearest_centroid_predict(train_X, train_y, test_X))`,
-    memory: ['Boolean indexing builds each centroid; two singleton axes build all test-to-centroid pairs.'],
+model = NearestCentroidClassifier().fit(train_X, train_y)
+print(model.predict(test_X))`,
+    memory: ['Use a class when `fit` creates centroids that later `predict` calls reuse.'],
   },
   'iou-matrix': {
     code: `import numpy as np
@@ -4720,31 +4861,29 @@ print(apply_rope(x))`,
   'scaled-dot-product-self-attention': {
     code: `import numpy as np
 
-def self_attention(
-    x: np.ndarray,
-    W_q: np.ndarray,
-    W_k: np.ndarray,
-    W_v: np.ndarray,
-    W_o: np.ndarray,
-    num_heads: int,
-    mask: np.ndarray | None = None,
-) -> np.ndarray:
-    batch, length, model_dim = x.shape
-    head_dim = model_dim // num_heads
-    split = lambda z: z.reshape(batch, length, num_heads, head_dim).transpose(0, 2, 1, 3)
-    q, k, v = split(x @ W_q), split(x @ W_k), split(x @ W_v)
-    scores = q @ k.swapaxes(-1, -2) / np.sqrt(head_dim)
-    if mask is not None:
-        scores = np.where(mask, scores, -np.inf)
-    shifted = scores - np.max(scores, axis=-1, keepdims=True)
-    weights = np.exp(shifted)
-    weights /= np.sum(weights, axis=-1, keepdims=True)
-    context = (weights @ v).transpose(0, 2, 1, 3).reshape(batch, length, model_dim)
-    return context @ W_o`,
+class MultiHeadSelfAttention:
+    def __init__(self, W_q: np.ndarray, W_k: np.ndarray, W_v: np.ndarray, W_o: np.ndarray, num_heads: int):
+        self.W_q, self.W_k, self.W_v, self.W_o = W_q, W_k, W_v, W_o
+        self.num_heads = num_heads
+
+    def __call__(self, x: np.ndarray, mask: np.ndarray | None = None) -> np.ndarray:
+        batch, length, model_dim = x.shape
+        head_dim = model_dim // self.num_heads
+        split = lambda z: z.reshape(batch, length, self.num_heads, head_dim).transpose(0, 2, 1, 3)
+        q, k, v = split(x @ self.W_q), split(x @ self.W_k), split(x @ self.W_v)
+        scores = q @ k.swapaxes(-1, -2) / np.sqrt(head_dim)
+        if mask is not None:
+            scores = np.where(mask, scores, -np.inf)
+        shifted = scores - np.max(scores, axis=-1, keepdims=True)
+        weights = np.exp(shifted)
+        weights /= np.sum(weights, axis=-1, keepdims=True)
+        context = (weights @ v).transpose(0, 2, 1, 3).reshape(batch, length, model_dim)
+        return context @ self.W_o`,
     exampleCode: `x = np.array([[[1.0, 0.0], [0.0, 1.0]]])
 weight = np.eye(2)
-print(self_attention(x, weight, weight, weight, weight, num_heads=1))`,
-    memory: ['Memorize the path: project, split heads, `QKᵀ / sqrt(d)`, softmax, weighted sum, merge heads.'],
+layer = MultiHeadSelfAttention(weight, weight, weight, weight, num_heads=1)
+print(layer(x))`,
+    memory: ['A class owns reusable projection weights; `__call__` still follows project, split, attend, merge.'],
   },
   'average-precision-from-matches': {
     code: `import numpy as np
@@ -4891,6 +5030,7 @@ const ALL_CODE_PRACTICE_PROBLEMS: readonly CodePracticeProblem[] = [
 export const codePracticeProblems: readonly CodePracticeProblem[] = ALL_CODE_PRACTICE_PROBLEMS
   .map((problem) => {
     const numpyAlternative = NUMPY_ALTERNATIVES[problem.id];
+    const referenceSolution = COMPACT_REFERENCE_SOLUTIONS[problem.id] ?? problem.solutionCode;
     const tags = problem.tags ?? [];
 
     return {
@@ -4902,8 +5042,8 @@ export const codePracticeProblems: readonly CodePracticeProblem[] = ALL_CODE_PRA
         problem.editorStart ?? (problem.signature.trimStart().startsWith('def ') ? 'blank' : 'scaffold'),
       order: PROGRESSIVE_ORDER[problem.id] ?? problem.order,
       difficulty: PROGRESSIVE_DIFFICULTY[problem.id] ?? problem.difficulty,
-      walkthroughCode: problem.walkthroughCode ?? problem.solutionCode,
-      solutionCode: COMPACT_REFERENCE_SOLUTIONS[problem.id] ?? problem.solutionCode,
+      walkthroughCode: referenceSolution,
+      solutionCode: referenceSolution,
       visual: CODE_PRACTICE_VISUALS[problem.id] ?? problem.visual,
       numpyAlternative,
       tags: numpyAlternative && !tags.includes('NumPy') ? [...tags, 'NumPy'] : tags,
