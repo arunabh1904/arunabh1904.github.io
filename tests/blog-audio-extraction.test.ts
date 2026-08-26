@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -95,11 +96,37 @@ function paragraphChunksForTts(source: string) {
   return JSON.parse(result.stdout) as Array<{
     text: string;
     pause_seconds: number;
-    kind: 'heading' | 'paragraph';
+    kind: 'section' | 'paragraph';
   }>;
 }
 
+function humanNarrationModes() {
+  const program = [
+    'import importlib.util, json, pathlib, sys',
+    'path = pathlib.Path(sys.argv[1])',
+    'spec = importlib.util.spec_from_file_location("blog_audio", path)',
+    'module = importlib.util.module_from_spec(spec)',
+    'sys.modules[spec.name] = module',
+    'spec.loader.exec_module(module)',
+    'print(json.dumps({post["slug"]: post["narration_mode"] for post in module.discover_posts() if post["synthesis_profile"] == "human"}))',
+  ].join('; ');
+  const result = spawnSync('python3', ['-c', program, exporterPath], {
+    cwd: projectRoot,
+    encoding: 'utf8',
+  });
+
+  expect(result.stderr).toBe('');
+  expect(result.status).toBe(0);
+  return JSON.parse(result.stdout) as Record<string, string>;
+}
+
 describe('Blog audio extraction', () => {
+  it('compiles every human-profile post from the full visible source', () => {
+    expect(new Set(Object.values(humanNarrationModes()))).toEqual(
+      new Set(['full-source']),
+    );
+  });
+
   it('preserves authored prose in order while omitting visual-only material', () => {
     const source = [
       '# Evidence',
@@ -214,7 +241,7 @@ describe('Blog audio extraction', () => {
     ]);
   });
 
-  it('gives the human profile explicit heading and paragraph pauses', () => {
+  it('keeps headings with following prose and explicit section pauses', () => {
     const chunks = paragraphChunksForTts([
       '# Perception',
       '',
@@ -228,23 +255,57 @@ describe('Blog audio extraction', () => {
     ].join('\n'));
 
     expect(chunks).toEqual([
-      { text: 'Perception.', pause_seconds: 0.65, kind: 'heading' },
       {
-        text: 'First paragraph. Second sentence.',
-        pause_seconds: 0.35,
-        kind: 'paragraph',
+        text: 'Perception.\n\nFirst paragraph. Second sentence.\n\nSecond paragraph stays a separate synthesis request.',
+        pause_seconds: 0.55,
+        kind: 'section',
       },
       {
-        text: 'Second paragraph stays a separate synthesis request.',
-        pause_seconds: 0.35,
-        kind: 'paragraph',
-      },
-      { text: 'Geometry.', pause_seconds: 0.65, kind: 'heading' },
-      {
-        text: 'The final paragraph has no trailing synthetic silence.',
+        text: 'Geometry.\n\nThe final paragraph has no trailing synthetic silence.',
         pause_seconds: 0,
-        kind: 'paragraph',
+        kind: 'section',
       },
     ]);
+  });
+
+  it('never emits a heading as a standalone request when prose follows it', () => {
+    const chunks = paragraphChunksForTts([
+      '## End-to-end planning',
+      '',
+      'Planning consumes the fused state under a deadline.',
+    ].join('\n'));
+
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0]).toEqual({
+      text: 'End-to-end planning.\n\nPlanning consumes the fused state under a deadline.',
+      pause_seconds: 0,
+      kind: 'section',
+    });
+  });
+
+  it('keeps consecutive headings with their first prose paragraph', () => {
+    const chunks = paragraphChunksForTts([
+      '## Decisions and actions',
+      '',
+      '### Driving models',
+      '',
+      'The policy consumes visual evidence.',
+    ].join('\n'));
+
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0]?.text).toBe(
+      'Decisions and actions.\n\nDriving models.\n\nThe policy consumes visual evidence.',
+    );
+  });
+
+  it('decodes each bounded Voxtral request as one waveform', () => {
+    const exporter = readFileSync(exporterPath, 'utf8');
+    const humanGenerator = exporter.slice(
+      exporter.indexOf('def generate_human_post('),
+      exporter.indexOf('\ndef generate_post('),
+    );
+
+    expect(humanGenerator).toContain('stream=False');
+    expect(humanGenerator).not.toContain('streaming_interval=');
   });
 });

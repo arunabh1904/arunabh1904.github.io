@@ -18,7 +18,7 @@ import importlib.util
 import json
 import re
 import sys
-import tempfile
+import wave
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +29,38 @@ DEFAULT_ASR_MODEL = "mlx-community/whisper-large-v3-turbo"
 DEFAULT_MAX_WER = 0.08
 DEFAULT_MAX_INSERTION_WORDS = 2
 DEFAULT_MAX_CHUNK_WER = 0.50
+DEFAULT_MAX_UNALIGNED_SECONDS = 1.5
+DISALLOWED_INSERTION_WORDS = frozenset(
+    {
+        "ah",
+        "erm",
+        "ha",
+        "haha",
+        "hahaha",
+        "hehe",
+        "hmm",
+        "hm",
+        "laugh",
+        "laughs",
+        "laughter",
+        "giggle",
+        "giggles",
+        "mhmm",
+        "mm",
+        "mmhmm",
+        "mmm",
+        "okay",
+        "ok",
+        "well",
+        "uh",
+        "uhh",
+        "uhm",
+        "um",
+        "umm",
+        "yeah",
+    }
+)
+DISALLOWED_INSERTION_PHRASES = frozenset({"all right", "i mean", "you know"})
 
 
 def load_generator() -> Any:
@@ -65,26 +97,86 @@ def normalize_transcript(text: str) -> str:
     return " ".join(normalized)
 
 
+def is_disallowed_insertion(word: str) -> bool:
+    """Return whether an inserted ASR token signals an audible improvisation."""
+
+    normalized = re.sub(r"[^a-z]", "", word.casefold())
+    return normalized in DISALLOWED_INSERTION_WORDS or bool(
+        re.search(r"([a-z])\1{2,}", normalized)
+        or re.fullmatch(r"h+a+h*a*", normalized)
+    )
+
+
+def wav_duration_seconds(path: Path) -> float:
+    """Read a cached PCM WAV duration without adding an audio dependency."""
+
+    with wave.open(str(path), "rb") as audio:
+        return audio.getnframes() / audio.getframerate()
+
+
+def unaligned_regions(
+    transcription: dict[str, Any],
+    *,
+    audio_seconds: float,
+    max_unaligned_seconds: float,
+) -> list[dict[str, Any]]:
+    """Find long audio regions that Whisper did not align to a spoken word."""
+
+    words = [
+        word
+        for segment in transcription.get("segments", [])
+        for word in segment.get("words", [])
+    ]
+    if not words:
+        return [{"position": "whole_chunk", "seconds": round(audio_seconds, 3)}]
+
+    regions: list[dict[str, Any]] = []
+
+    def record(position: str, seconds: float, context: str) -> None:
+        if seconds > max_unaligned_seconds:
+            regions.append(
+                {
+                    "position": position,
+                    "seconds": round(seconds, 3),
+                    "context": context,
+                }
+            )
+
+    record("prefix", float(words[0]["start"]), str(words[0]["word"]).strip())
+    for previous, following in zip(words, words[1:]):
+        record(
+            "internal",
+            float(following["start"]) - float(previous["end"]),
+            f"{str(previous['word']).strip()} | {str(following['word']).strip()}",
+        )
+    record(
+        "suffix",
+        audio_seconds - float(words[-1]["end"]),
+        str(words[-1]["word"]).strip(),
+    )
+    return regions
+
+
 def audit_post(
+    generator: Any,
     post: dict[str, Any],
     *,
     asr_model: str,
     max_wer: float,
     max_insertion_words: int,
     max_chunk_wer: float,
+    max_unaligned_seconds: float,
 ) -> dict[str, Any]:
     """Transcribe cached synthesis chunks and return release-gate metrics."""
 
     import jiwer
     import mlx_whisper
 
-    chunk_cache = (
-        Path(tempfile.gettempdir()) / "blog-audio-chunks" / post["digest"]
-    )
-    chunk_paths = [
-        chunk_cache / f"chunk-{index:03d}.wav"
-        for index in range(len(post["narration_chunks"]))
-    ]
+    chunk_paths = []
+    for index in range(len(post["narration_chunks"])):
+        content_addressed = generator.human_chunk_cache_path(post, index)
+        legacy = generator.legacy_human_chunk_cache_path(post, index)
+        chunk_paths.append(content_addressed if content_addressed.exists() else legacy)
     missing = [str(path) for path in chunk_paths if not path.exists()]
     if missing:
         raise FileNotFoundError(
@@ -95,7 +187,9 @@ def audit_post(
     references: list[str] = []
     hypotheses: list[str] = []
     long_insertions: list[dict[str, Any]] = []
+    disallowed_insertions: list[dict[str, Any]] = []
     high_error_chunks: list[dict[str, Any]] = []
+    suspicious_unaligned_regions: list[dict[str, Any]] = []
     for index, (chunk, chunk_path) in enumerate(
         zip(post["narration_chunks"], chunk_paths)
     ):
@@ -103,6 +197,8 @@ def audit_post(
             str(chunk_path),
             path_or_hf_repo=asr_model,
             language="en",
+            temperature=0.0,
+            word_timestamps=True,
         )
         reference = normalize_transcript(chunk.text)
         hypothesis = normalize_transcript(transcription["text"])
@@ -116,6 +212,20 @@ def audit_post(
             inserted_words = hypothesis_words[
                 alignment.hyp_start_idx : alignment.hyp_end_idx
             ]
+            rejected_words = [
+                word for word in inserted_words if is_disallowed_insertion(word)
+            ]
+            inserted_text = " ".join(inserted_words)
+            rejected_phrase = inserted_text in DISALLOWED_INSERTION_PHRASES
+            if rejected_words or rejected_phrase:
+                disallowed_insertions.append(
+                    {
+                        "chunk": index,
+                        "text": inserted_text,
+                        "rejected_words": rejected_words,
+                        "rejected_phrase": rejected_phrase,
+                    }
+                )
             if len(inserted_words) > max_insertion_words:
                 long_insertions.append(
                     {
@@ -133,12 +243,20 @@ def audit_post(
                     "recognized": transcription["text"].strip(),
                 }
             )
+        for region in unaligned_regions(
+            transcription,
+            audio_seconds=wav_duration_seconds(chunk_path),
+            max_unaligned_seconds=max_unaligned_seconds,
+        ):
+            suspicious_unaligned_regions.append({"chunk": index, **region})
 
     comparison = jiwer.process_words(references, hypotheses)
     passed = (
         comparison.wer <= max_wer
         and not long_insertions
+        and not disallowed_insertions
         and not high_error_chunks
+        and not suspicious_unaligned_regions
     )
     return {
         "slug": post["slug"],
@@ -152,11 +270,14 @@ def audit_post(
         "deletions": comparison.deletions,
         "insertions": comparison.insertions,
         "long_insertions": long_insertions,
+        "disallowed_insertions": disallowed_insertions,
         "high_error_chunks": high_error_chunks,
+        "suspicious_unaligned_regions": suspicious_unaligned_regions,
         "limits": {
             "max_wer": max_wer,
             "max_insertion_words": max_insertion_words,
             "max_chunk_wer": max_chunk_wer,
+            "max_unaligned_seconds": max_unaligned_seconds,
         },
         "passed": passed,
     }
@@ -178,6 +299,11 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_MAX_INSERTION_WORDS,
     )
     parser.add_argument("--max-chunk-wer", type=float, default=DEFAULT_MAX_CHUNK_WER)
+    parser.add_argument(
+        "--max-unaligned-seconds",
+        type=float,
+        default=DEFAULT_MAX_UNALIGNED_SECONDS,
+    )
     return parser.parse_args()
 
 
@@ -191,11 +317,13 @@ def main() -> int:
 
     reports = [
         audit_post(
+            generator,
             posts_by_slug[slug],
             asr_model=args.asr_model,
             max_wer=args.max_wer,
             max_insertion_words=args.max_insertion_words,
             max_chunk_wer=args.max_chunk_wer,
+            max_unaligned_seconds=args.max_unaligned_seconds,
         )
         for slug in args.post
     ]
