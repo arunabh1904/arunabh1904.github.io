@@ -5036,8 +5036,7 @@ export const codePracticeProblems: readonly CodePracticeProblem[] = ALL_CODE_PRA
       ...problem,
       ...ATTENTION_PROBLEM_ENRICHMENTS[problem.id],
       track: problem.track ?? 'fundamentals',
-      editorStart:
-        problem.editorStart ?? (problem.signature.trimStart().startsWith('def ') ? 'blank' : 'scaffold'),
+      editorStart: problem.editorStart ?? 'blank',
       order: PROGRESSIVE_ORDER[problem.id] ?? problem.order,
       difficulty: PROGRESSIVE_DIFFICULTY[problem.id] ?? problem.difficulty,
       walkthroughCode: referenceSolution,

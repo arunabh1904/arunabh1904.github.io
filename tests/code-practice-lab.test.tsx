@@ -404,7 +404,7 @@ describe('CodePracticeLab', () => {
     expect(container.querySelector('.code-practice-lab--reference')).toBeNull();
   });
 
-  it('runs full nn.Module exercises in the same browser workspace', async () => {
+  it('reveals a full nn.Module exercise only after Solution is pressed', async () => {
     loadPyodideRuntime.mockResolvedValueOnce({
       runPythonAsync: vi.fn(),
     });
@@ -415,7 +415,7 @@ describe('CodePracticeLab', () => {
       title: 'Build a configurable ResNet',
       track: 'architecture',
       numpyAlternative: undefined,
-      editorStart: 'scaffold',
+      editorStart: 'blank',
       starterCode: `from torch import nn
 
 class ResNet(nn.Module):
@@ -431,7 +431,18 @@ class ResNet(nn.Module):
     expect(loadPyodideRuntime).toHaveBeenCalledOnce();
     expect(container.textContent).not.toContain('Local PyTorch');
     expect(container.querySelector('button[aria-label="Run code"]')).not.toBeNull();
+    expect(getEditor().textContent).not.toContain('class ResNet(nn.Module):');
+
+    const solutionButton = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Solution',
+    );
+    await act(async () => {
+      solutionButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
     expect(getEditor().textContent).toContain('class ResNet(nn.Module):');
+    expect(getEditor().textContent).toContain('return x');
+    expect(getEditor().textContent).not.toContain('raise NotImplementedError');
   });
 
   it('keeps the default workspace focused until a reference solution is loaded', async () => {
