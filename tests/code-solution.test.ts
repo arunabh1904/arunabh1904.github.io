@@ -89,6 +89,17 @@ describe('augmentCodeWithSolution', () => {
     }
   });
 
+  it('keeps Cross-Attention helper parameters aligned after solution insertion', () => {
+    const problem = codePracticeProblems.find((candidate) => candidate.id === 'cross-attention')!;
+    const annotatedCode = augmentCodeWithSolution(problem);
+
+    expect(annotatedCode).toContain(
+      'def _split_heads(self, x: torch.Tensor) -> torch.Tensor:',
+    );
+    expect(annotatedCode).toContain('batch_size, length, _ = x.shape');
+    expect(annotatedCode).not.toContain('def forward(self, seq_a, seq_b, mask');
+  });
+
   it('keeps reference snippets short and leaves validation in the prompt', () => {
     const problem = codePracticeProblems.find(
       (candidate) => candidate.id === 'stable-softmax-cross-entropy',

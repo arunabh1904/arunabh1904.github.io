@@ -224,6 +224,31 @@ describe('code-practice primitive-first solutions', () => {
     }
   });
 
+  it('keeps cross-attention config-driven, two-source, and unmasked', () => {
+    const problem = codePracticeProblems.find((candidate) => candidate.id === 'cross-attention')!;
+    const exerciseText = [
+      problem.summary,
+      ...problem.prompt,
+      problem.signature,
+      ...problem.requirements,
+      ...problem.examples.flatMap((example) => [...example.lines, example.result]),
+      ...problem.hint,
+      ...problem.solutionNotes,
+      problem.solutionDiagram ?? '',
+      problem.solutionCode,
+      problem.starterCode,
+    ].join('\n');
+
+    expect(exerciseText).not.toMatch(/\bmask(?:ed|ing)?\b/i);
+    expect(problem.solutionCode).toContain('class CrossAttentionConfig:');
+    expect(problem.solutionCode).toContain(
+      'def forward(self, seq_a: torch.Tensor, seq_b: torch.Tensor) -> torch.Tensor:',
+    );
+    expect(problem.solutionCode).toContain('torch.amax(x, dim=dim, keepdim=True)');
+    expect(problem.solutionCode).toContain('weights = stable_softmax(scores, dim=-1)');
+    expect(() => compilePython(problem.solutionCode)).not.toThrow();
+  });
+
   it('runs the n-gram reference solution end to end', () => {
     const ngram = codePracticeProblems.find(
       (problem) => problem.id === 'simple-n-gram-language-model',

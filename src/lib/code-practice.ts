@@ -1958,10 +1958,10 @@ smoke_test()`,
     title: 'Cross-attention',
     difficulty: 'Hard',
     summary:
-      'Compute multi-head cross-attention from a query sequence and a separate context sequence, with scaled dot-product scores and an output projection.',
+      'Build config-driven multi-head cross-attention where one sequence supplies queries and another supplies keys and values.',
     prompt: [
-      'Implement `CrossAttention` as an `nn.Module` for a query sequence and a separate context sequence.',
-      'Store the learned projections on the module, build Q from the query and K/V from the context, then return `(B, Tq, D_model)`.',
+      'Implement `CrossAttention` as an `nn.Module` for two token sequences. `seq_a` supplies queries; `seq_b` supplies keys and values.',
+      'Keep the model dimensions in `CrossAttentionConfig`, store all four learned projections on the module, and return one output vector per token in `seq_a`.',
     ],
     signature: `@dataclass(frozen=True, slots=True)
 class CrossAttentionConfig:
@@ -1971,168 +1971,129 @@ class CrossAttentionConfig:
 class CrossAttention(nn.Module):
     def forward(
         self,
-        query_x: torch.Tensor,
-        context_x: torch.Tensor,
-        mask: torch.Tensor | None = None,
+        seq_a: torch.Tensor,
+        seq_b: torch.Tensor,
     ) -> torch.Tensor:
         ...`,
     requirements: [
-      '`query_x` has shape `(B, Tq, D_model)`.',
-      '`context_x` has shape `(B, Tk, D_model)`.',
-      'The config requires `num_heads` to divide `model_dim`.',
-      'The module owns Q, K, V, and output projections.',
-      '`mask`, if provided, is broadcastable to `(B, H, Tq, Tk)` and contains `1` for allowed positions and `0` for blocked positions.',
-      'Return an output of shape `(B, Tq, D_model)`.',
-      'Include a runnable smoke test with different query and context lengths.',
+      '`seq_a` has shape `(B, La, D_model)` and supplies queries.',
+      '`seq_b` has shape `(B, Lb, D_model)` and supplies keys and values.',
+      'The two sequences share batch size and `D_model`, but `La` and `Lb` may differ.',
+      '`CrossAttentionConfig` requires `num_heads` to divide a positive `model_dim`.',
+      'The module owns query, key, value, and output projections with `bias=False`.',
+      'Compute softmax explicitly and stably over the `Lb` key axis.',
+      'Return an output of shape `(B, La, D_model)`.',
+      'Include a runnable smoke test with `model_dim=6`, `num_heads=2`, `La=3`, and `Lb=5`.',
     ],
     examples: [
       {
         label: 'Example 1',
         lines: [
-          'layer = CrossAttention(CrossAttentionConfig(model_dim=8, num_heads=2))',
-          'query_x.shape = (2, 3, 8)',
-          'context_x.shape = (2, 5, 8)',
+          'layer = CrossAttention(CrossAttentionConfig(model_dim=6, num_heads=2))',
+          'seq_a.shape = (2, 3, 6)',
+          'seq_b.shape = (2, 5, 6)',
         ],
-        result: 'layer(query_x, context_x).shape == (2, 3, 8)',
+        result: 'layer(seq_a, seq_b).shape == (2, 3, 6)',
       },
       {
         label: 'Example 2',
-        lines: [
-          'mask.shape = (3, 5)',
-          'output = layer(query_x, context_x, mask)',
-        ],
-        result: 'output.shape == query_x.shape and every value is finite',
+        lines: ['seq_a.shape = (1, 1, 6)', 'seq_b.shape = (1, 4, 6)'],
+        result: 'layer(seq_a, seq_b).shape == (1, 1, 6)',
       },
     ],
     hint: [
-      'Put learned projections in `__init__`; keep query/context tensor flow in `forward`.',
-      'The only difference from self-attention is that queries come from `query_x`, while keys and values come from `context_x`.',
-      'Reshape the projected tensors into `(B, H, Tq, D_head)` for queries and `(B, H, Tk, D_head)` for keys and values.',
-      'Use the scaled dot-product formula `Q K^T / sqrt(D_head)` and a numerically stable softmax over the last axis.',
-      'If a mask is provided, broadcast it to the score tensor and zero out blocked positions before softmax.',
+      'Put the learned projections in `__init__`; keep the two-sequence tensor flow in `forward`.',
+      'Queries come from `seq_a`, while keys and values both come from `seq_b`.',
+      'Reshape projections into `(B, H, La, D_head)` for queries and `(B, H, Lb, D_head)` for keys and values.',
+      'Use `Q K^T / sqrt(D_head)`, then apply stable softmax over the last axis.',
+      'Permute the context back to token-major order before reshaping the heads into `D_model`.',
     ],
     solutionNotes: [
-      'Cross-attention uses the same equation as self-attention:\n`Attention(Q, K, V) = softmax(QKᵀ / √D_head) V`\nThe difference is where the three inputs come from: `Q` uses `query_x`; `K` and `V` use `context_x`.',
-      'Use a module because the projections are learned parameters reused across calls. The config owns the model/head divisibility invariant.',
-      'The two sequence lengths stay separate:\n`Q: (B, H, Tq, D_head)`\n`K, V: (B, H, Tk, D_head)`\n`scores: (B, H, Tq, Tk)`\n`output: (B, Tq, D)`',
-      'Each query token can read all `Tk` context tokens. Apply any mask to the score matrix before the stable softmax.',
+      'Cross-attention changes the source of Q, K, and V:\n`Q = W_q seq_a; K = W_k seq_b; V = W_v seq_b`\nEach token in `seq_a` therefore retrieves information from `seq_b`.',
+      'The config owns the split invariant:\n`D_head = D_model / H`\nExact division lets every head receive the same feature width while the four projections remain learned module parameters.',
+      'The sequence lengths remain distinct:\n`Q: (B,H,La,D_head); K,V: (B,H,Lb,D_head)`\n`Q @ Kᵀ` contracts `D_head`, so the score matrix has shape `(B,H,La,Lb)`.',
+      'Scaling controls the logit variance:\n`scores = QKᵀ / √D_head`\nWithout the divisor, larger heads tend to produce larger dot products and a more saturated softmax.',
+      'Stable softmax subtracts each row maximum before exponentiation. `keepdim=True` preserves shape `(B,H,La,1)`, so the maximum and denominator broadcast across the `Lb` keys.',
+      'The value mixture has shape `(B,H,La,D_head)`. Permuting to `(B,La,H,D_head)` and reshaping merges the heads, so the output length follows `seq_a`, not `seq_b`.',
     ],
     solutionDiagram: `Self:  Q,K,V ← one sequence x
       scores: (B, H, T, T)
 
-Cross: Q ← query_x (B, Tq, D)
-       K,V ← context_x (B, Tk, D)
-       scores: (B, H, Tq, Tk)
+Cross: Q ← seq_a (B, La, D)
+       K,V ← seq_b (B, Lb, D)
+       scores: (B, H, La, Lb)
 
 Only the source of K,V and the key length change.`,
     solutionCode: `from __future__ import annotations
 
+from dataclasses import dataclass
+import math
 import torch
+from torch import nn
 
-def _stable_masked_softmax(logits: torch.Tensor) -> torch.Tensor:
-    # Masked attention represents forbidden positions as -inf, so record the usable entries.
-    finite = torch.isfinite(logits)
-    # Replace non-finite values temporarily so an all-masked row has a finite maximum.
-    safe_logits = torch.where(finite, logits, torch.zeros_like(logits))
-    # Subtracting this row-wise maximum is the usual stable softmax shift.
-    maximum = torch.amax(safe_logits, dim=-1, keepdim=True)
-    # Exponentiate only valid entries; multiplying by finite restores exact zero for masked scores.
-    exponentiated = torch.exp(safe_logits - maximum) * torch.as_tensor(
-        finite,
-        dtype=logits.dtype,
-    )
-    denominator = torch.sum(exponentiated, dim=-1, keepdim=True)
-    # Use one for all-masked rows so division is defined before the final zeroing step.
-    safe_denominator = torch.where(
-        denominator > 0.0,
-        denominator,
-        torch.ones_like(denominator),
-    )
-    # An all-masked query has no valid distribution, so return an all-zero attention row.
-    return torch.where(
-        denominator > 0.0,
-        exponentiated / safe_denominator,
-        torch.zeros_like(exponentiated),
-    )
+def stable_softmax(x: torch.Tensor, dim: int = -1) -> torch.Tensor:
+    shifted = x - torch.amax(x, dim=dim, keepdim=True)
+    exp_x = torch.exp(shifted)
+    return exp_x / torch.sum(exp_x, dim=dim, keepdim=True)
 
-def cross_attention(
-    query_x: torch.Tensor,
-    context_x: torch.Tensor,
-    W_q: torch.Tensor,
-    W_k: torch.Tensor,
-    W_v: torch.Tensor,
-    W_o: torch.Tensor,
-    num_heads: int,
-    mask: torch.Tensor | None = None,
-) -> torch.Tensor:
-    # Query and context may have different lengths, but all attention arithmetic uses one float dtype.
-    query_x = torch.as_tensor(query_x, dtype=torch.float64)
-    context_x = torch.as_tensor(context_x, dtype=torch.float64)
-    W_q = torch.as_tensor(W_q, dtype=torch.float64)
-    W_k = torch.as_tensor(W_k, dtype=torch.float64)
-    W_v = torch.as_tensor(W_v, dtype=torch.float64)
-    W_o = torch.as_tensor(W_o, dtype=torch.float64)
+@dataclass(frozen=True, slots=True)
+class CrossAttentionConfig:
+    model_dim: int
+    num_heads: int
 
-    # Both inputs are batches of token vectors; only their sequence lengths may differ.
-    if query_x.ndim != 3 or context_x.ndim != 3:
-        raise ValueError("query_x and context_x must have shape (B, T, D_model)")
-    if any(size <= 0 for size in query_x.shape) or any(size <= 0 for size in context_x.shape):
-        raise ValueError("inputs must have positive dimensions")
-    if query_x.shape[0] != context_x.shape[0] or query_x.shape[2] != context_x.shape[2]:
-        raise ValueError("query_x and context_x must share batch size and model dimension")
-    if isinstance(num_heads, bool) or not isinstance(num_heads, int) or num_heads <= 0:
-        raise ValueError("num_heads must be a positive integer")
+    def __post_init__(self) -> None:
+        if self.model_dim <= 0 or self.num_heads <= 0 or self.model_dim % self.num_heads:
+            raise ValueError("num_heads must divide a positive model_dim")
 
-    batch_size, query_len, model_dim = query_x.shape
-    context_len = context_x.shape[1]
-    # Splitting model features evenly across heads requires an exact division.
-    if model_dim % num_heads != 0:
-        raise ValueError("num_heads must divide D_model")
-    # Every projection maps D_model features back to D_model features.
-    for matrix, name in ((W_q, "W_q"), (W_k, "W_k"), (W_v, "W_v"), (W_o, "W_o")):
-        if matrix.ndim != 2 or matrix.shape != (model_dim, model_dim):
-            raise ValueError(f"{name} must have shape (D_model, D_model)")
+    @property
+    def head_dim(self) -> int:
+        return self.model_dim // self.num_heads
 
-    head_dim = model_dim // num_heads
-    # Queries come from query_x; keys and values come from the separate context sequence.
-    q = torch.matmul(query_x, W_q)
-    k = torch.matmul(context_x, W_k)
-    v = torch.matmul(context_x, W_v)
-    # Split features into heads and move heads before token positions.
-    q = torch.permute(torch.reshape(q, (batch_size, query_len, num_heads, head_dim)), (0, 2, 1, 3))
-    k = torch.permute(torch.reshape(k, (batch_size, context_len, num_heads, head_dim)), (0, 2, 1, 3))
-    v = torch.permute(torch.reshape(v, (batch_size, context_len, num_heads, head_dim)), (0, 2, 1, 3))
+class CrossAttention(nn.Module):
+    def __init__(self, config: CrossAttentionConfig) -> None:
+        super().__init__()
+        self.config = config
+        self.q_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.k_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.v_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
 
-    # Each query compares with every context key in its head; scale the dot products by sqrt(D_head).
-    scores = torch.matmul(q, torch.transpose(k, -1, -2)) / (head_dim ** 0.5)
-    if mask is not None:
-        # Permit convenient mask shapes while enforcing the final (B, H, Tq, Tk) score layout.
-        mask = torch.as_tensor(mask)
-        try:
-            mask = torch.broadcast_to(mask, scores.shape)
-        except ValueError as exc:
-            raise ValueError("mask must be broadcastable to (B, H, Tq, Tk)") from exc
-        if not bool(torch.all((mask == 0) | (mask == 1))):
-            raise ValueError("mask must contain only 0 and 1")
-        # Set forbidden scores to -inf so their softmax probability becomes exactly zero.
-        scores = torch.where(
-            mask != 0,
-            scores,
-            torch.full_like(scores, float("-inf")),
-        )
+    def _split_heads(self, x: torch.Tensor) -> torch.Tensor:
+        batch_size, length, _ = x.shape
+        x = x.reshape(batch_size, length, self.config.num_heads, self.config.head_dim)
+        return x.permute(0, 2, 1, 3)
 
-    # Normalize over context keys, then use those weights to mix context value vectors.
-    attention = _stable_masked_softmax(scores)
-    context = torch.matmul(attention, v)
-    # Restore token-major layout, concatenate heads, and apply the output projection.
-    context = torch.permute(context, (0, 2, 1, 3))
-    context = torch.reshape(context, (batch_size, query_len, model_dim))
-    return torch.matmul(context, W_o)`,
+    def forward(self, seq_a: torch.Tensor, seq_b: torch.Tensor) -> torch.Tensor:
+        q = self._split_heads(self.q_proj(seq_a))
+        k = self._split_heads(self.k_proj(seq_b))
+        v = self._split_heads(self.v_proj(seq_b))
+        scores = q @ k.transpose(-2, -1) / math.sqrt(self.config.head_dim)
+        weights = stable_softmax(scores, dim=-1)
+        context = (weights @ v).permute(0, 2, 1, 3)
+        context = context.reshape(seq_a.shape[0], seq_a.shape[1], self.config.model_dim)
+        return self.out_proj(context)
+
+def smoke_test() -> None:
+    torch.manual_seed(0)
+    model = CrossAttention(CrossAttentionConfig(model_dim=6, num_heads=2))
+    seq_a = torch.randn(2, 3, 6)
+    seq_b = torch.randn(2, 5, 6)
+    output = model(seq_a, seq_b)
+    assert output.shape == (2, 3, 6)
+    assert bool(torch.all(torch.isfinite(output)))
+    print("Cross-attention smoke test passed:", tuple(output.shape))
+
+smoke_test()`,
     starterCode: `from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 import torch
 from torch import nn
+
+def stable_softmax(x: torch.Tensor, dim: int = -1) -> torch.Tensor:
+    # TODO: subtract the maximum, exponentiate, and normalize along dim.
+    raise NotImplementedError("Implement stable_softmax")
 
 @dataclass(frozen=True, slots=True)
 class CrossAttentionConfig:
@@ -2156,20 +2117,21 @@ class CrossAttention(nn.Module):
         self.v_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
         self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
 
-    def _split_heads(self, tensor: torch.Tensor) -> torch.Tensor:
+    def _split_heads(self, x: torch.Tensor) -> torch.Tensor:
         # TODO: reshape (B, T, D_model) into (B, H, T, D_head).
         raise NotImplementedError("Implement _split_heads")
 
-    def forward(self, query_x: torch.Tensor, context_x: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
+    def forward(self, seq_a: torch.Tensor, seq_b: torch.Tensor) -> torch.Tensor:
         # TODO: project two sources, split heads, attend stably, merge, and project out.
         raise NotImplementedError("Implement forward")
 
 def smoke_test() -> None:
     torch.manual_seed(0)
-    layer = CrossAttention(CrossAttentionConfig(model_dim=8, num_heads=2))
-    query, context = torch.randn(2, 3, 8), torch.randn(2, 5, 8)
-    output = layer(query, context, torch.ones(3, 5))
-    assert output.shape == query.shape and bool(torch.all(torch.isfinite(output)))
+    layer = CrossAttention(CrossAttentionConfig(model_dim=6, num_heads=2))
+    seq_a = torch.randn(2, 3, 6)
+    seq_b = torch.randn(2, 5, 6)
+    output = layer(seq_a, seq_b)
+    assert output.shape == seq_a.shape and bool(torch.all(torch.isfinite(output)))
     print("Cross-attention smoke test passed:", tuple(output.shape))
 
 smoke_test()`,
@@ -4240,8 +4202,14 @@ def smoke_test():
 
 smoke_test()`,
   'cross-attention': `from dataclasses import dataclass
+import math
 import torch
 from torch import nn
+
+def stable_softmax(x: torch.Tensor, dim: int = -1) -> torch.Tensor:
+    shifted = x - torch.amax(x, dim=dim, keepdim=True)
+    exp_x = torch.exp(shifted)
+    return exp_x / torch.sum(exp_x, dim=dim, keepdim=True)
 
 @dataclass(frozen=True, slots=True)
 class CrossAttentionConfig:
@@ -4265,34 +4233,29 @@ class CrossAttention(nn.Module):
         self.v_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
         self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
 
-    def _split_heads(self, tensor):
-        batch, length, _ = tensor.shape
-        tensor = tensor.reshape(batch, length, self.config.num_heads, self.config.head_dim)
-        return tensor.permute(0, 2, 1, 3)
+    def _split_heads(self, x: torch.Tensor) -> torch.Tensor:
+        batch_size, length, _ = x.shape
+        x = x.reshape(batch_size, length, self.config.num_heads, self.config.head_dim)
+        return x.permute(0, 2, 1, 3)
 
-    def forward(self, query_x, context_x, mask=None):
-        q = self._split_heads(self.q_proj(query_x))
-        k = self._split_heads(self.k_proj(context_x))
-        v = self._split_heads(self.v_proj(context_x))
-        scores = q @ k.transpose(-1, -2) / (self.config.head_dim ** 0.5)
-        if mask is not None:
-            mask = torch.broadcast_to(torch.as_tensor(mask), scores.shape)
-            scores = torch.where(mask != 0, scores, torch.full_like(scores, float('-inf')))
-        valid = torch.isfinite(scores)
-        safe = torch.where(valid, scores, torch.zeros_like(scores))
-        shifted = safe - torch.amax(safe, dim=-1, keepdim=True)
-        weights = torch.exp(shifted) * torch.as_tensor(valid, dtype=scores.dtype)
-        weights = weights / torch.clamp(torch.sum(weights, dim=-1, keepdim=True), min=1e-8)
+    def forward(self, seq_a: torch.Tensor, seq_b: torch.Tensor) -> torch.Tensor:
+        q = self._split_heads(self.q_proj(seq_a))
+        k = self._split_heads(self.k_proj(seq_b))
+        v = self._split_heads(self.v_proj(seq_b))
+        scores = q @ k.transpose(-2, -1) / math.sqrt(self.config.head_dim)
+        weights = stable_softmax(scores, dim=-1)
         context = (weights @ v).permute(0, 2, 1, 3)
-        context = context.reshape(query_x.shape[0], query_x.shape[1], self.config.model_dim)
+        context = context.reshape(seq_a.shape[0], seq_a.shape[1], self.config.model_dim)
         return self.out_proj(context)
 
 def smoke_test():
     torch.manual_seed(0)
-    layer = CrossAttention(CrossAttentionConfig(model_dim=8, num_heads=2))
-    query, context = torch.randn(2, 3, 8), torch.randn(2, 5, 8)
-    output = layer(query, context, torch.ones(3, 5))
-    assert output.shape == query.shape and bool(torch.all(torch.isfinite(output)))
+    model = CrossAttention(CrossAttentionConfig(model_dim=6, num_heads=2))
+    seq_a = torch.randn(2, 3, 6)
+    seq_b = torch.randn(2, 5, 6)
+    output = model(seq_a, seq_b)
+    assert output.shape == (2, 3, 6)
+    assert bool(torch.all(torch.isfinite(output)))
     print("Cross-attention smoke test passed:", tuple(output.shape))
 
 smoke_test()`,
