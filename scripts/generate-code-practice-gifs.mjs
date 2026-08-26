@@ -1,14 +1,22 @@
-import { execFileSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { dirname, join, resolve } from 'node:path';
 import sharp from 'sharp';
 
-const root = resolve(new URL('..', import.meta.url).pathname);
-const output = join(root, 'public/assets/images');
-const frames = join(root, '.tmp-code-practice-gif-frames');
-mkdirSync(output, { recursive: true });
-rmSync(frames, { recursive: true, force: true });
-mkdirSync(frames, { recursive: true });
+const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+
+export const WIDTH = 1000;
+export const HEIGHT = 620;
+export const FPS = 8;
+export const TRANSITION_SECONDS = 0.75;
+/** @type {Record<string, { target: string, slideCount: number, secondsPerSlide: number }>} */
+export const CODE_PRACTICE_GIF_TIMING = {
+  'code-tensor-ops-broadcasting.gif': { target: 'tensor', slideCount: 4, secondsPerSlide: 6.5 },
+  'code-patchify-layout.gif': { target: 'patch', slideCount: 2, secondsPerSlide: 8.5 },
+  'code-bce-probabilities-vs-logits.gif': { target: 'bce', slideCount: 4, secondsPerSlide: 7.5 },
+};
+export const CODE_PRACTICE_GIFS = Object.keys(CODE_PRACTICE_GIF_TIMING);
 
 const colors = {
   background: '#101820',
@@ -32,7 +40,7 @@ const arrow = (x1, y1, x2, y2, label) =>
   `${line(x1, y1, x2, y2)}<polygon points="${x2},${y2} ${x2 - 14},${y2 - 9} ${x2 - 14},${y2 + 9}" fill="${colors.accent}"/>${text((x1 + x2) / 2, y1 - 20, label, 17, colors.accent, 700, 'middle')}`;
 
 function shell(title, subtitle, body) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620"><rect width="1000" height="620" fill="${colors.background}"/>${text(42, 58, title, 34, colors.text, 700)}${text(44, 100, subtitle, 22, colors.muted)}${body}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}"><rect width="${WIDTH}" height="${HEIGHT}" fill="${colors.background}"/>${text(42, 58, title, 34, colors.text, 700)}${text(44, 100, subtitle, 22, colors.muted)}${body}</svg>`;
 }
 
 function grid(x, y, rows, cols, cell, values, stroke, label) {
@@ -162,27 +170,89 @@ async function rasterize(svg, path) {
   await sharp(Buffer.from(svg)).png().toFile(path);
 }
 
-async function saveGif(svgs, filename, durationMs) {
-  const prefix = join(frames, filename.replace('.gif', ''));
-  const pngPaths = [];
-  for (const [index, svg] of svgs.entries()) {
-    const path = `${prefix}-${String(index).padStart(2, '0')}.png`;
-    await rasterize(svg, path);
-    pngPaths.push(path);
-  }
-  const outputPath = join(output, filename);
-  execFileSync('ffmpeg', ['-y', '-framerate', String(1000 / durationMs), '-i', `${prefix}-%02d.png`, '-vf', 'split[s0][s1];[s0]palettegen=max_colors=128[p];[s1][p]paletteuse=dither=sierra2_4a', '-loop', '0', outputPath], { stdio: 'inherit' });
-  return pngPaths;
+const ease = (value) => {
+  const clamped = Math.max(0, Math.min(1, value));
+  return clamped * clamped * (3 - 2 * clamped);
+};
+
+function svgBody(svg) {
+  return svg.slice(svg.indexOf('>') + 1, svg.lastIndexOf('</svg>'));
 }
 
-const target = process.argv[2] ?? 'all';
-if (target === 'all' || target === 'tensor') {
-  await saveGif(tensorFrames(), 'code-tensor-ops-broadcasting.gif', 1800);
+function dissolve(current, next, amount) {
+  const fadingOut = amount < 0.5;
+  const activeFrame = fadingOut ? current : next;
+  const opacity = fadingOut ? 1 - ease(amount * 2) : ease((amount - 0.5) * 2);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}"><rect width="${WIDTH}" height="${HEIGHT}" fill="${colors.background}"/><g opacity="${opacity.toFixed(3)}">${svgBody(activeFrame)}</g></svg>`;
 }
-if (target === 'all' || target === 'patch') {
-  await saveGif(patchFrames(), 'code-patchify-layout.gif', 2200);
+
+function animationFrames(slides, secondsPerSlide) {
+  const framesPerSlide = Math.round(secondsPerSlide * FPS);
+  const transitionFrames = Math.round(TRANSITION_SECONDS * FPS);
+  const holdFrames = framesPerSlide - transitionFrames;
+  const result = [];
+
+  for (const [index, slide] of slides.entries()) {
+    const next = slides[(index + 1) % slides.length];
+    for (let frame = 0; frame < framesPerSlide; frame += 1) {
+      if (frame < holdFrames) {
+        result.push(slide);
+        continue;
+      }
+      const transitionFrame = frame - holdFrames + 1;
+      result.push(dissolve(slide, next, transitionFrame / transitionFrames));
+    }
+  }
+  return result;
 }
-if (target === 'all' || target === 'bce') {
-  await saveGif(bceFrames(), 'code-bce-probabilities-vs-logits.gif', 2300);
+
+const stories = {
+  'code-tensor-ops-broadcasting.gif': tensorFrames,
+  'code-patchify-layout.gif': patchFrames,
+  'code-bce-probabilities-vs-logits.gif': bceFrames,
+};
+
+export async function renderCodePracticeGifs(names, options = {}) {
+  const root = options.root ?? defaultRoot;
+  const output = options.outputDir ?? join(root, 'public/assets/images');
+  const scratch = options.scratchDir ?? join(root, '.tmp-code-practice-gif-frames');
+  mkdirSync(output, { recursive: true });
+  rmSync(scratch, { recursive: true, force: true });
+  mkdirSync(scratch, { recursive: true });
+
+  for (const filename of names) {
+    const timing = CODE_PRACTICE_GIF_TIMING[filename];
+    const buildSlides = stories[filename];
+    if (!timing || !buildSlides) throw new Error(`No Code Practice GIF storyboard for ${filename}`);
+
+    const frameDir = join(scratch, filename.replace('.gif', ''));
+    mkdirSync(frameDir, { recursive: true });
+    const frames = animationFrames(buildSlides(), timing.secondsPerSlide);
+    for (const [index, svg] of frames.entries()) {
+      await rasterize(svg, join(frameDir, `frame-${String(index).padStart(4, '0')}.png`));
+    }
+
+    const result = spawnSync('ffmpeg', [
+      '-hide_banner', '-loglevel', 'error', '-y',
+      '-framerate', String(FPS),
+      '-i', join(frameDir, 'frame-%04d.png'),
+      '-filter_complex', '[0:v]split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle',
+      '-loop', '0',
+      join(output, filename),
+    ], { stdio: 'inherit' });
+    if (result.status !== 0) throw new Error(`ffmpeg failed for ${filename}`);
+    rmSync(frameDir, { recursive: true, force: true });
+    console.log(`generated ${join(output, filename)}`);
+  }
+
+  rmSync(scratch, { recursive: true, force: true });
 }
-rmSync(frames, { recursive: true, force: true });
+
+if (resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
+  const target = process.argv[2] ?? 'all';
+  const names = CODE_PRACTICE_GIFS.filter((filename) => (
+    target === 'all' || CODE_PRACTICE_GIF_TIMING[filename].target === target
+  ));
+  if (names.length === 0) throw new Error(`Unknown Code Practice GIF target: ${target}`);
+  await renderCodePracticeGifs(names);
+}
