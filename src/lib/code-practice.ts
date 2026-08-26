@@ -4267,7 +4267,7 @@ const NUMPY_ALTERNATIVES: Readonly<Record<string, CodePracticeNumpyAlternative>>
   'l1-regression-loss': {
     code: `import numpy as np
 
-def l1_loss(prediction, target):
+def l1_loss(prediction: np.ndarray, target: np.ndarray) -> float:
     prediction = np.asarray(prediction, dtype=float)
     target = np.asarray(target, dtype=float)
     return np.mean(np.abs(prediction - target))`,
@@ -4276,7 +4276,11 @@ def l1_loss(prediction, target):
   'binary-cross-entropy-from-probabilities': {
     code: `import numpy as np
 
-def binary_cross_entropy(probability, target, eps=1e-8):
+def binary_cross_entropy(
+    probability: np.ndarray,
+    target: np.ndarray,
+    eps: float = 1e-8,
+) -> float:
     probability = np.asarray(probability, dtype=float)
     target = np.asarray(target, dtype=float)
     if np.any((target != 0) & (target != 1)):
@@ -4294,7 +4298,7 @@ def binary_cross_entropy(probability, target, eps=1e-8):
   'masked-mean': {
     code: `import numpy as np
 
-def masked_mean(features, mask):
+def masked_mean(features: np.ndarray, mask: np.ndarray) -> np.ndarray:
     features = np.asarray(features, dtype=float)
     weights = np.asarray(mask, dtype=float)[..., None]
     total = np.sum(features * weights, axis=1)
@@ -4305,7 +4309,10 @@ def masked_mean(features, mask):
   'binary-classification-metrics': {
     code: `import numpy as np
 
-def binary_classification_metrics(y_true, y_pred):
+def binary_classification_metrics(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+) -> dict[str, float]:
     y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
     tp = int(np.sum((y_true == 1) & (y_pred == 1)))
     tn = int(np.sum((y_true == 0) & (y_pred == 0)))
@@ -4321,7 +4328,7 @@ def binary_classification_metrics(y_true, y_pred):
   'top-k-accuracy': {
     code: `import numpy as np
 
-def top_k_accuracy(logits, labels, k):
+def top_k_accuracy(logits: np.ndarray, labels: np.ndarray, k: int) -> float:
     logits, labels = np.asarray(logits), np.asarray(labels)
     top_k = min(k, logits.shape[1])
     ranked = np.argsort(logits, axis=1)[:, ::-1]
@@ -4332,7 +4339,7 @@ def top_k_accuracy(logits, labels, k):
   'single-box-iou': {
     code: `import numpy as np
 
-def box_iou(box_a, box_b):
+def box_iou(box_a: np.ndarray, box_b: np.ndarray) -> float:
     box_a, box_b = np.asarray(box_a, dtype=float), np.asarray(box_b, dtype=float)
     top_left = np.maximum(box_a[:2], box_b[:2])
     bottom_right = np.minimum(box_a[2:], box_b[2:])
@@ -4347,7 +4354,7 @@ def box_iou(box_a, box_b):
   'wrapped-angular-difference': {
     code: `import numpy as np
 
-def angular_difference(prediction, target):
+def angular_difference(prediction: np.ndarray, target: np.ndarray) -> np.ndarray:
     difference = np.asarray(prediction) - np.asarray(target)
     return np.arctan2(np.sin(difference), np.cos(difference))`,
     memory: ['Wrap an angle with `atan2(sin(delta), cos(delta))` instead of modulo casework.'],
@@ -4355,7 +4362,11 @@ def angular_difference(prediction, target):
   'smooth-l1-huber-loss': {
     code: `import numpy as np
 
-def huber_loss(prediction, target, delta=1.0):
+def huber_loss(
+    prediction: np.ndarray,
+    target: np.ndarray,
+    delta: float = 1.0,
+) -> float:
     error = np.asarray(prediction, dtype=float) - np.asarray(target, dtype=float)
     magnitude = np.abs(error)
     quadratic = 0.5 * error ** 2
@@ -4366,7 +4377,7 @@ def huber_loss(prediction, target, delta=1.0):
   'stable-softmax-cross-entropy': {
     code: `import numpy as np
 
-def softmax_cross_entropy(logits, labels):
+def softmax_cross_entropy(logits: np.ndarray, labels: np.ndarray) -> float:
     logits = np.asarray(logits, dtype=float)
     labels = np.asarray(labels, dtype=int)
     shifted = logits - np.max(logits, axis=1, keepdims=True)
@@ -4377,7 +4388,11 @@ def softmax_cross_entropy(logits, labels):
   'class-weighted-cross-entropy': {
     code: `import numpy as np
 
-def class_weighted_cross_entropy(logits, labels, class_weight):
+def class_weighted_cross_entropy(
+    logits: np.ndarray,
+    labels: np.ndarray,
+    class_weight: np.ndarray,
+) -> float:
     logits = np.asarray(logits, dtype=float)
     labels = np.asarray(labels, dtype=int)
     shifted = logits - np.max(logits, axis=1, keepdims=True)
@@ -4390,7 +4405,7 @@ def class_weighted_cross_entropy(logits, labels, class_weight):
   'temperature-scaling-of-logits': {
     code: `import numpy as np
 
-def temperature_scaled_probs(logits, temperature):
+def temperature_scaled_probs(logits: np.ndarray, temperature: float) -> np.ndarray:
     scaled = np.asarray(logits, dtype=float) / temperature
     shifted = scaled - np.max(scaled, axis=-1, keepdims=True)
     exp_logits = np.exp(shifted)
@@ -4400,7 +4415,7 @@ def temperature_scaled_probs(logits, temperature):
   'pairwise-squared-distance': {
     code: `import numpy as np
 
-def pairwise_squared_distance(x, y):
+def pairwise_squared_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
     x_squared = np.sum(x * x, axis=1, keepdims=True)
     y_squared = np.sum(y * y, axis=1)[None, :]
@@ -4411,7 +4426,11 @@ def pairwise_squared_distance(x, y):
   'pairwise-cosine-similarity': {
     code: `import numpy as np
 
-def pairwise_cosine_similarity(x, y, eps=1e-8):
+def pairwise_cosine_similarity(
+    x: np.ndarray,
+    y: np.ndarray,
+    eps: float = 1e-8,
+) -> np.ndarray:
     x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
     numerator = x @ y.T
     x_norm = np.sqrt(np.sum(x * x, axis=1))
@@ -4424,7 +4443,11 @@ def pairwise_cosine_similarity(x, y, eps=1e-8):
   'nearest-centroid-classifier': {
     code: `import numpy as np
 
-def nearest_centroid_predict(train_X, train_y, test_X):
+def nearest_centroid_predict(
+    train_X: np.ndarray,
+    train_y: np.ndarray,
+    test_X: np.ndarray,
+) -> np.ndarray:
     train_X, train_y, test_X = map(np.asarray, (train_X, train_y, test_X))
     labels = np.unique(train_y)
     centroids = np.stack([train_X[train_y == label].mean(axis=0) for label in labels])
@@ -4435,7 +4458,7 @@ def nearest_centroid_predict(train_X, train_y, test_X):
   'iou-matrix': {
     code: `import numpy as np
 
-def box_iou_matrix(boxes1, boxes2):
+def box_iou_matrix(boxes1: np.ndarray, boxes2: np.ndarray) -> np.ndarray:
     boxes1, boxes2 = np.asarray(boxes1), np.asarray(boxes2)
     top_left = np.maximum(boxes1[:, None, :2], boxes2[None, :, :2])
     bottom_right = np.minimum(boxes1[:, None, 2:], boxes2[None, :, 2:])
@@ -4450,7 +4473,7 @@ def box_iou_matrix(boxes1, boxes2):
   'non-maximum-suppression': {
     code: `import numpy as np
 
-def nms(boxes, scores, iou_threshold):
+def nms(boxes: np.ndarray, scores: np.ndarray, iou_threshold: float) -> list[int]:
     boxes, scores = np.asarray(boxes, dtype=float), np.asarray(scores)
     order = np.argsort(scores, kind='stable')[::-1]
     keep = []
@@ -4471,7 +4494,11 @@ def nms(boxes, scores, iou_threshold):
   'dice-loss': {
     code: `import numpy as np
 
-def dice_loss(probability, target, eps=1e-8):
+def dice_loss(
+    probability: np.ndarray,
+    target: np.ndarray,
+    eps: float = 1e-8,
+) -> float:
     probability, target = np.asarray(probability), np.asarray(target)
     axes = tuple(range(1, probability.ndim))
     intersection = np.sum(probability * target, axis=axes)
@@ -4482,7 +4509,11 @@ def dice_loss(probability, target, eps=1e-8):
   'segmentation-iou-loss': {
     code: `import numpy as np
 
-def segmentation_iou_loss(probability, target, eps=1e-8):
+def segmentation_iou_loss(
+    probability: np.ndarray,
+    target: np.ndarray,
+    eps: float = 1e-8,
+) -> float:
     probability, target = np.asarray(probability), np.asarray(target)
     axes = tuple(range(1, probability.ndim))
     intersection = np.sum(probability * target, axis=axes)
@@ -4493,7 +4524,13 @@ def segmentation_iou_loss(probability, target, eps=1e-8):
   'focal-loss': {
     code: `import numpy as np
 
-def focal_loss(probability, target, alpha=0.25, gamma=2.0, eps=1e-8):
+def focal_loss(
+    probability: np.ndarray,
+    target: np.ndarray,
+    alpha: float = 0.25,
+    gamma: float = 2.0,
+    eps: float = 1e-8,
+) -> float:
     probability = np.clip(np.asarray(probability), eps, 1 - eps)
     target = np.asarray(target)
     p_t = np.where(target == 1, probability, 1 - probability)
@@ -4504,7 +4541,7 @@ def focal_loss(probability, target, alpha=0.25, gamma=2.0, eps=1e-8):
   'top-k-gather': {
     code: `import numpy as np
 
-def topk_features(scores, features, k):
+def topk_features(scores: np.ndarray, features: np.ndarray, k: int) -> np.ndarray:
     scores, features = np.asarray(scores), np.asarray(features)
     indices = np.argsort(scores, axis=1)[:, ::-1][:, :k]
     gather_indices = np.broadcast_to(indices[:, :, None],
@@ -4515,7 +4552,7 @@ def topk_features(scores, features, k):
   'homogeneous-coordinate-transform': {
     code: `import numpy as np
 
-def transform_points(points, transform):
+def transform_points(points: np.ndarray, transform: np.ndarray) -> np.ndarray:
     points, transform = np.asarray(points), np.asarray(transform)
     homogeneous = np.concatenate([points, np.ones((points.shape[0], 1))], axis=1)
     return (transform @ homogeneous.T).T[:, :3]`,
@@ -4524,7 +4561,7 @@ def transform_points(points, transform):
   '2d-patchify-for-images': {
     code: `import numpy as np
 
-def patchify(images, patch_size):
+def patchify(images: np.ndarray, patch_size: int) -> np.ndarray:
     batch, channels, height, width = images.shape
     grid_h, grid_w = height // patch_size, width // patch_size
     grid = images.reshape(batch, channels, grid_h, patch_size, grid_w, patch_size)
@@ -4535,7 +4572,11 @@ def patchify(images, patch_size):
   'unpatchify-back-to-image': {
     code: `import numpy as np
 
-def unpatchify(patches, image_shape, patch_size):
+def unpatchify(
+    patches: np.ndarray,
+    image_shape: tuple[int, int, int],
+    patch_size: int,
+) -> np.ndarray:
     channels, height, width = image_shape
     grid_h, grid_w = height // patch_size, width // patch_size
     batch = patches.shape[0]
@@ -4547,7 +4588,7 @@ def unpatchify(patches, image_shape, patch_size):
   'sinusoidal-positional-encoding': {
     code: `import numpy as np
 
-def sinusoidal_positional_encoding(length, dim):
+def sinusoidal_positional_encoding(length: int, dim: int) -> np.ndarray:
     positions = np.arange(length)[:, None]
     indices = np.arange(0, dim, 2)
     frequencies = np.exp(-np.log(10000.0) * indices / dim)
@@ -4561,7 +4602,10 @@ def sinusoidal_positional_encoding(length, dim):
   'causal-attention-mask': {
     code: `import numpy as np
 
-def make_causal_attention_mask(seq_lens, max_len=None):
+def make_causal_attention_mask(
+    seq_lens: np.ndarray,
+    max_len: int | None = None,
+) -> np.ndarray:
     seq_lens = np.asarray(seq_lens, dtype=int)
     length = int(seq_lens.max()) if max_len is None else max(int(seq_lens.max()), max_len)
     positions = np.arange(length)
@@ -4573,7 +4617,7 @@ def make_causal_attention_mask(seq_lens, max_len=None):
   'rope-rotary-positional-embedding': {
     code: `import numpy as np
 
-def apply_rope(x):
+def apply_rope(x: np.ndarray) -> np.ndarray:
     _, seq_len, _, dim = x.shape
     pair = np.arange(dim // 2)
     angles = np.arange(seq_len)[:, None] * (10000.0 ** (-2 * pair / dim))[None, :]
@@ -4588,7 +4632,15 @@ def apply_rope(x):
   'scaled-dot-product-self-attention': {
     code: `import numpy as np
 
-def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
+def self_attention(
+    x: np.ndarray,
+    W_q: np.ndarray,
+    W_k: np.ndarray,
+    W_v: np.ndarray,
+    W_o: np.ndarray,
+    num_heads: int,
+    mask: np.ndarray | None = None,
+) -> np.ndarray:
     batch, length, model_dim = x.shape
     head_dim = model_dim // num_heads
     split = lambda z: z.reshape(batch, length, num_heads, head_dim).transpose(0, 2, 1, 3)
@@ -4606,7 +4658,11 @@ def self_attention(x, W_q, W_k, W_v, W_o, num_heads, mask=None):
   'average-precision-from-matches': {
     code: `import numpy as np
 
-def average_precision(scores, is_true_positive, num_ground_truth):
+def average_precision(
+    scores: np.ndarray,
+    is_true_positive: np.ndarray,
+    num_ground_truth: int,
+) -> float:
     scores = np.asarray(scores)
     matches = np.asarray(is_true_positive, dtype=float)[np.argsort(scores)[::-1]]
     cumulative_tp = np.cumsum(matches)
@@ -4618,7 +4674,14 @@ def average_precision(scores, is_true_positive, num_ground_truth):
   'manual-backprop-for-a-2-layer-mlp': {
     code: `import numpy as np
 
-def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
+def mlp_loss_and_grads(
+    X: np.ndarray,
+    y: np.ndarray,
+    W1: np.ndarray,
+    b1: np.ndarray,
+    W2: np.ndarray,
+    b2: np.ndarray,
+) -> dict[str, np.ndarray | float]:
     hidden_pre = X @ W1 + b1
     hidden = np.maximum(hidden_pre, 0)
     logits = hidden @ W2 + b2

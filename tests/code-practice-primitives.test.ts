@@ -156,6 +156,8 @@ describe('code-practice primitive-first solutions', () => {
       const alternative = problem.numpyAlternative!;
       expect(problem.tags, problem.id).toContain('NumPy');
       expect(alternative.code, problem.id).toContain('import numpy as np');
+      expect(alternative.code, problem.id).toContain('np.ndarray');
+      expect(alternative.code, problem.id).toMatch(/\) -> [^:]+:/);
       expect(alternative.code, problem.id).not.toContain('torch');
       expect(alternative.code.split('\n').length, problem.id).toBeLessThanOrEqual(30);
       expect(alternative.memory.length, problem.id).toBeGreaterThan(0);

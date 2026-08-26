@@ -82,16 +82,25 @@ function getReferenceEditorCode(problem: CodePracticeProblem, currentCode: strin
   return removeReferenceAnnotations(augmentCodeWithSolution(problem, currentCode));
 }
 
+function getFunctionSignature(code: string) {
+  const lines = code.split('\n');
+  const start = lines.findIndex((line) => line.trimStart().startsWith('def '));
+  if (start === -1) {
+    return '';
+  }
+
+  const signature: string[] = [];
+  for (const line of lines.slice(start)) {
+    signature.push(line);
+    if (line.trimEnd().endsWith(':')) {
+      break;
+    }
+  }
+  return signature.join('\n');
+}
+
 export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const isBrowserRunnable = (problem.environment ?? 'browser') === 'browser';
-  const interviewDuration =
-    problem.interview?.durationMinutes ??
-    ({ Easy: 20, Medium: 30, Hard: 45 } as const)[problem.difficulty];
-  const evaluationCriteria = problem.interview?.evaluationCriteria ?? [
-    'Clarify tensor shapes, return values, and failure cases before coding.',
-    'Keep the implementation small enough to explain while you write it.',
-    'Run the example and add one edge-case check before calling it done.',
-  ];
   const containerRef = useRef<HTMLElement | null>(null);
   const runtimeRef = useRef<PyodideRuntime | null>(null);
   const loadingRef = useRef(false);
@@ -271,14 +280,10 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const editorThemeExtension = editorTheme === 'dark' ? githubDark : githubLight;
   const isReferenceLoaded = solutionLanguage !== null;
   const hasExecutionResult = hasRun || Boolean(errorOutput);
-  const explanationCode =
-    solutionLanguage === 'numpy' && problem.numpyAlternative
-      ? problem.numpyAlternative.code
-      : getReferenceEditorCode(problem, getInitialEditorCode(problem));
-  const explanationNotes =
-    solutionLanguage === 'numpy'
-      ? [...problem.solutionNotes, ...(problem.numpyAlternative?.memory ?? [])]
-      : problem.solutionNotes;
+  const torchExplanationCode = getReferenceEditorCode(problem, getInitialEditorCode(problem));
+  const numpyExplanationCode = problem.numpyAlternative?.code;
+  const numpySignature = numpyExplanationCode ? getFunctionSignature(numpyExplanationCode) : '';
+  const explanationNotes = [...problem.solutionNotes, ...(problem.numpyAlternative?.memory ?? [])];
   const outputSummary =
     problem.requirements.find((requirement) => requirement.startsWith('Return')) ??
     problem.examples[0]?.result ??
@@ -339,16 +344,11 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
     setErrorOutput('');
     setHasRun(false);
     setSolutionLanguage(language);
-    setIsExplanationOpen(true);
     setExplanationStep(0);
   }
 
   function handleOpenExplanation() {
-    if (solutionLanguage === null) {
-      handleLoadSolution('torch');
-      return;
-    }
-
+    setExplanationStep(0);
     setIsExplanationOpen(true);
   }
 
@@ -376,59 +376,8 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
         <p className="code-practice-lab__section-label">Interview prompt</p>
         <div className="code-practice-lab__copy">
-          {problem.prompt.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+          <p>{problem.prompt[0]}</p>
         </div>
-
-        <section className="code-practice-lab__interview" aria-label="Interview format">
-          <div className="code-practice-lab__interview-heading">
-            <p className="code-practice-lab__section-label">What good looks like</p>
-            <strong>{interviewDuration} min</strong>
-          </div>
-          <ul className="code-practice-lab__list">
-            {evaluationCriteria.map((criterion) => (
-              <li key={criterion}>{criterion}</li>
-            ))}
-          </ul>
-          {problem.interview && problem.interview.followUps.length > 0 && (
-            <div className="code-practice-lab__follow-ups">
-              <p className="code-practice-lab__section-label">Likely follow-ups</p>
-              <ul className="code-practice-lab__list">
-                {problem.interview.followUps.map((followUp) => (
-                  <li key={followUp}>{followUp}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </section>
-
-        {problem.reasoning && problem.reasoning.length > 0 && (
-          <section
-            className="code-practice-lab__reasoning"
-            aria-labelledby={`${problem.id}-reasoning-title`}
-          >
-            <div className="code-practice-lab__reasoning-heading">
-              <p className="code-practice-lab__section-label">Reason through the system</p>
-              <h2 id={`${problem.id}-reasoning-title`}>Defend the tradeoffs</h2>
-            </div>
-            <div className="code-practice-lab__reasoning-grid">
-              {problem.reasoning.map((point) => (
-                <article key={point.axis} className="code-practice-lab__reasoning-card">
-                  <h3>{point.axis}</h3>
-                  <p>{point.detail}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {problem.visual && (
-          <figure className="code-practice-lab__visual">
-            <img src={problem.visual.src} alt={problem.visual.alt} loading="lazy" />
-            <figcaption>{problem.visual.caption}</figcaption>
-          </figure>
-        )}
 
         <div className="code-practice-lab__specs">
           <section className="code-practice-lab__spec-card">
@@ -576,7 +525,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
         )}
       </article>
 
-      {isExplanationOpen && solutionLanguage && (
+      {isExplanationOpen && (
         <div
           className="code-practice-lab__explanation-backdrop"
           onMouseDown={(event) => {
@@ -594,7 +543,7 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
             <header className="code-practice-lab__explanation-header">
               <div>
                 <p className="code-practice-lab__section-label">
-                  {solutionLanguage === 'numpy' ? 'NumPy explanation' : 'Torch explanation'}
+                  {problem.numpyAlternative ? 'Torch + NumPy explanation' : 'Torch explanation'}
                 </p>
                 <h2 id={`${problem.id}-explanation-title`}>{problem.title}</h2>
               </div>
@@ -626,7 +575,17 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
                 <section className="code-practice-lab__explanation-step" aria-labelledby={`${problem.id}-contract-title`}>
                   <p className="code-practice-lab__section-label">Step 1 · Contract</p>
                   <h3 id={`${problem.id}-contract-title`}>Name the input and output first</h3>
-                  <p className="code-practice-lab__explanation-lead">{problem.prompt[0]}</p>
+                  <div className="code-practice-lab__explanation-copy">
+                    {problem.prompt.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </div>
+                  {problem.numpyAlternative && (
+                    <p className="code-practice-lab__explanation-lead">
+                      The input can be a <code>torch.Tensor</code> or an <code>np.ndarray</code>.
+                      The contract, formula, and shapes stay the same.
+                    </p>
+                  )}
                   <div className="code-practice-lab__concept-flow">
                     <article>
                       <span>Input</span>
@@ -643,9 +602,22 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
                       <p>{outputSummary}</p>
                     </article>
                   </div>
-                  <pre className="code-practice-lab__explanation-signature">
-                    <code>{problem.signature}</code>
-                  </pre>
+                  <div className="code-practice-lab__api-signatures">
+                    <article>
+                      <strong>Torch</strong>
+                      <pre className="code-practice-lab__explanation-signature">
+                        <code>{problem.signature}</code>
+                      </pre>
+                    </article>
+                    {numpySignature && (
+                      <article>
+                        <strong>NumPy</strong>
+                        <pre className="code-practice-lab__explanation-signature">
+                          <code>{numpySignature}</code>
+                        </pre>
+                      </article>
+                    )}
+                  </div>
                 </section>
               )}
 
@@ -653,8 +625,8 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
                 <section className="code-practice-lab__explanation-step" aria-labelledby={`${problem.id}-mechanism-title`}>
                   <p className="code-practice-lab__section-label">Step 2 · Mechanism</p>
                   <h3 id={`${problem.id}-mechanism-title`}>
-                    {solutionLanguage === 'numpy'
-                      ? 'Build the NumPy version from the same math'
+                    {problem.numpyAlternative
+                      ? 'Build the result once, then map the syntax'
                       : 'Build the result from the math'}
                   </h3>
                   {problem.visual && (
@@ -663,10 +635,10 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
                       <figcaption>{problem.visual.caption}</figcaption>
                     </figure>
                   )}
-                  {solutionLanguage === 'numpy' && (
+                  {problem.numpyAlternative && (
                     <p className="code-practice-lab__explanation-lead">
-                      The formula and shapes do not change. The final notes name the NumPy syntax
-                      worth remembering.
+                      Torch and NumPy perform the same operations here. Read the formula first;
+                      then remember the small API-name differences.
                     </p>
                   )}
                   <div className="code-practice-lab__explanation-copy">
@@ -708,12 +680,18 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
               {explanationStep === 3 && (
                 <section className="code-practice-lab__explanation-step" aria-labelledby={`${problem.id}-code-title`}>
                   <p className="code-practice-lab__section-label">Step 4 · Code and checks</p>
-                  <h3 id={`${problem.id}-code-title`}>
-                    {solutionLanguage === 'numpy' ? 'NumPy' : 'Torch'} reference
-                  </h3>
+                  <h3 id={`${problem.id}-code-title`}>Torch reference</h3>
                   <pre className="code-practice-lab__explanation-code">
-                    <code>{explanationCode}</code>
+                    <code>{torchExplanationCode}</code>
                   </pre>
+                  {numpyExplanationCode && (
+                    <>
+                      <h3>NumPy reference</h3>
+                      <pre className="code-practice-lab__explanation-code">
+                        <code>{numpyExplanationCode}</code>
+                      </pre>
+                    </>
+                  )}
                   <h3>What to test and explain</h3>
                   <ul className="code-practice-lab__list">
                     {problem.hint.map((hint) => (
