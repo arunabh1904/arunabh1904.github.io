@@ -8458,7 +8458,7 @@ html {
 .code-practice-lab__explanation-popout {
   display: flex;
   flex-direction: column;
-  width: min(72rem, 100%);
+  width: min(56rem, 100%);
   max-height: min(88dvh, 58rem);
   overflow: hidden;
   border: 1px solid rgba(127, 197, 255, 0.32);
@@ -8508,8 +8508,7 @@ html {
   scrollbar-gutter: stable;
 }
 
-.code-practice-lab__explanation-copy p,
-.code-practice-lab__explanation-lead {
+.code-practice-lab__explanation-copy p {
   margin: 0;
   color: rgba(226, 232, 240, 0.88);
   line-height: 1.55;
@@ -8518,13 +8517,8 @@ html {
 .code-practice-lab__explanation-walkthrough {
   display: grid;
   gap: 1.25rem;
-  width: min(58rem, 100%);
+  width: min(46rem, 100%);
   margin: 0 auto;
-}
-
-.code-practice-lab__explanation-lead {
-  color: #dbeafe;
-  font-size: 1.03rem;
 }
 
 .code-practice-lab__explanation-copy {
@@ -8532,23 +8526,29 @@ html {
   gap: 0.85rem;
 }
 
+.code-practice-lab__explanation-copy code {
+  padding: 0.08rem 0.28rem;
+  border-radius: 0.3rem;
+  background: rgba(96, 165, 250, 0.12);
+  color: #dbeafe;
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+}
+
 .code-practice-lab__explanation-visual {
-  margin: 0.15rem 0;
-  padding: 0.75rem;
-  border: 1px solid rgba(127, 197, 255, 0.2);
-  border-radius: 14px;
-  background: rgba(7, 13, 24, 0.76);
+  width: min(40rem, 100%);
+  margin: 0 auto;
 }
 
 .code-practice-lab__explanation-visual img {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 9px;
+  border-radius: 12px;
 }
 
 .code-practice-lab__explanation-visual figcaption {
-  margin: 0.7rem 0.2rem 0.1rem;
+  margin: 0.6rem 0 0;
   color: rgba(203, 213, 225, 0.82);
   font-size: 0.88rem;
   line-height: 1.5;
@@ -8557,12 +8557,6 @@ html {
 .code-practice-lab__explanation-reasoning {
   display: grid;
   gap: 0.65rem;
-  padding-left: 1rem;
-  border-left: 2px solid rgba(96, 165, 250, 0.55);
-}
-
-.code-practice-lab__explanation-reasoning strong {
-  color: #bfdbfe;
 }
 
 .code-practice-lab__explanation-reasoning p {
@@ -8593,18 +8587,15 @@ html {
 }
 
 :root[data-theme="light"] .code-practice-lab__explanation-copy p,
-:root[data-theme="light"] .code-practice-lab__explanation-lead,
 :root[data-theme="light"] .code-practice-lab__explanation-visual figcaption {
   color: var(--text-secondary-color);
 }
 
-:root[data-theme="light"] .code-practice-lab__explanation-visual {
-  border-color: var(--code-border-color);
-  background: #f8fafc;
-  color: #0f172a;
+:root[data-theme="light"] .code-practice-lab__explanation-copy code {
+  background: rgba(37, 99, 235, 0.08);
+  color: #1e3a8a;
 }
 
-:root[data-theme="light"] .code-practice-lab__explanation-reasoning strong,
 :root[data-theme="light"] .code-practice-lab__explanation-reasoning p {
   color: var(--text-color);
 }
@@ -8643,25 +8634,12 @@ html {
   line-height: 1.45;
 }
 
-.code-practice-lab__solution-diagram {
-  margin: 0;
-  padding: 0.85rem;
-  overflow-x: auto;
-  border: 1px solid rgba(255, 228, 92, 0.18);
-  border-radius: 0.55rem;
-  color: rgba(255, 247, 207, 0.86);
-  font-size: 0.82rem;
-  line-height: 1.5;
-  white-space: pre;
-}
-
 :root[data-theme="light"] .code-practice-lab__visual {
   border-color: var(--code-border-color);
   background: rgba(244, 247, 252, 0.96);
 }
 
-:root[data-theme="light"] .code-practice-lab__visual figcaption,
-:root[data-theme="light"] .code-practice-lab__solution-diagram {
+:root[data-theme="light"] .code-practice-lab__visual figcaption {
   color: var(--text-secondary-color);
 }
 

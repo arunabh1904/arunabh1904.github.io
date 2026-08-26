@@ -43,7 +43,7 @@ const testProblem: CodePracticeProblem = {
     },
   ],
   visual: {
-    src: '/assets/images/code-tensor-ops-broadcasting.gif',
+    src: '/assets/images/code-glance-stable-softmax-cross-entropy.svg',
     alt: 'Tensor operation visual',
     caption: 'Shape visual',
   },
@@ -158,14 +158,17 @@ describe('CodePracticeLab', () => {
     const dialog = container.querySelector('[role="dialog"]');
     expect(dialog).not.toBeNull();
     expect(dialog?.querySelector('h2')?.textContent).toBe('Explanation');
-    expect(dialog?.textContent).toContain('torch.Tensor');
-    expect(dialog?.textContent).toContain('np.ndarray');
+    expect(dialog?.textContent).not.toContain('torch.Tensor');
+    expect(dialog?.textContent).not.toContain('np.ndarray');
     expect(dialog?.textContent).toContain('Use a row-wise max shift before the exponentials.');
     expect(dialog?.textContent).not.toContain('Keep the row axis when subtracting the maximum.');
     expect(dialog?.textContent).not.toContain('Subtract the row max first.');
     expect(dialog?.textContent).not.toContain('Prompt copy');
     expect(dialog?.textContent).not.toContain('Explanation-only detail.');
     expect(dialog?.textContent).not.toContain('def softmax_cross_entropy');
+    expect(dialog?.querySelector('.code-practice-lab__explanation-walkthrough')?.firstElementChild)
+      .toBe(dialog?.querySelector('.code-practice-lab__explanation-visual'));
+    expect(dialog?.querySelector('pre')).toBeNull();
     expect(dialog?.querySelector('.code-practice-lab__explanation-steps')).toBeNull();
     expect(dialog?.querySelector('.code-practice-lab__explanation-footer')).toBeNull();
   });
@@ -228,16 +231,16 @@ describe('CodePracticeLab', () => {
 
     expect(container.querySelector('[role="dialog"]')).not.toBeNull();
     expect(container.querySelector('.code-practice-lab__explanation-visual img')?.getAttribute('src')).toBe(
-      '/assets/images/code-tensor-ops-broadcasting.gif',
+      '/assets/images/code-glance-stable-softmax-cross-entropy.svg',
     );
     expect(container.querySelector('[role="dialog"] h2')?.textContent).toBe('Explanation');
     expect(container.textContent).toContain('Use a row-wise max shift before the exponentials.');
     expect(container.querySelector('[role="dialog"]')?.textContent).not.toContain(
       'Keep the row axis when subtracting the maximum.',
     );
-    expect(container.querySelector('.code-practice-lab__solution-diagram')).not.toBeNull();
-    expect(container.textContent).toContain('(N, 1) × (1, M) → (N, M)');
-    expect(container.textContent).toContain('Tensor reasoning');
+    expect(container.querySelector('.code-practice-lab__solution-diagram')).toBeNull();
+    expect(container.textContent).not.toContain('(N, 1) × (1, M) → (N, M)');
+    expect(container.textContent).not.toContain('Tensor reasoning');
     expect(container.textContent).toContain('Keep the row maximum shaped (N, 1)');
     expect(container.querySelectorAll('.code-practice-lab__explanation-reasoning p')).toHaveLength(2);
     expect(container.querySelector('[role="dialog"]')?.textContent).not.toContain('Torch reference');

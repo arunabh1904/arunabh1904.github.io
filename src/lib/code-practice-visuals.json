@@ -1,0 +1,442 @@
+[
+  {
+    "id": "l1-regression-loss",
+    "headline": "Absolute error, then one mean",
+    "kind": "loss",
+    "steps": [
+      ["INPUT", "prediction - target", "same shape"],
+      ["CORE STEP", "take |error|", "elementwise"],
+      ["RESULT", "mean absolute error", "one scalar"]
+    ],
+    "caption": "L1 loss keeps each absolute error visible until the final mean."
+  },
+  {
+    "id": "binary-cross-entropy-from-probabilities",
+    "headline": "The label chooses the log term",
+    "kind": "loss",
+    "steps": [
+      ["INPUT", "probability p + label y", "p is already in [0, 1]"],
+      ["CORE STEP", "y=1: -log(p)\ny=0: -log(1-p)", "clip only for log(0)"],
+      ["RESULT", "mean BCE", "do not sigmoid again"]
+    ],
+    "caption": "Probability-input BCE clips endpoints; logits-input BCE uses the stable softplus form instead."
+  },
+  {
+    "id": "masked-mean",
+    "headline": "The mask controls both the sum and the count",
+    "kind": "matrix",
+    "steps": [
+      ["INPUT", "values x + mask", "matching shape"],
+      ["CORE STEP", "sum(x * mask)", "count mask entries"],
+      ["RESULT", "masked sum / count", "ignore hidden values"]
+    ],
+    "caption": "Dividing by all elements would dilute the mean; divide by the number selected."
+  },
+  {
+    "id": "binary-classification-metrics",
+    "headline": "Every prediction lands in one confusion bucket",
+    "kind": "matrix",
+    "steps": [
+      ["INPUT", "true labels + predictions", "zeros and ones"],
+      ["CORE STEP", "count TP TN FP FN", "four boolean masks"],
+      ["RESULT", "precision recall F1", "ratios of the counts"]
+    ],
+    "caption": "Build the four counts once, then derive every metric from them."
+  },
+  {
+    "id": "top-k-accuracy",
+    "headline": "A row is correct if its label appears in the top k",
+    "kind": "ranking",
+    "steps": [
+      ["INPUT", "logits (N, C)", "one row per example"],
+      ["CORE STEP", "take k class indices", "compare with label[:, None]"],
+      ["RESULT", "mean of row hits", "shape (N,) to scalar"]
+    ],
+    "caption": "The comparison broadcasts one target across the k candidates in each row."
+  },
+  {
+    "id": "single-box-iou",
+    "headline": "IoU is overlap divided by covered area",
+    "kind": "boxes",
+    "steps": [
+      ["INPUT", "two xyxy boxes", "four coordinates each"],
+      ["CORE STEP", "intersection / union", "union = A + B - overlap"],
+      ["RESULT", "IoU in [0, 1]", "one scalar"]
+    ],
+    "caption": "Clamp the intersection width and height at zero when boxes do not overlap."
+  },
+  {
+    "id": "wrapped-angular-difference",
+    "headline": "Wrap the raw angle error back to one circle",
+    "kind": "geometry",
+    "steps": [
+      ["INPUT", "delta = predicted - target", "any real angle"],
+      ["CORE STEP", "atan2(sin delta, cos delta)", "wrap across +/- pi"],
+      ["RESULT", "shortest signed error", "inside [-pi, pi]"]
+    ],
+    "caption": "Angles near opposite ends of the interval can still be close on the circle."
+  },
+  {
+    "id": "smooth-l1-huber-loss",
+    "headline": "Small errors are quadratic; large errors are linear",
+    "kind": "loss",
+    "steps": [
+      ["INPUT", "absolute error |e|", "prediction - target"],
+      ["CORE STEP", "switch at beta", "quadratic below, linear above"],
+      ["RESULT", "mean Huber loss", "smooth and outlier-aware"]
+    ],
+    "caption": "The two branches meet with the same value and slope at beta."
+  },
+  {
+    "id": "stable-softmax-cross-entropy",
+    "headline": "Shift each row before exponentiating",
+    "kind": "matrix",
+    "steps": [
+      ["INPUT", "logits (N, C)", "one class row per example"],
+      ["CORE STEP", "subtract row max (N, 1)", "then exp, sum, log"],
+      ["RESULT", "mean target loss", "gather one class per row"]
+    ],
+    "caption": "Subtracting one constant per row preserves softmax probabilities and prevents overflow."
+  },
+  {
+    "id": "class-weighted-cross-entropy",
+    "headline": "Weight each example by its target class",
+    "kind": "loss",
+    "steps": [
+      ["INPUT", "row losses + class weights", "weight[label] per row"],
+      ["CORE STEP", "loss * example weight", "elementwise over N"],
+      ["RESULT", "weighted sum / weight sum", "normalized scalar"]
+    ],
+    "caption": "Index the class-weight vector with labels to obtain one weight per example."
+  },
+  {
+    "id": "temperature-scaling-of-logits",
+    "headline": "Temperature changes confidence, not class order",
+    "kind": "ranking",
+    "steps": [
+      ["INPUT", "logits z + T > 0", "same class scores"],
+      ["CORE STEP", "scaled logits = z / T", "T<1 sharpens; T>1 softens"],
+      ["RESULT", "calibrated probabilities", "argmax stays the same"]
+    ],
+    "caption": "Dividing every logit by the same positive temperature preserves their ranking."
+  },
+  {
+    "id": "pairwise-squared-distance",
+    "headline": "Insert singleton axes to form every pair",
+    "kind": "matrix",
+    "steps": [
+      ["INPUT", "x (N, D) + y (M, D)", "two point sets"],
+      ["CORE STEP", "x[:,None] - y[None,:]", "broadcast to (N, M, D)"],
+      ["RESULT", "sum squares -> (N, M)", "one distance per pair"]
+    ],
+    "caption": "The new axes align N against M while leaving D as the feature axis."
+  },
+  {
+    "id": "pairwise-cosine-similarity",
+    "headline": "Pairwise dot products need pairwise norm products",
+    "kind": "matrix",
+    "steps": [
+      ["INPUT", "x (N, D) + y (M, D)", "row vectors"],
+      ["CORE STEP", "x @ y.T", "divide by norms (N,1)*(1,M)"],
+      ["RESULT", "similarity (N, M)", "one cosine per pair"]
+    ],
+    "caption": "The denominator broadcasts one x norm down rows and one y norm across columns."
+  },
+  {
+    "id": "nearest-centroid-classifier",
+    "headline": "Compress each class to one centroid",
+    "kind": "geometry",
+    "steps": [
+      ["INPUT", "labeled train points", "shape (N, D)"],
+      ["CORE STEP", "mean each class, then compare", "test-to-centroid distances"],
+      ["RESULT", "nearest class label", "argmin over classes"]
+    ],
+    "caption": "Training stores one mean vector per class; prediction is nearest-neighbor over centroids."
+  },
+  {
+    "id": "iou-matrix",
+    "headline": "Broadcast N boxes against M boxes",
+    "kind": "boxes",
+    "steps": [
+      ["INPUT", "boxes1 (N,4) + boxes2 (M,4)", "xyxy coordinates"],
+      ["CORE STEP", "form (N, M, 2) corners", "max top-left, min bottom-right"],
+      ["RESULT", "IoU matrix (N, M)", "one overlap per pair"]
+    ],
+    "caption": "Singleton axes create every cross-set box pair without a Python loop."
+  },
+  {
+    "id": "non-maximum-suppression",
+    "headline": "Keep the best box, suppress its duplicates, repeat",
+    "kind": "boxes",
+    "steps": [
+      ["INPUT", "boxes + confidence scores", "sorted high to low"],
+      ["CORE STEP", "keep top; remove high-IoU rest", "repeat on survivors"],
+      ["RESULT", "kept indices", "one box per object"]
+    ],
+    "caption": "NMS is greedy: every kept box changes which candidates remain."
+  },
+  {
+    "id": "weighted-box-regression-loss",
+    "headline": "Coordinate weights say which errors matter most",
+    "kind": "loss",
+    "steps": [
+      ["INPUT", "box error (..., 4)", "x y width height"],
+      ["CORE STEP", "abs(error) * weights", "weights broadcast over boxes"],
+      ["RESULT", "mean weighted error", "one scalar"]
+    ],
+    "caption": "Keep the four-coordinate axis last so one weight vector broadcasts everywhere."
+  },
+  {
+    "id": "dice-loss",
+    "headline": "Dice compares overlap with total foreground mass",
+    "kind": "masks",
+    "steps": [
+      ["INPUT", "prediction + target masks", "flatten per example"],
+      ["CORE STEP", "2 * intersection / total", "add epsilon for empty masks"],
+      ["RESULT", "1 - mean Dice", "overlap loss"]
+    ],
+    "caption": "Dice directly rewards shared foreground pixels instead of counting background agreement."
+  },
+  {
+    "id": "segmentation-iou-loss",
+    "headline": "Segmentation IoU uses soft intersection and union",
+    "kind": "masks",
+    "steps": [
+      ["INPUT", "prediction + target masks", "per example"],
+      ["CORE STEP", "intersection / union", "union = pred + target - overlap"],
+      ["RESULT", "1 - mean IoU", "one batch loss"]
+    ],
+    "caption": "Reduce spatial axes first so each image contributes one IoU before the batch mean."
+  },
+  {
+    "id": "focal-loss",
+    "headline": "Easy examples shrink; hard examples keep their weight",
+    "kind": "loss",
+    "steps": [
+      ["INPUT", "logits + binary targets", "stable BCE per element"],
+      ["CORE STEP", "multiply by (1 - p_t)^gamma", "downweight confident answers"],
+      ["RESULT", "mean focal loss", "focus on hard examples"]
+    ],
+    "caption": "Compute p_t for the true label, then use its complement as the difficulty weight."
+  },
+  {
+    "id": "top-k-gather",
+    "headline": "Top-k chooses rows; gather retrieves their features",
+    "kind": "ranking",
+    "steps": [
+      ["INPUT", "scores (B,N) + features (B,N,D)", "shared N axis"],
+      ["CORE STEP", "topk indices (B,K)", "expand indices to (B,K,D)"],
+      ["RESULT", "features (B,K,D)", "same order as top scores"]
+    ],
+    "caption": "Gather needs the index tensor to match every non-gathered axis."
+  },
+  {
+    "id": "homogeneous-coordinate-transform",
+    "headline": "Translation becomes a matrix multiply after appending one",
+    "kind": "geometry",
+    "steps": [
+      ["INPUT", "points (N,3)", "append a column of ones"],
+      ["CORE STEP", "homogeneous points @ T.T", "shape (N,4)"],
+      ["RESULT", "drop homogeneous coordinate", "transformed (N,3)"]
+    ],
+    "caption": "The appended one lets the final transform column add translation."
+  },
+  {
+    "id": "2d-patchify-for-images",
+    "headline": "Expose grid axes and local patch axes",
+    "kind": "patches",
+    "steps": [
+      ["INPUT", "image (B,C,H,W)", "patch size P"],
+      ["CORE STEP", "reshape + permute", "grid_h, grid_w, C, P, P"],
+      ["RESULT", "tokens (B,N,C*P*P)", "row-major patches"]
+    ],
+    "caption": "Patchify is a layout change: it does not mix or learn pixel values."
+  },
+  {
+    "id": "unpatchify-back-to-image",
+    "headline": "Split each token, restore the grid, then collapse",
+    "kind": "patches",
+    "steps": [
+      ["INPUT", "tokens (B,N,C*P*P)", "N = grid_h * grid_w"],
+      ["CORE STEP", "reshape + inverse permute", "restore grid and patch axes"],
+      ["RESULT", "image (B,C,H,W)", "original pixel layout"]
+    ],
+    "caption": "Unpatchify exactly reverses the axis order used by patchify."
+  },
+  {
+    "id": "sinusoidal-positional-encoding",
+    "headline": "Each position gets slow and fast sine waves",
+    "kind": "sequence",
+    "steps": [
+      ["INPUT", "positions (T,1) + frequencies", "D/2 frequency bands"],
+      ["CORE STEP", "sin on even, cos on odd", "broadcast to (T,D/2)"],
+      ["RESULT", "encoding (T,D)", "unique position pattern"]
+    ],
+    "caption": "Outer multiplication creates one angle for every position-frequency pair."
+  },
+  {
+    "id": "causal-attention-mask",
+    "headline": "Query row i can see key columns j <= i",
+    "kind": "matrix",
+    "steps": [
+      ["INPUT", "query positions + key positions", "rows against columns"],
+      ["CORE STEP", "i >= j", "lower triangle plus padding mask"],
+      ["RESULT", "visibility (B,T,T)", "no future tokens"]
+    ],
+    "caption": "Rows are queries and columns are keys; that orientation determines the triangle."
+  },
+  {
+    "id": "rope-rotary-positional-embedding",
+    "headline": "Rotate adjacent channel pairs by position",
+    "kind": "geometry",
+    "steps": [
+      ["INPUT", "Q or K (B,T,H,D)", "split even and odd channels"],
+      ["CORE STEP", "2D rotation by position angle", "sin/cos broadcast over B,H"],
+      ["RESULT", "rotated Q or K", "same shape, position-aware"]
+    ],
+    "caption": "Each adjacent pair acts like a 2D vector; the rotation preserves its length."
+  },
+  {
+    "id": "scaled-dot-product-self-attention",
+    "headline": "Each token builds a weighted mixture of all values",
+    "kind": "attention",
+    "steps": [
+      ["INPUT", "x -> Q, K, V", "split to (B,H,T,Dh)"],
+      ["CORE STEP", "softmax(QK.T / sqrt(Dh))", "scores (B,H,T,T)"],
+      ["RESULT", "weights @ V", "merge heads to (B,T,D)"]
+    ],
+    "caption": "The score matrix compares every query token with every key token."
+  },
+  {
+    "id": "incremental-kv-cache",
+    "headline": "Decode appends only the new keys and values",
+    "kind": "sequence",
+    "steps": [
+      ["INPUT", "cached prefix + new K,V", "same B,H,Dh"],
+      ["CORE STEP", "append on sequence axis", "old T + new T"],
+      ["RESULT", "longer K/V cache", "reuse prefix next step"]
+    ],
+    "caption": "Appending on any axis except sequence silently corrupts the cache layout."
+  },
+  {
+    "id": "grouped-query-and-multi-query-attention",
+    "headline": "Many query heads can share fewer key/value heads",
+    "kind": "attention",
+    "steps": [
+      ["INPUT", "Hq query heads + Hkv K/V heads", "Hq is divisible by Hkv"],
+      ["CORE STEP", "share each K/V head across groups", "repeat or broadcast by group"],
+      ["RESULT", "attention for Hq heads", "smaller K/V cache"]
+    ],
+    "caption": "MHA uses Hkv=Hq, GQA uses fewer K/V heads, and MQA uses one."
+  },
+  {
+    "id": "cross-attention",
+    "headline": "Queries come from one sequence; keys and values from another",
+    "kind": "attention",
+    "steps": [
+      ["INPUT", "target -> Q; source -> K,V", "Tq may differ from Ts"],
+      ["CORE STEP", "Q @ K.T", "scores (B,H,Tq,Ts)"],
+      ["RESULT", "source mixture per target", "output length Tq"]
+    ],
+    "caption": "The query length controls output rows; the source length controls score columns."
+  },
+  {
+    "id": "simple-n-gram-language-model",
+    "headline": "A context window indexes next-token counts",
+    "kind": "sequence",
+    "steps": [
+      ["INPUT", "token sequence + order n", "context length n-1"],
+      ["CORE STEP", "count context -> next token", "slide one token at a time"],
+      ["RESULT", "normalized next-token table", "sample or argmax"]
+    ],
+    "caption": "The model remembers counts for exact contexts; unseen contexts need a fallback."
+  },
+  {
+    "id": "average-precision-from-matches",
+    "headline": "Average precision is area under ranked precision-recall",
+    "kind": "ranking",
+    "steps": [
+      ["INPUT", "ranked TP/FP matches", "highest score first"],
+      ["CORE STEP", "cumulative precision and recall", "update at each rank"],
+      ["RESULT", "area under PR curve", "one AP scalar"]
+    ],
+    "caption": "Ranking matters: the same matches in a different order can produce different AP."
+  },
+  {
+    "id": "greedy-detection-matching",
+    "headline": "Each ground truth can be claimed once",
+    "kind": "boxes",
+    "steps": [
+      ["INPUT", "scored predictions + GT boxes", "sort predictions first"],
+      ["CORE STEP", "best unused IoU above threshold", "mark that GT used"],
+      ["RESULT", "TP/FP sequence", "feeds AP"]
+    ],
+    "caption": "Mask used ground truths before argmax so later predictions cannot reuse them."
+  },
+  {
+    "id": "batched-best-iou-match",
+    "headline": "Broadcast all box pairs, then reduce the ground-truth axis",
+    "kind": "boxes",
+    "steps": [
+      ["INPUT", "pred (B,N,4) + GT (B,M,4)", "matched batch axis"],
+      ["CORE STEP", "pairwise IoU (B,N,M)", "argmax over M"],
+      ["RESULT", "best IoU + index (B,N)", "one match per prediction"]
+    ],
+    "caption": "The M axis represents candidate ground truths and is the only axis reduced."
+  },
+  {
+    "id": "manual-backprop-for-a-2-layer-mlp",
+    "headline": "Cache the forward values needed by the reverse chain",
+    "kind": "network",
+    "steps": [
+      ["FORWARD", "x -> linear -> ReLU -> linear", "cache z1 and h"],
+      ["BACKWARD", "loss gradient flows right to left", "apply local derivatives"],
+      ["RESULT", "dW1 db1 dW2 db2", "matching parameter shapes"]
+    ],
+    "caption": "Backprop multiplies each upstream gradient by the local derivative at that node."
+  },
+  {
+    "id": "classic-mlp-forward-backward",
+    "headline": "Forward computes activations; backward reuses them for gradients",
+    "kind": "network",
+    "steps": [
+      ["FORWARD", "batch x through two layers", "predict and compute loss"],
+      ["BACKWARD", "differentiate output, then hidden", "ReLU gates negative preactivations"],
+      ["RESULT", "parameter gradients", "ready for an update"]
+    ],
+    "caption": "Every gradient has the same shape as the parameter it updates."
+  },
+  {
+    "id": "resnet-from-building-blocks",
+    "headline": "The skip path must match before residual addition",
+    "kind": "network",
+    "steps": [
+      ["INPUT", "feature map x", "main path + skip path"],
+      ["CORE STEP", "project skip when shape changes", "1x1 conv with stage stride"],
+      ["RESULT", "add -> ReLU -> next stage", "matched channels and size"]
+    ],
+    "caption": "Identity skips are free only when spatial size and channel count already match."
+  },
+  {
+    "id": "unet-encoder-decoder",
+    "headline": "Downsample for context; skip features restore detail",
+    "kind": "network",
+    "steps": [
+      ["ENCODER", "conv blocks + pooling", "save each scale"],
+      ["DECODER", "upsample + concatenate skip", "match spatial shapes"],
+      ["RESULT", "dense output at input size", "one prediction per pixel"]
+    ],
+    "caption": "Each decoder stage combines coarse context with the encoder feature at the same scale."
+  },
+  {
+    "id": "centernet-style-detector",
+    "headline": "One shared feature map feeds three detection heads",
+    "kind": "network",
+    "steps": [
+      ["INPUT", "image -> backbone", "downsampled feature map"],
+      ["HEADS", "heatmap + size + offset", "class, box extent, subpixel center"],
+      ["RESULT", "decode peaks into boxes", "score and coordinates"]
+    ],
+    "caption": "The heatmap finds centers; size and offset supply the box geometry around each peak."
+  }
+]

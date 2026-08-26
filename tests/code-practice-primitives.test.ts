@@ -264,7 +264,9 @@ describe('code-practice primitive-first solutions', () => {
     expect(bce?.solutionCode).toContain('(probability < 0) | (probability > 1)');
     expect(bce?.solutionNotes.join(' ')).toContain('max(z, 0) - z*y + log(1 + exp(-|z|))');
     expect(bce?.solutionNotes.join(' ')).not.toContain('sigmoid, then clamp, then log is stable');
-    expect(bce?.visual?.src).toBe('/assets/images/code-bce-probabilities-vs-logits.gif');
+    expect(bce?.visual?.src).toBe(
+      '/assets/images/code-glance-binary-cross-entropy-from-probabilities.svg',
+    );
   });
 
   it('supports tensor transpose methods used by 2D and attention references', () => {
