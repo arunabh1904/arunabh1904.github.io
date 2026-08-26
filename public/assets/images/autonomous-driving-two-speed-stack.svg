@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="860" viewBox="0 0 1600 860" role="img" aria-labelledby="title desc">
-  <title id="title">Sensor fusion and a triggered Driving VLM feeding trajectory proposal and independent validation</title>
-  <desc id="desc">The layout follows the Waymo source figure. Camera, LiDAR, and radar enter the upper sensor-fusion branch. Selected camera history, route context, and an uncertainty trigger enter the lower Driving VLM branch. Both branches feed a trajectory proposal model on the right. A scorer ranks candidate trajectories, while an independent validator checks geometry, dynamics, traffic rules, uncertainty limits, and fallback requirements before the vehicle controller receives a trajectory.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Sensor state and VLM context meet before trajectory validation</title>
+  <desc id="desc">A proposed implementation arranged like Waymo's source figure. Camera, LiDAR, and radar pass through separate encoders before alignment and fusion into measured state and learned planning features. A lower Driving VLM path adds bounded scene context for rare or uncertain scenes. Measured state, learned features, and VLM context feed a trajectory generator. Learned features do not feed the independent validator: its geometry, dynamics, traffic-rule, uncertainty, and fallback checks use candidate trajectories and explicit measured state before vehicle control.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07131d"/><stop offset="1" stop-color="#111f2d"/></linearGradient>
     <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102331"/><stop offset="1" stop-color="#0b1823"/></linearGradient>
@@ -10,103 +10,217 @@
     <marker id="violet-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#b19aff"/></marker>
     <style>
       text{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-      .kicker{font-size:15px;font-weight:750;letter-spacing:2.2px;fill:#78e0a5}
-      .title{font-size:42px;font-weight:760;fill:#f2f7fa}
-      .subtitle{font-size:19px;font-weight:520;fill:#a8bbc7}
-      .branch-title{font-size:18px;font-weight:760;letter-spacing:1.8px;fill:#f2f7fa}
-      .node-title{font-size:23px;font-weight:720;fill:#f2f7fa}
-      .copy{font-size:18px;font-weight:520;fill:#a8bbc7}
-      .small{font-size:16px;font-weight:560;fill:#a8bbc7}
+      .kicker{font-size:16px;font-weight:760;letter-spacing:2.1px;fill:#78e0a5}
+      .title{font-size:42px;font-weight:770;fill:#f2f7fa}
+      .subtitle{font-size:19px;font-weight:530;fill:#a8bbc7}
+      .branch-title{font-size:18px;font-weight:760;letter-spacing:1.7px;fill:#f2f7fa}
+      .node-title{font-size:22px;font-weight:730;fill:#f2f7fa}
+      .lane-title{font-size:18px;font-weight:700;fill:#f2f7fa}
+      .copy{font-size:17px;font-weight:540;fill:#a8bbc7}
+      .small{font-size:16px;font-weight:580;fill:#a8bbc7}
       .micro{font-size:15px;font-weight:760;letter-spacing:1px;fill:#f2f7fa}
       .panel{fill:url(#panel);stroke-width:1.5}
+      .card{fill:#0b1823;stroke:#30495b;stroke-width:1.3}
       .cyan{stroke:#58d8ff}.pink{stroke:#ff6fae}.violet{stroke:#b19aff}.green{stroke:#78e0a5}.red{stroke:#ff7a76}
-      .chip{fill:#0b1823;stroke-width:1.2}
       .flow{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+      .icon{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+      .muted-line{fill:none;stroke:#365166;stroke-width:1.5;stroke-linecap:round}
     </style>
   </defs>
 
-  <rect width="1600" height="860" rx="24" fill="url(#bg)"/>
-  <text x="52" y="52" class="kicker">PROPOSED IMPLEMENTATION OF THE PUBLISHED ARCHITECTURE</text>
-  <text x="52" y="102" class="title">Sensor fusion and Driving VLM inputs converge before trajectory validation</text>
-  <text x="52" y="136" class="subtitle">The layout mirrors the source figure: sensor fusion above, Driving VLM below, shared trajectory proposal on the right.</text>
+  <rect width="1600" height="900" rx="24" fill="url(#bg)"/>
+  <text x="52" y="50" class="kicker">PROPOSED IMPLEMENTATION</text>
+  <text x="52" y="98" class="title">Sensor state and VLM context meet before trajectory validation</text>
+  <text x="52" y="133" class="subtitle">Separate sensor encoders preserve modality-specific evidence; independent checks gate the path sent to control.</text>
 
-  <rect x="40" y="176" width="748" height="272" rx="22" class="panel cyan"/>
-  <text x="66" y="211" class="branch-title" fill="#58d8ff">SENSOR FUSION ENCODER · UPDATED EVERY PLANNING CYCLE</text>
-  <rect x="66" y="239" width="156" height="178" rx="16" class="chip cyan"/>
-  <text x="86" y="273" class="node-title">Sensors</text>
-  <circle cx="88" cy="307" r="5" fill="#58d8ff"/><text x="105" y="313" class="copy">Camera</text>
-  <circle cx="88" cy="347" r="5" fill="#ffc15a"/><text x="105" y="353" class="copy">LiDAR</text>
-  <circle cx="88" cy="387" r="5" fill="#ff6fae"/><text x="105" y="393" class="copy">Radar</text>
-  <path d="M222 328H262" class="flow cyan" marker-end="url(#cyan-arrow)"/>
-  <rect x="272" y="229" width="226" height="188" rx="16" class="chip green"/>
-  <text x="294" y="267" class="node-title">Align and fuse</text>
-  <text x="294" y="304" class="copy">Calibration and depth</text>
-  <text x="294" y="333" class="copy">Time and ego motion</text>
-  <text x="294" y="362" class="copy">Sensor health and age</text>
-  <text x="294" y="393" class="micro" fill="#78e0a5">SHARED VEHICLE FRAME</text>
-  <path d="M498 328H538" class="flow green" marker-end="url(#green-arrow)"/>
-  <rect x="548" y="229" width="214" height="188" rx="16" class="chip violet"/>
-  <text x="570" y="267" class="node-title">Driving state</text>
-  <text x="570" y="302" class="micro" fill="#78e0a5">EXPLICIT</text>
-  <text x="570" y="328" class="copy">tracks · occupancy</text>
-  <text x="570" y="353" class="copy">map · uncertainty</text>
-  <text x="570" y="383" class="micro" fill="#b19aff">LEARNED</text>
-  <text x="570" y="407" class="copy">dense features · tokens</text>
+  <!-- Sensor path: the source figure's upper branch. -->
+  <rect x="40" y="170" width="760" height="290" rx="22" class="panel cyan"/>
+  <text x="66" y="207" class="branch-title" fill="#58d8ff">SENSOR PATH · STATE UPDATE</text>
 
-  <rect x="40" y="482" width="748" height="284" rx="22" class="panel pink"/>
-  <text x="66" y="517" class="branch-title" fill="#ff6fae">DRIVING VLM · RUNS FOR RARE OR UNCERTAIN SCENES</text>
-  <rect x="66" y="547" width="210" height="174" rx="16" class="chip pink"/>
-  <text x="88" y="583" class="node-title">Selected context</text>
-  <text x="88" y="619" class="copy">camera history</text>
-  <text x="88" y="648" class="copy">route context</text>
-  <text x="88" y="677" class="copy">rare / uncertain scene</text>
-  <text x="88" y="706" class="copy">selected state features</text>
-  <path d="M276 634H316" class="flow pink" marker-end="url(#pink-arrow)"/>
-  <rect x="326" y="547" width="190" height="174" rx="16" class="chip pink"/>
-  <text x="348" y="583" class="node-title">Driving VLM</text>
-  <text x="348" y="621" class="copy">Interpret unusual</text>
-  <text x="348" y="650" class="copy">objects + signals</text>
-  <text x="348" y="679" class="copy">and road events</text>
-  <path d="M516 634H546" class="flow pink" marker-end="url(#pink-arrow)"/>
-  <rect x="556" y="547" width="206" height="174" rx="16" class="chip pink"/>
-  <text x="578" y="580" class="node-title">VLM output</text>
-  <text x="578" y="611" class="copy">scene interpretation</text>
-  <text x="578" y="640" class="copy">linked region or actor</text>
-  <text x="578" y="669" class="copy">confidence + time</text>
-  <text x="578" y="698" class="copy">expiration rule</text>
+  <!-- Camera lane. -->
+  <rect x="66" y="228" width="142" height="58" rx="14" class="card cyan"/>
+  <g transform="translate(82 246)" style="color:#58d8ff">
+    <rect x="0" y="0" width="30" height="21" rx="4" class="icon"/>
+    <circle cx="15" cy="10.5" r="5" class="icon"/>
+    <path d="M7 0l4-6h8l4 6" class="icon"/>
+  </g>
+  <text x="126" y="254" class="lane-title">Camera</text>
+  <text x="126" y="276" class="small">frames</text>
+  <path d="M208 257H230" class="flow cyan" marker-end="url(#cyan-arrow)"/>
+  <rect x="238" y="228" width="146" height="58" rx="14" class="card cyan"/>
+  <text x="255" y="253" class="lane-title">Image encoder</text>
+  <text x="255" y="276" class="small">image + depth</text>
 
-  <rect x="836" y="176" width="724" height="590" rx="22" class="panel violet"/>
-  <text x="864" y="211" class="branch-title" fill="#b19aff">TRAJECTORY PROPOSAL + INDEPENDENT VALIDATION</text>
-  <path d="M762 314H880" class="flow green" marker-end="url(#green-arrow)"/>
-  <path d="M762 634C820 634 826 326 880 326" class="flow pink" marker-end="url(#pink-arrow)"/>
-  <rect x="890" y="236" width="630" height="126" rx="17" class="chip violet"/>
-  <text x="916" y="276" class="node-title">Trajectory proposal model</text>
-  <text x="916" y="311" class="copy">Inputs: tracks, map, learned features, and VLM scene interpretation</text>
-  <text x="916" y="340" class="copy">Output: predicted actor futures and candidate ego trajectories</text>
-  <path d="M1205 362V398" class="flow violet" marker-end="url(#violet-arrow)"/>
-  <rect x="918" y="408" width="574" height="76" rx="16" class="chip violet"/>
-  <text x="944" y="442" class="node-title">Candidate trajectories</text>
-  <text x="944" y="470" class="copy">several feasible paths for the ego vehicle</text>
-  <path d="M1080 484V516" class="flow violet" marker-end="url(#violet-arrow)"/>
-  <path d="M1340 484V516" class="flow" stroke="#ff7a76" marker-end="url(#pink-arrow)"/>
-  <rect x="884" y="526" width="286" height="112" rx="16" class="chip violet"/>
-  <text x="906" y="562" class="node-title">Trajectory scorer</text>
-  <text x="906" y="594" class="copy">Ranks safety, progress,</text>
-  <text x="906" y="620" class="copy">comfort, and compliance</text>
-  <rect x="1226" y="526" width="306" height="112" rx="16" class="chip red"/>
-  <text x="1248" y="562" class="node-title">Independent validator</text>
-  <text x="1248" y="594" class="copy">Geometry, dynamics, and rules</text>
-  <text x="1248" y="620" class="copy">Uncertainty limits and fallback</text>
-  <path d="M762 365H808V501H1508V526" class="flow green" stroke-dasharray="8 7" marker-end="url(#green-arrow)"/>
-  <text x="1160" y="495" class="micro" text-anchor="middle" fill="#78e0a5">EXPLICIT SENSOR STATE ALSO FEEDS THE VALIDATOR</text>
-  <path d="M1027 638V668H1178" class="flow violet" marker-end="url(#violet-arrow)"/>
-  <path d="M1379 638V668H1232" class="flow" stroke="#ff7a76" marker-end="url(#pink-arrow)"/>
-  <rect x="1024" y="678" width="388" height="62" rx="16" class="chip green"/>
-  <text x="1218" y="707" class="node-title" text-anchor="middle">Select a valid trajectory</text>
-  <text x="1218" y="730" class="small" text-anchor="middle">highest-scoring trajectory that passes every check</text>
-  <path d="M1218 740V796" class="flow green" marker-end="url(#green-arrow)"/>
-  <rect x="1082" y="798" width="272" height="44" rx="22" class="chip green"/>
-  <text x="1218" y="826" class="node-title" text-anchor="middle">Vehicle controller</text>
+  <!-- LiDAR lane. -->
+  <rect x="66" y="306" width="142" height="58" rx="14" class="card green"/>
+  <g transform="translate(82 320)" style="color:#78e0a5">
+    <path d="M2 24h31M8 20l5-12h10l5 12" class="icon"/>
+    <circle cx="2" cy="4" r="2" fill="#78e0a5"/><circle cx="17" cy="1" r="2" fill="#78e0a5"/><circle cx="32" cy="6" r="2" fill="#78e0a5"/>
+  </g>
+  <text x="126" y="332" class="lane-title">LiDAR</text>
+  <text x="126" y="354" class="small">points</text>
+  <path d="M208 335H230" class="flow green" marker-end="url(#green-arrow)"/>
+  <rect x="238" y="306" width="146" height="58" rx="14" class="card green"/>
+  <text x="255" y="331" class="lane-title">Range encoder</text>
+  <text x="255" y="354" class="small">3D shape</text>
 
-  <text x="52" y="826" class="subtitle">The VLM adds scene context but cannot overwrite sensor state. Only the independent validator can admit a trajectory.</text>
+  <!-- Radar lane. -->
+  <rect x="66" y="384" width="142" height="58" rx="14" class="card pink"/>
+  <g transform="translate(82 397)" style="color:#ff6fae">
+    <circle cx="5" cy="15" r="3" fill="#ff6fae"/>
+    <path d="M11 8a10 10 0 010 14M17 3a17 17 0 010 24M24 0a23 23 0 010 30" class="icon"/>
+  </g>
+  <text x="126" y="410" class="lane-title">Radar</text>
+  <text x="126" y="432" class="small">returns</text>
+  <path d="M208 413H230" class="flow pink" marker-end="url(#pink-arrow)"/>
+  <rect x="238" y="384" width="146" height="58" rx="14" class="card pink"/>
+  <text x="255" y="409" class="lane-title">Motion encoder</text>
+  <text x="255" y="432" class="small">range + speed</text>
+
+  <!-- Three encoder streams converge. -->
+  <path d="M384 257H414V335H438" class="flow cyan"/>
+  <path d="M384 335H438" class="flow green" marker-end="url(#green-arrow)"/>
+  <path d="M384 413H414V335" class="flow pink"/>
+  <rect x="446" y="265" width="142" height="140" rx="22" class="card green"/>
+  <g transform="translate(486 282)" style="color:#78e0a5">
+    <circle cx="14" cy="14" r="11" class="icon"/><circle cx="48" cy="14" r="11" class="icon"/><circle cx="31" cy="43" r="11" class="icon"/>
+    <path d="M22 20l9 14 9-14M25 14h12" class="icon"/>
+  </g>
+  <text x="517" y="358" class="node-title" text-anchor="middle">Align + fuse</text>
+  <text x="517" y="384" class="small" text-anchor="middle">time · pose · health</text>
+  <path d="M588 335H614" class="flow green" marker-end="url(#green-arrow)"/>
+
+  <!-- State retains both checkable structure and learned features. -->
+  <rect x="622" y="239" width="152" height="196" rx="18" class="card violet"/>
+  <text x="698" y="270" class="node-title" text-anchor="middle">Driving state</text>
+  <rect x="640" y="287" width="116" height="60" rx="12" fill="#0e211f" stroke="#78e0a5"/>
+  <g transform="translate(652 299)" style="color:#78e0a5"><rect x="0" y="0" width="26" height="20" rx="4" class="icon"/><path d="M5 20v7m16-7v7M4 10h18" class="icon"/></g>
+  <text x="690" y="311" class="micro" fill="#78e0a5">MEASURED</text>
+  <text x="690" y="334" class="small">tracks · map</text>
+  <rect x="640" y="357" width="116" height="60" rx="12" fill="#15182a" stroke="#b19aff"/>
+  <g transform="translate(651 370)" fill="#b19aff"><circle cx="4" cy="4" r="3"/><circle cx="16" cy="4" r="3"/><circle cx="28" cy="4" r="3"/><circle cx="4" cy="16" r="3"/><circle cx="16" cy="16" r="3"/><circle cx="28" cy="16" r="3"/></g>
+  <text x="690" y="381" class="micro" fill="#b19aff">LEARNED</text>
+  <text x="690" y="404" class="small">features</text>
+
+  <!-- Triggered semantic path: the source figure's lower branch. -->
+  <rect x="40" y="485" width="760" height="315" rx="22" class="panel pink"/>
+  <text x="66" y="522" class="branch-title" fill="#ff6fae">VLM PATH · RARE OR UNCERTAIN SCENES</text>
+  <rect x="66" y="550" width="238" height="210" rx="18" class="card pink"/>
+  <text x="88" y="584" class="node-title">Selected context</text>
+  <rect x="86" y="603" width="198" height="42" rx="11" fill="#101d29" stroke="#365166"/>
+  <g transform="translate(100 613)" style="color:#58d8ff"><rect x="0" y="0" width="27" height="19" rx="4" class="icon"/><circle cx="13.5" cy="9.5" r="4.5" class="icon"/><path d="M31 4h12m-12 6h9m-9 6h6" class="icon"/></g>
+  <text x="152" y="630" class="copy">Camera history</text>
+  <rect x="86" y="653" width="198" height="42" rx="11" fill="#101d29" stroke="#365166"/>
+  <g transform="translate(102 663)" style="color:#ffc15a"><path d="M0 19C9 1 22 1 32 19" class="icon"/><path d="M16 2v20" class="icon" stroke-dasharray="4 4"/></g>
+  <text x="152" y="680" class="copy">Route context</text>
+  <rect x="86" y="703" width="198" height="42" rx="11" fill="#101d29" stroke="#365166"/>
+  <g transform="translate(105 711)" style="color:#ff6fae"><path d="M13 0L26 24H0Z" class="icon"/><path d="M13 7v8m0 4h.01" class="icon"/></g>
+  <text x="152" y="730" class="copy">Rare / uncertain</text>
+
+  <path d="M304 655H332" class="flow pink" marker-end="url(#pink-arrow)"/>
+  <rect x="340" y="570" width="170" height="170" rx="22" class="card pink"/>
+  <g transform="translate(387 592)" style="color:#ff6fae">
+    <rect x="0" y="0" width="76" height="62" rx="14" class="icon"/>
+    <circle cx="18" cy="20" r="4" fill="#ff6fae"/><circle cx="38" cy="20" r="4" fill="#ff6fae"/><circle cx="58" cy="20" r="4" fill="#ff6fae"/>
+    <path d="M16 42h44M24 51h28" class="icon"/>
+  </g>
+  <text x="425" y="690" class="node-title" text-anchor="middle">Driving VLM</text>
+  <text x="425" y="716" class="small" text-anchor="middle">interprets the scene</text>
+  <path d="M510 655H540" class="flow pink" marker-end="url(#pink-arrow)"/>
+
+  <rect x="548" y="550" width="226" height="210" rx="18" class="card pink"/>
+  <text x="570" y="584" class="node-title">Bounded output</text>
+  <g transform="translate(570 603)">
+    <rect x="0" y="0" width="182" height="38" rx="10" fill="#161a29" stroke="#ff6fae"/>
+    <circle cx="20" cy="19" r="7" fill="none" stroke="#ff6fae" stroke-width="2"/><path d="M15 19h10" stroke="#ff6fae" stroke-width="2"/>
+    <text x="40" y="25" class="copy">Scene label</text>
+    <rect x="0" y="47" width="182" height="38" rx="10" fill="#161a29" stroke="#ff6fae"/>
+    <path d="M14 66h13m-6-7l6 7-6 7" fill="none" stroke="#ff6fae" stroke-width="2"/>
+    <text x="40" y="72" class="copy">Actor link</text>
+    <rect x="0" y="94" width="182" height="38" rx="10" fill="#161a29" stroke="#ff6fae"/>
+    <circle cx="21" cy="113" r="9" fill="none" stroke="#ff6fae" stroke-width="2"/><path d="M21 108v6l4 3" fill="none" stroke="#ff6fae" stroke-width="2"/>
+    <text x="40" y="119" class="copy">Confidence + expiry</text>
+  </g>
+  <text x="661" y="749" class="micro" text-anchor="middle" fill="#ff6fae">NO STATE OVERRIDE</text>
+
+  <!-- Planning and validation preserve the source figure's rightward reading direction. -->
+  <rect x="830" y="170" width="730" height="680" rx="22" class="panel violet"/>
+  <text x="858" y="207" class="branch-title" fill="#b19aff">PLAN, RANK, CHECK</text>
+  <path id="measured-state-to-generator" d="M756 317H850V292H878" class="flow green" marker-end="url(#green-arrow)"/>
+  <path id="learned-features-to-generator" d="M756 387H838V358H878" class="flow violet" marker-end="url(#violet-arrow)"/>
+  <path d="M774 655C828 655 824 330 878 330" class="flow pink" marker-end="url(#pink-arrow)"/>
+
+  <rect x="886" y="230" width="634" height="150" rx="18" class="card violet"/>
+  <text x="912" y="265" class="node-title">Trajectory generator</text>
+  <text x="1492" y="265" class="micro" text-anchor="end" fill="#b19aff">PREDICT FUTURES + PROPOSE PATHS</text>
+  <g transform="translate(912 287)">
+    <rect x="0" y="0" width="132" height="58" rx="12" fill="#101d29" stroke="#78e0a5"/>
+    <g transform="translate(13 13)" style="color:#78e0a5"><rect x="0" y="5" width="28" height="18" rx="4" class="icon"/><path d="M6 23v6m16-6v6" class="icon"/></g>
+    <text x="54" y="34" class="copy">Tracks</text>
+    <rect x="146" y="0" width="132" height="58" rx="12" fill="#101d29" stroke="#78e0a5"/>
+    <g transform="translate(159 13)" style="color:#78e0a5"><path d="M0 29V5l10-4 10 4 10-4v24l-10 4-10-4Z" class="icon"/><path d="M10 1v24m10-20v24" class="icon"/></g>
+    <text x="200" y="34" class="copy">Map</text>
+    <rect x="292" y="0" width="132" height="58" rx="12" fill="#15182a" stroke="#b19aff"/>
+    <g transform="translate(307 17)" fill="#b19aff"><circle cx="3" cy="3" r="3"/><circle cx="15" cy="3" r="3"/><circle cx="27" cy="3" r="3"/><circle cx="3" cy="15" r="3"/><circle cx="15" cy="15" r="3"/><circle cx="27" cy="15" r="3"/></g>
+    <text x="346" y="34" class="copy">Features</text>
+    <rect x="438" y="0" width="168" height="58" rx="12" fill="#161a29" stroke="#ff6fae"/>
+    <g transform="translate(451 14)" style="color:#ff6fae"><path d="M0 0h32v22H16l-8 7v-7H0Z" class="icon"/></g>
+    <text x="492" y="34" class="copy">VLM context</text>
+  </g>
+
+  <path d="M1203 380V406" class="flow violet" marker-end="url(#violet-arrow)"/>
+  <rect x="900" y="414" width="590" height="112" rx="18" class="card violet"/>
+  <text x="924" y="449" class="node-title">Candidate paths</text>
+  <text x="924" y="477" class="small">three maneuvers</text>
+  <g transform="translate(1110 429)">
+    <rect x="0" y="0" width="350" height="82" rx="14" fill="#09131d" stroke="#30495b"/>
+    <path d="M16 62H334M16 36H334" class="muted-line" stroke-dasharray="10 10"/>
+    <path d="M18 68C96 68 126 60 166 42S260 18 332 18" class="flow green"/>
+    <path d="M18 68C110 68 170 59 332 55" class="flow violet"/>
+    <path d="M18 68C100 68 144 72 196 74S280 70 332 62" class="flow pink"/>
+    <g transform="translate(12 60)" style="color:#f2f7fa"><rect x="0" y="0" width="28" height="14" rx="4" class="icon"/><circle cx="7" cy="15" r="3" fill="#f2f7fa"/><circle cx="21" cy="15" r="3" fill="#f2f7fa"/></g>
+  </g>
+
+  <path d="M1080 526V548" class="flow violet" marker-end="url(#violet-arrow)"/>
+  <path d="M1370 526V548" class="flow" stroke="#ff7a76" marker-end="url(#pink-arrow)"/>
+  <rect x="880" y="556" width="295" height="132" rx="18" class="card violet"/>
+  <text x="904" y="590" class="node-title">Learned scorer</text>
+  <text x="1148" y="590" class="micro" text-anchor="end" fill="#b19aff">RANK</text>
+  <text x="904" y="615" class="small">safety · progress · comfort</text>
+  <g transform="translate(904 630)">
+    <circle cx="9" cy="7" r="6" fill="#78e0a5"/><path d="M7 7l2 2 4-5" fill="none" stroke="#07131d" stroke-width="2"/>
+    <rect x="28" y="1" width="174" height="11" rx="6" fill="#1d3140"/><rect x="28" y="1" width="154" height="11" rx="6" fill="#78e0a5"/>
+    <circle cx="9" cy="27" r="6" fill="#b19aff"/><rect x="28" y="21" width="174" height="11" rx="6" fill="#1d3140"/><rect x="28" y="21" width="112" height="11" rx="6" fill="#b19aff"/>
+    <circle cx="9" cy="47" r="6" fill="#ff6fae"/><rect x="28" y="41" width="174" height="11" rx="6" fill="#1d3140"/><rect x="28" y="41" width="76" height="11" rx="6" fill="#ff6fae"/>
+  </g>
+
+  <rect x="1220" y="556" width="300" height="132" rx="18" class="card red"/>
+  <text x="1244" y="590" class="node-title">Independent checks</text>
+  <g transform="translate(1245 607)" style="color:#ff7a76">
+    <path d="M20 0l17 7v13c0 15-9 24-17 28C12 44 3 35 3 20V7Z" class="icon"/>
+    <path d="M12 22l6 6 12-15" class="icon"/>
+  </g>
+  <g transform="translate(1300 610)">
+    <circle cx="7" cy="7" r="7" fill="#78e0a5"/><path d="M4 7l2 2 4-5" fill="none" stroke="#07131d" stroke-width="2"/><text x="24" y="13" class="copy">Geometry</text>
+    <circle cx="7" cy="34" r="7" fill="#78e0a5"/><path d="M4 34l2 2 4-5" fill="none" stroke="#07131d" stroke-width="2"/><text x="24" y="40" class="copy">Dynamics</text>
+    <circle cx="7" cy="61" r="7" fill="#78e0a5"/><path d="M4 61l2 2 4-5" fill="none" stroke="#07131d" stroke-width="2"/><text x="24" y="67" class="copy">Rules + fallback</text>
+  </g>
+
+  <!-- Only explicit measured state bypasses the learned generator and remains available to hard checks. -->
+  <path id="measured-state-to-validator" d="M756 317H814V540H1494V548" class="flow green" stroke-dasharray="8 7" marker-end="url(#green-arrow)"/>
+  <rect x="1116" y="529" width="268" height="24" rx="12" fill="#0e211f" stroke="#78e0a5"/>
+  <text x="1250" y="546" class="micro" text-anchor="middle" fill="#78e0a5">MEASURED STATE → HARD CHECKS</text>
+
+  <path d="M1028 688V720H1100" class="flow violet" marker-end="url(#violet-arrow)"/>
+  <path d="M1370 688V720H1300" class="flow" stroke="#ff7a76" marker-end="url(#pink-arrow)"/>
+  <rect x="1090" y="706" width="320" height="72" rx="18" class="card green"/>
+  <circle cx="1122" cy="742" r="15" fill="#78e0a5"/><path d="M1114 742l6 6 12-14" fill="none" stroke="#07131d" stroke-width="3"/>
+  <text x="1260" y="738" class="node-title" text-anchor="middle">Best passing path</text>
+  <text x="1260" y="762" class="small" text-anchor="middle">highest rank among valid candidates</text>
+  <path d="M1250 778V794" class="flow green" marker-end="url(#green-arrow)"/>
+  <rect x="1125" y="800" width="250" height="42" rx="21" class="card green"/>
+  <g transform="translate(1150 811)" style="color:#78e0a5"><rect x="0" y="0" width="34" height="17" rx="5" class="icon"/><circle cx="8" cy="18" r="3" fill="#78e0a5"/><circle cx="26" cy="18" r="3" fill="#78e0a5"/></g>
+  <text x="1270" y="828" class="lane-title" text-anchor="middle">Vehicle controller</text>
+
+  <text x="52" y="875" class="subtitle">VLM context changes proposals. Measured state and independent checks gate control.</text>
 </svg>

@@ -48,4 +48,21 @@ describe('authored Blog visual language', () => {
       }
     }
   });
+
+  it('draws one encoder lane per driving sensor before fusion', async () => {
+    const source = await readFile(
+      path.join(projectRoot, 'public', 'assets', 'images', 'autonomous-driving-two-speed-stack.svg'),
+      'utf8',
+    );
+
+    for (const label of ['Image encoder', 'Range encoder', 'Motion encoder']) {
+      expect(source).toContain(label);
+    }
+    for (const visualCue of ['Candidate paths', 'Learned scorer', 'Independent checks']) {
+      expect(source).toContain(visualCue);
+    }
+    expect(source).toContain('id="measured-state-to-validator"');
+    expect(source).toContain('id="learned-features-to-generator"');
+    expect(source).not.toContain('id="learned-features-to-validator"');
+  });
 });
