@@ -30,13 +30,13 @@ CLIP removed the expensive fusion step by encoding images and text independently
 
 CLIP's success came from its simplicity. Contrast images against the text found alongside them on the internet, then build a similarity index of sorts in a shared vector space. This completely sidesteps a fixed class ontology. Adding a concept no longer means collecting labels and retraining a classifier head. Do it across a large enough corpus and batch, and voilà: classification becomes retrieval against language.
 
-[CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html) trained this recipe on 400 million image-text pairs. In each batch, an image encoder $f_I$ and a text encoder $f_T$ map both sides into the shared space. The contrastive loss pulls matched pairs together and pushes mismatched pairs apart. In simplified form,
+[CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html) trained this recipe on 400 million image-text pairs. In each batch, an image encoder $f_I$ and a text encoder $f_T$ map both sides into the shared space. The contrastive loss pulls matched pairs together and pushes mismatched pairs apart. The score for image $i$ and text $j$ is their normalized embedding dot product divided by temperature $\tau$:
 
 $$
 s_{ij}=\frac{f_I(I_i)^\top f_T(T_j)}{\tau},
 $$
 
-where $\tau$ controls how sharply the model separates the similarities. At inference, class names are written as prompts and embedded by the text encoder. The predicted class is the prompt with the highest similarity to the image.
+Temperature $\tau$ controls how sharply the model separates the similarities. At inference, class names are written as prompts and embedded by the text encoder. The predicted class is the prompt with the highest similarity to the image.
 
 ![Figure 1 from the CLIP paper, showing contrastive pretraining and zero-shot transfer through text prompts](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
 *CLIP aligns image and text encoders during pretraining, then replaces the fixed classifier head with written class prompts. source: [Learning Transferable Visual Models From Natural Language Supervision](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html)*
