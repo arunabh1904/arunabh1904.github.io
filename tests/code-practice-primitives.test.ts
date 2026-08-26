@@ -108,7 +108,7 @@ const REQUIRED_PRIMITIVES = [
 
 describe('code-practice primitive-first solutions', () => {
   it('keeps every explanation scannable and puts key expressions on their own lines', () => {
-    expect(codePracticeProblems).toHaveLength(40);
+    expect(codePracticeProblems).toHaveLength(51);
 
     for (const problem of codePracticeProblems) {
       const hasStandaloneExpression = problem.solutionNotes.some((note) =>
@@ -236,19 +236,29 @@ describe('code-practice primitive-first solutions', () => {
       'l1-regression-loss',
       'binary-cross-entropy-from-probabilities',
       'masked-mean',
+      'basic-statistics-warmup',
       'binary-classification-metrics',
+      'cross-entropy-and-multiclass-metrics',
       'top-k-accuracy',
       'single-box-iou',
+      'rotate-image-quarter-turns',
+      'reflect-points-across-line',
       'wrapped-angular-difference',
       'smooth-l1-huber-loss',
+      'smooth-l1-loss-and-gradient',
       'stable-softmax-cross-entropy',
       'class-weighted-cross-entropy',
       'temperature-scaling-of-logits',
+      'multiple-linear-regression',
+      'polynomial-regression-office-prices',
+      'best-aptitude-test',
+      'laptop-battery-life',
       'pairwise-squared-distance',
       'pairwise-cosine-similarity',
       'nearest-centroid-classifier',
       'iou-matrix',
       'non-maximum-suppression',
+      'sparse-scatter-mean',
       'dice-loss',
       'segmentation-iou-loss',
       'focal-loss',
@@ -258,6 +268,7 @@ describe('code-practice primitive-first solutions', () => {
       'unpatchify-back-to-image',
       'sinusoidal-positional-encoding',
       'causal-attention-mask',
+      'masked-scaled-dot-product-attention',
       'rope-rotary-positional-embedding',
       'scaled-dot-product-self-attention',
       'average-precision-from-matches',
@@ -396,6 +407,43 @@ describe('code-practice primitive-first solutions', () => {
   it('supports tensor transpose methods used by 2D and attention references', () => {
     expect(TORCH_COMPAT_SOURCE).toContain('def permute(self, *dims):');
     expect(TORCH_COMPAT_SOURCE).toContain('def transpose(self, dim0, dim1):');
+  });
+
+  it('supports the browser primitives used by the Latitude practice set', () => {
+    for (const primitive of [
+      'def index_add_(self, dim, index, source):',
+      'torch.bincount =',
+      'torch.flip =',
+      'torch.sign =',
+      'torch.prod =',
+      '_linalg.lstsq =',
+    ]) {
+      expect(TORCH_COMPAT_SOURCE).toContain(primitive);
+    }
+  });
+
+  it('answers the Latitude-style follow-ups inside each explanation', () => {
+    const requiredExplanation = new Map([
+      ['multiple-linear-regression', ['condition number', 'Ridge regression']],
+      ['polynomial-regression-office-prices', ['interaction term', 'overfitting']],
+      ['basic-statistics-warmup', ['population standard deviation', 'Empty input']],
+      ['best-aptitude-test', ['outliers', 'average ranks']],
+      ['laptop-battery-life', ['piecewise model', 'held-out']],
+      ['masked-scaled-dot-product-attention', ['all-masked row', 'O(BHTS)']],
+      ['cross-entropy-and-multiclass-metrics', ['Macro F1', 'zero metrics']],
+      ['smooth-l1-loss-and-gradient', ['subgradient', 'As `beta -> 0`']],
+      ['sparse-scatter-mean', ['scatter maximum', 'nondeterministic']],
+      ['rotate-image-quarter-turns', ['Arbitrary-angle rotation', 'non-contiguous']],
+      ['reflect-points-across-line', ['Reflecting twice', '3D extension']],
+      ['non-maximum-suppression', ['Soft-NMS', 'class-aware']],
+    ]);
+
+    for (const [id, phrases] of requiredExplanation) {
+      const explanation = codePracticeProblems.find((problem) => problem.id === id)?.solutionNotes.join(' ') ?? '';
+      for (const phrase of phrases) {
+        expect(explanation, `${id} must answer ${phrase}`).toContain(phrase);
+      }
+    }
   });
 
   it('supports the inference layers used by browser architecture builds', () => {

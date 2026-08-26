@@ -3,6 +3,7 @@ import {
   ATTENTION_CODE_PRACTICE_PROBLEMS,
   ATTENTION_PROBLEM_ENRICHMENTS,
 } from './code-practice-attention';
+import { LATITUDE_CODE_PRACTICE_PROBLEMS } from './code-practice-latitude';
 import codePracticeVisualSpecs from './code-practice-visuals.json';
 
 export interface CodePracticeExample {
@@ -370,6 +371,9 @@ print(class_weighted_cross_entropy(logits, labels, class_weight).item())`,
     solutionNotes: [
       'NMS is a greedy loop:\n`sort by score → keep best box → suppress high-IoU boxes → repeat`',
       'Compute IoU between the kept box and all remaining boxes at once. Keep candidates whose IoU is at most the threshold; index-based tie-breaking makes equal scores deterministic.',
+      'Coordinates are continuous `xyxy` values:\n`width = max(0, x2 - x1)`\nDo not add one as an inclusive-pixel implementation would. Touching edges then have zero intersection, and zero-area boxes receive zero IoU.',
+      'Sorting costs `O(N log N)`, and the greedy comparisons are `O(N²)` in the worst case. A class-aware variant runs suppression independently per class, often by grouping IDs or offsetting boxes so different classes cannot overlap.',
+      'Hard NMS removes boxes above the threshold. Soft-NMS instead decays their scores as overlap rises, which can preserve nearby objects. Batched production kernels avoid the Python loop and process fixed-size chunks or use a compiled device implementation.',
     ],
     solutionCode: `from __future__ import annotations
 
@@ -958,6 +962,8 @@ print(top_k_accuracy(sample_logits, sample_labels, k=1).item())`,
       'Insert singleton axes so every box in the first set meets every box in the second:\n`boxes1[:, None, :2]: (N, 1, 2)`\n`boxes2[None, :, :2]: (1, M, 2)`\n`pairwise top-left corners: (N, M, 2)`',
       'Reducing only the coordinate axis keeps one value per pair:\n`intersection: (N, M)`\n`area1[:, None]: (N, 1)`\n`area2[None, :]: (1, M)`\n`union and IoU: (N, M)`',
       'Once the pairwise union is known, a `torch.where` denominator mask keeps the implementation stable and handles degenerate boxes cleanly.',
+      'Clamp intersection widths and heights at zero because separated boxes otherwise produce two negative lengths whose product looks positive. In continuous `xyxy` geometry, edge-touching boxes have zero overlap and widths never receive a `+1` pixel adjustment.',
+      'Empty sets broadcast naturally to `(0,M)` or `(N,0)`. A box with zero area gets IoU zero under this contract, including when both degenerate boxes share coordinates; defining it explicitly avoids a `0/0` NaN.',
     ],
     solutionDiagram: `boxes1 (N, 4)      boxes2 (M, 4)
       │                    │
@@ -4944,40 +4950,54 @@ const PROGRESSIVE_ORDER: Readonly<Record<string, number>> = {
   'l1-regression-loss': 1,
   'binary-cross-entropy-from-probabilities': 2,
   'masked-mean': 3,
-  'binary-classification-metrics': 4,
-  'top-k-accuracy': 5,
-  'single-box-iou': 6,
-  'wrapped-angular-difference': 7,
-  'smooth-l1-huber-loss': 8,
-  'stable-softmax-cross-entropy': 9,
-  'class-weighted-cross-entropy': 10,
-  'temperature-scaling-of-logits': 11,
-  'pairwise-squared-distance': 12,
-  'pairwise-cosine-similarity': 13,
-  'nearest-centroid-classifier': 14,
-  'iou-matrix': 15,
-  'non-maximum-suppression': 16,
-  'weighted-box-regression-loss': 17,
-  'dice-loss': 18,
-  'segmentation-iou-loss': 19,
-  'focal-loss': 20,
-  'top-k-gather': 21,
-  'homogeneous-coordinate-transform': 22,
-  '2d-patchify-for-images': 23,
-  'unpatchify-back-to-image': 24,
-  'sinusoidal-positional-encoding': 25,
-  'causal-attention-mask': 26,
-  'rope-rotary-positional-embedding': 27,
-  'scaled-dot-product-self-attention': 28,
-  'incremental-kv-cache': 29,
-  'grouped-query-and-multi-query-attention': 30,
-  'cross-attention': 31,
-  'simple-n-gram-language-model': 32,
-  'average-precision-from-matches': 33,
-  'greedy-detection-matching': 34,
-  'batched-best-iou-match': 35,
-  'manual-backprop-for-a-2-layer-mlp': 36,
-  'classic-mlp-forward-backward': 37,
+  'basic-statistics-warmup': 4,
+  'binary-classification-metrics': 5,
+  'cross-entropy-and-multiclass-metrics': 6,
+  'top-k-accuracy': 7,
+  'single-box-iou': 8,
+  'rotate-image-quarter-turns': 9,
+  'reflect-points-across-line': 10,
+  'wrapped-angular-difference': 11,
+  'smooth-l1-huber-loss': 12,
+  'smooth-l1-loss-and-gradient': 13,
+  'stable-softmax-cross-entropy': 14,
+  'class-weighted-cross-entropy': 15,
+  'temperature-scaling-of-logits': 16,
+  'multiple-linear-regression': 17,
+  'polynomial-regression-office-prices': 18,
+  'best-aptitude-test': 19,
+  'laptop-battery-life': 20,
+  'pairwise-squared-distance': 21,
+  'pairwise-cosine-similarity': 22,
+  'nearest-centroid-classifier': 23,
+  'iou-matrix': 24,
+  'non-maximum-suppression': 25,
+  'sparse-scatter-mean': 26,
+  'weighted-box-regression-loss': 27,
+  'dice-loss': 28,
+  'segmentation-iou-loss': 29,
+  'focal-loss': 30,
+  'top-k-gather': 31,
+  'homogeneous-coordinate-transform': 32,
+  '2d-patchify-for-images': 33,
+  'unpatchify-back-to-image': 34,
+  'sinusoidal-positional-encoding': 35,
+  'causal-attention-mask': 36,
+  'masked-scaled-dot-product-attention': 37,
+  'rope-rotary-positional-embedding': 38,
+  'scaled-dot-product-self-attention': 39,
+  'incremental-kv-cache': 40,
+  'grouped-query-and-multi-query-attention': 41,
+  'cross-attention': 42,
+  'simple-n-gram-language-model': 43,
+  'average-precision-from-matches': 44,
+  'greedy-detection-matching': 45,
+  'batched-best-iou-match': 46,
+  'manual-backprop-for-a-2-layer-mlp': 47,
+  'classic-mlp-forward-backward': 48,
+  'resnet-from-building-blocks': 49,
+  'unet-encoder-decoder': 50,
+  'centernet-style-detector': 51,
 };
 
 const PROGRESSIVE_DIFFICULTY: Readonly<Record<string, CodePracticeProblem['difficulty']>> = {
@@ -5022,13 +5042,14 @@ const PROGRESSIVE_DIFFICULTY: Readonly<Record<string, CodePracticeProblem['diffi
 
 const ALL_CODE_PRACTICE_PROBLEMS: readonly CodePracticeProblem[] = [
   ...RAW_CODE_PRACTICE_PROBLEMS,
+  ...LATITUDE_CODE_PRACTICE_PROBLEMS,
   ...ATTENTION_CODE_PRACTICE_PROBLEMS,
   ...ARCHITECTURE_CODE_PRACTICE_PROBLEMS,
 ];
 
 export const codePracticeProblems: readonly CodePracticeProblem[] = ALL_CODE_PRACTICE_PROBLEMS
   .map((problem) => {
-    const numpyAlternative = NUMPY_ALTERNATIVES[problem.id];
+    const numpyAlternative = NUMPY_ALTERNATIVES[problem.id] ?? problem.numpyAlternative;
     const referenceSolution = COMPACT_REFERENCE_SOLUTIONS[problem.id] ?? problem.solutionCode;
     const tags = problem.tags ?? [];
 

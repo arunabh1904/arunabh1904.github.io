@@ -438,5 +438,126 @@
       ["RESULT", "decode peaks into boxes", "score and coordinates"]
     ],
     "caption": "The heatmap finds centers; size and offset supply the box geometry around each peak."
+  },
+  {
+    "id": "multiple-linear-regression",
+    "headline": "Add the intercept, solve, then reuse the design",
+    "kind": "matrix",
+    "steps": [
+      ["INPUT", "X (N,F) + y (N)", "prepend a ones column"],
+      ["CORE STEP", "least squares on (N,F+1)", "avoid explicit inverse"],
+      ["RESULT", "test design @ weights", "predictions (T)"]
+    ],
+    "caption": "Train and test matrices must use the same intercept and feature-column order."
+  },
+  {
+    "id": "polynomial-regression-office-prices",
+    "headline": "Expand monomials before fitting the linear model",
+    "kind": "matrix",
+    "steps": [
+      ["INPUT", "features (N,F)", "choose maximum degree d"],
+      ["EXPAND", "powers + interactions", "one shared monomial order"],
+      ["RESULT", "least-squares prediction", "design width C(F+d,d)"]
+    ],
+    "caption": "Polynomial regression is linear in its expanded monomial features."
+  },
+  {
+    "id": "basic-statistics-warmup",
+    "headline": "Sort for position; count for frequency",
+    "kind": "ranking",
+    "steps": [
+      ["INPUT", "values (N)", "non-empty sample"],
+      ["CORE STEP", "mean median mode std", "smallest tied mode"],
+      ["RESULT", "mean +/- 1.96 SE", "95% interval"]
+    ],
+    "caption": "Median uses order, mode uses counts, and the interval uses standard error."
+  },
+  {
+    "id": "best-aptitude-test",
+    "headline": "Compare each test with the GPA ranking",
+    "kind": "ranking",
+    "steps": [
+      ["INPUT", "GPA (N) + tests (5,N)", "same students"],
+      ["CORE STEP", "Pearson or rank correlation", "average tied ranks"],
+      ["RESULT", "strongest |correlation|", "one-based test id"]
+    ],
+    "caption": "Spearman measures monotonic rank agreement; Pearson measures linear value agreement."
+  },
+  {
+    "id": "laptop-battery-life",
+    "headline": "The rising line stops at battery capacity",
+    "kind": "ranking",
+    "steps": [
+      ["INPUT", "charge duration x", "inspect the training scatter"],
+      ["CORE STEP", "runtime = min(2x, 8)", "knee at four hours"],
+      ["RESULT", "bounded battery runtime", "never above capacity"]
+    ],
+    "caption": "A piecewise rule fits the observed saturation that a global line would miss."
+  },
+  {
+    "id": "masked-scaled-dot-product-attention",
+    "headline": "Mask the scores before the stable softmax",
+    "kind": "attention",
+    "steps": [
+      ["INPUT", "Q (B,T,D), K/V (B,S,.)", "valid mask (B,T,S)"],
+      ["CORE STEP", "QK.T / sqrt(D)", "masked stable softmax"],
+      ["RESULT", "weights @ V", "output (B,T,Dv)"]
+    ],
+    "caption": "All-masked query rows need an explicit zero distribution instead of NaNs."
+  },
+  {
+    "id": "cross-entropy-and-multiclass-metrics",
+    "headline": "Stable loss and confusion counts share valid labels",
+    "kind": "matrix",
+    "steps": [
+      ["INPUT", "logits + labels", "filter ignore_index"],
+      ["CORE STEP", "log-sum-exp + confusion", "true rows, predicted cols"],
+      ["RESULT", "loss precision recall F1", "macro and micro views"]
+    ],
+    "caption": "Rows provide recall denominators; columns provide precision denominators."
+  },
+  {
+    "id": "smooth-l1-loss-and-gradient",
+    "headline": "Differentiate both Smooth L1 branches",
+    "kind": "loss",
+    "steps": [
+      ["INPUT", "residual r", "compare |r| with beta"],
+      ["CORE STEP", "quadratic or linear branch", "gradient r/beta or sign(r)"],
+      ["RESULT", "mean loss + scaled gradient", "divide grad by element count"]
+    ],
+    "caption": "Mean reduction scales every elementwise derivative by the number of residuals."
+  },
+  {
+    "id": "sparse-scatter-mean",
+    "headline": "Repeated point IDs accumulate into one grid cell",
+    "kind": "matrix",
+    "steps": [
+      ["INPUT", "features (N,C) + cell ids", "sparse occupied points"],
+      ["CORE STEP", "indexed sums + counts", "no loop over cells"],
+      ["RESULT", "means (cells,C)", "zeros for empty cells"]
+    ],
+    "caption": "Counts provide the divisor and identify empty dense-grid rows."
+  },
+  {
+    "id": "rotate-image-quarter-turns",
+    "headline": "Transpose spatial axes, then flip one axis",
+    "kind": "patches",
+    "steps": [
+      ["INPUT", "image (...,H,W)", "leading axes stay fixed"],
+      ["CORE STEP", "transpose H/W + flip", "one clockwise turn"],
+      ["RESULT", "image (...,W,H)", "same pixels, new layout"]
+    ],
+    "caption": "Quarter turns reindex pixels exactly and require no interpolation."
+  },
+  {
+    "id": "reflect-points-across-line",
+    "headline": "Move twice through the line along its normal",
+    "kind": "geometry",
+    "steps": [
+      ["INPUT", "points (N,2) + line", "a*x + b*y + c = 0"],
+      ["CORE STEP", "signed normal projection", "broadcast one factor per point"],
+      ["RESULT", "mirrored points (N,2)", "reflect twice to recover input"]
+    ],
+    "caption": "Dividing by the normal's squared length makes line scaling irrelevant."
   }
 ]
