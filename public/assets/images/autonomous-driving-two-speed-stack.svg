@@ -47,7 +47,7 @@
   <text x="126" y="254" class="lane-title">Camera</text>
   <text x="126" y="276" class="small">frames</text>
   <path d="M208 257H230" class="flow cyan" marker-end="url(#cyan-arrow)"/>
-  <rect x="238" y="228" width="146" height="58" rx="14" class="card cyan"/>
+  <rect x="238" y="228" width="162" height="58" rx="14" class="card cyan"/>
   <text x="255" y="253" class="lane-title">Image encoder</text>
   <text x="255" y="276" class="small">image + depth</text>
 
@@ -60,7 +60,7 @@
   <text x="126" y="332" class="lane-title">LiDAR</text>
   <text x="126" y="354" class="small">points</text>
   <path d="M208 335H230" class="flow green" marker-end="url(#green-arrow)"/>
-  <rect x="238" y="306" width="146" height="58" rx="14" class="card green"/>
+  <rect x="238" y="306" width="162" height="58" rx="14" class="card green"/>
   <text x="255" y="331" class="lane-title">Range encoder</text>
   <text x="255" y="354" class="small">3D shape</text>
 
@@ -73,34 +73,32 @@
   <text x="126" y="410" class="lane-title">Radar</text>
   <text x="126" y="432" class="small">returns</text>
   <path d="M208 413H230" class="flow pink" marker-end="url(#pink-arrow)"/>
-  <rect x="238" y="384" width="146" height="58" rx="14" class="card pink"/>
+  <rect x="238" y="384" width="162" height="58" rx="14" class="card pink"/>
   <text x="255" y="409" class="lane-title">Motion encoder</text>
   <text x="255" y="432" class="small">range + speed</text>
 
   <!-- Three encoder streams converge. -->
-  <path d="M384 257H414V335H438" class="flow cyan"/>
-  <path d="M384 335H438" class="flow green" marker-end="url(#green-arrow)"/>
-  <path d="M384 413H414V335" class="flow pink"/>
-  <rect x="446" y="265" width="142" height="140" rx="22" class="card green"/>
+  <path d="M400 257H422V335H430" class="flow cyan"/>
+  <path d="M400 335H430" class="flow green" marker-end="url(#green-arrow)"/>
+  <path d="M400 413H422V335" class="flow pink"/>
+  <rect x="438" y="265" width="158" height="140" rx="22" class="card green"/>
   <g transform="translate(486 282)" style="color:#78e0a5">
     <circle cx="14" cy="14" r="11" class="icon"/><circle cx="48" cy="14" r="11" class="icon"/><circle cx="31" cy="43" r="11" class="icon"/>
     <path d="M22 20l9 14 9-14M25 14h12" class="icon"/>
   </g>
   <text x="517" y="358" class="node-title" text-anchor="middle">Align + fuse</text>
   <text x="517" y="384" class="small" text-anchor="middle">time · pose · health</text>
-  <path d="M588 335H614" class="flow green" marker-end="url(#green-arrow)"/>
+  <path d="M596 335H614" class="flow green" marker-end="url(#green-arrow)"/>
 
   <!-- State retains both checkable structure and learned features. -->
   <rect x="622" y="239" width="152" height="196" rx="18" class="card violet"/>
   <text x="698" y="270" class="node-title" text-anchor="middle">Driving state</text>
   <rect x="640" y="287" width="116" height="60" rx="12" fill="#0e211f" stroke="#78e0a5"/>
-  <g transform="translate(652 299)" style="color:#78e0a5"><rect x="0" y="0" width="26" height="20" rx="4" class="icon"/><path d="M5 20v7m16-7v7M4 10h18" class="icon"/></g>
-  <text x="690" y="311" class="micro" fill="#78e0a5">MEASURED</text>
-  <text x="690" y="334" class="small">tracks · map</text>
+  <text x="698" y="311" class="micro" text-anchor="middle" fill="#78e0a5">MEASURED</text>
+  <text x="698" y="334" class="small" text-anchor="middle">tracks · map</text>
   <rect x="640" y="357" width="116" height="60" rx="12" fill="#15182a" stroke="#b19aff"/>
-  <g transform="translate(651 370)" fill="#b19aff"><circle cx="4" cy="4" r="3"/><circle cx="16" cy="4" r="3"/><circle cx="28" cy="4" r="3"/><circle cx="4" cy="16" r="3"/><circle cx="16" cy="16" r="3"/><circle cx="28" cy="16" r="3"/></g>
-  <text x="690" y="381" class="micro" fill="#b19aff">LEARNED</text>
-  <text x="690" y="404" class="small">features</text>
+  <text x="698" y="381" class="micro" text-anchor="middle" fill="#b19aff">LEARNED</text>
+  <text x="698" y="404" class="small" text-anchor="middle">features</text>
 
   <!-- Triggered semantic path: the source figure's lower branch. -->
   <rect x="40" y="485" width="760" height="315" rx="22" class="panel pink"/>
@@ -130,14 +128,14 @@
 
   <rect x="548" y="550" width="226" height="210" rx="18" class="card pink"/>
   <text x="570" y="584" class="node-title">Bounded output</text>
-  <g transform="translate(570 603)">
-    <rect x="0" y="0" width="182" height="38" rx="10" fill="#161a29" stroke="#ff6fae"/>
+  <g transform="translate(562 603)">
+    <rect x="0" y="0" width="204" height="38" rx="10" fill="#161a29" stroke="#ff6fae"/>
     <circle cx="20" cy="19" r="7" fill="none" stroke="#ff6fae" stroke-width="2"/><path d="M15 19h10" stroke="#ff6fae" stroke-width="2"/>
     <text x="40" y="25" class="copy">Scene label</text>
-    <rect x="0" y="47" width="182" height="38" rx="10" fill="#161a29" stroke="#ff6fae"/>
+    <rect x="0" y="47" width="204" height="38" rx="10" fill="#161a29" stroke="#ff6fae"/>
     <path d="M14 66h13m-6-7l6 7-6 7" fill="none" stroke="#ff6fae" stroke-width="2"/>
     <text x="40" y="72" class="copy">Actor link</text>
-    <rect x="0" y="94" width="182" height="38" rx="10" fill="#161a29" stroke="#ff6fae"/>
+    <rect x="0" y="94" width="204" height="38" rx="10" fill="#161a29" stroke="#ff6fae"/>
     <circle cx="21" cy="113" r="9" fill="none" stroke="#ff6fae" stroke-width="2"/><path d="M21 108v6l4 3" fill="none" stroke="#ff6fae" stroke-width="2"/>
     <text x="40" y="119" class="copy">Confidence + expiry</text>
   </g>
@@ -171,7 +169,7 @@
   <path d="M1203 380V406" class="flow violet" marker-end="url(#violet-arrow)"/>
   <rect x="900" y="414" width="590" height="112" rx="18" class="card violet"/>
   <text x="924" y="449" class="node-title">Candidate paths</text>
-  <text x="924" y="477" class="small">three maneuvers</text>
+  <text x="924" y="477" class="small">top-k maneuvers</text>
   <g transform="translate(1110 429)">
     <rect x="0" y="0" width="350" height="82" rx="14" fill="#09131d" stroke="#30495b"/>
     <path d="M16 62H334M16 36H334" class="muted-line" stroke-dasharray="10 10"/>
@@ -186,8 +184,7 @@
   <rect x="880" y="556" width="295" height="132" rx="18" class="card violet"/>
   <text x="904" y="590" class="node-title">Learned scorer</text>
   <text x="1148" y="590" class="micro" text-anchor="end" fill="#b19aff">RANK</text>
-  <text x="904" y="615" class="small">safety · progress · comfort</text>
-  <g transform="translate(904 630)">
+  <g transform="translate(904 615)">
     <circle cx="9" cy="7" r="6" fill="#78e0a5"/><path d="M7 7l2 2 4-5" fill="none" stroke="#07131d" stroke-width="2"/>
     <rect x="28" y="1" width="174" height="11" rx="6" fill="#1d3140"/><rect x="28" y="1" width="154" height="11" rx="6" fill="#78e0a5"/>
     <circle cx="9" cy="27" r="6" fill="#b19aff"/><rect x="28" y="21" width="174" height="11" rx="6" fill="#1d3140"/><rect x="28" y="21" width="112" height="11" rx="6" fill="#b19aff"/>
@@ -209,7 +206,7 @@
   <!-- Only explicit measured state bypasses the learned generator and remains available to hard checks. -->
   <path id="measured-state-to-validator" d="M756 317H814V540H1494V548" class="flow green" stroke-dasharray="8 7" marker-end="url(#green-arrow)"/>
   <rect x="1116" y="529" width="268" height="24" rx="12" fill="#0e211f" stroke="#78e0a5"/>
-  <text x="1250" y="546" class="micro" text-anchor="middle" fill="#78e0a5">MEASURED STATE → HARD CHECKS</text>
+  <text x="1250" y="546" class="micro" text-anchor="middle" fill="#78e0a5">MEASURED STATE → VALIDATOR</text>
 
   <path d="M1028 688V720H1100" class="flow violet" marker-end="url(#violet-arrow)"/>
   <path d="M1370 688V720H1300" class="flow" stroke="#ff7a76" marker-end="url(#pink-arrow)"/>
