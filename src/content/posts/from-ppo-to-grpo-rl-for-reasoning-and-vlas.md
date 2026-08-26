@@ -51,7 +51,7 @@ This frame also separates two ideas that are routinely conflated. **On-policy** 
 
 The figure holds the prompt fixed and changes only the source of contrast. It is not one four-stage pipeline. Each panel answers a different question about what evidence exists before the update begins.
 
-[![Animation comparing how PPO, DPO, GRPO, and on-policy knowledge distillation construct a learning signal](/assets/images/blog-rl-learning-signals.gif)](/assets/images/blog-rl-learning-signals.gif)
+<div class="architecture-comparison blog-frame-explainer" data-blog-frame-explainer="blog-rl-learning-signals.gif"><div class="blog-frame-explainer__viewport"><a href="/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-01.webp"><img src="/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-01.webp" alt="Manual explainer comparing how PPO, DPO, GRPO, and on-policy knowledge distillation construct a learning signal"></a></div></div>
 
 *PPO compares sampled actions with a learned value baseline. DPO starts from an already collected chosen–rejected pair. DeepSeekMath's GRPO compares several current-policy completions of the same prompt. GKD samples the student's own prefix and asks a teacher for a dense next-token distribution there. Custom explanatory synthesis based on [PPO](https://arxiv.org/abs/1707.06347), [DPO](https://arxiv.org/abs/2305.18290), [DeepSeekMath](https://arxiv.org/abs/2402.03300), and [On-Policy Distillation](https://arxiv.org/abs/2306.13649).*
 

@@ -85,9 +85,9 @@ That is not what the machine gave me.
 
 For the smaller models, MLX was clearly faster on this M5 Max. For `26B A4B`, the story got more nuanced: `llama.cpp` and MLX were effectively tied on the short prompt, but MLX pulled ahead once the prompt got long. For `31B`, MLX was the cleaner win, especially on prompt processing and time to first token.
 
-The animation keeps the model/runtime rows fixed while the input grows from `512` to `8192` tokens. Decode speed moves modestly; time to first token moves enough to change how the model feels.
+The frame-by-frame comparison keeps the model/runtime rows fixed while the input changes from `512` to `8192` tokens. Decode speed moves modestly; time to first token moves enough to change how the model feels.
 
-[![Animation comparing short- and long-prompt time to first token and decode throughput for Gemma 4 on MLX and llama.cpp](/assets/images/local-gemma-long-prompt-latency.gif)](/assets/images/local-gemma-long-prompt-latency.gif)
+<div class="architecture-comparison blog-frame-explainer" data-blog-frame-explainer="local-gemma-long-prompt-latency.gif"><div class="blog-frame-explainer__viewport"><a href="/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-01.webp"><img src="/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-01.webp" alt="Manual explainer comparing short- and long-prompt time to first token and decode throughput for Gemma 4 on MLX and llama.cpp"></a></div></div>
 
 *Long prompts expose prefill as the practical bottleneck. The `31B` weights fit, but TTFT rises to `13.5 s` on MLX and `24.2 s` on llama.cpp in the measured long suite. `26B A4B` retains roughly `100 tok/s` decode while reaching the first token much sooner. Custom visualization of this post's benchmark tables; measurements are from one 64 GB M5 Max on April 4, 2026.*
 

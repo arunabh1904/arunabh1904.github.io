@@ -11,6 +11,7 @@
     "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
     "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
     "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "generate:blog-explainers": "node ./scripts/generate-blog-explainer-frames.mjs",
     "test": "vitest run",
     "validate": "npm run check && npm run test",
     "verify:build": "node ./scripts/verify-build.mjs",

@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -137,6 +137,26 @@ function grid(x, y, cols, rows, cell, color, fillAmount, opacity = 1) {
   return out;
 }
 
+function spatialGrid(x, y, w, h, cols, rows, opacity = 1, accent = C.teal, marker = null) {
+  let out = rect(x, y, w, h, C.bg, 9, opacity, accent, 1.2);
+  for (let col = 1; col < cols; col++) out += line(x + w * col / cols, y, x + w * col / cols, y + h, C.faint, 1, opacity);
+  for (let row = 1; row < rows; row++) out += line(x, y + h * row / rows, x + w, y + h * row / rows, C.faint, 1, opacity);
+  if (marker) {
+    const cellW = w / cols;
+    const cellH = h / rows;
+    const markerX = x + marker.col * cellW;
+    const markerY = y + marker.row * cellH;
+    out += rect(markerX + 2, markerY + 2, cellW - 4, cellH - 4, marker.color ?? accent, 3, opacity * 0.28, marker.color ?? accent, 1.2);
+    if (marker.crossed) {
+      out += line(markerX + 5, markerY + 5, markerX + cellW - 5, markerY + cellH - 5, marker.color ?? C.red, 2, opacity);
+      out += line(markerX + cellW - 5, markerY + 5, markerX + 5, markerY + cellH - 5, marker.color ?? C.red, 2, opacity);
+    } else {
+      out += circle(markerX + cellW / 2, markerY + cellH / 2, Math.min(cellW, cellH) * 0.15, marker.color ?? accent, opacity);
+    }
+  }
+  return out;
+}
+
 function bev(x, y, w, h, opacity = 1, accent = C.teal) {
   let out = rect(x, y, w, h, C.bg, 12, opacity, accent, 1.2);
   for (let i = 1; i < 7; i++) out += line(x + (w * i) / 7, y, x + (w * i) / 7, y + h, C.faint, 1, opacity);
@@ -224,12 +244,27 @@ function drawAttention(mode, local, opacity) {
     out += text('Sₜ', 761, 390, 18, C.teal, 'middle', 650, opacity);
     return out + footer('State size stays fixed. Individual token records disappear.', opacity * reveal(local, 0.66, 0.80), C.teal);
   }
-  return summary([
-    ['MHA', 'full history per head · largest cache'],
-    ['GQA', 'fewer shared histories · fewer K/V maps'],
-    ['MLA', 'compressed latent per token · reconstruction bottleneck'],
-    ['DeltaNet', 'one recurrent state · bounded, lossy memory'],
-  ], opacity, 'Storage format sets cache size and which past details can be retrieved.');
+  let out = '';
+  const rows = [
+    ['MHA', C.teal, '4 separate K/V histories'],
+    ['GQA', C.blue, '2 shared K/V histories'],
+    ['MLA', C.amber, 'one zᵢ per token'],
+    ['DeltaNet', C.green, 'one fixed state Sₜ'],
+  ];
+  rows.forEach(([name, color, result], row) => {
+    const y = 142 + row * 72;
+    out += text(name, 92, y + 26, 15, color, 'start', 700, opacity);
+    ['the', 'key', 'was', 'blue'].forEach((label, col) => { out += token(label, 188 + col * 67, y, opacity, color, 55); });
+    out += arrow(462, y + 21, 530, y + 21, color, 1.6, opacity);
+    if (name === 'DeltaNet') {
+      out += grid(556, y - 2, 5, 2, 24, color, 0.7, opacity);
+    } else {
+      const count = name === 'MHA' ? 4 : name === 'GQA' ? 2 : 4;
+      for (let i = 0; i < count; i++) out += rect(558 + i * 34, y + 2, 24, 34, C.bg, 5, opacity, color, 1.2);
+    }
+    out += text(result, 742, y + 26, 14, C.ink, 'start', 580, opacity);
+  });
+  return out + footer('Only MHA, GQA, and MLA keep every token individually addressable.', opacity, C.amber);
 }
 
 function sameScene(opacity) {
@@ -270,12 +305,21 @@ function drawVlm(mode, local, opacity) {
     out += text('action trajectory', 708, 369, 17, C.green, 'middle', 620, opacity);
     return out + footer('π0 retains scene state across time and predicts robot actions.', opacity * reveal(local, 0.62, 0.77));
   }
-  return summary([
-    ['CLIP', 'features for image-text matching'],
-    ['LLaVA', 'features used to generate text'],
-    ['Molmo', 'phrase-to-location coordinates'],
-    ['π0', 'time-indexed state for action prediction'],
-  ], opacity, 'Different outputs require different visual details.');
+  out += arrow(452, 275, 500, 275, C.teal, 2, opacity);
+  const cards = [
+    [520, 154, 'CLIP', 'image ↔ text score', C.teal],
+    [704, 154, 'LLaVA', 'generated text', C.blue],
+    [520, 292, 'Molmo', 'mug point (x, y)', C.amber],
+    [704, 292, 'π0', 'robot action path', C.green],
+  ];
+  cards.forEach(([x, y, name, output, color]) => {
+    out += rect(x, y, 164, 108, C.bg, 10, opacity, color, 1.2);
+    out += text(name, x + 82, y + 31, 14, color, 'middle', 700, opacity);
+    out += text(output, x + 82, y + 72, 14, C.ink, 'middle', 580, opacity);
+  });
+  out += circle(602, 377, 6, C.amber, opacity);
+  out += path('M 734 375 C 770 352 816 350 850 326', C.green, 2.5, opacity);
+  return out + footer('The same scene supports different models only if the representation preserves the required output.', opacity, C.amber);
 }
 
 function modalityRows(opacity, values, unit) {
@@ -303,7 +347,8 @@ function drawBudget(mode, local, opacity) {
     ['2', 'predicted training units'],
     ['3', 'forward and backward FLOPs'],
     ['4', 'update norm at shared parameters'],
-  ], opacity, 'Report all four quantities; sample percentage alone is incomplete.');
+    ['5', 'independent decisions after temporal overlap'],
+  ], opacity, 'Report all five quantities; sample percentage alone is incomplete.');
   return `${sequenceTokens(208, opacity * p, C.blue, ['text', 'image', 'video', 'action'])}${arrow(480, 270, 480, 329, C.teal, 2, opacity * p)}${text('same sample share ≠ same optimization load', 480, 374, 19, C.ink, 'middle', 620, opacity * p)}`;
 }
 
@@ -322,11 +367,7 @@ function drawFeedback(mode, local, opacity) {
   if (mode === 'episode') return timeline(opacity, 0, 9, C.red, p) + footer('Episode outcome copies one failure bit across every action.', opacity * reveal(local, 0.62, 0.78), C.red);
   if (mode === 'apo') return timeline(opacity, 6, 7, C.amber, p) + text('failed action', 580, 226, 14, C.red, 'middle', 600, opacity * p) + text('corrected action', 646, 329, 14, C.green, 'middle', 600, opacity * p) + footer('Action Preference Optimization compares the failed and corrected actions.', opacity * reveal(local, 0.62, 0.78), C.amber);
   if (mode === 'process') return timeline(opacity, 4, 7, C.green, p) + line(514, 221, 514, 329, C.amber, 1.5, opacity * p, '5 5') + text('matched state?', 514, 205, 14, C.amber, 'middle', 600, opacity * p) + footer('Process feedback is valid only across comparable states.', opacity * reveal(local, 0.62, 0.78), C.green);
-  return summary([
-    ['Outcome', 'labels the whole trajectory'],
-    ['APO', 'uses the local intervention and correction'],
-    ['Process', 'needs progress or matched states'],
-  ], opacity, 'The loss cannot supply an alternative action that was never observed.');
+  return `${timeline(opacity, 6, 7, C.red, 1)}${path('M 170 214 L 170 194 L 790 194 L 790 214', C.red, 1.6, opacity)}${text('TERMINAL FAILURE BIT COVERS THE WHOLE ROLLOUT', 480, 176, 14, C.red, 'middle', 700, opacity)}${rect(560, 245, 160, 60, C.amber, 8, opacity * 0.08, C.amber, 1.5)}${text('defensible failure window', 640, 334, 14, C.amber, 'middle', 650, opacity)}${path('M 646 286 C 682 326 721 348 760 370', C.green, 2, opacity)}${circle(760, 370, 10, C.green, opacity)}${text('observed human correction', 760, 405, 14, C.green, 'middle', 650, opacity)}${footer('Keep credit local to the failure and correction the rollout actually observed.', opacity, C.amber)}`;
 }
 
 function drawLearning(mode, local, opacity) {
@@ -352,12 +393,22 @@ function drawLearning(mode, local, opacity) {
     [0.22, 0.62, 0.35, 0.82, 0.45].forEach((v, i) => { out += rect(365 + i * 48, 402 - v * 90 * p, 26, v * 90 * p, C.green, 4, opacity * 0.45); });
     return out + footer('GKD supplies dense teacher logits on student-generated states.', opacity * reveal(local, 0.62, 0.78), C.green);
   }
-  return summary([
-    ['PPO', 'current rollout + learned baseline'],
-    ['DPO', 'fixed chosen and rejected pair'],
-    ['GRPO', 'current-policy prompt group'],
-    ['GKD', 'teacher distribution at student states'],
-  ], opacity, 'Compare methods by sampled data, feedback unit, and reference signal.');
+  let out = token('same prompt x', 400, 132, opacity, C.blue, 160);
+  const cards = [
+    [72, 'PPO', 'current rollout', 'value baseline', C.teal],
+    [284, 'DPO', 'stored y⁺ / y⁻', 'reference policy', C.rose],
+    [496, 'GRPO', 'current group', 'group mean', C.amber],
+    [708, 'GKD', 'student prefix', 'teacher logits', C.green],
+  ];
+  cards.forEach(([x, name, samples, reference, color]) => {
+    out += arrow(480, 182, x + 90, 232, color, 1.5, opacity);
+    out += rect(x, 244, 180, 148, C.bg, 10, opacity, color, 1.2);
+    out += text(name, x + 90, 278, 15, color, 'middle', 700, opacity);
+    out += text(samples, x + 90, 322, 14, C.ink, 'middle', 600, opacity);
+    out += line(x + 22, 341, x + 158, 341, C.faint, 1, opacity);
+    out += text(reference, x + 90, 371, 14, C.muted, 'middle', 560, opacity);
+  });
+  return out + footer('The prompt is fixed; the sampled data and reference signal change.', opacity, C.amber);
 }
 
 function pipelineBlocks(opacity, activeCount = 4) {
@@ -383,12 +434,7 @@ function drawHermes(mode, local, opacity) {
   if (mode === 'request') return pipelineBlocks(opacity, 3) + circle(mix(230, 711, p), 263, 7, C.teal, opacity) + footer('Hermes sends an OpenAI-compatible request to localhost.', opacity * reveal(local, 0.58, 0.74), C.teal);
   if (mode === 'weights') return pipelineBlocks(opacity, 4) + circle(mix(678, 902, p), 263, 7, C.amber, opacity) + footer('llama-server owns sampling, the KV cache, and GGUF loading.', opacity * reveal(local, 0.58, 0.74), C.amber);
   if (mode === 'return') return pipelineBlocks(opacity, 4) + circle(mix(901, 230, p), 318, 7, C.green, opacity) + text('generated tokens return through the same API boundary', 480, 369, 16, C.green, 'middle', 600, opacity * p);
-  return summary([
-    ['Agent', 'tools, sessions, and skills'],
-    ['API', 'stable localhost contract'],
-    ['Server', 'sampling and KV cache'],
-    ['GGUF', 'weights and tokenizer'],
-  ], opacity, 'A model-load error originates in llama-server or the GGUF file, not Hermes.');
+  return `${pipelineBlocks(opacity, 4)}${text('agent or tool failure', 145, 356, 13, C.blue, 'middle', 650, opacity)}${arrow(145, 339, 145, 306, C.blue, 1.4, opacity)}${text('connection / HTTP failure', 369, 391, 13, C.teal, 'middle', 650, opacity)}${arrow(369, 372, 369, 306, C.teal, 1.4, opacity)}${text('sampling or cache failure', 593, 356, 13, C.green, 'middle', 650, opacity)}${arrow(593, 339, 593, 306, C.green, 1.4, opacity)}${text('load or tokenizer failure', 817, 391, 13, C.amber, 'middle', 650, opacity)}${arrow(817, 372, 817, 306, C.amber, 1.4, opacity)}${footer('Test the layer that owns the failed contract; do not reinstall the whole stack.', opacity, C.amber)}`;
 }
 
 const gemmaLong = [
@@ -445,18 +491,6 @@ function drawBenchmark(family, mode, local, opacity) {
       : summary([['4B', '1.74–2.10 s long-prompt TTFT on MLX'], ['9B', '2.89 s MLX · 5.16 s llama.cpp'], ['14B', '4.93 s MLX · 11.11 s llama.cpp']], opacity, 'The 4B models have the lowest measured first-token latency.');
   }
   return '';
-}
-
-function featurePyramid(opacity, p, offsetX = 0, offsetY = 0) {
-  let out = '';
-  [[310, 185, 340, 180], [350, 215, 260, 125], [390, 245, 180, 72]].forEach(([x, y, w, h], i) => {
-    x += offsetX;
-    y += offsetY;
-    out += rect(x, y, w, h, C.bg, 10, opacity * (0.42 + i * 0.18) * p, C.teal, 1.3);
-    const cells = 4 + i * 2;
-    for (let c = 1; c < cells; c++) out += line(x + w * c / cells, y, x + w * c / cells, y + h, C.faint, 1, opacity * p);
-  });
-  return out;
 }
 
 function vehicle(x, y, w, h, color, opacity, label = '') {
@@ -561,17 +595,17 @@ function sensorEvidenceCards(opacity) {
   ];
   return cards.map(([name, value, color], i) => {
     const x = 94 + i * 258;
-    return `${rect(x, 182, 214, 96, C.bg, 12, opacity, color, 1.3)}${text(name, x + 18, 215, 14, color, 'start', 700, opacity, 1.2)}${text(value, x + 18, 251, 17, C.ink, 'start', 580, opacity)}`;
+    return `${rect(x, 182, 214, 96, C.bg, 12, opacity, color, 1.3)}${text(name, x + 18, 215, 14, color, 'start', 700, opacity, 1.2)}${text(value, x + 18, 251, 16, C.ink, 'start', 580, opacity)}${cyclist(x + 186, 228, opacity, C.green)}`;
   }).join('');
 }
 
 function drawCameraEncoder(mode, local, opacity) {
   const p = reveal(local);
-  if (mode === 'input') return forwardDrivingScene(210, 140, 540, 290, p, opacity, { labels: true, boxActor: true }) + footer('As the ego car advances, the cyclist grows from a few pixels into a clear object.', opacity * reveal(local, 0.60, 0.76));
-  if (mode === 'coarse') return `${forwardDrivingScene(82, 170, 350, 220, p, opacity, { boxActor: true })}${arrow(455, 280, 535, 280, C.red, 2, opacity * p)}${grid(578, 190, 6, 5, 38, C.red, p, opacity)}${text('cyclist cell lost', 692, 411, 16, C.red, 'middle', 650, opacity)}${footer('At long range, one coarse feature map can merge the cyclist into the background.', opacity * reveal(local, 0.62, 0.78), C.red)}`;
-  if (mode === 'pyramid') return `${forwardDrivingScene(70, 170, 330, 215, p, opacity, { boxActor: true })}${arrow(423, 278, 518, 278, C.teal, 2, opacity * p)}${featurePyramid(opacity, p, 250, -7)}${footer('Fine maps preserve the cyclist; coarse maps preserve the lane and intersection context.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
-  if (mode === 'supervision') return `${forwardDrivingScene(82, 170, 350, 220, p, opacity, { boxActor: true })}${arrow(455, 280, 535, 280, C.green, 2, opacity * p)}${rect(578, 178, 270, 105, C.bg, 10, opacity, C.green, 1.2)}${text('IMAGE LOSS', 713, 210, 14, C.green, 'middle', 700, opacity)}${text('keep cyclist pixels separable', 713, 246, 16, C.ink, 'middle', 560, opacity)}${rect(578, 302, 270, 90, C.bg, 10, opacity, C.teal, 1.2)}${text('BEV LOSS', 713, 334, 14, C.teal, 'middle', 700, opacity)}${text('place actor in the right cell', 713, 368, 16, C.ink, 'middle', 560, opacity)}${footer('Perspective supervision protects the small actor before camera features are lifted into BEV.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
-  return summary([['Observed change', 'cyclist grows as ego closes distance'], ['Failure', 'coarse map erases the distant cyclist'], ['Useful contract', 'fine detail plus wide road context']], opacity, 'Choose resolution and pyramid levels from the smallest actor that must survive.');
+  if (mode === 'input') return `${forwardDrivingScene(64, 180, 250, 190, 0.08, opacity, { boxActor: true })}${forwardDrivingScene(355, 180, 250, 190, 0.36, opacity, { boxActor: true })}${forwardDrivingScene(646, 180, 250, 190, 0.78, opacity, { boxActor: true })}${text('distant · a few pixels', 189, 405, 15, C.red, 'middle', 650, opacity)}${text('approaching', 480, 405, 15, C.amber, 'middle', 650, opacity)}${text('close · clear shape', 771, 405, 15, C.green, 'middle', 650, opacity)}${footer('The same cyclist grows in the image as the ego car closes distance.', opacity, C.green)}`;
+  if (mode === 'coarse') return `${forwardDrivingScene(70, 170, 340, 220, 0.31, opacity, { boxActor: true })}${ring(290, 291, 24, C.green, opacity, 1.8)}${text('CYCLIST', 290, 334, 14, C.green, 'middle', 700, opacity)}${arrow(434, 280, 528, 280, C.red, 2, opacity * p)}${spatialGrid(566, 188, 286, 188, 5, 4, opacity, C.red, { col: 3, row: 1, color: C.red, crossed: true })}${text('one stride-16 cell mixes actor + background', 709, 409, 15, C.red, 'middle', 650, opacity)}${footer('The coarse map has no separate cyclist cell for later geometry to recover.', opacity, C.red)}`;
+  if (mode === 'pyramid') return `${forwardDrivingScene(60, 172, 310, 210, 0.31, opacity, { boxActor: true })}${ring(260, 288, 23, C.green, opacity, 1.8)}${text('CYCLIST', 260, 329, 13, C.green, 'middle', 700, opacity)}${arrow(392, 278, 470, 278, C.teal, 2, opacity * p)}${text('FINE MAP · actor boundary', 632, 169, 14, C.green, 'middle', 700, opacity)}${spatialGrid(486, 184, 292, 112, 10, 4, opacity, C.green, { col: 7, row: 1, color: C.green })}${text('COARSE MAP · intersection context', 676, 329, 14, C.teal, 'middle', 700, opacity)}${spatialGrid(562, 344, 228, 66, 5, 2, opacity, C.teal)}${footer('The pyramid keeps a cyclist cell and a wider view of the lane and crosswalk.', opacity, C.teal)}`;
+  if (mode === 'supervision') return `${forwardDrivingScene(70, 170, 340, 220, 0.31, opacity, { boxActor: true })}${ring(290, 291, 24, C.green, opacity, 1.8)}${arrow(434, 280, 520, 280, C.green, 2, opacity * p)}${rect(548, 176, 310, 92, C.bg, 10, opacity, C.green, 1.2)}${text('IMAGE LOSS', 703, 208, 14, C.green, 'middle', 700, opacity)}${text('cyclist remains separable in the image map', 703, 244, 15, C.ink, 'middle', 560, opacity)}${rect(548, 286, 310, 92, C.bg, 10, opacity, C.teal, 1.2)}${text('BEV LOSS', 703, 318, 14, C.teal, 'middle', 700, opacity)}${text('cyclist lands in the correct metric cell', 703, 354, 15, C.ink, 'middle', 560, opacity)}${footer('Perspective supervision gives the backbone a direct reason to keep the small actor.', opacity, C.green)}`;
+  return `${forwardDrivingScene(62, 170, 330, 220, 0.31, opacity, { boxActor: true })}${ring(275, 291, 25, C.green, opacity, 2)}${text('CYCLIST', 275, 335, 14, C.green, 'middle', 750, opacity)}${arrow(415, 280, 490, 280, C.teal, 2, opacity)}${text('COARSE ONLY', 630, 172, 14, C.red, 'middle', 700, opacity)}${spatialGrid(506, 188, 248, 82, 5, 2, opacity, C.red, { col: 3, row: 0, color: C.red, crossed: true })}${text('actor merged', 782, 235, 14, C.red, 'start', 650, opacity)}${text('FINE + COARSE PYRAMID', 660, 316, 14, C.green, 'middle', 700, opacity)}${spatialGrid(506, 332, 248, 82, 10, 3, opacity, C.green, { col: 7, row: 1, color: C.green })}${text('actor retained', 782, 379, 14, C.green, 'start', 650, opacity)}${footer('If the camera encoder erases the cyclist, projection and fusion cannot recreate it.', opacity, C.amber)}`;
 }
 
 function drawLidar(mode, local, opacity) {
@@ -580,8 +614,8 @@ function drawLidar(mode, local, opacity) {
   if (mode === 'compensate') return `${roadScene(70, 170, 350, 220, p, opacity, { sensor: 'lidar', trail: true })}${arrow(443, 280, 523, 280, C.amber, 2, opacity * p)}${roadScene(548, 170, 340, 220, p, opacity, { sensor: 'lidar' })}${text('motion-compensated', 718, 414, 16, C.amber, 'middle', 650, opacity)}${footer('Ego-motion compensation aligns the static curb; the moving cyclist still changes position.', opacity * reveal(local, 0.62, 0.78), C.amber)}`;
   if (mode === 'pillars') return `${roadScene(75, 175, 330, 210, p, opacity, { sensor: 'lidar' })}${arrow(428, 280, 518, 280, C.amber, 2, opacity * p)}${bev(565, 178, 285, 210, opacity, C.amber)}${rect(720, 248, 36, 42, C.bg, 4, opacity, C.green, 1.5)}${text('one x-y cell', 707, 414, 16, C.amber, 'middle', 650, opacity)}${footer('Pillars keep horizontal location but collapse the height structure inside each cell.', opacity * reveal(local, 0.62, 0.78), C.amber)}`;
   if (mode === 'voxels') return `${roadScene(75, 175, 330, 210, p, opacity, { sensor: 'lidar' })}${arrow(428, 280, 518, 280, C.blue, 2, opacity * p)}${grid(565, 178, 8, 6, 35, C.blue, 0.38 * p, opacity)}${text('occupied 3D cells only', 705, 414, 16, C.blue, 'middle', 650, opacity)}${footer('Sparse voxels preserve height and spend compute only where the scan has returns.', opacity * reveal(local, 0.62, 0.78), C.blue)}`;
-  if (mode === 'windows') return `${grid(210, 160, 12, 7, 42, C.blue, 0.34, opacity)}${rect(252, 202, 168, 126, C.bg, 8, opacity * p, C.teal, 2)}${text('cyclist window', 336, 352, 15, C.teal, 'middle', 650, opacity)}${rect(546, 244, 168, 126, C.bg, 8, opacity * p, C.teal, 2)}${text('vehicle window', 630, 394, 15, C.teal, 'middle', 650, opacity)}${footer('Windowed attention connects nearby occupied cells without filling the empty road volume.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
-  return summary([['First align', 'compensate ego motion across the sweep'], ['Pillars', 'retain x-y location; collapse height early'], ['Sparse voxels', 'retain height; compute on occupied cells']], opacity, 'The encoder should preserve the geometry needed to separate cyclist, van, curb, and road.');
+  if (mode === 'windows') return `${text('LAYER 1 · vertical sets', 290, 161, 14, C.blue, 'middle', 700, opacity)}${spatialGrid(140, 178, 300, 190, 6, 5, opacity, C.blue, { col: 2, row: 2, color: C.green })}${line(290, 178, 290, 368, C.amber, 3, opacity)}${cyclist(265, 273, opacity, C.green)}${text('cyclist at set edge', 290, 401, 14, C.green, 'middle', 650, opacity)}${arrow(464, 273, 536, 273, C.teal, 2, opacity * p)}${text('LAYER 2 · horizontal sets', 690, 161, 14, C.teal, 'middle', 700, opacity)}${spatialGrid(540, 178, 300, 190, 6, 5, opacity, C.teal, { col: 2, row: 2, color: C.green })}${line(540, 292, 840, 292, C.amber, 3, opacity)}${cyclist(665, 273, opacity, C.green)}${arrow(646, 271, 706, 325, C.green, 1.8, opacity)}${text('next layer crosses the old boundary', 690, 401, 14, C.green, 'middle', 650, opacity)}${footer('Alternating set directions let nearby occupied voxels exchange context without global attention.', opacity, C.teal)}`;
+  return `${roadScene(62, 166, 330, 230, 0.72, opacity, { sensor: 'lidar', labels: true })}${ring(275, 232, 25, C.green, opacity, 1.8)}${text('same cyclist returns', 227, 427, 14, C.green, 'middle', 650, opacity)}${arrow(416, 281, 486, 281, C.teal, 2, opacity)}${rect(512, 154, 360, 112, C.bg, 10, opacity, C.amber, 1.2)}${text('PILLAR', 536, 187, 14, C.amber, 'start', 700, opacity)}${text('x-y cell retained', 536, 222, 16, C.ink, 'start', 600, opacity)}${text('height pooled', 842, 222, 16, C.red, 'end', 650, opacity)}${rect(512, 286, 360, 112, C.bg, 10, opacity, C.blue, 1.2)}${text('SPARSE VOXELS', 536, 319, 14, C.blue, 'start', 700, opacity)}${text('x-y-z cells retained', 536, 354, 16, C.ink, 'start', 600, opacity)}${text('occupied cells only', 842, 354, 16, C.green, 'end', 650, opacity)}${footer('Keep the cyclist geometry until the downstream task no longer needs its height.', opacity, C.amber)}`;
 }
 
 function radarSweeps(opacity, progress) {
@@ -600,13 +634,34 @@ function radarSweeps(opacity, progress) {
   return out;
 }
 
+function radarPlacementLane(y, opacity, corrected = false) {
+  const egoX = 142;
+  const radarX = 548;
+  const cameraX = 668;
+  let out = line(118, y, 842, y, C.faint, 2, opacity);
+  out += vehicle(egoX, y - 20, 28, 40, C.blue, opacity, 'EGO');
+  out += vehicle(radarX, y - 21, 30, 42, C.rose, opacity, 'LEAD CAR');
+  out += ring(radarX + 15, y, 29, C.rose, opacity, 1.6);
+  out += text('radar return · 26 m', radarX + 15, y - 43, 14, C.rose, 'middle', 700, opacity);
+  out += path(`M ${cameraX} ${y - 30} L ${cameraX + 48} ${y - 30} L ${cameraX + 48} ${y + 30} L ${cameraX} ${y + 30} Z`, C.blue, 1.8, opacity * (corrected ? 0.38 : 1), 'none', '6 5');
+  out += text('camera box', cameraX + 24, y + 51, 13, C.blue, 'middle', 650, opacity);
+  if (corrected) {
+    out += arrow(cameraX - 4, y, radarX + 42, y, C.green, 2, opacity);
+    out += rect(radarX - 7, y - 32, 44, 64, C.bg, 4, opacity, C.green, 2);
+    out += text('moved to measured range', 430, y + 54, 14, C.green, 'middle', 650, opacity);
+  } else {
+    out += text('still misplaced', cameraX + 24, y - 43, 14, C.red, 'middle', 700, opacity);
+  }
+  return out;
+}
+
 function drawRadar(mode, local, opacity) {
   const p = reveal(local);
   if (mode === 'input') return radarSweeps(opacity, p) + footer('Range falls from 34 m to 26 m; Doppler measures a 5 m/s closing speed.', opacity * reveal(local, 0.62, 0.78), C.rose);
-  if (mode === 'proposal') return `${forwardDrivingScene(70, 170, 340, 220, p, opacity, { boxActor: true })}${arrow(435, 280, 520, 280, C.rose, 2, opacity * p)}${rect(556, 184, 302, 188, C.bg, 12, opacity, C.rose, 1.3)}${text('CAMERA PROPOSAL', 707, 220, 14, C.blue, 'middle', 700, opacity)}${text('lead car detected', 707, 258, 18, C.ink, 'middle', 620, opacity)}${text('RADAR CONFIRMATION', 707, 304, 14, C.rose, 'middle', 700, opacity)}${text('26 m · closing 5 m/s', 707, 342, 18, C.ink, 'middle', 620, opacity)}${footer('Late proposal fusion can confirm the camera box, but cannot repair where it was placed.', opacity * reveal(local, 0.62, 0.78), C.rose)}`;
-  if (mode === 'depth') return `${forwardDrivingScene(70, 170, 340, 220, p, opacity, { boxActor: true })}${arrow(435, 280, 520, 280, C.amber, 2, opacity * p)}${line(568, 328, 828, 208, C.faint, 2, opacity)}${[0,1,2,3,4].map((i)=>circle(596+i*51,315-i*23,7,i===2?C.rose:C.faint,opacity*(i===2?p:0.65))).join('')}${text('camera: broad depth ray', 701, 365, 15, C.muted, 'middle', 560, opacity)}${text('radar selects 26 m', 701, 397, 17, C.rose, 'middle', 650, opacity)}${footer('Depth fusion moves the image feature to the range supported by the radar return.', opacity * reveal(local, 0.62, 0.78), C.amber)}`;
+  if (mode === 'proposal') return `${radarPlacementLane(274, opacity, false)}${text('PROPOSAL FUSION', 480, 158, 15, C.red, 'middle', 750, opacity)}${footer('The radar confirms that a lead car exists, but the camera branch still controls its placement.', opacity, C.rose)}`;
+  if (mode === 'depth') return `${radarPlacementLane(274, opacity, true)}${text('DEPTH FUSION', 480, 158, 15, C.green, 'middle', 750, opacity)}${footer('The radar measurement moves the camera feature to the supported 26 m range.', opacity, C.green)}`;
   if (mode === 'bev') return `${roadScene(150, 155, 660, 255, p, opacity, { sensor: 'radar', labels: true })}${text('LEAD CAR · 26 m · −5 m/s', 480, 184, 15, C.rose, 'middle', 700, opacity)}${text('GUARDRAIL RETURN · 0 m/s', 682, 384, 14, C.muted, 'middle', 600, opacity)}${footer('A radar BEV keeps moving and stationary returns separate until other sensors resolve identity.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
-  return summary([['Measured progression', '34 m → 30 m → 26 m'], ['Doppler', 'closing speed stays near 5 m/s'], ['Failure mode', 'late fusion cannot repair a misplaced camera box']], opacity, 'Use radar early enough if its range should change geometry, not merely confirm a proposal.');
+  return `${text('PROPOSAL FUSION · box stays wrong', 480, 150, 14, C.red, 'middle', 700, opacity)}${radarPlacementLane(238, opacity, false)}${text('DEPTH FUSION · box moves to 26 m', 480, 331, 14, C.green, 'middle', 700, opacity)}${radarPlacementLane(397, opacity, true)}${footer('Fuse radar before box placement if range must change the geometry.', opacity, C.amber)}`;
 }
 
 function drawLifting(mode, local, opacity) {
@@ -615,7 +670,7 @@ function drawLifting(mode, local, opacity) {
   if (mode === 'lss') { let out = `${forwardDrivingScene(72, 170, 350, 220, p, opacity, { boxActor: true })}${arrow(447, 280, 532, 280, C.teal, 2, opacity * p)}${roadScene(558, 170, 330, 220, p, opacity, {})}${line(590, 355, 818, 214, C.faint, 2, opacity)}`; for (let i=0;i<6;i++) out += circle(608+i*42,344-i*25,8,i===3?C.green:C.teal,opacity*(i===3?1:0.35)); return out + text('depth probability along ray', 712, 408, 16, C.teal, 'middle', 650, opacity) + footer('LSS spreads the cyclist feature over depth bins, then accumulates those bins into BEV.', opacity * reveal(local, 0.62, 0.78), C.teal); }
   if (mode === 'detr3d') return `${forwardDrivingScene(72, 170, 350, 220, p, opacity, { boxActor: true })}${arrow(447, 280, 532, 280, C.blue, 2, opacity * p)}${roadScene(558, 170, 330, 220, p, opacity, {})}${circle(705, 252, 19, C.blue, 0.10 * opacity, C.blue, 1.6)}${line(590, 355, 705, 252, C.blue, 2, opacity * p)}${text('candidate actor at 24 m', 715, 414, 16, C.blue, 'middle', 650, opacity)}${footer('An object query starts from a 3D reference, then asks whether the camera supports it.', opacity * reveal(local, 0.62, 0.78), C.blue)}`;
   if (mode === 'bevformer') { let out = `${forwardDrivingScene(72, 170, 350, 220, p, opacity, { boxActor: true })}${arrow(447, 280, 532, 280, C.teal, 2, opacity * p)}${roadScene(558, 170, 330, 220, p, opacity, {})}`; for(let i=0;i<4;i++){out += circle(705,326-i*31,6,C.teal,opacity*p); out += line(590,355,705,326-i*31,C.teal,1,opacity*p);} return out + text('vertical samples in one BEV cell', 715, 414, 16, C.teal, 'middle', 650, opacity) + footer('A BEV cell projects several height references into the camera and gathers matching evidence.', opacity * reveal(local, 0.62, 0.78), C.teal); }
-  return summary([['Failure to avoid', 'wrong depth writes cyclist evidence into the wrong cell'], ['LSS', 'spread one pixel feature across depth bins'], ['Query or BEV sampling', 'test selected 3D locations against the image']], opacity, 'Camera lifting is the explicit choice that turns an image observation into 3D placement.');
+  return `${forwardDrivingScene(64, 174, 330, 214, 0.31, opacity, { boxActor: true })}${ring(277, 291, 24, C.green, opacity, 2)}${text('one cyclist image patch', 229, 421, 14, C.green, 'middle', 650, opacity)}${arrow(418, 278, 512, 278, C.amber, 2, opacity)}${text('BEV CELLS ALONG THE VIEWING RAY', 704, 161, 14, C.amber, 'middle', 700, opacity)}${spatialGrid(548, 178, 312, 210, 6, 4, opacity, C.teal)}${path('M 568 360 L 832 198', C.amber, 2, opacity, 'none', '7 6')}${rect(754, 182, 48, 48, C.red, 3, opacity * 0.22, C.red, 1.5)}${line(761, 189, 795, 223, C.red, 2, opacity)}${line(795, 189, 761, 223, C.red, 2, opacity)}${text('wrong depth', 778, 250, 13, C.red, 'middle', 700, opacity)}${rect(650, 285, 48, 48, C.green, 3, opacity * 0.22, C.green, 1.5)}${cyclist(674, 307, opacity, C.green)}${text('correct cyclist cell', 674, 361, 13, C.green, 'middle', 700, opacity)}${footer('Depth is placement: an error writes real image evidence into the wrong metric location.', opacity, C.amber)}`;
 }
 
 function drawFusion(mode, local, opacity) {
@@ -624,7 +679,7 @@ function drawFusion(mode, local, opacity) {
   if (mode === 'point') return `${sensorEvidenceCards(opacity)}${arrow(201, 300, 480, 352, C.blue, 1.7, opacity * p)}${arrow(459, 300, 480, 352, C.amber, 1.7, opacity * p)}${arrow(717, 300, 480, 352, C.rose, 1.7, opacity * p)}${circle(480, 372, 24, C.teal, 0.12 * opacity, C.teal, 1.5)}${text('actor point', 480, 420, 16, C.teal, 'middle', 650, opacity)}${footer('Point fusion combines the three measurements at the cyclist, but keeps no camera-only lane field.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
   if (mode === 'query') return `${sensorEvidenceCards(opacity)}${arrow(201, 300, 480, 346, C.blue, 1.7, opacity * p)}${arrow(459, 300, 480, 346, C.amber, 1.7, opacity * p)}${arrow(717, 300, 480, 346, C.rose, 1.7, opacity * p)}${rect(353, 357, 254, 68, C.bg, 12, opacity, C.green, 1.4)}${text('CYCLIST QUERY', 480, 386, 14, C.green, 'middle', 700, opacity)}${text('type · 24 m · −5 m/s', 480, 414, 16, C.ink, 'middle', 600, opacity)}${footer('Object-query fusion keeps a compact cyclist state, but not the whole road surface.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
   if (mode === 'bev') return `${sensorEvidenceCards(opacity)}${arrow(201, 300, 480, 326, C.blue, 1.7, opacity * p)}${arrow(459, 300, 480, 326, C.amber, 1.7, opacity * p)}${arrow(717, 300, 480, 326, C.rose, 1.7, opacity * p)}${roadScene(350, 336, 260, 108, p, opacity, {})}${footer('Dense BEV keeps the cyclist, lane boundary, crosswalk, and free space in one spatial field.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
-  return summary([['Point', 'one sampled location; nearby context may be absent'], ['Object query', 'one actor state; road field may be absent'], ['Dense BEV', 'actor plus lane, crosswalk, and free space']], opacity, 'Choose the fusion unit from what downstream prediction must still inspect.');
+  return `${sensorEvidenceCards(opacity)}${arrow(201, 297, 214, 333, C.blue, 1.6, opacity)}${arrow(459, 297, 480, 333, C.amber, 1.6, opacity)}${arrow(717, 297, 746, 333, C.rose, 1.6, opacity)}${rect(92, 334, 244, 96, C.bg, 11, opacity, C.teal, 1.2)}${text('POINT', 214, 362, 13, C.teal, 'middle', 700, opacity)}${circle(214, 393, 9, C.green, opacity)}${text('one measured location', 214, 420, 13, C.muted, 'middle', 560, opacity)}${rect(358, 334, 244, 96, C.bg, 11, opacity, C.green, 1.2)}${text('OBJECT QUERY', 480, 362, 13, C.green, 'middle', 700, opacity)}${text('cyclist · 24 m · −5 m/s', 480, 397, 15, C.ink, 'middle', 620, opacity)}${rect(624, 334, 244, 96, C.bg, 11, opacity, C.blue, 1.2)}${text('DENSE BEV', 746, 362, 13, C.blue, 'middle', 700, opacity)}${roadScene(680, 374, 132, 45, 0.72, opacity, {})}${footer('The fusion unit decides whether prediction receives one point, one actor, or the surrounding road field.', opacity, C.amber)}`;
 }
 
 function drawDropout(mode, local, opacity) {
@@ -633,15 +688,15 @@ function drawDropout(mode, local, opacity) {
   if (mode === 'unibev') return `${roadScene(92, 170, 330, 220, p, opacity, { sensor: 'all', rain: true })}${rect(548, 178, 300, 198, C.bg, 12, opacity, C.teal, 1.3)}${text('AVAILABLE INPUTS', 698, 211, 14, C.teal, 'middle', 700, opacity)}${text('camera', 585, 253, 16, C.muted, 'start', 600, opacity)}${text('degraded, still present', 815, 253, 16, C.amber, 'end', 600, opacity)}${text('LiDAR', 585, 294, 16, C.muted, 'start', 600, opacity)}${text('present', 815, 294, 16, C.green, 'end', 600, opacity)}${text('radar', 585, 335, 16, C.muted, 'start', 600, opacity)}${text('present', 815, 335, 16, C.green, 'end', 600, opacity)}${footer('An availability mask can represent a missing sensor, but not how trustworthy a present sensor is.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
   if (mode === 'metabev') return `${roadScene(92, 170, 330, 220, p, opacity, { sensor: 'all', rain: true })}${arrow(446, 280, 520, 280, C.green, 2, opacity * p)}${rect(548, 178, 300, 198, C.bg, 12, opacity, C.green, 1.3)}${text('SHARED SCENE STATE', 698, 213, 14, C.green, 'middle', 700, opacity)}${text('cyclist: 24 m', 585, 260, 17, C.ink, 'start', 600, opacity)}${text('lead car: closing', 585, 302, 17, C.ink, 'start', 600, opacity)}${text('crosswalk: occupied', 585, 344, 17, C.ink, 'start', 600, opacity)}${footer('Training across sensor subsets teaches one scene state to survive a missing input stream.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
   if (mode === 'grace') return `${roadScene(92, 170, 330, 220, p, opacity, { sensor: 'all', rain: true })}${rect(548, 178, 300, 198, C.bg, 12, opacity, C.amber, 1.3)}${text('RELIABILITY WEIGHTS', 698, 213, 14, C.amber, 'middle', 700, opacity)}${text('camera', 585, 257, 16, C.blue, 'start', 650, opacity)}${text('0.25', 815, 257, 17, C.ink, 'end', 650, opacity)}${rect(650, 241, 110 * 0.25, 18, C.blue, 4, opacity * 0.45)}${text('LiDAR', 585, 302, 16, C.amber, 'start', 650, opacity)}${text('0.95', 815, 302, 17, C.ink, 'end', 650, opacity)}${rect(650, 286, 110 * 0.95, 18, C.amber, 4, opacity * 0.45)}${text('radar', 585, 347, 16, C.rose, 'start', 650, opacity)}${text('0.85', 815, 347, 17, C.ink, 'end', 650, opacity)}${rect(650, 331, 110 * 0.85, 18, C.rose, 4, opacity * 0.45)}${footer('Reliability gating lowers the rain-damaged camera contribution without pretending it vanished.', opacity * reveal(local, 0.62, 0.78), C.amber)}`;
-  return summary([['Availability', 'is a sensor stream present?'], ['Reliability', 'how much should this measurement influence state?'], ['Required outcome', 'cyclist state remains stable through rain and sensor loss']], opacity, 'Treat missing input and degraded input as different failure cases.');
+  return `${roadScene(58, 166, 350, 230, 0.72, opacity, { sensor: 'all', labels: true, rain: true })}${text('same cyclist · rain + glare', 233, 426, 14, C.green, 'middle', 650, opacity)}${arrow(431, 279, 506, 279, C.amber, 2, opacity)}${rect(532, 160, 340, 104, C.bg, 11, opacity, C.teal, 1.2)}${text('AVAILABILITY MASK', 556, 193, 14, C.teal, 'start', 700, opacity)}${text('camera = present', 556, 231, 17, C.ink, 'start', 620, opacity)}${text('cannot express degraded', 846, 231, 14, C.red, 'end', 650, opacity)}${rect(532, 286, 340, 104, C.bg, 11, opacity, C.amber, 1.2)}${text('RELIABILITY WEIGHT', 556, 319, 14, C.amber, 'start', 700, opacity)}${text('camera = 0.25', 556, 357, 17, C.ink, 'start', 620, opacity)}${rect(716, 341, 112, 18, C.faint, 4, opacity)}${rect(716, 341, 28, 18, C.blue, 4, opacity * 0.62)}${footer('A present camera can still be unreliable; continuous gating can down-weight it.', opacity, C.amber)}`;
 }
 
 function temporalPanels(opacity, progress) {
   const p = clamp(progress);
   const states = [
-    ['t₀ · observed', 0.10, {}],
-    ['t₁ · behind van', 0.38, { hideCyclist: true, showPrediction: true }],
-    ['t₂ · observed again', 0.82, {}],
+    ['t₀ · observed', 0.10, { labels: true }],
+    ['t₁ · behind van', 0.38, { hideCyclist: true, showPrediction: true, labels: true }],
+    ['t₂ · observed again', 0.82, { labels: true }],
   ];
   return states.map(([label, sceneP, options], i) => {
     const x = 64 + i * 300;
@@ -657,7 +712,7 @@ function drawTemporal(mode, local, opacity) {
   if (mode === 'instances') return `${roadScene(76, 175, 340, 215, 0.38, opacity, { hideCyclist: true, showPrediction: true })}${arrow(441, 280, 520, 280, C.green, 2, opacity * p)}${rect(548, 176, 310, 215, C.bg, 12, opacity, C.green, 1.3)}${text('CYCLIST TRACK', 703, 210, 14, C.green, 'middle', 700, opacity)}${text('last seen: t₀', 580, 252, 16, C.muted, 'start', 560, opacity)}${text('velocity: 4.2 m/s left', 580, 291, 16, C.ink, 'start', 600, opacity)}${text('predicted position: crosswalk', 580, 330, 16, C.ink, 'start', 600, opacity)}${text('uncertainty: growing', 580, 369, 16, C.amber, 'start', 650, opacity)}${footer('Recurrent instances carry the cyclist state forward and expand uncertainty while no pixels support it.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
   if (mode === 'queue') return `${roadScene(76, 175, 340, 215, 0.38, opacity, { hideCyclist: true, showPrediction: true })}${arrow(441, 280, 520, 280, C.teal, 2, opacity * p)}${rect(548, 176, 310, 215, C.bg, 12, opacity, C.teal, 1.3)}${text('BOUNDED FOREGROUND QUEUE', 703, 210, 14, C.teal, 'middle', 700, opacity)}${text('1  cyclist · occluded', 580, 256, 16, C.green, 'start', 650, opacity)}${text('2  lead car · observed', 580, 298, 16, C.rose, 'start', 650, opacity)}${text('3  delivery van · static', 580, 340, 16, C.amber, 'start', 650, opacity)}${text('new low-score clutter dropped', 580, 376, 15, C.muted, 'start', 560, opacity)}${footer('A bounded queue keeps the important hidden cyclist while replacing lower-value foreground entries.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
   if (mode === 'correct') return `${roadScene(160, 155, 640, 260, 0.82, opacity, { labels: true })}${ring(482, 226, 32 * (1 - 0.55 * p), C.green, opacity, 1.4)}${text('prediction corrected by current evidence', 480, 445, 16, C.green, 'middle', 650, opacity)}${footer('When the cyclist reappears, the new observation corrects position and contracts uncertainty.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
-  return summary([['t₀', 'observe cyclist and estimate velocity'], ['t₁', 'predict behind van; uncertainty grows'], ['t₂', 'reobserve cyclist; correct state and uncertainty']], opacity, 'Temporal memory is useful only if its prediction can be corrected by fresh evidence.');
+  return `${temporalPanels(opacity, 1)}${footer('The track is useful because the t₂ observation corrects the t₁ prediction.', opacity, C.amber)}`;
 }
 
 function drawLidarContract(mode, local, opacity) {
@@ -666,7 +721,7 @@ function drawLidarContract(mode, local, opacity) {
   if (mode === 'labels') return `${forwardDrivingScene(70, 170, 340, 220, p, opacity, { boxActor: true })}${arrow(435, 280, 520, 280, C.amber, 2, opacity * p)}${rect(548, 178, 310, 198, C.bg, 12, opacity, C.amber, 1.3)}${text('TRAINING LABEL', 703, 212, 14, C.amber, 'middle', 700, opacity)}${text('cyclist depth = 24 m', 703, 260, 18, C.ink, 'middle', 650, opacity)}${text('camera predicts depth', 703, 310, 16, C.muted, 'middle', 560, opacity)}${text('LiDAR absent at runtime', 703, 348, 16, C.green, 'middle', 650, opacity)}${footer('LiDAR can label camera depth during training without becoming a deployed sensor dependency.', opacity * reveal(local, 0.62, 0.78), C.amber)}`;
   if (mode === 'runtime') return `${forwardDrivingScene(70, 170, 340, 220, p, opacity, { boxActor: true })}${roadScene(550, 170, 340, 220, p, opacity, { sensor: 'lidar' })}${arrow(410, 280, 534, 280, C.teal, 2, opacity * p)}${text('CAMERA', 240, 415, 15, C.blue, 'middle', 700, opacity)}${text('LiDAR AT INFERENCE', 720, 415, 15, C.amber, 'middle', 700, opacity)}${footer('If live LiDAR points enter the model, every deployed vehicle must supply calibrated LiDAR.', opacity * reveal(local, 0.62, 0.78), C.teal)}`;
   if (mode === 'teacher') return `${roadScene(70, 170, 340, 220, p, opacity, { sensor: 'all' })}${arrow(435, 280, 520, 280, C.green, 2, opacity * p)}${forwardDrivingScene(550, 170, 340, 220, p, opacity, { boxActor: true })}${text('CAMERA + LiDAR TEACHER', 240, 415, 15, C.amber, 'middle', 700, opacity)}${text('CAMERA-ONLY STUDENT', 720, 415, 15, C.green, 'middle', 700, opacity)}${footer('The teacher transfers cyclist geometry during training; the deployed student uses camera only.', opacity * reveal(local, 0.62, 0.78), C.green)}`;
-  return summary([['Depth labels', 'LiDAR used only to create training targets'], ['Runtime input', 'LiDAR required on every deployed vehicle'], ['Teacher', 'LiDAR path removed after distillation']], opacity, 'Ask where the LiDAR tensor exists: dataset, deployed graph, or teacher graph.');
+  return `${roadScene(54, 166, 330, 230, 0.72, opacity, { sensor: 'lidar', labels: true })}${text('same cyclist scan', 219, 426, 14, C.green, 'middle', 650, opacity)}${arrow(406, 279, 472, 279, C.teal, 2, opacity)}${rect(500, 142, 380, 82, C.bg, 10, opacity, C.amber, 1.2)}${text('DEPTH LABEL', 522, 174, 14, C.amber, 'start', 700, opacity)}${text('dataset only', 522, 204, 15, C.ink, 'start', 600, opacity)}${text('runtime LiDAR: NO', 852, 204, 15, C.green, 'end', 700, opacity)}${rect(500, 242, 380, 82, C.bg, 10, opacity, C.red, 1.2)}${text('LIVE MODEL INPUT', 522, 274, 14, C.red, 'start', 700, opacity)}${text('deployed graph', 522, 304, 15, C.ink, 'start', 600, opacity)}${text('runtime LiDAR: YES', 852, 304, 15, C.red, 'end', 700, opacity)}${rect(500, 342, 380, 82, C.bg, 10, opacity, C.blue, 1.2)}${text('TEACHER SIGNAL', 522, 374, 14, C.blue, 'start', 700, opacity)}${text('training graph only', 522, 404, 15, C.ink, 'start', 600, opacity)}${text('runtime LiDAR: NO', 852, 404, 15, C.green, 'end', 700, opacity)}${footer('The same scan creates three different deployment contracts.', opacity, C.amber)}`;
 }
 
 function buildStory(titleSteps, draw) {
@@ -679,6 +734,16 @@ function buildStory(titleSteps, draw) {
 
   return {
     steps: titleSteps,
+    snapshot(index) {
+      const step = titleSteps[index];
+      if (!step) throw new Error(`No storyboard step ${index}`);
+      const body = `${top(index + 1, titleSteps.length, step.title, 1)}${draw(step.mode, 1, 1)}`;
+      return {
+        svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" role="img" aria-label="${esc(step.description ?? step.title)}"><rect width="${WIDTH}" height="${HEIGHT}" fill="${C.bg}"/>${body}</svg>`,
+        title: step.title,
+        description: step.description ?? step.title,
+      };
+    },
     frame(frame) {
       const totalFrames = Math.round(totalSeconds * FPS);
       const t = Math.min(frame / FPS, totalSeconds - 1 / FPS);
@@ -729,7 +794,7 @@ export const CALM_BLOG_STORIES = {
     { title: 'Examples expand into different numbers of units.', mode: 'units', seconds: 8.5 },
     { title: 'Those units consume different amounts of compute.', mode: 'flops', seconds: 9 },
     { title: 'Gradient norms show unequal updates to shared parameters.', mode: 'updates', seconds: 9 },
-    { title: 'Report examples, units, FLOPs, and gradient norms.', mode: 'ledgers', seconds: 11.5 },
+    { title: 'Report five ledgers, including independent decisions.', mode: 'ledgers', seconds: 11.5 },
   ], drawBudget),
   'blog-vla-feedback-attribution.gif': buildStory([
     { title: 'One failed rollout does not reveal a successful alternative.', mode: 'failure', seconds: 7, buildSeconds: 2.6 },
@@ -779,7 +844,7 @@ export const CALM_BLOG_STORIES = {
     { title: 'Compensation aligns the curb, not the independently moving cyclist.', mode: 'compensate', seconds: 10, buildSeconds: 4.2 },
     { title: 'Pillars keep x-y location but collapse height inside each cell.', mode: 'pillars', seconds: 9.5, buildSeconds: 4 },
     { title: 'Sparse voxels retain the cyclist height structure.', mode: 'voxels', seconds: 9.5, buildSeconds: 4 },
-    { title: 'Sparse windows connect nearby occupied cells only.', mode: 'windows', seconds: 9.5, buildSeconds: 4 },
+    { title: 'Alternating attention sets cross one sparse-window boundary.', mode: 'windows', seconds: 9.5, buildSeconds: 4 },
     { title: 'Preserve the geometry that separates cyclist, van, curb, and road.', mode: 'summary', seconds: 12.5 },
   ], drawLidar),
   'autonomous-perception-radar-encoder.gif': buildStory([
@@ -826,6 +891,41 @@ export const CALM_BLOG_STORIES = {
     { title: 'Locate the LiDAR tensor in dataset, deployed graph, or teacher.', mode: 'summary', seconds: 12 },
   ], drawLidarContract),
 };
+
+export async function renderBlogExplainerFrames(names = CALM_BLOG_GIFS, options = {}) {
+  const root = options.root ?? process.cwd();
+  const outputDir = options.outputDir ?? join(root, 'public/assets/images/blog-explainer-frames');
+  const manifest = {};
+  mkdirSync(outputDir, { recursive: true });
+
+  for (const name of names) {
+    const story = CALM_BLOG_STORIES[name];
+    if (!story) throw new Error(`No Blog explainer storyboard for ${name}`);
+    const storyDirName = name.replace(/\.gif$/, '');
+    const storyDir = join(outputDir, storyDirName);
+    rmSync(storyDir, { recursive: true, force: true });
+    mkdirSync(storyDir, { recursive: true });
+    const frames = [];
+
+    for (let index = 0; index < story.steps.length; index++) {
+      const snapshot = story.snapshot(index);
+      const filename = `frame-${String(index + 1).padStart(2, '0')}.webp`;
+      await sharp(Buffer.from(snapshot.svg))
+        .webp({ quality: 92, smartSubsample: true })
+        .toFile(join(storyDir, filename));
+      frames.push({
+        src: `/assets/images/blog-explainer-frames/${storyDirName}/${filename}`,
+        title: snapshot.title,
+        description: snapshot.description,
+      });
+    }
+
+    manifest[name] = { frames };
+    console.log(`generated ${frames.length} explainer frames for ${name}`);
+  }
+
+  writeFileSync(join(outputDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+}
 
 export async function renderCalmBlogGifs(names, options = {}) {
   const root = options.root ?? process.cwd();

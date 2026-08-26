@@ -6,7 +6,8 @@ import { CALM_BLOG_STORIES, PERCEPTION_BLOG_GIFS } from '../scripts/calm-blog-gi
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 type VisualStep = { title: string; seconds: number };
-const perceptionStories = CALM_BLOG_STORIES as Record<string, { steps: VisualStep[] }>;
+type VisualStory = { steps: VisualStep[]; snapshot(index: number): { svg: string } };
+const perceptionStories = CALM_BLOG_STORIES as Record<string, VisualStory>;
 const authoredSvgFiles = [
   'blog-audio-release-pipeline.svg',
   'autonomous-driving-perception-system.svg',
@@ -62,6 +63,15 @@ describe('authored Blog visual language', () => {
       const groundedSteps = story.steps.filter((step) => concreteRoadTerms.test(step.title));
       expect(groundedSteps.length, filename).toBeGreaterThanOrEqual(3);
       expect(new Set(story.steps.map((step) => step.seconds)).size, filename).toBeGreaterThan(1);
+    }
+  });
+
+  it('keeps the concrete road actor visible in every perception takeaway frame', () => {
+    for (const filename of PERCEPTION_BLOG_GIFS) {
+      const story = perceptionStories[filename];
+      const finalSvg = story.snapshot(story.steps.length - 1).svg;
+      expect(finalSvg, filename).toMatch(/cyclist|lead car/i);
+      expect(finalSvg, filename).not.toMatch(/Observed change|Useful contract|Failure mode/);
     }
   });
 

@@ -8,8 +8,6 @@ import { describe, expect, it } from 'vitest';
 import {
   CALM_BLOG_STORIES,
   CALM_BLOG_GIFS,
-  DEFAULT_BUILD_SECONDS,
-  DEFAULT_TRANSITION_SECONDS,
   HEIGHT,
   WIDTH,
 } from '../scripts/calm-blog-gifs.mjs';
@@ -17,16 +15,14 @@ import {
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const postsDir = path.join(projectRoot, 'src', 'content', 'posts');
 const imageDir = path.join(projectRoot, 'public', 'assets', 'images');
-type TimedStep = {
+type StoryStep = {
   title: string;
-  seconds: number;
-  buildSeconds?: number;
-  transitionSeconds?: number;
 };
-const timedStories = CALM_BLOG_STORIES as Record<string, { steps: TimedStep[] }>;
+const stories = CALM_BLOG_STORIES as Record<string, { steps: StoryStep[] }>;
+type ExplainerManifest = Record<string, { frames: Array<{ src: string; title: string; description: string }> }>;
 
 describe('Blog GIF visual system', () => {
-  it('covers every GIF referenced by a Blog post', async () => {
+  it('replaces every Blog GIF with a manual frame explainer', async () => {
     const postFiles = await fg('**/*.{md,mdx}', { cwd: postsDir, absolute: true });
     const referenced = new Set<string>();
 
@@ -35,7 +31,8 @@ describe('Blog GIF visual system', () => {
       const parsed = matter(source);
       if (parsed.data.section !== 'blog') continue;
 
-      for (const match of source.matchAll(/\/assets\/images\/([^\s)"'<>]+\.gif)/g)) {
+      expect(source).not.toMatch(/<(?:img|source)[^>]+src=["'][^"']+\.gif/i);
+      for (const match of source.matchAll(/data-blog-frame-explainer=["']([^"']+\.gif)["']/g)) {
         referenced.add(match[1]);
       }
     }
@@ -43,33 +40,26 @@ describe('Blog GIF visual system', () => {
     expect([...referenced].sort()).toEqual([...CALM_BLOG_GIFS].sort());
   });
 
-  it('keeps every Blog GIF slow, legible, and bounded in size', async () => {
+  it('renders one legible, bounded image for every complete storyboard state', async () => {
+    const manifest = JSON.parse(
+      await readFile(path.join(imageDir, 'blog-explainer-frames', 'manifest.json'), 'utf8'),
+    ) as ExplainerManifest;
+
+    expect(Object.keys(manifest).sort()).toEqual([...CALM_BLOG_GIFS].sort());
+
     for (const filename of CALM_BLOG_GIFS) {
-      const filePath = path.join(imageDir, filename);
-      const story = timedStories[filename];
-      const [metadata, file] = await Promise.all([
-        sharp(filePath, { animated: true }).metadata(),
-        stat(filePath),
-      ]);
+      const story = stories[filename];
+      const frames = manifest[filename].frames;
+      expect(frames).toHaveLength(story.steps.length);
 
-      const durations = story.steps.map((step) => step.seconds);
-      const expectedDurationMs = durations.reduce((sum, duration) => sum + duration, 0) * 1_000;
-
-      expect(durations.every((duration) => typeof duration === 'number'), filename).toBe(true);
-      expect(new Set(durations).size, filename).toBeGreaterThan(1);
-      for (const step of story.steps) {
-        const transitionSeconds = step.transitionSeconds ?? DEFAULT_TRANSITION_SECONDS;
-        const buildSeconds = step.buildSeconds ?? DEFAULT_BUILD_SECONDS;
-        const completedStateSeconds = step.seconds - transitionSeconds - 0.8 * buildSeconds;
-        expect(completedStateSeconds, `${filename}: ${step.title}`).toBeGreaterThanOrEqual(3);
+      for (const [index, frame] of frames.entries()) {
+        expect(frame.title, `${filename}: frame ${index + 1}`).toBe(story.steps[index].title);
+        const filePath = path.join(projectRoot, 'public', frame.src.replace(/^\//, ''));
+        const [metadata, file] = await Promise.all([sharp(filePath).metadata(), stat(filePath)]);
+        expect(metadata.width, frame.src).toBe(WIDTH);
+        expect(metadata.height, frame.src).toBe(HEIGHT);
+        expect(file.size, frame.src).toBeLessThan(100_000);
       }
-
-      expect(metadata.width, filename).toBe(WIDTH);
-      expect(metadata.pageHeight, filename).toBe(HEIGHT);
-      expect(metadata.pages, filename).toBeGreaterThanOrEqual(180);
-      const renderedDurationMs = (metadata.delay ?? []).reduce((sum, delay) => sum + delay, 0);
-      expect(Math.abs(renderedDurationMs - expectedDurationMs), filename).toBeLessThanOrEqual(150);
-      expect(file.size, filename).toBeLessThan(2_000_000);
     }
   });
 });

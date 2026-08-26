@@ -459,6 +459,79 @@ img:not(.float-right):not(.float-left) {
   margin: 0;
 }
 
+.architecture-comparison.blog-frame-explainer {
+  overflow: visible;
+}
+
+.blog-frame-explainer__viewport {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.blog-frame-explainer__viewport > a,
+.blog-frame-explainer__viewport img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.blog-frame-explainer__controls {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(8rem, 1fr) 2.5rem auto auto;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.7rem 0.1rem 0;
+}
+
+.blog-frame-explainer__button {
+  display: grid;
+  width: 2.5rem;
+  height: 2.25rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent-color) 42%, transparent);
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, var(--accent-color) 8%, var(--background-color));
+  color: var(--text-color);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.blog-frame-explainer__button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.blog-frame-explainer__range {
+  width: 100%;
+  accent-color: var(--accent-color);
+}
+
+.blog-frame-explainer__status {
+  min-width: 3.4rem;
+  color: var(--text-color);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.blog-frame-explainer__hint {
+  color: var(--text-secondary-color);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.blog-frame-explainer:focus-visible,
+.blog-frame-explainer__button:focus-visible,
+.blog-frame-explainer__range:focus-visible {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 3px;
+}
+
 /*
  * Post media shares the reading column with the prose around it. Dense diagrams
  * keep their designed mobile scale inside a local scroller instead of widening
@@ -521,6 +594,7 @@ img:not(.float-right):not(.float-left) {
   }
 
   .architecture-comparison > a,
+  .blog-frame-explainer__viewport > a,
   [data-post-section] p:has(> a[href$=".gif"]) > a,
   [data-post-section] p:has(> a[href$=".svg"]) > a,
   [data-post-section] p:has(> img[src$=".gif"]) > img,
@@ -531,6 +605,14 @@ img:not(.float-right):not(.float-left) {
 
   .source-explainer-comparison--architecture figure {
     width: 68rem;
+  }
+
+  .blog-frame-explainer__controls {
+    grid-template-columns: 2.5rem minmax(6rem, 1fr) 2.5rem auto;
+  }
+
+  .blog-frame-explainer__hint {
+    grid-column: 1 / -1;
   }
 }
 

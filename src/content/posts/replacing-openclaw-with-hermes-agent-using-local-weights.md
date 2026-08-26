@@ -37,7 +37,7 @@ Hermes does not force one inference path. It works with hosted providers, but it
 
 The figure shows the boundary that resolved the setup. A prompt does not travel from Hermes directly into a weight file. Hermes calls an HTTP API; the serving process owns model loading, the KV cache, and token generation; the GGUF is inert model data on disk.
 
-[![Animation showing Hermes Agent calling a localhost OpenAI-compatible endpoint backed by llama-server and an on-disk GGUF](/assets/images/blog-hermes-local-stack.gif)](/assets/images/blog-hermes-local-stack.gif)
+<div class="architecture-comparison blog-frame-explainer" data-blog-frame-explainer="blog-hermes-local-stack.gif"><div class="blog-frame-explainer__viewport"><a href="/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-01.webp"><img src="/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-01.webp" alt="Manual explainer showing Hermes Agent calling a localhost OpenAI-compatible endpoint backed by llama-server and an on-disk GGUF"></a></div></div>
 
 *Hermes owns the agent loop, tools, sessions, and skills. The custom endpoint is the interface. `llama-server` owns inference, and the GGUF supplies weights and tokenizer data. A model-load error below the API boundary can therefore be fixed without replacing the agent shell. Custom explanatory diagram, checked against the current [Hermes provider documentation](https://github.com/NousResearch/hermes-agent/blob/main/website/docs/integrations/providers.md).*
 

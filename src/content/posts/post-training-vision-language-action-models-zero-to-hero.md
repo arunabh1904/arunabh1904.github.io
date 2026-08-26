@@ -135,7 +135,7 @@ The deployment event must therefore support both the comparison label and the li
 
 Suppose the gripper misses the handle at step 42 and a human takes over at step 47. The terminal bit says the episode failed. The intervention says behavior was unacceptable by step 47. Neither tells us that every earlier action was wrong.
 
-[![Animation comparing episode outcomes, Action Preference Optimization, and process or interactive feedback on the same robot failure](/assets/images/blog-vla-feedback-attribution.gif)](/assets/images/blog-vla-feedback-attribution.gif)
+<div class="architecture-comparison blog-frame-explainer" data-blog-frame-explainer="blog-vla-feedback-attribution.gif"><div class="blog-frame-explainer__viewport"><a href="/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-01.webp"><img src="/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-01.webp" alt="Manual explainer comparing episode outcomes, Action Preference Optimization, and process or interactive feedback on the same robot failure"></a></div></div>
 
 *A terminal outcome labels the whole rollout. An intervention narrows the failure to a local window. A process critic can narrow it further, but only if the critic reads the state correctly. Custom synthesis based on [Action Preference Optimization](/paper%20shorts/2025/06/08/action-preference-optimization-for-robotic-policy-refinement.html), [VLAC](/paper%20shorts/2025/09/19/vlac-vision-language-action-critic-for-real-world-rl.html), and [RIPT-VLA](/paper%20shorts/2025/05/22/ript-vla-interactive-post-training-for-vision-language-action-models.html).*
 

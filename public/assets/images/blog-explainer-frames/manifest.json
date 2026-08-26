@@ -1,0 +1,496 @@
+{
+  "blog-attention-memory.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-01.webp",
+        "title": "How four attention variants store the same token sequence.",
+        "description": "How four attention variants store the same token sequence."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-02.webp",
+        "title": "MHA stores a full token history for every head.",
+        "description": "MHA stores a full token history for every head."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-03.webp",
+        "title": "GQA shares fewer full histories across query heads.",
+        "description": "GQA shares fewer full histories across query heads."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-04.webp",
+        "title": "MLA stores one compressed latent vector per token.",
+        "description": "MLA stores one compressed latent vector per token."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-05.webp",
+        "title": "DeltaNet updates one fixed-size recurrent state.",
+        "description": "DeltaNet updates one fixed-size recurrent state."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-attention-memory/frame-06.webp",
+        "title": "Storage format sets cache size and retrieval limits.",
+        "description": "Storage format sets cache size and retrieval limits."
+      }
+    ]
+  },
+  "blog-vlm-evidence-contract.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-01.webp",
+        "title": "Different outputs require different visual details.",
+        "description": "Different outputs require different visual details."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-02.webp",
+        "title": "CLIP retains features for image-text matching.",
+        "description": "CLIP retains features for image-text matching."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-03.webp",
+        "title": "LLaVA retains features used to generate text.",
+        "description": "LLaVA retains features used to generate text."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-04.webp",
+        "title": "Molmo retains phrase-to-location coordinates.",
+        "description": "Molmo retains phrase-to-location coordinates."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-05.webp",
+        "title": "π0 retains time-indexed state for action prediction.",
+        "description": "π0 retains time-indexed state for action prediction."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-06.webp",
+        "title": "The required output determines which details are retained.",
+        "description": "The required output determines which details are retained."
+      }
+    ]
+  },
+  "blog-multimodal-gradient-budget.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-01.webp",
+        "title": "Equal sample percentages can produce unequal optimization load.",
+        "description": "Equal sample percentages can produce unequal optimization load."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-02.webp",
+        "title": "First count sampled examples by modality.",
+        "description": "First count sampled examples by modality."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-03.webp",
+        "title": "Examples expand into different numbers of units.",
+        "description": "Examples expand into different numbers of units."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-04.webp",
+        "title": "Those units consume different amounts of compute.",
+        "description": "Those units consume different amounts of compute."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-05.webp",
+        "title": "Gradient norms show unequal updates to shared parameters.",
+        "description": "Gradient norms show unequal updates to shared parameters."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-06.webp",
+        "title": "Report five ledgers, including independent decisions.",
+        "description": "Report five ledgers, including independent decisions."
+      }
+    ]
+  },
+  "blog-vla-feedback-attribution.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-01.webp",
+        "title": "One failed rollout does not reveal a successful alternative.",
+        "description": "One failed rollout does not reveal a successful alternative."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-02.webp",
+        "title": "Episode outcomes label the whole trajectory.",
+        "description": "Episode outcomes label the whole trajectory."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-03.webp",
+        "title": "APO compares the failed action with the human correction.",
+        "description": "APO compares the failed action with the human correction."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-04.webp",
+        "title": "Process feedback requires progress or matched states.",
+        "description": "Process feedback requires progress or matched states."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-05.webp",
+        "title": "Observed feedback limits which labels the loss can use.",
+        "description": "Observed feedback limits which labels the loss can use."
+      }
+    ]
+  },
+  "blog-rl-learning-signals.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-01.webp",
+        "title": "Four methods define their training comparisons differently.",
+        "description": "Four methods define their training comparisons differently."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-02.webp",
+        "title": "PPO compares sampled actions with value estimates.",
+        "description": "PPO compares sampled actions with value estimates."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-03.webp",
+        "title": "DPO compares a fixed chosen and rejected response.",
+        "description": "DPO compares a fixed chosen and rejected response."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-04.webp",
+        "title": "GRPO compares rewards within one sampled prompt group.",
+        "description": "GRPO compares rewards within one sampled prompt group."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-05.webp",
+        "title": "GKD matches teacher probabilities on student states.",
+        "description": "GKD matches teacher probabilities on student states."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-rl-learning-signals/frame-06.webp",
+        "title": "Compare sampled data, feedback unit, and reference signal.",
+        "description": "Compare sampled data, feedback unit, and reference signal."
+      }
+    ]
+  },
+  "blog-hermes-local-stack.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-01.webp",
+        "title": "The agent shell and model runtime are separate.",
+        "description": "The agent shell and model runtime are separate."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-02.webp",
+        "title": "Hermes sends one request across a local API.",
+        "description": "Hermes sends one request across a local API."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-03.webp",
+        "title": "llama-server loads and runs the GGUF.",
+        "description": "llama-server loads and runs the GGUF."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-04.webp",
+        "title": "llama-server returns generated tokens through the local API.",
+        "description": "llama-server returns generated tokens through the local API."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/blog-hermes-local-stack/frame-05.webp",
+        "title": "Map each failure to the agent, API, server, or model file.",
+        "description": "Map each failure to the agent, API, server, or model file."
+      }
+    ]
+  },
+  "local-gemma-long-prompt-latency.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-01.webp",
+        "title": "The benchmark changes one variable: prompt length.",
+        "description": "The benchmark changes one variable: prompt length."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-02.webp",
+        "title": "Long prompts separate Gemma 4 models in prefill.",
+        "description": "Long prompts separate Gemma 4 models in prefill."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-03.webp",
+        "title": "Runtime choice compounds long-prompt latency.",
+        "description": "Runtime choice compounds long-prompt latency."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-04.webp",
+        "title": "Decode speed moves less than first-token latency.",
+        "description": "Decode speed moves less than first-token latency."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-05.webp",
+        "title": "Memory fit does not guarantee low first-token latency.",
+        "description": "Memory fit does not guarantee low first-token latency."
+      }
+    ]
+  },
+  "local-qwen-long-prompt-latency.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-01.webp",
+        "title": "The benchmark changes one variable: prompt length.",
+        "description": "The benchmark changes one variable: prompt length."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-02.webp",
+        "title": "Long prompts expose the Qwen prefill cost.",
+        "description": "Long prompts expose the Qwen prefill cost."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-03.webp",
+        "title": "MLX and llama.cpp diverge as models grow.",
+        "description": "MLX and llama.cpp diverge as models grow."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-04.webp",
+        "title": "Decode remains steadier than first-token latency.",
+        "description": "Decode remains steadier than first-token latency."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/local-qwen-long-prompt-latency/frame-05.webp",
+        "title": "The 4B models have the lowest measured first-token latency.",
+        "description": "The 4B models have the lowest measured first-token latency."
+      }
+    ]
+  },
+  "autonomous-perception-camera-encoder.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-encoder/frame-01.webp",
+        "title": "The ego car closes on a cyclist emerging beside a parked van.",
+        "description": "The ego car closes on a cyclist emerging beside a parked van."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-encoder/frame-02.webp",
+        "title": "A coarse feature map can erase the distant cyclist.",
+        "description": "A coarse feature map can erase the distant cyclist."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-encoder/frame-03.webp",
+        "title": "Fine maps keep the cyclist; coarse maps keep road context.",
+        "description": "Fine maps keep the cyclist; coarse maps keep road context."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-encoder/frame-04.webp",
+        "title": "Image and BEV losses protect the same cyclist evidence.",
+        "description": "Image and BEV losses protect the same cyclist evidence."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-encoder/frame-05.webp",
+        "title": "Design the encoder around the smallest actor that must survive.",
+        "description": "Design the encoder around the smallest actor that must survive."
+      }
+    ]
+  },
+  "autonomous-perception-lidar-encoder.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-01.webp",
+        "title": "The ego car moves while one LiDAR sweep is being measured.",
+        "description": "The ego car moves while one LiDAR sweep is being measured."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-02.webp",
+        "title": "Compensation aligns the curb, not the independently moving cyclist.",
+        "description": "Compensation aligns the curb, not the independently moving cyclist."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-03.webp",
+        "title": "Pillars keep x-y location but collapse height inside each cell.",
+        "description": "Pillars keep x-y location but collapse height inside each cell."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-04.webp",
+        "title": "Sparse voxels retain the cyclist height structure.",
+        "description": "Sparse voxels retain the cyclist height structure."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-05.webp",
+        "title": "Alternating attention sets cross one sparse-window boundary.",
+        "description": "Alternating attention sets cross one sparse-window boundary."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-encoder/frame-06.webp",
+        "title": "Preserve the geometry that separates cyclist, van, curb, and road.",
+        "description": "Preserve the geometry that separates cyclist, van, curb, and road."
+      }
+    ]
+  },
+  "autonomous-perception-radar-encoder.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-radar-encoder/frame-01.webp",
+        "title": "Three radar sweeps show the lead car closing from 34 m to 26 m.",
+        "description": "Three radar sweeps show the lead car closing from 34 m to 26 m."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-radar-encoder/frame-02.webp",
+        "title": "Late radar fusion can confirm a camera proposal.",
+        "description": "Late radar fusion can confirm a camera proposal."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-radar-encoder/frame-03.webp",
+        "title": "Earlier radar fusion can move the proposal to the measured range.",
+        "description": "Earlier radar fusion can move the proposal to the measured range."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-radar-encoder/frame-04.webp",
+        "title": "Radar BEV retains moving and stationary returns separately.",
+        "description": "Radar BEV retains moving and stationary returns separately."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-radar-encoder/frame-05.webp",
+        "title": "Fuse radar early if its range must change object geometry.",
+        "description": "Fuse radar early if its range must change object geometry."
+      }
+    ]
+  },
+  "autonomous-perception-camera-lifting.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-01.webp",
+        "title": "The cyclist image patch could lie anywhere along one 3D ray.",
+        "description": "The cyclist image patch could lie anywhere along one 3D ray."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-02.webp",
+        "title": "LSS spreads the cyclist feature across predicted depth bins.",
+        "description": "LSS spreads the cyclist feature across predicted depth bins."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-03.webp",
+        "title": "An object query tests one candidate cyclist position.",
+        "description": "An object query tests one candidate cyclist position."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-04.webp",
+        "title": "A BEV cell samples several heights against the camera image.",
+        "description": "A BEV cell samples several heights against the camera image."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-camera-lifting/frame-05.webp",
+        "title": "Wrong depth writes cyclist evidence into the wrong BEV cell.",
+        "description": "Wrong depth writes cyclist evidence into the wrong BEV cell."
+      }
+    ]
+  },
+  "autonomous-perception-fusion-granularity.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-fusion-granularity/frame-01.webp",
+        "title": "Three sensors describe the same cyclist differently.",
+        "description": "Three sensors describe the same cyclist differently."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-fusion-granularity/frame-02.webp",
+        "title": "Point fusion keeps measurements at the cyclist location.",
+        "description": "Point fusion keeps measurements at the cyclist location."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-fusion-granularity/frame-03.webp",
+        "title": "An object query keeps one compact cyclist state.",
+        "description": "An object query keeps one compact cyclist state."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-fusion-granularity/frame-04.webp",
+        "title": "Dense BEV also keeps lane, crosswalk, and free space.",
+        "description": "Dense BEV also keeps lane, crosswalk, and free space."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-fusion-granularity/frame-05.webp",
+        "title": "Choose the fusion unit from what prediction must inspect.",
+        "description": "Choose the fusion unit from what prediction must inspect."
+      }
+    ]
+  },
+  "autonomous-perception-modality-dropout.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-modality-dropout/frame-01.webp",
+        "title": "Rain degrades the camera before the camera disappears.",
+        "description": "Rain degrades the camera before the camera disappears."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-modality-dropout/frame-02.webp",
+        "title": "Availability records which sensor streams are present.",
+        "description": "Availability records which sensor streams are present."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-modality-dropout/frame-03.webp",
+        "title": "Training across sensor sets preserves one cyclist state.",
+        "description": "Training across sensor sets preserves one cyclist state."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-modality-dropout/frame-04.webp",
+        "title": "Reliability weights reduce the rain-damaged camera input.",
+        "description": "Reliability weights reduce the rain-damaged camera input."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-modality-dropout/frame-05.webp",
+        "title": "Missing input and degraded input are different failures.",
+        "description": "Missing input and degraded input are different failures."
+      }
+    ]
+  },
+  "autonomous-perception-temporal-memory.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-01.webp",
+        "title": "The cyclist is observed, occluded by the van, then observed again.",
+        "description": "The cyclist is observed, occluded by the van, then observed again."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-02.webp",
+        "title": "A warped field carries the cyclist region after ego motion.",
+        "description": "A warped field carries the cyclist region after ego motion."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-03.webp",
+        "title": "A recurrent track predicts the hidden cyclist and grows uncertainty.",
+        "description": "A recurrent track predicts the hidden cyclist and grows uncertainty."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-04.webp",
+        "title": "A bounded queue retains the hidden cyclist over weaker clutter.",
+        "description": "A bounded queue retains the hidden cyclist over weaker clutter."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-05.webp",
+        "title": "Fresh pixels correct the cyclist track when it reappears.",
+        "description": "Fresh pixels correct the cyclist track when it reappears."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-temporal-memory/frame-06.webp",
+        "title": "Observe, predict through occlusion, then correct with evidence.",
+        "description": "Observe, predict through occlusion, then correct with evidence."
+      }
+    ]
+  },
+  "autonomous-perception-lidar-training-contracts.gif": {
+    "frames": [
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-training-contracts/frame-01.webp",
+        "title": "One cyclist scan can give LiDAR three different roles.",
+        "description": "One cyclist scan can give LiDAR three different roles."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-training-contracts/frame-02.webp",
+        "title": "LiDAR can label cyclist depth during camera training only.",
+        "description": "LiDAR can label cyclist depth during camera training only."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-training-contracts/frame-03.webp",
+        "title": "Live LiDAR input creates a deployed sensor dependency.",
+        "description": "Live LiDAR input creates a deployed sensor dependency."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-training-contracts/frame-04.webp",
+        "title": "A LiDAR teacher can train a camera-only deployed student.",
+        "description": "A LiDAR teacher can train a camera-only deployed student."
+      },
+      {
+        "src": "/assets/images/blog-explainer-frames/autonomous-perception-lidar-training-contracts/frame-05.webp",
+        "title": "Locate the LiDAR tensor in dataset, deployed graph, or teacher.",
+        "description": "Locate the LiDAR tensor in dataset, deployed graph, or teacher."
+      }
+    ]
+  }
+}
