@@ -87,6 +87,16 @@ function getNumpyReferenceCode(problem: CodePracticeProblem) {
   return alternative ? `${alternative.code}\n\n${alternative.exampleCode}` : '';
 }
 
+function renderInlineCode(text: string) {
+  return text.split(/(`[^`]+`)/g).map((part, index) =>
+    part.startsWith('`') && part.endsWith('`') ? (
+      <code key={`${part}-${index}`}>{part.slice(1, -1)}</code>
+    ) : (
+      part
+    ),
+  );
+}
+
 export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
   const isBrowserRunnable = (problem.environment ?? 'browser') === 'browser';
   const containerRef = useRef<HTMLElement | null>(null);
@@ -528,19 +538,6 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
 
             <div className="code-practice-lab__explanation-scroll">
               <article className="code-practice-lab__explanation-walkthrough">
-                {problem.numpyAlternative && (
-                  <p className="code-practice-lab__explanation-lead">
-                    Whether the input is a <code>torch.Tensor</code> or an{' '}
-                    <code>np.ndarray</code>, the math and shapes are the same.
-                  </p>
-                )}
-
-                <div className="code-practice-lab__explanation-copy">
-                  {problem.solutionNotes.map((note) => (
-                    <p key={note}>{note}</p>
-                  ))}
-                </div>
-
                 {problem.visual && (
                   <figure className="code-practice-lab__explanation-visual">
                     <img src={problem.visual.src} alt={problem.visual.alt} />
@@ -548,17 +545,17 @@ export default function CodePracticeLab({ problem }: CodePracticeLabProps) {
                   </figure>
                 )}
 
-                {problem.solutionDiagram && (
-                  <pre className="code-practice-lab__solution-diagram">
-                    <code>{problem.solutionDiagram}</code>
-                  </pre>
-                )}
+                <div className="code-practice-lab__explanation-copy">
+                  {problem.solutionNotes.map((note) => (
+                    <p key={note}>{renderInlineCode(note)}</p>
+                  ))}
+                </div>
 
                 {problem.reasoning && problem.reasoning.length > 0 && (
                   <div className="code-practice-lab__explanation-reasoning">
                     {problem.reasoning.map((point) => (
                       <p key={point.axis}>
-                        <strong>{point.axis}:</strong> {point.detail}
+                        {point.detail}
                       </p>
                     ))}
                   </div>

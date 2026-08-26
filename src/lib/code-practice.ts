@@ -3,6 +3,7 @@ import {
   ATTENTION_CODE_PRACTICE_PROBLEMS,
   ATTENTION_PROBLEM_ENRICHMENTS,
 } from './code-practice-attention';
+import codePracticeVisualSpecs from './code-practice-visuals.json';
 
 export interface CodePracticeExample {
   label: string;
@@ -75,6 +76,17 @@ export const CODE_PRACTICE_SECTION_SUMMARY =
 
 const PYTORCH_AND_NUMPY_PACKAGES = ['torch', 'numpy'] as const;
 
+const CODE_PRACTICE_VISUALS: Readonly<Record<string, CodePracticeVisual>> = Object.fromEntries(
+  codePracticeVisualSpecs.map((spec) => [
+    spec.id,
+    {
+      src: `/assets/images/code-glance-${spec.id}.svg`,
+      alt: `${spec.headline}.`,
+      caption: spec.caption,
+    },
+  ]),
+);
+
 export function getCodePracticeProblemPath(problem: Pick<CodePracticeProblem, 'id'> | string) {
   const problemId = typeof problem === 'string' ? problem : problem.id;
   return `/code/${problemId}.html`;
@@ -96,12 +108,6 @@ const RAW_CODE_PRACTICE_PROBLEMS = [
       'Write `softmax_cross_entropy(logits, labels)` so it returns the mean cross-entropy loss across a batch.',
       'Treat this like an interview question: keep the implementation concise, validate the inputs, and avoid numerical overflow when computing the softmax terms.',
     ],
-    visual: {
-      src: '/assets/images/code-tensor-ops-broadcasting.gif',
-      alt: 'Animated tensor diagrams showing broadcasting, expand, torch.cat, and torch.stack.',
-      caption:
-        'Tensor shape intuition: broadcasting aligns singleton axes, expand exposes a larger view, cat joins an existing axis, and stack creates a new axis. The same shape bookkeeping appears throughout the first PyTorch problems.',
-    },
     signature: `def softmax_cross_entropy(
     logits: torch.Tensor,
     labels: torch.Tensor,
@@ -1373,12 +1379,6 @@ print(sinusoidal_positional_encoding(sample_length, sample_dim))`,
       'Write `unpatchify(patches, image_shape, patch_size)` so it reconstructs and returns a batch of images from flattened patch tokens.',
       'Assume the patches are in row-major order across the image grid. Validate the inputs, then reshape the patch tensor back into `(B, C, H, W)`.',
     ],
-    visual: {
-      src: '/assets/images/code-patchify-layout.gif',
-      alt: 'Animated 4 by 4 image diagram showing row-major patch tokens and the inverse reshape and permutation.',
-      caption:
-        'Read the layout from left to right: patch tokens are ordered by grid row, then grid column; each token contains all channels and its local P×P pixels. Unpatchify reverses those axis moves.',
-    },
     signature: `def unpatchify(
     patches: torch.Tensor,
     image_shape: tuple[int, int, int],
@@ -1510,12 +1510,6 @@ print(unpatchify(sample_patches, sample_image_shape, patch_size=2))`,
       'Write `patchify(images, patch_size)` so it converts a batch of images into flattened patch tokens.',
       'Assume patches are ordered row-major over the image grid. Validate the inputs, then return an array of shape `(B, N, C * P * P)` where `N = (H // P) * (W // P)`.',
     ],
-    visual: {
-      src: '/assets/images/code-patchify-layout.gif',
-      alt: 'Animated 4 by 4 image diagram showing a row-major patch grid flattened into four patch tokens.',
-      caption:
-        'Patchify first exposes `(grid_h, P, grid_w, P)`, then permutes to put the grid axes first. Only after that permutation is each P×P patch flattened into one token.',
-    },
     signature: `def patchify(images: torch.Tensor, patch_size: int) -> torch.Tensor:
     ...`,
     requirements: [
@@ -2921,12 +2915,6 @@ print(huber_loss(prediction, target).item())`,
     title: 'Binary cross-entropy from probabilities',
     difficulty: 'Easy',
     summary: 'Compute binary cross-entropy from probabilities while keeping logarithms finite.',
-    visual: {
-      src: '/assets/images/code-bce-probabilities-vs-logits.gif',
-      alt: 'Diagram comparing binary cross-entropy from probabilities with the stable logits formulation.',
-      caption:
-        'First identify the input: probabilities use the two-log BCE formula with endpoint clipping, while raw logits use the stable softplus form without an explicit sigmoid-to-log chain.',
-    },
     prompt: [
       'Write `binary_cross_entropy(probability, target)` for elementwise binary targets in `{0, 1}`.',
       '`probability` already contains probabilities, so do not apply sigmoid inside this function. Validate the range, clamp only to protect the logarithms at 0 and 1, then return the mean loss.',
@@ -4912,6 +4900,7 @@ export const codePracticeProblems: readonly CodePracticeProblem[] = ALL_CODE_PRA
       difficulty: PROGRESSIVE_DIFFICULTY[problem.id] ?? problem.difficulty,
       walkthroughCode: problem.walkthroughCode ?? problem.solutionCode,
       solutionCode: COMPACT_REFERENCE_SOLUTIONS[problem.id] ?? problem.solutionCode,
+      visual: CODE_PRACTICE_VISUALS[problem.id] ?? problem.visual,
       numpyAlternative,
       tags: numpyAlternative && !tags.includes('NumPy') ? [...tags, 'NumPy'] : tags,
     };
