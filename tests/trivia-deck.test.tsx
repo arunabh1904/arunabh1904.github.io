@@ -232,7 +232,7 @@ describe('automatic trivia grading', () => {
     );
     expect(card).toBeDefined();
 
-    const grade = gradeTriviaAnswer(card!, 'contigous');
+    const grade = gradeTriviaAnswer(card!, 'noncontigous');
 
     expect(grade.status).toBe('close');
   });
