@@ -114,6 +114,12 @@ class _CompatTensor(_np.ndarray):
         self[...] = _np.asarray(self) + value
         return self
 
+    def index_add_(self, dim, index, source):
+        selector = [slice(None)] * self.ndim
+        selector[int(dim)] = _np.asarray(index, dtype=_np.int64)
+        _np.add.at(self, tuple(selector), _np.asarray(source))
+        return self
+
     def sub_(self, value):
         self[...] = _np.asarray(self) - value
         return self
@@ -322,10 +328,10 @@ torch.rand = lambda *size, dtype=_np.float32, **_kwargs: _tensor(_np.random.rand
 torch.randn = lambda *size, dtype=_np.float32, **_kwargs: _tensor(_np.random.randn(*_shape_args(size)).astype(dtype), copy=False)
 torch.randint = _randint
 torch.randperm = _randperm
-torch.zeros_like = lambda value, **_kwargs: _tensor(_np.zeros_like(value), copy=False)
-torch.ones_like = lambda value, **_kwargs: _tensor(_np.ones_like(value), copy=False)
-torch.empty_like = lambda value, **_kwargs: _tensor(_np.empty_like(value), copy=False)
-torch.full_like = lambda value, fill_value, **_kwargs: _tensor(_np.full_like(value, fill_value), copy=False)
+torch.zeros_like = lambda value, dtype=None, **_kwargs: _tensor(_np.zeros_like(value, dtype=dtype), copy=False)
+torch.ones_like = lambda value, dtype=None, **_kwargs: _tensor(_np.ones_like(value, dtype=dtype), copy=False)
+torch.empty_like = lambda value, dtype=None, **_kwargs: _tensor(_np.empty_like(value, dtype=dtype), copy=False)
+torch.full_like = lambda value, fill_value, dtype=None, **_kwargs: _tensor(_np.full_like(value, fill_value, dtype=dtype), copy=False)
 torch.arange = _arange
 torch.tril = lambda value, diagonal=0: _wrap(_np.tril(value, diagonal=diagonal))
 torch.eye = lambda n, m=None, dtype=_np.float32, **_kwargs: _tensor(_np.eye(n, m if m is not None else n, dtype=dtype), copy=False)
@@ -338,11 +344,13 @@ torch.atan2 = _np.arctan2
 torch.sqrt = _np.sqrt
 torch.pow = _np.power
 torch.abs = _np.abs
+torch.sign = _np.sign
 torch.clamp = lambda value, min=None, max=None: _np.minimum(_np.maximum(value, -_np.inf if min is None else min), _np.inf if max is None else max)
 torch.maximum = _np.maximum
 torch.minimum = _np.minimum
 torch.sum = _sum
 torch.mean = _mean
+torch.prod = lambda value, dim=None, keepdim=False: _np.prod(value, axis=_axis(dim), keepdims=keepdim)
 torch.cumsum = lambda value, dim: _wrap(_np.cumsum(value, axis=dim))
 torch.amax = _amax
 torch.amin = _amin
@@ -368,11 +376,21 @@ torch.concat = torch.cat
 torch.stack = lambda values, dim=0: _wrap(_np.stack(values, axis=dim))
 torch.where = _np.where
 torch.broadcast_to = _np.broadcast_to
+torch.flip = lambda value, dims: _wrap(_np.flip(value, axis=tuple(dims)))
 torch.isfinite = _np.isfinite
 torch.is_floating_point = lambda value: _np.issubdtype(_np.asarray(value).dtype, _np.floating)
 torch.all = lambda value, dim=None, keepdim=False: _np.all(value, axis=_axis(dim), keepdims=keepdim)
 torch.any = lambda value, dim=None, keepdim=False: _np.any(value, axis=_axis(dim), keepdims=keepdim)
-torch.unique = lambda value, sorted=True, **_kwargs: _np.unique(value)
+def _unique(value, sorted=True, return_inverse=False, return_counts=False, **_kwargs):
+    result = _np.unique(value, return_inverse=return_inverse, return_counts=return_counts)
+    if isinstance(result, tuple):
+        return tuple(_wrap(item) for item in result)
+    return _wrap(result)
+
+torch.unique = _unique
+torch.bincount = lambda value, weights=None, minlength=0: _wrap(_np.bincount(
+    _np.asarray(value, dtype=_np.int64), weights=weights, minlength=minlength,
+))
 torch.argsort = lambda value, dim=-1, descending=False, stable=False: _np.argsort(-value if descending else value, axis=dim, kind='stable' if stable else None)
 torch.topk = _topk
 torch.sort = _sort
@@ -1066,6 +1084,9 @@ torch.utils = _utils
 
 _linalg = _types.ModuleType('torch.linalg')
 _linalg.norm = _norm
+_linalg.lstsq = lambda left, right, **_kwargs: _types.SimpleNamespace(
+    solution=_wrap(_np.linalg.lstsq(left, right, rcond=None)[0]),
+)
 torch.linalg = _linalg
 
 _sys.modules['torch'] = torch
