@@ -320,19 +320,22 @@ describe('code-practice primitive-first solutions', () => {
     );
   });
 
-  it('starts plain-function interviews blank while preserving class scaffolds', () => {
+  it('starts every interview from a blank editor', () => {
     for (const problem of codePracticeProblems) {
-      const isPlainFunction = problem.signature.trimStart().startsWith('def ');
-      expect(problem.editorStart, problem.id).toBe(isPlainFunction ? 'blank' : 'scaffold');
+      expect(problem.editorStart, problem.id).toBe('blank');
     }
 
     expect(
       codePracticeProblems.find((problem) => problem.id === 'incremental-kv-cache')?.editorStart,
-    ).toBe('scaffold');
+    ).toBe('blank');
+    expect(
+      codePracticeProblems.find((problem) => problem.id === 'scaled-dot-product-self-attention')
+        ?.editorStart,
+    ).toBe('blank');
     expect(
       codePracticeProblems.find((problem) => problem.id === 'simple-n-gram-language-model')
         ?.editorStart,
-    ).toBe('scaffold');
+    ).toBe('blank');
   });
 
   it('does not bypass a lesson with a matching PyTorch convenience helper', () => {
