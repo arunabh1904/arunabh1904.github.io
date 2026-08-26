@@ -8,7 +8,9 @@ const sharp = createRequire(import.meta.url)('sharp');
 export const WIDTH = 960;
 export const HEIGHT = 540;
 export const FPS = 8;
-export const STEP_SECONDS = 4.6;
+export const DEFAULT_STEP_SECONDS = 8;
+export const DEFAULT_BUILD_SECONDS = 3.2;
+export const DEFAULT_TRANSITION_SECONDS = 0.65;
 
 export const GENERAL_BLOG_GIFS = [
   'blog-attention-memory.gif',
@@ -106,8 +108,8 @@ function labelPair(left, right, y, opacity, color = C.teal) {
   return `${text(left, 160, y, 16, color, 'start', 650, opacity)}${text(right, 352, y, 16, C.ink, 'start', 520, opacity)}${line(112, y + 17, 848, y + 17, C.faint, 1, opacity)}`;
 }
 
-function sceneAlpha(local) {
-  return ease(local / 0.09) * ease((1 - local) / 0.09);
+function sceneAlpha(elapsed, duration, transitionSeconds) {
+  return ease(elapsed / transitionSeconds) * ease((duration - elapsed) / transitionSeconds);
 }
 
 function reveal(local, start = 0.12, end = 0.62) {
@@ -566,16 +568,28 @@ function drawLidarContract(mode, local, opacity) {
 }
 
 function buildStory(titleSteps, draw) {
+  const durations = titleSteps.map((step) => step.seconds ?? DEFAULT_STEP_SECONDS);
+  const boundaries = durations.reduce((ends, duration) => {
+    ends.push((ends.at(-1) ?? 0) + duration);
+    return ends;
+  }, []);
+  const totalSeconds = boundaries.at(-1);
+
   return {
     steps: titleSteps,
     frame(frame) {
-      const totalFrames = Math.round(titleSteps.length * STEP_SECONDS * FPS);
-      const t = Math.min(frame / FPS, titleSteps.length * STEP_SECONDS - 1 / FPS);
-      const index = Math.min(titleSteps.length - 1, Math.floor(t / STEP_SECONDS));
-      const local = (t - index * STEP_SECONDS) / STEP_SECONDS;
-      const opacity = sceneAlpha(local);
+      const totalFrames = Math.round(totalSeconds * FPS);
+      const t = Math.min(frame / FPS, totalSeconds - 1 / FPS);
+      const index = Math.max(0, boundaries.findIndex((end) => t < end));
       const step = titleSteps[index];
-      const body = `${top(index + 1, titleSteps.length, step.title, opacity)}${draw(step.mode, local, opacity)}`;
+      const start = index === 0 ? 0 : boundaries[index - 1];
+      const duration = durations[index];
+      const elapsed = t - start;
+      const transitionSeconds = step.transitionSeconds ?? DEFAULT_TRANSITION_SECONDS;
+      const buildSeconds = Math.min(step.buildSeconds ?? DEFAULT_BUILD_SECONDS, duration - transitionSeconds);
+      const drawProgress = clamp(elapsed / buildSeconds);
+      const opacity = sceneAlpha(elapsed, duration, transitionSeconds);
+      const body = `${top(index + 1, titleSteps.length, step.title, opacity)}${draw(step.mode, drawProgress, opacity)}`;
       return {
         svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" role="img" aria-label="${esc(step.description ?? step.title)}"><rect width="${WIDTH}" height="${HEIGHT}" fill="${C.bg}"/>${body}</svg>`,
         totalFrames,
@@ -584,123 +598,123 @@ function buildStory(titleSteps, draw) {
   };
 }
 
-const stories = {
+export const CALM_BLOG_STORIES = {
   'blog-attention-memory.gif': buildStory([
-    { title: 'One sequence. Four ways to remember it.', mode: 'intro' },
-    { title: 'MHA stores a full token history for every head.', mode: 'mha' },
-    { title: 'GQA shares fewer full histories across query heads.', mode: 'gqa' },
-    { title: 'MLA compresses each token before caching it.', mode: 'mla' },
-    { title: 'DeltaNet folds every write into one fixed-size state.', mode: 'delta' },
-    { title: 'The memory carrier predicts the trade-off.', mode: 'summary' },
+    { title: 'One sequence. Four ways to remember it.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'MHA stores a full token history for every head.', mode: 'mha', seconds: 9 },
+    { title: 'GQA shares fewer full histories across query heads.', mode: 'gqa', seconds: 9 },
+    { title: 'MLA compresses each token before caching it.', mode: 'mla', seconds: 9 },
+    { title: 'DeltaNet folds every write into one fixed-size state.', mode: 'delta', seconds: 8.5 },
+    { title: 'The memory carrier predicts the trade-off.', mode: 'summary', seconds: 12 },
   ], drawAttention),
   'blog-vlm-evidence-contract.gif': buildStory([
-    { title: 'The same scene can demand four different outputs.', mode: 'intro' },
-    { title: 'CLIP compresses the scene into semantic identity.', mode: 'clip' },
-    { title: 'LLaVA keeps evidence that supports generated text.', mode: 'llava' },
-    { title: 'Molmo binds language to an inspectable point.', mode: 'molmo' },
-    { title: 'π0 carries the scene forward into robot action.', mode: 'pi0' },
-    { title: 'The output contract determines what vision preserves.', mode: 'summary' },
+    { title: 'The same scene can demand four different outputs.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'CLIP compresses the scene into semantic identity.', mode: 'clip', seconds: 8 },
+    { title: 'LLaVA keeps evidence that supports generated text.', mode: 'llava', seconds: 8.5 },
+    { title: 'Molmo binds language to an inspectable point.', mode: 'molmo', seconds: 9 },
+    { title: 'π0 carries the scene forward into robot action.', mode: 'pi0', seconds: 9 },
+    { title: 'The output contract determines what vision preserves.', mode: 'summary', seconds: 11.5 },
   ], drawVlm),
   'blog-multimodal-gradient-budget.gif': buildStory([
-    { title: 'Equal mixture percentages can hide unequal training.', mode: 'intro' },
-    { title: 'Start with the sampled-example ledger.', mode: 'examples' },
-    { title: 'Examples expand into different numbers of units.', mode: 'units' },
-    { title: 'Those units consume different amounts of compute.', mode: 'flops' },
-    { title: 'Shared parameters receive unequal update pressure.', mode: 'updates' },
-    { title: 'A multimodal mixture needs four ledgers.', mode: 'ledgers' },
+    { title: 'Equal mixture percentages can hide unequal training.', mode: 'intro', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Start with the sampled-example ledger.', mode: 'examples', seconds: 8 },
+    { title: 'Examples expand into different numbers of units.', mode: 'units', seconds: 8.5 },
+    { title: 'Those units consume different amounts of compute.', mode: 'flops', seconds: 9 },
+    { title: 'Shared parameters receive unequal update pressure.', mode: 'updates', seconds: 9 },
+    { title: 'A multimodal mixture needs four ledgers.', mode: 'ledgers', seconds: 11.5 },
   ], drawBudget),
   'blog-vla-feedback-attribution.gif': buildStory([
-    { title: 'One robot failure exposes only part of the cause.', mode: 'failure' },
-    { title: 'Episode outcomes label the whole trajectory.', mode: 'episode' },
-    { title: 'APO localizes the intervention and correction.', mode: 'apo' },
-    { title: 'Process feedback needs comparable states.', mode: 'process' },
-    { title: 'Feedback can claim only what the rollout reveals.', mode: 'summary' },
+    { title: 'One robot failure exposes only part of the cause.', mode: 'failure', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Episode outcomes label the whole trajectory.', mode: 'episode', seconds: 8 },
+    { title: 'APO localizes the intervention and correction.', mode: 'apo', seconds: 9 },
+    { title: 'Process feedback needs comparable states.', mode: 'process', seconds: 9 },
+    { title: 'Feedback can claim only what the rollout reveals.', mode: 'summary', seconds: 11 },
   ], drawFeedback),
   'blog-rl-learning-signals.gif': buildStory([
-    { title: 'One gradient can be built from four contrasts.', mode: 'intro' },
-    { title: 'PPO learns the baseline.', mode: 'ppo' },
-    { title: 'DPO stores the contrast.', mode: 'dpo' },
-    { title: 'GRPO samples the contrast.', mode: 'grpo' },
-    { title: 'GKD asks a teacher on student states.', mode: 'gkd' },
-    { title: 'The acronym matters less than the evidence path.', mode: 'summary' },
+    { title: 'One gradient can be built from four contrasts.', mode: 'intro', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'PPO learns the baseline.', mode: 'ppo', seconds: 8 },
+    { title: 'DPO stores the contrast.', mode: 'dpo', seconds: 8 },
+    { title: 'GRPO samples the contrast.', mode: 'grpo', seconds: 9 },
+    { title: 'GKD asks a teacher on student states.', mode: 'gkd', seconds: 9 },
+    { title: 'The acronym matters less than the evidence path.', mode: 'summary', seconds: 11.5 },
   ], drawLearning),
   'blog-hermes-local-stack.gif': buildStory([
-    { title: 'The agent shell and model runtime are separate.', mode: 'separate' },
-    { title: 'Hermes sends one request across a local API.', mode: 'request' },
-    { title: 'llama-server loads and runs the GGUF.', mode: 'weights' },
-    { title: 'Generated tokens return through the same boundary.', mode: 'return' },
-    { title: 'The boundary tells you where a failure belongs.', mode: 'summary' },
+    { title: 'The agent shell and model runtime are separate.', mode: 'separate', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Hermes sends one request across a local API.', mode: 'request', seconds: 8 },
+    { title: 'llama-server loads and runs the GGUF.', mode: 'weights', seconds: 8.5 },
+    { title: 'Generated tokens return through the same boundary.', mode: 'return', seconds: 8 },
+    { title: 'The boundary tells you where a failure belongs.', mode: 'summary', seconds: 10.5 },
   ], drawHermes),
   'local-gemma-long-prompt-latency.gif': buildStory([
-    { title: 'The benchmark changes one variable: prompt length.', mode: 'design' },
-    { title: 'Long prompts separate Gemma 4 models in prefill.', mode: 'long' },
-    { title: 'Runtime choice compounds long-prompt latency.', mode: 'runtime' },
-    { title: 'Decode speed moves less than first-token latency.', mode: 'decode' },
-    { title: 'Fit and interactivity are different constraints.', mode: 'decision' },
+    { title: 'The benchmark changes one variable: prompt length.', mode: 'design', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Long prompts separate Gemma 4 models in prefill.', mode: 'long', seconds: 9.5 },
+    { title: 'Runtime choice compounds long-prompt latency.', mode: 'runtime', seconds: 9.5 },
+    { title: 'Decode speed moves less than first-token latency.', mode: 'decode', seconds: 9 },
+    { title: 'Fit and interactivity are different constraints.', mode: 'decision', seconds: 11 },
   ], (mode, local, opacity) => drawBenchmark('gemma', mode, local, opacity)),
   'local-qwen-long-prompt-latency.gif': buildStory([
-    { title: 'The benchmark changes one variable: prompt length.', mode: 'design' },
-    { title: 'Long prompts expose the Qwen prefill cost.', mode: 'long' },
-    { title: 'MLX and llama.cpp diverge as models grow.', mode: 'runtime' },
-    { title: 'Decode remains steadier than first-token latency.', mode: 'decode' },
-    { title: 'The 4B models remain the interactive choice.', mode: 'decision' },
+    { title: 'The benchmark changes one variable: prompt length.', mode: 'design', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Long prompts expose the Qwen prefill cost.', mode: 'long', seconds: 9.5 },
+    { title: 'MLX and llama.cpp diverge as models grow.', mode: 'runtime', seconds: 9.5 },
+    { title: 'Decode remains steadier than first-token latency.', mode: 'decode', seconds: 9 },
+    { title: 'The 4B models remain the interactive choice.', mode: 'decision', seconds: 11 },
   ], (mode, local, opacity) => drawBenchmark('qwen', mode, local, opacity)),
   'autonomous-perception-camera-encoder.gif': buildStory([
-    { title: 'The camera encoder decides which evidence survives.', mode: 'input' },
-    { title: 'One coarse map can erase small actors.', mode: 'coarse' },
-    { title: 'A feature pyramid carries detail and context.', mode: 'pyramid' },
-    { title: 'Perspective losses protect later 3D evidence.', mode: 'supervision' },
-    { title: 'Encoder cost buys a specific kind of evidence.', mode: 'summary' },
+    { title: 'The camera encoder decides which evidence survives.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
+    { title: 'One coarse map can erase small actors.', mode: 'coarse', seconds: 8 },
+    { title: 'A feature pyramid carries detail and context.', mode: 'pyramid', seconds: 8.5 },
+    { title: 'Perspective losses protect later 3D evidence.', mode: 'supervision', seconds: 9 },
+    { title: 'Encoder cost buys a specific kind of evidence.', mode: 'summary', seconds: 11 },
   ], drawCameraEncoder),
   'autonomous-perception-lidar-encoder.gif': buildStory([
-    { title: 'LiDAR begins as sparse points in continuous 3D.', mode: 'input' },
-    { title: 'PointPillars collapses height early.', mode: 'pillars' },
-    { title: 'SECOND keeps occupied voxels sparse first.', mode: 'voxels' },
-    { title: 'DSVT attends inside sparse windows.', mode: 'dsvt' },
-    { title: 'VoxelNeXt keeps the detection head sparse.', mode: 'voxelnext' },
-    { title: 'The key choice is where sparsity disappears.', mode: 'summary' },
+    { title: 'LiDAR begins as sparse points in continuous 3D.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
+    { title: 'PointPillars collapses height early.', mode: 'pillars', seconds: 8 },
+    { title: 'SECOND keeps occupied voxels sparse first.', mode: 'voxels', seconds: 8.5 },
+    { title: 'DSVT attends inside sparse windows.', mode: 'dsvt', seconds: 8.5 },
+    { title: 'VoxelNeXt keeps the detection head sparse.', mode: 'voxelnext', seconds: 8.5 },
+    { title: 'The key choice is where sparsity disappears.', mode: 'summary', seconds: 11.5 },
   ], drawLidar),
   'autonomous-perception-radar-encoder.gif': buildStory([
-    { title: 'Radar supplies sparse range and velocity evidence.', mode: 'input' },
-    { title: 'Proposal fusion confirms camera candidates.', mode: 'proposal' },
-    { title: 'Depth fusion sharpens geometric placement.', mode: 'depth' },
-    { title: 'An independent BEV preserves radar-native evidence.', mode: 'bev' },
-    { title: 'Fusion stage decides what radar can correct.', mode: 'summary' },
+    { title: 'Radar supplies sparse range and velocity evidence.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Proposal fusion confirms camera candidates.', mode: 'proposal', seconds: 8 },
+    { title: 'Depth fusion sharpens geometric placement.', mode: 'depth', seconds: 8.5 },
+    { title: 'An independent BEV preserves radar-native evidence.', mode: 'bev', seconds: 9 },
+    { title: 'Fusion stage decides what radar can correct.', mode: 'summary', seconds: 11 },
   ], drawRadar),
   'autonomous-perception-camera-lifting.gif': buildStory([
-    { title: 'A camera pixel defines a ray, not a 3D point.', mode: 'input' },
-    { title: 'LSS distributes evidence along depth bins.', mode: 'lss' },
-    { title: 'DETR3D projects an object reference point.', mode: 'detr3d' },
-    { title: 'BEVFormer samples vertical references from BEV.', mode: 'bevformer' },
-    { title: 'The query defines which geometry is reconstructed.', mode: 'summary' },
+    { title: 'A camera pixel defines a ray, not a 3D point.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
+    { title: 'LSS distributes evidence along depth bins.', mode: 'lss', seconds: 8.5 },
+    { title: 'DETR3D projects an object reference point.', mode: 'detr3d', seconds: 8.5 },
+    { title: 'BEVFormer samples vertical references from BEV.', mode: 'bevformer', seconds: 9 },
+    { title: 'The query defines which geometry is reconstructed.', mode: 'summary', seconds: 11 },
   ], drawLifting),
   'autonomous-perception-fusion-granularity.gif': buildStory([
-    { title: 'Hold the actor fixed. Change the fusion unit.', mode: 'input' },
-    { title: 'Point fusion aligns evidence at 3D samples.', mode: 'point' },
-    { title: 'Object queries gather candidate-centered evidence.', mode: 'query' },
-    { title: 'Dense BEV fusion keeps a shared spatial field.', mode: 'bev' },
-    { title: 'Fusion granularity controls visible disagreement.', mode: 'summary' },
+    { title: 'Hold the actor fixed. Change the fusion unit.', mode: 'input', seconds: 6.5, buildSeconds: 2.4 },
+    { title: 'Point fusion aligns evidence at 3D samples.', mode: 'point', seconds: 8 },
+    { title: 'Object queries gather candidate-centered evidence.', mode: 'query', seconds: 8.5 },
+    { title: 'Dense BEV fusion keeps a shared spatial field.', mode: 'bev', seconds: 8.5 },
+    { title: 'Fusion granularity controls visible disagreement.', mode: 'summary', seconds: 11 },
   ], drawFusion),
   'autonomous-perception-modality-dropout.gif': buildStory([
-    { title: 'A missing sensor and a bad sensor are different.', mode: 'failure' },
-    { title: 'UniBEV trains with explicit modality dropout.', mode: 'unibev' },
-    { title: 'MetaBEV learns one state across sensor sets.', mode: 'metabev' },
-    { title: 'Grace-BEV gates present sensors by reliability.', mode: 'grace' },
-    { title: 'Availability and trust need separate controls.', mode: 'summary' },
+    { title: 'A missing sensor and a bad sensor are different.', mode: 'failure', seconds: 7, buildSeconds: 2.6 },
+    { title: 'UniBEV trains with explicit modality dropout.', mode: 'unibev', seconds: 8 },
+    { title: 'MetaBEV learns one state across sensor sets.', mode: 'metabev', seconds: 8.5 },
+    { title: 'Grace-BEV gates present sensors by reliability.', mode: 'grace', seconds: 9 },
+    { title: 'Availability and trust need separate controls.', mode: 'summary', seconds: 11 },
   ], drawDropout),
   'autonomous-perception-temporal-memory.gif': buildStory([
-    { title: 'Temporal state must survive motion and occlusion.', mode: 'input' },
-    { title: 'BEVFormer warps a dense field into the new frame.', mode: 'warp' },
-    { title: 'StreamPETR carries recurrent actor instances.', mode: 'instances' },
-    { title: 'Sparse4D keeps a bounded foreground-query queue.', mode: 'queue' },
-    { title: 'The memory unit determines what can persist.', mode: 'summary' },
+    { title: 'Temporal state must survive motion and occlusion.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
+    { title: 'BEVFormer warps a dense field into the new frame.', mode: 'warp', seconds: 9 },
+    { title: 'StreamPETR carries recurrent actor instances.', mode: 'instances', seconds: 9 },
+    { title: 'Sparse4D keeps a bounded foreground-query queue.', mode: 'queue', seconds: 9 },
+    { title: 'The memory unit determines what can persist.', mode: 'summary', seconds: 11 },
   ], drawTemporal),
   'autonomous-perception-lidar-training-contracts.gif': buildStory([
-    { title: 'One LiDAR scan can play three training roles.', mode: 'input' },
-    { title: 'Depth labels can disappear after training.', mode: 'labels' },
-    { title: 'Runtime sparse depth becomes a sensor dependency.', mode: 'runtime' },
-    { title: 'A LiDAR-camera teacher can be distilled away.', mode: 'teacher' },
-    { title: 'Training input is not always deployment input.', mode: 'summary' },
+    { title: 'One LiDAR scan can play three training roles.', mode: 'input', seconds: 7, buildSeconds: 2.6 },
+    { title: 'Depth labels can disappear after training.', mode: 'labels', seconds: 8 },
+    { title: 'Runtime sparse depth becomes a sensor dependency.', mode: 'runtime', seconds: 9 },
+    { title: 'A LiDAR-camera teacher can be distilled away.', mode: 'teacher', seconds: 9 },
+    { title: 'Training input is not always deployment input.', mode: 'summary', seconds: 11 },
   ], drawLidarContract),
 };
 
@@ -712,7 +726,7 @@ export async function renderCalmBlogGifs(names, options = {}) {
   mkdirSync(scratchRoot, { recursive: true });
 
   for (const name of names) {
-    const story = stories[name];
+    const story = CALM_BLOG_STORIES[name];
     if (!story) throw new Error(`No calm Blog GIF storyboard for ${name}`);
     const { totalFrames } = story.frame(0);
     const frameDir = join(scratchRoot, name.replace(/\.gif$/, ''));
