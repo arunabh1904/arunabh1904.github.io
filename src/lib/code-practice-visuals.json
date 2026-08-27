@@ -430,14 +430,14 @@
   },
   {
     "id": "unet-encoder-decoder",
-    "headline": "Downsample for context; skip features restore detail",
+    "headline": "Downsample, save skips, then restore the image grid",
     "kind": "network",
     "steps": [
-      ["ENCODER", "conv blocks + pooling", "save each scale"],
-      ["DECODER", "upsample + concatenate skip", "match spatial shapes"],
-      ["RESULT", "dense output at input size", "one prediction per pixel"]
+      ["ENCODER", "DoubleConv + pool x4", "save x1 through x4"],
+      ["DECODER", "upsample + concatenate", "match each skip"],
+      ["RESULT", "1x1 head per pixel", "(B, classes, H, W)"]
     ],
-    "caption": "Each decoder stage combines coarse context with the encoder feature at the same scale."
+    "caption": "U-Net keeps encoder features as skips so the decoder can recover per-pixel detail after four downsampling steps."
   },
   {
     "id": "centernet-style-detector",
