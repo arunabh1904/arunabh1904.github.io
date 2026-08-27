@@ -122,9 +122,24 @@ FORBIDDEN_REFERENCE_FIELDS = {
 # reviewed human voice without invalidating untouched legacy MP3s.
 HUMAN_NARRATION_POSTS = frozenset(
     {
+        "attention-mechanisms-demystified",
         "building-local-blog-audio-with-qwen3-tts",
+        "code-is-cheap-understanding-isnt",
+        "from-ppo-to-grpo-rl-for-reasoning-and-vlas",
         "from-seeing-to-doing-the-evolution-of-vision-language-models",
+        "how-to-read-scaling-laws-for-language-models",
         "how-unified-sensor-models-are-built-for-autonomous-driving",
+        "my-journey-so-far-full-story",
+        "omni-model-pretraining-decisions",
+        "on-engineering-management",
+        "open-weight-models-that-fit-on-a-64-gb-macbook-pro",
+        "post-training-vision-language-action-models-zero-to-hero",
+        "replacing-openclaw-with-hermes-agent-using-local-weights",
+        "running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro",
+        "running-gemma-4-locally-on-a-64-gb-macbook-pro",
+        "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro",
+        "running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro",
+        "thoughts-on-good-research-in-industry",
     }
 )
 HUMAN_MODEL = "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16"
@@ -146,19 +161,74 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
         "22": 1905,
         "31": 1905,
     },
+    "code-is-cheap-understanding-isnt": {
+        "14": 1905,
+    },
+    "from-ppo-to-grpo-rl-for-reasoning-and-vlas": {
+        "4": 1905,
+        "11": 1905,
+    },
     "from-seeing-to-doing-the-evolution-of-vision-language-models": {
         "4": 1905,
         "26": 1905,
         "28": 1905,
         "41": 1905,
     },
+    "how-to-read-scaling-laws-for-language-models": {
+        "13": 1905,
+        "19": 1906,
+    },
     "how-unified-sensor-models-are-built-for-autonomous-driving": {
         "0": 1905,
         "4": 1905,
         "20": 1905,
     },
+    "my-journey-so-far-full-story": {
+        "25": 1906,
+    },
+    "omni-model-pretraining-decisions": {
+        "8": 1905,
+        "12": 1905,
+    },
+    "on-engineering-management": {
+        "11": 1905,
+        "14": 1905,
+        "24": 1905,
+    },
+    "open-weight-models-that-fit-on-a-64-gb-macbook-pro": {
+        "5": 1905,
+    },
+    "replacing-openclaw-with-hermes-agent-using-local-weights": {
+        "1": 1905,
+        "8": 1906,
+    },
+    "running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro": {
+        "8": 1905,
+    },
+    "running-gemma-4-locally-on-a-64-gb-macbook-pro": {
+        "10": 1905,
+        "11": 1905,
+    },
+    "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro": {
+        "3": 1905,
+        "15": 1905,
+    },
+    "running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro": {
+        "4": 1905,
+        "5": 1905,
+    },
+    "attention-mechanisms-demystified": {
+        "7": 1905,
+        "9": 1906,
+        "11": 1906,
+        "14": 1906,
+    },
 }
 HUMAN_POST_PRONUNCIATION_LEXICONS = {
+    "attention-mechanisms-demystified": {
+        "scaleddotproductattention": "scaled dot product attention",
+        "iscausal=True": "is causal equals true",
+    },
     "building-local-blog-audio-with-qwen3-tts": {
         "BEVDet4D": "B E V Det four D",
     },
@@ -167,6 +237,37 @@ HUMAN_POST_PRONUNCIATION_LEXICONS = {
         # The shared phonetic spelling is helpful in prose but unstable as a
         # two-word Voxtral prompt. Restore the written form for this heading.
         "lie-dar encoders": "Lidar encoders",
+    },
+    "running-gemma-4-locally-on-a-64-gb-macbook-pro": {
+        "issue #13460": "issue number thirteen thousand four hundred sixty",
+    },
+    "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro": {
+        "llama.cpp": "llama C P P",
+        "10360": "10 360",
+        "48d22e295": "commit 48 D 22 E 295",
+        "Muse-Glimmer-30B-KQuant-17GB-Q4KM.gguf": (
+            "Muse Glimmer 30 B K Quant 17 G B Q 4 K M G G U F"
+        ),
+        "dflash-Muse-Glimmer-30B-Q4KM.gguf": (
+            "D Flash Muse Glimmer 30 B Q 4 K M G G U F"
+        ),
+        "10353": "10 353",
+        "8660": "8 660",
+        "llama-server": "llama server",
+        "16K": "16 K",
+        "GB": "G B",
+        "tok/s": "tokens per second",
+        "tokens/s": "tokens per second",
+        "http://127.0.0.1:8080/v1": (
+            "H T T P at 127 dot 0 dot 0 dot 1, port 8080, V 1"
+        ),
+        "mmproj-Muse-Glimmer-30B-Q4KM.gguf": (
+            "M M proj Muse Glimmer 30 B Q 4 K M G G U F"
+        ),
+        "draft dflash": "draft D Flash",
+        "scripts/benchllamaserverlocal.py": (
+            "scripts slash bench llama server local dot py"
+        ),
     },
 }
 # These long-form canaries keep complete source narration. Their narrow caps
@@ -182,6 +283,11 @@ HUMAN_HEADING_PAUSE_SECONDS = 0.55
 HUMAN_SENTENCE_PAUSE_POLICY = "model-natural-with-explicit-structure-v1"
 HUMAN_CHUNKING_POLICY = "heading-with-following-paragraph-groups-v3"
 HUMAN_CHUNK_MAX_CHARS = 900
+HUMAN_POST_CHUNK_MAX_CHARS = {
+    # Dense benchmark identifiers and numeric suites need more acoustic
+    # headroom than ordinary prose even after pronunciation expansion.
+    "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro": 450,
+}
 HUMAN_MAX_GENERATION_TOKENS = 1_600
 HUMAN_MIN_SECONDS_PER_WORD = 0.24
 HUMAN_MAX_SECONDS_PER_WORD = 0.72
@@ -429,7 +535,9 @@ def split_bounded_sentences(text: str, max_chars: int) -> list[str]:
     return groups
 
 
-def paragraph_chunks_for_tts(text: str) -> list[NarrationChunk]:
+def paragraph_chunks_for_tts(
+    text: str, *, max_chars: int = HUMAN_CHUNK_MAX_CHARS
+) -> list[NarrationChunk]:
     """Compile bounded requests while keeping every heading in prose context.
 
     Short standalone heading prompts encouraged the casual voice to improvise
@@ -461,13 +569,13 @@ def paragraph_chunks_for_tts(text: str) -> list[NarrationChunk]:
 
     def append_bounded(rendered: str) -> None:
         nonlocal buffer_has_prose
-        available = HUMAN_CHUNK_MAX_CHARS
+        available = max_chars
         if buffer and not buffer_has_prose:
             heading_chars = len("\n\n".join(buffer)) + 2
-            available = max(200, HUMAN_CHUNK_MAX_CHARS - heading_chars)
+            available = max(200, max_chars - heading_chars)
         for group in split_bounded_sentences(rendered, available):
             candidate = "\n\n".join([*buffer, group])
-            if buffer and len(candidate) > HUMAN_CHUNK_MAX_CHARS:
+            if buffer and len(candidate) > max_chars:
                 flush_buffer(HUMAN_PARAGRAPH_PAUSE_SECONDS)
             buffer.append(group)
             buffer_has_prose = True
@@ -563,7 +671,14 @@ def discover_posts() -> list[dict[str, Any]]:
         narration_mode = "full-source"
         text = shape_narration(clean_markdown(source))
         uses_human_profile = post_slug in HUMAN_NARRATION_POSTS
-        narration_chunks = paragraph_chunks_for_tts(text) if uses_human_profile else []
+        human_chunk_max_chars = HUMAN_POST_CHUNK_MAX_CHARS.get(
+            post_slug, HUMAN_CHUNK_MAX_CHARS
+        )
+        narration_chunks = (
+            paragraph_chunks_for_tts(text, max_chars=human_chunk_max_chars)
+            if uses_human_profile
+            else []
+        )
         post_pronunciations = HUMAN_POST_PRONUNCIATION_LEXICONS.get(post_slug, {})
         if narration_chunks and post_pronunciations:
             narration_chunks = [
@@ -602,7 +717,7 @@ def discover_posts() -> list[dict[str, Any]]:
                 "heading_pause_seconds": HUMAN_HEADING_PAUSE_SECONDS,
                 "sentence_pause_policy": HUMAN_SENTENCE_PAUSE_POLICY,
                 "chunking_policy": HUMAN_CHUNKING_POLICY,
-                "chunk_max_chars": HUMAN_CHUNK_MAX_CHARS,
+                "chunk_max_chars": human_chunk_max_chars,
                 "max_generation_tokens": HUMAN_MAX_GENERATION_TOKENS,
                 "min_seconds_per_word": HUMAN_MIN_SECONDS_PER_WORD,
                 "max_seconds_per_word": HUMAN_MAX_SECONDS_PER_WORD,
@@ -681,6 +796,7 @@ def discover_posts() -> list[dict[str, Any]]:
                 "source_sha256": source_sha256,
                 "narration_mode": narration_mode,
                 "narration_word_count": narration_word_count,
+                "human_chunk_max_chars": human_chunk_max_chars,
                 "digest": digest,
                 "output": AUDIO_DIR / f"{post_slug}.mp3",
             }
@@ -762,6 +878,7 @@ def narrator_profile_errors(posts: list[dict[str, Any]], manifest: dict[str, Any
         expected = (
             {
                 **human_expected,
+                "chunk_max_chars": post["human_chunk_max_chars"],
                 "chunk_seed_overrides": HUMAN_CHUNK_SEED_OVERRIDES.get(
                     post["slug"], {}
                 ),
@@ -1221,7 +1338,7 @@ def manifest_record(post: dict[str, Any], duration_seconds: float) -> dict[str, 
             "heading_pause_seconds": HUMAN_HEADING_PAUSE_SECONDS,
             "sentence_pause_policy": HUMAN_SENTENCE_PAUSE_POLICY,
             "chunking_policy": HUMAN_CHUNKING_POLICY,
-            "chunk_max_chars": HUMAN_CHUNK_MAX_CHARS,
+            "chunk_max_chars": post["human_chunk_max_chars"],
             "max_generation_tokens": HUMAN_MAX_GENERATION_TOKENS,
             "min_seconds_per_word": HUMAN_MIN_SECONDS_PER_WORD,
             "max_seconds_per_word": HUMAN_MAX_SECONDS_PER_WORD,

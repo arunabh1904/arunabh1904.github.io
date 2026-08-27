@@ -78,7 +78,35 @@ def load_generator() -> Any:
 def normalize_transcript(text: str) -> str:
     """Return a punctuation-insensitive, word-aligned ASR comparison string."""
 
-    words = re.findall(r"[a-z0-9]+", text.casefold())
+    text = text.casefold()
+    # Canonicalize ordinary ASR renderings of technical units and names. These
+    # equivalences reduce false WER without removing repeated words or long
+    # vocalizations, which remain release failures below.
+    text = re.sub(r"\bc\s*\+\s*\+", "cpp", text)
+    text = re.sub(r"\b(?:d\s+flash|deflash)\b", "dflash", text)
+    text = re.sub(r"\bmac\s+os\b", "macos", text)
+    text = re.sub(r"\bopen\s+ai\b", "openai", text)
+    text = re.sub(
+        r"\b(?:tok|toke|toks|tokens?)\s*(?:/|slash|per)\s*(?:s|sec|seconds?)?\b",
+        "tokenspersecond",
+        text,
+    )
+    words = [
+        part
+        for token in re.findall(r"[a-z0-9]+", text)
+        for part in re.findall(r"[a-z]+|[0-9]+", token)
+    ]
+    unit_aliases = {
+        "gig": "gb",
+        "gigabit": "gb",
+        "gigabits": "gb",
+        "gigabyte": "gb",
+        "gigabytes": "gb",
+        "secs": "s",
+        "second": "s",
+        "seconds": "s",
+    }
+    words = [unit_aliases.get(word, word) for word in words]
     normalized: list[str] = []
     index = 0
     while index < len(words):
