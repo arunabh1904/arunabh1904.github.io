@@ -505,227 +505,174 @@ test_resnet50()`,
   {
     id: 'unet-encoder-decoder',
     order: 40,
-    title: 'Build a U-Net encoder-decoder',
+    title: 'Implement U-Net with double-convolution blocks',
     difficulty: 'Hard',
     track: 'architecture',
     summary:
-      'Implement a configurable U-Net with reusable blocks, skip connections, and robust odd-size handling.',
+      'Implement a small four-level U-Net with DoubleConv blocks, transposed-convolution upsampling, and skip connections for per-pixel prediction.',
     prompt: [
-      'A segmentation pipeline must preserve fine spatial detail while using deeper context. Implement `DoubleConv`, `UpBlock`, and `UNet` using the supplied `UNetConfig`.',
-      'Treat input-size behavior as part of the API. Your decoder must align each upsampled tensor to its skip tensor before concatenation, including when pooling rounded an odd spatial dimension down.',
+      'A segmentation model should combine deep context with fine spatial detail. Implement `DoubleConv` and `UNet` for inputs shaped `(B, in_channels, H, W)`.',
+      'Use four encoder levels and four decoder levels. For this simple interview version, assume `H` and `W` are divisible by 16, and return per-pixel logits shaped `(B, num_classes, H, W)`.',
     ],
-    signature: `@dataclass(frozen=True, slots=True)
-class UNetConfig: ...
-
-class DoubleConv(nn.Module): ...
-class UpBlock(nn.Module): ...
+    signature: `class DoubleConv(nn.Module): ...
 class UNet(nn.Module): ...`,
     requirements: [
-      'Use one reusable double-convolution block throughout the encoder and decoder.',
-      'Store encoder and decoder blocks in `nn.ModuleList` containers.',
-      'Use max pooling to downsample and transposed convolution to upsample.',
-      'Resize an upsampled feature map to the exact skip size before concatenation when necessary.',
-      'Return logits shaped `(B, out_channels, H, W)` for even and odd input sizes.',
+      'Implement `DoubleConv` with two `3x3` convolutions and a ReLU after each convolution.',
+      'Build encoder levels with channel widths `64, 128, 256, 512`, using `MaxPool2d(2)` between levels.',
+      'Use a `1024`-channel bottleneck and four `ConvTranspose2d` upsamplers with `kernel_size=2` and `stride=2`.',
+      'Concatenate each upsampled tensor with its matching encoder feature along `dim=1`, then apply a decoder `DoubleConv`.',
+      'Use a `1x1` convolutional head and return logits shaped `(B, num_classes, H, W)`.',
+      'Assume `H` and `W` are divisible by 16 so the four downsampling and upsampling paths align exactly.',
     ],
     examples: [
       {
-        label: 'Odd-size acceptance check',
+        label: 'Segmentation shape check',
         lines: [
-          'config = UNetConfig(in_channels=3, out_channels=4, channels=(32, 64, 128))',
-          'images.shape = (2, 3, 127, 131)',
+          'model = UNet(in_channels=3, num_classes=4)',
+          'images.shape = (2, 3, 128, 128)',
         ],
-        result: 'model(images).shape == (2, 4, 127, 131)',
+        result: 'model(images).shape == (2, 4, 128, 128)',
       },
     ],
     hint: [
-      'Save the output of each encoder block before pooling it.',
-      'The bottleneck has twice as many channels as the deepest encoder block.',
-      'Build the decoder by iterating over encoder channels in reverse.',
-      'After upsampling, compare `x.shape[-2:]` with `skip.shape[-2:]` before concatenating on the channel axis.',
+      'Save `x1` through `x4` before pooling; those are the skip features.',
+      'After concatenation, the decoder inputs have `1024`, `512`, `256`, and `128` channels.',
+      'The four `2x` pools divide each spatial dimension by 16; the four transposed convolutions reverse that.',
+      'The `1x1` head changes channels to `num_classes` without changing the image grid.',
     ],
     interview: {
       durationMinutes: 50,
       evaluationCriteria: [
         'Explains what information the skip connections restore.',
-        'Keeps channel bookkeeping inside reusable blocks instead of the forward method.',
-        'Tests an odd spatial size and states the output-logit contract.',
+        'Keeps the channel bookkeeping correct across concatenation and decoder convolutions.',
+        'States the divisible-by-16 input constraint and output-logit contract.',
       ],
       followUps: [
         'When would bilinear upsampling be preferable to transposed convolution?',
-        'How would you adapt the output and loss for multi-label segmentation?',
+        'What changes are needed to support odd input dimensions?',
+        'Which loss would you use for multi-class versus multi-label segmentation?',
       ],
     },
     solutionNotes: [
-      'The encoder builds semantics while reducing resolution. Save each block output before pooling; those saved tensors carry the fine boundaries that would otherwise be lost in the bottleneck.',
-      'Each decoder stage repeats one shape operation:\n`upsample decoder → align to skip size → concatenate channels → DoubleConv`\nConcatenation happens on channels, so the first decoder convolution receives `decoder_channels + skip_channels`.',
-      'The channel ledger is easiest to derive backward from the encoder widths. If the deepest skip has `C` channels, the bottleneck has `2C`; after upsampling to `C`, concatenating the `C`-channel skip produces `2C` input channels for `DoubleConv`.',
-      'Odd sizes expose a common hidden assumption: repeated division by two is not exactly reversible. Resize to the actual skip shape:\n`target_size = skip.shape[-2:]`\nThis avoids brittle crop arithmetic and restores the exact input resolution.',
-      'The final `1x1` convolution changes channels without changing spatial size:\n`(B, C, H, W) → (B, classes, H, W)`\nReturn logits; sigmoid or softmax belongs with the chosen loss or inference post-processing.',
+      'Each `DoubleConv` preserves `(H, W)` because both `3x3` convolutions use `padding=1`. The two ReLUs add the nonlinearity after each spatial-processing step.',
+      'The encoder saves `x1` through `x4` before pooling. Pooling halves the grid while increasing channels, and the bottleneck operates at `(H/16, W/16)` with `1024` channels.',
+      'Every decoder stage follows the same memory pattern:\n`upsample -> concatenate skip -> DoubleConv`\nConcatenation is along `dim=1`, so it doubles the channels at each matching scale.',
+      'The four pool/upsample pairs line up exactly when `H` and `W` are divisible by 16. Supporting odd dimensions would require explicit padding, cropping, or interpolation before each concatenation.',
+      'The final `1x1` convolution maps 64 features to one logit per class and pixel:\n`(B, 64, H, W) -> (B, num_classes, H, W)`\nKeep these as logits for the chosen segmentation loss.',
+      'Memory cue: downsample for context, save the skips, then restore the grid. The decoder reuses the saved high-resolution features instead of asking the bottleneck to recreate every boundary.',
     ],
-    solutionDiagram: `input -> enc 32 -> pool -> enc 64 -> pool -> enc 128 -> bottleneck 256
-            |                    |                     |
-            +--------------------+---------------------+
-                                 decoder + skips -> logits at input size`,
+    solutionDiagram: `U-Net memory map
+input (B, C, H, W)
+  -> DoubleConv 64 -> pool
+  -> DoubleConv 128 -> pool
+  -> DoubleConv 256 -> pool
+  -> DoubleConv 512 -> pool
+  -> bottleneck DoubleConv 1024
+  -> up + concat x4 -> DoubleConv 512
+  -> up + concat x3 -> DoubleConv 256
+  -> up + concat x2 -> DoubleConv 128
+  -> up + concat x1 -> DoubleConv 64
+  -> 1x1 head -> (B, num_classes, H, W)`,
     starterCode: `from __future__ import annotations
 
-from dataclasses import dataclass
-
 import torch
-import torch.nn.functional as F
 from torch import nn
-
-
-@dataclass(frozen=True, slots=True)
-class UNetConfig:
-    in_channels: int = 3
-    out_channels: int = 1
-    channels: tuple[int, ...] = (64, 128, 256, 512)
-
-    def __post_init__(self) -> None:
-        if self.in_channels <= 0 or self.out_channels <= 0:
-            raise ValueError("input and output channels must be positive")
-        if len(self.channels) < 2 or any(channel <= 0 for channel in self.channels):
-            raise ValueError("channels must contain at least two positive widths")
 
 
 class DoubleConv(nn.Module):
     def __init__(self, in_channels: int, out_channels: int) -> None:
-        # TODO: create two Conv-BatchNorm-ReLU layers.
+        # TODO: create two 3x3 convolution + ReLU layers.
         raise NotImplementedError("Implement __init__")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # TODO: apply the double-convolution block.
-        raise NotImplementedError("Implement forward")
-
-
-class UpBlock(nn.Module):
-    def __init__(self, in_channels: int, skip_channels: int, out_channels: int) -> None:
-        # TODO: create the upsampler and the skip-fusion block.
-        raise NotImplementedError("Implement __init__")
-
-    def forward(self, x: torch.Tensor, skip: torch.Tensor) -> torch.Tensor:
-        # TODO: upsample, align, concatenate, and fuse.
+        # TODO: apply both convolutions and activations.
         raise NotImplementedError("Implement forward")
 
 
 class UNet(nn.Module):
-    def __init__(self, config: UNetConfig) -> None:
-        # TODO: assemble encoder blocks, bottleneck, decoder blocks, and output head.
+    def __init__(self, in_channels: int = 3, num_classes: int = 1) -> None:
+        # TODO: assemble the encoder, bottleneck, decoder, and head.
         raise NotImplementedError("Implement __init__")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # TODO: save skips, run the bottleneck, and decode in reverse order.
+        # TODO: save encoder skips, then upsample and concatenate them.
         raise NotImplementedError("Implement forward")
 
 
-def smoke_test() -> None:
-    device = torch.device("cpu")
-    config = UNetConfig(out_channels=4, channels=(4, 8))
-    model = UNet(config).to(device=device, dtype=torch.float32).eval()
-    images = torch.randn(1, 3, 17, 19, device=device, dtype=torch.float32)
-    with torch.inference_mode():
-        logits = model(images)
-    assert logits.shape == (1, 4, 17, 19)
-    print(tuple(logits.shape))
+def test_unet() -> None:
+    model = UNet(in_channels=3, num_classes=4)
+    images = torch.randn(2, 3, 128, 128)
+    logits = model(images)
+    print(logits.shape)
+    assert logits.shape == (2, 4, 128, 128)
 
 
 if __name__ == "__main__":
-    smoke_test()`,
+    test_unet()`,
     solutionCode: `from __future__ import annotations
 
-from dataclasses import dataclass
-
 import torch
-import torch.nn.functional as F
 from torch import nn
-
-
-@dataclass(frozen=True, slots=True)
-class UNetConfig:
-    in_channels: int = 3
-    out_channels: int = 1
-    channels: tuple[int, ...] = (64, 128, 256, 512)
-
-    def __post_init__(self) -> None:
-        if self.in_channels <= 0 or self.out_channels <= 0:
-            raise ValueError("input and output channels must be positive")
-        if len(self.channels) < 2 or any(channel <= 0 for channel in self.channels):
-            raise ValueError("channels must contain at least two positive widths")
 
 
 class DoubleConv(nn.Module):
     def __init__(self, in_channels: int, out_channels: int) -> None:
         super().__init__()
-        self.layers = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, 3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, 3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
+        self.block = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, 3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(out_channels, out_channels, 3, padding=1),
+            nn.ReLU(),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.layers(x)
-
-
-class UpBlock(nn.Module):
-    def __init__(self, in_channels: int, skip_channels: int, out_channels: int) -> None:
-        super().__init__()
-        self.upsample = nn.ConvTranspose2d(in_channels, out_channels, 2, stride=2)
-        self.fuse = DoubleConv(out_channels + skip_channels, out_channels)
-
-    def forward(self, x: torch.Tensor, skip: torch.Tensor) -> torch.Tensor:
-        x = self.upsample(x)
-        if x.shape[-2:] != skip.shape[-2:]:
-            x = F.interpolate(x, size=skip.shape[-2:], mode="bilinear", align_corners=False)
-        return self.fuse(torch.cat((skip, x), dim=1))
+        return self.block(x)
 
 
 class UNet(nn.Module):
-    def __init__(self, config: UNetConfig) -> None:
+    def __init__(self, in_channels: int = 3, num_classes: int = 1) -> None:
         super().__init__()
-        encoder_channels = (config.in_channels, *config.channels[:-1])
-        self.encoder = nn.ModuleList(
-            DoubleConv(in_channels, out_channels)
-            for in_channels, out_channels in zip(encoder_channels, config.channels)
-        )
+        self.enc1 = DoubleConv(in_channels, 64)
+        self.enc2 = DoubleConv(64, 128)
+        self.enc3 = DoubleConv(128, 256)
+        self.enc4 = DoubleConv(256, 512)
         self.pool = nn.MaxPool2d(2)
-        bottleneck_channels = config.channels[-1] * 2
-        self.bottleneck = DoubleConv(config.channels[-1], bottleneck_channels)
-        decoder = []
-        current_channels = bottleneck_channels
-        for skip_channels in reversed(config.channels):
-            decoder.append(UpBlock(current_channels, skip_channels, skip_channels))
-            current_channels = skip_channels
-        self.decoder = nn.ModuleList(decoder)
-        self.output_head = nn.Conv2d(config.channels[0], config.out_channels, 1)
+        self.bottleneck = DoubleConv(512, 1024)
+
+        self.up4 = nn.ConvTranspose2d(1024, 512, kernel_size=2, stride=2)
+        self.dec4 = DoubleConv(1024, 512)
+        self.up3 = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)
+        self.dec3 = DoubleConv(512, 256)
+        self.up2 = nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2)
+        self.dec2 = DoubleConv(256, 128)
+        self.up1 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
+        self.dec1 = DoubleConv(128, 64)
+        self.head = nn.Conv2d(64, num_classes, kernel_size=1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        skips = []
-        for block in self.encoder:
-            x = block(x)
-            skips.append(x)
-            x = self.pool(x)
-        x = self.bottleneck(x)
-        for block, skip in zip(self.decoder, reversed(skips)):
-            x = block(x, skip)
-        return self.output_head(x)
+        x1 = self.enc1(x)
+        x2 = self.enc2(self.pool(x1))
+        x3 = self.enc3(self.pool(x2))
+        x4 = self.enc4(self.pool(x3))
+        x = self.bottleneck(self.pool(x4))
+
+        x = self.dec4(torch.cat([self.up4(x), x4], dim=1))
+        x = self.dec3(torch.cat([self.up3(x), x3], dim=1))
+        x = self.dec2(torch.cat([self.up2(x), x2], dim=1))
+        x = self.dec1(torch.cat([self.up1(x), x1], dim=1))
+        return self.head(x)
 
 
-def smoke_test() -> None:
-    device = torch.device("cpu")
-    config = UNetConfig(out_channels=4, channels=(4, 8))
-    model = UNet(config).to(device=device, dtype=torch.float32).eval()
-    images = torch.randn(1, 3, 17, 19, device=device, dtype=torch.float32)
-    with torch.inference_mode():
-        logits = model(images)
-    assert logits.shape == (1, 4, 17, 19)
-    print(tuple(logits.shape))
+def test_unet() -> None:
+    model = UNet(in_channels=3, num_classes=4)
+    images = torch.randn(2, 3, 128, 128)
+    logits = model(images)
+    print(logits.shape)
+    assert logits.shape == (2, 4, 128, 128)
 
 
 if __name__ == "__main__":
-    smoke_test()`,
+    test_unet()`,
     packages: ['torch'],
     tags: ['PyTorch', 'Architecture', 'U-Net', 'Segmentation', 'Clean Code'],
   },

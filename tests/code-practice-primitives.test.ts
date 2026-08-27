@@ -34,6 +34,7 @@ const CLASS_BASED_PROBLEMS = new Set([
 const REFERENCE_TEST_NAMES = new Map([
   ['resnet-from-building-blocks', 'test_resnet'],
   ['resnet-50-bottleneck-blocks', 'test_resnet50'],
+  ['unet-encoder-decoder', 'test_unet'],
 ]);
 
 // These helpers solve the operation being taught instead of exposing its tensor steps.
@@ -575,8 +576,9 @@ describe('code-practice primitive-first solutions', () => {
     expect(resnet18.solutionCode).toContain('nn.AdaptiveAvgPool2d(1)');
     expect(resnet50.solutionCode).toContain('class Bottleneck(nn.Module):');
     expect(resnet50.solutionCode).toContain('expansion = 4');
-    expect(unet.solutionCode).toContain('F.interpolate(');
-    expect(unet.solutionCode).toContain('nn.ModuleList(');
+    expect(unet.solutionCode).toContain('class DoubleConv(nn.Module):');
+    expect(unet.solutionCode).toContain('nn.ConvTranspose2d(');
+    expect(unet.solutionCode).toContain('torch.cat([self.up4(x), x4], dim=1)');
     expect(centernet.solutionCode).toContain('class CenterNetOutput:');
     expect(centernet.solutionCode).toContain('nn.init.constant_');
     expect(centernet.solutionCode).toContain('-2.19');
