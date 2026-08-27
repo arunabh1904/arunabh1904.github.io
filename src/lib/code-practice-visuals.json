@@ -331,25 +331,25 @@
   },
   {
     "id": "cross-attention",
-    "headline": "Queries come from one sequence; keys and values from another",
+    "headline": "Q comes from A; K and V come from B",
     "kind": "attention",
     "steps": [
-      ["INPUT", "target -> Q; source -> K,V", "Tq may differ from Ts"],
-      ["CORE STEP", "Q @ K.T", "scores (B,H,Tq,Ts)"],
-      ["RESULT", "source mixture per target", "output length Tq"]
+      ["INPUT", "A -> Q; B -> K,V", "La may differ from Lb"],
+      ["CORE STEP", "Q @ K.T / sqrt(Dh)", "scores (B,H,La,Lb)"],
+      ["RESULT", "merge heads + Wo", "output length La"]
     ],
-    "caption": "The query length controls output rows; the source length controls score columns."
+    "caption": "The query sequence controls output rows; softmax distributes each query across the key/value sequence."
   },
   {
     "id": "simple-n-gram-language-model",
-    "headline": "A context window indexes next-token counts",
+    "headline": "Count, back off, normalize, sample",
     "kind": "sequence",
     "steps": [
-      ["INPUT", "token sequence + order n", "context length n-1"],
-      ["CORE STEP", "count context -> next token", "slide one token at a time"],
-      ["RESULT", "normalized next-token table", "sample or argmax"]
+      ["FIT", "context -> next-token counts", "store sizes 0 ... n-1"],
+      ["PREDICT", "try longest suffix first", "back off when unseen"],
+      ["GENERATE", "sample and append", "local seeded RNG"]
     ],
-    "caption": "The model remembers counts for exact contexts; unseen contexts need a fallback."
+    "caption": "The empty context is the unigram fallback; longer observed suffixes provide more specific predictions."
   },
   {
     "id": "average-precision-from-matches",
@@ -364,36 +364,36 @@
   },
   {
     "id": "greedy-detection-matching",
-    "headline": "Each ground truth can be claimed once",
+    "headline": "Sort by confidence, then claim each GT once",
     "kind": "boxes",
     "steps": [
       ["INPUT", "scored predictions + GT boxes", "sort predictions first"],
-      ["CORE STEP", "best unused IoU above threshold", "mark that GT used"],
-      ["RESULT", "TP/FP sequence", "feeds AP"]
+      ["CORE STEP", "best unused IoU", "check threshold"],
+      ["RESULT", "match indices or -1", "one GT per prediction"]
     ],
-    "caption": "Mask used ground truths before argmax so later predictions cannot reuse them."
+    "caption": "Confidence order decides who claims an object first; the used-GT set makes duplicate predictions false positives."
   },
   {
     "id": "batched-best-iou-match",
-    "headline": "Broadcast all box pairs, then reduce the ground-truth axis",
+    "headline": "Broadcast box pairs, compute IoU, then max over GT boxes",
     "kind": "boxes",
     "steps": [
-      ["INPUT", "pred (B,N,4) + GT (B,M,4)", "matched batch axis"],
-      ["CORE STEP", "pairwise IoU (B,N,M)", "argmax over M"],
-      ["RESULT", "best IoU + index (B,N)", "one match per prediction"]
+      ["INPUT", "pred (B,N,4) + GT (B,M,4)", "broadcast N x M pairs"],
+      ["CORE STEP", "intersection / union", "pairwise IoU (B,N,M)"],
+      ["RESULT", "max over M", "score + GT index (B,N)"]
     ],
-    "caption": "The M axis represents candidate ground truths and is the only axis reduced."
+    "caption": "Broadcasting compares every prediction with every GT box; max over M keeps each prediction's best match."
   },
   {
     "id": "manual-backprop-for-a-2-layer-mlp",
-    "headline": "Cache the forward values needed by the reverse chain",
+    "headline": "Cache activations; backpropagate right to left",
     "kind": "network",
     "steps": [
-      ["FORWARD", "x -> linear -> ReLU -> linear", "cache z1 and h"],
-      ["BACKWARD", "loss gradient flows right to left", "apply local derivatives"],
-      ["RESULT", "dW1 db1 dW2 db2", "matching parameter shapes"]
+      ["FORWARD", "X -> affine -> ReLU -> affine", "cache z1 and h"],
+      ["LOGITS", "probs - one-hot", "divide by batch size"],
+      ["BACKWARD", "W2 -> ReLU -> W1", "four parameter gradients"]
     ],
-    "caption": "Backprop multiplies each upstream gradient by the local derivative at that node."
+    "caption": "The softmax-cross-entropy shortcut starts the chain; affine rules and the ReLU mask finish every gradient."
   },
   {
     "id": "classic-mlp-forward-backward",

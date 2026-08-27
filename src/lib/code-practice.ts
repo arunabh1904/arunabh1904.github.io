@@ -1958,17 +1958,15 @@ smoke_test()`,
     title: 'Cross-attention',
     difficulty: 'Hard',
     summary:
-      'Build config-driven multi-head cross-attention where one sequence supplies queries and another supplies keys and values.',
+      'Build multi-head cross-attention where one sequence supplies queries and another supplies keys and values.',
     prompt: [
       'Implement `CrossAttention` as an `nn.Module` for two token sequences. `seq_a` supplies queries; `seq_b` supplies keys and values.',
-      'Keep the model dimensions in `CrossAttentionConfig`, store all four learned projections on the module, and return one output vector per token in `seq_a`.',
+      'Project, split, attend, and merge the heads. Return one output vector per token in `seq_a`.',
     ],
-    signature: `@dataclass(frozen=True, slots=True)
-class CrossAttentionConfig:
-    model_dim: int
-    num_heads: int
+    signature: `class CrossAttention(nn.Module):
+    def __init__(self, d_model: int, num_heads: int):
+        ...
 
-class CrossAttention(nn.Module):
     def forward(
         self,
         seq_a: torch.Tensor,
@@ -1979,17 +1977,17 @@ class CrossAttention(nn.Module):
       '`seq_a` has shape `(B, La, D_model)` and supplies queries.',
       '`seq_b` has shape `(B, Lb, D_model)` and supplies keys and values.',
       'The two sequences share batch size and `D_model`, but `La` and `Lb` may differ.',
-      '`CrossAttentionConfig` requires `num_heads` to divide a positive `model_dim`.',
+      '`num_heads` must divide a positive `d_model`.',
       'The module owns query, key, value, and output projections with `bias=False`.',
       'Compute softmax explicitly and stably over the `Lb` key axis.',
       'Return an output of shape `(B, La, D_model)`.',
-      'Include a runnable smoke test with `model_dim=6`, `num_heads=2`, `La=3`, and `Lb=5`.',
+      'Include a runnable test with `d_model=6`, `num_heads=2`, `La=3`, and `Lb=5`.',
     ],
     examples: [
       {
         label: 'Example 1',
         lines: [
-          'layer = CrossAttention(CrossAttentionConfig(model_dim=6, num_heads=2))',
+          'layer = CrossAttention(d_model=6, num_heads=2)',
           'seq_a.shape = (2, 3, 6)',
           'seq_b.shape = (2, 5, 6)',
         ],
@@ -2004,17 +2002,16 @@ class CrossAttention(nn.Module):
     hint: [
       'Put the learned projections in `__init__`; keep the two-sequence tensor flow in `forward`.',
       'Queries come from `seq_a`, while keys and values both come from `seq_b`.',
-      'Reshape projections into `(B, H, La, D_head)` for queries and `(B, H, Lb, D_head)` for keys and values.',
+      'Reshape `[B, L, D]` into `[B, H, L, D_head]` before computing attention scores.',
       'Use `Q K^T / sqrt(D_head)`, then apply stable softmax over the last axis.',
-      'Permute the context back to token-major order before reshaping the heads into `D_model`.',
+      'Permute `[B, H, La, D_head]` to `[B, La, H, D_head]` before merging heads into `D_model`.',
     ],
     solutionNotes: [
-      'Cross-attention changes the source of Q, K, and V:\n`Q = W_q seq_a; K = W_k seq_b; V = W_v seq_b`\nEach token in `seq_a` therefore retrieves information from `seq_b`.',
-      'The config owns the split invariant:\n`D_head = D_model / H`\nExact division lets every head receive the same feature width while the four projections remain learned module parameters.',
-      'The sequence lengths remain distinct:\n`Q: (B,H,La,D_head); K,V: (B,H,Lb,D_head)`\n`Q @ Kᵀ` contracts `D_head`, so the score matrix has shape `(B,H,La,Lb)`.',
-      'Scaling controls the logit variance:\n`scores = QKᵀ / √D_head`\nWithout the divisor, larger heads tend to produce larger dot products and a more saturated softmax.',
-      'Stable softmax subtracts each row maximum before exponentiation. `keepdim=True` preserves shape `(B,H,La,1)`, so the maximum and denominator broadcast across the `Lb` keys.',
-      'The value mixture has shape `(B,H,La,D_head)`. Permuting to `(B,La,H,D_head)` and reshaping merges the heads, so the output length follows `seq_a`, not `seq_b`.',
+      'The whole pattern is:\n`q = split_heads(Wq(A))`\n`k = split_heads(Wk(B))`\n`v = split_heads(Wv(B))`\n`output = Wo(merge_heads(softmax(qkᵀ / √D_head) v))`',
+      '`seq_a` supplies Q, so its length `La` determines the output length. `seq_b` supplies K and V, so its length `Lb` is the key/value axis over which softmax distributes attention.',
+      'The shape flow is:\n`A: (B, La, D), B: (B, Lb, D)`\n`Q: (B, H, La, Dh), K,V: (B, H, Lb, Dh)`\n`scores: (B, H, La, Lb)`\n`context: (B, H, La, Dh)`\n`merged: (B, La, D)`',
+      'Divide by `sqrt(head_dim)`, not `sqrt(d_model)`, to keep dot-product logits at a useful scale as head width changes.',
+      'Stable softmax subtracts the maximum over `dim=-1` before exponentiating. That last axis is the sequence B/key axis, so each query distributes probability across tokens in `seq_b`.',
     ],
     solutionDiagram: `Self:  Q,K,V ← one sequence x
       scores: (B, H, T, T)
@@ -2024,70 +2021,67 @@ Cross: Q ← seq_a (B, La, D)
        scores: (B, H, La, Lb)
 
 Only the source of K,V and the key length change.`,
-    solutionCode: `from __future__ import annotations
+    solutionCode: `import math
 
-from dataclasses import dataclass
-import math
 import torch
 from torch import nn
 
 def stable_softmax(x: torch.Tensor, dim: int = -1) -> torch.Tensor:
-    shifted = x - torch.amax(x, dim=dim, keepdim=True)
-    exp_x = torch.exp(shifted)
-    return exp_x / torch.sum(exp_x, dim=dim, keepdim=True)
-
-@dataclass(frozen=True, slots=True)
-class CrossAttentionConfig:
-    model_dim: int
-    num_heads: int
-
-    def __post_init__(self) -> None:
-        if self.model_dim <= 0 or self.num_heads <= 0 or self.model_dim % self.num_heads:
-            raise ValueError("num_heads must divide a positive model_dim")
-
-    @property
-    def head_dim(self) -> int:
-        return self.model_dim // self.num_heads
+    x = x - x.max(dim=dim, keepdim=True).values
+    exp_x = torch.exp(x)
+    return exp_x / exp_x.sum(dim=dim, keepdim=True)
 
 class CrossAttention(nn.Module):
-    def __init__(self, config: CrossAttentionConfig) -> None:
+    def __init__(self, d_model: int, num_heads: int):
         super().__init__()
-        self.config = config
-        self.q_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
-        self.k_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
-        self.v_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
-        self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        if d_model <= 0 or num_heads <= 0 or d_model % num_heads != 0:
+            raise ValueError("num_heads must divide a positive d_model")
 
-    def _split_heads(self, x: torch.Tensor) -> torch.Tensor:
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.head_dim = d_model // num_heads
+
+        self.q_proj = nn.Linear(d_model, d_model, bias=False)
+        self.k_proj = nn.Linear(d_model, d_model, bias=False)
+        self.v_proj = nn.Linear(d_model, d_model, bias=False)
+        self.out_proj = nn.Linear(d_model, d_model, bias=False)
+
+    def split_heads(self, x: torch.Tensor) -> torch.Tensor:
         batch_size, length, _ = x.shape
-        x = x.reshape(batch_size, length, self.config.num_heads, self.config.head_dim)
+        x = x.reshape(batch_size, length, self.num_heads, self.head_dim)
         return x.permute(0, 2, 1, 3)
 
-    def forward(self, seq_a: torch.Tensor, seq_b: torch.Tensor) -> torch.Tensor:
-        q = self._split_heads(self.q_proj(seq_a))
-        k = self._split_heads(self.k_proj(seq_b))
-        v = self._split_heads(self.v_proj(seq_b))
-        scores = q @ k.transpose(-2, -1) / math.sqrt(self.config.head_dim)
+    def forward(
+        self,
+        seq_a: torch.Tensor,
+        seq_b: torch.Tensor,
+    ) -> torch.Tensor:
+        q = self.split_heads(self.q_proj(seq_a))
+        k = self.split_heads(self.k_proj(seq_b))
+        v = self.split_heads(self.v_proj(seq_b))
+
+        scores = q @ k.transpose(-2, -1)
+        scores = scores / math.sqrt(self.head_dim)
         weights = stable_softmax(scores, dim=-1)
-        context = (weights @ v).permute(0, 2, 1, 3)
-        context = context.reshape(seq_a.shape[0], seq_a.shape[1], self.config.model_dim)
+
+        context = weights @ v
+        context = context.permute(0, 2, 1, 3)
+        batch_size, length, _, _ = context.shape
+        context = context.reshape(batch_size, length, self.d_model)
         return self.out_proj(context)
 
-def smoke_test() -> None:
+def test_cross_attention():
     torch.manual_seed(0)
-    model = CrossAttention(CrossAttentionConfig(model_dim=6, num_heads=2))
+    layer = CrossAttention(d_model=6, num_heads=2)
     seq_a = torch.randn(2, 3, 6)
     seq_b = torch.randn(2, 5, 6)
-    output = model(seq_a, seq_b)
+    output = layer(seq_a, seq_b)
+    print(output.shape)
     assert output.shape == (2, 3, 6)
-    assert bool(torch.all(torch.isfinite(output)))
-    print("Cross-attention smoke test passed:", tuple(output.shape))
 
-smoke_test()`,
-    starterCode: `from __future__ import annotations
+test_cross_attention()`,
+    starterCode: `import math
 
-from dataclasses import dataclass
-import math
 import torch
 from torch import nn
 
@@ -2095,46 +2089,33 @@ def stable_softmax(x: torch.Tensor, dim: int = -1) -> torch.Tensor:
     # TODO: subtract the maximum, exponentiate, and normalize along dim.
     raise NotImplementedError("Implement stable_softmax")
 
-@dataclass(frozen=True, slots=True)
-class CrossAttentionConfig:
-    model_dim: int
-    num_heads: int
-
-    def __post_init__(self) -> None:
-        if self.model_dim <= 0 or self.num_heads <= 0 or self.model_dim % self.num_heads:
-            raise ValueError("num_heads must divide a positive model_dim")
-
-    @property
-    def head_dim(self) -> int:
-        return self.model_dim // self.num_heads
-
 class CrossAttention(nn.Module):
-    def __init__(self, config: CrossAttentionConfig):
-        super().__init__()
-        self.config = config
-        self.q_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
-        self.k_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
-        self.v_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
-        self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+    def __init__(self, d_model: int, num_heads: int):
+        # TODO: validate the head split and create four learned projections.
+        raise NotImplementedError("Implement __init__")
 
-    def _split_heads(self, x: torch.Tensor) -> torch.Tensor:
-        # TODO: reshape (B, T, D_model) into (B, H, T, D_head).
-        raise NotImplementedError("Implement _split_heads")
+    def split_heads(self, x: torch.Tensor) -> torch.Tensor:
+        # TODO: reshape [B, L, D] into [B, H, L, D_head].
+        raise NotImplementedError("Implement split_heads")
 
-    def forward(self, seq_a: torch.Tensor, seq_b: torch.Tensor) -> torch.Tensor:
-        # TODO: project two sources, split heads, attend stably, merge, and project out.
+    def forward(
+        self,
+        seq_a: torch.Tensor,
+        seq_b: torch.Tensor,
+    ) -> torch.Tensor:
+        # TODO: use A for Q, B for K/V, attend, merge heads, and project out.
         raise NotImplementedError("Implement forward")
 
-def smoke_test() -> None:
+def test_cross_attention():
     torch.manual_seed(0)
-    layer = CrossAttention(CrossAttentionConfig(model_dim=6, num_heads=2))
+    layer = CrossAttention(d_model=6, num_heads=2)
     seq_a = torch.randn(2, 3, 6)
     seq_b = torch.randn(2, 5, 6)
     output = layer(seq_a, seq_b)
-    assert output.shape == seq_a.shape and bool(torch.all(torch.isfinite(output)))
-    print("Cross-attention smoke test passed:", tuple(output.shape))
+    print(output.shape)
+    assert output.shape == (2, 3, 6)
 
-smoke_test()`,
+test_cross_attention()`,
     packages: PYTORCH_AND_NUMPY_PACKAGES,
     tags: ['PyTorch', 'Attention', 'Transformers'],
   },
@@ -2144,10 +2125,10 @@ smoke_test()`,
     title: 'Manual backprop for a 2-layer MLP',
     difficulty: 'Hard',
     summary:
-      'Compute the loss and parameter gradients for a 2-layer ReLU MLP with softmax cross-entropy.',
+      'Implement a small 2-layer ReLU MLP from tensor operations and return its stable cross-entropy loss plus four parameter gradients.',
     prompt: [
-      'Implement forward and backward for a 2-layer MLP with one hidden ReLU layer.',
-      'Given inputs `X`, labels `y`, and parameters `W1`, `b1`, `W2`, and `b2`, compute the mean softmax cross-entropy loss and the gradients for all four parameters.',
+      'Implement `mlp_loss_and_grads` for the network `X -> Linear -> ReLU -> Linear -> softmax cross-entropy`.',
+      'Given `X`, integer labels `y`, and parameters `W1`, `b1`, `W2`, and `b2`, compute the mean loss and return `dW1`, `db1`, `dW2`, and `db2` without autograd.',
     ],
     signature: `def mlp_loss_and_grads(
     X: torch.Tensor,
@@ -2163,8 +2144,10 @@ smoke_test()`,
       '`y` has shape `(N,)` and contains integer class labels in the range `[0, C)`.',
       '`W1` has shape `(D_in, H)` and `b1` has shape `(H,)`.',
       '`W2` has shape `(H, C)` and `b2` has shape `(C,)`.',
-      'Return the mean softmax cross-entropy loss and a dictionary with `dW1`, `db1`, `dW2`, and `db2`.',
-      'Raise `ValueError` on invalid input.',
+      'Use `X @ W1 + b1`, ReLU, and `h @ W2 + b2` for the forward pass.',
+      'Build softmax probabilities with a row-wise max shift, exponentials, and a row sum.',
+      'Compute the mean cross-entropy loss and return a dictionary with `dW1`, `db1`, `dW2`, and `db2`.',
+      'Do not use autograd or a fused cross-entropy helper.',
     ],
     examples: [
       {
@@ -2206,55 +2189,21 @@ smoke_test()`,
     ],
     hint: [
       'Cache the hidden pre-activations so you can apply the ReLU derivative during backprop.',
-      'Build stable probabilities with a max shift, exponentials, and row sums; then the logits gradient is `probs - one_hot(y)`, averaged over the batch.',
+      'Build stable probabilities with a max shift, exponentials, and row sums; then subtract one from each target-class probability and divide by `N`.',
       'Backpropagate from the output layer into the hidden layer before multiplying by the ReLU mask.',
       'Return the gradients in a dictionary so the caller can inspect each parameter separately.',
     ],
     solutionNotes: [
-      'Cache the forward path because every backward step needs one of these values:\n`X → z1 → ReLU → hidden → z2 → softmax → loss`',
-      'Start backprop from the softmax-cross-entropy shortcut:\n`dlogits = (probs - one_hot(y)) / N`\nThen move backward through the second affine layer, the ReLU mask, and the first affine layer.',
+      'Cache the forward path because every backward step needs one of these values:\n`X → z1 → ReLU → hidden → logits → softmax → loss`',
+      'The softmax-cross-entropy shortcut is implemented by copying `probs`, subtracting one at each target class, and dividing by `N`:\n`dlogits = (probs - one_hot(y)) / N`',
       'The output-layer gradients follow directly from the affine rule:\n`dW2 = hidden.T @ dlogits`\n`db2 = sum(dlogits, axis=0)`\n`dhidden = dlogits @ W2.T`',
       'ReLU passes gradient only where its pre-activation was positive:\n`dz1 = dhidden * (z1 > 0)`\nThen finish with `dW1 = X.T @ dz1` and `db1 = sum(dz1, axis=0)`.',
-      'The most common interview mistakes are forgetting the batch division in `dlogits`, using the post-ReLU tensor for the ReLU mask, or transposing the wrong operand. Check each gradient shape against its parameter shape.',
+      'Use the shifted-logit loss `mean(log(sum(exp(shifted))) - shifted[target])` so the loss remains stable even when probabilities underflow. Check every gradient shape against its parameter shape.',
+      'Memory cue: forward caches activations; backward walks right to left—output gradient, second affine layer, ReLU gate, first affine layer.',
     ],
     solutionCode: `from __future__ import annotations
 
 import torch
-
-def _validate_mlp_inputs(X, y, W1, b1, W2, b2):
-    # Use float tensors for activations/parameters, but check labels before converting them to indices.
-    X = torch.as_tensor(X, dtype=torch.float64)
-    y = torch.as_tensor(y)
-    W1 = torch.as_tensor(W1, dtype=torch.float64)
-    b1 = torch.as_tensor(b1, dtype=torch.float64)
-    W2 = torch.as_tensor(W2, dtype=torch.float64)
-    b2 = torch.as_tensor(b2, dtype=torch.float64)
-
-    # X holds N examples, each with D_in input features; y supplies one class per example.
-    if X.ndim != 2 or any(size <= 0 for size in X.shape):
-        raise ValueError("X must have positive shape (N, D_in)")
-    if y.ndim != 1 or y.shape[0] != X.shape[0]:
-        raise ValueError("y must have shape (N,)")
-    if torch.is_floating_point(y):
-        raise ValueError("y must contain integer class labels")
-    y = torch.as_tensor(y, dtype=torch.long)
-
-    # Check the first affine layer, then use its hidden width to validate subsequent tensors.
-    input_dim = X.shape[1]
-    if W1.ndim != 2 or W1.shape[0] != input_dim or W1.shape[1] == 0:
-        raise ValueError("W1 must have shape (D_in, H)")
-    hidden_dim = W1.shape[1]
-    if b1.ndim != 1 or b1.shape[0] != hidden_dim:
-        raise ValueError("b1 must have shape (H,)")
-    if W2.ndim != 2 or W2.shape[0] != hidden_dim or W2.shape[1] == 0:
-        raise ValueError("W2 must have shape (H, C)")
-    num_classes = W2.shape[1]
-    if b2.ndim != 1 or b2.shape[0] != num_classes:
-        raise ValueError("b2 must have shape (C,)")
-    # Gather and one-hot subtraction require targets in the final layer's class range.
-    if bool(torch.any(y < 0)) or bool(torch.any(y >= num_classes)):
-        raise ValueError("y contains labels outside the valid range")
-    return X, y, W1, b1, W2, b2
 
 def mlp_loss_and_grads(
     X: torch.Tensor,
@@ -2264,43 +2213,26 @@ def mlp_loss_and_grads(
     W2: torch.Tensor,
     b2: torch.Tensor,
 ) -> dict[str, torch.Tensor]:
-    # Centralize coercion and all shape checks before computing a forward pass.
-    X, y, W1, b1, W2, b2 = _validate_mlp_inputs(X, y, W1, b1, W2, b2)
+    z1 = X @ W1 + b1
+    h = torch.relu(z1)
+    logits = h @ W2 + b2
 
-    # First affine layer, ReLU activation, then second affine layer produce class logits.
-    hidden_pre = torch.matmul(X, W1) + b1
-    # ReLU retains positive activations and replaces the rest with zero.
-    hidden = torch.where(hidden_pre > 0.0, hidden_pre, torch.zeros_like(hidden_pre))
-    logits = torch.matmul(hidden, W2) + b2
+    shifted = logits - torch.amax(logits, dim=1, keepdim=True)
+    exp_logits = torch.exp(shifted)
+    normalizers = torch.sum(exp_logits, dim=1)
+    probs = exp_logits / normalizers[:, None]
+    rows = torch.arange(X.shape[0], dtype=torch.long)
+    loss = torch.mean(torch.log(normalizers) - shifted[rows, y])
 
-    # Reuse the same max-shifted exponentials for the manual loss and logits gradient.
-    # Shift logits row by row before exponentiating so large values cannot overflow.
-    shifted_logits = logits - torch.amax(logits, dim=1, keepdim=True)
-    # These positive weights are the numerator terms of softmax.
-    exponentiated = torch.exp(shifted_logits)
-    # Their class-wise total is the denominator for both probabilities and loss.
-    normalizers = torch.sum(exponentiated, dim=1)
-    # Restore a column axis on the total so it divides every class weight in a row.
-    probabilities = exponentiated / normalizers[:, None]
-    # Select each row's target logit with matching row and class-index vectors.
-    row_indices = torch.arange(X.shape[0], dtype=torch.long)
-    # log(denominator) minus the target score is the per-example cross-entropy.
-    loss = torch.mean(torch.log(normalizers) - shifted_logits[row_indices, y])
-
-    # Start dlogits at softmax probabilities, then subtract the one-hot target in each row.
-    dlogits = torch.clone(probabilities)
-    dlogits[torch.arange(X.shape[0]), y] -= 1.0
-    dlogits = dlogits / X.shape[0]
-
-    # Backpropagate through the output affine layer to obtain its parameter gradients.
-    dW2 = torch.matmul(torch.transpose(hidden, 0, 1), dlogits)
+    dlogits = probs.clone()
+    dlogits[rows, y] -= 1.0
+    dlogits /= X.shape[0]
+    dW2 = h.T @ dlogits
     db2 = torch.sum(dlogits, dim=0)
-    # Send the gradient through W2, then apply the ReLU derivative to the pre-activation.
-    dhidden = torch.matmul(dlogits, torch.transpose(W2, 0, 1))
-    dhidden_pre = dhidden * (hidden_pre > 0)
-    # The remaining chain-rule terms are the first layer's weight and bias gradients.
-    dW1 = torch.matmul(torch.transpose(X, 0, 1), dhidden_pre)
-    db1 = torch.sum(dhidden_pre, dim=0)
+    dh = dlogits @ W2.T
+    dz1 = dh * (z1 > 0)
+    dW1 = X.T @ dz1
+    db1 = torch.sum(dz1, dim=0)
 
     return {"loss": loss, "dW1": dW1, "db1": db1, "dW2": dW2, "db2": db2}`,
     starterCode: `from __future__ import annotations
@@ -2316,9 +2248,9 @@ def mlp_loss_and_grads(
     b2: torch.Tensor,
 ) -> dict[str, torch.Tensor]:
     # TODO:
-    # 1. Validate shapes, finite values, and integer label range.
-    # 2. Run affine -> ReLU -> affine, then build stable probabilities from max, exp, sum, and log.
-    # 3. Backpropagate the logits gradient through both affine layers.
+    # 1. Run affine -> ReLU -> affine and build stable probabilities.
+    # 2. Use the softmax-cross-entropy gradient at the logits.
+    # 3. Backpropagate through both affine layers and the ReLU mask.
     raise NotImplementedError("Implement mlp_loss_and_grads")
 
 sample_X = torch.tensor([[1.0, 2.0]], dtype=torch.float64)
@@ -2524,11 +2456,10 @@ print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, 
     title: 'Simple n-gram language model',
     difficulty: 'Medium',
     summary:
-      'Build a runnable backoff n-gram model that learns token counts and samples deterministic continuations.',
+      'Build a small backoff n-gram model that counts next tokens, returns probabilities, and samples continuations.',
     prompt: [
       'Implement a simple n-gram language model class with `__init__`, `fit`, `next_token_probs`, and `generate` methods.',
-      'Train on a list of tokens, return next-token probability distributions from observed counts, sample autoregressively, and back off gracefully when a context has not been seen before.',
-      'Keep corpus loading outside the model. The supplied smoke test uses a tiny sequence so every expected probability is easy to verify in an interview.',
+      'Train on a list of tokens, return next-token probabilities from observed counts, sample autoregressively, and back off when a context has not been seen before.',
     ],
     signature: `class NGramModel:
     def __init__(self, n: int):
@@ -2544,14 +2475,12 @@ print(mlp_forward_backward(sample_X, sample_y, sample_W1, sample_b1, sample_W2, 
         ...`,
     requirements: [
       '`n` is an integer with `n >= 1`.',
-      '`fit(tokens)` trains on a 1D list of tokens, where each token is a string or int.',
-      'The same `fit(tokens)` method should work for any iterable of string or integer tokens.',
-      'Store the observed counts needed to answer next-token queries for orders up to `n`.',
+      '`fit(tokens)` trains on a list of string or integer tokens.',
+      'Store counts for every context size from `0` through `n - 1` so the model can back off.',
       '`next_token_probs(context)` returns a dictionary mapping candidate next tokens to probabilities that sum to `1.0`.',
       'If a context is unseen, back off to progressively shorter suffixes until a seen context is found.',
       '`generate(max_tokens, seed=None)` samples up to `max_tokens` tokens autoregressively.',
       'Sampling must be deterministic when `seed` is provided.',
-      'Raise `ValueError` on invalid inputs.',
     ],
     examples: [
       {
@@ -2580,185 +2509,99 @@ generated = ['a', 'b', 'a', 'b', 'a']`,
       'During training, update counts for every suffix length from `0` up to `n - 1`, not just the longest context.',
       'To back off gracefully, keep shortening the context suffix until you find a context with observed counts.',
       'Use a dedicated seeded RNG inside `generate` so sampling is repeatable without touching global random state.',
-      'Keep corpus loading and tokenization outside the class so the model stays reusable and the interview solution runs offline.',
+      'Keep tokenization and corpus loading outside the class; the interview solution only needs an already-tokenized list.',
     ],
     solutionNotes: [
-      'Map each context tuple to counts of the tokens observed after it:\n`context tuple → next-token counts → normalized probabilities`\nDuring fitting, update every suffix length up to order `n`.',
-      'At inference time, keep at most `n - 1` context tokens and back off through shorter suffixes until one was seen during fitting. Normalize that context’s counts into probabilities.',
-      'Generation repeats lookup and sampling. A local `random.Random(seed)` keeps the sequence deterministic without changing global random state.',
-      'The class owns fitted counts because `next_token_probs` and `generate` reuse them. Corpus loading is deliberately outside this interview implementation; the smoke test uses a tiny token list so the whole solution runs offline and the probability checks are exact.',
+      'The key data structure is:\n`self.counts = defaultdict(Counter)`\nEach context tuple maps to counts of the tokens seen after it.',
+      'For a bigram model trained on `a, b, a, c`, the empty context stores global counts while `("a",)` stores `b: 1` and `c: 1`. The empty context is the unigram fallback for unseen histories.',
+      'During `fit`, each token updates every available suffix from `()` through the longest context. A trigram therefore records the empty, one-token, and two-token contexts.',
+      'At prediction time, try the longest suffix first and back off to shorter suffixes. Divide the selected `Counter` by its total to form probabilities.',
+      'Generation repeatedly looks up the current output history, samples with a local `random.Random(seed)`, and appends the sampled token. Memory cue: count → back off → normalize → sample.',
     ],
     solutionCode: `from __future__ import annotations
 
 from collections import Counter, defaultdict
-from collections.abc import Iterable
 import random
-
-# Each vocabulary item can be a word-like string or an integer token id.
-Token = str | int
-
-# Prefer the browser-mounted corpus, then the public source, then a small offline fallback.
-TINY_SHAKESPEARE_PATH = "/datasets/tiny-shakespeare.txt"
-TINY_SHAKESPEARE_URL = (
-    "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
-)
-TINY_SHAKESPEARE_FALLBACK = """First Citizen: Before we proceed any further, hear me speak.
-All: Speak, speak.
-First Citizen: You are all resolved rather to die than to famish?
-All: Resolved. resolved.
-First Citizen: First, you know Caius Marcius is chief enemy to the people.
-All: We know't, we know't.
-"""
-
-def load_tiny_shakespeare(max_chars: int = 12000) -> str:
-    # Bound the downloaded/demo corpus to a positive, predictable amount of text.
-    if isinstance(max_chars, bool) or not isinstance(max_chars, int) or max_chars <= 0:
-        raise ValueError("max_chars must be a positive integer")
-
-    try:
-        # Pyodide exposes browser-served assets through open_url.
-        from pyodide.http import open_url
-
-        text = open_url(TINY_SHAKESPEARE_PATH).read()
-    except Exception:
-        try:
-            # Outside the browser, fetch the same corpus directly from its public source.
-            from urllib.request import urlopen
-
-            with urlopen(TINY_SHAKESPEARE_URL, timeout=10) as response:
-                text = response.read().decode("utf-8")
-        except Exception:
-            # Keep the exercise runnable even when neither the mounted asset nor network is available.
-            text = TINY_SHAKESPEARE_FALLBACK
-
-    # Convert to str defensively and trim only after a source has been selected.
-    return str(text[:max_chars])
-
-def tokenize_words(text: str) -> list[str]:
-    # This minimal tokenizer treats whitespace-delimited chunks as word tokens.
-    if not isinstance(text, str) or not text.strip():
-        raise ValueError("text must be a non-empty string")
-    return text.split()
-
-def _coerce_tokens(values: Iterable[Token], name: str) -> list[Token]:
-    # A bare string is iterable by character but is not a sequence of already-tokenized values.
-    if isinstance(values, (str, bytes)):
-        raise ValueError(f"{name} must be a sequence of string or int tokens")
-    try:
-        # Materialize iterables once because training and validation may make multiple passes.
-        items = list(values)
-    except TypeError as exc:
-        raise ValueError(f"{name} must be a sequence of string or int tokens") from exc
-    # bool is an int subclass, but treating True/False as vocabulary items is rarely intentional.
-    if any(isinstance(token, bool) or not isinstance(token, (str, int)) for token in items):
-        raise ValueError(f"{name} must contain only string or int tokens")
-    return items
 
 class NGramModel:
     def __init__(self, n: int):
-        # An n-gram order of one is valid: it learns an unconditional token distribution.
-        if isinstance(n, bool) or not isinstance(n, int) or n < 1:
-            raise ValueError("n must be an integer >= 1")
         self.n = n
-        # Map each context tuple to a Counter of the tokens observed immediately after it.
-        self.counts: defaultdict[tuple[Token, ...], Counter[Token]] = defaultdict(Counter)
+        self.counts = defaultdict(Counter)
 
-    def fit(self, tokens: Iterable[Token]) -> NGramModel:
-        # Validate and materialize the token stream before rebuilding the model state.
-        tokens = _coerce_tokens(tokens, "tokens")
-        self.counts.clear()
-
-        # Visit each observed next token once.
-        for index, token in enumerate(tokens):
-            # Store every available suffix so inference can back off without retraining.
-            for context_len in range(min(self.n - 1, index) + 1):
-                context = tuple(tokens[index - context_len:index]) if context_len else ()
-                # Increment the count for seeing token immediately after that context.
+    def fit(self, tokens):
+        for i, token in enumerate(tokens):
+            # Store counts for context sizes 0 ... n - 1.
+            for size in range(min(self.n - 1, i) + 1):
+                context = tuple(tokens[i - size:i])
                 self.counts[context][token] += 1
+
         return self
 
-    def next_token_probs(self, context: Iterable[Token]) -> dict[Token, float]:
-        # Normalize any caller-supplied history to the same token representation as fit.
-        context = _coerce_tokens(context, "context")
-        # Try the longest usable suffix first, then progressively fall back to shorter contexts.
-        for context_len in range(min(len(context), self.n - 1), -1, -1):
-            key = tuple(context[-context_len:]) if context_len else ()
-            counts = self.counts.get(key)
-            if counts:
-                # Divide counts by their total to expose a proper categorical distribution.
+    def next_token_probs(self, context):
+        # Try longest context first, then back off.
+        for size in range(min(self.n - 1, len(context)), -1, -1):
+            key = tuple(context[-size:]) if size > 0 else ()
+
+            if key in self.counts:
+                counts = self.counts[key]
                 total = sum(counts.values())
-                return {token: count / total for token, count in counts.items()}
-        # An unfitted or empty model has no next-token distribution.
+
+                return {
+                    token: count / total
+                    for token, count in counts.items()
+                }
+
         return {}
 
-    def generate(self, max_tokens: int, seed: int | None = None) -> list[Token]:
-        # Validate output length and optional seed without accepting bool as an integer argument.
-        if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens < 0:
-            raise ValueError("max_tokens must be a non-negative integer")
-        if seed is not None and (isinstance(seed, bool) or not isinstance(seed, int)):
-            raise ValueError("seed must be an integer or None")
-
-        # A local RNG makes a supplied seed reproducible without modifying global random state.
+    def generate(self, max_tokens: int, seed: int | None = None):
         rng = random.Random(seed)
-        generated: list[Token] = []
+        output = []
+
         for _ in range(max_tokens):
-            # The generated history is the context; next_token_probs automatically backs off.
-            probs = self.next_token_probs(generated)
+            probs = self.next_token_probs(output)
+
             if not probs:
                 break
-            # random.choices expects parallel item and probability-weight lists.
-            tokens, weights = list(probs), list(probs.values())
-            # A local RNG keeps seeded generation reproducible without global-state side effects.
-            generated.append(rng.choices(tokens, weights=weights, k=1)[0])
-        return generated
 
-# Load a bounded corpus, tokenize it, and train a trigram model in one fluent expression.
-text = load_tiny_shakespeare(max_chars=12000)
-tokens = tokenize_words(text)
-model = NGramModel(3).fit(tokens)
+            tokens = list(probs.keys())
+            weights = list(probs.values())
 
-# Show corpus size, one conditional distribution, and a deterministic sampled continuation.
-print(f"loaded {len(tokens)} tokens")
-print(model.next_token_probs(["Before", "we"]))
-print(" ".join(str(token) for token in model.generate(12, seed=7)))`,
+            next_token = rng.choices(tokens, weights=weights, k=1)[0]
+            output.append(next_token)
+
+        return output
+
+model = NGramModel(2)
+model.fit(["a", "b", "a", "c"])
+
+print(model.next_token_probs(["a"]))
+print(model.next_token_probs(["unseen"]))
+print(model.generate(5, seed=4))`,
     starterCode: `from __future__ import annotations
 
 from collections import Counter, defaultdict
-from collections.abc import Iterable
 import random
-
-Token = str | int
-
-def _coerce_tokens(values: Iterable[Token], name: str) -> list[Token]:
-    # TODO: reject strings as containers and validate each token type.
-    raise NotImplementedError("Implement _coerce_tokens")
 
 class NGramModel:
     def __init__(self, n: int):
-        # TODO: validate n and initialize the suffix-count mapping.
+        # TODO: store the order and initialize context -> next-token counts.
         raise NotImplementedError("Implement __init__")
 
-    def fit(self, tokens: Iterable[Token]) -> NGramModel:
-        # TODO: update counts for every suffix length from 0 through n - 1.
+    def fit(self, tokens):
+        # TODO: count the next token for every context size from 0 through n - 1.
         raise NotImplementedError("Implement fit")
 
-    def next_token_probs(self, context: Iterable[Token]) -> dict[Token, float]:
-        # TODO: back off from the longest context suffix and normalize counts.
+    def next_token_probs(self, context):
+        # TODO: try the longest suffix first, then back off and normalize counts.
         raise NotImplementedError("Implement next_token_probs")
 
-    def generate(self, max_tokens: int, seed: int | None = None) -> list[Token]:
+    def generate(self, max_tokens: int, seed: int | None = None):
         # TODO: use a local seeded RNG and sample autoregressively.
         raise NotImplementedError("Implement generate")
 
-def smoke_test() -> None:
-    model = NGramModel(2).fit(["a", "b", "a", "c"])
-    assert model.next_token_probs(["a"]) == {"b": 0.5, "c": 0.5}
-    assert model.next_token_probs(["unseen"]) == {"a": 0.5, "b": 0.25, "c": 0.25}
-    generated = model.generate(5, seed=4)
-    assert len(generated) == 5
-    print("n-gram smoke test passed:", generated)
-
-smoke_test()`,
+model = NGramModel(2)
+model.fit(["a", "b", "a", "c"])
+print(model.next_token_probs(["a"]))`,
     tags: ['Language Models', 'Probability', 'Hash Maps'],
   },
   {
@@ -3721,8 +3564,9 @@ print(average_precision(scores, matches, num_ground_truth=2).item())`,
     ...`,
     requirements: [
       'Inputs have shapes `(N, 4)`, `(N,)`, and `(M, 4)`.',
-      'For each prediction, choose the unmatched ground truth with highest IoU.',
-      'Mark a match only when the best IoU is at least the threshold.',
+      'Compute the pairwise IoU matrix with shape `(N, M)` using broadcasting.',
+      'Process predictions in descending score order and choose the best unused ground truth.',
+      'Mark a match only when the best IoU is at least the threshold; each ground truth can be used once.',
       'Return `-1` for unmatched predictions and preserve prediction-index order in the output.',
     ],
     examples: [
@@ -3738,17 +3582,40 @@ print(average_precision(scores, matches, num_ground_truth=2).item())`,
       },
     ],
     hint: [
-      'Compute a vectorized `(N, M)` IoU matrix first.',
-      'Use a `set` of already claimed ground-truth indices while traversing sorted predictions.',
+      'Use `predictions[:, None, :2]` and `ground_truth[None, :, :2]` to compute all `(N, M)` corner pairs.',
+      '`torch.argsort(scores, descending=True)` gives the order in which predictions claim ground truths.',
+      'Keep a `set` of used GT indices and skip them in the inner loop.',
       'Do not let a second high-overlap prediction become a second true positive.',
     ],
     solutionNotes: [
-      'Match in descending confidence order:\n`prediction → best unmatched ground truth → threshold check → claim or false positive`',
-      'Once a ground-truth object is claimed, later duplicates are false positives. Vectorized IoU handles the geometry; the small loop enforces the one-to-one rule.',
-      'The output must return to original prediction order even though matching happens in score order. Write each decision into `matches[prediction_index]` instead of appending decisions to a new list.',
-      'Mask already-used ground truths before `argmax`. Choosing the best ground truth first and checking availability afterward can miss the next-best legal match.',
+      'Compute all box overlaps once. The two singleton axes create every pair:\n`predictions[:, None, :2]: (N, 1, 2)`\n`ground_truth[None, :, :2]: (1, M, 2)`\nBroadcasting produces `(N, M, 2)` corners and then an `(N, M)` IoU matrix.',
+      'Sort predictions by confidence, then for each one scan only unused ground truths. Track the largest IoU and its index before applying the threshold.',
+      'The `used_gt` set enforces one-to-one matching: once a GT is claimed by a high-confidence prediction, later duplicates remain `-1`.',
+      'Matching happens in score order, but `matches[pred_idx]` writes into original prediction order. Memory cue: pairwise IoU → sort scores → best unused GT → threshold → claim.',
     ],
     solutionCode: `import torch
+
+def box_iou(
+    predictions: torch.Tensor,
+    ground_truth: torch.Tensor,
+) -> torch.Tensor:
+    top_left = torch.maximum(
+        predictions[:, None, :2], ground_truth[None, :, :2]
+    )
+    bottom_right = torch.minimum(
+        predictions[:, None, 2:], ground_truth[None, :, 2:]
+    )
+
+    wh = (bottom_right - top_left).clamp(min=0)
+    intersection = wh[..., 0] * wh[..., 1]
+
+    pred_wh = predictions[:, 2:] - predictions[:, :2]
+    gt_wh = ground_truth[:, 2:] - ground_truth[:, :2]
+    pred_area = pred_wh[:, 0] * pred_wh[:, 1]
+    gt_area = gt_wh[:, 0] * gt_wh[:, 1]
+
+    union = pred_area[:, None] + gt_area[None, :] - intersection
+    return intersection / union.clamp(min=1e-8)
 
 def match_predictions(
     predictions: torch.Tensor,
@@ -3756,37 +3623,28 @@ def match_predictions(
     ground_truth: torch.Tensor,
     iou_threshold: float,
 ) -> list[int]:
-    predictions = torch.as_tensor(predictions, dtype=torch.float64)
-    scores = torch.as_tensor(scores, dtype=torch.float64)
-    ground_truth = torch.as_tensor(ground_truth, dtype=torch.float64)
-    if predictions.ndim != 2 or predictions.shape[1] != 4 or ground_truth.ndim != 2 or ground_truth.shape[1] != 4:
-        raise ValueError("predictions and ground_truth must have shape (N, 4) and (M, 4)")
-    if scores.shape != (predictions.shape[0],) or not 0 <= iou_threshold <= 1:
-        raise ValueError("scores or iou_threshold is invalid")
-
-    top_left = torch.maximum(predictions[:, None, :2], ground_truth[None, :, :2])
-    bottom_right = torch.minimum(predictions[:, None, 2:], ground_truth[None, :, 2:])
-    size = torch.clamp(bottom_right - top_left, min=0.0)
-    intersection = size[..., 0] * size[..., 1]
-    area_pred = (predictions[:, 2] - predictions[:, 0]) * (predictions[:, 3] - predictions[:, 1])
-    area_gt = (ground_truth[:, 2] - ground_truth[:, 0]) * (ground_truth[:, 3] - ground_truth[:, 1])
-    union = area_pred[:, None] + area_gt[None, :] - intersection
-    ious = torch.where(union > 0, intersection / torch.where(union > 0, union, torch.ones_like(union)), torch.zeros_like(union))
+    ious = box_iou(predictions, ground_truth)
 
     matches = [-1] * predictions.shape[0]
-    used = set()
-    for prediction_index in torch.argsort(scores, descending=True).tolist():
-        if ground_truth.shape[0] == 0:
-            continue
-        available = torch.as_tensor([ground_truth_index not in used for ground_truth_index in range(ground_truth.shape[0])], dtype=torch.bool)
-        if not torch.any(available):
-            continue
-        candidate_ious = torch.where(available, ious[prediction_index], torch.full_like(ious[prediction_index], float('-inf')))
-        best_gt = int(torch.argmax(candidate_ious).item())
-        best_iou = float(candidate_ious[best_gt].item())
+    used_gt = set()
+
+    order = torch.argsort(scores, descending=True)
+    for pred_idx in order.tolist():
+        best_iou = -1.0
+        best_gt = -1
+
+        for gt_idx in range(ground_truth.shape[0]):
+            if gt_idx in used_gt:
+                continue
+
+            iou = ious[pred_idx, gt_idx].item()
+            if iou > best_iou:
+                best_iou = iou
+                best_gt = gt_idx
+
         if best_iou >= iou_threshold:
-            matches[prediction_index] = best_gt
-            used.add(best_gt)
+            matches[pred_idx] = best_gt
+            used_gt.add(best_gt)
     return matches
 
 predictions = torch.tensor([[0.0, 0.0, 2.0, 2.0], [0.0, 0.0, 2.0, 2.0]])
@@ -3801,7 +3659,7 @@ def match_predictions(
     ground_truth: torch.Tensor,
     iou_threshold: float,
 ) -> list[int]:
-    # TODO: compute pairwise IoU, then greedily claim each ground-truth box once.
+    # TODO: compute pairwise IoU, sort predictions by score, then greedily claim each GT once.
     raise NotImplementedError("Implement match_predictions")
 
 predictions = torch.tensor([[0.0, 0.0, 2.0, 2.0], [0.0, 0.0, 2.0, 2.0]])
@@ -3891,12 +3749,12 @@ print(transform_points(points, transform))`,
   {
     id: 'batched-best-iou-match',
     order: 34,
-    title: 'Batched best-IoU matching',
+    title: 'Find the best IoU match with broadcasting',
     difficulty: 'Hard',
-    summary: 'For every predicted box in every batch item, find the ground-truth box with maximum IoU.',
+    summary: 'Compute every prediction-to-ground-truth IoU within a batch, then select the best ground-truth box for each prediction.',
     prompt: [
-      'Write `best_iou_match(predictions, ground_truth)` for tensors shaped `(B, N, 4)` and `(B, M, 4)`.',
-      'Return both the best IoU and the best ground-truth index for each predicted box.',
+      'Write `best_iou_match(predictions, ground_truth)` for box tensors shaped `(B, N, 4)` and `(B, M, 4)` in `[x1, y1, x2, y2]` format.',
+      'Use broadcasting to compute every pairwise IoU inside each batch item, then return the best IoU and ground-truth index for each prediction.',
     ],
     signature: `def best_iou_match(
     predictions: torch.Tensor,
@@ -3904,30 +3762,33 @@ print(transform_points(points, transform))`,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     ...`,
     requirements: [
+      'Broadcast prediction and ground-truth coordinates to form pairwise tensors shaped `(B, N, M, 2)`.',
+      'Compute intersection, individual areas, union, and IoU for every `(prediction, ground_truth)` pair.',
+      'Use `iou.max(dim=-1)` to return both the best IoU and its ground-truth index.',
       'Return `best_iou` and `best_gt` with shape `(B, N)`.',
-      'Use broadcasting to form pairwise IoUs within each batch item.',
-      'Use `argmax` over the ground-truth axis and gather the corresponding IoUs.',
-      'Raise `ValueError` for incompatible batch or box shapes.',
     ],
     examples: [
       {
         label: 'Example',
         lines: [
-          'predictions.shape = [B, N, 4]',
-          'ground_truth.shape = [B, M, 4]',
+          'predictions.shape = (2, 5, 4)',
+          'ground_truth.shape = (2, 3, 4)',
         ],
-        result: 'best_iou.shape = [B, N]; best_gt.shape = [B, N]',
+        result: 'best_iou.shape = (2, 5); best_gt.shape = (2, 5)',
       },
     ],
     hint: [
-      'Use `predictions[:, :, None, :]` and `ground_truth[:, None, :, :]` to create `(B, N, M, 4)` pairs.',
-      'After `argmax(dim=-1)`, add a final singleton axis before `torch.gather`.',
+      'Use `predictions[:, :, None, :2]` and `ground_truth[:, None, :, :2]` for pairwise corners.',
+      'Compute `union = pred_area[:, :, None] + gt_area[:, None, :] - intersection`.',
+      'Call `iou.max(dim=-1)`; it returns the values and indices together.',
+      'Keep the batch axis intact so boxes from different images never interact.',
     ],
     solutionNotes: [
-      'This is the full pattern in one exercise: batch-aware broadcasting creates every prediction–ground-truth pair, and the last axis is reduced to the best match.',
-      'The shape flow is:\n`pairwise IoU: (B, N, M)`\n`argmax over M: (B, N)`\n`gather best IoU: (B, N)`',
-      'The singleton axes keep batches isolated:\n`predictions[:, :, None, :]: (B, N, 1, 4)`\n`ground_truth[:, None, :, :]: (B, 1, M, 4)`\nBroadcasting forms `(B, N, M, 4)` without comparing boxes across images.',
-      '`argmax` returns the winning ground-truth index, while `gather` retrieves the IoU at that index. This is independent best matching; unlike greedy detection matching, it does not prevent several predictions from choosing the same ground truth.',
+      'Pairwise broadcasting creates every prediction–ground-truth comparison at once:\n`predictions[:, :, None, :2]: (B, N, 1, 2)`\n`ground_truth[:, None, :, :2]: (B, 1, M, 2)`\nTogether these expand to `(B, N, M, 2)`.',
+      'The geometry is:\n`tl = max(pred_xy1, gt_xy1)`\n`br = min(pred_xy2, gt_xy2)`\n`inter = clamp(br - tl, 0)`\nMultiply the last axis to get intersection area.',
+      'IoU uses the union correction:\n`union = pred_area + gt_area - intersection`\nClamp the denominator to avoid division by zero for degenerate boxes.',
+      'Reduce only the ground-truth axis:\n`best_iou, best_gt = iou.max(dim=-1)`\nThis returns independent best matches, so multiple predictions may select the same ground truth.',
+      'Memory cue: broadcast pairs, compute `intersection / union`, then max over M. The output keeps one score and one GT index for every prediction.',
     ],
     solutionCode: `import torch
 
@@ -3935,21 +3796,18 @@ def best_iou_match(
     predictions: torch.Tensor,
     ground_truth: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    predictions = torch.as_tensor(predictions, dtype=torch.float64)
-    ground_truth = torch.as_tensor(ground_truth, dtype=torch.float64)
-    if predictions.ndim != 3 or ground_truth.ndim != 3 or predictions.shape[0] != ground_truth.shape[0] or predictions.shape[2] != 4 or ground_truth.shape[2] != 4:
-        raise ValueError("predictions and ground_truth must be (B, N, 4) and (B, M, 4)")
     top_left = torch.maximum(predictions[:, :, None, :2], ground_truth[:, None, :, :2])
     bottom_right = torch.minimum(predictions[:, :, None, 2:], ground_truth[:, None, :, 2:])
-    size = torch.clamp(bottom_right - top_left, min=0.0)
-    intersection = size[..., 0] * size[..., 1]
-    area_pred = (predictions[..., 2] - predictions[..., 0]) * (predictions[..., 3] - predictions[..., 1])
-    area_gt = (ground_truth[..., 2] - ground_truth[..., 0]) * (ground_truth[..., 3] - ground_truth[..., 1])
-    union = area_pred[:, :, None] + area_gt[:, None, :] - intersection
-    ious = torch.where(union > 0, intersection / torch.where(union > 0, union, torch.ones_like(union)), torch.zeros_like(union))
-    best_gt = torch.argmax(ious, dim=-1)
-    best_iou = torch.gather(ious, dim=-1, index=best_gt[..., None]).squeeze(-1)
-    return best_iou, best_gt
+    wh = (bottom_right - top_left).clamp(min=0)
+    intersection = wh[..., 0] * wh[..., 1]
+
+    pred_wh = predictions[..., 2:] - predictions[..., :2]
+    gt_wh = ground_truth[..., 2:] - ground_truth[..., :2]
+    pred_area = pred_wh[..., 0] * pred_wh[..., 1]
+    gt_area = gt_wh[..., 0] * gt_wh[..., 1]
+    union = pred_area[:, :, None] + gt_area[:, None, :] - intersection
+    iou = intersection / union.clamp(min=1e-8)
+    return iou.max(dim=-1)
 
 predictions = torch.tensor([[[0.0, 0.0, 2.0, 2.0]]])
 ground_truth = torch.tensor([[[1.0, 1.0, 3.0, 3.0]]])
@@ -3960,7 +3818,7 @@ def best_iou_match(
     predictions: torch.Tensor,
     ground_truth: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    # TODO: broadcast pairwise IoU over B, N, and M, then argmax over M.
+    # TODO: broadcast pairwise IoU over B, N, and M, then max over M.
     raise NotImplementedError("Implement best_iou_match")
 
 predictions = torch.tensor([[[0.0, 0.0, 2.0, 2.0]]])
@@ -4201,69 +4059,60 @@ def smoke_test():
     print("MHA smoke test passed:", tuple(output.shape))
 
 smoke_test()`,
-  'cross-attention': `from dataclasses import dataclass
-import math
+  'cross-attention': `import math
 import torch
 from torch import nn
 
 def stable_softmax(x: torch.Tensor, dim: int = -1) -> torch.Tensor:
-    shifted = x - torch.amax(x, dim=dim, keepdim=True)
-    exp_x = torch.exp(shifted)
-    return exp_x / torch.sum(exp_x, dim=dim, keepdim=True)
-
-@dataclass(frozen=True, slots=True)
-class CrossAttentionConfig:
-    model_dim: int
-    num_heads: int
-
-    def __post_init__(self):
-        if self.model_dim <= 0 or self.num_heads <= 0 or self.model_dim % self.num_heads:
-            raise ValueError("num_heads must divide a positive model_dim")
-
-    @property
-    def head_dim(self):
-        return self.model_dim // self.num_heads
+    x = x - x.max(dim=dim, keepdim=True).values
+    exp_x = torch.exp(x)
+    return exp_x / exp_x.sum(dim=dim, keepdim=True)
 
 class CrossAttention(nn.Module):
-    def __init__(self, config: CrossAttentionConfig):
+    def __init__(self, d_model: int, num_heads: int):
         super().__init__()
-        self.config = config
-        self.q_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
-        self.k_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
-        self.v_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
-        self.out_proj = nn.Linear(config.model_dim, config.model_dim, bias=False)
+        if d_model <= 0 or num_heads <= 0 or d_model % num_heads != 0:
+            raise ValueError("num_heads must divide a positive d_model")
 
-    def _split_heads(self, x: torch.Tensor) -> torch.Tensor:
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.head_dim = d_model // num_heads
+        self.q_proj = nn.Linear(d_model, d_model, bias=False)
+        self.k_proj = nn.Linear(d_model, d_model, bias=False)
+        self.v_proj = nn.Linear(d_model, d_model, bias=False)
+        self.out_proj = nn.Linear(d_model, d_model, bias=False)
+
+    def split_heads(self, x: torch.Tensor) -> torch.Tensor:
         batch_size, length, _ = x.shape
-        x = x.reshape(batch_size, length, self.config.num_heads, self.config.head_dim)
+        x = x.reshape(batch_size, length, self.num_heads, self.head_dim)
         return x.permute(0, 2, 1, 3)
 
     def forward(self, seq_a: torch.Tensor, seq_b: torch.Tensor) -> torch.Tensor:
-        q = self._split_heads(self.q_proj(seq_a))
-        k = self._split_heads(self.k_proj(seq_b))
-        v = self._split_heads(self.v_proj(seq_b))
-        scores = q @ k.transpose(-2, -1) / math.sqrt(self.config.head_dim)
+        q = self.split_heads(self.q_proj(seq_a))
+        k = self.split_heads(self.k_proj(seq_b))
+        v = self.split_heads(self.v_proj(seq_b))
+        scores = q @ k.transpose(-2, -1) / math.sqrt(self.head_dim)
         weights = stable_softmax(scores, dim=-1)
         context = (weights @ v).permute(0, 2, 1, 3)
-        context = context.reshape(seq_a.shape[0], seq_a.shape[1], self.config.model_dim)
+        batch_size, length, _, _ = context.shape
+        context = context.reshape(batch_size, length, self.d_model)
         return self.out_proj(context)
 
-def smoke_test():
+def test_cross_attention():
     torch.manual_seed(0)
-    model = CrossAttention(CrossAttentionConfig(model_dim=6, num_heads=2))
+    layer = CrossAttention(d_model=6, num_heads=2)
     seq_a = torch.randn(2, 3, 6)
     seq_b = torch.randn(2, 5, 6)
-    output = model(seq_a, seq_b)
+    output = layer(seq_a, seq_b)
+    print(output.shape)
     assert output.shape == (2, 3, 6)
-    assert bool(torch.all(torch.isfinite(output)))
-    print("Cross-attention smoke test passed:", tuple(output.shape))
 
-smoke_test()`,
+test_cross_attention()`,
   'manual-backprop-for-a-2-layer-mlp': `import torch
 
 def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
     hidden_pre = X @ W1 + b1
-    hidden = torch.clamp(hidden_pre, min=0)
+    hidden = torch.relu(hidden_pre)
     logits = hidden @ W2 + b2
     shifted = logits - torch.amax(logits, dim=1, keepdim=True)
     exp_logits = torch.exp(shifted)
@@ -4301,60 +4150,49 @@ def mlp_forward_backward(X, y, W1, b1, W2, b2):
     dW1 = X.T @ dhidden
     db1 = torch.sum(dhidden, dim=0)
     return {'loss': loss, 'dW1': dW1, 'db1': db1, 'dW2': dW2, 'db2': db2}`,
-  'simple-n-gram-language-model': `from collections import Counter, defaultdict
+  'simple-n-gram-language-model': `from __future__ import annotations
+
+from collections import Counter, defaultdict
 import random
 
-def _coerce_tokens(values, name):
-    if isinstance(values, (str, bytes)):
-        raise ValueError(f"{name} must be an iterable of tokens")
-    return list(values)
-
 class NGramModel:
-    def __init__(self, n):
-        if isinstance(n, bool) or not isinstance(n, int) or n < 1:
-            raise ValueError("n must be an integer >= 1")
+    def __init__(self, n: int):
         self.n = n
         self.counts = defaultdict(Counter)
 
     def fit(self, tokens):
-        tokens = _coerce_tokens(tokens, 'tokens')
-        self.counts.clear()
-        for index, token in enumerate(tokens):
-            for size in range(min(self.n - 1, index) + 1):
-                context = tuple(tokens[index - size:index])
+        for i, token in enumerate(tokens):
+            for size in range(min(self.n - 1, i) + 1):
+                context = tuple(tokens[i - size:i])
                 self.counts[context][token] += 1
         return self
 
     def next_token_probs(self, context):
-        context = list(context)
         for size in range(min(self.n - 1, len(context)), -1, -1):
-            key = tuple(context[-size:]) if size else ()
-            counts = self.counts.get(key)
-            if counts:
+            key = tuple(context[-size:]) if size > 0 else ()
+            if key in self.counts:
+                counts = self.counts[key]
                 total = sum(counts.values())
                 return {token: count / total for token, count in counts.items()}
         return {}
 
-    def generate(self, max_tokens, seed=None):
+    def generate(self, max_tokens: int, seed: int | None = None):
         rng = random.Random(seed)
         output = []
         for _ in range(max_tokens):
             probs = self.next_token_probs(output)
             if not probs:
                 break
-            tokens, weights = zip(*probs.items())
+            tokens = list(probs.keys())
+            weights = list(probs.values())
             output.append(rng.choices(tokens, weights=weights, k=1)[0])
         return output
 
-def smoke_test():
-    model = NGramModel(2).fit(["a", "b", "a", "c"])
-    assert model.next_token_probs(["a"]) == {"b": 0.5, "c": 0.5}
-    assert model.next_token_probs(["unseen"]) == {"a": 0.5, "b": 0.25, "c": 0.25}
-    generated = model.generate(5, seed=4)
-    assert len(generated) == 5
-    print("n-gram smoke test passed:", generated)
-
-smoke_test()`,
+model = NGramModel(2)
+model.fit(["a", "b", "a", "c"])
+print(model.next_token_probs(["a"]))
+print(model.next_token_probs(["unseen"]))
+print(model.generate(5, seed=4))`,
 };
 
 // NumPy is useful here when it reinforces the same formula with a smaller array API.

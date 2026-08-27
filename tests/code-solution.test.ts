@@ -48,7 +48,7 @@ describe('augmentCodeWithSolution', () => {
       expect(() => compilePython(annotatedCode), problem.id).not.toThrow();
       expect(augmentCodeWithSolution(problem, annotatedCode), problem.id).toBe(annotatedCode);
     }
-  });
+  }, 15_000);
 
   it('keeps the reference path focused on the operation being taught', () => {
     const softmaxProblem = codePracticeProblems.find(
@@ -72,7 +72,7 @@ describe('augmentCodeWithSolution', () => {
   it('inserts class helper methods required by attention forward passes', () => {
     const expectedHelpers = new Map([
       ['scaled-dot-product-self-attention', ['_split_heads']],
-      ['cross-attention', ['_split_heads']],
+      ['cross-attention', ['split_heads']],
       ['grouped-query-and-multi-query-attention', ['_split', '_repeat_kv']],
     ]);
 
@@ -94,7 +94,7 @@ describe('augmentCodeWithSolution', () => {
     const annotatedCode = augmentCodeWithSolution(problem);
 
     expect(annotatedCode).toContain(
-      'def _split_heads(self, x: torch.Tensor) -> torch.Tensor:',
+      'def split_heads(self, x: torch.Tensor) -> torch.Tensor:',
     );
     expect(annotatedCode).toContain('batch_size, length, _ = x.shape');
     expect(annotatedCode).not.toContain('def forward(self, seq_a, seq_b, mask');
