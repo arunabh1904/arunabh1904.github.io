@@ -28,13 +28,13 @@ summary: "2022 – Training Language Models to Follow Instructions with Human Fe
 ## Core Insights
 
 ![Figure 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model from Training Language Models to Follow Instructions with Human Feedback](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-paper-figure.png)
-*Figure 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model. From the [Training Language Models to Follow Instructions with Human Feedback paper](https://arxiv.org/abs/2203.02155). source: [Training Language Models to Follow Instructions with Human Feedback paper](https://arxiv.org/abs/2203.02155)*
+*Fig 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model. | source: [Training Language Models to Follow Instructions with Human Feedback paper](https://arxiv.org/abs/2203.02155)*
 
 ![Figure 6 from Training Language Models to Follow Instructions with Human Feedback](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-source-figure-6.webp)
-*Figure 6 Results on the TruthfulQA dataset. Gray bars indicate ratings of truthfulness; colored bars indicate ratings of truthfulness and informativeness. source: [Training Language Models to Follow Instructions with Human Feedback](https://arxiv.org/abs/2203.02155)*
+*Fig 2: Results on the TruthfulQA dataset. Gray bars indicate ratings of truthfulness; colored bars indicate ratings of truthfulness and informativeness. | source: [Training Language Models to Follow Instructions with Human Feedback](https://arxiv.org/abs/2203.02155)*
 
 ![Figure 2 from Training Language Models to Follow Instructions with Human Feedback](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-source-figure-2.webp)
-*Figure 2 A diagram illustrating the three steps of our method: (1) supervised fine-tuning (SFT), (2) reward model (RM) training, and (3) reinforcement learning via proximal policy optimization (PPO) on this reward model. Blue arrows indicate that this data is used to train one of our models. In Step 2, boxes A-D are samples from our models that get ranked by labelers. See Section 3 for more details on our method. source: [Training Language Models to Follow Instructions with Human Feedback](https://arxiv.org/abs/2203.02155)*
+*Fig 3: A diagram illustrating the three steps of our method: (1) supervised fine-tuning (SFT), (2) reward model (RM) training, and (3) reinforcement learning via proximal policy optimization (PPO) on this reward model. Blue arrows indicate that this data is used to train one of our models. | source: [Training Language Models to Follow Instructions with Human Feedback](https://arxiv.org/abs/2203.02155)*
 
 
 ### Method and reported result

@@ -30,13 +30,13 @@ The paper first audits the learned depth inside Lift-Splat-style detectors. Repl
 The full system adds efficient voxel pooling and temporal fusion. On nuScenes test, the paper reports 60.9 NDS, the first camera-only result above 60 NDS at publication. That number does not mean sparse LiDAR labels solve monocular ambiguity everywhere: supervision is sparse, dynamic-object alignment can be imperfect, and the runtime camera still loses direct range observability in novel conditions.
 
 ![Figure 4 from BEVDepth, showing LiDAR depth supervision used during training and a camera-only inference path](/assets/images/bevdepth-paper-figure-4.png)
-*The red supervision arrow exists only during training; the deployed path runs from multi-view images through depth prediction and BEV pooling. source: [BEVDepth](https://arxiv.org/abs/2206.10092)*
+*Fig 1: The red supervision arrow exists only during training; the deployed path runs from multi-view images through depth prediction and BEV pooling. | source: [BEVDepth](https://arxiv.org/abs/2206.10092)*
 
 ![Figure 4 from BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection](/assets/images/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection-source-figure-4.webp)
-*Figure 4 Framework of BEVDepth. Image backbone extracts image feature from multi-view images. Depth net takes Image feature as input, generates context and depth, and gets the final point feature. Voxel Pooling unifies all point features into one coordinate system and pools them onto the BEV feature map. source: [BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection](https://arxiv.org/abs/2206.10092)*
+*Fig 2: Framework of BEVDepth. Image backbone extracts image feature from multi-view images. | source: [BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection](https://arxiv.org/abs/2206.10092)*
 
 ![Figure 1 from BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection](/assets/images/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection-source-figure-1.webp)
-*Figure 1 Depth estimation results in Lift-splat detector and BEVDepth. Dashed boxes highlight the regions that Lift-splat detector makes “relatively” accurate depth predictions in, usually being the attaching regions between objects and the ground. source: [BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection](https://arxiv.org/abs/2206.10092)*
+*Fig 3: Depth estimation results in Lift-splat detector and BEVDepth. Dashed boxes highlight the regions that Lift-splat detector makes “relatively” accurate depth predictions in, usually being the attaching regions between objects and the ground. | source: [BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection](https://arxiv.org/abs/2206.10092)*
 
 
 | Depth mechanism | Input at training | Input at inference | Role |

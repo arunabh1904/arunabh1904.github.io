@@ -26,13 +26,11 @@ DriveMM is an academic generalist model for autonomous driving. It trains across
 DriveMM, presented as RoboTron-Drive in the paper, tries to unify autonomous-driving tasks in one large multimodal model. It handles multiple datasets and task types through a shared model and prompt formulation instead of training separate specialized networks for every perception, prediction, or planning task. The main evidence is broad performance across six datasets and 13 tasks, including zero-shot generalization to unseen datasets. The limitation is that all-in-one benchmark performance does not prove closed-loop driving safety. The paper is best read as a generalization study for driving LMMs, not as a complete autonomy stack.
 
 ![Figure 1: RoboTron-Drive achieves SOTA in both general capabilities and generalization ability from DriveMM: All-in-One Large Multimodal Model for Autonomous Driving](/assets/images/drivemm-all-in-one-large-multimodal-model-for-autonomous-driving-paper-figure.jpg)
-*Figure 1: RoboTron-Drive achieves SOTA in both general capabilities and generalization ability. From the [DriveMM: All-in-One Large Multimodal Model for Autonomous Driving paper](https://arxiv.org/abs/2412.07689). source: [DriveMM: All-in-One Large Multimodal Model for Autonomous Driving paper](https://arxiv.org/abs/2412.07689)*
+*Fig 1: RoboTron-Drive achieves SOTA in both general capabilities and generalization ability. | source: [DriveMM: All-in-One Large Multimodal Model for Autonomous Driving paper](https://arxiv.org/abs/2412.07689)*
 
 ![Figure 2 from DriveMM: All-in-One Large Multimodal Model for Autonomous Driving](/assets/images/drivemm-all-in-one-large-multimodal-model-for-autonomous-driving-source-figure-2.webp)
-*Figure 2 Figure S2 : Visualization of CODA-LM. source: [DriveMM: All-in-One Large Multimodal Model for Autonomous Driving](https://arxiv.org/abs/2412.07689)*
+*Fig 2: CODA-LM organizes status and motion prediction, scene and road understanding, risk detection, grounding, and action reasoning as prompts to one multimodal language model. | source: [DriveMM: All-in-One Large Multimodal Model for Autonomous Driving](https://arxiv.org/abs/2412.07689)*
 
-![Figure 2 from DriveMM: All-in-One Large Multimodal Model for Autonomous Driving](/assets/images/drivemm-all-in-one-large-multimodal-model-for-autonomous-driving-source-figure-2.webp)
-*Figure 2 Overview of RoboTron-Drive framwork. We adapt the architecture form of LLaVA [ 30 ] with a different model instantiation, processing various visual input signals. We design a perspective-aware prompt to accept multi-perspective inputs in AD scenario. Equipped with diverse AD multimodal data, RoboTron-Drive possesses an all-in-one capability to accomplish multiple tasks in autonomous driving. source: [DriveMM: All-in-One Large Multimodal Model for Autonomous Driving](https://arxiv.org/abs/2412.07689)*
 
 
 **What to look at:**

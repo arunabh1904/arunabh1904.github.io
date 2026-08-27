@@ -26,13 +26,13 @@ CRAFT starts from camera-generated 3D proposals, associates nearby radar returns
 Soft Polar Association builds a proposal-specific radar set. A spatio-contextual fusion transformer then exchanges position and feature evidence between image tokens and radar returns. On nuScenes test, the paper reports 41.1 mAP and 52.3 NDS. Relative to its camera-only CRAFT-I baseline on validation, radar adds 7.9 mAP overall, with larger gains on reflective metal classes and distant objects.
 
 ![CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer source figure: Overall architecture of CRAFT.](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-paper-figure.webp)
-*Overall architecture of CRAFT. source: [CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer](https://arxiv.org/abs/2209.06535)*
+*Fig 1: CRAFT associates radar points with camera proposals in polar space, exchanges image and radar features through a spatio-contextual fusion transformer, then applies fused detection heads. | source: [CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer](https://arxiv.org/abs/2209.06535)*
 
 ![Figure 5 from CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-source-figure-5.webp)
-*Figure 5 Qualitative results of CRAFT. Blue circles indicate samples that are refined by fusing radar points and have more accurate localization, and red circles indicate samples that are predicted by camera-only since there are no valid radar returns among associated points. Best viewed in color with zoom in. source: [CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer](https://arxiv.org/abs/2209.06535)*
+*Fig 2: CRAFT qualitative results mark radar-refined camera proposals in blue and camera-only predictions in red when no valid radar return can be associated. | source: [CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer](https://arxiv.org/abs/2209.06535)*
 
 ![Figure 4 from CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-source-figure-4.webp)
-*Figure 4 Analysis of different object distances and the number of radar points. source: [CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer](https://arxiv.org/abs/2209.06535)*
+*Fig 3: Analysis of different object distances and the number of radar points. | source: [CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer](https://arxiv.org/abs/2209.06535)*
 
 
 | Ablation | Car AP | Association recall | What it isolates |

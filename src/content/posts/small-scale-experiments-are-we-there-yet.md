@@ -24,13 +24,13 @@ summary: '2026 – Small-Scale Experiments: Are We There Yet?'
 ## Core Insights
 
 ![Scaling-law fits obtained after random searches of 4, 16, 64, and 256 hyperparameter configurations](/assets/images/small-scale-hyperparameter-tuning-frontier.png)
-*The scaling law is fitted to the best run found at each scale. With a small search, poor configurations obscure the frontier; a 256-configuration search makes the held-out 268M prediction accurate.. source: [Small-Scale Experiments: Are We There Yet?](https://arxiv.org/abs/2608.11859)*
+*Fig 1: The scaling law is fitted to the best run found at each scale. With a small search, poor configurations obscure the frontier; a 256-configuration search makes the held-out 268M prediction accurate. | source: [Small-Scale Experiments: Are We There Yet?](https://arxiv.org/abs/2608.11859)*
 
 ![Figure 1 from Small-Scale Experiments: Are We There Yet?](/assets/images/small-scale-experiments-are-we-there-yet-source-figure-1.webp)
-*Figure 1 Scaling laws emerge at very small scales, smaller than widely believed; however, hyperparameter tuning becomes critical. Predictable scaling appears only at the fully tuned frontier. Smaller models are harder to tune, making their scaling laws harder to observe though no less present. source: [Small-Scale Experiments: Are We There Yet?](https://arxiv.org/abs/2608.11859)*
+*Fig 2: Scaling laws emerge at very small scales, smaller than widely believed; however, hyperparameter tuning becomes critical. Predictable scaling appears only at the fully tuned frontier. | source: [Small-Scale Experiments: Are We There Yet?](https://arxiv.org/abs/2608.11859)*
 
 ![Figure 2 from Small-Scale Experiments: Are We There Yet?](/assets/images/small-scale-experiments-are-we-there-yet-source-figure-2.webp)
-*Figure 2 Given a fixed corpus, perplexity corresponds to downstream capability across a wide variety of tasks. The relationship between pretraining loss and capability is not always predictable or even monotonic; however, models achieving the same loss have a similar conditional distribution over their capabilities as we increase parameters and data, or even randomize the architecture, as long as the composition of pretraining data remains fixed. source: [Small-Scale Experiments: Are We There Yet?](https://arxiv.org/abs/2608.11859)*
+*Fig 3: With a fixed pretraining corpus, models that reach the same loss show similar downstream capability distributions even when parameter count, data volume, or architecture changes; the relationship is task-dependent and not always monotonic. | source: [Small-Scale Experiments: Are We There Yet?](https://arxiv.org/abs/2608.11859)*
 
 
 ### A scaling law describes the tuned frontier

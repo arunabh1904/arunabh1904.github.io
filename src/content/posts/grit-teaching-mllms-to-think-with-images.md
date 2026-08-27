@@ -19,14 +19,12 @@ summary: '2025 – GRIT: Teaching MLLMs to Think with Images'
 
 ## Core Insights
 
-![GRIT comparison of language-only reasoning with grounded reasoning that includes bounding boxes](/assets/images/grit-paper-figure-1.png)
-*GRIT makes parts of the reasoning trace inspectable by inserting explicit references to image regions. source: [GRIT](https://arxiv.org/abs/2505.15879)*
 
 ![Figure 1 from GRIT: Teaching MLLMs to Think with Images](/assets/images/grit-teaching-mllms-to-think-with-images-source-figure-1.webp)
-*Figure 1 Comparison of reasoning with pure natural language and our grounded reasoning that mixes explicit bounding boxes for image regions with a chain of natural language thoughts. Our GRIT method enables MLLMs to perform grounded reasoning with only 20 training samples, realizing a clear and reliable process of thinking with images. source: [GRIT: Teaching MLLMs to Think with Images](https://arxiv.org/abs/2505.15879)*
+*Fig 1: Comparison of reasoning with pure natural language and our grounded reasoning that mixes explicit bounding boxes for image regions with a chain of natural language thoughts. Our GRIT method enables MLLMs to perform grounded reasoning with only 20 training samples, realizing a clear and reliable process of thinking with images. | source: [GRIT: Teaching MLLMs to Think with Images](https://arxiv.org/abs/2505.15879)*
 
 ![Figure 2 from GRIT: Teaching MLLMs to Think with Images](/assets/images/grit-teaching-mllms-to-think-with-images-source-figure-2.webp)
-*Figure 2 Model update via GRPO-GR. During GRPO-GR training, we sample a group of model completions and calculate the grounded-reasoning-format reward ( ), the optional grounded-target-counting reward ( ), and the GPT-aided answer-accuracy reward ( ). The rewards are used to calculate the group-normalized advantage and guide the policy optimization. source: [GRIT: Teaching MLLMs to Think with Images](https://arxiv.org/abs/2505.15879)*
+*Fig 2: GRPO-GR samples groups of completions and combines grounded-reasoning format, target-counting, and GPT-assisted answer-accuracy rewards to update the multimodal model. | source: [GRIT: Teaching MLLMs to Think with Images](https://arxiv.org/abs/2505.15879)*
 
 
 The method changes the reasoning interface. A language-only chain can sound coherent while drifting away from the image. GRIT requires the model to name coordinates as it reasons, which gives the reward function a structural target and the reader an evidence trail.

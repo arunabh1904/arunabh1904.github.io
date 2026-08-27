@@ -27,10 +27,10 @@ NVAutoNet is a camera-only, multi-task BEV system designed around the constraint
 The paper reports training on a proprietary dataset with 2.2 million scenes and a 200-meter detection range. The full network runs at 53 FPS, or roughly 18 ms, on NVIDIA DRIVE Orin. It also augments sensor mounting and camera parameters so one model can tolerate deviations across vehicles rather than overfit to a single calibration.
 
 ![NVAutoNet: Fast and Accurate 360° 3D Visual Perception for Self Driving source figure: NVAutoNet overview.](/assets/images/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving-paper-figure.webp)
-*NVAutoNet overview. source: [NVAutoNet: Fast and Accurate 360° 3D Visual Perception for Self Driving](https://arxiv.org/abs/2303.12976)*
+*Fig 1: NVAutoNet encodes multi-camera images, lifts features into BEV, fuses them, and applies a BEV encoder to produce 360-degree 3D detections and trajectories. | source: [NVAutoNet: Fast and Accurate 360° 3D Visual Perception for Self Driving](https://arxiv.org/abs/2303.12976)*
 
 ![Figure 2 from NVAutoNet: Fast and Accurate 360° 3D Visual Perception for Self Driving](/assets/images/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving-source-figure-2.webp)
-*Figure 2 An overview of perspective to BEV view transformation. Left: Camera pixels are projected onto the BEV plane using camera intrinsic and extrinsic parameters. The resulting polar BEV points are then used to fit polynomial functions (one for each image column). These polynomial functions accept BEV radial distances as inputs and output corresponding BEV angular positions. Right: Image features are transformed into pseudo BEV features which are then transformed to the BEV features using BEV indices. source: [NVAutoNet: Fast and Accurate 360° 3D Visual Perception for Self Driving](https://arxiv.org/abs/2303.12976)*
+*Fig 2: An overview of perspective to BEV view transformation. Left: Camera pixels are projected onto the BEV plane using camera intrinsic and extrinsic parameters. | source: [NVAutoNet: Fast and Accurate 360° 3D Visual Perception for Self Driving](https://arxiv.org/abs/2303.12976)*
 
 
 | Signal | Reported value | Interpretation |

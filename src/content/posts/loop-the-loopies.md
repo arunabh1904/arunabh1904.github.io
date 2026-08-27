@@ -23,13 +23,13 @@ summary: '2026 – Loop the Loopies!'
 ## Core Insights
 
 ![Loopie layer-loop recurrence compared with whole-model recurrence](/assets/images/loopie-layer-loop-vs-model-loop.png)
-*Layer-loop applies each Attention/MoE block repeatedly before advancing through the stack; model-loop traverses the whole stack and then starts again. The local schedule improves parameter reuse and avoids a cyclic pipeline path. org/abs/2607.16051). source: [Loopie paper](https://arxiv.org/abs/2607.16051)*
+*Fig 1: Layer-loop applies each Attention/MoE block repeatedly before advancing through the stack; model-loop traverses the whole stack and then starts again. The local schedule improves parameter reuse and avoids a cyclic pipeline path. | source: [Loopie paper](https://arxiv.org/abs/2607.16051)*
 
 ![Figure 5 from Loop the Loopies!](/assets/images/loop-the-loopies-source-figure-5.webp)
-*Figure 5 Layer-loop ablation for Loopie-6B-A0.6B. We report the average score across eight downstream benchmarks for Loopie-6B-A0.6B and Loopie-6B-A0.6B-Ablation. Loopie-6B-A0.6B-Ablation matches Loopie-6B-A0.6B in all architectural details except for the removal of layer-loop recurrence. source: [Loop the Loopies!](https://arxiv.org/abs/2607.16051)*
+*Fig 2: Layer-loop ablation for Loopie-6B-A0.6B. We report the average score across eight downstream benchmarks for Loopie-6B-A0.6B and Loopie-6B-A0.6B-Ablation. | source: [Loop the Loopies!](https://arxiv.org/abs/2607.16051)*
 
 ![Figure 7 from Loop the Loopies!](/assets/images/loop-the-loopies-source-figure-7.webp)
-*Figure 7 Composition of the Stage-2 high-quality annealing data pool: multiple data sources make up the 1.26T-token annealing recipe. source: [Loop the Loopies!](https://arxiv.org/abs/2607.16051)*
+*Fig 3: Composition of the Stage-2 high-quality annealing data pool: multiple data sources make up the 1.26T-token annealing recipe. | source: [Loop the Loopies!](https://arxiv.org/abs/2607.16051)*
 
 
 ### Recurrence is scheduled within each stored layer

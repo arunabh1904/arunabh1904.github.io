@@ -32,13 +32,13 @@ The authors define unintended memorization as information about a particular dat
 The cleanest experiment trains on uniformly random bitstrings. Random strings have known information content and no shared structure, so loss reduction cannot come from learning reusable linguistic patterns. Under that setup, memorization rises with data size until it reaches an empirical capacity limit. The authors then adapt the analysis to text by using a large oracle model to estimate how much of a sample is explained by the underlying text distribution rather than sample-level storage.
 
 ![Figure 1 from How Much Do Language Models Memorize? showing random-string memorization plateauing at capacity](/assets/images/how-much-do-language-models-memorize-paper-figure.png)
-*Figure 1 isolates capacity with uniform random data: because there is no reusable pattern to learn, memorization rises until it hits the model's empirical storage limit. From the [paper](https://arxiv.org/abs/2505.24832). source: [paper](https://arxiv.org/abs/2505.24832)*
+*Fig 1: Isolates capacity with uniform random data: because there is no reusable pattern to learn, memorization rises until it hits the model's empirical storage limit. | source: [paper](https://arxiv.org/abs/2505.24832)*
 
 ![Figure 10 from How Much Do Language Models Memorize?](/assets/images/how-much-do-language-models-memorize-source-figure-10.webp)
-*Figure 10 Extraction rates of 64-token training sequences across prefix lengths, for both train and evaluation. source: [How Much Do Language Models Memorize?](https://arxiv.org/abs/2505.24832)*
+*Fig 2: Extraction rates of 64-token training sequences across prefix lengths, for both train and evaluation. | source: [How Much Do Language Models Memorize?](https://arxiv.org/abs/2505.24832)*
 
 ![Figure 7 from How Much Do Language Models Memorize?](/assets/images/how-much-do-language-models-memorize-source-figure-7.webp)
-*Figure 7 Scaling law curves for membership inference overlaid with empirical data, shown in circles. source: [How Much Do Language Models Memorize?](https://arxiv.org/abs/2505.24832)*
+*Fig 3: Scaling law curves for membership inference overlaid with empirical data, shown in circles. | source: [How Much Do Language Models Memorize?](https://arxiv.org/abs/2505.24832)*
 
 
 _memorization rises until it hits the model's empirical storage limit. source: [paper](https://arxiv.org/abs/2505.24832)

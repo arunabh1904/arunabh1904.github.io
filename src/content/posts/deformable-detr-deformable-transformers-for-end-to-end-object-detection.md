@@ -27,7 +27,7 @@ summary: '2020 – Deformable DETR: Deformable Transformers for End-to-End Objec
 Deformable attention narrows the search. Given a query and a reference point, each attention head predicts a small set of offsets and a weight for each sampled location. Bilinear interpolation retrieves those features, and their weighted sum becomes the query update. The multi-scale version repeats the operation across four feature levels; the default model uses eight heads and four samples per head per level. In the encoder, a feature-map location serves as its own reference point. In the decoder, each object query predicts a reference point that acts as an initial guess for the box center.
 
 ![Deformable attention predicts sampling offsets and weights around a query reference point, retrieves only those image features, and aggregates them across attention heads.](/assets/images/deformable-detr-deformable-attention-source-figure-2.svg)
-*Each query predicts where to sample and how strongly to weight each sampled feature instead of attending to every image location. source: [Deformable DETR](https://arxiv.org/abs/2010.04159)*
+*Fig 1: Each query predicts where to sample and how strongly to weight each sampled feature instead of attending to every image location. | source: [Deformable DETR](https://arxiv.org/abs/2010.04159)*
 
 The important change is the routing rule. Dense attention lets a query inspect the entire feature map, but pays for every possible query-key pair. Deformable attention fixes the number of sampled keys, so encoder complexity grows linearly with feature-map area and multi-scale features become affordable without a separate feature pyramid.
 

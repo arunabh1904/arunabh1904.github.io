@@ -25,14 +25,12 @@ DIMA tackles planner latency by distilling a large multimodal LLM into a smaller
 
 DiMA distills an expensive multimodal or language-enhanced driving planner into an efficient LLM-free planner. The teacher contributes world knowledge and long-tail reasoning; the student learns to reproduce useful planning behavior without calling an LLM at deployment time. The target setting is rare or difficult maneuvers where language reasoning can help, such as overtaking and three-point turns. The key benefit is latency and compute reduction. The caveat is that distillation freezes the teacher's behavior into the student, so the deployed model cannot ask new questions or recover reasoning traces at test time.
 
-![Figure from DiMA: long-tail and zero-shot driving scenarios compared against prior planners](/assets/images/distilling-multimodal-large-language-models-for-autonomous-driving-paper-figure.png)
-*Source figure from the [DiMA paper](https://arxiv.org/abs/2501.09757). source: [DiMA paper](https://arxiv.org/abs/2501.09757)*
 
 ![Figure 2 from Distilling Multi-modal Large Language Models for Autonomous Driving](/assets/images/distilling-multimodal-large-language-models-for-autonomous-driving-source-figure-2.webp)
-*Figure 2 Overview of DiMA. The input to the framework is a multi-view image sequence and a question text prompt. The vision-based end-to-end planner consists of a scene encoder and a planning transformer. The scene encoder learns structured latent representations in the form of b ird’s-eye-view, e go, a gent, and m ap ( ) token embeddings and acts as a trainable tokenizer for the multi-modal large language model (MLLM). The planning transformer is trained under standard planning constraints Jiang et al. 2023 ; Hu et al. source: [Distilling Multi-modal Large Language Models for Autonomous Driving](https://arxiv.org/abs/2501.09757)*
+*Fig 1: DiMA feeds multi-view image sequences to a scene encoder that produces BEV, ego, agent, and map tokens; a multimodal language model supervises the planning transformer during training while deployment remains vision-only. | source: [Distilling Multi-modal Large Language Models for Autonomous Driving](https://arxiv.org/abs/2501.09757)*
 
 ![Figure 1 from Distilling Multi-modal Large Language Models for Autonomous Driving](/assets/images/distilling-multimodal-large-language-models-for-autonomous-driving-source-figure-1.webp)
-*Figure 1 Comparison of planning performance in long-tail scenarios from nuScenes: DiMA-VAD demonstrates greater robustness compared to VAD Jiang et al. 2023 in long-tail navigation scenarios such as overtaking a vehicle and performing a 3-point turn. DiMA-VAD also outperforms recent vision-planner PARA-Drive Weng et al. 2024 and LLM planner TOKEN Tian et al. 2024a . Notably, the 3-point turn is a zero-shot scenario that is only present in the validation set. source: [Distilling Multi-modal Large Language Models for Autonomous Driving](https://arxiv.org/abs/2501.09757)*
+*Fig 2: Long-tail nuScenes examples show DiMA-VAD navigating overtakes and three-point turns more successfully than VAD, PARA-Drive, and TOKEN; the three-point turn appears only in validation. | source: [Distilling Multi-modal Large Language Models for Autonomous Driving](https://arxiv.org/abs/2501.09757)*
 
 
 **What to look at:**

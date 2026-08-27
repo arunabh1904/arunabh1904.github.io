@@ -28,14 +28,12 @@ Occ3D turns camera-based scene reconstruction into a benchmarkable semantic occu
 
 CTF-Occ improves over BEVFormer by 1.65 mIoU on Occ3D-nuScenes and improves the reported Occ3D-Waymo baseline by 1.97 mIoU. On Waymo, top-k uncertain-token selection with online hard-example mining reaches 18.43 mIoU, compared with 14.06 when neither targeted selection nor hard-example mining is active.
 
-![Occ3D: A Large-Scale 3D Occupancy Prediction Benchmark for Autonomous Driving source figure: Overview of the label generation pipeline.](/assets/images/occ3d-large-scale-3d-occupancy-prediction-benchmark-paper-figure.webp)
-*Overview of the label generation pipeline. source: [Occ3D: A Large-Scale 3D Occupancy Prediction Benchmark for Autonomous Driving](https://arxiv.org/abs/2304.14365)*
 
 ![Figure 3 from Occ3D: A Large-Scale 3D Occupancy Prediction Benchmark for Autonomous Driving](/assets/images/occ3d-large-scale-3d-occupancy-prediction-benchmark-source-figure-3.webp)
-*Figure 3 (a) Occlusion Reasoning for Visibility Mask. source: [Occ3D: A Large-Scale 3D Occupancy Prediction Benchmark for Autonomous Driving](https://arxiv.org/abs/2304.14365)*
+*Fig 1: Multi-frame LiDAR rays label camera-view voxels as occupied, free, or unknown, including regions visible to LiDAR but occluded from the current camera. | source: [Occ3D: A Large-Scale 3D Occupancy Prediction Benchmark for Autonomous Driving](https://arxiv.org/abs/2304.14365)*
 
 ![Figure 2 from Occ3D: A Large-Scale 3D Occupancy Prediction Benchmark for Autonomous Driving](/assets/images/occ3d-large-scale-3d-occupancy-prediction-benchmark-source-figure-2.webp)
-*Figure 2 Overview of the label generation pipeline. The pipeline consists of three main steps: voxel densification, occlusion reasoning, and image-guided voxel refinement.Voxel densification consists of object segmentation, multi-frame aggregation, and label assignment. source: [Occ3D: A Large-Scale 3D Occupancy Prediction Benchmark for Autonomous Driving](https://arxiv.org/abs/2304.14365)*
+*Fig 2: Overview of the label generation pipeline. The pipeline consists of three main steps: voxel densification, occlusion reasoning, and image-guided voxel refinement. | source: [Occ3D: A Large-Scale 3D Occupancy Prediction Benchmark for Autonomous Driving](https://arxiv.org/abs/2304.14365)*
 
 
 | Label stage | Purpose | Failure risk |

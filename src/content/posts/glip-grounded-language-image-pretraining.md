@@ -22,13 +22,13 @@ summary: '2021 – GLIP: Grounded Language-Image Pre-training'
 ## Core Insights
 
 ![GLIP zero-shot transfer to several object detection domains through text prompts](/assets/images/glip-paper-figure-1.png)
-*A prompt names the categories for each target dataset, and the same grounded model produces boxes without task-specific label heads. source: [GLIP](https://arxiv.org/abs/2112.03857)*
+*Fig 1: A prompt names the categories for each target dataset, and the same grounded model produces boxes without task-specific label heads. | source: [GLIP](https://arxiv.org/abs/2112.03857)*
 
 ![Figure 9 from GLIP: Grounded Language-Image Pre-training](/assets/images/glip-grounded-language-image-pretraining-source-figure-9.webp)
-*Figure 9 Per dataset zero-shot performance. The first 3 datasets contain novel categories not present in the Objects365 vocabulary while the last 2 datasets’ categories are covered by Objects365 data. Grounding data bring significant benefit to novel categories. source: [GLIP: Grounded Language-Image Pre-training](https://arxiv.org/abs/2112.03857)*
+*Fig 2: Per dataset zero-shot performance. The first 3 datasets contain novel categories not present in the Objects365 vocabulary while the last 2 datasets’ categories are covered by Objects365 data. | source: [GLIP: Grounded Language-Image Pre-training](https://arxiv.org/abs/2112.03857)*
 
 ![Figure 10 from GLIP: Grounded Language-Image Pre-training](/assets/images/glip-grounded-language-image-pretraining-source-figure-10.webp)
-*Figure 10 A manual prompt tuning example from the Aquarium dataset in ODinW. Given an expressive prompt (“flat and round”), zero-shot GLIP can detect the novel entity “stingray” better. source: [GLIP: Grounded Language-Image Pre-training](https://arxiv.org/abs/2112.03857)*
+*Fig 3: A manual prompt tuning example from the Aquarium dataset in ODinW. Given an expressive prompt (“flat and round”), zero-shot GLIP can detect the novel entity “stingray” better. | source: [GLIP: Grounded Language-Image Pre-training](https://arxiv.org/abs/2112.03857)*
 
 
 GLIP rewrites detection labels as phrases. That puts box-supervised detection data and phrase-grounding data into one training format. Self-training then turns much larger web corpora into noisy grounding supervision.

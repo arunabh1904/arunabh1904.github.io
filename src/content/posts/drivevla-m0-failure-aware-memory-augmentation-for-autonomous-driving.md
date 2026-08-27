@@ -28,13 +28,13 @@ The inherited problem is persistent failure under distribution shift: an end-to-
 The memory has two roles. It is a database of failures rather than generic demonstrations, and it carries both a latent scene representation and an expert trajectory label. This lets the retriever match road structure and agent interaction separately. The reported memory-expansion experiment suggests that adding stored cases can improve performance without changing the base model or its original training.
 
 ![DriveVLA-M0 memory-generation and retrieval-augmented test-time training pipeline](/assets/images/drivevla-m0-overview-paper-figure.png)
-*Failures become latent memory entries during generation and are retrieved for a lightweight test-time correction. source: [DriveVLA-M0](https://arxiv.org/abs/2608.10413)*
+*Fig 1: Failures become latent memory entries during generation and are retrieved for a lightweight test-time correction. | source: [DriveVLA-M0](https://arxiv.org/abs/2608.10413)*
 
 ![Figure 1 from DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving](/assets/images/drivevla-m0-failure-aware-memory-augmentation-for-autonomous-driving-source-figure-1.webp)
-*Figure 1 We propose DriveVLA-M0, a failure-aware memory augmentation VLA framework. (a) Classic VLA: VLMs perform scene reasoning in vision-language space and pass intermediate features to an Action Decoder for planning. The red trajectories indicate the model’s likely selections. (b) Ours: We retrieve structurally similar failure cases using Retrieved Model from a latent memory pool and inject them into the Action Decoder via LoRA-based test-time training for scenario-specific correction. source: [DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving](https://arxiv.org/abs/2608.10413)*
+*Fig 2: DriveVLA-M0 retrieves structurally similar failures from a latent memory and injects them into the action decoder through LoRA test-time updates, correcting plans that a conventional VLA would repeat. | source: [DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving](https://arxiv.org/abs/2608.10413)*
 
 ![Figure 3 from DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving](/assets/images/drivevla-m0-failure-aware-memory-augmentation-for-autonomous-driving-source-figure-3.webp)
-*Figure 3 Attention maps of query and retrieved scenes. Top: map embedding; Bottom: agent embedding. Yellow indicates higher attention, and gray-purple indicates lower attention. source: [DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving](https://arxiv.org/abs/2608.10413)*
+*Fig 3: Attention maps of query and retrieved scenes. Top: map embedding; Bottom: agent embedding. | source: [DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving](https://arxiv.org/abs/2608.10413)*
 
 
 The trade-off is operational: retrieval quality, memory curation, and test-time optimization become part of the driving loop. The paper reports NAVSIM results rather than real closed-loop vehicle behavior, and a memory can amplify systematic labeling or scenario-selection errors. The next control should compare failure-only memory with random, success-only, and nearest-neighbor memory at equal storage and backward compute.

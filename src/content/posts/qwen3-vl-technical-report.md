@@ -20,13 +20,13 @@ summary: '2025 – Qwen3-VL Technical Report'
 ## Core Insights
 
 ![Qwen3-VL architecture with DeepStack visual injection and interleaved position encoding](/assets/images/qwen3-vl-paper-figure-1.png)
-*Visual evidence enters the language model at several depths rather than through one final feature map. Timestamp tokens give video events an explicit textual time reference. source: [Qwen3-VL](https://arxiv.org/abs/2511.21631)*
+*Fig 1: Visual evidence enters the language model at several depths rather than through one final feature map. Timestamp tokens give video events an explicit textual time reference. | source: [Qwen3-VL](https://arxiv.org/abs/2511.21631)*
 
 ![Figure 3 from Qwen3-VL Technical Report](/assets/images/qwen3-vl-technical-report-source-figure-3.webp)
-*Figure 3 Needle-in-a-Haystack performance heatmap for Qwen3-VL-235B-A22B-Instruct across varying video durations and needle positions. Each cell shows accuracy (%) for locating and answering questions about the inserted “needle” frame. source: [Qwen3-VL Technical Report](https://arxiv.org/abs/2511.21631)*
+*Fig 2: Needle-in-a-Haystack performance heatmap for Qwen3-VL-235B-A22B-Instruct across varying video durations and needle positions. Each cell shows accuracy (%) for locating and answering questions about the inserted “needle” frame. | source: [Qwen3-VL Technical Report](https://arxiv.org/abs/2511.21631)*
 
 ![Figure 1 from Qwen3-VL Technical Report](/assets/images/qwen3-vl-technical-report-source-figure-1.webp)
-*Figure 1 The Qwen3-VL framework integrates a vision encoder and a language model decoder to process multimodal inputs, including text, images, and video. The vision encoder is specifically designed to handle dynamic, native-resolution visual inputs, mapping them to visual tokens of variable length. source: [Qwen3-VL Technical Report](https://arxiv.org/abs/2511.21631)*
+*Fig 3: The Qwen3-VL framework integrates a vision encoder and a language model decoder to process multimodal inputs, including text, images, and video. The vision encoder is specifically designed to handle dynamic, native-resolution visual inputs, mapping them to visual tokens of variable length. | source: [Qwen3-VL Technical Report](https://arxiv.org/abs/2511.21631)*
 
 
 DeepStack addresses a connector bottleneck. Early vision layers retain local detail, while later layers carry stronger semantics. Injecting multiple levels reduces pressure on one terminal visual representation to serve every downstream question.

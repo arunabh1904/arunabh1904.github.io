@@ -27,7 +27,7 @@ DLRFusion does not collapse every radar measurement into one feature tensor. It 
 On K-RADAR, DLRFusion reports 73.2 BEV AP and 45.7 3D AP at IoU 0.5 across weather conditions. The second-best compared system, LOD-PDR, reports 71.3 and 40.4 respectively, so the 3D AP gain is 5.3 absolute points, or about 13% relative. The paper's fusion ablation is also diagnostic: separate encoding followed by the proposed interaction reaches 45.7 3D AP, versus 36.9 for concatenation and 31.0 for a BEVFusion-style variant.
 
 ![DLRFusion framework with separate LiDAR, radar power, and radar Doppler encoders joined by iterative pairwise interactions](/assets/images/dlrfusion-paper-figure.webp)
-*DLRFusion preserves radar power and Doppler as separate evidence streams, then lets each interact with LiDAR and with one another across BEV stages. source: [DLRFusion](https://openaccess.thecvf.com/content/ICCV2025/html/Chae_Doppler-Aware_LiDAR-RADAR_Fusion_for_Weather-Robust_3D_Detection_ICCV_2025_paper.html)*
+*Fig 1: DLRFusion preserves radar power and Doppler as separate evidence streams, then lets each interact with LiDAR and with one another across BEV stages. | source: [DLRFusion](https://openaccess.thecvf.com/content/ICCV2025/html/Chae_Doppler-Aware_LiDAR-RADAR_Fusion_for_Weather-Robust_3D_Detection_ICCV_2025_paper.html)*
 
 | Fusion strategy | BEV AP | 3D AP |
 | --- | ---: | ---: |

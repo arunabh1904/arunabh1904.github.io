@@ -26,13 +26,13 @@ summary: "2013 – Playing Atari with Deep Reinforcement Learning"
 ## Core Insights
 
 ![Sample screenshots from five of the games used for training](/assets/images/playing-atari-with-dqn-paper-figure.png)
-*Figure 1 provides sample screenshots from five of the games used for training. source: [Playing Atari with Deep Reinforcement Learning paper](https://arxiv.org/abs/1312.5602)*
+*Fig 1: Provides sample screenshots from five of the games used for training. | source: [Playing Atari with Deep Reinforcement Learning paper](https://arxiv.org/abs/1312.5602)*
 
 ![Figure 2 from Playing Atari with Deep Reinforcement Learning](/assets/images/playing-atari-with-dqn-source-figure-2.webp)
-*Figure 2 The two plots on the left show average reward per episode on Breakout and Seaquest respectively during training. The statistics were computed by running an -greedy policy with for 10000 steps. The two plots on the right show the average maximum predicted action-value of a held out set of states on Breakout and Seaquest respectively. One epoch corresponds to 50000 minibatch weight updates or roughly 30 minutes of training time. source: [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)*
+*Fig 2: The two plots on the left show average reward per episode on Breakout and Seaquest respectively during training. The statistics were computed by running an -greedy policy with for 10000 steps. | source: [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)*
 
 ![Figure 3 from Playing Atari with Deep Reinforcement Learning](/assets/images/playing-atari-with-dqn-source-figure-3.webp)
-*Figure 3 The leftmost plot shows the predicted value function for a 30 frame segment of the game Seaquest. The three screenshots correspond to the frames labeled by A, B, and C respectively. source: [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)*
+*Fig 3: The leftmost plot shows the predicted value function for a 30 frame segment of the game Seaquest. The three screenshots correspond to the frames labeled by A, B, and C respectively. | source: [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)*
 
 
 ### Method and reported result

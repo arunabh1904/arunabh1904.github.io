@@ -24,10 +24,10 @@ summary: "2023 – Learning Fine-Grained Bimanual Manipulation with Low-Cost Har
 ## Core Insights
 
 ![ACT conditional variational autoencoder with a transformer action decoder plus action chunking and temporal ensembling](/assets/images/action-chunking-with-transformers-act-paper-figure.png)
-*Figure 4 shows the learned policy and deployment rule together: the CVAE predicts an action chunk from multi-view images and joints, while temporal ensembling reconciles overlapping chunk predictions during execution. source: [ACT](https://arxiv.org/abs/2304.13705)*
+*Fig 1: Shows the learned policy and deployment rule together: the CVAE predicts an action chunk from multi-view images and joints, while temporal ensembling reconciles overlapping chunk predictions during execution. | source: [ACT](https://arxiv.org/abs/2304.13705)*
 
 ![Figure 1 from Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware (ACT)](/assets/images/action-chunking-with-transformers-act-source-figure-1.webp)
-*Figure 1 Fig. 1 : Left: Camera viewpoints of the front, top, and two wrist cameras, together with an illustration of the bimanual workspace of ALOHA . Middle: Detailed view of the “handle and scissor” mechanism and custom grippers. Right: Technical spec of the ViperX 6dof robot [ 1 ]. source: [Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware (ACT)](https://arxiv.org/abs/2304.13705)*
+*Fig 2: Left: Camera viewpoints of the front, top, and two wrist cameras, together with an illustration of the bimanual workspace of ALOHA. Middle: Detailed view of the “handle and scissor” mechanism and custom grippers. | source: [Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware (ACT)](https://arxiv.org/abs/2304.13705)*
 
 
 Action chunking reduces the effective decision horizon and captures coordinated motion that per-step regression tends to fragment. A latent variable models variation across human demonstrations, while a transformer consumes multi-view images and joint state to generate the chunk. Temporal ensembling smooths successive predictions without committing to an entire open-loop plan.

@@ -28,13 +28,13 @@ summary: "2020 – Denoising Diffusion Probabilistic Models"
 ## Core Insights
 
 ![Figure 2 from DDPM: the directed graphical model for forward noising and learned reverse denoising](/assets/images/ddpm-paper-figure-2-graphical-model.png)
-*Figure 2 from the [DDPM paper](https://arxiv.org/abs/2006.11239), via ar5iv. source: [DDPM paper](https://arxiv.org/abs/2006.11239)*
+*Fig 1: The diffusion graphical model adds noise from data x0 to xT through the forward process, then learns reverse transitions that denoise samples back toward data. | source: [DDPM paper](https://arxiv.org/abs/2006.11239)*
 
 ![Figure 6 from Denoising Diffusion Probabilistic Models](/assets/images/denoising-diffusion-probabilistic-models-source-figure-6.webp)
-*Figure 6 Unconditional CIFAR10 progressive generation ( over time, from left to right). Extended samples and sample quality metrics over time in the appendix ( Figs. 14 and 10 ). source: [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239)*
+*Fig 2: Unconditional CIFAR10 progressive generation ( over time, from left to right). Extended samples and sample quality metrics over time in the appendix ( Figs. 14 and 10 ). | source: [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239)*
 
 ![Figure 1 from Denoising Diffusion Probabilistic Models](/assets/images/denoising-diffusion-probabilistic-models-source-figure-1.webp)
-*Figure 1 Generated samples on CelebA-HQ (left) and unconditional CIFAR10 (right). source: [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239)*
+*Fig 3: Generated samples on CelebA-HQ (left) and unconditional CIFAR10 (right). | source: [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239)*
 
 
 ### Method and reported result

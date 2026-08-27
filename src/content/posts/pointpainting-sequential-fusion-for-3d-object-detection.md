@@ -26,13 +26,13 @@ PointPainting runs image semantic segmentation first, projects every LiDAR point
 The paper paints PointPillars, VoxelNet, and PointRCNN and reports gains across 24 of 27 KITTI validation comparisons. On nuScenes test, its strengthened PointPillars+ baseline rises from 40.1 to 46.4 mAP and from 55.0 to 58.1 NDS after painting. Every nuScenes class improves, with especially large gains for traffic cones, whose sparse LiDAR returns benefit from image semantics.
 
 ![PointPainting: Sequential Fusion for 3D Object Detection source figure: PointPainting overview.](/assets/images/pointpainting-sequential-fusion-for-3d-object-detection-paper-figure.webp)
-*PointPainting overview. source: [PointPainting: Sequential Fusion for 3D Object Detection](https://arxiv.org/abs/1911.10150)*
+*Fig 1: PointPainting projects image-segmentation labels onto LiDAR points before detection, enriching the point cloud with semantic classes and improving the resulting 3D boxes. | source: [PointPainting: Sequential Fusion for 3D Object Detection](https://arxiv.org/abs/1911.10150)*
 
 ![Figure 4 from PointPainting: Sequential Fusion for 3D Object Detection](/assets/images/pointpainting-sequential-fusion-for-3d-object-detection-source-figure-4.webp)
-*Figure 4 Qualitative analysis of KITTI results. We created four different comparison figures. For each comparison, the upper left is the original point cloud, while the upper right is the painted point cloud with the segmentation outputs used to color car (orange), cyclist (red) and pedestrian (blue) points. PointPillars / Painted PointPillars predicted 3D bounding boxes are displayed on the both the input point cloud (upper left / right) and projected into the image (lower left / right). source: [PointPainting: Sequential Fusion for 3D Object Detection](https://arxiv.org/abs/1911.10150)*
+*Fig 2: Qualitative analysis of KITTI results. We created four different comparison figures. | source: [PointPainting: Sequential Fusion for 3D Object Detection](https://arxiv.org/abs/1911.10150)*
 
 ![Figure 1 from PointPainting: Sequential Fusion for 3D Object Detection](/assets/images/pointpainting-sequential-fusion-for-3d-object-detection-source-figure-1.webp)
-*Figure 1 PointPainting is a general fusion method that be can used with any lidar detection network. Top left: PointPillars pointpillars , VoxelNet voxelnet ; second , and PointRCNN pointrcnn on the KITTI kitti bird’s-eye view val set (Table 1 ). The painted version of PointRCNN is state of the art on the KITTI test set outperforming all published fusion and lidar-only methods (Table 2 ). Top right: improvements are larger for the harder pedestrian (ped.) and cyclist classes. Error bars indicate std. across methods. source: [PointPainting: Sequential Fusion for 3D Object Detection](https://arxiv.org/abs/1911.10150)*
+*Fig 3: PointPainting is a general fusion method that be can used with any lidar detection network. Top left: PointPillars pointpillars, VoxelNet voxelnet; second, and PointRCNN pointrcnn on the KITTI kitti bird’s-eye view val set (Table 1 ). | source: [PointPainting: Sequential Fusion for 3D Object Detection](https://arxiv.org/abs/1911.10150)*
 
 
 | What PointPainting preserves | What it discards |

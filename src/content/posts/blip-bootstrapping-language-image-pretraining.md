@@ -21,14 +21,12 @@ summary: '2022 – BLIP: Bootstrapping Language-Image Pre-training for Unified V
 
 ## Core Insights
 
-![BLIP multimodal mixture of encoder-decoder architecture and pretraining objectives](/assets/images/blip-paper-figure-2.png)
-*BLIP shares most parameters across three modes. The image-text encoder learns contrastive alignment, the image-grounded text encoder learns matching, and the image-grounded text decoder learns caption generation. source: [BLIP](https://arxiv.org/abs/2201.12086)*
 
 ![Figure 2 from BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation](/assets/images/blip-bootstrapping-language-image-pretraining-source-figure-2.webp)
-*Figure 2 Pre-training model architecture and objectives of BLIP (same parameters have the same color). We propose multimodal mixture of encoder-decoder, a unified vision-language model which can operate in one of the three functionalities: (1) Unimodal encoder is trained with an image-text contrastive (ITC) loss to align the vision and language representations. source: [BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation](https://arxiv.org/abs/2201.12086)*
+*Fig 1: Pre-training model architecture and objectives of BLIP (same parameters have the same color). We propose multimodal mixture of encoder-decoder, a unified vision-language model which can operate in one of the three functionalities: (1) Unimodal encoder is trained with an image-text contrastive (ITC) loss to align the vision and language representations. | source: [BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation](https://arxiv.org/abs/2201.12086)*
 
 ![Figure 4 from BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation](/assets/images/blip-bootstrapping-language-image-pretraining-source-figure-4.webp)
-*Figure 4 Examples of the web text and the synthetic text . Green texts are accepted by the filter, whereas red texts are rejected. source: [BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation](https://arxiv.org/abs/2201.12086)*
+*Fig 2: Examples of the web text and the synthetic text. Green texts are accepted by the filter, whereas red texts are rejected. | source: [BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation](https://arxiv.org/abs/2201.12086)*
 
 
 BLIP makes generation part of the visual representation recipe. The same multimodal mixture of encoder-decoder, or MED, switches attention masks to act as a text encoder, an image-grounded text encoder, or an image-grounded text decoder. Image-text contrastive loss learns a shared space. Image-text matching loss learns pairwise fusion. Language-modeling loss makes the visual evidence usable one word at a time.

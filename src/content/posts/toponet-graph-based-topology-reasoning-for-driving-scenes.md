@@ -30,10 +30,10 @@ The paper introduces TopoNet for graph-based topology reasoning in driving scene
 The evaluation is on OpenLane-V2, where the paper reports large gains over prior work across perceptual and topological metrics. The limitation is that topology reasoning depends heavily on the quality and coverage of detected lanes and elements; if perception misses the right entity, graph reasoning has less to work with.
 
 ![Figure 2 from TopoNet showing traffic element and centerline branches with scene graph reasoning](/assets/images/toponet-graph-based-topology-reasoning-for-driving-scenes-paper-figure.png)
-*Figure 2 shows how TopoNet routes traffic elements and centerlines through decoder branches, then reasons over their relationships with a scene graph neural network. From the [TopoNet paper](https://arxiv.org/abs/2304.05277), via ar5iv. source: [TopoNet paper](https://arxiv.org/abs/2304.05277)*
+*Fig 1: Shows how TopoNet routes traffic elements and centerlines through decoder branches, then reasons over their relationships with a scene graph neural network. | source: [TopoNet paper](https://arxiv.org/abs/2304.05277)*
 
 ![Figure 5 from TopoNet: Graph-based Topology Reasoning for Driving Scenes](/assets/images/toponet-graph-based-topology-reasoning-for-driving-scenes-source-figure-5.webp)
-*Figure 5 Fig. 5 : Failure case under large-area occlusion. TopoNet fails to predict centerlines and the lane graph in the intersection with a large bus colluding in front. Note that the relationship between the left lane and the red light is an incorrect annotation where our algorithm reasons about the direction of the left lane and avoids the false positive prediction. source: [TopoNet: Graph-based Topology Reasoning for Driving Scenes](https://arxiv.org/abs/2304.05277)*
+*Fig 2: Failure case under large-area occlusion. TopoNet fails to predict centerlines and the lane graph in the intersection with a large bus colluding in front. | source: [TopoNet: Graph-based Topology Reasoning for Driving Scenes](https://arxiv.org/abs/2304.05277)*
 
 
 _then reasons over their relationships with a scene graph neural network. source: [TopoNet paper](https://arxiv.org/abs/2304.05277)

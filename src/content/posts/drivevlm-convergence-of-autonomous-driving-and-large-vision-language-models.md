@@ -26,13 +26,13 @@ DriveVLM uses large vision-language models for scene description, scene analysis
 DriveVLM explores how VLM reasoning can support autonomous driving. It uses language-level scene understanding and hierarchical planning, with a dual variant that combines VLM semantics with conventional driving modules. The evaluation covers public driving datasets and deployment-oriented tests, aiming to show that VLMs can help decompose complex scenes and decisions. The design question is where the VLM belongs: it can reason and explain, but low-level control still needs geometry, timing, and safety constraints. The caveat is standard for driving VLMs: semantic competence is not the same as robust closed-loop planning.
 
 ![Figure 1: DriveVLM and DriveVLM-Dual model pipelines from DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models](/assets/images/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models-paper-figure.png)
-*Figure 1: DriveVLM and DriveVLM-Dual model pipelines. From the [DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models paper](https://arxiv.org/abs/2402.12289). source: [DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models paper](https://arxiv.org/abs/2402.12289)*
+*Fig 1: DriveVLM performs scene description, analysis, and hierarchical planning at low frequency, while DriveVLM-Dual couples those outputs to a high-frequency perception and planning stack. | source: [DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models paper](https://arxiv.org/abs/2402.12289)*
 
 ![Figure 2 from DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models](/assets/images/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models-source-figure-2.webp)
-*Figure 2 An annotated sample of the SUP-AD dataset. source: [DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models](https://arxiv.org/abs/2402.12289)*
+*Fig 2: A SUP-AD sample links a construction scene to weather, road and lane conditions, critical objects, meta-actions, and a textual driving decision. | source: [DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models](https://arxiv.org/abs/2402.12289)*
 
 ![Figure 3 from DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models](/assets/images/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models-source-figure-3.webp)
-*Figure 3 The proposed data mining and annotation pipeline for constructing a scene understanding and planning dataset. Scenario examples randomly sampled from the dataset (below) demonstrate the diversity and complexity of the dataset. source: [DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models](https://arxiv.org/abs/2402.12289)*
+*Fig 3: The proposed data mining and annotation pipeline for constructing a scene understanding and planning dataset. Scenario examples randomly sampled from the dataset (below) demonstrate the diversity and complexity of the dataset. | source: [DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models](https://arxiv.org/abs/2402.12289)*
 
 
 **What to look at:**

@@ -27,14 +27,12 @@ PETRv2 extends PETR's 3D position-aware image tokens across time and tasks. Ego 
 
 Coordinate alignment gives historical features the position they occupy in the current ego frame. A feature-guided position encoder modulates geometric embeddings with appearance so the same nominal coordinate can carry different evidence. In the main nuScenes test configuration, PETRv2 reports 49.0 mAP and 58.2 NDS; its multiscale variant reaches 50.8 mAP and 59.1 NDS. Average velocity error drops from PETR's 0.808 m/s to 0.343 m/s.
 
-![PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images source figure: The paradigm of the proposed PETRv2.](/assets/images/petrv2-unified-3d-perception-from-multicamera-images-paper-figure.webp)
-*The paradigm of the proposed PETRv2. source: [PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](https://arxiv.org/abs/2206.01256)*
 
 ![Figure 3 from PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](/assets/images/petrv2-unified-3d-perception-from-multicamera-images-source-figure-3.webp)
-*Figure 3 The definition of three kinds of queries for multi-task learning. The det query is defined in the whole 3D space while the seg query is initialized under the BEV space. The lane query is defined with the anchor line, which is constructed with 300 anchor points. source: [PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](https://arxiv.org/abs/2206.01256)*
+*Fig 1: The definition of three kinds of queries for multi-task learning. The det query is defined in the whole 3D space while the seg query is initialized under the BEV space. | source: [PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](https://arxiv.org/abs/2206.01256)*
 
 ![Figure 1 from PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](/assets/images/petrv2-unified-3d-perception-from-multicamera-images-source-figure-1.webp)
-*Figure 1 The paradigm of the proposed PETRv2. The 2D features are extracted by the backbone network from the multi-view images and the 3D coordinates are generated following the same way as PETR liu2022petr . To achieve the temporal alignment, the 3D coordinates in PETR of previous frame are firstly transformed through pose transformation. source: [PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](https://arxiv.org/abs/2206.01256)*
+*Fig 2: The paradigm of the proposed PETRv2. The 2D features are extracted by the backbone network from the multi-view images and the 3D coordinates are generated following the same way as PETR liu2022petr. | source: [PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](https://arxiv.org/abs/2206.01256)*
 
 
 | Added component | Validation effect | Interpretation |

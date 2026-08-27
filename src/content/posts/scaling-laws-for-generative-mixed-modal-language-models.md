@@ -25,10 +25,10 @@ Scaling Laws for Generative Mixed-Modal Language Models runs more than 250 exper
 ## Core Insights
 
 ![Speech and text perplexity ratio across training showing a predicted cross-modal competition barrier](/assets/images/scaling-laws-for-generative-mixed-modal-language-models-paper-figure.png)
-*Figure 4 visualizes the interaction term rather than only unimodal scaling: speech-text mixtures approach or cross a predicted competition barrier differently as model size and training progress change. source: [Scaling Laws for Generative Mixed-Modal Language Models](https://arxiv.org/abs/2301.03728)*
+*Fig 1: Visualizes the interaction term rather than only unimodal scaling: speech-text mixtures approach or cross a predicted competition barrier differently as model size and training progress change. | source: [Scaling Laws for Generative Mixed-Modal Language Models](https://arxiv.org/abs/2301.03728)*
 
 ![Figure 6 from Scaling Laws for Generative Mixed-Modal Language Models](/assets/images/scaling-laws-for-generative-mixed-modal-language-models-source-figure-6.webp)
-*Figure 6 Left: Example run showing the perplexity on only the speech tokens of a 2.7B run over the Speech|Text dataset. We highlight a region where roughly for 15000 steps perplexity for speech flattened. Right: Correlation between the mixed-modal parameter and the percent of non-text perplexity that are within a flat regime in the 6.7B model regime. source: [Scaling Laws for Generative Mixed-Modal Language Models](https://arxiv.org/abs/2301.03728)*
+*Fig 2: Left: Example run showing the perplexity on only the speech tokens of a 2.7B run over the Speech|Text dataset. We highlight a region where roughly for 15000 steps perplexity for speech flattened. | source: [Scaling Laws for Generative Mixed-Modal Language Models](https://arxiv.org/abs/2301.03728)*
 
 
 | Component | Role |

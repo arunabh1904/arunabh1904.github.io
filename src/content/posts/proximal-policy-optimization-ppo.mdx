@@ -29,7 +29,7 @@ import { ppoPlayground } from '../../lib/python-playground-examples';
 ## Core Insights
 
 ![PPO's clipped surrogate flattens reward-improving probability-ratio changes outside the epsilon interval](/assets/images/proximal-policy-optimization-ppo-paper-figure.png)
-*For positive and negative advantages, clipping removes the incentive to move the action probability beyond the trusted band in the apparently helpful direction. It does not impose a hard KL constraint. source: [PPO](https://arxiv.org/abs/1707.06347)*
+*Fig 1: For positive and negative advantages, clipping removes the incentive to move the action probability beyond the trusted band in the apparently helpful direction. It does not impose a hard KL constraint. | source: [PPO](https://arxiv.org/abs/1707.06347)*
 
 With ratio $r_t(\theta)=\pi_\theta(a_t\mid s_t)/\pi_{\theta_{\mathrm{old}}}(a_t\mid s_t)$ and estimated advantage $\hat A_t$, PPO maximizes
 

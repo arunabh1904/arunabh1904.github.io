@@ -30,13 +30,13 @@ The paper first builds large ensembles of optimized single motion-forecasting mo
 The evidence includes strong Waymo Open Motion Dataset and Argoverse leaderboard performance for the ensembles, followed by student models that retain high performance at a fraction of the compute cost. The key caveat is that distillation quality depends on the teacher distribution: if the ensemble misses rare futures or encodes systematic bias, the student can inherit those limits.
 
 ![Figure 4 from Scaling Motion Forecasting Models with Ensemble Distillation showing metrics versus inference FLOPs](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-paper-figure.png)
-*Figure 4 shows the deployment tradeoff: larger ensembles improve metrics with more FLOPs, while distilled students aim to preserve much of that gain at lower inference cost. From the [ensemble distillation paper](https://arxiv.org/abs/2404.03843). source: [ensemble distillation paper](https://arxiv.org/abs/2404.03843)*
+*Fig 1: Shows the deployment tradeoff: larger ensembles improve metrics with more FLOPs, while distilled students aim to preserve much of that gain at lower inference cost. | source: [ensemble distillation paper](https://arxiv.org/abs/2404.03843)*
 
 ![Figure 3 from Scaling Motion Forecasting Models with Ensemble Distillation](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-3.webp)
-*Figure 3 Fig. 3 : Illustration of the ensemble distillation pipeline. A set of teachers and a NMS that outputs trajectories form the ensemble. The student is trained with a groundtruth loss ( ) and a distillation loss ( ). source: [Scaling Motion Forecasting Models with Ensemble Distillation](https://arxiv.org/abs/2404.03843)*
+*Fig 2: Illustration of the ensemble distillation pipeline. A set of teachers and a NMS that outputs trajectories form the ensemble. | source: [Scaling Motion Forecasting Models with Ensemble Distillation](https://arxiv.org/abs/2404.03843)*
 
 ![Figure 5 from Scaling Motion Forecasting Models with Ensemble Distillation](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-5.webp)
-*Figure 5 Fig. 5 : Scaling ensemble result using the Argoverse dataset. The Ensemble models are represented in orange , with ensemble size linearly related to the FLOPs. Distilled student models are represented in green. source: [Scaling Motion Forecasting Models with Ensemble Distillation](https://arxiv.org/abs/2404.03843)*
+*Fig 3: Scaling ensemble result using the Argoverse dataset. The Ensemble models are represented in orange, with ensemble size linearly related to the FLOPs. | source: [Scaling Motion Forecasting Models with Ensemble Distillation](https://arxiv.org/abs/2404.03843)*
 
 
 _while distilled students aim to preserve much of that gain at lower inference cost. source: [ensemble distillation paper](https://arxiv.org/abs/2404.03843)

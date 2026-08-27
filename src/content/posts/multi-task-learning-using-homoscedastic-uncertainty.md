@@ -24,14 +24,12 @@ Kendall, Gal, and Cipolla derive trainable weights for classification and regres
 
 The learned uncertainty is global for each task, not input-dependent. On the paper's Tiny Cityscapes experiment, joint semantic segmentation, instance regression, and depth reach 63.4 semantic IoU, 3.50 instance error, and 0.522 depth error; the semantic-only result is 59.4 IoU. The final relative task weighting is reported near 43:1:0.16, showing how far raw equal weighting can be from the learned scale.
 
-![Multi-Task Learning Using Homoscedastic Uncertainty source figure: Multi-task deep learning.](/assets/images/multi-task-learning-using-homoscedastic-uncertainty-paper-figure.webp)
-*Multi-task deep learning. source: [Multi-Task Learning Using Homoscedastic Uncertainty](https://arxiv.org/abs/1705.07115)*
 
 ![Figure 1 from Multi-Task Learning Using Homoscedastic Uncertainty](/assets/images/multi-task-learning-using-homoscedastic-uncertainty-source-figure-1.webp)
-*Figure 1 Multi-task deep learning. We derive a principled way of combining multiple regression and classification loss functions for multi-task learning. Our architecture takes a single monocular RGB image as input and produces a pixel-wise classification, an instance semantic segmentation and an estimate of per pixel depth. source: [Multi-Task Learning Using Homoscedastic Uncertainty](https://arxiv.org/abs/1705.07115)*
+*Fig 1: Multi-task deep learning. We derive a principled way of combining multiple regression and classification loss functions for multi-task learning. | source: [Multi-Task Learning Using Homoscedastic Uncertainty](https://arxiv.org/abs/1705.07115)*
 
 ![Figure 3 from Multi-Task Learning Using Homoscedastic Uncertainty](/assets/images/multi-task-learning-using-homoscedastic-uncertainty-source-figure-3.webp)
-*Figure 3 (b) Semantic Segmentation. source: [Multi-Task Learning Using Homoscedastic Uncertainty](https://arxiv.org/abs/1705.07115)*
+*Fig 2: Semantic segmentation from the uncertainty-weighted multi-task model separates road, vehicles, vegetation, sky, buildings, and pedestrians in a street scene. | source: [Multi-Task Learning Using Homoscedastic Uncertainty](https://arxiv.org/abs/1705.07115)*
 
 
 | Mechanism | What it handles | What it does not handle |

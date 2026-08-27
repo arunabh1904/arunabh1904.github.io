@@ -22,13 +22,13 @@ summary: "2023 – DriveGPT4: Interpretable End-to-end Autonomous Driving via La
 The paper's central choice is to make the same model answer a question about a maneuver and predict the maneuver's low-level control. A custom visual-instruction dataset supplies the driving-specific supervision, while the paper's mix-finetuning recipe combines that data with the base model's broader capabilities. This is a tighter coupling than a VLM used only as a captioner, but it does not by itself establish that a fluent explanation caused the control output.
 
 ![DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model source figure: DriveGPT4 overview.](/assets/images/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model-paper-figure.webp)
-*DriveGPT4 overview. source: [DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](https://arxiv.org/abs/2310.01412)*
+*Fig 1: DriveGPT4 aligns video and language during pretraining, mixes driving and instruction data during fine-tuning, and decodes both textual explanations and low-level control signals. | source: [DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](https://arxiv.org/abs/2310.01412)*
 
 ![Figure 6 from DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](/assets/images/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model-source-figure-6.webp)
-*Figure 6 Fig. 6 : Comparison of DriveGPT4 and GPT4-V. GPT4-V is prompted with BDD-X QA pairs before the comparison. source: [DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](https://arxiv.org/abs/2310.01412)*
+*Fig 2: Comparison of DriveGPT4 and GPT4-V. GPT4-V is prompted with BDD-X QA pairs before the comparison. | source: [DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](https://arxiv.org/abs/2310.01412)*
 
 ![Figure 1 from DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](/assets/images/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model-source-figure-1.webp)
-*Figure 1 Fig. 1 : Example of BDD-X labeled data. source: [DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](https://arxiv.org/abs/2310.01412)*
+*Fig 3: BDD-X examples pair video clips with an action description and a natural-language justification, such as stopping for a red light or changing lanes for faster traffic. | source: [DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](https://arxiv.org/abs/2310.01412)*
 
 
 BDD-X makes the evaluation legible because it pairs driving video with human-facing explanations. The abstract does not report the action horizon, control representation, loss weighting, training-set size, or a matched ablation that removes explanation supervision while holding control data fixed. Those omissions matter: a shared decoder can correlate language and action without ensuring that its language evidence drives the control decision.

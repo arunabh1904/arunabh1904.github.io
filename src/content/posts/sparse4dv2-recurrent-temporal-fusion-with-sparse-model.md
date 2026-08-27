@@ -28,13 +28,11 @@ Sparse4D v2 changes the first Sparse4D from explicit multi-frame image sampling 
 The decoder reserves one layer for fresh anchors and uses later layers for recurrent temporal instances. Camera-parameter encoding exposes calibration to the instance update. Dense LiDAR-derived depth supervision stabilizes the camera backbone during training but is absent from inference. Efficient Deformable Aggregation fuses sampling and weighted reduction into one operator.
 
 ![Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model source figure: Overall Framework of Sparse4Dv2, which conforms to an encoder-decoder structure.](/assets/images/sparse4dv2-recurrent-temporal-fusion-with-sparse-model-paper-figure.webp)
-*Overall Framework of Sparse4Dv2, which conforms to an encoder-decoder structure. source: [Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model](https://arxiv.org/abs/2305.14018)*
+*Fig 1: Overall Framework of Sparse4Dv2, which conforms to an encoder-decoder structure. | source: [Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model](https://arxiv.org/abs/2305.14018)*
 
 ![Figure 1 from Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model](/assets/images/sparse4dv2-recurrent-temporal-fusion-with-sparse-model-source-figure-1.webp)
-*Figure 1 (a) Multi-frame Sampling and Fusion. source: [Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model](https://arxiv.org/abs/2305.14018)*
+*Fig 2: Sparse4Dv2 samples object features across frames, propagates them recurrently, and fuses earlier samples into the current representation after motion-aligned coordinate updates. | source: [Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model](https://arxiv.org/abs/2305.14018)*
 
-![Figure 1 from Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model](/assets/images/sparse4dv2-recurrent-temporal-fusion-with-sparse-model-source-figure-1.webp)
-*Figure 1 (b) Recurrent Temporal Fusion. source: [Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model](https://arxiv.org/abs/2305.14018)*
 
 
 | Change | Reported effect | Why it matters |

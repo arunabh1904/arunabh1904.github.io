@@ -27,10 +27,10 @@ Map-free prediction replaces explicit lane topology with sensor-derived BEV feat
 The second change moves physical supervision upstream. PGID feeds the agent's instantaneous state into iterative decoding and combines this with acceleration, jerk, and curvature penalties. These constraints therefore shape the features used to generate multimodal hypotheses, rather than only rejecting implausible output trajectories after decoding. The distinction matters because a feasible trajectory is a property of the whole rollout, not just its final points.
 
 ![SIPTraj architecture with hierarchical agent-scene grounding and physics-guided iterative decoding](/assets/images/siptraj-architecture-paper-figure.png)
-*The paper's overview couples agent-conditioned BEV grounding with physics-aware iterative decoding. source: [SIPTraj](https://arxiv.org/abs/2608.00779)*
+*Fig 1: The paper's overview couples agent-conditioned BEV grounding with physics-aware iterative decoding. | source: [SIPTraj](https://arxiv.org/abs/2608.00779)*
 
 ![Figure 1 from SIPTraj: Map-Free End-to-End Trajectory Prediction via Physics-Guided Scene Interaction](/assets/images/siptraj-map-free-end-to-end-trajectory-prediction-via-physics-guided-scene-interaction-source-figure-1.webp)
-*Figure 1 Fig. 1: Comparison of trajectory prediction paradigms. (a) HD-map-based models achieve high accuracy but suffer from heavy HD-map dependency. (b) Prior map-free models replace maps with BEV features but rely on late fusion, leading to agent-agnostic scene extraction and physically unmodeled trajectories. source: [SIPTraj: Map-Free End-to-End Trajectory Prediction via Physics-Guided Scene Interaction](https://arxiv.org/abs/2608.00779)*
+*Fig 2: Comparison of trajectory prediction paradigms. (a) HD-map-based models achieve high accuracy but suffer from heavy HD-map dependency. (b) Prior map-free models replace maps with BEV features but rely on late fusion, leading to agent-agnostic scene extraction and physically unmodeled trajectories. | source: [SIPTraj: Map-Free End-to-End Trajectory Prediction via Physics-Guided Scene Interaction](https://arxiv.org/abs/2608.00779)*
 
 
 | Dataset | mADE@5 | mADE@10 | mFDE@1 | mFDE@10 | Miss rate |

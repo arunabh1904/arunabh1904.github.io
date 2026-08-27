@@ -23,14 +23,12 @@ summary: '2026 – Beyond Flat Policies: Hierarchical Post-Training for Embodied
 
 ## Core Insights
 
-![HiRoC planner training, subgoal distribution alignment, and hierarchical reinforcement-learning pipeline](/assets/images/hiroc-hierarchical-post-training-framework.png)
-*HiRoC does not train one flat policy end to end. It first teaches a planner to emit subgoals, aligns the executor to those subgoals with SFT, then freezes the planner and applies episode- and subgoal-level GRPO to the executor.. source: [HiRoC paper](https://arxiv.org/abs/2608.05999)*
 
 ![Figure 2 from Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](/assets/images/beyond-flat-policies-hierarchical-post-training-for-embodied-agents-source-figure-2.webp)
-*Figure 2 The framework of HiRoC. (a) shows the environmental interaction via our proposed HiRoC. The training process of HiRoC is divided into three parts: (b) train planner by SFT on pre-collected trajectories; (c) pretrain executor with SFT on prepared data to overcome the issue of distribution misalignment (DM); and (d) train executor by RL tuning when interacting with environment. source: [Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](https://arxiv.org/abs/2608.05999)*
+*Fig 1: The framework of HiRoC. (a) shows the environmental interaction via our proposed HiRoC. The training process of HiRoC is divided into three parts: (b) train planner by SFT on pre-collected trajectories; (c) pretrain executor with SFT on prepared data to overcome the issue of distribution misalignment (DM); and (d) train executor by RL tuning when interacting with environment. | source: [Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](https://arxiv.org/abs/2608.05999)*
 
 ![Figure 3 from Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](/assets/images/beyond-flat-policies-hierarchical-post-training-for-embodied-agents-source-figure-3.webp)
-*Figure 3 Performance of compared baselines in terms of zero-shot. source: [Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](https://arxiv.org/abs/2608.05999)*
+*Fig 2: Performance of compared baselines in terms of zero-shot. | source: [Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](https://arxiv.org/abs/2608.05999)*
 
 
 ### Hierarchy creates a new alignment problem

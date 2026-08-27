@@ -20,13 +20,13 @@ summary: '2021 – Multimodal Few-Shot Learning with Frozen Language Models'
 ## Core Insights
 
 ![Examples of multimodal few-shot generation from a frozen language model](/assets/images/multimodal-few-shot-frozen-lm-paper-figure-1.png)
-*Image prefixes let a frozen language model condition generation on visual examples and reuse knowledge learned from text. source: [Multimodal Few-Shot Learning with Frozen Language Models](https://arxiv.org/abs/2106.13884)*
+*Fig 1: Image prefixes let a frozen language model condition generation on visual examples and reuse knowledge learned from text. | source: [Multimodal Few-Shot Learning with Frozen Language Models](https://arxiv.org/abs/2106.13884)*
 
 ![Figure 4 from Multimodal Few-Shot Learning with Frozen Language Models](/assets/images/multimodal-few-shot-learning-with-frozen-language-models-source-figure-4.webp)
-*Figure 4 Examples of (a) the Open-Ended miniImageNet evaluation (b) the Fast VQA evaluation. source: [Multimodal Few-Shot Learning with Frozen Language Models](https://arxiv.org/abs/2106.13884)*
+*Fig 2: Examples of (a) the Open-Ended miniImageNet evaluation (b) the Fast VQA evaluation. | source: [Multimodal Few-Shot Learning with Frozen Language Models](https://arxiv.org/abs/2106.13884)*
 
 ![Figure 3 from Multimodal Few-Shot Learning with Frozen Language Models](/assets/images/multimodal-few-shot-learning-with-frozen-language-models-source-figure-3.webp)
-*Figure 3 Inference-Time interface for Frozen . The figure demonstrates how we can support (a) visual question answering, (b) outside-knowledge question answering and (c) few-shot image classification via in-context learning. source: [Multimodal Few-Shot Learning with Frozen Language Models](https://arxiv.org/abs/2106.13884)*
+*Fig 3: Inference-Time interface for Frozen. The figure demonstrates how we can support (a) visual question answering, (b) outside-knowledge question answering and (c) few-shot image classification via in-context learning. | source: [Multimodal Few-Shot Learning with Frozen Language Models](https://arxiv.org/abs/2106.13884)*
 
 
 The key decision is where adaptation lives. The language model stays fixed. Only the visual pathway learns to produce embeddings that the decoder can interpret as context. This makes visual conditioning cheap relative to retraining the full generator.

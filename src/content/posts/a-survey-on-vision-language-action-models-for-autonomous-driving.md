@@ -30,13 +30,13 @@ The survey formalizes the building blocks of VLA4AD systems, compares more than 
 This is not a method paper, so the value is coverage and vocabulary. It helps place papers like Talk2BEV, DriveLM, OpenDriveVLA, DiffVLA, UniDriveVLA, and DriveVLA-W0 on the same timeline without pretending they solve the same subproblem.
 
 ![Figure 2 from the VLA4AD survey showing the architecture blocks for vision-language-action autonomous driving systems](/assets/images/a-survey-on-vision-language-action-models-for-autonomous-driving-paper-figure.png)
-*Figure 2 summarizes the VLA4AD architecture blocks, connecting visual inputs, language reasoning, and action generation. From the [survey paper](https://arxiv.org/abs/2506.24044). source: [survey paper](https://arxiv.org/abs/2506.24044)*
+*Fig 1: Summarizes the VLA4AD architecture blocks, connecting visual inputs, language reasoning, and action generation. | source: [survey paper](https://arxiv.org/abs/2506.24044)*
 
 ![Figure 1 from A Survey on Vision-Language-Action Models for Autonomous Driving](/assets/images/a-survey-on-vision-language-action-models-for-autonomous-driving-source-figure-1.webp)
-*Figure 1 Comparisons of autonomous driving paradigms. (a) End-to-end driving offers direct perception-to-control mapping but lacks interpretability and generalization. (b) VLM4AD introduces natural language reasoning and explainability, yet remains perception-centric. (c) VLA4AD integrates perception, reasoning, and action, enabling interpretable and robust closed-loop control. source: [A Survey on Vision-Language-Action Models for Autonomous Driving](https://arxiv.org/abs/2506.24044)*
+*Fig 2: Comparisons of autonomous driving paradigms. (a) End-to-end driving offers direct perception-to-control mapping but lacks interpretability and generalization. (b) VLM4AD introduces natural language reasoning and explainability, yet remains perception-centric. (c) VLA4AD integrates perception, reasoning, and action, enabling interpretable and robust closed-loop control. | source: [A Survey on Vision-Language-Action Models for Autonomous Driving](https://arxiv.org/abs/2506.24044)*
 
 ![Figure 3 from A Survey on Vision-Language-Action Models for Autonomous Driving](/assets/images/a-survey-on-vision-language-action-models-for-autonomous-driving-source-figure-3.webp)
-*Figure 3 Evolution of VLA models for AD. From left to right: (1) VLM-as-explainer: a frozen LLM narrates the driving scene but produces no control. (2) Modular VLA: language is transformed into an intermediate representation that an action head converts into trajectory or low-level control. (3) End-to-end VLA: a single multimodal pipeline maps sensor input directly to actions. (4) Augmented VLA: tool-using or CoT VLMs add long-horizon reasoning while retaining the end-to-end control pathway. source: [A Survey on Vision-Language-Action Models for Autonomous Driving](https://arxiv.org/abs/2506.24044)*
+*Fig 3: Evolution of VLA models for AD. From left to right: (1) VLM-as-explainer: a frozen LLM narrates the driving scene but produces no control. | source: [A Survey on Vision-Language-Action Models for Autonomous Driving](https://arxiv.org/abs/2506.24044)*
 
 
 _connecting visual inputs, language reasoning, and action generation. source: [survey paper](https://arxiv.org/abs/2506.24044)

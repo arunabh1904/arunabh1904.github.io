@@ -22,14 +22,12 @@ summary: "2026 – Skaling: Chinchilla's Exponents Meet Kaplan's Coupling"
 
 ## Core Insights
 
-![Chinchilla and Skaling residuals across model-size and training-token grids](/assets/images/skaling-boundary-bias-comparison.png)
-*The additive Chinchilla fit leaves a saddle-shaped residual at data-poor and overtrained corners; Skaling reduces that boundary pattern. The right panel reports the per-run MAPE ratio, not a new loss metric.. source: [Skaling paper](https://arxiv.org/abs/2608.07222)*
 
 ![Figure 1 from Skaling: Chinchilla](/assets/images/skaling-chinchillas-exponents-meet-kaplans-coupling-source-figure-1.webp)
-*Figure 1 The additive Chinchilla law carries a systematic, boundary-concentrated prediction bias that the Skaling law removes. Each marker is a trained configuration (model size horizontal, training tokens vertical). Left, centre: signed percentage error (positive = overestimation (red), negative = underestimation (blue)) of the fitted Chinchilla and Skaling laws (shared colorbar); Chinchilla shows a saddle-shaped residual that grows toward the corners, whereas Skaling stays near zero throughout. Right: the per-run ratio of the two laws’ errors (capped at ); red runs where Skaling is x times more accurate. Skaling wins at of configurations (median , and at a third of them), with the largest gains at the cheaper edges. source: [Skaling: Chinchilla](https://arxiv.org/abs/2608.07222)*
+*Fig 1: The additive Chinchilla law carries a systematic, boundary-concentrated prediction bias that the Skaling law removes. Each marker is a trained configuration (model size horizontal, training tokens vertical). | source: [Skaling: Chinchilla](https://arxiv.org/abs/2608.07222)*
 
 ![Figure 2 from Skaling: Chinchilla](/assets/images/skaling-chinchillas-exponents-meet-kaplans-coupling-source-figure-2.webp)
-*Figure 2 First-order derivative structure on Farseer ( Equation 1 ; MLS estimates, log–log axes; the colorbar shows the cross-variable). Top: same-variable projections, vs (a) and vs (b), whose linear trends indicate power-law decay ( ). Bottom: cross-variable projections, vs (c) and vs (d); the dominant structure is horizontal bands induced by the same-variable dependence, while the cross-slopes remain small. source: [Skaling: Chinchilla](https://arxiv.org/abs/2608.07222)*
+*Fig 2: Log-log projections of loss derivatives across model and data scales follow approximately linear trends, supporting the paper’s coupled power-law scaling model. | source: [Skaling: Chinchilla](https://arxiv.org/abs/2608.07222)*
 
 
 ### One exponent restores model–data interaction

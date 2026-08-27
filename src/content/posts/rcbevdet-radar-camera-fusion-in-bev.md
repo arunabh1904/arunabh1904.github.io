@@ -30,13 +30,13 @@ RadarBEVNet couples two encoders. The point path retains local measurement attri
 On nuScenes test, the paper reports that RCBEVDet improves its BEVDepth baseline by 3.4 NDS and 3.5 mAP. It surpasses the compared CRN configuration by 1.5 NDS with a smaller image backbone and reports 21–28 FPS depending on configuration. On View-of-Delft, which uses 4D radar, it reports 69.80 mAP in the region of interest. A sensor-dropout experiment is included, but the main benchmark gains do not by themselves establish adverse-weather reliability.
 
 ![Figure 2 from RCBEVDet, showing a dual-stream radar encoder, RCS-aware BEV scattering, and camera-radar cross-attention](/assets/images/rcbevdet-paper-figure-2.png)
-*The radar path preserves measurement-specific structure before meeting camera features in BEV. source: [RCBEVDet](https://arxiv.org/abs/2403.16440)*
+*Fig 1: The radar path preserves measurement-specific structure before meeting camera features in BEV. | source: [RCBEVDet](https://arxiv.org/abs/2403.16440)*
 
 ![Figure 1 from RCBEVDet: Radar-Camera Fusion in Bird](/assets/images/rcbevdet-radar-camera-fusion-in-bev-source-figure-1.webp)
-*Figure 1 Comparison of the proposed RCBEVDet and other real-time 3D object detectors. Our RCBEVDet achieves state-of-the-art accuracy and accuracy-speed trade-offs. All entries are evaluated on nuScenes val set, and the inference speed is benchmarked by a single RTX3090 GPU. source: [RCBEVDet: Radar-Camera Fusion in Bird](https://arxiv.org/abs/2403.16440)*
+*Fig 2: Comparison of the proposed RCBEVDet and other real-time 3D object detectors. Our RCBEVDet achieves state-of-the-art accuracy and accuracy-speed trade-offs. | source: [RCBEVDet: Radar-Camera Fusion in Bird](https://arxiv.org/abs/2403.16440)*
 
 ![Figure 2 from RCBEVDet: Radar-Camera Fusion in Bird](/assets/images/rcbevdet-radar-camera-fusion-in-bev-source-figure-2.webp)
-*Figure 2 Overall pipeline of RCBEVDet. Firstly, multi-view images are encoded and transformed into the bird’s eye view to obtain the image BEV feature. Concurrently, radar point clouds are sent to the proposed RadarBEVNet to extract the radar BEV feature. Afterward, BEV features from radar and cameras are aligned dynamically and aggregated with the cross-attention multi-layer fusion (CAMF). The fused semantically rich multi-modal BEV feature is employed for the 3D object detection task. source: [RCBEVDet: Radar-Camera Fusion in Bird](https://arxiv.org/abs/2403.16440)*
+*Fig 3: Overall pipeline of RCBEVDet. Firstly, multi-view images are encoded and transformed into the bird’s eye view to obtain the image BEV feature. | source: [RCBEVDet: Radar-Camera Fusion in Bird](https://arxiv.org/abs/2403.16440)*
 
 
 | Radar property | Modeling response | Why it matters |

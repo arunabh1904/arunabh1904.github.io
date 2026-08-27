@@ -26,13 +26,13 @@ Wan is an open suite of video foundation models built on diffusion transformers.
 ## Core Insights
 
 ![Wan diffusion transformer architecture with text conditioning patchified video latents and a stack of DiT blocks](/assets/images/wan-open-and-advanced-large-scale-video-generative-models-paper-figure.png)
-*The Wan-DiT architecture shows the generative core after compression: patchified video latents are denoised through stacked transformer blocks with timestep and text conditioning, then decoded back to video. source: [Wan](https://arxiv.org/abs/2503.20314)*
+*Fig 1: The Wan-DiT architecture shows the generative core after compression: patchified video latents are denoised through stacked transformer blocks with timestep and text conditioning, then decoded back to video. | source: [Wan](https://arxiv.org/abs/2503.20314)*
 
 ![Figure 7 from Wan: Open and Advanced Large-Scale Video Generative Models](/assets/images/wan-open-and-advanced-large-scale-video-generative-models-source-figure-7.webp)
-*Figure 7 Comparison of video reconstruction performance at resolution and 25 frames. source: [Wan: Open and Advanced Large-Scale Video Generative Models](https://arxiv.org/abs/2503.20314)*
+*Fig 2: Comparison of video reconstruction performance at resolution and 25 frames. | source: [Wan: Open and Advanced Large-Scale Video Generative Models](https://arxiv.org/abs/2503.20314)*
 
 ![Figure 3 from Wan: Open and Advanced Large-Scale Video Generative Models](/assets/images/wan-open-and-advanced-large-scale-video-generative-models-source-figure-3.webp)
-*Figure 3 Data provisioning across different training phases. For each stage, we dynamically adjust the proportions of data related to motion, quality, and category based on data throughput. source: [Wan: Open and Advanced Large-Scale Video Generative Models](https://arxiv.org/abs/2503.20314)*
+*Fig 3: Data provisioning across different training phases. For each stage, we dynamically adjust the proportions of data related to motion, quality, and category based on data throughput. | source: [Wan: Open and Advanced Large-Scale Video Generative Models](https://arxiv.org/abs/2503.20314)*
 
 
 | Component | Decision it informs |

@@ -19,14 +19,12 @@ summary: '2026 – π0.7: A Steerable Generalist Robotic Foundation Model'
 
 ## Core Insights
 
-![Pi0.7 architecture with multimodal context, video history, and an action expert](/assets/images/pi0-7-paper-figure-2.svg)
-*A 4B vision-language backbone supplies semantics, a video-history encoder preserves recent state, and an 860M action expert generates controls. source: [π0.7](https://arxiv.org/abs/2604.15483)*
 
 ![Figure 2 from π0.7: A Steerable Generalist Robotic Foundation Model](/assets/images/pi0-7-steerable-generalist-robotic-foundation-model-source-figure-2.webp)
-*Figure 2 Fig. 2 : Architecture overview. The model is a 5B-parameter VLA consisting of a 4B VLM backbone, a MEM -style video history encoder and a 860M parameter action expert. The model’s context includes multiple distinct modalities, including language commands, episode metadata that describes the data quality and strategy, and multimodal inputs such as subgoal images. source: [π0.7: A Steerable Generalist Robotic Foundation Model](https://arxiv.org/abs/2604.15483)*
+*Fig 1: Architecture overview. The model is a 5B-parameter VLA consisting of a 4B VLM backbone, a MEM -style video history encoder and a 860M parameter action expert. | source: [π0.7: A Steerable Generalist Robotic Foundation Model](https://arxiv.org/abs/2604.15483)*
 
 ![Figure 5 from π0.7: A Steerable Generalist Robotic Foundation Model](/assets/images/pi0-7-steerable-generalist-robotic-foundation-model-source-figure-5.webp)
-*Figure 5 Fig. 5 : Illustration of selected evaluation tasks. We evaluate on a number of tasks, and two of the more longer-horizon ones are visualized here. For some tasks such as “Take Out Trash”, we provide a coarse instruction like “take out the trash” and performs the full long-horizon task. source: [π0.7: A Steerable Generalist Robotic Foundation Model](https://arxiv.org/abs/2604.15483)*
+*Fig 2: Illustration of selected evaluation tasks. We evaluate on a number of tasks, and two of the more longer-horizon ones are visualized here. | source: [π0.7: A Steerable Generalist Robotic Foundation Model](https://arxiv.org/abs/2604.15483)*
 
 
 The central decision is context conditioning. A language command says what to do. Metadata can describe data quality or strategy. Subgoal images specify a desired intermediate state. This lets one policy reuse demonstrations, imperfect autonomous data, and non-robot sources without pretending they are equivalent.

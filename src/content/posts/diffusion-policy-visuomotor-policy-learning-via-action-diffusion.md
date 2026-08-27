@@ -24,13 +24,13 @@ summary: "2023 – Diffusion Policy: Visuomotor Policy Learning via Action Diffu
 ## Core Insights
 
 ![Diffusion Policy overview with observation-conditioned denoising of action sequences using convolutional or transformer backbones](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-paper-figure.png)
-*Figure 2 shows why the output is a trajectory distribution rather than a point action: Gaussian action sequences are iteratively denoised while visual observations condition every convolutional block or transformer decoder layer. source: [Diffusion Policy](https://arxiv.org/abs/2303.04137)*
+*Fig 1: Shows why the output is a trajectory distribution rather than a point action: Gaussian action sequences are iteratively denoised while visual observations condition every convolutional block or transformer decoder layer. | source: [Diffusion Policy](https://arxiv.org/abs/2303.04137)*
 
 ![Figure 10 from Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-source-figure-10.webp)
-*Figure 10 Realworld Sauce Manipulation. [Left] 6DoF pouring Task. The robot needs to \raisebox{-0.9pt}{1}⃝ dip the ladle to scoop sauce from the bowl, \raisebox{-0.9pt}{2}⃝ approach the center of the pizza dough, \raisebox{-0.9pt}{3}⃝ pour sauce, and \raisebox{-0.9pt}{4}⃝ lift the ladle to finish the task. [Right] Periodic spreading Task The robot needs to \raisebox{-0.9pt}{1}⃝ approach the center of the sauce with a grasped spoon, \raisebox{-0.9pt}{2}⃝ spread the sauce to cover pizza in a spiral pattern, and \raisebox{-0. source: [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](https://arxiv.org/abs/2303.04137)*
+*Fig 2: Diffusion Policy controls a robot through multi-step pouring and sauce-spreading motions, illustrating contact-rich trajectories that require coordinated six-degree-of-freedom actions. | source: [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](https://arxiv.org/abs/2303.04137)*
 
 ![Figure 4 from Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-source-figure-4.webp)
-*Figure 4 Velocity v.s. Position Control. The performance difference when switching from velocity to position control. While both BCRNN and BET performance decrease, Diffusion Policy is able to leverage the advantage of position and improve its performance. source: [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](https://arxiv.org/abs/2303.04137)*
+*Fig 3: On Square and Kitchen tasks, position-controlled Diffusion Policy variants improve success more than velocity-controlled LSTM-GMM and BET baselines, with the largest gain on Kitchen. | source: [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](https://arxiv.org/abs/2303.04137)*
 
 
 The policy conditions a diffusion model on observations, starts from noisy action sequences, and refines them across denoising steps. Receding-horizon control executes only the near part of each sampled trajectory before observing again. This combination gives diffusion enough horizon to coordinate motion while retaining closed-loop replanning.

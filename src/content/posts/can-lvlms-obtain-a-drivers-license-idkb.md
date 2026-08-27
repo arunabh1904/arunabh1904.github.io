@@ -26,13 +26,13 @@ IDKB is an Interactive Driving Knowledge Base for testing whether LVLMs understa
 IDKB tests whether LVLMs know driving rules and applied traffic knowledge. The benchmark covers signs, laws, exam-style questions, and scenario reasoning, then evaluates 15 representative LVLMs. Its central claim is that visual-language capability is not the same as driving competence: a model may recognize a road scene but still choose an illegal or unsafe action. The benchmark is valuable because autonomous driving needs rule knowledge, not only perception. The caveat is scope: passing IDKB would show specialized knowledge, but it would not prove planning, control, or closed-loop safety.
 
 ![Figure 1: Performance of 15 representative Large Vision-Language Models on IDKB, evaluated by three driving knowledge understanding metrics from Can LVLMs Obtain a Driver's License?](/assets/images/can-lvlms-obtain-a-drivers-license-idkb-paper-figure.png)
-*Figure 1: Performance of 15 representative Large Vision-Language Models on IDKB, evaluated by three driving knowledge understanding metrics. From the [Can LVLMs Obtain a Driver's License? paper](https://arxiv.org/abs/2409.02914). source: [Can LVLMs Obtain a Driver's License? paper](https://arxiv.org/abs/2409.02914)*
+*Fig 1: Performance of 15 representative Large Vision-Language Models on IDKB, evaluated by three driving knowledge understanding metrics. | source: [Can LVLMs Obtain a Driver's License? paper](https://arxiv.org/abs/2409.02914)*
 
 ![Figure 3 from Can LVLMs Obtain a Driver](/assets/images/can-lvlms-obtain-a-drivers-license-idkb-source-figure-3.webp)
-*Figure 3 Annotated examples of three data sources – Driving Handbook Data, Driving Test Data, and Driving Road Data. source: [Can LVLMs Obtain a Driver](https://arxiv.org/abs/2409.02914)*
+*Fig 2: Annotated examples of three data sources – Driving Handbook Data, Driving Test Data, and Driving Road Data. | source: [Can LVLMs Obtain a Driver](https://arxiv.org/abs/2409.02914)*
 
 ![Figure 4 from Can LVLMs Obtain a Driver](/assets/images/can-lvlms-obtain-a-drivers-license-idkb-source-figure-4.webp)
-*Figure 4 Data distribution in terms of data source, data domain and knowledge category. source: [Can LVLMs Obtain a Driver](https://arxiv.org/abs/2409.02914)*
+*Fig 3: Data distribution in terms of data source, data domain and knowledge category. | source: [Can LVLMs Obtain a Driver](https://arxiv.org/abs/2409.02914)*
 
 
 **What to look at:**

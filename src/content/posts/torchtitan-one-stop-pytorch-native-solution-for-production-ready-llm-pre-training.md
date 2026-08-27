@@ -26,10 +26,10 @@ TorchTitan is a PyTorch-native distributed training system for composing large-m
 ## Core Insights
 
 ![TorchTitan initialization workflow composing model data parallelism checkpointing logging and training configuration](/assets/images/torchtitan-one-stop-pytorch-native-solution-for-production-ready-llm-pre-training-paper-figure.png)
-*Figure 1 shows TorchTitan's systems claim: production pretraining is assembled from composable configuration, model, data, parallelism, checkpoint, and observability components rather than a single monolithic trainer. source: [TorchTitan](https://arxiv.org/abs/2410.06511)*
+*Fig 1: Shows TorchTitan's systems claim: production pretraining is assembled from composable configuration, model, data, parallelism, checkpoint, and observability components rather than a single monolithic trainer. | source: [TorchTitan](https://arxiv.org/abs/2410.06511)*
 
 ![Figure 2 from TorchTitan: One-stop PyTorch Native Solution for Production-ready LLM Pre-training](/assets/images/torchtitan-one-stop-pytorch-native-solution-for-production-ready-llm-pre-training-source-figure-2.webp)
-*Figure 2 Scaling with 4D Parallelism. source: [TorchTitan: One-stop PyTorch Native Solution for Production-ready LLM Pre-training](https://arxiv.org/abs/2410.06511)*
+*Fig 2: TorchTitan moves from FSDP to tensor, pipeline, context, and data parallel combinations as model size, context length, and GPU count grow from hundreds to thousands. | source: [TorchTitan: One-stop PyTorch Native Solution for Production-ready LLM Pre-training](https://arxiv.org/abs/2410.06511)*
 
 
 | Capability | Operational consequence |

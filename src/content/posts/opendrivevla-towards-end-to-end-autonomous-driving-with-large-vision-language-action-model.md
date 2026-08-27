@@ -32,13 +32,13 @@ OpenDriveVLA uses hierarchical vision-language alignment to map 2D and 3D struct
 This is part of the shift from "VLM as explainer" to "VLA as spatial action model." The caveat is that open-loop planning and QA are still indirect evidence; the real question is whether the aligned tokens remain reliable under closed-loop distribution shift.
 
 ![Figure 2 from OpenDriveVLA showing hierarchical feature alignment, driving instruction tuning, agent-env-ego interaction modeling, and trajectory planning tuning](/assets/images/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model-paper-figure.png)
-*Figure 2 shows OpenDriveVLA's staged training pipeline, from hierarchical feature alignment to trajectory planning tuning. From the [OpenDriveVLA paper](https://arxiv.org/abs/2503.23463). source: [OpenDriveVLA paper](https://arxiv.org/abs/2503.23463)*
+*Fig 1: Shows OpenDriveVLA's staged training pipeline, from hierarchical feature alignment to trajectory planning tuning. | source: [OpenDriveVLA paper](https://arxiv.org/abs/2503.23463)*
 
 ![Figure 3 from OpenDriveVLA: Towards End-to-end Autonomous Driving with Large Vision Language Action Model](/assets/images/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model-source-figure-3.webp)
-*Figure 3 Fig. 3 : Visualization of OpenDriveVLA-7B planning actions under original dataset instruction to keep forward (left) and modified instruction to turn right (right). The QA prediction showcases (middle) are from results reported in Table II and Table III . The agent motion prediction results are visualized after the agent-env-ego interaction stage. source: [OpenDriveVLA: Towards End-to-end Autonomous Driving with Large Vision Language Action Model](https://arxiv.org/abs/2503.23463)*
+*Fig 2: Visualization of OpenDriveVLA-7B planning actions under original dataset instruction to keep forward (left) and modified instruction to turn right (right). The QA prediction showcases (middle) are from results reported in Table II and Table III. | source: [OpenDriveVLA: Towards End-to-end Autonomous Driving with Large Vision Language Action Model](https://arxiv.org/abs/2503.23463)*
 
 ![Figure 5 from OpenDriveVLA: Towards End-to-end Autonomous Driving with Large Vision Language Action Model](/assets/images/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model-source-figure-5.webp)
-*Figure 5 Fig. 5 : Example 1 of Stage 1 dataset visualization from nuScenes Sample 90. Green boxes show instance token captions; Yellow boxes indicate map token captions; Red boxes represent scene token captions. source: [OpenDriveVLA: Towards End-to-end Autonomous Driving with Large Vision Language Action Model](https://arxiv.org/abs/2503.23463)*
+*Fig 3: Example 1 of Stage 1 dataset visualization from nuScenes Sample 90. Green boxes show instance token captions; Yellow boxes indicate map token captions; Red boxes represent scene token captions. | source: [OpenDriveVLA: Towards End-to-end Autonomous Driving with Large Vision Language Action Model](https://arxiv.org/abs/2503.23463)*
 
 
 **What to look at:**

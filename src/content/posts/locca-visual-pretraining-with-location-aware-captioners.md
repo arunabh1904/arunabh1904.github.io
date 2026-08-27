@@ -28,13 +28,11 @@ Standard captioning pretraining gives a model a useful global visual representat
 The important design choice is that localization enters during visual pretraining rather than only during later instruction tuning. This keeps the model simple: one vision transformer, one transformer decoder, one generative objective. The authors also call out a benchmark hygiene issue on RefCOCO: the splits overlap heavily, so they remove validation and test images from the combined training set.
 
 ![Figure 1 from LocCa showing captioning, automatic referring expression, and grounded captioning pretraining tasks](/assets/images/locca-visual-pretraining-with-location-aware-captioners-paper-figure.png)
-*Figure 1 shows the LocCa task interface: normal captioning, automatic referring expression, and grounded captioning all share the same encoder-decoder model. From the [LocCa paper](https://arxiv.org/abs/2403.19596). source: [LocCa paper](https://arxiv.org/abs/2403.19596)*
+*Fig 1: Shows the LocCa task interface: normal captioning, automatic referring expression, and grounded captioning all share the same encoder-decoder model. | source: [LocCa paper](https://arxiv.org/abs/2403.19596)*
 
 ![Figure 3 from LocCa: Visual Pretraining with Location-aware Captioners](/assets/images/locca-visual-pretraining-with-location-aware-captioners-source-figure-3.webp)
-*Figure 3 Ablation studies on (a) impact of different pretrained image resolutions on string token; and (b) string vs special token of box coordinates with pretrained res 224. The results are the average Acc@0.5 of the val&test splits on RefCOCO/+. source: [LocCa: Visual Pretraining with Location-aware Captioners](https://arxiv.org/abs/2403.19596)*
+*Fig 2: Ablation studies on (a) impact of different pretrained image resolutions on string token; and (b) string vs special token of box coordinates with pretrained res 224. The results are the average Acc@0.5 of the val&test splits on RefCOCO/+. | source: [LocCa: Visual Pretraining with Location-aware Captioners](https://arxiv.org/abs/2403.19596)*
 
-![Figure 3 from LocCa: Visual Pretraining with Location-aware Captioners](/assets/images/locca-visual-pretraining-with-location-aware-captioners-source-figure-3.webp)
-*Figure 3 Result on COCO detection with a limit of 25 output boxes. For reward tuned models we show both the results before (dark blue and orange) and after (light blue and orange) reinforce tuning [ 88 ]. source: [LocCa: Visual Pretraining with Location-aware Captioners](https://arxiv.org/abs/2403.19596)*
 
 
 **What to look at:**

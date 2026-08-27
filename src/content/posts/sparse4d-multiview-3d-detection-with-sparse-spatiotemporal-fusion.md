@@ -30,13 +30,13 @@ Sparse 4D sampling starts with fixed keypoints at the anchor's center and face c
 The depth-reweight module addresses an ambiguity created by projecting a 3D anchor into images: an image feature can match appearance while belonging to the wrong depth along the ray. The module predicts an instance-level depth distribution and scales the sampled feature by confidence at the anchor depth. On nuScenes, the paper reports that Sparse4D surpasses earlier sparse camera detectors and most compared BEV methods while avoiding dense view transformation and global attention.
 
 ![Figure 2 from Sparse4D, showing iterative 3D anchors sampling multi-view, multi-scale, multi-timestamp image features](/assets/images/sparse4d-paper-figure-2.png)
-*Sparse4D turns space-time fusion into sparse evidence retrieval around a fixed set of evolving anchors. source: [Sparse4D](https://arxiv.org/abs/2211.10581)*
+*Fig 1: Sparse4D turns space-time fusion into sparse evidence retrieval around a fixed set of evolving anchors. | source: [Sparse4D](https://arxiv.org/abs/2211.10581)*
 
 ![Figure 1 from Sparse4D: Multi-View 3D Object Detection with Sparse Spatial-Temporal Fusion](/assets/images/sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion-source-figure-1.webp)
-*Figure 1 Overview of the Sparse4D. For each candidate anchor instance, we sparsely sampling multi-timestamp/view/scale features of multiple keypoints, then hierarchically fuse these feature as instance feature for precise anchor refinement. source: [Sparse4D: Multi-View 3D Object Detection with Sparse Spatial-Temporal Fusion](https://arxiv.org/abs/2211.10581)*
+*Fig 2: Overview of the Sparse4D. For each candidate anchor instance, we sparsely sampling multi-timestamp/view/scale features of multiple keypoints, then hierarchically fuse these feature as instance feature for precise anchor refinement. | source: [Sparse4D: Multi-View 3D Object Detection with Sparse Spatial-Temporal Fusion](https://arxiv.org/abs/2211.10581)*
 
 ![Figure 5 from Sparse4D: Multi-View 3D Object Detection with Sparse Spatial-Temporal Fusion](/assets/images/sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion-source-figure-5.webp)
-*Figure 5 Ablation study of the influence of Refinement Modules and Historical Frame. In this experiment, the input image size is set to and learnable keypoints are removed. source: [Sparse4D: Multi-View 3D Object Detection with Sparse Spatial-Temporal Fusion](https://arxiv.org/abs/2211.10581)*
+*Fig 3: Ablation study of the influence of Refinement Modules and Historical Frame. In this experiment, the input image size is set to and learnable keypoints are removed. | source: [Sparse4D: Multi-View 3D Object Detection with Sparse Spatial-Temporal Fusion](https://arxiv.org/abs/2211.10581)*
 
 
 | Sparse state | What it carries | Failure pressure |

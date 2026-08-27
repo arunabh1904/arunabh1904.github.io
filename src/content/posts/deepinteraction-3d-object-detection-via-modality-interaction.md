@@ -30,13 +30,13 @@ The encoder has two jobs. Intra-modal learning improves each stream in its nativ
 The paper's ablations support the interaction claim. Using both representations in the decoder beats repeatedly using the LiDAR stream; adding cross-modal interaction improves over intra-modal processing alone; and the method improves its LiDAR-only baseline with both voxel and pillar backbones. Category gains are largest for some sparse or small classes, including 11.8 mAP for bicycles, 6.9 for motorcycles, and 5.9 for traffic cones in the reported nuScenes validation breakdown.
 
 ![Figure 1 from DeepInteraction, contrasting feature collapse with retained modality-specific representations](/assets/images/deepinteraction-paper-figure-1.png)
-*The left pipeline fuses once; the right keeps both representations alive and exchanges information during encoding and decoding. source: [DeepInteraction](https://arxiv.org/abs/2208.11112)*
+*Fig 1: The left pipeline fuses once; the right keeps both representations alive and exchanges information during encoding and decoding. | source: [DeepInteraction](https://arxiv.org/abs/2208.11112)*
 
 ![Figure 2 from DeepInteraction: 3D Object Detection via Modality Interaction](/assets/images/deepinteraction-3d-object-detection-via-modality-interaction-source-figure-2.webp)
-*Figure 2 Illustration of the multi-modal representational interactions. Given two modality-specific representations, the image-to-LiDAR feature interaction (a) spread the visual signal in the image representation to the LiDAR BEV representation, and the LiDAR-to-image feature interaction (b) takes cross-modal relative contexts from LiDAR representation to enhance the image representations. source: [DeepInteraction: 3D Object Detection via Modality Interaction](https://arxiv.org/abs/2208.11112)*
+*Fig 2: Illustration of the multi-modal representational interactions. Given two modality-specific representations, the image-to-LiDAR feature interaction (a) spread the visual signal in the image representation to the LiDAR BEV representation, and the LiDAR-to-image feature interaction (b) takes cross-modal relative contexts from LiDAR representation to enhance the image representations. | source: [DeepInteraction: 3D Object Detection via Modality Interaction](https://arxiv.org/abs/2208.11112)*
 
 ![Figure 3 from DeepInteraction: 3D Object Detection via Modality Interaction](/assets/images/deepinteraction-3d-object-detection-via-modality-interaction-source-figure-3.webp)
-*Figure 3 Illustration of our multi-modal predictive interaction. Our predictive interaction decoder (a) generates predictions via (b) progressively interacting with two modality-specific representations. source: [DeepInteraction: 3D Object Detection via Modality Interaction](https://arxiv.org/abs/2208.11112)*
+*Fig 3: Illustration of our multi-modal predictive interaction. Our predictive interaction decoder (a) generates predictions via (b) progressively interacting with two modality-specific representations. | source: [DeepInteraction: 3D Object Detection via Modality Interaction](https://arxiv.org/abs/2208.11112)*
 
 
 | Strategy | Benefit | Cost |

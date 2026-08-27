@@ -26,13 +26,13 @@ VoTr replaces a sparse-convolutional LiDAR backbone with attention over occupied
 VoTr has sparse voxel modules that may create features at new active positions and submanifold modules that update only existing positions. Each query attends to a fixed-size set of local or dilated occupied voxels. The fixed budget keeps attention bounded even when the scene contains tens of thousands of active voxels.
 
 ![VoTr: Voxel Transformer for 3D Object Detection source figure: The overall architecture of Voxel Transformer (VoTr).](/assets/images/votr-voxel-transformer-for-3d-object-detection-paper-figure.webp)
-*The overall architecture of Voxel Transformer (VoTr). source: [VoTr: Voxel Transformer for 3D Object Detection](https://arxiv.org/abs/2109.02497)*
+*Fig 1: VoTR replaces the dense 3D backbone in a voxel detector with stacked sparse and submanifold attention modules, then keeps the BEV backbone and detection head. | source: [VoTr: Voxel Transformer for 3D Object Detection](https://arxiv.org/abs/2109.02497)*
 
 ![Figure 3 from VoTr: Voxel Transformer for 3D Object Detection](/assets/images/votr-voxel-transformer-for-3d-object-detection-source-figure-3.webp)
-*Figure 3 Illustration of Local and Dilated Attention. We note that this is a 2D example and can be easily extended to 3D cases. For each query (red), Local Attention (yellow) focuses on the local region while Dilated Attention (green) searches the whole space with gradually enlarged steps. The non-empty voxels (light blue) which meet the searching locations are selected as the attending voxels (dark blue). source: [VoTr: Voxel Transformer for 3D Object Detection](https://arxiv.org/abs/2109.02497)*
+*Fig 2: Illustration of Local and Dilated Attention. We note that this is a 2D example and can be easily extended to 3D cases. | source: [VoTr: Voxel Transformer for 3D Object Detection](https://arxiv.org/abs/2109.02497)*
 
 ![Figure 1 from VoTr: Voxel Transformer for 3D Object Detection](/assets/images/votr-voxel-transformer-for-3d-object-detection-source-figure-1.webp)
-*Figure 1 (a) 3D convolutional network. source: [VoTr: Voxel Transformer for 3D Object Detection](https://arxiv.org/abs/2109.02497)*
+*Fig 3: A fixed 3D-convolution neighborhood aggregates nearby occupied voxels around an object, but still spends computation according to geometric position rather than content. | source: [VoTr: Voxel Transformer for 3D Object Detection](https://arxiv.org/abs/2109.02497)*
 
 
 Replacing SECOND's convolutional backbone with VoTr improves Waymo Level-1 vehicle mAP by 1.05 points. The gains grow with range: 1.42 points at 30–50 m and 1.72 beyond 50 m. On KITTI, adding dilated attention raises moderate car AP from 75.48 to 78.27. Increasing attended voxels from 24 to 48 adds 1.19 AP, which makes the accuracy-cost relationship explicit.

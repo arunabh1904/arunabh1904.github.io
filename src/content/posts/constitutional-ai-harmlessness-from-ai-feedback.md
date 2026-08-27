@@ -22,13 +22,13 @@ summary: "2022 – Constitutional AI: Harmlessness from AI Feedback"
 ## Core Insights
 
 ![Constitutional AI pipeline showing supervised self-critique and revision followed by reinforcement learning from AI feedback](/assets/images/constitutional-ai-harmlessness-from-ai-feedback-paper-figure.png)
-*Figure 1 separates the two mechanisms: critique-and-revision creates supervised targets, then constitutional preference judgments train the reward model used for RLAIF. source: [Constitutional AI](https://arxiv.org/abs/2212.08073)*
+*Fig 1: Separates the two mechanisms: critique-and-revision creates supervised targets, then constitutional preference judgments train the reward model used for RLAIF. | source: [Constitutional AI](https://arxiv.org/abs/2212.08073)*
 
 ![Figure 6 from Constitutional AI: Harmlessness from AI Feedback](/assets/images/constitutional-ai-harmlessness-from-ai-feedback-source-figure-6.webp)
-*Figure 6 We show harmlessness PM scores of revised responses for varying number of constitutional principles used. Increasing the number of principles does not improve these PM scores, but we have found that it improves the diversity of revised responses, which improves exploration during the RL phase of CAI training. source: [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073)*
+*Fig 2: We show harmlessness PM scores of revised responses for varying number of constitutional principles used. Increasing the number of principles does not improve these PM scores, but we have found that it improves the diversity of revised responses, which improves exploration during the RL phase of CAI training. | source: [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073)*
 
 ![Figure 2 from Constitutional AI: Harmlessness from AI Feedback](/assets/images/constitutional-ai-harmlessness-from-ai-feedback-source-figure-2.webp)
-*Figure 2 We show harmlessness versus helpfulness Elo scores (higher is better, only differences are meaningful) computed from crowdworkers’ model comparisons for all 52B RL runs. Points further to the right are later steps in RL training. The Helpful and HH models were trained with human feedback as in [ Bai et al., 2022 ] , and exhibit a tradeoff between helpfulness and harmlessness. The RL-CAI models trained with AI feedback learn to be less harmful at a given level of helpfulness. source: [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073)*
+*Fig 3: We show harmlessness versus helpfulness Elo scores (higher is better, only differences are meaningful) computed from crowdworkers’ model comparisons for all 52B RL runs. Points further to the right are later steps in RL training. | source: [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073)*
 
 
 The constitution is both specification and data generator. It makes behavioral constraints inspectable, but every generated critique, revision, and preference still passes through a model whose interpretation can be incomplete. The supervised stage also gives the RL policy a safer starting distribution, reducing the exploration burden in the reinforcement phase.

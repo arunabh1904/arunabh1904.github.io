@@ -22,13 +22,13 @@ summary: "2025 – VisualPRM: An Effective Process Reward Model for Multimodal R
 ## Core Insights
 
 ![Comparison of outcome, value-based process, and advantage-based process reward modeling across reasoning steps](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-paper-figure.png)
-*Figure 3 distinguishes outcome supervision from stepwise value and advantage targets; VisualPRM uses the step-conditioned signal to score where a multimodal solution goes wrong. source: [VisualPRM](https://arxiv.org/abs/2503.10291)*
+*Fig 1: Distinguishes outcome supervision from stepwise value and advantage targets; VisualPRM uses the step-conditioned signal to score where a multimodal solution goes wrong. | source: [VisualPRM](https://arxiv.org/abs/2503.10291)*
 
 ![Figure 1 from VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-1.webp)
-*Figure 1 The overall Best-of-8 evaluation results across seven multimodal reasoning benchmarks with different critic models. Our VisualPRM greatly enhances the overall performance, while InternVL2.5-8B struggles to be an effective critic model. source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](https://arxiv.org/abs/2503.10291)*
+*Fig 2: The overall Best-of-8 evaluation results across seven multimodal reasoning benchmarks with different critic models. Our VisualPRM greatly enhances the overall performance, while InternVL2.5-8B struggles to be an effective critic model. | source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](https://arxiv.org/abs/2503.10291)*
 
 ![Figure 2 from VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-2.webp)
-*Figure 2 Data examples in VisualPRM400K and VisualProcessBench. For VisualPRM400K, we generate the data using an automatic data pipeline. The key idea is to estimate the expected accuracy of the given step based on Monte Carlo sampling and consider the step correct if . During the training process of VisualPRM, the data is formulated as multi-turn conversations and the model is required to predict the correctness of each step conditioned on the image, question, and previous steps. source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](https://arxiv.org/abs/2503.10291)*
+*Fig 3: Data examples in VisualPRM400K and VisualProcessBench. For VisualPRM400K, we generate the data using an automatic data pipeline. | source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](https://arxiv.org/abs/2503.10291)*
 
 
 At inference, a policy model generates several reasoning traces and VisualPRM selects among them. Best-of-8 improves six model sizes/families; the paper reports a 5.9-point average gain even for InternVL2.5-78B across seven benchmarks. VisualPRM outperforms outcome reward and self-consistency baselines in the studied comparisons.

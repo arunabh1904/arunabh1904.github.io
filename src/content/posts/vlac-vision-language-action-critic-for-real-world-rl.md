@@ -22,13 +22,13 @@ summary: "2025 – VLAC: A Vision-Language-Action-Critic Model for Real-World Re
 ## Core Insights
 
 ![VLAC training and deployment overview combining progress-understanding data with action generation and dense rewards for real-world reinforcement learning](/assets/images/vlac-vision-language-action-critic-for-real-world-rl-paper-figure.png)
-*Figure 2 shows the model's dual role: mixed robot and vision-language data teach task progress and actions, then the same network supplies dense progress rewards while acting as a policy in real-world RL. source: [VLAC](https://arxiv.org/abs/2509.15937)*
+*Fig 1: Shows the model's dual role: mixed robot and vision-language data teach task progress and actions, then the same network supplies dense progress rewards while acting as a policy in real-world RL. | source: [VLAC](https://arxiv.org/abs/2509.15937)*
 
 ![Figure 5 from VLAC: A Vision-Language-Action-Critic Model for Real-World Reinforcement Learning](/assets/images/vlac-vision-language-action-critic-for-real-world-rl-source-figure-5.webp)
-*Figure 5 Example results of VLAC for task progress understanding. source: [VLAC: A Vision-Language-Action-Critic Model for Real-World Reinforcement Learning](https://arxiv.org/abs/2509.15937)*
+*Fig 2: Example results of VLAC for task progress understanding. | source: [VLAC: A Vision-Language-Action-Critic Model for Real-World Reinforcement Learning](https://arxiv.org/abs/2509.15937)*
 
 ![Figure 3 from VLAC: A Vision-Language-Action-Critic Model for Real-World Reinforcement Learning](/assets/images/vlac-vision-language-action-critic-for-real-world-rl-source-figure-3.webp)
-*Figure 3 VLAC forward pass generates structured action tokens, reward tokens, and a value head is attached to estimate state value for PPO updates. source: [VLAC: A Vision-Language-Action-Critic Model for Real-World Reinforcement Learning](https://arxiv.org/abs/2509.15937)*
+*Fig 3: VLAC forward pass generates structured action tokens, reward tokens, and a value head is attached to estimate state value for PPO updates. | source: [VLAC: A Vision-Language-Action-Critic Model for Real-World Reinforcement Learning](https://arxiv.org/abs/2509.15937)*
 
 
 The critic sits inside an asynchronous real-world RL system with graded human support: demonstration replay, return-and-explore, and human-guided exploration. Across four real manipulation tasks, the paper reports improvement from roughly 30% to roughly 90% success within 200 interaction episodes; human intervention improves sample efficiency by about 50% and final success reaches as high as 100%.

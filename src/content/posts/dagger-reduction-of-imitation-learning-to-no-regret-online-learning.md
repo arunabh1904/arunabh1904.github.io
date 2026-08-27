@@ -26,7 +26,7 @@ summary: "2011 – DAgger: A Reduction of Imitation Learning to No-Regret Online
 The algorithm repeatedly runs a mixture of the current learner and expert, asks the expert for the correct action on visited states, aggregates those state–action labels, and retrains a stationary policy. The dataset therefore follows the learner as it improves. Under the paper's assumptions, no-regret online learning yields performance that scales linearly with horizon rather than the quadratic worst case of naive behavioral cloning.
 
 ![DAgger loop in which the learner visits states, an expert labels them, the dataset grows, and the policy is retrained](/assets/images/dagger-data-aggregation-loop.svg)
-*DAgger changes the training distribution by repeatedly labeling states induced by the current learner. mlr.press/v15/ross11a.html). source: [Ross, Gordon, and Bagnell (2011)](https://proceedings.mlr.press/v15/ross11a.html)*
+*Fig 1: DAgger repeatedly runs the current learner, asks the expert to label the learner-induced states, aggregates those corrections, and retrains on the expanding on-policy dataset. | source: [Ross, Gordon, and Bagnell (2011)](https://proceedings.mlr.press/v15/ross11a.html)*
 
 DAgger's lasting contribution is a data-collection rule: label the states your policy causes, not only the states an expert prefers. Modern intervention logs, corrective action chunks, and failure mining are variations on that principle. The difficult part is that querying an expert online can be expensive or unsafe.
 

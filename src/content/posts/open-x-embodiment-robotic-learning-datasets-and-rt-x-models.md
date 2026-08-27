@@ -24,13 +24,13 @@ summary: "2023 – Open X-Embodiment: Robotic Learning Datasets and RT-X Models"
 ## Core Insights
 
 ![Open X-Embodiment dataset composition across robot embodiments scenes trajectories skills and object categories](/assets/images/open-x-embodiment-robotic-learning-datasets-and-rt-x-models-paper-figure.png)
-*Figure 0 makes the mixture imbalance visible: embodiments contribute very different numbers of datasets, scenes, and trajectories even while the aggregate corpus covers a broad skill and object vocabulary. source: [Open X-Embodiment](https://arxiv.org/abs/2310.08864)*
+*Fig 1: Makes the mixture imbalance visible: embodiments contribute very different numbers of datasets, scenes, and trajectories even while the aggregate corpus covers a broad skill and object vocabulary. | source: [Open X-Embodiment](https://arxiv.org/abs/2310.08864)*
 
 ![Figure 1 from Open X-Embodiment: Robotic Learning Datasets and RT-X Models](/assets/images/open-x-embodiment-robotic-learning-datasets-and-rt-x-models-source-figure-1.webp)
-*Figure 1 Fig. 1 : RT-1-X and RT-2-X both take images and a text instruction as input and output discretized end-effector actions. RT-1-X is an architecture designed for robotics, with a FiLM [ 116 ] conditioned EfficientNet [ 117 ] and a Transformer [ 118 ] . RT-2-X builds on a VLM backbone by representing actions as another language, and training action text tokens together with vision-language data. source: [Open X-Embodiment: Robotic Learning Datasets and RT-X Models](https://arxiv.org/abs/2310.08864)*
+*Fig 2: RT-1-X and RT-2-X both take images and a text instruction as input and output discretized end-effector actions. RT-1-X is an architecture designed for robotics, with a FiLM conditioned EfficientNet and a Transformer. | source: [Open X-Embodiment: Robotic Learning Datasets and RT-X Models](https://arxiv.org/abs/2310.08864)*
 
 ![Figure 2 from Open X-Embodiment: Robotic Learning Datasets and RT-X Models](/assets/images/open-x-embodiment-robotic-learning-datasets-and-rt-x-models-source-figure-2.webp)
-*Figure 2 Fig. 2 : RT-1-X mean success rate is higher than that of either the Original Method or RT-1. RT-1 and RT-1-X have the same network architecture. Therefore the performance increase can be attributed to co-training on the robotics data mixture. The lab logos indicate the physical location of real robot evaluation, and the robot pictures indicate the embodiment used for the evaluation. source: [Open X-Embodiment: Robotic Learning Datasets and RT-X Models](https://arxiv.org/abs/2310.08864)*
+*Fig 3: RT-1-X mean success rate is higher than that of either the Original Method or RT-1. RT-1 and RT-1-X have the same network architecture. | source: [Open X-Embodiment: Robotic Learning Datasets and RT-X Models](https://arxiv.org/abs/2310.08864)*
 
 
 RT-X models trained on the mixture show positive transfer across several robots. The result makes dataset diversity a reusable asset, but standardization does not erase embodiment mismatch. A delta end-effector command, joint target, and mobile-base action can share a schema while retaining different physical meanings.

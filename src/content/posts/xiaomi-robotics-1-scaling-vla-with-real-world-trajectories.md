@@ -21,11 +21,9 @@ summary: '2026 – Xiaomi-Robotics-1: Scaling VLA Models with Real-World Traject
 
 ## Core Insights
 
-![Xiaomi-Robotics-1 pretraining and post-training pipeline over large-scale UMI trajectories](/assets/images/xiaomi-robotics-1-paper-figure-1.png)
-*Large-scale human-operated trajectories supply action coverage. Cross-embodiment post-training aligns those capabilities to robot observations and commands. source: [Xiaomi-Robotics-1](https://arxiv.org/abs/2607.15330)*
 
 ![Figure 1 from Xiaomi-Robotics-1: Scaling VLA Models with Real-World Trajectories](/assets/images/xiaomi-robotics-1-scaling-vla-with-real-world-trajectories-source-figure-1.webp)
-*Figure 1 Overview. Xiaomi-Robotics-1 is pre-trained on over 100k hours of real-world UMI trajectories with auto-labeled state-transition language prompts. It is then aligned to robot embodiments and imperative instruction prompts via cross-embodiment post-training. Xiaomi-Robotics-1 scales effectively with data and model size. It is able to perform multiple tasks in unseen environment out-of-the-box and learn new tasks efficiently. source: [Xiaomi-Robotics-1: Scaling VLA Models with Real-World Trajectories](https://arxiv.org/abs/2607.15330)*
+*Fig 1: Overview. Xiaomi-Robotics-1 is pre-trained on over 100k hours of real-world UMI trajectories with auto-labeled state-transition language prompts. | source: [Xiaomi-Robotics-1: Scaling VLA Models with Real-World Trajectories](https://arxiv.org/abs/2607.15330)*
 
 
 The scale comes from UMI collection rather than robot-only teleoperation. Automatic state-transition captions give each clip a language condition tied to what changed, then post-training translates that broad skill base into the target embodiment.

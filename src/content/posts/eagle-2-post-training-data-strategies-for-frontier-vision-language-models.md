@@ -28,13 +28,13 @@ Eagle 2 argues that frontier VLM performance depends heavily on post-training da
 Eagle 2 is a data-strategy paper for post-training VLMs. Instead of only releasing a final model, it studies how instruction data, ordering, filtering, and staged tuning affect frontier multimodal performance. The contribution is a transparent recipe and ablation trail showing which data choices move OCR, grounding, visual reasoning, and instruction-following behavior. The evidence comes from step-by-step ablations and broad benchmarks. The caveat is reproducibility: post-training data quality and filtering details are hard to copy exactly, and benchmark leakage must be watched closely.
 
 ![Figure 1: Overview of Eagle2-9B’s result across different multimodal benchmarks, in comparison to state-of-the-art open-source and commercial frontier models from Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models](/assets/images/eagle-2-post-training-data-strategies-for-frontier-vision-language-models-paper-figure.png)
-*Figure 1: Overview of Eagle2-9B’s result across different multimodal benchmarks, in comparison to state-of-the-art open-source and commercial frontier models. From the [Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models paper](https://arxiv.org/abs/2501.14818). source: [Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models paper](https://arxiv.org/abs/2501.14818)*
+*Fig 1: Overview of Eagle2-9B’s result across different multimodal benchmarks, in comparison to state-of-the-art open-source and commercial frontier models. | source: [Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models paper](https://arxiv.org/abs/2501.14818)*
 
 ![Figure 2 from Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models](/assets/images/eagle-2-post-training-data-strategies-for-frontier-vision-language-models-source-figure-2.webp)
-*Figure 2 Step-by-Step ablation of Eagle 2. We show the average scores of 13 benchmarks, detailed numbers are in Table 5 and 6. source: [Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models](https://arxiv.org/abs/2501.14818)*
+*Fig 2: Step-by-Step ablation of Eagle 2. We show the average scores of 13 benchmarks, detailed numbers are in Table 5 and 6. | source: [Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models](https://arxiv.org/abs/2501.14818)*
 
 ![Figure 4 from Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models](/assets/images/eagle-2-post-training-data-strategies-for-frontier-vision-language-models-source-figure-4.webp)
-*Figure 4 Data Distribution for Stage-1.5 and Stage-2. source: [Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models](https://arxiv.org/abs/2501.14818)*
+*Fig 3: Eagle2 shifts its post-training mixture from captioning-heavy Stage 1.5 toward more science, mathematics, OCR, text-only, and grounding data in Stage 2. | source: [Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models](https://arxiv.org/abs/2501.14818)*
 
 
 **What to look at:**
