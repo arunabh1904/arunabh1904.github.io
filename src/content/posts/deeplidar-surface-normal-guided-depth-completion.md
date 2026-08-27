@@ -25,7 +25,7 @@ DeepLiDAR predicts depth through two paths. One estimates surface normals from R
 Surface normals transfer more consistently across range than raw depth and provide a boundary-sensitive intermediate target. The direct branch remains necessary where the geometric recovery assumptions fail. On KITTI, DeepLiDAR reports 758.38 mm RMSE versus 814.73 mm for the cited Sparse-to-Dense system. Removing the normal path adds about 87 mm; replacing learned confidence with a binary validity mask adds 69 mm.
 
 ![DeepLiDAR: Surface-Normal-Guided Depth Completion source figure: Our system takes as input a color image and a sparse depth image from the LiDAR (Row 1), and output a dense depth map…](/assets/images/deeplidar-surface-normal-guided-depth-completion-paper-figure.webp)
-*Our system takes as input a color image and a sparse depth image from the LiDAR (Row 1), and output a dense depth map…. source: [DeepLiDAR: Surface-Normal-Guided Depth Completion](https://arxiv.org/abs/1812.00488)*
+*Fig 1: Our system takes as input a color image and a sparse depth image from the LiDAR (Row 1), and output a dense depth map…. | source: [DeepLiDAR: Surface-Normal-Guided Depth Completion](https://arxiv.org/abs/1812.00488)*
 
 | Component | Function | Evidence from ablation |
 | --- | --- | --- |

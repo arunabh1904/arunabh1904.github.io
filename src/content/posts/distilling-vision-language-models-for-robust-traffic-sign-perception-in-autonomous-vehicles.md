@@ -28,13 +28,13 @@ Traffic-sign defenses often specialize to one perturbation or sacrifice clean ac
 The evaluation uses clean data for training and tests shadow, natural-light, and printable RP2 attacks. The reported maximum gains are +12.5 percentage points under shadow attacks on GTSRB and +13.2 points under natural-light attacks on LISA. In the physical RP2 experiment, the baseline correctly classifies 6 of 16 images, compared with 12 of 16 for LAMDA. The two losses are complementary: language replacement with irrelevant prototypes removes much of the robustness gain.
 
 ![LAMDA training diagram with frozen language prototypes supervising an image-only traffic-sign classifier](/assets/images/lamda-training-paper-figure.png)
-*The text encoder and prototype banks are used as fixed train-time teachers and removed before deployment. source: [LAMDA](https://arxiv.org/abs/2608.08815)*
+*Fig 1: The text encoder and prototype banks are used as fixed train-time teachers and removed before deployment. | source: [LAMDA](https://arxiv.org/abs/2608.08815)*
 
 ![Figure 4 from Distilling Vision-Language Models for Robust Traffic Sign Perception in Autonomous Vehicles](/assets/images/distilling-vision-language-models-for-robust-traffic-sign-perception-in-autonomous-vehicles-source-figure-4.webp)
-*Figure 4 Fig. 4 : Physical adversarial patch attack (RP2) on a Speed Limit 35 sign evaluated at four distances. Baseline : standard training ( ). Our method ( ) improves robustness, correctly classifying the attacked sign at distances where the baseline fails. source: [Distilling Vision-Language Models for Robust Traffic Sign Perception in Autonomous Vehicles](https://arxiv.org/abs/2608.08815)*
+*Fig 2: An RP2 adversarial patch is evaluated on a Speed Limit 35 sign at four viewing distances, exposing how recognition robustness changes with distance. | source: [Distilling Vision-Language Models for Robust Traffic Sign Perception in Autonomous Vehicles](https://arxiv.org/abs/2608.08815)*
 
 ![Figure 1 from Distilling Vision-Language Models for Robust Traffic Sign Perception in Autonomous Vehicles](/assets/images/distilling-vision-language-models-for-robust-traffic-sign-perception-in-autonomous-vehicles-source-figure-1.webp)
-*Figure 1 (b) Natural Light [ 10 ]. source: [Distilling Vision-Language Models for Robust Traffic Sign Perception in Autonomous Vehicles](https://arxiv.org/abs/2608.08815)*
+*Fig 3: A naturally lit Speed Limit 60 sign provides one clean-domain traffic-sign example used alongside adverse-light and attack conditions. | source: [Distilling Vision-Language Models for Robust Traffic Sign Perception in Autonomous Vehicles](https://arxiv.org/abs/2608.08815)*
 
 
 The important boundary is the attacker. The physical attacks are generated against fixed target models and evaluated transfer-style; an adaptive attacker with direct access to the trained backbone is left for future work. The result is evidence for cheap train-time semantic anchoring, not a complete adversarial-defense guarantee.

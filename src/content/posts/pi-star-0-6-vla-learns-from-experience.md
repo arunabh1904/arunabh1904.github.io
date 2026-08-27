@@ -20,13 +20,13 @@ summary: '2025 – π*0.6: A VLA That Learns From Experience'
 ## Core Insights
 
 ![Tasks learned by pi-star-0.6 including espresso making, box assembly, and laundry folding](/assets/images/pi-star-0-6-paper-figure-2.png)
-*The evaluation stresses contact-rich, variable tasks where autonomous failures and expert corrections provide useful post-training evidence. source: [π0.6](https://arxiv.org/abs/2511.14759)*
+*Fig 1: The evaluation stresses contact-rich, variable tasks where autonomous failures and expert corrections provide useful post-training evidence. | source: [π0.6](https://arxiv.org/abs/2511.14759)*
 
 ![Figure 3 from π*0.6: A VLA That Learns From Experience](/assets/images/pi-star-0-6-vla-learns-from-experience-source-figure-3.webp)
-*Figure 3 Fig. 3 : Interaction between the VLA and value function during Recap training. The VLA uses a pre-trained VLM backbone. Training follows the KI recipe [ 15 ] , with next-token prediction on many data sources in pre-training, and an flow-matching action-expert with stop gradient. The VLA is conditioned on a binarized advantage indicator, obtained from a separate value function initialized from a pre-trained but smaller VLM model. source: [π*0.6: A VLA That Learns From Experience](https://arxiv.org/abs/2511.14759)*
+*Fig 2: Interaction between the VLA and value function during Recap training. The VLA uses a pre-trained VLM backbone. | source: [π*0.6: A VLA That Learns From Experience](https://arxiv.org/abs/2511.14759)*
 
 ![Figure 6 from π*0.6: A VLA That Learns From Experience](/assets/images/pi-star-0-6-vla-learns-from-experience-source-figure-6.webp)
-*Figure 6 Fig. 6 : Illustrations of the tasks used in our experiments. Tasks include three different laundry variants, assembling boxes, and making coffee drinks with an espresso machine. source: [π*0.6: A VLA That Learns From Experience](https://arxiv.org/abs/2511.14759)*
+*Fig 3: Illustrations of the tasks used in our experiments. Tasks include three different laundry variants, assembling boxes, and making coffee drinks with an espresso machine. | source: [π*0.6: A VLA That Learns From Experience](https://arxiv.org/abs/2511.14759)*
 
 
 RECAP treats deployment as a data source rather than a final exam. Advantage conditioning lets one policy learn from trajectories of different quality. Expert interventions mark where the autonomous policy needed correction, while on-policy data exposes states missing from demonstrations.

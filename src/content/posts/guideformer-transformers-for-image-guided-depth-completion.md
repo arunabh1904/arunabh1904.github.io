@@ -25,7 +25,7 @@ GuideFormer uses separate color and sparse-depth branches, then transfers image 
 Transformer blocks enlarge the receptive field available to sparse measurements, while guided attention limits exchange to features useful for depth. The paper reports 721.48 mm RMSE on KITTI depth completion. It also identifies computation speed as a limitation, so the accuracy result should be considered with attention cost and deployment support.
 
 ![GuideFormer dual-branch architecture with guided attention and confidence-weighted depth fusion](/assets/images/guideformer-paper-figure.webp)
-*Color and sparse-depth branches keep separate confidence maps while guided-attention modules exchange information before four candidate depth maps are fused. source: [GuideFormer](https://openaccess.thecvf.com/content/CVPR2022/html/Rho_GuideFormer_Transformers_for_Image_Guided_Depth_Completion_CVPR_2022_paper.html)*
+*Fig 1: Color and sparse-depth branches keep separate confidence maps while guided-attention modules exchange information before four candidate depth maps are fused. | source: [GuideFormer](https://openaccess.thecvf.com/content/CVPR2022/html/Rho_GuideFormer_Transformers_for_Image_Guided_Depth_Completion_CVPR_2022_paper.html)*
 
 | Module | Information retained | Cost |
 | --- | --- | --- |

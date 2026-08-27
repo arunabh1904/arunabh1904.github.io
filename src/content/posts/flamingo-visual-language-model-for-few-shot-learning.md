@@ -19,14 +19,12 @@ summary: '2022 – Flamingo: A Visual Language Model for Few-Shot Learning'
 
 ## Core Insights
 
-![Flamingo examples across few-shot visual tasks and multi-image dialogue](/assets/images/flamingo-paper-figure-1.svg)
-*One model changes tasks through interleaved visual and textual prompts instead of task-specific fine-tuning. source: [Flamingo](https://arxiv.org/abs/2204.14198)*
 
 ![Figure 4 from Flamingo: A Visual Language Model for Few-Shot Learning](/assets/images/flamingo-visual-language-model-for-few-shot-learning-source-figure-4.webp)
-*Figure 4 gated xattn-dense layers. To condition the LM on visual inputs, we insert new cross-attention layers between existing pretrained and frozen LM layers. The keys and values in these layers are obtained from the vision features while the queries are derived from the language inputs. They are followed by dense feed-forward layers. These layers are gated so that the LM is kept intact at initialization for improved stability and performance. source: [Flamingo: A Visual Language Model for Few-Shot Learning](https://arxiv.org/abs/2204.14198)*
+*Fig 1: Gated xattn-dense layers. To condition the LM on visual inputs, we insert new cross-attention layers between existing pretrained and frozen LM layers. | source: [Flamingo: A Visual Language Model for Few-Shot Learning](https://arxiv.org/abs/2204.14198)*
 
 ![Figure 1 from Flamingo: A Visual Language Model for Few-Shot Learning](/assets/images/flamingo-visual-language-model-for-few-shot-learning-source-figure-1.webp)
-*Figure 1 Selected examples of inputs and outputs obtained from Flamingo -80B. Flamingo can rapidly adapt to various image/video understanding tasks with few-shot prompting (top). Out of the box, Flamingo is also capable of multi-image visual dialogue (bottom). More examples in Appendix C. source: [Flamingo: A Visual Language Model for Few-Shot Learning](https://arxiv.org/abs/2204.14198)*
+*Fig 2: Selected examples of inputs and outputs obtained from Flamingo -80B. Flamingo can rapidly adapt to various image/video understanding tasks with few-shot prompting (top). | source: [Flamingo: A Visual Language Model for Few-Shot Learning](https://arxiv.org/abs/2204.14198)*
 
 
 Flamingo's interface has two bottlenecks. The resampler decides which visual evidence survives. Gated cross-attention decides where that evidence enters the language model. This keeps training tractable and preserves the language model, but a fixed visual token budget can discard small objects or fine geometry.

@@ -26,13 +26,13 @@ SENNA uses a hybrid architecture: a vision-language model produces a high-level 
 SENNA separates driving into a VLM-based decision layer and an end-to-end trajectory layer. Senna-VLM produces structured scene understanding, decisions, and explanations; Senna-E2E turns those semantics into planning outputs. Training uses staged pretraining and driving-specific instruction data so the language model learns traffic context rather than generic image chat. The paper's value is making the semantic decision step explicit. The caveat is that language plans are not safety guarantees: downstream control still has to handle geometry, timing, and uncertainty.
 
 ![Figure 1: Previous methods plan trajectories without a decision-making step, making model learning difficult from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-paper-figure.png)
-*Figure 1: Previous methods plan trajectories without a decision-making step, making model learning difficult. From the [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving paper](https://arxiv.org/abs/2410.22313). source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving paper](https://arxiv.org/abs/2410.22313)*
+*Fig 1: Previous methods plan trajectories without a decision-making step, making model learning difficult. | source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving paper](https://arxiv.org/abs/2410.22313)*
 
 ![Figure 5 from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-source-figure-5.webp)
-*Figure 5 Fig. 5: Qualitative results of Senna. The red boxes and text highlights key information that is relevant to driving decisions. source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](https://arxiv.org/abs/2410.22313)*
+*Fig 2: Qualitative results of Senna. The red boxes and text highlights key information that is relevant to driving decisions. | source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](https://arxiv.org/abs/2410.22313)*
 
 ![Figure 4 from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-source-figure-4.webp)
-*Figure 4 Fig. 4: Visualization of Meta-action data distribution in the DriveX dataset. source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](https://arxiv.org/abs/2410.22313)*
+*Fig 3: Visualization of Meta-action data distribution in the DriveX dataset. | source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](https://arxiv.org/abs/2410.22313)*
 
 
 **What to look at:**

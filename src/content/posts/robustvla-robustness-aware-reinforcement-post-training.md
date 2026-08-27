@@ -22,13 +22,13 @@ summary: "2025 – RobustVLA: Robustness-Aware Reinforcement Post-Training for V
 ## Core Insights
 
 ![RobustVLA loop injecting observation and action perturbations then applying stability Jacobian and smoothness regularization during reinforcement post-training](/assets/images/robustvla-robustness-aware-reinforcement-post-training-paper-figure.png)
-*Figure 1 traces the robustness claim from intervention to objective: perturbations expose return drift and error amplification, which motivate Jacobian, action-smoothing, and robust RL regularizers. source: [RobustVLA](https://arxiv.org/abs/2511.01331)*
+*Fig 1: Traces the robustness claim from intervention to objective: perturbations expose return drift and error amplification, which motivate Jacobian, action-smoothing, and robust RL regularizers. | source: [RobustVLA](https://arxiv.org/abs/2511.01331)*
 
 ![Figure 4 from RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](/assets/images/robustvla-robustness-aware-reinforcement-post-training-source-figure-4.webp)
-*Figure 4 (a) Ablation studies on Jacobian weight , and action-smooth weight . (b-c) T-SNE visualization of the observation representations of the baseline RIPT-VLA and the proposed RobustVLA. “ ”: task success; “ ”: task failure. source: [RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2511.01331)*
+*Fig 2: (a) Ablation studies on Jacobian weight, and action-smooth weight. (b-c) T-SNE visualization of the observation representations of the baseline RIPT-VLA and the proposed RobustVLA. “ ”: task success; “ ”: task failure. | source: [RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2511.01331)*
 
 ![Figure 2 from RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](/assets/images/robustvla-robustness-aware-reinforcement-post-training-source-figure-2.webp)
-*Figure 2 Robust VLA benchmarks based on the LIBERO include two types: a) observation perturbation and b) action perturbation. source: [RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2511.01331)*
+*Fig 3: RobustVLA evaluates observation perturbations—shifts, rotations, color changes, occlusions, and erasing—alongside action noise, covering both perception and control failures. | source: [RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2511.01331)*
 
 
 Observation perturbations model lighting, camera, latency, or state-estimation error; action perturbations model actuator and execution mismatch. Standard RL can overfit to the nominal environment even as success rises. RobustVLA adds lightweight penalties to constrain the sensitivity terms identified by the analysis and reports improved reliability across perturbed robot environments.

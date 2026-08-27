@@ -32,13 +32,13 @@ UniDriveVLA uses a Mixture-of-Transformers design. A driving understanding exper
 This is a sharper version of the VLA design problem: driving needs both language-level reasoning and precise spatial action grounding. UniDriveVLA tries to avoid forcing one Transformer stream to optimize all of those objectives at once. The abstract reports state-of-the-art results in open-loop nuScenes and closed-loop Bench2Drive among its comparisons.
 
 ![Figure 3 from UniDriveVLA showing the Mixture-of-Transformers architecture with understanding, perception, and action experts](/assets/images/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving-paper-figure.png)
-*Figure 3 shows UniDriveVLA's Mixture-of-Transformers architecture, where specialized experts are coordinated through masked joint attention. From the [UniDriveVLA paper](https://arxiv.org/abs/2604.02190). source: [UniDriveVLA paper](https://arxiv.org/abs/2604.02190)*
+*Fig 1: Shows UniDriveVLA's Mixture-of-Transformers architecture, where specialized experts are coordinated through masked joint attention. | source: [UniDriveVLA paper](https://arxiv.org/abs/2604.02190)*
 
 ![Figure 4 from UniDriveVLA: Unifying Understanding, Perception, and Action Planning for Autonomous Driving](/assets/images/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving-source-figure-4.webp)
-*Figure 4 Illustration of Masked Joint Attention. source: [UniDriveVLA: Unifying Understanding, Perception, and Action Planning for Autonomous Driving](https://arxiv.org/abs/2604.02190)*
+*Fig 2: Masked joint attention lets prefix vision and text tokens, perception tokens, and suffix status or action tokens see only the dependencies required by their roles. | source: [UniDriveVLA: Unifying Understanding, Perception, and Action Planning for Autonomous Driving](https://arxiv.org/abs/2604.02190)*
 
 ![Figure 1 from UniDriveVLA: Unifying Understanding, Perception, and Action Planning for Autonomous Driving](/assets/images/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving-source-figure-1.webp)
-*Figure 1 Comparison of VLA paradigms for autonomous driving. (a) Vanilla 2D VLA provides strong semantic reasoning but limited spatial perception. (b) 3D-enhanced VLA improves spatial perception but may degrade semantic reasoning. (c) UniDriveVLA decouples understanding, perception, and action with the Mixture-of-Transformers architecture, achieving both. source: [UniDriveVLA: Unifying Understanding, Perception, and Action Planning for Autonomous Driving](https://arxiv.org/abs/2604.02190)*
+*Fig 3: Comparison of VLA paradigms for autonomous driving. (a) Vanilla 2D VLA provides strong semantic reasoning but limited spatial perception. (b) 3D-enhanced VLA improves spatial perception but may degrade semantic reasoning. (c) UniDriveVLA decouples understanding, perception, and action with the Mixture-of-Transformers architecture, achieving both. | source: [UniDriveVLA: Unifying Understanding, Perception, and Action Planning for Autonomous Driving](https://arxiv.org/abs/2604.02190)*
 
 
 **What to look at:**

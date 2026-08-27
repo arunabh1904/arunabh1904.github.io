@@ -33,7 +33,7 @@ The paper starts from [ResNet-50](/paper%20shorts/2015/12/01/deep-residual-learn
 The architecture study then keeps that recipe fixed and changes the network in stages. At the macro level, ConvNeXt adopts a 3-3-9-3 stage ratio and a non-overlapping $4\times4$ stride-4 stem. Its blocks use depthwise convolution with wider channels, an inverted bottleneck, a $7\times7$ spatial kernel, GELU, fewer activations and normalization layers, and LayerNorm. Separate layers handle downsampling between stages. The ResNet-50-scale model moves from 78.8% to 82.0% across the accepted changes while staying near the Swin-T compute regime. Intermediate FLOPs vary, and the sequence is not a full factorial ablation. The chart therefore establishes a practical recipe, not an independent effect size for every component.
 
 ![ConvNeXt modernization path from ResNet-50 and ResNet-200 through macro design, depthwise convolution, inverted bottlenecks, large kernels, and micro-design changes](/assets/images/a-convnet-for-the-2020s-source-figure-2.webp)
-*Figure 2 separates the training baseline from the accepted architecture changes and records ImageNet-1K accuracy and GFLOPs after each step. source: [A ConvNet for the 2020s](https://arxiv.org/abs/2201.03545)*
+*Fig 1: Separates the training baseline from the accepted architecture changes and records ImageNet-1K accuracy and GFLOPs after each step. | source: [A ConvNet for the 2020s](https://arxiv.org/abs/2201.03545)*
 
 ### The ConvNeXt block separates spatial and channel mixing
 
@@ -42,7 +42,7 @@ ConvNeXt keeps a residual hierarchy, but its block is closer to a Transformer bl
 This separation matters for dense camera features. The model keeps convolution's translation-equivariant, sliding-window computation while gaining a larger local receptive field and a Transformer-like inverted bottleneck. Unlike the [Vision Transformer](/paper%20shorts/2020/10/01/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale.html), ConvNeXt does not build pairwise token interactions. Its spatial mixing therefore avoids the quadratic attention cost that grows with image resolution.
 
 ![Swin Transformer, ResNet, and ConvNeXt blocks compared side by side](/assets/images/a-convnet-for-the-2020s-source-figure-4.webp)
-*Figure 4 shows the shared inverted-bottleneck shape and the operator change: Swin uses windowed self-attention, while ConvNeXt uses one large depthwise convolution for spatial mixing. source: [A ConvNet for the 2020s](https://arxiv.org/abs/2201.03545)*
+*Fig 2: Shows the shared inverted-bottleneck shape and the operator change: Swin uses windowed self-attention, while ConvNeXt uses one large depthwise convolution for spatial mixing. | source: [A ConvNet for the 2020s](https://arxiv.org/abs/2201.03545)*
 
 ### The downstream evidence makes ConvNeXt a backbone result
 

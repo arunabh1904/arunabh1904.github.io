@@ -25,13 +25,13 @@ Janus keeps an autoregressive multimodal transformer but separates the visual en
 ## Core Insights
 
 ![Janus architecture with separate visual encoders for understanding and image generation feeding one autoregressive transformer](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-paper-figure.png)
-*Figure 2 exposes Janus's core separation: understanding and generation use different visual encoders while language modeling remains shared, avoiding one visual codebook serving incompatible semantic and pixel objectives. source: [Janus](https://arxiv.org/abs/2410.13848)*
+*Fig 1: Exposes Janus's core separation: understanding and generation use different visual encoders while language modeling remains shared, avoiding one visual codebook serving incompatible semantic and pixel objectives. | source: [Janus](https://arxiv.org/abs/2410.13848)*
 
 ![Figure 1 from Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-source-figure-1.webp)
-*Figure 1 (a) Benchmark Performance. source: [Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](https://arxiv.org/abs/2410.13848)*
+*Fig 2: Janus exceeds similarly sized MobileVLM, LLaVA-Phi, InstructBLIP, and Show-o variants across a broad set of multimodal understanding benchmarks. | source: [Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](https://arxiv.org/abs/2410.13848)*
 
 ![Figure 3 from Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-source-figure-3.webp)
-*Figure 3 Our Janus adopts a three-stage training procedure. We use flame symbols/snowflake symbols in the diagram to indicate the module updates/does not update its parameters. source: [Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](https://arxiv.org/abs/2410.13848)*
+*Fig 3: Our Janus adopts a three-stage training procedure. We use flame symbols/snowflake symbols in the diagram to indicate the module updates/does not update its parameters. | source: [Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](https://arxiv.org/abs/2410.13848)*
 
 
 | Question | Janus's answer |

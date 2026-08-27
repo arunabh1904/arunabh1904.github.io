@@ -24,10 +24,10 @@ summary: "2022 – RT-1: Robotics Transformer for Real-World Control at Scale"
 ## Core Insights
 
 ![RT-1 architecture conditioning EfficientNet with language using FiLM then compressing visual tokens for a decoder-only action transformer](/assets/images/rt-1-robotics-transformer-for-real-world-control-at-scale-paper-figure.png)
-*Figure 3 traces RT-1 end to end: a sentence embedding modulates EfficientNet features, TokenLearner compresses the vision-language grid, and a decoder-only transformer emits discretized robot actions. source: [RT-1](https://arxiv.org/abs/2212.06817)*
+*Fig 1: Traces RT-1 end to end: a sentence embedding modulates EfficientNet features, TokenLearner compresses the vision-language grid, and a decoder-only transformer emits discretized robot actions. | source: [RT-1](https://arxiv.org/abs/2212.06817)*
 
 ![Figure 1 from RT-1: Robotics Transformer for Real-World Control at Scale](/assets/images/rt-1-robotics-transformer-for-real-world-control-at-scale-source-figure-1.webp)
-*Figure 1 (a) RT-1 takes images and natural language instructions and outputs discretized base and arm actions. Despite its size (35M parameters), it does this at 3 Hz, due to its efficient yet high-capacity architecture: a FiLM ( Perez et al. 2018 ) conditioned EfficientNet ( Tan & Le 2019 ) , a TokenLearner ( Ryoo et al. 2021 ) , and a Transformer ( Vaswani et al. 2017 ). source: [RT-1: Robotics Transformer for Real-World Control at Scale](https://arxiv.org/abs/2212.06817)*
+*Fig 2: RT-1 conditions an EfficientNet visual encoder with language, compresses image tokens with TokenLearner, and uses a Transformer to emit discretized arm and base actions at 3 Hz. | source: [RT-1: Robotics Transformer for Real-World Control at Scale](https://arxiv.org/abs/2212.06817)*
 
 
 The paper's scaling variable is not only episode count. Task and object diversity produce better generalization than adding redundant examples from the same narrow distribution. TokenLearner compresses the spatial feature map into a small set of visual tokens, making transformer control feasible under a real-time budget.

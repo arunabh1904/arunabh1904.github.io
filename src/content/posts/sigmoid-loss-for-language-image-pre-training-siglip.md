@@ -29,7 +29,7 @@ summary: '2023 – Sigmoid Loss for Language-Image Pre-Training (SigLIP)'
 ## Core Insights
 
 ![Cross-device SigLIP loss computation accumulates independent pair losses without materializing one global softmax](/assets/images/sigmoid-loss-for-language-image-pre-training-siglip-paper-figure.png)
-*Each device keeps local image embeddings and receives chunks of text embeddings. Because pair losses are independent, the system can accumulate negatives without assembling one global similarity matrix. source: [SigLIP](https://arxiv.org/abs/2303.15343)*
+*Fig 1: Each device keeps local image embeddings and receives chunks of text embeddings. Because pair losses are independent, the system can accumulate negatives without assembling one global similarity matrix. | source: [SigLIP](https://arxiv.org/abs/2303.15343)*
 
 For a batch of $n$ matched pairs, SigLIP labels diagonal image-text pairs positive and all off-diagonal pairs negative:
 

@@ -19,14 +19,12 @@ summary: '2023 – PaLM-E: An Embodied Multimodal Language Model'
 
 ## Core Insights
 
-![PaLM-E examples of multimodal reasoning, dialogue, and robot planning](/assets/images/palm-e-paper-figure-2.png)
-*PaLM-E uses one multimodal sequence interface across visual reasoning and robot planning tasks. source: [PaLM-E](https://arxiv.org/abs/2303.03378)*
 
 ![Figure 2 from PaLM-E: An Embodied Multimodal Language Model](/assets/images/palm-e-embodied-multimodal-language-model-source-figure-2.webp)
-*Figure 2 PaLM-E-562B can do zero-shot multimodal chain-of-thought reasoning , can tell visually-conditioned jokes given an image, and demonstrates an array of robot-relevant multimodal-informed capabilities including perception, visually-grounded dialogue, and planning. PaLM-E also generalizes, zero-shot, to multi-image prompts despite only being trained on single-image prompts. PaLM-E can also perform math given an image with textually-interleaved handwritten numbers. source: [PaLM-E: An Embodied Multimodal Language Model](https://arxiv.org/abs/2303.03378)*
+*Fig 1: PaLM-E-562B can do zero-shot multimodal chain-of-thought reasoning, can tell visually-conditioned jokes given an image, and demonstrates an array of robot-relevant multimodal-informed capabilities including perception, visually-grounded dialogue, and planning. PaLM-E also generalizes, zero-shot, to multi-image prompts despite only being trained on single-image prompts. | source: [PaLM-E: An Embodied Multimodal Language Model](https://arxiv.org/abs/2303.03378)*
 
 ![Figure 3 from PaLM-E: An Embodied Multimodal Language Model](/assets/images/palm-e-embodied-multimodal-language-model-source-figure-3.webp)
-*Figure 3 Overview of transfer learning demonstrated by PaLM-E: across three different robotics domains, using PaLM and ViT pretraining together with the full mixture of robotics and general visual-language data provides a significant performance increase compared to only training on the respective in-domain data. See Tab. 1 , Fig. 4 , Tab. 3 , Tab. 4 for additional data in each domain. source: [PaLM-E: An Embodied Multimodal Language Model](https://arxiv.org/abs/2303.03378)*
+*Fig 2: Overview of transfer learning demonstrated by PaLM-E: across three different robotics domains, using PaLM and ViT pretraining together with the full mixture of robotics and general visual-language data provides a significant performance increase compared to only training on the respective in-domain data. See Tab. | source: [PaLM-E: An Embodied Multimodal Language Model](https://arxiv.org/abs/2303.03378)*
 
 
 The model treats images, state estimates, and text as parts of one sentence. Learned encoders map continuous observations into the embedding space consumed by the language model. The decoder then produces text plans rather than low-level motor commands.

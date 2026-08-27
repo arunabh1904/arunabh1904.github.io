@@ -28,7 +28,7 @@ LLaVA connects a CLIP-style visual encoder to Vicuna with a learned projection l
 LLaVA connects a CLIP-style vision encoder to an LLM and instruction-tunes the combined model for visual dialogue. The data move is the key: use GPT-4 to generate image-grounded instruction-following conversations from captions and visual context. Training first aligns visual features to the language model, then tunes for multimodal chat and reasoning. The paper demonstrates that instruction tuning transfers from text-only assistants to visual assistants. The caveat is synthetic supervision: generated data can teach useful behavior, but it may also preserve language priors or miss fine visual details.
 
 ![Figure 1: LLaVA network architecture from Visual Instruction Tuning (LLaVA)](/assets/images/visual-instruction-tuning-llava-paper-figure.png)
-*Figure 1: LLaVA network architecture. From the [Visual Instruction Tuning (LLaVA) paper](https://arxiv.org/abs/2304.08485). source: [Visual Instruction Tuning (LLaVA) paper](https://arxiv.org/abs/2304.08485)*
+*Fig 1: LLaVA projects visual-encoder features into a language model, then answers multimodal instructions through the shared token sequence. | source: [Visual Instruction Tuning (LLaVA) paper](https://arxiv.org/abs/2304.08485)*
 
 **What to look at:**
 - CLIP image encoder plus Vicuna language model joined by a learned projection layer.

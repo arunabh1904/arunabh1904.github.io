@@ -27,7 +27,7 @@ summary: '2026 – a bounded visual-token attention bias steers Alpamayo-R1 traj
 A YOLO11-nano detector selects a lead vehicle, maps its box onto Alpamayo-R1's $10 \times 18$ merged visual-token grid, and identifies the corresponding token indices. A forward pre-hook then adds a non-negative bias to those key positions before softmax:
 
 ![Attention-steering pipeline from detector box through visual-token selection to a bounded pre-softmax bias and a changed trajectory](/assets/images/attention-steering-overview.webp)
-*The intervention is external and weight-free: detection chooses visual-token columns, a bounded bias changes their attention mass, and the original diffusion decoder produces the trajectory. source: [Inference-Time Attention Steering](https://arxiv.org/abs/2608.17095)*
+*Fig 1: The intervention is external and weight-free: detection chooses visual-token columns, a bounded bias changes their attention mass, and the original diffusion decoder produces the trajectory. | source: [Inference-Time Attention Steering](https://arxiv.org/abs/2608.17095)*
 
 $$
 \tilde{z}_{q,j}=z_{q,j}+b_j,\qquad
@@ -40,7 +40,7 @@ $$
 The clamp $\beta=4$ bounds the perturbation, while a sink guard excludes the first four token positions. Token spans and mask shapes are checked on every run; an unexpected serving path fails open and leaves the model unchanged. This exposure audit is part of the method because a mask-based hook can affect only forward passes that materialize an additive attention mask.
 
 ![Detector box aligned to the merged visual-token grid used by the attention-steering hook](/assets/images/attention-steering-grounding.webp)
-*Actor grounding is only as precise as the detector-to-token projection: every selected grid cell becomes an attended key column across the exposed action-decoder layers. source: [Inference-Time Attention Steering](https://arxiv.org/abs/2608.17095)*
+*Fig 2: Actor grounding is only as precise as the detector-to-token projection: every selected grid cell becomes an attended key column across the exposed action-decoder layers. | source: [Inference-Time Attention Steering](https://arxiv.org/abs/2608.17095)*
 
 The evaluation uses Alpamayo-R1-10B with a 36-layer Qwen3-VL backbone, four front-camera context frames, and 64 predicted waypoints over 6.4 seconds. Baseline and steered diffusion samples share a seed. The paired zero-bias condition is therefore bit-identical, which is essential because cross-seed trajectory variation is about 30 times larger than the measured steering effect.
 
@@ -53,7 +53,7 @@ The evaluation uses Alpamayo-R1-10B with a 36-layer Qwen3-VL backbone, four fron
 | Last 8, bias sweep to $\lambda=4$ | about 17 cm | about 38 cm mean; about 140 cm maximum case | Fifty-scene dose response |
 
 ![Baseline and attention-steered trajectories showing a late-layer dose response across bias magnitudes](/assets/images/attention-steering-trajectories.webp)
-*The paired trajectories move monotonically as the late-layer bias grows, but displacement alone does not establish safer or actor-specific behavior. source: [Inference-Time Attention Steering](https://arxiv.org/abs/2608.17095)*
+*Fig 3: The paired trajectories move monotonically as the late-layer bias grows, but displacement alone does not establish safer or actor-specific behavior. | source: [Inference-Time Attention Steering](https://arxiv.org/abs/2608.17095)*
 
 ### Unchanged reasoning text is a routing result
 

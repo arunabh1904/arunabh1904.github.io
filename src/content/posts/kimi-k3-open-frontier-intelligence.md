@@ -32,13 +32,11 @@ summary: '2026 – Kimi K3: Open Frontier Intelligence'
 The paper's strongest contribution is therefore architectural and systemic rather than a single benchmark lead. Kimi Delta Attention, periodic global attention, depth-wise Attention Residuals, and a much wider expert pool are co-designed with training kernels, expert routing, persistent sandboxes, quantization-aware post-training, and prefix caching. The resulting system approaches the strongest proprietary models on several agentic tasks, but does not erase the cost of serving a 104B-active model or the comparability problems in harness-dependent evaluation.
 
 ![Kimi K3 architecture combining Kimi Delta Attention, gated MLA, Stable LatentMoE, Attention Residuals, and a MoonViT-V2 vision pathway](/assets/images/kimi-k3-architecture-paper-figure.png)
-*Kimi K3 scales information flow along three axes: KDA and gated MLA mix tokens, Stable LatentMoE mixes channels through sparse experts, and Attention Residuals select earlier block representations across depth. MoonViT-V2 supplies the native vision path. org/abs/2607.24653). source: [Kimi K3 report](https://arxiv.org/abs/2607.24653)*
+*Fig 1: Kimi K3 scales information flow along three axes: KDA and gated MLA mix tokens, Stable LatentMoE mixes channels through sparse experts, and Attention Residuals select earlier block representations across depth. MoonViT-V2 supplies the native vision path. | source: [Kimi K3 report](https://arxiv.org/abs/2607.24653)*
 
 ![Figure 8 from Kimi K3: Open Frontier Intelligence](/assets/images/kimi-k3-open-frontier-intelligence-source-figure-8.webp)
-*Figure 8 Scores and the average assistant steps across a variety of public and in-house evaluations during RL. By scaling RL FLOPs, tool-call steps scale up consistently, accompanied by a comprehensive improvement in the model’s overall capability. source: [Kimi K3: Open Frontier Intelligence](https://arxiv.org/abs/2607.24653)*
+*Fig 2: Scores and the average assistant steps across a variety of public and in-house evaluations during RL. By scaling RL FLOPs, tool-call steps scale up consistently, accompanied by a comprehensive improvement in the model’s overall capability. | source: [Kimi K3: Open Frontier Intelligence](https://arxiv.org/abs/2607.24653)*
 
-![Figure 1 from Kimi K3: Open Frontier Intelligence](/assets/images/kimi-k3-open-frontier-intelligence-source-figure-1.webp)
-*Figure 1 Kimi K3 main results. source: [Kimi K3: Open Frontier Intelligence](https://arxiv.org/abs/2607.24653)*
 
 
 Each backbone group contains three Kimi Delta Attention layers followed by one gated Multi-head Latent Attention layer; an extra MLA layer at the end guarantees a final global interaction. KDA maintains a fixed-size recurrent state and applies channel-wise decay plus a delta-rule write, making long sequences cheaper than full softmax attention. The periodic MLA layers preserve unrestricted content-based retrieval while compressing their KV state. This 69-KDA/24-MLA split makes most sequence mixing linear-time without asking a recurrent state to remember everything.

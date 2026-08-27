@@ -24,7 +24,7 @@ summary: '2026 – recurrent temporal context sharpens satellite candidates befo
 The model consumes a sequence of ground images and one satellite map. The current ground feature is the query, while the recurrent previous state supplies keys and values. The resulting context-enhanced coarse feature scores satellite-grid candidates; multi-level features provide local structure for a second-stage offset regressor. The ordering matters: temporal evidence reduces ambiguity before the fine regressor is restricted to selected candidate cells.
 
 ![Cross-view sequential localization pipeline with temporal context, coarse satellite-grid matching, and fine offset refinement](/assets/images/cross-view-sequential-visual-localization-paper-figure.webp)
-*History first sharpens the coarse satellite-grid distribution; only the retained candidates reach fine localization. source: [Cross-View Sequential Visual Localization](https://arxiv.org/abs/2608.10660)*
+*Fig 1: History first sharpens the coarse satellite-grid distribution; only the retained candidates reach fine localization. | source: [Cross-View Sequential Visual Localization](https://arxiv.org/abs/2608.10660)*
 
 The CVIS ablation traces that claim. A DINOv2 matching baseline reports 12.25 m mean error; adding multi-level features reduces it to 5.92 m, a position-aware update to 4.96 m, and full temporal context to 1.57 m. For the top-64 candidate mask, the full model covers 99.98% of ground-truth cells while retaining 17.73% of the 19-by-19 search grid. That is evidence for better candidate recall, not merely trajectory smoothing after localization.
 

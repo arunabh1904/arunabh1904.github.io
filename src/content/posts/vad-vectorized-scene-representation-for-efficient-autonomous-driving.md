@@ -30,10 +30,10 @@ The paper proposes an end-to-end vectorized paradigm for autonomous driving. Ins
 The paper reports state-of-the-art end-to-end planning performance on nuScenes. The abstract highlights VAD-Base reducing average collision rate by 29.0% while running 2.5x faster than the previous best method, and VAD-Tiny reaching up to 9.3x faster inference with comparable planning performance. The caveat is that open-loop dataset planning metrics still cannot fully prove closed-loop driving robustness.
 
 ![Figure 1 from VAD comparing rasterized scene representation with vectorized scene representation](/assets/images/vad-vectorized-scene-representation-for-efficient-autonomous-driving-paper-figure.png)
-*Figure 1 shows the representational shift: VAD keeps agents, maps, and ego plans as vectors instead of flattening the scene into dense raster grids. From the [VAD paper](https://arxiv.org/abs/2303.12077), via ar5iv. source: [VAD paper](https://arxiv.org/abs/2303.12077)*
+*Fig 1: Shows the representational shift: VAD keeps agents, maps, and ego plans as vectors instead of flattening the scene into dense raster grids. | source: [VAD paper](https://arxiv.org/abs/2303.12077)*
 
 ![Figure 2 from VAD: Vectorized Scene Representation for Efficient Autonomous Driving](/assets/images/vad-vectorized-scene-representation-for-efficient-autonomous-driving-source-figure-2.webp)
-*Figure 2 Overall architecture of VAD. The full pipeline of VAD is divided into four phases. Backbone includes an image feature extractor and a BEV encoder to project the image features to the BEV features. Vectorized Scene Learning aims to encode the scene information into agent queries and map queries, as well as represent the scene with motion vectors and map vectors. source: [VAD: Vectorized Scene Representation for Efficient Autonomous Driving](https://arxiv.org/abs/2303.12077)*
+*Fig 2: Overall architecture of VAD. The full pipeline of VAD is divided into four phases. | source: [VAD: Vectorized Scene Representation for Efficient Autonomous Driving](https://arxiv.org/abs/2303.12077)*
 
 
 _maps, and ego plans as vectors instead of flattening the scene into dense raster grids. source: [VAD paper](https://arxiv.org/abs/2303.12077)

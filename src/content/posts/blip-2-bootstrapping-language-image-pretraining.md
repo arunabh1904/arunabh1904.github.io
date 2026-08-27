@@ -19,14 +19,12 @@ summary: '2023 – BLIP-2: Bootstrapping Language-Image Pre-training with Frozen
 
 ## Core Insights
 
-![BLIP-2 two-stage Q-Former bridge between frozen vision and language models](/assets/images/blip-2-paper-figure-1.png)
-*The Q-Former first learns to extract language-relevant visual evidence, then learns to present that evidence to a frozen decoder. source: [BLIP-2](https://arxiv.org/abs/2301.12597)*
 
 ![Figure 1 from BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Models](/assets/images/blip-2-bootstrapping-language-image-pretraining-source-figure-1.webp)
-*Figure 1 Overview of BLIP-2’s framework. We pre-train a lightweight Querying Transformer following a two-stage strategy to bridge the modality gap. The first stage bootstraps vision-language representation learning from a frozen image encoder. The second stage bootstraps vision-to-language generative learning from a frozen LLM, which enables zero-shot instructed image-to-text generation (see Figure 4 for more examples). source: [BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Models](https://arxiv.org/abs/2301.12597)*
+*Fig 1: Overview of BLIP-2’s framework. We pre-train a lightweight Querying Transformer following a two-stage strategy to bridge the modality gap. | source: [BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Models](https://arxiv.org/abs/2301.12597)*
 
 ![Figure 5 from BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Models](/assets/images/blip-2-bootstrapping-language-image-pretraining-source-figure-5.webp)
-*Figure 5 Effect of vision-language representation learning on vision-to-language generative learning. Without representation learning, the Q-Former fails the bridge the modality gap, leading to significantly lower performance on zero-shot VQA. source: [BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Models](https://arxiv.org/abs/2301.12597)*
+*Fig 2: Effect of vision-language representation learning on vision-to-language generative learning. Without representation learning, the Q-Former fails the bridge the modality gap, leading to significantly lower performance on zero-shot VQA. | source: [BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Models](https://arxiv.org/abs/2301.12597)*
 
 
 The Q-Former is both an adapter and a compression boundary. A small set of learned queries attends to image features, so the decoder receives a predictable number of visual tokens regardless of image resolution.

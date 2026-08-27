@@ -24,13 +24,13 @@ summary: "2025 – Pi0.5: A Vision-Language-Action Model with Open-World General
 ## Core Insights
 
 ![Pi0.5 two-stage training with heterogeneous pretraining high-level subtask prediction and flow-matching action post-training](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-paper-figure.png)
-*Figure 3 shows how open-world behavior is divided: broad robot, web, and semantic-action pretraining builds the base VLA, then mobile-manipulation post-training couples high-level subtask inference to continuous flow-matching actions. source: [π0.5](https://arxiv.org/abs/2504.16054)*
+*Fig 1: Shows how open-world behavior is divided: broad robot, web, and semantic-action pretraining builds the base VLA, then mobile-manipulation post-training couples high-level subtask inference to continuous flow-matching actions. | source: [π0.5](https://arxiv.org/abs/2504.16054)*
 
 ![Figure 2 from Pi0.5: A Vision-Language-Action Model with Open-World Generalization](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-source-figure-2.webp)
-*Figure 2 Fig. 2 : cleaning a new kitchen. The robot is tasked with cleaning a kitchen in a home that was not in the training data. The model is given general tasks (close the cabinets, put the items in the drawer, wipe the spill, and put the dishes in the sink), which it performs by both predicting subtasks to accomplish (e.g., pick up the plate) and emitting low-level actions. source: [Pi0.5: A Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054)*
+*Fig 2: Cleaning a new kitchen. The robot is tasked with cleaning a kitchen in a home that was not in the training data. | source: [Pi0.5: A Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054)*
 
 ![Figure 6 from Pi0.5: A Vision-Language-Action Model with Open-World Generalization](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-source-figure-6.webp)
-*Figure 6 Fig. 6 : Evaluation environments. We evaluate in entirely new kitchens and bedrooms that were not seen during training, with novel objects, backgrounds, and layouts. We use a set of mock rooms for controlled, reproducible quantitative comparisons (left) and real homes for a realistic final evaluation (right). source: [Pi0.5: A Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054)*
+*Fig 3: Evaluation environments. We evaluate in entirely new kitchens and bedrooms that were not seen during training, with novel objects, backgrounds, and layouts. | source: [Pi0.5: A Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054)*
 
 
 The paper targets long-horizon generalization rather than isolated tabletop skills. It reports mobile manipulation in entirely new homes, including kitchen and bedroom cleanup tasks lasting 10–15 minutes. Ablations attribute that behavior to heterogeneous co-training and semantic subtask prediction, not simply more robot episodes.

@@ -28,10 +28,10 @@ EMMA is Waymo's end-to-end multimodal driving model. It uses camera data plus no
 EMMA builds autonomous-driving outputs on top of a multimodal foundation model. It maps camera inputs, navigation instructions, ego state, road graph elements, objects, and trajectories into a unified language-like interface with task-specific prompts. The paper's evidence includes strong motion planning on nuScenes and competitive Waymo motion results. The appeal is one model for several driving outputs; the risk is precision. Text-style serialization must still produce exact geometry, calibrated trajectories, and low-latency behavior for safety-critical driving.
 
 ![Figure 1: EMMA overview diagram from EMMA: End-to-End Multimodal Model for Autonomous Driving](/assets/images/emma-end-to-end-multimodal-model-for-autonomous-driving-paper-figure.png)
-*Figure 1: EMMA overview diagram. From the [EMMA: End-to-End Multimodal Model for Autonomous Driving paper](https://arxiv.org/abs/2410.23262). source: [EMMA: End-to-End Multimodal Model for Autonomous Driving paper](https://arxiv.org/abs/2410.23262)*
+*Fig 1: EMMA frames perception, scene understanding, and driving decisions as language generation from a shared multimodal model instead of separate task-specific heads. | source: [EMMA: End-to-End Multimodal Model for Autonomous Driving paper](https://arxiv.org/abs/2410.23262)*
 
 ![Figure 3 from EMMA: End-to-End Multimodal Model for Autonomous Driving](/assets/images/emma-end-to-end-multimodal-model-for-autonomous-driving-source-figure-3.webp)
-*Figure 3 Ablation study on the number of sampled trajectories. As more trajectories are sampled, the quality measured by ADE@5s also improves, but the benefits diminish after 12+ samples. source: [EMMA: End-to-End Multimodal Model for Autonomous Driving](https://arxiv.org/abs/2410.23262)*
+*Fig 2: Ablation study on the number of sampled trajectories. As more trajectories are sampled, the quality measured by ADE@5s also improves, but the benefits diminish after 12+ samples. | source: [EMMA: End-to-End Multimodal Model for Autonomous Driving](https://arxiv.org/abs/2410.23262)*
 
 
 **What to look at:**

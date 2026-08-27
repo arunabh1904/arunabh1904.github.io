@@ -24,13 +24,13 @@ summary: "2025 – Human-Assisted Robotic Policy Refinement via Action Preferenc
 ## Core Insights
 
 ![Action Preference Optimization pipeline from human-assisted deployment and interventions to adaptively weighted VLA fine-tuning](/assets/images/action-preference-optimization-for-robotic-policy-refinement-paper-figure.png)
-*Figure 1 connects deployment to learning: human interventions turn failed or suboptimal rollouts into action preferences, and adaptive weighting controls how strongly each corrected segment updates the VLA. source: [Action Preference Optimization](https://arxiv.org/abs/2506.07127)*
+*Fig 1: Connects deployment to learning: human interventions turn failed or suboptimal rollouts into action preferences, and adaptive weighting controls how strongly each corrected segment updates the VLA. | source: [Action Preference Optimization](https://arxiv.org/abs/2506.07127)*
 
 ![Figure 4 from Human-Assisted Robotic Policy Refinement via Action Preference Optimization](/assets/images/action-preference-optimization-for-robotic-policy-refinement-source-figure-4.webp)
-*Figure 4 Lifelong learning results of APO method. source: [Human-Assisted Robotic Policy Refinement via Action Preference Optimization](https://arxiv.org/abs/2506.07127)*
+*Fig 2: Across Coffee_D0 and StackThree_D0, APO success rises with rollout iterations while human intervention frequency falls, outperforming the baseline throughout lifelong refinement. | source: [Human-Assisted Robotic Policy Refinement via Action Preference Optimization](https://arxiv.org/abs/2506.07127)*
 
 ![Figure 6 from Human-Assisted Robotic Policy Refinement via Action Preference Optimization](/assets/images/action-preference-optimization-for-robotic-policy-refinement-source-figure-6.webp)
-*Figure 6 The rollout trajectory of APO. As indicated by the bold red and green boxes, APO can autonomously correct form failure scenarios. source: [Human-Assisted Robotic Policy Refinement via Action Preference Optimization](https://arxiv.org/abs/2506.07127)*
+*Fig 3: The rollout trajectory of APO. As indicated by the bold red and green boxes, APO can autonomously correct form failure scenarios. | source: [Human-Assisted Robotic Policy Refinement via Action Preference Optimization](https://arxiv.org/abs/2506.07127)*
 
 
 The data loop combines autonomous execution, human takeover, and trajectory logging. APO uses a prospect-theoretic binary objective related to KTO, then adaptively reweights token-level gradients according to decoded continuous-action error. That second step addresses a VLA-specific mismatch: two nearby action tokens may have very different physical effects, while token probability alone does not encode control distance.

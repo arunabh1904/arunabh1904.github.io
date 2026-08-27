@@ -21,14 +21,12 @@ summary: '2021 – MDETR: Modulated Detection for End-to-End Multimodal Understa
 
 ## Core Insights
 
-![MDETR localizing an unusual text query for a pink elephant](/assets/images/mdetr-paper-figure-1.png)
-*The text query changes what the detector searches for. The example tests composition beyond a fixed detector label. source: [MDETR](https://arxiv.org/abs/2104.12763)*
 
 ![Figure 1 from MDETR: Modulated Detection for End-to-End Multimodal Understanding](/assets/images/mdetr-modulated-detection-for-end-to-end-multimodal-understanding-source-figure-1.webp)
-*Figure 1 Output of MDETR for the query “A pink elephant”. The colors are not segmentation masks but the real colors of the pixels. The model has never seen a pink nor a blue elephant in training. source: [MDETR: Modulated Detection for End-to-End Multimodal Understanding](https://arxiv.org/abs/2104.12763)*
+*Fig 1: Output of MDETR for the query “A pink elephant”. The colors are not segmentation masks but the real colors of the pixels. | source: [MDETR: Modulated Detection for End-to-End Multimodal Understanding](https://arxiv.org/abs/2104.12763)*
 
 ![Figure 5 from MDETR: Modulated Detection for End-to-End Multimodal Understanding](/assets/images/mdetr-modulated-detection-for-end-to-end-multimodal-understanding-source-figure-5.webp)
-*Figure 5 MDETR provides interpretable predictions as seen here. For the question “What is on the table?”, MDETR fine-tuned on GQA predicts boxes for key words in the question, and is able to provide the correct answer as “laptop”. Image from COCO val set. source: [MDETR: Modulated Detection for End-to-End Multimodal Understanding](https://arxiv.org/abs/2104.12763)*
+*Fig 2: MDETR provides interpretable predictions as seen here. For the question “What is on the table?”, MDETR fine-tuned on GQA predicts boxes for key words in the question, and is able to provide the correct answer as “laptop”. Image from COCO val set. | source: [MDETR: Modulated Detection for End-to-End Multimodal Understanding](https://arxiv.org/abs/2104.12763)*
 
 
 MDETR removes the frozen detector that earlier multimodal systems treated as a visual front end. A DETR-style model receives both image features and raw text, so object queries are trained against the language used to describe the scene.

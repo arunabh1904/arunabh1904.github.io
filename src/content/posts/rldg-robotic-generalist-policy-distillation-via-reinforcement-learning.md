@@ -24,13 +24,13 @@ summary: "2024 – RLDG: Robotic Generalist Policy Distillation via Reinforcemen
 ## Core Insights
 
 ![RLDG workflow training specialist reinforcement-learning policies collecting their rollouts and distilling them into a generalist robot policy](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-paper-figure.png)
-*Figure 1 shows the division of labor: narrow RL specialists supply high-quality task data, then one OpenVLA or Octo policy absorbs those behaviors through ordinary fine-tuning. source: [RLDG](https://arxiv.org/abs/2412.09858)*
+*Fig 1: Shows the division of labor: narrow RL specialists supply high-quality task data, then one OpenVLA or Octo policy absorbs those behaviors through ordinary fine-tuning. | source: [RLDG](https://arxiv.org/abs/2412.09858)*
 
 ![Figure 4 from RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-source-figure-4.webp)
-*Figure 4 Success rate comparison of OpenVLA and Octo policies fine-tuned with RLDG versus conventional methods using human demonstrations. Both generalists trained with RLDG consistently outperform their counterparts trained with the same number of successful expert human demonstrations in both training and unseen scenarios. source: [RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning](https://arxiv.org/abs/2412.09858)*
+*Fig 2: Success rate comparison of OpenVLA and Octo policies fine-tuned with RLDG versus conventional methods using human demonstrations. Both generalists trained with RLDG consistently outperform their counterparts trained with the same number of successful expert human demonstrations in both training and unseen scenarios. | source: [RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning](https://arxiv.org/abs/2412.09858)*
 
 ![Figure 6 from RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-source-figure-6.webp)
-*Figure 6 Cycle time comparison between policies trained with RL data versus human demonstrations. N/A for RL in FMB Assembly denotes policy not trained on the whole task, while N/A for fine-tuned policies denotes no successes recorded. The RL-trained policies generally achieve faster execution times across tasks, demonstrating the efficiency benefits of using RL-generated data for policy training. source: [RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning](https://arxiv.org/abs/2412.09858)*
+*Fig 3: Cycle time comparison between policies trained with RL data versus human demonstrations. N/A for RL in FMB Assembly denotes policy not trained on the whole task, while N/A for fine-tuned policies denotes no successes recorded. | source: [RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning](https://arxiv.org/abs/2412.09858)*
 
 
 On precise insertion and assembly tasks, the paper reports that generalists trained on RL-generated data outperform those trained on human demonstrations by as much as 40%. Analysis attributes the gain to both cleaner action distributions and state coverage: RL specialists visit states and execute corrections that teleoperators may not demonstrate consistently.

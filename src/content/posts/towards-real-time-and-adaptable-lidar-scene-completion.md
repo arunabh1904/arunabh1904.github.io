@@ -26,13 +26,13 @@ summary: "2026 – Towards Real-Time and Adaptable LiDAR Scene Completion"
 Generative scene completion spends time refining noise, while non-generative methods often start from a fixed perturbation that cannot cover large gaps and must be retuned for each sensor. RapidLiDAR predicts where each observed point should move to form a coarse, geometry-aware initialization. The refinement stage queries multi-scale 3D voxel and 2D BEV features, replacing expensive point-neighborhood operations with resolution-agnostic feature extraction.
 
 ![RapidLiDAR architecture with adaptive initialization and multi-scale refinement](/assets/images/rapidlidar-overview-paper-figure.jpg)
-*The learned initialization expands partial observations before voxel/BEV refinement fills the remaining scene. source: [RapidLiDAR](https://arxiv.org/abs/2608.16490)*
+*Fig 1: The learned initialization expands partial observations before voxel/BEV refinement fills the remaining scene. | source: [RapidLiDAR](https://arxiv.org/abs/2608.16490)*
 
 ![Figure 1 from Towards Real-Time and Adaptable LiDAR Scene Completion](/assets/images/towards-real-time-and-adaptable-lidar-scene-completion-source-figure-1.webp)
-*Figure 1 Initialization matters. Top row: each method’s initialization; bottom row: the corresponding refined output. The highlighted box marks a large unobserved region. source: [Towards Real-Time and Adaptable LiDAR Scene Completion](https://arxiv.org/abs/2608.16490)*
+*Fig 2: Initialization matters. Top row: each method’s initialization; bottom row: the corresponding refined output. | source: [Towards Real-Time and Adaptable LiDAR Scene Completion](https://arxiv.org/abs/2608.16490)*
 
 ![Figure 3 from Towards Real-Time and Adaptable LiDAR Scene Completion](/assets/images/towards-real-time-and-adaptable-lidar-scene-completion-source-figure-3.webp)
-*Figure 3 Illustration of Dense BEV Head. Converts sparse 3D volumetric features into a dense BEV map. The channel and depth dimensions are merged and projected to using a 2D convolution. Multi-head self-attention over BEV tokens captures global scene context, followed by residual 2D convolutions for feature refinement. source: [Towards Real-Time and Adaptable LiDAR Scene Completion](https://arxiv.org/abs/2608.16490)*
+*Fig 3: Illustration of Dense BEV Head. Converts sparse 3D volumetric features into a dense BEV map. | source: [Towards Real-Time and Adaptable LiDAR Scene Completion](https://arxiv.org/abs/2608.16490)*
 
 
 The paper's main evidence is a systems-quality trade-off: completion is reported at 0.1 seconds, close to the 10 Hz acquisition rate of automotive LiDAR, while quality remains competitive. The benchmark does not establish downstream detection or planning benefit, and the 10 Hz comparison depends on the paper's hardware and measurement boundary.

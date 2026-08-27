@@ -1,7 +1,9 @@
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fg from 'fast-glob';
+import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import {
   groupPostsByField,
@@ -16,6 +18,47 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
 const manifestPath = path.join(projectRoot, 'src', 'content', 'migration-manifest.json');
 const postsDir = path.join(projectRoot, 'src', 'content', 'posts');
+
+const paperNotePattern = /^section:\s*['"]?paper-shorts['"]?\s*$/m;
+const localImagePattern = /^!\[[^\]]*\]\((\/assets\/images\/[^)]+)\)$/;
+const figureCaptionPattern = /^\*Fig (\d+): (.+) \| source: \[([^\]]+)\]\((https?:\/\/[^)]+)\)\*$/;
+
+function differenceHash(buffer: Buffer, width: number, height: number) {
+  let hash = 0n;
+  let bit = 1n;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width - 1; x += 1) {
+      if (buffer[y * width + x] > buffer[y * width + x + 1]) {
+        hash |= bit;
+      }
+      bit <<= 1n;
+    }
+  }
+  return hash;
+}
+
+function averageHash(buffer: Buffer) {
+  const mean = buffer.reduce((sum, value) => sum + value, 0) / buffer.length;
+  let hash = 0n;
+  let bit = 1n;
+  for (const value of buffer) {
+    if (value >= mean) {
+      hash |= bit;
+    }
+    bit <<= 1n;
+  }
+  return hash;
+}
+
+function hammingDistance(left: bigint, right: bigint) {
+  let value = left ^ right;
+  let distance = 0;
+  while (value) {
+    distance += Number(value & 1n);
+    value >>= 1n;
+  }
+  return distance;
+}
 
 type ManifestEntry = {
   legacyPath: string;
@@ -156,6 +199,152 @@ describe('markdown authoring', () => {
     ).toEqual([]);
     expect(missingAssets, 'Every paper-note image must exist in public/.').toEqual([]);
   });
+
+  it('uses explanatory, sequential captions for every paper-note image', async () => {
+    const postFiles = await fg('**/*.{md,mdx}', {
+      cwd: postsDir,
+      absolute: true,
+    });
+
+    const offenders: string[] = [];
+    for (const filePath of postFiles) {
+      const source = await readFile(filePath, 'utf8');
+      if (!paperNotePattern.test(source) || /PAPER RADAR DRAFT/.test(source)) {
+        continue;
+      }
+
+      const lines = source.split(/\r?\n/);
+      let expectedFigure = 1;
+      for (let index = 0; index < lines.length; index += 1) {
+        if (!localImagePattern.test(lines[index])) {
+          continue;
+        }
+
+        let captionIndex = index + 1;
+        while (captionIndex < lines.length && lines[captionIndex].trim() === '') {
+          captionIndex += 1;
+        }
+        const caption = lines[captionIndex]?.trim() ?? '';
+        const match = caption.match(figureCaptionPattern);
+        const location = `${path.relative(projectRoot, filePath)}:${captionIndex + 1}`;
+        if (!match) {
+          offenders.push(`${location} malformed or missing caption`);
+          continue;
+        }
+
+        const [, figureNumber, explanation, sourceLabel] = match;
+        const wordCount = explanation.split(/\s+/).filter(Boolean).length;
+        if (Number(figureNumber) !== expectedFigure) {
+          offenders.push(`${location} expected Fig ${expectedFigure}, found Fig ${figureNumber}`);
+        }
+        if (wordCount < 8 || wordCount > 60) {
+          offenders.push(`${location} explanation has ${wordCount} words`);
+        }
+        if (
+          !sourceLabel.trim() ||
+          /https?:|\[[^\]]+\]\([^)]+\)|org\/abs/i.test(explanation) ||
+          /\(\s*\)|\{\s*,?\s*\}|,,/.test(explanation)
+        ) {
+          offenders.push(`${location} contains source or extraction residue`);
+        }
+        expectedFigure += 1;
+      }
+    }
+
+    expect(
+      offenders,
+      'Use `Fig <n>: <explanation> | source: [paper](URL)` with note-local numbering and a concise explanation.',
+    ).toEqual([]);
+  });
+
+  it('does not repeat exact or perceptually duplicate images within a paper note', async () => {
+    const postFiles = await fg('**/*.{md,mdx}', {
+      cwd: postsDir,
+      absolute: true,
+    });
+    const fingerprintCache = new Map<string, {
+      contentHash: string;
+      differenceHash: bigint;
+      averageHash: bigint;
+    }>();
+    const offenders: string[] = [];
+    // These KTO figures share a plot template but compare different objectives and scales.
+    const visuallyDistinctNearMatch = new Set([
+      [
+        '/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-2.webp',
+        '/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-3.webp',
+      ].sort().join('|'),
+    ]);
+
+    async function fingerprint(imagePath: string) {
+      const cached = fingerprintCache.get(imagePath);
+      if (cached) {
+        return cached;
+      }
+      const assetPath = path.join(projectRoot, 'public', imagePath);
+      const file = await readFile(assetPath);
+      const differencePixels = await sharp(file, { animated: false, pages: 1 })
+        .flatten({ background: '#ffffff' })
+        .grayscale()
+        .resize(17, 16, { fit: 'fill' })
+        .raw()
+        .toBuffer();
+      const averagePixels = await sharp(file, { animated: false, pages: 1 })
+        .flatten({ background: '#ffffff' })
+        .grayscale()
+        .resize(16, 16, { fit: 'fill' })
+        .raw()
+        .toBuffer();
+      const result = {
+        contentHash: createHash('sha256').update(file).digest('hex'),
+        differenceHash: differenceHash(differencePixels, 17, 16),
+        averageHash: averageHash(averagePixels),
+      };
+      fingerprintCache.set(imagePath, result);
+      return result;
+    }
+
+    for (const filePath of postFiles) {
+      const source = await readFile(filePath, 'utf8');
+      if (!paperNotePattern.test(source) || /PAPER RADAR DRAFT/.test(source)) {
+        continue;
+      }
+      const imagePaths = source
+        .split(/\r?\n/)
+        .map((line) => line.match(localImagePattern)?.[1])
+        .filter((imagePath): imagePath is string => Boolean(imagePath));
+      const fingerprints = await Promise.all(imagePaths.map(fingerprint));
+
+      for (let left = 0; left < imagePaths.length; left += 1) {
+        for (let right = left + 1; right < imagePaths.length; right += 1) {
+          const pairKey = [imagePaths[left], imagePaths[right]].sort().join('|');
+          const exactDuplicate =
+            imagePaths[left] === imagePaths[right] ||
+            fingerprints[left].contentHash === fingerprints[right].contentHash;
+          const perceptualDuplicate =
+            hammingDistance(
+              fingerprints[left].differenceHash,
+              fingerprints[right].differenceHash,
+            ) <= 40 &&
+            hammingDistance(
+              fingerprints[left].averageHash,
+              fingerprints[right].averageHash,
+            ) <= 40 &&
+            !visuallyDistinctNearMatch.has(pairKey);
+          if (exactDuplicate || perceptualDuplicate) {
+            offenders.push(
+              `${path.relative(projectRoot, filePath)} -> ${imagePaths[left]} <> ${imagePaths[right]}`,
+            );
+          }
+        }
+      }
+    }
+
+    expect(
+      offenders,
+      'Paper notes should not repeat the same figure through alternate filenames, formats, or crops.',
+    ).toEqual([]);
+  }, 30_000);
 
   it('keeps Blog callouts sparse instead of enforcing a quota', async () => {
     const postFiles = await fg('**/*.{md,mdx}', {

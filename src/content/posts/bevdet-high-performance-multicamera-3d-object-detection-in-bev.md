@@ -27,14 +27,12 @@ BEVDet assembles an image backbone, Lift-Splat-style view transformer, BEV encod
 
 Image-space augmentation alone is insufficient because the detector's output lives in ego coordinates. BEVDet applies rotation, scaling, and flipping after view transformation, then uses a BEV encoder to build metric context. In the reported ablation, combining image and BEV augmentation raises peak mAP from 23.0 to 31.6 and largely removes late-training overfit.
 
-![BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View source figure: The framework of the proposed BEVDet paradigm.](/assets/images/bevdet-high-performance-multicamera-3d-object-detection-in-bev-paper-figure.webp)
-*The framework of the proposed BEVDet paradigm. source: [BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View](https://arxiv.org/abs/2112.11790)*
 
 ![Figure 3 from BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View](/assets/images/bevdet-high-performance-multicamera-3d-object-detection-in-bev-source-figure-3.webp)
-*Figure 3 Combining the features with the auxiliary indexes. source: [BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View](https://arxiv.org/abs/2112.11790)*
+*Fig 1: An auxiliary binary index is assigned to voxel indices and summed per voxel, illustrating the efficient feature aggregation used during view transformation. | source: [BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View](https://arxiv.org/abs/2112.11790)*
 
 ![Figure 1 from BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View](/assets/images/bevdet-high-performance-multicamera-3d-object-detection-in-bev-source-figure-1.webp)
-*Figure 1 The framework of the proposed BEVDet paradigm. BEVDet with a modular design consists of four modules: Image-view encoder, including a backbone and a neck, is applied at first for image feature extraction. View transformer transforms the feature from the image view to BEV. BEV encoder further encodes the BEV features. Finally, a task-specific head is built upon the BVE features and predicts the target values of the 3D objects. We take BEVDet-Tiny as an example for illustrating the channels of different modules. source: [BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View](https://arxiv.org/abs/2112.11790)*
+*Fig 2: The framework of the proposed BEVDet paradigm. BEVDet with a modular design consists of four modules: Image-view encoder, including a backbone and a neck, is applied at first for image feature extraction. | source: [BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View](https://arxiv.org/abs/2112.11790)*
 
 
 | Configuration | mAP | NDS | FPS | What changed |

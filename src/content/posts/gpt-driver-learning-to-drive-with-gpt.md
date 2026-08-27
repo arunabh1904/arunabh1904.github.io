@@ -28,10 +28,10 @@ GPT-Driver asks whether a language model can act as a motion planner when the dr
 GPT-Driver reformulates motion planning as GPT-style sequence generation. It serializes structured scene state into language-model tokens and predicts future waypoints plus a rationale. This gives the model an interpretable interface: the generated plan can be paired with an explanation of the driving decision. The evidence focuses on open-loop planning quality. The caveat is that open-loop waypoint prediction does not prove closed-loop safety, and LLM latency remains a deployment problem. The paper is useful as an early example of adapting pretrained language models to structured planning rather than raw perception.
 
 ![Figure 1: Overview of GPT-Driver from GPT-Driver: Learning to Drive with GPT](/assets/images/gpt-driver-learning-to-drive-with-gpt-paper-figure.png)
-*Figure 1: Overview of GPT-Driver. From the [GPT-Driver: Learning to Drive with GPT paper](https://arxiv.org/abs/2310.01415). source: [GPT-Driver: Learning to Drive with GPT paper](https://arxiv.org/abs/2310.01415)*
+*Fig 1: GPT-Driver converts structured scene observations into language tokens, prompts a language model to reason about the scene, and decodes the response into a future trajectory. | source: [GPT-Driver: Learning to Drive with GPT paper](https://arxiv.org/abs/2310.01415)*
 
 ![Figure 2 from GPT-Driver: Learning to Drive with GPT](/assets/images/gpt-driver-learning-to-drive-with-gpt-source-figure-2.webp)
-*Figure 2 An example of input prompts provided to the LLM. The upper text box offers a universal context related to motion planning for every driving scenario. The lower text box provides a language description of the observations and ego-states specific to this particular frame. Parameterized inputs are highlighted in red. source: [GPT-Driver: Learning to Drive with GPT](https://arxiv.org/abs/2310.01415)*
+*Fig 2: An example of input prompts provided to the LLM. The upper text box offers a universal context related to motion planning for every driving scenario. | source: [GPT-Driver: Learning to Drive with GPT](https://arxiv.org/abs/2310.01415)*
 
 
 **What to look at:**

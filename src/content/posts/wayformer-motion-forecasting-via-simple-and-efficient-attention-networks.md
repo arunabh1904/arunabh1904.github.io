@@ -28,13 +28,13 @@ Wayformer encodes heterogeneous driving inputs such as road geometry, lane conne
 The design philosophy is close to "make the representation uniform, then spend effort on scaling attention." The caveat is that simple attention can hide useful structure: the model may learn relations that methods like LaneGCN encode explicitly.
 
 ![Figure 1 from Wayformer showing an encoder-decoder Transformer for multimodal scene inputs and trajectory distributions](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-paper-figure.png)
-*Figure 1 shows Wayformer as an encoder-decoder attention network over heterogeneous scene tokens, with multimodal trajectory prediction at the output. From the [Wayformer paper](https://arxiv.org/abs/2207.05844), via ar5iv. source: [Wayformer paper](https://arxiv.org/abs/2207.05844)*
+*Fig 1: Shows Wayformer as an encoder-decoder attention network over heterogeneous scene tokens, with multimodal trajectory prediction at the output. | source: [Wayformer paper](https://arxiv.org/abs/2207.05844)*
 
 ![Figure 5 from Wayformer: Motion Forecasting via Simple and Efficient Attention Networks](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-source-figure-5.webp)
-*Figure 5 (c) Hierarchical Fusion. source: [Wayformer: Motion Forecasting via Simple and Efficient Attention Networks](https://arxiv.org/abs/2207.05844)*
+*Fig 2: Across attention layouts, lower minADE generally requires higher latency; interleaved, sequential, and multi-axis variants trace similar accuracy-efficiency frontiers around 16–48 ms. | source: [Wayformer: Motion Forecasting via Simple and Efficient Attention Networks](https://arxiv.org/abs/2207.05844)*
 
 ![Figure 6 from Wayformer: Motion Forecasting via Simple and Efficient Attention Networks](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-source-figure-6.webp)
-*Figure 6 (c) Hierarchical Fusion. source: [Wayformer: Motion Forecasting via Simple and Efficient Attention Networks](https://arxiv.org/abs/2207.05844)*
+*Fig 3: Increasing latent-token reduction lowers latency but degrades minADE, exposing the tradeoff between input compression and motion-forecasting accuracy. | source: [Wayformer: Motion Forecasting via Simple and Efficient Attention Networks](https://arxiv.org/abs/2207.05844)*
 
 
 _with multimodal trajectory prediction at the output. source: [Wayformer paper](https://arxiv.org/abs/2207.05844)

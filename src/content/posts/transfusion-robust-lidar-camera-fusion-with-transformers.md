@@ -30,13 +30,13 @@ Hard association projects each LiDAR point onto one image pixel. It wastes most 
 On nuScenes, the paper reports that enabling camera fusion improves its LiDAR-only model by 3.4 mAP and 1.5 NDS. Under a simulated 1-meter misalignment, TransFusion loses 0.49 mAP, compared with 2.33 and 2.85 for the two hard-association baselines reported in the same experiment. When images are missing or poor, the first decoder still retains a LiDAR-only path.
 
 ![Figure 2 from TransFusion, showing LiDAR-initialized object queries followed by soft image fusion](/assets/images/transfusion-paper-figure-2.png)
-*The two decoder stages separate geometric proposal formation from image refinement. source: [TransFusion](https://arxiv.org/abs/2203.11496)*
+*Fig 1: The two decoder stages separate geometric proposal formation from image refinement. | source: [TransFusion](https://arxiv.org/abs/2203.11496)*
 
 ![Figure 1 from TransFusion: Robust LiDAR-Camera Fusion for 3D Object Detection with Transformers](/assets/images/transfusion-robust-lidar-camera-fusion-with-transformers-source-figure-1.webp)
-*Figure 1 Left: An example of bad illumination conditions. Right: Due to the sparsity of point clouds, the hard-association based fusion methods waste many image features and are sensitive to sensor calibration, since the projected points may fall outside objects due to a small calibration error. source: [TransFusion: Robust LiDAR-Camera Fusion for 3D Object Detection with Transformers](https://arxiv.org/abs/2203.11496)*
+*Fig 2: Left: An example of bad illumination conditions. Right: Due to the sparsity of point clouds, the hard-association based fusion methods waste many image features and are sensitive to sensor calibration, since the projected points may fall outside objects due to a small calibration error. | source: [TransFusion: Robust LiDAR-Camera Fusion for 3D Object Detection with Transformers](https://arxiv.org/abs/2203.11496)*
 
 ![Figure 3 from TransFusion: Robust LiDAR-Camera Fusion for 3D Object Detection with Transformers](/assets/images/transfusion-robust-lidar-camera-fusion-with-transformers-source-figure-3.webp)
-*Figure 3 The first row shows the input images and the predictions of object queries projected on the images, and the second row shows the cross-attention maps. Our fusion strategy is able to dynamically choose relevant image pixels and is not limited by the number of LiDAR points. The two images are picked from nuScenes and Waymo, respectively. source: [TransFusion: Robust LiDAR-Camera Fusion for 3D Object Detection with Transformers](https://arxiv.org/abs/2203.11496)*
+*Fig 3: The first row shows the input images and the predictions of object queries projected on the images, and the second row shows the cross-attention maps. Our fusion strategy is able to dynamically choose relevant image pixels and is not limited by the number of LiDAR points. | source: [TransFusion: Robust LiDAR-Camera Fusion for 3D Object Detection with Transformers](https://arxiv.org/abs/2203.11496)*
 
 
 | Fusion decision | TransFusion choice | Practical effect |

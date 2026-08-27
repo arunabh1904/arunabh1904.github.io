@@ -32,10 +32,10 @@ The paper studies a missing piece in imitation-heavy end-to-end driving: models 
 During training, an arbitrary end-to-end driving model receives its normal planning loss plus auxiliary text-alignment and action-classification heads. At inference, those heads and the VLM teacher are not needed for the driving loop. The evidence comes from nuScenes open-loop planning and CARLA closed-loop evaluation, where VLM-AD improves planning error, collision rate, route completion, and driving score when added to strong baselines. The main caveat is teacher quality: if the VLM annotations are wrong or biased, the student can inherit that reasoning.
 
 ![Figure 2 from VLM-AD showing VLM-generated reasoning and action labels supervising an end-to-end driving model](/assets/images/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision-paper-figure.png)
-*Figure 2 shows the training-time teacher setup: the VLM produces freeform reasoning and structured action labels, while the deployed driver remains VLM-free. From the [VLM-AD paper](https://arxiv.org/abs/2412.14446). source: [VLM-AD paper](https://arxiv.org/abs/2412.14446)*
+*Fig 1: Shows the training-time teacher setup: the VLM produces freeform reasoning and structured action labels, while the deployed driver remains VLM-free. | source: [VLM-AD paper](https://arxiv.org/abs/2412.14446)*
 
 ![Figure 1 from VLM-AD: End-to-End Autonomous Driving through Vision-Language Model Supervision](/assets/images/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision-source-figure-1.webp)
-*Figure 1 VLM-AD augments an arbitrary end-to-end driving model using auxiliary text prediction tasks during training. These tasks distill driving reasoning knowledge from a VLM to encourage the model to learn richer representations, without fine-tuning a VLM at training time or requiring a VLM at inference time. source: [VLM-AD: End-to-End Autonomous Driving through Vision-Language Model Supervision](https://arxiv.org/abs/2412.14446)*
+*Fig 2: VLM-AD augments an arbitrary end-to-end driving model using auxiliary text prediction tasks during training. These tasks distill driving reasoning knowledge from a VLM to encourage the model to learn richer representations, without fine-tuning a VLM at training time or requiring a VLM at inference time. | source: [VLM-AD: End-to-End Autonomous Driving through Vision-Language Model Supervision](https://arxiv.org/abs/2412.14446)*
 
 
 _while the deployed driver remains VLM-free. source: [VLM-AD paper](https://arxiv.org/abs/2412.14446)

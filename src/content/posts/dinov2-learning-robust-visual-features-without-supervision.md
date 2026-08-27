@@ -28,13 +28,13 @@ summary: '2023 – DINOv2: Learning Robust Visual Features without Supervision'
 ## Core Insights
 
 ![DINOv2 patch features establish semantic correspondences across different objects, poses, and image styles](/assets/images/dinov2-learning-robust-visual-features-paper-figure.png)
-*Principal components of patch features align corresponding parts across pose, category, and style changes. The figure visualizes the spatial structure that dense downstream probes exploit. source: [DINOv2](https://arxiv.org/abs/2304.07193)*
+*Fig 1: Principal components of patch features align corresponding parts across pose, category, and style changes. The figure visualizes the spatial structure that dense downstream probes exploit. | source: [DINOv2](https://arxiv.org/abs/2304.07193)*
 
 ![Figure 2 from DINOv2: Learning Robust Visual Features without Supervision](/assets/images/dinov2-learning-robust-visual-features-without-supervision-source-figure-2.webp)
-*Figure 2 Evolution of performance when scaling in parameters. We show performance on eight types of vision tasks, as presented in Sec. 7 , and average metrics with each type. Features are extracted from our self-supervised encoders, DINOv2 (dark blue), and we compare them with self-supervised methods (pale orange), as well as weakly-supervised methods (dark pink). We report the best-performing weakly-supervised model’s performance as a dashed horizontal line. source: [DINOv2: Learning Robust Visual Features without Supervision](https://arxiv.org/abs/2304.07193)*
+*Fig 2: Evolution of performance when scaling in parameters. We show performance on eight types of vision tasks, as presented in Sec. 7, and average metrics with each type. | source: [DINOv2: Learning Robust Visual Features without Supervision](https://arxiv.org/abs/2304.07193)*
 
 ![Figure 5 from DINOv2: Learning Robust Visual Features without Supervision](/assets/images/dinov2-learning-robust-visual-features-without-supervision-source-figure-5.webp)
-*Figure 5 (a) Comparison on individual metrics. source: [DINOv2: Learning Robust Visual Features without Supervision](https://arxiv.org/abs/2304.07193)*
+*Fig 3: Across image- and pixel-level benchmarks, distilled ViT-L/14 and ViT-g/14 models substantially outperform a scratch-trained ViT-L/14, especially on dense visual tasks. | source: [DINOv2: Learning Robust Visual Features without Supervision](https://arxiv.org/abs/2304.07193)*
 
 
 The objective has two complementary views of an image. DINO aligns class-token distributions across crops, encouraging global semantic invariance. iBOT masks student patches and asks them to predict teacher patch distributions, retaining spatial detail. Sinkhorn-Knopp centering stabilizes target assignments, a KoLeo regularizer spreads features, and separate heads prevent the global and patch losses from competing through one output projection.

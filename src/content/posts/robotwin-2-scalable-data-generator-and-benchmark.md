@@ -24,13 +24,13 @@ summary: "2025 – RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bim
 ## Core Insights
 
 ![RoboTwin 2 pipeline using a multimodal model simulation feedback expert code generation and domain randomization to produce manipulation trajectories](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-paper-figure.png)
-*Figure 2 shows how scale is produced: an MLLM writes task programs against a skill API, simulation feedback repairs them, and domain randomization turns successful programs into diverse policy-training trajectories. source: [RoboTwin 2.0](https://arxiv.org/abs/2506.18088)*
+*Fig 1: Shows how scale is produced: an MLLM writes task programs against a skill API, simulation feedback repairs them, and domain randomization turns successful programs into diverse policy-training trajectories. | source: [RoboTwin 2.0](https://arxiv.org/abs/2506.18088)*
 
 ![Figure 1 from RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-source-figure-1.webp)
-*Figure 1 Overview of Robo Twin 2.0. RoboTwin 2.0 is a scalable framework for bimanual manipulation, integrating an expert data generation pipeline with a 50-task benchmark built on the RoboTwin Object Dataset (731 objects, 147 categories). A multimodal language agent automates task program synthesis, while flexible dual-arm configurations enable large-scale, diverse data collection. Policies trained on RoboTwin 2.0 exhibit improved robustness and generalization to unseen environments. source: [RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation](https://arxiv.org/abs/2506.18088)*
+*Fig 2: Overview of Robo Twin 2.0. RoboTwin 2.0 is a scalable framework for bimanual manipulation, integrating an expert data generation pipeline with a 50-task benchmark built on the RoboTwin Object Dataset (731 objects, 147 categories). | source: [RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation](https://arxiv.org/abs/2506.18088)*
 
 ![Figure 4 from RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-source-figure-4.webp)
-*Figure 4 Visualization of domain randomization and our texture library. source: [RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation](https://arxiv.org/abs/2506.18088)*
+*Fig 3: Visualization of domain randomization and our texture library. | source: [RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation](https://arxiv.org/abs/2506.18088)*
 
 
 Domain randomization spans clutter, lighting, backgrounds, tabletop height, and language. Embodiment-aware generation adapts grasps and action candidates across five dual-arm platforms. The paper reports a 10.9-point gain in code-generation success, large relative gains from synthetic pretraining, and a 367% relative improvement when synthetic data are combined with ten real demonstrations over the ten-demo baseline.

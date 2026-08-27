@@ -28,13 +28,13 @@ VoxelNeXt keeps LiDAR detection sparse through the prediction head. Instead of c
 Extra downsampling stages enlarge the sparse receptive field without filling the grid. Feature-magnitude pruning removes up to half of selected voxels with little validation loss in the reported setting. Sparse height compression then combines a 3D backbone with a 2D sparse head, retaining vertical reasoning early while avoiding an expensive 3D prediction stage.
 
 ![VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking source figure: Detailed structure of VoxelNeXt framework.](/assets/images/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking-paper-figure.webp)
-*Detailed structure of VoxelNeXt framework. source: [VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking](https://arxiv.org/abs/2303.11301)*
+*Fig 1: VoxelNeXt gathers multiscale sparse voxel features, scores candidate voxels, applies sparse max pooling, and predicts objects without converting features into a dense BEV map. | source: [VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking](https://arxiv.org/abs/2303.11301)*
 
 ![Figure 1 from VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking](/assets/images/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking-source-figure-1.webp)
-*Figure 1 Visualization of input and heatmaps of CenterPoint in BEV for . Most values in the heatmaps are nearly zero, while the dense head computes over all BEV features, which is wasteful. source: [VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking](https://arxiv.org/abs/2303.11301)*
+*Fig 2: CenterPoint heatmaps are nearly zero over most of the dense BEV grid, showing why evaluating a dense head everywhere wastes computation. | source: [VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking](https://arxiv.org/abs/2303.11301)*
 
 ![Figure 3 from VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking](/assets/images/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking-source-figure-3.webp)
-*Figure 3 Latency on Argoverse2 and various perception ranges. source: [VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking](https://arxiv.org/abs/2303.11301)*
+*Fig 3: As perception range grows from 50 to 200 meters, VoxelNeXt keeps overall and head latency nearly flat, while CenterPoint and FSD become increasingly expensive. | source: [VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking](https://arxiv.org/abs/2303.11301)*
 
 
 On nuScenes test, VoxelNeXt reports 64.5 mAP and 70.0 NDS at 66 ms; its double-flip variant reaches 66.2 mAP and 71.4 NDS. On tracking, the corresponding variants report 69.5 and 71.0 AMOTA. A controlled quarter-data comparison against CenterPoint improves mAP by 0.9 and NDS by 1.0.

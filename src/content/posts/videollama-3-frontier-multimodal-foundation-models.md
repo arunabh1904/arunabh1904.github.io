@@ -28,13 +28,13 @@ VideoLLaMA 3 takes a vision-centric route to image and video understanding. It f
 VideoLLaMA 3 is a vision-centric model for image and video understanding. Its training recipe treats high-quality image-text data as the base for video capability, then adds video-specific tuning instead of treating video as a separate problem. The framework also uses visual-token efficiency techniques so longer videos do not overwhelm the language context. The evidence compares image and video benchmarks against prior MLLMs. The caveat is that benchmark videos are still cleaner and shorter than many real temporal reasoning tasks. The takeaway is that video MLLMs need both temporal data and strong visual representation design.
 
 ![Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced image/video MLLM on various representative benchmarks from VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](/assets/images/videollama-3-frontier-multimodal-foundation-models-paper-figure.png)
-*Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced image/video MLLM on various representative benchmarks. From the [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding paper](https://arxiv.org/abs/2501.13106). source: [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding paper](https://arxiv.org/abs/2501.13106)*
+*Fig 1: Performance Comparison of VideoLLaMA3 with the previous advanced image/video MLLM on various representative benchmarks. | source: [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding paper](https://arxiv.org/abs/2501.13106)*
 
 ![Figure 6 from VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](/assets/images/videollama-3-frontier-multimodal-foundation-models-source-figure-6.webp)
-*Figure 6 Case study of chart images understanding. source: [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](https://arxiv.org/abs/2501.13106)*
+*Fig 2: VideoLLaMA 3 reads chart images and produces grounded comparisons of trends, model strength, and parameter efficiency rather than only transcribing visible text. | source: [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](https://arxiv.org/abs/2501.13106)*
 
 ![Figure 2 from VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](/assets/images/videollama-3-frontier-multimodal-foundation-models-source-figure-2.webp)
-*Figure 2 Training paradigm of VideoLLaMA3. The training of VideoLLaMA3 has four stages: (1) Vision Encoder Adaptation, (2) Vision-Language Alignment, (3) Multi-task Fine-tuning, and (4) Video-centric Fine-tuning. source: [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](https://arxiv.org/abs/2501.13106)*
+*Fig 3: Training paradigm of VideoLLaMA3. The training of VideoLLaMA3 has four stages: (1) Vision Encoder Adaptation, (2) Vision-Language Alignment, (3) Multi-task Fine-tuning, and (4) Video-centric Fine-tuning. | source: [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](https://arxiv.org/abs/2501.13106)*
 
 
 **What to look at:**

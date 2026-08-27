@@ -28,13 +28,11 @@ summary: "2026 – mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously
 ## Core Insights
 
 ![mSFT Figure 2 showing test-accuracy curves that peak at different epochs and the resulting peak-epoch differences across tasks](/assets/images/msft-heterogeneous-peak-epochs.webp)
-*Figure 2 from the [mSFT paper](https://arxiv.org/abs/2603.21606), CC BY 4.0. The two panels jointly establish the premise: sub-datasets do not share one useful stopping point. source: [mSFT paper](https://arxiv.org/abs/2603.21606)*
+*Fig 1: Different subsets reach peak test accuracy at different epochs; the lower panel quantifies each task’s offset from the mixture’s shared stopping point. | source: [mSFT paper](https://arxiv.org/abs/2603.21606)*
 
 ![Figure 3 from mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-3.webp)
-*Figure 3 (b) Mean absolute shift in optimal compute across various model architectures and scales. source: [mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](https://arxiv.org/abs/2603.21606)*
+*Fig 2: (b) Mean absolute shift in optimal compute across various model architectures and scales. | source: [mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](https://arxiv.org/abs/2603.21606)*
 
-![Figure 3 from mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-3.webp)
-*Figure 3 (a) ( Optimal Compute) for individual benchmarks on Qwen3 8B. source: [mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](https://arxiv.org/abs/2603.21606)*
 
 
 ### Method and reported result

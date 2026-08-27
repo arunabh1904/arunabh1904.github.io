@@ -28,13 +28,13 @@ Pi0 is a vision-language-action model for general robot control. It starts from 
 Pi0 connects a pretrained vision-language backbone to continuous robot control through an action model trained with flow matching. The VLM supplies semantic grounding from images and language, while the flow action head models smooth trajectories. Training spans multiple robot embodiments, including single-arm, dual-arm, and mobile manipulation settings. The evaluation emphasizes language-prompted generalist behavior and dexterous tasks. The key caveat is data and robustness: broad robot policies need diverse demonstrations and careful safety validation under distribution shift.
 
 ![Figure 2 from pi0: a mobile manipulator follows a natural-language instruction to fold laundry](/assets/images/pi0-vision-language-action-flow-model-for-general-robot-control-paper-figure.jpeg)
-*Figure 2 from the [pi0 paper](https://arxiv.org/abs/2410.24164). source: [pi0 paper](https://arxiv.org/abs/2410.24164)*
+*Fig 1: A mobile manipulator executes an instruction to fold laundry, illustrating the long-horizon dexterous tasks used to evaluate the pi0 vision-language-action policy. | source: [pi0 paper](https://arxiv.org/abs/2410.24164)*
 
 ![Figure 3 from Pi0: A Vision-Language-Action Flow Model for General Robot Control](/assets/images/pi0-vision-language-action-flow-model-for-general-robot-control-source-figure-3.webp)
-*Figure 3 Fig. 3: Overview of our framework. We start with a pre-training mixture, which consists of both our own dexterous manipulation datasets and open-source data. We use this mixture to train our flow matching VLA model, which consists of a larger VLM backbone and a smaller action expert for processing robot states and actions. The VLM backbone weights are initialized from PaliGemma [ 5 ] , providing representations learned from large-scale Internet pre-training. source: [Pi0: A Vision-Language-Action Flow Model for General Robot Control](https://arxiv.org/abs/2410.24164)*
+*Fig 2: Overview of our framework. We start with a pre-training mixture, which consists of both our own dexterous manipulation datasets and open-source data. | source: [Pi0: A Vision-Language-Action Flow Model for General Robot Control](https://arxiv.org/abs/2410.24164)*
 
 ![Figure 4 from Pi0: A Vision-Language-Action Flow Model for General Robot Control](/assets/images/pi0-vision-language-action-flow-model-for-general-robot-control-source-figure-4.webp)
-*Figure 4 Fig. 4: Overview of our dataset : The pre-training mixture consists of a subset of OXE [ 10 ] and the dataset. We use a subset of OXE, which we refer to as OXE Magic Soup [ 24 ] . The right figure illustrates the weight of the different datasets in the pre-training mixture. The left figure illustrates their relative sizes as measured by the number of steps. source: [Pi0: A Vision-Language-Action Flow Model for General Robot Control](https://arxiv.org/abs/2410.24164)*
+*Fig 3: Overview of our dataset: The pre-training mixture consists of a subset of OXE and the dataset. We use a subset of OXE, which we refer to as OXE Magic Soup. | source: [Pi0: A Vision-Language-Action Flow Model for General Robot Control](https://arxiv.org/abs/2410.24164)*
 
 
 **What to look at:**

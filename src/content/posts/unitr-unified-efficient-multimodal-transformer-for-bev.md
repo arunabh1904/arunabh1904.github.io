@@ -30,7 +30,7 @@ An image patch and a LiDAR voxel do not begin as the same object. UniTR preserve
 The paper reports 73.1 NDS and 70.0 mAP on nuScenes validation at 88.7 ms, versus 71.4 NDS, 68.5 mAP, and 130.5 ms for its reproduced MIT BEVFusion comparison. With TensorRT, it reports 50.2 ms at the same accuracy. For map segmentation, its enhanced variant reports 74.7 mIoU, 12.0 points above the cited BEVFusion result. The low-beam sweep also shows the parallel shared backbone improving over serial modality encoders from 1- through 32-beam LiDAR settings.
 
 ![Figure 3 from UniTR, showing modality-specific tokenizers followed by shared intra-modal and 2D/3D cross-modal transformer blocks](/assets/images/unitr-paper-figure-3.png)
-*UniTR shares encoder weights without pretending that image patches and LiDAR voxels have identical neighborhoods. source: [UniTR](https://arxiv.org/abs/2308.07732)*
+*Fig 1: UniTR shares encoder weights without pretending that image patches and LiDAR voxels have identical neighborhoods. | source: [UniTR](https://arxiv.org/abs/2308.07732)*
 
 | Boundary | Shared? | Reason |
 | --- | --- | --- |

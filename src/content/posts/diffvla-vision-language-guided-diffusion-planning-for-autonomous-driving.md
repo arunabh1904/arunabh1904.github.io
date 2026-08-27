@@ -28,7 +28,7 @@ DiffVLA targets three pain points in end-to-end driving: expensive BEV computati
 The paper reports a 45.0 PDMS score in the Autonomous Grand Challenge 2025 setting. The caveat is familiar for diffusion planners: sampling can improve diversity, but real-time latency and safety certification remain hard constraints.
 
 ![Figure 1 from DiffVLA showing the perception-enhanced diffusion VLA framework](/assets/images/diffvla-vision-language-guided-diffusion-planning-for-autonomous-driving-paper-figure.png)
-*Figure 1 shows DiffVLA's perception-enhanced diffusion VLA framework, where vision-language guidance and agent-map context condition trajectory diffusion. From the [DiffVLA paper](https://arxiv.org/abs/2505.19381). source: [DiffVLA paper](https://arxiv.org/abs/2505.19381)*
+*Fig 1: Shows DiffVLA's perception-enhanced diffusion VLA framework, where vision-language guidance and agent-map context condition trajectory diffusion. | source: [DiffVLA paper](https://arxiv.org/abs/2505.19381)*
 
 _where vision-language guidance and agent-map context condition trajectory diffusion. source: [DiffVLA paper](https://arxiv.org/abs/2505.19381)
 

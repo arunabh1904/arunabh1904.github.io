@@ -28,13 +28,13 @@ summary: "2021 – Learning Transferable Visual Models From Natural Language Sup
 ## Core Insights
 
 ![Figure 1 from CLIP: contrastive language-image pre-training and zero-shot transfer](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
-*Figure 1 from the [CLIP paper](https://arxiv.org/abs/2103.00020), via ar5iv. source: [CLIP paper](https://arxiv.org/abs/2103.00020)*
+*Fig 1: CLIP learns aligned image and text embeddings through contrastive pretraining, turns class names into a zero-shot classifier, and predicts by comparing image and label-text similarities. | source: [CLIP paper](https://arxiv.org/abs/2103.00020)*
 
 ![Figure 2 from Learning Transferable Visual Models From Natural Language Supervision](/assets/images/learning-transferable-visual-models-from-natural-language-supervision-source-figure-2.webp)
-*Figure 2 CLIP is much more efficient at zero-shot transfer than our image caption baseline. Although highly expressive, we found that transformer-based language models are relatively weak at zero-shot ImageNet classification. Here, we see that it learns 3x slower than a baseline which predicts a bag-of-words (BoW) encoding of the text ( Joulin et al. 2016 ) . Swapping the prediction objective for the contrastive objective of CLIP further improves efficiency another 4x. source: [Learning Transferable Visual Models From Natural Language Supervision](https://arxiv.org/abs/2103.00020)*
+*Fig 2: CLIP is much more efficient at zero-shot transfer than our image caption baseline. Although highly expressive, we found that transformer-based language models are relatively weak at zero-shot ImageNet classification. | source: [Learning Transferable Visual Models From Natural Language Supervision](https://arxiv.org/abs/2103.00020)*
 
 ![Figure 5 from Learning Transferable Visual Models From Natural Language Supervision](/assets/images/learning-transferable-visual-models-from-natural-language-supervision-source-figure-5.webp)
-*Figure 5 Zero-shot CLIP is competitive with a fully supervised baseline. Across a 27 dataset eval suite, a zero-shot CLIP classifier outperforms a fully supervised linear classifier fitted on ResNet-50 features on 16 datasets, including ImageNet. source: [Learning Transferable Visual Models From Natural Language Supervision](https://arxiv.org/abs/2103.00020)*
+*Fig 3: Zero-shot CLIP is competitive with a fully supervised baseline. Across a 27 dataset eval suite, a zero-shot CLIP classifier outperforms a fully supervised linear classifier fitted on ResNet-50 features on 16 datasets, including ImageNet. | source: [Learning Transferable Visual Models From Natural Language Supervision](https://arxiv.org/abs/2103.00020)*
 
 
 ### Method and reported result

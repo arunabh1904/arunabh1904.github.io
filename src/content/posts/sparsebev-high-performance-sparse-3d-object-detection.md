@@ -28,10 +28,10 @@ SparseBEV keeps the BEV prior without building a dense BEV map. Pillar-shaped qu
 Scale-adaptive attention gives each query head a learned BEV receptive field. Large classes learn broader neighborhoods. Adaptive sampling predicts support around the query, projects it across eight timestamps and visible cameras, and weights feature scales. Dynamic mixing lets the query decide how sampled points and channels should interact.
 
 ![SparseBEV: High-Performance Sparse 3D Object Detection from Multi-Camera Videos source figure: The overall architecture of SparseBEV, a fully-sparse camera-only 3D object detector.](/assets/images/sparsebev-high-performance-sparse-3d-object-detection-paper-figure.webp)
-*The overall architecture of SparseBEV, a fully-sparse camera-only 3D object detector. source: [SparseBEV: High-Performance Sparse 3D Object Detection from Multi-Camera Videos](https://arxiv.org/abs/2308.09244)*
+*Fig 1: The overall architecture of SparseBEV, a fully-sparse camera-only 3D object detector. | source: [SparseBEV: High-Performance Sparse 3D Object Detection from Multi-Camera Videos](https://arxiv.org/abs/2308.09244)*
 
 ![Figure 5 from SparseBEV: High-Performance Sparse 3D Object Detection from Multi-Camera Videos](/assets/images/sparsebev-high-performance-sparse-3d-object-detection-source-figure-5.webp)
-*Figure 5 Ablations of adaptive spatio-temporal sampling. The performance continues to increase with the number of frames. For sampling points, we observe that 16 points per frame works best. source: [SparseBEV: High-Performance Sparse 3D Object Detection from Multi-Camera Videos](https://arxiv.org/abs/2308.09244)*
+*Fig 2: Ablations of adaptive spatio-temporal sampling. The performance continues to increase with the number of frames. | source: [SparseBEV: High-Performance Sparse 3D Object Detection from Multi-Camera Videos](https://arxiv.org/abs/2308.09244)*
 
 
 | Component | mAP | NDS | Contribution |

@@ -28,13 +28,13 @@ The problem is automated lane-model generation under limited observations. A pre
 The evaluation uses an internal dataset with multiple vehicle observations and human annotations as ground truth. The reported results beat the authors' implemented baseline on highway and non-highway operational design domains. The main limitation is evidence scope: because the dataset is internal, the note is best read as a system design paper rather than a public benchmark anchor.
 
 ![Figure 1 from LMT-Net showing the polyline encoder, transformer module, and lane graph prediction heads](/assets/images/lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations-paper-figure.png)
-*Figure 1 shows the full LMT-Net path from sparse observed polylines to lane-pair and connectivity predictions. From the [LMT-Net paper](https://arxiv.org/abs/2409.12409). source: [LMT-Net paper](https://arxiv.org/abs/2409.12409)*
+*Fig 1: Shows the full LMT-Net path from sparse observed polylines to lane-pair and connectivity predictions. | source: [LMT-Net paper](https://arxiv.org/abs/2409.12409)*
 
 ![Figure 2 from LMT-Net: Lane Model Transformer Network for Automated HD Mapping from Sparse Vehicle Observations](/assets/images/lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations-source-figure-2.webp)
-*Figure 2 Fig. 2: Two examples: (a) a highway scenario and (b) a non-highway scenario. Top shows raw traces in yellow. Middle shows input data with observed lane boundaries in green and driven traces in red. The bottom shows ground truth lane boundaries in blue. Observed lane boundaries can be incomplete (left) or noisy (right). source: [LMT-Net: Lane Model Transformer Network for Automated HD Mapping from Sparse Vehicle Observations](https://arxiv.org/abs/2409.12409)*
+*Fig 2: Two examples: (a) a highway scenario and (b) a non-highway scenario. Top shows raw traces in yellow. | source: [LMT-Net: Lane Model Transformer Network for Automated HD Mapping from Sparse Vehicle Observations](https://arxiv.org/abs/2409.12409)*
 
 ![Figure 3 from LMT-Net: Lane Model Transformer Network for Automated HD Mapping from Sparse Vehicle Observations](/assets/images/lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations-source-figure-3.webp)
-*Figure 3 Fig. 3: Illustration of baseline implementations for lane pair prediction. source: [LMT-Net: Lane Model Transformer Network for Automated HD Mapping from Sparse Vehicle Observations](https://arxiv.org/abs/2409.12409)*
+*Fig 3: Illustration of baseline implementations for lane pair prediction. | source: [LMT-Net: Lane Model Transformer Network for Automated HD Mapping from Sparse Vehicle Observations](https://arxiv.org/abs/2409.12409)*
 
 
 **What to look at:**

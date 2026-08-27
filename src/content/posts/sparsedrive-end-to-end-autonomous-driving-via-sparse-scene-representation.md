@@ -30,13 +30,11 @@ SparseDrive has three main parts. Symmetric sparse perception unifies object det
 The paper frames dense BEV computation as both an efficiency problem and a planning-safety problem. Sparse scene representations are lighter and keep agent-map instances explicit, but the model must preserve enough context to avoid losing global scene cues. That is the central tradeoff.
 
 ![Figure 3 from SparseDrive showing the sparse scene representation pipeline for perception, motion prediction, and planning](/assets/images/sparsedrive-end-to-end-autonomous-driving-via-sparse-scene-representation-paper-figure.png)
-*Figure 3 shows SparseDrive's architecture: image features become sparse scene representations, which support symmetric sparse perception and parallel motion planning. From the [SparseDrive paper](https://arxiv.org/abs/2405.19620). source: [SparseDrive paper](https://arxiv.org/abs/2405.19620)*
+*Fig 1: Shows SparseDrive's architecture: image features become sparse scene representations, which support symmetric sparse perception and parallel motion planning. | source: [SparseDrive paper](https://arxiv.org/abs/2405.19620)*
 
 ![Figure 2 from SparseDrive: End-to-End Autonomous Driving via Sparse Scene Representation](/assets/images/sparsedrive-end-to-end-autonomous-driving-via-sparse-scene-representation-source-figure-2.webp)
-*Figure 2 (a) BEV-Centric paradigm. source: [SparseDrive: End-to-End Autonomous Driving via Sparse Scene Representation](https://arxiv.org/abs/2405.19620)*
+*Fig 2: A BEV-centric driving stack shares a dense backbone, then branches into detection and tracking, online mapping, motion prediction, and planning. | source: [SparseDrive: End-to-End Autonomous Driving via Sparse Scene Representation](https://arxiv.org/abs/2405.19620)*
 
-![Figure 2 from SparseDrive: End-to-End Autonomous Driving via Sparse Scene Representation](/assets/images/sparsedrive-end-to-end-autonomous-driving-via-sparse-scene-representation-source-figure-2.webp)
-*Figure 2 (b) Sparse-Centric paradigm. source: [SparseDrive: End-to-End Autonomous Driving via Sparse Scene Representation](https://arxiv.org/abs/2405.19620)*
 
 
 **What to look at:**

@@ -26,13 +26,13 @@ summary: "2019 – Mastering Atari, Go, Chess & Shogi by Planning with a Learned
 ## Core Insights
 
 ![Figure 1: Planning, acting, and training with a learned model from Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model](/assets/images/mastering-atari-go-chess-shogi-muzero-paper-figure.png)
-*Figure 1: Planning, acting, and training with a learned model. From the [Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model paper](https://arxiv.org/abs/1911.08265). source: [Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model paper](https://arxiv.org/abs/1911.08265)*
+*Fig 1: Planning, acting, and training with a learned model. | source: [Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model paper](https://arxiv.org/abs/1911.08265)*
 
 ![Figure 4 from Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model](/assets/images/mastering-atari-go-chess-shogi-muzero-source-figure-4.webp)
-*Figure 4 Figure S4: Learning curves of MuZero in Atari for individual games. Total reward is shown on the y-axis, millions of training steps on the x-axis. Line indicates mean score across 1000 evaluation games, shaded region indicates standard deviation. source: [Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model](https://arxiv.org/abs/1911.08265)*
+*Fig 2: Figure S4: Learning curves of MuZero in Atari for individual games. Total reward is shown on the y-axis, millions of training steps on the x-axis. | source: [Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model](https://arxiv.org/abs/1911.08265)*
 
 ![Figure 2 from Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model](/assets/images/mastering-atari-go-chess-shogi-muzero-source-figure-2.webp)
-*Figure 2 Evaluation of MuZero throughout training in chess, shogi, Go and Atari. The x-axis shows millions of training steps. For chess, shogi and Go, the y-axis shows Elo rating, established by playing games against AlphaZero using 800 simulations per move for both players. MuZero ’s Elo is indicated by the blue line, AlphaZero ’s Elo by the horizontal orange line. For Atari, mean (full line) and median (dashed line) human normalized scores across all 57 games are shown on the y-axis. source: [Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model](https://arxiv.org/abs/1911.08265)*
+*Fig 3: Evaluation of MuZero throughout training in chess, shogi, Go and Atari. The x-axis shows millions of training steps. | source: [Mastering Atari, Go, Chess & Shogi by Planning with a Learned Model](https://arxiv.org/abs/1911.08265)*
 
 
 ### Method and reported result

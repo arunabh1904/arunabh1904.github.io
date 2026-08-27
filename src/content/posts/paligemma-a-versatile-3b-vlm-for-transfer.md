@@ -28,10 +28,10 @@ The architecture is intentionally simple. Image tokens from SigLIP go through a 
 The training recipe has stages: reuse unimodal checkpoints, run multimodal pretraining, upcycle to higher image resolutions, then transfer to individual tasks. The release includes checkpoints at 224px, 448px, and 896px, which matters because many OCR, chart, document, and segmentation tasks are resolution sensitive.
 
 ![Figure 1 from PaliGemma showing the SigLIP image encoder feeding a Gemma decoder language model](/assets/images/paligemma-a-versatile-3b-vlm-for-transfer-paper-figure.png)
-*Figure 1 shows PaliGemma's core architecture: a SigLIP image encoder feeds a Gemma decoder language model through a projection layer. From the [PaliGemma paper](https://arxiv.org/abs/2407.07726). source: [PaliGemma paper](https://arxiv.org/abs/2407.07726)*
+*Fig 1: Shows PaliGemma's core architecture: a SigLIP image encoder feeds a Gemma decoder language model through a projection layer. | source: [PaliGemma paper](https://arxiv.org/abs/2407.07726)*
 
 ![Figure 7 from PaliGemma: A Versatile 3B VLM for Transfer](/assets/images/paligemma-a-versatile-3b-vlm-for-transfer-source-figure-7.webp)
-*Figure 7 Training setup for Stage1. Left: The more is frozen or reset, the more performance deteriorates. Right: The effect of freezing ViT is most visible in some pretraining perplexities. source: [PaliGemma: A Versatile 3B VLM for Transfer](https://arxiv.org/abs/2407.07726)*
+*Fig 2: Training setup for Stage1. Left: The more is frozen or reset, the more performance deteriorates. | source: [PaliGemma: A Versatile 3B VLM for Transfer](https://arxiv.org/abs/2407.07726)*
 
 
 **What to look at:**

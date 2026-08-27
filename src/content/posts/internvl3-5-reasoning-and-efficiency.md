@@ -19,14 +19,12 @@ summary: '2025 – InternVL3.5: Multimodal Reasoning and Efficiency'
 
 ## Core Insights
 
-![InternVL3.5 comparison across multimodal, reasoning, text, and agentic benchmarks](/assets/images/internvl3-5-paper-figure-1.png)
-*The reported aggregate spans several capability families, so the endpoint combines model, post-training, and serving changes. source: [InternVL3.5](https://arxiv.org/abs/2508.18265)*
 
 ![Figure 3 from InternVL3.5: Multimodal Reasoning and Efficiency](/assets/images/internvl3-5-reasoning-and-efficiency-source-figure-3.webp)
-*Figure 3 Training recipes of InternVL3.5. InternVL3.5 consists of three training stages: (1) native pre-training for vision-language alignment, (2) supervised fine-tuning for adaptation to downstream tasks, (3) Cascade RL for improvement on reasoning capabilities. InternVL3.5-Flash is an efficient version of InternVL3.5, which further integrates a visual resolution router (ViR) through consistency training and router training. source: [InternVL3.5: Multimodal Reasoning and Efficiency](https://arxiv.org/abs/2508.18265)*
+*Fig 1: Training recipes of InternVL3.5. InternVL3.5 consists of three training stages: (1) native pre-training for vision-language alignment, (2) supervised fine-tuning for adaptation to downstream tasks, (3) Cascade RL for improvement on reasoning capabilities. | source: [InternVL3.5: Multimodal Reasoning and Efficiency](https://arxiv.org/abs/2508.18265)*
 
 ![Figure 1 from InternVL3.5: Multimodal Reasoning and Efficiency](/assets/images/internvl3-5-reasoning-and-efficiency-source-figure-1.webp)
-*Figure 1 Comparison between InternVL3.5 and leading MLLMs in general capabilities. Hatched bars represent closed-source commercial models. We report average scores on a set of multimodal general, reasoning, text, and agentic benchmarks: MMBench v1. source: [InternVL3.5: Multimodal Reasoning and Efficiency](https://arxiv.org/abs/2508.18265)*
+*Fig 2: Comparison between InternVL3.5 and leading MLLMs in general capabilities. Hatched bars represent closed-source commercial models. | source: [InternVL3.5: Multimodal Reasoning and Efficiency](https://arxiv.org/abs/2508.18265)*
 
 
 The visual resolution router allocates different token budgets to different inputs. Decoupled deployment places the vision encoder and language model on separate devices to balance their workloads. These are serving decisions as much as model decisions.

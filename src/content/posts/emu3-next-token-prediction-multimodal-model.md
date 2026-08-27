@@ -20,13 +20,13 @@ summary: '2024 – Emu3: Next-Token Prediction Is All You Need'
 ## Core Insights
 
 ![Emu3 comparison across image generation, visual understanding, and video generation](/assets/images/emu3-paper-figure-1.png)
-*One next-token model is evaluated across tasks usually handled by separate model families. source: [Emu3](https://arxiv.org/abs/2409.18869)*
+*Fig 1: One next-token model is evaluated across tasks usually handled by separate model families. | source: [Emu3](https://arxiv.org/abs/2409.18869)*
 
 ![Figure 3 from Emu3: Next-Token Prediction Is All You Need](/assets/images/emu3-next-token-prediction-multimodal-model-source-figure-3.webp)
-*Figure 3 Qualitative results of Emu3 text-to-image generation. source: [Emu3: Next-Token Prediction Is All You Need](https://arxiv.org/abs/2409.18869)*
+*Fig 2: Text-to-image samples from Emu3 span objects, people, scenes, and stylized compositions, illustrating visual generation learned through next-token prediction. | source: [Emu3: Next-Token Prediction Is All You Need](https://arxiv.org/abs/2409.18869)*
 
 ![Figure 2 from Emu3: Next-Token Prediction Is All You Need](/assets/images/emu3-next-token-prediction-multimodal-model-source-figure-2.webp)
-*Figure 2 Reconstruction samples. Left: Original and reconstructed videos at 540 960 resolution, showcasing a sampling of 8 frames at 30 FPS. Right: original and reconstructed 512 512 resolution images. Zoom in to see the details. source: [Emu3: Next-Token Prediction Is All You Need](https://arxiv.org/abs/2409.18869)*
+*Fig 3: Reconstruction samples. Left: Original and reconstructed videos at 540 960 resolution, showcasing a sampling of 8 frames at 30 FPS. | source: [Emu3: Next-Token Prediction Is All You Need](https://arxiv.org/abs/2409.18869)*
 
 
 Emu3 makes tokenization carry the burden of unification. Once visual signals become discrete symbols, the transformer can train and decode them like text. This removes separate task objectives but makes visual sequence length and tokenizer fidelity central constraints.

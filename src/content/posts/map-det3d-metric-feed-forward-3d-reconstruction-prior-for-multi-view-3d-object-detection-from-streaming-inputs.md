@@ -27,11 +27,9 @@ Single images underconstrain absolute depth and scale, so the common 2D-to-3D pi
 
 The ablation makes the representation decision visible. Starting from a multi-view transformer, unfreezing the scale head, transformer, and pose components raises the displayed AP15 from 11.7 to 21.2; the best configuration uses all listed components. This is evidence that the reconstruction prior needs object-aware and camera-motion adaptation, not merely a frozen feature extractor.
 
-![Map-Det3D architecture using a metric feed-forward reconstruction prior for detection](/assets/images/map-det3d-overview-paper-figure.png)
-*A short streaming window is treated as multi-view input to a metric reconstruction encoder and direct 3D detection decoder. source: [Map-Det3D](https://arxiv.org/abs/2608.12179)*
 
 ![Figure 2 from Map-Det3D: Metric Feed-Forward 3D Reconstruction Prior for Multi-view 3D Object Detection from Streaming Inputs](/assets/images/map-det3d-metric-feed-forward-3d-reconstruction-prior-for-multi-view-3d-object-detection-from-streaming-inputs-source-figure-2.webp)
-*Figure 2 Architecture overview. Map-Det3D treats a short temporal window as multi-view input, repurposes a metric FF3R backbone, i.e . MapAnything, as the encoder of a detection transformer, and decodes up-to-scale 3D boxes that are converted to metric scale via the predicted scale factor. source: [Map-Det3D: Metric Feed-Forward 3D Reconstruction Prior for Multi-view 3D Object Detection from Streaming Inputs](https://arxiv.org/abs/2608.12179)*
+*Fig 1: Architecture overview. Map-Det3D treats a short temporal window as multi-view input, repurposes a metric FF3R backbone, i.e. | source: [Map-Det3D: Metric Feed-Forward 3D Reconstruction Prior for Multi-view 3D Object Detection from Streaming Inputs](https://arxiv.org/abs/2608.12179)*
 
 
 The method's deployment contract is online streaming, but its strongest assumption is a stable calibrated camera setup and a useful reconstruction prior. The paper reports limitations around efficiency and domain changes; a cross-camera calibration and motion test is needed before treating metric reconstruction as a general replacement for learned depth heads.

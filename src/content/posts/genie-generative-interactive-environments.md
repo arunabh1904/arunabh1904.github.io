@@ -26,13 +26,13 @@ Genie learns an interactive generative environment from unlabeled Internet video
 ## Core Insights
 
 ![Genie architecture with video tokenizer latent action model and dynamics model predicting future video tokens](/assets/images/genie-generative-interactive-environments-paper-figure.png)
-*Figure 2 separates the learned interface from the simulator: the tokenizer compresses video, the latent-action model infers controls from frame pairs, and the dynamics model predicts the next visual state conditioned on those controls. source: [Genie](https://arxiv.org/abs/2402.15391)*
+*Fig 1: Separates the learned interface from the simulator: the tokenizer compresses video, the latent-action model infers controls from frame pairs, and the dynamics model predicts the next visual state conditioned on those controls. | source: [Genie](https://arxiv.org/abs/2402.15391)*
 
 ![Figure 12 from Genie: Generative Interactive Environments](/assets/images/genie-generative-interactive-environments-source-figure-12.webp)
-*Figure 12 Controllable, consistent latent actions in Robotics : trajectories beginning from three different starting frames from our Robotics dataset. Each column shows the resulting frame from taking the same latent action five times. Despite training without action labels, the same actions are consistent across varied prompt frames and have semantic meaning: down , up and left. source: [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391)*
+*Fig 2: Controllable, consistent latent actions in Robotics: trajectories beginning from three different starting frames from our Robotics dataset. Each column shows the resulting frame from taking the same latent action five times. | source: [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391)*
 
 ![Figure 5 from Genie: Generative Interactive Environments](/assets/images/genie-generative-interactive-environments-source-figure-5.webp)
-*Figure 5 Video tokenizer : a VQ-VAE with ST-transformer. source: [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391)*
+*Fig 3: Genie’s spatio-temporal VQ-VAE compresses video frames into discrete latent tokens and decodes those tokens back into reconstructed video. | source: [Genie: Generative Interactive Environments](https://arxiv.org/abs/2402.15391)*
 
 
 | Component | Job |

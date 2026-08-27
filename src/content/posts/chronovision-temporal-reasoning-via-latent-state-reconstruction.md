@@ -26,13 +26,13 @@ summary: '2026 – ChronoVision trains a VLM to reconstruct latent visual states
 The paper introduces Vbvr-VQA by turning a video-reasoning problem into ordering six shuffled frames after an initial frame and prompt. Exact-match accuracy requires the entire sequence to be correct, which makes an answer based on only a plausible end state insufficient. During supervised fine-tuning, a Reconstructive Visual Head predicts the latent final state and an ROI Attention Locating module uses semantic span queries to focus attention on relevant regions. GRPO then receives outcome, latent-grounding, and focus rewards.
 
 ![ChronoVision: Temporal Reasoning via Latent State Reconstruction source figure: Overall pipeline of ChronoVision.](/assets/images/chronovision-temporal-reasoning-via-latent-state-reconstruction-paper-figure.webp)
-*Overall pipeline of ChronoVision. source: [ChronoVision: Temporal Reasoning via Latent State Reconstruction](https://arxiv.org/abs/2608.05631)*
+*Fig 1: ChronoVision reconstructs shuffled video frames by combining visual and text encoders, a language-model backbone, a reconstructive visual head, and region-of-interest localization. | source: [ChronoVision: Temporal Reasoning via Latent State Reconstruction](https://arxiv.org/abs/2608.05631)*
 
 ![Figure 3 from ChronoVision: Temporal Reasoning via Latent State Reconstruction](/assets/images/chronovision-temporal-reasoning-via-latent-state-reconstruction-source-figure-3.webp)
-*Figure 3 Qualitative comparison of reasoning chains on a transformation planning problem from Vbvr-VQA. The task requires reconstructing the correct chronological order of six shuffled candidate frames by inferring valid intermediate moves under the top-block-only constraint. source: [ChronoVision: Temporal Reasoning via Latent State Reconstruction](https://arxiv.org/abs/2608.05631)*
+*Fig 2: Qualitative comparison of reasoning chains on a transformation planning problem from Vbvr-VQA. The task requires reconstructing the correct chronological order of six shuffled candidate frames by inferring valid intermediate moves under the top-block-only constraint. | source: [ChronoVision: Temporal Reasoning via Latent State Reconstruction](https://arxiv.org/abs/2608.05631)*
 
 ![Figure 1 from ChronoVision: Temporal Reasoning via Latent State Reconstruction](/assets/images/chronovision-temporal-reasoning-via-latent-state-reconstruction-source-figure-1.webp)
-*Figure 1 Examples of the Vbvr-VQA dataset. source: [ChronoVision: Temporal Reasoning via Latent State Reconstruction](https://arxiv.org/abs/2608.05631)*
+*Fig 3: Vbvr-VQA spans mazes, transformations, mental simulation, visuospatial navigation, and fluid or crystallized reasoning tasks that require reconstructing latent temporal state. | source: [ChronoVision: Temporal Reasoning via Latent State Reconstruction](https://arxiv.org/abs/2608.05631)*
 
 
 This is a representation-level auxiliary objective, not a visible image generator. The paper does not claim to render the imagined intermediate states, so its evidence is about the usefulness of latent reconstruction for ordering and physical-reasoning evaluations rather than about interpretable internal visual chains of thought.

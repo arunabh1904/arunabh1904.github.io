@@ -24,13 +24,13 @@ summary: "2025 – RIPT-VLA: Interactive Post-Training for Vision-Language-Actio
 ## Core Insights
 
 ![RIPT-VLA training progression from broad pretraining and supervised fine-tuning to interactive reinforcement post-training](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-paper-figure.png)
-*Figure 1 makes the added training stage explicit: RIPT-VLA starts from an SFT policy, collects on-policy interaction, and uses reinforcement learning to repair the deployment distribution rather than only replay demonstrations. source: [RIPT-VLA](https://arxiv.org/abs/2505.17016)*
+*Fig 1: Makes the added training stage explicit: RIPT-VLA starts from an SFT policy, collects on-policy interaction, and uses reinforcement learning to repair the deployment distribution rather than only replay demonstrations. | source: [RIPT-VLA](https://arxiv.org/abs/2505.17016)*
 
 ![Figure 6 from RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-source-figure-6.webp)
-*Figure 6 Analysis on context dataset size. source: [RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2505.17016)*
+*Fig 2: In one-shot cross-scenario transfer, RIPT improves as rollout contexts increase and begins 36.8 points above supervised fine-tuning with a single context. | source: [RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2505.17016)*
 
 ![Figure 2 from RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-source-figure-2.webp)
-*Figure 2 Few-shot curve on LIBERO-LONG. source: [RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2505.17016)*
+*Fig 3: On five-shot LIBERO-LONG, RIPT improves success over supervised fine-tuning across one to ten demonstrations, with a 20.8-point gain at one demonstration. | source: [RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2505.17016)*
 
 
 The optimizer combines dynamic rollout sampling with leave-one-out advantage estimation. Grouping rollouts by task turns a sparse $0/1$ outcome into a relative signal; batches are constructed to retain non-zero advantage rather than wasting updates on groups where every rollout has the same result. The method applies to both a lightweight QueST policy and the 7B OpenVLA-OFT model.

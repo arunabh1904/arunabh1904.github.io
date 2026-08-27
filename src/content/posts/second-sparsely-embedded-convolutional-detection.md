@@ -26,7 +26,7 @@ SECOND turns VoxelNet's dense 3D middle encoder into a sparse one. It computes o
 SECOND begins with voxel feature encoding, applies a sparse 3D convolutional middle network, converts the result to a dense BEV feature map, and predicts boxes with an RPN. Its GPU rule-generation step builds the active input-output pairs needed by each sparse convolution. On KITTI, the paper reports roughly $3\times$ faster inference than the dense counterpart; the small model runs at about 40 FPS and the larger model at 20 FPS on a GTX 1080 Ti.
 
 ![SECOND detector pipeline from point cloud through voxel features and sparse convolution to an RPN with three prediction heads](/assets/images/second-paper-figure.webp)
-*SECOND spends 3D computation only on occupied voxels, then hands the resulting representation to a dense BEV proposal network. source: [SECOND](https://doi.org/10.3390/s18103337)*
+*Fig 1: SECOND spends 3D computation only on occupied voxels, then hands the resulting representation to a dense BEV proposal network. | source: [SECOND](https://doi.org/10.3390/s18103337)*
 
 Two details matter beyond speed. Database sampling inserts complete labeled objects and their points into training scenes, reducing foreground imbalance and accelerating convergence. The angle objective separates overlap from direction: sine-based regression avoids a large penalty for geometrically equivalent headings, while an auxiliary classifier recovers the discrete direction.
 

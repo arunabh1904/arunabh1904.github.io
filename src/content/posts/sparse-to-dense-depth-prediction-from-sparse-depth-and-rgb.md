@@ -24,14 +24,12 @@ Sparse-to-Dense feeds RGB and sparse depth into an encoder-decoder that predicts
 
 The network can use one joint encoder or separate RGB and depth branches. Sparse points anchor metric scale while image features interpolate structure between measurements. The paper reports that 100 samples roughly halve NYU depth error and reduce the cited KITTI error from about 7 m to about 3.5 m; at 500 samples, the fraction of reliable KITTI pixels rises from 59.1% to 93.5%.
 
-![Sparse-to-Dense encoder-decoder architectures for NYU Depth and KITTI with different input shapes and shared upsampling design](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-paper-figure.webp)
-*The source uses dataset-specific encoder widths but the same core contract: fuse RGB with sparse metric samples, compress through a ResNet encoder, and upsample to dense depth. source: [Sparse-to-Dense](https://arxiv.org/abs/1709.07492)*
 
 ![Figure 2 from Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-source-figure-2.webp)
-*Figure 2 Fig. 2: CNN architecture for NYU-Depth-v2 and KITTI datasets, respectively. Cubes are feature maps, with dimensions represented as #features@height width. The encoding layers in blue consist of a ResNet [ 14 ] and a 3 3 convolution. The decoding layers in yellow are composed of 4 upsampling layers ( ) followed by a bilinear upsampling. source: [Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](https://arxiv.org/abs/1709.07492)*
+*Fig 1: CNN architecture for NYU-Depth-v2 and KITTI datasets, respectively. Cubes are feature maps, with dimensions represented as #features@height width. | source: [Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](https://arxiv.org/abs/1709.07492)*
 
 ![Figure 5 from Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-source-figure-5.webp)
-*Figure 5 Fig. 5: Impact of number of depth sample on the prediction accuracy on the NYU-Depth-v2 dataset. Left column: lower is better; right column: higher is better. source: [Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](https://arxiv.org/abs/1709.07492)*
+*Fig 2: Impact of number of depth sample on the prediction accuracy on the NYU-Depth-v2 dataset. Left column: lower is better; right column: higher is better. | source: [Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](https://arxiv.org/abs/1709.07492)*
 
 
 | Runtime input | Role | Failure consideration |

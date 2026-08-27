@@ -26,14 +26,12 @@ CenterPoint detects objects as center points in BEV, then regresses height, dime
 
 A class-specific heatmap supplies candidate centers; lightweight attribute heads complete the 3D state. The paper reports 58.0 mAP and 65.5 NDS for detection and 63.8 AMOTA for tracking on nuScenes. The center head adds roughly 3–4 mAP over the compared anchor formulation; refinement adds about 2 mAP with under 10% overhead in the reported setup.
 
-![CenterPoint: Center-Based 3D Detection and Tracking source figure: We present a center-based framework to represent, detect and track objects.](/assets/images/centerpoint-center-based-3d-detection-and-tracking-paper-figure.webp)
-*We present a center-based framework to represent, detect and track objects. source: [CenterPoint: Center-Based 3D Detection and Tracking](https://arxiv.org/abs/2006.11275)*
 
 ![Figure 3 from CenterPoint: Center-Based 3D Detection and Tracking](/assets/images/centerpoint-center-based-3d-detection-and-tracking-source-figure-3.webp)
-*Figure 3 Example qualitative results of CenterPoint on the Waymo validation. We show the raw point-cloud in blue, our detected objects in green bounding boxes, and Lidar points inside bounding boxes in red. Best viewed on screen. source: [CenterPoint: Center-Based 3D Detection and Tracking](https://arxiv.org/abs/2006.11275)*
+*Fig 1: CenterPoint detections on Waymo place green 3D boxes around objects in the blue point cloud, with returns inside predicted boxes highlighted in red. | source: [CenterPoint: Center-Based 3D Detection and Tracking](https://arxiv.org/abs/2006.11275)*
 
 ![Figure 1 from CenterPoint: Center-Based 3D Detection and Tracking](/assets/images/centerpoint-center-based-3d-detection-and-tracking-source-figure-1.webp)
-*Figure 1 We present a center-based framework to represent, detect and track objects. Previous anchor-based methods use axis-aligned anchors with respect to ego-vehicle coordinate. When the vehicle is driving in straight roads, both anchor-based and our center-based method are able to detect objects accurately (top). However, during a safety-critical left turn (bottom), anchor-based methods have difficulty fitting axis-aligned bounding boxes to rotated objects. source: [CenterPoint: Center-Based 3D Detection and Tracking](https://arxiv.org/abs/2006.11275)*
+*Fig 2: We present a center-based framework to represent, detect and track objects. Previous anchor-based methods use axis-aligned anchors with respect to ego-vehicle coordinate. | source: [CenterPoint: Center-Based 3D Detection and Tracking](https://arxiv.org/abs/2006.11275)*
 
 
 | Output | Representation | Downstream value |

@@ -28,10 +28,10 @@ VectorNet uses a hierarchical graph neural network. A local subgraph network sum
 The paper's main contrast is against rasterization. Raster BEV images let standard convolutional networks process the scene, but rendering discards some structure and spends computation on pixels that are not meaningful entities. VectorNet reports comparable or better behavior prediction on an internal benchmark and Argoverse while saving more than 70% of model parameters and roughly an order of magnitude in FLOPs against the rendering baseline.
 
 ![Figure 2 from VectorNet showing input vectors, polyline subgraphs, a global interaction graph, and trajectory prediction](/assets/images/vectornet-encoding-hd-maps-and-agent-dynamics-from-vectorized-representation-paper-figure.png)
-*Figure 2 shows the core hierarchy: vectors become polyline features, polyline features interact globally, and agent nodes support map completion and trajectory prediction. From the [VectorNet paper](https://arxiv.org/abs/2005.04259). source: [VectorNet paper](https://arxiv.org/abs/2005.04259)*
+*Fig 1: Shows the core hierarchy: vectors become polyline features, polyline features interact globally, and agent nodes support map completion and trajectory prediction. | source: [VectorNet paper](https://arxiv.org/abs/2005.04259)*
 
 ![Figure 4 from VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation](/assets/images/vectornet-encoding-hd-maps-and-agent-dynamics-from-vectorized-representation-source-figure-4.webp)
-*Figure 4 (Left) Visualization of the prediction: lanes are shown in grey, non-target agents are green, target agent’s ground truth trajectory is in pink, predicted trajectory in blue. (Right) Visualization of attention for road and agent: Brighter red color corresponds to higher attention score. It can be seen that when agents are facing multiple choices (first two examples), the attention mechanism is able to focus on the correct choices (two right-turn lanes in the second example). source: [VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation](https://arxiv.org/abs/2005.04259)*
+*Fig 2: (Left) Visualization of the prediction: lanes are shown in grey, non-target agents are green, target agent’s ground truth trajectory is in pink, predicted trajectory in blue. (Right) Visualization of attention for road and agent: Brighter red color corresponds to higher attention score. | source: [VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation](https://arxiv.org/abs/2005.04259)*
 
 
 **What to look at:**

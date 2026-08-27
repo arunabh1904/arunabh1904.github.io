@@ -24,10 +24,10 @@ summary: "2026 – VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-Worl
 ## Core Insights
 
 ![VLA-REPLICA procedure for aligning camera and robot poses reproducing object placement and running standardized policy evaluations](/assets/images/vla-replica-low-cost-reproducible-real-world-evaluation-paper-figure.png)
-*Figure 2 shows the reproducibility controls: AprilTag and video-overlay alignment fix viewpoint geometry, task reference images fix object placement, and the same suite is then run across policies. source: [VLA-REPLICA](https://arxiv.org/abs/2605.20774)*
+*Fig 1: Shows the reproducibility controls: AprilTag and video-overlay alignment fix viewpoint geometry, task reference images fix object placement, and the same suite is then run across policies. | source: [VLA-REPLICA](https://arxiv.org/abs/2605.20774)*
 
 ![Figure 1 from VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation](/assets/images/vla-replica-low-cost-reproducible-real-world-evaluation-source-figure-1.webp)
-*Figure 1 Overview of the VLA-Replica benchmark. (a)1. Hardware components. (a)2. Our assembled platform with the leader arm, the follower arm, the light box, the cameras, and the manipulation workspace. (b) 10 manipulation tasks in the benchmark. source: [VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation](https://arxiv.org/abs/2605.20774)*
+*Fig 2: Overview of the VLA-Replica benchmark. (a)1. Hardware components. (a)2. | source: [VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation](https://arxiv.org/abs/2605.20774)*
 
 
 The tasks span pick-and-place, object interaction, and memory-dependent behavior. Independent replicas produce consistent policy results, which is the paper's most important evidence: a benchmark is useful only if rebuilding it does not change the ranking. The controlled light box reduces nuisance variation while deliberate OOD settings reintroduce chosen shifts.

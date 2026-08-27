@@ -27,10 +27,10 @@ WPT uses a world model during training to forecast how candidate actions change 
 On nuScenes, the teacher reports 0.61 m average L2 error and 0.11% collision rate. The distilled student reports 0.66 m and 0.24%, compared with 0.88 m and 1.06% for the undistilled baseline. On Bench2Drive, the teacher reaches a 79.23 driving score and 54.54% success rate; the student retains 72.61 and 45.45%. The paper reports 64 ms planning latency for the student versus 312 ms for the teacher, a 4.9× difference.
 
 ![WPT: World-to-Policy Transfer via Online World Model Distillation source figure: Overview of WPT framework.](/assets/images/wpt-world-to-policy-transfer-via-online-world-model-distillation-paper-figure.webp)
-*Overview of WPT framework. source: [WPT: World-to-Policy Transfer via Online World Model Distillation](https://arxiv.org/abs/2511.20095)*
+*Fig 1: WPT trains a world-model-enhanced teacher that proposes and scores multimodal trajectories, then distills both policy features and world-model rewards into a lighter student policy. | source: [WPT: World-to-Policy Transfer via Online World Model Distillation](https://arxiv.org/abs/2511.20095)*
 
 ![Figure 1 from WPT: World-to-Policy Transfer via Online World Model Distillation](/assets/images/wpt-world-to-policy-transfer-via-online-world-model-distillation-source-figure-1.webp)
-*Figure 1 Different training paradigms of AD policy with world model. (a) Imitation learning where the policy is trained using expert supervision. (b) World model (WM) directly integrated into the AD policy for enhanced feature evolution and trajectory reasoning. (c) Simulator-based reinforcement learning for AD policy training using a simulated world. (d) Our WPT, where the policy interacts with the WM during training, with both the teacher policy ( T ) and the student policy ( S ) leveraging the WM for knowledge transfer. source: [WPT: World-to-Policy Transfer via Online World Model Distillation](https://arxiv.org/abs/2511.20095)*
+*Fig 2: WPT is positioned against imitation learning, direct world-model integration, and simulator-based reinforcement learning. Its teacher and student both consult the world model during training, transferring planning and reward knowledge without requiring it at student inference. | source: [WPT: World-to-Policy Transfer via Online World Model Distillation](https://arxiv.org/abs/2511.20095)*
 
 
 | Model | Avg. L2 | Collision rate | Runtime role |

@@ -27,14 +27,12 @@ Driving with LLMs studies a middle ground between raw-image VLMs and classical p
 
 Driving with LLMs feeds structured object-level vectors into a language model instead of raw pixels. A Vector-Former converts detected agents, lanes, and scene state into tokens that the LLM can use for QA and action generation. This makes the driving state more explicit and the model's outputs easier to explain. The method depends heavily on upstream perception: missing or incorrect objects become misleading language-model input. The paper matters as an interface design for combining modular autonomy state with LLM reasoning.
 
-![Figure from Driving with LLMs: object-level vector modality feeds a Vector-Former and LLM control loop](/assets/images/driving-with-llms-fusing-object-level-vector-modality-paper-figure.png)
-*Source figure from the [Driving with LLMs paper](https://arxiv.org/abs/2310.01957). source: [Driving with LLMs paper](https://arxiv.org/abs/2310.01957)*
 
 ![Figure 1 from Driving with LLMs: Fusing Object-Level Vector Modality for Explainable Autonomous Driving](/assets/images/driving-with-llms-fusing-object-level-vector-modality-source-figure-1.webp)
-*Figure 1 An overview of the architecture for Driving with LLMs, demonstrating how object-level vector input from our driving simulator is employed to predict actions via LLMs. source: [Driving with LLMs: Fusing Object-Level Vector Modality for Explainable Autonomous Driving](https://arxiv.org/abs/2310.01957)*
+*Fig 1: An overview of the architecture for Driving with LLMs, demonstrating how object-level vector input from our driving simulator is employed to predict actions via LLMs. | source: [Driving with LLMs: Fusing Object-Level Vector Modality for Explainable Autonomous Driving](https://arxiv.org/abs/2310.01957)*
 
 ![Figure 4 from Driving with LLMs: Fusing Object-Level Vector Modality for Explainable Autonomous Driving](/assets/images/driving-with-llms-fusing-object-level-vector-modality-source-figure-4.webp)
-*Figure 4 Demonstration of the interaction with the pretrained LLM-Driver. Notably, the driving LLM agent has the ability to anticipate future actions when prompted. Please refer to Appendix B for additional results, including some failure cases. source: [Driving with LLMs: Fusing Object-Level Vector Modality for Explainable Autonomous Driving](https://arxiv.org/abs/2310.01957)*
+*Fig 2: Demonstration of the interaction with the pretrained LLM-Driver. Notably, the driving LLM agent has the ability to anticipate future actions when prompted. | source: [Driving with LLMs: Fusing Object-Level Vector Modality for Explainable Autonomous Driving](https://arxiv.org/abs/2310.01957)*
 
 
 **What to look at:**

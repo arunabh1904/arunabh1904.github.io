@@ -27,13 +27,13 @@ BEVDet4D adds a simple temporal path to BEVDet: transform the previous frame's B
 Ego alignment is critical because a static scene otherwise appears to move with the vehicle. The extra encoder gives local convolutions a way to interpret paired features after warping. In the tiny configuration, the paper reports velocity error falling from 0.909 to 0.337 and NDS increasing from 39.2 to 47.6; the test result reaches 56.9 NDS.
 
 ![BEVDet4D: Temporal Cues in Multi-Camera 3D Detection source figure: The framework of the proposed BEVDet4D paradigm.](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-paper-figure.webp)
-*The framework of the proposed BEVDet4D paradigm. source: [BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](https://arxiv.org/abs/2203.17054)*
+*Fig 1: BEVDet4D aligns and concatenates current and previous BEV features before the BEV encoder and detection head, adding temporal cues to the single-frame pipeline. | source: [BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](https://arxiv.org/abs/2203.17054)*
 
 ![Figure 1 from BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-source-figure-1.webp)
-*Figure 1 The inference speed and performance of different paradigms on the nuScenes val set. source: [BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](https://arxiv.org/abs/2203.17054)*
+*Fig 2: The inference speed and performance of different paradigms on the nuScenes val set. | source: [BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](https://arxiv.org/abs/2203.17054)*
 
 ![Figure 4 from BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-source-figure-4.webp)
-*Figure 4 Ablation on the time interval between the current frame and the reference one. Points drawn in the same color are in the same training configuration. source: [BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](https://arxiv.org/abs/2203.17054)*
+*Fig 3: Ablation on the time interval between the current frame and the reference one. Points drawn in the same color are in the same training configuration. | source: [BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](https://arxiv.org/abs/2203.17054)*
 
 
 | Component | Purpose | Failure mode |
