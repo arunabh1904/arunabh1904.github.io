@@ -29,14 +29,11 @@ RadarBEVNet couples two encoders. The point path retains local measurement attri
 
 On nuScenes test, the paper reports that RCBEVDet improves its BEVDepth baseline by 3.4 NDS and 3.5 mAP. It surpasses the compared CRN configuration by 1.5 NDS with a smaller image backbone and reports 21–28 FPS depending on configuration. On View-of-Delft, which uses 4D radar, it reports 69.80 mAP in the region of interest. A sensor-dropout experiment is included, but the main benchmark gains do not by themselves establish adverse-weather reliability.
 
-![Figure 2 from RCBEVDet, showing a dual-stream radar encoder, RCS-aware BEV scattering, and camera-radar cross-attention](/assets/images/rcbevdet-paper-figure-2.png)
-*Fig 1: The radar path preserves measurement-specific structure before meeting camera features in BEV. | source: [RCBEVDet](https://arxiv.org/abs/2403.16440)*
+![RCBEVDet pipeline with a dual-stream radar encoder, RCS-aware BEV scattering, and camera-radar cross-attention](/assets/images/rcbevdet-radar-camera-fusion-in-bev-source-figure-2.webp)
+*Fig 1: The radar path preserves measurement-specific structure with dual-stream encoding and RCS-aware BEV scattering, then meets the camera path through cross-attention in BEV. | source: [RCBEVDet: Radar-Camera Fusion in Bird](https://arxiv.org/abs/2403.16440)*
 
-![Figure 1 from RCBEVDet: Radar-Camera Fusion in Bird](/assets/images/rcbevdet-radar-camera-fusion-in-bev-source-figure-1.webp)
-*Fig 2: Comparison of the proposed RCBEVDet and other real-time 3D object detectors. Our RCBEVDet achieves state-of-the-art accuracy and accuracy-speed trade-offs. | source: [RCBEVDet: Radar-Camera Fusion in Bird](https://arxiv.org/abs/2403.16440)*
-
-![Figure 2 from RCBEVDet: Radar-Camera Fusion in Bird](/assets/images/rcbevdet-radar-camera-fusion-in-bev-source-figure-2.webp)
-*Fig 3: Overall pipeline of RCBEVDet. Firstly, multi-view images are encoded and transformed into the bird’s eye view to obtain the image BEV feature. | source: [RCBEVDet: Radar-Camera Fusion in Bird](https://arxiv.org/abs/2403.16440)*
+![RCBEVDet accuracy-speed comparison against real-time 3D object detectors](/assets/images/rcbevdet-radar-camera-fusion-in-bev-source-figure-1.webp)
+*Fig 2: RCBEVDet lies on the reported accuracy-speed frontier among real-time 3D detectors; the comparison is benchmark- and hardware-dependent. | source: [RCBEVDet: Radar-Camera Fusion in Bird](https://arxiv.org/abs/2403.16440)*
 
 
 | Radar property | Modeling response | Why it matters |

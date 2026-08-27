@@ -26,14 +26,11 @@ summary: '2023 – On-Policy Distillation of Language Models: GKD'
 
 ## Core Insights
 
-![On-policy GKD improves student models across summarization, translation, and arithmetic compared with fixed-data distillation](/assets/images/on-policy-distillation-language-models-paper-figure.png)
-*Fig 1: Across three tasks and student sizes, the on-policy variants deliver the largest gains over the initial student. The figure reports task-specific performance rather than claiming one divergence is universally best. | source: [GKD](https://arxiv.org/abs/2306.13649)*
-
-![Figure 1 from On-Policy Distillation of Language Models: GKD](/assets/images/on-policy-distillation-language-models-gkd-source-figure-1.webp)
-*Fig 2: Across student sizes, on-policy GKD trains on the student’s own sampled outputs and approaches the T5-XL teacher more closely than supervised fine-tuning, sequence KD, or fixed-data KD. | source: [On-Policy Distillation of Language Models: GKD](https://arxiv.org/abs/2306.13649)*
+![On-policy GKD improves student models across summarization, translation, and arithmetic compared with fixed-data distillation](/assets/images/on-policy-distillation-language-models-gkd-source-figure-1.webp)
+*Fig 1: Across three tasks and student sizes, on-policy GKD trains on the student’s sampled outputs and approaches the T5-XL teacher more closely than supervised fine-tuning, sequence KD, or fixed-data KD. | source: [On-Policy Distillation of Language Models: GKD](https://arxiv.org/abs/2306.13649)*
 
 ![Figure 3 from On-Policy Distillation of Language Models: GKD](/assets/images/on-policy-distillation-language-models-gkd-source-figure-3.webp)
-*Fig 3: Distilled T5-small improves as training data grows across temperature-sampling settings, showing how on-policy generation changes the data-scaling behavior of distillation. | source: [On-Policy Distillation of Language Models: GKD](https://arxiv.org/abs/2306.13649)*
+*Fig 2: Distilled T5-Small improves as training data grows across temperature-sampling settings, showing how on-policy generation changes the data-scaling behavior of distillation. | source: [On-Policy Distillation of Language Models: GKD](https://arxiv.org/abs/2306.13649)*
 
 
 Let $y_{<t}$ be a prefix sampled from either a fixed dataset or the current student. The teacher and student define next-token distributions $p_T(\cdot\mid x,y_{<t})$ and $p_S(\cdot\mid x,y_{<t})$. GKD minimizes a chosen divergence between those distributions and mixes the two prefix sources with a coefficient $\lambda$. At $\lambda=0$, training is conventional offline distillation; at $\lambda=1$, every target is evaluated on a student-generated trajectory.

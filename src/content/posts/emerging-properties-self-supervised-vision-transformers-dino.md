@@ -27,14 +27,11 @@ summary: '2021 – DINO: Emerging Properties in Self-Supervised Vision Transform
 
 ## Core Insights
 
-![DINO self-distillation sends global and local image crops through student and momentum-teacher networks](/assets/images/emerging-properties-self-supervised-vision-transformers-dino-paper-figure.png)
-*Fig 1: The teacher sees global crops while the student matches its centered, sharpened distribution from global and local crops; stop-gradient and an exponential-moving-average teacher stabilize the target. | source: [DINO](https://arxiv.org/abs/2104.14294)*
-
-![Figure 2 from DINO: Emerging Properties in Self-Supervised Vision Transformers](/assets/images/emerging-properties-self-supervised-vision-transformers-dino-source-figure-2.webp)
-*Fig 2: Self-distillation with no labels. We illustrate DINO in the case of one single pair of views (, ) for simplicity. | source: [DINO: Emerging Properties in Self-Supervised Vision Transformers](https://arxiv.org/abs/2104.14294)*
+![DINO self-distillation sends global and local image crops through student and momentum-teacher networks](/assets/images/emerging-properties-self-supervised-vision-transformers-dino-source-figure-2.webp)
+*Fig 1: The teacher sees global crops while the student matches its centered, sharpened distribution from global and local crops; stop-gradient and an exponential-moving-average teacher stabilize the target. | source: [DINO: Emerging Properties in Self-Supervised Vision Transformers](https://arxiv.org/abs/2104.14294)*
 
 ![Figure 6 from DINO: Emerging Properties in Self-Supervised Vision Transformers](/assets/images/emerging-properties-self-supervised-vision-transformers-dino-source-figure-6.webp)
-*Fig 3: Top-1 accuracy on ImageNet validation with -NN classifier. (left) Comparison between the performance of the momentum teacher and the student during training. (right) Comparison between different types of teacher network. The momentum encoder leads to the best performance but is not the only viable option. | source: [DINO: Emerging Properties in Self-Supervised Vision Transformers](https://arxiv.org/abs/2104.14294)*
+*Fig 2: ImageNet k-NN accuracy compares the student with its momentum teacher during training and shows that a momentum encoder gives the strongest teacher targets among the tested update rules. | source: [DINO: Emerging Properties in Self-Supervised Vision Transformers](https://arxiv.org/abs/2104.14294)*
 
 
 For two transformed views $x$ and $x'$, the student distribution $P_s(x)$ is trained against the teacher distribution $P_t(x')$ with cross-entropy. The teacher is not optimized by backpropagation; its parameters are an exponential moving average of the student. Centering the teacher logits prevents one dimension from dominating, while a lower teacher temperature sharpens the target. Multi-crop training makes the student align local views with a teacher that sees the image globally.
