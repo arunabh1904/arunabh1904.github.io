@@ -38,7 +38,10 @@ const REFERENCE_TEST_NAMES = new Map([
   ['resnet-50-bottleneck-blocks', 'test_resnet50'],
   ['unet-encoder-decoder', 'test_unet'],
   ['centernet-style-detector', 'test_centernet'],
+  ['cross-attention', 'test_cross_attention'],
 ]);
+
+const DIRECT_TEST_PROBLEMS = new Set(['simple-n-gram-language-model']);
 
 // These helpers solve the operation being taught instead of exposing its tensor steps.
 const BANNED_CONVENIENCE_CALLS = [
@@ -104,7 +107,7 @@ const REQUIRED_PRIMITIVES = [
   },
   {
     id: 'cross-attention',
-    fragments: ['torch.amax(', 'torch.exp(', 'torch.sum('],
+    fragments: ['.max(dim=dim', 'torch.exp(', '.sum('],
   },
   {
     id: 'manual-backprop-for-a-2-layer-mlp',
@@ -177,7 +180,7 @@ describe('code-practice primitive-first solutions', () => {
     const ngram = codePracticeProblems.find(
       (problem) => problem.id === 'simple-n-gram-language-model',
     )!;
-    expect(ngram.solutionNotes.join(' ')).toContain('runs offline');
+    expect(ngram.solutionNotes.join(' ')).toContain('empty context');
     expect(ngram.prompt.join(' ')).not.toContain('Tiny Shakespeare');
   });
 
@@ -224,6 +227,9 @@ describe('code-practice primitive-first solutions', () => {
     for (const problem of codePracticeProblems) {
       if (CLASS_BASED_PROBLEMS.has(problem.id)) {
         expect(problem.solutionCode, problem.id).toContain('class ');
+        if (DIRECT_TEST_PROBLEMS.has(problem.id)) {
+          continue;
+        }
         const testName = REFERENCE_TEST_NAMES.get(problem.id) ?? 'smoke_test';
         expect(problem.solutionCode, problem.id).toContain(`def ${testName}()`);
         expect(problem.solutionCode.trimEnd(), problem.id).toMatch(
@@ -249,7 +255,7 @@ describe('code-practice primitive-first solutions', () => {
     }
   });
 
-  it('keeps cross-attention config-driven, two-source, and unmasked', () => {
+  it('keeps cross-attention two-source, stable, and unmasked', () => {
     const problem = codePracticeProblems.find((candidate) => candidate.id === 'cross-attention')!;
     const exerciseText = [
       problem.summary,
@@ -265,11 +271,11 @@ describe('code-practice primitive-first solutions', () => {
     ].join('\n');
 
     expect(exerciseText).not.toMatch(/\bmask(?:ed|ing)?\b/i);
-    expect(problem.solutionCode).toContain('class CrossAttentionConfig:');
+    expect(problem.solutionCode).toContain('class CrossAttention(nn.Module):');
     expect(problem.solutionCode).toContain(
       'def forward(self, seq_a: torch.Tensor, seq_b: torch.Tensor) -> torch.Tensor:',
     );
-    expect(problem.solutionCode).toContain('torch.amax(x, dim=dim, keepdim=True)');
+    expect(problem.solutionCode).toContain('x.max(dim=dim, keepdim=True).values');
     expect(problem.solutionCode).toContain('weights = stable_softmax(scores, dim=-1)');
     expect(() => compilePython(problem.solutionCode)).not.toThrow();
   });
@@ -278,7 +284,7 @@ describe('code-practice primitive-first solutions', () => {
     const ngram = codePracticeProblems.find(
       (problem) => problem.id === 'simple-n-gram-language-model',
     )!;
-    expect(runPython(ngram.solutionCode)).toContain('n-gram smoke test passed');
+    expect(runPython(ngram.solutionCode)).toContain("{'b': 0.5, 'c': 0.5}");
   });
 
   it('offers NumPy only for concise array-math interviews', () => {
@@ -436,7 +442,7 @@ describe('code-practice primitive-first solutions', () => {
       (problem) => problem.id === 'binary-cross-entropy-from-probabilities',
     );
 
-    expect(ngram?.solutionCode).toContain('key = tuple(context[-size:]) if size else ()');
+    expect(ngram?.solutionCode).toContain('key = tuple(context[-size:]) if size > 0 else ()');
     expect(matching?.solutionCode).toContain('used_gt = set()');
     expect(matching?.solutionCode).toContain('if gt_idx in used_gt');
     expect(matching?.solutionCode).not.toContain('best_gt not in used');
