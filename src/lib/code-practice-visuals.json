@@ -441,14 +441,14 @@
   },
   {
     "id": "centernet-style-detector",
-    "headline": "One shared feature map feeds three detection heads",
+    "headline": "One stride-four map, three prediction heads",
     "kind": "network",
     "steps": [
-      ["INPUT", "image -> backbone", "downsampled feature map"],
-      ["HEADS", "heatmap + size + offset", "class, box extent, subpixel center"],
-      ["RESULT", "decode peaks into boxes", "score and coordinates"]
+      ["INPUT", "image -> stride-4 backbone", "shared (B, 128, H/4, W/4)"],
+      ["HEADS", "heatmap / size / offset", "K / 2 / 2 channels"],
+      ["RESULT", "dense maps at 1/4 resolution", "centers + box geometry"]
     ],
-    "caption": "The heatmap finds centers; size and offset supply the box geometry around each peak."
+    "caption": "One shared stride-four feature map feeds heads for class centers, box size, and sub-cell center offsets."
   },
   {
     "id": "multiple-linear-regression",

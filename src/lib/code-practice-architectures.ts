@@ -679,113 +679,77 @@ if __name__ == "__main__":
   {
     id: 'centernet-style-detector',
     order: 41,
-    title: 'Build a CenterNet-style detector',
+    title: 'Implement CenterNet with three prediction heads',
     difficulty: 'Hard',
     track: 'architecture',
     summary:
-      'Implement a compact keypoint detector with typed outputs and separate heatmap, size, and offset heads.',
+      'Implement a compact CenterNet-style detector with a stride-four backbone and separate heatmap, size, and offset prediction heads.',
     prompt: [
-      'Design the prediction side of a CenterNet-style detector. The model should turn an image into a stride-four feature map, then predict class-center heatmap logits, box size, and sub-pixel center offset at every location.',
-      'Keep decoding and losses out of scope. In the interview, make the output contract explicit and explain why the heatmap head uses a negative prior bias.',
+      'A CenterNet-style detector predicts object centers on a dense feature grid. Implement `PredictionHead` and `CenterNet` for inputs shaped `(B, 3, H, W)`.',
+      'The backbone should downsample by four, then three heads should predict heatmap logits, box size, and center offset. Assume `H` and `W` are divisible by four.',
     ],
-    signature: `@dataclass(frozen=True, slots=True)
-class CenterNetConfig: ...
-
-@dataclass(slots=True)
-class CenterNetOutput: ...
-
-class CenterNetDetector(nn.Module): ...`,
+    signature: `class PredictionHead(nn.Module): ...
+class CenterNet(nn.Module): ...`,
     requirements: [
-      'Use a frozen config dataclass and a typed output dataclass.',
-      'Downsample the input by exactly four before the prediction heads.',
-      'Use separate heads for class heatmap logits, width/height, and center offset.',
-      'Initialize the final heatmap bias to `-2.19` so initial foreground probabilities are low.',
-      'Assume the input height and width are divisible by four.',
-      'Return heatmap logits shaped `(B, K, H/4, W/4)` and two regression maps shaped `(B, 2, H/4, W/4)`.',
-      'Do not apply sigmoid or decode boxes inside `forward`.',
+      'Implement `PredictionHead` as a `3x3` convolution, ReLU, and `1x1` convolution.',
+      'Build a backbone with two stride-2 convolutions followed by one stride-1 convolution.',
+      'Use separate heads for the class heatmap, box size `(w, h)`, and center offset `(dx, dy)`.',
+      'Return heatmap logits shaped `(B, num_classes, H/4, W/4)`.',
+      'Return size and offset maps shaped `(B, 2, H/4, W/4)`.',
+      'Keep sigmoid, decoding, and detection losses outside `forward`.',
     ],
     examples: [
       {
-        label: 'Acceptance check',
+        label: 'Dense prediction shape check',
         lines: [
-          'config = CenterNetConfig(num_classes=6)',
-          'images.shape = (2, 3, 128, 160)',
+          'model = CenterNet(num_classes=6)',
+          'images.shape = (2, 3, 64, 80)',
         ],
-        result: 'heatmap=(2, 6, 32, 40); size=(2, 2, 32, 40); offset=(2, 2, 32, 40)',
+        result: 'heatmap=(2, 6, 16, 20); size=(2, 2, 16, 20); offset=(2, 2, 16, 20)',
       },
     ],
     hint: [
-      'Two stride-two convolutional blocks produce the required stride-four feature grid.',
-      'A small `PredictionHead` class keeps the three task heads structurally consistent.',
-      'Initialize only the last convolution in the heatmap head with the negative bias.',
-      'Returning logits keeps the model compatible with a numerically stable focal-style loss.',
+      'Two stride-2 convolutions turn `(H, W)` into `(H/4, W/4)`.',
+      'Reuse the same `PredictionHead` structure for all three tasks; only `out_channels` changes.',
+      'The heatmap has `num_classes` channels; size and offset each have two.',
+      'Return the raw heatmap values so the training loss can decide how to normalize them.',
     ],
     interview: {
       durationMinutes: 45,
       evaluationCriteria: [
         'Defines the dense output shapes before implementing the modules.',
         'Separates shared feature extraction from task-specific prediction heads.',
-        'Explains the heatmap prior and keeps post-processing outside `forward`.',
+        'Tracks the stride-four spatial contract and keeps post-processing outside `forward`.',
       ],
       followUps: [
         'How would you decode these maps into image-space boxes?',
-        'Where would deformable convolutions or a feature pyramid fit?',
+        'Why might you use a sigmoid on the heatmap during training or inference?',
+        'Where would a feature pyramid or deformable convolution fit?',
       ],
     },
     solutionNotes: [
-      'One stride-four feature map feeds three heads:\n`heatmap logits: (B, classes, H/4, W/4)`\n`box size: (B, 2, H/4, W/4)`\n`center offset: (B, 2, H/4, W/4)`',
-      'Each output cell corresponds to a stride-four location in the input image. The heatmap asks which class center occupies that cell; size predicts box width and height; offset repairs the sub-cell error caused by mapping a continuous center onto a discrete grid.',
-      'The backbone is shared because all three tasks need the same local feature map. Separate small heads let each task learn its own final representation without duplicating the expensive image encoder.',
-      'Initialize the final heatmap bias to `-2.19`, so the initial sigmoid probability is about `0.1`. Starting with a low foreground prior prevents the many background locations from producing confident positives before training.',
-      'Return raw heatmap logits for a stable focal-style loss. Thresholding, local-maximum suppression, top-k selection, and decoding back to image coordinates are inference steps, so they stay outside `forward`.',
+      'Two stride-2 convolutions create one shared stride-four feature grid:\n`(B, 3, H, W) -> (B, 128, H/4, W/4)`',
+      'Each `PredictionHead` keeps the task-specific mapping small:\n`Conv3x3 -> ReLU -> Conv1x1`\nThe final convolution changes only the number of prediction channels.',
+      'The three heads read the same features but produce different meanings:\n`heatmap: (B, classes, H/4, W/4)`\n`size: (B, 2, H/4, W/4)`\n`offset: (B, 2, H/4, W/4)`',
+      'At each grid cell, the heatmap scores class centers, size predicts box width and height, and offset corrects the sub-cell center location lost when a continuous point is assigned to a discrete grid.',
+      'The four-way spatial reduction is exact for dimensions divisible by four. Decoding peaks, applying sigmoid or thresholds, and converting cell coordinates back to image coordinates belong outside `forward`.',
+      'Memory cue: one shared stride-four map, then three heads—heatmap finds centers; size and offset describe the box around each center.',
     ],
-    solutionDiagram: `image (B, 3, H, W)
-  -> stride-4 backbone (B, C, H/4, W/4)
-     |-> heatmap logits (B, K, H/4, W/4)
-     |-> box size       (B, 2, H/4, W/4)
-     +-> center offset  (B, 2, H/4, W/4)`,
+    solutionDiagram: `CenterNet memory map
+image (B, 3, H, W)
+  -> stride-4 backbone (B, 128, H/4, W/4)
+     |-> heatmap head -> (B, K, H/4, W/4)
+     |-> size head    -> (B, 2, H/4, W/4)
+     +-> offset head  -> (B, 2, H/4, W/4)`,
     starterCode: `from __future__ import annotations
-
-from dataclasses import dataclass
 
 import torch
 from torch import nn
 
 
-@dataclass(frozen=True, slots=True)
-class CenterNetConfig:
-    in_channels: int = 3
-    num_classes: int = 80
-    feature_channels: int = 128
-    head_channels: int = 64
-
-    def __post_init__(self) -> None:
-        if min(self.in_channels, self.num_classes, self.feature_channels, self.head_channels) <= 0:
-            raise ValueError("all channel counts and num_classes must be positive")
-        if self.feature_channels < 2:
-            raise ValueError("feature_channels must be at least two")
-
-
-@dataclass(slots=True)
-class CenterNetOutput:
-    heatmap_logits: torch.Tensor
-    size: torch.Tensor
-    offset: torch.Tensor
-
-
-class ConvNormAct(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, stride: int = 1) -> None:
-        # TODO: build one stride-aware feature block.
-        raise NotImplementedError("Implement __init__")
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # TODO: apply the feature block.
-        raise NotImplementedError("Implement forward")
-
-
 class PredictionHead(nn.Module):
-    def __init__(self, in_channels: int, hidden_channels: int, out_channels: int) -> None:
-        # TODO: build a small task-specific head.
+    def __init__(self, in_channels: int, out_channels: int) -> None:
+        # TODO: build a 3x3 -> ReLU -> 1x1 prediction head.
         raise NotImplementedError("Implement __init__")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -793,122 +757,83 @@ class PredictionHead(nn.Module):
         raise NotImplementedError("Implement forward")
 
 
-class CenterNetDetector(nn.Module):
-    def __init__(self, config: CenterNetConfig) -> None:
-        # TODO: assemble the stride-four backbone and three prediction heads.
+class CenterNet(nn.Module):
+    def __init__(self, num_classes: int) -> None:
+        # TODO: assemble the backbone and three prediction heads.
         raise NotImplementedError("Implement __init__")
 
-    def forward(self, x: torch.Tensor) -> CenterNetOutput:
-        # TODO: return typed heatmap, size, and offset maps.
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        # TODO: return heatmap, size, and offset maps.
         raise NotImplementedError("Implement forward")
 
 
-def smoke_test() -> None:
-    device = torch.device("cpu")
-    config = CenterNetConfig(num_classes=6, feature_channels=8, head_channels=4)
-    model = CenterNetDetector(config).to(device=device, dtype=torch.float32).eval()
-    images = torch.randn(1, 3, 16, 20, device=device, dtype=torch.float32)
-    with torch.inference_mode():
-        output = model(images)
-    assert output.heatmap_logits.shape == (1, 6, 4, 5)
-    assert output.size.shape == output.offset.shape == (1, 2, 4, 5)
-    print(tuple(output.heatmap_logits.shape), tuple(output.size.shape), tuple(output.offset.shape))
+def test_centernet() -> None:
+    model = CenterNet(num_classes=6)
+    images = torch.randn(2, 3, 64, 80)
+    heatmap, size, offset = model(images)
+    print(heatmap.shape, size.shape, offset.shape)
+    assert heatmap.shape == (2, 6, 16, 20)
+    assert size.shape == (2, 2, 16, 20)
+    assert offset.shape == (2, 2, 16, 20)
 
 
 if __name__ == "__main__":
-    smoke_test()`,
+    test_centernet()`,
     solutionCode: `from __future__ import annotations
-
-from dataclasses import dataclass
 
 import torch
 from torch import nn
 
 
-@dataclass(frozen=True, slots=True)
-class CenterNetConfig:
-    in_channels: int = 3
-    num_classes: int = 80
-    feature_channels: int = 128
-    head_channels: int = 64
-
-    def __post_init__(self) -> None:
-        if min(self.in_channels, self.num_classes, self.feature_channels, self.head_channels) <= 0:
-            raise ValueError("all channel counts and num_classes must be positive")
-        if self.feature_channels < 2:
-            raise ValueError("feature_channels must be at least two")
-
-
-@dataclass(slots=True)
-class CenterNetOutput:
-    heatmap_logits: torch.Tensor
-    size: torch.Tensor
-    offset: torch.Tensor
-
-
-class ConvNormAct(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, stride: int = 1) -> None:
-        super().__init__()
-        self.layers = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, 3, stride=stride, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
-        )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.layers(x)
-
-
 class PredictionHead(nn.Module):
-    def __init__(self, in_channels: int, hidden_channels: int, out_channels: int) -> None:
+    def __init__(self, in_channels: int, out_channels: int) -> None:
         super().__init__()
-        self.layers = nn.Sequential(
-            nn.Conv2d(in_channels, hidden_channels, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(hidden_channels, out_channels, 1),
+        self.head = nn.Sequential(
+            nn.Conv2d(in_channels, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, out_channels, kernel_size=1),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.layers(x)
+        return self.head(x)
 
 
-class CenterNetDetector(nn.Module):
-    def __init__(self, config: CenterNetConfig) -> None:
+class CenterNet(nn.Module):
+    def __init__(self, num_classes: int) -> None:
         super().__init__()
-        mid_channels = config.feature_channels // 2
         self.backbone = nn.Sequential(
-            ConvNormAct(config.in_channels, mid_channels, stride=2),
-            ConvNormAct(mid_channels, config.feature_channels, stride=2),
-            ConvNormAct(config.feature_channels, config.feature_channels),
+            nn.Conv2d(3, 64, 3, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, 3, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(128, 128, 3, padding=1),
+            nn.ReLU(),
         )
-        self.heatmap_head = PredictionHead(config.feature_channels, config.head_channels, config.num_classes)
-        self.size_head = PredictionHead(config.feature_channels, config.head_channels, 2)
-        self.offset_head = PredictionHead(config.feature_channels, config.head_channels, 2)
-        nn.init.constant_(self.heatmap_head.layers[-1].bias, -2.19)
+        self.heatmap_head = PredictionHead(128, num_classes)
+        self.size_head = PredictionHead(128, 2)
+        self.offset_head = PredictionHead(128, 2)
 
-    def forward(self, x: torch.Tensor) -> CenterNetOutput:
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         features = self.backbone(x)
-        return CenterNetOutput(
-            heatmap_logits=self.heatmap_head(features),
-            size=self.size_head(features),
-            offset=self.offset_head(features),
+        return (
+            self.heatmap_head(features),
+            self.size_head(features),
+            self.offset_head(features),
         )
 
 
-def smoke_test() -> None:
-    device = torch.device("cpu")
-    config = CenterNetConfig(num_classes=6, feature_channels=8, head_channels=4)
-    model = CenterNetDetector(config).to(device=device, dtype=torch.float32).eval()
-    images = torch.randn(1, 3, 16, 20, device=device, dtype=torch.float32)
-    with torch.inference_mode():
-        output = model(images)
-    assert output.heatmap_logits.shape == (1, 6, 4, 5)
-    assert output.size.shape == output.offset.shape == (1, 2, 4, 5)
-    print(tuple(output.heatmap_logits.shape), tuple(output.size.shape), tuple(output.offset.shape))
+def test_centernet() -> None:
+    model = CenterNet(num_classes=6)
+    images = torch.randn(2, 3, 64, 80)
+    heatmap, size, offset = model(images)
+    print(heatmap.shape, size.shape, offset.shape)
+    assert heatmap.shape == (2, 6, 16, 20)
+    assert size.shape == (2, 2, 16, 20)
+    assert offset.shape == (2, 2, 16, 20)
 
 
 if __name__ == "__main__":
-    smoke_test()`,
+    test_centernet()`,
     packages: ['torch'],
     tags: ['PyTorch', 'Architecture', 'CenterNet', 'Detection', 'Clean Code'],
   },
