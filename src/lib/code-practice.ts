@@ -2144,10 +2144,10 @@ smoke_test()`,
     title: 'Manual backprop for a 2-layer MLP',
     difficulty: 'Hard',
     summary:
-      'Compute the loss and parameter gradients for a 2-layer ReLU MLP with softmax cross-entropy.',
+      'Implement a small 2-layer ReLU MLP from tensor operations and return its stable cross-entropy loss plus four parameter gradients.',
     prompt: [
-      'Implement forward and backward for a 2-layer MLP with one hidden ReLU layer.',
-      'Given inputs `X`, labels `y`, and parameters `W1`, `b1`, `W2`, and `b2`, compute the mean softmax cross-entropy loss and the gradients for all four parameters.',
+      'Implement `mlp_loss_and_grads` for the network `X -> Linear -> ReLU -> Linear -> softmax cross-entropy`.',
+      'Given `X`, integer labels `y`, and parameters `W1`, `b1`, `W2`, and `b2`, compute the mean loss and return `dW1`, `db1`, `dW2`, and `db2` without autograd.',
     ],
     signature: `def mlp_loss_and_grads(
     X: torch.Tensor,
@@ -2163,8 +2163,10 @@ smoke_test()`,
       '`y` has shape `(N,)` and contains integer class labels in the range `[0, C)`.',
       '`W1` has shape `(D_in, H)` and `b1` has shape `(H,)`.',
       '`W2` has shape `(H, C)` and `b2` has shape `(C,)`.',
-      'Return the mean softmax cross-entropy loss and a dictionary with `dW1`, `db1`, `dW2`, and `db2`.',
-      'Raise `ValueError` on invalid input.',
+      'Use `X @ W1 + b1`, ReLU, and `h @ W2 + b2` for the forward pass.',
+      'Build softmax probabilities with a row-wise max shift, exponentials, and a row sum.',
+      'Compute the mean cross-entropy loss and return a dictionary with `dW1`, `db1`, `dW2`, and `db2`.',
+      'Do not use autograd or a fused cross-entropy helper.',
     ],
     examples: [
       {
@@ -2206,55 +2208,21 @@ smoke_test()`,
     ],
     hint: [
       'Cache the hidden pre-activations so you can apply the ReLU derivative during backprop.',
-      'Build stable probabilities with a max shift, exponentials, and row sums; then the logits gradient is `probs - one_hot(y)`, averaged over the batch.',
+      'Build stable probabilities with a max shift, exponentials, and row sums; then subtract one from each target-class probability and divide by `N`.',
       'Backpropagate from the output layer into the hidden layer before multiplying by the ReLU mask.',
       'Return the gradients in a dictionary so the caller can inspect each parameter separately.',
     ],
     solutionNotes: [
-      'Cache the forward path because every backward step needs one of these values:\n`X → z1 → ReLU → hidden → z2 → softmax → loss`',
-      'Start backprop from the softmax-cross-entropy shortcut:\n`dlogits = (probs - one_hot(y)) / N`\nThen move backward through the second affine layer, the ReLU mask, and the first affine layer.',
+      'Cache the forward path because every backward step needs one of these values:\n`X → z1 → ReLU → hidden → logits → softmax → loss`',
+      'The softmax-cross-entropy shortcut is implemented by copying `probs`, subtracting one at each target class, and dividing by `N`:\n`dlogits = (probs - one_hot(y)) / N`',
       'The output-layer gradients follow directly from the affine rule:\n`dW2 = hidden.T @ dlogits`\n`db2 = sum(dlogits, axis=0)`\n`dhidden = dlogits @ W2.T`',
       'ReLU passes gradient only where its pre-activation was positive:\n`dz1 = dhidden * (z1 > 0)`\nThen finish with `dW1 = X.T @ dz1` and `db1 = sum(dz1, axis=0)`.',
-      'The most common interview mistakes are forgetting the batch division in `dlogits`, using the post-ReLU tensor for the ReLU mask, or transposing the wrong operand. Check each gradient shape against its parameter shape.',
+      'Use the shifted-logit loss `mean(log(sum(exp(shifted))) - shifted[target])` so the loss remains stable even when probabilities underflow. Check every gradient shape against its parameter shape.',
+      'Memory cue: forward caches activations; backward walks right to left—output gradient, second affine layer, ReLU gate, first affine layer.',
     ],
     solutionCode: `from __future__ import annotations
 
 import torch
-
-def _validate_mlp_inputs(X, y, W1, b1, W2, b2):
-    # Use float tensors for activations/parameters, but check labels before converting them to indices.
-    X = torch.as_tensor(X, dtype=torch.float64)
-    y = torch.as_tensor(y)
-    W1 = torch.as_tensor(W1, dtype=torch.float64)
-    b1 = torch.as_tensor(b1, dtype=torch.float64)
-    W2 = torch.as_tensor(W2, dtype=torch.float64)
-    b2 = torch.as_tensor(b2, dtype=torch.float64)
-
-    # X holds N examples, each with D_in input features; y supplies one class per example.
-    if X.ndim != 2 or any(size <= 0 for size in X.shape):
-        raise ValueError("X must have positive shape (N, D_in)")
-    if y.ndim != 1 or y.shape[0] != X.shape[0]:
-        raise ValueError("y must have shape (N,)")
-    if torch.is_floating_point(y):
-        raise ValueError("y must contain integer class labels")
-    y = torch.as_tensor(y, dtype=torch.long)
-
-    # Check the first affine layer, then use its hidden width to validate subsequent tensors.
-    input_dim = X.shape[1]
-    if W1.ndim != 2 or W1.shape[0] != input_dim or W1.shape[1] == 0:
-        raise ValueError("W1 must have shape (D_in, H)")
-    hidden_dim = W1.shape[1]
-    if b1.ndim != 1 or b1.shape[0] != hidden_dim:
-        raise ValueError("b1 must have shape (H,)")
-    if W2.ndim != 2 or W2.shape[0] != hidden_dim or W2.shape[1] == 0:
-        raise ValueError("W2 must have shape (H, C)")
-    num_classes = W2.shape[1]
-    if b2.ndim != 1 or b2.shape[0] != num_classes:
-        raise ValueError("b2 must have shape (C,)")
-    # Gather and one-hot subtraction require targets in the final layer's class range.
-    if bool(torch.any(y < 0)) or bool(torch.any(y >= num_classes)):
-        raise ValueError("y contains labels outside the valid range")
-    return X, y, W1, b1, W2, b2
 
 def mlp_loss_and_grads(
     X: torch.Tensor,
@@ -2264,43 +2232,26 @@ def mlp_loss_and_grads(
     W2: torch.Tensor,
     b2: torch.Tensor,
 ) -> dict[str, torch.Tensor]:
-    # Centralize coercion and all shape checks before computing a forward pass.
-    X, y, W1, b1, W2, b2 = _validate_mlp_inputs(X, y, W1, b1, W2, b2)
+    z1 = X @ W1 + b1
+    h = torch.relu(z1)
+    logits = h @ W2 + b2
 
-    # First affine layer, ReLU activation, then second affine layer produce class logits.
-    hidden_pre = torch.matmul(X, W1) + b1
-    # ReLU retains positive activations and replaces the rest with zero.
-    hidden = torch.where(hidden_pre > 0.0, hidden_pre, torch.zeros_like(hidden_pre))
-    logits = torch.matmul(hidden, W2) + b2
+    shifted = logits - torch.amax(logits, dim=1, keepdim=True)
+    exp_logits = torch.exp(shifted)
+    normalizers = torch.sum(exp_logits, dim=1)
+    probs = exp_logits / normalizers[:, None]
+    rows = torch.arange(X.shape[0], dtype=torch.long)
+    loss = torch.mean(torch.log(normalizers) - shifted[rows, y])
 
-    # Reuse the same max-shifted exponentials for the manual loss and logits gradient.
-    # Shift logits row by row before exponentiating so large values cannot overflow.
-    shifted_logits = logits - torch.amax(logits, dim=1, keepdim=True)
-    # These positive weights are the numerator terms of softmax.
-    exponentiated = torch.exp(shifted_logits)
-    # Their class-wise total is the denominator for both probabilities and loss.
-    normalizers = torch.sum(exponentiated, dim=1)
-    # Restore a column axis on the total so it divides every class weight in a row.
-    probabilities = exponentiated / normalizers[:, None]
-    # Select each row's target logit with matching row and class-index vectors.
-    row_indices = torch.arange(X.shape[0], dtype=torch.long)
-    # log(denominator) minus the target score is the per-example cross-entropy.
-    loss = torch.mean(torch.log(normalizers) - shifted_logits[row_indices, y])
-
-    # Start dlogits at softmax probabilities, then subtract the one-hot target in each row.
-    dlogits = torch.clone(probabilities)
-    dlogits[torch.arange(X.shape[0]), y] -= 1.0
-    dlogits = dlogits / X.shape[0]
-
-    # Backpropagate through the output affine layer to obtain its parameter gradients.
-    dW2 = torch.matmul(torch.transpose(hidden, 0, 1), dlogits)
+    dlogits = probs.clone()
+    dlogits[rows, y] -= 1.0
+    dlogits /= X.shape[0]
+    dW2 = h.T @ dlogits
     db2 = torch.sum(dlogits, dim=0)
-    # Send the gradient through W2, then apply the ReLU derivative to the pre-activation.
-    dhidden = torch.matmul(dlogits, torch.transpose(W2, 0, 1))
-    dhidden_pre = dhidden * (hidden_pre > 0)
-    # The remaining chain-rule terms are the first layer's weight and bias gradients.
-    dW1 = torch.matmul(torch.transpose(X, 0, 1), dhidden_pre)
-    db1 = torch.sum(dhidden_pre, dim=0)
+    dh = dlogits @ W2.T
+    dz1 = dh * (z1 > 0)
+    dW1 = X.T @ dz1
+    db1 = torch.sum(dz1, dim=0)
 
     return {"loss": loss, "dW1": dW1, "db1": db1, "dW2": dW2, "db2": db2}`,
     starterCode: `from __future__ import annotations
@@ -2316,9 +2267,9 @@ def mlp_loss_and_grads(
     b2: torch.Tensor,
 ) -> dict[str, torch.Tensor]:
     # TODO:
-    # 1. Validate shapes, finite values, and integer label range.
-    # 2. Run affine -> ReLU -> affine, then build stable probabilities from max, exp, sum, and log.
-    # 3. Backpropagate the logits gradient through both affine layers.
+    # 1. Run affine -> ReLU -> affine and build stable probabilities.
+    # 2. Use the softmax-cross-entropy gradient at the logits.
+    # 3. Backpropagate through both affine layers and the ReLU mask.
     raise NotImplementedError("Implement mlp_loss_and_grads")
 
 sample_X = torch.tensor([[1.0, 2.0]], dtype=torch.float64)
@@ -3721,8 +3672,9 @@ print(average_precision(scores, matches, num_ground_truth=2).item())`,
     ...`,
     requirements: [
       'Inputs have shapes `(N, 4)`, `(N,)`, and `(M, 4)`.',
-      'For each prediction, choose the unmatched ground truth with highest IoU.',
-      'Mark a match only when the best IoU is at least the threshold.',
+      'Compute the pairwise IoU matrix with shape `(N, M)` using broadcasting.',
+      'Process predictions in descending score order and choose the best unused ground truth.',
+      'Mark a match only when the best IoU is at least the threshold; each ground truth can be used once.',
       'Return `-1` for unmatched predictions and preserve prediction-index order in the output.',
     ],
     examples: [
@@ -3738,17 +3690,40 @@ print(average_precision(scores, matches, num_ground_truth=2).item())`,
       },
     ],
     hint: [
-      'Compute a vectorized `(N, M)` IoU matrix first.',
-      'Use a `set` of already claimed ground-truth indices while traversing sorted predictions.',
+      'Use `predictions[:, None, :2]` and `ground_truth[None, :, :2]` to compute all `(N, M)` corner pairs.',
+      '`torch.argsort(scores, descending=True)` gives the order in which predictions claim ground truths.',
+      'Keep a `set` of used GT indices and skip them in the inner loop.',
       'Do not let a second high-overlap prediction become a second true positive.',
     ],
     solutionNotes: [
-      'Match in descending confidence order:\n`prediction → best unmatched ground truth → threshold check → claim or false positive`',
-      'Once a ground-truth object is claimed, later duplicates are false positives. Vectorized IoU handles the geometry; the small loop enforces the one-to-one rule.',
-      'The output must return to original prediction order even though matching happens in score order. Write each decision into `matches[prediction_index]` instead of appending decisions to a new list.',
-      'Mask already-used ground truths before `argmax`. Choosing the best ground truth first and checking availability afterward can miss the next-best legal match.',
+      'Compute all box overlaps once. The two singleton axes create every pair:\n`predictions[:, None, :2]: (N, 1, 2)`\n`ground_truth[None, :, :2]: (1, M, 2)`\nBroadcasting produces `(N, M, 2)` corners and then an `(N, M)` IoU matrix.',
+      'Sort predictions by confidence, then for each one scan only unused ground truths. Track the largest IoU and its index before applying the threshold.',
+      'The `used_gt` set enforces one-to-one matching: once a GT is claimed by a high-confidence prediction, later duplicates remain `-1`.',
+      'Matching happens in score order, but `matches[pred_idx]` writes into original prediction order. Memory cue: pairwise IoU → sort scores → best unused GT → threshold → claim.',
     ],
     solutionCode: `import torch
+
+def box_iou(
+    predictions: torch.Tensor,
+    ground_truth: torch.Tensor,
+) -> torch.Tensor:
+    top_left = torch.maximum(
+        predictions[:, None, :2], ground_truth[None, :, :2]
+    )
+    bottom_right = torch.minimum(
+        predictions[:, None, 2:], ground_truth[None, :, 2:]
+    )
+
+    wh = (bottom_right - top_left).clamp(min=0)
+    intersection = wh[..., 0] * wh[..., 1]
+
+    pred_wh = predictions[:, 2:] - predictions[:, :2]
+    gt_wh = ground_truth[:, 2:] - ground_truth[:, :2]
+    pred_area = pred_wh[:, 0] * pred_wh[:, 1]
+    gt_area = gt_wh[:, 0] * gt_wh[:, 1]
+
+    union = pred_area[:, None] + gt_area[None, :] - intersection
+    return intersection / union.clamp(min=1e-8)
 
 def match_predictions(
     predictions: torch.Tensor,
@@ -3756,37 +3731,28 @@ def match_predictions(
     ground_truth: torch.Tensor,
     iou_threshold: float,
 ) -> list[int]:
-    predictions = torch.as_tensor(predictions, dtype=torch.float64)
-    scores = torch.as_tensor(scores, dtype=torch.float64)
-    ground_truth = torch.as_tensor(ground_truth, dtype=torch.float64)
-    if predictions.ndim != 2 or predictions.shape[1] != 4 or ground_truth.ndim != 2 or ground_truth.shape[1] != 4:
-        raise ValueError("predictions and ground_truth must have shape (N, 4) and (M, 4)")
-    if scores.shape != (predictions.shape[0],) or not 0 <= iou_threshold <= 1:
-        raise ValueError("scores or iou_threshold is invalid")
-
-    top_left = torch.maximum(predictions[:, None, :2], ground_truth[None, :, :2])
-    bottom_right = torch.minimum(predictions[:, None, 2:], ground_truth[None, :, 2:])
-    size = torch.clamp(bottom_right - top_left, min=0.0)
-    intersection = size[..., 0] * size[..., 1]
-    area_pred = (predictions[:, 2] - predictions[:, 0]) * (predictions[:, 3] - predictions[:, 1])
-    area_gt = (ground_truth[:, 2] - ground_truth[:, 0]) * (ground_truth[:, 3] - ground_truth[:, 1])
-    union = area_pred[:, None] + area_gt[None, :] - intersection
-    ious = torch.where(union > 0, intersection / torch.where(union > 0, union, torch.ones_like(union)), torch.zeros_like(union))
+    ious = box_iou(predictions, ground_truth)
 
     matches = [-1] * predictions.shape[0]
-    used = set()
-    for prediction_index in torch.argsort(scores, descending=True).tolist():
-        if ground_truth.shape[0] == 0:
-            continue
-        available = torch.as_tensor([ground_truth_index not in used for ground_truth_index in range(ground_truth.shape[0])], dtype=torch.bool)
-        if not torch.any(available):
-            continue
-        candidate_ious = torch.where(available, ious[prediction_index], torch.full_like(ious[prediction_index], float('-inf')))
-        best_gt = int(torch.argmax(candidate_ious).item())
-        best_iou = float(candidate_ious[best_gt].item())
+    used_gt = set()
+
+    order = torch.argsort(scores, descending=True)
+    for pred_idx in order.tolist():
+        best_iou = -1.0
+        best_gt = -1
+
+        for gt_idx in range(ground_truth.shape[0]):
+            if gt_idx in used_gt:
+                continue
+
+            iou = ious[pred_idx, gt_idx].item()
+            if iou > best_iou:
+                best_iou = iou
+                best_gt = gt_idx
+
         if best_iou >= iou_threshold:
-            matches[prediction_index] = best_gt
-            used.add(best_gt)
+            matches[pred_idx] = best_gt
+            used_gt.add(best_gt)
     return matches
 
 predictions = torch.tensor([[0.0, 0.0, 2.0, 2.0], [0.0, 0.0, 2.0, 2.0]])
@@ -3801,7 +3767,7 @@ def match_predictions(
     ground_truth: torch.Tensor,
     iou_threshold: float,
 ) -> list[int]:
-    # TODO: compute pairwise IoU, then greedily claim each ground-truth box once.
+    # TODO: compute pairwise IoU, sort predictions by score, then greedily claim each GT once.
     raise NotImplementedError("Implement match_predictions")
 
 predictions = torch.tensor([[0.0, 0.0, 2.0, 2.0], [0.0, 0.0, 2.0, 2.0]])
@@ -3891,12 +3857,12 @@ print(transform_points(points, transform))`,
   {
     id: 'batched-best-iou-match',
     order: 34,
-    title: 'Batched best-IoU matching',
+    title: 'Find the best IoU match with broadcasting',
     difficulty: 'Hard',
-    summary: 'For every predicted box in every batch item, find the ground-truth box with maximum IoU.',
+    summary: 'Compute every prediction-to-ground-truth IoU within a batch, then select the best ground-truth box for each prediction.',
     prompt: [
-      'Write `best_iou_match(predictions, ground_truth)` for tensors shaped `(B, N, 4)` and `(B, M, 4)`.',
-      'Return both the best IoU and the best ground-truth index for each predicted box.',
+      'Write `best_iou_match(predictions, ground_truth)` for box tensors shaped `(B, N, 4)` and `(B, M, 4)` in `[x1, y1, x2, y2]` format.',
+      'Use broadcasting to compute every pairwise IoU inside each batch item, then return the best IoU and ground-truth index for each prediction.',
     ],
     signature: `def best_iou_match(
     predictions: torch.Tensor,
@@ -3904,30 +3870,33 @@ print(transform_points(points, transform))`,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     ...`,
     requirements: [
+      'Broadcast prediction and ground-truth coordinates to form pairwise tensors shaped `(B, N, M, 2)`.',
+      'Compute intersection, individual areas, union, and IoU for every `(prediction, ground_truth)` pair.',
+      'Use `iou.max(dim=-1)` to return both the best IoU and its ground-truth index.',
       'Return `best_iou` and `best_gt` with shape `(B, N)`.',
-      'Use broadcasting to form pairwise IoUs within each batch item.',
-      'Use `argmax` over the ground-truth axis and gather the corresponding IoUs.',
-      'Raise `ValueError` for incompatible batch or box shapes.',
     ],
     examples: [
       {
         label: 'Example',
         lines: [
-          'predictions.shape = [B, N, 4]',
-          'ground_truth.shape = [B, M, 4]',
+          'predictions.shape = (2, 5, 4)',
+          'ground_truth.shape = (2, 3, 4)',
         ],
-        result: 'best_iou.shape = [B, N]; best_gt.shape = [B, N]',
+        result: 'best_iou.shape = (2, 5); best_gt.shape = (2, 5)',
       },
     ],
     hint: [
-      'Use `predictions[:, :, None, :]` and `ground_truth[:, None, :, :]` to create `(B, N, M, 4)` pairs.',
-      'After `argmax(dim=-1)`, add a final singleton axis before `torch.gather`.',
+      'Use `predictions[:, :, None, :2]` and `ground_truth[:, None, :, :2]` for pairwise corners.',
+      'Compute `union = pred_area[:, :, None] + gt_area[:, None, :] - intersection`.',
+      'Call `iou.max(dim=-1)`; it returns the values and indices together.',
+      'Keep the batch axis intact so boxes from different images never interact.',
     ],
     solutionNotes: [
-      'This is the full pattern in one exercise: batch-aware broadcasting creates every prediction–ground-truth pair, and the last axis is reduced to the best match.',
-      'The shape flow is:\n`pairwise IoU: (B, N, M)`\n`argmax over M: (B, N)`\n`gather best IoU: (B, N)`',
-      'The singleton axes keep batches isolated:\n`predictions[:, :, None, :]: (B, N, 1, 4)`\n`ground_truth[:, None, :, :]: (B, 1, M, 4)`\nBroadcasting forms `(B, N, M, 4)` without comparing boxes across images.',
-      '`argmax` returns the winning ground-truth index, while `gather` retrieves the IoU at that index. This is independent best matching; unlike greedy detection matching, it does not prevent several predictions from choosing the same ground truth.',
+      'Pairwise broadcasting creates every prediction–ground-truth comparison at once:\n`predictions[:, :, None, :2]: (B, N, 1, 2)`\n`ground_truth[:, None, :, :2]: (B, 1, M, 2)`\nTogether these expand to `(B, N, M, 2)`.',
+      'The geometry is:\n`tl = max(pred_xy1, gt_xy1)`\n`br = min(pred_xy2, gt_xy2)`\n`inter = clamp(br - tl, 0)`\nMultiply the last axis to get intersection area.',
+      'IoU uses the union correction:\n`union = pred_area + gt_area - intersection`\nClamp the denominator to avoid division by zero for degenerate boxes.',
+      'Reduce only the ground-truth axis:\n`best_iou, best_gt = iou.max(dim=-1)`\nThis returns independent best matches, so multiple predictions may select the same ground truth.',
+      'Memory cue: broadcast pairs, compute `intersection / union`, then max over M. The output keeps one score and one GT index for every prediction.',
     ],
     solutionCode: `import torch
 
@@ -3935,21 +3904,18 @@ def best_iou_match(
     predictions: torch.Tensor,
     ground_truth: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    predictions = torch.as_tensor(predictions, dtype=torch.float64)
-    ground_truth = torch.as_tensor(ground_truth, dtype=torch.float64)
-    if predictions.ndim != 3 or ground_truth.ndim != 3 or predictions.shape[0] != ground_truth.shape[0] or predictions.shape[2] != 4 or ground_truth.shape[2] != 4:
-        raise ValueError("predictions and ground_truth must be (B, N, 4) and (B, M, 4)")
     top_left = torch.maximum(predictions[:, :, None, :2], ground_truth[:, None, :, :2])
     bottom_right = torch.minimum(predictions[:, :, None, 2:], ground_truth[:, None, :, 2:])
-    size = torch.clamp(bottom_right - top_left, min=0.0)
-    intersection = size[..., 0] * size[..., 1]
-    area_pred = (predictions[..., 2] - predictions[..., 0]) * (predictions[..., 3] - predictions[..., 1])
-    area_gt = (ground_truth[..., 2] - ground_truth[..., 0]) * (ground_truth[..., 3] - ground_truth[..., 1])
-    union = area_pred[:, :, None] + area_gt[:, None, :] - intersection
-    ious = torch.where(union > 0, intersection / torch.where(union > 0, union, torch.ones_like(union)), torch.zeros_like(union))
-    best_gt = torch.argmax(ious, dim=-1)
-    best_iou = torch.gather(ious, dim=-1, index=best_gt[..., None]).squeeze(-1)
-    return best_iou, best_gt
+    wh = (bottom_right - top_left).clamp(min=0)
+    intersection = wh[..., 0] * wh[..., 1]
+
+    pred_wh = predictions[..., 2:] - predictions[..., :2]
+    gt_wh = ground_truth[..., 2:] - ground_truth[..., :2]
+    pred_area = pred_wh[..., 0] * pred_wh[..., 1]
+    gt_area = gt_wh[..., 0] * gt_wh[..., 1]
+    union = pred_area[:, :, None] + gt_area[:, None, :] - intersection
+    iou = intersection / union.clamp(min=1e-8)
+    return iou.max(dim=-1)
 
 predictions = torch.tensor([[[0.0, 0.0, 2.0, 2.0]]])
 ground_truth = torch.tensor([[[1.0, 1.0, 3.0, 3.0]]])
@@ -3960,7 +3926,7 @@ def best_iou_match(
     predictions: torch.Tensor,
     ground_truth: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    # TODO: broadcast pairwise IoU over B, N, and M, then argmax over M.
+    # TODO: broadcast pairwise IoU over B, N, and M, then max over M.
     raise NotImplementedError("Implement best_iou_match")
 
 predictions = torch.tensor([[[0.0, 0.0, 2.0, 2.0]]])
@@ -4263,7 +4229,7 @@ smoke_test()`,
 
 def mlp_loss_and_grads(X, y, W1, b1, W2, b2):
     hidden_pre = X @ W1 + b1
-    hidden = torch.clamp(hidden_pre, min=0)
+    hidden = torch.relu(hidden_pre)
     logits = hidden @ W2 + b2
     shifted = logits - torch.amax(logits, dim=1, keepdim=True)
     exp_logits = torch.exp(shifted)

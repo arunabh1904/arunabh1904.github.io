@@ -31,6 +31,8 @@ const CLASS_BASED_PROBLEMS = new Set([
   'centernet-style-detector',
 ]);
 
+const MULTI_FUNCTION_PROBLEMS = new Set(['greedy-detection-matching']);
+
 const REFERENCE_TEST_NAMES = new Map([
   ['resnet-from-building-blocks', 'test_resnet'],
   ['resnet-50-bottleneck-blocks', 'test_resnet50'],
@@ -199,7 +201,11 @@ describe('code-practice primitive-first solutions', () => {
     const fundamentals = codePracticeProblems.filter((problem) => problem.track === 'fundamentals');
 
     for (const problem of fundamentals) {
-      const lineLimit = CLASS_BASED_PROBLEMS.has(problem.id) ? 80 : 45;
+      const lineLimit = CLASS_BASED_PROBLEMS.has(problem.id)
+        ? 80
+        : MULTI_FUNCTION_PROBLEMS.has(problem.id)
+          ? 65
+          : 45;
       expect(problem.solutionCode.split('\n').length, problem.id).toBeLessThanOrEqual(lineLimit);
       expect(
         problem.solutionCode.split('\n').filter((line) => line.trimStart().startsWith('#')),
@@ -431,7 +437,8 @@ describe('code-practice primitive-first solutions', () => {
     );
 
     expect(ngram?.solutionCode).toContain('key = tuple(context[-size:]) if size else ()');
-    expect(matching?.solutionCode).toContain('candidate_ious = torch.where(available');
+    expect(matching?.solutionCode).toContain('used_gt = set()');
+    expect(matching?.solutionCode).toContain('if gt_idx in used_gt');
     expect(matching?.solutionCode).not.toContain('best_gt not in used');
     expect(bce?.solutionCode).toContain('(target != 0) & (target != 1)');
     expect(bce?.solutionCode).toContain('(probability < 0) | (probability > 1)');

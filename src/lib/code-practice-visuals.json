@@ -364,36 +364,36 @@
   },
   {
     "id": "greedy-detection-matching",
-    "headline": "Each ground truth can be claimed once",
+    "headline": "Sort by confidence, then claim each GT once",
     "kind": "boxes",
     "steps": [
       ["INPUT", "scored predictions + GT boxes", "sort predictions first"],
-      ["CORE STEP", "best unused IoU above threshold", "mark that GT used"],
-      ["RESULT", "TP/FP sequence", "feeds AP"]
+      ["CORE STEP", "best unused IoU", "check threshold"],
+      ["RESULT", "match indices or -1", "one GT per prediction"]
     ],
-    "caption": "Mask used ground truths before argmax so later predictions cannot reuse them."
+    "caption": "Confidence order decides who claims an object first; the used-GT set makes duplicate predictions false positives."
   },
   {
     "id": "batched-best-iou-match",
-    "headline": "Broadcast all box pairs, then reduce the ground-truth axis",
+    "headline": "Broadcast box pairs, compute IoU, then max over GT boxes",
     "kind": "boxes",
     "steps": [
-      ["INPUT", "pred (B,N,4) + GT (B,M,4)", "matched batch axis"],
-      ["CORE STEP", "pairwise IoU (B,N,M)", "argmax over M"],
-      ["RESULT", "best IoU + index (B,N)", "one match per prediction"]
+      ["INPUT", "pred (B,N,4) + GT (B,M,4)", "broadcast N x M pairs"],
+      ["CORE STEP", "intersection / union", "pairwise IoU (B,N,M)"],
+      ["RESULT", "max over M", "score + GT index (B,N)"]
     ],
-    "caption": "The M axis represents candidate ground truths and is the only axis reduced."
+    "caption": "Broadcasting compares every prediction with every GT box; max over M keeps each prediction's best match."
   },
   {
     "id": "manual-backprop-for-a-2-layer-mlp",
-    "headline": "Cache the forward values needed by the reverse chain",
+    "headline": "Cache activations; backpropagate right to left",
     "kind": "network",
     "steps": [
-      ["FORWARD", "x -> linear -> ReLU -> linear", "cache z1 and h"],
-      ["BACKWARD", "loss gradient flows right to left", "apply local derivatives"],
-      ["RESULT", "dW1 db1 dW2 db2", "matching parameter shapes"]
+      ["FORWARD", "X -> affine -> ReLU -> affine", "cache z1 and h"],
+      ["LOGITS", "probs - one-hot", "divide by batch size"],
+      ["BACKWARD", "W2 -> ReLU -> W1", "four parameter gradients"]
     ],
-    "caption": "Backprop multiplies each upstream gradient by the local derivative at that node."
+    "caption": "The softmax-cross-entropy shortcut starts the chain; affine rules and the ReLU mask finish every gradient."
   },
   {
     "id": "classic-mlp-forward-backward",
