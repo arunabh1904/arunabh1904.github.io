@@ -412,7 +412,7 @@ describe('CodePracticeLab', () => {
     await render({
       ...testProblem,
       id: 'resnet-from-building-blocks',
-      title: 'Build a configurable ResNet',
+      title: 'Implement a small ResNet classifier',
       track: 'architecture',
       numpyAlternative: undefined,
       editorStart: 'blank',

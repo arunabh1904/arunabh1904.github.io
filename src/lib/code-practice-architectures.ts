@@ -4,232 +4,224 @@ export const ARCHITECTURE_CODE_PRACTICE_PROBLEMS = [
   {
     id: 'resnet-from-building-blocks',
     order: 38,
-    title: 'Build a configurable ResNet',
+    title: 'Implement a small ResNet classifier',
     difficulty: 'Hard',
     track: 'architecture',
     summary:
-      'Implement a typed residual block and assemble a configurable ResNet with explicit downsampling rules.',
+      'Implement a small ResNet-style image classifier with two-convolution residual blocks, projected skip connections, and global average pooling.',
     prompt: [
-      'You are given a classification service that needs a small ResNet family rather than one fixed network. Implement `BasicBlock` and `ResNet` around the supplied `ResNetConfig`.',
-      'In the interview, first state when the identity path must be projected. Then build the stages, preserve the batch dimension through global pooling, and finish with a shape smoke test.',
+      'Implement a small ResNet-style image classifier in PyTorch. Each residual block should follow `y = F(x) + x`, where `F(x)` contains two `3x3` convolutions.',
+      'Build `BasicBlock` and `ResNet` for inputs shaped `(B, 3, H, W)`. Use BatchNorm and ReLU, project the skip connection when the shape changes, downsample between stages with `stride=2`, and return logits shaped `(B, num_classes)`.',
     ],
-    signature: `@dataclass(frozen=True, slots=True)
-class ResNetConfig: ...
-
-class BasicBlock(nn.Module): ...
+    signature: `class BasicBlock(nn.Module): ...
 
 class ResNet(nn.Module): ...`,
     requirements: [
       'Use `nn.Module` subclasses for the residual block and network.',
-      'Use the supplied frozen dataclass as the architecture contract.',
-      'Project the skip path when stride changes or channel counts differ.',
-      'Build one stage per `(channel, block_count)` pair in the config.',
-      'Return logits shaped `(B, num_classes)` for any valid image height and width.',
-      'Keep device and dtype behavior inherited from the input and module parameters.',
+      'Each `BasicBlock` must contain two `3x3` convolutions, with BatchNorm and ReLU in the residual path.',
+      'Project the skip path with a `1x1` convolution when stride changes or channel counts differ; otherwise use the identity skip.',
+      'Build multiple stages, using `stride=2` on the first block of each downsampling stage.',
+      'Apply global average pooling before the final linear classifier.',
+      'Return logits shaped `(B, num_classes)` for an input shaped `(B, 3, H, W)`.',
     ],
     examples: [
       {
-        label: 'Acceptance check',
+        label: 'Shape check',
         lines: [
-          'config = ResNetConfig(num_classes=10, blocks_per_stage=(2, 2, 2, 2))',
-          'images.shape = (2, 3, 224, 224)',
+          'model = ResNet(num_classes=10)',
+          'x.shape = (4, 3, 64, 64)',
         ],
-        result: 'model(images).shape == (2, 10)',
+        result: 'model(x).shape == (4, 10)',
       },
     ],
     hint: [
-      'A residual addition is valid only when the main and skip paths have the same shape.',
-      'The first block in each later stage performs spatial downsampling; the remaining blocks use stride one.',
-      'Track `self.in_channels` as `_make_stage` appends blocks.',
-      'Use adaptive average pooling so the classifier does not depend on a fixed image size.',
+      'A residual addition is valid only when the main and skip paths have the same shape. Use a `1x1` projection when they do not.',
+      'Put the requested stride on the first convolution of the residual path and on the projection skip.',
+      'Only the first block in a downsampling stage uses `stride=2`; later blocks in that stage keep `stride=1`.',
+      'Adaptive average pooling maps `(B, C, Hf, Wf)` to `(B, C, 1, 1)` before flattening.',
     ],
     interview: {
       durationMinutes: 50,
       evaluationCriteria: [
         'Explains the identity-versus-projection decision before coding.',
-        'Separates configuration, reusable blocks, stage assembly, and the forward path.',
-        'Checks tensor shapes and names one production concern such as initialization or normalization.',
+        'Separates the reusable block, stage assembly, and forward path.',
+        'Checks the final tensor shape and names one production concern such as initialization or normalization.',
       ],
       followUps: [
-        'How would you generalize this to bottleneck blocks without rewriting `ResNet`?',
-        'What changes for small images such as CIFAR-10?',
+        'How would you generalize this to bottleneck blocks?',
+        'What changes would you make for small images such as CIFAR-10?',
       ],
     },
     solutionNotes: [
-      'A residual block learns a correction to the input, then adds the original signal back:\n`output = ReLU(residual_path(x) + skip_path(x))`\nIf both paths already have the same shape, the skip is the identity and adds no parameters.',
-      'Addition requires identical shapes. The first block of a new stage usually halves height and width while increasing channels, so its skip path needs a stride-matched `1x1` convolution. Later blocks keep the shape and return to the identity skip.',
-      'Track the spatial path before coding:\n`stem: H × W → H/4 × W/4`\n`later stages: /8 → /16 → /32`\nOnly the first block in each later stage downsamples; accidentally applying stride to every block collapses the feature map.',
-      '`_make_stage` owns the repetitive construction and updates `self.in_channels` after each block. The config supplies widths and block counts, so changing from `(2, 2, 2, 2)` to another depth does not require rewriting `forward`.',
-      'Adaptive average pooling removes the remaining spatial axes regardless of input image size:\n`(B, C, Hf, Wf) → (B, C, 1, 1) → (B, C) → logits (B, K)`',
-      'The smoke test checks an odd image size as well as the final class shape. In an interview, that catches fixed-size pooling, incorrect stage strides, and projection shortcuts whose output cannot be added to the residual path.',
+      'A `BasicBlock` learns a residual correction with two `3x3` convolutions. BatchNorm and ReLU shape the residual branch, then the block adds the skip path and applies a final ReLU:\n`output = ReLU(F(x) + skip(x))`',
+      'Addition requires identical tensor shapes. When the channel count or stride changes, the skip uses a `1x1` convolution with the same stride; when the shape already matches, the identity skip (`nn.Identity()`) preserves the input without adding parameters.',
+      'The first block of each later stage performs spatial downsampling with `stride=2`. The remaining blocks use stride one, so a four-stage network preserves its feature map within each stage instead of shrinking it at every block.',
+      '`make_stage` keeps stage construction consistent: create the first block with the requested stride, update `self.in_channels`, then append stride-one blocks. The forward method can then stack the stages without repeating block logic.',
+      'Adaptive average pooling removes the spatial axes for any valid feature-map size:\n`(B, C, Hf, Wf) → (B, C, 1, 1) → (B, C) → (B, num_classes)`',
+      'The shape test checks the interview contract directly: a batch of RGB images produces one logit vector per image. It also catches a missing projection, an incorrectly placed stride, or a classifier wired to the wrong channel count.',
     ],
-    solutionDiagram: `input
-  -> stem / 4
-  -> stage 1 / 4
-  -> stage 2 / 8
-  -> stage 3 / 16
-  -> stage 4 / 32
-  -> adaptive pool -> linear -> logits`,
-    starterCode: `from __future__ import annotations
-
-from dataclasses import dataclass
-
-import torch
+    solutionDiagram: `input (B, 3, H, W)
+  -> stem
+  -> stage 1
+  -> stage 2 / 2
+  -> stage 3 / 2
+  -> stage 4 / 2
+  -> adaptive average pool
+  -> linear classifier
+  -> logits (B, num_classes)`,
+    starterCode: `import torch
 from torch import nn
 
 
-@dataclass(frozen=True, slots=True)
-class ResNetConfig:
-    in_channels: int = 3
-    num_classes: int = 1000
-    stage_channels: tuple[int, ...] = (64, 128, 256, 512)
-    blocks_per_stage: tuple[int, ...] = (2, 2, 2, 2)
-
-    def __post_init__(self) -> None:
-        if self.in_channels <= 0 or self.num_classes <= 0:
-            raise ValueError("in_channels and num_classes must be positive")
-        if len(self.stage_channels) != len(self.blocks_per_stage) or not self.stage_channels:
-            raise ValueError("stage_channels and blocks_per_stage must have equal non-zero length")
-        if any(value <= 0 for value in (*self.stage_channels, *self.blocks_per_stage)):
-            raise ValueError("stage widths and depths must be positive")
-
-
 class BasicBlock(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, stride: int = 1) -> None:
-        # TODO: build the residual branch and the conditional projection.
+    def __init__(self, in_channels, out_channels, stride=1):
+        super().__init__()
+
+        # TODO: define two 3x3 convolutions with BatchNorm and ReLU.
+        # TODO: use a 1x1 projection when the skip shape changes.
         raise NotImplementedError("Implement __init__")
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # TODO: combine the residual and skip paths, then apply the final activation.
+    def forward(self, x):
+        # TODO: compute the residual branch, add the skip branch, then apply ReLU.
         raise NotImplementedError("Implement forward")
 
 
 class ResNet(nn.Module):
-    def __init__(self, config: ResNetConfig) -> None:
-        # TODO: create the stem, stages, adaptive pool, and classifier.
+    def __init__(self, num_classes=10):
+        super().__init__()
+
+        # TODO: create the stem, four stages, global average pool, and classifier.
         raise NotImplementedError("Implement __init__")
 
-    def _make_stage(self, out_channels: int, block_count: int, stride: int) -> nn.Sequential:
-        # TODO: downsample once, then append stride-one residual blocks.
-        raise NotImplementedError("Implement _make_stage")
+    def make_stage(self, out_channels, num_blocks, stride):
+        # TODO: downsample only the first block, then use stride one.
+        raise NotImplementedError("Implement make_stage")
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # TODO: run the classification path and return (B, num_classes) logits.
+    def forward(self, x):
+        # TODO: return logits shaped (B, num_classes).
         raise NotImplementedError("Implement forward")
 
 
-def smoke_test() -> None:
-    device = torch.device("cpu")
-    config = ResNetConfig(
-        num_classes=10,
-        stage_channels=(4, 8),
-        blocks_per_stage=(1, 1),
-    )
-    model = ResNet(config).to(device=device, dtype=torch.float32).eval()
-    images = torch.randn(1, 3, 17, 19, device=device, dtype=torch.float32)
-    with torch.inference_mode():
-        logits = model(images)
-    assert logits.shape == (1, 10)
-    print(tuple(logits.shape))
+def test_resnet():
+    model = ResNet(num_classes=10)
+    x = torch.randn(4, 3, 64, 64)
+    y = model(x)
+    assert y.shape == (4, 10)
+    print(y.shape)
 
 
 if __name__ == "__main__":
-    smoke_test()`,
-    solutionCode: `from __future__ import annotations
-
-from dataclasses import dataclass
-
-import torch
+    test_resnet()`,
+    solutionCode: `import torch
 from torch import nn
 
 
-@dataclass(frozen=True, slots=True)
-class ResNetConfig:
-    in_channels: int = 3
-    num_classes: int = 1000
-    stage_channels: tuple[int, ...] = (64, 128, 256, 512)
-    blocks_per_stage: tuple[int, ...] = (2, 2, 2, 2)
-
-    def __post_init__(self) -> None:
-        if self.in_channels <= 0 or self.num_classes <= 0:
-            raise ValueError("in_channels and num_classes must be positive")
-        if len(self.stage_channels) != len(self.blocks_per_stage) or not self.stage_channels:
-            raise ValueError("stage_channels and blocks_per_stage must have equal non-zero length")
-        if any(value <= 0 for value in (*self.stage_channels, *self.blocks_per_stage)):
-            raise ValueError("stage widths and depths must be positive")
-
-
 class BasicBlock(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, stride: int = 1) -> None:
+    def __init__(self, in_channels, out_channels, stride=1):
         super().__init__()
-        self.residual = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, 3, stride=stride, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, 3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
+
+        self.conv1 = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size=3,
+            stride=stride,
+            padding=1,
+            bias=False,
         )
-        self.projection = (
-            nn.Identity()
-            if stride == 1 and in_channels == out_channels
-            else nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, 1, stride=stride, bias=False),
+        self.bn1 = nn.BatchNorm2d(out_channels)
+
+        self.conv2 = nn.Conv2d(
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            bias=False,
+        )
+        self.bn2 = nn.BatchNorm2d(out_channels)
+
+        self.relu = nn.ReLU()
+
+        # Project the skip connection if its shape changes.
+        if stride != 1 or in_channels != out_channels:
+            self.skip = nn.Sequential(
+                nn.Conv2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size=1,
+                    stride=stride,
+                    bias=False,
+                ),
                 nn.BatchNorm2d(out_channels),
             )
-        )
-        self.activation = nn.ReLU(inplace=True)
+        else:
+            self.skip = nn.Identity()
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.activation(self.residual(x) + self.projection(x))
+    def forward(self, x):
+        residual = self.skip(x)
+
+        x = self.relu(self.bn1(self.conv1(x)))
+        x = self.bn2(self.conv2(x))
+
+        x = x + residual
+        return self.relu(x)
 
 
 class ResNet(nn.Module):
-    def __init__(self, config: ResNetConfig) -> None:
+    def __init__(self, num_classes=10):
         super().__init__()
-        self.in_channels = config.stage_channels[0]
-        self.stem = nn.Sequential(
-            nn.Conv2d(config.in_channels, self.in_channels, 7, stride=2, padding=3, bias=False),
-            nn.BatchNorm2d(self.in_channels),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(3, stride=2, padding=1),
-        )
-        stages = []
-        for index, (channels, blocks) in enumerate(zip(config.stage_channels, config.blocks_per_stage)):
-            stages.append(self._make_stage(channels, blocks, stride=1 if index == 0 else 2))
-        self.stages = nn.Sequential(*stages)
-        self.pool = nn.AdaptiveAvgPool2d(1)
-        self.classifier = nn.Linear(config.stage_channels[-1], config.num_classes)
 
-    def _make_stage(self, out_channels: int, block_count: int, stride: int) -> nn.Sequential:
+        self.in_channels = 64
+
+        self.stem = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+        )
+
+        self.stage1 = self.make_stage(64, num_blocks=2, stride=1)
+        self.stage2 = self.make_stage(128, num_blocks=2, stride=2)
+        self.stage3 = self.make_stage(256, num_blocks=2, stride=2)
+        self.stage4 = self.make_stage(512, num_blocks=2, stride=2)
+
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.fc = nn.Linear(512, num_classes)
+
+    def make_stage(self, out_channels, num_blocks, stride):
         blocks = [BasicBlock(self.in_channels, out_channels, stride)]
         self.in_channels = out_channels
-        blocks.extend(BasicBlock(out_channels, out_channels) for _ in range(block_count - 1))
+
+        for _ in range(num_blocks - 1):
+            blocks.append(BasicBlock(out_channels, out_channels))
+
         return nn.Sequential(*blocks)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        features = self.stages(self.stem(x))
-        return self.classifier(torch.flatten(self.pool(features), 1))
+    def forward(self, x):
+        x = self.stem(x)
+
+        x = self.stage1(x)
+        x = self.stage2(x)
+        x = self.stage3(x)
+        x = self.stage4(x)
+
+        x = self.pool(x)
+        x = torch.flatten(x, 1)
+
+        return self.fc(x)
 
 
-def smoke_test() -> None:
-    device = torch.device("cpu")
-    config = ResNetConfig(
-        num_classes=10,
-        stage_channels=(4, 8),
-        blocks_per_stage=(1, 1),
-    )
-    model = ResNet(config).to(device=device, dtype=torch.float32).eval()
-    images = torch.randn(1, 3, 17, 19, device=device, dtype=torch.float32)
-    with torch.inference_mode():
-        logits = model(images)
-    assert logits.shape == (1, 10)
-    print(tuple(logits.shape))
+def test_resnet():
+    model = ResNet(num_classes=10)
+
+    x = torch.randn(4, 3, 64, 64)
+    y = model(x)
+
+    print(y.shape)
+    assert y.shape == (4, 10)
 
 
-if __name__ == "__main__":
-    smoke_test()`,
+test_resnet()`,
     packages: ['torch'],
-    tags: ['PyTorch', 'Architecture', 'ResNet', 'Clean Code'],
+    tags: ['PyTorch', 'CNNs', 'ResNet', 'Architecture'],
   },
   {
     id: 'unet-encoder-decoder',
