@@ -35,6 +35,7 @@ const REFERENCE_TEST_NAMES = new Map([
   ['resnet-from-building-blocks', 'test_resnet'],
   ['resnet-50-bottleneck-blocks', 'test_resnet50'],
   ['unet-encoder-decoder', 'test_unet'],
+  ['centernet-style-detector', 'test_centernet'],
 ]);
 
 // These helpers solve the operation being taught instead of exposing its tensor steps.
@@ -579,8 +580,10 @@ describe('code-practice primitive-first solutions', () => {
     expect(unet.solutionCode).toContain('class DoubleConv(nn.Module):');
     expect(unet.solutionCode).toContain('nn.ConvTranspose2d(');
     expect(unet.solutionCode).toContain('torch.cat([self.up4(x), x4], dim=1)');
-    expect(centernet.solutionCode).toContain('class CenterNetOutput:');
-    expect(centernet.solutionCode).toContain('nn.init.constant_');
-    expect(centernet.solutionCode).toContain('-2.19');
+    expect(centernet.solutionCode).toContain('class PredictionHead(nn.Module):');
+    expect(centernet.solutionCode).toContain('class CenterNet(nn.Module):');
+    expect(centernet.solutionCode).toContain('self.heatmap_head = PredictionHead(128, num_classes)');
+    expect(centernet.solutionCode).toContain('self.size_head = PredictionHead(128, 2)');
+    expect(centernet.solutionCode).toContain('self.offset_head = PredictionHead(128, 2)');
   });
 });
