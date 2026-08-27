@@ -31,14 +31,11 @@ summary: '2026 – DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence 
 
 That boundary matters because two sources support different claims. The V4 technical report explains the pretrained architecture, 32-trillion-token training run, long-context efficiency, and original specialist-to-distillation pipeline. The July 31 changelog reports new agent scores and says the checkpoint was “only re-post-trained,” but does not disclose the new data, reward design, rollout budget, teacher models, ablations, or before/after scores under the same harness.
 
-![DeepSeek V4 architecture with hybrid compressed attention, DeepSeekMoE, manifold-constrained hyper-connections, and multi-token prediction](/assets/images/deepseek-v4-architecture-paper-figure.png)
-*Fig 1: DeepSeek V4 retains a Transformer/MoE backbone but replaces ordinary attention with interleaved Compressed Sparse Attention and Heavily Compressed Attention, and replaces a single residual stream with manifold-constrained mixing paths. | source: [DeepSeek V4 report](https://arxiv.org/abs/2606.19348)*
-
-![Figure 2 from DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence after Post-Training](/assets/images/deepseek-v4-flash-0731-efficient-million-token-intelligence-source-figure-2.webp)
-*Fig 2: Overall architecture of DeepSeek-V4 series. We use hybrid CSA (Compressed Sparse Attention) and HCA (Heavily Compressed Attention) for attention layers, DeepSeekMoE for feed-forward layers, and strengthen conventional residual connections with m HC. | source: [DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence after Post-Training](https://arxiv.org/abs/2606.19348)*
+![DeepSeek V4 architecture with hybrid compressed attention, DeepSeekMoE, manifold-constrained hyper-connections, and multi-token prediction](/assets/images/deepseek-v4-flash-0731-efficient-million-token-intelligence-source-figure-2.webp)
+*Fig 1: DeepSeek V4 retains a Transformer/MoE backbone but interleaves Compressed Sparse Attention with Heavily Compressed Attention and replaces a single residual stream with manifold-constrained mixing paths. | source: [DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence after Post-Training](https://arxiv.org/abs/2606.19348)*
 
 ![Figure 1 from DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence after Post-Training](/assets/images/deepseek-v4-flash-0731-efficient-million-token-intelligence-source-figure-1.webp)
-*Fig 3: Left: benchmark performance of DeepSeek-V4-Pro-Max and its counterparts. Right: inference FLOPs and KV cache size of DeepSeek-V4 series and DeepSeek-V3.2. | source: [DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence after Post-Training](https://arxiv.org/abs/2606.19348)*
+*Fig 2: The left panel compares benchmark performance, while the right separates inference FLOPs from KV-cache size to show the efficiency trade-off across DeepSeek V4 and V3.2 variants. | source: [DeepSeek-V4-Flash-0731: Efficient Million-Token Intelligence after Post-Training](https://arxiv.org/abs/2606.19348)*
 
 
 The Flash backbone has 43 Transformer layers with a 4,096-wide hidden state. Every layer uses a DeepSeekMoE feed-forward block with one shared expert and 256 routed experts; six routed experts activate per token. The first two layers use sliding-window attention. Later layers interleave Compressed Sparse Attention (CSA) and Heavily Compressed Attention (HCA), which serve different memory jobs rather than one generic sparse pattern.

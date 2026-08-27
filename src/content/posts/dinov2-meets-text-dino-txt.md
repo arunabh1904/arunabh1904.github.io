@@ -25,14 +25,11 @@ summary: '2024 – DINOv2 Meets Text: dino.txt'
 
 ## Core Insights
 
-![dino.txt appends trainable visual blocks to a frozen DINOv2 backbone and aligns pooled global-plus-patch features with text](/assets/images/dinov2-meets-text-dino-txt-paper-figure.png)
-*Fig 1: The DINOv2 backbone remains frozen. Two new visual blocks adapt its tokens, and the contrastive image embedding concatenates the updated class token with average-pooled patch tokens before matching text. | source: [dino.txt](https://arxiv.org/abs/2412.16334)*
-
-![Figure 2 from DINOv2 Meets Text: dino.txt](/assets/images/dinov2-meets-text-dino-txt-source-figure-2.webp)
-*Fig 2: Overview of our method dino.txt. We first show the localization quality of the self-supervised features (left). | source: [DINOv2 Meets Text: dino.txt](https://arxiv.org/abs/2412.16334)*
+![dino.txt appends trainable visual blocks to a frozen DINOv2 backbone and aligns pooled global-plus-patch features with text](/assets/images/dinov2-meets-text-dino-txt-source-figure-2.webp)
+*Fig 1: The DINOv2 backbone remains frozen while new visual blocks adapt its tokens; the contrastive image embedding combines the updated class token with pooled patch tokens before matching text. | source: [DINOv2 Meets Text: dino.txt](https://arxiv.org/abs/2412.16334)*
 
 ![Figure 4 from DINOv2 Meets Text: dino.txt](/assets/images/dinov2-meets-text-dino-txt-source-figure-4.webp)
-*Fig 3: At high-resolution inference, DINO-TXT preserves small objects and fine scene detail in the input image used for text-aligned recognition. | source: [DINOv2 Meets Text: dino.txt](https://arxiv.org/abs/2412.16334)*
+*Fig 2: At high-resolution inference, DINO-TXT preserves small objects and fine scene detail in the input image used for text-aligned recognition. | source: [DINOv2 Meets Text: dino.txt](https://arxiv.org/abs/2412.16334)*
 
 
 Freezing is the main design constraint. A CLIP-style model can sacrifice spatial detail because its training target evaluates whole-image agreement. dino.txt instead preserves the original patch grid and limits trainable visual capacity. The image embedding concatenates the updated class token with an average over updated patch tokens, making the patch path participate in the global contrastive loss. At inference, patch embeddings can be compared directly with class-name text embeddings for open-vocabulary segmentation.

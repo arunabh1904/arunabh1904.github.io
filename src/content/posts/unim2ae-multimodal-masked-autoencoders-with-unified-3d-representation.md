@@ -29,14 +29,11 @@ The camera branch divides images into patches; the LiDAR branch voxelizes the po
 
 On nuScenes, the paper reports improvements of 1.2 NDS for 3D object detection and 6.5 mIoU for BEV map segmentation after pretraining. The result supports cross-modal masked pretraining, but the objective still depends on synchronized camera-LiDAR data and reconstruction fidelity is only a proxy for downstream perception.
 
-![Figure 2 from UniM²AE, showing masked camera and LiDAR tokens interacting in a shared 3D volume before modality-specific reconstruction](/assets/images/unim2ae-paper-figure-2.png)
-*Fig 1: The shared 3D volume is used during pretraining to force cross-modal completion; downstream heads are added later. | source: [UniM²AE](https://arxiv.org/abs/2308.10421)*
-
 ![Figure 1 from UniM²AE: Multi-Modal Masked Autoencoders with Unified 3D Representation for Autonomous Driving](/assets/images/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation-source-figure-1.webp)
-*Fig 2: (a) Multi-modal frameworks that align masked input before feature extraction but ignore feature characteristics from two branch. (b) UniM 2 AE that interacts multi-modal features with unified representation. | source: [UniM²AE: Multi-Modal Masked Autoencoders with Unified 3D Representation for Autonomous Driving](https://arxiv.org/abs/2308.10421)*
+*Fig 1: Early input alignment fuses modalities before their encoders, whereas UniM²AE first extracts modality-specific features and then lets them interact in a shared 3D volume. | source: [UniM²AE: Multi-Modal Masked Autoencoders with Unified 3D Representation for Autonomous Driving](https://arxiv.org/abs/2308.10421)*
 
-![Figure 2 from UniM²AE: Multi-Modal Masked Autoencoders with Unified 3D Representation for Autonomous Driving](/assets/images/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation-source-figure-2.webp)
-*Fig 3: Overview of UniM 2 AE. The LiDAR branch voxelize the point cloud, while the camera branch divides multiple images into patches, both subsequently randomly masking their inputs. | source: [UniM²AE: Multi-Modal Masked Autoencoders with Unified 3D Representation for Autonomous Driving](https://arxiv.org/abs/2308.10421)*
+![Masked camera and LiDAR tokens interacting in a shared 3D volume before modality-specific reconstruction](/assets/images/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation-source-figure-2.webp)
+*Fig 2: Camera patches and LiDAR voxels are masked separately, projected into a shared 3D volume for cross-modal completion, and decoded back into their original modalities during pretraining. | source: [UniM²AE: Multi-Modal Masked Autoencoders with Unified 3D Representation for Autonomous Driving](https://arxiv.org/abs/2308.10421)*
 
 
 | Pretraining choice | Purpose | Cost or uncertainty |

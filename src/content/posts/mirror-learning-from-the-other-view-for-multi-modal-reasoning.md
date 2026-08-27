@@ -29,14 +29,11 @@ The method keeps student rollouts on-policy. It applies ordinary outcome-reward 
 
 ODA-Data begins with 97,000 geometry problems from ODA-Math-460k. After difficulty filtering, Gemini-3-Pro-Preview generates and verifies TikZ diagrams and removes from the image-dominant prompt any relations already visible in the diagram. The authors then retain examples that Qwen3-VL-4B-Instruct solves under one view but not the other, yielding about 2,000 paired problems split 85:15 for training and validation. This filtering makes ODA-Val a diagnostic test of modality asymmetry, not a representative sample of general geometry.
 
-![MIRROR selects the strongest view of each problem as a teacher for students operating on restricted text or image views](/assets/images/mirror-reciprocal-reasoning.png)
-*Fig 1: Text, image, and combined views expose different bottlenecks. MIRROR selects the best teacher per problem rather than fixing one transfer direction. | source: [paper](https://arxiv.org/abs/2607.21552)*
+![MIRROR selects the strongest view of each problem as a teacher for students operating on restricted text or image views](/assets/images/mirror-learning-from-the-other-view-for-multi-modal-reasoning-source-figure-1.webp)
+*Fig 1: Text, image, and combined views expose different bottlenecks, so MIRROR selects the strongest view per problem as the teacher instead of fixing one transfer direction. | source: [MIRROR: Learning from the Other View for Multi-Modal Reasoning](https://arxiv.org/abs/2607.21552)*
 
-![Figure 4 from MIRROR: Learning from the Other View for Multi-Modal Reasoning](/assets/images/mirror-learning-from-the-other-view-for-multi-modal-reasoning-source-figure-4.webp)
-*Fig 2: Net solvability gain after training. Each bar shows the change in the fraction of solved examples relative to the base model across 3 random seeds. | source: [MIRROR: Learning from the Other View for Multi-Modal Reasoning](https://arxiv.org/abs/2607.21552)*
-
-![Figure 1 from MIRROR: Learning from the Other View for Multi-Modal Reasoning](/assets/images/mirror-learning-from-the-other-view-for-multi-modal-reasoning-source-figure-1.webp)
-*Fig 3: Modality-Informed Reciprocal Reasoning Optimization ( MIRROR ). MIRROR exploits view asymmetry by selecting the strongest-performing view of each problem as a teacher and regularizing weaker student views towards the teacher distribution, improving performance without external supervision. | source: [MIRROR: Learning from the Other View for Multi-Modal Reasoning](https://arxiv.org/abs/2607.21552)*
+![Net solvability gain for text-only, image-only, combined-view, and MIRROR training](/assets/images/mirror-learning-from-the-other-view-for-multi-modal-reasoning-source-figure-4.webp)
+*Fig 2: Each bar measures the change in solved examples relative to the base model across three random seeds; reciprocal teaching produces the largest net gain. | source: [MIRROR: Learning from the Other View for Multi-Modal Reasoning](https://arxiv.org/abs/2607.21552)*
 
 
 For each candidate teacher view, the policy samples 16 rollouts and estimates success. The best view is selected per problem, with ties broken randomly. The student then generates from either the text-dominant or image-dominant prompt. The auxiliary objective compares each sampled student token with the probability assigned to that token by the selected teacher view. Because the teacher only rescores student-generated trajectories, it supplies dense guidance without introducing off-policy teacher states.

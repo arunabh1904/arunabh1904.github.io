@@ -31,14 +31,11 @@ The paper also tests a sensor choice that camera-only comparisons omit. Rasteriz
 
 Simple-BEV begins with a $100\text{ m}\times10\text{ m}\times100\text{ m}$ 3D volume discretized to $200\times8\times200$. A ResNet-101 produces features for six cameras. For every voxel, the model projects its 3D coordinate into each image and bilinearly samples the corresponding feature, then averages valid observations across cameras. The vertical axis is folded into channels, optional radar or LiDAR features are concatenated, and a BEV ResNet-18 predicts vehicle occupancy with auxiliary centerness and offset heads.
 
-![Lift-Splat pushes image features along rays, while Simple-BEV pulls a projected image feature for every 3D voxel](/assets/images/simple-bev-lifting.png)
-*Fig 1: The parameter-free lifter starts from each voxel and samples the projected image location, guaranteeing one feature per visible voxel. | source: [paper](https://arxiv.org/abs/2206.07959)*
-
-![Figure 1 from Simple-BEV: What Really Matters for Multi-Sensor BEV Perception?](/assets/images/simple-bev-what-really-matters-for-multi-sensor-bev-perception-source-figure-1.webp)
-*Fig 2: 2D-to-BEV architecture, illustrated with two lifting strategies. The left panel shows the Lift-Splat approach: in this method, each 2D feature is “pushed” to 3D, filling voxels that intersect with its ray. | source: [Simple-BEV: What Really Matters for Multi-Sensor BEV Perception?](https://arxiv.org/abs/2206.07959)*
+![Lift-Splat pushes image features along rays, while Simple-BEV pulls a projected image feature for every 3D voxel](/assets/images/simple-bev-what-really-matters-for-multi-sensor-bev-perception-source-figure-1.webp)
+*Fig 1: Lift-Splat pushes each 2D feature along its camera ray using a depth distribution, while Simple-BEV starts from each 3D voxel and pulls the projected image feature with bilinear sampling. | source: [Simple-BEV: What Really Matters for Multi-Sensor BEV Perception?](https://arxiv.org/abs/2206.07959)*
 
 ![Figure 2 from Simple-BEV: What Really Matters for Multi-Sensor BEV Perception?](/assets/images/simple-bev-what-really-matters-for-multi-sensor-bev-perception-source-figure-2.webp)
-*Fig 3: Comparing IOU over distance for Lift-Splat-style splatting versus our bilinear sampling strategy, splatting is better at close range, while bilinear sampling is better at medium to long range. | source: [Simple-BEV: What Really Matters for Multi-Sensor BEV Perception?](https://arxiv.org/abs/2206.07959)*
+*Fig 2: IoU by distance shows splatting ahead at close range but bilinear sampling stronger from medium to long range. | source: [Simple-BEV: What Really Matters for Multi-Sensor BEV Perception?](https://arxiv.org/abs/2206.07959)*
 
 
 The lifting comparison is deliberately matched on resolution, batch size, backbone, and augmentations. Multi-scale deformable attention reaches 48.9 IoU, bilinear sampling 47.4, deformable attention 46.5, depth-based splatting 44.4, and unweighted splatting 43.1. The best learned operator buys 1.5 points over bilinear sampling while adding parameters, a custom CUDA kernel, slower training, and lower inference speed. Distance-stratified results add nuance: splatting is better nearby, while bilinear sampling is better at medium and long range.

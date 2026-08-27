@@ -24,14 +24,11 @@ summary: '2026 – G-MARK: Grounded Multi-Agent Reasoning for Cooperative Drivin
 
 ## Core Insights
 
-![G-MARK pipeline from per-agent evidence graphs through conservative association and context enrichment to task heads](/assets/images/g-mark-cooperative-knowledge-graph-framework.png)
-*Fig 1: G-MARK preserves agent, observation, and hypothesis nodes through association, then adds provenance and planning context before task-specific inference. This makes delayed fusion inspectable instead of collapsing evidence into one object list. | source: [G-MARK paper](https://arxiv.org/abs/2608.19964)*
-
-![Figure 1 from G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-1.webp)
-*Fig 2: Overview of the G-MARK cooperative KG reasoning framework. | source: [G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](https://arxiv.org/abs/2608.19964)*
+![G-MARK pipeline from per-agent evidence graphs through conservative association and context enrichment to task heads](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-1.webp)
+*Fig 1: G-MARK preserves agent, observation, and hypothesis nodes through conservative association, then adds provenance and planning context before task-specific heads; the graph keeps delayed fusion inspectable instead of collapsing evidence into one object list. | source: [G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](https://arxiv.org/abs/2608.19964)*
 
 ![Figure 2 from G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-2.webp)
-*Fig 3: G-MARK reaches the lowest trajectory error with near-zero communicated megabytes, while competing cooperative-driving methods trade much higher bandwidth for worse planning accuracy. | source: [G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](https://arxiv.org/abs/2608.19964)*
+*Fig 2: G-MARK reaches the lowest trajectory error with near-zero communicated megabytes, while competing cooperative-driving methods trade much higher bandwidth for worse planning accuracy. | source: [G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](https://arxiv.org/abs/2608.19964)*
 
 
 ### The graph preserves how an object became believable
