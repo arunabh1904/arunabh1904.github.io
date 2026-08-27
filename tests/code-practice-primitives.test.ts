@@ -26,8 +26,14 @@ const CLASS_BASED_PROBLEMS = new Set([
   'cross-attention',
   'simple-n-gram-language-model',
   'resnet-from-building-blocks',
+  'resnet-50-bottleneck-blocks',
   'unet-encoder-decoder',
   'centernet-style-detector',
+]);
+
+const REFERENCE_TEST_NAMES = new Map([
+  ['resnet-from-building-blocks', 'test_resnet'],
+  ['resnet-50-bottleneck-blocks', 'test_resnet50'],
 ]);
 
 // These helpers solve the operation being taught instead of exposing its tensor steps.
@@ -108,7 +114,7 @@ const REQUIRED_PRIMITIVES = [
 
 describe('code-practice primitive-first solutions', () => {
   it('keeps every explanation scannable and puts key expressions on their own lines', () => {
-    expect(codePracticeProblems).toHaveLength(51);
+    expect(codePracticeProblems).toHaveLength(52);
 
     for (const problem of codePracticeProblems) {
       const hasStandaloneExpression = problem.solutionNotes.some((note) =>
@@ -157,6 +163,13 @@ describe('code-practice primitive-first solutions', () => {
     expect(resnet.solutionNotes.join(' ')).toContain('make_stage');
     expect(resnet.solutionNotes.join(' ')).toContain('Adaptive average pooling');
 
+    const resnet50 = codePracticeProblems.find(
+      (problem) => problem.id === 'resnet-50-bottleneck-blocks',
+    )!;
+    expect(resnet50.solutionNotes.join(' ')).toContain('ResNet-50');
+    expect(resnet50.solutionNotes.join(' ')).toContain('1-3-1');
+    expect(resnet50.solutionNotes.join(' ')).toContain('3-4-6-3');
+
     const ngram = codePracticeProblems.find(
       (problem) => problem.id === 'simple-n-gram-language-model',
     )!;
@@ -203,7 +216,7 @@ describe('code-practice primitive-first solutions', () => {
     for (const problem of codePracticeProblems) {
       if (CLASS_BASED_PROBLEMS.has(problem.id)) {
         expect(problem.solutionCode, problem.id).toContain('class ');
-        const testName = problem.id === 'resnet-from-building-blocks' ? 'test_resnet' : 'smoke_test';
+        const testName = REFERENCE_TEST_NAMES.get(problem.id) ?? 'smoke_test';
         expect(problem.solutionCode, problem.id).toContain(`def ${testName}()`);
         expect(problem.solutionCode.trimEnd(), problem.id).toMatch(
           new RegExp(`${testName}\\(\\)$`),
@@ -218,6 +231,7 @@ describe('code-practice primitive-first solutions', () => {
       'grouped-query-and-multi-query-attention',
       'cross-attention',
       'resnet-from-building-blocks',
+      'resnet-50-bottleneck-blocks',
       'unet-encoder-decoder',
       'centernet-style-detector',
     ]) {
@@ -532,6 +546,7 @@ describe('code-practice primitive-first solutions', () => {
 
     expect(architectures.map((problem) => problem.id)).toEqual([
       'resnet-from-building-blocks',
+      'resnet-50-bottleneck-blocks',
       'unet-encoder-decoder',
       'centernet-style-detector',
     ]);
@@ -540,9 +555,11 @@ describe('code-practice primitive-first solutions', () => {
       expect(problem.packages, problem.id).toContain('torch');
       expect(problem.interview?.durationMinutes, problem.id).toBeGreaterThanOrEqual(45);
       expect(problem.solutionCode, problem.id).toContain('nn.Module');
-      if (problem.id === 'resnet-from-building-blocks') {
-        expect(problem.solutionCode, problem.id).toContain('class BasicBlock(nn.Module):');
-        expect(problem.solutionCode, problem.id).toContain('def test_resnet()');
+      if (REFERENCE_TEST_NAMES.has(problem.id)) {
+        expect(problem.solutionCode, problem.id).toContain('class ');
+        expect(problem.solutionCode, problem.id).toContain(
+          `def ${REFERENCE_TEST_NAMES.get(problem.id)}()`,
+        );
       } else {
         expect(problem.solutionCode, problem.id).toContain('@dataclass');
         expect(problem.solutionCode, problem.id).toContain('def smoke_test()');
@@ -551,11 +568,17 @@ describe('code-practice primitive-first solutions', () => {
       }
     }
 
-    expect(architectures[0].solutionCode).toContain('nn.AdaptiveAvgPool2d(1)');
-    expect(architectures[1].solutionCode).toContain('F.interpolate(');
-    expect(architectures[1].solutionCode).toContain('nn.ModuleList(');
-    expect(architectures[2].solutionCode).toContain('class CenterNetOutput:');
-    expect(architectures[2].solutionCode).toContain('nn.init.constant_');
-    expect(architectures[2].solutionCode).toContain('-2.19');
+    const resnet18 = architectures.find((problem) => problem.id === 'resnet-from-building-blocks')!;
+    const resnet50 = architectures.find((problem) => problem.id === 'resnet-50-bottleneck-blocks')!;
+    const unet = architectures.find((problem) => problem.id === 'unet-encoder-decoder')!;
+    const centernet = architectures.find((problem) => problem.id === 'centernet-style-detector')!;
+    expect(resnet18.solutionCode).toContain('nn.AdaptiveAvgPool2d(1)');
+    expect(resnet50.solutionCode).toContain('class Bottleneck(nn.Module):');
+    expect(resnet50.solutionCode).toContain('expansion = 4');
+    expect(unet.solutionCode).toContain('F.interpolate(');
+    expect(unet.solutionCode).toContain('nn.ModuleList(');
+    expect(centernet.solutionCode).toContain('class CenterNetOutput:');
+    expect(centernet.solutionCode).toContain('nn.init.constant_');
+    expect(centernet.solutionCode).toContain('-2.19');
   });
 });

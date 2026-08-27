@@ -418,6 +418,17 @@
     "caption": "Identity skips are free only when spatial size and channel count already match."
   },
   {
+    "id": "resnet-50-bottleneck-blocks",
+    "headline": "Remember 1-3-1, x4, then 3-4-6-3",
+    "kind": "network",
+    "steps": [
+      ["BLOCK", "1x1 -> 3x3 -> 1x1", "bottleneck path"],
+      ["EXPAND", "base width x4", "256 -> 512 -> 1024 -> 2048"],
+      ["DEPTH", "3 -> 4 -> 6 -> 3", "first block downsamples"]
+    ],
+    "caption": "ResNet-50 is easiest to recall as the bottleneck path, fourfold expansion, and 3-4-6-3 stage depths."
+  },
+  {
     "id": "unet-encoder-decoder",
     "headline": "Downsample for context; skip features restore detail",
     "kind": "network",

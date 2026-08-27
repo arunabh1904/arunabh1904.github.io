@@ -4959,8 +4959,9 @@ const PROGRESSIVE_ORDER: Readonly<Record<string, number>> = {
   'manual-backprop-for-a-2-layer-mlp': 47,
   'classic-mlp-forward-backward': 48,
   'resnet-from-building-blocks': 49,
-  'unet-encoder-decoder': 50,
-  'centernet-style-detector': 51,
+  'resnet-50-bottleneck-blocks': 50,
+  'unet-encoder-decoder': 51,
+  'centernet-style-detector': 52,
 };
 
 const PROGRESSIVE_DIFFICULTY: Readonly<Record<string, CodePracticeProblem['difficulty']>> = {

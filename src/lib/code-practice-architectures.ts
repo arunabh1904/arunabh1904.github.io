@@ -4,13 +4,13 @@ export const ARCHITECTURE_CODE_PRACTICE_PROBLEMS = [
   {
     id: 'resnet-from-building-blocks',
     order: 38,
-    title: 'Implement a small ResNet classifier',
+    title: 'Implement ResNet-18 with basic blocks',
     difficulty: 'Hard',
     track: 'architecture',
     summary:
-      'Implement a small ResNet-style image classifier with two-convolution residual blocks, projected skip connections, and global average pooling.',
+      'Implement a small ResNet-18-style image classifier with two-convolution residual blocks, projected skip connections, and global average pooling.',
     prompt: [
-      'Implement a small ResNet-style image classifier in PyTorch. Each residual block should follow `y = F(x) + x`, where `F(x)` contains two `3x3` convolutions.',
+      'Implement a small ResNet-18-style image classifier in PyTorch. Each residual block should follow `y = F(x) + x`, where `F(x)` contains two `3x3` convolutions.',
       'Build `BasicBlock` and `ResNet` for inputs shaped `(B, 3, H, W)`. Use BatchNorm and ReLU, project the skip connection when the shape changes, downsample between stages with `stride=2`, and return logits shaped `(B, num_classes)`.',
     ],
     signature: `class BasicBlock(nn.Module): ...
@@ -53,7 +53,7 @@ class ResNet(nn.Module): ...`,
       ],
     },
     solutionNotes: [
-      'A `BasicBlock` learns a residual correction with two `3x3` convolutions. BatchNorm and ReLU shape the residual branch, then the block adds the skip path and applies a final ReLU:\n`output = ReLU(F(x) + skip(x))`',
+      'The previous exercise is a small ResNet-18-style model: its four stages use `[2, 2, 2, 2]` `BasicBlock`s. Each block learns a residual correction with two `3x3` convolutions. BatchNorm and ReLU shape the residual branch, then the block adds the skip path and applies a final ReLU:\n`output = ReLU(F(x) + skip(x))`',
       'Addition requires identical tensor shapes. When the channel count or stride changes, the skip uses a `1x1` convolution with the same stride; when the shape already matches, the identity skip (`nn.Identity()`) preserves the input without adding parameters.',
       'The first block of each later stage performs spatial downsampling with `stride=2`. The remaining blocks use stride one, so a four-stage network preserves its feature map within each stage instead of shrinking it at every block.',
       '`make_stage` keeps stage construction consistent: create the first block with the requested stride, update `self.in_channels`, then append stride-one blocks. The forward method can then stack the stages without repeating block logic.',
@@ -224,8 +224,287 @@ test_resnet()`,
     tags: ['PyTorch', 'CNNs', 'ResNet', 'Architecture'],
   },
   {
-    id: 'unet-encoder-decoder',
+    id: 'resnet-50-bottleneck-blocks',
     order: 39,
+    title: 'Implement ResNet-50 with bottleneck blocks',
+    difficulty: 'Hard',
+    track: 'architecture',
+    summary:
+      'Implement ResNet-50 with three-convolution bottleneck blocks, fourfold channel expansion, projected skips, and global average pooling.',
+    prompt: [
+      'Implement a ResNet-50 image classifier in PyTorch. Replace the two-convolution `BasicBlock` with a `Bottleneck` block whose path is `1x1 -> 3x3 -> 1x1`.',
+      'Use the bottleneck expansion factor of `4`, the ResNet-50 stage depths `[3, 4, 6, 3]`, and an ImageNet-style `7x7` stem with stride two followed by `3x3` max pooling. Return logits shaped `(B, num_classes)` for inputs shaped `(B, 3, H, W)`.',
+    ],
+    signature: `class Bottleneck(nn.Module): ...
+
+class ResNet50(nn.Module): ...`,
+    requirements: [
+      'Implement `Bottleneck` and `ResNet50` as `nn.Module` subclasses.',
+      'Use a `1x1`, `3x3`, `1x1` residual path with BatchNorm and ReLU after the first two convolutions.',
+      'Expand the final bottleneck channels by `4` and project the skip path when channels or spatial size change.',
+      'Build four stages with block counts `[3, 4, 6, 3]`; only the first block of stages two through four uses `stride=2`.',
+      'Use global average pooling before a linear classifier and return shape `(B, num_classes)`.',
+    ],
+    examples: [
+      {
+        label: 'Shape check',
+        lines: [
+          'model = ResNet50(num_classes=10)',
+          'x.shape = (2, 3, 224, 224)',
+        ],
+        result: 'model(x).shape == (2, 10)',
+      },
+    ],
+    hint: [
+      'The middle `3x3` convolution performs spatial processing; put the stage stride there and on the skip projection.',
+      'A bottleneck with base width `C` outputs `4C` channels, so the next block in the same stage receives `4C` input channels.',
+      'The stage pattern to memorize is `3, 4, 6, 3`; the first block carries the stage stride and the rest use stride one.',
+      'Adaptive average pooling turns the final `(B, 2048, Hf, Wf)` feature map into `(B, 2048, 1, 1)` before flattening.',
+    ],
+    interview: {
+      durationMinutes: 50,
+      evaluationCriteria: [
+        'Explains why the bottleneck expands channels after the spatial convolution.',
+        'Keeps the residual and projection paths shape-compatible at every stage boundary.',
+        'Uses the `[3, 4, 6, 3]` depth pattern and verifies the final classifier shape.',
+      ],
+      followUps: [
+        'Why can a bottleneck block be cheaper than three full-width convolutions?',
+        'How would you adapt this stem and stage schedule for CIFAR-10?',
+      ],
+    },
+    solutionNotes: [
+      'ResNet-50 changes the block, not the residual principle. The residual path is:\n`1x1 -> 3x3 -> 1x1`\nThe first convolution sets the hidden width, the `3x3` processes space, and the last convolution expands the output to `4 * out_channels` before addition.',
+      'The skip path must end at the same channel count as the bottleneck output. That means the first block of a stage projects from `in_channels` to `4 * out_channels`; later blocks receive `4 * out_channels` and can use the identity skip when their spatial shape also matches.',
+      'The stage depths `[3, 4, 6, 3]` are the ResNet-50 signature. The first block of stages two, three, and four carries `stride=2` in both paths, while the remaining blocks preserve that stage’s spatial resolution.',
+      'The channel arithmetic is easier to remember than the full module: base widths are `64, 128, 256, 512`, bottleneck outputs are `256, 512, 1024, 2048`, and the classifier therefore consumes `2048` features.',
+      'The diagram summarizes the implementation: remember `1-3-1` for the bottleneck path, `×4` for channel expansion, and `3-4-6-3` for stage depth. Adaptive average pooling then removes the final spatial axes before classification.',
+      'The shape test uses a batch of `224x224` RGB images and ten classes. It catches incorrect expansion, missing projection shortcuts, misplaced strides, and a classifier connected to the hidden width instead of the expanded width.',
+    ],
+    solutionDiagram: `ResNet-50 memory map
+
+input (B, 3, H, W)
+  -> 7x7 conv, stride 2 -> 3x3 max pool, stride 2
+  -> [1x1 -> 3x3 -> 1x1] x 3, base 64, output 256
+  -> [1x1 -> 3x3 -> 1x1] x 4, stride 2, base 128, output 512
+  -> [1x1 -> 3x3 -> 1x1] x 6, stride 2, base 256, output 1024
+  -> [1x1 -> 3x3 -> 1x1] x 3, stride 2, base 512, output 2048
+  -> global average pool -> linear -> logits (B, num_classes)
+
+Remember: 1-3-1 inside each block, x4 at the output, 3-4-6-3 across stages.`,
+    starterCode: `import torch
+from torch import nn
+
+
+class Bottleneck(nn.Module):
+    expansion = 4
+
+    def __init__(self, in_channels: int, out_channels: int, stride: int = 1) -> None:
+        super().__init__()
+
+        # TODO: build the 1x1 -> 3x3 -> 1x1 residual path.
+        # TODO: expand the output channels by Bottleneck.expansion.
+        # TODO: project the skip when its shape changes.
+        raise NotImplementedError("Implement __init__")
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # TODO: run both paths, add them, and apply the final ReLU.
+        raise NotImplementedError("Implement forward")
+
+
+class ResNet50(nn.Module):
+    def __init__(self, num_classes: int = 1000) -> None:
+        super().__init__()
+
+        # TODO: create the 7x7 stem, [3, 4, 6, 3] stages, pool, and classifier.
+        raise NotImplementedError("Implement __init__")
+
+    def make_stage(
+        self,
+        out_channels: int,
+        num_blocks: int,
+        stride: int,
+    ) -> nn.Sequential:
+        # TODO: downsample only the first Bottleneck in this stage.
+        raise NotImplementedError("Implement make_stage")
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # TODO: return logits shaped (B, num_classes).
+        raise NotImplementedError("Implement forward")
+
+
+def test_resnet50() -> None:
+    model = ResNet50(num_classes=10)
+    x = torch.randn(2, 3, 224, 224)
+    y = model(x)
+    assert y.shape == (2, 10)
+    print(y.shape)
+
+
+test_resnet50()`,
+    solutionCode: `import torch
+from torch import nn
+
+
+class Bottleneck(nn.Module):
+    expansion = 4
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        stride: int = 1,
+    ) -> None:
+        super().__init__()
+
+        hidden_channels = out_channels
+
+        # 1x1: reduce / set channel width
+        self.conv1 = nn.Conv2d(
+            in_channels,
+            hidden_channels,
+            kernel_size=1,
+            bias=False,
+        )
+        self.bn1 = nn.BatchNorm2d(hidden_channels)
+
+        # 3x3: spatial processing
+        self.conv2 = nn.Conv2d(
+            hidden_channels,
+            hidden_channels,
+            kernel_size=3,
+            stride=stride,
+            padding=1,
+            bias=False,
+        )
+        self.bn2 = nn.BatchNorm2d(hidden_channels)
+
+        # 1x1: expand channels by 4
+        self.conv3 = nn.Conv2d(
+            hidden_channels,
+            out_channels * self.expansion,
+            kernel_size=1,
+            bias=False,
+        )
+        self.bn3 = nn.BatchNorm2d(out_channels * self.expansion)
+
+        self.relu = nn.ReLU()
+
+        final_channels = out_channels * self.expansion
+
+        # Match residual shape if spatial size or channels change.
+        if stride != 1 or in_channels != final_channels:
+            self.skip = nn.Sequential(
+                nn.Conv2d(
+                    in_channels,
+                    final_channels,
+                    kernel_size=1,
+                    stride=stride,
+                    bias=False,
+                ),
+                nn.BatchNorm2d(final_channels),
+            )
+        else:
+            self.skip = nn.Identity()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        residual = self.skip(x)
+
+        x = self.relu(self.bn1(self.conv1(x)))
+        x = self.relu(self.bn2(self.conv2(x)))
+        x = self.bn3(self.conv3(x))
+
+        x = x + residual
+        return self.relu(x)
+
+
+class ResNet50(nn.Module):
+    def __init__(self, num_classes: int = 1000) -> None:
+        super().__init__()
+
+        self.in_channels = 64
+
+        self.stem = nn.Sequential(
+            nn.Conv2d(
+                3,
+                64,
+                kernel_size=7,
+                stride=2,
+                padding=3,
+                bias=False,
+            ),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+        )
+
+        # ResNet-50 block counts: [3, 4, 6, 3]
+        self.stage1 = self.make_stage(64, num_blocks=3, stride=1)
+        self.stage2 = self.make_stage(128, num_blocks=4, stride=2)
+        self.stage3 = self.make_stage(256, num_blocks=6, stride=2)
+        self.stage4 = self.make_stage(512, num_blocks=3, stride=2)
+
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.fc = nn.Linear(512 * Bottleneck.expansion, num_classes)
+
+    def make_stage(
+        self,
+        out_channels: int,
+        num_blocks: int,
+        stride: int,
+    ) -> nn.Sequential:
+        blocks = [
+            Bottleneck(
+                self.in_channels,
+                out_channels,
+                stride=stride,
+            )
+        ]
+
+        self.in_channels = out_channels * Bottleneck.expansion
+
+        for _ in range(num_blocks - 1):
+            blocks.append(
+                Bottleneck(
+                    self.in_channels,
+                    out_channels,
+                    stride=1,
+                )
+            )
+
+        return nn.Sequential(*blocks)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.stem(x)
+
+        x = self.stage1(x)
+        x = self.stage2(x)
+        x = self.stage3(x)
+        x = self.stage4(x)
+
+        x = self.pool(x)
+        x = torch.flatten(x, 1)
+
+        return self.fc(x)
+
+
+def test_resnet50():
+    model = ResNet50(num_classes=10)
+
+    x = torch.randn(2, 3, 224, 224)
+    y = model(x)
+
+    print(y.shape)
+    assert y.shape == (2, 10)
+
+
+test_resnet50()`,
+    packages: ['torch'],
+    tags: ['PyTorch', 'CNNs', 'ResNet', 'Bottleneck', 'Architecture'],
+  },
+  {
+    id: 'unet-encoder-decoder',
+    order: 40,
     title: 'Build a U-Net encoder-decoder',
     difficulty: 'Hard',
     track: 'architecture',
@@ -452,7 +731,7 @@ if __name__ == "__main__":
   },
   {
     id: 'centernet-style-detector',
-    order: 40,
+    order: 41,
     title: 'Build a CenterNet-style detector',
     difficulty: 'Hard',
     track: 'architecture',
