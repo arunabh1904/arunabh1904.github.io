@@ -38,6 +38,7 @@ const REFERENCE_TEST_NAMES = new Map([
   ['resnet-50-bottleneck-blocks', 'test_resnet50'],
   ['unet-encoder-decoder', 'test_unet'],
   ['centernet-style-detector', 'test_centernet'],
+  ['grouped-query-and-multi-query-attention', 'test_gqa'],
   ['cross-attention', 'test_cross_attention'],
 ]);
 
@@ -99,10 +100,10 @@ const REQUIRED_PRIMITIVES = [
   {
     id: 'grouped-query-and-multi-query-attention',
     fragments: [
-      'torch.broadcast_to(',
-      'self.config.num_query_heads // heads',
-      'torch.amax(',
-      'return "mqa" if self.num_kv_heads == 1 else "gqa"',
+      'self.num_query_heads // self.num_kv_heads',
+      'repeat_interleave(repeats, dim=1)',
+      'math.sqrt(self.head_dim)',
+      'weights = stable_softmax(scores, dim=-1)',
     ],
   },
   {
@@ -537,7 +538,7 @@ describe('code-practice primitive-first solutions', () => {
     expect(attentionProblems[4]?.solutionCode).toContain('cached_layout != update_layout');
     expect(attentionProblems[5]?.title).toContain('GQA');
     expect(attentionProblems[5]?.title).toContain('MQA');
-    expect(attentionProblems[5]?.solutionCode).toContain('for kv_heads, expected_mode in');
+    expect(attentionProblems[5]?.solutionCode).toContain('def repeat_kv(self, x: torch.Tensor)');
 
     const axes = new Set(
       attentionProblems.flatMap((problem) => problem?.reasoning?.map((point) => point.axis) ?? []),

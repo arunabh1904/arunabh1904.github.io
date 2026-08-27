@@ -73,7 +73,7 @@ describe('augmentCodeWithSolution', () => {
     const expectedHelpers = new Map([
       ['scaled-dot-product-self-attention', ['_split_heads']],
       ['cross-attention', ['split_heads']],
-      ['grouped-query-and-multi-query-attention', ['_split', '_repeat_kv']],
+      ['grouped-query-and-multi-query-attention', ['split_heads', 'repeat_kv']],
     ]);
 
     for (const [id, helpers] of expectedHelpers) {
