@@ -154,7 +154,7 @@ describe('code-practice primitive-first solutions', () => {
     )!;
     expect(resnet.solutionNotes.join(' ')).toContain('identity skip');
     expect(resnet.solutionNotes.join(' ')).toContain('1x1');
-    expect(resnet.solutionNotes.join(' ')).toContain('_make_stage');
+    expect(resnet.solutionNotes.join(' ')).toContain('make_stage');
     expect(resnet.solutionNotes.join(' ')).toContain('Adaptive average pooling');
 
     const ngram = codePracticeProblems.find(
@@ -203,8 +203,11 @@ describe('code-practice primitive-first solutions', () => {
     for (const problem of codePracticeProblems) {
       if (CLASS_BASED_PROBLEMS.has(problem.id)) {
         expect(problem.solutionCode, problem.id).toContain('class ');
-        expect(problem.solutionCode, problem.id).toContain('def smoke_test()');
-        expect(problem.solutionCode.trimEnd(), problem.id).toMatch(/smoke_test\(\)$/);
+        const testName = problem.id === 'resnet-from-building-blocks' ? 'test_resnet' : 'smoke_test';
+        expect(problem.solutionCode, problem.id).toContain(`def ${testName}()`);
+        expect(problem.solutionCode.trimEnd(), problem.id).toMatch(
+          new RegExp(`${testName}\\(\\)$`),
+        );
       } else {
         expect(problem.signature.trimStart(), problem.id).toMatch(/^def /);
       }
@@ -536,11 +539,16 @@ describe('code-practice primitive-first solutions', () => {
     for (const problem of architectures) {
       expect(problem.packages, problem.id).toContain('torch');
       expect(problem.interview?.durationMinutes, problem.id).toBeGreaterThanOrEqual(45);
-      expect(problem.solutionCode, problem.id).toContain('@dataclass');
       expect(problem.solutionCode, problem.id).toContain('nn.Module');
-      expect(problem.solutionCode, problem.id).toContain('def smoke_test()');
-      expect(problem.solutionCode, problem.id).toContain('with torch.inference_mode():');
-      expect(problem.solutionCode, problem.id).toContain('.eval()');
+      if (problem.id === 'resnet-from-building-blocks') {
+        expect(problem.solutionCode, problem.id).toContain('class BasicBlock(nn.Module):');
+        expect(problem.solutionCode, problem.id).toContain('def test_resnet()');
+      } else {
+        expect(problem.solutionCode, problem.id).toContain('@dataclass');
+        expect(problem.solutionCode, problem.id).toContain('def smoke_test()');
+        expect(problem.solutionCode, problem.id).toContain('with torch.inference_mode():');
+        expect(problem.solutionCode, problem.id).toContain('.eval()');
+      }
     }
 
     expect(architectures[0].solutionCode).toContain('nn.AdaptiveAvgPool2d(1)');
