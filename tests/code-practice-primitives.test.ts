@@ -20,6 +20,7 @@ function runPython(code: string) {
 
 const CLASS_BASED_PROBLEMS = new Set([
   'nearest-centroid-classifier',
+  'non-maximum-suppression',
   'scaled-dot-product-self-attention',
   'incremental-kv-cache',
   'grouped-query-and-multi-query-attention',

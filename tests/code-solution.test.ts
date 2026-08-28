@@ -113,7 +113,7 @@ describe('augmentCodeWithSolution', () => {
     expect(nmsProblem!.solutionCode.split('\n').length).toBeLessThanOrEqual(45);
     expect(annotatedCode).not.toContain('raise ValueError');
     expect(annotatedCode).toContain('return torch.mean(torch.log(normalizers)');
-    expect(nmsCode).toContain('while order:');
+    expect(nmsCode).toContain('while len(order) > 0:');
   });
 
   it('augments the current editor contents without discarding an inserted hint', () => {

@@ -322,25 +322,28 @@ print(class_weighted_cross_entropy(logits, labels, class_weight).item())`,
     title: 'Non-maximum suppression',
     difficulty: 'Medium',
     summary:
-      'Implement PyTorch-based non-maximum suppression with deterministic score tie-breaking and invalid-box checks.',
+      'Implement class-based PyTorch non-maximum suppression with a reusable IoU threshold.',
     prompt: [
-      'Write `nms(boxes, scores, iou_threshold)` so it returns the indices of the boxes kept after non-maximum suppression.',
-      'Process boxes in descending score order, break ties by smaller original index, suppress only boxes whose IoU with a kept box is strictly greater than `iou_threshold`, and raise `ValueError` when a box has `x2 < x1` or `y2 < y1`.',
+      'Write an `NMS` class. Its constructor receives `iou_threshold`, and calling an instance as `nms(boxes, scores)` returns the indices kept after non-maximum suppression.',
+      'Implement `pairwise_iou` for one selected box against all remaining boxes. Process candidates in descending score order and suppress only boxes whose IoU with a kept box is strictly greater than the instance threshold.',
     ],
-    signature: `def nms(
-    boxes: torch.Tensor,
-    scores: torch.Tensor,
-    iou_threshold: float,
-) -> list[int]:
-    ...`,
+    signature: `class NMS:
+    def __init__(self, iou_threshold: float = 0.5):
+        ...
+
+    def pairwise_iou(self, box: torch.Tensor, boxes: torch.Tensor) -> torch.Tensor:
+        ...
+
+    def __call__(self, boxes: torch.Tensor, scores: torch.Tensor) -> list[int]:
+        ...`,
     requirements: [
       '`boxes` is an `(N, 4)` PyTorch tensor of `[x1, y1, x2, y2]`.',
       '`scores` is a PyTorch tensor of shape `(N,)`.',
+      'Store `iou_threshold` on the `NMS` instance during construction.',
+      '`pairwise_iou` compares one `[x1, y1, x2, y2]` box with every row in `boxes`.',
       'Return a list of selected box indices after non-maximum suppression.',
       'Process boxes in descending order of score.',
-      'If scores tie, prefer the smaller original index first.',
       'Suppress boxes whose IoU with a kept box is strictly greater than `iou_threshold`.',
-      'Raise `ValueError` if any box has `x2 < x1` or `y2 < y1`.',
     ],
     examples: [
       {
@@ -349,6 +352,7 @@ print(class_weighted_cross_entropy(logits, labels, class_weight).item())`,
           'boxes = [[0, 0, 2, 2], [0.5, 0.5, 2.5, 2.5], [5, 5, 7, 7]]',
           'scores = [0.9, 0.8, 0.7]',
           'iou_threshold = 0.3',
+          'nms = NMS(iou_threshold)',
         ],
         result: '[0, 2]',
       },
@@ -358,107 +362,96 @@ print(class_weighted_cross_entropy(logits, labels, class_weight).item())`,
           'boxes = [[0, 0, 2, 2], [0, 0, 2, 2]]',
           'scores = [0.5, 0.5]',
           'iou_threshold = 0.1',
+          'nms = NMS(iou_threshold)',
         ],
         result: '[0]',
       },
     ],
     hint: [
-      'Sort the candidate indices by `(-score, index)` so the traversal order is deterministic.',
-      'A small helper that computes IoU between one box and many remaining boxes keeps the main loop clean.',
+      'Store the threshold once in `__init__`, then read it as `self.iou_threshold` from `__call__`.',
+      'Use `torch.maximum` and `torch.minimum` to find the intersection corners between one box and all remaining boxes.',
       'After keeping the current best box, remove only the boxes with `IoU > iou_threshold`; boxes with equal IoU to the threshold should stay.',
-      'Validate the box coordinates before you start suppressing anything.',
+      'Keep the sorted indices as one tensor: slice off `order[1:]`, filter it by IoU, and use the result as the next `order`.',
     ],
     solutionNotes: [
-      'NMS is a greedy loop:\n`sort by score → keep best box → suppress high-IoU boxes → repeat`',
-      'Compute IoU between the kept box and all remaining boxes at once. Keep candidates whose IoU is at most the threshold; index-based tie-breaking makes equal scores deterministic.',
+      'The class stores the suppression policy once:\n`nms = NMS(iou_threshold=0.3)`\nCalling `nms(boxes, scores)` then runs the same policy for each set of candidates.',
+      'NMS is a greedy loop:\n`sort by score → keep best box → suppress high-IoU boxes → repeat`\n`pairwise_iou` computes the selected box’s overlap with all remaining candidates in one vectorized operation.',
       'Coordinates are continuous `xyxy` values:\n`width = max(0, x2 - x1)`\nDo not add one as an inclusive-pixel implementation would. Touching edges then have zero intersection, and zero-area boxes receive zero IoU.',
       'Sorting costs `O(N log N)`, and the greedy comparisons are `O(N²)` in the worst case. A class-aware variant runs suppression independently per class, often by grouping IDs or offsetting boxes so different classes cannot overlap.',
       'Hard NMS removes boxes above the threshold. Soft-NMS instead decays their scores as overlap rises, which can preserve nearby objects. Batched production kernels avoid the Python loop and process fixed-size chunks or use a compiled device implementation.',
     ],
-    solutionCode: `from __future__ import annotations
+    solutionCode: `import torch
 
-import torch
+class NMS:
+    def __init__(self, iou_threshold: float = 0.5):
+        self.iou_threshold = iou_threshold
 
-def _pairwise_iou(box: torch.Tensor, boxes: torch.Tensor) -> torch.Tensor:
-    # Intersect one selected box with every remaining candidate coordinate by coordinate.
-    x1 = torch.maximum(box[0], boxes[:, 0])
-    y1 = torch.maximum(box[1], boxes[:, 1])
-    x2 = torch.minimum(box[2], boxes[:, 2])
-    y2 = torch.minimum(box[3], boxes[:, 3])
+    def pairwise_iou(
+        self,
+        box: torch.Tensor,
+        boxes: torch.Tensor,
+    ) -> torch.Tensor:
+        top_left = torch.maximum(box[:2], boxes[:, :2])
+        bottom_right = torch.minimum(box[2:], boxes[:, 2:])
+        wh = (bottom_right - top_left).clamp(min=0)
+        intersection = wh[:, 0] * wh[:, 1]
+        area1 = (box[2] - box[0]) * (box[3] - box[1])
+        area2 = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+        union = area1 + area2 - intersection
+        return intersection / union.clamp(min=1e-8)
 
-    # Clamp non-overlapping widths and heights to zero before computing their area.
-    inter_area = torch.clamp(x2 - x1, min=0.0) * torch.clamp(y2 - y1, min=0.0)
-    box_area = (box[2] - box[0]) * (box[3] - box[1])
-    boxes_area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
-    # IoU is shared area divided by the area covered by either box.
-    union = box_area + boxes_area - inter_area
+    def __call__(self, boxes: torch.Tensor, scores: torch.Tensor) -> list[int]:
+        order = torch.argsort(scores, descending=True)
+        keep = []
+        while len(order) > 0:
+            current = order[0].item()
+            keep.append(current)
+            remaining = order[1:]
+            if len(remaining) == 0:
+                break
+            ious = self.pairwise_iou(boxes[current], boxes[remaining])
+            order = remaining[ious <= self.iou_threshold]
+        return keep
 
-    # Avoid division by zero for degenerate boxes while preserving exact zero IoU there.
-    safe_union = torch.where(union > 0.0, union, torch.ones_like(union))
-    return torch.where(union > 0.0, inter_area / safe_union, torch.zeros_like(union))
+def smoke_test():
+    boxes = torch.tensor([
+        [0.0, 0.0, 2.0, 2.0],
+        [0.5, 0.5, 2.5, 2.5],
+        [5.0, 5.0, 7.0, 7.0],
+    ])
+    scores = torch.tensor([0.9, 0.8, 0.7])
+    print(NMS(iou_threshold=0.3)(boxes, scores))
 
-def nms(
-    boxes: torch.Tensor,
-    scores: torch.Tensor,
-    iou_threshold: float,
-) -> list[int]:
-    # Use one floating dtype for geometry and scores, even when callers pass Python lists.
-    boxes = torch.as_tensor(boxes, dtype=torch.float64)
-    scores = torch.as_tensor(scores, dtype=torch.float64)
+smoke_test()`,
+    starterCode: `import torch
 
-    # Validate the contract before accessing coordinate columns or candidate indices.
-    if boxes.ndim != 2 or boxes.shape[1] != 4:
-        raise ValueError("boxes must have shape (N, 4)")
-    if scores.ndim != 1 or scores.shape[0] != boxes.shape[0]:
-        raise ValueError("scores must have shape (N,)")
-    if not 0.0 <= iou_threshold <= 1.0:
-        raise ValueError("iou_threshold must be in [0, 1]")
-    if not bool(torch.all(torch.isfinite(boxes))) or not bool(torch.all(torch.isfinite(scores))):
-        raise ValueError("boxes and scores must contain only finite values")
-    if bool(torch.any(boxes[:, 2] < boxes[:, 0])) or bool(torch.any(boxes[:, 3] < boxes[:, 1])):
-        raise ValueError("boxes must satisfy x2 >= x1 and y2 >= y1")
+class NMS:
+    def __init__(self, iou_threshold: float = 0.5):
+        self.iou_threshold = iou_threshold
 
-    # Sorting in Python makes the tie-break rule explicit and reviewable.
-    order = sorted(range(boxes.shape[0]), key=lambda i: (-float(scores[i].item()), i))
-    keep: list[int] = []
+    def pairwise_iou(
+        self,
+        box: torch.Tensor,
+        boxes: torch.Tensor,
+    ) -> torch.Tensor:
+        # TODO: compute intersection over union between one box and many boxes.
+        raise NotImplementedError("Implement pairwise_iou")
 
-    # Greedily keep the highest-scoring candidate that has not been suppressed.
-    while order:
-        current = order.pop(0)
-        keep.append(current)
-        if not order:
-            break
-
-        # Compare the selected box with every remaining candidate in one vectorized operation.
-        remaining = torch.as_tensor(order, dtype=torch.long)
-        ious = _pairwise_iou(boxes[current], boxes[remaining])
-        # Equal-threshold IoUs survive: only IoU values strictly above the threshold are suppressed.
-        order = [int(index) for index in remaining[ious <= iou_threshold].tolist()]
-
-    return keep`,
-    starterCode: `from __future__ import annotations
-
-import torch
-
-def nms(
-    boxes: torch.Tensor,
-    scores: torch.Tensor,
-    iou_threshold: float,
-) -> list[int]:
-    # TODO:
-    # 1. Validate shape, finite values, box geometry, and threshold.
-    # 2. Sort by descending score with the original index as a deterministic tie-break.
-    # 3. Keep the first candidate and suppress only boxes with IoU > iou_threshold.
-    raise NotImplementedError("Implement nms")
+    def __call__(self, boxes: torch.Tensor, scores: torch.Tensor) -> list[int]:
+        # TODO: keep the highest-scoring box, then suppress only IoUs above the threshold.
+        raise NotImplementedError("Implement __call__")
 
 sample_boxes = torch.tensor([
     [0.0, 0.0, 2.0, 2.0],
     [0.5, 0.5, 2.5, 2.5],
     [5.0, 5.0, 7.0, 7.0],
-], dtype=torch.float64)
-sample_scores = torch.tensor([0.9, 0.8, 0.7], dtype=torch.float64)
+])
+sample_scores = torch.tensor([0.9, 0.8, 0.7])
 
-print(nms(sample_boxes, sample_scores, iou_threshold=0.3))`,
+def smoke_test():
+    print(NMS(iou_threshold=0.3)(sample_boxes, sample_scores))
+
+smoke_test()`,
     packages: PYTORCH_AND_NUMPY_PACKAGES,
     tags: ['PyTorch', 'Computer Vision', 'Greedy'],
   },
@@ -3852,26 +3845,38 @@ def class_weighted_cross_entropy(logits: torch.Tensor, labels: torch.Tensor, cla
     return torch.sum(losses * example_weight) / torch.sum(example_weight)`,
   'non-maximum-suppression': `import torch
 
-def _pairwise_iou(box, boxes):
-    top_left = torch.maximum(box[:2], boxes[:, :2])
-    bottom_right = torch.minimum(box[2:], boxes[:, 2:])
-    size = torch.clamp(bottom_right - top_left, min=0)
-    intersection = size[:, 0] * size[:, 1]
-    area_box = (box[2] - box[0]) * (box[3] - box[1])
-    area_boxes = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
-    union = area_box + area_boxes - intersection
-    return intersection / torch.clamp(union, min=1e-8)
+class NMS:
+    def __init__(self, iou_threshold: float = 0.5):
+        self.iou_threshold = iou_threshold
 
-def nms(boxes: torch.Tensor, scores: torch.Tensor, iou_threshold: float) -> list[int]:
-    order = torch.argsort(scores, descending=True, stable=True).tolist()
-    keep = []
-    while order:
-        current, order = order[0], order[1:]
-        keep.append(current)
-        if order:
-            remaining = torch.as_tensor(order, dtype=torch.long)
-            order = [int(i) for i in remaining[_pairwise_iou(boxes[current], boxes[remaining]) <= iou_threshold].tolist()]
-    return keep`,
+    def pairwise_iou(self, box: torch.Tensor, boxes: torch.Tensor) -> torch.Tensor:
+        top_left = torch.maximum(box[:2], boxes[:, :2])
+        bottom_right = torch.minimum(box[2:], boxes[:, 2:])
+        wh = (bottom_right - top_left).clamp(min=0)
+        intersection = wh[:, 0] * wh[:, 1]
+        area1 = (box[2] - box[0]) * (box[3] - box[1])
+        area2 = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+        union = area1 + area2 - intersection
+        return intersection / union.clamp(min=1e-8)
+
+    def __call__(self, boxes: torch.Tensor, scores: torch.Tensor) -> list[int]:
+        order = torch.argsort(scores, descending=True)
+        keep = []
+        while len(order) > 0:
+            current = order[0].item()
+            keep.append(current)
+            remaining = order[1:]
+            if len(remaining) == 0: break
+            ious = self.pairwise_iou(boxes[current], boxes[remaining])
+            order = remaining[ious <= self.iou_threshold]
+        return keep
+
+def smoke_test():
+    boxes = torch.tensor([[0.0, 0.0, 2.0, 2.0], [0.5, 0.5, 2.5, 2.5], [5.0, 5.0, 7.0, 7.0]])
+    scores = torch.tensor([0.9, 0.8, 0.7])
+    print(NMS(iou_threshold=0.3)(boxes, scores))
+
+smoke_test()`,
   'causal-attention-mask': `import torch
 
 def make_causal_attention_mask(seq_lens: torch.Tensor, max_len: int | None = None) -> torch.Tensor:
@@ -4460,30 +4465,39 @@ print(box_iou_matrix(boxes1, boxes2))`,
   'non-maximum-suppression': {
     code: `import numpy as np
 
-def nms(boxes: np.ndarray, scores: np.ndarray, iou_threshold: float) -> list[int]:
-    boxes, scores = np.asarray(boxes, dtype=float), np.asarray(scores)
-    order = np.argsort(scores, kind='stable')[::-1]
-    keep = []
-    while order.size:
-        current, order = order[0], order[1:]
-        keep.append(int(current))
-        top_left = np.maximum(boxes[current, :2], boxes[order, :2])
-        bottom_right = np.minimum(boxes[current, 2:], boxes[order, 2:])
-        size = np.clip(bottom_right - top_left, 0, None)
-        intersection = size[:, 0] * size[:, 1]
-        area_current = np.prod(boxes[current, 2:] - boxes[current, :2])
-        area_other = np.prod(boxes[order, 2:] - boxes[order, :2], axis=1)
-        iou = intersection / np.maximum(area_current + area_other - intersection, 1e-8)
-        order = order[iou <= iou_threshold]
-    return keep`,
+class NMS:
+    def __init__(self, iou_threshold: float = 0.5):
+        self.iou_threshold = iou_threshold
+
+    def pairwise_iou(self, box: np.ndarray, boxes: np.ndarray) -> np.ndarray:
+        top_left = np.maximum(box[:2], boxes[:, :2])
+        bottom_right = np.minimum(box[2:], boxes[:, 2:])
+        wh = np.clip(bottom_right - top_left, 0, None)
+        intersection = wh[:, 0] * wh[:, 1]
+        area1 = np.prod(box[2:] - box[:2])
+        area2 = np.prod(boxes[:, 2:] - boxes[:, :2], axis=1)
+        union = area1 + area2 - intersection
+        return intersection / np.maximum(union, 1e-8)
+
+    def __call__(self, boxes: np.ndarray, scores: np.ndarray) -> list[int]:
+        order = np.argsort(scores)[::-1]
+        keep = []
+        while len(order) > 0:
+            current = int(order[0])
+            keep.append(current)
+            remaining = order[1:]
+            if len(remaining) == 0: break
+            ious = self.pairwise_iou(boxes[current], boxes[remaining])
+            order = remaining[ious <= self.iou_threshold]
+        return keep`,
     exampleCode: `boxes = np.array([
     [0.0, 0.0, 2.0, 2.0],
     [0.5, 0.5, 2.5, 2.5],
     [5.0, 5.0, 7.0, 7.0],
 ])
 scores = np.array([0.9, 0.8, 0.7])
-print(nms(boxes, scores, iou_threshold=0.3))`,
-    memory: ['NMS is one stable descending sort followed by a greedy filter of boxes above the IoU threshold.'],
+print(NMS(iou_threshold=0.3)(boxes, scores))`,
+    memory: ['Store the IoU threshold in `NMS`, then call the instance like a function for each candidate set.'],
   },
   'dice-loss': {
     code: `import numpy as np
