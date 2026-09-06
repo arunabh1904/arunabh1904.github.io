@@ -1,0 +1,189 @@
+<!-- Generated from paper-radar: scripts/build-cloud.py. Do not edit. -->
+<!doctype html>
+<html lang="en"><head><meta name="referrer" content="no-referrer"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paper Radar review deck</title>
+<style>
+  :root { color-scheme: light; --ink:#20201d; --muted:#6f6b63; --blue:#3659a2; --red:#a54848; --green:#2e7655; --paper:#fff; --canvas:#f5f3ee; --border:#dedbd3; }
+  html { height:100%; overscroll-behavior:none; } * { box-sizing:border-box; } body { height:100%; margin:0; overflow:hidden; overscroll-behavior:none; background:var(--canvas); color:var(--ink); font:16px/1.5 system-ui,sans-serif; }
+  main { max-width:620px; height:100dvh; margin:0 auto; padding:18px 16px max(12px, env(safe-area-inset-bottom)); overflow:hidden; display:grid; grid-template-rows:auto minmax(0, 1fr) auto; }
+  header { display:flex; align-items:start; justify-content:space-between; gap:18px; }
+  h1 { margin:0 0 5px; font-size:28px; line-height:1.1; } p { margin:0; } .muted { color:var(--muted); font-size:13px; }
+  a { color:var(--blue); } .deck { position:relative; min-height:0; margin:14px 0 12px; }
+  .card { position:absolute; inset:0; display:flex; min-height:0; flex-direction:column; background:var(--paper); border:1px solid var(--border); border-radius:18px; box-shadow:0 14px 35px rgba(32,32,29,.11); overflow:hidden; touch-action:pan-y; user-select:none; cursor:grab; }
+  .card:active { cursor:grabbing; } .card.next { transform:scale(.97) translateY(10px); opacity:.55; }
+  .card-body { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; touch-action:pan-y; user-select:text; padding:24px 22px 18px; } .card-kicker { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; } .eyebrow { color:var(--blue); text-transform:uppercase; letter-spacing:.08em; font-size:11px; font-weight:800; }
+  .corpus-callout { flex:none; max-width:58%; padding:7px 9px; border:1px solid #b9c8e8; border-radius:9px; background:#eef2fb; color:var(--blue); text-align:right; font-size:10px; line-height:1.25; } .corpus-callout strong { display:block; text-transform:uppercase; letter-spacing:.06em; } .corpus-callout span { display:block; margin-top:3px; color:#51658f; }
+  h2 { margin:8px 0 10px; font-size:23px; line-height:1.2; } .authors { color:var(--muted); font-size:13px; margin-bottom:19px; }
+  figure { margin:0 0 19px; padding:10px 10px 8px; background:#f8f8f6; border:1px solid var(--border); border-radius:10px; }
+  figure img { display:block; width:auto; max-width:100%; max-height:255px; margin:0 auto; object-fit:contain; }
+  figcaption { margin-top:8px; color:var(--muted); font-size:11px; line-height:1.4; }
+  .abstract { white-space:pre-wrap; font:16px/1.65 Georgia,serif; } .open { display:inline-block; margin-top:19px; font-size:13px; font-weight:750; text-decoration:none; }
+  .hint { margin-top:auto; padding:10px 14px; background:#f8f8f6; border-top:1px solid var(--border); color:var(--muted); font-size:12px; }
+  .bottom-controls { position:relative; z-index:5; align-self:end; width:100%; background:var(--canvas); } .navigation, .buttons { display:grid; grid-template-columns:1fr 1fr; gap:10px; } .navigation { margin:0 0 10px; } button { border:0; border-radius:10px; padding:13px 12px; font:750 14px system-ui; cursor:pointer; }
+  button:disabled { opacity:.45; cursor:default; } .skip { background:#f6e9e9; color:var(--red); } .save { background:#e6f2eb; color:var(--green); }
+  .previous, .next { background:#e9edf7; color:var(--blue); }
+  .blog { width:100%; margin-top:10px; background:#eef2fb; color:var(--blue); } .undo { width:100%; margin-top:10px; background:transparent; color:var(--muted); border:1px solid var(--border); } .notice { min-height:20px; margin:10px 0 0; color:var(--green); font-size:13px; font-weight:700; text-align:center; } .notice[data-state="error"] { color:var(--red); } .secondary { color:var(--muted); font-size:13px; text-align:center; margin-top:10px; }
+  .empty { background:var(--paper); border:1px solid var(--border); border-radius:16px; padding:24px; margin-top:25px; }
+  @media (max-width:480px) { main { padding-top:12px; padding-bottom:max(12px, env(safe-area-inset-bottom)); } h1 { font-size:25px; } h2 { font-size:21px; } .corpus-callout { max-width:62%; } .navigation { margin-bottom:8px; } }
+</style></head>
+<body><main>
+  <header><div><p class="eyebrow">Paper Radar</p><h1>Review deck</h1><p class="muted" id="progress"></p><select id="batches" aria-label="Reading batch" hidden></select></div>
+    <a class="muted" id="catalog-link" href="#">Blog queue</a></header>
+  <section class="deck" id="deck" aria-live="polite"></section>
+  <div class="bottom-controls"><div class="navigation" aria-label="Paper navigation"><button class="previous" id="previous" type="button">↑ Previous paper</button><button class="next" id="next" type="button">Next paper ↓</button></div>
+    <div class="buttons"><button class="skip" id="skip" type="button">← Not relevant</button><button class="save" id="blog" type="button">Add to blog →</button></div>
+    <button class="undo" id="undo" type="button">Undo last decision</button>
+    <p class="notice" id="action-status" role="status" aria-live="polite"></p>
+    <p class="secondary">Scroll the paper content. Swipe left/right to decide.</p></div>
+</main>
+<script>
+function startDeck(state, transport) {
+const deck = document.getElementById("deck");
+const progress = document.getElementById("progress");
+const actionControls = [document.getElementById("skip"), document.getElementById("blog")];
+const previous = document.getElementById("previous");
+const next = document.getElementById("next");
+const undo = document.getElementById("undo");
+const notice = document.getElementById("action-status");
+const SWIPE_THRESHOLD = 90;
+const SWIPE_AXIS_LOCK = 12;
+const SWIPE_EXIT_DURATION = 560;
+let index = state.catalog ? 0 : state.cards.findIndex(card => !card.reviewed);
+let lastDecision = null;
+notice.textContent = "";
+if (index < 0) index = state.cards.length;
+if (transport.catalog) document.getElementById("catalog-link").onclick = event => { event.preventDefault(); transport.catalog(); };
+let activePointer = null;
+let actionInFlight = false;
+
+function escapeHtml(value) { return String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;", "'":"&#39;"}[char])); }
+function current() { return state.cards[index]; }
+function nextUnreviewed(start) { const nextIndex = state.cards.findIndex((card, candidate) => candidate >= start && !card.reviewed); return nextIndex < 0 ? state.cards.length : nextIndex; }
+function showNotice(message, state = "success") { notice.textContent = message; notice.dataset.state = state; }
+function updateControls() { const card = current(); previous.disabled = index <= 0 || actionInFlight; next.disabled = index >= state.cards.length || actionInFlight; actionControls.forEach(button => button.disabled = !card || actionInFlight); undo.disabled = actionInFlight || !(card?.reviewedAction || lastDecision); }
+function moveBetweenPapers(delta) { if (actionInFlight || activePointer) return; const target = Math.max(0, Math.min(state.cards.length, index + delta)); if (target === index) return; index = target; render(); }
+function render() {
+  if (!current()) {
+    progress.textContent = `${state.cards.filter(c => c.reviewed).length} of ${state.cards.length} reviewed`;
+    deck.innerHTML = `<div class="empty"><h2>Deck complete</h2><p>You reached the end of this deck. Previous paper lets you revisit any undecided cards.</p><p style="margin-top:14px"><button id="empty-catalog">Open paper catalog</button></p></div>`;
+    document.getElementById("empty-catalog").onclick = () => document.getElementById("catalog-link").click();
+    updateControls();
+    return;
+  }
+  const card = current();
+  progress.textContent = `${index + 1} of ${state.cards.length} · ${card.section === "must-read" ? "Must read" : "Quick scan"}${card.reviewed ? " · Decided" : ""}`;
+  const figure = card.image_url ? `<figure><a href="${escapeHtml(card.image_source_url)}" target="_blank" rel="noreferrer"><img src="${escapeHtml(card.image_url)}" alt="${escapeHtml(card.image_caption)}"></a><figcaption>${escapeHtml(card.image_caption)} · <a href="${escapeHtml(card.image_source_url)}" target="_blank" rel="noreferrer">Source figure</a></figcaption></figure>` : "";
+  const connections = [];
+  if (card.corpusAuthors.length) connections.push(`Author${card.corpusAuthors.length === 1 ? "" : "s"}: ${escapeHtml(card.corpusAuthors.slice(0, 2).join(", "))}${card.corpusAuthors.length > 2 ? ` +${card.corpusAuthors.length - 2}` : ""}`);
+  if (card.corpusLabs.length) connections.push(`Lab${card.corpusLabs.length === 1 ? "" : "s"}: ${escapeHtml(card.corpusLabs.slice(0, 2).join(", "))}${card.corpusLabs.length > 2 ? ` +${card.corpusLabs.length - 2}` : ""}`);
+  const corpusCallout = connections.length ? `<aside class="corpus-callout" aria-label="Prior corpus connection"><strong>Seen in your corpus</strong><span>${connections.join("<br>")}</span></aside>` : "";
+  deck.innerHTML = `<article class="card" id="active-card" tabindex="0">
+    <div class="card-body"><div class="card-kicker"><p class="eyebrow">${escapeHtml(card.field)}</p>${corpusCallout}</div><h2>${escapeHtml(card.title)}</h2>
+    <p class="authors">${escapeHtml(card.authors.join(", ") || "Authors unavailable")}</p>${figure}
+    <div class="abstract">${escapeHtml(card.abstract || "Abstract unavailable.")}</div>
+    <button class="copy" id="copy-paper">Copy title + abstract</button><a class="open" href="${escapeHtml(card.url)}" target="_blank" rel="noreferrer">Open paper ↗</a></div>
+    <div class="hint">${card.reviewed ? "Decision recorded · swipe again to change it, or undo it" : "← Not relevant · Swipe right to add to blog"}</div></article>`;
+  document.getElementById("copy-paper").onclick = async () => {
+    const text = card.title + "\n" + card.url + "\n\n" + card.abstract;
+    try { await navigator.clipboard.writeText(text); showNotice("Copied"); }
+    catch (error) { const area = document.createElement("textarea"); area.value = text; area.setAttribute("aria-label", "Copyable paper text"); document.querySelector(".card-body").append(area); area.focus(); area.select(); showNotice("Text selected. Press Copy or Ctrl/Cmd+C."); }
+  };
+  updateControls();
+  const active = document.getElementById("active-card");
+  active.addEventListener("pointerdown", startSwipe);
+  active.addEventListener("pointermove", moveSwipe, {passive:false});
+  active.addEventListener("pointerup", endSwipe);
+  active.addEventListener("pointercancel", cancelSwipe);
+  active.focus({preventScroll:true});
+}
+function resetSwipe(card) { card.style.transition = "transform 420ms cubic-bezier(.2,.8,.2,1)"; card.style.transform = ""; window.setTimeout(() => { if (!actionInFlight) card.style.transition = ""; }, 420); }
+function animateSwipeExit(card, direction, axis = "x") { return new Promise(resolve => { card.style.transition = `transform ${SWIPE_EXIT_DURATION}ms cubic-bezier(.2,.8,.2,1)`; card.style.transform = axis === "x" ? `translateX(${direction * 125}vw) rotate(${direction * 18}deg)` : `translateY(${direction * 115}vh)`; window.setTimeout(resolve, SWIPE_EXIT_DURATION); }); }
+async function act(action, swipeDirection = 0) {
+  const card = action === "undo" ? (current()?.reviewedAction ? current() : lastDecision) : current(); if (!card) return;
+  if (actionInFlight) return;
+  actionInFlight = true; updateControls();
+  showNotice(action === "add_to_blog" ? "Adding to blog…" : action === "skip" ? "Recording…" : "Undoing…");
+  const active = document.getElementById("active-card");
+  if (swipeDirection && active) await animateSwipeExit(active, swipeDirection);
+  let response;
+  try { response = await transport.act(card, action); }
+  catch (error) { if (active) resetSwipe(active); showNotice((error.message || "Could not confirm that action.") + " Reload to check the saved decision.", "error"); actionInFlight = false; updateControls(); return; }
+  if (!response.ok) { if (active) resetSwipe(active); showNotice("Could not record that action. Please try again.", "error"); actionInFlight = false; updateControls(); return; }
+  if (response.version !== undefined) card.version = response.version;
+  if (action === "undo") {
+    index = state.cards.indexOf(card); lastDecision = null;
+    card.reviewed = false; card.labels = []; card.reviewedAction = null;
+    showNotice("Undone · card reopened"); actionInFlight = false; render(); return;
+  }
+  card.reviewed = true; card.reviewedAction = action; lastDecision = card;
+  card.labels = card.labels.filter(label => label !== "skip" && label !== "blog");
+  card.labels.push(action === "add_to_blog" ? "blog" : "skip");
+  showNotice(action === "add_to_blog" ? "Added to blog · draft queued" : "Marked not relevant");
+  index = nextUnreviewed(index + 1); actionInFlight = false; render();
+}
+function beginSwipe(card, target, id, x, y) { if (actionInFlight || activePointer || target.closest("a,button,textarea,select")) return; activePointer = {id, x, y, axis:null}; card.style.transition = "none"; }
+function moveActiveSwipe(card, id, x, y) {
+  if (!activePointer || activePointer.id !== id) return null;
+  const dx = x - activePointer.x; const dy = y - activePointer.y;
+  if (!activePointer.axis && Math.max(Math.abs(dx), Math.abs(dy)) >= SWIPE_AXIS_LOCK) activePointer.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+  if (activePointer.axis !== "x") return activePointer.axis;
+  if (typeof card.setPointerCapture === "function" && !card.hasPointerCapture(id)) card.setPointerCapture(id);
+  card.style.transform = `translateX(${dx}px) rotate(${dx / 18}deg)`;
+  return "x";
+}
+function finishSwipe(card, id, x) { if (!activePointer || activePointer.id !== id) return; const dx = x - activePointer.x; const axis = activePointer.axis; activePointer = null; if (axis === "x" && Math.abs(dx) >= SWIPE_THRESHOLD) act(dx < 0 ? "skip" : "add_to_blog", dx < 0 ? -1 : 1); else resetSwipe(card); }
+function startSwipe(event) { if (event.button && event.button !== 0) return; beginSwipe(event.currentTarget, event.target, event.pointerId, event.clientX, event.clientY); }
+function moveSwipe(event) { if (moveActiveSwipe(event.currentTarget, event.pointerId, event.clientX, event.clientY) === "x") event.preventDefault(); }
+function endSwipe(event) { finishSwipe(event.currentTarget, event.pointerId, event.clientX); }
+function cancelSwipe(event) { if (!activePointer || activePointer.id !== event.pointerId) return; activePointer = null; resetSwipe(event.currentTarget); }
+document.getElementById("skip").onclick = () => act("skip");
+document.getElementById("blog").onclick = () => act("add_to_blog");
+undo.onclick = () => act("undo");
+previous.onclick = () => moveBetweenPapers(-1);
+next.onclick = () => moveBetweenPapers(1);
+document.onkeydown = event => { if (event.target.closest("input,textarea,select,button,a")) return; if (event.key === "ArrowUp") moveBetweenPapers(-1); if (event.key === "ArrowDown") moveBetweenPapers(1); if (event.key === "ArrowLeft") act("skip"); if (event.key === "ArrowRight") act("add_to_blog"); };
+render();
+}
+/** Adapt cloud persistence to the original shared swipe deck. */
+let readerKey = '', selectedBatch = '';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwuocbg260zCges5Ai0JJQg3ftWNbqEO8GD1D-cStyYbdqnO8Po3pS0Xx10Ocs-TbYs/exec';
+const rpc = async (method, ...args) => {
+  const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 30000);
+  try {
+    const response = await fetch(API_URL, {method:'POST', credentials:'omit',
+      headers:{'Content-Type':'text/plain'}, body:JSON.stringify({key:readerKey,method,args}), signal:controller.signal});
+    if (!response.ok) throw new Error('Reader service unavailable. Reload to check saved decisions.');
+    const result = await response.json();
+    if (!result.ok) throw new Error(result.error);
+    return result.data;
+  } finally { clearTimeout(timeout); }
+};
+async function loadDeck(batch) {
+  try {
+    const data = await rpc('readerData', batch || '');
+    selectedBatch = data.batch;
+    const picker = document.getElementById('batches');
+    picker.hidden = false; picker.replaceChildren();
+    for (const name of [...data.batches, 'catalog']) {
+      const option = document.createElement('option'); option.value = name;
+      option.textContent = name === 'catalog' ? 'Blog queue' : name.startsWith('catchup-') ? 'Missed-week catch-up' : name;
+      option.selected = name === data.batch; picker.append(option);
+    }
+    picker.onchange = () => loadDeck(picker.value);
+    startDeck(data, {
+      catalog: () => loadDeck('catalog'),
+      act: async (card, action) => {
+        const result = await rpc('recordFeedback', selectedBatch, card.id, action, card.version);
+        return {ok: true, version: result.version};
+      }
+    });
+  } catch (error) {
+    document.getElementById('deck').textContent = 'Could not open this deck. Reopen the private link in your email, or retry.';
+    document.getElementById('action-status').textContent = error.message || String(error);
+  }
+}
+const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+readerKey = params.get('key') || '';
+loadDeck(params.get('batch') || '');
+
+</script></body></html>
