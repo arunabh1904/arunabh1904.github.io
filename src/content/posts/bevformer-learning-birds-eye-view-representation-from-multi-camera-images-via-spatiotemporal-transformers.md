@@ -17,7 +17,7 @@ summary: "2022 – BEVFormer: Learning Bird's-Eye-View Representation from Multi
 
 ## Summary
 
-> BEVFormer turns six camera streams into a persistent metric workspace by making every BEV cell a learned query. Each query first reads the ego-motion-aligned BEV from the previous timestamp, then samples a small set of image features at projected 3D heights. On the paper's nuScenes test setup it reaches 56.9 NDS and 0.378 m/s mean velocity error. The latency table separates the BEV encoder from the full model: the default BEV encoder is 130 ms (391 ms backbone + 19 ms head, 1.7 FPS end to end), while the 7 ms encoder configuration is 412 ms end to end at 2.3 FPS and gives up 3.9 NDS points. The contribution is therefore a useful representation and a tunable systems trade-off, not a claim that dense BEV is always the cheapest camera-only design.
+> BEVFormer turns six camera streams into a persistent metric workspace by making every BEV cell a learned query. Each query first reads ego-motion-aligned history, then samples a small set of image features at projected 3D heights. On the paper's nuScenes test setup it reaches 56.9 NDS and 0.378 m/s mean velocity error. The contribution is a reusable spatial state with a measured accuracy/compute trade-off; the paper still identifies camera depth and dense BEV cost as limitations.
 
 ## Core Insights
 
@@ -41,11 +41,11 @@ The visibility experiment makes that mechanism concrete. The source figure divid
 
 ### The ablation separates receptive field, memory, and latency
 
-The spatial cross-attention comparison is more informative than the headline score. Replacing deformable attention with global attention consumes too much GPU memory; restricting every query to its single reference point loses context because projection and calibration are not exact at object extent. Sampling a local region around several projected heights gives the best trade-off at comparable model scale. The method's sparse sampling is therefore a bounded approximation to image-wide attention, not a free removal of geometric uncertainty.
+The spatial cross-attention comparison is more informative than the headline score. Replacing deformable attention with global attention consumes too much GPU memory; restricting every query to its single geometrically projected reference point loses context around the object. The paper's learned offsets sample a local region around several projected heights, which is an interpretation of how the model can cover object extent and residual feature misalignment—not a claim that the calibrated reference point itself is inaccurate. The method's sparse sampling is therefore a bounded approximation to image-wide attention, not a free removal of geometric uncertainty.
 
 Temporal memory explains the jump from the single-frame BEVFormer-S model to the full system. On the test set, BEVFormer reaches 0.378 m/s mAVE, a large improvement over earlier camera-only systems that were nearly unable to estimate velocity. The same temporal state also raises recall for occluded objects. But the model still has a dense feature map at every timestamp, and it is the camera backbone rather than only the BEV encoder that becomes the main efficiency bottleneck.
 
-The scale table gives usable operating points. With one encoder layer and the full 200×200 BEV, configuration C reaches 50.1 NDS at 25 ms versus the default 51.7 NDS at 130 ms for the BEV encoder. Configuration D combines one layer, single-scale features, and a 100×100 BEV; its BEV encoder is 7 ms and reaches 47.8 NDS. The corresponding end-to-end rows are 391+130+19 ms (1.7 FPS) for the default and 387+7+18 ms (2.3 FPS) for D. Those numbers are measured on a V100 with a 900×1600 input and R101-DCN backbone, so they are a design curve for this setup rather than a portable product latency claim.
+The scale table gives usable operating points. With one encoder layer and the full 200×200 BEV, configuration C reaches 50.1 NDS at 25 ms versus the default 51.7 NDS at 130 ms for the BEV encoder. Configuration D combines one layer, single-scale features, and a 100×100 BEV; its BEV encoder is 7 ms and reaches 47.8 NDS. The corresponding component rows are 391/130/19 ms for the default and 387/7/18 ms for D (backbone/BEV encoder/head). The paper reports 1.7 FPS and 2.3 FPS for those configurations; the component sums are useful for locating the bottleneck but should not be treated as measured end-to-end latency because runtime overhead is reported separately. These measurements use a V100 with a 900×1600 input and R101-DCN backbone, so they are a design curve for this setup rather than a portable product latency claim.
 
 ### What the qualitative result does and does not show
 
@@ -67,5 +67,5 @@ _BEV queries, spatial cross-attention, temporal self-attention, and detection/se
 
 - A calibrated BEV query gives detection, velocity, and map heads one persistent spatial state; temporal self-attention reads aligned history before deformable image sampling.
 - The occlusion gain comes from memory, while the spatial cross-attention gain comes from bounded multi-height sampling; neither removes camera depth ambiguity.
-- The paper's latency table must be read end to end: the default 130 ms BEV encoder sits beside a 391 ms backbone and 19 ms head, while the 7 ms encoder configuration totals about 2.3 FPS.
-- Evaluate dense BEV against sparse object memory with the same backbone, history, calibration perturbations, and P99 budget, then slice recall for small, distant, and 0–40% visible objects.
+- The latency table separates the 130 ms versus 7 ms BEV encoder from the 391/19 ms and 387/18 ms backbone/head components; the reported throughput is 1.7 versus 2.3 FPS, with overhead outside those sums.
+- The source's strongest qualitative and visibility evidence is improved cross-view consistency and recall for 0–40% visible objects, while small and remote objects remain failure cases.

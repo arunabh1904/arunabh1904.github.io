@@ -36,7 +36,7 @@ The outdoor curve exposes a harder boundary. KITTI spans distances to about 100 
 The density figure should be read horizontally within each dataset rather than by comparing raw error between indoor and outdoor panels. The left plots are error metrics where lower is better; the right plots are threshold accuracies where higher is better. The RGBd curve drops quickly at low sample counts and then flattens. That shape is the central result: a small number of metric anchors resolves a large scale ambiguity, while later samples mostly refine already-supported surfaces.
 
 ![Figure 5 from Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-source-figure-5.webp)
-*Fig 2: As the expected number of NYU depth samples increases, RGBd error falls quickly before saturating; the paired threshold plots show the same diminishing-return pattern. | source: [Sparse-to-Dense, Figure 5](https://arxiv.org/abs/1709.07492)*
+*Fig 2: On the NYU-Depth-v2 indoor split, RGBd error falls quickly as the expected number of sparse depth samples increases and then saturates; the paired threshold plots show the same diminishing-return pattern. The KITTI density results are reported separately in the paper's table. | source: [Sparse-to-Dense, Figure 5](https://arxiv.org/abs/1709.07492)*
 
 
 ### Architecture choices matter after the sensor contract is fixed
@@ -47,6 +47,7 @@ The authors also demonstrate dense maps from sparse visual-odometry landmarks an
 
 ## High-Level Takeaways
 
-Sparse-to-Dense is a reference for the lifecycle of privileged geometry. If sparse depth is guaranteed at runtime, the model is a depth-completion system and its density, placement, timing, and calibration are part of the input specification. If the product is camera-only, sparse depth should be used as supervision or distillation and then removed deliberately; feeding it at deployment would change the problem. The network learns a dense surface from anchors, so measured pixels and predicted pixels should be evaluated separately rather than treated as equally observed.
-
-The next evaluation should replace the paper's uniform random masks with the actual sensor's scan pattern, dropout, motion distortion, range-dependent density, and boundary errors. Measure distant surfaces and object edges separately, and report confidence between anchors. The paper supports a large gain from a small metric hint; it does not support treating the completed surface as equally observed everywhere.
+- Sparse-to-Dense shows a large metric gain from a small runtime hint: on NYU, 100 samples cut the RGB-only RMSE from 0.514 to roughly 0.264 in the controlled RGBd comparison, while the curve saturates as samples accumulate.
+- The architecture uses sparse depth as an input anchor and predicts the rest of the surface; it does not make every completed pixel an observation.
+- The indoor Figure 5 curve is NYU-only. KITTI's separate table reports the outdoor density trend, where RGB-only RMSE 6.266 m falls to 4.303 m at 100 samples and 3.378 m at 500.
+- The deployment claim is conditional on the sampling, range, timing, and calibration contract; blurry boundaries and uniform random masks leave a clear domain limit.
