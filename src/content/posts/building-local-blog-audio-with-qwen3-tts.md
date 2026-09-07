@@ -21,7 +21,7 @@ Local Blog audio means that every post has a static MP3 generated on my Mac and 
 
 I learned that distinction by shipping the wrong thing several times. One release changed voices between chunks. Another repeated part of its voice-reference sentence before nearly every chunk. A later version removed that preface but sounded too excited, flipped register around thirty-five seconds, skipped near forty-two seconds, and pronounced *cyclist* badly. The next system passed its manifest and waveform checks yet still inserted strange phrases, repeated clauses, and rushed through transitions. The files were technically valid. They did not sound human.
 
-The human narration profile now uses Voxtral 4B TTS with its fixed `casual_female` voice. Each heading shares a bounded request with the prose that follows it, each request is decoded as one waveform, and the compiler normalizes its edges before assembly. Conservative sampling keeps the casual voice from improvising around short prompts. Local speech recognition audits every request for wrong words, inserted fillers, and unaligned audio that may contain a laugh or other non-verbal artifact. The VLM and autonomous-driving posts remain the long-form canaries because they expose voice, pacing, pronunciation, and continuity failures quickly.
+The human narration profile now uses Voxtral 4B TTS with its fixed `casual_female` voice. Each heading shares a bounded request with the prose that follows it, each request is decoded as one waveform, and the compiler normalizes its edges before assembly. Pairing headings with their prose reduces the opportunity for the casual voice to improvise around tiny prompts. Local speech recognition audits every request for wrong words, inserted fillers, and unaligned audio that may contain a laugh or other non-verbal artifact. The VLM and autonomous-driving posts remain the long-form canaries because they expose voice, pacing, pronunciation, and continuity failures quickly.
 
 > The central lesson was uncomfortable: provenance checks can prove which inputs produced a file, and waveform checks can prove that its samples are valid. Neither can prove that the voice said the right words with believable timing. Audio needs compiler invariants, speech-content audits, and a listener's ear.
 
@@ -100,7 +100,7 @@ Qwen3-TTS Base solved a real problem: one reference clip could anchor a reusable
 
 I tested three preset voices from [Voxtral 4B TTS](https://huggingface.co/mistralai/Voxtral-4B-TTS-2603) on the same technical passage. `hi_female` read it accurately, but the `hi` preset carries the Indian-English identity that its name implies. That was the wrong default for this corpus even though the transcript passed. `neutral_female` repeated a phrase for roughly 20 seconds. `casual_female` was quicker and sounded the most conversational once the compiler supplied the missing structural pauses.
 
-The casual preset also exposed a new failure. At temperature `0.65`, a short isolated heading could trigger performance instead of narration: a laugh, an elongated non-word sound, “um,” or “yeah” before the written text. Whole-file word error rate barely moved because the insertions were short. The fix combined two changes. The compiler stopped synthesizing headings alone, and the acoustic sampling temperature dropped to `0.3`. Model choice did not remove the need for an artifact gate; it gave the gate a better candidate to constrain.
+The casual preset also exposed a new failure. A short isolated heading could trigger performance instead of narration: a laugh, an elongated non-word sound, “um,” or “yeah” before the written text. Whole-file word error rate barely moved because the insertions were short. I initially credited both heading grouping and lowering the requested temperature from `0.65` to `0.3`. A later [source check](https://github.com/Blaizzy/mlx-audio/blob/v0.5.3/mlx_audio/tts/models/voxtral_tts/voxtral_tts.py) caught a problem with that explanation: `mlx-audio 0.5.3` accepts temperature, top-k, and top-p arguments for Voxtral but does not use them. Its semantic decoder uses argmax; its acoustic decoder uses seeded flow matching. The temperature change therefore cannot explain the improvement. Grouping headings with prose and auditing each request remain the defensible controls. Model choice did not remove the need for an artifact gate.
 
 The accepted human profile is fixed:
 
@@ -108,6 +108,8 @@ The accepted human profile is fixed:
 HUMAN_MODEL = "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16"
 HUMAN_VOICE = "casual_female"
 HUMAN_NARRATOR_SEED = 1904
+
+# Accepted request arguments, unused by Voxtral in mlx-audio 0.5.3:
 HUMAN_TEMPERATURE = 0.3
 HUMAN_TOP_K = 50
 HUMAN_TOP_P = 0.9
@@ -118,7 +120,7 @@ HUMAN_PARAGRAPH_PAUSE_SECONDS = 0.24
 HUMAN_HEADING_PAUSE_SECONDS = 0.55
 ```
 
-The model, preset, sampling settings, chunk seeds, speed, pause policy, pronunciation lexicon, and source digest enter the manifest profile. Change the article and that post becomes stale. Change a generation setting and every assigned post becomes stale. A rejected chunk receives a reviewed seed override, so the exporter can reuse its accepted cached sample instead of rolling the dice again. The seed records the choice; the cache preserves the accepted waveform. Keeping that artifact does not make it current when its source or generation profile changes.
+The model, preset, requested settings, chunk seeds, speed, pause policy, pronunciation lexicon, and source digest enter the manifest profile. New exports also record the runtime and distinguish requested sampling arguments from the decoding method that actually runs. The exporter pins that runtime so an upgrade requires another control check. Change the article and that post becomes stale. Change a generation setting and every assigned post becomes stale. A rejected chunk receives a reviewed seed override, so the exporter can reuse its accepted cached sample instead of rolling the dice again. The seed records the choice; the cache preserves the accepted waveform. Keeping that artifact does not make it current when its source or generation profile changes.
 
 There is also a deployment boundary. Mistral's model card says the supplied reference voices and model inherit CC BY-NC 4.0. That fits this non-commercial personal site. A commercial product would need a model and voice license that permits its use; acoustic quality does not override licensing.
 

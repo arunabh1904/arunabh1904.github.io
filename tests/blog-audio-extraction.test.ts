@@ -309,3 +309,35 @@ describe('Blog audio extraction', () => {
     expect(humanGenerator).not.toContain('streaming_interval=');
   });
 });
+
+describe('Voxtral runtime provenance', () => {
+  it('records effective decoding and rejects an unreviewed runtime before export', () => {
+    const program = `
+import importlib.util, json, sys
+spec = importlib.util.spec_from_file_location("blog_audio", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = module
+spec.loader.exec_module(module)
+module.validate_human_runtime("0.5.3")
+try:
+    module.validate_human_runtime("0.5.4")
+except RuntimeError as error:
+    rejected = "Review decoder controls" in str(error)
+else:
+    rejected = False
+post = next(p for p in module.discover_posts() if p["synthesis_profile"] == "human")
+record = module.manifest_record(post, 60.0)
+print(json.dumps({"rejected": rejected, "runtime": record["inference_runtime"],
+    "applied": record["sampling_controls_applied"], "semantic": record["semantic_decoding"],
+    "acoustic": record["acoustic_decoding"]}))
+`;
+    const result = spawnSync('python3', ['-c', program, exporterPath], {
+      cwd: projectRoot, encoding: 'utf8',
+    });
+    expect(result.status, result.stderr).toBe(0);
+    expect(JSON.parse(result.stdout)).toEqual({
+      rejected: true, runtime: 'mlx-audio==0.5.3', applied: false,
+      semantic: 'argmax', acoustic: 'seeded-flow-matching',
+    });
+  });
+});

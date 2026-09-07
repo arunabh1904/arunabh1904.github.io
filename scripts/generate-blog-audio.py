@@ -145,9 +145,10 @@ HUMAN_NARRATION_POSTS = frozenset(
 HUMAN_MODEL = "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16"
 HUMAN_VOICE = "casual_female"
 HUMAN_VOICE_MODE = "voxtral-fixed-preset-heading-context-full-decode-v3"
-# The casual preset already supplies expressive delivery. Higher sampling
-# temperatures made it improvise fillers and even laughter around short
-# headings, so keep acoustic sampling conservative.
+# These are retained API-request values, not effective sampling controls.
+# mlx-audio 0.5.3 ignores them for Voxtral: semantic codes use argmax and
+# acoustic flow uses seeded noise. Record that distinction in new exports.
+HUMAN_RUNTIME = "mlx-audio==0.5.3"
 HUMAN_TEMPERATURE = 0.3
 HUMAN_TOP_K = 50
 HUMAN_TOP_P = 0.9
@@ -1316,6 +1317,10 @@ def manifest_record(post: dict[str, Any], duration_seconds: float) -> dict[str, 
         return {
             **common,
             "synthesis_profile": "human",
+            "inference_runtime": HUMAN_RUNTIME,
+            "sampling_controls_applied": False,
+            "semantic_decoding": "argmax",
+            "acoustic_decoding": "seeded-flow-matching",
             "model": HUMAN_MODEL,
             "voice": HUMAN_VOICE,
             "voice_mode": HUMAN_VOICE_MODE,
@@ -1372,6 +1377,16 @@ def manifest_record(post: dict[str, Any], duration_seconds: float) -> dict[str, 
         "max_generation_tokens": MAX_GENERATION_TOKENS,
         "min_seconds_per_word": MIN_SECONDS_PER_WORD,
     }
+
+
+def validate_human_runtime(installed_version: str) -> None:
+    """Refuse a runtime upgrade until its effective controls are reviewed."""
+    actual_runtime = f"mlx-audio=={installed_version}"
+    if actual_runtime != HUMAN_RUNTIME:
+        raise RuntimeError(
+            f"Voxtral runtime changed: {actual_runtime}; expected {HUMAN_RUNTIME}. "
+            "Review decoder controls before export."
+        )
 
 
 def main() -> int:
@@ -1446,6 +1461,10 @@ def main() -> int:
             )
             model = loaded_models.get(model_name)
             if model is None:
+                if post["synthesis_profile"] == "human":
+                    from importlib.metadata import version
+
+                    validate_human_runtime(version("mlx-audio"))
                 print(f"Loading {model_name} for the {post['synthesis_profile']} profile...")
                 model = load_model(model_name)
                 loaded_models[model_name] = model
