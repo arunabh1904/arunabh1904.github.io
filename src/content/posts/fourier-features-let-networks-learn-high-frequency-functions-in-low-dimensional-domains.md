@@ -17,53 +17,47 @@ summary: "2020 – Fourier Features Let Networks Learn High Frequency Functions 
 
 **Code:** [tancik/fourier-feature-networks](https://github.com/tancik/fourier-feature-networks)
 
-### Method and reported result
-
-A plain MLP has a spectral bias: it learns smooth, low-frequency functions much more easily than sharp boundaries or fine texture. This paper fixes that failure mode by mapping each coordinate through sinusoidal Fourier features before the MLP sees it.
-
 ## Summary
 
-> That small input change matters for BEV and mapping work because many spatial tasks are low-dimensional coordinate regression problems with high-frequency structure. Lane boundaries, occupancy edges, radiance fields, and implicit maps all ask a network to represent sharp geometry from coordinates.
+> Coordinate MLPs learn smooth structure first, which makes sharp image detail, shape boundaries, and radiance variation slow to fit. Fourier features change the coordinates before the MLP sees them: each input is projected onto sinusoidal bases, exposing a tunable range of frequencies. The paper explains this through the neural tangent kernel and shows gains on direct and indirect low-dimensional regression, including image, shape, CT, MRI, and NeRF-style tasks. The useful rule is a bandwidth choice, not a universal encoding: low scales underfit and high scales overfit.
 
 ## Core Insights
 
-The paper studies why coordinate MLPs struggle when the target function contains high-frequency detail. The method samples or chooses Fourier bases, maps an input coordinate through sine and cosine features, and feeds the expanded representation into a standard MLP. Using neural tangent kernel analysis, the authors show that this transformation changes the effective kernel into a stationary kernel whose bandwidth can be tuned by the Fourier feature scale.
+### Fourier coordinates reshape the kernel before learning begins
 
-The empirical evidence comes from image regression and low-dimensional vision and graphics tasks. The important caveat is that the frequency scale is a real modeling choice. Too little bandwidth leaves the MLP smooth; too much bandwidth can overfit or make optimization brittle.
+For a coordinate v, the mapping is gamma(v) = [cos(2π Bv), sin(2π Bv)], with rows of B sampled from a frequency distribution. A plain MLP's NTK is a dot-product kernel that is not translation-invariant over a dense Euclidean coordinate domain. The sinusoidal mapping makes the composed kernel a function of coordinate differences, so it is stationary. The standard deviation of the sampled frequencies then controls how much high-frequency power the effective kernel carries.
 
-![Figure 2 from Fourier Features showing how Fourier mappings change the MLP neural tangent kernel](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-paper-figure.png)
-*Fig 1: Shows why the input mapping matters: Fourier features reshape the effective NTK into a frequency-aware kernel. | source: [Fourier Features paper](https://arxiv.org/abs/2006.10739)*
+![The paper compares the NTK of a raw coordinate MLP with the stationary, tunable kernels produced by Fourier mappings.](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-paper-figure.png)
+*Fig 1: A Fourier mapping makes the composed NTK more stationary and widens its spectrum as the frequency schedule changes. | source: [Fourier Features, Figure 2](https://arxiv.org/abs/2006.10739)*
 
-![Figure 4 from Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-source-figure-4.webp)
-*Fig 2: Random Fourier features approximate the same high-frequency functions with a sparse subset of frequencies; distribution bandwidth matters more than the precise sampling distribution. | source: [Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains](https://arxiv.org/abs/2006.10739)*
+The distinction between scale and distribution shape is central. In a controlled one-dimensional task, Gaussian, uniform, log-uniform, and Laplacian frequency samples trace nearly the same error curve when compared at the same empirical standard deviation. For the random-feature scale used in the regression experiments, a low standard deviation concentrates the spectrum near zero and gives a broad spatial kernel, so the reconstruction is smooth and misses detail. Raising that scale widens spectral support and narrows the spatial kernel; it can recover detail, but it can also fit frequencies absent from the held-out signal. Figure 2 uses a separate power-law parameter p: lower p slows the spectral falloff and produces a narrower spatial kernel, so the two scale conventions should not be conflated.
 
-![Figure 1 from Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-source-figure-1.webp)
-*Fig 3: Fourier features improve the results of coordinate-based MLPs for a variety of high-frequency low-dimensional regression tasks, both with direct (b, c) and indirect (d, e) supervision. We visualize an example MLP (a) for an image regression task (b), where the input to the network is a pixel coordinate and the output is that pixel’s color. | source: [Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains](https://arxiv.org/abs/2006.10739)*
+![Different random frequency distributions follow a shared underfitting-to-overfitting curve when plotted against sampled-frequency scale.](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-source-figure-4.webp)
+*Fig 2: Sparse random Fourier features match dense features over a useful range, with underfitting at low frequency scale and overfitting at high scale. | source: [Fourier Features, Figure 4](https://arxiv.org/abs/2006.10739)*
 
+### Bandwidth explains the same gain across direct and indirect tasks
 
-**What to look at:**
-- The contribution is an input representation, not a new network family.
-- Fourier features let a coordinate network expose high frequencies early instead of asking hidden layers to discover them slowly.
-- The bandwidth parameter controls the smoothness/detail tradeoff.
+The experiments use four-layer, 256-channel ReLU MLPs for most tasks and 256 frequencies; the shape experiment uses an eight-layer network. For 2D image regression, 512×512 images are split into a 256×256 training grid and an offset 256×256 test grid. Scales are tuned on held-out images, then evaluated on the remaining images.
 
-### Reported evidence
+| Mapping | Natural image PSNR | Text image PSNR | 3D shape boundary IoU |
+| --- | ---: | ---: | ---: |
+| No mapping | 19.32 ± 2.48 | 18.40 ± 2.23 | 0.864 ± 0.014 |
+| Basic Fourier | 21.71 ± 2.71 | 20.48 ± 1.96 | 0.892 ± 0.017 |
+| Positional encoding | 24.95 ± 3.72 | 27.57 ± 3.07 | 0.960 ± 0.011 |
+| Gaussian Fourier | 25.57 ± 4.19 | 30.47 ± 2.11 | 0.973 ± 0.010 |
 
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Core method | Sinusoidal coordinate mapping before an MLP | A small representation change recovers high-frequency regression. |
-| Theory | NTK analysis of the transformed MLP | Explains the frequency bias instead of only showing examples. |
-| Tasks | Low-dimensional vision and graphics regression | Matches the coordinate-heavy structure of implicit scene and map models. |
+The same pattern extends to indirect supervision. In Table 1, Gaussian features reach 28.33 PSNR on 2D CT, 19.88 on 3D MRI, and 25.48 on the simplified NeRF task, compared with 16.75, 15.44, and 22.41 with no mapping. Those tasks supervise the network through integral projections, Fourier coefficients, or volume rendering rather than a label at each coordinate, so the improvement is not just a pixel-interpolation trick.
 
-**Compact result slice:**
+![Fourier features improve coordinate MLPs on both direct and forward-model-supervised regression tasks.](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-source-figure-1.webp)
+*Fig 3: The same input mapping helps image and shape regression as well as indirect CT, MRI, and inverse-rendering supervision. | source: [Fourier Features, Figure 1](https://arxiv.org/abs/2006.10739)*
 
-| Input mapping | 2D natural image PSNR | 3D shape IoU |
-| ------------- | --------------------- | ------------ |
-| No mapping | 19.32 | 0.864 |
-| Gaussian Fourier features | 25.57 | 0.973 |
+### The encoding is a tuned prior, not a universal coordinate trick
+
+The frequency scale is tuned separately for each dataset: the paper uses sigma 10 for Gaussian features on Natural images, sigma 14 for Text, sigma 5 for MRI, and sigma 6.05 for its NeRF scene. Those values are evidence that the encoding is a controllable prior, not a plug-in constant. Jointly optimizing the feature frequencies with the MLP did not improve the 2D task, and axis-aligned positional encoding performs worse on off-axis sinusoidal signals than isotropic Gaussian features. The experiments are small coordinate-regression problems, often fitting one image or one mesh per network; they do not establish robustness to noisy coordinates or a single bandwidth across scenes.
 
 ## High-Level Takeaways
 
-- Fourier features inform whether an MLP should learn geometry directly from raw coordinates or receive a fixed sinusoidal basis that exposes high spatial frequencies. The atomic unit is a coordinate-value pair; a bandwidth-controlled projection maps the coordinate into periodic features before the shared MLP.
-- The experiments show that the embedding changes the effective kernel and overcomes spectral bias on images and 3D signals. They do not prescribe one bandwidth for noisy, multiscale driving geometry. The missing test jointly sweeps bandwidth, learned encodings, and coordinate noise at matched parameters. At 10× spatial extent or resolution, aliasing and basis size become limiting. The claim would weaken if a learned positional encoding matched high-frequency reconstruction while adapting more robustly across scales.
-- Fourier features became one of the standard ways to make coordinate networks useful for detailed spatial signals.
-- If an MLP is asked to learn geometry from raw coordinates, give it a frequency basis first; otherwise the model starts with the wrong smoothness prior.
+- Fourier features expose high frequencies before the MLP has to discover them through slow optimization.
+- The NTK view explains both benefits and failure modes: the frequency scale widens the learnable spectrum, while too much bandwidth produces noisy interpolation.
+- Gaussian features improve every task in the paper's Table 1, including indirect CT, MRI, and NeRF-style supervision.
+- Bandwidth must be selected with the target signal and sampling pattern; the paper does not justify one encoding scale for all spatial tasks.

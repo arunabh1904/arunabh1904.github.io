@@ -18,37 +18,42 @@ summary: '2020 – Deformable DETR: Deformable Transformers for End-to-End Objec
 
 ## Summary
 
-> DETR made object detection a set-prediction problem, but dense attention over image features left it slow to train and weak on small objects. Deformable DETR replaces that dense lookup with a few learned samples around a reference point at each feature scale. On COCO validation with a ResNet-50 backbone, the base model reaches 43.8 AP after 50 epochs; DETR-DC5 reaches 43.3 AP after 500. Small-object AP rises from 22.5 to 26.4. Sparse sampling makes high-resolution, multi-scale features tractable, but moves the burden onto the quality of the reference points and learned offsets.
+> DETR made object detection a set-prediction problem, but dense attention over image features made it slow to optimize and weak on small objects. Deformable DETR gives each query a reference point and lets each attention head sample a small, learned set of nearby features at every scale. On COCO validation with a ResNet-50 backbone, the base model reaches 43.8 AP after 50 epochs, versus 43.3 AP for DETR-DC5 after 500 epochs. The speedup comes from restricting where attention looks; it also makes reference points and offsets part of the detector's error surface.
 
 ## Core Insights
 
-[DETR](/paper%20shorts/2020/05/26/end-to-end-object-detection-with-transformers.html) asks every image query to compare itself with every location in the feature map. Encoder attention therefore grows quadratically with image resolution. At initialization, attention is also nearly uniform, so the model needs a long schedule to discover the few locations that matter. Higher-resolution features help with small objects, but make both problems worse.
+### Reference points turn attention into sparse evidence gathering
 
-Deformable attention narrows the search. Given a query and a reference point, each attention head predicts a small set of offsets and a weight for each sampled location. Bilinear interpolation retrieves those features, and their weighted sum becomes the query update. The multi-scale version repeats the operation across four feature levels; the default model uses eight heads and four samples per head per level. In the encoder, a feature-map location serves as its own reference point. In the decoder, each object query predicts a reference point that acts as an initial guess for the box center.
+In DETR, every image query can compare itself with every location in the feature map. The encoder's cost therefore grows badly when the feature map is made dense enough for small objects, and the model spends a long schedule learning which locations matter. Deformable attention changes the lookup rule. For query q with reference point p, head m predicts K two-dimensional offsets and K normalized weights. The operator bilinearly samples the feature map at p plus each offset, sums the K values, and combines the heads. The multi-scale form repeats this over four feature levels, so the query receives both fine and coarse evidence without a separate top-down pyramid.
 
-![Deformable attention predicts sampling offsets and weights around a query reference point, retrieves only those image features, and aggregates them across attention heads.](/assets/images/deformable-detr-deformable-attention-source-figure-2.svg)
-*Fig 1: Each query predicts where to sample and how strongly to weight each sampled feature instead of attending to every image location. | source: [Deformable DETR](https://arxiv.org/abs/2010.04159)*
+![Deformable attention predicts offsets and weights around a reference point, then aggregates only those sampled image features.](/assets/images/deformable-detr-deformable-attention-source-figure-2.svg)
+*Fig 1: The deformable attention module samples a small set of learned locations around each query reference point instead of comparing against every image location. | source: [Deformable DETR, Figure 2](https://arxiv.org/abs/2010.04159)*
 
-The important change is the routing rule. Dense attention lets a query inspect the entire feature map, but pays for every possible query-key pair. Deformable attention fixes the number of sampled keys, so encoder complexity grows linearly with feature-map area and multi-scale features become affordable without a separate feature pyramid.
+In the encoder, each feature-map pixel is its own reference point. In the decoder, an object query predicts a normalized reference point, and the box head predicts offsets relative to that point. This couples the attention route to the box being refined: a useful reference point makes it easier to retrieve evidence for the corresponding object. With K fixed, encoder attention is linear in the number of feature-map pixels, while decoder cross-attention depends on the number of queries and sampled points rather than the full image area.
 
-The COCO comparison separates the convergence result from the final detector variants:
+### Fast convergence and iterative boxes separate the gains
+
+The main COCO validation comparison separates the convergence claim from the optional refinements:
 
 | Model | Epochs | AP | AP$_S$ | FLOPs | Inference |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | DETR-DC5 | 500 | 43.3 | 22.5 | 187 G | 12 FPS |
 | DETR-DC5+ | 50 | 36.2 | 16.3 | 187 G | 12 FPS |
 | Deformable DETR | 50 | 43.8 | 26.4 | 173 G | 19 FPS |
-| + refinement and two-stage proposals | 50 | 46.2 | 28.8 | 173 G | 19 FPS |
+| + iterative bounding-box refinement | 50 | 45.4 | 26.8 | 173 G | 19 FPS |
+| ++ two-stage Deformable DETR | 50 | 46.2 | 28.8 | 173 G | 19 FPS |
 
-*COCO 2017 validation results with ResNet-50 backbones; runtime was measured on an NVIDIA Tesla V100. DETR-DC5+ adds focal loss and increases the query count to 300 for a closer 50-epoch control.*
+These are COCO 2017 validation results with ResNet-50 backbones; runtime was measured on an NVIDIA Tesla V100. DETR-DC5+ is the fairer short-schedule control because it adds focal loss and raises the query count to 300. The source table reports the same 173 GFLOPs and 19 FPS for the base, iterative-refinement, and two-stage Deformable DETR rows, but the two-stage variant uses 340 GPU-hours versus 325 for the other two. The base result therefore says more than the 46.2 AP endpoint: it reaches a higher AP than the 500-epoch DETR-DC5 model in one tenth of the training epochs, while the modified 50-epoch control remains at 36.2 AP.
 
-The base result is more informative than the 46.2 AP endpoint. Deformable DETR slightly exceeds the 500-epoch DETR-DC5 result after one tenth as many epochs, while the 50-epoch DETR-DC5+ control remains at 36.2 AP. The attention ablation also identifies where the gain comes from: multi-scale inputs add 1.7 AP, increasing the samples per head from one to four adds 0.9 AP, and allowing attention to exchange information across scales adds another 1.5 AP. Once that cross-scale exchange is present, adding FPN or BiFPN does not materially improve AP in the reported setting.
+The attention ablation explains the gain. Moving from one feature level to multi-scale inputs adds 1.7 AP and 2.9 small-object AP. Increasing the samples per head from one to four adds 0.9 AP. Allowing the attention operation itself to exchange information across scales adds another 1.5 AP. In the reported setting, adding FPN does not improve performance because the multi-scale deformable attention already performs the cross-level exchange.
 
-Sparse routing is still a trade-off. A query can only use the locations it samples, so a poor reference point or offset can exclude the needed evidence. The custom operator also uses irregular memory access; despite comparable FLOPs, the paper reports that Deformable DETR remains 25% slower than Faster R-CNN with FPN. The evidence is limited to 2D detection on COCO. It does not test calibrated multi-camera geometry, where [DETR3D](/paper%20shorts/2021/10/14/detr3d-multiview-images-via-3d-to-2d-queries.html) projects sparse 3D object queries into camera features, or [BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html), where BEV queries retrieve image evidence near geometry-derived reference points.
+### Sparse routing leaves coverage and latency exposed
+
+Sparse routing trades coverage for a learned sampling decision. If a reference point or offset misses the evidence, the query cannot recover it through an all-pixels fallback. The custom operator also performs unordered memory accesses: despite comparable FLOPs, the paper reports that the model is still 25% slower than Faster R-CNN with FPN, though it is 1.6 times faster than DETR-DC5. The evidence is a 2D COCO study. It does not test calibration error, missing camera views, or metric 3D reference points, where later systems add geometry to the query and sampling location.
 
 ## High-Level Takeaways
 
-- Deformable attention replaces an all-pixels search with a fixed number of learned samples around each reference point, making high-resolution and multi-scale features practical inside a DETR-style detector.
-- The paper's strongest result is convergence: the base ResNet-50 model reaches 43.8 AP in 50 epochs, while DETR-DC5 reaches 43.3 AP in 500.
-- Sparse sampling trades dense coverage for learned routing. Reference points and offsets become part of the model's error surface, and irregular memory access keeps measured speed from following FLOPs exactly.
-- The COCO result does not establish that sparse sampling remains reliable under calibration error, occlusion, or missing camera views. Multiview driving models inherit the mechanism but add a new geometric failure mode.
+- Deformable attention replaces an all-location search with a fixed number of learned samples around each reference point.
+- The strongest result is convergence: 43.8 AP in 50 epochs against 43.3 AP for DETR-DC5 in 500 epochs.
+- Multi-scale inputs and cross-scale sampling explain the small-object gain; FPN is redundant in the reported configuration.
+- The mechanism makes learned reference points and offsets a central failure mode, and measured latency still depends on memory access rather than FLOPs alone.

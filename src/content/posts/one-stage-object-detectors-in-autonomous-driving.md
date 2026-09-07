@@ -18,44 +18,49 @@ summary: '2026 – a survey of one-stage detector design and the limits of cross
 
 ## Summary
 
-> This survey organizes one-stage detectors by assignment, representation, feature fusion, loss design, and deployment trade-offs. Its useful conclusion is methodological: AP, frames per second, parameters, and input size must be read together and within one dataset-hardware protocol. The paper does not train a detector or run a matched autonomous-driving benchmark; its performance table combines values from Pascal VOC and COCO, different resolutions, hardware, and reporting conventions. It is therefore a map of design choices, not evidence that one listed family is safest or fastest for a driving stack.
+> This paper is a survey and comparative analysis, not a new detector. Its useful contribution is a decision map for one-stage design: assignment, feature fusion, score calibration, loss, post-processing, and scaling each move the speed-accuracy trade-off. Its reported AP, FPS, parameter, and FLOP values are collected from different papers and protocols, so they are evidence about the literature's design choices rather than a matched autonomous-driving leaderboard.
 
 ## Core Insights
 
-### One-stage detection now names several design families
+### One-stage is a placement in the pipeline, not one architecture
 
-The original distinction was procedural: two-stage detectors generate proposals before classification and box refinement, while one-stage detectors predict dense classes and boxes directly. The survey shows how much diversity now sits inside the second category. SSD and RetinaNet use default boxes; early YOLO variants use grid-based anchors; FCOS predicts per-location boxes with centerness; CenterNet turns objects into keypoints; YOLOX combines an anchor-free head with dynamic assignment; and YOLOv10 removes non-maximum suppression through consistent one-to-many and one-to-one training assignments.
+“One-stage” describes where the proposal stage went; it does not identify one architecture. The survey's taxonomy separates default-box methods such as SSD, RetinaNet, and EfficientDet; grid-based YOLO variants; keypoint and center representations such as CornerNet and CenterNet; per-location anchor-free regression such as FCOS; and recent NMS-free training such as YOLOv10. The design decisions are orthogonal. A detector can change its label assignment while retaining a feature pyramid, or change its score calibration while keeping anchors.
 
-![Timeline of one-stage detector families from early YOLO and SSD through anchor-free and NMS-free designs](/assets/images/one-stage-detectors-timeline.webp)
-*Fig 1: The chronology is best read as branching design decisions—assignment, feature fusion, loss, post-processing, and scaling—not as one model family replacing another. | source: [One-Stage Object Detectors](https://arxiv.org/abs/2608.19014)*
+![Chronology of the one-stage detectors organized by the survey.](/assets/images/one-stage-detectors-timeline.webp)
+*Fig 1: The timeline shows branches of assignment, feature fusion, and efficiency design rather than one model replacing another. | source: [One-Stage Object Detectors in Autonomous Driving, Figure 1](https://arxiv.org/abs/2608.19014)*
 
-![Figure 4 from One-Stage Object Detectors in Autonomous Driving](/assets/images/one-stage-object-detectors-in-autonomous-driving-source-figure-4.webp)
-*Fig 2: Radar chart comparing representative one-stage detectors across multiple dimensions. | source: [One-Stage Object Detectors in Autonomous Driving](https://arxiv.org/abs/2608.19014)*
+The survey connects these choices to driving constraints. Multi-scale features and feature pyramids help distant pedestrians, cyclists, and signs; focal or quality-aware losses address the foreground-background and classification-localization imbalance; anchor-free heads remove anchor tuning but can create crowded-scene or keypoint-grouping problems; and NMS-free training targets post-processing latency. EfficientDet is used as the efficiency-oriented example, while YOLOX, FCOS, GFL, VFNet, RTMDet, and YOLOv10 illustrate other branches.
 
+### The survey turns detector comparisons into a deployment checklist
 
-Feature fusion and optimization often matter as much as the output parameterization. [EfficientDet](/paper%20shorts/2020/04/01/efficientdet-scalable-and-efficient-object-detection.html) couples BiFPN with compound scaling, RetinaNet introduces focal loss for foreground-background imbalance, GFL represents box coordinates as distributions, and VFNet aligns classification confidence with localization quality. These changes move the deployment frontier without making anchor-based versus anchor-free a sufficient selection rule.
+The paper's comparison is most useful as a checklist for a real evaluation:
 
-| Selection axis | What the survey records | Required deployment control |
+| Axis | What the survey records | What a deployment comparison must hold fixed |
 | --- | --- | --- |
-| Detection quality | AP or mAP from original papers | Same dataset, class set, IoU rule, resolution, and test-time augmentation |
-| Throughput | FPS or latency when reported | Same hardware, precision, batch size, pre/post-processing, and runtime |
-| Small-object behavior | Multi-scale features and reported weaknesses | Range-stratified pedestrian, cyclist, sign, and occlusion recall |
-| Efficiency | Parameters, FLOPs, and model scale | Measured memory, energy, and worst-case latency on target hardware |
-| Driving relevance | KITTI, Waymo, nuScenes, BDD100K, and Argoverse coverage | Per-class and adverse-condition results under the intended sensor contract |
+| Detection quality | AP or mAP from the original studies | Dataset, classes, IoU rule, resolution, augmentation |
+| Throughput | FPS or latency where reported | Hardware, precision, batch size, runtime, pre/post-processing |
+| Small objects | Feature-pyramid choices and reported weaknesses | Range-stratified recall for pedestrians, cyclists, and signs |
+| Efficiency | Parameters, FLOPs, and model scale | Memory, energy, and worst-case latency on the target device |
+| Driving relevance | KITTI, Waymo, nuScenes, BDD100K, Cityscapes, Argoverse | Same sensor contract and adverse-condition slices |
 
-### The comparison table is not a leaderboard
+The survey explicitly warns that its speed-accuracy plot mixes sources. Its points are useful for locating candidate papers, but a point's horizontal position can reflect a different GPU, image size, precision mode, or definition of FPS. The qualitative radar makes the same point in another form:
 
-The survey explicitly marks its performance table as cross-paper reporting rather than a controlled benchmark. For example, it places YOLO and EfficientDet COCO numbers beside SSD and DSSD Pascal VOC numbers, with several missing FPS and parameter entries. Its qualitative radar chart is also a survey-derived five-point assessment, not a new measurement. The defensible use is to shortlist mechanisms and baselines before running a hardware- and dataset-matched evaluation.
+![Qualitative radar comparison of representative one-stage detectors.](/assets/images/one-stage-object-detectors-in-autonomous-driving-source-figure-4.webp)
+*Fig 2: The radar scores summarize reported accuracy, speed, efficiency, deployment readiness, and small-object handling on a qualitative five-point scale. | source: [One-Stage Object Detectors in Autonomous Driving, Figure 4](https://arxiv.org/abs/2608.19014)*
 
-![Cross-paper speed-accuracy scatter for one-stage detectors collected by the survey](/assets/images/one-stage-detectors-speed-accuracy.webp)
-*Fig 3: This plot is a reading aid, not a leaderboard: points mix datasets, input sizes, hardware, runtimes, and reporting conventions, so their relative positions do not establish a matched speed-accuracy frontier. | source: [One-Stage Object Detectors](https://arxiv.org/abs/2608.19014)*
+The source's Figure 3 is a reading aid, not a new experiment. A detector that appears far right on an FPS axis may still have unacceptable tail latency after decoding and NMS, while a high AP value from COCO says little about a rare, distant cyclist in rain.
 
-The survey's autonomous-driving discussion identifies the right failure categories—small and distant objects, occlusion, adverse weather, edge compute, and missing deployment-centric metrics—but it does not quantify them under one protocol. A detector choice for driving should therefore be driven by critical-class recall, calibration, degradation tests, and end-to-end latency, not a global AP/FPS pair copied from unrelated papers.
+![Speed-accuracy points collected across the survey's cited detector papers.](/assets/images/one-stage-detectors-speed-accuracy.webp)
+*Fig 3: The survey's cross-paper speed-accuracy plot should be read as a literature map, because datasets, input sizes, hardware, and reporting conventions differ. | source: [One-Stage Object Detectors in Autonomous Driving, Figure 3](https://arxiv.org/abs/2608.19014)*
+
+### Cross-paper plots cannot answer a safety question
+
+The survey does not run a controlled benchmark on KITTI, Waymo, BDD100K, or another driving dataset, and it does not measure a single detector on a common device. Its strongest conclusion is therefore methodological: mAP and FPS should be joined by class-, range-, weather-, and occlusion-stratified recall, calibration, energy, and tail latency. The paper's future directions—small-object handling, adverse-weather robustness, edge optimization, deployment-centric metrics, and integration with tracking and planning—follow from that missing protocol.
 
 ## High-Level Takeaways
 
-- One-stage detection is no longer one architecture: anchor assignment, feature pyramid design, score-localization alignment, post-processing, and scaling policy are independent decisions.
-- The survey is most useful as a taxonomy and reading list. Its heterogeneous reported numbers cannot support a detector ranking for autonomous driving.
-- A production comparison should hold the input, dataset, hardware, precision, runtime, and post-processing fixed, then report range- and condition-stratified recall for safety-critical classes.
-- Anchor-free prediction removes anchor tuning but does not automatically improve latency, crowded-scene localization, or small-object recall.
-- The survey's deployment claims would become decision-grade only after a matched benchmark on driving data and target hardware, including tail latency, energy, calibration, weather, and occlusion slices.
+- One-stage detection is a family of independent choices about assignment, representation, fusion, loss, scaling, and post-processing.
+- The survey is a useful taxonomy and reading list; its collected numbers do not rank detectors for an autonomous-driving stack.
+- Anchor-free heads remove anchor design, but they do not guarantee lower latency or better crowded-scene localization.
+- A defensible AV comparison needs one dataset, one sensor contract, one device, and explicit tail-latency and degradation slices.
+- The next useful artifact is a matched benchmark that reports safety-critical per-class recall alongside AP, energy, calibration, and end-to-end latency.

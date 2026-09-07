@@ -13,44 +13,42 @@ summary: "2024 – SENNA: Bridging Large Vision-Language Models and End-to-End A
 
 **arXiv:** [2410.22313](https://arxiv.org/abs/2410.22313)
 
-### Method and reported result
-
-SENNA uses a hybrid architecture: a vision-language model produces a high-level textual plan, while an end-to-end driving module converts that plan and the sensor input into a precise trajectory. The design avoids asking the LVLM to output exact steering-level control directly.
-
 ## Summary
 
-> This makes the language layer inspectable. A planner can say what it intends to do before the control module turns that intent into geometry.
+> SENNA gives a large vision-language model a compact driving interface: it describes the scene, predicts a lateral/longitudinal meta-action, and hands that decision to a trajectory planner. Senna-VLM uses a CLIP ViT-L/14 encoder, a learned query adapter, and Vicuna-7B; Senna-E2E then combines the meta-action with scene features and predicts a continuous plan. On DriveX, SENNA reports 71.21% decision accuracy; on the DriveX-pretrained nuScenes row it reports average planning L2 of 0.43 m and average collision rate of 0.12%.
 
 ## Core Insights
 
-SENNA separates driving into a VLM-based decision layer and an end-to-end trajectory layer. Senna-VLM produces structured scene understanding, decisions, and explanations; Senna-E2E turns those semantics into planning outputs. Training uses staged pretraining and driving-specific instruction data so the language model learns traffic context rather than generic image chat. The paper's value is making the semantic decision step explicit. The caveat is that language plans are not safety guarantees: downstream control still has to handle geometry, timing, and uncertainty.
+### Let language choose the maneuver, not every control point
 
-![Figure 1: Previous methods plan trajectories without a decision-making step, making model learning difficult from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-paper-figure.png)
-*Fig 1: Previous methods plan trajectories without a decision-making step, making model learning difficult. | source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving paper](https://arxiv.org/abs/2410.22313)*
+SENNA's VLM consumes surround-view images and produces structured answers about the scene, traffic signals, vulnerable road users, motion intent, and planning. Its most important output is a meta-action: one of Left, Straight, or Right crossed with Accelerate, Keep, Decelerate, or Stop. A Driving Vision Adapter uses learned image queries to compress each CLIP ViT-L/14 view before Vicuna-v1.5-7B reasons over the resulting tokens. Senna-E2E then maps the formatted decision into a learned embedding and lets a VADv2-style planner turn it into a trajectory.
 
-![Figure 5 from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-source-figure-5.webp)
-*Fig 2: Qualitative results of Senna. The red boxes and text highlights key information that is relevant to driving decisions. | source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](https://arxiv.org/abs/2410.22313)*
+The decomposition is visible in the first figure. Prior pipelines send perception features directly toward motion and planning; SENNA inserts an inspectable decision layer between scene interpretation and numeric control. That layer can make a driving intent legible, but its small vocabulary also creates a hard interface: a “turn left” embedding cannot carry every timing, gap, or recovery detail needed by the downstream planner.
 
-![Figure 4 from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-source-figure-4.webp)
-*Fig 3: Visualization of Meta-action data distribution in the DriveX dataset. | source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](https://arxiv.org/abs/2410.22313)*
+![Figure 2 from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-paper-figure.png)
+*Fig 1: Previous pipelines connect perception directly to planning, while SENNA routes visual reasoning through a meta-action before trajectory generation. | source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving, Figure 2](https://arxiv.org/abs/2410.22313)*
 
+### Train driving semantics from an automatic curriculum
 
-**What to look at:**
-- Senna-VLM produces high-level textual plans.
-- Senna-E2E turns those plans into precise trajectories.
-- The interface is inspectable and potentially editable.
+The VLM training has three stages. Mix pretraining aligns the vision adapter with single-image instruction data; driving fine-tuning adds surround-view planning questions; planning fine-tuning teaches the meta-action questions. The labels are generated from 3D boxes, tracks, ego future, and planner state, then converted into questions and answers, so this is a planning-oriented automatic annotation pipeline rather than a collection of manually written explanations. DriveX contains one million three-second clips, with 800,000 for training and 200,000 for validation.
 
-### Reported evidence
+The planner is trained with ground-truth meta-actions but receives the VLM prediction at inference. This distinction matters: a reported trajectory error mixes planner quality with exposure to an incorrect language decision. On DriveX, SENNA reaches 71.21% decision accuracy; path F1 is 95.60 for straight, 89.37 for left, and 90.09 for right, while speed F1 is 80.18 keep, 58.83 accelerate, 61.99 decelerate, and 80.10 stop. The qualitative examples show why the intermediate text is useful: the model names the red light, nearby actors, and intended response rather than exposing only a curve.
 
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Decomposition | Language plan plus control module | Separates semantic intent from numeric control. |
-| Training | Planning-oriented QA and curriculum | Tunes the VLM for traffic decisions. |
-| Caveat | Language plan is not a guarantee | Control still needs safety validation. |
+![Figure 6 from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-source-figure-5.webp)
+*Fig 2: Qualitative SENNA answers highlight scene details that support the predicted driving decision and explanation. | source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving, Figure 6](https://arxiv.org/abs/2410.22313)*
+
+### Token budget and camera coverage are part of the method
+
+SENNA's ablations show that semantic compression has an operating point. With 32, 64, and 128 image tokens per view, DriveX accuracy rises from 69.36% to 70.42% to 71.21%; at 256 tokens it falls to 56.13%, and the 512/576-token settings collapse. Surround views also matter: front-only accuracy is 64.91%, versus 71.21% for six-view input. The resulting DriveX-pretrained nuScenes row reaches planning errors of 0.26, 0.42, and 0.61 m at 1, 2, and 3 seconds, averaging 0.43 m; collision rates are 0.05%, 0.11%, and 0.21%, averaging 0.12%.
+
+The class distribution explains why the authors report more than overall accuracy. The DriveX chart is uneven rather than dominated by one class: accelerate-right is only 3.54%, while most other meta-actions occupy roughly 13–16%. Reporting path and speed F1 keeps a rare action from disappearing inside the 71.21% aggregate. A compact language interface is helpful only when its categories preserve the distinctions the planner needs.
+
+![Figure 5 from SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving](/assets/images/senna-bridging-large-vision-language-models-and-end-to-end-autonomous-driving-source-figure-4.webp)
+*Fig 3: The DriveX meta-action distribution shows the class imbalance that motivates path and speed breakdowns alongside overall accuracy. | source: [SENNA: Bridging Large Vision-Language Models and End-to-End Autonomous Driving, Figure 5](https://arxiv.org/abs/2410.22313)*
 
 ## High-Level Takeaways
 
-- SENNA informs whether a driving stack should separate high-level semantic commands from low-level continuous trajectory control. The VLM predicts a compact driving intention from images and language context; a fast planner conditions on that intention to generate the trajectory.
-- The hierarchy reduces language-generation latency in the control loop, but the command vocabulary can become an information bottleneck. The missing test varies command granularity and compares oracle, learned, and absent high-level guidance under matched planner capacity. At 10× scenario complexity, ambiguous commands and recovery from a wrong high-level decision dominate. The separation would fail if direct end-to-end planning matched safety and generalization without the semantic intermediate.
-- SENNA captures a useful decomposition for safety-critical systems: use language for semantic planning, but keep numeric control in a component designed for precision.
-- The most useful VLM in a driving stack may be the one that thinks out loud at the right abstraction level.
+- SENNA makes language a maneuver-level interface and leaves precise geometry to an end-to-end planner.
+- The automatic QA curriculum supplies scene semantics at scale, while ground-truth meta-actions during planner training create a measurable inference-time exposure gap.
+- The 128-token, surround-view operating point is a systems result as much as a modeling result: more visual tokens can hurt, and front-only context misses decisions that views around the ego vehicle disambiguate.
+- Its reported nuScenes planning gains are meaningful under the paper's pretrained and ego-state settings, but they do not make the language decision a safety certificate.
