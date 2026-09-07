@@ -29,7 +29,7 @@ At planning time, the model no longer generates the lane-divider and 3D-box imag
 
 The pipeline is easiest to read from left to right. During pre-training, the model learns to complete a road skeleton and object layout before it has to generate detailed pixels. During fine-tuning, the right-hand branch collapses those learned steps into one frame and passes that frame to the trajectory head. If a predicted lane bends incorrectly or a moving box is misplaced, the error is exposed in an inspectable image but can also propagate directly into the plan. The same intermediate is therefore the paper’s interpretability advantage and its principal error channel.
 
-![FutureSightDrive visual CoT pipeline](/assets/images/futuresightdrive-thinking-visually-with-spatio-temporal-cot-for-autonomous-driving-paper-figure.webp)
+![FutureSightDrive visual CoT pipeline](/assets/images/futuresightdrive-source-figure-2-visual-cot.png)
 *Fig 1: FSDrive first learns future lanes, boxes, and frames, then uses one unified future image as the visual reasoning step before predicting a trajectory. | source: [FutureSightDrive: Thinking Visually with Spatio-Temporal CoT for Autonomous Driving, Figure 2](https://arxiv.org/abs/2505.17685)*
 
 ### Progressive pre-training supplies physical scaffolding

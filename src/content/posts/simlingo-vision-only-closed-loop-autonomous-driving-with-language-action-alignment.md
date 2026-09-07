@@ -29,7 +29,7 @@ The action output has two complementary coordinate systems. Temporal speed waypo
 
 The model first autoregressively generates language when the task asks for commentary, VQA, or an action explanation. A second forward pass then predicts the path and speed queries conditioned on that generated language. Commentary is therefore on the action path during default inference, although the later ablation shows that adding unaligned language tasks alone does not materially change driving.
 
-![SimLingo architecture and split action representation](/assets/images/simlingo-vision-only-closed-loop-autonomous-driving-with-language-action-alignment-source-figure-2.webp)
+![SimLingo architecture and split action representation](/assets/images/simlingo-source-figure-2-path-speed.png)
 *Fig 1: Image tiles, navigation conditioning, and the language prompt enter a shared LLM; separate query heads produce temporal speed and geometric path waypoints alongside language. | source: [SimLingo: Vision-Only Closed-Loop Autonomous Driving with Language-Action Alignment, Figure 2](https://arxiv.org/abs/2503.09594)*
 
 ### Action Dreaming makes the instruction causal
