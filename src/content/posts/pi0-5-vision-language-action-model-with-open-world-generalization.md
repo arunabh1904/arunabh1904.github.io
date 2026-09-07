@@ -19,35 +19,53 @@ summary: "2025 – Pi0.5: A Vision-Language-Action Model with Open-World General
 
 ## Summary
 
-> Pi0.5 extends Pi0 by co-training a VLM/action policy on heterogeneous examples: web vision-language tasks, object detection, language instructions, high-level subtask predictions, and low-level trajectories from multiple robots. The hierarchy remains inside one model: language predicts useful intermediate goals while a flow-based action expert controls the robot.
+> π0.5 combines heterogeneous robot, web, and semantic-subtask data with a two-stage VLA recipe. It pretrains a discrete-token model for broad transfer, then adds a smaller flow-matching action expert for mobile manipulation. At test time the same model predicts a high-level subtask and the continuous action chunk that executes it.
 
 ## Core Insights
 
-![Pi0.5 two-stage training with heterogeneous pretraining high-level subtask prediction and flow-matching action post-training](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-paper-figure.png)
-*Fig 1: Shows how open-world behavior is divided: broad robot, web, and semantic-action pretraining builds the base VLA, then mobile-manipulation post-training couples high-level subtask inference to continuous flow-matching actions. | source: [π0.5](https://arxiv.org/abs/2504.16054)*
+### The design joins two time scales
 
-![Figure 2 from Pi0.5: A Vision-Language-Action Model with Open-World Generalization](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-source-figure-2.webp)
-*Fig 2: Cleaning a new kitchen. The robot is tasked with cleaning a kitchen in a home that was not in the training data. | source: [Pi0.5: A Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054)*
+The model starts from a PaliGemma VLM and takes images, a language prompt, and proprioceptive state. During pretraining, robot actions are represented as FAST discrete tokens alongside text, image patches, and object locations. The mixture includes about 400 hours of mobile-manipulator data across roughly 100 homes, non-mobile robot data from diverse environments, laboratory cross-embodiment data, high-level subtask annotations, and web captioning, VQA, and localization data.
 
-![Figure 6 from Pi0.5: A Vision-Language-Action Model with Open-World Generalization](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-source-figure-6.webp)
-*Fig 3: Evaluation environments. We evaluate in entirely new kitchens and bedrooms that were not seen during training, with novel objects, backgrounds, and layouts. | source: [Pi0.5: A Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054)*
+Post-training adds a separate action expert with random initialization. The model retains autoregressive text prediction for high-level outputs but trains the expert with flow matching for continuous action chunks. Given a noisy action $a^{\tau,\omega}_{t:t+H}=\tau a_{t:t+H}+(1-\tau)\omega$, the expert predicts the vector field $\omega-a_{t:t+H}$. The attention mask prevents FAST action tokens and flow-expert tokens from attending to each other while allowing the VLM prefix to condition both. This lets one model produce a text subtask such as “pick up the cup,” then condition the low-level flow process on that subtask.
 
+The training schedule is part of the method. Pretraining runs for 280,000 discrete-token steps; post-training adds 80,000 steps with the combined text and flow objective, using $\alpha=10$ for the action term. At inference the model autoregressively decodes the subtask and then uses ten flow-denoising steps for the action chunk. The action expert is smaller than the VLM, so continuous control does not require repeatedly decoding the full language backbone.
 
-The paper targets long-horizon generalization rather than isolated tabletop skills. It reports mobile manipulation in entirely new homes, including kitchen and bedroom cleanup tasks lasting 10–15 minutes. Ablations attribute that behavior to heterogeneous co-training and semantic subtask prediction, not simply more robot episodes.
+### What the architecture is actually combining
 
-The architecture separates time scales. High-level tokens express what should happen next; continuous action chunks express how. This reduces the burden on low-level control to remember an entire household task, but subtask errors can still compound and are difficult to correct without feedback.
+![π0.5 combines discrete-token pretraining, semantic subtasks, and a flow-matching action expert](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-paper-figure.png)
+*Fig 1: The two-stage recipe first mixes robot, web, and high-level tasks with FAST tokens, then specializes a mobile-manipulation model with verbal instructions and a continuous flow expert. | source: [π0.5, Figure 3](https://arxiv.org/abs/2504.16054)*
 
-| Data/interface | Knowledge contributed |
-| --- | --- |
-| Web image–text and detection | Open-world semantics and object grounding |
-| High-level subtask prediction | Long-horizon decomposition |
-| Multi-robot trajectories | Embodied control priors |
-| Flow action expert | Smooth continuous action chunks |
+Figure 1 shows why the paper calls the recipe hybrid. The broad stage supplies shared visual and language representations; the second stage supplies continuous action precision and mobile-manipulation specialization. The hierarchy is not an external planner: both the text subtask and the action chunk are generated by the same network, with the subtask serving as the low-level policy's context.
+
+The robot platforms have four cameras, two 6-DoF arms, grippers, a mobile base, and a torso lift. The action/state space is 18 or 19 dimensions. The system commands target arm poses, gripper states, torso lift, and base velocities at 50 Hz, with simple PD controllers and no additional trajectory planner or collision detector. That detail matters when comparing “end-to-end” control: the learned policy selects targets, while the low-level hardware controller tracks them.
+
+### Unseen homes, long tasks
+
+![π0.5 breaks a general kitchen-cleaning command into executable subtasks in a new home](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-source-figure-2.webp)
+*Fig 2: A kitchen-cleaning rollout shows a single broad instruction followed by model-generated subtasks for drawer, utensil, and dish actions; each text step conditions the next low-level control segment. | source: [π0.5, Figure 2](https://arxiv.org/abs/2504.16054)*
+
+The headline evaluation uses three kitchens and three bedrooms in real homes absent from training, plus controlled mock kitchens and bedrooms. Tasks include putting items in a drawer, placing dishes in a sink, putting laundry in a basket, and making a bed. The paper scores task progress with explicit rubrics—picking, placing, opening or closing a drawer, straightening a blanket, and positioning pillows—rather than treating an episode as a single binary label. Quantitative evaluations use ten trials per task in the standard comparisons; individual real-home tasks last roughly two to five minutes and may contain several object moves.
+
+![π0.5 evaluates in mock and real rooms with unseen layouts, backgrounds, and objects](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-source-figure-6.webp)
+*Fig 3: The evaluation suite pairs reproducible mock rooms with three unseen real kitchens and three unseen real bedrooms, separating controlled quantitative comparisons from an in-the-wild transfer check. | source: [π0.5, Figure 6](https://arxiv.org/abs/2504.16054)*
+
+Figure 3 clarifies the generalization claim. The test homes are not merely new camera frames of training rooms; they introduce novel layouts, backgrounds, and object instances. The authors report consistent success across the real-home tasks and use the mock rooms to measure scaling and ablations. The remaining failure modes are concrete: difficult drawer handles, partial occlusion, and a high-level subtask that repeats an action instead of moving the task forward.
+
+### Which parts of the mixture matter?
+
+For location scaling, the authors train on mobile-manipulation data from 3, 12, 22, 53, 82, and 104 locations. They hold the training steps at 40,000 so that the models see the same number of unique samples even though the location subsets differ in size. End-to-end performance on four mock tasks generally improves with the number of locations; the 104-location model approaches a control trained directly on the test homes. The result is evidence for environment diversity, not simply more gradient steps.
+
+The co-training ablations separate four ingredients: non-mobile multi-environment robot data (ME), laboratory cross-embodiment data (CE), web data (WD), and high-level or verbal-instruction data. Removing ME or CE degrades mock-home performance, and removing both is worse. WD has little statistically significant effect on the four mock tasks but substantially affects language following on out-of-distribution object categories. The interpretation is sensible but bounded: the paper varies a large mixture, so these ablations identify useful ingredients under this recipe rather than an additive causal value for every data source.
+
+The high-level control ablation is sharper. Full π0.5, with the learned high-level policy and low-level expert, performs best. An implicit-high-level variant keeps subtask data in training but feeds the original task directly at inference and is second best, showing that semantic subtask supervision helps even without explicit runtime decoding. Removing high-level data hurts more. A zero-shot GPT-4 high-level controller performs worst, while a human high-level oracle is a useful upper bound. This suggests that the subtask annotations teach the low-level policy a decomposition it can sometimes use implicitly.
+
+Against π0 and a π0-FAST+Flow model trained only on robot action data, π0.5 performs best in the same mock environments. π0-FAST+Flow is a useful control because it shares the hybrid action representation but cannot use the web and high-level mixture in the same way. The paper also allows longer training for π0 and still finds the hybrid co-training recipe ahead, but the comparison remains tied to the authors' data, compute, and evaluation stack.
 
 ## High-Level Takeaways
 
-- Pi0.5 informs whether long-horizon generalization should come from a monolithic low-level policy or heterogeneous co-training with an explicit semantic time scale. Its units range from web tokens to action chunks; the backbone shares representations while the action expert specializes continuous control.
-- The demonstrations establish compelling open-world behavior, but the private mixture makes contribution accounting difficult. A missing ablation matches robot hours, web data, and subtask labels against a hierarchical two-model baseline. At ten times the horizon, subtask drift and error recovery become the bottleneck. The central claim weakens if the policy succeeds only when high-level predictions follow familiar household scripts or if a planner/action decomposition recovers more reliably.
-- Pi0.5 shows why VLA post-training cannot be reduced to one loss: semantic retention, task decomposition, and motor adaptation interact.
-- Few public details allow exact reproduction of mixture weights and data quality.
-- Heterogeneous co-training is useful when each data type owns a time scale and the system can measure transfer between them.
+- π0.5 uses discrete FAST tokens for scalable multimodal pretraining and a flow-matching expert for continuous mobile manipulation.
+- High-level subtask prediction reduces the memory burden on low-level control, while implicit subtask supervision still helps when explicit decoding is removed.
+- Generalization improves with diverse training locations and cross-embodiment data; web data matters especially for unseen object categories.
+- The unseen-home results are meaningful because the tasks are multistage, but they still use simple prompts, scripted rubrics, and learned target tracking.
+- A fair follow-up should match robot hours, scene diversity, web data, and inference cost against an external planner plus action policy.

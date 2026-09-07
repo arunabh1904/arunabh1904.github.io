@@ -19,34 +19,53 @@ summary: "2023 – Diffusion Policy: Visuomotor Policy Learning via Action Diffu
 
 ## Summary
 
-> Diffusion Policy represents a visuomotor policy as a conditional denoising process over action trajectories. Instead of regressing toward the average of several valid behaviors, it learns the score of a multimodal action distribution and samples a coherent sequence at inference time.
+> Diffusion Policy predicts a distribution over short action trajectories by denoising noise into a sequence of robot commands. It pairs that expressive trajectory model with receding-horizon execution, so the controller can coordinate several actions and still replan when the next image disagrees with the prediction.
 
 ## Core Insights
 
-![Diffusion Policy overview with observation-conditioned denoising of action sequences using convolutional or transformer backbones](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-paper-figure.png)
-*Fig 1: Shows why the output is a trajectory distribution rather than a point action: Gaussian action sequences are iteratively denoised while visual observations condition every convolutional block or transformer decoder layer. | source: [Diffusion Policy](https://arxiv.org/abs/2303.04137)*
+### Why a trajectory distribution helps
 
-![Figure 10 from Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-source-figure-10.webp)
-*Fig 2: Diffusion Policy controls a robot through multi-step pouring and sauce-spreading motions, illustrating contact-rich trajectories that require coordinated six-degree-of-freedom actions. | source: [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](https://arxiv.org/abs/2303.04137)*
+A direct behavior-cloning regressor maps an observation to one action, often averaging demonstrations that contain different valid choices. The paper instead models $p(A_t\mid O_t)$, where $A_t$ is a finite action sequence and $O_t$ is a history of observations. It samples a clean trajectory $A_t^0$ from demonstrations, adds noise at a random diffusion step $k$, and trains a network to predict that noise:
 
-![Figure 4 from Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-source-figure-4.webp)
-*Fig 3: On Square and Kitchen tasks, position-controlled Diffusion Policy variants improve success more than velocity-controlled LSTM-GMM and BET baselines, with the largest gain on Kitchen. | source: [Diffusion Policy: Visuomotor Policy Learning via Action Diffusion](https://arxiv.org/abs/2303.04137)*
+$$\mathcal{L}=\operatorname{MSE}\left(\epsilon_k,\epsilon_\theta(O_t,A_t^0+\epsilon_k,k)\right).$$
 
+At inference, the model begins with a noisy action sequence and repeatedly removes predicted noise. The observation conditions the denoising network but is not itself diffused, which lets the visual representation be computed once per control cycle. A CNN version applies FiLM conditioning at every temporal convolution. The paper's time-series transformer sends each action token through causal attention to itself and earlier action tokens, while cross-attending to the observation tokens. The two designs share the same conditional trajectory objective.
 
-The policy conditions a diffusion model on observations, starts from noisy action sequences, and refines them across denoising steps. Receding-horizon control executes only the near part of each sampled trajectory before observing again. This combination gives diffusion enough horizon to coordinate motion while retaining closed-loop replanning.
+The controller predicts $T_p$ actions, executes only $T_a$, then observes again. This is the central compromise: a whole chunk gives the model room to express a coherent contact sequence, while the short executed prefix limits the damage from a stale prediction. The next inference can be warm-started from the previous sequence. In the real-world experiments, DDIM reduces a 100-step training schedule to 10 inference steps and reports about 0.1 seconds per policy call on an Nvidia 3080; the real-world hyperparameter table uses 16 inference iterations for the reported tasks.
 
-Across 15 tasks from four manipulation benchmarks, the paper reports an average 46.9% improvement over the compared state of the art. The important mechanism is distributional expressivity: high-dimensional action sequences and multiple valid strategies are represented without an explicit mixture model. The cost is iterative sampling and a likelihood interface that is less convenient for policy-gradient or preference optimization.
+### The design at a glance
 
-| Representation | Strength | Post-training complication |
-| --- | --- | --- |
-| Per-step regression | Cheap and explicit | Averages incompatible actions |
-| Autoregressive tokens | Native likelihood | Quantization and sequential latency |
-| Diffusion trajectory | Multimodal continuous behavior | Iterative inference and denoising-step credit assignment |
+![Diffusion Policy conditions action-sequence denoising on an observation history](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-paper-figure.png)
+*Fig 1: The policy starts from noisy actions, repeatedly predicts the denoising direction, and uses either FiLM-conditioned temporal convolutions or a causal action transformer with observation cross-attention. | source: [Diffusion Policy, Figure 2](https://arxiv.org/abs/2303.04137)*
+
+Figure 1 explains why this is more than “diffusion for actions.” The output is a sequence with internal temporal structure; the observation enters as context at every denoising stage. Causal attention prevents a later action token from leaking information backward through the action sequence, while cross-attention preserves visual conditioning. The policy therefore represents multiple smooth ways to reach the same local goal without an explicit mixture-of-Gaussians head.
+
+### Evidence from simulation and real robots
+
+The paper evaluates behavior cloning on 15 tasks across four benchmarks, covering 2-DoF to 6-DoF actions, single-arm and bimanual systems, rigid and fluid objects, and state or image observations. Across its comparison set it reports a 46.9% average improvement. The controlled state benchmarks help separate distribution modeling from camera perception: the transformer variant reaches 0.99/0.94 on the hardest reported multi-stage BlockPush metrics and 0.99/0.96 on Kitchen's difficult metrics, while the baselines are lower (Table 4). The authors also report that an action horizon of eight steps works best for most tasks; longer horizons smooth motion but react too slowly, while a one-step policy loses temporal consistency.
+
+The Push-T experiment shows the cost of averaging modes. In the real setup, the task first pushes a T-shaped block into a target and then moves the end effector to an end zone. The end-state IoU must exceed the minimum IoU achieved by human demonstrations. The end-to-end transformer version succeeds in 19 of 20 trials (0.95), with average IoU 0.80, while the best IBC and LSTM-GMM variants succeed in 0 and 0.20 of trials. A camera occlusion causes only a brief jitter; when the block is shifted during pushing or while moving to the end zone, the policy replans and approaches from the needed direction.
+
+![Diffusion Policy executes the multimodal sequence needed for sauce pouring and spreading](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-source-figure-10.webp)
+*Fig 2: The six-degree-of-freedom sauce tasks combine scooping, pouring or periodic spreading, and self-termination; the table below the source figure compares human, LSTM-GMM, and Diffusion Policy outcomes. | source: [Diffusion Policy, Figure 10](https://arxiv.org/abs/2303.04137)*
+
+The sauce experiment is a useful stress test because idle actions and periodic contact are part of the task. For pouring, Diffusion Policy obtains IoU 0.74 and success 0.79 versus human IoU 0.79 and success 1.00; for spreading, it obtains coverage 0.77 and success 1.00 versus human 0.79 and 1.00. LSTM-GMM reaches 0.06/0 for pouring and 0.27/0 for spreading. These numbers are not just a win on a clean trajectory: the controller handles viscosity, varied initial positions, and perturbations to the dough, but still has failures when grasping or contact geometry is wrong.
+
+![Position control gives Diffusion Policy a different latency and smoothness trade-off from velocity control](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-source-figure-4.webp)
+*Fig 3: The source ablation compares velocity and position control across the simulated tasks; position control improves the diffusion variants, while latency and horizon still impose a responsiveness trade-off. | source: [Diffusion Policy, Figure 4](https://arxiv.org/abs/2303.04137)*
+
+Figure 3 is a control-interface result, not an architectural footnote. Position commands let the receding-horizon policy absorb small image and network delays without integrating velocity errors at every step. The paper warns that comparisons are asymmetric: Diffusion Policy uses position control, while several baselines are strongest with velocity control. A matched action-space comparison is therefore needed before attributing every gain to the sampler.
+
+### What the ablations actually establish
+
+On the robomimic Square proficient-human task, the vision encoder choice matters. A CLIP ViT-B/16 trained end to end reaches 0.98 success after 50 epochs, compared with 0.70 when frozen and 0.22 when trained from scratch. ResNet-18 reaches 0.92 with fine-tuning, 0.58 frozen, and 0.94 from scratch. The result argues for adapting the visual representation to the action loss; “pretrained” alone is not a sufficient recipe.
+
+The diffusion representation also has a deployment cost. It requires multiple denoising evaluations, and its training objective does not expose the same convenient normalized action likelihood as an autoregressive policy. The benchmarks show strong imitation under the paper's horizons, data, and hardware. They do not establish superiority under a strict high-frequency control budget, online reinforcement learning, or a policy-preference objective.
 
 ## High-Level Takeaways
 
-- Diffusion Policy informs whether action multimodality is important enough to justify iterative decoding. Its atomic unit is an action trajectory corrupted at a diffusion timestep; the loss predicts denoising information conditioned on visual state. Temporal compression comes from predicting a sequence and executing it receding-horizon.
-- The benchmark establishes a strong imitation-learning Pareto point, not that diffusion remains optimal under strict latency or online RL. A missing experiment matches end-to-end control frequency and compute against flow, autoregressive, and parallel regression heads. At ten times the horizon, denoising cost and model error across the unused tail grow. The representation claim fails if a simpler continuous chunk policy matches robustness and multimodality at the same closed-loop rate.
-- Diffusion Policy made the policy distribution—not only the backbone—a central robot-learning decision.
-- Strong offline imitation results do not automatically provide tractable action log-probabilities for RL.
-- Diffusion is valuable when the action distribution has several precise modes; its sampling interface must still fit the control and post-training loop.
+- Diffusion Policy learns multimodal, temporally coherent action chunks instead of averaging incompatible demonstrations.
+- Receding-horizon execution turns those chunks into a closed-loop controller; the action horizon must balance smoothness against reaction time.
+- The strongest evidence comes from contact-rich and multimodal tasks, including Push-T and sauce manipulation, with explicit success and geometry metrics.
+- End-to-end visual fine-tuning and the choice of position versus velocity control materially affect the comparison.
+- A deployment decision should compare diffusion, flow, autoregressive, and parallel regression heads at the same control rate and hardware budget.
