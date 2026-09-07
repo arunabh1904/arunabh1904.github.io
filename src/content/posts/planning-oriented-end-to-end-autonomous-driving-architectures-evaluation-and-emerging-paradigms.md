@@ -19,49 +19,38 @@ summary: '2026 – a planning-oriented taxonomy that treats evaluation protocol 
 
 ## Summary
 
-> This survey argues that end-to-end driving should be classified by what supports the final plan, not by how much visible structure the network removes. It organizes methods along four axes—input representation, planning output, supervision, and evaluation—and follows the field from direct control imitation through structured BEV and vector planners to world models and vision-language-action systems. Its strongest decision rule is that an open-loop displacement score, a NAVSIM non-reactive score, and a Bench2Drive closed-loop score are different claims. The review maps those claims through June 2026; it does not provide a new cross-benchmark experiment or a universal model ranking.
+> This survey's useful claim is that “end-to-end” does not identify one architecture or one level of evidence. It classifies driving systems by the input representation, planning output, supervision, and evaluation contract that support the final plan. It then separates open-loop displacement matching, NAVSIM's non-reactive evaluation, and Bench2Drive's reactive simulation. The review is a structured claim map through June 2026, not a new experiment or a universal leaderboard.
 
 ## Core Insights
 
-### End-to-end does not mean structure-free
+### Start with the planning contract
 
-Planning-oriented systems remain end to end when their intermediate objects are learned or jointly optimized toward driving behavior. A model may carry BEV features, object or map queries, route encodings, world-model latents, language tokens, or explicit safety constraints. The architectural question is whether those objects preserve the geometry, uncertainty, semantics, and action interface the planner needs—not whether the diagram contains named modules.
+The survey asks a more precise question than whether a model has a visible perception head: what information is allowed to support the final plan, and how is that plan trained? Its four axes are input representation, planning output, supervision, and evaluation. Inputs may be raw images, learned BEV features, objects and maps, world-model latents, or language-conditioned tokens. Outputs may be controls, waypoints, trajectories, or actions generated through a latent or language interface. Supervision may be imitation, auxiliary perception and prediction, preference or reinforcement signals, or multimodal task mixtures.
 
-![Planning-oriented end-to-end driving taxonomy organized by input representation, planning output, supervision, and evaluation](/assets/images/planning-oriented-e2e-structure.webp)
-*Fig 1: The survey classifies systems by the information and training contract supporting the final plan; learned BEV, object, world-model, or language structure remains compatible with end-to-end optimization. | source: [Planning-Oriented End-to-End Autonomous Driving](https://arxiv.org/abs/2608.20111)*
+This classification explains why “end-to-end” can describe systems with very different inductive bias. UniAD keeps structured BEV tasks because those tasks serve planning. A VLA may keep language because scene explanation and command conditioning shape the action interface. A world model may predict future consequences before selecting a trajectory. The visible module boundary is less informative than the contract between representation, objective, and action.
 
-![Figure 4 from Planning-Oriented End-to-End Autonomous Driving: Architectures, Evaluation, and Emerging Paradigms](/assets/images/planning-oriented-end-to-end-autonomous-driving-architectures-evaluation-and-emerging-paradigms-source-figure-4.webp)
-*Fig 2: Why open-loop and closed-loop evaluations can disagree. Open-loop trajectory matching tests similarity under the logged state distribution, while closed-loop evaluation tests the policy under the states it actually induces. | source: [Planning-Oriented End-to-End Autonomous Driving: Architectures, Evaluation, and Emerging Paradigms](https://arxiv.org/abs/2608.20111)*
+The survey's organizing change is therefore comparative. It asks which axis a new method changes, what control it uses, and whether the evaluation measures that change. A planner that adds a language head but reports only logged L2 has shown a different kind of evidence from a planner that improves a reactive collision score.
 
+### Evaluation changes what a result means
 
-The survey's four-axis taxonomy prevents a backbone name from standing in for a driving formulation:
+Open-loop trajectory metrics compare a predicted path with the logged future under the state distribution already present in the dataset. They are useful for measuring geometric fidelity, but they do not ask where the policy goes after its first mistake. NAVSIM adds standardized planning and safety proxies while remaining non-reactive: other agents do not respond to the ego vehicle's chosen action. Bench2Drive runs routes in a reactive CARLA environment, so the policy's decisions can change future interactions, but the simulator and controller introduce their own transfer boundary. WOD-E2E and long-tail evaluations expose additional questions about coverage and preferences rather than resolving the same one.
 
-| Axis | Representative choices | Decision exposed |
-| --- | --- | --- |
-| Input representation | Raw sensors, BEV, vectors, object queries, world-state latents, VLM tokens | Which evidence and structure reach the planner? |
-| Planning output | Controls, waypoints, trajectories, distributions, action tokens | Can the output express alternatives and accept safety checks? |
-| Supervision | Behavior cloning, privileged distillation, auxiliary tasks, RL, world-model prediction, language alignment | Which target teaches recovery, consequence, and route compliance? |
-| Evaluation | Open-loop replay, non-reactive real-log simulation, reactive closed loop, long-tail or preference scoring | Which behavior does the reported number actually test? |
+![Open-loop errors can become different states under reactive evaluation](/assets/images/planning-oriented-end-to-end-autonomous-driving-architectures-evaluation-and-emerging-paradigms-source-figure-4.webp)
+*Fig 1: The source sequence shows how a small open-loop deviation can lead to a different state, making non-reactive replay and closed-loop evaluation test different policy properties. | source: [Planning-Oriented End-to-End Autonomous Driving, Figure 4](https://arxiv.org/abs/2608.20111)*
 
-The progression is therefore not a clean replacement sequence. Direct behavior cloning minimizes interfaces but suffers from covariate shift. Privileged teachers add structure during training. BEV and vectorized planners expose geometry and multi-task supervision. World models evaluate possible consequences, but only if their imagined futures remain calibrated under action changes. VLA systems add semantic context, yet must bridge text-space reasoning to metric trajectories under a bounded latency budget.
+The figure's causal path is the survey's most important evaluation intuition. A logged frame gives every method the same starting point, so displacement error can be compared cleanly. Once the ego plan changes the state, the next observation is policy-dependent. A low open-loop error can coexist with poor recovery, while a larger logged error can still lead to a safe reactive route. The metrics should therefore be read as different contracts, not placed in one ranking without qualification.
 
-### Evaluation determines the scope of the architecture claim
+### Read foundation-model claims through action
 
-Open-loop evaluation scores a policy on states visited by the logged expert. It cannot test recovery after the policy causes a deviation, and it may penalize a safe alternative simply because it differs from the recorded path. NAVSIM-style non-reactive evaluation adds real sensor logs and planning-aware safety, progress, and comfort proxies at scale, but other agents do not react to the ego plan. Bench2Drive-style simulation tests interaction and recovery under the policy's induced state distribution, while inheriting CARLA's sim-to-real boundary. WOD-E2E adds rare scenarios and human preferences but remains open loop.
+The review treats world models and VLA systems as extensions of the same planning question. Visual realism is insufficient for a world model unless the predicted consequence is conditioned on an action and helps choose among plans. Language quality is insufficient for a VLA unless instructions, descriptions, or explanations alter an action-grounded decision under a controlled comparison. The atomic object is the future transition or action chunk, not the prettiness of a generated frame or the fluency of a caption.
 
+That perspective also changes what a useful ablation looks like. A world-model paper should compare action-conditioned prediction against an equally trained visual-only predictor and measure downstream plan selection. A VLA paper should hold the visual input and planner fixed while removing language supervision or command conditioning. A structured planner should report whether its auxiliary map, object, or motion losses change the final planning metric under the same compute and data budget.
 
-The practical rule is to compare claims within protocols and triangulate across them. A low nuScenes L2 error does not imply a high closed-loop route score. A high NAVSIM score is stronger proxy evidence than displacement alone, but ranking inversions and saturated submetrics prevent it from replacing reactive evaluation. Small leaderboard differences are also uninterpretable without the benchmark version, controller, safety wrapper, sensor configuration, seeds, and metric implementation.
-
-The same standard applies to language and world models. [Inference-time attention steering](/paper%20shorts/2026/08/17/inference-time-attention-steering-for-vision-language-action-driving-models.html) can move a trajectory without establishing safer behavior, while [XCoT-VLA](/paper%20shorts/2026/08/11/xcot-vla-executable-chain-of-thought-for-vision-language-action-driving.html) trains a compact reasoning interface whose gains are still tied to its evaluation setting. Better explanations, plausible futures, and lower displacement error are useful diagnostics; none is a substitute for action-grounded and closed-loop evidence.
-
-### The review is a claim map, not a meta-analysis
-
-The authors use a structured narrative search across scholarly databases, benchmark repositories, leaderboards, code releases, and project pages, with work covered through June 2026. Inclusion criteria span influential driving formulations, planning outputs, benchmarks, world models, VLM/VLA mechanisms, and reproducibility or safety critiques. The resulting scope is broad, but public academic work is overrepresented, recent 2025–2026 methods lack independent reproduction, and metric versions make many numbers protocol-dependent. The paper correctly recommends comparing methods by claim and benchmark family instead of merging their scores.
+The survey is careful about its evidence boundary. It follows recent methods, benchmark repositories, leaderboards, code, and project pages through June 2026, but public methods and protocol-compatible results are overrepresented. It does not fit a meta-analysis, normalize every metric implementation, or establish research priority from publication order. Its value is a claim map: before comparing two numbers, identify what state distribution, controller, sensor setup, benchmark version, and safety wrapper produced them.
 
 ## High-Level Takeaways
 
-- A structured intermediate representation is compatible with end-to-end learning when the representation and policy are optimized around the final plan.
-- Output space, supervision, and evaluation can matter more than the encoder family: a trajectory distribution, a privileged teacher, or a reactive benchmark changes the scientific claim even when the visual backbone stays fixed.
-- Open-loop, non-reactive real-log, reactive closed-loop, and preference-aware evaluations test different failure surfaces and should never share one undifferentiated leaderboard.
-- World models need calibrated action-conditioned futures; VLA systems need evidence that language improves action quality rather than only explanation quality.
-- The survey's thesis would weaken if benchmark-aligned, compute-matched studies found that open-loop rankings reliably predict closed-loop safety and route completion across datasets, controllers, and distribution shifts.
+- “End-to-end” is a training relationship; the useful comparison unit is the representation, objective, output, and evaluation contract that support the plan.
+- Open-loop L2, non-reactive NAVSIM, and reactive Bench2Drive answer different questions and should not share one unqualified ranking.
+- World models and VLA systems earn their planning claim only when future prediction or language conditioning changes an action-grounded evaluation.
+- A useful comparison would publish controller, sensor, compute, seeds, and reactive recovery beside logged-trajectory accuracy so the four axes can be read together.
