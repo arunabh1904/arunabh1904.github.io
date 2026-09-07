@@ -9,8 +9,6 @@ field: 'BEV Perception & Mapping'
 summary: '2023 – UniBEV: one detector for camera, LiDAR, and fused operating modes'
 ---
 
-## 2023 – UniBEV
-
 **ArXiv:** [2309.14516](https://arxiv.org/abs/2309.14516)
 
 **Code:** [UniBEV](https://github.com/tudelft-iv/UniBEV)

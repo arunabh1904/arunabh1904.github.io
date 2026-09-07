@@ -15,8 +15,6 @@ topics:
 summary: '2022 – Simple-BEV: What Really Matters for Multi-Sensor BEV Perception?'
 ---
 
-## 2022 – Simple-BEV
-
 **ArXiv:** [2206.07959](https://arxiv.org/abs/2206.07959)
 
 **Project and code:** [Simple-BEV](https://simple-bev.github.io/)
@@ -36,6 +34,9 @@ Simple-BEV begins with a metric volume spanning 100×10×100 m and discretized i
 
 The distinction changes how the two operators cover distance. Splatting can place multiple samples into nearby voxels but may leave far voxels with few or no samples at fixed depth intervals. Pull-based sampling gives every voxel a feature, although far voxels sample densely packed image regions. The paper's distance breakdown shows splatting ahead at close range and bilinear sampling ahead at medium and long range. That is a geometric explanation for why a parameter-free operator can remain competitive.
 
+![Simple-BEV source Figure 2: IoU by distance for splatting and bilinear sampling](/assets/images/simple-bev-what-really-matters-for-multi-sensor-bev-perception-source-figure-2.webp)
+*Fig 2: The distance curves show the geometric trade-off: splatting helps nearby voxels, while pull-based sampling is stronger at medium and long range. | source: [Simple-BEV, Figure 2](https://arxiv.org/abs/2206.07959)*
+
 ### The matched lifting table is smaller than the training effects
 
 The camera-only experiments use nuScenes vehicle segmentation: 28,130 training samples and 6,019 validation samples, six cameras, and IoU as the metric. The ResNet-101 is initialized from COCO detection; the BEV ResNet-18 starts from scratch. Training runs for 25,000 iterations with AdamW and a one-cycle schedule. The 200×8×200 volume and 200×200 output are held fixed while the authors vary lifting, resolution, batch size, and augmentation.
@@ -48,16 +49,13 @@ The camera-only experiments use nuScenes vehicle segmentation: 28,130 training s
 | Bilinear sampling | 47.4 | Parameter-free geometry is competitive. |
 | Multi-scale deformable attention | 48.9 | Best lifting score, with a larger systems cost. |
 
-The matched table keeps backbone, resolution, batch size, and augmentations constant. Multi-scale deformable attention buys 1.5 points over bilinear sampling, but uses 59M rather than 42M parameters, requires a custom CUDA kernel, trains about a day longer, and is 0.5 FPS slower at test time. The difference is real; it is simply smaller than the nearly 14-point gain from increasing effective batch size from 2 to 40.
+The matched table keeps backbone, resolution, batch size, and augmentations constant. Multi-scale deformable attention buys 1.5 points over bilinear sampling, but uses 59M rather than 42M parameters, requires a custom CUDA kernel, trains about a day longer, and is 0.5 FPS slower at test time. The difference is real; it is smaller than the nearly 14-point gain in the batch sweep. That sweep holds 25,000 iterations fixed, so batch 40 processes about 20 times as many examples as batch 2. The gain therefore mixes effective-batch and optimization effects with more training data seen; it is not an isolated batch-size intervention.
 
 Resolution creates another explicit frontier. At 672×1200, the model reaches 49.3 IoU, but takes 133 ms versus 83 ms for the 47.4 IoU model at 448×800 and needs nearly twice the training time. At the highest tested resolution, performance falls again, plausibly because the feature scale no longer matches the backbone's pretraining. The paper does not claim that resolution should always be maximized.
 
 ### Radar is useful when its input contract is preserved
 
 The radar experiment uses the same synchronized nuScenes vehicle-segmentation setup. Each radar return contributes position, velocity, and metadata channels. Three sweeps at t, t-1, and t-2 are aligned to the current frame; the BEV raster is concatenated with RGB features before compression. Camera-only IoU is 47.4, camera plus radar is 55.7, and camera plus LiDAR is 60.8.
-
-![Simple-BEV source Figure 2: IoU by distance for splatting and bilinear sampling](/assets/images/simple-bev-what-really-matters-for-multi-sensor-bev-perception-source-figure-2.webp)
-*Fig 2: The distance curves show the geometric trade-off: splatting helps nearby voxels, while pull-based sampling is stronger at medium and long range. | source: [Simple-BEV, Figure 2](https://arxiv.org/abs/2206.07959)*
 
 The radar ablations explain why earlier negative results do not settle the question. Removing return metadata lowers IoU by 0.7; using nuScenes-filtered returns instead of raw returns lowers it by 2.0; using one sweep instead of three lowers it by 2.4. The useful signal is not a binary occupancy mask. Velocity can separate moving objects from background, and accumulation helps overcome radar's extreme sparsity.
 

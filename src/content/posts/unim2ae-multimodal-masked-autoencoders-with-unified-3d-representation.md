@@ -10,8 +10,6 @@ field: 'BEV Perception & Mapping'
 summary: '2023 – UniM²AE: Multi-Modal Masked Autoencoders with Unified 3D Representation for Autonomous Driving'
 ---
 
-## 2023 – UniM²AE
-
 **ArXiv:** [2308.10421](https://arxiv.org/abs/2308.10421)
 
 **Code:** [UniM2AE](https://github.com/hollow-503/UniM2AE)
@@ -24,12 +22,12 @@ summary: '2023 – UniM²AE: Multi-Modal Masked Autoencoders with Unified 3D Rep
 
 ### Preserve height before asking modalities to agree
 
-A camera patch can contain several objects at different depths, while a LiDAR voxel already carries metric position. Projecting both into the image plane merges geometry; collapsing them into a flat BEV removes height. UniM²AE uses a 3D volume as the meeting space instead. LiDAR tokens are placed directly by ego-frame coordinates. Image tokens use camera projection and spatial cross-attention to sample the volume. The volume keeps x, y, and z long enough for a traffic sign above the road and a car on the road to remain different objects.
+A camera patch can contain several objects at different depths, while a LiDAR voxel already carries metric position. Projecting both into the image plane merges geometry; collapsing them into a flat BEV removes height. UniM²AE uses a 3D volume as the meeting space instead. LiDAR tokens are placed directly by ego-frame coordinates. For image features, 3D volume queries are projected into each camera view, and deformable attention samples the corresponding 2D feature maps. The volume keeps x, y, and z long enough for a traffic sign above the road and a car on the road to remain different objects.
 
 ![UniM²AE source Figure 1: image-plane alignment versus unified 3D interaction](/assets/images/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation-source-figure-1.webp)
 *Fig 1: The source comparison shows why UniM²AE aligns features in a 3D volume rather than forcing masked camera and LiDAR inputs to share an image-plane layout. | source: [UniM²AE, Figure 1](https://arxiv.org/abs/2308.10421)*
 
-The representation is also reversible. After interaction, the fused volume is projected back to the masked LiDAR voxel positions and the masked camera pixels. That gives each modality a decoder target in its native space while allowing the encoder to borrow information from the other sensor. The shared object is therefore geometric enough for correspondence and detailed enough for reconstruction.
+The shared volume can then be mapped back to each modality. After interaction, the fused volume is sampled at masked LiDAR voxel positions and projected to the corresponding camera coordinates. That gives each modality a decoder target in its native space while allowing the encoder to borrow information from the other sensor. The shared object is therefore geometric enough for correspondence and detailed enough for reconstruction.
 
 ### Mask each stream, then exchange evidence in the volume
 

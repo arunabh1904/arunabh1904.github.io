@@ -10,15 +10,13 @@ field: 'BEV Perception & Mapping'
 summary: '2023 – MetaBEV: Solving Sensor Failures for BEV Detection and Map Segmentation'
 ---
 
-## 2023 – MetaBEV
-
 **ArXiv:** [2304.09801](https://arxiv.org/abs/2304.09801)
 
 **Project:** [MetaBEV](https://chongjiange.github.io/metabev)
 
 ## Summary
 
-> MetaBEV makes sensor availability part of the BEV computation path. Learned meta-BEV queries repeatedly attend to whichever camera and LiDAR features exist, while modality-specific experts keep the cross-attention path flexible and a second mixture-of-experts block separates detection from map segmentation. With switched-modality training, it reaches 42.6 NDS and 54.4 mIoU when LiDAR is absent, versus 7.1 NDS and 36.7 mIoU for the zero-filled BEVFusion comparison; with cameras absent, it reaches 69.2 NDS and 53.7 mIoU. The evidence covers explicit missing modes and simulated corruptions, so it supports graceful degradation under those protocols rather than a general safety guarantee.
+> MetaBEV makes sensor availability part of the BEV computation path. Learned meta-BEV queries repeatedly attend to whichever camera and LiDAR features exist, while modality-specific MLP projections keep the cross-attention path flexible and a separate mixture-of-experts block addresses detection/map-segmentation conflict. With switched-modality training, it reaches 42.6 NDS and 54.4 mIoU when LiDAR is absent, versus 7.1 NDS and 36.7 mIoU for the zero-filled BEVFusion comparison; with cameras absent, it reaches 69.2 NDS and 53.7 mIoU. The evidence covers explicit missing modes and simulated corruptions, so it supports graceful degradation under those protocols rather than a general safety guarantee.
 
 ## Core Insights
 
@@ -45,7 +43,7 @@ Switched-modality training chooses camera only, LiDAR only, or both with equal p
 | Missing cameras, map mIoU | 53.7 | 4.1 | Segmentation under LiDAR-only input. |
 | Full sensors, map mIoU | 70.4 | 62.7 | Canonical multimodal performance. |
 
-The asymmetric gaps matter. Missing LiDAR devastates the zero-filled camera path, while MetaBEV still produces a usable BEV. Missing cameras is easier for detection because LiDAR carries metric structure, but BEVFusion's segmentation head still collapses. The model is learning a conditional scene representation, not merely averaging two streams.
+The asymmetric gaps matter. Missing LiDAR devastates the zero-filled camera path, while MetaBEV still retains nontrivial detection and map predictions. Missing cameras is easier for detection because LiDAR carries metric structure, but BEVFusion's segmentation head still collapses. The model is learning a conditional scene representation, not merely averaging two streams.
 
 ### Separate sensor flexibility from task conflict
 
