@@ -19,7 +19,9 @@ summary: '2025 – Qwen2.5-VL Technical Report'
 
 ## Core Insights
 
-Qwen2.5-VL redesigns the visual encoder around high-resolution cost. Patch features retain their native spatial layout; window attention handles most layers locally, and only four layers use full attention to exchange information across windows. The report uses windows up to 112 × 112 patches. This preserves small cells in a chart or document without paying global quadratic cost at every layer, though the number of patches and the resulting language context still grow with the input.
+### Local windows and absolute time control different costs
+
+Qwen2.5-VL redesigns the visual encoder around high-resolution cost. Patch features retain their native spatial layout; window attention handles most layers locally, and only four layers use full attention to exchange information across windows. The report uses windows up to 112 × 112 pixels, corresponding to 8 × 8 patches. This preserves small cells in a chart or document without paying global quadratic cost at every layer, though the number of patches and the resulting language context still grow with the input.
 
 ![Qwen2.5-VL's vision encoder, window-attention blocks, dynamic FPS sampling, and absolute-time position IDs](/assets/images/qwen2-5-vl-technical-report-source-figure-1.webp)
 *Fig 1: The source architecture diagram connects native-resolution image and video tokens to window attention, dynamic FPS sampling, and temporal IDs aligned to elapsed seconds. | source: [Qwen2.5-VL, Figure 1](https://arxiv.org/abs/2502.13923)*

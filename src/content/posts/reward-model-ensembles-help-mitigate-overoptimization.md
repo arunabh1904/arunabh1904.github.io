@@ -38,7 +38,7 @@ Figure 2 gives the diagnostic that the method is designed to improve: policy KL 
 ![Figure 3 from Reward Model Ensembles Help Mitigate Overoptimization](/assets/images/reward-model-ensembles-help-mitigate-overoptimization-source-figure-3.webp)
 *Fig 3: In best-of-$n$ sampling, ensemble objectives sustain higher gold reward than a single reward model as policy KL grows, while the proxy reward continues upward and exposes overoptimization. | source: [Reward Model Ensembles, Figure 3](https://arxiv.org/abs/2310.02743)*
 
-The best-of-$n$ curves show the practical payoff. Under noiseless labels, ensembles improve the gold reward by up to about 30%; with 25% label noise, the reported improvement reaches roughly 70% relative to the single-model baseline. For PPO, a single reward model needs a larger KL penalty to avoid overoptimization, while worst-case and uncertainty-weighted ensembles avoid it with a small penalty around 0.01 in the studied runs. The gain comes from using disagreement as a stop signal, not from making the mean proxy more accurate everywhere.
+The best-of-$n$ curves show the practical payoff. Under noiseless labels, ensembles improve the gold reward by up to about 30%; with 25% label noise, the reported improvement reaches up to roughly 75% relative to the single-model baseline. For PPO, a single reward model needs a larger KL penalty to avoid overoptimization, while worst-case and uncertainty-weighted ensembles avoid it with a small penalty around 0.01 in the studied runs. The gain comes from using disagreement as a stop signal, not from making the mean proxy more accurate everywhere.
 
 | Objective | Behavior |
 | --- | --- |
@@ -54,5 +54,5 @@ The evidence supports ensembles as a way to detect proxy exploitation in this sy
 
 - Reward-model ensembles turn disagreement into a conservative signal for the part of policy space where proxy optimization can leave the gold objective behind.
 - The paper's 7M–1.3B proxy sweep, best-of-$n$/PPO comparison, and 25% label-noise setup make overoptimization measurable, but the gold reward remains synthetic.
-- Best-of-$n$ gains are about 30% without label noise and roughly 70% with the reported 25% noise; PPO benefits from ensembles plus a small KL penalty in the studied runs.
+- Best-of-$n$ gains are about 30% without label noise and up to roughly 75% with the reported 25% noise; PPO benefits from ensembles plus a small KL penalty in the studied runs.
 - Ensemble members can share blind spots, so disagreement is evidence about extrapolation only when it correlates with independently measured failures.

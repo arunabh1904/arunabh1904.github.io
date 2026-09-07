@@ -20,6 +20,8 @@ summary: "2024 – Janus: Decoupling Visual Encoding for Unified Multimodal Unde
 
 ## Core Insights
 
+### Specialized visual routes share one transformer
+
 Janus does not claim that every understanding system must use invariant semantic features or that every generator must preserve the same level of detail. Its narrower argument is architectural: in this setup, using one visual encoder for both jobs creates a tradeoff worth removing. SigLIP features are flattened and mapped into the language-model space for understanding, while a VQ tokenizer turns target images into codebook IDs for generation. Both routes then enter one shared autoregressive transformer.
 
 ![Janus architecture with separate visual understanding and generation encoders feeding one autoregressive transformer](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-paper-figure.png)

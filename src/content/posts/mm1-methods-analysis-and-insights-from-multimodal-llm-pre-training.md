@@ -20,6 +20,8 @@ summary: "2024 – MM1: Methods, Analysis & Insights from Multimodal LLM Pre-tra
 
 ## Core Insights
 
+### Controlled ablations locate the useful visual capacity
+
 MM1 starts with a deliberately small base configuration: a 1.2B decoder-only language model, ViT-L/14 at 336 × 336, a C-Abstractor producing 144 image tokens, and a 45% captioned, 45% interleaved, 10% text-only data mixture. Each ablation changes one architecture or data choice at a time and evaluates zero-, four-, and eight-shot captioning and VQA.
 
 ![MM1 model and data ablation axes: image encoder, connector, resolution, visual tokens, and data mixture](/assets/images/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training-paper-figure.png)

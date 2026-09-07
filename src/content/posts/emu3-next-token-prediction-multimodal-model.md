@@ -19,6 +19,8 @@ summary: '2024 – Emu3: Next-Token Prediction Is All You Need'
 
 ## Core Insights
 
+### Discrete visual tokens extend next-token prediction
+
 Once a tokenizer maps pixels and frames into discrete symbols, the transformer no longer needs separate objectives for “understanding” and “generation.” It can condition on image tokens while answering a question, continue a video token stream, or emit image tokens after text. Emu3 is trained from scratch on a mixture of language, image, and video data, so the shared interface is present throughout training rather than added after a language-only model has already formed its abstractions.
 
 ![Emu3 architecture: one transformer predicts interleaved text, image, and video tokens](/assets/images/emu3-paper-figure-1.png)

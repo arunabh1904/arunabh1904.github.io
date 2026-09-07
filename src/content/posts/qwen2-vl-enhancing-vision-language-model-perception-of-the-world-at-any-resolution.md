@@ -22,7 +22,9 @@ summary: "2024 – Qwen2-VL: Enhancing Vision-Language Model's Perception of the
 
 ## Core Insights
 
-A fixed 224 × 224 resize makes the visual bottleneck independent of the question. That is especially costly for documents: the answer may be a small word, cell, or formula that disappears during resizing. Qwen2-VL removes fixed absolute position embeddings from the vision path, uses 2D-RoPE, and lets each image produce a variable number of visual tokens. A 224 × 224 input with 14-pixel patches is compressed by the post-ViT merger to 66 tokens; larger inputs can preserve more patches while the packed sequence remains bounded by the available context and memory.
+### Resolution determines the visual sequence length
+
+A fixed 224 × 224 resize makes the visual bottleneck independent of the question. That is especially costly for documents: the answer may be a small word, cell, or formula that disappears during resizing. Qwen2-VL removes fixed absolute position embeddings from the vision path, uses 2D-RoPE, and lets each image produce a variable number of visual tokens. A 224 × 224 input with 14-pixel patches is compressed by the post-ViT merger to 64 visual tokens, bracketed by two boundary tokens for 66 tokens in total; larger inputs can preserve more patches while the packed sequence remains bounded by the available context and memory.
 
 ![Qwen2-VL capability overview across video understanding, grounding, multilingual OCR, documents, formula recognition, and UI interaction](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-paper-figure.jpg)
 *Fig 1: The paper's capability overview shows the tasks enabled by the variable-resolution vision-language interface, including video chat, grounding, multilingual OCR, document understanding, and UI interaction. | source: [Qwen2-VL, Figure 1](https://arxiv.org/abs/2409.12191)*

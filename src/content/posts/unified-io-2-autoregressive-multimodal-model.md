@@ -19,6 +19,8 @@ summary: '2023 – Unified-IO 2: Scaling Autoregressive Multimodal Models'
 
 ## Core Insights
 
+### Modalities meet in a shared autoregressive sequence
+
 Unified-IO 2's unification happens at serialization time. Text becomes BPE tokens, points and boxes become coordinate tokens, images and dense outputs use discrete visual codes, and audio has its own encoder and decoder. Dynamic packing puts those sequences into one encoder context; dynamic unpacking sends decoder outputs to the appropriate detokenizer. The system is broad because the transformer sees a common contract, not because pixels, waveforms, and actions have been forced into one raw representation.
 
 ![Unified-IO 2 architecture for packing text, image, audio, history, and structured outputs into one encoder-decoder transformer](/assets/images/unified-io-2-autoregressive-multimodal-model-source-figure-2.webp)
