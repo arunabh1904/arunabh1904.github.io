@@ -19,25 +19,31 @@ summary: '2024 – LLaVA-OneVision: Easy Visual Task Transfer'
 
 ## Core Insights
 
+### One interface carries images, image sets, and video
+
 The paper's central idea is interface continuity. A single image, a sequence of images, and a video frame stream all become visual tokens inserted before the same language model. The architecture remains deliberately small: SigLIP encodes visual features, a two-layer MLP maps them into the Qwen-2 embedding space, and the language model predicts the answer conditioned on the visual sequence.
 
 ![LLaVA-OneVision network architecture](/assets/images/llava-onevision-easy-visual-task-transfer-source-figure-1.webp)
-*Source Figure 1. The same projector-and-LLM interface consumes a single image, multiple images, or video frames; the visual signal changes while the language path stays shared. [LLaVA-OneVision](https://arxiv.org/abs/2408.03326)*
+*Fig 1: The same projector-and-LLM interface consumes a single image, multiple images, or video frames; the visual signal changes while the language path stays shared. | source: [LLaVA-OneVision, Figure 1](https://arxiv.org/abs/2408.03326)*
 
 The less obvious decision is how to keep those modalities comparable. A 384×384 SigLIP input yields 729 tokens. For a high-resolution single image, Higher AnyRes splits the image into crops, encodes them, then bilinearly interpolates the crop features if their total would exceed a threshold. For multi-image input, each image is padded into a 384×384 frame and receives 729 tokens. For video, each frame is encoded and then pooled to 196 tokens so more frames fit. The authors choose the maximum visual sequences to be roughly equal: $(1+9)\times729=7,290$ for a single image, $12\times729=8,748$ for multi-image, and $32\times196=6,272$ for video.
 
 ![LLaVA-OneVision Higher AnyRes representation](/assets/images/llava-onevision-easy-visual-task-transfer-source-figure-2.webp)
-*Source Figure 2. Higher AnyRes preserves more spatial crops and uses bilinear interpolation to fit them into a bounded sequence; original AnyRes resizes and splits more aggressively. The tradeoff is resolution versus token count, not a new temporal encoder. [LLaVA-OneVision](https://arxiv.org/abs/2408.03326)*
+*Fig 2: Higher AnyRes preserves more spatial crops and uses bilinear interpolation to fit them into a bounded sequence; original AnyRes resizes and splits more aggressively. The tradeoff is resolution versus token count, not a new temporal encoder. | source: [LLaVA-OneVision, Figure 2](https://arxiv.org/abs/2408.03326)*
+
+### Mixed training builds on an established image interface
 
 The curriculum follows the same logic. Stage 1 aligns the projector on 558K image-text pairs and updates only the projector. Stage 1.5 adds 4M high-quality knowledge examples and trains the full model. Stage 2 first trains on 3.2M single-image instructions, then continues with a 1.6M OneVision mixture containing 560K multi-image, 350K video, and 800K sampled single-image examples. The vision encoder learning rate is set five times lower than the language/projector rate in the full-model stages. This is a useful separation: learn a broad image interface before asking it to coordinate several visual signals.
 
-The benchmark table shows that transfer is asymmetric. The 7B model rises from the single-image checkpoint to the full OneVision checkpoint on multi-image tasks: MI-VQA goes from 60.3 to 90.2, NLVR2 from 75.9 to 89.4, and Spot-the-Diff from 7.9 to 39.2. Video also improves: EgoSchema goes from 52.9 to 60.1 and VideoMME from 55.0/59.1 to 58.2/61.5 for the short/long settings. These are capability changes after mixed-modality training, not zero-shot image-to-video transfer alone.
+The benchmark table shows that transfer is asymmetric. The 7B model rises from the single-image checkpoint to the full OneVision checkpoint on multi-image tasks: MI-VQA goes from 60.3 to 90.2, NLVR2 from 75.9 to 89.4, and Spot-the-Diff from 7.9 to 39.2. Video also improves: EgoSchema goes from 52.9 to 60.1 and VideoMME from 55.0/59.1 to 58.2/61.5 without/with subtitles. These are capability changes after mixed-modality training, not zero-shot image-to-video transfer alone.
 
-The authors' own analysis supplies the most human insight. On ActivityNet-QA, LLaVA-OV-7B trained only on images scores 55.1, close to 56.6 after OneVision training. Many questions ask about a static property such as the color of a ball visible throughout the clip. A model can answer those from one frame. By contrast, EgoSchema and multi-view tasks benefit more from the extra modality training because they require comparison, ordering, or context across frames. “Video understanding” therefore contains both frame recognition and temporal reasoning; the transfer story is strongest where the question actually demands the latter.
+### A video benchmark can reward single-frame recognition
+
+The authors' analysis reveals a useful benchmark distinction. On ActivityNet-QA, LLaVA-OV-7B trained only on images scores 55.1, close to 56.6 after OneVision training. Many questions ask about a static property such as the color of a ball visible throughout the clip. A model can answer those from one frame. By contrast, EgoSchema and multi-view tasks benefit more from the extra modality training because they require comparison, ordering, or context across frames. “Video understanding” therefore contains both frame recognition and temporal reasoning; the transfer story is strongest where the question actually demands the latter.
 
 The emerging-capability examples make the composition concrete. A model trained separately on chart and diagram data can combine them in a multi-image insurance calculation; OCR and referring skills transfer to set-of-mark GUI instructions; and image, multi-image, and video skills combine for visual prompting in videos and image-in-video referring. These are plausible compositions, but the paper describes them through qualitative examples, so they should be read as capability demonstrations rather than prevalence estimates.
 
-The boundary is visible in the data as well. Of the 1.6M OneVision examples, the paper reports 43.0% multi-image, 25.9% video, and 31.2% single-image. The model is still trained mostly on single-image instructions overall, and the visual token budget limits the number of frames or images that can be represented. The high-level architecture makes transfer easy to attempt, but it does not by itself enforce object identity across frames, causal order, or long-range temporal state.
+The source has a mixture-accounting inconsistency: Section 4.2 lists 560K multi-image, 350K video, and 800K single-image examples, which sum to 1.71M, while Figure 5 labels the collection 1.6M and gives different proportions (43.0%, 25.9%, and 31.2%). Those should not be treated as a reconciled count ledger. The model is still trained mostly on single-image instructions overall, and the visual token budget limits the number of frames or images that can be represented. The high-level architecture makes transfer easy to attempt, but it does not by itself enforce object identity across frames, causal order, or long-range temporal state.
 
 ## High-Level Takeaways
 
