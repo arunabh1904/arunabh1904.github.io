@@ -58,9 +58,9 @@ The headline NLVR2 comparison is a 22-point absolute increase over the prior 54%
 
 The ablations give the mechanism more resolution. Removing the image-QA loss lowers the development scores from 69.9/60.0/74.9 to 68.9/58.2/72.4 on VQA/GQA/NLVR2. Replacing the two visual objectives with no vision tasks gives 66.3/57.1/50.9; RoI regression and detected-label classification together recover 69.9/60.0/74.9. Adding QA pretraining beats simply adding other QA examples at fine-tuning, and loading BERT weights helps early but eventually underperforms the from-scratch LXMERT pretraining. These controls support complementary visual and cross-modal supervision rather than a generic “more data” explanation.
 
-### Decision test and boundary
+### The strongest transfer result leaves the pretraining images behind
 
-LXMERT is the useful reference when a detector already provides a region vocabulary and the research question is how to distribute supervision across object structure, language, and cross-modal interaction. Match detector features and image overlap when comparing objective mixtures, and separate VQA/GQA transfer from the cleaner NLVR2 test. A patch encoder would remove the fixed-region bottleneck but would also change the tokenization and object losses that define this experiment. The paper shows what a structured region pipeline can learn; it does not establish that the same five-task recipe scales to raw pixels or open-world concepts.
+NLVR2 matters because the model must carry its learned image-language interaction to new images and statements, while VQA and GQA already contribute questions during pretraining. That distinction makes the visual-loss and QA-loss ablations more useful than the headline score alone. The detector remains frozen throughout: replacing it with raw patches would change both the representation and the targets of the masked-object tasks, so the five-task recipe has not been established for that different setting.
 
 ## High-Level Takeaways
 

@@ -56,17 +56,17 @@ The natural-image experiments use a ResNet-101 or EfficientNet-B3/B5 backbone, a
 | PhraseCut segmentation | 53.1 mean IoU; 56.1 Pr@0.5 | ResNet-101 backbone |
 | GQA | 62.95 test-dev / 62.45 test-standard | ENB5 visual backbone |
 
-The referring-expression numbers exceed proposal-reranking baselines because MDETR predicts the box directly and does not depend on a detector trained on downstream images. The paper flags a leakage issue for several prior systems: their Bottom-Up-and-Top-Down detector saw some RefCOCO validation and test images during detector training. MDETR’s pretraining excludes those images, so the comparison is not only about architecture.
+The referring-expression numbers exceed the proposal-reranking baselines in the table. Direct box prediction also removes the limit imposed by a fixed proposal set, although the comparison does not isolate that architectural choice from training differences. The paper flags a leakage issue for several prior systems: their Bottom-Up-and-Top-Down detector saw some RefCOCO validation and test images during detector training. MDETR’s pretraining excludes those images, so the comparison is not only about architecture.
 
 The CLEVR results show another boundary. MDETR reaches 99.7% on the main task and 81.7% on CLEVR-Humans after fine-tuning, but CoGenT test-B accuracy falls to 76.7 from 99.8 on test-A. The model therefore handles text-conditioned boxes and synthetic reasoning well while retaining compositional biases. A curriculum that first trains modulated detection reaches 99.7% QA accuracy; removing that curriculum falls to 68.2. Replacing separate QA heads with one shared head falls to 90.1, so the GQA/CLEVR gains depend on the task-specific decoder design as well as the pretrained detector.
 
-### Decision test and boundary
+### Free-form queries still need aligned supervision
 
-MDETR is the right baseline when a system must ground open-ended phrases or questions directly in image regions. Compare it with proposal-based models under matched image-overlap controls and report whether the supervision contains phrase boxes, masks, or only captions. The architecture removes a fixed label vocabulary, but it still requires aligned region language and runs a fused encoder for each query. Its strong grounding and inspectable QA outputs support the value of text-conditioned detection; they do not show that cheap caption-only web data can supply the same alignment.
+MDETR moves the visual boundary from a fixed detector vocabulary to the phrases supplied at inference. Its boxes and QA outputs expose a useful grounding interface, but learning that interface takes phrase-box annotations, not just arbitrary web captions. The LVIS timing makes the other cost concrete: querying many category names repeats multimodal processing. The model expands what can be requested while leaving annotation cost and query volume as practical limits.
 
 ## High-Level Takeaways
 
 - MDETR replaces fixed detector classes with text-conditioned boxes and token-span alignment.
-- Soft token prediction and contrastive object-token alignment are both necessary for clean grounding.
+- Removing either soft token prediction or contrastive alignment sharply lowers detection AP in the CLEVR ablation.
 - Dense phrase-box data transfer to referring expressions, phrase grounding, segmentation, and VQA.
 - The method trades detector vocabulary limits for aligned annotation cost and per-query multimodal compute.

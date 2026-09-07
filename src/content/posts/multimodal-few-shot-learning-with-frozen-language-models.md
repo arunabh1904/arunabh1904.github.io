@@ -15,7 +15,7 @@ summary: '2021 – Multimodal Few-Shot Learning with Frozen Language Models'
 
 ## Summary
 
-> Frozen gives a pretrained autoregressive language model a visual interface without updating its weights. A vision encoder maps each image to two continuous vectors in the language model’s token-embedding space, and caption training teaches the frozen decoder to continue from that prefix. The resulting model can answer some visual questions, retrieve outside knowledge, and bind new visual categories from a few interleaved image-text examples. Its transfer is striking for a proof of concept, while its exact-match scores and five-way binding results show how much information a tiny prefix loses.
+> Frozen gives a pretrained autoregressive language model a visual interface without updating its weights. A vision encoder maps each image to two continuous vectors in the language model’s token-embedding space, and caption training teaches the frozen decoder to continue from that prefix. The resulting model can answer some visual questions, retrieve outside knowledge, and bind new visual categories from a few interleaved image-text examples. Its transfer is striking for a proof of concept, while its exact-match scores and five-way binding results show that this early interface supports only limited visual concept learning.
 
 ## Core Insights
 
@@ -26,7 +26,7 @@ summary: '2021 – Multimodal Few-Shot Learning with Frozen Language Models'
 
 Frozen starts with a 7B autoregressive Transformer trained on the C4 text corpus. Its weights, including the token embedding and self-attention layers, stay fixed. An NF-ResNet-50 vision encoder produces one pooled image vector. A learned linear map expands that vector to $D\times n$ values and reshapes them into $n$ embeddings of the same width $D$ as a language token. The authors test prefix lengths of one, two, and four and find two works best in their configuration.
 
-Caption training updates the visual pathway only. The frozen language model still computes the next-token likelihood, and gradients flow through its attention operations into the image encoder and projection. The learned prefix therefore has to express an image in a coordinate system the language model already knows how to continue. Fine-tuning the language model is an available control, but it generalizes worse because the roughly three million Conceptual Captions pairs are much smaller than the text-only pretraining corpus.
+Caption training updates the visual pathway only. The frozen language model still computes the next-token likelihood, and gradients flow through its attention operations into the image encoder and projection. The learned prefix therefore has to express an image in a coordinate system the language model already knows how to continue. Fine-tuning the language model is an available control, but it generalizes worse in the reported transfer experiments. The authors attribute this to overfitting on roughly three million Conceptual Captions pairs, a much smaller corpus than the language model’s text pretraining data.
 
 ![Frozen inference interface for VQA, outside-knowledge questions, and few-shot classification](/assets/images/multimodal-few-shot-learning-with-frozen-language-models-source-figure-3.webp)
 *Fig 2: The same prefix interface supports an image question, an image plus a knowledge-seeking question, or an ordered support set of images and labels before a new query. | source: [Frozen, Figure 3](https://arxiv.org/abs/2106.13884)*
@@ -55,9 +55,9 @@ Open-ended miniImageNet replaces familiar class names with nonsense words and gi
 
 Fast-VQA makes the same distinction in a question-answering setting. A support set teaches new names for known visual categories, and the model must use those names in a question about a new image. Frozen rises from 1.6% to 7.9% on the synthetic-name version and from 3.7% to 10.5% when the real category names are used. The blind baseline also improves with more textual support, especially on the real-name version. The gains therefore show multimodal integration, but they are not purely visual: task format and linguistic reminders help too.
 
-### Decision test and boundary
+### Preserving the language model preserves useful priors and their limits
 
-Frozen is the right baseline when the question is whether a large text model’s prompting behavior can be reached through a small learned visual interface. Compare it with a blind prefix, a finetuned decoder, and a richer visual token stream under the same open-ended exact-match protocol. Its two-vector prefix is inexpensive and modular, but it cannot preserve arbitrary spatial detail, five-way binding is near chance, and the paper’s strongest examples use curated seeds. The contribution is the frozen-decoder interface and the evidence that language-only few-shot behavior can transfer across the modality boundary.
+Frozen's appeal is that caption training can reach a text model's existing prompting behavior through a learned visual prefix. The decoder's prior knowledge stays available, and interleaved examples can influence the answer without gradient updates. Yet blind prefixes already achieve substantial VQA scores, five-way novel-name binding is near chance, and the strongest open-ended examples use curated decoding seeds. These observations limit what the visual bridge establishes; they do not isolate the two-vector prefix as the cause of every failure. The paper demonstrates a transferable interface, with considerable room left for richer visual conditioning.
 
 ## High-Level Takeaways
 

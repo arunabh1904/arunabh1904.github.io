@@ -55,9 +55,9 @@ The full model beats the paper’s task-specific comparisons across the four tra
 
 The depth study does not support one magic number. Six repeated co-attention blocks give the best VQA result among the tested depths (70.55), while retrieval continues to rise from 55.68 R@1 at two blocks to 58.78 at eight. VCR and RefCOCO+ are slightly better with shallower variants. Data scale is similarly regular: zero-shot retrieval R@1 rises from 0 with no Conceptual Captions pretraining to 20.40, 26.76, and 31.86 when using 25%, 50%, and 100% of the corpus. The model benefits from more alignment data, but the task-dependent depth trend says that “more fusion” is not itself the claim.
 
-### Decision test and boundary
+### The detector still decides what the model can see
 
-ViLBERT is a useful baseline when an existing detector already supplies object regions and the question is how to stage visual-language interaction. Compare it with a single-stream model at matched data and fine-tuning settings, and report region-proposal recall separately from cross-modal scores. The detector fixes what can enter the model, Conceptual Captions contains noisy alt text, and the bidirectional BERT-style core does not directly solve open-ended generation. Its lasting contribution is the transferable two-stream grounding interface, not detector-free visual understanding.
+ViLBERT makes visual-language interaction transferable while retaining a fixed visual front end. A caption can help identify a proposed region, but co-attention cannot retrieve visual evidence absent from the detector outputs. Its bidirectional BERT-style core also serves discriminative heads rather than directly generating open-ended answers. The depth ablation and detector dependence together locate the contribution: learning where to exchange semantic information, given an existing region vocabulary.
 
 ## High-Level Takeaways
 

@@ -49,6 +49,8 @@ UNITER pretrains on image-sentence pairs from COCO Captions, Visual Genome Dense
 
 The downstream suite contains VQA, VCR, NLVR2, SNLI-VE visual entailment, Flickr30K and COCO image-text retrieval, and RefCOCO/RefCOCO+/RefCOCOg referring-expression comprehension. UNITER-base and large use the same pretraining objectives, then add task heads and fine-tune end to end. VCR receives a second pretraining stage on the VCR data; NLVR2 receives a small pair-level adaptation because the task has two images while the pretraining input has one.
 
+Removing evaluation images from image-text pretraining does not remove every source of overlap. For referring expressions, the appendix acknowledges that the shared upstream detector had seen some validation and test images. The authors retain those detector features for comparison with concurrent work and also rerun MAttNet with them, increasing its accuracy by 1.5 percentage points. The ground-truth-object and detected-proposal scores therefore need both their proposal setting and this detector-training caveat.
+
 ### The objective mixture transfers, with measurable caveats
 
 | Evaluation | UNITER result | Protocol boundary |
@@ -64,9 +66,9 @@ The paper reports UNITER-large as state of the art across its six task families,
 
 Data choice matters as much as the loss. The same full objective on out-of-domain SBU+Conceptual Captions reaches 396.91, below the 400.93 in-domain result, while combining both mixtures reaches 405.24. This is evidence for both domain similarity and scale. The two-image NLVR2 adaptation is also informative: a pair model reaches 75.85 development accuracy and adding bidirectional attention between the image representations reaches 77.18, beating a triplet input that asks the single-image pretrained encoder to absorb a new interaction pattern.
 
-### Decision test and boundary
+### Fine-grained fusion costs a new pass for each pair
 
-UNITER is the right baseline when local word-region grounding matters more than independent embedding speed. Compare it with two-stream and dual-encoder models using the same detector, image-overlap controls, and pair-scoring budget; report WRA and conditional-masking ablations separately. The detector still fixes the available visual vocabulary, and VCR’s second-stage pretraining means its best score is not a pure transfer result. UNITER shows that a single fused sequence plus explicit transport can improve alignment; it does not make open-world detection or large-scale retrieval cheap.
+UNITER lets every word and region interact before deciding whether a pair matches. That is useful for grounding a phrase in its surrounding sentence, but it prevents retrieval from being reduced to one cached image vector and one cached text vector. Explicit transport strengthens alignment within this fused representation; it does not remove the pair-scoring cost or the detector vocabulary. The added VCR pretraining and detector overlap further explain why transfer protocols matter alongside the objective mixture.
 
 ## High-Level Takeaways
 
