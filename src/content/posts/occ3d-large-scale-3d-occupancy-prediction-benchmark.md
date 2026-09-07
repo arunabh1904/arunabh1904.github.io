@@ -27,7 +27,7 @@ summary: '2023 – Occ3D: visibility-aware dense 3D occupancy benchmarks'
 
 A 3D detector answers where a known object is with a compact box. Occ3D asks for the state of every voxel: occupied with a semantic class, free, or unobserved. The representation can retain an irregular construction vehicle arm and can place out-of-vocabulary objects into a General Object (GO) class. It is richer than a box ontology, but it is not the same as semantic scene completion: the authors explicitly do not require a model to infer invisible regions.
 
-The two releases make the scale concrete:
+The two releases make the scale concrete. The first row is the native Occ3D-nuScenes label grid; the second is the much finer Occ3D-Waymo label grid published by the benchmark:
 
 | Benchmark | Split and data | Classes | Voxel volume and size |
 | --- | --- | ---: | --- |
@@ -50,7 +50,9 @@ The last refinement step addresses a subtle failure: pose drift and LiDAR noise 
 
 ### CTF-Occ spends computation where geometry is uncertain
 
-Occ3D also introduces CTF-Occ. Its pyramid voxel encoder predicts whether a voxel is empty, selects foreground or uncertain tokens, refines only the top-k candidates with spatial cross-attention, and upsamples between levels. An implicit MLP decoder can query a semantic label at an arbitrary coordinate. In the matched Occ3D-nuScenes table, CTF-Occ reaches 28.53 mIoU versus BEVFormer's 26.88, a 1.65 point gain. On Occ3D-Waymo it reaches 18.73 versus 16.76, a 1.97 point gain; the vehicle IoU gain is 10.23 points.
+Occ3D also introduces CTF-Occ. Its pyramid voxel encoder predicts whether a voxel is empty, selects foreground or uncertain tokens, refines only the top-k candidates with spatial cross-attention, and upsamples between levels. An implicit MLP decoder can query a semantic label at an arbitrary coordinate. In the matched Occ3D-nuScenes table, CTF-Occ reaches 28.53 mIoU versus BEVFormer's 26.88, a 1.65 point gain. On Occ3D-Waymo it reaches 18.73 versus 16.76, a 1.97 point gain; the paper's corresponding vehicle comparison is 28.09 IoU versus TPVFormer's 17.86, a 10.23 point gain.
+
+The label grid and the model evaluation grid should not be conflated. Occ3D-Waymo publishes 5 cm labels, but the paper's CTF-Occ experiments use a 0.4 m voxel size on both datasets. The 18.73 mIoU result therefore evaluates the benchmark at that coarser model grid; it is not a 5 cm-resolution camera prediction score.
 
 The ablation explains the source of that gain: on Waymo, the combination of OHEM and top-k token selection reaches 18.43 mIoU, whereas removing both targeted selection and hard-example weighting gives 14.06. The model is not simply “using a finer grid”; it is reallocating cross-attention toward occupied and ambiguous regions in a space dominated by empty voxels.
 

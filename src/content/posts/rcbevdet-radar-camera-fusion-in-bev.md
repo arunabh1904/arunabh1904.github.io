@@ -18,7 +18,7 @@ summary: "2024 – RCBEVDet: Radar-Camera Fusion in Bird's-Eye View for 3D Objec
 >
 > RCBEVDet treats radar as a measurement with its own structure, uncertainty, and motion signal. A point branch preserves sparse returns, a transformer branch supplies context, RCS-aware scattering turns signal strength into a spatial prior, and deformable cross-attention aligns the radar and camera BEV features before fusion.
 >
-> The paper's useful lesson is architectural: radar should not be forced through a LiDAR encoder and then fused as if both sensors had the same failure modes. The reported gains come from several small decisions that address sparsity, scattering, and calibration together.
+> The paper's useful lesson is architectural: radar should not be forced through a LiDAR encoder and then fused as if both sensors had the same failure modes. The reported gains come from several small decisions that address sparsity, scattering, and spatial misalignment together.
 >
 ## Core Insights
 
