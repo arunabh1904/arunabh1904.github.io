@@ -21,35 +21,66 @@ summary: '2024 – DINOv2 Meets Text: dino.txt'
 
 ## Summary
 
-> dino.txt asks whether language alignment can be added to a strong self-supervised vision model without erasing the dense geometry that made it valuable. It freezes a DINOv2 ViT-L/14, adds two trainable visual transformer blocks, and learns a text encoder from scratch with image-text contrastive training. The added visual path updates both the class token and patch tokens, so image-level retrieval and pixel-level zero-shot segmentation share one aligned representation.
+> dino.txt adds a language interface to DINOv2 without replacing its self-supervised visual geometry. The DINOv2 ViT-L/14 stays frozen, two trainable vision blocks adapt its tokens to web image-text data, and a text encoder is learned from scratch. Concatenating the updated class token with averaged patch tokens makes one contrastive objective serve image classification, retrieval, and dense open-vocabulary segmentation. The result is efficient alignment with a clear tradeoff: the frozen backbone preserves dense features, while the new text encoder remains weaker than CLIP’s for general language tasks.
 
 ## Core Insights
 
-![dino.txt appends trainable visual blocks to a frozen DINOv2 backbone and aligns pooled global-plus-patch features with text](/assets/images/dinov2-meets-text-dino-txt-source-figure-2.webp)
-*Fig 1: The DINOv2 backbone remains frozen while new visual blocks adapt its tokens; the contrastive image embedding combines the updated class token with pooled patch tokens before matching text. | source: [DINOv2 Meets Text: dino.txt](https://arxiv.org/abs/2412.16334)*
+### One representation carries global and local alignment
 
-![Figure 4 from DINOv2 Meets Text: dino.txt](/assets/images/dinov2-meets-text-dino-txt-source-figure-4.webp)
-*Fig 2: At high-resolution inference, DINO-TXT preserves small objects and fine scene detail in the input image used for text-aligned recognition. | source: [DINOv2 Meets Text: dino.txt](https://arxiv.org/abs/2412.16334)*
+![Figure 1 from DINOv2 Meets Text: dino.txt](/assets/images/dinov2-meets-text-dino-txt-source-figure-2.webp)
+*Fig 1: Overview of dino.txt: frozen DINOv2 features, two trainable vision blocks, and a text encoder align global and patch tokens for classification and open-vocabulary segmentation; the right panel shows test-time class-name queries. | source: [DINOv2 Meets Text: dino.txt, Figure 2](https://arxiv.org/abs/2412.16334)*
 
+DINOv2 already provides a strong image representation, but it does not expose a text query interface. A naive LiT recipe—freeze DINOv2 and train only a text tower against its class token—reaches 78.8% ImageNet zero-shot accuracy and 30.2 COCO retrieval R@1, yet only 8.3 ADE20K mIoU. The global class token is useful for image recognition, but the patch tokens have not been trained to occupy the same text-aligned space.
 
-Freezing is the main design constraint. A CLIP-style model can sacrifice spatial detail because its training target evaluates whole-image agreement. dino.txt instead preserves the original patch grid and limits trainable visual capacity. The image embedding concatenates the updated class token with an average over updated patch tokens, making the patch path participate in the global contrastive loss. At inference, patch embeddings can be compared directly with class-name text embeddings for open-vocabulary segmentation.
+dino.txt keeps the ViT-L/14 backbone frozen and appends two trainable Transformer blocks, written as $\psi$. If the backbone emits a class token $c$ and patch tokens $f_1,\ldots,f_N$, the added blocks produce $c'$ and $f'_p$. The global descriptor is
 
-The second contribution is data curation. LVTD-2.3B is filtered and rebalanced for visual and textual quality. In the reported ablation, the reference recipe reaches 78.8% ImageNet zero-shot accuracy, 30.2 on COCO retrieval, and 8.3 mIoU on ADE20K. Adding the full recipe and image curation raises those figures to 81.4, 45.4, and 20.6 respectively. The result is not caused by architecture alone.
+$$
+g = [c';\;\operatorname{avg}(f'_1,\ldots,f'_N)].
+$$
 
-| Reported comparison | Result | Boundary |
-| --- | ---: | --- |
-| dino.txt ImageNet zero-shot | 81.4% | ViT-L/14, 50k training iterations |
-| Training cost | 128 A100s for 19 hours | Private 2.3B-pair data pipeline |
-| Same-data CLIP ImageNet | 79.0% after 110 hours | Supports reusing DINOv2 rather than relearning vision |
-| ADE20K zero-shot segmentation at higher resolution | 25.1 mIoU | Still far below a task-trained segmentation system |
+The text encoder is trained from scratch and maps its end-of-sentence representation into the same $2D$ dimension. The average patch path is the important design choice: the class token continues to carry global context, while gradients from the pooled patches give every local token a reason to become text-discriminative. At inference, the global descriptor supports classification and retrieval; each patch can be compared with the text embedding for a class name to produce a segmentation map.
 
-The paper also reports 41.0 mIoU on Cityscapes and 67.6 on Pascal VOC under its zero-shot protocol. A “perfect-boundary” ADE20K analysis reaches 38.9 mIoU, showing that boundary quality is not the only limitation: class vocabulary, synonyms, overlapping labels, and text alignment still matter.
+Figure 1 is a useful architecture walkthrough. On the left, the frozen DINOv2 feature maps already show object structure before language alignment. In the middle, only the two small vision blocks and text encoder receive gradients; the loss sees one concatenated image descriptor rather than separate global and dense objectives. On the right, the same learned text space is applied either to one global vector or to the patch grid. The design avoids a segmentation-specific decoder, but it asks the text-aligned patches to preserve enough locality for pixel prediction while the class token learns the language interface.
+
+### Data curation is part of the alignment method
+
+The training pool starts from 2.3 billion CommonCrawl image-text pairs. Text curation follows a balanced sampling procedure based on caption frequencies; image curation uses DINOv2 embeddings and hierarchical k-means to suppress overrepresented visual clusters. The final LVTD-2.3B data selection is the intersection of those text- and image-curated choices. The point is not simply to remove bad captions. A caption can mention a balanced word while its image distribution remains dominated by near-duplicates or head concepts, so the authors rebalance both modalities.
+
+The ablation makes that decision visible. Starting from the reference LiT recipe at 78.8/30.2/8.3 on ImageNet/COCO/ADE20K, increasing the batch to 65k reaches 79.8/35.1/18.2. One and two trainable vision blocks raise retrieval to 40.8 and 42.1 while leaving classification near 79.8. Increasing the text embedding from 768 to 1,280 reaches 80.8/43.9/20.5, and adding image-based curation reaches 81.4/45.4/20.6. The largest retrieval and dense gains do not come from unfreezing DINOv2; they come from a small adaptation path and better paired data.
+
+Training lasts 50k iterations, equivalent to 1.6 billion pairs at batch 32k or 3.2 billion at batch 65k. The paper reports 128 A100 GPUs for 19 hours to reach 81.4% ImageNet accuracy. A CLIP model trained on the same LVTD-2.3B data needs 110 hours to reach 79.0%, while a CLIP run constrained to dino.txt’s compute reaches 73%. This is a comparison of the proposed initialization and frozen-backbone recipe with a from-scratch baseline; the data curation and implementation are still part of the cost.
+
+### The global–dense tradeoff is measured, not assumed
+
+| Representation or inference | ImageNet | COCO retrieval | ADE20K mIoU |
+| --- | ---: | ---: | ---: |
+| DINOv2 LiT, class token | 78.8 | 30.2 | 8.3 |
+| dino.txt, 65k batch + two vision blocks | 79.7 | 42.1 | 20.4 |
+| dino.txt, large text encoder + image curation | 81.4 | 45.4 | 20.6 |
+| dino.txt, high-resolution inference | — | — | 25.1 |
+
+The pooling ablation shows why concatenation matters. Using only the class token preserves 78.8% ImageNet accuracy but has weak dense features. Average or max pooling alone improves ADE20K to 13.3 or 18.0 while harming classification. Concatenating class and average patch tokens reaches 79.2/34.7/18.2, so the model does not have to choose between a global and local objective. The two added vision blocks then restore retrieval and classification as the alignment becomes more flexible.
+
+At 224 pixels, dino.txt reaches 81.4 ImageNet, 45.4 COCO retrieval R@1, and 20.6 ADE20K mIoU. At 336 pixels, ImageNet accuracy is 81.6 and COCO retrieval is 44.9. High-resolution dense inference reaches 25.1 ADE20K, 41.0 Cityscapes, 67.6 Pascal VOC, 24.1 Pascal Context, and 36.7 COCO-Stuff mIoU. The 800-crop protocol visits each pixel about 40 times and takes around ten seconds on an A100, so the dense ceiling is not a free property of the representation.
+
+![Figure 4 from DINOv2 Meets Text: dino.txt showing high-resolution inference](/assets/images/dinov2-meets-text-dino-txt-source-figure-4.webp)
+*Fig 2: The center panel groups dense features into 32 clusters; the right panel assigns those regions labels from ADE20K. This separates the quality of the spatial grouping from the semantics supplied by class-name queries. | source: [DINOv2 Meets Text: dino.txt, Figure 4](https://arxiv.org/abs/2412.16334)*
+
+Figure 2 shows the dense protocol rather than a new model head. The image is processed through overlapping crops, the patch features are clustered with $k=32$, and class-name embeddings label the clusters. The visual intuition is that high-resolution views reveal small or separated regions that a single 224-pixel grid would merge. The cost is repeated encoding and a clustering step, and the labels are only as good as the text query and benchmark ontology.
+
+### The remaining error is semantic as well as geometric
+
+Giving the segmentation system ground-truth masks for the k-means step raises ADE20K from 25.1 to a 38.9 mIoU boundary topline. That gap is not all boundary localization: the model can predict “shower” where the annotation says “wall,” and overlapping objects can be omitted because the dataset assigns one label where the image contains several concepts. Class names themselves are unstable; replacing ADE20K names with nearest words found from the ground-truth mask embeddings adds 2.1 mIoU. These tests make the benchmark limitation concrete rather than attributing every error to patch quality.
+
+The text encoder is another boundary. On MTEB it trails CLIP’s text encoder by 4.2 points on average, and removing the two trainable vision blocks makes it 3.2 points worse. Freezing the strong visual tower saves compute and protects DINOv2’s dense geometry, but it also limits how well the text space can adapt to a new image-text distribution. dino.txt is therefore a strong image-alignment interface, not a general-purpose language encoder.
+
+### When dense geometry is worth a frozen tower
+
+The frozen tower is useful because language alignment does not have to reconstruct visual structure from scratch. Two added vision blocks and patch pooling give the text loss access to that structure, but the resulting interface still inherits errors from both sides: imperfect regions and imperfect names. The gap between ordinary and expensive high-resolution inference shows why a representation score alone is insufficient. Its practical value depends on how much repeated encoding the dense application can afford, as well as whether the text queries describe its actual regions.
 
 ## High-Level Takeaways
 
-- dino.txt informs whether to retrain a vision-language encoder end to end or attach language to an established dense backbone. Freezing is attractive when DINO features already serve depth, correspondence, or segmentation consumers that should not regress. The tradeoff is a constrained cross-modal interface: two new blocks and a new text tower must absorb the alignment burden.
-- The paper's best result combines architecture, a 2.3-billion-pair private dataset, filtering, and training choices. A matched public-data comparison with end-to-end CLIP and partial DINO unfreezing is the missing decision experiment. The text encoder is also weak on general text benchmarks—the paper reports a 4.2 MTEB average—so the system is a visual alignment model, not a drop-in language encoder.
-- [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html) simplifies the contrastive loss for image-text training; dino.txt changes the initialization and freezing strategy. [DINOv3](/paper%20shorts/2025/08/13/dinov3.html) later incorporates text alignment as one post-training stage in a larger self-supervised vision pipeline.
-- dino.txt adds image- and pixel-level language alignment to a frozen DINOv2 backbone through a small trainable visual adapter and a new text encoder.
-- The strongest data are private, the text tower is not generally competitive, and zero-shot segmentation remains sensitive to label wording and evaluation ontology.
-- Language alignment does not require relearning visual structure; a constrained adapter can preserve dense DINO features while making them queryable with text.
+- dino.txt aligns a frozen DINOv2 backbone with text using two vision blocks and a concatenated class-plus-patch representation.
+- The same contrastive training supports global classification, retrieval, and patch-level open-vocabulary segmentation.
+- Image and text curation together raise the reported ImageNet/COCO/ADE20K result to 81.4/45.4/20.6.
+- High-resolution inference reaches 25.1 ADE20K mIoU but costs about 800 crops and ten seconds on an A100; benchmark labels and text quality remain limiting factors.
