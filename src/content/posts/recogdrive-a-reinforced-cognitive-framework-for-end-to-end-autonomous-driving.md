@@ -30,7 +30,7 @@ The diffusion planner uses self-attention for relations among waypoints and cros
 
 ### Treat denoising as the policy, not just as a decoder
 
-Training is staged around that interface. The VLM is frozen while the planner learns by DDPM imitation for 200 epochs; a ten-epoch DiffGRPO stage then samples trajectories and evaluates them in the NAVSIM simulator; the VLM receives three epochs of supervised fine-tuning. DiffGRPO regards the whole denoising chain as an internal Markov decision process. The reward is NAVSIM's PDMS, which combines collision, drivable-area compliance, time-to-collision, comfort, and progress terms. Group-standardized advantages compare sampled plans for the same scene, while a behavior-cloning term keeps the diffusion policy anchored to demonstrated trajectories. A discount of 0.6 weights later denoising decisions more heavily, since early steps still contain high noise.
+Training is staged around that interface. The VLM first receives three epochs of supervised fine-tuning on the hierarchical driving data. Its parameters are then frozen while the diffusion planner learns by DDPM imitation for 200 epochs, followed by a ten-epoch DiffGRPO stage that samples trajectories and evaluates them in the NAVSIM simulator. DiffGRPO regards the whole denoising chain as an internal Markov decision process. The reward is NAVSIM's PDMS, which combines collision, drivable-area compliance, time-to-collision, comfort, and progress terms. Group-standardized advantages compare sampled plans for the same scene, while a behavior-cloning term keeps the diffusion policy anchored to demonstrated trajectories. A discount of 0.6 weights later denoising decisions more heavily, since early steps still contain high noise.
 
 ![Figure 4 from ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving](/assets/images/recogdrive-a-reinforced-cognitive-framework-for-end-to-end-autonomous-driving-source-figure-4.webp)
 *Fig 2: Imitation learning fits trajectories to demonstrations, whereas DiffGRPO samples multiple denoising trajectories, scores them in the simulator, and learns from their relative quality. | source: [ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving, Figure 4](https://arxiv.org/abs/2506.08052)*
@@ -39,11 +39,11 @@ That design explains why the paper's ablation is more informative than the headl
 
 ### The result is tied to the evaluation contract
 
-The gains are measured on NAVSIM's 1,192-scene navtrain/136-scene navtest setup and on 220 short CARLA routes in Bench2Drive. ReCogDrive reaches 45.45% scenario success and a 71.36 driving score on Bench2Drive, but the two benchmarks probe different things. DriveBench VQA is also strong (56.71 average GPT score), while adding chain-of-thought does not improve NAVSIM (90.7 versus 90.8 without it). That last result is a useful boundary: the paper's cognition is carried mainly by the trained representations and planner interface, not by requiring a visible verbal chain at inference.
+The gains are measured on NAVSIM's 1,192-scene navtrain/136-scene navtest setup and on 220 short CARLA routes in Bench2Drive. ReCogDrive reaches 45.45% scenario success and a 71.36 driving score on Bench2Drive, but the two benchmarks probe different things. On the Drive VQA table, it reports a 67.30 DriveLM GPT score and a 56.71 DriveBench average; adding chain-of-thought does not improve NAVSIM (90.7 versus 90.8 without it). That last result is a useful boundary: the paper's cognition is carried mainly by the trained representations and planner interface, not by requiring a visible verbal chain at inference.
 
 ## High-Level Takeaways
 
 - ReCogDrive makes the VLM a source of driving priors and lets a diffusion model own the continuous action geometry.
 - The strongest ablation jump comes from DiffGRPO on simulator-scored trajectories, after the data pipeline and diffusion interface are already in place.
-- Its 0.075-second trajectory generation and camera-only 90.8 PDMS are reported under NAVSIM's closed-loop protocol; the CARLA result is a separate short-route test.
+- Its 0.075-second trajectory generation and camera-only 90.8 PDMS are reported under NAVSIM's non-reactive benchmark scoring (the paper labels the table's metrics “closed-loop”); the CARLA result is a separate short-route test.
 - The optional chain-of-thought result is revealing: richer textual reasoning is not automatically the missing ingredient when the latent driving representation and action interface already carry the useful information.
