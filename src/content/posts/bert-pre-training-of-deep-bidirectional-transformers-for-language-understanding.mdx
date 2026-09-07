@@ -12,121 +12,121 @@ legacyPath: >-
 tags:
   - Other
 field: 'Language Models'
-summary: "2019 – >-"
+summary: "BERT learns bidirectional token representations through masked pretraining and transfers them through full fine-tuning."
 ---
+
 import PythonPlayground from '../../components/PythonPlayground';
 import { bertPlayground } from '../../lib/python-playground-examples';
 
 ## 2019 – BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
 
-**arXiv:** [1810.04805](https://arxiv.org/abs/1810.04805)  
-**GitHub:** [google-research/bert](https://github.com/google-research/bert)  
-**Project page / blog:** [Google AI Blog – "Open Sourcing BERT"](https://ai.googleblog.com/2018/11/open-sourcing-bert-state-of-art-pre.html)  
-**Conference:** NAACL 2019
+**Paper:** [arXiv:1810.04805](https://arxiv.org/abs/1810.04805) · Preprint 2018, NAACL 2019 · [Reference code](https://github.com/google-research/bert)
 
 ## Summary
 
-> BERT makes bidirectional pretraining practical by training a Transformer encoder with masked language modeling and next-sentence prediction, then fine-tuning the same backbone for downstream tasks. Masked LM lets each token condition on both left and right context, unlike left-to-right language models. Fine-tuning adds only small task-specific heads for classification, span extraction, or sentence-pair tasks. The empirical case spans GLUE, MultiNLI, SQuAD, and other NLU benchmarks, where deeper bidirectional pretraining beats feature-based and unidirectional baselines. The caveats are the pretrain-finetune mismatch from mask tokens and the later-questioned value of next-sentence prediction. The lasting idea is that one pretrained encoder can become a general language-understanding substrate.
+> BERT pretrains a Transformer encoder to recover selected tokens using context on both sides, then fine-tunes the full encoder for downstream tasks. The key change is the information available at every layer, not simply a larger classifier. Its original ablations separate bidirectionality from next-sentence prediction and show that the masking mixture matters differently for frozen features and full fine-tuning. The reusable component is a pretrained initialization: each downstream task still receives its own fine-tuned model.
 
 ## Core Insights
 
-![Figure 1: Overall pre-training and fine-tuning procedures for BERT from BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](/assets/images/bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding-paper-figure.png)
-*Fig 1: BERT pretrains a bidirectional Transformer encoder with masked-token and sentence-pair objectives, then fine-tunes the shared representation with lightweight task-specific heads. | source: [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding paper](https://arxiv.org/abs/1810.04805)*
+### Hide the prediction target so both directions can contribute
 
-![Figure 2 from >-](/assets/images/>--source-figure-2.webp)
-*Fig 2: BERT input representation. The input embeddings are the sum of the token embeddings, the segmentation embeddings and the position embeddings. | source: [BERT](https://arxiv.org/abs/1810.04805)*
+If a bidirectional network could see the token it was asked to predict, the training objective would permit trivial copying. BERT selects some positions as prediction targets and corrupts their inputs. The encoder can then use visible evidence to the left and right without being directly handed most target identities.
 
+This differs from concatenating separately trained forward and backward representations. In BERT, the contextual computation at every layer can jointly combine both directions. A word in an answer span can therefore incorporate a later disambiguating phrase before the span classifier scores it.
 
-### tiny_pretrain.py – core BERT objectives in ~40 LOC
+The source transfer diagram shows the other half of the recipe. Pretraining learns masked-token and sentence-pair objectives; downstream training changes the output task while updating the same encoder parameters. The models start from a shared checkpoint but are fine-tuned separately.
+
+![BERT source Figure 1 showing pretraining and downstream fine-tuning with a shared encoder architecture](/assets/images/bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding-paper-figure.png)
+*Fig 1: The encoder architecture transfers from pretraining to downstream tasks, while output heads change. Fine-tuning updates all parameters; the diagram does not imply one frozen model serves every task unchanged. | source: [BERT, Figure 1](https://arxiv.org/abs/1810.04805)*
+
+### Selection, corruption, and supervision are three different masks
+
+BERT selects 15% of eligible WordPiece positions for prediction. Among those selected positions, 80% become `[MASK]`, 10% become a random token, and 10% remain unchanged. Every selected position retains its original token as the label, including those left unchanged or replaced by something else. Unselected positions contribute no masked-LM loss.
+
+For 100 eligible tokens, the expected counts are 12 mask replacements, 1.5 random replacements, and 1.5 unchanged targets. These are expectations over sampling, not guaranteed counts in each short sentence. Corrupting 15% of words and computing a reconstruction loss at every position would train a different objective.
+
+One corruption draw per selected position keeps the alternatives mutually exclusive. This PyTorch example isolates that bookkeeping; it is not the complete original data generator, which also constructs paired spans and training examples.
+
 ```python
-import random, torch
-from typing import Iterable, Tuple, Generator
-from transformers import BertTokenizer
-
-def mask_tokens(ids: torch.Tensor | list[int], tok: BertTokenizer,
-                p: float = 0.15) -> Tuple[torch.Tensor, torch.Tensor]:
-    ids = torch.tensor(ids)
-    is_special = torch.tensor(tok.get_special_tokens_mask(ids.tolist(), True)).bool()
-    mask = ~is_special & (torch.rand_like(ids.float()) < p)
-
-    labels = torch.where(mask, ids, torch.full_like(ids, -100))
-    rand = torch.randint(len(tok), ids.shape, dtype=torch.long)
-
-    ids[mask] = torch.where(torch.rand_like(ids.float()) < 0.8,
-                            tok.mask_token_id,
-                            ids[mask])
-    ids[(ids == tok.mask_token_id) & (torch.rand_like(ids.float()) < 0.125)] = \
-        rand[(ids == tok.mask_token_id) & (torch.rand_like(ids.float()) < 0.125)]
-    return ids, labels
+import torch
 
 
-def make_sentence_pairs(docs: Iterable[str], ratio: float = 0.5
-                        ) -> Generator[Tuple[str, str, int], None, None]:
-    docs = [d.split('.') for d in docs]
-    for sents in docs:
-        sents = [s.strip() for s in sents if s.strip()]
-        for i in range(len(sents)-1):
-            a, b_true = sents[i], sents[i+1]
-            if random.random() < ratio:
-                b = random.choice(random.choice(docs)).strip()
-                yield a, b, 1
-            else:
-                yield a, b_true, 0
+def mask_tokens(
+    ids: torch.Tensor,
+    special_mask: torch.Tensor,
+    mask_token_id: int,
+    vocab_size: int,
+    probability: float = 0.15,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Return corrupted ids and original-token labels; -100 ignores a position."""
+    if ids.dtype != torch.long or ids.ndim not in (1, 2):
+        raise ValueError("ids must be a long tensor of shape [T] or [B, T]")
+    if special_mask.shape != ids.shape or special_mask.dtype != torch.bool:
+        raise ValueError("special_mask must be boolean with the same shape as ids")
+    if special_mask.device != ids.device:
+        raise ValueError("ids and special_mask must be on the same device")
+    if not 0 <= probability <= 1 or not 0 <= mask_token_id < vocab_size:
+        raise ValueError("invalid selection probability or mask token id")
+
+    selected = (torch.rand(ids.shape, device=ids.device) < probability) & ~special_mask
+    labels = ids.masked_fill(~selected, -100)
+    corrupted = ids.clone()  # Do not overwrite the caller's original tokens.
+    choice = torch.rand(ids.shape, device=ids.device)
+    replace_mask = selected & (choice < 0.8)
+    replace_random = selected & (choice >= 0.8) & (choice < 0.9)
+    random_ids = torch.randint(vocab_size, ids.shape, device=ids.device)
+    corrupted[replace_mask] = mask_token_id
+    corrupted[replace_random] = random_ids[replace_random]
+    return corrupted, labels
 ```
 
-### BERT, Six Years On: What Still Matters
-
-BERT's recipe is simple enough to summarize and strong enough to keep reappearing: pre-train a Transformer encoder on large text corpora, then fine-tune the same backbone for many downstream tasks. The base model has 12 layers, the large model has 24, and both were trained on roughly 3.3B tokens.
-
----
-
-## How the Pre-training Works
-
-### Masked-Language Modelling (MLM)
-
-The `mask_tokens` function corrupts 15% of input pieces at random, forcing the network to infer each blank from both left and right context. This made BERT genuinely bidirectional, unlike GPT-1's left-to-right objective or ELMo's concatenation of two one-directional RNNs.
-
-This browser-side toy version strips away the `torch` machinery and focuses on the bookkeeping that matters. Run it once, then walk through the traced values to see which positions become labels, how the masked input is formed, and how the model head maps predictions back to the hidden originals.
+The remaining selected positions keep their original inputs but remain supervised. A small toy batch can select no positions; skip its masked-LM mean loss rather than averaging an empty target set. The browser playground below traces the same distinction between the visible input and the hidden original labels.
 
 <PythonPlayground client:visible {...bertPlayground} />
 
-### Next-Sentence Prediction (NSP)
+### Segment identity does not reset token position
 
-`make_sentence_pairs` creates 50% real A to B pairs and 50% mismatches. The classifier sitting on `[CLS]` learns a discourse-level coherence signal. Later work, especially RoBERTa, showed that NSP was not necessary for strong accuracy, but the idea still seeded a large family of inter-sentence objectives for sentence embeddings and dense retrieval.
+A sentence pair is packed as `[CLS] A [SEP] B [SEP]`. “Sentence” here can mean a contiguous text span rather than exactly one grammatical sentence. Each position receives the sum of a token embedding, a segment embedding, and a learned position embedding.
 
----
+![BERT source Figure 2 showing token, segment, and position embeddings added at each sequence position](/assets/images/bert-source-figure-2-input-embeddings.png)
+*Fig 2: Segment identity switches from A to B after the first separator, while position indices continue across the packed sequence. The three embedding types are added, so representation width stays unchanged. | source: [BERT, Figure 2](https://arxiv.org/abs/1810.04805)*
 
-## Key Numbers
+The segment row answers which span a token belongs to; the position row answers where it appears in the complete input. Neither supplies an attention barrier between the spans. Their tokens can interact, which lets a question condition passage representations before an answer-span head scores start and end positions.
 
-| Benchmark | Metric | Prev SOTA | BERT-large | Gain |
-| --------- | ------ | --------- | ---------- | ---- |
-| GLUE | Avg. score | 72.8 | 80.5 | +7.7 |
-| SQuAD 1.1 | F1 | 88.5 | 93.2 | +4.7 |
-| SQuAD 2.0 | F1 | 78.0 | 83.1 | +5.1 |
-| MNLI | Acc. | 82.1 | 86.7 | +4.6 |
+### The original ablation supports NSP within this recipe
 
-Training cost: ~4 days on 16 TPU v3 chips; a single downstream fine-tune (e.g. QA) ~30 min on one TPU.
+Next-sentence prediction uses an actual following span for half the examples and a randomly sampled span from another document for the other half. The `[CLS]` representation supports the binary classification loss. This is a test of whether two spans are adjacent under the sampling procedure, not a general guarantee of discourse understanding or sentence-embedding similarity.
 
----
+Table 5 compares controlled variants using the BERT-Base architecture and the same data and fine-tuning procedure:
 
-## Why BERT Hit Hard
+| Pretraining variant | MNLI-m accuracy | QNLI accuracy | SQuAD 1.1 F1 |
+| --- | ---: | ---: | ---: |
+| Masked LM + NSP | 84.4 | 88.4 | 88.5 |
+| Masked LM without NSP | 83.9 | 84.9 | 87.9 |
+| Left-to-right LM without NSP | 82.1 | 84.3 | 77.8 |
 
-BERT combined four things at the right time. Masked-language modeling gave the encoder access to both left and right context. A single backbone could support QA, NLI, NER, and sentiment by swapping a task head and fine-tuning end to end. `[CLS]` and segment embeddings gave pairwise classification and retrieval a default recipe. Open weights and code turned the paper from a result into an ecosystem, leading quickly to RoBERTa, ALBERT, DistilBERT, and many domain-specific variants.
+Removing NSP has a task-dependent cost, especially on QNLI. Moving from bidirectional masked modeling to left-to-right modeling produces a much larger SQuAD drop. Adding a newly initialized bidirectional LSTM during fine-tuning recovers some of that loss, to 84.9 F1, but remains below the pretrained bidirectional encoder.
 
----
+This supports both components within the tested setup. It does not show that every later encoder recipe requires NSP. Conversely, dismissing NSP without discussing the original control would hide evidence the paper actually reports.
 
-## Where It Falls Short
+### The corruption mixture matters more when features stay frozen
 
-BERT was compute-hungry in 2018 and still non-trivial to reproduce casually. NSP did not age well; later ablations showed that many variants can drop it. The 512-token limit and quadratic attention make long documents awkward without architectural changes. BERT also has static knowledge, so domain adaptation or continual learning is required when the world or target domain moves.
+Appendix C.2 compares masking strategies. Replacing every selected target with `[MASK]` gives MNLI fine-tuning accuracy of 84.3, versus 84.2 for the 80/10/10 mixture. The difference is small. For feature-based NER, however, the same change lowers development F1 from 94.9 to 94.0.
 
----
+That pattern helps explain the pretraining–downstream mismatch. Full fine-tuning can adjust representations to ordinary unmasked inputs; a frozen feature extractor has less opportunity to adapt. The mixture is therefore best understood as a transfer design choice, not an indispensable numerical constant proven optimal for every use.
 
-## Looking Forward
+### Corpus size, training steps, and headline scores need separate labels
 
-BERT's recipe became a floor, not a ceiling. Better corruption schemes, cheaper compressors, and longer-context attention methods all stand on top of the same basic idea: mask some tokens, optionally test sentence order, backpropagate, and reuse the encoder everywhere. That elegance is why BERT is still worth teaching.
+The corpus contains about 3.3B **words** from BooksCorpus and English Wikipedia; that is not the number of training tokens consumed. Training repeats over the data for one million steps. Sequence length is 128 for 90% of steps and 512 for the final 10%, limiting the cost of quadratic attention while training the longer positional range.
+
+BERT-Base has 110M parameters; BERT-Large has 340M. The appendix reports four days of pretraining on 16 TPU chips for Base and 64 for Large. A Cloud TPU device count is not interchangeable with the chip count.
+
+The often-cited 93.2 SQuAD 1.1 test F1 uses an ensemble plus additional TriviaQA training. The single Large model's development F1 is 90.9 before that addition. Keeping model size, extra supervised data, ensemble status, and evaluation split attached to each result prevents a stronger system score from becoming an inflated single-checkpoint claim.
 
 ## High-Level Takeaways
 
-- BERT informs the decision to spend pre-training compute on a bidirectional encoder that transfers through fine-tuning rather than train a task-specific model or a left-to-right representation. Its atomic unit is a masked token sequence, optionally paired with a second segment for next-sentence prediction.
-- The pre-training recipe mixes masked-language modeling and next-sentence prediction over BooksCorpus and English Wikipedia, with shorter sequences used for most steps before a smaller number of length-512 updates. That curriculum makes sequence length a compute-allocation choice, not merely a tokenizer setting.
-- The most consequential missing ablation is a matched-token comparison of MLM with and without next-sentence prediction and with alternative corruption schemes; later work showed that NSP was not generally necessary. At 10× scale, sparse corruption wastes prediction opportunities and long-sequence attention dominates cost. BERT's central recipe would be falsified if a simpler encoder objective matched downstream transfer under identical data, parameters, tokens, and fine-tuning sweeps.
+- Masked-token prediction enables joint use of left and right context throughout the encoder.
+- Selected targets, replaced inputs, and ignored loss positions must remain distinct in the implementation.
+- Pair segments share attention and continuous positional indices; segment embeddings identify membership without separating computation.
+- The original controls support NSP and bidirectionality within their tested recipe, with different effects across tasks.
+- Full fine-tuning and frozen feature use respond differently to corruption, and headline results may include extra data or ensembles.
