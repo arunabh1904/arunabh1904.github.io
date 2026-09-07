@@ -23,71 +23,83 @@ summary: "2022 – Training Language Models to Follow Instructions with Human Fe
 
 ## Summary
 
-> InstructGPT aligns GPT-3-style models to user intent through supervised demonstrations and preference-based reinforcement learning. The pipeline first fine-tunes on labeler-written ideal responses, then trains a reward model from ranked model outputs, then optimizes the policy with PPO against that reward while controlling drift from the supervised model. The central result is that smaller InstructGPT models can be preferred over much larger base GPT-3 models on real API prompts. The paper also measures truthfulness, toxicity, and academic NLP performance to check side effects. The caveat is that RLHF optimizes for labeler preference under a specific prompt distribution, so reward-model errors and preference coverage matter. The lasting idea is that instruction following can be an explicit alignment target rather than an automatic result of scale.
+> InstructGPT changes the post-training target from predicting plausible continuations to producing answers that labelers prefer for a user's request. Demonstrations initialize the policy, ranked completions train a reward model, and PPO then optimizes that learned preference signal while staying near the supervised model. The resulting behavior is much easier to steer on the held-out API prompts used in the study. PPO-ptx recovers some general capabilities, but the gains remain tied to the prompt and labeler distribution and do not amount to universal alignment.
 
 ## Core Insights
 
-![Figure 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model from Training Language Models to Follow Instructions with Human Feedback](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-paper-figure.png)
-*Fig 1: Human evaluations of various models on our API prompt distribution, evaluated by how often outputs from each model were preferred to those from the 175B SFT model. | source: [Training Language Models to Follow Instructions with Human Feedback paper](https://arxiv.org/abs/2203.02155)*
+### The target is a behavior distribution, not an abstract notion of alignment
 
-![Figure 6 from Training Language Models to Follow Instructions with Human Feedback](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-source-figure-6.webp)
-*Fig 2: Results on the TruthfulQA dataset. Gray bars indicate ratings of truthfulness; colored bars indicate ratings of truthfulness and informativeness. | source: [Training Language Models to Follow Instructions with Human Feedback](https://arxiv.org/abs/2203.02155)*
+GPT-3 already contains broad knowledge and can be prompted into many tasks, but its pretraining objective does not say that an answer should follow a user's intent, avoid fabrication, or refuse harmful requests. InstructGPT starts with the same GPT-3 architecture at 1.3B, 6B, and 175B parameters and changes the post-training target. Prompts come from early OpenAI API Playground use and labeler-written tasks spanning generation, question answering, dialogue, summarization, and extraction. Train, validation, and test splits are separated by user ID, and personally identifiable information is filtered from the training split.
 
-![Figure 2 from Training Language Models to Follow Instructions with Human Feedback](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-source-figure-2.webp)
-*Fig 3: A diagram illustrating the three steps of our method: (1) supervised fine-tuning (SFT), (2) reward model (RM) training, and (3) reinforcement learning via proximal policy optimization (PPO) on this reward model. Blue arrows indicate that this data is used to train one of our models. | source: [Training Language Models to Follow Instructions with Human Feedback](https://arxiv.org/abs/2203.02155)*
+The prompt distribution is broad in task type but narrow in coverage: it is over 96% English, and its notion of a good answer is supplied mainly by the contractors and researchers who wrote the guidance. The held-out test prompts are from customers not represented in training, which makes the preference comparison more meaningful than evaluating on the same prompts used to collect demonstrations. It still measures agreement with this particular deployment population rather than a universal human value function.
 
+![Figure 1: Human evaluations on the API prompt distribution](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-paper-figure.png)
+*Fig 1: Human evaluations on the API prompt distribution, shown as win rate against the 175B SFT model; the dashed midpoint is the comparison baseline. | source: [Training Language Models to Follow Instructions with Human Feedback, Figure 1](https://arxiv.org/abs/2203.02155)*
 
-### Method and reported result
+The chart makes the scale result easy to read. At each size, the SFT and PPO variants move above the GPT-3 baselines, and the 1.3B PPO-ptx point is already above the 175B GPT-3 point. At 175B, the PPO-ptx curve is the highest of the plotted variants. These points are comparisons against the 175B SFT baseline, so the paper's separate head-to-head numbers—85 ± 3% against 175B GPT-3 and 71 ± 4% against few-shot 175B GPT-3—should not be read as the y-values of this chart.
 
-GPT-3 could generate impressive text, but it often missed what users actually asked for. InstructGPT showed that reinforcement learning from human feedback could move a language model toward user intent. The pipeline has three stages: supervised fine-tuning on human demonstrations, reward-model training from ranked outputs, and PPO policy optimization with a KL penalty that keeps the model close to the supervised baseline.
+### Three stages put different supervision at different interfaces
 
-The striking result is that preference data can beat scale for instruction following. A 1.3B-parameter InstructGPT model was preferred to the 175B GPT-3 on real customer prompts, while also reducing toxicity and hallucination. The paper also helped crystallize the helpfulness, honesty, and harmlessness framing that shaped later alignment evaluations.
+![Figure 2: A diagram illustrating the three steps of our method](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-source-figure-2.webp)
+*Fig 2: The three-step pipeline: collect demonstrations for SFT, rank sampled outputs to train an RM, then optimize a policy with PPO on new prompts. | source: [Training Language Models to Follow Instructions with Human Feedback, Figure 2](https://arxiv.org/abs/2203.02155)*
 
-**Evals / Benchmarks**
+The diagram is more than a workflow summary: each step changes what counts as a training signal.
 
-| Metric / task | Vanilla GPT-3 175&nbsp;B | InstructGPT 1.3&nbsp;B | InstructGPT 175&nbsp;B |
-| ------------- | ----------------------- | --------------------- | ----------------------- |
-| Human preference (API prompts) | — | 58&nbsp;% preferred | 85&nbsp;% preferred |
-| TruthfulQA (higher = better) | 22&nbsp;% | 37&nbsp;% | 40&nbsp;% |
-| RealToxicityPrompts (toxicity ↓) | 6.6&nbsp;% | 4.9&nbsp;% | 4.6&nbsp;% |
-| Academic NLP (avg.) | 70.0 | 69.2&nbsp;(-0.8) | 70.3&nbsp;(+0.3) |
+1. **SFT turns demonstrations into a starting policy.** A labeler writes the response they consider appropriate for a prompt, and GPT-3 is fine-tuned on these prompt-response pairs. The SFT dataset contains about 13k training prompts from the API and labeler-written prompts.
 
-The key result is that alignment gains did not require sacrificing standard benchmark scores.
+2. **The RM turns relative judgments into a scalar.** The SFT or PPO policies produce between four and nine completions for a prompt. A labeler ranks them, and a 6B reward model is trained to assign the preferred completion a higher score. For a pair $(y_w, y_l)$, the paper uses
 
-**Tiny RLHF-style PPO loop (PyTorch-like pseudocode)**
-```python
-for step in range(num_updates):
-    # 1. sample model outputs
-    prompts = dataset.sample(batch_size)
-    with torch.no_grad():
-        responses, logp = policy.generate(prompts, return_logprobs=True)
+   $$
+   \mathcal{L}_{\mathrm{RM}}=-\mathbb{E}\left[\log\sigma\left(r_\theta(x,y_w)-r_\theta(x,y_l)\right)\right].
+   $$
 
-    # 2. compute rewards
-    with torch.no_grad():
-        reward = reward_model(prompts, responses)  # ≈ human preference
-        kl_penalty = kl_coef * (logp - ref_logp)
-        advantage = (reward - kl_penalty).detach()
+   The authors keep all pairwise comparisons from one ranking as a single batch element because treating correlated pairs as independent examples made the RM overfit. The RM's held-out-labeler accuracy is 69.6 ± 0.9%, versus 72.4 ± 0.4% on the labelers whose comparisons were used for training.
 
-    # 3. PPO policy update
-    ratio = (policy.logp(prompts, responses) - logp).exp()
-    loss = -torch.min(
-        ratio * advantage,
-        torch.clamp(ratio, 1 - epsilon, 1 + epsilon) * advantage,
-    ).mean()
-    loss.backward()
-    optimizer.step()
-    optimizer.zero_grad()
-```
-A reference policy (the frozen supervised model) keeps the RL step from drifting too far.
+3. **PPO changes the policy while constraining drift.** The RL environment is a one-step bandit: sample a customer prompt, generate a response, receive the RM score, and end the episode. A per-token KL penalty keeps the policy near the SFT model, and the value function is initialized from the RM. The PPO-ptx variant adds a pretraining likelihood term:
 
-### Where the evidence stops
+   $$
+   J(\pi_\phi)=\mathbb{E}_{x\sim D,\,y\sim\pi_\phi}\left[r_\theta(x,y)-\beta\log\frac{\pi_\phi(y\mid x)}{\pi_{\mathrm{SFT}}(y\mid x)}\right]
+   +\gamma\,\mathbb{E}_{x\sim D_{\mathrm{pretrain}}}\left[\log\pi_\phi(x)\right].
+   $$
 
-The pipeline is clear, and the quality-over-size result is still important. But RLHF is expensive in both human labor and compute, reward models can be gamed, and the alignment target is narrow: a model can become better at satisfying raters without becoming robustly truthful or safe in every setting.
+   Here $\beta$ controls the KL penalty and $\gamma$ controls the strength of the pretraining updates; ordinary PPO sets $\gamma=0$. The PPO update uses a value-based advantage estimate internally. The scalar RM reward and the KL term are ingredients of that RL objective, not an advantage by themselves.
 
-**Why it matters**
-RLHF transformed large language models from clever autocomplete systems into instruction-following assistants, laying the groundwork for ChatGPT, GPT-4, and beyond.
+Steps 2 and 3 can be iterated: collect comparisons from the current policy, train a new RM, and optimize again. That loop explains both the strength and the cost of the method. The policy can improve against a current preference target, but every new round can also amplify errors in the target.
+
+### Preference gains and side effects need separate denominators
+
+The headline preference result is not a single general-purpose score. The source reports several measurements, each with its own comparator and population:
+
+| Source measurement | Reported result | Comparator and scope |
+| --- | --- | --- |
+| Direct human preference | 175B InstructGPT preferred 85 ± 3% of the time | 175B GPT-3, held-out API-prompt evaluation |
+| Few-shot human preference | 175B InstructGPT preferred 71 ± 4% of the time | Few-shot 175B GPT-3 |
+| Closed-domain hallucination | About 21% versus 41% | InstructGPT versus GPT-3 on API tasks where answers should stay within the input |
+| Reward-model transfer | 69.6 ± 0.9% versus 72.4 ± 0.4% | Held-out labelers versus training labelers |
+
+The closed-domain result is a behavior-level measure: it asks whether the output invents information that is absent from the prompt. It does not establish factuality on open-domain questions. Likewise, the preference result says that labelers favored one completion under the study instructions; it does not say that the chosen completion is always true or safe.
+
+### Truthfulness can improve by becoming more willing to abstain
+
+![Figure 3: Results on the TruthfulQA dataset](/assets/images/training-language-models-to-follow-instructions-with-human-feedback-source-figure-6.webp)
+*Fig 3: TruthfulQA results; gray bars rate truthfulness, while colored bars rate answers that are both truthful and informative, for ordinary and instruction-plus-question prompts. | source: [Training Language Models to Follow Instructions with Human Feedback, Figure 6](https://arxiv.org/abs/2203.02155)*
+
+The two panels are prompt conditions: the left uses the ordinary QA prompt, while the right adds an instruction telling the model to answer “I have no comment” when it is uncertain. Within each panel, gray bars rate truthfulness and colored bars rate answers that are both truthful and informative. PPO and PPO-ptx therefore improve truthfulness partly by choosing the safer abstention; the colored truthfulness-and-informativeness bars show the cost of that choice. The paper reports small but significant truthfulness improvements over GPT-3, with the 1.3B PPO-ptx model as an exception that is slightly worse than the same-size GPT-3 baseline.
+
+The other safety measurements are similarly conditional. On RealToxicityPrompts, a respectful instruction reduces toxicity relative to GPT-3, but the advantage disappears without that instruction; when explicitly prompted for toxic text, InstructGPT can be more toxic. On Winogender and CrowS-Pairs, the paper finds no significant bias improvement, and a respectful prompt can make the PPO-ptx model more certain in ways that increase measured bias.
+
+### PPO-ptx reduces, but does not erase, the alignment tax
+
+PPO training can reduce performance on public NLP tasks such as SQuAD, DROP, HellaSwag, and WMT 2015 French-to-English translation. The paper calls this an alignment tax because a model that is easier to steer on customer prompts may lose capabilities that matter elsewhere. PPO-ptx mixes updates from the original pretraining distribution and reverses many of these regressions without sacrificing labeler preference. It surpasses GPT-3 on HellaSwag, but still lags on DROP, SQuADv2, and translation. Increasing the KL coefficient alone lowers validation reward and does not fully recover the lost task performance, which is why the pretraining term is a distinct intervention rather than a cosmetic regularizer.
+
+### Decision test and boundary
+
+Use this pipeline when the target prompt distribution is concrete, comparison labels can express the desired behavior more reliably than demonstrations alone, and the team can afford online rollouts plus an RM/PPO loop. Evaluate the result with a specified comparator and keep preference, truthfulness, toxicity, bias, and capability metrics separate. PPO-ptx is the relevant choice when public-task regressions matter, but neither variant removes the core boundary: the policy is optimized for the coverage and judgments represented in the data. The paper's held-out-labeler result is encouraging evidence of transfer, not evidence that the learned reward captures broad human values.
 
 ## High-Level Takeaways
 
-- InstructGPT informs whether scarce human preference data is better spent on supervised demonstrations alone or on a reward model followed by policy optimization. Its training pipeline moves from prompt-response demonstrations to ranked completion pairs and finally to PPO rollouts constrained by a KL penalty to the supervised policy.
-- The smaller aligned model beating a much larger base model establishes that behavioral supervision can dominate parameter count on instruction-following judgments. It does not isolate the value of PPO from demonstration quality, reward-model capacity, and sampling policy. At 10× scale, annotation consistency, reward hacking, and rollout cost dominate. The RLHF stack would be falsified as necessary if a matched supervised or direct-preference method reproduced helpfulness and safety without the online RL stage.
+- Human demonstrations give GPT-3 a usable instruction-following starting point; ranked comparisons and PPO then optimize behavior against a learned preference signal.
+- Preference supervision can outweigh parameter count for this API prompt distribution: 175B InstructGPT beats GPT-3 in direct comparisons, and the 1.3B model beats the 175B GPT-3 baseline in the paper's plotted evaluation.
+- The reward model is a proxy with measurable transfer loss: held-out-labeler accuracy is 69.6 ± 0.9%, below its 72.4 ± 0.4% training-labeler accuracy.
+- Truthfulness and toxicity gains depend on how the model is prompted, and measured bias does not improve; a preference win rate cannot stand in for those tests.
+- PPO-ptx preserves more pretrained capability than PPO alone, while leaving an alignment tax on some public NLP tasks.

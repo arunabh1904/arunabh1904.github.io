@@ -9,50 +9,59 @@ tags:
 field: 'Vision-Language-Action & Robotics'
 summary: "2024 – OpenVLA: An Open-Source Vision-Language-Action Model"
 ---
+
 ## 2024 – OpenVLA
 
 **arXiv:** [2406.09246](https://arxiv.org/abs/2406.09246)
 
 **Project:** [openvla.github.io](https://openvla.github.io/)
 
-### Method and reported result
-
-OpenVLA is a 7B-parameter vision-language-action model trained on real robot demonstrations from Open X-Embodiment. It fuses SigLIP and DINOv2 visual features, maps them into a Llama-style language model, and trains the model to emit robot actions instead of text.
-
 ## Summary
 
-> The open release matters: checkpoints, code, and fine-tuning recipes make generalist robot policies easier to study and adapt.
+> OpenVLA turns a pretrained vision-language model into a generalist robot policy with a deliberately simple action interface: continuous controls become language-model tokens, and the model predicts those tokens with next-token cross-entropy. Its open 7B checkpoint transfers across robot tasks, but its results also show where the recipe depends on robot-specific visual fine-tuning and a large, carefully curated demonstration mixture.
 
 ## Core Insights
 
-OpenVLA adapts a pretrained vision-language model into an action-generating robot policy and releases the result as an open baseline. The model takes robot observations and language instructions, then predicts actions for manipulation tasks. Its contribution is partly technical and partly ecosystem-oriented: provide an inspectable VLA recipe rather than leaving robot foundation policies closed. The evidence tests generalization across robot tasks and datasets. The caveat is action representation: a VLM backbone helps semantic grounding, but precise continuous control and embodiment transfer still require robot-specific data and validation.
+OpenVLA is best understood as an interface and data study built around a 7B Prismatic VLM. The backbone combines a 600M visual encoder with a two-layer projector and a Llama 2 7B language model. The visual encoder concatenates SigLIP features, which provide semantic image-text alignment, with DINOv2 features, which contribute finer spatial structure. The model then reuses the language model’s sequence machinery to emit actions. That choice makes the policy easy to inspect and fine-tune, while exposing the cost of asking an autoregressive language model to be a controller.
 
-![Figure 1: OpenVLA model architecture from OpenVLA: An Open-Source Vision-Language-Action Model](/assets/images/openvla-open-source-vision-language-action-model-paper-figure.png)
-*Fig 1: OpenVLA projects visual features into a language-model backbone, conditions on a natural-language instruction, and autoregressively emits tokenized robot actions. | source: [OpenVLA: An Open-Source Vision-Language-Action Model paper](https://arxiv.org/abs/2406.09246)*
+### Turning robot controls into a language-model sequence
 
-![Figure 2 from OpenVLA: An Open-Source Vision-Language-Action Model](/assets/images/openvla-open-source-vision-language-action-model-source-figure-2.webp)
-*Fig 2: BridgeData V2 WidowX robot evaluation tasks and results. We evaluate OpenVLA and prior state-of-the-art generalist robot policies on a comprehensive suite of tasks covering several axes of generalization, as well as tasks that specifically assess language conditioning ability. | source: [OpenVLA: An Open-Source Vision-Language-Action Model](https://arxiv.org/abs/2406.09246)*
+OpenVLA discretizes each action dimension into 256 bins. The bin interval is the 1st–99th percentile range in the training data, so a few outlier motions do not consume most of the available resolution. Because the Llama tokenizer reserves too few new-token slots, the training recipe overwrites its 256 least-used vocabulary entries with action tokens. A seven-dimensional robot action therefore becomes a seven-token suffix, and cross-entropy is evaluated on that suffix rather than on the visual or instruction prefix.
 
-![Figure 3 from OpenVLA: An Open-Source Vision-Language-Action Model](/assets/images/openvla-open-source-vision-language-action-model-source-figure-3.webp)
-*Fig 3: Google robot evaluation results. We evaluate generalist robot policies on in-distribution and out-of-distribution (OOD) tasks on the mobile manipulator used in RT-1 and RT-2 evaluations. | source: [OpenVLA: An Open-Source Vision-Language-Action Model](https://arxiv.org/abs/2406.09246)*
+The interface preserves the strengths of a VLM—language conditioning, a mature transformer, and a shared representation across tasks—but it does not make control continuous. Quantization and one-token-at-a-time decoding remain part of the policy’s behavior. This is why the release is useful as a baseline: a downstream result can be attributed to the data mixture, visual features, or fine-tuning recipe without first implementing a new action decoder.
 
+![OpenVLA architecture and tokenized action interface](/assets/images/openvla-open-source-vision-language-action-model-paper-figure.png)
+*Fig 1: OpenVLA maps image patches and an instruction into a Llama 2 7B backbone, then de-tokenizes the predicted action tokens into seven robot controls. The visual encoder concatenates DINOv2 and SigLIP features; the projector aligns them to the language space. | source: [OpenVLA: An Open-Source Vision-Language-Action Model, Figure 2](https://arxiv.org/abs/2406.09246)*
 
-**What to look at:**
-- The visual encoder fuses SigLIP and DINOv2 features.
-- The policy is trained on Open X-Embodiment robot demonstrations.
-- The open checkpoints and fine-tuning notebooks are core artifacts.
+### Why the data mixture matters as much as the backbone
 
-### Reported evidence
+The full Open X-Embodiment collection contained more than 2M trajectories from over 70 robot datasets when the paper was written. OpenVLA curates 970k of them into a common setting: manipulation data with at least one third-person camera and single-arm end-effector control. Octo’s mixture weights are reused to favor diverse tasks and scenes, and DROID is first included conservatively at 10% before being removed for the final third of training because its action-token accuracy remained low. The resulting model sees many embodiments, but the common action and camera assumptions narrow what “out of the box” means.
 
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Scale | 7B VLA | Large enough to reuse language-model priors. |
-| Data | 970k robot demonstrations | Gives the model cross-embodiment behavior. |
-| Artifact | Open code/checkpoints | Makes generalist robot policies inspectable. |
+The design sweeps explain two less obvious choices. At 224×224 pixels, OpenVLA performs as well as the tested 384×384 variant while taking roughly one-third the training time. Fine-tuning the visual encoder is crucial for control even though frozen encoders often help ordinary VLM transfer: robot actions need spatial detail around contacts, object orientation, and grasp geometry. The final run makes 27 epochs through the robot data, reaching over 95% action-token accuracy; the authors found that the usual one or two language-model epochs were insufficient for real-robot performance.
+
+### What the evaluations actually separate
+
+On the 17-task BridgeData V2 WidowX suite, OpenVLA reaches 70.6% average success, ahead of RT-2-X at 50.6%, Octo at 20.0%, and RT-1-X at 18.5%. The category breakdown explains the average: OpenVLA reaches 87.0% on visual generalization, 60.0% on motion, 76.7% on physical generalization, and 90.0% on language grounding. Semantic generalization is the exception—36.3% for OpenVLA versus 38.8% for RT-2-X—consistent with RT-2-X retaining more internet-language co-training. The evaluation uses 170 rollouts, so the result is a broad task comparison rather than a claim that every individual manipulation is solved.
+
+![BridgeData V2 results across generalization categories](/assets/images/openvla-open-source-vision-language-action-model-source-figure-2.webp)
+*Fig 2: Across 170 BridgeData V2 rollouts, OpenVLA leads the generalization categories overall, with semantic generalization as the exception against RT-2-X. The bars cover visual, motion, physical, semantic, and language-grounding tests; detailed task results are in Table 4. | source: [OpenVLA: An Open-Source Vision-Language-Action Model, Figure 3](https://arxiv.org/abs/2406.09246)*
+
+The Google mobile-manipulator evaluation checks whether that advantage survives a different robot and task distribution. OpenVLA averages 85.0%, compared with 78.3% for RT-2-X, 33.3% for RT-1-X, and 26.7% for Octo. The in-distribution scores are 88.0% and 72.0% for OpenVLA and RT-2-X; on out-of-distribution tasks, both reach 82.9%. Read together with BridgeData, the plots support a narrower conclusion than “the 7B model is universally better”: the open model transfers strongly when the task semantics and physical control conventions remain close enough to the curated robot data, while RT-2-X retains an edge on internet-style semantic knowledge in the BridgeData categories.
+
+![Google robot results for in-distribution and out-of-distribution tasks](/assets/images/openvla-open-source-vision-language-action-model-source-figure-3.webp)
+*Fig 3: On 60 Google-robot rollouts, OpenVLA and RT-2-X are close overall and far ahead of RT-1-X and Octo. The plot separates in-distribution from OOD tasks; Table 6 contains the per-task results. | source: [OpenVLA: An Open-Source Vision-Language-Action Model, Figure 4](https://arxiv.org/abs/2406.09246)*
+
+### Fine-tuning and cost are part of the result
+
+OpenVLA is also a starting point for adaptation. Across diverse and narrow fine-tuning tasks, it is the only tested approach to maintain at least 50% success on every task, although Diffusion Policy produces smoother trajectories on narrow, dexterous single-instruction tasks. One scope detail matters: the paper’s Sections 5.3 and 5.4 run these parameter-efficient fine-tuning and quantization experiments on a smaller OpenVLA variant pretrained with Octo’s OpenX mixture and a SigLIP-only vision backbone, rather than on the final fused DINOv2–SigLIP model used in the main cross-robot comparison.
+
+For that smaller variant, the parameter-efficient sweep gives a practical boundary: full fine-tuning reaches 69.7 ± 7.2% mean success, LoRA reaches 68.2 ± 7.5% while training only 1.4% of the parameters, and last-layer-only tuning falls to 30.3 ± 6.1%. Freezing the visual encoder also hurts, at 47.0 ± 6.9%, supporting the claim that visual features must adapt to the target robot and scene. LoRA rank 32 and 64 perform the same within error bars, and the paper reports 10–15 hours on one A100 for a new task, an eightfold compute reduction relative to full fine-tuning.
+
+The quantization result is more specific than “lower precision is free.” Table 2 measures 71.3 ± 4.8% at 16.8 GB in bfloat16, 58.1 ± 5.1% at 10.2 GB in int8, and 71.9 ± 4.7% at 7.0 GB in int4 across eight BridgeData V2 tasks and 80 rollouts. Int4 matches bfloat16, while int8 slows the A5000 controller to 1.2 Hz and changes the system dynamics; int4 reaches 3 Hz. The final OpenVLA training run still uses 64 A100 GPUs for 14 days, totaling 21,500 A100-hours, and the fused model runs at roughly 6 Hz on an RTX 4090 in bfloat16 without compilation or speculative decoding.
 
 ## High-Level Takeaways
 
-- OpenVLA informs whether an inspectable 7B vision-language backbone trained across many robot datasets is a useful default policy before building a proprietary architecture. The policy fuses SigLIP's semantic features with DINOv2's spatial features, then autoregressively emits discretized actions from language-conditioned observations. Open X-Embodiment's 970,000 demonstrations supply the cross-robot curriculum, making data interoperability as central as model scale.
-- The release establishes a strong open baseline and shows broad transfer, but it does not separate the contribution of internet-scale VLM priors from robot-data scale and dual visual encoders. A compute-matched policy trained from scratch and a single-encoder ablation across unseen embodiments would answer that. At ten times the embodiments, inconsistent action spaces and dataset imbalance could overwhelm shared tokens. The foundation-policy thesis would fail if per-robot specialists initialized from the same encoders adapt faster and achieve higher closed-loop reliability with equal demonstrations.
-- OpenVLA made the VLA recipe concrete and public. It also showed that Internet-scale vision-language pretraining can combine with robot demonstration data to produce transferable manipulation policies.
-- OpenVLA is the CLIP-to-actions moment: visual-language representations become a starting point for robot control.
+- OpenVLA’s central engineering move is to reuse a VLM sequence model for control by quantizing each action dimension into 256 data-derived bins and predicting an action-token suffix.
+- The fused SigLIP–DINOv2 encoder and 970k-trajectory Open X mixture are as consequential as the 7B Llama backbone: spatially precise robot control requires visual fine-tuning and curated embodiment overlap.
+- OpenVLA reaches 70.6% on BridgeData V2 and 85.0% on the Google robot; LoRA retains 68.2% versus 69.7% for full fine-tuning while using 1.4% of the parameters.
+- The release is a strong open baseline, with 21,500 A100-hours of pretraining and roughly 6 Hz uncompiled inference; higher-frequency control, multi-arm transfer, and longer-horizon tests define the next boundary.
