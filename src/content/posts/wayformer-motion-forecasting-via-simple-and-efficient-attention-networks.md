@@ -27,6 +27,12 @@ Wayformer encodes heterogeneous driving inputs such as road geometry, lane conne
 
 The design philosophy is close to "make the representation uniform, then spend effort on scaling attention." The caveat is that simple attention can hide useful structure: the model may learn relations that methods like LaneGCN encode explicitly.
 
+### Fusion placement is a latency decision
+
+The latency sweep gives the architectural choice a useful boundary. With short budgets up to about 16 ms, late fusion is the strongest option in the paper's study; between roughly 16 and 32 ms, hierarchical fusion is competitive; once the budget exceeds 32 ms, early fusion catches up as the extra cross-modal interactions become affordable. The result is not a universal ranking of fusion schemes. It says that a fusion point is coupled to token count, attention depth, and the deployment budget.
+
+There are also limits hidden by the uniform token interface. The experiments are ego-centric and repeatedly compute a scene representation for each target agent. Sparse abstract tokens can miss cues such as a pedestrian's visual pose or a vehicle's wheel angle, and independent per-agent decoding does not enumerate the combinatorial joint futures that an interactive planner may need. Wayformer's simplicity is strongest when its inputs already contain the relevant structure and the evaluation budget resembles the tested regime.
+
 ![Figure 1 from Wayformer showing an encoder-decoder Transformer for multimodal scene inputs and trajectory distributions](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-paper-figure.png)
 *Fig 1: Shows Wayformer as an encoder-decoder attention network over heterogeneous scene tokens, with multimodal trajectory prediction at the output. | source: [Wayformer paper](https://arxiv.org/abs/2207.05844)*
 
@@ -37,22 +43,9 @@ The design philosophy is close to "make the representation uniform, then spend e
 *Fig 3: Increasing latent-token reduction lowers latency but degrades minADE, exposing the tradeoff between input compression and motion-forecasting accuracy. | source: [Wayformer: Motion Forecasting via Simple and Efficient Attention Networks](https://arxiv.org/abs/2207.05844)*
 
 
-_with multimodal trajectory prediction at the output. source: [Wayformer paper](https://arxiv.org/abs/2207.05844)
 
 
-**What to look at:**
-- Heterogeneous inputs become a shared token set.
-- Early fusion lets agents, roads, and signals interact before heavy abstraction.
-- Factorized and latent-query attention trade accuracy for speed and memory.
 
-### Reported evidence
-
-| Design choice | Detail | Why it matters |
-| ------------- | ------ | -------------- |
-| Fusion | Early, late, and hierarchical variants | Tests where heterogeneous scene information should meet. |
-| Efficiency | Factorized and latent-query attention | Makes large scene attention more practical. |
-| Inputs | Road geometry, traffic lights, agent history | Covers the messy inputs forecasting systems actually use. |
-| Benchmarks | Waymo Open Motion Dataset and Argoverse | Compares across major public motion forecasting settings. |
 
 ## High-Level Takeaways
 

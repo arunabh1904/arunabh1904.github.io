@@ -27,6 +27,8 @@ VectorNet uses a hierarchical graph neural network. A local subgraph network sum
 
 The paper's main contrast is against rasterization. Raster BEV images let standard convolutional networks process the scene, but rendering discards some structure and spends computation on pixels that are not meaningful entities. VectorNet reports comparable or better behavior prediction on an internal benchmark and Argoverse while saving more than 70% of model parameters and roughly an order of magnitude in FLOPs against the rendering baseline.
 
+The masked entity-completion loss is more than a generic pretext task. When a lane polyline or agent history is hidden, the global graph must infer it from neighboring geometry and motion context before the forecasting head sees the scene. In the paper's Argoverse ablation, adding this auxiliary objective improves displacement error at three seconds from 3.84 to 3.67, a modest but direct test that the global representation became more useful for forecasting. The gain does not erase preprocessing assumptions: the vectorizer still decides how curves are segmented and what happens when map entities are missing.
+
 ![Figure 2 from VectorNet showing input vectors, polyline subgraphs, a global interaction graph, and trajectory prediction](/assets/images/vectornet-encoding-hd-maps-and-agent-dynamics-from-vectorized-representation-paper-figure.png)
 *Fig 1: Shows the core hierarchy: vectors become polyline features, polyline features interact globally, and agent nodes support map completion and trajectory prediction. | source: [VectorNet paper](https://arxiv.org/abs/2005.04259)*
 
@@ -34,19 +36,7 @@ The paper's main contrast is against rasterization. Raster BEV images let standa
 *Fig 2: (Left) Visualization of the prediction: lanes are shown in grey, non-target agents are green, target agent’s ground truth trajectory is in pink, predicted trajectory in blue. (Right) Visualization of attention for road and agent: Brighter red color corresponds to higher attention score. | source: [VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation](https://arxiv.org/abs/2005.04259)*
 
 
-**What to look at:**
-- Map and motion inputs stay as vectors rather than rendered pixels.
-- The model separates local polyline structure from global scene interaction.
-- Masked map and trajectory completion make context learning part of training.
 
-### Reported evidence
-
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Representation | HD maps and trajectories as polylines | Preserves lane and agent geometry without rasterization. |
-| Architecture | Local polyline subgraphs plus global graph | Matches the natural hierarchy of driving scenes. |
-| Auxiliary task | Masked entity completion | Forces the global graph to use scene context. |
-| Evidence | Internal benchmark and Argoverse | Shows vectorized encoding can compete with rendered BEV baselines. |
 
 ## High-Level Takeaways
 

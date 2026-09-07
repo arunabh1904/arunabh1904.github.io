@@ -36,10 +36,6 @@ The report finds power-law improvement with training compute and a strong correl
 *Fig 2: The model architecture is a pair of encoder/decoder Transformer networks. This model takes multimodal scene data as input and produces a series of motion tokens autoregressively. | source: [Scaling Laws of Motion Forecasting and Planning](https://arxiv.org/abs/2506.08228)*
 
 
-**What to look at:**
-- Closed-loop metrics improve with scale, not only open-loop forecasting metrics.
-- Data/model allocation matters; bigger models are not the whole story.
-- Inference-time sampling creates a separate scaling axis.
 
 ### Reported evidence
 

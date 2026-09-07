@@ -37,10 +37,6 @@ The evaluation uses an internal dataset with multiple vehicle observations and h
 *Fig 3: Illustration of baseline implementations for lane pair prediction. | source: [LMT-Net: Lane Model Transformer Network for Automated HD Mapping from Sparse Vehicle Observations](https://arxiv.org/abs/2409.12409)*
 
 
-**What to look at:**
-- Sparse vehicle observations are treated as enough signal to recover useful lane-model structure.
-- Lane pairs and connectivity are predicted together, not as disconnected perception outputs.
-- The graph output matches how downstream autonomy systems reason about lanes.
 
 ### Reported evidence
 

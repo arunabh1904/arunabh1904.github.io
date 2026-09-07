@@ -39,10 +39,6 @@ The paper argues that vector maps should keep their graph structure through the 
 *Fig 3: Overall architecture: Our model is composed of four modules. (1) ActorNet receives the past actor trajectories as input, and uses 1D convolution to extract actor node features. | source: [LaneGCN: Learning Lane Graph Representations for Motion Forecasting](https://arxiv.org/abs/2007.13732)*
 
 
-**What to look at:**
-- Lane graph edges preserve topology that raster features can blur.
-- Along-lane dilation helps messages travel farther than immediate lane neighbors.
-- Actor-map fusion is directional and staged, not one generic attention block.
 
 ### Reported evidence
 

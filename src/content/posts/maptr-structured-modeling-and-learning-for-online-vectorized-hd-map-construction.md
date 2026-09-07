@@ -36,13 +36,8 @@ The reported evidence is strong for its time: with camera input on nuScenes, Map
 *Fig 2: Typical cases for illustrating the ambiguity of map element about start point and direction. (a) Polyline: for the lane divider between two opposite lanes, defining its direction is difficult. | source: [MapTR: Structured Modeling and Learning for Online Vectorized HD Map Construction](https://arxiv.org/abs/2208.14437)*
 
 
-_hierarchical queries decode vector map elements, and matching handles point-level ambiguity. source: [MapTR paper](https://arxiv.org/abs/2208.14437)
 
 
-**What to look at:**
-- Map elements are point sets with multiple equivalent orderings.
-- Hierarchical queries mirror the structure of a vector map element.
-- Matching defines the structured prediction problem rather than serving as an incidental training detail.
 
 ### Reported evidence
 

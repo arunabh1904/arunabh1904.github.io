@@ -26,6 +26,8 @@ Map-free prediction replaces explicit lane topology with sensor-derived BEV feat
 
 The second change moves physical supervision upstream. PGID feeds the agent's instantaneous state into iterative decoding and combines this with acceleration, jerk, and curvature penalties. These constraints therefore shape the features used to generate multimodal hypotheses, rather than only rejecting implausible output trajectories after decoding. The distinction matters because a feasible trajectory is a property of the whole rollout, not just its final points.
 
+HASE and PGID also answer different failure modes. HASE is agent-conditioned: it retrieves BEV evidence for the current target and refines that retrieval through interaction and relation stages, so a bend in the road is interpreted relative to the agent's position and history. PGID then carries the current kinematic state through iterative prediction. A mode that reaches the right endpoint by making an implausibly sharp turn can be penalized while it is being formed, rather than after the decoder has committed to it.
+
 ![SIPTraj architecture with hierarchical agent-scene grounding and physics-guided iterative decoding](/assets/images/siptraj-architecture-paper-figure.png)
 *Fig 1: The paper's overview couples agent-conditioned BEV grounding with physics-aware iterative decoding. | source: [SIPTraj](https://arxiv.org/abs/2608.00779)*
 

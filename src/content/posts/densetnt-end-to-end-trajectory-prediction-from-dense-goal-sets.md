@@ -43,11 +43,6 @@ The main training problem is supervision. Each driving log shows only one realiz
 *Fig 3: Two-stage training of goal set predictor. In the first stage, we use the ground truth goals to train all the modules except for the goal set predictor. | source: [DenseTNT: End-to-End Trajectory Prediction from Dense Goal Sets](https://arxiv.org/abs/2108.09640)*
 
 
-**What to look at:**
-- Dense goal scoring removes dependence on sparse predefined anchors.
-- Goal-set prediction replaces NMS with a learned selection module.
-- Offline optimization supplies multi-future pseudo-labels that are missing from ordinary logged data.
-- The online model runs without the optimization loop, but its quality depends on the heatmap and pseudo-label objective.
 
 ### Reported evidence
 

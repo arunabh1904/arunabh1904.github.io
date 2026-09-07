@@ -30,11 +30,6 @@ At detection time, LiDAR, camera features, surfel priors, and 3DGS priors are en
 ![Figure 2 from MPA3D showing camera, LiDAR, surfel, and 3D Gaussian priors fused for 3D detection](/assets/images/scene-reconstruction-as-mapping-priors-for-3d-detection-paper-figure.png)
 *Fig 1: Shows MPA3D: camera BEV features, LiDAR, surfels, and 3D Gaussian priors are encoded and gated before the SWFormer detector head. | source: [Scene Reconstruction as Mapping Priors for 3D Detection paper](https://arxiv.org/abs/2605.22997)*
 
-**What to look at:**
-- The map prior is generated automatically, without human map labeling.
-- Surfels are cheaper; 3DGS is denser and more expensive.
-- Gated fusion handles mismatched feature density across LiDAR and map priors.
-- The priors mostly describe static background, which makes dynamic foreground easier to isolate.
 
 ### Reported evidence
 

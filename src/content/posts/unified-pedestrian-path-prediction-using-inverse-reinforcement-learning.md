@@ -30,6 +30,8 @@ The technical change is in the learning contract. STGAT already represents pedes
 
 The result is a comparative study rather than a new perception architecture. Its claim is that advanced graph predictors can still benefit from a decision-oriented objective, extending earlier formulation comparisons that used shallow models. The abstract does not report a single cross-dataset percentage gain in the available source summary, so the note should not invent one; the important evidence is the controlled comparison against supervised learning.
 
+The full-state PPO formulation is the clearest controlled result in the paper's tables. Averaged across the ETH/UCY scenes, supervised training gives ADE/FDE 0.5801/1.1824 and minADE/minFDE 0.5334/1.0843. PPO with the full state reaches 0.5460/1.1335 and 0.5227/1.0551, while REINFORCE with the same state reaches 0.5630/1.1680 and 0.5350/1.0840. Removing the PPO value baseline worsens minADE/minFDE to 0.5370/1.0844. That pattern supports a benefit from both sequential policy optimization and variance reduction, but it does not identify a learned human-preference cost: the evaluation still measures held-out trajectory error.
+
 The open decision is whether inverse reinforcement learning improves behavior because it captures a useful latent cost or because its rollout and objective choices regularize the predictor. A matched study should hold STGAT, data, horizon, and evaluation fixed while varying only state/action definitions and policy objective.
 
 ## High-Level Takeaways
@@ -37,4 +39,6 @@ The open decision is whether inverse reinforcement learning improves behavior be
 - The paper informs whether pedestrian prediction should be trained as a sequential decision problem when the architecture already models social interaction.
 - The atomic unit is a pedestrian graph state and next-path action, with deterministic or stochastic policy variants.
 - Reformulation can matter independently of model size, but the reported gains do not establish better closed-loop vehicle safety.
+- The reported comparison uses eight observed and twelve predicted steps, five training runs, and twenty samples per test case; PPO's advantage is therefore a benchmark-level result under a particular rollout and sampling protocol.
+- The source does not establish that the decision formulation transfers beyond ETH/UCY or remains stable under the higher-variance, longer-horizon rollouts a driving planner would require.
 - The conclusion would weaken if supervised STGAT matches the policy formulations under equal rollout, reward-design, and compute budgets.

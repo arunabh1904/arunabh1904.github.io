@@ -24,6 +24,8 @@ GuideFormer uses separate color and sparse-depth branches, then transfers image 
 
 Transformer blocks enlarge the receptive field available to sparse measurements, while guided attention limits exchange to features useful for depth. The paper reports 721.48 mm RMSE on KITTI depth completion. It also identifies computation speed as a limitation, so the accuracy result should be considered with attention cost and deployment support.
 
+The KITTI setup makes the guidance problem severe: 86k training frames contain projected LiDAR at only about 16% of image pixels. In the architecture ablation, replacing both Transformer branches with CNNs gives 772.78 mm RMSE; Transformer encoders and decoders reduce that to 765.38, while also reducing parameters from 132M to 99M, at the cost of 1802G computation and 0.101 seconds per frame. Guided-attention placement matters more than the generic “Transformer” label: sequential pre-guidance reaches 754.17 mm RMSE, versus 756.15 for parallel pre-guidance and 757.52 for sequential post-guidance. The reported 721.48-mm test RMSE is thus tied to a particular directional exchange and confidence fusion schedule, not just a larger receptive field.
+
 ![GuideFormer dual-branch architecture with guided attention and confidence-weighted depth fusion](/assets/images/guideformer-paper-figure.webp)
 *Fig 1: Color and sparse-depth branches keep separate confidence maps while guided-attention modules exchange information before four candidate depth maps are fused. | source: [GuideFormer](https://openaccess.thecvf.com/content/CVPR2022/html/Rho_GuideFormer_Transformers_for_Image_Guided_Depth_Completion_CVPR_2022_paper.html)*
 

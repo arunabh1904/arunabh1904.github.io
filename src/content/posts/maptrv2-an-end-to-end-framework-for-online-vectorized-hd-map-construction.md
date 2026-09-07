@@ -39,10 +39,6 @@ The evidence spans nuScenes and Argoverse2, where the paper reports state-of-the
 *Fig 3: Convergence curves of MapTRv2 and MapTR with ResNet-50 backbone on nuScenes dataset. MapTRv2 significantly outperforms MapTR with 4x shorter training schedule and 2.8 higher mAP. | source: [MapTRv2: An End-to-End Framework for Online Vectorized HD Map Construction](https://arxiv.org/abs/2308.05736)*
 
 
-**What to look at:**
-- The representation is still point sets plus equivalent permutations.
-- Auxiliary one-to-many matching gives more positive training signal than strict one-to-one matching alone.
-- Dense supervision helps the model learn spatial structure before final vector outputs are evaluated.
 
 ### Reported evidence
 

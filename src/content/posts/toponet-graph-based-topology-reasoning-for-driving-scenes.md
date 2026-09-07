@@ -36,13 +36,8 @@ The evaluation is on OpenLane-V2, where the paper reports large gains over prior
 *Fig 2: Failure case under large-area occlusion. TopoNet fails to predict centerlines and the lane graph in the intersection with a large bus colluding in front. | source: [TopoNet: Graph-based Topology Reasoning for Driving Scenes](https://arxiv.org/abs/2304.05277)*
 
 
-_then reasons over their relationships with a scene graph neural network. source: [TopoNet paper](https://arxiv.org/abs/2304.05277)
 
 
-**What to look at:**
-- The target is road topology, not just lane geometry.
-- Lane connectivity and traffic-element assignment are modeled together.
-- The scene knowledge graph injects structured prior relationships instead of using arbitrary message passing.
 
 ### Reported evidence
 

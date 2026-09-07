@@ -38,11 +38,6 @@ TNT uses VectorNet as the HD-map context encoder when maps are available and a R
 *Fig 2: Qualitative results on the Argoverse validation set. Lane centerlines are shown in grey, agent’s past trajectory in blue, ground truth future trajectory is in light blue. | source: [TNT: Target-driveN Trajectory Prediction](https://arxiv.org/abs/2008.08294)*
 
 
-**What to look at:**
-- Targets make intent interpretable: turning, lane changes, and speed choices become endpoint hypotheses.
-- The framework avoids test-time latent sampling by producing diverse futures in parallel.
-- Target candidates can come from map structure for vehicles or a grid for pedestrians.
-- The scoring stage matters because good endpoints do not automatically imply good full trajectories.
 
 ### Reported evidence
 

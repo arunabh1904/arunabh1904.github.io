@@ -29,6 +29,12 @@ The model represents the scene across agents, time, and features. Attention oper
 
 The paper's contribution is less about a new primitive and more about unification. A single Transformer can handle marginal, joint, conditional, and goal-conditioned prediction by changing the query/mask pattern. The tradeoff is computational: attention over heterogeneous scene elements is flexible, but scaling it requires careful factorization.
 
+### A mask changes the question without changing the scene encoder
+
+The mask is an interface for the task. A marginal query hides the target's future while leaving other agents' histories visible; a joint query hides the futures of all selected agents; a conditional query reveals one agent's future so the model can predict another's response; and a goal-conditioned query supplies a desired endpoint. The same scene tensor is reused, but visibility changes which variables are treated as evidence and which are sampled. This makes “joint prediction” a property of the conditioning pattern, rather than a second decoder bolted onto an otherwise independent predictor.
+
+The paper's public benchmarks make the distinction tangible. On Argoverse, the marginal model reports 0.80 minADE, 1.23 minFDE, and 0.13 miss rate. On Waymo, joint and conditional evaluations are reported separately because a model that is good at the best single-agent endpoint can still produce mutually incompatible futures. The cost is that the mask cannot remove scene-size scaling: as the number of agents or forecast steps grows, the visible interaction tensor and its attention memory grow with it. The note's unification claim should therefore be read as an interface and training result, not evidence that every query is equally cheap.
+
 ![Figure 2 from Scene Transformer showing masking strategies and the attention-based encoder-decoder architecture](/assets/images/scene-transformer-a-unified-architecture-for-predicting-multiple-agent-trajectories-paper-figure.png)
 *Fig 1: Shows the two key ideas: prediction tasks become mask patterns, and one attention encoder-decoder handles agent-time-road interactions. | source: [Scene Transformer paper](https://arxiv.org/abs/2106.08417)*
 
@@ -39,22 +45,9 @@ The paper's contribution is less about a new primitive and more about unificatio
 *Fig 3: Goal-conditioned prediction navigates AV to selected goal positions. Rectangles indicate vehicles on the road. | source: [Scene Transformer: A Unified Architecture for Predicting Multiple Agent Trajectories](https://arxiv.org/abs/2106.08417)*
 
 
-_and one attention encoder-decoder handles agent-time-road interactions. source: [Scene Transformer paper](https://arxiv.org/abs/2106.08417)
 
 
-**What to look at:**
-- Masking defines the prediction task.
-- Joint prediction keeps interactions between future agents visible to the model.
-- The same architecture can answer several forecasting queries.
 
-### Reported evidence
-
-| Idea | Detail | Why it matters |
-| ---- | ------ | -------------- |
-| Scene-centric tensor | Agents, time, and features in one representation | Avoids re-encoding each target independently. |
-| Masked tasks | MP, CMP, and GCP as visibility patterns | Turns a family of tasks into one model interface. |
-| Attention axes | Time, agents, and road graph | Lets heterogeneous scene information interact. |
-| Evidence | Waymo Open Motion Dataset and Argoverse | Tests both large-scale scene prediction and public map-rich forecasting. |
 
 ## High-Level Takeaways
 

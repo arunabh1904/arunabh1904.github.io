@@ -41,10 +41,6 @@ The empirical evidence comes from image regression and low-dimensional vision an
 *Fig 3: Fourier features improve the results of coordinate-based MLPs for a variety of high-frequency low-dimensional regression tasks, both with direct (b, c) and indirect (d, e) supervision. We visualize an example MLP (a) for an image regression task (b), where the input to the network is a pixel coordinate and the output is that pixel’s color. | source: [Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains](https://arxiv.org/abs/2006.10739)*
 
 
-**What to look at:**
-- The contribution is an input representation, not a new network family.
-- Fourier features let a coordinate network expose high frequencies early instead of asking hidden layers to discover them slowly.
-- The bandwidth parameter controls the smoothness/detail tradeoff.
 
 ### Reported evidence
 

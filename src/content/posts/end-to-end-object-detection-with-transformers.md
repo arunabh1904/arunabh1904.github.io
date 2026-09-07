@@ -38,6 +38,12 @@ On COCO, DETR reports accuracy and runtime comparable to a heavily optimized Fas
 
 The simplification moves complexity into optimization. The original model uses a long 500-epoch schedule, and the paper identifies slow convergence and weaker small-object performance as open problems. Doubling feature resolution helps small objects but makes encoder self-attention much more expensive.
 
+### The set contract moves duplicate handling into training
+
+The Hungarian matcher is the hinge of the design. For each image, it chooses a one-to-one assignment between ground-truth boxes and the fixed query slots using class, box-$L_1$, and generalized-IoU costs. Matched slots receive the object label and box; every remaining slot is trained as “no object.” At inference, the decoder can emit all slots in parallel because the loss has already made duplicate ownership explicit. This is a stronger claim than simply swapping a convolution for attention: the detector's output is an unordered set with a fixed budget.
+
+The COCO numbers show both the payoff and the cost. DETR-R50 reaches 42.0 AP at 28 FPS against 40.2 AP at 26 FPS for the Faster R-CNN-FPN reference, while the higher-resolution DETR-DC5 reaches 43.3 AP but drops to 12 FPS. Small-object AP is 20.5 for DETR-R50 versus 24.1 for the reference, which matches the paper's diagnosis that global feature resolution, rather than duplicate suppression, is the remaining bottleneck. The box-loss ablation also matters: removing the generalized-IoU term lowers AP from 40.6 to 35.8, so the elegant matching interface still depends on a carefully shaped geometric objective.
+
 | Design choice | Function |
 | --- | --- |
 | Fixed object queries | Bound the output set. |

@@ -39,13 +39,8 @@ The evidence includes strong Waymo Open Motion Dataset and Argoverse leaderboard
 *Fig 3: Scaling ensemble result using the Argoverse dataset. The Ensemble models are represented in orange, with ensemble size linearly related to the FLOPs. | source: [Scaling Motion Forecasting Models with Ensemble Distillation](https://arxiv.org/abs/2404.03843)*
 
 
-_while distilled students aim to preserve much of that gain at lower inference cost. source: [ensemble distillation paper](https://arxiv.org/abs/2404.03843)
 
 
-**What to look at:**
-- Ensembles are used as a temporary training tool, not as the final deployed system.
-- Distillation targets the practical gap between leaderboard accuracy and onboard compute.
-- The paper is about scaling under constraints rather than inventing a new motion representation.
 
 ### Reported evidence
 

@@ -39,11 +39,6 @@ The offline module gathers local maps from multiple traversals and fuses them in
 *Fig 3: Query trajectories across decoder layers show how map-element estimates move and contract; color distinguishes query types and ellipsoid size visualizes uncertainty. | source: [RTMap: Real-Time Recursive Mapping with Change Detection and Localization](https://arxiv.org/abs/2507.00980)*
 
 
-**What to look at:**
-- Hybrid queries distinguish current observations from prior-map elements.
-- Existence-aware matching supports matched, outdated, and newly observed map elements.
-- The system can use an explicit MAP state estimator for 6-DOF localization.
-- Offline crowdsourcing turns repeated local maps into a self-updating prior.
 
 ### Reported evidence
 

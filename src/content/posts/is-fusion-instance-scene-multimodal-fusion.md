@@ -26,6 +26,8 @@ IS-Fusion argues that one fusion granularity cannot serve both scene context and
 
 Scene fusion uses hierarchical interaction to strengthen BEV context; instance fusion combines point-to-grid and grid-to-region transformations around proposals. On nuScenes validation, the full model reports 72.8 mAP and 74.0 NDS. The paper's ablation reports simple image-LiDAR fusion at 69.4/71.6, scene fusion adding about 2.2 mAP and 1.6 NDS, and the instance path contributing further gains.
 
+The two instance transformations do different work. Point-to-grid adds only about 0.5 mAP/0.3 NDS, while grid-to-region adds 1.8/1.2 by letting a proposal retrieve object-centered features from the shared BEV context; together they account for the full HSF improvement of 2.2/1.6 over the 69.4/71.6 baseline. The paper's qualitative comparison shows incomplete BEV responses without instance guidance becoming more complete after that retrieval. Its K=200 proposals and D=16 instance-token setting perform best in the reported sweep; increasing either to 300 or 32 degrades, so the instance path has a real proposal and token budget rather than free detail.
+
 ![IS-Fusion framework with hierarchical scene fusion and proposal-centered instance fusion](/assets/images/is-fusion-paper-figure.webp)
 *Fig 1: The scene path builds global BEV context, while proposal-selected instance features preserve object detail before both representations are decoded together. | source: [IS-Fusion](https://openaccess.thecvf.com/content/CVPR2024/html/Yin_IS-Fusion_Instance-Scene_Collaborative_Fusion_for_Multimodal_3D_Object_Detection_CVPR_2024_paper.html)*
 

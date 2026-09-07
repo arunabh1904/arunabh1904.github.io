@@ -27,6 +27,12 @@ The problem is forecasting plausible, interactive futures for multiple road agen
 
 The main evidence is performance on the Waymo Open Motion Dataset. The paper reports state-of-the-art multi-agent motion prediction and a first-place rank on the interactive challenge leaderboard. The caveat is shared with most tokenized forecasting systems: discretization simplifies the objective, but token design and decoding strategy become part of the modeling assumptions.
 
+### Joint likelihood is useful even when the endpoint metric is not lowest
+
+MotionLM is trained on 1.1 million nine-second examples formed from one second of history and eight seconds of future motion. In the interactive setting it emits six joint modes, and the evaluation can roll out up to eight agent replicas with 512 samples per replica. That rollout contract makes the interaction claim concrete: the decoder is choosing later tokens after earlier agents' predicted tokens are in the context, rather than drawing six independent paths and pairing them afterward.
+
+The numbers show why a single metric is insufficient. MotionLM reports interactive minADE 0.8911 and minFDE 2.0067, slightly above JFP's 0.8817 and 1.9905, but improves miss rate from 0.4233 to 0.4115 and interactive mAP from 0.2050 to 0.2178. The conditional factorization is also measurable: on the paper's marginal comparison, temporally causal decoding moves minADE/minFDE from 0.6069/1.2236 for the marginal model to 0.5997/1.2034, while the acausal variant reaches 0.5899/1.1804. Causal ordering therefore trades a little endpoint accuracy for a rollout that can react to the generated scene state, which is the behavior a planner needs.
+
 ![Figure 2 from MotionLM showing scene encoding, autoregressive motion-token decoding, and rollout aggregation](/assets/images/motionlm-multi-agent-motion-forecasting-as-language-modeling-paper-figure.png)
 *Fig 1: Shows the language-model analogy concretely: scene features condition an autoregressive decoder that rolls out discrete motion tokens. | source: [MotionLM paper](https://arxiv.org/abs/2309.16534)*
 
@@ -37,18 +43,7 @@ The main evidence is performance on the Waymo Open Motion Dataset. The paper rep
 *Fig 3: Our model autoregressively generates sequences of discrete motion tokens for a set of agents to produce consistent interactive trajectory forecasts. | source: [MotionLM: Multi-Agent Motion Forecasting as Language Modeling](https://arxiv.org/abs/2309.16534)*
 
 
-**What to look at:**
-- Motion tokens replace anchors and manually specified multimodal heads.
-- Joint autoregressive decoding models interactions directly.
-- Temporally causal rollouts make conditional prediction natural.
 
-### Reported evidence
-
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Representation | Discrete motion tokens | Brings trajectory forecasting into the next-token framework. |
-| Objective | Standard language-model likelihood | Simplifies multimodal forecasting training. |
-| Benchmark | Waymo Open Motion Dataset interactive challenge | Tests joint futures, not only independent agent predictions. |
 
 **Compact result slice:**
 

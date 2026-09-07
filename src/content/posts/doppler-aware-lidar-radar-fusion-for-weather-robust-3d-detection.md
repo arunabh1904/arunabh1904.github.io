@@ -37,6 +37,8 @@ On K-RADAR, DLRFusion reports 73.2 BEV AP and 45.7 3D AP at IoU 0.5 across weath
 
 The limitation is temporal. K-RADAR's restricted Doppler range does not support reliable absolute object velocity, so the paper uses simple motion compensation and evaluates single-frame detection rather than tracking.
 
+The component ablation explains the large 3D gain. At IoU 0.5, a power-only radar model reaches 14.1 AP3D; adding Doppler with preprocessing and separate branches reaches 19.9. In the fused model, power-LiDAR interaction alone gives 37.9 AP3D, adding Doppler-LiDAR changes little, and adding the power-Doppler path raises it to 45.7. The useful operation is therefore not “more channels”: Doppler first updates power, then the refined power and Doppler paths update LiDAR through repeated interactions. Across K-RADAR's seven weather conditions, the total score is 73.2 BEV AP / 45.7 3D AP at IoU 0.5, versus 71.3/40.4 for LOD-PDR, but the absolute-velocity limitation still bounds temporal claims.
+
 ## High-Level Takeaways
 
 - Signal-specific branches matter when channels carry structurally different evidence rather than interchangeable features.

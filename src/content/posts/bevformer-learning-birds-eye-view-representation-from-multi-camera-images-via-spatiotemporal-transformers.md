@@ -39,13 +39,8 @@ The reported nuScenes test result in the abstract is 56.9% NDS, a 9.0 point gain
 *Fig 3: Visualization results of BEVFormer on nuScenes val set. We show the 3D bboxes predictions in multi-camera images and the bird’s-eye-view. | source: [BEVFormer: Learning Bird](https://arxiv.org/abs/2203.17270)*
 
 
-_BEV queries, spatial cross-attention, temporal self-attention, and detection/segmentation heads. source: [BEVFormer paper](https://arxiv.org/abs/2203.17270)
 
 
-**What to look at:**
-- BEV queries define the dense bird's-eye grid.
-- Spatial cross-attention connects each BEV cell to camera evidence.
-- Temporal self-attention carries history without recomputing a long video window.
 
 ### Reported evidence
 
