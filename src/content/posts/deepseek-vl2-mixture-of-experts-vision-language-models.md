@@ -38,7 +38,7 @@ The training schedule preserves the asymmetry between conditioning and output. S
 
 The benchmark results show where dynamic resolution matters. In the full model's OCR table, DeepSeek-VL2 reaches 93.3 DocVQA, 86.0 ChartQA, 78.1 InfoVQA, 84.2 TextVQA, and 811 OCRBench with 4.5B activated parameters including the vision encoder. DeepSeek-VL2-Small reaches 92.3 DocVQA and 834 OCRBench with 2.8B activated parameters. The general table reports 51.1 MMMU, 83.1 MMBench, 61.3 MMStar, and 62.8 MathVista for the full model. These comparisons support strong capability per active parameter, but they do not make dense and sparse inference costs identical.
 
-![DeepSeek-VL2 average benchmark performance versus activated parameters](/assets/images/deepseek-vl2-mixture-of-experts-vision-language-models-paper-figure.png)
+![DeepSeek-VL2 average benchmark performance versus activated parameters](/assets/images/deepseek-vl2-source-figure-1-performance.png)
 *Fig 3: The paper compares average multimodal performance against activated parameters across the DeepSeek-VL2, InternVL2, and Qwen2-VL families; its average combines MMBench v1.1, MMStar, MMMU (validation), MathVista (test-mini), AI2D (test), and OCRBench scaled to 0–100. | source: [DeepSeek-VL2, Figure 1](https://arxiv.org/abs/2412.10302)*
 
 The efficiency boundary is operational. Dynamic tile counts can make batches uneven, expert routing can create load imbalance, and the report describes separate pipeline strategies for text-only and image batches. The authors also report that the 3B, 16B, and 27B variants can fit on single GPUs with 10GB, 40GB, and 80GB memory respectively. These are deployment facts for the reported implementation, not guarantees across arbitrary serving stacks.
