@@ -51,7 +51,7 @@ For SA classification, RoBERTa reaches an in-vehicle macro-F1 of 0.914±0.007 an
 
 For driver action, frozen video alone is weaker than language and motion. RoBERTa text reaches 0.728±0.009 accuracy and 0.289±0.018 macro-F1; CLIP plus kinematics gives the best macro-F1 at 0.306±0.016, showing that simple visual and motion cues add complementary signal. Explanation generation is evaluated from action, context, and kinematic inputs rather than end-to-end pixels. T5-base is best on BLEU-4 (0.036±0.002), ROUGE-L (0.238±0.010), and BERTScore-F1 (0.895±0.003), while GPT-2 has the best METEOR at 0.185±0.010. Low n-gram scores are expected because multiple natural explanations can be valid; they also show that generating a driver-like reason remains open.
 
-NARRATE’s boundary is deliberate. One Brisbane route, 35 drivers, mostly daytime collection, and long-tailed actions limit geographic and behavioral coverage. The dataset gives explanation models a human source of reasons and a sensor-grounded event, but transfer to other traffic conventions and unseen drivers still needs to be tested.
+NARRATE’s boundary is deliberate. One Brisbane route, 35 drivers, mostly daytime collection, and long-tailed actions limit geographic and behavioral coverage. The participant-disjoint split tests new drivers within this cohort; transfer to new cohorts, regions, and traffic conventions still needs to be tested. The dataset gives explanation models a human source of reasons and a sensor-grounded event.
 
 ## High-Level Takeaways
 
