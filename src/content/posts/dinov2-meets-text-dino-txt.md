@@ -61,10 +61,10 @@ Training lasts 50k iterations, equivalent to 1.6 billion pairs at batch 32k or 3
 
 The pooling ablation shows why concatenation matters. Using only the class token preserves 78.8% ImageNet accuracy but has weak dense features. Average or max pooling alone improves ADE20K to 13.3 or 18.0 while harming classification. Concatenating class and average patch tokens reaches 79.2/34.7/18.2, so the model does not have to choose between a global and local objective. The two added vision blocks then restore retrieval and classification as the alignment becomes more flexible.
 
-At 224 pixels, dino.txt reaches 81.4 ImageNet, 45.4 COCO retrieval R@1, and 20.6 ADE20K mIoU. At 336 pixels, the reported numbers are 81.6, 44.9, and the same global-evaluation family; high-resolution dense inference reaches 25.1 ADE20K, 41.0 Cityscapes, 67.6 Pascal VOC, 24.1 Pascal Context, and 36.7 COCO-Stuff mIoU. The 800-crop protocol visits each pixel about 40 times and takes around ten seconds on an A100, so the dense ceiling is not a free property of the representation.
+At 224 pixels, dino.txt reaches 81.4 ImageNet, 45.4 COCO retrieval R@1, and 20.6 ADE20K mIoU. At 336 pixels, ImageNet accuracy is 81.6 and COCO retrieval is 44.9. High-resolution dense inference reaches 25.1 ADE20K, 41.0 Cityscapes, 67.6 Pascal VOC, 24.1 Pascal Context, and 36.7 COCO-Stuff mIoU. The 800-crop protocol visits each pixel about 40 times and takes around ten seconds on an A100, so the dense ceiling is not a free property of the representation.
 
 ![Figure 4 from DINOv2 Meets Text: dino.txt showing high-resolution inference](/assets/images/dinov2-meets-text-dino-txt-source-figure-4.webp)
-*Fig 2: High-resolution inference. Left: input image. Middle: result of k-means clustering (k=32) on the features. Right: open-vocabulary predictions with the ADE20K class names. | source: [DINOv2 Meets Text: dino.txt, Figure 4](https://arxiv.org/abs/2412.16334)*
+*Fig 2: The center panel groups dense features into 32 clusters; the right panel assigns those regions labels from ADE20K. This separates the quality of the spatial grouping from the semantics supplied by class-name queries. | source: [DINOv2 Meets Text: dino.txt, Figure 4](https://arxiv.org/abs/2412.16334)*
 
 Figure 2 shows the dense protocol rather than a new model head. The image is processed through overlapping crops, the patch features are clustered with $k=32$, and class-name embeddings label the clusters. The visual intuition is that high-resolution views reveal small or separated regions that a single 224-pixel grid would merge. The cost is repeated encoding and a clustering step, and the labels are only as good as the text query and benchmark ontology.
 
@@ -76,7 +76,7 @@ The text encoder is another boundary. On MTEB it trails CLIP’s text encoder by
 
 ### When dense geometry is worth a frozen tower
 
-Use dino.txt when a self-supervised visual backbone already serves dense tasks and the new requirement is open-vocabulary querying. Compare it with frozen DINOv2 plus class-token LiT, partial unfreezing, and end-to-end CLIP at matched image-text pairs, text capacity, and dense inference cost. Evaluate class-name sensitivity and overlapping concepts separately from boundary quality. The paper supports an efficient adapter recipe; it does not establish that strict freezing is always optimal, nor that its private curation pipeline transfers unchanged to another domain.
+The frozen tower is useful because language alignment does not have to reconstruct visual structure from scratch. Two added vision blocks and patch pooling give the text loss access to that structure, but the resulting interface still inherits errors from both sides: imperfect regions and imperfect names. The gap between ordinary and expensive high-resolution inference shows why a representation score alone is insufficient. Its practical value depends on how much repeated encoding the dense application can afford, as well as whether the text queries describe its actual regions.
 
 ## High-Level Takeaways
 

@@ -43,7 +43,7 @@ The learnable temperature is $t=\exp(t')$. The additional bias $b$ is initialize
 CLIP’s symmetric softmax loss must normalize each image against every text and each text against every image. The denominator couples all entries in the similarity matrix: a device needs a global view before it can finish its local loss. SigLIP instead sums independent pair losses. It keeps the same positive diagonal and negative off-diagonal intuition, but the objective no longer asks the optimizer to select one class from the entire batch.
 
 ![Cross-device SigLIP loss computation accumulates independent pair losses without materializing one global softmax](/assets/images/sigmoid-loss-for-language-image-pre-training-siglip-paper-figure.png)
-*Fig 1: Efficient loss implementation demonstrated via a mock setup with 3 devices and a global batch size of 12. There are no all-gathers, and at any point in time only the bright yellow square (size 4 × 4) is materialized in memory. | source: [SigLIP, Figure 1](https://arxiv.org/abs/2303.15343)*
+*Fig 1: Three devices circulate embedding chunks to evaluate a global batch of twelve. The highlighted 4 × 4 block is the similarity matrix currently held in memory; successive blocks contribute to the same global objective. | source: [SigLIP, Figure 1](https://arxiv.org/abs/2303.15343)*
 
 Figure 1 is best read as a memory diagram. Each device begins with four image and four text embeddings and evaluates its local 4 × 4 block. It then swaps text chunks, computes the next block, and accumulates the pair losses. After every text chunk has visited every image chunk, a cross-device sum completes the objective. The largest live similarity block stays 4 × 4 in this toy setup, rather than becoming one global 12 × 12 matrix. The loss is still pairwise across the global batch; the implementation changes how that work is scheduled.
 
@@ -72,9 +72,9 @@ Noise experiments point in the same direction. The authors corrupt images, texts
 | Large-batch stability | $\beta_2=0.95$ stabilizes gradient spikes | Optimizer settings become part of the scaling recipe |
 | Noisy pairs | Sigmoid retains an advantage under injected corruption | Suggestive robustness, not a corpus-independent law |
 
-### A better systems boundary, not an unlimited-negative claim
+### Pairwise independence changes what must fit in memory
 
-Use SigLIP when the training bottleneck is the global softmax and the available system cannot afford a giant all-gathered similarity matrix. Compare it with a softmax baseline at matched encoders, data, examples seen, optimizer, and batch composition; otherwise the loss and systems changes are confounded. The paper’s private WebLI corpus also limits reproducibility. SigLIP changes normalization and communication, while [dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html) changes the visual initialization and freezing decision. At 32k, data quality, false negatives, optimizer stability, and image resolution may dominate the choice of loss.
+SigLIP makes a global learning objective executable as a sequence of local pair computations. That is valuable even when batch-size scaling has plateaued: memory no longer has to grow with the full similarity matrix. The remaining limits come from which pairs carry useful information and how their gradients are optimized. Its private WebLI corpus limits reproduction of the reported scores. The comparison with [dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html) is complementary: one changes normalization and communication, while the other changes visual initialization and which weights need training.
 
 ## High-Level Takeaways
 

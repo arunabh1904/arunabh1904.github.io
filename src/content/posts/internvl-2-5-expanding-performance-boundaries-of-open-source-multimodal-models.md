@@ -25,7 +25,7 @@ summary: "2024 – InternVL 2.5: Expanding Performance Boundaries of Open-Source
 ### The architecture spends tokens where the image needs them
 
 ![Figure 1 from InternVL 2.5 showing model performance on the OpenCompass leaderboard](/assets/images/internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models-paper-figure.png)
-*Fig 1: Performance of various MLLMs on the OpenCompass leaderboard. InternVL 2.5 showcases strong multimodal capabilities, rivaling closed-source models like GPT-4o and Claude-3.5-Sonnet. However, since the OpenCompass score is derived from 8 academic VQA benchmarks and covers only a subset of overall capabilities, we still need further effort to match the performance with closed-source models. | source: [InternVL 2.5, Figure 1](https://arxiv.org/abs/2412.05271)*
+*Fig 1: The model family improves the eight-benchmark OpenCompass VQA aggregate across sizes. The plotted ranking measures that evaluation slice; it does not cover the full range of multimodal behavior. | source: [InternVL 2.5, Figure 1](https://arxiv.org/abs/2412.05271)*
 
 InternVL 2.5 keeps the ViT–MLP–LLM pattern rather than introducing a new fusion block. Its InternViT-6B or InternViT-300M encoder produces visual tokens, a randomly initialized two-layer MLP maps them into the language model’s input space, and the LLM generates the response with next-token prediction. A 448 × 448 tile initially yields 1,024 visual tokens; pixel unshuffle reduces that to 256 before the language model sees it. The reduction is what makes dynamic high resolution practical: the system can tile a wide or tall image without sending every raw patch into the LLM.
 
@@ -75,7 +75,7 @@ The causal story is therefore narrower than the leaderboard. InternVL 2.5 improv
 
 ### Scale is coupled to data quality and inference budget
 
-InternVL 2.5 is a good fit when one open model must cover high-resolution documents, multiple images, video, grounding, and multilingual inputs, and the deployment can choose tile and frame budgets explicitly. Read each score with its prompt and test-time setting, especially CoT and majority voting. The practical follow-up is to hold model size, training tokens, frame count, and answer budget fixed while changing one axis at a time; otherwise a larger vision encoder, cleaner data, and more inference can be mistaken for the same improvement. The paper’s strongest systems lesson is that scaling only becomes usable when the data filter and input policy scale with it.
+InternVL 2.5 exposes two budgets that a parameter count hides: how much visual evidence enters the context and how much answer generation is allowed. Dynamic tiles and frame sampling control the first; direct answering and reasoning prompts change the second. Filtering matters because a longer response budget is useful only if the model can spend it without falling into repetition. The benchmark gains therefore belong to the combined training and inference recipe. Reusing a stronger vision encoder makes that recipe cheaper to extend across model sizes, but does not isolate one universal scaling relationship.
 
 ## High-Level Takeaways
 

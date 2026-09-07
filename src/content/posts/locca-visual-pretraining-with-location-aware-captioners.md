@@ -23,7 +23,7 @@ summary: "2024 – LocCa: Visual Pretraining with Location-aware Captioners"
 ### Location enters through the same language interface
 
 ![Figure 1 from LocCa showing captioning, automatic referring expression, and grounded captioning pretraining tasks](/assets/images/locca-visual-pretraining-with-location-aware-captioners-paper-figure.png)
-*Fig 1: Overview of LocCa. LocCa consists of a standard vision transformer and a transformer decoder. The vision transformer takes image pixel as input, produces visual tokens as cross attention input to the transformer decoder. The transformer decoder is trained to read out rich information from the visual tokens. We adopt the following three task for pretraining: Cap, AREF and GCAP. | source: [LocCa, Figure 1](https://arxiv.org/abs/2403.19596)*
+*Fig 1: One visual encoder feeds a shared decoder for captions, descriptions followed by boxes, and boxes followed by descriptions. Changing the output sequence makes spatial information necessary without adding a separate region encoder. | source: [LocCa, Figure 1](https://arxiv.org/abs/2403.19596)*
 
 Figure 1 is a single encoder with three output contracts. Cap maps an image to a caption. AREF (automatic referring expression) maps a generated region description to its box. GCAP (grounded captioning) maps a box to its regional caption. During pretraining, the model does not receive the box as a privileged input for one task and the caption as a privileged input for the other. It predicts both sides sequentially from the image, using task prefixes to indicate the sequence:
 
@@ -44,7 +44,7 @@ This supervision is weak in two ways. The locations come from a detector, not hu
 The clean RefCOCO evaluation isolates that transfer. RefCOCO, RefCOCO+, and RefCOCOg training images overlap heavily with one another: 61.2% of RefCOCO validation images, 60.5% of testA, and 65.1% of testB also appear in the combined training pool, with the same ratios for RefCOCO+ and 48.8%/48.3% for RefCOCOg val-u/test-u. LocCa removes all validation and test images from the combined training sets and also removes COCO images and near-duplicates from pretraining. This makes the “clean” numbers lower than contaminated comparisons, but much easier to interpret.
 
 ![Figure 2 from LocCa showing COCO detection before and after reward tuning](/assets/images/locca-visual-pretraining-with-location-aware-captioners-source-figure-2.png)
-*Fig 2: Result on COCO detection with a limit of 25 output boxes. For reward tuned models we show both the results before (dark blue and orange) and after (light blue and orange) reinforce tuning. | source: [LocCa, Figure 2](https://arxiv.org/abs/2403.19596)*
+*Fig 2: COCO detection is limited to 25 predicted boxes. Paired bars show the downstream detector before and after reward tuning, so the benefit of visual pretraining can be distinguished from the later optimization step. | source: [LocCa, Figure 2](https://arxiv.org/abs/2403.19596)*
 
 Figure 2 shows a second transfer interface. For COCO detection, LocCa uses an Objects365-pretrained decoder that can emit up to 25 box sequences, first trains by likelihood and then applies reinforcement tuning against an mAP-related reward. The pretrained visual encoder is what changes the starting point: location-aware LocCa is already more object-sensitive before reward tuning, and the gap remains after it. The result is not zero-shot detection from the three pretraining tasks; it is evidence that a location-aware visual encoder makes a downstream autoregressive detector easier to train.
 
@@ -63,7 +63,7 @@ On holistic transfer, LocCa reaches 84.5 ImageNet-1k, 96.0 Resisc-45, 127.1 COCO
 The encoder also transfers into PaLI-3. With a 224-pixel LocCa-L encoder, the PaLI-3 transfer reaches 138.9 COCO CIDEr, 77.6 VQAv2, 58.4 OKVQA, 49.2 TextVQA, 50.9 ST-VQA, and 79.3/64.1 on simple/complex TallyQA. The corresponding SigLIP-L row is 135.8, 75.6, 57.5, 41.1, 46.2, and 74.9/61.4. The improvement is largest on visually situated text and counting-style tasks, which is exactly where a global caption objective has fewer reasons to preserve precise object identity and position.
 
 ![Figure 3 from LocCa showing resolution and coordinate-token ablations](/assets/images/locca-visual-pretraining-with-location-aware-captioners-source-figure-3.png)
-*Fig 3: Ablation studies on (a) impact of different pretrained image resolutions on string token; and (b) string vs special token of box coordinates with pretrained res 224. The results are the average Acc@0.5 of the val&test splits on RefCOCO/+. | source: [LocCa, Figure 3](https://arxiv.org/abs/2403.19596)*
+*Fig 3: The left panel varies pretraining and transfer resolution; the right compares ordinary string tokens with dedicated coordinate tokens. Scores average referring-expression accuracy over the reported RefCOCO and RefCOCO+ splits. | source: [LocCa, Figure 3](https://arxiv.org/abs/2403.19596)*
 
 Figure 3 separates two implementation questions from the pretraining idea. Transferring a 224-pixel encoder at 384 or 640 pixels improves RefCOCO, and pretraining at the larger resolution improves it again; the model benefits from both more image detail and the encoder’s native positional geometry. String-token coordinates perform about as well as special coordinate tokens, so LocCa’s simple decision to tokenize integer coordinates with the same SentencePiece vocabulary is not the source of the localization gain.
 
@@ -75,7 +75,7 @@ The same distinction appears in segmentation. Referring-expression segmentation 
 
 ### Location supervision is the transfer advantage
 
-Use LocCa when a caption-pretrained encoder must later support grounding, detection, OCR, or object-sensitive VQA while retaining one generative interface. Report the clean RefCOCO protocol, separate proxy-box pretraining from downstream boxes, and distinguish frozen-encoder transfer from full-model fine-tuning. The key comparison is ordinary captioning at the same image-text compute with and without AREF/GCAP; the paper’s ablations show that either location-aware task helps, GCAP alone gives a large gain, and their combination is complementary. The durable claim is specific: adding coordinate-bearing language during visual pretraining changes what the encoder preserves. It does not remove the need for task-specific set prediction, pixel labels, or leakage-resistant evaluation.
+LocCa changes what a captioning encoder has a reason to retain. A global caption can name the right objects after losing their precise arrangement; a coordinate-bearing sequence cannot. Either location-aware task improves transfer in the ablations, and combining them is complementary. The large frozen-encoder gains show that useful spatial information survives in the representation before downstream adaptation. Complete detection and segmentation still require their own output machinery, while the clean RefCOCO protocol is essential to distinguish learned localization from familiar evaluation images.
 
 ## High-Level Takeaways
 

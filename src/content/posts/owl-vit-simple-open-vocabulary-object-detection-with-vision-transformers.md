@@ -26,7 +26,7 @@ summary: '2022 – OWL-ViT: Simple Open-Vocabulary Object Detection with Vision 
 ### The open-vocabulary interface is almost the CLIP interface
 
 ![Figure 1 from OWL-ViT: Simple Open-Vocabulary Object Detection with Vision Transformers](/assets/images/owl-vit-simple-open-vocabulary-object-detection-with-vision-transformers-source-figure-1.webp)
-*Fig 1: Overview of our method. Left: We first pre-train an image and text encoder contrastively using image-text pairs, similar to CLIP, ALIGN, and LiT. Right: we transfer the model to open-vocabulary detection by adding a linear classification projection and an MLP box head to the visual tokens. | source: [OWL-ViT, Figure 1](https://arxiv.org/abs/2205.06230)*
+*Fig 1: Image-level contrastive training supplies the two encoders. Detection then replaces image pooling with per-token object embeddings and boxes, leaving text queries independently encodable. | source: [OWL-ViT, Figure 1](https://arxiv.org/abs/2205.06230)*
 
 The left side of Figure 1 is an ordinary dual encoder. A Vision Transformer and a text Transformer are contrastively pretrained on image-text pairs, with a pooled image representation used during image-level training. Detection changes the interface rather than replacing the encoders. OWL-ViT discards the image token-pooling and final projection layers, linearly projects each output token into the same embedding space as text, and sends that token through a small MLP box head. One token proposes one box and one image embedding.
 
@@ -57,7 +57,7 @@ On LVIS, evaluation uses all 1,203 category names as queries. To measure rare-ca
 The image-conditioned experiment is cleaner about the query mechanism. On four unseen COCO splits, OWL-ViT reaches 41.8 AP50 with one query image and 46.8 with ten, compared with 16.8 and 22.0 for SiamMask. The model’s advantage is not an extra cross-attention architecture; it is the ability to average multiple object embeddings while keeping the target-image encoder independent. Figure 2 makes the boundary visible: a butterfly image produces a strong matching box among a dense field of candidates, including a species name that the text query missed in the paired example. The figure is a query substitution experiment, not evidence that the model has learned a universal species taxonomy.
 
 ![Figure 2 from OWL-ViT: Simple Open-Vocabulary Object Detection with Vision Transformers](/assets/images/owl-vit-simple-open-vocabulary-object-detection-with-vision-transformers-source-figure-2.webp)
-*Fig 2: Example of one-shot image-conditioned detection. Images in the middle are used as queries; the respective detections on the target image are shown on the left and right. | source: [OWL-ViT, Figure 2](https://arxiv.org/abs/2205.06230)*
+*Fig 2: The center images provide example-object queries for the detections on either side. An image can specify the target when a category name is inadequate. | source: [OWL-ViT, Figure 2](https://arxiv.org/abs/2205.06230)*
 
 ### Scaling transfers semantics, but not automatically localization
 
@@ -67,7 +67,7 @@ More image-text pretraining initially improves rare-category AP, then plateaus f
 
 ### Query openness ends where localization begins
 
-Choose OWL-ViT when the deployed detector must accept new text labels or example images without replacing a learned classifier. Reproduce the full interface at matched query counts and report rare-category localization separately from ordinary transfer. The method still relies on millions of boxes, its text prompts and negative sampling shape the result, and the visual token budget limits dense scenes. Its lasting idea is the clean boundary between visual object embeddings and externally supplied queries: semantic openness becomes an inference property, while localization remains a supervised transfer problem.
+OWL-ViT separates two kinds of learning that a fixed classifier joins together. Box supervision teaches visual tokens to localize objects; the shared embedding space lets an external query decide which objects matter. A new label or example image can change that decision at inference, but cannot repair a missed box. That distinction explains both the flexibility of image-conditioned queries and the dependence on detection data, negative sampling, and token count.
 
 ## High-Level Takeaways
 
