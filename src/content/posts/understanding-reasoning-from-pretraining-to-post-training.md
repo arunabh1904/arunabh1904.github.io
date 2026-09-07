@@ -31,7 +31,7 @@ summary: '2026 – Understanding Reasoning from Pretraining to Post-Training'
 
 ### Chess makes the pretraining-to-RL dependency measurable
 
-The testbed keeps the action space and verifier explicit. Decoder-only Transformers from 5M to 1B parameters are pretrained on 54B tokens of 2022 Lichess Blitz and Rapid games. The data splits are disjoint at the board-position level, which is the paper’s contamination control. A proposal model samples continuations from a puzzle position; common prefixes are merged into a search tree and serialized for SFT. RL then uses GRPO on 156,000 quality-filtered puzzles with a binary reward: the full line must match the unique correct solution.
+The testbed keeps the action space and verifier explicit. Decoder-only Transformers from 5M to 1B parameters are pretrained with varying token budgets drawn from a 54B-token corpus of 2022 Lichess Blitz and Rapid games. The data splits are disjoint at the board-position level, which is the paper’s contamination control. A proposal model samples continuations from a puzzle position; common prefixes are merged into a search tree and serialized for SFT. RL then uses GRPO on 156,000 quality-filtered puzzles with a binary reward: the full line must match the unique correct solution.
 
 The evaluation contains 1,480 tactical puzzles divided into difficulty bins B1–B5. The aggregate pass@k analysis uses B1–B4 because B5 is rarely solved; B5 remains useful for inspecting failure mechanisms. This design asks a clean question: does the prior learned from human games change how efficiently a policy converts verifiable RL experience into correct moves?
 
@@ -81,5 +81,5 @@ The paper repeats the comparison on one 1B OLMo-2 trajectory: 14 checkpoints fro
 
 - Treat pretraining loss and token exposure as different predictors. In this testbed, loss orders the level from which RL starts, while tokens order the local rate at which RL improves.
 - Use a small joint sweep before committing a large reasoning-training budget. Vary model size and token count independently, run matched RL budgets on a non-saturating difficulty band, and fit the interaction instead of extrapolating from pretraining alone.
-- Inspect pass@1 together with pass@k and policy-shift categories. A higher top answer can come from useful tail discovery or from concentrating probability on a wrong mode.
-- The 20% to 28% RL-share result is a modeled frontier inside the measured regime. It is most useful as a sweep proposal, with the chess verifier, B3–B4 focus, finite model sizes, and one-trajectory math transfer treated as explicit limits.
+- Inspect pass@1 together with pass@k and policy-shift categories. A more confident top answer may reflect useful discovery or reinforcement of a wrong move; aggregate pass@1 alone cannot separate these changes.
+- The 20% to 28% RL-share result is a modeled frontier extrapolated from the measured local curves. It is most useful as a sweep proposal, with the chess verifier, B3–B4 focus, finite model sizes, and one-trajectory math transfer treated as explicit limits.

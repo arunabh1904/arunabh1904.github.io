@@ -50,7 +50,7 @@ R_{\mathrm{BoN}}(d)=d(\alpha_{\mathrm{BoN}}-\beta_{\mathrm{BoN}}d),
 R_{\mathrm{RL}}(d)=d(\alpha_{\mathrm{RL}}-\beta_{\mathrm{RL}}\log d).
 $$
 
-These are empirical descriptions of the measured regime, not a claim that reward must follow either function at arbitrary distance. The RL expression is especially a local fit near the origin, where its logarithmic behavior should not be read literally.
+These are empirical descriptions of the measured regime, not a claim that reward must follow either function at arbitrary distance. The authors explicitly caution that the RL expression likely fails near the origin because its slope becomes infinite there.
 
 The source figure makes the mechanism visible. Dashed curves are proxy scores; solid curves are gold scores. The proxy keeps improving, while the gold score bends over and can decline. Increasing reward-model size shifts the bend, but does not remove it:
 

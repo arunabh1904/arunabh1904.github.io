@@ -30,18 +30,18 @@ mc_i=\frac{\text{number of correct sampled completions}}
 {\text{number of sampled completions}}.
 $$
 
-A step is labeled correct when $mc_i>0$. The image, question, previous steps, and current step are formatted as a multi-turn conversation; the model predicts the correctness of every step. This is a noisy but scalable alternative to labeling every intermediate derivation by hand.
+A step is labeled correct when $mc_i>0$. The image, question, previous steps, and current step are formatted as a multi-turn conversation; the model predicts the correctness of every step. This is a noisy but scalable recoverability label: at least one sampled continuation reached the correct answer. It is not a direct check of local logical truth. An incorrect step can be repaired later, while a finite sample can miss a valid continuation.
 
 The data and evaluation sets answer different questions, which the source figure makes explicit:
 
 ![Examples from VisualPRM400K automatic supervision and VisualProcessBench human step labels](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-2.webp)
 *Fig 1: VisualPRM400K attaches Monte Carlo expected-accuracy labels to generated solution steps, while VisualProcessBench contains human correctness judgments for evaluating critics. | source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning, Figure 2](https://arxiv.org/abs/2503.10291)*
 
-VisualProcessBench contains 2,866 samples and 26,950 human step labels drawn from MMMU, MathVista, MathVision, MathVerse’s Vision-Only split, DynaMath, and WeMath. Thirteen annotators worked for three days, or 39 person-days, at an estimated $37 per person-day. The benchmark includes incorrect steps throughout a solution, not only the first error, and reports macro F1 for step judgments. That makes it a test of critic discrimination rather than a proxy for final answer accuracy.
+VisualProcessBench contains 2,866 samples and 26,950 human step labels drawn from MMMU, MathVista, MathVision, MathVerse’s Vision-Only split, DynaMath, and WeMath. The benchmark includes incorrect steps throughout a solution, not only the first error, and reports macro F1 over correct and incorrect step judgments, with an overall micro average across data sources. That makes it a test of critic discrimination rather than a proxy for final answer accuracy.
 
 ### Value and advantage labels ask different process questions
 
-The paper compares two labels. A value-based process reward model scores whether the current step is correct, using the sign of its expected accuracy. An advantage-based model scores how the step changes expected accuracy relative to the preceding step. The distinction matters: a step may be correct in isolation while failing to improve the solution, or it may be a neutral transition that preserves a good trajectory.
+The paper compares two labels. A value-based process reward model uses positive continuation success as its correctness target. An advantage-based model scores how the step changes expected accuracy relative to the preceding step. The distinction matters: a step may be correct in isolation while failing to improve the solution, or it may be a neutral transition that preserves a good trajectory.
 
 The source schematic below compares the two process-modeling choices:
 

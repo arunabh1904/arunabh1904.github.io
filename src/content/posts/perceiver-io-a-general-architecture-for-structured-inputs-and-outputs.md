@@ -38,7 +38,7 @@ A standard Transformer repeatedly builds queries and keys over the full input, w
 
 ### Queries carry the semantics of the requested output
 
-The latent array is deliberately task agnostic. Output semantics enter through the queries. A classification task can use one learned query. A sequence or dense spatial output can attach a position embedding to each query. A multimodal output can combine modality and position embeddings. For optical flow, the query can also include the input feature at the location being decoded; for StarCraft II, it can include the unit representation.
+The latent architecture is shared as a design across tasks; the experiments use task-specific training, not one universal set of weights. Output semantics enter through the queries. A classification task can use one learned query. A sequence or dense spatial output can attach a position embedding to each query. A multimodal output can combine modality and position embeddings. For optical flow, the query can also include the input feature at the location being decoded; for StarCraft II, it can include the unit representation.
 
 The source’s domain overview shows the same interface spanning unlike data shapes:
 
@@ -57,7 +57,7 @@ $$
 
 The encoder and decoder are linear in input and output index sizes, while latent self-attention is independent of $M$ and $O$. This is the computational reason to use a bottleneck. It is also the representational risk: if $N$ or $D$ is too small, the latent array must discard information before the output query reveals which details matter.
 
-The multimodal autoencoding experiment is an unusually clear stress test. The model serializes 50,000 video patches, 30,000 raw audio samples, and one 700-dimensional class label into a common input array. It uses 512-channel latents and reports a 88× compression setting with 784 latents:
+The multimodal autoencoding experiment is an unusually clear stress test. The model serializes 50,000 video patches, 30,000 raw audio samples, and one 700-dimensional class label into a common input array. It uses 512-channel latents and reports an 88× compression setting with 784 latents:
 
 ![Multimodal audio-video-label autoencoding at 88× compression](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-4.webp)
 *Fig 3: Inputs are on the left and reconstructions on the right for the 88× compression setting; audio, video, and labels share the latent workspace. | source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs, Figure 4](https://arxiv.org/abs/2107.14795)*
@@ -66,7 +66,7 @@ The table makes the tradeoff visible: at 88× compression, audio PSNR is 26.97, 
 
 ### The architecture is competitive where its interface matters
 
-On GLUE, a SentencePiece Perceiver IO model reaches 81.2 average versus 81.1 for BERT Base at a comparable FLOPs budget. The byte-level version avoids tokenization and reaches 81.8 with a larger compute budget. On optical flow, Perceiver IO obtains 1.81 EPE on Sintel clean and 2.42 on Sintel final, compared with RAFT’s 1.95 and 2.57 in the reported AutoFlow comparison. The model uses no cost volumes or explicit warping, and its latent representation does not maintain a 2D layout.
+On GLUE, a SentencePiece Perceiver IO model reaches 81.2 average versus 81.1 for BERT Base at a comparable FLOPs budget. Byte-level Perceiver IO avoids subword tokenization and reaches 81.0 at 113B reported FLOPs; the larger Perceiver IO++ reaches 81.8 at 241B FLOPs. On optical flow, Perceiver IO obtains 1.81 EPE on Sintel clean and 2.42 on Sintel final, compared with RAFT’s 1.95 and 2.57 in the reported AutoFlow comparison. The model uses no cost volumes or explicit warping, and its latent representation does not maintain a 2D layout.
 
 These results establish that a general interface can be competitive, not that input structure is irrelevant. The optical-flow experiment still uses patch extraction, positional features, and RAFT’s AutoFlow augmentation parameters. Perceiver IO moves the burden from a fixed architecture to the input features, output queries, latent capacity, and loss weighting.
 

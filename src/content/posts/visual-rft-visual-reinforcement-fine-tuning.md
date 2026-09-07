@@ -15,13 +15,13 @@ summary: '2025 – Visual-RFT: Visual Reinforcement Fine-Tuning'
 
 ## Summary
 
-> Visual-RFT applies reinforcement learning with verifiable rewards to visual perception tasks. The policy generates a reasoning trace and a structured answer, then receives a task-specific rule-based score. With roughly 100 examples, the paper reports a 24.3-point gain over the baseline in one-shot fine-grained classification, plus gains of 21.9 on two-shot COCO detection and 15.4 on LVIS.
+> Visual-RFT applies reinforcement learning with verifiable rewards to visual perception tasks. The policy generates a reasoning trace and a structured answer, then receives a task-specific rule-based score. With roughly 100 examples, the paper reports a 24.3-point gain over the baseline in one-shot fine-grained classification, plus gains of 21.9 on two-shot COCO detection and 15.4 on ten-shot LVIS.
 
 ## Core Insights
 
 ### The visual output contract determines the reward
 
-Visual-RFT starts from a practical mismatch: a fluent answer is not necessarily a correct box, class, or grounding mask. For each image and prompt, the LVLM samples a group of responses containing a <think> trace and an <answer> with the required structure. GRPO compares their rewards within the group, using
+Visual-RFT starts from a practical mismatch: a fluent answer is not necessarily a correct box or class. For each image and prompt, the LVLM samples a group of responses containing a `<think>` trace and an `<answer>` with the required structure. GRPO compares their rewards within the group, using
 
 $$
 A_i=\frac{r_i-\operatorname{mean}(r)}{\operatorname{std}(r)}
@@ -40,7 +40,7 @@ $$
 R_d=R_{\mathrm{IoU}}+R_{\mathrm{conf}}+R_{\mathrm{format}}.
 $$
 
-$R_{\mathrm{IoU}}$ averages the matched box overlaps. For a matched box, the confidence term rewards high confidence; for an unmatched box with zero IoU, it rewards low confidence through $1-c_i$. The format term checks the required <think> and <answer> tags. For classification, the corresponding contract is
+$R_{\mathrm{IoU}}$ averages the assigned overlaps across predictions, including zeros for unmatched boxes. For a matched box, the confidence term rewards high confidence; for an unmatched box assigned zero IoU, it rewards low confidence through $1-c_i$. The format term checks the required `<think>` and `<answer>` tags. For classification, the corresponding contract is
 
 $$
 R_{\mathrm{cls}}=R_{\mathrm{acc}}+R_{\mathrm{format}},
@@ -59,9 +59,9 @@ The training settings are deliberately data-limited. The fine-grained classifica
 
 ### The gains follow the reward contract
 
-On four fine-grained datasets—Flower102, Pets37, FGVC Aircraft, and Cars196—the one-shot Visual-RFT average is 24.3 points above the Qwen2-VL-2B baseline; the SFT comparison is 4.3 points lower than the baseline average in the reported table. On eight COCO categories, the two-shot setting improves by 21.9 points over the baseline. On six rare LVIS categories, the reported gain is 15.4 points.
+On four fine-grained datasets—Flower102, Pets37, FGVC Aircraft, and Cars196—the one-shot Visual-RFT average is 24.3 points above the Qwen2-VL-2B baseline; the SFT comparison is 4.3 points lower than the baseline average in the reported table. On eight COCO categories, the two-shot setting improves by 21.9 points over the baseline. On six rare LVIS categories with ten examples per class, the reported gain is 15.4 points.
 
-The transfer tests are also specific. In LISA reasoning grounding, the Qwen2-VL-2B Visual-RFT model improves test mIoU by 10.7 points and test gIoU by 9.1 points over the SFT comparison shown in the paper. In open-vocabulary detection, the model is trained on 6,000 COCO annotations from 65 base classes and tested on 15 new COCO classes plus 13 rare LVIS classes. The reported Qwen2-VL-2B mAP on new COCO classes rises from 9.8 to 31.3, and the selected rare-LVIS result rises from 2.7 to 20.7. These are different tasks with different verifiers; the shared recipe is group-relative policy optimization, not a shared reward definition.
+The transfer tests are also specific. In LISA reasoning grounding, the Qwen2-VL-2B Visual-RFT model reaches 37.6 test box mIoU, up 10.7 points from the base model (26.9) and 9.3 from SFT (28.3). Its predicted boxes prompt SAM to produce segmentation masks; test gIoU reaches 34.4, up 9.1 points from both the base and SFT models (25.3). In open-vocabulary detection, the model is trained on 6,000 COCO annotations from 65 base classes and tested on 15 new COCO classes plus 13 rare LVIS classes. The reported Qwen2-VL-2B mAP on new COCO classes rises from 9.8 to 31.3, and the selected rare-LVIS result rises from 2.7 to 20.7. These are different tasks with different verifiers; the shared recipe is group-relative policy optimization, not a shared reward definition.
 
 ## High-Level Takeaways
 
