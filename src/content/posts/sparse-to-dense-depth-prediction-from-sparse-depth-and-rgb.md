@@ -12,36 +12,41 @@ summary: '2017 – Sparse-to-Dense: complete sparse runtime range measurements w
 
 **arXiv:** [1709.07492](https://arxiv.org/abs/1709.07492)
 
-### Method and reported result
-
-Sparse-to-Dense feeds RGB and sparse depth into an encoder-decoder that predicts a dense depth map. The sparse values are runtime inputs, not merely training labels. Random sampling simulates different depth densities and lets the paper study how a small number of range measurements changes monocular prediction.
-
 ## Summary
 
-> That lifecycle distinction is essential: depth completion is sensor fusion. Removing the range sensor at deployment changes the input distribution and invalidates the advertised completion behavior.
+> Sparse-to-Dense treats a few range measurements as runtime evidence, not as labels hidden behind a camera-only model. An RGB image supplies boundaries and semantic regularities; sparse depth fixes metric scale; an encoder-decoder fills the unobserved pixels. On NYU-Depth-v2, 100 random samples cut the reported RGB-only RMSE by more than half, and on KITTI the same order of sparsity reduces RMSE from 6.266 m to 4.303 m. The paper also shows saturation and blurry boundaries, so the useful promise is graceful completion under a known sampling contract rather than arbitrary recovery of metric geometry from appearance.
 
 ## Core Insights
 
-The network can use one joint encoder or separate RGB and depth branches. Sparse points anchor metric scale while image features interpolate structure between measurements. The paper reports that 100 samples roughly halve NYU depth error and reduce the cited KITTI error from about 7 m to about 3.5 m; at 500 samples, the fraction of reliable KITTI pixels rises from 59.1% to 93.5%.
+### A depth sample is an anchor, not a dense target
 
+The input is a full RGB image plus a sparse depth image in which most pixels are zero because they were never measured. The network must learn the difference between “missing” and “measured zero,” and use measured values as anchors while extending them into nearby regions; the output is still a learned dense prediction rather than a hard copy of the sparse pixels. During training, the authors sample depth pixels from the ground-truth image on the fly with a Bernoulli mask. The expected sample count is controlled, but the exact count varies from example to example, which acts as both data augmentation and a robustness test.
+
+The architecture figure shows why the model is two-dimensional at the interface but not camera-only. The RGB and depth channels enter a ResNet-based encoder, and the decoder upsamples through four UpProj blocks before a final bilinear step. The KITTI and NYU models use different backbones because KITTI's image is roughly three times larger and the same network would exceed the available GPU memory. The design is therefore a practical bottleneck architecture, with the sparse sensor injected near the input and a dense prediction produced at the output.
 
 ![Figure 2 from Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-source-figure-2.webp)
-*Fig 1: CNN architecture for NYU-Depth-v2 and KITTI datasets, respectively. Cubes are feature maps, with dimensions represented as #features@height width. | source: [Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](https://arxiv.org/abs/1709.07492)*
+*Fig 1: The RGB and sparse-depth inputs enter dataset-specific ResNet encoders and meet in an upsampling decoder that produces a full-resolution depth map. The two drawings reflect the different KITTI and NYU memory budgets. | source: [Sparse-to-Dense, Figure 2](https://arxiv.org/abs/1709.07492)*
+
+### The useful ablation is the input density curve
+
+On NYU-Depth-v2, the RGB-only model in the paper reaches RMSE 0.514. With 20, 50, and 200 sparse depth samples, the RGB-plus-depth model reaches 0.351, 0.281, and 0.230 respectively. The gain is not simply an extra training signal: those samples are available at inference and supply absolute scale that the RGB branch cannot infer reliably indoors. As density increases, the sparse-depth-only model also improves, and the color cue becomes less important once the sampled geometry is sufficiently informative.
+
+The outdoor curve exposes a harder boundary. KITTI spans distances to about 100 m, compared with NYU's roughly 10 m indoor range. The paper reports RGB-only RMSE 6.266 m, then 4.884 m with 50 samples, 4.303 m with 100, 3.851 m with 200, and 3.378 m with 500. The fraction of predictions within the paper's reliable threshold rises from 59.1% to 93.5% between zero and 500 samples. More points help, but the curve is not a promise that a fixed tiny sensor will work equally well across range, scene type, and sampling pattern.
+
+The density figure should be read horizontally within each dataset rather than by comparing raw error between indoor and outdoor panels. The left plots are error metrics where lower is better; the right plots are threshold accuracies where higher is better. The RGBd curve drops quickly at low sample counts and then flattens. That shape is the central result: a small number of metric anchors resolves a large scale ambiguity, while later samples mostly refine already-supported surfaces.
 
 ![Figure 5 from Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-source-figure-5.webp)
-*Fig 2: Impact of number of depth sample on the prediction accuracy on the NYU-Depth-v2 dataset. Left column: lower is better; right column: higher is better. | source: [Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](https://arxiv.org/abs/1709.07492)*
+*Fig 2: As the expected number of NYU depth samples increases, RGBd error falls quickly before saturating; the paired threshold plots show the same diminishing-return pattern. | source: [Sparse-to-Dense, Figure 5](https://arxiv.org/abs/1709.07492)*
 
 
-| Runtime input | Role | Failure consideration |
-| --- | --- | --- |
-| RGB | Boundaries and semantic priors | Lighting and texture shortcuts. |
-| Sparse depth | Metric anchors | Density, pattern, and missing returns shift. |
-| Sampling mask | Indicates observed support | Must not confuse zero with missing. |
-| Dense output | Consumer-friendly geometry | Can be overconfident between anchors. |
+### Architecture choices matter after the sensor contract is fixed
+
+The paper's NYU architecture ablation needs a careful comparison. The RGB $\mathcal{L}_1$ model with a convolutional first layer and UpProj decoder reaches RMSE 0.528, while the RGBd model with the same choices reaches 0.264; that is the closer modality comparison. The 0.361-to-0.261 change is instead the first encoder convolution changing from ChanDrop to DepthWise while the UpProj decoder stays fixed. The RGB-only rows also change loss and decoder together: the $\mathcal{L}_2$ Conv/DeConv2 row is 0.610, berHu is 0.554, $\mathcal{L}_1$ Conv/DeConv2 is 0.552, and later decoder variants reach 0.533, 0.529, and 0.528. The sparse modality explains the large controlled jump; encoder and decoder choices explain the smaller architectural steps.
+
+The authors also demonstrate dense maps from sparse visual-odometry landmarks and vertically denser LiDAR outputs. Those are useful interface demonstrations: a sparse SLAM map can become a surface that a planner can consume, and a low-resolution LiDAR can appear denser in the image plane. They use the ground-truth depth of the first frame to set absolute scale in the simple visual-odometry demonstration, so that example does not establish a complete metric SLAM system.
 
 ## High-Level Takeaways
 
-- Use depth completion when sparse depth is guaranteed at runtime and downstream modules benefit from a dense surface. If the deployment goal is camera-only, use sparse depth as supervision or distillation instead and remove it from the inference graph deliberately.
-- Evaluate error by distance, object boundary, surface type, and sampling pattern. Uniform random samples are easier than real scanning geometry and motion distortion.
-- DeepLiDAR adds surface-normal reasoning and learned confidence; GuideFormer replaces convolutional exchange with guided attention.
-- Sparse measurements can dramatically improve dense depth, but the improvement is a runtime sensor dependency, not free privileged supervision.
+Sparse-to-Dense is a reference for the lifecycle of privileged geometry. If sparse depth is guaranteed at runtime, the model is a depth-completion system and its density, placement, timing, and calibration are part of the input specification. If the product is camera-only, sparse depth should be used as supervision or distillation and then removed deliberately; feeding it at deployment would change the problem. The network learns a dense surface from anchors, so measured pixels and predicted pixels should be evaluated separately rather than treated as equally observed.
+
+The next evaluation should replace the paper's uniform random masks with the actual sensor's scan pattern, dropout, motion distortion, range-dependent density, and boundary errors. Measure distant surfaces and object edges separately, and report confidence between anchors. The paper supports a large gain from a small metric hint; it does not support treating the completed surface as equally observed everywhere.
