@@ -23,11 +23,7 @@ summary: "2026 – Skaling: Chinchilla's Exponents Meet Kaplan's Coupling"
 ## Core Insights
 
 
-![Figure 1 from Skaling: Chinchilla](/assets/images/skaling-chinchillas-exponents-meet-kaplans-coupling-source-figure-1.webp)
-*Fig 1: The additive Chinchilla law carries a systematic, boundary-concentrated prediction bias that the Skaling law removes. Each marker is a trained configuration (model size horizontal, training tokens vertical). | source: [Skaling: Chinchilla](https://arxiv.org/abs/2608.07222)*
 
-![Figure 2 from Skaling: Chinchilla](/assets/images/skaling-chinchillas-exponents-meet-kaplans-coupling-source-figure-2.webp)
-*Fig 2: Log-log projections of loss derivatives across model and data scales follow approximately linear trends, supporting the paper’s coupled power-law scaling model. | source: [Skaling: Chinchilla](https://arxiv.org/abs/2608.07222)*
 
 
 ### One exponent restores model–data interaction
@@ -50,6 +46,14 @@ $$
 
 When $k=1$, the model collapses to Chinchilla. The full-grid fits recover $k$ between roughly 0.31 and 0.45 on Farseer and SK-Grid, so the measured surfaces reject the additive special case in those experiments.
 
+### Coupling changes the fitted frontier without changing its optimization formula
+
+For fixed positive coefficients and $k>0$, raising a positive quantity to $k$ preserves its ordering. Under the approximation $C=6ND$, minimizing Skaling therefore selects the same $N,D$ as minimizing its *inner* sum. The derivative contains a positive factor $kZ^{k-1}$ multiplying $Z'$, so the stationary point still satisfies $Z'=0$.
+
+The resulting allocation scales as $N_*\propto C^{\beta/(\alpha+\beta)}$ and $D_*\propto C^{\alpha/(\alpha+\beta)}$. Consequently, $D_*/N_*\propto C^{(\alpha-\beta)/(\alpha+\beta)}$. Equal inner exponents give a constant ratio; their relative size determines which direction it moves.
+
+Then why does the allocation change? Because fitting the coupled law changes the estimated inner coefficients and exponents. Copying Chinchilla's fitted parameters and merely adding an outer exponent would miss the paper's allocation result. The extra flexibility changes the inferred loss surface before optimization.
+
 ### Boundary prediction is the relevant test
 
 Farseer contains 404 runs from 100M to 6.4B parameters plus seven larger far-extrapolation runs. SK-Grid contains 134 configurations from 134M to 4.9B parameters plus three far-extrapolation runs. All compared laws use the same optimizer and fitting objective.
@@ -61,7 +65,17 @@ Farseer contains 404 runs from 100M to 6.4B parameters plus seven larger far-ext
 | SK-Grid, full grid | 5.17% | 0.70% |
 | SK-Grid, L-shape | 14.63% | 1.15% |
 
-The full Farseer far corner is nearly tied. The stronger result is consistency across imbalanced boundaries and under sparse profiling. The L-shaped design sweeps tokens only for the smallest models and model size only at short training horizons. It costs about one tenth of the full fitting grid, yet Skaling stays near or below the full-grid Chinchilla error in most reported regimes.
+![Skaling source Figure 1 comparing residual patterns and per-configuration error ratios](/assets/images/skaling-chinchillas-exponents-meet-kaplans-coupling-source-figure-1.webp)
+*Fig 1: Opposite error signs occupy different corners under the additive fit. Skaling reduces this structured bias; the right panel compares error magnitudes, where red favors Skaling rather than indicating positive prediction error. | source: [Skaling, Figure 1](https://arxiv.org/abs/2608.07222)*
+
+The first two panels share a signed-error scale, while the third uses an error-ratio scale. Read the corner pattern before the average: a model can fit the middle well while systematically missing configurations with too much data for their size, or too little. Random interior holdouts may not expose the decision that matters for a larger run.
+
+The full Farseer far corner is nearly tied. The stronger result is consistency across imbalanced boundaries and under sparse profiling. The L-shaped design sweeps tokens only for the smallest models and model size only at short training horizons. Table 1's fitting-grid costs fall from $5.0\times10^{22}$ to $5.1\times10^{21}$ FLOPs on Farseer, about 9.8-fold, and from $3.1\times10^{21}$ to $6.5\times10^{20}$ on SK-Grid, about 4.8-fold. Skaling stays near or below full-grid Chinchilla error in most reported regimes; a universal tenfold saving would overstate the second grid.
+
+![Skaling source Figure 4 showing random versus L-shaped training grids and held-out extrapolation regions](/assets/images/skaling-source-figure-4-grid-design.png)
+*Fig 2: Blue L-shaped edges reserve training for cheap configurations; the upper-right interior is held out. The evaluation panel separately tests larger models, longer training, and the far corner. | source: [Skaling, Figure 4](https://arxiv.org/abs/2608.07222)*
+
+The L does not recover every possible two-dimensional surface. It works here because the chosen functional form supplies a strong assumption about how edge trends combine. Its success must therefore be measured on the expensive held-out region, not inferred from how neatly it fits the edges.
 
 This result sharpens the argument in [How to Read Scaling Laws for Language Models](/blog/2026/08/19/how-to-read-scaling-laws-for-language-models.html): a high interpolation $R^2$ does not validate the shape of a frontier. Chinchilla reaches interpolation $R^2$ values above 0.99 on both full grids while missing their boundaries systematically.
 
@@ -71,9 +85,18 @@ On Farseer, Skaling's fitted exponents imply that the compute-optimal token-to-p
 
 The loss floor $E$ is also weakly identified because the experiments do not reach saturation. A concave outer exponent and a smaller constant floor can explain similar curvature. On Farseer-code and the original Chinchilla measurements, $k$ lies closer to 1 and Skaling performs near the additive baseline. The form should therefore be selected by held-out boundary evidence, not adopted as a default because it is newer.
 
+### An appendix shows that the fitting objective is part of the result
+
+Appendix F fits differences between pairs of configurations where one is larger in both dimensions and achieves lower loss. Subtracting their losses cancels the shared floor $E$. The shape parameters can be fitted first, and the floor recovered afterward, reducing one source of ambiguity.
+
+This helps the additive baseline substantially: full-grid far-extrapolation MAPE drops from 2.46% to 0.79% on Farseer and from 5.17% to 3.67% on SK-Grid. The correction does not consistently improve Skaling. It also reweights the observations toward informative boundaries, so it is more than an algebraically equivalent implementation of the original fit.
+
+The practical comparison is therefore between a functional form *and* a fitting procedure. The main shared-objective experiment favors coupling, but the appendix prevents attributing every baseline error to additivity alone. Neither a tiny fitted floor nor a good boundary average establishes a universal asymptotic law.
+
 ## High-Level Takeaways
 
-- An additive scaling law makes a testable claim: the marginal value of data is independent of model size. Check the mixed derivative and boundary residuals before trusting that claim.
-- The L-shaped grid is the expensive decision result. A better inductive bias can save profiling compute only when it still predicts held-out corners.
-- Skaling's gain is largest where $N$ and $D$ are imbalanced. Interior fit quality alone hides the failure it is designed to repair.
-- A decisive replication would fit both laws on new architectures, tokenizers, and data mixtures, then reserve genuinely larger runs before inspecting them. Reject the coupled form when $k$ collapses toward 1 or its uncertainty-adjusted boundary error does not beat the additive baseline.
+- A zero mixed derivative is a testable structural assumption of additive scaling laws.
+- The outer exponent preserves the allocation formula but changes the fitted parameters that enter it.
+- L-shaped profiling reduces measured cost substantially, with different savings on the two grids.
+- Boundary residuals reveal failures that high interpolation fit quality can conceal.
+- Loss-floor ambiguity and the pairwise-fitting appendix make the fitting procedure essential to the comparison.

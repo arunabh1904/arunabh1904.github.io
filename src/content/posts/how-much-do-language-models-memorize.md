@@ -9,71 +9,77 @@ tags:
 field: 'Language Models'
 summary: "2025 – How Much Do Language Models Memorize?"
 ---
+
 ## 2025 – How Much Do Language Models Memorize?
 
-**arXiv:** [2505.24832](https://arxiv.org/abs/2505.24832)
-
-**Discussion thread:** [Jack Morris on X](https://x.com/jxmnop/status/1929903028372459909)
-
-### Method and reported result
-
-How Much Do Language Models Memorize? measures how much sample-specific training information a language model stores in its weights. It separates unintended memorization from generalization in settings where the information content of the training data can be controlled.
+**Paper:** [arXiv:2505.24832](https://arxiv.org/abs/2505.24832)
 
 ## Summary
 
-> The headline estimate is about 3.6 bits per parameter for GPT-style transformers. The deeper point is that memorization is not a yes-or-no property of a model or a datapoint; it is a finite capacity budget that changes how the model behaves as data size grows.
+> The paper measures sample-specific information through how much a trained model helps compress its training data beyond a reference model. Uniform random sequences isolate memorization because they contain no reusable linguistic structure; the measured capacity grows roughly with parameter count, at about 3.6 bits per parameter in the studied GPT-style models. On text, the result depends on what the reference already explains. The deeper contribution is separating storage, generalization, extraction, and membership inference, which can move differently as the dataset grows.
 
 ## Core Insights
 
-Extraction attacks and membership inference are useful probes, but the paper argues that they do not directly measure memorization. A model can reproduce a string because it stored that sample, because it learned the distribution that generated the string, or because the evaluation prompt makes the string unusually likely. The paper therefore defines memorization as the sample-specific information stored beyond what a good model of the data distribution would already know.
+### Reproducing a string does not explain why the model knows it
 
-The authors define unintended memorization as information about a particular dataset, separate from generalization, which is information about the data-generating process. They estimate it through a compression view: a datapoint is memorized when access to the model lets you encode it in fewer bits than a reference compressor or reference model would need.
+A familiar phrase can be predictable from general language structure, while a random identifier requires information about that particular sample. An extraction test treats both as reproduced strings. The paper instead asks how much information the target model contributes beyond a reference that approximates the data-generating distribution.
 
-The cleanest experiment trains on uniformly random bitstrings. Random strings have known information content and no shared structure, so loss reduction cannot come from learning reusable linguistic patterns. Under that setup, memorization rises with data size until it reaches an empirical capacity limit. The authors then adapt the analysis to text by using a large oracle model to estimate how much of a sample is explained by the underlying text distribution rather than sample-level storage.
+Its conceptual definition uses conditional information and Kolmogorov complexity. Exact Kolmogorov complexity is uncomputable, so the experiments use likelihood-based code lengths as a practical approximation. A model that assigns probability $p(x)$ to a sequence gives an idealized arithmetic-coding length near $-\log_2 p(x)$ bits.
 
-![Figure 1 from How Much Do Language Models Memorize? showing random-string memorization plateauing at capacity](/assets/images/how-much-do-language-models-memorize-paper-figure.png)
-*Fig 1: Isolates capacity with uniform random data: because there is no reusable pattern to learn, memorization rises until it hits the model's empirical storage limit. | source: [paper](https://arxiv.org/abs/2505.24832)*
+For the compression scheme used here, access to both reference and target means choosing the shorter of their two codes. The sample-specific gain is therefore approximated by
 
-![Figure 10 from How Much Do Language Models Memorize?](/assets/images/how-much-do-language-models-memorize-source-figure-10.webp)
-*Fig 2: Extraction rates of 64-token training sequences across prefix lengths, for both train and evaluation. | source: [How Much Do Language Models Memorize?](https://arxiv.org/abs/2505.24832)*
+$$
+\widehat{m}_U(x)=\max\left(0,\log_2 p_{target}(x)-\log_2 p_{reference}(x)\right).
+$$
 
-![Figure 7 from How Much Do Language Models Memorize?](/assets/images/how-much-do-language-models-memorize-source-figure-7.webp)
-*Fig 3: Scaling law curves for membership inference overlaid with empirical data, shown in circles. | source: [How Much Do Language Models Memorize?](https://arxiv.org/abs/2505.24832)*
+This is a gain in coding efficiency, not a count of tokens that can be recalled verbatim. The reference matters: if it already predicts a sample well, less of the target's performance is credited to unintended memorization.
 
+### Uniform random sequences make the reference exact
 
-_memorization rises until it hits the model's empirical storage limit. source: [paper](https://arxiv.org/abs/2505.24832)
+The synthetic experiments usually use 64-token sequences drawn uniformly from a vocabulary of 2,048 symbols. Each token has 11 bits of entropy, so a sequence contains 704 bits before any sample-specific information is available. There is no grammar or shared semantic structure that would let the model predict an unseen random sequence better.
 
+For illustration, assigning an average of ten bits per observed token would compress such a training sequence to 640 bits, a gain of 64 bits. That would demonstrate partial information about the sequence without requiring perfect free-running reproduction of all 64 tokens.
 
-**What to look at:**
-- Unintended memorization is the dataset-specific part of what the model stores.
-- Generalization is the part tied to the real data-generating process.
-- Random uniform data eliminates generalization and exposes capacity directly.
-- On text, the paper connects capacity saturation to double descent and the shift from storing samples to learning reusable patterns.
-- Membership inference gets harder as the dataset-to-capacity ratio grows, so average-case privacy risk depends on both model size and data scale.
-- The estimates are empirical and architecture-specific; they should be read as scaling evidence for GPT-style models, not a universal constant for all networks.
+The capacity experiment sums these gains over training samples and varies the dataset size. Small enough datasets can be largely memorized. Once more samples are added, the total information stored stops growing proportionately.
 
-### Reported evidence
+![Source Figure 1 showing memorization plateaus for GPT-style models trained on uniform random data](/assets/images/how-much-do-language-models-memorize-paper-figure.png)
+*Fig 1: The dashed line grows with the dataset's information content. Each model eventually falls below it and approaches a plateau, distinguishing more available data from more information retained in the weights. | source: [Memorization paper, Figure 1](https://arxiv.org/abs/2505.24832)*
 
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Capacity estimate | About 3.6 bits per parameter for GPT-family transformers | Turns memorization into a storage budget. |
-| Synthetic setup | Uniform random bitstrings | Removes shared structure, so loss reduction is memorization. |
-| Model sweep | Hundreds of GPT-style transformers from small to 1.5B parameters | Shows the trend is not one model size or one architecture setting. |
-| Precision check | bfloat16 averages 3.51 bits per parameter; fp32 averages 3.83 | More numeric precision helps only modestly. |
-| Membership scaling | Larger datasets make average-point membership inference harder | Explains why attacks can weaken even when large models have high raw capacity. |
+The horizontal axis counts datapoints; the vertical axis counts memorized bits. Following one colored curve to the right holds the architecture fixed while changing data size. Comparing plateau heights across colors then estimates how capacity changes with model size.
 
-**Compact result slice:**
+### The bits-per-parameter estimate is an empirical lower bound
 
-| Regime | Observation | Interpretation |
-| ------ | ----------- | -------------- |
-| Random bitstrings | Memorization increases with dataset size, then plateaus | The plateau estimates model capacity. |
-| Model size sweep | Capacity is roughly linear in parameter count | GPT-style transformers store a stable number of bits per parameter. |
-| Text data | Unintended memorization decreases after capacity fills | The model starts spending training signal on generalization. |
-| Membership inference | F1 approaches random guessing as datasets get very large | Average samples become hard to distinguish from held-out text. |
+The direct synthetic sweep uses GPT-2-style models of roughly 100K to 20M parameters, trained from scratch for one million steps, typically with five seeds per model–dataset setting. The broader membership-scaling experiments extend to 1.5B parameters. Those are different pieces of evidence; the largest membership model is not itself the basis of every capacity estimate.
+
+Across widths and depths, the main fit gives roughly 3.6 bits per parameter. Table 1 reports averages of 3.51 in bfloat16 and 3.83 in float32. Doubling the numerical storage precision therefore does not double the measured information acquired through this training procedure.
+
+These quantities are not file sizes or a proof that weights can be quantized losslessly to 3.6 bits. Optimization may miss a higher-capacity solution, some large datasets are not fully converged, and the chosen compressor may fail to recover information that another procedure could use. The paper explicitly treats the measured capacity as a lower bound, conditional on architecture, training, and measurement.
+
+### Text makes the distinction between memorization and generalization reference-dependent
+
+For natural language, the experiments use FineWeb sequences of 64 tokens, with additional deduplication after truncation. That extra step matters because different full documents can yield duplicate short sequences. The paper considers a same-sized reference trained on the full dataset and a stronger oracle reference selected for low held-out loss.
+
+With the stronger reference, unintended memorization first rises and then falls as the target's training dataset grows. The target becomes less specialized to individual examples and more useful on unseen text. This is not information literally being emptied from the weights; it is a change in what the target explains *beyond that reference*.
+
+The double-descent analysis relates dataset information to estimated model capacity. Near the capacity boundary, held-out performance worsens before improving as data grows further. The authors interpret this as pressure to reuse shared structure once storing samples individually is no longer sufficient. That is an explanation supported by the controlled trend, rather than a universal theorem that all language-model generalization begins at one sharp storage threshold.
+
+### Extraction and membership inference answer separate questions
+
+The prefix-completion experiment gives the model 8, 16, or 32 tokens and asks it to reproduce the remainder of a 64-token sequence. Training extraction falls sharply with dataset size, but eventually becomes comparable to held-out extraction instead of necessarily reaching zero.
+
+![Source Figure 10 comparing extraction of training and held-out sequences at different prefix lengths](/assets/images/how-much-do-language-models-memorize-source-figure-10.webp)
+*Fig 2: Solid training curves approach dashed held-out curves at large dataset sizes. Nonzero extraction alone therefore cannot establish training membership; longer prefixes also change how much information the prompt already supplies. | source: [Memorization paper, Figure 10](https://arxiv.org/abs/2505.24832)*
+
+Read the separation between solid and dashed curves of the same color, not only their absolute height. A long prefix can make a continuation predictable for both training and test examples. Under this controlled, deduplicated setup, matching extraction rates supports the authors' generalization account; it does not prove every extractable string in an arbitrary deployed model is harmless or unseen.
+
+Membership inference instead thresholds model loss to decide whether a sequence belonged to training. It can succeed even when exact extraction fails: the paper reports settings with a membership score of 0.97 and extraction rate zero. A small likelihood advantage can reveal membership without being large enough to reproduce an entire suffix.
+
+The fitted membership curves weaken as the dataset-to-capacity ratio grows, approaching the reported chance baseline for average examples. This is an empirical claim about the tested loss-based attack and sample distribution. It does not rule out stronger attacks, duplicated rare strings, or unusually memorized outliers.
 
 ## High-Level Takeaways
 
-- This paper informs how much parameter budget should be interpreted as storage rather than transferable computation. The unit of analysis is a training token whose recoverability is measured against held-out generalization, producing an estimated memorization capacity of roughly 3.6 bits per parameter for the studied GPT-style models.
-- That estimate is conditional on the data distribution, model family, extraction method, and definition of memorization; it is not a hardware-independent constant. The missing study varies duplication, deduplication, tokenizer, and architecture while holding tokens and optimization fixed. At 10× scale, rare-string extraction, privacy exposure, and benchmark leakage become more important than the average capacity estimate. The claim would fail if an independent extraction protocol produced a substantially different bits-per-parameter slope on held-out model families.
-- The paper gives a cleaner measurement vocabulary for a fuzzy debate. Instead of asking only whether a string can be extracted, it asks how many bits of sample-specific information the weights contain and how that budget scales.
-- Memorization is a finite information budget. For GPT-style language models, this paper estimates that budget at roughly 3.6 bits per parameter and shows how it interacts with data size, double descent, and membership inference.
+- Memorization is measured relative to information a reference model already explains.
+- Uniform random data isolates sample-specific storage; likelihood gains can reveal partial storage without exact recall.
+- Roughly 3.6 bits per parameter is a measured lower bound for the studied setup, not a universal quantization limit.
+- Text memorization estimates change with the reference and the dataset-to-capacity regime.
+- Extraction and membership inference remain distinct: either can be misleading when treated as a complete measure of memorization.

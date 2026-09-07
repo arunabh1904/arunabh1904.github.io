@@ -22,14 +22,8 @@ summary: '2026 – Loop the Loopies!'
 
 ## Core Insights
 
-![Loopie layer-loop recurrence compared with whole-model recurrence](/assets/images/loopie-layer-loop-vs-model-loop.png)
-*Fig 1: Layer-loop applies each Attention/MoE block repeatedly before advancing through the stack; model-loop traverses the whole stack and then starts again. The local schedule improves parameter reuse and avoids a cyclic pipeline path. | source: [Loopie paper](https://arxiv.org/abs/2607.16051)*
 
-![Figure 5 from Loop the Loopies!](/assets/images/loop-the-loopies-source-figure-5.webp)
-*Fig 2: Layer-loop ablation for Loopie-6B-A0.6B. We report the average score across eight downstream benchmarks for Loopie-6B-A0.6B and Loopie-6B-A0.6B-Ablation. | source: [Loop the Loopies!](https://arxiv.org/abs/2607.16051)*
 
-![Figure 7 from Loop the Loopies!](/assets/images/loop-the-loopies-source-figure-7.webp)
-*Fig 3: Composition of the Stage-2 high-quality annealing data pool: multiple data sources make up the 1.26T-token annealing recipe. | source: [Loop the Loopies!](https://arxiv.org/abs/2607.16051)*
 
 
 ### Recurrence is scheduled within each stored layer
@@ -46,11 +40,18 @@ $$
 L_1 \rightarrow L_1 \rightarrow L_2 \rightarrow L_2 \rightarrow L_3 \rightarrow L_3.
 $$
 
+![Source comparison of layer-loop and whole-model recurrence schedules](/assets/images/loopie-layer-loop-vs-model-loop.png)
+*Fig 1: Layer-loop finishes repeated applications within one stored block before moving onward. Whole-model recurrence returns to earlier blocks after traversing the stack, changing where repeated computation sits in the execution schedule. | source: [Loopie paper](https://arxiv.org/abs/2607.16051)*
+
+Read the diagram as an execution order, not as extra independent weights. Reusing a block twice means applying the same transformation to two different intermediate states. It creates additional computation while tying the parameters across those effective depths.
+
 Both schedules reuse parameters across effective depth, but layer-loop keeps repeated applications adjacent. That shortens the reuse distance for weights and gradients, keeps the repetitions inside one pipeline stage, and shares a block across neighboring effective depths rather than positions separated by a full model traversal. In a 6B-A0.6B experiment, layer-loop initially trails model-loop but passes it after roughly 1.2 trillion tokens.
 
 ### The Loopie Recipe matches realized training time
 
 The large comparison starts from a Qwen3-like 30B-A3B MoE with 48 stored layers. The recurrent seed halves stored depth to 24 and applies every layer twice. Under the paper's checkpointing scheme, dominant activation memory scales with stored depth rather than executed depth, so this seed retains 48 block applications while cutting the activation-memory proxy in half.
+
+The checkpointing boundary is the crucial implementation detail: all recurrent applications of one stored layer sit inside the same checkpointed unit. Intermediate work is recomputed during backpropagation, rather than retaining an independent layer-boundary activation for every loop. The memory claim would not automatically hold in an implementation that stores each recurrent step separately.
 
 Loopie then uses the memory headroom to double the per-device microbatch and halve gradient-accumulation steps, keeping tokens per optimizer update fixed. The authors sweep aligned widths and depths and select 27 stored layers, width 2,304, and two loops because that configuration matches the baseline's measured end-to-end optimizer-step time in Megatron-LM. The resulting model has 20B total and 2B active parameters.
 
@@ -63,9 +64,22 @@ Loopie then uses the memory headroom to double the per-device microbatch and hal
 | Best reported throughput | 189.65 TFLOPS/s | 261.53 TFLOPS/s |
 | Per-device microbatch | 1 | 2 |
 
+The selected model's activation proxy at the *reference* microbatch is $2304\times27/(2048\times48)\approx0.633$. That number cannot by itself prove a doubled microbatch fits: parameters, optimizer states, temporary buffers, and communication workspaces still contribute to peak memory. Candidate feasibility is measured on the real system.
+
 This operational match is the paper's most important qualification. Hardware allocation, sequence length, tokens per step, updates, data, optimizer, and checkpointing are held fixed; theoretical FLOPs are not. The larger microbatch turns more nominal work into the same step time on the tested systems. A different accelerator, parallelism plan, or kernel stack can move that boundary.
 
 The main 800-billion-token run crosses the vanilla baseline near 600 billion tokens. Four smaller matched-wall-time pairs, spanning 0.15B to 1B baseline parameter scales, also favor Loopie by 0.6 to 2.2 average benchmark points. The authors choose two loops because the marginal advantage over adding stored layers falls as the loop count rises. The sweep does not establish that two loops are universally optimal.
+
+### Read token efficiency separately from hardware throughput
+
+Figure 5 compares the reported layer-loop variant with an ablation that the authors describe as retaining the backbone, data, token budget, and overall looped computation budget while removing the layer-loop pattern. The separation of the curves supports a contribution from the schedule beyond simply adding nominal computation.
+
+![Loopie source Figure 5 comparing downstream score against pretraining tokens for the recurrence ablation](/assets/images/loop-the-loopies-source-figure-5.webp)
+*Fig 2: The horizontal axis counts training tokens. The upper curve reaches comparable benchmark scores earlier, which is a sample-efficiency comparison rather than a direct measurement of inference or training throughput. | source: [Loopie, Figure 5](https://arxiv.org/abs/2607.16051)*
+
+The plot's “2.14× speedup” annotation marks a horizontal separation at a chosen score; it should not be read as a universal wall-clock multiplier. There is also a source labeling inconsistency: the legend says 5B while the caption and surrounding discussion describe 6B-A0.6B. The qualitative comparison is visible, but that inconsistency limits precise attribution of the plotted configuration.
+
+The loop-count sweep has a different caveat. Section 2.8 says the small two-times-stored-layer baseline consumes substantially more training compute than the two-loop model. Its curve therefore does not establish that adding independent layers dominates two loops at equal compute. It supports the authors' practical choice within the reported sweep, with the matching limitation attached.
 
 ### Post-training is a second, separate contribution
 
@@ -75,7 +89,8 @@ Math and code reinforcement learning then uses GSPO with DAPO-style asymmetric c
 
 ## High-Level Takeaways
 
-- Loopie informs whether a training system should spend its budget on more stored parameters or on repeated computation with better memory locality. The answer depends on realized optimizer-step time, not parameter count or theoretical FLOPs alone.
-- The controlled result supports two-step layer-loop recurrence plus a hardware-aware width-depth recipe. It does not support naive looping at fixed stored size, and its 1.424× nominal-work caveat should travel with every “compute-matched” claim.
-- At ten times the scale, pipeline scheduling, expert communication, checkpointing semantics, and microbatch efficiency are likely to decide whether the recipe still pays. Inference memory and latency were not systematically studied.
-- A decisive replication should match energy, accelerator-hours, training tokens, data, and inference cost across recurrent and non-recurrent MoE models on more than one hardware stack. Reject the scaling claim if the advantage disappears under energy or inference-budget matching, or if a tuned vanilla model recovers the same throughput.
+- Layer-loop ties weights across adjacent effective depths, changing computation order without creating an independent block for each application.
+- The activation saving depends on grouping recurrent applications inside a checkpointed unit.
+- The main comparison matches measured optimizer-step time while Loopie performs about 1.424 times the nominal block work.
+- Token-efficiency curves, loop-count controls, and hardware timing answer different questions and have different qualifications.
+- Final post-training scores mix architecture with additional data and optimization; inference-time efficiency remains insufficiently studied.
