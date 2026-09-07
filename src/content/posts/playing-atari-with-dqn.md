@@ -9,59 +9,80 @@ tags:
 field: 'Reinforcement Learning'
 summary: "2013 – Playing Atari with Deep Reinforcement Learning"
 ---
+
 ## 2013 – Playing Atari with Deep Reinforcement Learning
 
-**arXiv:** [1312.5602](https://arxiv.org/abs/1312.5602)
-
-**GitHub:** [DeepMind-Atari-Deep-Q-Learner](https://github.com/kuz/DeepMind-Atari-Deep-Q-Learner) (unofficial re-implementation)
-
-**Project page / DeepMind blog:** [Deep Reinforcement Learning](https://deepmind.com/blog/deep-reinforcement-learning)
-
-**Conference:** NIPS Deep Learning Workshop 2013 (expanded Nature version published 2015)
+**Paper:** [arXiv:1312.5602](https://arxiv.org/abs/1312.5602) · NIPS Deep Learning Workshop, 2013
 
 ## Summary
 
-> DQN combines Q-learning with deep convolutional networks to learn control directly from pixels. The input is a stack of recent Atari frames; the output is one Q-value per action. Two stabilizers make the method work: experience replay breaks temporal correlations by sampling past transitions, and a target network slows down bootstrapping targets. The same architecture and hyperparameters are applied across seven Atari games, which was the important generality claim at the time. The evidence shows performance above previous methods on six games and above a human expert on three. The caveat is sample inefficiency and instability; later deep RL work spent years improving exploration, targets, replay, and evaluation.
+> The 2013 DQN paper shows that a convolutional Q-network trained from pixels and experience replay can outperform earlier methods on six of seven Atari games and a human expert on three. Its generality claim is one architecture and learning recipe trained separately for each game, not one shared set of weights playing all seven. The original network has two convolutional layers; Algorithm 1 does not contain the periodically synchronized separate target network commonly associated with later DQN. Keeping those versions distinct makes the actual contribution clearer: end-to-end visual value learning became practical through replay and a largely shared training setup.
 
 ## Core Insights
 
-![Sample screenshots from five of the games used for training](/assets/images/playing-atari-with-dqn-paper-figure.png)
-*Fig 1: Provides sample screenshots from five of the games used for training. | source: [Playing Atari with Deep Reinforcement Learning paper](https://arxiv.org/abs/1312.5602)*
+### Learn features for choosing an action, not for reconstructing a screen
 
-![Figure 2 from Playing Atari with Deep Reinforcement Learning](/assets/images/playing-atari-with-dqn-source-figure-2.webp)
-*Fig 2: The two plots on the left show average reward per episode on Breakout and Seaquest respectively during training. The statistics were computed by running an -greedy policy with for 10000 steps. | source: [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)*
+A single Atari frame can show where the ball is without revealing where it is moving. DQN stacks four recent preprocessed frames, giving its Q-network a short visual history. Frames are converted to grayscale, downsampled, and cropped to an 84×84 playing region. This is learned control from pixels, but not unprocessed emulator input or access to its hidden state.
 
-![Figure 3 from Playing Atari with Deep Reinforcement Learning](/assets/images/playing-atari-with-dqn-source-figure-3.webp)
-*Fig 3: The leftmost plot shows the predicted value function for a 30 frame segment of the game Seaquest. The three screenshots correspond to the frames labeled by A, B, and C respectively. | source: [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)*
+The original network applies 16 filters of size 8×8 with stride four, then 32 filters of size 4×4 with stride two. A 256-unit fully connected hidden layer feeds one linear output per legal action. For a channels-first implementation, the tensor path is $4\times84\times84\rightarrow16\times20\times20\rightarrow32\times9\times9\rightarrow256\rightarrow|\mathcal A|$.
 
+All action values share the expensive visual computation. An alternative network taking both a state and a candidate action would require a separate forward pass for each action. Here, one pass gives every legal action's estimated return, and greedy selection takes the largest. The network has to learn which visual differences change those returns; there is no separate object-labeling or image-reconstruction target.
 
-### Method and reported result
+### Replay changes both sample reuse and the distribution of updates
 
-DQN made a blunt claim feel plausible: a single neural network could learn control policies directly from Atari pixels, without hand-built state features for each game. The model was a convolutional Q-network trained from raw Atari-2600 frames, and two stabilisation tricks kept the learning problem from collapsing:
+The replay buffer stores transitions from many episodes and samples them uniformly for minibatch updates. This reuses an interaction more than once, reduces correlations between adjacent updates, and smooths the training distribution across several past behaviors.
 
-1. **Experience replay:** store transitions and sample them randomly to break temporal correlations.
-2. **Target network:** hold a slowly updated copy of the Q-network to compute stable learning targets.
+The last role is easy to overlook. If a policy begins moving left, its next observations mostly describe the left side. Training only on that stream can immediately reinforce the preference that produced it. Replay supplies a mixture of earlier states, weakening that rapid feedback between the current policy and its next update. It does not make the data independent or remove all distribution shift.
 
-With those pieces in place, the authors trained one CNN architecture across seven Atari games using the same weights and hyperparameters. That result mattered because it moved deep RL away from game-specific feature engineering and toward end-to-end pixel-to-action learning. Replay memory and target networks also became durable building blocks for value-based deep RL, while the paper's limitations helped motivate later variants such as Double DQN, prioritized replay, and distributional RL.
+For a nonterminal transition, the bootstrapped target has the familiar form
 
-### Reported evidence
+$$
+y=r+\gamma\max_{a'}Q(s',a';\theta),
+\qquad
+L=(y-Q(s,a;\theta))^2.
+$$
 
-| Game (subset of 7) | DQN vs. prior SOTA | DQN vs. human expert |
-| ------------------ | ------------------ | -------------------- |
-| Breakout | +560% | Super-human |
-| Enduro | +134% | Super-human |
-| Pong | Wins 93% | Matches |
+The target is treated as fixed while differentiating the current prediction. The background section writes this using previous-iteration parameters, but the 2013 algorithm does not specify a second network held unchanged for a periodic synchronization interval. Importing that later stabilization mechanism would misdescribe this paper's experiment.
 
-Overall, DQN beat previous algorithms on 6 of the 7 reported games and exceeded human scores on 3. The cost was still high for the time: roughly 10 million frames per game, or about 2 to 4 GPU-days in 2013.
+Q-learning is off-policy here: a stored transition may come from an older exploratory policy, while its target evaluates a greedy continuation. The buffer contains the most recent million frames, so uniform replay also has limits. Rare decisive transitions may be overwritten or sampled too infrequently; the paper itself identifies unequal learning value across transitions as a reason to investigate better sampling.
 
-### Where the evidence stops
+### Shared hyperparameters conceal a deliberate change to the learning objective
 
-The cleanest part of DQN is also why it became such a good baseline: one architecture, one training recipe, multiple games. But the method was sample-inefficient, sensitive to tuning, and weak on sparse-reward games such as Montezuma's Revenge. It also inherited Q-learning's tendency to overestimate values, a problem that later work attacked directly with Double DQN and related fixes.
+The experiments use RMSProp, minibatches of 32, and ten million training frames. Exploration decreases linearly from fully random to an epsilon of 0.1 over the first million frames. Positive training rewards are clipped to +1 and negative rewards to −1, while evaluation reports ordinary game scores.
 
-A CNN, replay memory, and a target network were enough to learn control policies from pixels. That combination became the starting point for much of the modern deep-RL toolbox.
+Reward clipping makes update scales more comparable across games, helping one learning rate work across different score systems. It also discards reward magnitude: a small positive event and a large positive event receive the same immediate training signal. That is a trade-off in the learned objective, not simply numerical bookkeeping.
+
+Frame skipping reduces how often the network must act. The last action is repeated for four frames in most games. Space Invaders uses three because four-frame sampling makes blinking lasers invisible. This exception is revealing: the broad reuse claim remains useful, but sensor sampling can erase a relevant event even when the representation learner is expressive enough to recognize it.
+
+### The value function anticipates reward rather than tracking accumulated score
+
+The source's Seaquest example follows a short event sequence. At A, an enemy appears and predicted value rises. At B, the torpedo is about to hit and value peaks. At C, the enemy has disappeared and value returns near its earlier level.
+
+![DQN source Figure 3: predicted value around the appearance and destruction of a Seaquest enemy](/assets/images/playing-atari-with-dqn-source-figure-3.webp)
+*Fig 1: Value rises when an enemy creates a reward opportunity, peaks before the hit, and drops after that opportunity is consumed. This source panel plots the remaining expected return, not cumulative game score. | source: [Playing Atari with Deep Reinforcement Learning, Figure 3](https://arxiv.org/abs/1312.5602)*
+
+The drop after the hit is therefore not necessarily evidence that the action was bad. A value estimate describes reward still available from the current state. Consuming an opportunity can increase realized score while reducing future value. The plot is an intuitive qualitative check; it does not establish that all predicted values are calibrated.
+
+Figure 2 separately shows noisy episode rewards alongside smoother average predicted Q-values on a fixed state set. Smooth Q-values are easier to monitor, but can look reassuring even when values are systematically wrong. The authors observed no divergence in these runs; that observation is weaker than a convergence guarantee for nonlinear off-policy learning.
+
+### Compare the same evaluation statistic
+
+Table 1's main rows use average scores under an epsilon-greedy evaluation policy with epsilon 0.05. Its lower rows report the best single episode for comparison with deterministic evolutionary policies. Those are different statistics.
+
+| Game | DQN average score | Human reference score |
+| --- | ---: | ---: |
+| Breakout | 168 | 31 |
+| Enduro | 470 | 368 |
+| Pong | 20 | −3 |
+| Seaquest | 1,705 | 28,010 |
+| Q*bert | 1,952 | 18,900 |
+
+The human reference is the median score after roughly two hours of play per game. DQN exceeds it on Breakout, Enduro, and Pong, while remaining far behind on Seaquest and Q*bert. This establishes meaningful cross-task reuse of a recipe, with substantial remaining long-horizon weaknesses. It does not show multitask transfer through shared weights or human-level sample efficiency.
 
 ## High-Level Takeaways
 
-- DQN informs whether a single convolutional Q-network can replace game-specific features and controllers while learning directly from pixels. The learning unit is a replayed transition $(s,a,r,s')$; replay breaks short-term correlation and a lagged target network stabilizes the bootstrapped label.
-- The Atari results establish sample reuse and target lag as a workable combination, not a generally stable recipe for every observation or reward distribution. The missing ablation is a seed-rich factorial study of replay, target updates, reward clipping, frame stacking, and optimizer under equal environment steps. At 10× task diversity, replay imbalance and interference would dominate. The claim would fail if an on-policy or model-based baseline matched median human-normalized score with the same frames and less tuning.
-- DQN showed that a relatively simple network—three convolutional layers followed by two fully connected layers—could handle high-dimensional visual state in a reinforcement-learning loop. Its durable contribution was the recipe: pair Q-learning with enough neural capacity, then add experience replay and a target network to make the targets less volatile.
+- The 2013 result reuses architecture and training choices across separately trained games; it is not a single multitask policy.
+- Four-frame visual input and one output per action make value-based control tractable without hand-engineered object features.
+- Replay smooths the update distribution across past behavior as well as reusing samples; uniform finite memory still loses or undersamples important events.
+- Reward clipping and frame skipping help standardize training but change reward priorities and observability.
+- Distinguish the original two-convolution replay-based paper from later target-network DQN, and compare average scores with averages rather than best episodes.
