@@ -25,19 +25,17 @@ summary: "2024 – KTO: Model Alignment as Prospect Theoretic Optimization"
 
 ## Core Insights
 
+KTO changes the data contract for preference optimization. DPO expects a chosen and rejected completion for the same prompt; KTO assigns each completion a desirable or undesirable label and estimates a reference point from the policy and reference model. Desirable examples receive a gain-shaped objective, undesirable examples receive a loss-shaped objective, and a KL term keeps the policy close to its reference. The loss is therefore not “DPO with one item removed”: its reference point and asymmetric value function decide how an isolated label affects the update.
+
 ![KTO implied human value curves showing loss aversion and a reference point for preferred and rejected outcomes](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-paper-figure.png)
-*Fig 1: A schematic of KTO's prospect-theory motivation: desirable and undesirable outcomes are valued relative to a reference point, with asymmetric sensitivity to gains and losses. | source: [KTO, Figure 1](https://arxiv.org/abs/2402.01306)*
+*Fig 1: The author's schematic of KTO's prospect-theory motivation: desirable and undesirable outcomes are valued relative to a reference point, with asymmetric sensitivity to gains and losses. | source: [KTO, Figure 1](https://arxiv.org/abs/2402.01306)*
+
+The paper places KTO, DPO, and PPO-style objectives inside a broader family called human-aware losses. Across 1B–30B language models, KTO matches or exceeds paired-preference methods in the reported comparisons despite using unpaired binary feedback. The result does not mean pairs are useless. It shows that a loss with the right inductive bias can extract value from a cheaper feedback interface.
+
+The first comparison asks whether the broader human-aware loss family matters at all. Figure 2 compares HALO objectives such as DPO and offline PPO with conditional SFT and SLiC against the SFT target generations. The HALO methods are generally closer to or above chance, but the paper reports significant differences mainly at 13B and above; only the HALO-aligned Llama 13B and 30B models match or exceed the SFT target. The result is a scale-qualified comparison, not a universal win for every alignment loss.
 
 ![Figure 2 from KTO: Model Alignment as Prospect Theoretic Optimization](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-2.webp)
 *Fig 2: Across model sizes, HALO objectives such as DPO and offline PPO score closer to or above the SFT target than SLiC and conditional SFT in GPT-4-judged comparisons. | source: [KTO, Figure 2](https://arxiv.org/abs/2402.01306)*
-
-![Figure 3 from KTO: Model Alignment as Prospect Theoretic Optimization](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-3.webp)
-*Fig 3: KTO is competitive with DPO across the Pythia and Llama scales; for the Llama models, KTO alone matches the reported SFT-plus-DPO comparison more closely than DPO alone. | source: [KTO, Figure 3](https://arxiv.org/abs/2402.01306)*
-
-
-KTO measures each completion relative to a reference point estimated from the policy and reference model. Desirable examples receive a gain-shaped objective; undesirable examples receive a loss-shaped objective. The asymmetry encodes loss aversion, while a KL term keeps the policy from moving arbitrarily far from its reference.
-
-The paper places KTO, DPO, and PPO-style objectives inside a broader family called human-aware losses. Across 1B–30B language models, KTO matches or exceeds paired-preference methods in the reported comparisons despite using unpaired binary feedback. The result does not mean pairs are useless. It shows that a loss with the right inductive bias can extract value from a cheaper feedback interface.
 
 | Design choice | KTO's answer | Operational consequence |
 | --- | --- | --- |
@@ -45,6 +43,18 @@ The paper places KTO, DPO, and PPO-style objectives inside a broader family call
 | Reference | Policy-relative utility with KL control | The reference distribution remains part of the method even without pairwise labels. |
 | Main comparison | Binary feedback versus preference pairs | Data interface and objective must be evaluated together. |
 
-### Decision test and boundary
+The KTO-specific comparison comes next. In Figure 3, SFT+KTO is competitive with SFT+DPO across Pythia and Llama scales. KTO alone is better than DPO alone for the Llama 7B, 13B, and 30B models, with the gap significant at 7B and 30B after the paper's multiple-comparison correction. The authors also note that KTO is more sensitive to learning rate than the other hyperparameters and recommend a larger practical learning rate than DPO; the exact setting is part of the result, not an implementation footnote.
 
-KTO is the bridge from paired language preferences to deployment signals that arrive one event at a time. Its atomic unit is a labeled completion, so logs and moderation outcomes can be used without constructing a counterfactual pair. The experiments show binary feedback can compete in the studied language-model regime, but they do not establish behavior for continuous actions, irreversible transitions, or highly imbalanced failures. A robotics test should compare KTO, correction SFT, and paired preferences under the same rollout and annotation budget, then measure closed-loop recovery and safety. If binary optimization improves logged desirability while recovery is unchanged, the reference point is fitting the label rather than the task. Use KTO when binary feedback is genuinely abundant; an unmatched failure and success are not automatically a preference pair.
+![Figure 3 from KTO: Model Alignment as Prospect Theoretic Optimization](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-3.webp)
+*Fig 3: KTO is competitive with DPO across the Pythia and Llama scales; for the Llama models, KTO alone matches the reported SFT-plus-DPO comparison more closely than DPO alone. | source: [KTO, Figure 3](https://arxiv.org/abs/2402.01306)*
+
+### Binary feedback changes the data contract
+
+KTO is useful when feedback arrives one event at a time and pairing would be artificial. The experiments show that binary feedback can compete in the studied language-model regime, but they do not establish how the reference-point estimate behaves under extreme class imbalance or irreversible decisions. The unresolved comparison is simple: hold model, examples, and update budget fixed while comparing KTO with paired preferences and supervised correction. If KTO improves the logged label while an independent task metric stays flat, the reference point is fitting the feedback interface rather than the task.
+
+## High-Level Takeaways
+
+- KTO's atomic unit is a labeled completion, so approval, rejection, or moderation events can enter training without inventing a matched counterfactual pair.
+- Prospect-theory shaping supplies the asymmetry between gains and losses; the KL reference still matters because the binary label alone does not define a target distribution.
+- The reported advantage is scale- and protocol-dependent: KTO is competitive with DPO from 1B to 30B, while the strongest significance appears for the larger Llama comparisons.
+- The open question is whether the binary data interface remains calibrated under class imbalance and task feedback that is delayed, continuous, or only weakly related to token likelihood.
