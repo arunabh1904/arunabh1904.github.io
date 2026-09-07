@@ -27,8 +27,6 @@ summary: '2026 – MIRROR: Learning from the Other View for Multi-Modal Reasonin
 
 The method keeps student rollouts on-policy. It applies ordinary outcome-reward GRPO to the student trajectory, then adds a reverse-KL term computed by rescoring those same tokens under an exponential-moving-average teacher conditioned on the selected view. On a curated 2,000-example geometry dataset, MIRROR improves Qwen3-VL-4B-Instruct beyond single-view and mixed-view GRPO. The result is evidence that paired views need a directed transfer objective; merely placing them in the same RL mixture does not make the successful reasoning path move across modalities.
 
-The teacher is selected per problem rather than fixed for the whole run. MIRROR evaluates text-dominant, image-dominant, and combined views, chooses the view with the strongest rollout success, and uses that view to guide students trained on the restricted views. The auxiliary loss is reverse KL on student-generated tokens. An EMA copy with decay 0.99 slows the target so that the teacher does not chase the same unstable policy it is supposed to regularize.
-
 ![MIRROR selects the strongest view of each problem as a teacher for students operating on restricted text or image views](/assets/images/mirror-learning-from-the-other-view-for-multi-modal-reasoning-source-figure-1.webp)
 *Fig 1: Text, image, and combined views expose different bottlenecks, so MIRROR selects the strongest view per problem as the teacher instead of fixing one transfer direction. | source: [MIRROR, Figure 1](https://arxiv.org/abs/2607.21552)*
 

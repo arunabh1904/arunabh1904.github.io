@@ -25,10 +25,12 @@ summary: "2024 – KTO: Model Alignment as Prospect Theoretic Optimization"
 
 ## Core Insights
 
-KTO changes the data contract for preference optimization. DPO expects a chosen and rejected completion for the same prompt; KTO assigns each completion a desirable or undesirable label and estimates a reference point from the policy and reference model. Desirable examples receive a gain-shaped objective, undesirable examples receive a loss-shaped objective, and a KL term keeps the policy close to its reference. The loss is therefore not “DPO with one item removed”: its reference point and asymmetric value function decide how an isolated label affects the update.
+KTO changes the feedback required for preference optimization. DPO expects a chosen and rejected completion for the same prompt; KTO assigns each completion a desirable or undesirable label and estimates a reference point from the policy and reference model. Desirable examples receive a gain-shaped objective, undesirable examples receive a loss-shaped objective, while a detached KL estimate sets the utility reference point. This estimate is not a separate additive KL penalty backpropagated through the loss. The loss is therefore not “DPO with one item removed”: its reference point and asymmetric value function decide how an isolated label affects the update.
 
 ![KTO implied human value curves showing loss aversion and a reference point for preferred and rejected outcomes](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-paper-figure.png)
-*Fig 1: The author's schematic of KTO's prospect-theory motivation: desirable and undesirable outcomes are valued relative to a reference point, with asymmetric sensitivity to gains and losses. | source: [KTO, Figure 1](https://arxiv.org/abs/2402.01306)*
+*Fig 1: The paper compares the implied value curves of prospect theory, PPO-Clip, and DPO. The reference point and asymmetric gain/loss response motivate KTO; these are conceptual value curves rather than measured KTO outcomes. | source: [KTO, Figure 1](https://arxiv.org/abs/2402.01306)*
+
+In the default objective, the log probability ratio of a completion under the policy and reference model is compared with that reference point. Desirable examples use a sigmoid of the difference; undesirable examples reverse its sign. In practice, the reference point is estimated using mismatched prompt–response pairs within the microbatch, clamped nonnegative, and excluded from backpropagation. This is a convenient biased estimate, not an exact per-prompt KL calculation.
 
 The paper places KTO, DPO, and PPO-style objectives inside a broader family called human-aware losses. Across 1B–30B language models, KTO matches or exceeds paired-preference methods in the reported comparisons despite using unpaired binary feedback. The result does not mean pairs are useless. It shows that a loss with the right inductive bias can extract value from a cheaper feedback interface.
 
@@ -40,7 +42,7 @@ The first comparison asks whether the broader human-aware loss family matters at
 | Design choice | KTO's answer | Operational consequence |
 | --- | --- | --- |
 | Feedback unit | One prompt–response labeled desirable or undesirable | Logs and moderation outcomes can become training data without constructing pairs. |
-| Reference | Policy-relative utility with KL control | The reference distribution remains part of the method even without pairwise labels. |
+| Reference | Policy-relative utility with a detached KL reference point | The reference distribution remains part of the method even without pairwise labels. |
 | Main comparison | Binary feedback versus preference pairs | Data interface and objective must be evaluated together. |
 
 The KTO-specific comparison comes next. In Figure 3, SFT+KTO is competitive with SFT+DPO across Pythia and Llama scales. KTO alone is better than DPO alone for the Llama 7B, 13B, and 30B models, with the gap significant at 7B and 30B after the paper's multiple-comparison correction. The authors also note that KTO is more sensitive to learning rate than the other hyperparameters and recommend a larger practical learning rate than DPO; the exact setting is part of the result, not an implementation footnote.

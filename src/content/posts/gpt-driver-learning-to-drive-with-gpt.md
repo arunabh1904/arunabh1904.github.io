@@ -15,14 +15,13 @@ summary: "2023 – GPT-Driver: Learning to Drive with GPT"
 
 **GitHub:** [PointsCoder/GPT-Driver](https://github.com/PointsCoder/GPT-Driver)
 
-## Method
-GPT-Driver asks whether a language model can act as a motion planner when the driving scene is serialized into tokens. Instead of directly predicting a trajectory with a specialized planner, the system prompts and fine-tunes GPT-style models to produce future waypoints and rationales.
-
 ## Summary
 
-> This is not a deployable AV stack by itself. It is a useful probe: language models can absorb structured scene descriptions and generate plausible plans, but latency, grounding, and closed-loop reliability remain hard.
+> GPT-Driver asks whether a language model can act as a motion planner when the driving scene is serialized into tokens. Instead of directly predicting a trajectory with a specialized planner, the system prompts and fine-tunes GPT-style models to produce future waypoints and rationales. This is not a deployable AV stack by itself. It is a useful probe: language models can absorb structured scene descriptions and generate plausible plans, but latency, grounding, and closed-loop reliability remain hard.
 
 ## Core Insights
+
+### Structured scene facts become a coordinate sequence
 
 GPT-Driver reformulates motion planning as GPT-style sequence generation. It serializes structured scene state into language-model tokens and predicts future waypoints plus a rationale. This gives the model an interpretable interface: the generated plan can be paired with an explanation of the driving decision. The evidence focuses on open-loop planning quality. The caveat is that open-loop waypoint prediction does not prove closed-loop safety, and LLM latency remains a deployment problem. The paper is useful as an early example of adapting pretrained language models to structured planning rather than raw perception.
 
@@ -32,15 +31,15 @@ On nuScenes, GPT-Driver reaches average L2 0.44 m and collision 0.17% under the 
 
 The experiment is best understood as a planner-interface test rather than end-to-end visual driving. GPT-Driver receives detections, predicted object motion, ego state, history, and a mission goal that have already been structured by upstream systems. Its contribution is to serialize those facts, reason about critical objects, and emit six waypoints; any failure in perception or prediction is inherited before the language model gets to plan.
 
-Read the prompt figure from the reusable instruction block to the scene-specific facts and then to the six-coordinate answer. That layout explains why the rationale is useful for inspection while also exposing a risk: a fluent thought can name the right object without the numeric waypoint actually responding to it.
+The overview places perception before the language interface. Its inputs are already structured scene facts, so the model is being tested as a planner rather than asked to discover objects directly in pixels.
 
 ![Figure 1: Overview of GPT-Driver from GPT-Driver: Learning to Drive with GPT](/assets/images/gpt-driver-learning-to-drive-with-gpt-paper-figure.png)
-*Fig 1: GPT-Driver converts structured scene observations into language tokens, prompts a language model to reason about the scene, and decodes the response into a future trajectory. | source: [GPT-Driver: Learning to Drive with GPT paper](https://arxiv.org/abs/2310.01415)*
+*Fig 1: GPT-Driver converts structured scene observations into language tokens, prompts a language model to reason about the scene, and decodes the response into a future trajectory. | paper Figure 1; source: [GPT-Driver: Learning to Drive with GPT paper](https://arxiv.org/abs/2310.01415)*
+
+Read the prompt from the reusable instruction block through the scene-specific facts to the six-coordinate answer. The rationale exposes which objects the model mentions, but faithfulness requires the numeric path to respond to those objects as well. Correct prose and correct geometry remain distinct outputs to check.
 
 ![Figure 2 from GPT-Driver: Learning to Drive with GPT](/assets/images/gpt-driver-learning-to-drive-with-gpt-source-figure-2.webp)
-*Fig 2: The prompt combines a reusable planning instruction with serialized perception, predicted motion, ego history, and the requested six-point trajectory. The layout makes the interface legible: structured scene facts enter as text, then the model returns both a decision rationale and coordinates. | source: [GPT-Driver: Learning to Drive with GPT](https://arxiv.org/abs/2310.01415)*
-
-
+*Fig 2: The prompt combines a reusable planning instruction with serialized perception, predicted motion, ego history, and the requested six-point trajectory. The layout makes the interface legible: structured scene facts enter as text, then the model returns both a decision rationale and coordinates. | paper Figure 2; source: [GPT-Driver: Learning to Drive with GPT](https://arxiv.org/abs/2310.01415)*
 
 
 ## High-Level Takeaways

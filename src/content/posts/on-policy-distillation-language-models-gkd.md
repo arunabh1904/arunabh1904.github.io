@@ -47,7 +47,7 @@ The data-scaling result makes the exposure-mismatch argument concrete. On XSum, 
 
 The paper also combines on-policy GKD with an RL objective for factual summarization. On XSum, increasing the RL weight raises ROUGE-2 while reducing the improvement in textual entailment; the combined method improves summarization quality over the RLEF comparison while remaining more factually consistent than the teacher. This is the useful division of labor: GKD supplies dense teacher correction on the student's states, while the task reward supplies a signal the teacher may not optimize directly.
 
-The teacher is still the ceiling and the bottleneck. GKD assumes the starting student generates prefixes on which teacher probabilities are useful. If the student collapses into nonsense, teacher supervision on those states may spend compute far from the deployment boundary. Divergence choice is also task-dependent: mode-seeking objectives can prevent low-quality mass under temperature sampling, but they can reduce diversity.
+The teacher remains a source of bias and inference cost. GKD assumes the starting student generates prefixes on which teacher probabilities are useful. If the student collapses into nonsense, teacher supervision on those states may spend compute far from the deployment boundary. Divergence choice is also task-dependent: mode-seeking objectives can prevent low-quality mass under temperature sampling, but they can reduce diversity.
 
 ### On-policy states trade labels for inference
 
@@ -58,4 +58,4 @@ GKD is attractive when teacher logits are available and token-level correction i
 - GKD changes the distillation state distribution: the student generates the prefixes, while the teacher supplies token-level probabilities on those visited states.
 - The method separates two choices that ordinary KD often conflates: where sequences come from and which divergence shapes the correction.
 - The reported 5% XSum result and the RL combination show efficiency and flexibility, but both still pay for student generation and teacher scoring.
-- GKD is a good fit when teacher logits are accessible and the student's own errors are the deployment problem; it is a poor fit when the teacher's behavior is the ceiling to be surpassed.
+- GKD is a good fit when teacher logits are accessible and the student's own errors are the deployment problem; surpassing the teacher on a new objective requires a signal beyond pure imitation, as the paper's RL combination illustrates.
