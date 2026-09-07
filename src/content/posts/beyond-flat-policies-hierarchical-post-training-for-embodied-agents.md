@@ -13,7 +13,6 @@ field: 'Robot Post-Training & Evaluation'
 summary: '2026 – Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents'
 ---
 
-## 2026 – Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents
 
 **arXiv:** [2608.05999](https://arxiv.org/abs/2608.05999)
 
@@ -25,10 +24,10 @@ summary: '2026 – Beyond Flat Policies: Hierarchical Post-Training for Embodied
 
 
 ![Figure 2 from Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](/assets/images/beyond-flat-policies-hierarchical-post-training-for-embodied-agents-source-figure-2.webp)
-*Fig 1: The framework of HiRoC. (a) shows the environmental interaction via our proposed HiRoC. The training process of HiRoC is divided into three parts: (b) train planner by SFT on pre-collected trajectories; (c) pretrain executor with SFT on prepared data to overcome the issue of distribution misalignment (DM); and (d) train executor by RL tuning when interacting with environment. | source: [Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](https://arxiv.org/abs/2608.05999)*
+*Fig 1: HiRoC separates interaction, planner SFT, subgoal-conditioned executor SFT, and executor RL. The planner stays frozen while the executor learns to turn each current subgoal into an action chunk. | source: [Beyond Flat Policies, Figure 2](https://arxiv.org/abs/2608.05999)*
 
 ![Figure 3 from Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](/assets/images/beyond-flat-policies-hierarchical-post-training-for-embodied-agents-source-figure-3.webp)
-*Fig 2: Performance of compared baselines in terms of zero-shot. | source: [Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](https://arxiv.org/abs/2608.05999)*
+*Fig 2: HiRoC's LIBERO-Plus zero-shot success rates across camera, robot-tilt, language, lighting, background, noise, layout, and their average. The improvement is broad across perturbations, but the benchmark does not equalize all baseline training recipes. | source: [Beyond Flat Policies, Figure 3](https://arxiv.org/abs/2608.05999)*
 
 
 ### Hierarchy creates a new alignment problem

@@ -13,7 +13,6 @@ field: 'Robot Post-Training & Evaluation'
 summary: '2026 – TEMPO: Semantic-Action Decoupled RL Post-Training for VLA Models'
 ---
 
-## 2026 – TEMPO: Semantic-Action Decoupled RL Post-Training for VLA Models
 
 **arXiv:** [2608.07314](https://arxiv.org/abs/2608.07314)
 
@@ -25,8 +24,11 @@ summary: '2026 – TEMPO: Semantic-Action Decoupled RL Post-Training for VLA Mod
 
 ## Core Insights
 
+![TEMPO's slow semantic projection update and fast action-expert update with two reinforcement-learning loops](/assets/images/tempo-semantic-action-decoupled-rl-post-training-for-vla-models-source-figure-1.png)
+*Fig 1: The paper's interface is a frozen VLM, a slowly updated semantic projection, and a quickly updated action expert. Each trainable block has its own RL loop, so the semantic latent can move on a slower clock than the action policy. | source: [TEMPO, Figure 1](https://arxiv.org/abs/2608.07314)*
+
 ![TEMPO with a frozen VLM, slowly updated semantic projection, quickly updated action expert, and separate replay buffers](/assets/images/tempo-two-timescale-post-training-framework.png)
-*Fig 1: The semantic projection and action expert share environment rollouts but use separate replay buffers, critics, and actor updates. The slow semantic loop limits latent drift while the fast action loop absorbs control feedback. | source: [TEMPO paper](https://arxiv.org/abs/2608.07314)*
+*Fig 2: This explanatory view expands the source diagram into the training state: the semantic and action loops share rollouts but use separate replay buffers, critics, and actor updates. The slow semantic loop limits latent drift while the fast action loop absorbs control feedback. | diagram based on [TEMPO](https://arxiv.org/abs/2608.07314)*
 
 ### One RL clock is a hidden architectural assumption
 
@@ -40,7 +42,7 @@ $$
 \rho = \frac{f_{\mathrm{action}}}{f_{\mathrm{semantic}}}.
 $$
 
-The expensive design choice is not only which parameters to expose to RL. It is how often each exposed interface is allowed to move.
+The paper's effective ratio also depends on how many gradient updates each loop performs and on its action dimensionality: $\rho = N_a d_s/(N_s d_a)$. Thus “5:1” names an update schedule, not necessarily five times the number of environment rollouts or five times the total compute. The expensive design choice is not only which parameters to expose to RL. It is how often each exposed interface is allowed to move.
 
 ### The ratio ablation carries the mechanism claim
 
@@ -60,7 +62,7 @@ Component ablations are smaller but consistent. Updating only the action expert 
 
 With a fixed 10:1 ratio, post-training on one selected CALVIN subtask reaches 81.2% five-task success. Training on all 34 reaches 79.2%. The result warns against treating online-task count as a monotone scaling axis: a fixed interaction budget spread across more tasks changes both coverage and update density.
 
-The physical study uses two multi-stage drawer tasks, 60 demonstrations per task, three random seeds, and 20 evaluation trials per checkpoint. TEMPO reaches and maintains higher late-training rewards than FLOWER-RL. This supports feasibility on hardware, but two tasks cannot establish general semantic retention, and the reported curves do not price the extra online data, critics, or update loops.
+The physical study uses a 6-DoF Synria Alicia arm with a 1-DoF gripper, an Intel D435i third-person camera, and a D405 wrist camera. It trains on two multi-stage drawer tasks with 60 demonstrations per task, three random seeds, and 20 evaluation trials per checkpoint. TEMPO reaches and maintains higher late-training rewards than FLOWER-RL; the example sequences show it opening the drawer before retrieving the car, where FLOWER-RL attempts the later manipulation directly. This supports feasibility on hardware, but two tasks cannot establish general semantic retention, and the reported curves do not price the extra online data, critics, or update loops.
 
 ## High-Level Takeaways
 

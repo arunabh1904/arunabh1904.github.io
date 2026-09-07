@@ -12,7 +12,6 @@ field: 'Robot Post-Training & Evaluation'
 summary: '2026 – EXIMO: VLM-Guided Exploration of VLA Policies'
 ---
 
-## 2026 – EXIMO: VLM-Guided Exploration of VLA Policies
 
 **arXiv:** [2608.19891](https://arxiv.org/abs/2608.19891)
 
@@ -23,13 +22,13 @@ summary: '2026 – EXIMO: VLM-Guided Exploration of VLA Policies'
 ## Core Insights
 
 ![EXIMO pipeline with VLM-guided exploration, filtered supervised fine-tuning, and residual reinforcement learning](/assets/images/eximo-vlm-guided-exploration-pipeline.png)
-*Fig 1: EXIMO assigns a different learning problem to each stage. The VLM decomposes a task during data collection, successful episodes train a standalone VLA, and a small residual policy then corrects the VLA online. | source: [EXIMO paper](https://arxiv.org/abs/2608.19891)*
+*Fig 1: EXIMO assigns a different learning problem to each stage. The VLM decomposes a task during data collection, successful episodes train a standalone VLA, and a small residual policy then corrects the VLA online. | diagram based on the paper's Explore, Imitate, and Optimize stages: [EXIMO paper](https://arxiv.org/abs/2608.19891)*
 
-![Figure 2 from EXIMO: VLM-Guided Exploration of VLA Policies](/assets/images/eximo-vlm-guided-exploration-of-vla-policies-source-figure-2.webp)
-*Fig 2: Success rate (top), time to success (middle), and episode length (bottom) of VLM orchestrated GROD, GROD with no orchestration, and GROD finetuned on the data collected from VLM orchestration. The baselines and the per-task legend (shared across all three plots) are shown on the right. | source: [EXIMO: VLM-Guided Exploration of VLA Policies](https://arxiv.org/abs/2608.19891)*
+![Figure 2 from EXIMO: VLM-Guided Exploration of VLA Policies](/assets/images/eximo-vlm-guided-exploration-of-vla-policies-source-figure-2-interaction.png)
+*Fig 2: During exploration, the VLM receives an image history and the global task, reasons about what has already happened, and emits the next natural-language instruction. The example asks the robot to pick up the blue plate before placing objects on the rack. | source: [EXIMO, Figure 2](https://arxiv.org/abs/2608.19891)*
 
-![Figure 1 from EXIMO: VLM-Guided Exploration of VLA Policies](/assets/images/eximo-vlm-guided-exploration-of-vla-policies-source-figure-1.webp)
-*Fig 3: Example interaction of the VLM during the explore phase of Eximo. The VLM is given a sequence of images from the environment along with the task description in the prompt. | source: [EXIMO: VLM-Guided Exploration of VLA Policies](https://arxiv.org/abs/2608.19891)*
+![Figure 3 from EXIMO: VLM-Guided Exploration of VLA Policies](/assets/images/eximo-vlm-guided-exploration-of-vla-policies-source-figure-2.webp)
+*Fig 3: Across 22 ALOHA tasks, the plot compares VLM-orchestrated GROD, GROD without orchestration, and GROD fine-tuned on the collected data. Success, time to success, and episode length show why a better collection policy can matter before RL begins. | source: [EXIMO, Figure 3](https://arxiv.org/abs/2608.19891)*
 
 
 ### The VLM improves the data before RL begins
