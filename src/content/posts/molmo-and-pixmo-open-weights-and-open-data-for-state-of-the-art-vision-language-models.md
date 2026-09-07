@@ -15,41 +15,43 @@ summary: "2024 – Molmo and PixMo: Open Weights and Open Data for State-of-the-
 
 **Project:** [Allen AI Molmo](https://allenai.org/blog/molmo)
 
-### Method and reported result
-
-Molmo is a family of open multimodal models trained with PixMo, a carefully built set of image-text datasets. The core bet is data quality: detailed human descriptions, pointing supervision, and open data can close much of the gap to proprietary systems without relying only on massive scraped corpora.
-
 ## Summary
 
-> This matters because many VLMs are hard to inspect. Molmo makes the data story more visible, which makes the model easier to study and reuse.
+> Molmo is a useful open-model experiment because it opens the supervision as well as the weights. PixMo uses long human descriptions, pointing annotations, and synthetic task data to make each image teach more than an image–caption match. On the paper's 11-dataset average, Molmo-72B reaches 81.2, compared with 79.4 for Qwen2-VL-72B and 78.5 for GPT-4o; its human-evaluation Elo is 1077. Those comparisons do not erase the cost of collecting the data, but they make the data-to-capability story inspectable.
 
 ## Core Insights
 
-Molmo is the model family and PixMo is the open data recipe behind it. The paper argues that high-quality, inspectable multimodal data can make open VLMs competitive. PixMo includes dense captions, pointing and grounding supervision, and related annotations that teach localization and visual description. Molmo uses that data to build open-weight models with strong visual understanding. The caveat is that openness does not remove data collection cost or annotation bias; it makes those choices auditable. The lasting idea is that data quality and transparency can substitute for some closed-model scale.
+### Supervision is a capability interface
 
-![Figure 1: Datasets in PixMo (left) and the capabilities they enable in Molmo (right) from Molmo and PixMo: Open Weights and Open Data for State-of-the-Art Vision-Language Models](/assets/images/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models-paper-figure.png)
-*Fig 1: Datasets in PixMo (left) and the capabilities they enable in Molmo (right). | source: [Molmo and PixMo: Open Weights and Open Data for State-of-the-Art Vision-Language Models paper](https://arxiv.org/abs/2409.17146)*
+PixMo is not one caption corpus. The authors combine three human-annotated sets—dense captions, instruction following, and pointing—with four synthetic sets for clocks, documents, counting, and related skills. The human caption set contains 712,000 images and about 1.3 million transcripts: annotators speak for 60–90 seconds, yielding captions that average 196 words. Pointing adds more than 2.3 million grounding annotations. A point answers “where?” in a way a sentence-level caption cannot, so the same image can supervise recognition, localization, and a later answer that must refer to a particular object.
 
-![Figure 4 from Molmo and PixMo: Open Weights and Open Data for State-of-the-Art Vision-Language Models](/assets/images/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models-source-figure-4.webp)
-*Fig 2: Datasets used for fine-tuning, shown in proportion to their sampling rates. Green denotes human-annotated data we collected, blue denotes synthetic data we generated, and purple represents pre-existing academic datasets. | source: [Molmo and PixMo: Open Weights and Open Data for State-of-the-Art Vision-Language Models](https://arxiv.org/abs/2409.17146)*
+![Figure 1: PixMo datasets and the capabilities they support](/assets/images/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models-paper-figure.png)
+*Fig 1: This source Figure 1 maps three human-annotated PixMo datasets and four synthetic datasets to the Molmo capabilities they are intended to teach; the important design choice is the mix of language and spatial supervision. | source: [Molmo and PixMo, Figure 1](https://arxiv.org/abs/2409.17146)*
 
+The open-data claim is therefore stronger than “we released a large dataset.” The paper releases enough of the ingredients to inspect how a model acquires a behavior. It also exposes a limit: human speech, transcription, point validation, and synthetic generation are an annotation pipeline with its own coverage and cultural biases. Openness makes those choices easier to study; it does not make them free or neutral.
 
-**What to look at:**
-- PixMo data quality is the main mechanism: detailed human captions and pointing supervision.
-- Open weights plus open data make the model easier to audit than closed VLMs.
-- The interesting comparison is data quality versus raw data quantity.
+### Crops and the connector make that supervision usable
 
-### Reported evidence
+The visual path is a standard ViT plus connector plus language model, but two implementation choices determine whether detailed supervision survives. Molmo encodes a low-resolution full image and overlapping high-resolution crops. The connector combines the third-to-last and tenth-to-last ViT layers, attention-pools each 2×2 patch window, and maps the result through an MLP. Earlier features preserve local evidence while later features supply stronger semantics, so the connector is not forced to choose one representation for both jobs.
 
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Data | PixMo collection | Rich captions and pointing supervision improve grounding. |
-| Openness | Open weights and data | Makes the training story inspectable. |
-| Signal | Small models compete strongly | Suggests annotation quality can substitute for some scale. |
+The crop ablation makes the intuition concrete. On the paper's 11-task average, a single crop scores 62.8, non-overlapping multi-crops 75.7, and overlapping multi-crops 76.9. The main academic evaluation uses 36 crops after training with 12, but the authors keep training and test crop counts matched for captioning, pointing, and counting because those behaviors degrade under a mismatch. Overlap preserves context at crop boundaries; without it, a small object can become a fragment with no surrounding relation.
+
+### The evidence separates data design from raw scale
+
+| Comparison | Reported result | What it isolates |
+| --- | ---: | --- |
+| Molmo-72B, 11-dataset average | 81.2 | Best model in the reported Molmo family |
+| Molmo-7B-D, 11-dataset average | 77.3 | Strong performance without the 72B language backbone |
+| PixMo-Cap size sweep, 712k images | 76.9 | More high-quality caption data still helps, with diminishing returns |
+| Academic data only | 72.5 | The PixMo mixture contributes beyond the open academic baseline |
+
+The scale curve rises from 74.9 with no PixMo-Cap data to 75.5 at 89,000 images, 76.3 at 178,000, and 76.9 at 712,000. Removing documents lowers the reported average to 75.8; removing pointing lowers it to 76.2. These are useful component clues, though the paper does not turn them into a cost-normalized causal comparison between human annotation, weak web captions, and synthetic data.
+
+Pointing also has an output-order effect. On the two counting benchmarks, the point-then-count chain-of-thought strategy reaches 89.4 and 86.3, while count-then-point reaches 81.5 and 77.6. The result suggests that spatially grounded intermediate outputs make the count easier to express. It is a counting-strategy ablation, not evidence that a universal training curriculum should always put pointing first.
 
 ## High-Level Takeaways
 
-- Molmo and PixMo inform whether an open VLM program should buy more weakly labeled scale or fewer, richer human annotations. PixMo's dense descriptions and pointing data make the image–text example more informative by supervising both what is present and where it is; Molmo then turns that data into generated language and point-based outputs through a shared multimodal model. The openness of weights and data makes the causal story unusually auditable.
-- The strong results from relatively small models support data quality as a substitute for some parameter scale, but the paper does not fully normalize for the cost of collecting and validating that quality. A useful missing curve would plot downstream capability against total human and compute dollars for PixMo, web-scale weak data, and synthetic captions. At ten times the collection scale, annotator consistency and coverage of rare visual concepts may become the limiting factors. The claim weakens if a cost-matched weak-data baseline matches grounding and description quality on fresh images rather than familiar benchmark styles.
-- Molmo shows that VLM progress also comes from annotation design, spatial grounding, and open data—not architecture scale alone.
-- For multimodal models, the caption is part of the architecture. Better supervision changes what the model can see.
+- Molmo makes annotation design part of the model interface: long descriptions say what is present, while points say where the evidence is.
+- The best reported model reaches 81.2 on the paper's 11-dataset average, but the paper does not report a human-and-compute cost curve against matched weakly labeled data.
+- Overlapping crops and multi-level visual features are practical mechanisms for turning detailed supervision into tokens the language model can use.
+- Pointing helps counting most when it comes first, a paper-specific clue that supervision order changes which capabilities become easy to learn.

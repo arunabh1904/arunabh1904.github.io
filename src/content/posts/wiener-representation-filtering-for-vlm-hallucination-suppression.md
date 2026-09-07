@@ -15,41 +15,52 @@ summary: '2026 – Wiener filtering suppresses hallucination-associated directio
 
 ## Summary
 
-> This paper makes hallucination mitigation an offline weight edit: estimate which deep language-model directions are associated with hallucinated responses, attenuate them with a covariance-derived Wiener filter, and absorb the result into the existing feed-forward projections. The reported CHAIR gains come with unchanged architecture, parameter count, and inference-time cost, but depend on calibration data that pairs truthful and hallucinatory generations.
+> Wiener Representation Filtering turns object hallucination into an offline weight-editing problem. From paired truthful and hallucinatory generations of the same image, it estimates which hidden-state directions have unusually high distortion relative to truthful signal, attenuates those modes with a Wiener-shaped filter, and folds the edit into selected feed-forward projections. The architecture and inference graph stay unchanged. The reported gains are substantial on CHAIR and POPE, but the edit is model-specific and depends on calibration pairs that represent the deployment failure.
 
 ## Core Insights
 
-### A spectral filter rather than a decoding loop
+### Hallucination is modeled as paired residual geometry
 
-The method treats a hidden state as a truthful component plus a hallucination-associated distortion. From paired samples, it estimates their second-order statistics, solves a generalized eigendecomposition, and applies a Wiener-style gain that weakens modes with a high distortion-to-signal ratio. The edit is made only to down-projection matrices in selected deep feed-forward blocks. It is calibrated once with forward passes, then folded into the weights; it adds neither a second decoding pass nor an inference module.
+For an image with a truthful caption representation x− and a hallucinatory representation x+, the paper constructs a residual d = x+ − x−. It treats the truthful activation as signal with covariance ΣT and the residual as hallucination-associated distortion with covariance ΣH. The additive model is a calibration construction induced by the paired samples; it is not a claim that a transformer literally stores independent “truth” and “hallucination” neurons.
 
-![Generalized eigenvalue spectrum used to identify representation directions associated with hallucination distortion](/assets/images/wiener-representation-filtering-paper-figure.webp)
-*Fig 1: The concentrated spectrum motivates direction-dependent attenuation: a small set of modes carries much more estimated distortion relative to truthful signal than the rest. | source: [Wiener Representation Filtering](https://arxiv.org/abs/2608.08167)*
+Under an approximately zero signal–residual cross-covariance assumption, the linear MMSE operator is A* = ΣT(ΣT + ΣH)−1. For a stable, interpretable edit, the authors eigendecompose ΣH = QΛQᵀ, measure the truthful variance τj² = qjᵀΣTqj in each distortion mode, and apply
 
-![Figure 2 from Wiener Representation Filtering for VLM Hallucination Suppression](/assets/images/wiener-representation-filtering-for-vlm-hallucination-suppression-source-figure-2.webp)
-*Fig 2: A qualitative case study comparing model-generated descriptions for a complex meme. We visualize the outputs from the Baseline and our method, color-coding text segments as Hallucinations and Truth. | source: [Wiener Representation Filtering for VLM Hallucination Suppression](https://arxiv.org/abs/2608.08167)*
+$$
+\tilde\gamma_j = \left(1 + \frac{\lambda_j}{\tau_j^2}\right)^{-\alpha}.
+$$
 
-![Figure 3 from Wiener Representation Filtering for VLM Hallucination Suppression](/assets/images/wiener-representation-filtering-for-vlm-hallucination-suppression-source-figure-3.webp)
-*Fig 3: Dolan–Moré performance profiles on 10 MME subsets for mPLUG-Owl2 (left) and LLaVA-1.5 (right). | source: [Wiener Representation Filtering for VLM Hallucination Suppression](https://arxiv.org/abs/2608.08167)*
+The sharpness α changes how strongly the ordering is expressed. All modes remain available and gains are bounded between zero and one, unlike hard projection that deletes an entire subspace. With approximately 3,000 paired calibration samples per model, the filter is absorbed into the FFN output projection W̃out = Fα Wout, so there is no second decoding pass or new inference module.
 
+![Figure 4: Hallucination covariance spectra for three VLMs](/assets/images/wiener-representation-filtering-paper-figure.webp)
+*Fig 1: This source Figure 4 shows a few large eigenvalue spikes followed by a long decaying tail in LLaVA-7B, MiniGPT-4, and mPLUG-Owl2; the spectrum motivates continuous, direction-dependent attenuation. | source: [Wiener Representation Filtering, Figure 4](https://arxiv.org/abs/2608.08167)*
 
-That placement is the central empirical choice. On MiniGPT-4, the paper reports sentence-level CHAIR of 23.0 for the baseline, 14.0 when editing layers 14–24, and 13.0 for layers 24–32. Mean subtraction and uniform shrinkage do not reproduce that result, supporting the narrower claim that the useful signal is direction-dependent rather than a global bias or a generic reduction in activation magnitude.
+### Deep layers and anisotropy do the empirical work
 
-### The evidence is broad, but the calibration contract matters
+The controlled ablation is more informative than the headline average. On MiniGPT-4, baseline CHAIR sentence/object rates are 23.0/8.4. Subtracting only the mean residual gives 22.0/8.2, and uniform shrinkage gives 24.0/8.5. Editing layers 14–24 reaches 14.0/5.0; editing the deeper 24–32 range reaches 13.0/4.9 with BLEU 0.162. This pattern says the useful correction is structured and appears late in the language backbone: a global offset or isotropic contraction cannot reproduce it.
 
-Across LLaVA-1.5, MiniGPT-4, and mPLUG-Owl2 on CHAIR, the reported edit reaches sentence-level hallucination rates of 14.93, 16.87, and 15.40, respectively; the corresponding instance-level rates are 4.70, 6.13, and 6.07. The paper also reports POPE, MME, video reasoning, and diffusion-language-model experiments. Those are useful transfer checks, but they do not remove the operational dependency on representative calibration pairs, model-specific layer ranges, and a held-out tuning set.
+The deployment configuration is selected on 100 held-out MSCOCO images and then fixed. LLaVA-1.5 uses layers 20–32 with α = 60, mPLUG-Owl2 layers 20–32 with α = 20, and MiniGPT-4 layers 24–32 with α = 10. Generation uses beam size 3 for CHAIR and greedy decoding for MME, with a 64-token limit for CHAIR/POPE and 128 for MME. These details matter because a weight edit can otherwise be credited for changes caused by decoding or layer selection.
 
-| Decision | Reported choice | Consequence |
-| --- | --- | --- |
-| Intervention | Deep FFN down projections | Reuses the original runtime graph. |
-| Signal | Paired truthful and hallucinatory hidden states | Requires a calibration set that reflects the target failure. |
-| Filter | Covariance-derived, mode-wise attenuation | Preserves some semantic directions that uniform shrinkage removes. |
-| Evaluation | CHAIR, POPE, MME and supplementary transfers | Measures several grounding settings, not every safety-critical hallucination mode. |
+### Grounding improves across tests, with a clear calibration contract
+
+| Backbone | CHAIRS ↓ | CHAIRI ↓ | BLEU ↑ |
+| --- | ---: | ---: | ---: |
+| LLaVA-1.5, Wiener | 14.93 ± 2.61 | 4.70 ± 0.66 | 0.151 ± 0.005 |
+| MiniGPT-4, Wiener | 16.87 ± 2.81 | 6.13 ± 1.33 | 0.157 ± 0.002 |
+| mPLUG-Owl2, Wiener | 15.40 ± 1.93 | 6.07 ± 0.60 | 0.142 ± 0.001 |
+
+These CHAIR results average 500 MSCOCO validation images across three seeds. The paper also reports POPE object-presence scores and Dolan–Moré profiles on ten relevant MME subsets, where the edit dominates competitors over a broad performance-ratio range. A qualitative example makes the desired behavior tangible: the filtered model removes nonexistent clouds and a striped pole from a meme description while keeping the scene's actual content.
+
+![Figure 2: Qualitative hallucination reduction](/assets/images/wiener-representation-filtering-for-vlm-hallucination-suppression-source-figure-2.webp)
+*Fig 2: This source Figure 2 compares a baseline and Wiener-filtered description of a complex meme, marking hallucinated and truthful text to show which claims disappear. | source: [Wiener Representation Filtering, Figure 2](https://arxiv.org/abs/2608.08167)*
+
+![Figure 3: Dolan–Moré MME profiles](/assets/images/wiener-representation-filtering-for-vlm-hallucination-suppression-source-figure-3.webp)
+*Fig 3: This source Figure 3 plots the fraction of ten MME subsets within a performance ratio of the best method for mPLUG-Owl2 and LLaVA-1.5; it tests whether the edit helps beyond CHAIR-style captions. | source: [Wiener Representation Filtering, Figure 3](https://arxiv.org/abs/2608.08167)*
+
+The boundary is the calibration contract. A new model, domain, or hallucination taxonomy can change ΣH, the best layers, and the sharpness. The paper's evidence supports a training-free post-hoc edit for the evaluated backbones; it does not establish one universal hallucination subspace or guarantee that suppressing a frequent false positive will preserve rare but correct details.
 
 ## High-Level Takeaways
 
-- The paper shifts a common hallucination trade-off from decoding-time control to a one-time representation edit. Its atomic object is a hidden-state direction, not a token or a retrieved fact.
-- The strongest controlled result is the comparison with mean subtraction, uniform shrinkage, and shallower layer ranges. It supports spectral, deep-layer editing on the tested models; it does not establish a universal hallucination subspace.
-- A deployment decision should hold calibration size, image domain, and latency fixed against decoding-based controls, then test counterfactual images and rare objects. The method's case weakens if the same edit suppresses correct visual details under distribution shift.
-- The unreported scaling question is recalibration: a changing model, data domain, or failure taxonomy may change the covariance estimate and the directions worth preserving.
-- Hallucination reduction can be a weight-space filtering problem, but the filter is only as trustworthy as the contrast data used to estimate it.
+- The method preserves inference cost by editing FFN weights offline, while using covariance geometry to decide which directions to attenuate.
+- Mean subtraction and uniform shrinkage fail to match deep, anisotropic Wiener editing on the controlled MiniGPT-4 ablation.
+- The strongest CHAIR results are 14.93/4.70 for LLaVA-1.5, 16.87/6.13 for MiniGPT-4, and 15.40/6.07 for mPLUG-Owl2 at sentence/instance level.
+- The practical risk is recalibration: the filter is only as representative as the truthful–hallucinatory pairs used to estimate it.
