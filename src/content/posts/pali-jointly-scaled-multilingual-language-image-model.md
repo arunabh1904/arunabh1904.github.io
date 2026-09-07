@@ -9,8 +9,6 @@ field: 'Multimodal Scaling & Data Mixtures'
 summary: '2022 – PaLI: A Jointly-Scaled Multilingual Language-Image Model'
 ---
 
-## 2022 – PaLI: A Jointly-Scaled Multilingual Language-Image Model
-
 **arXiv:** [2209.06794](https://arxiv.org/abs/2209.06794)
 
 ## Summary
@@ -32,7 +30,7 @@ The family makes the scaling choice visible. PaLI-3B pairs an approximately 1B m
 
 The paper's most useful comparison is Figure 2. Moving from mT5-Large to mT5-XXL adds about 12B language parameters and improves the average over seven reported tasks by 3.1 points. Holding that language component fixed and moving from ViT-G to ViT-e adds roughly 2B visual parameters, only about 13% of the total model, yet improves the same average by 3.2 points. A later high-resolution phase adds another 2.0 points to that average.
 
-That pattern explains why a modest-looking vision increase matters. The ViT-e is only marginally better than ViT-G on ImageNet—72.11 versus 70.27 zero-shot in the reported comparison—but the paired model moves COCO captioning from 146.2 to 149.1 CIDEr and VQAv2 from 82.9 to 83.4. Visual capacity is paying off where the model must ground generated language in an image, even when a vision-only score barely moves.
+That pattern explains why a modest-looking vision increase matters. In Table 5's 224×224 zero-shot image classification, PaLI-17B with ViT-e scores 72.11 top-1 on ImageNet versus 70.27 for PaLI-15B with ViT-G; these are generative zero-shot class scores, not a separately fine-tuned vision classifier. The paired model moves COCO captioning from 146.2 to 149.1 CIDEr and VQAv2 from 82.9 to 83.4. Visual capacity is paying off where the model must ground generated language in an image, even when a vision-only score barely moves.
 
 ![PaLI scaling comparison across language, vision, and high-resolution stages](/assets/images/pali-jointly-scaled-multilingual-language-image-model-source-figure-2.webp)
 *Fig 2: The bars compare PaLI-3B, PaLI-15B, PaLI-17B, and the additional high-resolution phase across captioning and VQA tasks; the empty bars isolate the high-resolution contribution. | source: [PaLI, Figure 2](https://arxiv.org/abs/2209.06794)*

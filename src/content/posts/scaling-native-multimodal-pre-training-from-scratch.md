@@ -15,8 +15,6 @@ topics:
 summary: '2026 – Scaling Native Multimodal Pre-Training From Scratch'
 ---
 
-## 2026 – Scaling Native Multimodal Pre-Training From Scratch
-
 **arXiv:** [2607.22043](https://arxiv.org/abs/2607.22043)
 
 ## Summary
@@ -38,7 +36,7 @@ For each budget, the authors vary $N$ and $D$ under $C=6ND$ and fit a parabola t
 
 The language fits are $N_{\mathrm{opt}}\propto C^a$ with $a=0.697,0.684,0.667,0.663$ for $r=0,0.1,0.2,0.3$, and $D_{\mathrm{opt}}\propto C^b$ with the complementary exponents 0.303, 0.316, 0.333, and 0.337. The envelope cross-check does not reproduce a monotonic decline, so the paper treats the small drift as fitting noise rather than evidence that multimodal data changes the language allocation law.
 
-The multimodal objective behaves differently. Its IsoFLOP exponents are $a=0.709,0.679,0.643$ for $r=0.1,0.2,0.3$, with token exponents $b=0.291,0.321,0.357$. The envelope estimator follows the same downward trend in $a$. Increasing the multimodal share therefore shifts compute toward data: at $r=0.3$, buying capacity without enough multimodal tokens is a worse use of the budget than it is at $r=0.1.
+The multimodal objective behaves differently. Its IsoFLOP exponents are $a=0.709,0.679,0.643$ for $r=0.1,0.2,0.3$, with token exponents $b=0.291,0.321,0.357$. The envelope estimator follows the same downward trend in $a$. Increasing the multimodal share therefore shifts compute toward data: at $r=0.3$, buying capacity without enough multimodal tokens is a worse use of the budget than it is at $r=0.1$.
 
 ![Training-curve envelopes for the language objective](/assets/images/scaling-native-multimodal-pre-training-from-scratch-source-figure-2.webp)
 *Fig 2: The lower envelope of language training curves yields a compute law and an independent allocation estimate; the fitted frontier is nearly the same across mixture ratios. | source: [Scaling Native Multimodal Pre-Training From Scratch, Figure 2](https://arxiv.org/abs/2607.22043)*

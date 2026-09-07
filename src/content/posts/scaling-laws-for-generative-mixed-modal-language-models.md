@@ -9,8 +9,6 @@ field: 'Multimodal Scaling & Data Mixtures'
 summary: "2023 – Scaling Laws for Generative Mixed-Modal Language Models"
 ---
 
-## 2023 – Scaling Laws for Generative Mixed-Modal Language Models
-
 **arXiv:** [2301.03728](https://arxiv.org/abs/2301.03728)  
 **Conference:** Technical report
 
@@ -38,10 +36,10 @@ The first term is what two independent models would achieve after averaging thei
 
 The paper fits seven model sizes from 8M to 6.7B on 5B, 10B, and 100B token budgets, using 50/50 token mixtures for each selected pair. It then estimates the compute point where Speech|Text should cross its competition barrier. The predicted optimum is a 28.35B model with 45.12B tokens, so the authors train a nearby 30B model on 50B tokens, alongside 350M and 2.7B comparisons.
 
-The local rendering of the ratio makes the decision legible: the 350M and 2.7B curves stay above one, while the 30B curve moves below one late in training. A ratio below one means the mixed model's averaged perplexity is lower than the mean of the two corresponding unimodal models. The source Figure 5 uses precisely this ratio, $0.5(L_{\text{Text}}+L_{\text{Speech}})/L_{\text{Speech|Text}}$; it is a test of the extrapolation, not a generic training-loss plot.
+The source Figure 5 plots $0.5(L_{\text{Text}}+L_{\text{Speech}})/L_{\text{Speech|Text}}$ against updates: the 350M and 2.7B curves stay above the dashed barrier, while the 30B curve crosses it late. The paper calls that crossing the onset of synergy. There is a direction-of-inequality caveat in the printed source: because perplexity is lower-is-better, the displayed unimodal-over-mixed fraction would mathematically make a mixed model that beats the unimodal average produce a value above one, even though the caption labels below one as barrier crossing. I report the observed crossing and the paper's convention rather than silently reversing either one.
 
-![Speech-text competition ratio across model sizes and training updates](/assets/images/scaling-laws-for-generative-mixed-modal-language-models-paper-figure.png)
-*Fig 1: The clean rendering shows the predicted competition barrier at ratio 1 and the late 30B crossing; the 350M and 2.7B curves remain in the competition regime. | source: [Scaling Laws for Generative Mixed-Modal Language Models, Figure 5](https://arxiv.org/abs/2301.03728)*
+![Source Figure 5: Speech-text competition ratio across model sizes and training updates](/assets/images/scaling-laws-for-generative-mixed-modal-language-models-source-figure-5.png)
+*Fig 1: The source plot makes the scale transition visible: 350M and 2.7B remain above the dashed competition barrier, while 30B crosses it late in training. | source: [Scaling Laws for Generative Mixed-Modal Language Models, Figure 5](https://arxiv.org/abs/2301.03728)*
 
 ### Competition appears in the training dynamics
 

@@ -9,8 +9,6 @@ field: 'Multimodal Scaling & Data Mixtures'
 summary: "2025 – Scaling Laws for Optimal Data Mixtures"
 ---
 
-## 2025 – Scaling Laws for Optimal Data Mixtures
-
 **arXiv:** [2507.09404](https://arxiv.org/abs/2507.09404)  
 **Conference:** Technical report
 

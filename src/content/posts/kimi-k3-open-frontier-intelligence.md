@@ -16,8 +16,6 @@ topics:
 summary: '2026 – Kimi K3: Open Frontier Intelligence'
 ---
 
-## 2026 – Kimi K3: Open Frontier Intelligence
-
 **arXiv:** [2607.24653](https://arxiv.org/abs/2607.24653)<br />
 **Technical blog:** [Kimi K3](https://www.kimi.com/blog/kimi-k3)<br />
 **Code and report:** [MoonshotAI/Kimi-K3](https://github.com/MoonshotAI/Kimi-K3)<br />
@@ -33,7 +31,7 @@ summary: '2026 – Kimi K3: Open Frontier Intelligence'
 
 Kimi K3 uses three KDA layers followed by one gated MLA layer in each block, plus a final MLA layer. KDA maintains a fixed-size recurrent state with channel-wise decay and delta-rule writes; gated MLA periodically restores unrestricted global content retrieval while using a compressed key-value representation. The resulting 69 KDA and 24 MLA layers make most sequence mixing linear-time without asking recurrence to solve every retrieval problem.
 
-Attention Residuals apply the same selective-access idea over depth. Learned pseudo-queries attend over the embedding and earlier block outputs instead of forcing every layer into one accumulated residual. K3's Block AttnRes groups its 93 layers into eight 12-layer blocks plus a partial final block, reducing the saved depth state while retaining access to earlier representations. Stable LatentMoE then handles width: two full-width shared experts process common transformations, while each token activates 16 of 896 routed experts in a half-width latent space.
+Attention Residuals apply the same selective-access idea over depth. Learned pseudo-queries attend over the embedding and earlier block outputs instead of forcing every layer into one accumulated residual. K3's Block AttnRes partitions its 93-layer backbone into eight blocks of at most 12 layers, with the last block partial; counting the embedding as a source gives nine block-level states. Stable LatentMoE then handles width: two full-width shared experts process common transformations, while each token activates 16 of 896 routed experts in a half-width latent space.
 
 ![Kimi K3 architecture across token, depth, and expert mixing](/assets/images/kimi-k3-architecture-paper-figure.png)
 *Fig 1: The architecture combines KDA with periodic gated MLA, Block Attention Residuals across earlier blocks, Stable LatentMoE with shared and routed experts, and a native MoonViT-V2 vision path. | source: [Kimi K3, Figure 2](https://arxiv.org/abs/2607.24653)*
