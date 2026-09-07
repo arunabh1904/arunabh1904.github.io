@@ -59,6 +59,6 @@ The category breakdown explains where the retained streams matter most. Relative
 ## High-Level Takeaways
 
 - DeepInteraction keeps image and LiDAR representations separate while sharing bidirectional interaction operators in the encoder and decoder.
-- MMRI alone reaches 69.5/72.5 mAP/NDS on validation, MMPI alone 69.3/72.1, and their combination 69.9/72.6, showing that representation and prediction interaction are complementary.
+- The encoder ablation reaches 69.5/72.5 mAP/NDS with MMRI and 69.9/72.6 with MMRI plus intra-modal learning. Separately, the decoder reaches 69.3/72.1 with image-side MMPI and LiDAR-side DETR, versus 69.9/72.6 when both streams use MMPI.
 - The base R50 model reaches 70.8/73.4 on nuScenes test; larger and ensemble variants reach higher scores with different evaluation costs.
 - The strongest category gains are on bicycles (+11.8 mAP), motorcycles (+6.9), and traffic cones (+5.9), while calibration quality and interaction cost remain explicit limits.

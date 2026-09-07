@@ -19,7 +19,7 @@ summary: "2024 – Transfusion: Predict the Next Token and Diffuse Images with O
 
 ## Core Insights
 
-### A shared trunk does not require a shared likelihood
+### One transformer supports two prediction objectives
 
 Transfusion builds a mixed sequence from discrete text tokens and continuous image patches. Text strings use a normal vocabulary. Images pass through a VAE, are arranged left-to-right and top-to-bottom as latent patches, and are wrapped with beginning-of-image (BOI) and end-of-image (EOI) tokens. The transformer sees one vector sequence, but the training losses stay modality-specific:
 
@@ -30,14 +30,14 @@ $$
 The language loss is computed per text token. The diffusion loss is computed over a whole noised latent image before patchification. The paper sets $\lambda=5$ after preliminary experiments. This is a shared-parameter model with a non-shared statistical interface.
 
 ![Source Figure 1 from Transfusion: text and image blocks processed by one transformer](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-paper-figure.png)
-*Fig 1: A text prefix emits a BOI marker, a continuous image block is denoised in parallel, and an EOI marker returns decoding to the language path; the transformer is shared while the modality heads differ. | source: [Transfusion](https://arxiv.org/abs/2408.11039)*
+*Fig 1: A text prefix emits a BOI marker, a continuous image block is denoised in parallel, and an EOI marker returns decoding to the language path; the transformer is shared while the modality heads differ. | source: [Transfusion, Figure 1](https://arxiv.org/abs/2408.11039)*
 
 Attention follows the same separation. Every position is causally masked against later sequence elements, but patches from one image attend bidirectionally to one another. Thus a caption can condition an image, and an image can condition a later caption, while image patches do not have to predict one another left-to-right. At inference, language decoding samples token by token; after BOI, the model appends Gaussian-noise patches and runs the diffusion reverse process before emitting EOI.
 
 ### Compression comes from the VAE and the patch interface
 
 ![Source Figure 3 from Transfusion: VAE latents converted to image patches through linear or U-Net blocks](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-source-figure-3.webp)
-*Fig 2: A VAE maps pixels to a continuous latent grid, and a linear layer or U-Net down/up path converts local latent windows to and from transformer vectors; the choice changes both sequence length and inductive bias. | source: [Transfusion](https://arxiv.org/abs/2408.11039)*
+*Fig 2: A VAE maps pixels to a continuous latent grid, and a linear layer or U-Net down/up path converts local latent windows to and from transformer vectors; the choice changes both sequence length and inductive bias. | source: [Transfusion, Figure 3](https://arxiv.org/abs/2408.11039)*
 
 The canonical VAE has 86M parameters, latent dimension 8, and maps a 256×256 image to a 32×32×8 latent tensor. With 2×2 latent patching, that is 256 image elements; with 8×8 patching, one image can be represented by 16 elements. A linear encoder/decoder adds almost no parameters, while U-Net down/up blocks add 0.27B parameters across configurations and provide spatial inductive bias.
 
@@ -47,8 +47,8 @@ The 16-patch result is therefore a sequence-length result, not a free compressio
 
 The controlled comparison trains Transfusion and Chameleon at 0.16B, 0.37B, 0.76B, 1.4B, and 7B transformer sizes on 0.5T tokens with a 1:1 text/image token ratio. Both use matched VAE data and architecture; Chameleon additionally pays for a VQ-VAE codebook and stability modifications. The largest controlled models use 2×2 latent patches, simple linear image layers, and bidirectional intra-image attention.
 
-![Source Figure 5 from Transfusion: benchmark scaling against Chameleon](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-source-figure-5.webp)
-*Fig 3: On logarithmic compute axes, Transfusion’s fitted trends stay above Chameleon for text accuracy, captioning, image FID, and CLIP alignment; the lines summarize the tested scale range rather than an asymptotic law. | source: [Transfusion](https://arxiv.org/abs/2408.11039)*
+![Source Figure 5 from Transfusion: six-metric scaling comparison against Chameleon](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-source-figure-5-full.png)
+*Fig 3: Figure 5 compares Transfusion (red) and Chameleon (blue) across six scaling metrics: C4 and Wikipedia perplexity, Llama 2 accuracy, MS-COCO CIDEr, FID, and CLIP. Lower is better for perplexity and FID; higher is better for accuracy, CIDEr, and CLIP. The fitted lines summarize the tested scale range, not an asymptotic law. | source: [Transfusion, Figure 5](https://arxiv.org/abs/2408.11039)*
 
 | 7B model, 0.5T tokens | Transfusion | Chameleon | Relative FLOPs to match Chameleon |
 | --- | ---: | ---: | ---: |
@@ -61,7 +61,7 @@ The controlled comparison trains Transfusion and Chameleon at 0.16B, 0.37B, 0.76
 
 The FID parity ratio is the striking number: the fitted comparison estimates that Transfusion needs about 2.9% of Chameleon’s FLOPs to reach the 7B Chameleon result. The table does not mean an image is 34 times cheaper in every deployment. It uses a controlled proxy $6ND$, and continuous representations shorten the sequence, so the authors calculate theoretical FLOPs to remove that particular sequence-length confounder.
 
-The large 7B Transfusion model adds U-Net image blocks and trains on 2T multimodal tokens: 1T text tokens and about 3.5B image-caption pairs. The paper reports 66.1 Llama evaluation accuracy, MS-COCO FID 6.78, and GenEval 0.63, compared with SDXL’s GenEval 0.55 and DeepFloyd’s 0.61. SD3 reaches 0.68 with synthetic-caption advantages in its cited result. Transfusion’s distinctive evidence is that one model also generates text, not that it dominates every image-only system.
+The large 7B Transfusion model adds U-Net image blocks and trains on 2T multimodal tokens: 1T text tokens and about 3.5B image-caption pairs. The paper reports 66.1 Llama evaluation accuracy, MS-COCO FID 6.78, and GenEval 0.63, compared with SDXL’s GenEval 0.55 and DeepFloyd’s 0.61. The cited SD3 result reaches 0.68 using synthetic captions, so the comparison also changes the caption data. Transfusion’s distinctive evidence is that one model also generates text, not that it dominates every image-only system.
 
 ### The ablations locate the source of the gain
 
@@ -74,4 +74,4 @@ At 0.76B with U-Net encoding, reducing each image from 256 to 64 or 16 patches g
 - Transfusion shares transformer parameters while preserving next-token prediction for text and diffusion for continuous images; the loss boundary is the core design decision.
 - Continuous VAE patches remove a discrete image-token bottleneck, but VAE quality, patch size, U-Net parameters, and diffusion steps determine the actual cost.
 - Intra-image bidirectional attention and U-Net spatial bias explain much of the image advantage in the ablations, so the headline comparison is not only about continuous versus discrete values.
-- The decisive follow-up is a matched data, VAE, sequence, sampler, and image-compute comparison against a stronger discrete tokenizer and a modular text-plus-diffusion system.
+- Shortening the image sequence shifts work into the image interface rather than removing it. The patch-size ablation shows why spatial inductive bias matters: a U-Net can preserve image quality under compression even while text accuracy falls.

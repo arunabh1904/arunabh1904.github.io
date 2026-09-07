@@ -39,7 +39,7 @@ On Waymo, this targeted readout adds about 2 mAP with less than 10% extra comput
 
 ### Velocity makes the same point a track state
 
-CenterPoint predicts planar velocity from the current and previous BEV views. At inference, it moves each current center backward by the negative velocity estimate and greedily matches the result to existing tracks by closest distance. Unmatched tracks survive for three frames and retain their last velocity. This avoids a separate Kalman filter or appearance embedding; the association costs about 1 ms on top of detection in the nuScenes ablation, compared with 73 ms for the Mahalanobis-distance Kalman baseline under the paper's measurement.
+The velocity head consumes the current and previous BEV map views and predicts the object's planar center displacement between those timesteps. At inference, it moves each current center backward by the negative velocity estimate and greedily matches the result to existing tracks by closest distance. Unmatched tracks survive for three frames and retain their last velocity. This avoids a separate Kalman filter or appearance embedding; the association costs about 1 ms on top of detection in the nuScenes ablation, compared with 73 ms for the Mahalanobis-distance Kalman baseline under the paper's measurement.
 
 The shortcut has a clear interpretation. If the velocity is good, a tracklet is just a path of points through time. If two objects cross, detections are delayed, or the velocity is wrong, closest-point matching has no appearance or global assignment signal to correct the identity. The representation simplifies tracking by accepting that failure mode.
 

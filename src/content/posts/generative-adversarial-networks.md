@@ -36,10 +36,10 @@ $$
 D_G^*(x)=\frac{p_{data}(x)}{p_{data}(x)+p_g(x)}.
 $$
 
-Substituting it into the game gives $C(G)=-\log 4+2\,\mathrm{JSD}(p_{data}\|p_g)$. The ideal equilibrium is therefore precise: $p_g=p_{data}$ and $D(x)=1/2$. The discriminator is not merely a critic with an arbitrary reward; in the idealized derivation it estimates how much more likely a point is under data than under the generator.
+Substituting it into the game gives $C(G)=-\log 4+2\,\mathrm{JSD}(p_{data}\|p_g)$. The ideal equilibrium is therefore precise: $p_g=p_{data}$ and $D(x)=1/2$. The discriminator is not merely a critic with an arbitrary reward; in the idealized derivation it is the data-versus-generator posterior, whose odds recover the density ratio $p_{data}(x)/p_g(x)$.
 
 ![Source Figure 1 from Generative Adversarial Nets: the generator and discriminator approach distributional equilibrium](/assets/images/generative-adversarial-networks-source-figure-1.png)
-*Fig 1: The four panels move from separated data and generator densities to an equilibrium where the discriminator is flat and $p_g$ matches $p_{data}$; arrows show how the latent map changes the generated density. | source: [Generative Adversarial Nets](https://arxiv.org/abs/1406.2661)*
+*Fig 1: The four panels move from separated data and generator densities to an equilibrium where the discriminator is flat and $p_g$ matches $p_{data}$; arrows show how the latent map changes the generated density. | source: [Generative Adversarial Nets, Figure 1](https://arxiv.org/abs/1406.2661)*
 
 The panel sequence also shows what the theorem assumes away. It treats the discriminator as reaching its optimum while the generator changes slowly. The actual algorithm alternates $k$ discriminator updates with one generator update; the paper uses $k=1$, minibatches, and momentum because solving the inner game to completion would be expensive and could overfit a finite dataset.
 
@@ -52,14 +52,14 @@ The original models are multilayer perceptrons. Generators use rectifier and sig
 ### The experiments test sampling and a weak likelihood proxy
 
 ![Source Figure 2 from Generative Adversarial Nets: random samples and nearest training examples](/assets/images/generative-adversarial-networks-source-figure-2.png)
-*Fig 2: The panels show random MNIST, face, and CIFAR-10 samples; the yellow rightmost column is the nearest training example for each neighboring sample, a visual check against simple memorization. | source: [Generative Adversarial Nets](https://arxiv.org/abs/1406.2661)*
+*Fig 2: The panels show random MNIST, face, and CIFAR-10 samples; the yellow rightmost column is the nearest training example for each neighboring sample, a visual check against simple memorization. | source: [Generative Adversarial Nets, Figure 2](https://arxiv.org/abs/1406.2661)*
 
 The paper evaluates MNIST, the Toronto Face Database, and CIFAR-10. For a quantitative signal it fits a Gaussian Parzen window to generated samples and reports test-set log-likelihood estimates. On MNIST, adversarial nets report $225\pm2$, compared with $214\pm1.1$ for Deep GSN, $138\pm2$ for DBN, and $121\pm1.6$ for stacked CAE. On TFD, the result is $2057\pm26$, below stacked CAE’s $2110\pm50$ but above DBN’s $1909\pm66$ and Deep GSN’s $1890\pm29$.
 
 Those numbers require careful reading. The MNIST comparison uses real-valued rather than binary images. On TFD, the bandwidth is cross-validated per fold and the reported error is across folds. The authors explicitly warn that Parzen estimates have high variance and behave poorly in high dimensions. The table is evidence that an implicit model can produce competitive samples under a then-available proxy, not a general likelihood victory.
 
 ![Source Figure 3 from Generative Adversarial Nets: linear interpolation in the generator’s latent space](/assets/images/generative-adversarial-networks-source-figure-3.png)
-*Fig 3: Linear paths between latent coordinates produce smooth digit changes, showing that the learned generator map is structured beyond isolated memorized examples. | source: [Generative Adversarial Nets](https://arxiv.org/abs/1406.2661)*
+*Fig 3: Linear paths through latent space produce smooth digit changes. This tests continuity of the learned mapping; smooth interpolation alone does not establish mode coverage or rule out memorization. | source: [Generative Adversarial Nets, Figure 3](https://arxiv.org/abs/1406.2661)*
 
 The samples are direct forward passes and do not depend on Markov-chain mixing. That is a meaningful systems advantage over contemporaneous models. The same property does not guarantee coverage: the generator can map many noise values to the same output, the paper’s “Helvetica scenario,” while the discriminator remains poorly synchronized.
 
@@ -74,4 +74,4 @@ That boundary explains the later research line. Wasserstein objectives, gradient
 - GANs make a density-ratio classifier the training interface for an implicit generator, removing MCMC and explicit likelihood from the sampling path.
 - The global $p_g=p_{data}$ result depends on an optimal discriminator and sufficient capacity; finite alternating updates create the actual research problem.
 - The original Parzen scores and nearest-example panels support feasibility, while mode coverage and high-dimensional likelihood remain unmeasured or weakly measured.
-- The right matched test keeps generator capacity, data, compute, and random seeds fixed while checking sharpness, rare-mode recall, and training stability against a non-adversarial model.
+- Direct sampling avoids a Markov chain, but a cheap forward pass can still miss modes. The theorem concerns matching distributions; attractive individual samples are only part of the evidence.

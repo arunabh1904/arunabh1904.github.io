@@ -31,7 +31,7 @@ $$
 where each distance compares an input feature to its corresponding semantic or pixel codebook entry. The index is shared, but the embeddings are not. Separate semantic and pixel decoders can therefore reconstruct different targets after the transformer has consumed the same discrete coordinates.
 
 ![Source Figure 3 from TokenFlow: dual encoders, codebooks, shared mapping, and decoders](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-paper-figure.png)
-*Fig 1: TokenFlow jointly chooses an index from semantic and pixel distances, then decodes the aligned index through separate semantic and pixel paths for downstream understanding and image reconstruction. | source: [TokenFlow](https://arxiv.org/abs/2412.03069)*
+*Fig 1: TokenFlow jointly chooses an index from semantic and pixel distances, then decodes the aligned index through separate semantic and pixel paths for downstream understanding and image reconstruction. | source: [TokenFlow, Figure 3](https://arxiv.org/abs/2412.03069)*
 
 The training objective combines semantic feature loss, vector-quantization and commitment terms, and pixel reconstruction:
 
@@ -44,7 +44,7 @@ The model also uses multi-scale VQ. With 131,072 entries, the paper reports code
 ### The tokenizer’s sampling policy is part of the representation result
 
 ![Source Figure 5 from TokenFlow: single-pass and multi-step sampling comparison](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-source-figure-5.webp)
-*Fig 2: Single-pass top-$k=1200$, top-$p=0.8$ sampling produces inconsistent local patterns, while repeated narrowing within a scale yields more coherent generations. | source: [TokenFlow](https://arxiv.org/abs/2412.03069)*
+*Fig 2: Single-pass top-$k=1200$, top-$p=0.8$ sampling produces inconsistent local patterns, while repeated narrowing within a scale yields more coherent generations. | source: [TokenFlow, Figure 5](https://arxiv.org/abs/2412.03069)*
 
 TokenFlow’s next-scale generator predicts image tokens autoregressively, but the paper finds that independent top-$k$/top-$p$ choices can break correlations among tokens at the same scale. Its multi-step sampler first uses broad sampling, then resamples the same scale with smaller $k$ and $p$ values. For the 256×256 evaluation, it uses three steps per scale with top-$k=[1200,100,1]$ and top-$p=[0.8,0.8,1.0]$ across all scales except the first, for 25 model runs in total. The comparison is therefore about a tokenizer and an inference policy together. A single-pass baseline does not test the same system.
 
@@ -53,7 +53,7 @@ TokenFlow’s next-scale generator predicts image tokens autoregressively, but t
 The tokenizer is trained on LAION and COYO-700M, with 50-epoch ImageNet-1K ablations. The generation model starts from Llama-2-7B, trains for two epochs on 60M curated image-caption pairs, drops text conditioning with probability 0.1 for classifier-free guidance, and uses guidance scale 7.5 at inference. For understanding, TokenFlow follows LLaVA-style adapter and instruction stages; the XL model uses Cambrian data because its SigLIP-SO400M teacher benefits from more alignment data.
 
 ![Source Figure 1 from TokenFlow: multimodal understanding benchmark comparison](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-source-figure-1.webp)
-*Fig 3: TokenFlow-XL’s 14B Qwen-backed model is compared with continuous and discrete visual-input systems across eight understanding benchmarks; the radar makes the cross-benchmark trade-offs visible. | source: [TokenFlow](https://arxiv.org/abs/2412.03069)*
+*Fig 3: TokenFlow-XL’s 14B Qwen-backed model is compared with continuous and discrete visual-input systems across nine understanding benchmarks; the radar makes the cross-benchmark trade-offs visible. | source: [TokenFlow, Figure 1](https://arxiv.org/abs/2412.03069)*
 
 | Task | TokenFlow result | What the protocol fixes |
 | --- | ---: | --- |
@@ -69,7 +69,7 @@ The key ablation is more specific. Starting from a single CLIP-distilled codeboo
 
 ## High-Level Takeaways
 
-- TokenFlow’s unification contract is shared indices with specialized embeddings, so understanding and reconstruction can use aligned coordinates without sharing all feature content.
+- TokenFlow uses shared indices with specialized embeddings, so understanding and reconstruction can use aligned coordinates without sharing all feature content.
 - Shared mapping, multi-scale VQ, and semantic initialization each address a different failure; the ablation separates their reconstruction and understanding contributions.
 - The 7.2% claim belongs to the Qwen2.5-14B comparison; the same Vicuna-13B comparison is 64.0 versus LLaVA-1.5’s 62.9, which is the cleaner backbone control.
-- The decisive follow-up is a matched tokenizer-compute and sampler-step sweep against single semantic, single pixel, and separate-tokenizer baselines at higher resolutions.
+- A compact shared index does not make generation a single-pass operation. The reported quality includes repeated within-scale sampling, so tokenizer reconstruction quality and generator inference cost must be read together.

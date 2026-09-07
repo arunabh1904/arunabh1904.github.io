@@ -45,7 +45,7 @@ $$
 $$
 
 ![Source Figure 2 from DDPM: forward noising and learned reverse denoising](/assets/images/ddpm-paper-figure-2-graphical-model.png)
-*Fig 1: The forward chain moves $x_0$ toward Gaussian noise, while the learned reverse transitions move from $x_T$ back toward a data sample; the two directions share the same timestep structure but only the reverse path is learned. | source: [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239)*
+*Fig 1: The forward chain moves $x_0$ toward Gaussian noise, while the learned reverse transitions move from $x_T$ back toward a data sample; the two directions share the same timestep structure but only the reverse path is learned. | source: [Denoising Diffusion Probabilistic Models, Figure 2](https://arxiv.org/abs/2006.11239)*
 
 This graphical model is the useful mental split. Corruption is known, cheap, and differentiable in closed form. Learning concentrates on the conditional reverse steps, where the target noise is available because the corruption process generated it.
 
@@ -64,7 +64,7 @@ The main CIFAR-10 model uses $T=1000$, a linear $\beta_t$ schedule from $10^{-4}
 ### The reported samples are strong, but the protocol matters
 
 ![Source Figure 6 from DDPM: progressive CIFAR-10 generation across reverse time](/assets/images/denoising-diffusion-probabilistic-models-source-figure-6.webp)
-*Fig 2: Each row shows the model’s estimate of the clean CIFAR-10 image at successive reverse times; broad structure appears before the final texture and edges. | source: [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239)*
+*Fig 2: Each row shows the model's estimate of the clean CIFAR-10 image at successive reverse times; broad structure appears before the final texture and edges. | source: [Denoising Diffusion Probabilistic Models, Figure 6](https://arxiv.org/abs/2006.11239)*
 
 The progressive panel is more informative than a final sample grid because it shows where the chain spends its representational work. Early reverse states recover large-scale shape and color; later states add local detail. That ordering is also why the chain can be read as progressive lossy decompression: a noisy intermediate preserves some coarse information and discards fine detail.
 
@@ -74,10 +74,10 @@ The progressive panel is more informative than a final sample grid because it sh
 | CIFAR-10 test reference | FID 5.24 | The 3.17 FID is against the training set |
 | LSUN Church 256² | FID 7.89 | Unconditional samples |
 | LSUN Bedroom 256² | FID 4.90 | Unconditional samples |
-| CIFAR-10 compression | 1.78 bits/dim; RMSE 0.95 | Best-quality progressive-compression model |
+| CIFAR-10 compression | 1.78 bits/dim; RMSE 0.95 [0,255] pixel units | Best-quality progressive-compression model |
 
-![Source Figure 1 from DDPM: unconditional CelebA-HQ and CIFAR-10 samples](/assets/images/denoising-diffusion-probabilistic-models-source-figure-1.webp)
-*Fig 3: The source presents unconditional CelebA-HQ faces and CIFAR-10 samples as a qualitative check that the reverse chain works across image domains. | source: [Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2006.11239)*
+![Source Figure 1 from DDPM: four unconditional CelebA-HQ face samples (retained crop)](/assets/images/denoising-diffusion-probabilistic-models-source-figure-1.webp)
+*Fig 3: This retained crop shows four unconditional CelebA-HQ faces from source Figure 1; the original source figure also contains CIFAR-10 samples, which are omitted here for legibility. | source: [Denoising Diffusion Probabilistic Models, Figure 1](https://arxiv.org/abs/2006.11239)*
 
 The training-set versus test-set FID distinction is material. It prevents the headline 3.17 from being read as a universal estimate of generalization, and it makes the later sampler and evaluation improvements easier to compare honestly. The original paper’s strongest contribution is the combination of a simple corruption process, a stable noise target, and a reverse chain that produced competitive samples without adversarial training.
 
@@ -89,5 +89,5 @@ Sampling requires the model to evaluate a reverse transition for each selected t
 
 - DDPM supplies a known corruption path and a noise target at every timestep, turning generation into a sequence of supervised denoising problems.
 - The simplified noise-prediction loss gives strong samples while the variational decomposition keeps a likelihood and compression interpretation available.
-- CIFAR-10 FID 3.17 is a training-set reference result; the reported test FID 5.24 and thousands of reverse evaluations define the practical boundary.
-- The next decisive experiment is a matched wall-clock comparison of step count, resolution, and sample quality against a fast solver or latent diffusion model.
+- CIFAR-10 FID 3.17 is a training-set reference result; the reported test FID 5.24 and the 1,000 reverse steps define the practical boundary.
+- Training can jump directly to any noise level, while the original sampler must visit every reverse step. That asymmetry is why sampling speed becomes a separate research problem after the denoising objective works.

@@ -17,7 +17,7 @@ summary: '2022 – TransFusion: Robust LiDAR-Camera Fusion for 3D Object Detecti
 
 ## Summary
 
-> TransFusion lets LiDAR propose an object and lets a query search a camera feature map around that proposal. This soft association avoids forcing every image feature through a sparse LiDAR point or a single calibrated pixel. The first decoder layer predicts boxes from LiDAR; the second uses spatially modulated cross-attention to retrieve image evidence, with an image-guided heatmap available for LiDAR-sparse objects. On nuScenes test, fusion improves TransFusion-L from 65.5 to 68.9 mAP and from 70.2 to 71.7 NDS, while a one-meter calibration offset costs only 0.49 mAP in the paper's stress test.
+> TransFusion lets LiDAR propose an object and lets a query search a camera feature map around that proposal. This soft association avoids forcing every image feature through a sparse LiDAR point or a single calibrated pixel. The first decoder layer predicts boxes from LiDAR; the second uses spatially modulated cross-attention to retrieve image evidence, with an image-guided heatmap available for LiDAR-sparse objects. On nuScenes test, fusion improves TransFusion-L from 65.5 to 68.9 mAP and from 70.2 to 71.7 NDS, while a one-meter calibration offset costs 0.49 mAP percentage points in the paper's 12-epoch validation stress test.
 
 ## Core Insights
 
@@ -48,17 +48,17 @@ The paper's qualitative attention maps are more informative than a claim that th
 ![TransFusion source Figure 3: object-query projections and cross-attention maps](/assets/images/transfusion-robust-lidar-camera-fusion-with-transformers-source-figure-3.webp)
 *Fig 3: The first row projects query predictions onto nuScenes and Waymo images; the second shows the cross-attention maps. The queries select relevant image regions beyond the sparse LiDAR points. | source: [TransFusion, Figure 3](https://arxiv.org/abs/2203.11496)*
 
-The same design keeps a LiDAR-only path. TransFusion-L is the first decoder stage without camera fusion, so missing or poor images do not make the detector lose its geometric baseline. On nuScenes test, TransFusion-L reaches 65.5 mAP/70.2 NDS, and the fused model reaches 68.9/71.7 without test-time augmentation or a model ensemble. The fused model also reports 71.8 AMOTA on the nuScenes tracking test, compared with 68.6 for TransFusion-L.
+TransFusion-L evaluates the first decoder stage without camera fusion. This gives a LiDAR-only baseline, and the authors say fusion can be disabled when a camera failure is known. Keeping fusion enabled with missing images is a different test: the model must tolerate corrupted image features, as the experiments below show. On nuScenes test, TransFusion-L reaches 65.5 mAP/70.2 NDS, and the fused model reaches 68.9/71.7 without test-time augmentation or a model ensemble. The fused model also reports 71.8 AMOTA on the nuScenes tracking test, compared with 68.6 for TransFusion-L.
 
 ### Robustness is measured with controlled sensor failures
 
 The image-quality experiments use the nuScenes validation split with shortened 12-epoch training and compare TransFusion against two hard-fusion baselines built on the same LiDAR model: point-wise concatenation (CC) and PointAugmenting (PA). At night, TransFusion reaches 55.2 mAP, compared with 51.0 for PA and 49.4 for CC; in daytime it reaches 65.7, compared with 64.3 and 63.4. When images are dropped, TransFusion falls from 65.6 mAP with all views to 65.1 with one missing image, 63.9 with three, and 61.7 with six. CC falls to 39.5 and PA to 47.0 when six images are missing.
 
-The calibration test randomly translates the camera-to-LiDAR transform. At a one-meter offset, TransFusion loses 0.49 mAP; PA loses 2.33 and CC 2.85. The paper's explanation is specific: the calibration projects the query into an approximate image region, but the cross-attention can still choose useful pixels around it. This is a robustness mechanism supported by the perturbation, rather than a claim that calibration no longer matters.
+The calibration test randomly translates the camera-to-LiDAR transform. At a one-meter offset, TransFusion loses 0.49 mAP percentage points; PA loses 2.33 and CC 2.85, all in the paper's 12-epoch validation stress test. The paper's explanation is specific: the calibration projects the query into an approximate image region, but the cross-attention can still choose useful pixels around it. This is a robustness mechanism supported by the perturbation, rather than a claim that calibration no longer matters.
 
 ## High-Level Takeaways
 
 - Input-dependent, category-aware LiDAR queries give the transformer a geometric proposal before image fusion begins.
 - SMCA uses the projected box as a soft locality prior, allowing a query to search image context instead of trusting one LiDAR point or pixel.
 - On nuScenes test, fusion improves TransFusion-L from 65.5/70.2 to 68.9/71.7 mAP/NDS and the tracking result from 68.6 to 71.8 AMOTA.
-- Under controlled failures, one dropped image costs 0.5 mAP and a one-meter calibration offset costs 0.49 mAP; the LiDAR-only decoder remains the fallback when camera evidence degrades.
+- Under controlled failures, one dropped image costs 0.5 mAP and six dropped images leave fused TransFusion at 61.7 mAP; TransFusion-L is the separately evaluated LiDAR-only baseline, while the paper only says fusion can be disabled when camera failure is known.
