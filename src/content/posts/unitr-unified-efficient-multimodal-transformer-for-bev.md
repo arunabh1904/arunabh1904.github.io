@@ -33,7 +33,7 @@ The intra-modal block partitions each modality in its native space: image tokens
 
 A single projection loses something. The camera plane preserves dense semantic neighborhoods; LiDAR space preserves metric proximity and height. UniTR uses both kinds of inter-modal block. For 2D interaction, LiDAR tokens are projected into the first camera view they hit, and mixed local sets exchange information in perspective space. For 3D interaction, image tokens are assigned approximate depth from precomputed virtual grid points and unprojected into the LiDAR coordinate system. The standard stack uses inter2D, inter2D, then inter3D blocks, mixing the two views inside the shared backbone rather than appending a separate late fusion module.
 
-The standard configuration is one intra-modal block followed by inter2D, inter2D, and inter3D blocks; enriched LiDAR tokens are then pooled to BEV. The ordering ablation favors native features → 2D semantic alignment → 3D consolidation over putting 3D fusion first or fusing before intra-modal learning.
+The ordering ablation favors learning native features before 2D semantic alignment and 3D consolidation. Putting 3D fusion first or fusing before intra-modal learning gives slightly worse results.
 
 The matched ablation makes the role of each space visible:
 
