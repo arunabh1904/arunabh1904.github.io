@@ -9,55 +9,49 @@ tags:
 field: 'Motion Forecasting & Planning'
 summary: "2024 – Scaling Motion Forecasting Models with Ensemble Distillation"
 ---
-## 2024 – Ensemble Distillation
 
 **arXiv:** [2404.03843](https://arxiv.org/abs/2404.03843)
 
 **Project:** [Waymo research page](https://waymo.com/research/scaling-motion-forecasting-models-with-ensemble-distillation/)
 
-### Method and reported result
-
-Motion forecasting gets better when you ensemble many strong models, but autonomous vehicles cannot usually afford to run a large ensemble in real time. This paper uses the ensemble as a teacher and trains smaller student models to keep much of the accuracy at lower compute.
-
 ## Summary
 
-> The work is a deployment-minded scaling paper. It treats accuracy, latency, and onboard compute as coupled constraints instead of assuming the best leaderboard model can be used directly.
+> A motion-forecasting ensemble can improve both precision and coverage, but running many models onboard is expensive. This paper separates training compute from serving compute: independently trained Wayformer teachers form a multimodal ensemble, and a smaller student learns from the ensemble distribution as well as the logged ground truth. The hard part is that trajectory modes have no natural correspondence across independently trained teachers, so averaging the first mode from one model with the first mode from another is meaningless. The paper therefore aggregates teacher mixtures with non-maximal suppression (NMS), samples from the resulting distribution, and trains the student with a negative log-likelihood distillation loss plus the ordinary ground-truth loss.
 
 ## Core Insights
 
-The paper first builds large ensembles of optimized single motion-forecasting models and shows that the ensembles improve generalization. It then develops a generalized distillation framework that transfers those ensemble predictions into smaller student models. The task focus is motion forecasting on real-world autonomous-driving data.
+### Preserve multimodality before distilling it
 
-The evidence includes strong Waymo Open Motion Dataset and Argoverse leaderboard performance for the ensembles, followed by student models that retain high performance at a fraction of the compute cost. The key caveat is that distillation quality depends on the teacher distribution: if the ensemble misses rare futures or encodes systematic bias, the student can inherit those limits.
+Each teacher emits a Gaussian mixture over a trajectory, with mixture weights, means, and per-timestep covariance. The ensemble is a weighted sum of the teacher distributions. A temperature `τ` flattens each teacher's mixture weights so lower-probability modes are not discarded too early, and a variance scale controls whether samples use the full Gaussian or just its means.
 
-![Figure 4 from Scaling Motion Forecasting Models with Ensemble Distillation showing metrics versus inference FLOPs](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-paper-figure.png)
-*Fig 1: Shows the deployment tradeoff: larger ensembles improve metrics with more FLOPs, while distilled students aim to preserve much of that gain at lower inference cost. | source: [ensemble distillation paper](https://arxiv.org/abs/2404.03843)*
+![Ensemble distillation's inference-compute tradeoff](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-paper-figure.png)
+*Fig 1: On WOMD, teacher ensembles improve metrics as inference FLOPs grow; distilled students occupy a much cheaper operating region. | source: [Scaling Motion Forecasting Models with Ensemble Distillation, Figure 4](https://arxiv.org/abs/2404.03843)*
 
-![Figure 3 from Scaling Motion Forecasting Models with Ensemble Distillation](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-3.webp)
-*Fig 2: Illustration of the ensemble distillation pipeline. A set of teachers and a NMS that outputs trajectories form the ensemble. | source: [Scaling Motion Forecasting Models with Ensemble Distillation](https://arxiv.org/abs/2404.03843)*
+Because teacher modes do not align, NMS first greedily selects modes that cover the most total likelihood and then refines them with a k-means-like update. This produces a smaller mixture that still represents distinct futures. The same aggregation is used to reduce the student's output when it emits more modes than the benchmark allows.
 
-![Figure 5 from Scaling Motion Forecasting Models with Ensemble Distillation](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-5.webp)
-*Fig 3: Scaling ensemble result using the Argoverse dataset. The Ensemble models are represented in orange, with ensemble size linearly related to the FLOPs. | source: [Scaling Motion Forecasting Models with Ensemble Distillation](https://arxiv.org/abs/2404.03843)*
+### Distillation transfers evidence, not only a softened label
 
+The student minimizes
+`L_total = L_distill + w_gt L_gt`.
+The distillation term is the negative log likelihood of samples drawn from the aggregated teacher distribution. For the WOMD experiments, the authors use a 20-teacher ensemble, `τ=8`, and `w_gt=0.4`. To make label generation affordable, the paper uses an efficient teacher-sampling approximation: it sets the variance scale to zero and uses the mixture means weighted by their probabilities. This zero applies to label generation; it is not a claim that the deployed distribution has zero variance. When teacher and student output counts match, a simpler bijective mode mapping can also supervise the mixture weights.
 
-_while distilled students aim to preserve much of that gain at lower inference cost. source: [ensemble distillation paper](https://arxiv.org/abs/2404.03843)
+![The ensemble-to-student training pipeline](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-3.webp)
+*Fig 2: NMS merges unmatched teacher modes into a compact teacher distribution; the student learns from its samples alongside the ground-truth loss. | source: [Scaling Motion Forecasting Models with Ensemble Distillation, Figure 3](https://arxiv.org/abs/2404.03843)*
 
+The experimental protocol uses Wayformer early fusion with hidden size 256, two encoder layers, eight decoder layers, 64 teacher modes, AdamW, batch size 256, and one million steps. WOMD predicts up to eight agents from one second of history over an eight-second future; Argoverse 2 predicts one focal agent from five seconds of history over six seconds. All reported metrics use six final trajectories, and the WOMD training set duplicates classified U-turn and left/right-turn examples at 5%.
 
-**What to look at:**
-- Ensembles are used as a temporary training tool, not as the final deployed system.
-- Distillation targets the practical gap between leaderboard accuracy and onboard compute.
-- The paper is about scaling under constraints rather than inventing a new motion representation.
+### The student keeps much of the ensemble gain at a different cost point
 
-### Reported evidence
+On the WOMD leaderboard table, the single Wayformer baseline reports minFDE 1.126, minADE 0.545, miss rate 0.123, mAP 0.412, and relative FLOPs 1×. The distilled student reports 1.122/0.546/0.117/0.438 with 1.36× relative FLOPs. The 20-model ensemble reports 1.137/0.549/0.118/0.446 at 20× relative FLOPs. The student therefore improves miss rate and mAP over the single model while approaching the ensemble's coverage at a much smaller serving budget.
 
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Teacher | Large ensemble of optimized forecasters | Raises the accuracy ceiling. |
-| Student | Distilled smaller model | Brings ensemble gains closer to deployment cost. |
-| Benchmarks | WOMD and Argoverse leaderboards | Covers widely used motion-forecasting evaluations. |
+![Ensemble scaling on Argoverse](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-5.webp)
+*Fig 3: Argoverse ensembles and distilled students follow the same quality-versus-relative-FLOPs pattern, with students moving the curve toward deployable compute. | source: [Scaling Motion Forecasting Models with Ensemble Distillation, Figure 5](https://arxiv.org/abs/2404.03843)*
+
+The temperature ablation makes the precision-coverage tradeoff explicit: increasing `τ` spreads probability mass toward lower-ranked trajectories, and `τ=8` is the reported optimum for the soft-mAP/minADE balance. Distillation can therefore improve the student even when it is smaller than the teacher, but it inherits the ensemble's blind spots and depends on expensive teacher inference during training.
 
 ## High-Level Takeaways
 
-- This paper informs whether serving constraints should cap teacher quality or whether a costly forecasting ensemble can be used only during training and distilled into one onboard model. The unit is a scene with multiple teacher trajectory distributions; the student learns both logged futures and the ensemble's softened multimodal predictions.
-- The result establishes a train-serve asymmetry: ensemble diversity can improve a student that cannot afford ensemble inference. The missing comparison matches total teacher-training compute against a single larger teacher and tests which teacher diversity actually transfers. At 10× ensemble size, teacher storage, inference for label generation, and correlated errors dominate. Distillation would fail as the allocation strategy if a directly trained student or single teacher matched leaderboard and calibration metrics at lower end-to-end cost.
-- It showed a practical way to use scaling and ensembles even when the production model must stay small.
-- For driving forecasts, the best model family may be a training-time ensemble plus a deployment-time student.
+- Ensemble distillation creates a train-serve asymmetry: pay for diversity while generating labels, then deploy one student.
+- NMS is part of the method, not a cosmetic post-process. It solves the mode correspondence problem and determines which teacher futures the student can see.
+- In the reported WOMD table, the student moves from 1× to 1.36× relative FLOPs while improving mAP from 0.412 to 0.438; the 20-model ensemble reaches 0.446 at 20×. Those are matched six-mode metrics, so the compute comparison is interpretable.
+- Temperature, variance scaling, and the ground-truth loss control whether the student preserves rare modes or concentrates on common trajectories. A student cannot recover futures absent from the teacher mixture.

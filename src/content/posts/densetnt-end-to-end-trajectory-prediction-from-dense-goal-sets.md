@@ -9,7 +9,6 @@ tags:
 field: 'Motion Forecasting & Planning'
 summary: "2021 – DenseTNT: End-to-End Trajectory Prediction from Dense Goal Sets"
 ---
-## 2021 – DenseTNT
 
 **arXiv:** [2108.09640](https://arxiv.org/abs/2108.09640)
 
@@ -19,69 +18,45 @@ summary: "2021 – DenseTNT: End-to-End Trajectory Prediction from Dense Goal Se
 
 **CVF:** [ICCV 2021 paper](https://openaccess.thecvf.com/content/ICCV2021/html/Gu_DenseTNT_End-to-End_Trajectory_Prediction_From_Dense_Goal_Sets_ICCV_2021_paper.html)
 
-### Method and reported result
-
-DenseTNT is the direct follow-up to goal-based methods like TNT. TNT showed that endpoints are a strong way to represent intent, but sparse anchors and NMS-style goal selection still leave a lot of hand-designed machinery in the loop.
-
 ## Summary
 
-> DenseTNT replaces that machinery with dense goal probability estimation and a learned goal-set predictor. The model scores dense candidate positions on the road, predicts a set of goals from that heatmap, and completes trajectories conditioned on those goals.
+> DenseTNT treats the endpoint as the compact representation of trajectory intent, but removes the sparse hand-designed anchors used by earlier goal-based predictors. It samples a dense set of reachable positions around nearby lanes, estimates a probability for each position, predicts a small set of goals from that heatmap, and completes one trajectory per goal. The interesting part is the supervision problem: a log contains one realized future even though the predictor should cover several plausible futures, so DenseTNT first uses an offline optimizer to turn the dense endpoint distribution into multi-goal pseudo-labels and then trains an online goal-set predictor to imitate them. The deployed model therefore keeps the dense coverage idea without running the optimizer at inference time.
 
 ## Core Insights
 
-DenseTNT starts from the observation that sparse goal anchors are too coarse. One anchor can only generate one goal, and two positions on the same lane can carry different local information. The paper therefore samples dense goal candidates on nearby lanes, uses a dense goal encoder to estimate a probability distribution over those candidates, and feeds the distribution into a multi-head goal-set predictor.
+### Make the endpoint distribution dense before choosing modes
 
-The main training problem is supervision. Each driving log shows only one realized future, while a trajectory predictor should output several plausible futures. DenseTNT solves this by using an offline optimization model to turn the dense goal heatmap into multi-future pseudo-labels. The online goal-set predictor then learns to imitate those pseudo-labels, so inference does not need the optimization loop.
+TNT-style anchors are sparse and often place one candidate per lane. That can miss nearby positions on the same lane that correspond to different speeds or maneuvers, and NMS needs a heatmap-dependent threshold. DenseTNT samples lane candidates within a 50 m Manhattan neighborhood, keeps points within 3 m of a lane centerline or inside a lane boundary, and uses 1 m spacing between adjacent candidates. A sparse VectorNet-style encoder represents lanes and agents; a dense goal encoder combines each candidate with that context to produce a categorical goal distribution.
 
-![Figure 2 from DenseTNT showing sparse context encoding, dense goal probability estimation, goal-set prediction, and trajectory completion](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-paper-figure.png)
-*Fig 1: Shows the dense-goal pipeline: vectorized context features become a goal heatmap, a learned goal-set predictor selects goals, and a trajectory decoder completes the futures. | source: [DenseTNT paper](https://arxiv.org/abs/2108.09640)*
+![DenseTNT's dense-goal architecture, from context encoding through goal-set prediction](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-paper-figure.png)
+*Fig 1: DenseTNT scores dense endpoint candidates, predicts a compact goal set, and completes a trajectory for each selected goal. | source: [DenseTNT, Figure 2](https://arxiv.org/abs/2108.09640)*
 
-![Figure 5 from DenseTNT: End-to-End Trajectory Prediction from Dense Goal Sets](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-source-figure-5.webp)
-*Fig 2: Qualitative results of DenseTNT (online). Dense predicted heatmaps are shown in red, predicted goal sets and corresponding trajectories are shown in orange, ground truth trajectories are shown in green. | source: [DenseTNT: End-to-End Trajectory Prediction from Dense Goal Sets](https://arxiv.org/abs/2108.09640)*
+### Use optimization only to create the missing multimodal labels
 
-![Figure 3 from DenseTNT: End-to-End Trajectory Prediction from Dense Goal Sets](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-source-figure-3.webp)
-*Fig 3: Two-stage training of goal set predictor. In the first stage, we use the ground truth goals to train all the modules except for the goal set predictor. | source: [DenseTNT: End-to-End Trajectory Prediction from Dense Goal Sets](https://arxiv.org/abs/2108.09640)*
+The offline model chooses a goal set by minimizing the expected endpoint error under the heatmap. Its hill-climbing search can find several high-probability, well-separated goals, but it is too expensive and too brittle to make the inference path. The online model replaces that search with multiple goal-set heads. During training, the authors perturb predicted goals 100 times, retain the best candidates, and train the set predictor against those pseudo-labels. The trajectory decoder is a two-layer MLP conditioned on a goal; it uses the ground-truth goal during training and a smooth L1 loss over the full future. Training is staged: 16 epochs train the lane, heatmap, and completion modules, then 6 epochs train the goal-set predictor from the offline labels.
 
+![DenseTNT's two-stage training diagram](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-source-figure-3.webp)
+*Fig 2: The first stage learns the context, dense goal, and completion modules; the second stage learns to replace offline goal optimization with a predictor. | source: [DenseTNT, Figure 3](https://arxiv.org/abs/2108.09640)*
 
-**What to look at:**
-- Dense goal scoring removes dependence on sparse predefined anchors.
-- Goal-set prediction replaces NMS with a learned selection module.
-- Offline optimization supplies multi-future pseudo-labels that are missing from ordinary logged data.
-- The online model runs without the optimization loop, but its quality depends on the heatmap and pseudo-label objective.
+### The result is a coverage tradeoff, not a uniform distance win
 
-### Reported evidence
+On the Argoverse validation split, TNT reports minADE/minFDE/miss rate of 0.73/1.29/9.3%. DenseTNT with 100 ms of optimization reaches 0.80/1.27/7.0%, while optimizing the minFDE objective reaches 0.73/1.05/9.8%. The online goal-set predictor reaches 0.82/1.37/7.0%. The pattern is revealing: the learned selector preserves coverage at the same 7.0% miss rate as the default optimizer, while the objective that improves closest-endpoint error can sacrifice coverage.
 
-| Component | Detail | Why it matters |
-| --------- | ------ | -------------- |
-| Context encoder | VectorNet-style sparse map and agent encoder | Preserves lane and agent structure. |
-| Dense goal encoder | Scores dense candidate locations on nearby lanes | Captures fine-grained endpoint choices. |
-| Offline model | Optimizes a goal set from the heatmap | Creates multi-future pseudo-labels from single-future logs. |
-| Online model | Multi-head goal-set predictor plus trajectory completion | Avoids optimization at inference time. |
+| setting | minADE | minFDE | miss rate |
+| --- | ---: | ---: | ---: |
+| TNT | 0.73 | 1.29 | 9.3% |
+| DenseTNT, 100 ms optimization | 0.80 | 1.27 | 7.0% |
+| DenseTNT, minFDE objective | 0.73 | 1.05 | 9.8% |
+| DenseTNT, online goal-set predictor | 0.82 | 1.37 | 7.0% |
 
-**Compact result slice:**
+The endpoint resolution is also a real compute knob. Moving from 3 m to 1 m sampling changes minFDE/MR from 1.42/12.5% to 1.27/7.0%; 0.5 m gives the same 1.27/7.0%. Increasing optimizer time from 20 ms to 100 ms changes 1.29/7.6% to 1.27/7.0%, with only small gains beyond that. On the Waymo challenge, the online system reports mADE 1.0387, mFDE 1.5514, miss rate 0.1779, and mAP 0.3281.
 
-The Argoverse slice shows the tradeoff: DenseTNT improves miss-rate coverage, even when the online goal-set predictor does not win every raw distance metric.
-
-| Setting | minADE | minFDE | Miss rate |
-| ------- | ------ | ------ | --------- |
-| TNT on Argoverse validation | 0.73 | 1.29 | 9.3% |
-| DenseTNT with 100 ms optimization | 0.80 | 1.27 | 7.0% |
-| DenseTNT with minFDE objective | 0.73 | 1.05 | 9.8% |
-| DenseTNT online goal-set predictor | 0.82 | 1.37 | 7.0% |
-
-**Waymo challenge slice:**
-
-Waymo used mAP as the official ranking metric, so this table is about calibrated multimodal prediction rather than only the closest trajectory error.
-
-| Method | mADE | mFDE | Miss rate | mAP |
-| ------ | ---- | ---- | --------- | --- |
-| TVN | 0.7558 | 1.5859 | 0.2032 | 0.3168 |
-| SceneTransformer | 0.6117 | 1.2116 | 0.1564 | 0.2788 |
-| DenseTNT | 1.0387 | 1.5514 | 0.1779 | 0.3281 |
+![DenseTNT's qualitative online predictions](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-source-figure-5.webp)
+*Fig 3: Dense heatmaps support several endpoint modes; the selected goals and completed trajectories cover those modes while the green path is the observed future. | source: [DenseTNT, Figure 5](https://arxiv.org/abs/2108.09640)*
 
 ## High-Level Takeaways
 
-- DenseTNT informs whether multimodal forecasting should rely on hand-designed sparse goal anchors or learn a dense distribution over reachable endpoints. The training unit is one agent history paired with a future trajectory; endpoint probabilities define candidate modes before target-conditioned trajectories are decoded and scored.
-- The method removes anchor engineering, but dense goal coverage makes map resolution and candidate pruning part of the compute budget. A decisive ablation would match proposal count and decoder capacity across sparse anchors, dense goals, and direct trajectory generation. At 10× scene density, goal scoring and duplicate modes can dominate while rare maneuvers remain underrepresented. DenseTNT's claim would fail if adaptive sparse proposals matched minFDE and miss rate with fewer candidates and better calibration.
-- DenseTNT pushed goal-conditioned forecasting away from sparse anchor heuristics and toward dense probability maps plus learned set prediction.
-- TNT made endpoints the intent variable; DenseTNT made endpoint selection dense, learned, and closer to end-to-end.
+- DenseTNT is useful when endpoint uncertainty dominates trajectory uncertainty: spend capacity on a dense, map-aware endpoint distribution and decode paths conditionally.
+- The offline optimizer is a label generator, not the deployed predictor. The online model matches its 7.0% Argoverse miss rate in the reported setting, but its minADE/minFDE are worse than the optimized selector.
+- Candidate resolution has diminishing returns: 1 m sampling materially improves coverage over 3 m, while 0.5 m adds no reported gain. Map errors and out-of-lane behavior remain outside this endpoint construction.
+- DenseTNT turns goal selection into a learned set-prediction problem, but its quality still depends on dense candidate coverage and the pseudo-label objective chosen for the optimizer.
