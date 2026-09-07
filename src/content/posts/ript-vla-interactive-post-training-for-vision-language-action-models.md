@@ -11,8 +11,6 @@ field: 'Robot Post-Training & Evaluation'
 summary: "2025 – RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models"
 ---
 
-## 2025 – RIPT-VLA: Interactive Post-Training for Vision-Language-Action Models
-
 **arXiv:** [2505.17016](https://arxiv.org/abs/2505.17016)
 
 **Project:** [RIPT-VLA](https://ariostgx.github.io/ript_vla/)
@@ -24,7 +22,7 @@ summary: "2025 – RIPT-VLA: Interactive Post-Training for Vision-Language-Actio
 ## Core Insights
 
 ![RIPT-VLA training progression from broad pretraining and supervised fine-tuning to interactive reinforcement post-training](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-paper-figure.png)
-*Fig 1: The additional stage is interactive post-training, where the SFT policy generates the states it must learn to handle instead of only replaying demonstration states. | source: [RIPT-VLA](https://arxiv.org/abs/2505.17016)*
+*Fig 1: The additional stage is interactive post-training, where the SFT policy generates the states it must learn to handle instead of only replaying demonstration states. | source: [RIPT-VLA, Figure 1](https://arxiv.org/abs/2505.17016)*
 
 ### A group of rollouts turns a binary outcome into relative credit
 

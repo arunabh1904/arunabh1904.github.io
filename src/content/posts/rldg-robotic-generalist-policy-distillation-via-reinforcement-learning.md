@@ -11,8 +11,6 @@ field: 'Robot Post-Training & Evaluation'
 summary: "2024 – RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning"
 ---
 
-## 2024 – RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning
-
 **arXiv:** [2412.09858](https://arxiv.org/abs/2412.09858)
 
 **Project:** [generalist-distillation.github.io](https://generalist-distillation.github.io/)
@@ -24,11 +22,11 @@ summary: "2024 – RLDG: Robotic Generalist Policy Distillation via Reinforcemen
 ## Core Insights
 
 ![RLDG workflow training specialist reinforcement-learning policies collecting their rollouts and distilling them into a generalist robot policy](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-paper-figure.png)
-*Fig 1: The specialist and generalist have different jobs: RL optimizes a narrow reward, while supervised distillation transfers the resulting state-action distribution into one policy that can handle several tasks. | source: [RLDG](https://arxiv.org/abs/2412.09858)*
+*Fig 1: The specialist and generalist have different jobs: RL optimizes a narrow reward, while supervised distillation transfers the resulting state-action distribution into one policy that can handle several tasks. | source: [RLDG, Figure 1](https://arxiv.org/abs/2412.09858)*
 
 ### The data boundary is the method
 
-RLDG first trains separate vision-based policies with HIL-SERL, an intervention-enabled RL system built on RLPD. After convergence, each specialist is rolled out to construct a balanced dataset. Connector Insertion uses separate USB, Ethernet, and VGA specialists, with equal episodes per connector; the resulting generalist is tested zero-shot on Type-C, HDMI, DisplayPort, and 3-pin XLR. For FMB Assembly, RL is used only for the precision-critical insertion segment and human demonstrations provide grasping and transport data. Ordinary supervised learning then minimizes the action log-likelihood on the combined dataset.
+RLDG first trains separate vision-based policies with HIL-SERL, an intervention-enabled RL system built on RLPD. After convergence, each specialist is rolled out to construct a balanced dataset. Connector Insertion uses separate USB, Ethernet, and VGA specialists, with equal episodes per connector; the resulting generalist is tested zero-shot on Type-C, HDMI, DisplayPort, and 3-pin XLR. For FMB Assembly, RL is used only for the precision-critical insertion segment and human demonstrations provide grasping and transport data. Ordinary supervised learning then minimizes the negative action log-likelihood (equivalently, cross-entropy for OpenVLA's discretized actions) on the combined dataset.
 
 This boundary lets the reward be task-specific without making the final policy task-specific. The setup is a Franka Panda with a wrist-mounted RealSense D405. A 1 kHz impedance controller executes 6D end-effector delta-pose commands; data collection, RL, and Octo run at 10 Hz, while OpenVLA runs at 4 Hz. OpenVLA is the 7B model pretrained on 970k Open X-Embodiment demonstrations and discretizes each action dimension into 256 bins. Octo uses a continuous diffusion head. Both generalists are fine-tuned from pretrained checkpoints using only wrist-camera images, so the comparison tests the source of the training data under a matched observation interface.
 

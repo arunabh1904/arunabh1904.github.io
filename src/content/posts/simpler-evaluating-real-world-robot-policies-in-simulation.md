@@ -11,8 +11,6 @@ field: 'Robot Post-Training & Evaluation'
 summary: "2024 – SIMPLER: Evaluating Real-World Robot Manipulation Policies in Simulation"
 ---
 
-## 2024 – SIMPLER: Evaluating Real-World Robot Manipulation Policies in Simulation
-
 **arXiv:** [2405.05941](https://arxiv.org/abs/2405.05941)
 
 **Project:** [simpler-env.github.io](https://simpler-env.github.io/)
@@ -24,7 +22,7 @@ summary: "2024 – SIMPLER: Evaluating Real-World Robot Manipulation Policies in
 ## Core Insights
 
 ![SIMPLER comparison of expensive real-robot evaluation with reproducible simulated evaluation matched to the same task](/assets/images/simpler-evaluating-real-world-robot-policies-in-simulation-paper-figure.png)
-*Fig 1: The benchmark proposition is ranking fidelity: a useful simulated evaluation should select the better real policy even when its images and physics are not a perfect digital twin. | source: [SIMPLER](https://arxiv.org/abs/2405.05941)*
+*Fig 1: The benchmark proposition is ranking fidelity: a useful simulated evaluation should select the better real policy even when its images and physics are not a perfect digital twin. | source: [SIMPLER, Figure 1](https://arxiv.org/abs/2405.05941)*
 
 ### A useful simulator preserves decisions, not pixels
 
@@ -46,7 +44,7 @@ The visual pipeline then matches fixed-camera observations by green-screening re
 
 ### The paired result is strong, but its scope is visible
 
-On Google Robot tasks, the Visual Matching plots in the paper report MMRV/Pearson pairs of 0.031/0.976 for Pick Coke Can, 0.111/0.855 for Move Near, 0.055/0.915 for Open/Close Drawer, and 0.000/0.969 for Open Drawer and Place Apple. On the separate WidowX plus BridgeData V2 setup, the average is MMRV 0.014 and $r=0.890$. These are comparisons among six open-source policy checkpoints, including RT-1 checkpoints at different training stages, RT-1-X, RT-2-X, and Octo variants; Octo simulation scores are averaged over three random seeds and Google Robot scores over four arm/gripper color variants.
+On Google Robot tasks, the Visual Matching plots in the paper report MMRV/Pearson pairs of 0.031/0.976 for Pick Coke Can, 0.111/0.855 for Move Near, 0.055/0.915 for Open/Close Drawer, and 0.000/0.969 for Open Drawer and Place Apple. On the separate WidowX plus BridgeData V2 setup, the average is MMRV 0.014 and $r=0.890$. These are comparisons among six evaluated policy checkpoints, including RT-1 checkpoints at different training stages, RT-1-X, RT-2-X, and Octo variants; Octo simulation scores are averaged over three random seeds and Google Robot scores over four arm/gripper color variants.
 
 SIMPLER also reproduces within-policy sensitivity. Camera pose and table texture changes affect both real and simulated policies more than lighting or distractors in the reported shifts. A real arm-texture test confirms a trend first seen in simulation: Octo-Base is more sensitive to the arm appearance than RT-1-X. The result is a useful screening layer, not a proof that a policy is safe on hardware. The paper’s environments focus on rigid-object manipulation, green-screening assumes fixed cameras, and asset construction still includes manual curation.
 

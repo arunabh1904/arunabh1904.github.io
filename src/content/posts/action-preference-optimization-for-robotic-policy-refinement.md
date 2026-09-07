@@ -11,8 +11,6 @@ field: 'Robot Post-Training & Evaluation'
 summary: "2025 – Human-Assisted Robotic Policy Refinement via Action Preference Optimization"
 ---
 
-## 2025 – Human-Assisted Robotic Policy Refinement via Action Preference Optimization
-
 **arXiv:** [2506.07127](https://arxiv.org/abs/2506.07127)
 
 **Project:** [Action Preference Optimization](https://gewu-lab.github.io/action_preference_optimization/)
@@ -24,7 +22,7 @@ summary: "2025 – Human-Assisted Robotic Policy Refinement via Action Preferenc
 ## Core Insights
 
 ![Action Preference Optimization pipeline from human-assisted deployment and interventions to adaptively weighted VLA fine-tuning](/assets/images/action-preference-optimization-for-robotic-policy-refinement-paper-figure.png)
-*Fig 1: APO closes the deployment loop: intervention makes the task safe enough to collect data, and the labels plus decoded action errors determine the next update. | source: [Action Preference Optimization](https://arxiv.org/abs/2506.07127)*
+*Fig 1: APO closes the deployment loop: the operator corrects a failed or risky autonomous attempt, and the labels plus decoded action errors determine the next update. | source: [Action Preference Optimization, Figure 1](https://arxiv.org/abs/2506.07127)*
 
 ### A takeover is evidence about a local action, not a clean preference pair
 
@@ -43,7 +41,7 @@ This is the paper’s most VLA-specific idea. The preference label says which si
 
 ### The controlled results separate preference learning from generic replay
 
-The main RoboMimic comparison fine-tunes OpenVLA from 300 expert demonstrations, collects 50 interaction trajectories per task, and evaluates 50 trials under three unseen seeds. APO reaches 60%, 54%, 46%, and 32% on Coffee_D0, StackThree_D0, ThreePieceAssembly_D0, and Square_D0, respectively, for a 48.0% mean. The base policy averages 40.5%; KTO averages 43.5%; and trajectory-preference TPO averages 41.5%. Dagger and weighted behavior cloning do not improve the mean. These numbers support the claim that the intervention labels and adaptive weighting together help; they do not show that any preference method is universally superior.
+The main RoboMimic comparison fine-tunes OpenVLA from 300 expert demonstrations, collects 50 interaction trajectories per task, and evaluates 50 trials per task under each of three unseen seeds, reporting the average success rate. APO reaches 60%, 54%, 46%, and 32% on Coffee_D0, StackThree_D0, ThreePieceAssembly_D0, and Square_D0, respectively, for a 48.0% mean. The base policy averages 40.5%; KTO averages 43.5%; and trajectory-preference TPO averages 41.5%. Dagger and weighted behavior cloning do not improve the mean. These numbers support the claim that the intervention labels and adaptive weighting together help; they do not show that any preference method is universally superior.
 
 The disruption experiment is a useful boundary check. With only 20 interaction trajectories plus 20 original expert demonstrations, APO reaches a 28.0% mean across randomized stick position, gray background, and wooden-block texture, versus 21.3% for the base policy. On the original tasks after this disruption update, APO averages 45.3% versus 39.3% for the base, while ordinary behavior-cloning variants suffer larger forgetting. In the lifelong experiment the model is updated every 20 interaction rollouts; the curves in Figure 2 show success rising at the same time that the operator intervenes less often.
 

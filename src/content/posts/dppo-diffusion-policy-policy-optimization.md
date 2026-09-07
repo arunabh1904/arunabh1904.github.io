@@ -11,8 +11,6 @@ field: 'Robot Post-Training & Evaluation'
 summary: "2024 – DPPO: Diffusion Policy Policy Optimization"
 ---
 
-## 2024 – DPPO: Diffusion Policy Policy Optimization
-
 **arXiv:** [2409.00588](https://arxiv.org/abs/2409.00588)
 
 **Project:** [diffusion-ppo.github.io](https://diffusion-ppo.github.io/)
@@ -24,11 +22,11 @@ summary: "2024 – DPPO: Diffusion Policy Policy Optimization"
 ## Core Insights
 
 ![Diffusion Policy MDP unrolling denoising states inside each environment action step for policy-gradient optimization](/assets/images/dppo-diffusion-policy-policy-optimization-paper-figure.png)
-*Fig 1: The reduction that makes the update tractable: each denoising transition has a Gaussian likelihood, while environment reward is paid only after the final action is executed. | source: [DPPO](https://arxiv.org/abs/2409.00588)*
+*Fig 1: The reduction that makes the update tractable: each denoising transition has a Gaussian likelihood, while environment reward is paid only after the final action is executed. | source: [DPPO, Figure 3](https://arxiv.org/abs/2409.00588)*
 
 ### The policy gradient follows denoising time, not just robot time
 
-A Diffusion Policy first samples noise and repeatedly denoises an action chunk. The robot then executes only part of that chunk before observing the next state. DPPO keeps both clocks explicit. For environment state $s_t$, the inner chain contains $a_t^K, a_t^{K-1}, \ldots, a_t^0$; the denoising transition from $a_t^{k+1}$ to $a_t^k$ is Gaussian, so its log-likelihood can be evaluated exactly. Only the final $a_t^0$ advances the physical environment and receives its reward. The resulting trajectory is therefore a chain of inner denoising MDPs joined by environment transitions.
+A Diffusion Policy first samples noise and repeatedly denoises an action chunk. The robot then executes only part of that chunk before observing the next state. DPPO keeps both clocks explicit. For environment state $s_t$, the inner chain contains $a_t^K, a_t^{K-1}, \ldots, a_t^0$; the denoising transition from $a_t^{k+1}$ to $a_t^k$ is Gaussian, so its log-likelihood can be evaluated exactly. The final action marginal $p_\theta(a_t^0\mid s_t)$ is not available as one tractable density; DPPO instead optimizes the explicit Gaussian transitions along the denoising path. Only the final $a_t^0$ advances the physical environment and receives its reward. The resulting trajectory is therefore a chain of inner denoising MDPs joined by environment transitions.
 
 PPO is applied to those inner transitions. An environment discount handles future robot rewards, while a denoising discount downweights earlier, noisier denoising steps. The value estimator depends on the environment state rather than also conditioning on the partially denoised action; the authors report that this choice is more stable on difficult tasks. That detail matters: the method is not “PPO on the final action” with a diffusion wrapper. Its optimization unit is the stochastic path that produced the final action chunk.
 
