@@ -15,24 +15,35 @@ summary: "2025 – ReCogDrive: A Reinforced Cognitive Framework for End-to-End A
 
 ## Summary
 
-> ReCogDrive separates driving cognition from continuous action generation. An autoregressive VLM learns driving priors through a three-stage data pipeline—generation, refinement, and quality control—then conditions a diffusion planner that produces continuous trajectories. A Diffusion Group Relative Policy Optimization stage targets safety and comfort. The paper reports state-of-the-art results on NAVSIM and Bench2Drive, plus qualitative DriveBench understanding results; the abstract does not provide the underlying scores, planning latency, or a component-level ablation.
+> ReCogDrive separates driving cognition from the action interface. InternVL3 is trained on a twelve-dataset, quality-controlled mixture of perception, dynamic-understanding, planning, and reasoning examples; its hidden states condition a diffusion planner that emits continuous trajectories. Diffusion Group Relative Policy Optimization (DiffGRPO) then scores complete denoising trajectories in NAVSIM and updates the planner with group-relative advantages. On NAVSIM navtest, the camera-only model reports 90.8 PDMS, compared with 88.1 for camera-and-LiDAR DiffusionDrive and 88.3 for WoTE; on Bench2Drive it reports a 71.36 driving score.
 
 ## Core Insights
 
-The design responds to a language-action mismatch: trajectory coordinates represented as text can be invalid, infeasible, or slow to decode. ReCogDrive retains an autoregressive model for driving understanding, but transfers its learned priors into a diffusion trajectory planner instead of asking the language model to serialize controls itself. The staged data pipeline is intended to give the VLM a more structured cognitive representation before that handoff.
+### Put cognition and coordinates on different sides of the interface
 
+The paper treats language as a useful place to represent driving concepts, but a poor place to serialize every waypoint. ReCogDrive uses InternVL3—InternViT-300M plus a Qwen2.5 language model with dynamic image resolution—to interpret the scene. A hierarchical data pipeline first generates examples at four cognitive levels, refines and augments open driving data, then applies automated quality control. The resulting VLM hidden states are passed to a diffusion transformer rather than decoded as a long string of floating-point numbers.
 
-![Figure 4 from ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving](/assets/images/recogdrive-a-reinforced-cognitive-framework-for-end-to-end-autonomous-driving-source-figure-4.webp)
-*Fig 1: Imitation learning fits a diffusion trajectory to ground truth, while reinforcement learning samples multiple plans, scores them in NAVSIM, and uses group-relative advantages to update the planner. | source: [ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving](https://arxiv.org/abs/2506.08052)*
+The diffusion planner uses self-attention for relations among waypoints and cross-attention to the VLM states. Historical trajectories are concatenated as context, ego state enters through adaptive layer normalization, and pooled semantic features give the planner a compact scene-level signal. The visual summary below is useful because it shows the handoff as two coupled paths: the language model supplies driving context, while the denoiser repeatedly turns that context into a physically continuous plan.
 
 ![Figure 1 from ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving](/assets/images/recogdrive-a-reinforced-cognitive-framework-for-end-to-end-autonomous-driving-source-figure-1.webp)
-*Fig 2: Overview of ReCogDrive. We present ReCogDrive, an end-to-end autonomous driving system, which possesses rich driving priors and generates continuous, stable trajectories via a diffusion denoising process. | source: [ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving](https://arxiv.org/abs/2506.08052)*
+*Fig 1: Overview of ReCogDrive, with driving priors entering a diffusion denoising process that produces continuous trajectories. | source: [ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving, Figure 1](https://arxiv.org/abs/2506.08052)*
 
+### Treat denoising as the policy, not just as a decoder
 
-The model changes three major variables at once—data curation, action interface, and reinforcement objective. The abstract does not specify the trajectory diffusion parameterization, the rewards used by DiffGRPO, the relative loss weights, or a matched continuous non-diffusion planner. A causal result would need to freeze the data and VLM, then independently swap the action decoder and the reinforcement stage while measuring safety, comfort, and wall-clock cost.
+Training is staged around that interface. The VLM is frozen while the planner learns by DDPM imitation for 200 epochs; a ten-epoch DiffGRPO stage then samples trajectories and evaluates them in the NAVSIM simulator; the VLM receives three epochs of supervised fine-tuning. DiffGRPO regards the whole denoising chain as an internal Markov decision process. The reward is NAVSIM's PDMS, which combines collision, drivable-area compliance, time-to-collision, comfort, and progress terms. Group-standardized advantages compare sampled plans for the same scene, while a behavior-cloning term keeps the diffusion policy anchored to demonstrated trajectories. A discount of 0.6 weights later denoising decisions more heavily, since early steps still contain high noise.
+
+![Figure 4 from ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving](/assets/images/recogdrive-a-reinforced-cognitive-framework-for-end-to-end-autonomous-driving-source-figure-4.webp)
+*Fig 2: Imitation learning fits trajectories to demonstrations, whereas DiffGRPO samples multiple denoising trajectories, scores them in the simulator, and learns from their relative quality. | source: [ReCogDrive: A Reinforced Cognitive Framework for End-to-End Autonomous Driving, Figure 4](https://arxiv.org/abs/2506.08052)*
+
+That design explains why the paper's ablation is more informative than the headline comparison. Starting from a trajectory-only model, driving pretraining raises PDMS from 82.4 to 84.1, the diffusion planner raises it to 86.5, and DiffGRPO raises it to 90.8. The final camera-only NAVSIM row is NC 97.9, DAC 97.3, TTC 94.9, comfort 100, EP 87.3, and PDMS 90.8. The planner also generates a trajectory in about 0.075 seconds versus 0.5839 seconds for the text baseline, a reported 7.8× speedup.
+
+### The result is tied to the evaluation contract
+
+The gains are measured on NAVSIM's 1,192-scene navtrain/136-scene navtest setup and on 220 short CARLA routes in Bench2Drive. ReCogDrive reaches 45.45% scenario success and a 71.36 driving score on Bench2Drive, but the two benchmarks probe different things. DriveBench VQA is also strong (56.71 average GPT score), while adding chain-of-thought does not improve NAVSIM (90.7 versus 90.8 without it). That last result is a useful boundary: the paper's cognition is carried mainly by the trained representations and planner interface, not by requiring a visible verbal chain at inference.
 
 ## High-Level Takeaways
 
-- ReCogDrive uses language-like cognition to condition a continuous diffusion planner, explicitly splitting understanding from the physical action interface.
-- Its reported NAVSIM and Bench2Drive results make the hybrid plausible, but the abstract does not identify whether data curation, diffusion, or DiffGRPO drives the outcome.
-- The architecture earns its complexity only if a matched continuous decoder and equal-budget RL study cannot recover the same safety and comfort improvements.
+- ReCogDrive makes the VLM a source of driving priors and lets a diffusion model own the continuous action geometry.
+- The strongest ablation jump comes from DiffGRPO on simulator-scored trajectories, after the data pipeline and diffusion interface are already in place.
+- Its 0.075-second trajectory generation and camera-only 90.8 PDMS are reported under NAVSIM's closed-loop protocol; the CARLA result is a separate short-route test.
+- The optional chain-of-thought result is revealing: richer textual reasoning is not automatically the missing ingredient when the latent driving representation and action interface already carry the useful information.
