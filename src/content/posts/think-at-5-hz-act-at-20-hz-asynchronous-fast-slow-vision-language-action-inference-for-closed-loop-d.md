@@ -16,51 +16,43 @@ topics:
 summary: '2026 – Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-Language-Action Inference for Closed-Loop Driving'
 ---
 
-## 2026 – Think at 5 Hz, Act at 20 Hz
-
 **arXiv:** [2607.15621](https://arxiv.org/abs/2607.15621)
 
 ## Summary
 
-> The usual way to fit a slow vision-language driving policy into a fast control loop is to run it less often and replay its last action. This paper instead separates the two clocks: a frozen 7B LMDrive backbone updates its scene representation at 5 Hz, while a trainable 337M action expert reads that representation and the current observation to predict fresh waypoints at 20 Hz.
+> This paper separates the slow part of a driving VLA from the part that must react every control tick. A frozen 7B LMDrive backbone updates a per-layer key-value cache at 5 Hz, while a trainable 337M action expert reads that cache, the current frame, and ego state at 20 Hz to predict fresh waypoints. Randomized cache staleness during training makes the split usable in closed-loop CARLA, where control freshness raises route completion from 82.1% to 94.0% in the matched expert ablation.
 
 ## Core Insights
 
-The strongest result is not the composite driving score. Running the same expert at 10 Hz and 20 Hz leaves that score within experimental spread, but fresh 20 Hz control raises route completion from 82.1% to 94.0%, cuts route deviations from 11.3 to 4.3 per kilometer, and reduces red-light violations from 10.4 to 6.9. The architecture makes that comparison feasible because its per-tick model cost stays near 32 ms instead of growing with visual history.
+### The cache turns a slow backbone into a standing scene representation
 
-The slow path turns instruction text and visual history into a persistent per-layer key-value cache. Every four control ticks, it appends four tokens for the latest frame. At every tick, the action expert contributes ten tokens—current-frame features, ego state, previous predictions, and learned waypoint queries—which cross-attend to the frozen cache at all 32 layers before a small head regresses five waypoints. The split gives language and history a slower update rate without forcing the control path to consume a stale action.
+LMDrive's 7B backbone is valuable for instruction and history, but recomputing its full visual sequence takes 89–169 ms per step as history grows. That does not fit a 50 ms control tick. The paper freezes the perception encoder, Q-Former, LLaMA-7B backbone, and original action head, then appends four visual tokens per frame to a per-layer cache every four ticks. A 337M, 32-layer expert with width 512 attends into the cached keys and values and emits five waypoints at every tick. Its ten input tokens combine the current frame, a state token containing previous predictions and ego state, and five learned waypoint queries.
 
-![Fast-slow driving architecture with a frozen 5 Hz backbone, persistent per-layer cache, and 20 Hz action expert](/assets/images/fast-slow-vla-architecture.png)
-*Fig 1: The slow backbone updates a cached scene representation every four ticks; the small expert reads that cache and current state every tick. | source: [paper](https://arxiv.org/abs/2607.15621)*
+The design is a scheduling decision with a modeling consequence. The backbone never attends to expert tokens, so its cache is identical whether or not the expert runs. The fast path can therefore be repeated without rebuilding the slow representation. Every 0.2 seconds, an incremental four-token append refreshes the cache; instruction changes, notices, episode boundaries, or the window cap trigger a rebuild.
 
-![Figure 5 from Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-Language-Action Inference for Closed-Loop Driving](/assets/images/think-at-5-hz-act-at-20-hz-asynchronous-fast-slow-vision-language-action-inference-for-closed-loop-d-source-figure-5.webp)
-*Fig 2: Left: per-step model latency versus history length. The legacy path re-encodes the full history each step and exceeds the 50 ms tick budget at every history length, while our per-tick cost stays flat at 32 ms. | source: [Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-Language-Action Inference for Closed-Loop Driving](https://arxiv.org/abs/2607.15621)*
+![Per-step model latency versus history length](/assets/images/think-at-5-hz-act-at-20-hz-asynchronous-fast-slow-vision-language-action-inference-for-closed-loop-d-source-figure-5.webp)
+*Fig 1: Full recomputation grows from 59 ms at 10 frames to 169 ms at 100 frames and crosses the 50 ms tick budget, while the cached path stays nearly flat around 32 ms of model compute. | source: [Think at 5 Hz, Act at 20 Hz, Figure 5](https://arxiv.org/abs/2607.15621)*
 
-![Figure 3 from Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-Language-Action Inference for Closed-Loop Driving](/assets/images/think-at-5-hz-act-at-20-hz-asynchronous-fast-slow-vision-language-action-inference-for-closed-loop-d-source-figure-3.webp)
-*Fig 3: The four evaluation towns. The expert is trained on short routes from town05 only; towns 01, 02, and 03 are never seen during expert training, and town03 is evaluated on the long-route tier. | source: [Think at 5 Hz, Act at 20 Hz: Asynchronous Fast-Slow Vision-Language-Action Inference for Closed-Loop Driving](https://arxiv.org/abs/2607.15621)*
+### Training the expert on staleness is part of the method
 
+At deployment the cache can lag the current world by up to three ticks. The expert is trained with a sampled delay, masking the backbone prefix so that the current frame sees an older cache. Its state token also receives noisy or dropped previous waypoints, which makes it learn to recover from its own imperfect history instead of relying on teacher-forced predictions alone.
 
-Asynchrony changes the training distribution. At deployment, the cache may lag the current frame by zero to three ticks, so training randomly truncates the visible prefix by a sampled delay. Previous waypoints also receive noise and dropout. This randomized-staleness expert reaches 0.031 m validation waypoint L1 under a synchronous test, compared with 0.037 m for the same expert trained only at zero delay and 0.123 m for the frozen backbone head. The gain is therefore partly robustness regularization, not only tolerance of an old cache.
+That distribution match matters even in the easier synchronous test. On held-out weather frames, the frozen backbone head reaches 0.123 m validation waypoint L1. The expert trained with randomized staleness reaches 0.031 m, while an otherwise matched expert trained only with zero delay reaches 0.037 m. The 4 mm difference is not evidence that stale context is harmless; it shows that delay augmentation acts as a useful regularizer before asynchronous execution is turned on. A cache-equivalence test also finds less than 4 mm waypoint movement when monolithic prefill is replaced by incremental appends.
 
-Training is deliberately narrow: 27,485 LMDrive instruction clips from CARLA town05, up to 40 frames each, five epochs on one 48 GB GPU. The 7B backbone, perception encoder, Q-Former, and original heads remain frozen; only the 337M expert is optimized. The open-loop comparison is not perfectly matched because the expert receives teacher-forced previous waypoints while the backbone head does not. Closed-loop evaluation removes that privileged signal because the expert must consume its own predictions.
+The open-loop comparison needs one qualification: the expert sees teacher-forced previous waypoints and a state token that the frozen backbone head does not use. The closed-loop experiment is therefore the decisive test for whether the learned expert helps after that privileged signal disappears.
 
-| Comparison | Main result | What it isolates |
-| --- | --- | --- |
-| Frozen head vs randomized-staleness expert | Waypoint L1: 0.123 m → 0.031 m | A small cache-reading action head can replace repeated 7B action inference, though inputs are not fully matched. |
-| LMDrive 10 Hz vs fast-slow 20 Hz | Route completion: 37.0% → 94.0% | Combined effect of the new expert and fresh control. |
-| Same expert at 10 Hz vs 20 Hz | Route completion: 82.1% → 94.0% | Control freshness, holding the learned expert fixed. |
-| Unseen town01 / town02 | Completion: 84.3% / 94.4% vs baseline 40.5% / 30.7% | The expert transfers across short-route layouts seen only by the frozen representation stack. |
+### Fresh control improves completion, but exposes a safety tradeoff
 
-_Full recomputation exceeds the 50 ms control budget even at short histories, while cached per-tick inference remains nearly flat around 32 ms. Figure 5 (left) in the source: [paper](https://arxiv.org/abs/2607.15621)_
-_Full recomputation exceeds the 50 ms control budget even at short histories, while cached per-tick inference remains nearly flat around 32 ms. source: Figure 5 (left) in the [paper](https://arxiv.org/abs/2607.15621)._
+On 32 LangAuto-Short routes in CARLA Town05, the public LMDrive baseline runs at 10 Hz with replayed commands and scores 28.8 driving score and 37.0% route completion. The same fast-slow expert run at the baseline's 10 Hz cadence reaches 34.0 driving score and 82.1% completion. At 20 Hz it reaches 32.9 driving score and 94.0% completion. Holding the expert fixed across the last two rows separates the effects: freshness cuts route deviations from 11.3 to 4.3 per kilometre, timeouts from 1.3 to 0.08, and red-light violations from 10.4 to 6.9, while infraction score falls from 0.45 to 0.37 and vehicle collisions rise from 3.2 to 11.2 per kilometre. The composite driving score stays within the reported run-to-run spread.
 
-Latency accounting needs one qualification. On an RTX 3090 Ti, median model compute is 32.4 ms per tick, including amortized cache maintenance, but the measured end-to-end agent step is 58 ms after sensor formatting and harness overhead. CARLA’s synchronous simulator still receives a new command every tick; wall-clock execution is about 17 Hz, not a demonstrated real-time 20 Hz physical system.
+![The four CARLA evaluation towns](/assets/images/think-at-5-hz-act-at-20-hz-asynchronous-fast-slow-vision-language-action-inference-for-closed-loop-d-source-figure-3.webp)
+*Fig 2: The expert is trained on short Town05 routes, transfers to unseen Town01 and Town02, and is tested on a long-route tier in Town03. | source: [Think at 5 Hz, Act at 20 Hz, Figure 3](https://arxiv.org/abs/2607.15621)*
+
+The zero-shot transfer is encouraging but bounded. On Town01 and Town02, route completion is 84.3% and 94.4% for the fast-slow agent versus 40.5% and 30.7% for LMDrive. On eight long Town03 routes, it completes 85.4% but earns only a 2.96 driving score because collisions and red-light violations collapse its penalty factor. The paper is a latency and control-rate study in CARLA, not evidence of safe physical-vehicle deployment. Median model compute is 32.4 ms, but sensor formatting and harness overhead make the measured end-to-end step 58 ms, about 17 Hz wall-clock execution.
 
 ## High-Level Takeaways
 
-- This paper informs whether to spend inference budget on repeatedly running a large semantic model or on a small high-rate controller over cached semantic state. Its evidence favors the latter when the large model changes slowly relative to the control loop: the matched-expert ablation attributes a substantial completion gain to action freshness, while latency stays independent of history length.
-- The missing control is a safety-matched comparison at equal end-to-end wall-clock budget. The 20 Hz system completes more route but has a lower infraction score than its 10 Hz expert variant, and vehicle collisions rise with the extra exposure. The conclusion would weaken if an optimized small recurrent controller over frozen features matched completion and safety without per-layer access to the 7B cache, or if retuning the baseline controller erased the freshness advantage.
-- At larger scale, cache bandwidth and hazard coverage become the likely constraints. Every expert layer attends to a growing frozen cache, and short single-town clips do not teach long-horizon traffic negotiation. The decisive next experiment is a multi-town, long-route study with identical training data, retuned low-level controllers, several seeds, real-time sensor overhead, and safety-normalized outcomes.
-- The paper reframes fast-slow VLA design as an interface problem: preserve a slow model’s semantic state, but let a smaller policy act on fresh evidence.
-- Results come from CARLA 0.9.10, with two runs for the main comparison and single runs for the frame-skip and transfer rows. On eight unseen long routes, the method completes 85.4% of the route but accumulates enough violations to score 2.96, so short-route transfer is not evidence of road readiness.
-- Cache slow semantic reasoning; spend the per-tick budget on a small controller trained for stale context and fresh observations.
+- Spend the slow model's budget on language and history, then spend each control tick on a small expert that can see fresh evidence.
+- Staleness augmentation is a training distribution correction; without it, a cache-reading controller is asked to generalize to a delay it never saw.
+- The matched 10 Hz versus 20 Hz rows attribute completion and red-light improvements to freshness, while the collision increase shows why completion alone is an unsafe objective.
+- The key follow-up is multi-town, long-route evaluation with retuned low-level control, several seeds, sensor overhead, and safety-normalized outcomes.

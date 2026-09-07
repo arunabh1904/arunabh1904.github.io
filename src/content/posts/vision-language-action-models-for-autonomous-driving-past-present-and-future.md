@@ -9,53 +9,50 @@ tags:
 field: 'Autonomous Driving: VLA & Planning'
 summary: "2025 – Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future"
 ---
-## 2025 – Vision-Language-Action Models for Autonomous Driving
 
 **arXiv:** [2512.16760](https://arxiv.org/abs/2512.16760)
 
+**Project:** [VLA4AD](https://worldbench.github.io/vla4ad)
+
 **Awesome list:** [awesome-vla-for-ad](https://github.com/worldbench/awesome-vla-for-ad)
-
-### Method and reported result
-
-Vision-Language-Action Models for Autonomous Driving frames driving VLA as the successor to vision-action systems. Vision-action models map perception to control but often lack structured reasoning and instruction following; VLA systems add language as a reasoning and guidance layer.
 
 ## Summary
 
-> The survey is especially useful because it distinguishes end-to-end VLA from dual-system VLA, then breaks down how actions are generated and how language guidance is injected.
+> This survey organizes driving VLAs around two decisions: whether perception, reasoning, and planning live in one end-to-end model or in a slow VLM plus a fast driving system, and whether the action interface is textual or numerical. That split is more useful than the label “VLA” alone because it predicts where precision, latency, interpretability, and failure recovery are traded.
 
 ## Core Insights
 
-The paper reviews the path from modular perception-decision-action stacks to VA models, world models, and VLA systems. Its central taxonomy splits VLA systems into two paradigms: End-to-End VLA and Dual-System VLA. It also distinguishes textual versus numerical action generators and explicit versus implicit guidance.
+### Every driving VLA exposes three interfaces
 
-That taxonomy complements the other VLA4AD survey. Where the earlier survey is a broad architecture-and-bibliography map, this one is helpful for reasoning about system boundaries: should language be inside the action generator, or should it guide a separate spatial planner?
+The paper starts from a compact formulation, (a_t = H(F(x_t;	heta))): a VLM backbone (F) turns multimodal input into a representation, and an action head (H) turns that representation into an executable output. The input (x_t) is not just an image. The survey distinguishes camera and LiDAR observations, BEV or occupancy features, language instructions, and vehicle state such as speed, acceleration, steering, and yaw rate. A paper's real architecture is therefore determined by what enters (F), what the backbone preserves, and what (H) is allowed to emit.
 
-![Figure 2 from the VLA-for-AD survey summarizing representative VA and VLA models across end-to-end models, world models, and dual systems](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-paper-figure.png)
-*Fig 1: Summarizes representative VA and VLA models across end-to-end, world-model, and dual-system families. | source: [survey paper](https://arxiv.org/abs/2512.16760)*
+![Representative VA and VLA models organized by output family and system boundary](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-paper-figure.png)
+*Fig 1: The survey's model map separates vision-action systems, end-to-end VLA textual and numerical generators, and dual-system VLA guidance or representation transfer. | source: [Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future, Figure 2](https://arxiv.org/abs/2512.16760)*
 
-![Figure 7 from Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-source-figure-7.webp)
-*Fig 2: Visualization examples of the AutoVLA reasoning/planning results on WOD-E2E dataset. | source: [Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future](https://arxiv.org/abs/2512.16760)*
+This framing prevents a common category error. A model that answers a scene question, a model that predicts a waypoint string, and a model that outputs a continuous trajectory may share a VLM backbone while imposing very different control contracts. The action head decides how much of the semantic representation must survive contact with the vehicle's timing and geometry.
 
-![Figure 1 from Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-source-figure-1.webp)
-*Fig 3: Outline. This work aims to provide a structured roadmap of the VLA paradigm for autonomous driving. | source: [Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future](https://arxiv.org/abs/2512.16760)*
+### End-to-end systems choose between language-shaped and control-shaped actions
 
+The survey divides end-to-end VLA into textual and numerical action generators. Textual generators produce meta-actions such as “slow down” or “change lane,” or serialize waypoints and reasoning in language. Their advantages are inspectability and a natural interface for instruction following. Their weakness is the gap between discrete words and continuous motion: a downstream controller still has to resolve timing, curvature, and interaction with other agents.
 
-**What to look at:**
-- End-to-end VLA and dual-system VLA are treated as distinct design paradigms.
-- Action generation can be textual, numerical, or mediated by a planner.
-- Guidance can be explicit instructions or implicit representation shaping.
+Numerical generators attach a regression, diffusion, flow-matching, or action-token head that produces trajectories or control values. LMDrive and similar systems predict control directly; ORION uses a generative trajectory head; AutoVLA and OpenDriveVLA discretize trajectories or structured actions into tokens. Numerical outputs are easier to execute and score, but the reasoning state becomes less visible and the head may need extensive trajectory supervision.
 
-**Taxonomy slice:**
+The action distinction is not cosmetic. A textual model can be semantically right yet numerically ambiguous; a numerical model can drive smoothly while failing to preserve the instruction that caused the maneuver. The survey's useful design question is which interface should be exposed to the safety-critical loop and which can remain a deliberative or explanatory layer.
 
-| Axis | Options | Why it matters |
-| ---- | ------- | -------------- |
-| System boundary | End-to-end VLA or dual-system VLA | Decides whether language and planning are one model or cooperating modules. |
-| Action generator | Textual action, numerical trajectory, or control signal | Determines how directly the model can drive. |
-| Guidance style | Explicit or implicit | Separates prompt-like supervision from representation-level conditioning. |
-| Historical line | VA, world model, VLA | Connects new VLA papers to older driving policy and dynamics work. |
+### Dual-system VLAs relocate reasoning instead of eliminating it
+
+Dual-system architectures separate a slow, deliberative VLM from a fast planner or controller. The survey further splits them into **explicit action guidance**, where the VLM emits a meta-action, waypoint, or other visible instruction, and **implicit representation transfer**, where VLM-generated explanations or features supervise the fast model during training. DriveVLM, Senna, and DiffVLA illustrate explicit guidance; VLP and VLM-AD illustrate distillation or feature transfer.
+
+The distinction predicts different failure modes. Explicit guidance keeps the semantic decision inspectable, but a bad VLM command can enter the planner at runtime and add latency. Implicit transfer removes the VLM from deployment and makes the fast path cheaper, but it can compress away the very rationale that made the system easier to audit. A dual-system paper should therefore report both the quality of the slow signal and the cost of converting it into safe fast actions.
+
+![Roadmap of the survey from preliminary interfaces through VA, VLA, datasets, and open challenges](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-source-figure-1.webp)
+*Fig 2: The roadmap connects input modalities, action generators, end-to-end versus dual-system architectures, open- and closed-loop benchmarks, and the unresolved challenges around generalization and trust. | source: [Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future, Figure 1](https://arxiv.org/abs/2512.16760)*
+
+The survey's benchmark section makes the comparison boundary explicit. nuScenes and NAVSIM navtest emphasize open-loop trajectory prediction; Bench2Drive provides closed-loop routes and interaction. Its metric table distinguishes L2 and collision rate from ADE/FDE, miss rate, heading error, and control errors. Those are not interchangeable: open-loop agreement with an expert future does not test whether a policy remains stable after its own action changes the future.
 
 ## High-Level Takeaways
 
-- This survey informs how to compare vision-action, end-to-end VLA, and dual-system driving models without collapsing them into one label. Its key units are system boundaries: where language enters, how action is represented, whether a world model is present, and whether evaluation is open or closed loop.
-- The historical taxonomy is useful if it predicts engineering tradeoffs rather than merely ordering papers. A common benchmark that fixes sensors, data, action horizon, and latency across the three paradigms is the missing test. As the field scales, proprietary data and inconsistent closed-loop protocols make architectural claims hard to compare. The taxonomy would fail if data scale and evaluator choice explained outcomes better than the proposed model evolution.
-- This survey gives a cleaner vocabulary for comparing monolithic driving VLAs against hybrid systems such as DriveVLM-Dual-style designs.
-- "Driving VLA" is not one architecture; it is a set of choices about where language reasoning sits relative to spatial planning and action generation.
+- Classify a paper by its system boundary, action representation, and runtime VLM dependency before comparing its model name or benchmark score.
+- Textual actions buy inspectability; numerical actions buy control precision. The missing bridge is a verified mapping between semantic intent and continuous trajectory.
+- Explicit guidance and implicit transfer make different promises about latency and auditability; report the VLM's role during deployment, not only during training.
+- A useful VLA evaluation must pair open-loop accuracy with closed-loop route, infraction, latency, and instruction-fidelity measurements under matched sensors and action horizons.
