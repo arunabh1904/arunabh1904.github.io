@@ -36,7 +36,7 @@ The connector ablation gives the intuition a measurable anchor. With four vision
 
 The data study is part of the model, not a postscript. Cambrian-1 uses a two-stage recipe with 1.2M adapter examples followed by 737K instruction examples, and it studies how data thresholds, mixture ratios, and system prompts change performance. The source Figure 5 makes the result visible: language-supervised, self-supervised, and other visual encoders respond differently to the training recipe, so a backbone ranking without a matched recipe is incomplete.
 
-![Cambrian-1 training-recipe comparison across visual encoder families](/assets/images/cambrian-1-vision-centric-exploration-of-multimodal-llms-source-figure-5.webp)
+![Cambrian-1 training-recipe comparison across visual encoder families](/assets/images/cambrian-1-vision-centric-exploration-of-multimodal-llms-source-figure-5.png)
 *Fig 3: The source comparison shows the distribution of benchmark scores under different instruction-tuning recipes for language-supervised, self-supervised, and other visual encoders. | source: [Cambrian-1, Figure 5](https://arxiv.org/abs/2406.16860)*
 
 The final table reports Cambrian-1-8B at 73.1 average, ahead of LLaVA-NeXT-8B at 72.5, while using 576 visual tokens instead of LLaVA-NeXT's 2,880. At 34B, Cambrian-1 reaches 76.8 versus 76.0 for LLaVA-NeXT-34B. These comparisons support the vision-centric recipe, but they do not isolate SVA from the four-encoder ensemble, data curation, instruction recipe, and model scale.
