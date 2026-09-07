@@ -11,52 +11,73 @@ summary: "2014 – Auto-Encoding Variational Bayes"
 ---
 ## 2014 – Auto-Encoding Variational Bayes
 
-**arXiv:** [1312.6114](https://arxiv.org/abs/1312.6114)
-
-**GitHub:** [pyro-ppl/vae](https://github.com/pyro-ppl/vae) (example implementation)
-
-**Project page:** n/a
-
+**arXiv:** [1312.6114](https://arxiv.org/abs/1312.6114)<br>
+**Example implementation:** [Pyro VAE tutorial](https://pyro.ai/examples/vae.html)<br>
+**Project page:** n/a<br>
 **Conference:** ICLR 2014
 
 ## Summary
 
-> The VAE paper solves inference for latent-variable models whose posterior is intractable but differentiable. It introduces the reparameterization trick: sample noise from a fixed distribution, transform it through encoder outputs, and backpropagate through the stochastic latent variable. The objective is the evidence lower bound, combining reconstruction likelihood with a KL term that keeps the approximate posterior near the prior. An encoder, or recognition model, amortizes inference across datapoints instead of optimizing a separate variational distribution for each one. The experiments show generative modeling and semi-supervised learning can be trained with stochastic gradient descent. The caveat is the usual VAE tradeoff: simple likelihoods and strong KL pressure can produce blurry samples or underused latents.
+> AEVB makes posterior inference in a nonlinear latent-variable model trainable with ordinary minibatch gradients. It rewrites the variational lower bound around a recognition network and samples as $z=\mu_\phi(x)+\sigma_\phi(x)\odot\epsilon$, so the randomness is independent of the encoder parameters. On MNIST and Frey Faces, the method reaches a better variational bound faster than wake-sleep across latent dimensions and remains usable on large minibatches. The evidence is an optimization and inference result on small image datasets; it does not show that a diagonal Gaussian posterior is adequate for every generative model.
 
 ## Core Insights
 
+### The lower bound turns an intractable posterior into a trainable target
 
-![Figure 2 from Auto-Encoding Variational Bayes](/assets/images/auto-encoding-variational-bayes-source-figure-2.webp)
-*Fig 1: AEVB reaches a tighter variational lower bound faster than wake-sleep across multiple latent-space dimensionalities. | source: [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114)*
+AEVB starts with a directed model $p_\theta(z)p_\theta(x\mid z)$. The marginal likelihood
 
-![Figure 3 from Auto-Encoding Variational Bayes](/assets/images/auto-encoding-variational-bayes-source-figure-3.webp)
-*Fig 2: Comparison of AEVB to the wake-sleep algorithm and Monte Carlo EM, in terms of the estimated marginal likelihood, for a different number of training points. Monte Carlo EM is not an on-line algorithm, and (unlike AEVB and the wake-sleep method) can’t be applied efficiently for the full MNIST dataset. | source: [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114)*
+$$
+\log p_\theta(x)=\log\int p_\theta(z)p_\theta(x\mid z)\,dz
+$$
 
+is hard to evaluate when the decoder is a nonlinear neural network, and the posterior $p_\theta(z\mid x)$ is hard to sample from. The paper introduces a recognition model $q_\phi(z\mid x)$ and writes
 
-### Method and reported result
+$$
+\log p_\theta(x)=D_{KL}\big(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x)\big)+\mathcal L(\theta,\phi;x).
+$$
 
-Kingma and Welling made variational inference feel like ordinary neural-network training. Their variational autoencoder pairs an encoder $q_\phi(z \mid x)$, which approximates the posterior over latent variables, with a decoder $p_\theta(x \mid z)$, which reconstructs observations from those latents. The key move is the reparameterisation trick: instead of sampling $z$ in a way that blocks gradients, sample fixed noise and transform it through differentiable parameters.
+The second term is the evidence lower bound:
 
-That trick turns Monte Carlo estimates of the evidence lower bound (ELBO) into low-variance gradients that work with standard stochastic gradient descent. The paper also made amortised inference practical at scale: the encoder learns to predict posterior parameters directly, rather than solving a separate inference problem for every datapoint.
+$$
+\mathcal L=-D_{KL}\big(q_\phi(z\mid x)\,\|\,p_\theta(z)\big)+\mathbb E_{q_\phi(z\mid x)}[\log p_\theta(x\mid z)].
+$$
 
-### Reported evidence and cost
+This decomposition makes the trade-off explicit. The decoder must explain the observation, while the encoder is regularized toward the prior. The gap is posterior mismatch, so maximizing the bound is useful even when exact marginal likelihood remains unavailable.
 
-| Dataset | Latent dim | $-\log p(x)$ ↓ (nats) | Notes |
-| ------- | ---------- | ---------------------- | ----- |
-| Binarised MNIST | 30 | ≈ 88 nats (ELBO estimate) | Competed closely with deep latent-Gaussian models |
-| Frey Faces | 2 | Smooth latent manifold | Visually coherent reconstructions |
+![Source Figure 2 from Auto-Encoding Variational Bayes: lower-bound optimization against wake-sleep](/assets/images/auto-encoding-variational-bayes-source-figure-2.webp)
+*Fig 1: Across MNIST and Frey Face latent dimensions, the AEVB curves rise to a better variational bound faster than wake-sleep; the plot is evidence about optimization, not a sample-quality ranking. | source: [Auto-Encoding Variational Bayes, Figure 2](https://arxiv.org/abs/1312.6114)*
 
-Training cost was modest for the original experiments: minutes per epoch on MNIST using a single GPU in 2013. Because the method uses SGD mini-batches and one objective, wall-clock time mostly comes down to ordinary forward and backward passes.
+The plot makes the amortization claim concrete. One encoder is updated for every minibatch, rather than running a separate iterative inference procedure for each example. On MNIST the comparison spans $N_z=3,5,10,20,200$; on Frey Faces it spans $N_z=2,5,10,20$. The extra latent coordinates do not visibly cause the bound to overfit in these experiments, which the paper attributes to the KL regularizer.
 
-### Where the evidence stops
+### Reparameterization replaces the score-function gradient
 
-The strength of VAEs is stability: training has a clear objective, avoids GAN-style mode collapse, and produces a latent space that supports interpolation. The tradeoff is expressiveness. Simple Gaussian priors and posteriors can underfit complex data, and the ELBO is only a lower bound, so a good training objective does not guarantee a tight estimate of true likelihood.
+A direct Monte Carlo gradient through a draw from $q_\phi(z\mid x)$ uses a score-function estimator. The paper notes that this estimator has high variance. For a diagonal Gaussian recognition model, it instead draws fixed noise and transforms it:
 
-Auto-Encoding Variational Bayes turned variational inference into a scalable deep-learning procedure. The reparameterisation trick is the small mathematical hinge that made the whole recipe practical.
+$$
+z=\mu_\phi(x)+\sigma_\phi(x)\odot\epsilon,\qquad \epsilon\sim\mathcal N(0,I).
+$$
+
+The expectation over $q_\phi$ becomes an expectation over $\epsilon$, so the sampled path is differentiable with respect to both $\mu_\phi$ and $\sigma_\phi$. In the VAE example, the prior is $\mathcal N(0,I)$, the encoder is an MLP that predicts the mean and standard deviation, and the decoder uses a Bernoulli likelihood for binary data or a Gaussian likelihood for real-valued data. When the KL term is analytic, only the reconstruction expectation needs Monte Carlo samples.
+
+The experimental algorithm uses minibatches of $M=100$ points and $L=1$ latent sample per point. A single sample is sufficient in the reported setting because the minibatch averages the estimator noise. That choice is part of the result: reparameterization is valuable because it makes a noisy objective cheap enough to optimize repeatedly, not because it removes stochasticity.
+
+### The marginal-likelihood comparison exposes the scale advantage
+
+![Source Figure 3 from Auto-Encoding Variational Bayes: estimated marginal likelihood on two MNIST training-set sizes](/assets/images/auto-encoding-variational-bayes-source-figure-3.webp)
+*Fig 2: With three latent variables, AEVB and wake-sleep improve the estimated marginal likelihood online, while MCEM is much slower on the larger MNIST training set. | source: [Auto-Encoding Variational Bayes, Figure 3](https://arxiv.org/abs/1312.6114)*
+
+For the marginal-likelihood experiment, the authors use 100-hidden-unit encoder and decoder networks, three latent variables, the first 1,000 training and test points, and 50 posterior samples per point for the estimator. The small and large panels use $N_{train}=1{,}000$ and $50{,}000$. MCEM uses a Hybrid Monte Carlo sampler and is not an online algorithm; the paper therefore treats its behavior on the full MNIST set as a scalability boundary rather than as a cleaner baseline.
+
+The paper also gives a useful representation check. In two dimensions, it maps a grid through the inverse Gaussian CDF and decodes each latent point. The result is a smooth manifold of faces or digits, but smooth interpolation is a property of this prior, decoder, and training setup. It is not evidence that every semantic factor has become an independent latent coordinate.
+
+![Source Figure 4 from Auto-Encoding Variational Bayes: learned two-dimensional Frey Face and MNIST manifolds](/assets/images/auto-encoding-variational-bayes-source-figure-4.png)
+*Fig 3: Decoding a grid in the Gaussian latent prior yields continuous face and digit manifolds, showing how the learned decoder organizes nearby latent points. | source: [Auto-Encoding Variational Bayes, Figure 4](https://arxiv.org/abs/1312.6114)*
+
+The closest comparison, wake-sleep, also uses a recognition model and has the same per-datapoint complexity, but its wake and sleep objectives do not jointly optimize a marginal-likelihood bound. Its advantage is support for discrete latent variables. AEVB’s gain is narrower and more consequential: for continuous latents, the encoder and decoder can be trained together with one differentiable bound.
 
 ## High-Level Takeaways
 
-- The paper clarifies which latent representation and generative objective give the best quality, likelihood, and sampling-cost tradeoff. Its fundamental training unit is a datapoint and a sampled latent variable.
-- For optimization, the ELBO adds an expected reconstruction term and a KL term per example; the original formulation does not introduce a separate $\beta$ reweighting coefficient. The encoder maps each observation to the parameters of a compact latent distribution sampled through reparameterization.
-- The most important missing comparison is a matched-compute comparison that separates objective choice, latent compression, sampler steps, and data quality. At 10× scale, data curation, latent bottlenecks, sampling cost, and training instability would dominate simple parameter scaling. The central claim would fail under this test: Hold data, parameters, and sampling compute fixed; reject the objective if a simpler likelihood or adversarial baseline matches quality and coverage.
-- VAEs gave deep generative modelling a stable likelihood-based recipe. They did not produce the sharpest samples, but they made latent-variable models trainable, inspectable, and useful for representation learning. Later work such as $\beta$-VAE, conditional VAEs, and flow-based models all build on this basic encoder-decoder view of probabilistic inference.
+- AEVB’s durable mechanism is the reparameterized stochastic path, which turns encoder inference into ordinary backpropagation through a sampled latent.
+- The KL to the prior regularizes the encoder. A different KL, between the approximate and true posteriors, is the gap between the bound and the log evidence; better reconstruction alone does not close it.
+- The reported $M=100$, $L=1$ minibatch regime demonstrates scalable optimization, while MCEM exposes why per-example iterative inference does not scale as cleanly.
+- A diagonal Gaussian posterior and simple likelihoods make the original model tractable. The resulting bound can still be loose when the true posterior has structure that the encoder family cannot represent.
