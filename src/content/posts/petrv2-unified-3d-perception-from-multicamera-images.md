@@ -27,14 +27,14 @@ PETRv2 keeps PETR's frustum-coordinate generator. For the previous frame, it app
 
 The paradigm figure is best read in the order of the coordinate contract. Current and previous cameras first become 3D position-aware features; pose alignment makes the historical coordinates current-frame addresses; then task queries retrieve evidence and task heads decode their own output. The shared part is the calibrated feature field, not a single universal output grid.
 
-![Figure 1 from PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](/assets/images/petrv2-unified-3d-perception-from-multicamera-images-source-figure-1.webp)
+![Figure 1 from PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](/assets/images/petrv2-unified-3d-perception-from-multicamera-images-source-figure-1-white.png)
 *Fig 1: Previous-frame 3D coordinates are pose-transformed into the current ego frame, concatenated with current features, and encoded before task-specific queries decode detection, BEV segmentation, and lanes. | source: [PETRv2, Figure 1](https://arxiv.org/abs/2206.01256)*
 
 ### Query geometry preserves task differences
 
 The same decoder supports three tasks through different query initialization. Detection queries are distributed in the full 3D space, segmentation queries are initialized in BEV, and lane queries represent ordered 3D points. That choice matters because a box is a sparse instance, a map is a region, and a lane is a structured curve. Sharing the feature field avoids duplicating the camera and temporal encoder while keeping the output contract explicit.
 
-![Figure 3 from PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](/assets/images/petrv2-unified-3d-perception-from-multicamera-images-source-figure-3.webp)
+![Figure 3 from PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](/assets/images/petrv2-unified-3d-perception-from-multicamera-images-source-figure-3-white.png)
 *Fig 2: Detection queries cover 3D space, segmentation queries are initialized under BEV, and lane queries use ordered points; the different query geometries encode the tasks' different output structures. | source: [PETRv2, Figure 3](https://arxiv.org/abs/2206.01256)*
 
 On nuScenes, PETRv2 reports 49.0 mAP and 58.2 NDS on the test split, with 0.343 m/s average velocity error versus PETR's 0.808 m/s in the paper's comparison. Its multiscale variant reaches 50.8 mAP and 59.1 NDS. The model also evaluates BEV segmentation on driveable area, lane, and vehicle classes and 3D lane detection on OpenLane. These task scores are evidence for a shared interface, not proof that all heads have identical capacity or calibration needs.

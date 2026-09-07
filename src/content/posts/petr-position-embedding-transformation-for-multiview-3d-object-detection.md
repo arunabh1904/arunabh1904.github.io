@@ -17,18 +17,24 @@ summary: '2022 – PETR: Position Embedding Transformation for Multi-View 3D Obj
 
 ## Summary
 
-> PETR puts 3D geometry into perspective image tokens before a DETR-style decoder sees them. It discretizes camera frustums, transforms the samples into the ego frame, and encodes those coordinates with a $1\times1$ position encoder. Object queries can then attend globally to position-aware features across views. The paper reports 44.1 mAP and 50.4 NDS on nuScenes test; its central ablation is more revealing than the leaderboard, with 2D positional encoding at 6.9 mAP versus 3D positional encoding at 30.5 mAP.
+> PETR puts 3D geometry into perspective image tokens before a DETR-style decoder sees them. It discretizes camera frustums, transforms the samples into the ego frame, and encodes those coordinates with a pointwise multilayer perceptron. Object queries can then attend globally to position-aware features across views. The paper reports 44.1 mAP and 50.4 NDS on nuScenes test; its central ablation is more revealing than the leaderboard, with 2D positional encoding at 6.9 mAP versus 3D positional encoding at 30.5 mAP.
 
 ## Core Insights
 
 ### Make a perspective token a metric address
 
-Given a feature map from each camera, PETR samples 64 points along every camera ray using linear-increasing depth bins. Intrinsics and extrinsics transform those samples into a shared 3D region. The 64 four-coordinate hypotheses for one image location are packed into the channel dimension (`D × 4`), normalized, and passed through a pointwise position encoder; they do not become 64 independently attended image tokens. The resulting positional tensor is added to the image feature at that perspective location. A transformer decoder then uses learned object queries to attend globally to the position-aware image tokens and regresses classes and 3D boxes. The geometry is attached before retrieval, so the query does not need to project a reference point and select a small local image neighborhood as in DETR3D.
+Given a feature map from each camera, PETR samples 64 points along every camera ray using linear-increasing depth bins. Intrinsics and extrinsics transform those samples into a shared 3D region. The 64 four-coordinate hypotheses for one image location are packed into the channel dimension (`D × 4`), normalized, and passed through a pointwise position encoder; they do not become 64 independently attended image tokens. The coordinate encoder is a multilayer perceptron applied independently at each image location. A separate $1\times1$ convolution projects the image features to the decoder width; the resulting positional tensor is added to those projected features. A transformer decoder then uses learned object queries to attend globally to the position-aware image tokens and regresses classes and 3D boxes. The geometry is attached before retrieval, so the query does not need to project a reference point and select a small local image neighborhood as in DETR3D.
 
 The architecture figure should be read from left to right and then back through attention. The image backbone produces six perspective feature maps; the coordinate generator creates the same-shaped frustum mesh for each camera; the position encoder turns those coordinates into feature channels; and the decoder's object queries gather evidence from the concatenated views. PETR is not a dense BEV lifter: it keeps the camera feature layout and lets the query discover which position-aware tokens explain one object.
 
-![PETR: Position Embedding Transformation for Multi-View 3D Object Detection source figure: The architecture of the proposed PETR paradigm.](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-paper-figure.webp)
+![PETR: Position Embedding Transformation for Multi-View 3D Object Detection source figure: The architecture of the proposed PETR paradigm.](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-source-figure-2-white.png)
 *Fig 1: Camera-frustum coordinates are transformed into 3D position embeddings, added to multiview image features, and read by object queries that decode 3D boxes and classes. | source: [PETR, Figure 2](https://arxiv.org/abs/2203.05625)*
+
+### Give each query a starting location in 3D
+
+PETR also uses geometry to initialize the decoder queries. It learns anchor points in normalized 3D space and maps their coordinates through a two-layer MLP to create the initial query embeddings. The anchor gives a query a spatial starting point; attention can still retrieve evidence globally across cameras.
+
+Table 5 separates the value of having anchors from the value of learning them. The no-anchor setting fails to converge in this experiment, while fixed BEV anchors reach 29.5 mAP, fixed 3D anchors reach 30.3, and learned 3D anchors reach 30.9. Increasing the learned-anchor count from 600 to 1,500 improves mAP from 30.0 to 30.9 in the reported ablation. The gain comes with more queries for the decoder to process: geometry helps organize the search, but increasing its capacity still has a cost.
 
 ### The position ablation isolates the useful signal
 

@@ -28,7 +28,7 @@ SOLOFusion begins from the observation that camera-only temporal fusion is a for
 The architecture figure is easiest to read as a budget allocation. Follow the image backbone into the low-resolution BEV stream and see the historical features accumulate; then follow the separate high-resolution short-term branch that samples a few depth candidates. The design does not build a high-resolution cost volume across the whole history because the paper finds that combination too expensive.
 
 ![SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection source figure: The framework of SOLOFusion.](/assets/images/solofusion-temporal-multiview-3d-object-detection-paper-figure.webp)
-*Fig 1: High-resolution short-term two-view depth matching and low-resolution long-term BEV feature fusion provide complementary temporal baselines before the detection head. | source: [SOLOFusion, Figure 2](https://arxiv.org/abs/2210.02443)*
+*Fig 1: High-resolution short-term two-view depth matching and low-resolution long-term BEV feature fusion provide complementary temporal baselines before the detection head. | source: [SOLOFusion, Figure 7](https://arxiv.org/abs/2210.02443)*
 
 ### Long history buys localization potential
 
