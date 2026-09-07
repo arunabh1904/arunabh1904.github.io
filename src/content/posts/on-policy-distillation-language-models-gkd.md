@@ -26,16 +26,12 @@ summary: '2023 – On-Policy Distillation of Language Models: GKD'
 
 ## Core Insights
 
-![On-policy GKD improves student models across summarization, translation, and arithmetic compared with fixed-data distillation](/assets/images/on-policy-distillation-language-models-gkd-source-figure-1.webp)
-*Fig 1: Across three tasks and student sizes, on-policy GKD trains on the student’s sampled outputs and approaches the T5-XL teacher more closely than supervised fine-tuning, sequence KD, or fixed-data KD. | source: [On-Policy Distillation of Language Models: GKD](https://arxiv.org/abs/2306.13649)*
-
-![Figure 3 from On-Policy Distillation of Language Models: GKD](/assets/images/on-policy-distillation-language-models-gkd-source-figure-3.webp)
-*Fig 2: Distilled T5-Small improves as training data grows across temperature-sampling settings, showing how on-policy generation changes the data-scaling behavior of distillation. | source: [On-Policy Distillation of Language Models: GKD](https://arxiv.org/abs/2306.13649)*
-
-
 Let $y_{<t}$ be a prefix sampled from either a fixed dataset or the current student. The teacher and student define next-token distributions $p_T(\cdot\mid x,y_{<t})$ and $p_S(\cdot\mid x,y_{<t})$. GKD minimizes a chosen divergence between those distributions and mixes the two prefix sources with a coefficient $\lambda$. At $\lambda=0$, training is conventional offline distillation; at $\lambda=1$, every target is evaluated on a student-generated trajectory.
 
 This changes the feedback density. A terminal reward says whether the whole answer worked. GKD tells the student, at each visited prefix, how its full next-token distribution differs from the teacher. It can also choose the behavior of that correction: forward KL is more mode-covering, reverse KL is more mode-seeking, and Jensen–Shannon divergences interpolate. The best choice depends on whether diversity or concentrated generation matters.
+
+![On-policy GKD improves student models across summarization, translation, and arithmetic compared with fixed-data distillation](/assets/images/on-policy-distillation-language-models-gkd-source-figure-1.webp)
+*Fig 1: Across summarization, translation, and arithmetic, GKD on student-sampled outputs brings smaller T5 students closer to the T5-XL teacher than the fixed-data baselines. | source: [GKD, Figure 1](https://arxiv.org/abs/2306.13649)*
 
 | Setting | Evidence in the paper | Interpretation |
 | --- | --- | --- |
@@ -44,14 +40,22 @@ This changes the feedback density. A terminal reward says whether the whole answ
 | GSM8K arithmetic | On-policy variants give the largest relative gains | Correcting self-generated reasoning states is useful |
 | FLAN task-agnostic distillation | Improves held-out BBH and MMLU | GKD can transfer across tasks, not only imitate one dataset |
 
-The teacher is still the ceiling and the bottleneck. GKD assumes the starting student generates prefixes on which teacher probabilities are useful. If the student collapses into nonsense, teacher supervision on those states may spend compute far from the deployment boundary. Every on-policy sequence also requires both student generation and teacher scoring, so saved label collection becomes inference cost.
+The data-scaling result makes the exposure-mismatch argument concrete. On XSum, the T5-Small student trained with on-policy GKD on only 5% of the data outperforms supervised KD and ImitKD trained with the full ground-truth dataset. The gain is not a claim that less data is always enough: the student still generates the prefixes and the teacher still scores them. The method trades fixed label collection for repeated student generation and teacher inference.
+
+![Figure 3 from On-Policy Distillation of Language Models: GKD](/assets/images/on-policy-distillation-language-models-gkd-source-figure-3.webp)
+*Fig 2: On XSum, the T5-Small student gains more from additional training data under on-policy GKD than the fixed-data baselines, showing the method's data-efficiency curve. | source: [GKD, Figure 3](https://arxiv.org/abs/2306.13649)*
+
+The paper also combines on-policy GKD with an RL objective for factual summarization. On XSum, increasing the RL weight raises ROUGE-2 while reducing the improvement in textual entailment; the combined method improves summarization quality over the RLEF comparison while remaining more factually consistent than the teacher. This is the useful division of labor: GKD supplies dense teacher correction on the student's states, while the task reward supplies a signal the teacher may not optimize directly.
+
+The teacher remains a source of bias and inference cost. GKD assumes the starting student generates prefixes on which teacher probabilities are useful. If the student collapses into nonsense, teacher supervision on those states may spend compute far from the deployment boundary. Divergence choice is also task-dependent: mode-seeking objectives can prevent low-quality mass under temperature sampling, but they can reduce diversity.
+
+### On-policy states trade labels for inference
+
+GKD is attractive when teacher logits are available and token-level correction is more informative than one sequence score. It has on-policy sampling but remains a differentiable supervised divergence: no reward, advantage, or credit assignment through future outcomes is required. When the teacher is much larger, its inference and logit transfer dominate the added cost. The decisive comparison refreshes an offline buffer at the same number of teacher tokens and measures exposure mismatch, diversity, and task quality. If replay matches on-policy performance, current-state coverage is not buying enough; if the teacher's preferred distribution encodes behavior the student must surpass, on-policy imitation becomes a ceiling. [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) uses fixed preference pairs, while [GRPO](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html) uses online states with a scalar reward. GKD occupies the dense-logit corner between them.
 
 ## High-Level Takeaways
 
-- GKD informs whether distillation data should follow a fixed corpus or the student's current state distribution. The atomic feedback unit is a teacher distribution at a student-visited prefix. This is attractive when the teacher is trusted, logits are accessible, and token-level correction is more informative than one sequence score.
-- The method should not be conflated with reinforcement learning. It has on-policy sampling but a differentiable supervised divergence; no reward, advantage, or credit assignment through future outcomes is required. The paper also shows that GKD can be mixed with a reward objective, which makes the distinction operational: distillation supplies dense local imitation while RL supplies task-level preference.
-- At ten times model size, teacher inference dominates cost and logit transfer becomes a systems problem. The claim would weaken if replaying a carefully refreshed offline buffer matched on-policy performance at the same number of teacher tokens. It would fail outright when the teacher's preferred distribution encodes the behavior the student is meant to surpass.
-- [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) learns from fixed chosen/rejected responses. [GRPO](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html) samples online but reduces each completion to a relative scalar reward. GKD occupies the third corner: online states with dense teacher distributions.
-- GKD makes distillation on-policy by training the student against teacher logits on prefixes generated by the current student.
-- It needs teacher access and substantial inference, inherits teacher errors, and assumes the initial student can visit useful states.
-- On-policy distillation is best understood as dense correction on the learner's own mistakes, not as another name for reinforcement learning.
+- GKD changes the distillation state distribution: the student generates the prefixes, while the teacher supplies token-level probabilities on those visited states.
+- The method separates two choices that ordinary KD often conflates: where sequences come from and which divergence shapes the correction.
+- The reported 5% XSum result and the RL combination show efficiency and flexibility, but both still pay for student generation and teacher scoring.
+- GKD is a good fit when teacher logits are accessible and the student's own errors are the deployment problem; surpassing the teacher on a new objective requires a signal beyond pure imitation, as the paper's RL combination illustrates.

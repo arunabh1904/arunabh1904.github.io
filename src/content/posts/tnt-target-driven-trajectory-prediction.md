@@ -11,60 +11,80 @@ summary: "2020 – TNT: Target-driveN Trajectory Prediction"
 ---
 ## 2020 – TNT: Target-driveN Trajectory Prediction
 
-**arXiv:** [2008.08294](https://arxiv.org/abs/2008.08294)
-
-**PMLR:** [CoRL 2020 proceedings](https://proceedings.mlr.press/v155/zhao21b.html)
-
+**arXiv:** [2008.08294](https://arxiv.org/abs/2008.08294)<br>
+**PMLR:** [CoRL 2020 proceedings](https://proceedings.mlr.press/v155/zhao21b.html)<br>
 **Project:** [Waymo research page](https://waymo.com/research/tnt-target-driven-trajectory-prediction/)
-
-### Method and reported result
-
-TNT says that for moderate-horizon motion forecasting, most of the multimodality lives in where the agent is trying to end up. Instead of sampling latent variables and hoping they cover the futures, TNT predicts explicit target states, then predicts trajectories conditioned on each target.
 
 ## Summary
 
-> That design makes the intermediate outputs interpretable. A planner can inspect possible destinations, target-conditioned rollouts, and trajectory scores instead of receiving only opaque samples from a latent distribution.
+> TNT moves much of trajectory uncertainty into an explicit endpoint distribution, predicts a path toward each selected endpoint, then ranks and removes near-duplicate paths. On Argoverse validation, the six-trajectory result improves minFDE from 1.68 m for a MultiPath reimplementation using the same VectorNet encoder to 1.29 m. The decisive ablation is downstream of endpoint generation: scoring whole trajectories cuts six-mode miss rate from 0.216 to 0.093. Candidate coverage, path quality, and final selection remain separate bottlenecks, and the endpoint-conditioned unimodality assumption becomes less convincing as the horizon grows.
 
 ## Core Insights
 
-The paper decomposes trajectory prediction into target uncertainty and control uncertainty. The target predictor estimates a distribution over candidate endpoints, using lane-centerline samples for vehicles and grid samples for pedestrians. Given each selected target, a motion estimator predicts one trajectory toward it. A final scoring and selection stage ranks the hypotheses and suppresses near-duplicates to produce a small set of trajectories.
+### Choose where before predicting how
 
-TNT uses VectorNet as the HD-map context encoder when maps are available and a ResNet image encoder for the Stanford Drone Dataset. The important modeling assumption is that once the target is fixed, the remaining trajectory distribution is close enough to unimodal for a simple regression head. That assumption is reasonable for short and moderate horizons, but the paper itself notes that longer horizons may need intermediate targets.
+A car approaching an intersection can turn, continue, or slow down. Directly regressing one future risks averaging distinct possibilities into an implausible path. TNT instead represents multiple candidate locations at a fixed future time. Different endpoints can encode both route and speed choices, making the intermediate uncertainty visible in physical coordinates.
 
-![Figure 2 from TNT showing context encoding, target prediction, target-conditioned motion estimation, and trajectory scoring](/assets/images/tnt-target-driven-trajectory-prediction-paper-figure.png)
-*Fig 1: Shows the three-stage TNT pipeline: encode the scene, score candidate target states, decode a trajectory for each selected target, then score and select a compact set. | source: [TNT paper](https://arxiv.org/abs/2008.08294)*
+The factorization is
 
-![Figure 4 from TNT: Target-driveN Trajectory Prediction](/assets/images/tnt-target-driven-trajectory-prediction-source-figure-4.webp)
-*Fig 2: Qualitative results on the Argoverse validation set. Lane centerlines are shown in grey, agent’s past trajectory in blue, ground truth future trajectory is in light blue. | source: [TNT: Target-driveN Trajectory Prediction](https://arxiv.org/abs/2008.08294)*
+$$
+p(s_{1:T}\mid x)\approx\sum_{\tau\in\mathcal T(x)}p(\tau\mid x)\,p(s_{1:T}\mid\tau,x).
+$$
 
+Here $x$ is the observed scene and $\tau$ is a candidate future endpoint. The modeling assumption is that conditioning on that endpoint leaves a trajectory distribution simple enough for one regression head. This is an approximation about the remaining uncertainty, not a claim that all paths to the same destination are identical.
 
-**What to look at:**
-- Targets make intent interpretable: turning, lane changes, and speed choices become endpoint hypotheses.
-- The framework avoids test-time latent sampling by producing diverse futures in parallel.
-- Target candidates can come from map structure for vehicles or a grid for pedestrians.
-- The scoring stage matters because good endpoints do not automatically imply good full trajectories.
+TNT uses [VectorNet](/paper%20shorts/2020/05/08/vectornet-encoding-hd-maps-and-agent-dynamics-from-vectorized-representation.html) to encode maps and agent histories when vector maps exist. On Stanford Drone, it uses a ResNet-50 image encoder instead. The contribution therefore sits mainly after context encoding: endpoints organize the output space, while the scene encoder can change with the available input.
 
-### Reported evidence
+The pipeline below separates three selections that can otherwise blur together. Dense candidate locations enter the target predictor; a smaller set of refined targets enters motion estimation; an even smaller set of complete trajectories leaves the final scorer.
 
-| Component | Detail | Why it matters |
-| --------- | ------ | -------------- |
-| Context encoder | VectorNet for vectorized HD maps; ResNet for image-only SDD | Keeps TNT compatible with both map-rich and image-only settings. |
-| Target prediction | Samples many candidate endpoints, then keeps top targets | Moves multimodality into an explicit endpoint space. |
-| Motion estimation | Regresses one trajectory conditioned on each selected target | Treats target-conditioned control as mostly unimodal. |
-| Scoring and selection | Ranks trajectories and removes near-duplicates | Produces a small deployable set of diverse forecasts. |
+![TNT source Figure 2: context encoding and the target, motion, and scoring stages](/assets/images/tnt-target-driven-trajectory-prediction-paper-figure.png)
+*Fig 1: Candidate endpoints are scored and refined before trajectories are generated. A separate scorer then evaluates the complete paths and selects a compact set, rather than treating endpoint probability as the final trajectory score. | source: [TNT, Figure 2](https://arxiv.org/abs/2008.08294)*
 
-**Compact result slice:**
+### Candidate design determines which futures are easy to represent
 
-| Dataset | Comparison | TNT result |
-| ------- | ---------- | ---------- |
-| Argoverse validation | MultiPath: 1.68 minFDE, 0.80 minADE, 0.14 MR | 1.29 minFDE, 0.73 minADE, 0.09 MR |
-| INTERACTION validation | MultiPath: 0.99 minFDE, 0.30 minADE | 0.67 minFDE, 0.21 minADE |
-| PAID pedestrians | MultiPath: 0.43 minFDE, 0.23 minADE | 0.32 minFDE, 0.18 minADE |
-| Stanford Drone | PECNet: 25.98 minFDE, 12.79 minADE | 21.16 minFDE, 12.23 minADE |
+The first stage predicts a probability and a continuous offset for every sampled location. Its classification target is the candidate nearest the ground-truth endpoint; Huber regression refines that candidate's location. The offset matters: the Argoverse target-stage ablation improves fifty-candidate minFDE from 0.69 to 0.53 m when refinement is enabled. Discretization supplies coverage without forcing the answer to lie exactly on the grid.
+
+Vehicle candidates come from lane centerlines on Argoverse and lane boundaries on INTERACTION. Pedestrian candidates use a surrounding grid because movement is less constrained by lane geometry. The paper gives a typical coarse-to-fine example of roughly 1,000 input locations reduced to fifty targets, but the actual candidate set depends on the scene and dataset.
+
+Denser sampling helps until it stops resolving a meaningful ambiguity. On Argoverse, reducing target spacing from five meters to two and one improves six-mode minFDE from 1.55 to 1.31 and 1.29 m. Halving it again to 0.5 m leaves the result at 1.29 m. Continuous offsets and the later stages make ever finer candidate spacing unnecessary in that experiment.
+
+### A likely endpoint does not guarantee a likely path
+
+The second stage takes one target and the context feature and predicts all future coordinates with a two-layer MLP. During training, it receives the ground-truth endpoint through teacher forcing. At inference, it receives the target stage's predictions. Future timesteps are modeled as conditionally independent given the endpoint and context, enabling parallel decoding rather than a recurrent rollout.
+
+The conditional-unimodality ablation compares the Huber regressor with a CVAE. With one trajectory per target, both give approximately 0.73 m minADE after final selection. Sampling ten CVAE trajectories per target improves that to 0.71 m. The modest gain supports the simpler decoder for the tested horizons; it does not rule out multiple routes or timing patterns sharing one endpoint on longer journeys.
+
+The final scorer sees whole trajectories. It is trained against a soft distribution based on each proposed path's distance from the ground truth, using the maximum squared pointwise displacement as the distance measure. At inference, candidates are sorted by score and selected greedily, suppressing paths too similar to those already retained. This adds both path-level plausibility and diversity to the endpoint ranking.
+
+### Selection recovers useful coverage within a six-trajectory budget
+
+The stage ablation measures the distinction directly:
+
+| Argoverse validation output | Candidate count | minFDE, m | minADE, m | Miss rate at 2 m |
+| --- | --- | --- | --- | --- |
+| Target stage | 50 | 0.533 | — | 0.027 |
+| Motion stage, endpoint-ranked | 6 | 1.632 | 0.877 | 0.216 |
+| Final trajectory scoring and selection | 6 | 1.292 | 0.728 | 0.093 |
+
+The fifty targets cover the observed endpoint well, but retaining only six by endpoint ranking loses substantial coverage. Scoring the complete trajectories nearly halves that six-mode miss rate again. There is still a gap from the fifty-candidate oracle: a compact prediction set cannot inherit the larger set's coverage for free.
+
+The retained example below shows the same progression visually. Many targets and trajectories cluster along plausible routes in the first two panels. The right panel keeps six representatives after scoring and suppression. It is a crop of one example from the source figure, not a summary of every behavior evaluated.
+
+![TNT source Figure 4, example crop: fifty targets, fifty trajectories, and six selected trajectories](/assets/images/tnt-target-driven-trajectory-prediction-source-figure-4.webp)
+*Fig 2: One Argoverse example traces candidate targets through motion estimation to the selected six paths. The reduction removes redundancy, but its usefulness depends on retaining distinct routes and speeds rather than merely the highest endpoint scores. | source: [TNT, Figure 4, example crop](https://arxiv.org/abs/2008.08294)*
+
+### The benchmark result depends on both split and output budget
+
+On Argoverse validation, TNT reports 1.29 m minFDE, 0.73 m minADE, and 0.09 miss rate with six trajectories. MultiPath, reimplemented with the same VectorNet context encoder, reports 1.68 m, 0.80 m, and 0.14. Sharing the encoder makes this a more informative test of the prediction design than comparing systems with unrelated scene representations.
+
+The test leaderboard comparison is mixed. TNT has lower minADE than the cited challenge winner, 0.94 versus 0.97 m, and the same 0.13 miss rate, but worse minFDE, 1.54 versus 1.42 m. The paper's broad competitive-performance description should therefore be read metric by metric.
+
+The pedestrian results also use different budgets and units. PAID reports 0.32 m minFDE and 0.18 m minADE with three trajectories. Stanford Drone reports 21.16 and 12.23 pixels with five trajectories and a longer 4.8-second prediction horizon. Those values cannot be directly ranked against the six-mode vehicle results. The portable idea is the endpoint-conditioned decomposition; candidate geometry, horizon, and evaluation budget still determine its usefulness.
 
 ## High-Level Takeaways
 
-- TNT informs whether multimodal forecasting should first choose a destination and then generate the path, rather than regress complete trajectories in one step. The atomic hierarchy is an actor history, a candidate target state, and a target-conditioned trajectory; a final scorer selects a compact diverse set.
-- The factorization gives modes a semantic endpoint, but target discretization and candidate pruning can exclude valid futures before decoding. The missing ablation holds total proposals fixed while comparing endpoint-first, anchor-trajectory, and direct set prediction across map-rich and map-free datasets. At 10× candidate density, target scoring dominates and duplicates crowd out rare modes. TNT's claim would fail if direct trajectory-set prediction matched miss rate and diversity without a target bottleneck.
-- TNT made goal-conditioned motion forecasting feel practical for autonomous driving. It kept the multimodal structure visible and showed that endpoint candidates can be a cleaner intent representation than opaque latent samples.
-- Predict the destination first, then make the trajectory explain how to get there.
+- TNT makes multimodality explicit through candidate endpoints, then models the path conditional on each endpoint. The endpoint is a useful intent proxy rather than a complete description of intent.
+- Target offsets recover precision without arbitrarily dense sampling; the Argoverse spacing ablation saturates at about one meter in the tested configuration.
+- Whole-trajectory scoring substantially improves the six-mode miss rate over endpoint ranking, demonstrating that target recall and final forecast quality are different problems.
+- A richer conditional decoder adds little in the reported ablation, supporting simple regression for those horizons without proving it sufficient for long-term motion.
+- Test gains are mixed across metrics, and pedestrian benchmarks change both units and candidate counts. The clean comparison holds the context encoder and output budget fixed.
