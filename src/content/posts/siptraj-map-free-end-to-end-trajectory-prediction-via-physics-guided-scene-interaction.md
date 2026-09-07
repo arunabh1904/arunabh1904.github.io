@@ -12,6 +12,8 @@ field: 'Motion Forecasting & Planning'
 summary: "2026 – SIPTraj: Map-Free End-to-End Trajectory Prediction via Physics-Guided Scene Interaction"
 ---
 
+**arXiv:** [2608.00779](https://arxiv.org/abs/2608.00779)
+
 ## Summary
 
 > SIPTraj replaces two priors lost with an HD map: agent-specific scene grounding and physical feasibility. Its Hierarchical Agent–Scene Encoder repeatedly reads BEV evidence for each agent, writes local evidence back into the agent representation, and refines relations. Its Physics-Guided Iterative Decoder injects speed, acceleration, and curvature as queries while acceleration, jerk, and curvature losses train the internal pathway. On the standard 2-second-history/6-second-future setup, the map-free model reports mADE5 of 1.1367 m on nuScenes and 0.7438 m on Argoverse 2 Sensor.

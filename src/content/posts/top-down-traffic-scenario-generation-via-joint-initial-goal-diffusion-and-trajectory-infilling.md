@@ -12,9 +12,11 @@ field: 'Motion Forecasting & Planning'
 summary: "2026 – Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling"
 ---
 
+**arXiv:** [2608.11407](https://arxiv.org/abs/2608.11407)
+
 ## Summary
 
-> TrafficDiffuser makes a traffic scenario explicit before it generates detailed motion. A diffusion model samples each agent's initial and goal states jointly from map context; an infiller then connects those endpoints by predicting distances from a bridge between them. The paired endpoints make an initial scene interpretable and turn trajectory synthesis into a constrained infilling problem. On Argoverse 2, the authors report a 55.3% reduction in speed-distribution distance versus SceneControl and a 2.8% off-road reduction versus PD-Init, while also showing the realism tradeoffs those headline reductions hide.
+> TrafficDiffuser makes a traffic scenario explicit before it generates detailed motion. A diffusion model samples each agent's initial and goal states jointly from map context; an infiller then connects those endpoints by predicting distances from a bridge between them. The paired endpoints make an initial scene interpretable and turn trajectory synthesis into a constrained infilling problem. On Argoverse 2, the displayed tables improve speed-distribution distance and off-road rate while increasing initialization collisions. The paper’s headline percentage reductions disagree with those table values, so the absolute comparisons are the clearer evidence.
 
 ## Core Insights
 
@@ -38,12 +40,12 @@ The diversity and initialization table makes that boundary visible. For generate
 
 ### Diffusion supplies diversity under a fixed map, not a closed-loop simulator
 
-The source Figure 5 holds the map and agent count fixed within each row and samples different initial-goal configurations across columns. The blue-to-red pair indicators make a useful intuition concrete: diversity is visible as different plausible endpoint assignments on the same road geometry, while the connecting line exposes whether an assignment is reachable. Guidance sampling is used for this qualitative visualization, whereas the quantitative Table I comparison is reported without guidance sampling for fairness.
+The source Figure 5 holds the map fixed within each row and varies agent count across columns and samples different initial-goal configurations across columns. The blue-to-red pair indicators make a useful intuition concrete: diversity is visible as different plausible endpoint assignments on the same road geometry, while the connecting line exposes whether an assignment is reachable. Guidance sampling is used for this qualitative visualization, whereas the quantitative Table I comparison is reported without guidance sampling for fairness.
 
 ![TrafficDiffuser samples diverse reachable initial-goal pairs on the same maps](/assets/images/top-down-traffic-scenario-generation-via-joint-initial-goal-diffusion-and-trajectory-infilling-source-figure-5.webp)
 *Fig 3: Repeated samples on fixed maps show diversity in agent count and reachable initial-goal pairs. | source: [Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling, Figure 5](https://arxiv.org/abs/2608.11407)*
 
-The authors use Argoverse 2 Motion Forecasting data, z-normalize positions and speeds, and model five categories: vehicle, bus, pedestrian, bicycle, and motorcycle. Common-sense metrics measure collision, off-road, and nearest lane-edge behavior; Jensen–Shannon divergence measures speed, lateral deviation, local density, and nearest-agent distributions. The 55.3% speed-distance reduction is relative to SceneControl's 0.16 JSD versus TrafficDiffuser's 0.068, and the off-road claim compares 5.10% with PD-Init's 5.36%. The model is not evaluated as a long-horizon closed-loop traffic world in this paper.
+The authors use Argoverse 2 Motion Forecasting data, z-normalize positions and speeds, and model five categories: vehicle, bus, pedestrian, bicycle, and motorcycle. Common-sense metrics measure collision, off-road, and nearest lane-edge behavior; Jensen–Shannon divergence measures speed, lateral deviation, local density, and nearest-agent distributions. The displayed speed JSD falls from SceneControl’s 0.16 to 0.068, a 57.5% reduction; the paper instead reports 55.3%. Off-road rate falls from PD-Init’s 5.36% to 5.10%, a 0.26-percentage-point reduction, or about 4.9% relative; the paper reports 2.8%. These source inconsistencies do not change the direction of either comparison, but the stated percentages should not be treated as calculations from the shown values. The model is not evaluated as a long-horizon closed-loop traffic world in this paper.
 
 ## High-Level Takeaways
 

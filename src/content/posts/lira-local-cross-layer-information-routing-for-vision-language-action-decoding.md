@@ -36,7 +36,7 @@ This is a routing change, not a new backbone or training recipe. The action head
 
 ### The local window is the useful inductive bias
 
-The action decoder uses a Qwen2.5-0.5B backbone, 64 LIRA Query tokens, and a centered three-layer window by default. This adds no trainable parameters relative to VLA-Adapter. The strongest separation appears under controlled distribution shift: zero-shot LIBERO-Plus success rises from 59.1% for VLA-Adapter to 78.0% for LIRA, while the ordinary LIBERO average moves from 97.3% to 98.9% and LIBERO-Long from 95.0% to 97.6%.
+The compact VLA uses a Prismatic-style VLM with a Qwen2.5-0.5B language backbone, 64 LIRA Query tokens, and a centered three-layer window by default. This adds no trainable parameters relative to VLA-Adapter. The strongest separation appears under controlled distribution shift: zero-shot LIBERO-Plus success rises from 59.1% for VLA-Adapter to 78.0% for LIRA, while the ordinary LIBERO average moves from 97.3% to 98.9% and LIBERO-Long from 95.0% to 97.6%.
 
 The ablations distinguish routing from simply adding queries. A last-layer-only route reaches 92.8% on LIBERO-Long with 256 query tokens, while LIRA reaches 97.6% with 64. A matched three-layer window beats a single layer (95.4→97.6% on LIBERO-Long), four layers falls to 96.4%, and global aggregation falls to 93.7%. The local neighborhood is doing the work; more tokens or unrestricted depth access are not reliable substitutes.
 

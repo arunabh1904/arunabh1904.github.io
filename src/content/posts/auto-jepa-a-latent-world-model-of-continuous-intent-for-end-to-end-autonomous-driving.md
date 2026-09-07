@@ -15,6 +15,8 @@ topics:
 summary: '2026 – Auto-JEPA: A Latent World Model of Continuous Intent for End-to-End Autonomous Driving'
 ---
 
+**arXiv:** [2607.29031](https://arxiv.org/abs/2607.29031)
+
 ## Summary
 
 > Auto-JEPA predicts a latent representation of future ego motion instead of reconstructing the whole future scene. Four front-camera frames, four historical ego positions, and a route command feed a frozen V-JEPA 2 encoder and a Transformer predictor that emits eight future-intent tokens. The predicted latent retrieves 300 executable trajectories from a ground-truth-only memory; a scene scorer ranks them and a learned drivable-area gate filters failures. The result is a planning-oriented predictive state, not a general simulator of other agents.

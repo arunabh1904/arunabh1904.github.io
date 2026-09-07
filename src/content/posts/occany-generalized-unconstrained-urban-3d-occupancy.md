@@ -32,7 +32,7 @@ The reconstruction stage starts from MUSt3R, freezes its encoder, and trains a d
 
 ### Novel views turn occlusion into an inference-time resource
 
-The rendering stage receives sampled camera poses along the predicted trajectory and reconstructs pointmaps and segmentation features for those novel views. A smaller rendering encoder is initialized from the reconstruction stage and distilled from its larger 24-block encoder. At inference, Test-Time View Augmentation samples forward and lateral shifts, aggregates original and rendered pointmaps, and voxelizes them with trilinear interpolation. It is a completion operation: a view that was never captured can expose an object surface hidden from the input cameras.
+The rendering stage receives sampled camera poses along the predicted trajectory and reconstructs pointmaps and segmentation features for those novel views. A smaller rendering encoder is initialized from the reconstruction stage and distilled from its larger 24-block encoder. At inference, Test-Time View Augmentation samples forward and lateral shifts, aggregates original and rendered pointmaps, and voxelizes them with trilinear interpolation. It is a completion operation: a synthesized view can hypothesize a surface hidden from the input cameras. That completion adds a learned prior, not a new sensor observation.
 
 ![OccAny two-stage reconstruction and novel-view-rendering training pipeline](/assets/images/occany-generalized-unconstrained-urban-3d-occupancy-source-figure-2.webp)
 *Fig 2: The source’s Figure 2 shows reconstruction, scene-memory formation, Segmentation Forcing, and the novel-view rendering stage trained from sampled poses. | source: [OccAny: Generalized Unconstrained Urban 3D Occupancy, Figure 2](https://arxiv.org/abs/2603.23502)*
@@ -50,7 +50,7 @@ This distinction matters for deployment. The target benchmark’s calibrated, vi
 ## High-Level Takeaways
 
 - OccAny learns a reusable metric scene memory and predicts target camera geometry instead of requiring a known target rig.
-- Segmentation Forcing adds semantic boundaries to geometric training, while Novel-View Rendering completes the surfaces that the input views cannot see.
+- Segmentation Forcing adds semantic boundaries to geometric training, while Novel-View Rendering predicts missing surfaces from learned priors.
 - The largest reported generalization gains depend on test-time view augmentation, so latency and pose-error sensitivity are part of the method’s identity.
 - Geometric IoU transfers much better than fine-grained semantic mIoU, and in-domain occupancy specialists still lead the comparison.
 - A convincing next step is a dynamic, uncalibrated evaluation with moving objects, pose drift, adverse weather, and matched inference budgets against calibrated occupancy models.

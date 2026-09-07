@@ -16,6 +16,8 @@ topics:
 summary: '2026 – Qwen-RobotWorld: Unifying Embodied World Modeling through Language-Conditioned Video Generation'
 ---
 
+**arXiv:** [2606.17030](https://arxiv.org/abs/2606.17030)
+
 ## Summary
 
 > Qwen-RobotWorld treats natural language as a shared action interface for manipulation, driving, navigation, and human-to-robot transfer. A frozen 7B Qwen2.5-VL encoder supplies action semantics, a 127M Wan VAE encodes video state, and a 20B, 60-layer double-stream MMDiT predicts future video latents through joint attention. The report's unification claim is backed by an 8.6M-pair, 200M-frame corpus and broad generation benchmarks; it does not yet show that generated rollouts improve a downstream policy in closed loop.
@@ -26,7 +28,7 @@ summary: '2026 – Qwen-RobotWorld: Unifying Embodied World Modeling through Lan
 
 Robot manipulation exposes joint or end-effector commands, driving exposes vehicle motion, and navigation exposes heading or waypoint instructions. Qwen-RobotWorld maps more than 20 embodiments and 500 action categories into natural-language descriptions, allowing one conditional video objective to see them as the same kind of transition: current observation plus language action produces future visual state.
 
-The data mixture is deliberately general plus expert. The Embodied World Knowledge corpus contains approximately 8.6M video-text pairs and more than 200M observation frames. Roughly 30% is general-world data; the embodied portion includes about 5.9M manipulation samples, about 200K driving samples, 6K+ indoor-navigation episodes, and human-to-robot transfer data across 14 morphologies. Within embodied SFT, manipulation receives about 90% of the embodied sampling weight, while navigation and driving each receive about 5%. This balance explains both the broad interface and the model's stronger manipulation evidence.
+The data mixture is deliberately general plus expert. The Embodied World Knowledge corpus contains approximately 8.6M video-text pairs and more than 200M observation frames. Roughly 30% is general-world data; the embodied portion includes about 5.9M manipulation samples, about 200K driving samples, 6K+ indoor-navigation episodes, and human-to-robot transfer data across 14 morphologies. The SFT recipe reserves about 5% for multi-view concatenation and about 5% for a combined navigation/driving bucket; manipulation dominates the remainder. This balance explains both the broad interface and the model's stronger manipulation evidence.
 
 ### Double-stream MMDiT couples semantics and visual dynamics at every layer
 

@@ -9,6 +9,8 @@ field: 'BEV Perception & Mapping'
 summary: '2025 – UniLION: one linear-RNN backbone across sensors, time, and driving tasks'
 ---
 
+**arXiv:** [2511.01768](https://arxiv.org/abs/2511.01768)
+
 ## Summary
 
 > UniLION turns sparse LiDAR, camera, and temporal voxels into one 3D backbone built from grouped linear RNNs, then fans a shared BEV representation into perception, prediction, and planning heads. Its strongest evidence is a sensor-ablation rather than a single leaderboard number: one model trained with LiDAR, cameras, and history can run after inputs disappear, although a LiDAR-only specialist remains better when LiDAR-only deployment is known in advance.

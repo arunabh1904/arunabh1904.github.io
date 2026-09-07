@@ -12,6 +12,8 @@ field: 'Motion Forecasting & Planning'
 summary: "2026 – Unified Pedestrian Path Prediction Using Inverse Reinforcement Learning"
 ---
 
+**arXiv:** [2608.15929](https://arxiv.org/abs/2608.15929)
+
 ## Summary
 
 > This study asks whether a strong social trajectory architecture benefits from a decision formulation rather than only supervised coordinate regression. It adapts STGAT to one-time and step-wise decision processes, uses squared distance to expert pedestrian trajectories as the reward signal, and compares supervised learning, REINFORCE, PPO, value baselines, and discount settings. The best reported average minADE/minFDE comes from PPO with a full-state baseline (0.5227/1.0551), while the step-wise supervised formulation at lambda=0.4 reaches 0.5079/1.0822. The paper is a controlled objective study, not a new perception backbone or a learned reward-discovery system.
