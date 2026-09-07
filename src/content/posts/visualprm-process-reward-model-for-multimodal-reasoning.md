@@ -17,34 +17,59 @@ summary: "2025 – VisualPRM: An Effective Process Reward Model for Multimodal R
 
 ## Summary
 
-> VisualPRM is an 8B process reward model trained to judge intermediate steps in multimodal reasoning. It introduces an automated 400K-example process-supervision dataset and VisualProcessBench, which contains human-labeled step correctness for evaluating critics rather than only final answers.
+> VisualPRM is an 8B process reward model that judges intermediate steps in multimodal reasoning. It uses about 400,000 automatically supervised process examples, introduces a human-labeled VisualProcessBench for critic evaluation, and improves Best-of-$N$ selection across seven multimodal benchmarks. The paper’s key contribution is to evaluate the critic as a step-level model, rather than treating final-answer accuracy as enough evidence that the critic works.
 
 ## Core Insights
 
-![Comparison of outcome, value-based process, and advantage-based process reward modeling across reasoning steps](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-paper-figure.png)
-*Fig 1: Distinguishes outcome supervision from stepwise value and advantage targets; VisualPRM uses the step-conditioned signal to score where a multimodal solution goes wrong. | source: [VisualPRM](https://arxiv.org/abs/2503.10291)*
+### Automatic process supervision turns a final answer into step labels
 
-![Figure 1 from VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-1.webp)
-*Fig 2: The overall Best-of-8 evaluation results across seven multimodal reasoning benchmarks with different critic models. Our VisualPRM greatly enhances the overall performance, while InternVL2.5-8B struggles to be an effective critic model. | source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](https://arxiv.org/abs/2503.10291)*
+A final correctness label cannot say where a visual solution went wrong. VisualPRM400K addresses this with Monte Carlo process supervision. For a solution step $s_i$, the authors sample continuations and estimate its expected accuracy,
 
-![Figure 2 from VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-2.webp)
-*Fig 3: Data examples in VisualPRM400K and VisualProcessBench. For VisualPRM400K, we generate the data using an automatic data pipeline. | source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](https://arxiv.org/abs/2503.10291)*
+$$
+mc_i=\frac{\text{number of correct sampled completions}}
+{\text{number of sampled completions}}.
+$$
 
+A step is labeled correct when $mc_i>0$. The image, question, previous steps, and current step are formatted as a multi-turn conversation; the model predicts the correctness of every step. This is a noisy but scalable alternative to labeling every intermediate derivation by hand.
 
-At inference, a policy model generates several reasoning traces and VisualPRM selects among them. Best-of-8 improves six model sizes/families; the paper reports a 5.9-point average gain even for InternVL2.5-78B across seven benchmarks. VisualPRM outperforms outcome reward and self-consistency baselines in the studied comparisons.
+The data and evaluation sets answer different questions, which the source figure makes explicit:
 
-The transferable lesson for robotics is methodological. A process critic needs its own benchmark with localized error labels. However, a text reasoning step is inspectable and reversible in ways a physical transition is not. Robot progress supervision must additionally represent geometry, contact, timing, and causal state change.
+![Examples from VisualPRM400K automatic supervision and VisualProcessBench human step labels](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-2.webp)
+*Figure 1: Source Figure 2. VisualPRM400K attaches Monte Carlo expected-accuracy labels to generated solution steps, while VisualProcessBench contains human correctness judgments for evaluating critics. The source image shows why a solution can be correct at its early steps and fail later. Source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](https://arxiv.org/abs/2503.10291).*
 
-| Artifact | Purpose |
-| --- | --- |
-| VisualPRM400K | Trains step-level multimodal error detection |
-| VisualProcessBench | Measures critic accuracy on human-labeled steps |
-| Best-of-$N$ evaluation | Tests whether critic ranking improves the policy output |
+VisualProcessBench contains 2,866 samples and 26,950 human step labels drawn from MMMU, MathVista, MathVision, MathVerse’s Vision-Only split, DynaMath, and WeMath. Thirteen annotators worked for three days, or 39 person-days, at an estimated $37 per person-day. The benchmark includes incorrect steps throughout a solution, not only the first error, and reports macro F1 for step judgments. That makes it a test of critic discrimination rather than a proxy for final answer accuracy.
+
+### Value and advantage labels ask different process questions
+
+The paper compares two labels. A value-based process reward model scores whether the current step is correct, using the sign of its expected accuracy. An advantage-based model scores how the step changes expected accuracy relative to the preceding step. The distinction matters: a step may be correct in isolation while failing to improve the solution, or it may be a neutral transition that preserves a good trajectory.
+
+The local schematic below is an adaptation of the paper’s process-modeling figure:
+
+![Adapted comparison of outcome, value-based, and advantage-based process supervision](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-paper-figure.png)
+*Figure 2: Adapted from source Figure 3. Value-based labels judge the expected correctness of each step; advantage-based labels judge its change from the previous step. The plotted graphic is a local adaptation of the source schematic; source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](https://arxiv.org/abs/2503.10291).*
+
+At inference, VisualPRM reads all steps and produces a score for each in one forward pass by using a “+” placeholder and the probability of generating it. For Best-of-$N$, a policy samples candidate solutions at temperature 0.7 and the critic aggregates their step scores to select one response. The main experiments use $N=8$ and evaluate MMMU, MathVista, MathVision, MathVerse-VO, DynaMath, WeMath, and LogicVista.
+
+### The critic improves selection even for large policy models
+
+The source Figure 1 compares pass@1 with Best-of-8 under an open-source critic and VisualPRM:
+
+![Best-of-8 multimodal reasoning results with different policy and critic models](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-1.webp)
+*Figure 3: Source Figure 1. VisualPRM-8B is compared with pass@1 and Best-of-8 using InternVL2.5-8B as the critic across six policy-model families and scales. The critic improves the overall score from 46.0 to 51.9 for InternVL2.5-78B, a 5.9-point gain, even though the policy is much larger than the critic. Source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning](https://arxiv.org/abs/2503.10291).*
+
+The reported Best-of-8 gains are 8.0 points for MiniCPM-V2.6, 3.7 for QwenVL2.5-7B, 8.4 for InternVL2.5-8B, 8.9 for InternVL2.5-26B, 6.3 for InternVL2.5-38B, and 5.9 for InternVL2.5-78B. The critic therefore adds value through ranking, not by making the policy generate a better single sample.
+
+The human benchmark explains why the model is useful as a critic. Random guessing scores 50.0 overall on VisualProcessBench; VisualPRM reaches 62.0. InternVL2.5-8B reaches 76.8 F1 on positive steps but only 19.2 on negative steps, which shows the failure mode of a generally capable MLLM used as a process judge: it tends to call most steps correct. VisualPRM’s advantage is discrimination between a plausible step and an actually erroneous one.
+
+### Ablations say aggregation matters as much as the critic
+
+For InternVL2.5-8B, VisualPRM beats self-consistency by 2.4 points and an outcome reward model by 1.5 points at Best-of-8. At $N=128$, those gaps widen to 3.1 and 4.3 points. The outcome critic improves at first but is not consistently monotonic as $N$ grows.
+
+The modeling ablations explain the result. Value-based PRMs outperform advantage-based PRMs in both Best-of-$N$ and VisualProcessBench. Averaging step scores beats selecting the maximum, because a single high-scored early step can hide a later error; averaging acts like an ensemble over the whole solution. Supervising all steps also slightly beats stopping supervision at the first incorrect step. The automatic labels are imperfect, so retaining later steps gives the model more signal about where solutions diverge.
 
 ## High-Level Takeaways
 
-- VisualPRM informs whether to spend compute on more policy samples or on a critic capable of ranking their reasoning paths. Its unit is an intermediate multimodal reasoning step. The critic is separate from the policy, so policy scale and critic quality can be varied independently.
-- The paper establishes value for selection among generated reasoning traces, not for dense robot reward. A missing transfer experiment aligns critic judgments with physical subgoal completion under occlusion and temporal ambiguity. At ten times the rollout length, local step accuracy can still produce globally inconsistent rankings. The process-supervision thesis fails in robotics if step labels do not predict closed-loop outcomes better than terminal success.
-- VisualPRM provides the clean blueprint for evaluating a critic as a model, dataset, and benchmark—not merely as an RL component.
-- Automated reasoning traces and physical trajectories have different counterfactual and observability structure.
-- Before optimizing a policy against a process reward, prove that the critic can localize the errors that cause final failure.
+- Evaluate a process critic twice: first on localized human step labels, then on whether it improves Best-of-$N$ selection. A good final-answer score alone cannot distinguish a useful critic from a lucky sampler.
+- Process reward is not one scalar design. Value labels, advantage labels, score aggregation, and supervision cutoff change what the critic prefers; the paper’s best combination is value-based, all-step supervision with average aggregation.
+- More test-time samples are useful only when the critic can rank them. VisualPRM keeps improving from $N=8$ to $N=128$, while the outcome critic saturates or declines in the same comparison.
+- The source labels are generated from multimodal reasoning traces and human judgments, so the result establishes step-level selection for these benchmarks. A physical process would need labels for temporal state, contact, and irreversible consequences before this critic pattern could be trusted.
