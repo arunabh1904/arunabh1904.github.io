@@ -28,7 +28,7 @@ The candidate-recall view makes the design easier to evaluate. With the full mod
 
 ### The ablations separate representation, position, and time
 
-The CVIS stepwise ablation starts with a 12.25 m mean error. Multi-level features reduce it to 5.92 m, a position-aware update to 4.96 m, and temporal context to 1.57 m. The full test split reports 1.57 m mean, 1.21 m median, 40.22% R@1 m, 77.51% R@2 m, and 98.99% R@5 m. The corresponding no-temporal model is 5.92 m mean and 61.95% R@5 m, while its latency is only 28.94 ms versus 97.32 ms for the full six-frame sequence on the authors’ RTX 3090 setup. The comparison makes the cost legible: history is doing more than smoothing an already-correct answer, but the recurrent branch is also the main latency increase.
+The CVIS stepwise ablation starts with a 12.25 m mean error. Multi-level features reduce it to 5.92 m, a position-aware update to 4.96 m, and temporal context to 1.57 m. The full test split reports 1.57 m mean, 1.21 m median, 40.22% R@1 m, 77.51% R@2 m, and 98.99% R@5 m. Table 4 labels its 5.92 m mean / 61.95% R@5 m variant “without temporal” and reports 28.94 ms versus 97.32 ms for the full six-frame sequence on an RTX 3090. Those accuracy values match Table 6’s multi-level-only row; the separate position-aware variant without cross-frame attention reaches 4.96 m. The runtime comparison therefore should not be mistaken for a matched full-model-minus-temporal ablation. The comparison makes the cost legible: history is doing more than smoothing an already-correct answer, but the recurrent branch is also the main latency increase.
 
 | Decision | What the paper measures | Why it matters |
 | --- | --- | --- |
