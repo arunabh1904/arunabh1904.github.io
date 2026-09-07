@@ -10,8 +10,8 @@ tags:
   - Apple Silicon
   - Inference
 summary: >-
-  A current fit guide for Muse Glimmer, Ministral, Granite, Nemotron, Mistral
-  Small 4, and DeepSeek V4 Flash on a 64 GB Apple Silicon machine.
+  An August 13, 2026 fit guide for Muse Glimmer, Ministral, Granite, Nemotron,
+  Mistral Small 4, and DeepSeek V4 Flash on a 64 GB Apple Silicon machine.
 ---
 # Which Current Open-Weight Models Fit on a 64 GB MacBook Pro?
 
@@ -19,11 +19,11 @@ The useful local-model question is no longer “which old Qwen quant should I do
 
 My shortlist on an M5 Max is `Muse Glimmer 30B` when I want a current multimodal generalist, `Ministral 3 14B` when I want the easiest fast deployment, and `Granite 4.1 30B` when the workload is closer to retrieval, tools, or enterprise text. `Nemotron 3 Nano 30B-A3B` is also plausible through a community 4-bit conversion, but its official full-precision checkpoint is too close to the machine's entire memory capacity. `Mistral Small 4` and `DeepSeek V4 Flash 0731` do not belong on this laptop.
 
-This is a fit guide dated August 13, 2026. File sizes are from the linked model repositories. Only the Glimmer row is backed by my own local benchmark; the other rows are capacity recommendations, not invented performance measurements.
+This is an August 13, 2026 snapshot. “Current” means current on that date. File sizes are from the linked model repositories. Only the Glimmer row is backed by my own local benchmark; the other rows are capacity recommendations, not invented performance measurements.
 
 ## The shortlist
 
-| Model | Practical local artifact | Weight size | `64 GB` verdict | Why I would choose it |
+| Model | Practical local artifact | Artifact size | `64 GB` verdict | Why I would choose it |
 | --- | --- | ---: | --- | --- |
 | `Muse Glimmer 30B` | Official `Q4_K_M` GGUF | `16.76 GB` | Comfortable | Current dense vision-language model with an official Mac-oriented quant |
 | `Ministral 3 14B Instruct` | Official `Q4_K_M` GGUF | `8.24 GB` | Very comfortable | Simplest current general-purpose serving target in this set |
@@ -32,7 +32,7 @@ This is a fit guide dated August 13, 2026. File sizes are from the linked model 
 | `Mistral Small 4 119B-A6B` | Official `NVFP4` checkpoint | About `70.8 GB` | No | Active compute is small; resident weights still exceed the laptop budget |
 | `DeepSeek V4 Flash 0731` | Official fused checkpoint | About `167 GB` | No | Supported serving starts around `200 GB` of accelerator memory |
 
-“Comfortable” does not mean “load a 128K context for free.” It means the weights leave a credible working budget. The KV cache, Metal buffers, multimodal projector, speculative draft model, application processes, and macOS all draw from the same physical memory. A model whose files consume `60+ GB` is not a `64 GB` laptop model merely because the operating system can swap.
+“Comfortable” does not mean “load a 128K context for free.” The table's artifact size is a storage footprint, not the complete resident-memory requirement. A credible fit leaves room for the runtime, KV cache, Metal buffers, multimodal projector, speculative draft model, application processes, and macOS, which all draw from the same physical memory. A model whose resident artifact consumes `60+ GB` is not a `64 GB` laptop model merely because the operating system can swap.
 
 Model fit is an application budget, not a weight-file test. The useful model is the one that leaves memory for its context, runtime, tools, and the rest of the machine.
 
@@ -40,11 +40,11 @@ I am using *open-weight* deliberately. These releases do not all use the same li
 
 ## Glimmer is the new default
 
-Meta's [`Muse-Glimmer-30B`](https://huggingface.co/meta-models/Muse-Glimmer-30B) is a `29.6B` dense vision-language model with a `131K` context window. The official [GGUF repository](https://huggingface.co/meta-models/Muse-Glimmer-30B-GGUF) makes the laptop decision unusually clean: the recommended `Q4_K_M` file is `16,756,683,904` bytes, while the higher-quality dynamic `Q4_K_XL` file is `19,653,960,832` bytes. Both leave far more headroom than this machine needs for text serving.
+Meta's [`Muse-Glimmer-30B`](https://huggingface.co/meta-models/Muse-Glimmer-30B) is a `29.6B` dense vision-language model with a `131K` context window. The official [GGUF repository](https://huggingface.co/meta-models/Muse-Glimmer-30B-GGUF) makes the laptop decision unusually clean: the recommended `Q4_K_M` file is `16,756,683,904` bytes, while the higher-quality dynamic `Q4_K_XL` file is `19,653,960,832` bytes. Both leave a credible budget for ordinary text serving; context, runtime allocations, and optional components still consume unified memory.
 
-Vision adds an approximately `1.4 GB` multimodal projector. Meta also publishes an approximately `1.6 GB` DFlash draft model for speculative decoding. Even with both components, the smaller official quant remains comfortably below half of unified memory.
+Vision adds an approximately `1.4 GB` multimodal projector. Meta also publishes an approximately `1.6 GB` DFlash draft model for speculative decoding. The three files total roughly `20 GB` before runtime allocations and KV cache, leaving a credible budget on this machine without promising that the full `131K` context will be interactive.
 
-That does not make Glimmer automatically better than every smaller specialist. It makes it the model in this list whose capability envelope is widest without making the fit decision uncomfortable. With full Metal offload, I measured the official `17 GB` quant at `27.9 tok/s`, rising to `48.3 tok/s` with the official DFlash drafter in [my Glimmer benchmark](/blog/2026/08/13/running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro.html).
+That does not make Glimmer automatically better than every smaller specialist. It makes it the model in this list whose capability envelope is widest without making the fit decision uncomfortable. With full Metal offload on the measured short text suite, I measured the official `17 GB` quant at `27.9 tok/s`, rising to `48.3 tok/s` with the official DFlash drafter in [my Glimmer benchmark](/blog/2026/08/13/running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro.html).
 
 ## Ministral is low friction
 

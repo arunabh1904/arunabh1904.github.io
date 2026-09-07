@@ -104,7 +104,7 @@ print(response.choices[0].message.content)
 
 This still lets a local browser app expose a service on the Mac: the UI, retrieval, tools, logging, and request policy run locally, while model inference runs behind DeepSeek's endpoint. It is not private local inference, but it is the only practical way to use the exact `0731` checkpoint on this hardware without renting a large accelerator server.
 
-DeepSeek's pricing changes on August 16, 2026, so I would read the [live pricing page](https://api-docs.deepseek.com/quick_start/pricing/) rather than freeze a comparison that will age within days. The durable comparison is architectural. API use converts a large fixed hardware commitment into metered requests. Self-hosting becomes rational only when privacy, sustained use, or deployment control repays a server with at least roughly `200 GB` of accelerator memory.
+DeepSeek's API docs announced pricing effective August 16, 2026, so I would read the [live pricing page](https://api-docs.deepseek.com/quick_start/pricing/) rather than treat a dated comparison as current. The durable comparison is architectural. API use converts a large fixed hardware commitment into metered requests. Self-hosting becomes rational only when privacy, sustained use, or deployment control repays a server with at least roughly `200 GB` of accelerator memory.
 
 ## Recommendation
 

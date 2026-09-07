@@ -41,7 +41,7 @@ Temperature $\tau$ controls how sharply the model separates the similarities. At
 ![Figure 1 from the CLIP paper, showing contrastive pretraining and zero-shot transfer through text prompts](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
 *CLIP aligns image and text encoders during pretraining, then replaces the fixed classifier head with written class prompts. source: [Learning Transferable Visual Models From Natural Language Supervision](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html)*
 
-CLIP's loss still couples every example in the batch. Each image competes against every caption, and every unmatched pair is treated as a negative. Larger batches give the model harder comparisons, but they also require heavy synchronization across devices. They can even create false negatives when two captions describe compatible images.
+CLIP's loss still couples every example in the batch. Each image competes against every caption, and every unmatched pair is treated as a negative. Larger batches give the model more comparisons, but they also require heavy synchronization across devices. They can even create false negatives when two captions describe compatible images.
 
 [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html) replaced CLIP's batch-wide softmax with an independent sigmoid loss for every image-text pair. Positive pairs receive a positive label and the remaining pairs receive a negative label. Removing the shared denominator reduces the dependence on batch size and cross-device synchronization, which makes the objective easier to scale across distributed systems.
 
@@ -55,7 +55,7 @@ Localization still does not provide a generative interface. A shared embedding c
 
 A pretrained language model already contained most of the machinery needed for text generation. The remaining problem was to map visual features into its input space without retraining the full vision-language stack.
 
-The first approach was to keep the language model frozen. [Multimodal Few-Shot Learning with Frozen Language Models](/paper%20shorts/2021/06/25/multimodal-few-shot-learning-with-frozen-language-models.html) learned a visual prefix that the decoder could treat like extra context. [Flamingo](/paper%20shorts/2022/04/29/flamingo-visual-language-model-for-few-shot-learning.html) built a stronger bridge. A Perceiver Resampler compresses an image or video into 64 visual tokens, and gated cross-attention lets the frozen language model read them between its existing blocks. The gates start near zero, so training begins with the original language model almost unchanged.
+One route kept the language model frozen. [Multimodal Few-Shot Learning with Frozen Language Models](/paper%20shorts/2021/06/25/multimodal-few-shot-learning-with-frozen-language-models.html) learned a visual prefix that the decoder could treat like extra context. [Flamingo](/paper%20shorts/2022/04/29/flamingo-visual-language-model-for-few-shot-learning.html) built a stronger bridge. A Perceiver Resampler compresses an image or video into 64 visual tokens, and gated cross-attention lets the frozen language model read them between its existing blocks. The gates start near zero, so training begins with the original language model almost unchanged.
 
 [BLIP](/paper%20shorts/2022/01/28/blip-bootstrapping-language-image-pretraining.html) trained more of the path and cleaned the data at the same time. The same encoder-decoder handles image-text contrast, image-text matching, and caption generation under different attention masks. Its CapFilt pipeline generates better captions for noisy web images and filters weak pairs. Captioning now does two jobs: it trains the model to generate text and improves the data used for the next round of training.
 
@@ -66,15 +66,15 @@ These models differ mainly in where they spend the training. Flamingo keeps both
 
 ### From Q-Formers to MLP projectors
 
-Connecting a vision encoder to a language model requires two decisions. The connector has to map visual features into the language model's embedding space, and it may also reduce the number of visual tokens. Q-Formers learned both operations together. Later projectors separated them and showed that the mapping itself could remain simple.
+A connector must map visual features into the language model's embedding space. It may also compress the visual sequence. These are separate decisions: a learned query bank does both, while a patchwise projector can change the feature dimension without reducing the number of tokens.
 
 [BLIP-2](/paper%20shorts/2023/01/30/blip-2-bootstrapping-language-image-pretraining.html) introduced the Querying Transformer, or Q-Former, to connect a frozen image encoder with a frozen language model. Its 32 learned queries cross-attend to the image patches and produce 32 visual tokens regardless of the input resolution. The Q-Former is therefore a connector and a learned compression module.
 
 $$
-Z=\operatorname{QFormer}(Q,f_I(I),T), \qquad |Q|=32.
+Z=\operatorname{QFormer}(Q,f_I(I)), \qquad |Q|=32.
 $$
 
-BLIP-2 trains the Q-Former with three objectives. Image-text contrast aligns the query outputs with text. Image-text matching allows full interaction and predicts whether an image-text pair is genuine. Image-grounded generation lets the text attend to the visual queries and previous words while masking future words. The Q-Former weights are shared across all three objectives, while the attention mask determines how image and text tokens interact.
+This equation describes the image-query path used to build the visual prompt. Text participates differently in the first-stage objectives; it is not an instruction input to every query extraction. BLIP-2 trains the Q-Former with three objectives. Image-text contrast aligns the query outputs with text. Image-text matching allows full interaction and predicts whether an image-text pair is genuine. Image-grounded generation lets the text attend to the visual queries and previous words while masking future words. The Q-Former weights are shared across all three objectives, while the attention mask determines how image and text tokens interact.
 
 The second stage maps the query outputs into the language model's embedding space through a linear projection. The projected queries act as soft visual prompt tokens, while the language model remains frozen. This design made it possible to reuse two strong unimodal models without updating either one. The cost is a fixed bottleneck: every image is reduced to 32 query outputs before the language model receives it.
 
@@ -123,27 +123,26 @@ More tokens preserve small text, crowded objects, and local layout, but increase
 
 The input recipes make the alternatives concrete. [PaliGemma](/paper%20shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html) uses separate 224, 448, and 896 pixel checkpoints. [Qwen2-VL](/paper%20shorts/2024/09/01/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution.html) keeps the native aspect ratio, converts each image into a variable number of patches, packs those sequences for training, and merges neighboring patches before they enter the language model. [Qwen2.5-VL](/paper%20shorts/2025/02/19/qwen2-5-vl-technical-report.html) extends the same dynamic treatment to documents and video, while [InternVL3.5](/paper%20shorts/2025/08/25/internvl3-5-reasoning-and-efficiency.html) learns when higher resolution is worth the extra compute. Qwen3-VL also injects features from several vision layers so local detail does not have to survive only through the final semantic layer.
 
+Qwen2-VL's architecture makes the difference visible: a tall document, a short equation, a landscape, and a video occupy very different stretches of the same context.
+
+![Qwen2-VL packs a document, equation, landscape, and video into variable-length visual token sequences](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-source-figure-2.webp)
+*The document occupies 11,427 tokens in the illustration, while the small equation occupies eight. These are examples of input-dependent token allocation, not fixed costs for every document or equation. source: [Qwen2-VL, Figure 2](https://arxiv.org/abs/2409.12191)*
+
+The small equation gets few tokens because it is a small image, not because the model has already decided that it is easy. Dynamic resolution allocates bandwidth from the input geometry; deciding which regions deserve another look is a further problem. More context can preserve the document's words, but the decoder still has to use the right ones.
+
 This is why visual tokens deserve their own accounting. A comparison between two VLMs is difficult to interpret unless it matches the input pixels, resizing policy, visual-token count, compute, and latency. Otherwise, an apparent architectural improvement may simply come from letting one model look more closely.
 
 ### Vision moved earlier into training
 
-Once the connector worked, the next gains came from what the model saw and when it saw it. [Eagle 2](/paper%20shorts/2025/01/01/eagle-2-post-training-data-strategies-for-frontier-vision-language-models.html) varies data quality, task balance, filtering, and training order instead of treating every instruction example as interchangeable. A smaller model trained on a deliberate curriculum can compete with a larger model trained on a poorly organized mixture. The useful accounting is not only how many examples we have, but what behavior each source teaches and which capabilities regress as its weight increases.
+Once the connector worked, the next gains came from what the model saw and when it saw it. [Eagle 2](/paper%20shorts/2025/01/01/eagle-2-post-training-data-strategies-for-frontier-vision-language-models.html) varies data quality, task balance, filtering, and training order instead of treating every instruction example as interchangeable. The useful accounting is not only how many examples we have, but what behavior each source teaches and which capabilities regress as its weight increases.
 
 Early visual assistants still attached a pretrained vision encoder to a pretrained language model. Newer models begin mixing vision and language earlier in training.
 
 That does not mean starting every weight from scratch. [InternVL3](/paper%20shorts/2025/04/14/internvl3-native-multimodal-pretraining.html) still initializes from strong pretrained components. It calls the recipe native multimodal pretraining because text and multimodal capabilities develop in the same training stage instead of adding vision at the end. Here, *native* describes when the modalities learn together, not where the initial weights came from.
 
-The small visual prefix is also disappearing. [Qwen3-VL](/paper%20shorts/2025/11/26/qwen3-vl-technical-report.html) uses long interleaved context, dynamic visual tokenization, explicit video timestamps, and features from multiple vision layers. The model can revisit visual evidence throughout the sequence instead of consuming one compressed image prefix at the start.
+The small visual prefix is no longer the only interface. [Qwen3-VL](/paper%20shorts/2025/11/26/qwen3-vl-technical-report.html) uses long interleaved context, dynamic visual tokenization, explicit video timestamps, and features from multiple vision layers. Visual evidence can enter at several points in the sequence instead of arriving as one fixed-length image prefix.
 
-This creates a spectrum rather than a binary distinction:
-
-1. frozen visual encoder plus frozen language model;
-2. trainable connector between mostly frozen components;
-3. jointly tuned multimodal stack;
-4. multimodal data present throughout pretraining;
-5. shared generative model over multiple modalities.
-
-Moving down this list gives vision and language more chances to adapt to each other. It also makes the result harder to explain. Better data, more visual tokens, a stronger language model, longer context, and joint training often arrive in the same model release.
+Three choices now need to be kept separate. Which components receive updates: the connector, the language model, or the full stack? When do text and multimodal data enter training? Which modalities can the model generate? A model can share a training stage without sharing every output objective. Better data, more visual tokens, a stronger language model, and longer context also often arrive together, so a release-level gain cannot isolate one architectural choice.
 
 ## Detour: models that also generate images
 
@@ -177,7 +176,7 @@ The supervision determines what the representation must preserve. A caption can 
 
 Grounding is still not geometry. A point such as $(0.63, 0.41)$ identifies a pixel location, but not its depth, camera pose, object orientation, free space, or uncertainty in physical units. [SpatialVLM](/paper%20shorts/2024/01/22/spatialvlm-spatial-reasoning-capabilities.html) adds spatial relations and measurements rather than relying on ordinary captions. Driving and robotics go further by using depth, multiple views, calibration, maps, object pose, and proprioception. Grounding tells us where the evidence appeared in an image. Geometry tells us what that evidence means in the world.
 
-The cleanest test is a counterfactual. If changing the light from red to green does not change the answer, the model was not using the grounded evidence. If masking the light causes the model to abstain, while changing an irrelevant car leaves the answer alone, the prediction is much easier to trust.
+A useful test is a counterfactual. If changing the light from red to green does not change the answer, we have reason to question whether the model used that evidence. If masking the light causes the model to abstain, while changing an irrelevant car leaves the answer alone, the prediction is easier to trust. These edits give us a diagnostic, not a guarantee: we still need to check that the edit preserved the rest of the scene and that the question actually depended on the light.
 
 ## Video-language models: sampling, packing, and time
 
@@ -209,7 +208,7 @@ A useful exchange between [Rohan Anil](https://x.com/_arohan_/status/20075978913
 
 A predictive representation is a learned bottleneck. Its value comes from throwing away variation that does not help prediction. Its risk is throwing away the local geometry and motion that a later controller needs.
 
-The global-versus-local problem therefore returns even without language. A strong video embedding can still be poor at depth or local motion. [V-JEPA 2.1](/paper%20shorts/2026/03/15/v-jepa-2-1-dense-video-features.html) adds dense prediction and self-supervision at intermediate layers so depth, anticipation, and interaction do not have to survive only through a global target.
+The global-versus-local problem therefore returns even without language. A strong video embedding can still be poor at depth or local motion. [V-JEPA 2.1](/paper%20shorts/2026/03/15/v-jepa-2-1-dense-video-features.html) extends V-JEPA 2’s masked-patch prediction with supervision on visible context tokens and intermediate layers. Those tokens now have a reason to retain local structure instead of only helping predict missing regions. A local prediction target does not guarantee locally useful features everywhere else.
 
 JEPA gives us a predictive latent state rather than a language answer. It will reappear in the pretraining story for world models, but it is not the next step in the VLM lineage. To return to that line, the next output contract changes from describing a scene to deciding what should happen in it.
 
@@ -235,7 +234,7 @@ My current read is that the near-term system will remain hybrid. Let the VLM han
 
 End-to-end systems may still win. We just do not get that conclusion from a fluent rationale or a lower open-loop trajectory error. The evidence has to survive closed-loop driving.
 
-#### Testing whether the model uses visual evidence
+### Testing whether decisions use visual evidence
 
 Fluent language can hide weak dependence on visual evidence. [DriveBench](/paper%20shorts/2025/01/01/are-vlms-ready-for-autonomous-driving-drivebench.html), [IDKB](/paper%20shorts/2024/09/01/can-lvlms-obtain-a-drivers-license-idkb.html), [TOD3Cap](/paper%20shorts/2024/03/01/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes.html), and [AutoTrust](/paper%20shorts/2024/12/01/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving.html) probe different parts of this problem, including visual corruption, 3D detail, and trustworthiness in driving scenes.
 
@@ -255,7 +254,7 @@ Final-answer accuracy can reward memorized priors. Corruptions, counterfactual e
 
 Post-training can then reward the behavior exposed by those tests. [Visual-RFT](/paper%20shorts/2025/03/03/visual-rft-visual-reinforcement-fine-tuning.html) uses task-specific signals such as intersection-over-union for detection. [GRIT](/paper%20shorts/2025/05/21/grit-teaching-mllms-to-think-with-images.html) interleaves language reasoning with explicit region references, making parts of the trace visually inspectable. These methods can teach the decoder to use visual features more reliably. They cannot recover a sign, object, or motion that the visual encoder already discarded.
 
-A controlled diagnostic helps separate those failures. Supplying the relevant crop or a structured scene description tests whether the model can reason once the evidence is explicit. Masking or editing the relevant pixels tests whether the original answer depended on them. The first intervention measures inference; the second measures visual dependence.
+A controlled diagnostic helps separate those failures. Supplying the relevant crop or a structured scene description tests whether the model can reason once the evidence is explicit. Masking or editing the relevant pixels tests whether the original answer depended on them. The first intervention gives the model a different input, so success does not show that its original perception worked. The second tests visual dependence.
 
 For deployment, an aggregate score is less informative than the conditions under which the model fails. Evidence sensitivity, calibrated uncertainty, and recovery behavior can matter even when they do not improve the overall average. [Part III](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html) takes the post-training story further, covering rewards, preferences, interventions, critics, and online rollouts after a robot begins changing its own data distribution.
 
@@ -279,6 +278,8 @@ Robot pretraining data also need not originate from a deployed robot. [Xiaomi-Ro
 
 This is where pretraining and post-training separate cleanly. Pretraining gives the policy a broad starting point. Post-training adapts it to one robot, command distribution, safety envelope, and deployment environment. Experience adds the failures and recoveries that demonstrations missed.
 
+FAST gives this trade a useful twist. Its T-shirt-folding example compresses a one-second action chunk from 700 naïve tokens to 53, yet the paper reports roughly 750 ms to decode a one-second chunk with π0-FAST on an RTX 4090. Fewer tokens shorten the autoregressive learning problem without necessarily making autoregressive control faster than the flow-based policy. Training efficiency and reaction time need separate measurements.
+
 The action representation decides what motions the policy can express, how it is trained, and how quickly it can react.
 
 | Action interface | Advantage | Cost |
@@ -288,6 +289,8 @@ The action representation decides what motions the policy can express, how it is
 | Compressed action tokens | shorter sequences over long horizons | compression may remove abrupt corrections |
 | Diffusion or flow chunks | expressive continuous distributions | iterative generation and harder likelihood-based RL |
 | Separate action expert | specialization without discarding VLM semantics | extra parameters and coordination path |
+
+The final row is a placement choice: a separate expert can itself use regression, diffusion, or flow. It should not be mistaken for a fifth kind of action distribution.
 
 A caption has no control frequency. An action does. A policy must fit sensing, inference, communication, and actuation inside a deadline. It must also decide how long an action chunk remains valid before new evidence should interrupt it. Longer chunks reduce inference calls and improve temporal coherence. Shorter chunks respond faster to disturbances.
 

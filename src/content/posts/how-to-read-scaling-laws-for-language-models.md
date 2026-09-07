@@ -72,10 +72,10 @@ That distinction establishes the object of study. A scaling law is a fitted rela
 
 Kaplan et al. varied non-embedding parameters $N$, training-data tokens $D$, and compute $C$. The original Figure 1 below is worth reading slowly.
 
-Each right-hand panel keeps the other constraints loose enough for one resource to dominate. The nearly straight line on log-log axes is the signature of a power law. It does not say that loss falls linearly with the resource.
+Read the three panels as separate one-resource slices: compute on the left, dataset size in the middle, and parameter count on the right. The nearly straight lines on these log-scaled axes are the signature of a power law; they do not say that loss falls linearly with the resource.
 
 ![Kaplan et al. 2020 Figure 1: validation loss as a function of compute, dataset size, and non-embedding parameters](/assets/images/kaplan-2020-simple-power-laws-paper-figure.png)
-*. The three panels show the measured loss curves against training compute, dataset size, and non-embedding parameters. source: [Kaplan et al., “Scaling Laws for Neural Language Models”](https://arxiv.org/abs/2001.08361)*
+*Figure 1: Kaplan et al. measure validation loss against compute, dataset size, and non-embedding parameter count. The fitted lines summarize one experimental regime; they are not a universal law. | source: [Kaplan et al., Figure 1](https://arxiv.org/abs/2001.08361)*
 
 The compact mental model is a loss surface with three kinds of limitation:
 

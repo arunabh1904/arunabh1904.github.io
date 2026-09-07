@@ -89,7 +89,7 @@ $$
 
 Each row of $A$ says where one token looks; the corresponding row of $Y$ is that token rewritten after gathering context. A token therefore does not keep one fixed meaning through the network. The representation of `bank`, for example, can become financial or geographic as successive layers retrieve different surrounding evidence.
 
-Consider the sentence:
+Consider the sentence with bidirectional self-attention, where the whole sentence is visible:
 
 > “The animal did not cross the street because it was too tired.”
 
@@ -102,6 +102,8 @@ When the model updates `it`, its query can ask for an animate antecedent compati
 | `cross` | Relevant event but not an antecedent | Event context |
 | `tired` | Explains the causal relation | Semantic clue |
 
+That example explains a possible routing pattern, not a measured attention trace. A causal decoder updating `it` cannot yet read `tired`, which occurs later in the sentence.
+
 In a decoder-only model, a causal mask removes future positions before softmax. The retrieval rule stays the same; the mask changes which keys are admissible. Self-attention also has no built-in sense of token order, so positional encodings such as RoPE must supply that structure. The interactive example that follows exposes the raw scores, normalized weights, and mixed value vector.
 
 <PythonPlayground client:visible {...attentionMechanismsPlayground} />
@@ -110,7 +112,7 @@ In a decoder-only model, a causal mask removes future positions before softmax. 
 
 The explicit equations are useful for reasoning, but a production implementation should not build the $T\times T$ score matrix and save the full probability matrix in high-bandwidth memory. PyTorch's [`scaled_dot_product_attention`](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention) keeps the same semantics while dispatching to an appropriate backend, including fused attention kernels when the device, dtype, and tensor layout support them.
 
-The complete causal multi-head block is therefore short. The projections produce `[batch, time, 3 * d_model]`; reshaping exposes the head axis expected by SDPA; `is_causal=True` applies the autoregressive mask without allocating a dense mask in Python.
+The complete causal multi-head block for a full input sequence is therefore short. The projections produce `[batch, time, 3 * d_model]`; reshaping exposes the head axis expected by SDPA; `is_causal=True` applies the autoregressive mask without allocating a dense mask in Python.
 
 ```python
 import torch
@@ -154,6 +156,8 @@ class CausalSelfAttention(nn.Module):
 # Optional after moving the module and inputs to the target device/dtype.
 # attn = torch.compile(CausalSelfAttention(d_model=1024, n_heads=16))
 ```
+
+This block recomputes keys and values for the supplied sequence. It is a training or prefill example; the cached decode helper later in the post shows how to process a new token without rebuilding the prefix.
 
 Three details carry most of the performance. The combined QKV projection reduces kernel launches; the head dimension remains the innermost contiguous dimension; and SDPA avoids a Python-level sequence of matmul, mask, softmax, dropout, and matmul operations. PyTorch selects the backend automatically, so forcing FlashAttention should be a diagnostic or benchmarking choice rather than a default. The dropout argument also requires care: SDPA applies dropout whenever `dropout_p` is nonzero, so evaluation must pass `0.0` explicitly as this module does.
 
@@ -206,7 +210,7 @@ Standard MHA gives every query head its own key and value heads. Multi-query att
 
 The benefit appears during inference. Reducing the number of KV heads reduces the cache stored per token and the memory traffic required to read it, while leaving the surrounding decoder architecture close to standard attention. The trade-off is a spectrum: MHA preserves the most independent K/V capacity, MQA compresses most aggressively, and GQA chooses an intermediate point that often retains more modeling quality.
 
-PyTorch's SDPA accepts different query-head and KV-head counts through `enable_gqa=True`. The following implementation keeps the K/V tensors at `n_kv_heads`; it does not manually repeat them to the query-head count, which would erase much of the memory-traffic advantage.
+PyTorch's SDPA accepts different query-head and KV-head counts through `enable_gqa=True`. The following implementation keeps the K/V tensors at `n_kv_heads`; it leaves head sharing to the backend. An optimized GQA kernel can reuse those heads directly; a fallback may still expand them internally, so the API flag alone is not a speed guarantee.
 
 ```python
 class GroupedQueryAttention(nn.Module):
@@ -279,7 +283,9 @@ def gqa_decode_step(q, k, v, k_cache, v_cache, position: int):
     )
 ```
 
-For `n_query_heads=32` and `n_kv_heads=8`, four query heads share each stored K/V head, so the K/V portion of the cache is one quarter of the corresponding 32-head MHA cache. The decode helper also preallocates and updates that cache rather than calling `torch.cat` every step, which would repeatedly copy the growing prefix. Current PyTorch documentation still labels native GQA support experimental and lists backend constraints; confirm the target device and version instead of silently expanding K/V heads as a fallback.
+For `n_query_heads=32` and `n_kv_heads=8`, four query heads share each stored K/V head, so the K/V portion of the cache is one quarter of the corresponding 32-head MHA cache. The decode helper also preallocates and updates that cache rather than calling `torch.cat` every step, which would repeatedly copy the growing prefix. Native GQA support is still experimental, so confirm support on the target device and PyTorch version.
+
+The `is_causal=False` in the single-token helper is deliberate. Every key in the sliced cache is already eligible. With a one-row query and a longer key sequence, SDPA's upper-left causal mask would expose only the first key, not the entire prefix. Decoding several new tokens together needs a different mask that also orders those new tokens.
 
 ### Compress the cache
 
@@ -380,10 +386,10 @@ This state does not grow with sequence length, which is attractive for long-cont
 DeltaNet addresses that capacity problem with a delta-rule update. It first asks what value the current key already retrieves,
 
 $$
-\hat v_t=k_t^\top S_{t-1},
+\hat v_t=S_{t-1}^\top k_t,
 $$
 
-then writes only the prediction error:
+then writes only the prediction error. Here $S$ has shape $d_k\times d_v$, so the outer product below updates the same key-by-value memory:
 
 $$
 S_t=S_{t-1}+\beta_t k_t(v_t-\hat v_t)^\top.
@@ -391,7 +397,7 @@ $$
 
 The write strength $0\leq\beta_t\leq1$ determines how strongly the new association replaces the old one. Gated DeltaNet adds a decay factor before this targeted correction, giving the model two distinct controls: decay weakens existing memory broadly, while the delta rule repairs the association addressed by the current key. Kimi Delta Attention makes the decay finer-grained by moving from one scalar per head toward channel-wise control over the recurrent state.
 
-The recurrent form is easiest to see one decode step at a time. With the positive feature map $\phi(x)=\operatorname{ELU}(x)+1$, the following code updates $S_t$ and $z_t$ without retaining a token-length dimension. It is vectorized over batches and heads, and `torch.compile` can fuse its pointwise and contraction graph on supported backends.
+Before implementing the delta rule, start with the simpler additive linear-attention recurrence above. Its state update is easiest to see one decode step at a time. With the positive feature map $\phi(x)=\operatorname{ELU}(x)+1$, the following code updates $S_t$ and $z_t$ without retaining a token-length dimension. It is vectorized over batches and heads, and `torch.compile` can fuse its pointwise and contraction graph on supported backends.
 
 ```python
 @torch.compile
@@ -462,7 +468,7 @@ The Gated DeltaNet paper shows the same design choice at two scales. Its H1 and 
 
 The figure exposes why “hybrid attention” names a composition strategy rather than one attention equation. A model can choose a different cheap mixer, a different periodic retrieval layer, and a different ratio while preserving the same division of labor.
 
-The design principle is more important than any one ratio. Recurrent or linear layers carry a cheap running summary, while occasional full-attention layers recover token-level content that a compressed state may have lost. Gated attention modifies those retained full-attention blocks: an output gate controls how much retrieved information enters the residual stream, but the block still performs scaled dot-product attention.
+The design principle is more important than any one ratio. Recurrent or linear layers carry a cheap running summary, while occasional full-attention layers retain a separate token-indexed path for retrieval. Those layers can revisit states within their retained cache window; they cannot reconstruct evidence that every earlier representation already discarded. Gated attention modifies those retained full-attention blocks: an output gate controls how much retrieved information enters the residual stream, but the block still performs scaled dot-product attention.
 
 Attention Residuals changes a different axis: depth rather than token position. A standard PreNorm residual stream accumulates every earlier layer with fixed unit weight. AttnRes instead lets a layer apply softmax attention over preceding layer outputs, and Block AttnRes groups layers to bound the resulting memory and communication cost. It is therefore not another KV-cache replacement. It is an orthogonal retrieval path that asks which earlier representation depth should contribute, completing the Kimi trajectory from selective token memory to selective depth memory.
 

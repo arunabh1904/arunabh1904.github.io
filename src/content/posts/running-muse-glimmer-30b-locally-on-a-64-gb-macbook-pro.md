@@ -11,13 +11,13 @@ tags:
   - Inference
 summary: >-
   A measured llama.cpp benchmark of Meta's official 17 GB Muse Glimmer 30B
-  quant on a 64 GB M5 Max, including reasoning latency and an 8K prompt test.
+  quant on a 64 GB M5 Max, including reasoning latency and an 8K-class prompt test.
 ---
 # Benchmarking Muse Glimmer 30B on a 64 GB MacBook Pro
 
 `Muse Glimmer 30B` fits comfortably on a `64 GB` M5 Max MacBook Pro and serves through `llama.cpp`. The official `Q4_K_M` GGUF occupies `16.76 GB`. With all layers explicitly placed on Metal, it generated at `27.9 tokens/s`; adding Meta's official `1.63 GB` DFlash drafter raised short-prompt decode to `48.3 tokens/s`.
 
-The first run was much slower, about `10 tokens/s`, because I had left GPU-layer placement on the runtime's automatic setting. The controlled reruns make the practical lesson clearer than the initial number: use full Metal offload, then enable DFlash. That gets close to Meta's reported M5 Max speed on short generation. Long prompts remain the constraint: the `8K` DFlash run needed `16.4 s` to begin reasoning and `17.9 s` to show the answer.
+The first run was much slower, about `10 tokens/s`, because I had left GPU-layer placement on the runtime's automatic setting. The controlled reruns make the practical lesson clearer than the initial number: use full Metal offload, then enable DFlash. That gets close to Meta's reported M5 Max speed on short generation. Long prompts remain the constraint: the `8,193`-token DFlash run needed `16.4 s` to begin reasoning and `17.9 s` to show the answer.
 
 This is a hardware-and-software snapshot from August 13, 2026. Muse Glimmer and its `llama.cpp` support are new enough that runtime releases may change the result materially.
 
@@ -47,12 +47,12 @@ I ran the model on:
 - Official `Muse-Glimmer-30B-KQuant-17GB-Q4_K_M.gguf`
 - Official `dflash-Muse-Glimmer-30B-Q4_K_M.gguf` for the speculative run
 
-Glimmer support requires `llama.cpp` build `10353` or newer, so I upgraded the local Homebrew build from `8660` to `10360` before testing. I used `llama-server` with one slot, Metal acceleration, flash attention, a `16K` allocated context, and the model's Jinja chat template.
+Glimmer support requires `llama.cpp` build `10353` or newer, so I upgraded the local Homebrew build from `8660` to `10360` before testing. I used `llama-server` with one slot, Metal acceleration, flash attention, a `16K` allocated context, and the model's Jinja chat template. That `16K` value is the context allocated for this benchmark; it is separate from the model's advertised `131K` maximum.
 
 The benchmark was text-only, so I did not load the vision projector. I ran three serving configurations: automatic layer placement without a drafter, explicit full Metal offload, and full Metal offload plus DFlash. I used two deterministic suites:
 
 - Short: `512` input tokens, at most `192` completion tokens
-- Long: `8193` input tokens, at most `96` completion tokens
+- Long: `8,193` input tokens, at most `96` completion tokens
 
 The task asked the model to print zero-padded integers, which it followed until each completion cap. Temperature was `0`, top-p was `1`, top-k was `1`, and the seed was fixed. Glimmer reasons by default, so I set low reasoning strength and a `32`-token reasoning budget rather than pretending hidden generation did not exist.
 

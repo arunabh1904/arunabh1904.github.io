@@ -47,9 +47,11 @@ That left these practical local targets for this machine:
 - `Qwen 3 30B A3B`
 - `Qwen 3 32B`
 
+This is a candidate list, not a measured leaderboard. The tables below cover only `Qwen 3 4B`, `Qwen 3 14B`, `Qwen 3.5 4B`, and `Qwen 3.5 9B`; the larger entries are fit and usability candidates from the release snapshot, not performance claims from this run.
+
 The two big family-level differences that matter for local use are:
 
-- [`Qwen 3.5`](https://huggingface.co/Qwen/Qwen3.5-9B) defaults to thinking mode and exposes a `262,144` token default context window, so if you do not explicitly disable thinking you are partly benchmarking chain-of-thought overhead instead of plain inference behavior.
+- [`Qwen 3.5`](https://huggingface.co/Qwen/Qwen3.5-9B) defaults to thinking mode and lists a `262,144`-token native context length, so if you do not explicitly disable thinking you are partly benchmarking chain-of-thought overhead instead of plain inference behavior.
 - [`Qwen 3`](https://huggingface.co/Qwen/Qwen3-14B-GGUF) supports both thinking and non-thinking modes in the same model, and the official GGUF releases make `llama.cpp` comparisons much easier for that family.
 
 ## Benchmark design
@@ -70,7 +72,7 @@ The local software stack for this round was:
 I used the same two text-only suites as the Gemma post:
 
 - Short suite: `512` input tokens, `192` output tokens
-- Long suite: `8192` input tokens, `96` output tokens
+- Long suite: `8,192` input tokens, `96` output tokens
 
 The task was intentionally boring and deterministic: read repeated background text, then emit exactly twelve numbered factual lines. Temperature was `0`. I recorded:
 

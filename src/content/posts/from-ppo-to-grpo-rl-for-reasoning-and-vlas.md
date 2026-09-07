@@ -78,7 +78,7 @@ The clipping rule answers a narrow question: how much should the optimizer trust
 
 That compromise fit early RLHF. A language model supplies tractable token log-probabilities; a learned reward model scores a completion; a value model predicts return; and a frozen reference policy supplies a KL anchor. But the complete training stack can require the actor, reference, reward model, and critic in memory, while generation dominates wall-clock time. The critic is especially awkward for sparse sequence rewards: it must predict the eventual quality of a long answer from every partial prefix.
 
-PPO therefore established the durable skeleton: online sampling, relative probability updates, and reference control. It also made the value model the obvious component to challenge.
+PPO therefore established the durable skeleton of online sampling and relative probability updates. RLHF added reference-policy control around that skeleton, and PPO also made the value model the obvious component to challenge.
 
 ## DPO: store the contrast
 
@@ -154,8 +154,8 @@ $$
 
 The state distribution is on-policy; the learning signal is dense supervised imitation. This distinction changes the error being corrected. Offline distillation teaches the student on teacher-written prefixes. At inference, one student mistake creates a prefix the teacher never wrote, and subsequent errors compound. GKD deliberately visits those student-created states and supplies a teacher distribution there.
 
-_The source figure compares distillation methods on summarization, translation, and arithmetic. On-policy targets are useful across tasks, although the best divergence and mixture remain task-dependent source: [GKD](https://arxiv.org/abs/2306.13649)_
-_The source figure compares distillation methods on summarization, translation, and arithmetic. On-policy targets are useful across tasks, although the best divergence and mixture remain task-dependent. source: [GKD](https://arxiv.org/abs/2306.13649)._
+![GKD compares offline and on-policy distillation across tasks](/assets/images/on-policy-distillation-language-models-gkd-source-figure-1.webp)
+*GKD's source Figure 1 compares supervised fine-tuning, supervised and sequence-level distillation, and on-policy GKD across summarization, translation, and arithmetic. GKD trains on teacher targets for prefixes the student actually generates, addressing the exposure mismatch described above. | source: [GKD, Figure 1](https://arxiv.org/abs/2306.13649)*
 
 Distillation and RL optimize different evidence:
 
