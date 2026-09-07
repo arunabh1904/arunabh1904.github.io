@@ -46,7 +46,7 @@ Short-term stereo has the opposite bottleneck: high-resolution features are info
 ![Figure 1 from SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection](/assets/images/solofusion-temporal-multiview-3d-object-detection-source-figure-1.webp)
 *Fig 3: Candidate depth hypotheses project farther apart between temporal views as the baseline grows, which is the geometric signal that the short- and long-term matching modules exploit. | source: [SOLOFusion, Figure 1](https://arxiv.org/abs/2210.02443)*
 
-The component ablation makes the complementarity concrete. High-resolution short-term fusion lowers mATE by about 5.2% but slows the R50 baseline from 17.6 to 12.2 FPS without increasing GPU memory. Low-resolution long-term fusion improves mAP by about 7.2% with a small FPS cost. Adding both produces roughly the combined 12% improvement. On the reported test model, the result is first on the camera-only nuScenes track at the time of submission, but the comparison includes different training and test-time settings across methods.
+The component ablation makes the complementarity concrete. High-resolution short-term fusion lowers mATE by 0.052 (reported as a 5.2% improvement) but slows the R50 baseline from 17.6 to 12.2 FPS without increasing GPU memory. Low-resolution long-term fusion lowers mATE by 0.072 (7.2%) with a small FPS cost; its large mAP gain is a separate result. Adding both produces roughly the combined 12% localization improvement. On the reported test model, the result is first on the camera-only nuScenes track at the time of submission, but the comparison includes different training and test-time settings across methods.
 
 ### History also tests the calibration contract
 
@@ -56,5 +56,5 @@ Temporal baselines amplify pose error, timestamp drift, rolling-shutter mismatch
 
 - SOLOFusion's key insight is a resolution/history trade: high-resolution short-term matching and low-resolution long-term BEV fusion solve different stereo regimes.
 - Sixteen previous frames improve the reported mAP/translation trend before saturation; 112 depth candidates are infeasible, while guided top-k keeps the useful hypotheses within a 3.3 GB memory budget.
-- The source ablation attributes about 5.2% mATE improvement to short-term fusion and about 7.2% mAP improvement to long-term fusion, with a complementary combined gain.
+- The source ablation attributes 0.052 and 0.072 reductions in mATE to short-term and long-term fusion, respectively; their combined reduction is about 12%.
 - Temporal alignment makes pose, timestamp, and moving-object errors part of the model's validity boundary.
