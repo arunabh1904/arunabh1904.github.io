@@ -24,7 +24,7 @@ summary: "2026 – From Recovery to Drop-off: How Action Post-training Reduces a
 
 The comparison is controlled at the backbone level: the base VLM and action-trained VLA share weights except for the post-training changes under study. A lightweight depth probe is trained at visual-token positions across all 36 layers. The VLA is worse at every depth, but the difference grows late: the reported mean depth score gap is 0.089 in early layers, 0.095 in middle layers, 0.166 in late layers, and 0.246 at the final layer.
 
-The layer profile matters more than the aggregate drop. The base VLM's depth decodability improves toward its final layers, whereas the VLA's late-layer decodability falls. Ablating the late MLP writes recovers most of that terminal loss; matched attention ablations do not produce comparable recovery. Module decomposition points to accumulated MLP writes as the channel where the base model makes depth most accessible and action post-training overwrites it.
+The layer profile matters more than the aggregate drop. The base VLM's depth decodability improves toward its final layers, whereas the VLA's late-layer decodability falls. Ablating the late MLP writes recovers most of that late-layer decline, while leaving the broader VLM–VLA gap; matched attention ablations do not produce comparable recovery. Module decomposition points to accumulated MLP writes as the channel where the base model makes depth most accessible and action post-training overwrites it.
 
 | Layer band | Molmo2-ER d1 | MolmoAct2-LIBERO d1 | Gap |
 | --- | ---: | ---: | ---: |
