@@ -14,9 +14,7 @@ summary: "2023 – MotionLM: Multi-Agent Motion Forecasting as Language Modeling
 
 ## Summary
 
-MotionLM recasts multi-agent forecasting as next-token prediction. It quantizes each agent's future displacement into discrete motion tokens, flattens the agent-time sequence, and trains a causal Transformer with the same likelihood objective used by a language model. Because the sequence is joint, the model can generate several agents' futures in one rollout rather than fitting independent trajectories and trying to reconcile them afterward.
-
-The useful distinction is between joint generation and simultaneous prediction. At each future time, the agents' tokens are conditionally independent given the previous timesteps, but every later timestep sees the whole emerging scene. That causal ordering lets a vehicle react to a pedestrian's earlier predicted motion while keeping sampling parallel across agents at the current step.
+> MotionLM recasts multi-agent forecasting as next-token prediction. It quantizes each agent's future displacement into discrete motion tokens, flattens the agent-time sequence, and trains a causal Transformer with the same likelihood objective used by a language model. Because the sequence is joint, the model can generate several agents' futures in one rollout rather than fitting independent trajectories and trying to reconcile them afterward. The useful distinction is between joint generation and simultaneous prediction: at each future time, the agents' tokens are conditionally independent given the previous timesteps, but every later timestep sees the whole emerging scene. That causal ordering lets a vehicle react to a pedestrian's earlier predicted motion while keeping sampling parallel across agents at the current step.
 
 ## Core Insights
 
@@ -33,20 +31,20 @@ with `p(A_t | A_<t, S)` factorized across agents. This is a compact way to expre
 
 ### Causal structure changes what “conditional” means
 
-The authors compare marginal prediction, temporally causal conditional prediction, and acausal conditioning. On the reported WOMD validation slice, minADE/minFDE/MR/soft-mAP are 0.6069/1.2236/0.1406/0.3951 for marginal, 0.5997/1.2034/0.1377/0.4096 for temporally causal conditional, and 0.5899/1.1804/0.1338/0.4274 for acausal conditioning. The acausal numbers look better, but they use future information in a way a real predictor cannot. The paper's point is that the causal mask is an intervention interface, not only a regularizer.
+The authors compare marginal prediction, temporally causal conditional prediction, and acausal conditioning. On the reported WOMD validation slice, minADE/minFDE/MR/soft-mAP are 0.6069/1.2236/0.1406/0.3951 for marginal, 0.5997/1.2034/0.1377/0.4096 for temporally causal conditional, and 0.5899/1.1804/0.1338/0.4274 for acausal conditioning. The acausal numbers look better because the query agent's full future is exposed. That setting can still be useful when conditioning on a candidate plan, but it does not represent the causal reaction of another agent to that plan. In the paper's supplementary example, conditioning on a trailing vehicle braking makes the acausal model spuriously brake the lead vehicle, whereas the temporally causal model keeps the lead vehicle moving; conditioning on the lead vehicle braking correctly makes the trailing vehicle stop. The causal mask is therefore an intervention interface, not only a regularizer.
 
 ![MotionLM's causal Bayesian-network view of joint rollouts](/assets/images/motionlm-multi-agent-motion-forecasting-as-language-modeling-source-figure-4.webp)
 *Fig 2: A temporally causal rollout lets later agent reactions depend on earlier joint actions; the acausal graph has access to information unavailable at prediction time. | source: [MotionLM, Figure 4](https://arxiv.org/abs/2309.16534)*
 
 ### More interaction and more rollouts buy different kinds of quality
 
-On the WOMD interactive test set, MotionLM reports minADE 0.8911, minFDE 2.0067, miss rate 0.4115, and mAP 0.2178, compared with JFP's 0.8817/1.9905/0.4233/0.2050. Its joint prediction overlap is 0.02607, close to JFP's 0.02671 and below Scene Transformer's 0.04336. In the interaction-frequency ablation, single-replica mAP rises from 0.2007 at 0.125 Hz to 0.2150 at 2 Hz; the ensemble rises from 0.1558 to 0.1687. The model therefore benefits when agents can “see” one another repeatedly during the 8-second rollout.
+On the WOMD interactive test set, MotionLM reports minADE 0.8911, minFDE 2.0067, miss rate 0.4115, and mAP 0.2178, compared with JFP's 0.8817/1.9905/0.4233/0.2050. Its joint prediction overlap is 0.02607, close to JFP's 0.02671 and below Scene Transformer's 0.04336. In the interaction-frequency ablation, ensemble mAP rises from 0.2007 at 0.125 Hz to 0.2150 at 2 Hz; the single-replica result rises from 0.1558 to 0.1687. The model therefore benefits when agents can “see” one another repeatedly during the 8-second rollout.
 
-The sampling curve is separate from the architecture curve. With one to 512 rollouts per replica, single-replica mAP increases from 0.1524 to 0.2150, while the ensemble increases from 0.0578 to 0.1687. The final reported interactive result uses 512 rollouts per replica and six retained modes after NMS plus k-means; the appendix notes that 32 rollouts already surpass the previous top entry.
+The sampling curve is separate from the architecture curve. With one to 512 rollouts per replica, ensemble mAP increases from 0.1524 to 0.2150, while the single-replica result increases from 0.0578 to 0.1687. The final reported interactive result uses 512 rollouts per replica and six retained modes after NMS plus k-means; the appendix notes that 32 rollouts already surpass the previous top entry.
 
 ## High-Level Takeaways
 
 - MotionLM is a strong test of whether interactive futures can be represented as a discrete sequence: a token is one agent's quantized displacement at one time, and the causal order carries the interaction.
-- The model's useful inductive bias is temporal causality. The acausal conditional score is numerically better on the paper's slice, but it is not a deployable forecasting protocol.
+- The model's useful inductive bias is temporal causality. Acausal conditioning can be useful when a candidate future is explicitly supplied, but it should not be read as a causal reaction model; the paper's lead/trailing-car example shows the direction-of-influence failure.
 - Interaction frequency and sample count are distinct budgets. Repeated cross-agent attention improves the joint metric, while more rollouts improve mode coverage after aggregation.
 - Quantization makes training simple and scalable, but vocabulary resolution, token horizon, and rollout latency become part of the planner's operating envelope.

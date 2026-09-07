@@ -16,9 +16,7 @@ summary: "2024 – Scaling Motion Forecasting Models with Ensemble Distillation"
 
 ## Summary
 
-A motion-forecasting ensemble can improve both precision and coverage, but running many models onboard is expensive. This paper separates training compute from serving compute: independently trained Wayformer teachers form a multimodal ensemble, and a smaller student learns from the ensemble distribution as well as the logged ground truth.
-
-The hard part is that trajectory modes have no natural correspondence across independently trained teachers. Averaging the first mode from one model with the first mode from another is meaningless. The paper therefore aggregates teacher mixtures with non-maximal suppression (NMS), samples from the resulting distribution, and trains the student with a negative log-likelihood distillation loss plus the ordinary ground-truth loss.
+> A motion-forecasting ensemble can improve both precision and coverage, but running many models onboard is expensive. This paper separates training compute from serving compute: independently trained Wayformer teachers form a multimodal ensemble, and a smaller student learns from the ensemble distribution as well as the logged ground truth. The hard part is that trajectory modes have no natural correspondence across independently trained teachers, so averaging the first mode from one model with the first mode from another is meaningless. The paper therefore aggregates teacher mixtures with non-maximal suppression (NMS), samples from the resulting distribution, and trains the student with a negative log-likelihood distillation loss plus the ordinary ground-truth loss.
 
 ## Core Insights
 
@@ -35,7 +33,7 @@ Because teacher modes do not align, NMS first greedily selects modes that cover 
 
 The student minimizes
 `L_total = L_distill + w_gt L_gt`.
-The distillation term is the negative log likelihood of samples drawn from the aggregated teacher distribution. For the WOMD experiments, the authors use a 20-teacher ensemble, `τ=8`, `w_gt=0.4`, and variance scale `w_var=0.5`; to make label generation affordable, teacher sampling sets the variance scale to zero and uses the mixture means weighted by their probabilities. When teacher and student output counts match, a simpler bijective mode mapping can also supervise the mixture weights.
+The distillation term is the negative log likelihood of samples drawn from the aggregated teacher distribution. For the WOMD experiments, the authors use a 20-teacher ensemble, `τ=8`, and `w_gt=0.4`. To make label generation affordable, the paper uses an efficient teacher-sampling approximation: it sets the variance scale to zero and uses the mixture means weighted by their probabilities. This zero applies to label generation; it is not a claim that the deployed distribution has zero variance. When teacher and student output counts match, a simpler bijective mode mapping can also supervise the mixture weights.
 
 ![The ensemble-to-student training pipeline](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-3.webp)
 *Fig 2: NMS merges unmatched teacher modes into a compact teacher distribution; the student learns from its samples alongside the ground-truth loss. | source: [Scaling Motion Forecasting Models with Ensemble Distillation, Figure 3](https://arxiv.org/abs/2404.03843)*

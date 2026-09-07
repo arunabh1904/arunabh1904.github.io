@@ -16,9 +16,7 @@ summary: "2025 – Scaling Laws of Motion Forecasting and Planning"
 
 ## Summary
 
-This report asks whether joint motion forecasting and planning improve predictably as training compute grows, as language models do. It studies an encoder-decoder autoregressive Transformer on nearly 447 thousand hours of driving data, varying model size, training examples, and compute over 84 models. It then follows the same family into open-loop forecasting, closed-loop simulation, inference-time sampling, and a small cross-agent transfer study.
-
-The useful result is a budget picture rather than a single “bigger is better” curve. Training loss, open-loop metrics, and the controlled closed-loop metric improve with scale in the measured range. At fixed training compute, the compute-optimal number of model parameters grows with exponent 0.63 while the number of training examples grows with exponent 0.44, so model size should grow about 1.5× as fast as data. Inference sampling creates a second scaling axis with its own crossover point.
+> This report asks whether joint motion forecasting and planning improve predictably as training compute grows, as language models do. It studies an encoder-decoder autoregressive Transformer on nearly 447 thousand hours of driving data, varying model size, training examples, and compute over 84 models, then follows the same family into open-loop forecasting, closed-loop simulation, inference-time sampling, and a small cross-agent transfer study. The useful result is a budget picture rather than a single “bigger is better” curve: training loss, open-loop metrics, and the controlled closed-loop metric improve with scale in the measured range. At fixed training compute, the compute-optimal number of model parameters grows with exponent 0.63 while the number of training examples grows with exponent 0.44, so model size should grow about 1.5× as fast as data. Inference sampling creates a second scaling axis with its own crossover point.
 
 ## Core Insights
 

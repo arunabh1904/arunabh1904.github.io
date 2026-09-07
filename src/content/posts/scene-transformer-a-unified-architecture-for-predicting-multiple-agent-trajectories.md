@@ -16,9 +16,7 @@ summary: "2021 – Scene Transformer: A Unified Architecture for Predicting Mult
 
 ## Summary
 
-Scene Transformer makes the forecasting query a mask over a scene tensor. Instead of maintaining separate networks for marginal, joint, conditional, and goal-conditioned prediction, it keeps one scene-centric representation and changes which agent-time cells are visible. The same Transformer can therefore answer different planning questions by changing the information pattern at its input.
-
-The design targets a real failure mode of independent predictions: two individually plausible futures may be mutually inconsistent. Scene Transformer predicts a set of coherent futures across agents and evaluates them with scene-level metrics when joint consistency is the goal. Its contribution is the interface between masking, factorized attention, and a joint loss, more than a new trajectory decoder.
+> Scene Transformer makes the forecasting query a mask over a scene tensor. Instead of maintaining separate networks for marginal, joint, conditional, and goal-conditioned prediction, it keeps one scene-centric representation and changes which agent-time cells are visible. The same Transformer can therefore answer different planning questions by changing the information pattern at its input. The design targets a real failure mode of independent predictions: two individually plausible futures may be mutually inconsistent, so Scene Transformer predicts a set of coherent futures across agents and evaluates them with scene-level metrics when joint consistency is the goal. Its contribution is the interface between masking, factorized attention, and a joint loss, more than a new trajectory decoder.
 
 ## Core Insights
 

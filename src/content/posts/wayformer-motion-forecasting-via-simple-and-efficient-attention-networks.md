@@ -14,9 +14,7 @@ summary: "2022 – Wayformer: Motion Forecasting via Simple and Efficient Attent
 
 ## Summary
 
-Wayformer studies whether a motion forecaster needs a different encoder for every input modality. It projects traffic lights, road polylines, agent histories, and nearby-agent interactions into a common token width, then compares early, late, and hierarchical fusion with several attention approximations. The paper's claim is architectural simplicity: early fusion, where modalities meet in one cross-modal encoder, is competitive with more specialized designs.
-
-The useful contribution is the controlled design space. Fusion determines when modalities can exchange information; factorized attention changes the cost of spatial-temporal interaction; latent queries reduce the number of tokens that later layers process. These are separable knobs, so quality and latency can be measured together rather than hidden behind a bespoke architecture.
+> Wayformer studies whether a motion forecaster needs a different encoder for every input modality. It projects traffic lights, road polylines, agent histories, and nearby-agent interactions into a common token width, then compares early, late, and hierarchical fusion with several attention approximations. The paper's claim is architectural simplicity: early fusion, where modalities meet in one cross-modal encoder, is competitive with more specialized designs. The useful contribution is the controlled design space: fusion determines when modalities can exchange information, factorized attention changes the cost of spatial-temporal interaction, and latent queries reduce the number of tokens that later layers process. These are separable knobs, so quality and latency can be measured together rather than hidden behind a bespoke architecture.
 
 ## Core Insights
 
@@ -31,7 +29,7 @@ The decoder uses learned queries and cross-attention to produce a Gaussian mixtu
 
 ### Efficiency comes from exploiting the token geometry
 
-Joint attention over spatial and temporal tokens has cost `O(S_m² × T²)`. Factorized attention reduces this to `O(S_m²) + O(T²)`, either by processing all temporal blocks before all spatial blocks (sequential) or by alternating them (interleaved). Latent-query attention adds another control: the first block maps `L_in` input tokens to `L_out` learned latents, so the reduction ratio `L_out/L_in` directly controls later self-attention and feed-forward cost.
+Joint attention over spatial and temporal tokens has cost `O(S_m² × T²)`. Factorized attention applies attention over one axis at a time: across the full tensor, the pairwise work is `O(T S_m² + S_m T²)` rather than the joint product. The paper describes the axis-local operations with the shorthand `O(S_m²) + O(T²)`. Sequential attention processes all temporal blocks before all spatial blocks, while interleaved attention alternates them. Latent-query attention adds another control: the first block maps `L_in` input tokens to `L_out` learned latents, so the reduction ratio `L_out/L_in` directly controls later self-attention and feed-forward cost.
 
 ![Wayformer's factorized-attention comparison](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-source-figure-5.webp)
 *Fig 2: Factorized attention traces quality and latency tradeoffs for early, late, and hierarchical fusion; the same nominal reduction can have different effects because road tokens are tiled in cross-modal encoders. | source: [Wayformer, Figure 5](https://arxiv.org/abs/2207.05844)*

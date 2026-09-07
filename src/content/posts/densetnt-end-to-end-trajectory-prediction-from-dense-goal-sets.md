@@ -20,9 +20,7 @@ summary: "2021 – DenseTNT: End-to-End Trajectory Prediction from Dense Goal Se
 
 ## Summary
 
-DenseTNT treats the endpoint as the compact representation of trajectory intent, but removes the sparse hand-designed anchors used by earlier goal-based predictors. It samples a dense set of reachable positions around nearby lanes, estimates a probability for each position, predicts a small set of goals from that heatmap, and completes one trajectory per goal.
-
-The interesting part is the supervision problem. A log contains one realized future, even though the predictor should cover several plausible futures. DenseTNT first uses an offline optimizer to turn the dense endpoint distribution into multi-goal pseudo-labels, then trains an online goal-set predictor to imitate them. The deployed model therefore keeps the dense coverage idea without running the optimizer at inference time.
+> DenseTNT treats the endpoint as the compact representation of trajectory intent, but removes the sparse hand-designed anchors used by earlier goal-based predictors. It samples a dense set of reachable positions around nearby lanes, estimates a probability for each position, predicts a small set of goals from that heatmap, and completes one trajectory per goal. The interesting part is the supervision problem: a log contains one realized future even though the predictor should cover several plausible futures, so DenseTNT first uses an offline optimizer to turn the dense endpoint distribution into multi-goal pseudo-labels and then trains an online goal-set predictor to imitate them. The deployed model therefore keeps the dense coverage idea without running the optimizer at inference time.
 
 ## Core Insights
 
