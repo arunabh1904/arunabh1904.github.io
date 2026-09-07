@@ -41,7 +41,7 @@ Each alternative receives an instruction, an action, and a safe-to-execute flag.
 The navigation-command figure makes the test concrete. Some rows use target points; others use commands such as “turn left,” “go straight,” or nonsensical prompts. The red path waypoints change with the scene and instruction, while green speed waypoints show the temporal profile. In the rainy examples, the model can continue along a valid lane when a command has no matching turn, but it fails on a concept such as a U-turn that is rare or absent in training. That is better evidence of context-sensitive grounding than a command-following sentence detached from control.
 
 ![SimLingo navigation command and path-speed responses](/assets/images/simlingo-vision-only-closed-loop-autonomous-driving-with-language-action-alignment-source-figure-6.webp)
-*Fig 2: Across weather and road contexts, the red path and green speed waypoints change for target-point, turn, speed, and object-related commands; unusual commands expose the model’s coverage limits. | source: [SimLingo: Vision-Only Closed-Loop Autonomous Driving with Language-Action Alignment, Figure 6](https://arxiv.org/abs/2503.09594)*
+*Fig 2: Across weather and road contexts, the red path and green speed waypoints respond to target points and navigation commands. Irrelevant statements and an unsupported U-turn request expose different instruction-following limits. | source: [SimLingo: Vision-Only Closed-Loop Autonomous Driving with Language-Action Alignment, Figure 6](https://arxiv.org/abs/2503.09594)*
 
 ### The data mixture is part of the method
 

@@ -41,7 +41,7 @@ The cache is an approximation, so the action expert sees a slightly different di
 FlashDrive freezes the VLA backbone and fine-tunes only the action expert. During training, a randomly sampled window is rolled out for $L-1$ steps under the streaming mask without gradients; gradients are enabled only at the final step, where the action loss is computed. Varying the window length exposes the action expert to accumulated approximation error. In Figure 3b, this recovers minADE1/minADE6 from 2.04/0.96 without fine-tuning to 1.73/0.79, close to the 1.72/0.77 no-streaming reference.
 
 ![FlashDrive streaming fine-tuning and action-expert accuracy](/assets/images/flashdrive-flash-vision-language-action-inference-for-autonomous-driving-source-figure-3.webp)
-*Fig 2: The mask lets only the newest frame query the retained context, while streaming fine-tuning brings the action errors back near the no-streaming reference after KV-cache approximation. | source: [FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving, Figure 3](https://arxiv.org/abs/2608.12932)*
+*Fig 2: The accuracy bars compare full recomputation, uncorrected streaming, and streaming with action-expert fine-tuning. Fine-tuning recovers most of the error increase caused by cache reuse. | source: [FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving, Figure 3(b)](https://arxiv.org/abs/2608.12932)*
 
 ### Compressing reasoning and action denoising
 
