@@ -38,9 +38,9 @@ That diagnosis changes what a training dashboard should monitor. ImageNet linear
 
 The authors choose an early iteration of the EMA teacher whose dense features are still strong. For P L2-normalized patch features X_S from the student and X_G from the Gram teacher, the added objective is
 
-\[
+$$
 \mathcal{L}_{\mathrm{Gram}} = \left\|X_S X_S^\top - X_G X_G^\top\right\|_F^2.
-\]
+$$
 
 The paper writes the Frobenius loss without an explicit $1/P^2$ average; an implementation can absorb that optional averaging into the Gram-loss weight. The model is therefore free to rotate or otherwise change the feature basis as long as the pairwise patch similarities remain close. This is a better fit for self-supervised training than copying the earlier feature vectors directly: the teacher supplies a geometry of local relationships, not a frozen coordinate system. The paper starts the refinement late, updates the Gram teacher every 10k iterations, and also uses a high-resolution variant whose teacher sees twice the normal input resolution before its feature map is downsampled 2×2 with bicubic interpolation.
 

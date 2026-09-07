@@ -25,9 +25,9 @@ For an image with a truthful caption representation x− and a hallucinatory rep
 
 Under an approximately zero signal–residual cross-covariance assumption, the linear MMSE operator is A* = ΣT(ΣT + ΣH)−1. For a stable, interpretable edit, the authors eigendecompose ΣH = QΛQᵀ, measure the truthful variance τj² = qjᵀΣTqj in each distortion mode, and apply
 
-\[
+$$
 \tilde\gamma_j = \left(1 + \frac{\lambda_j}{\tau_j^2}\right)^{-\alpha}.
-\]
+$$
 
 The sharpness α changes how strongly the ordering is expressed. All modes remain available and gains are bounded between zero and one, unlike hard projection that deletes an entire subspace. With approximately 3,000 paired calibration samples per model, the filter is absorbed into the FFN output projection W̃out = Fα Wout, so there is no second decoding pass or new inference module.
 
