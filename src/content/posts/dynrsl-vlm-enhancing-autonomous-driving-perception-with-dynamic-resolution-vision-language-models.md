@@ -21,6 +21,8 @@ summary: "2025 – DynRsl-VLM: Enhancing Autonomous Driving Perception with Dyna
 
 Resolution is a deployment decision, not merely a vision-backbone setting. Fixed downsampling spends roughly the same visual budget everywhere and can discard the objects that matter most in driving. DynRsl-VLM instead keeps a flexible number of image features, then aligns them to text with an interface designed for that representation. The intended gain is perceptual coverage without an unbounded token cost.
 
+The input construction is more specific than simply zooming detected boxes. YOLOv8 proposes vehicle and pedestrian regions in the high-resolution image; DynRsl-VLM keeps each ROI, also forms combined regions whose boxes contain pairs or groups of entities, and includes a low-resolution full image for global context. A frozen ViT processes the resulting views, and two projection heads align multiple resolution-specific image features to one text feature with symmetric InfoNCE. The three figures therefore trace one idea at three levels: alignment losses, the full model path, and the ROI-plus-global image set that preserves both object detail and relations.
+
 ![DynRsl-VLM: Enhancing Autonomous Driving Perception with Dynamic Resolution Vision-Language Models source figure: Architecture of the alignment module and the losses employed during model training.](/assets/images/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models-paper-figure.webp)
 *Fig 1: Architecture of the alignment module and the losses employed during model training. | source: [DynRsl-VLM: Enhancing Autonomous Driving Perception with Dynamic Resolution Vision-Language Models](https://arxiv.org/abs/2503.11265)*
 

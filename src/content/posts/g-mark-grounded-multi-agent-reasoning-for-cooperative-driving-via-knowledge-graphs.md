@@ -24,6 +24,8 @@ summary: '2026 – G-MARK: Grounded Multi-Agent Reasoning for Cooperative Drivin
 
 ## Core Insights
 
+Read the method figure from left to right: each vehicle contributes agent and observation nodes, conservative association builds object hypotheses, and context enrichment attaches provenance, visibility, uncertainty, disagreement, and path relevance before a task head reads the graph. The second figure shifts the question from architecture to operating point: how much serialized evidence is communicated for a given trajectory error. Together they explain why G-MARK is a delayed-fusion system—the graph preserves evidence until the downstream question decides which relationships matter.
+
 ![G-MARK pipeline from per-agent evidence graphs through conservative association and context enrichment to task heads](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-1.webp)
 *Fig 1: G-MARK preserves agent, observation, and hypothesis nodes through conservative association, then adds provenance and planning context before task-specific heads; the graph keeps delayed fusion inspectable instead of collapsing evidence into one object list. | source: [G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](https://arxiv.org/abs/2608.19964)*
 

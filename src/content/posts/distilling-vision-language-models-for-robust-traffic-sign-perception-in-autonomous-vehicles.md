@@ -27,6 +27,8 @@ Traffic-sign defenses often specialize to one perturbation or sacrifice clean ac
 
 The evaluation uses clean data for training and tests shadow, natural-light, and printable RP2 attacks. The reported maximum gains are +12.5 percentage points under shadow attacks on GTSRB and +13.2 points under natural-light attacks on LISA. In the physical RP2 experiment, the baseline correctly classifies 6 of 16 images, compared with 12 of 16 for LAMDA. The two losses are complementary: language replacement with irrelevant prototypes removes much of the robustness gain.
 
+The training diagram is easiest to interpret as a teacher path that disappears. A VLM supplies frozen embeddings for a class name and a richer sign description; the image student is trained with the ordinary class loss plus two prototype-alignment losses, then the text encoder and prototype banks are removed. The remaining deployed model is just the image backbone and classifier. The other panels test whether that semantic anchor survives perturbations: the RP2 sequence varies viewing distance, while the clean natural-light sign shows the visual domain before the attack is applied.
+
 ![LAMDA training diagram with frozen language prototypes supervising an image-only traffic-sign classifier](/assets/images/lamda-training-paper-figure.png)
 *Fig 1: The text encoder and prototype banks are used as fixed train-time teachers and removed before deployment. | source: [LAMDA](https://arxiv.org/abs/2608.08815)*
 
