@@ -11,78 +11,67 @@ tags:
 field: 'Vision-Language Models'
 summary: "2021 – Learning Transferable Visual Models From Natural Language Supervision"
 ---
+
 ## 2021 – Learning Transferable Visual Models From Natural Language Supervision (CLIP)
 
 **arXiv:** [2103.00020](https://arxiv.org/abs/2103.00020)
 
-**GitHub:** [openai/CLIP](https://github.com/openai/CLIP) | [mlfoundations/open_clip](https://github.com/mlfoundations/open_clip)
+**GitHub:** [openai/CLIP](https://github.com/openai/CLIP) · [mlfoundations/open_clip](https://github.com/mlfoundations/open_clip)
 
-**Project / blog:** [OpenAI CLIP announcement](https://openai.com/index/clip/)
-
-**Conference:** Released as a tech report; widely cited (ICML 2021 oral-style spotlight)
+**Project:** [OpenAI CLIP announcement](https://openai.com/index/clip/)
 
 ## Summary
 
-> CLIP learns visual representations from natural-language supervision instead of fixed class labels. It trains an image encoder and text encoder contrastively so matching image-caption pairs have high similarity and mismatched pairs have low similarity. At inference, classification becomes text retrieval: write prompts for candidate labels and choose the label whose text embedding best matches the image. The evidence is broad zero-shot transfer across many image benchmarks, with strong robustness to distribution shift compared with supervised ImageNet models. The caveat is data dependence: web-scale captions bring noise, bias, and uneven coverage, and prompt wording can change results. The lasting idea is that language can define open-ended visual categories without retraining a classifier.
+> CLIP learns visual representations from natural-language captions instead of a fixed class list. It trains image and text encoders to identify the matching pair inside a batch, then turns class descriptions into a classifier at inference time. On the paper’s largest model, zero-shot ImageNet accuracy reaches 76.2% without training on ImageNet’s labeled training split, and a 27-dataset study finds its zero-shot classifier beats a linear classifier fitted to supervised ResNet-50 features on 16 datasets. The same open vocabulary also imports web-data noise, prompt sensitivity, and social bias.
 
 ## Core Insights
 
-![Figure 1 from CLIP: contrastive language-image pre-training and zero-shot transfer](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
-*Fig 1: CLIP learns aligned image and text embeddings through contrastive pretraining, turns class names into a zero-shot classifier, and predicts by comparing image and label-text similarities. | source: [CLIP paper](https://arxiv.org/abs/2103.00020)*
+### Contrastive pairs turn language into a dynamic classifier
 
-![Figure 2 from Learning Transferable Visual Models From Natural Language Supervision](/assets/images/learning-transferable-visual-models-from-natural-language-supervision-source-figure-2.webp)
-*Fig 2: CLIP is much more efficient at zero-shot transfer than our image caption baseline. Although highly expressive, we found that transformer-based language models are relatively weak at zero-shot ImageNet classification. | source: [Learning Transferable Visual Models From Natural Language Supervision](https://arxiv.org/abs/2103.00020)*
+![CLIP contrastive pretraining and zero-shot prediction](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
+*Fig 1: CLIP learns one image and one text embedding for every pair in a batch, scores all image-text combinations, and later uses class descriptions as the rows of a zero-shot classifier. | source: [CLIP, Figure 1](https://arxiv.org/abs/2103.00020)*
 
-![Figure 5 from Learning Transferable Visual Models From Natural Language Supervision](/assets/images/learning-transferable-visual-models-from-natural-language-supervision-source-figure-5.webp)
-*Fig 3: Zero-shot CLIP is competitive with a fully supervised baseline. Across a 27 dataset eval suite, a zero-shot CLIP classifier outperforms a fully supervised linear classifier fitted on ResNet-50 features on 16 datasets, including ImageNet. | source: [Learning Transferable Visual Models From Natural Language Supervision](https://arxiv.org/abs/2103.00020)*
+For a batch of $N$ image-caption pairs, CLIP produces $N$ image embeddings and $N$ text embeddings, L2-normalizes them, and computes an $N\times N$ cosine-similarity matrix. The diagonal entries are the observed pairs; the other $N^2-N$ entries are in-batch negatives. A learned temperature scales the logits, and the loss averages cross-entropy in both directions: image-to-text and text-to-image. The encoders interact only through this similarity matrix, rather than through cross-attention over every image region and word.
 
+At test time, the labels do not need to be the closed-set symbols seen during training. The text encoder embeds prompts such as “a photo of a {label},” and the image encoder chooses the class whose text embedding has the highest similarity. The classifier is therefore synthesized from language for each task. A phrase can describe a breed, an action, or a place without adding a new output head, provided the web data and the prompt give the visual encoder enough evidence to learn it.
 
-### Method and reported result
+### The corpus makes the interface possible
 
-CLIP trains vision through language. It pairs an image encoder with a text Transformer and learns from 400M web image-caption pairs by pulling matching image/text embeddings together and pushing mismatches apart. After pre-training, classification becomes a prompt comparison problem: embed the image, embed candidate labels such as "a photo of a tiger", and choose the closest text embedding.
+CLIP’s dataset, WebImageText (WIT), contains about 400M image-text pairs gathered from publicly available internet sources. To widen the concept vocabulary, the authors search for pairs containing one of roughly 500,000 queries and cap each query at 20,000 pairs. This is a scalable collection rule rather than a clean annotation process: captions can be incomplete, duplicated, culturally narrow, or unrelated to the visible image. The text remains valuable because it names concepts that a 1,000-class label set cannot cover, but the model inherits the distribution that produced those captions.
 
-That framing replaced fixed softmax heads with natural-language supervision. One model could perform zero-shot classification across many datasets, and prompt wording became part of the evaluation surface. The same shared embedding space also made text-guided image search and generation feel natural.
+The authors first tried caption generation and a bag-of-words prediction baseline. Figure 2 shows the practical reason for the final objective: the Transformer language-model baseline learns ImageNet classes more slowly than the simpler bag-of-words predictor, and replacing prediction with batch contrastive learning improves efficiency again. CLIP therefore optimizes an easier pair-identification target instead of reproducing every word in the accompanying description. This choice sacrifices dense language generation for a representation that can be reused through text prompts.
 
-**Evals / Benchmarks**
+![CLIP’s zero-shot transfer efficiency as the image corpus grows](/assets/images/learning-transferable-visual-models-from-natural-language-supervision-source-figure-2-white.png)
+*Fig 2: The source efficiency plot shows zero-shot ImageNet accuracy rising faster for CLIP’s contrastive objective than for the captioning baselines as more image-text pairs are processed. | source: [CLIP, Figure 2](https://arxiv.org/abs/2103.00020)*
 
-| Dataset / task | Zero-shot top-1 | Supervised baseline | Encoder |
-| -------------- | --------------- | ------------------- | ------- |
-| ImageNet-1k | 76.2 % | 76.2 % (ResNet-50 with labels) | ViT-B/32 |
-| Oxford-Pets | 88.3 % | 93.5 % (finetuned) | RN50 |
-| UCF-101 (action) | 77.5 % | 84.2 % (I3D) | RN101 |
-| Avg. over 27 tasks | 70.1 % | 75.3 % (task-specific models) | RN50 |
+The training sweep includes ResNet-50, ResNet-101, three compute-scaled ResNets, and ViT-B/32, ViT-B/16, and ViT-L/14. The base text encoder is a 12-layer, 512-wide Transformer with a 49,152-token lower-cased BPE vocabulary and a 76-token context limit. The ResNet scaling sweep also widens the text encoder proportionally while holding its depth fixed. All models train from scratch for 32 epochs with a batch size of 32,768, Adam with decoupled weight decay, a cosine learning-rate schedule, mixed precision, and a learned temperature whose logit scale is clipped for stability. The best reported default is ViT-L/14 with one extra epoch at 336-pixel resolution; the largest ResNet takes 18 days on 592 V100 GPUs, and the largest Vision Transformer takes 12 days on 256 V100 GPUs.
 
-Training cost is roughly 400&nbsp;M pairs on 256&nbsp;A100 GPUs for around two weeks. Inference requires a single forward pass through both encoders.
+### Zero-shot breadth is the result, not just ImageNet accuracy
 
-**Tiny PyTorch snippet — zero-shot classifier with CLIP**
-```python
-import clip, torch
-model, preprocess = clip.load("ViT-B/32", device="cuda")
+![CLIP zero-shot transfer compared with a supervised ResNet-50 linear probe](/assets/images/learning-transferable-visual-models-from-natural-language-supervision-source-figure-5-white.png)
+*Fig 3: Each bar compares zero-shot CLIP with a linear classifier fitted to ResNet-50 features across the paper’s 27-dataset suite; CLIP is ahead on 16 datasets, including ImageNet. | source: [CLIP, Figure 5](https://arxiv.org/abs/2103.00020)*
 
-labels = ["cat", "dog", "airplane"]
-prompts = [f"a photo of a {c}" for c in labels]
-text_feat = clip.tokenize(prompts).cuda()
-with torch.no_grad():
-    text_emb = model.encode_text(text_feat)
-text_emb /= text_emb.norm(dim=-1, keepdim=True)
+| Evidence | Reported result | What it establishes |
+| --- | ---: | --- |
+| ImageNet zero-shot | 76.2% top-1 | matches the original supervised ResNet-50 without ImageNet labels |
+| Broad linear-probe comparison | ahead on 16 of 27 datasets | transfer is not confined to ordinary object recognition |
+| Prompt engineering and ensembling | nearly +5 points averaged over 36 datasets in Figure 4 | a separate evaluation from the 27-dataset comparison |
+| Natural distribution shifts | effective-robustness gap reduced by up to 75% | relative to the ImageNet-accuracy trend, not the raw accuracy drop |
+| ImageNet linear probe on frozen CLIP features | 85.4%, +9.2 points | average shifted-data accuracy slightly decreases |
 
-from PIL import Image
-img = preprocess(Image.open("mystery.jpg")).unsqueeze(0).cuda()
-with torch.no_grad():
-    img_emb = model.encode_image(img)
-img_emb /= img_emb.norm()
+The 27 datasets span OCR and text recognition, fine-grained objects, actions, geo-localization, scene recognition, and visual reasoning. CLIP is strongest where ImageNet’s single-label vocabulary is a poor description of the task: the paper highlights OCR, cars, and video actions. In Figure 5, CLIP leads by 28.9 points on StanfordCars and 23.2 on Country211, yet trails by 18.4 on German traffic signs, 18.2 on CLEVR counting, and 37.1 on EuroSAT. Those negative bars expose tasks for which a broad web vocabulary is insufficient. The comparison is also a representation study: the ResNet-50 backbone stays fixed, while a separate linear classifier is fitted for each dataset.
 
-probs = (100. * img_emb @ text_emb.T).softmax(dim=-1)
-pred = labels[probs.argmax()]
-print("Predicted class:", pred)
-```
+Prompt wording changes the classifier. On ImageNet, adding context such as “a photo of” improves accuracy by 1.3 points and ensembling 80 templates adds another 3.5. Figure 4 separately reports almost five points on average across 36 datasets. Both compare with contextless class names. This is not a nuisance outside the model; it is the mechanism by which a developer tells the text encoder what kind of visual evidence matters. A reported class score therefore bundles representation quality, label semantics, and prompt design.
 
-### Where the evidence stops
+The robustness analysis compares zero-shot CLIP with ImageNet-trained models on seven natural distribution shifts. The best zero-shot model reduces the effective-robustness gap by up to 75% relative to the accuracy trend fitted to ImageNet-trained models. This measures performance beyond what the in-distribution score predicts, rather than the raw difference between ImageNet and shifted accuracy. Fitting a logistic-regression classifier to frozen CLIP features on ImageNet raises ImageNet accuracy to 85.4% while slightly lowering average accuracy under distribution shift. The paper’s bias analysis also shows that the class list changes the behavior: changing the candidate labels or the language used to describe people changes which harmful associations can be emitted. The supplied class set therefore affects the associations being measured.
 
-CLIP is one of the cleanest bridges between vision and language: one embedding space, many tasks, no dataset-specific classifier head. The weaknesses follow from the same design. Training depends on heavy compute and a proprietary web-scale dataset, zero-shot accuracy can be sensitive to prompt wording, and fairness problems mirror the data scraped from the web.
+### A language-defined classifier still reflects its training distribution
+
+Independent encoders make the image and text embeddings reusable, while the global dot product gives no explicit box, count, or spatial relation. Strong transfer on many recognition tasks can therefore coexist with weak counting and unusual-object performance. The WIT overlap audit also matters: the paper detects median evaluation overlap of 2.2% and mean overlap of 3.2% across the audited datasets. Zero-shot means no supervised training on the benchmark's labeled split, not proof that web pretraining contains no overlapping images. Prompt sensitivity, uneven concept coverage, and the paper's observed social biases all follow the classifier into a new label set.
 
 ## High-Level Takeaways
 
-- CLIP informs the decision to buy visual transfer with image-text supervision rather than a closed-set label vocabulary. The training unit is an image-caption pair; separate visual and text encoders meet in a shared embedding space, and the contrastive batch defines the negative set.
-- The central tradeoff is breadth versus control: web captions expand semantic coverage but import bias, noise, and prompt sensitivity. A decisive ablation would match data volume and compute across curated class labels, raw captions, and filtered captions while evaluating both zero-shot transfer and calibration. At 10× scale, duplicate pairs and low-information captions dilute the negative set. CLIP's recipe would lose its advantage if a smaller curated or generative objective matched transfer across unseen datasets at lower data and batch-communication cost.
-- CLIP showed that natural-language supervision can give vision models rich, transferable semantics. It helped turn multimodal learning from a niche setup into a default way to build open-vocabulary systems.
+- CLIP trains image and text encoders with symmetric in-batch contrastive loss.
+- Natural-language class prompts synthesize a zero-shot classifier without task-specific output heads.
+- Broad transfer and shift robustness emerge at web scale, but prompt wording and task coverage affect the score.
+- Open vocabulary imports the web corpus’s noise and social bias; label design is part of deployment behavior.
