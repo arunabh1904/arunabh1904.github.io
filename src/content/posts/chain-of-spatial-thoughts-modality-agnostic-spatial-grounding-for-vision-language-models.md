@@ -27,7 +27,7 @@ Space Tokens changes the interface between geometry and language. The method res
 ![Space Tokens three-stage training pipeline for continuous spatial representations and reasoning](/assets/images/space-tokens-pipeline-paper-figure.png)
 *Fig 1: The three-stage pipeline first learns spatial representations, then trains the VLM to use them in next-token reasoning, and finally refines the policy with reinforcement learning. | source: [Chain of Spatial Thoughts, Figure 2](https://arxiv.org/abs/2608.10278)*
 
-The three stages separate “encode geometry” from “use geometry.” Stage 1 injects spatial tokens into a chain-of-thought prompt and backpropagates representation and reconstruction losses. Stage 2 freezes the projection layers and adds teacher-forced next-token prediction so the VLM must incorporate the tokens into its answer. Stage 3 uses GRPO with outcome, latent-grounding, and visual-focus rewards. All three stages fine-tune pretrained VLMs with LoRA; the underlying VLM architecture is unchanged at inference.
+The three stages separate “encode geometry” from “use geometry.” Stage 1 injects spatial tokens into a chain-of-thought prompt and backpropagates representation and reconstruction losses. Stage 2 freezes the projection layers and adds teacher-forced next-token prediction so the VLM must incorporate the tokens into its answer. Stage 3 uses GRPO with the VSI-Bench task metric as its reward: fuzzy matching for multiple-choice answers and mean relative accuracy for numeric answers. All three stages fine-tune pretrained VLMs with LoRA; the underlying VLM architecture is unchanged at inference.
 
 The data protocol also explains why a compact latent can help. Training uses one epoch of VICA-322K, samples 32 frames from each video, resizes them to 448 × 448, and uses six selected frames in the reasoning prompt. The paper reports that six informative frames reach 68.6 on VSI-Bench in the prompt-frame ablation, compared with 67.6 for all 32 frames. Selecting evidence before reasoning is part of the method's effective token budget.
 
@@ -46,7 +46,7 @@ The qualitative figure is a verification tool rather than a claim of reconstruct
 | Reserved spatial tokens | Geometry can remain inside the normal reasoning sequence | Token semantics depend on dedicated supervision. |
 | VGGT-Omega distillation | Scene-level 3D priors without a test-time teacher | Teacher quality and projection losses shape the representation. |
 | Six-frame reasoning | Less irrelevant visual context than all 32 sampled frames | Frame selection can discard useful evidence. |
-| GRPO refinement | Rewards answer, latent alignment, and visual focus | Stage-3 rewards are tuned to VSI-Bench and may not transfer. |
+| GRPO refinement | Optimizes the VSI-Bench task metric with fuzzy match or mean relative accuracy | Stage-3 reward is benchmark-specific and may not transfer. |
 
 ## High-Level Takeaways
 
