@@ -22,13 +22,13 @@ summary: "2022 – Constitutional AI: Harmlessness from AI Feedback"
 ## Core Insights
 
 ![Constitutional AI pipeline showing supervised self-critique and revision followed by reinforcement learning from AI feedback](/assets/images/constitutional-ai-harmlessness-from-ai-feedback-paper-figure.png)
-*Fig 1: Separates the two mechanisms: critique-and-revision creates supervised targets, then constitutional preference judgments train the reward model used for RLAIF. | source: [Constitutional AI](https://arxiv.org/abs/2212.08073)*
+*Fig 1: A schematic of CAI's two stages: self-critique and revision create supervised data, then constitutional comparisons train the preference model used for RLAIF. | source: [Constitutional AI, Figure 1](https://arxiv.org/abs/2212.08073)*
 
 ![Figure 6 from Constitutional AI: Harmlessness from AI Feedback](/assets/images/constitutional-ai-harmlessness-from-ai-feedback-source-figure-6.webp)
-*Fig 2: We show harmlessness PM scores of revised responses for varying number of constitutional principles used. Increasing the number of principles does not improve these PM scores, but we have found that it improves the diversity of revised responses, which improves exploration during the RL phase of CAI training. | source: [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073)*
+*Fig 2: Across one to sixteen constitutional principles, additional principles do not raise the harmlessness preference-model score; the paper argues that they can still diversify revisions for later RL exploration. | source: [Constitutional AI, Figure 6](https://arxiv.org/abs/2212.08073)*
 
 ![Figure 2 from Constitutional AI: Harmlessness from AI Feedback](/assets/images/constitutional-ai-harmlessness-from-ai-feedback-source-figure-2.webp)
-*Fig 3: We show harmlessness versus helpfulness Elo scores (higher is better, only differences are meaningful) computed from crowdworkers’ model comparisons for all 52B RL runs. Points further to the right are later steps in RL training. | source: [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073)*
+*Fig 3: Crowdworker Elo scores place helpfulness on the horizontal axis and harmlessness on the vertical axis; the RL-CAI runs trace a better frontier than the human-feedback baselines in this 52B comparison. | source: [Constitutional AI, Figure 2](https://arxiv.org/abs/2212.08073)*
 
 
 The constitution is both specification and data generator. It makes behavioral constraints inspectable, but every generated critique, revision, and preference still passes through a model whose interpretation can be incomplete. The supervised stage also gives the RL policy a safer starting distribution, reducing the exploration burden in the reinforcement phase.
@@ -41,10 +41,6 @@ The paper reports a less harmful, less evasive assistant with far fewer direct h
 | RLAIF | AI preference under a principle | Scales comparisons without one human label per pair. |
 | Human evaluation | Independent behavior judgment | Tests whether the constitution and judge produced the intended behavior. |
 
-## High-Level Takeaways
+### Decision test and boundary
 
-- Constitutional AI informs whether scarce human attention should label every example or define rules and audit the supervision that models generate from them. The fundamental units are a critique–revision example and a preference pair. The policy and preference model are separate, and errors in the AI judge can be amplified by RL.
-- In robotics, a constitution could encode forbidden contacts, workspace boundaries, uncertainty-triggered stops, and recovery priorities. The missing experiment is causal: compare rule-generated feedback with hand-labeled physical violations under matched human time, then evaluate novel hazards. At ten times the task diversity, principle conflicts and unmodeled geometry will dominate. The approach fails if the critic can verbalize the right rule while rewarding trajectories that violate it physically.
-- Constitutional AI is a blueprint for scalable supervision, not proof that automated oversight is self-validating.
-- The work studies dialogue harmlessness; physical safety constraints require grounded state and calibrated uncertainty.
-- A constitution lowers labeling cost only when independent evaluation can detect how the judge misread it.
+Constitutional AI is a blueprint for scalable supervision, not proof that automated oversight is self-validating. Its atomic units are a critique–revision example and a preference pair: the constitution defines the intended rule, a model generates corrective text and judgments, and RL optimizes against that learned signal. The paper studies dialogue harmlessness, where human evaluation remains the external check. For robotics, a constitution would need grounded constraints such as forbidden contacts, workspace boundaries, uncertainty-triggered stops, and recovery priorities. The decisive experiment compares rule-generated feedback with hand-labeled physical violations under matched human time and novel hazards. If the critic can verbalize the right principle while rewarding trajectories that violate it, the scaling advantage is illusory. A constitution lowers labeling cost only when independent evaluation can expose how the judge misread it.

@@ -24,13 +24,13 @@ summary: "2023 – Reward Model Ensembles Help Mitigate Overoptimization"
 ## Core Insights
 
 ![RLHF pipeline comparing a single proxy reward model with an ensemble used during policy optimization](/assets/images/reward-model-ensembles-help-mitigate-overoptimization-paper-figure.png)
-*Fig 1: Highlights the intervention: keep the ordinary SFT and preference-data stages, but optimize the policy against an ensemble of proxy reward models instead of one proxy. | source: [Reward Model Ensembles Help Mitigate Overoptimization](https://arxiv.org/abs/2310.02743)*
+*Fig 1: A schematic of the intervention: keep the ordinary SFT and preference-data stages, then optimize the policy against an ensemble of proxy reward models instead of one proxy. | source: [Reward Model Ensembles, Figure 1](https://arxiv.org/abs/2310.02743)*
 
 ![Figure 2 from Reward Model Ensembles Help Mitigate Overoptimization](/assets/images/reward-model-ensembles-help-mitigate-overoptimization-source-figure-2.webp)
-*Fig 2: An example of overoptimization. The KL divergence is the distance between the initial and current policy, measuring the degree of optimization. | source: [Reward Model Ensembles Help Mitigate Overoptimization](https://arxiv.org/abs/2310.02743)*
+*Fig 2: As optimization moves farther from the initial policy in KL divergence, the proxy score keeps rising after the gold score has begun to fall—the characteristic overoptimization pattern. | source: [Reward Model Ensembles, Figure 2](https://arxiv.org/abs/2310.02743)*
 
 ![Figure 3 from Reward Model Ensembles Help Mitigate Overoptimization](/assets/images/reward-model-ensembles-help-mitigate-overoptimization-source-figure-3.webp)
-*Fig 3: As policy KL divergence grows, ensemble aggregations sustain higher gold reward than a single reward model; proxy reward continues rising and reveals overoptimization. | source: [Reward Model Ensembles Help Mitigate Overoptimization](https://arxiv.org/abs/2310.02743)*
+*Fig 3: In best-of-$n$ sampling, ensemble objectives sustain higher gold reward than a single reward model as policy KL grows, while the proxy reward continues upward and exposes overoptimization. | source: [Reward Model Ensembles, Figure 3](https://arxiv.org/abs/2310.02743)*
 
 
 The evaluation extends the synthetic gold-reward setup used by the reward-overoptimization scaling paper and adds 25% label noise. For best-of-$n$, conservative ensemble objectives nearly eliminate overoptimization in the reported setting and improve performance by as much as 70%. For PPO, ensembles consistently reduce overoptimization; combining them with a small KL penalty prevents it in the studied runs without sacrificing performance.
@@ -43,10 +43,6 @@ The ensemble is useful because disagreement provides a local warning about extra
 | Worst-case ensemble | Conservative where any member predicts low reward |
 | Uncertainty-weighted ensemble | Trades predicted reward against disagreement |
 
-## High-Level Takeaways
+### Decision test and boundary
 
-- This paper informs whether extra critic capacity should buy a larger single model or an ensemble that exposes epistemic uncertainty. The unit is a response scored by several reward models; the policy objective changes how those scores are normalized and aggregated. The measured gains are orthogonal to simply scaling one reward model in the synthetic study.
-- The missing control is diversity: compare independently seeded replicas with critics trained from different label sources and representations. At ten times the deployment shift, correlated errors can make the ensemble confidently wrong. The approach is falsified if ensemble disagreement fails to rank real robot failures or if a held-out human/ground-truth metric regresses while the conservative objective rises.
-- Ensembles turn uncertainty into an optimization constraint rather than a dashboard metric.
-- Synthetic gold rewards and language outputs understate shared physical-perception failures.
-- An ensemble helps only when its members disagree for reasons related to the failures that matter.
+The design decision is whether extra critic capacity should buy one larger reward model or an ensemble whose disagreement constrains optimization. The synthetic gold-reward study reports that conservative ensemble objectives reduce overoptimization under 25% label noise and can improve best-of-$n$ performance by as much as 70%; PPO benefits when ensemble uncertainty is combined with a small KL penalty. Those results are orthogonal to simply scaling one critic, but members trained on the same data can share the same blind spot. The decisive test uses independently seeded critics with different label sources or representations, then checks whether disagreement ranks real failures and whether a held-out human or ground-truth metric improves while the proxy rises. In robotics, synthetic language rewards understate shared physical-perception errors. An ensemble helps only when its disagreement tracks the failures that matter.
