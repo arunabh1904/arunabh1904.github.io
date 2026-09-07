@@ -24,7 +24,7 @@ summary: "2025 – Vision-Language-Action Models for Autonomous Driving: Past, P
 
 ### Every driving VLA exposes three interfaces
 
-The paper starts from a compact formulation, (a_t = H(F(x_t;	heta))): a VLM backbone (F) turns multimodal input into a representation, and an action head (H) turns that representation into an executable output. The input (x_t) is not just an image. The survey distinguishes camera and LiDAR observations, BEV or occupancy features, language instructions, and vehicle state such as speed, acceleration, steering, and yaw rate. A paper's real architecture is therefore determined by what enters (F), what the backbone preserves, and what (H) is allowed to emit.
+The paper starts from a compact formulation, (a_t = H(F(x_t;	heta))): a VLM backbone $F$ turns multimodal input into a representation, and an action head $H$ turns that representation into an executable output. The input $x_t$ is not just an image. The survey distinguishes camera and LiDAR observations, BEV or occupancy features, language instructions, and vehicle state such as speed, acceleration, steering, and yaw rate. A paper's real architecture is therefore determined by what enters $F$, what the backbone preserves, and what $H$ is allowed to emit.
 
 ![Representative VA and VLA models organized by output family and system boundary](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-paper-figure.png)
 *Fig 1: The survey's model map separates vision-action systems, end-to-end VLA textual and numerical generators, and dual-system VLA guidance or representation transfer. | source: [Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future, Figure 2](https://arxiv.org/abs/2512.16760)*
