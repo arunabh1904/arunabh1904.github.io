@@ -21,43 +21,51 @@ summary: '2025 – DINOv3'
 
 ## Summary
 
-> DINOv3 scales self-supervised vision to a 6.7-billion-parameter transformer trained on 1.7 billion images, but its key technical result is about what scale breaks. During very long DINO/iBOT training, patch features gradually become too similar to the global class token. Classification keeps improving while dense spatial quality degrades. Gram anchoring constrains patch-to-patch relationships to an earlier, spatially healthier teacher.
+> DINOv3 scales self-supervised vision to a 7B-parameter ViT on a curated 1,689-million-image set, but its central result is about what scale breaks. During long DINO/iBOT training, ImageNet classification keeps improving while patch features lose locality and dense prediction degrades. Gram anchoring repairs that failure by matching pairwise patch similarities to an earlier, spatially healthier teacher. The paper reports 88.2→88.0 ImageNet linear accuracy alongside 50.3→55.7 ADE20K mIoU and 0.307→0.281 NYUv2 RMSE in its Gram ablation.
 
 ## Core Insights
 
-![DINOv3 ablations show Gram anchoring restoring dense prediction while retaining ImageNet classification](/assets/images/dinov3-gram-anchoring-paper-figure.png)
-*Fig 1: Long training improves global recognition but erodes dense features. Matching the student's patch Gram matrix to an earlier teacher restores segmentation and depth performance with little classification loss. | source: [DINOv3](https://arxiv.org/abs/2508.10104)*
+### Scale improves the global token while eroding patch locality
 
-![Figure 1 from DINOv3](/assets/images/dinov3-source-figure-1.webp)
-*Fig 2: (a) Evolution of linear probing results on ImageNet1k (IN1k) over the years, comparing fully- (SL), weakly- (WSL) and self-supervised learning (SSL) methods. Despite coming into the picture later, SSL has quickly progressed and now reached the Imagenet accuracy plateau of recent years. | source: [DINOv3](https://arxiv.org/abs/2508.10104)*
+The training recipe keeps DINO's global objective and iBOT's patch objective, but the two signals do not guarantee the same representation quality at long horizons. On both ViT-g and ViT-7B, linear-probe classification rises monotonically while segmentation starts to fall after roughly 200k iterations. By 600k and later, a patch chosen in one region becomes highly similar to increasingly irrelevant patches. The class token is becoming a better global descriptor while the patch grid is becoming a worse map of local evidence.
 
-![Figure 3 from DINOv3](/assets/images/dinov3-source-figure-3.webp)
-*Fig 3: High-resolution dense features. We visualize the cosine similarity maps obtained with DINOv3 output features between the patches marked with a red cross and all other patches. | source: [DINOv3](https://arxiv.org/abs/2508.10104)*
+![Figure 8: Gram anchoring evolution on dense and global benchmarks](/assets/images/dinov3-gram-anchoring-paper-figure.png)
+*Fig 1: This source Figure 8 tracks VOC, ADE20K, and ObjectNet during Gram refinement; dense curves recover quickly when patch relationships are anchored, while global performance changes only mildly. | source: [DINOv3, Figure 8](https://arxiv.org/abs/2508.10104)*
 
+That diagnosis changes what a training dashboard should monitor. ImageNet linear accuracy is a useful global probe, but it cannot tell whether a patch selected on a dog's ear still retrieves nearby fur or instead retrieves unrelated regions with the same image-level semantics. Dense probes and patch-similarity maps are not optional diagnostics once the intended use includes segmentation, depth, or correspondence.
 
-DINOv3 retains the DINO global loss, iBOT patch loss, Sinkhorn target centering, and feature-spreading regularization. The new diagnosis is representational: patch tokens increasingly encode the same global information instead of preserving local relations. The authors save an earlier teacher whose dense features remain strong and add a loss between teacher and student patch Gram matrices,
+### Gram anchoring preserves relationships rather than coordinates
 
-$$
-\mathcal{L}_{\text{Gram}} =
-\left\|
-X_s X_s^\top - X_g X_g^\top
-\right\|_F^2.
-$$
+The authors choose an early iteration of the EMA teacher whose dense features are still strong. For P L2-normalized patch features X_S from the student and X_G from the Gram teacher, the added objective is
 
-Because the loss matches pairwise relations rather than individual coordinates, it does not require the current model to copy the earlier feature basis exactly. In the reported recipe, Gram anchoring is introduced during a refinement stage after the long base run; the Gram teacher is refreshed periodically. High-resolution adaptation and multi-student distillation then produce a family of smaller checkpoints.
+\[
+\mathcal{L}_{\mathrm{Gram}} = \left\|X_S X_S^\top - X_G X_G^\top\right\|_F^2.
+\]
 
-| Ablation | ImageNet linear | ADE20K mIoU | NYU depth RMSE ↓ |
+The model is therefore free to rotate or otherwise change the feature basis as long as the pairwise patch similarities remain close. This is a better fit for self-supervised training than copying the earlier feature vectors directly: the teacher supplies a geometry of local relationships, not a frozen coordinate system. The paper starts the refinement late, updates the Gram teacher every 10k iterations, and also uses a high-resolution variant whose teacher sees twice the normal input resolution before its feature map is downsampled 2×2 with bicubic interpolation.
+
+The teacher choice has a sharp boundary. In the ablation, a 200k teacher is strong, a 100k teacher is similarly useful, and a 1M teacher is worse because it has already inherited the locality problem.
+
+### The repair trades a little global score for a large dense recovery
+
+| Gram teacher and resolution | ImageNet linear | ADE20K mIoU | NYUv2 RMSE ↓ |
 | --- | ---: | ---: | ---: |
-| Long-training baseline | 88.2% | 50.3 | 0.307 |
-| Gram anchoring, 200k refinement ×2 | 88.0% | 55.7 | 0.281 |
+| Baseline | 88.2 | 50.3 | 0.307 |
+| 200k, ×1 | 88.0 | 53.6 | 0.285 |
+| 200k, ×2 | 88.0 | 55.7 | 0.281 |
+| 100k, ×2 | 87.9 | 55.7 | 0.284 |
+| 1M, ×2 | 88.1 | 54.9 | 0.290 |
 
-This table isolates the main claim better than the largest-model leaderboard. Dense segmentation rises 5.4 points and depth error falls while classification changes by 0.2 points. The result says that one representation can retain both global and local information, but only if the training objective explicitly protects spatial relations late in training.
+The ×2 row gives the clearest intuition: the high-resolution teacher supplies a smoother local geometry, and the student distills that geometry without paying a large classification penalty. The result is measured on the paper's probes, so it does not establish that every dense task benefits equally or that a teacher checkpoint can be selected without validation. DINOv3's later high-resolution adaptation, multi-student distillation, and text alignment extend the release beyond this one regularizer.
+
+![Figure 3: High-resolution DINOv3 patch similarity maps](/assets/images/dinov3-source-figure-3.webp)
+*Fig 2: This source Figure 3 visualizes cosine similarity from a red-marked patch to all patches at 4096×4096 input resolution; the map shows the dense feature interface the Gram objective is designed to keep coherent. | source: [DINOv3, Figure 3](https://arxiv.org/abs/2508.10104)*
+
+The scale itself is part of the engineering boundary. The paper starts from an approximately 17-billion-image public-post pool and curates 1,689 million images into LVD-1689M; the flagship has 7B parameters (6.7B in the model table). Replication therefore requires both substantial data curation and a reliable checkpoint-selection strategy. Gram anchoring makes the trade-off explicit: more training is useful only if the objective protects the spatial information downstream tasks need.
 
 ## High-Level Takeaways
 
-- DINOv3 informs whether continued self-supervised scale is uniformly beneficial. It is not: a proxy such as ImageNet linear accuracy can hide deterioration in patch geometry. The atomic monitoring unit should therefore include both global and dense probes throughout the run, not only at the final checkpoint.
-- Gram anchoring depends on choosing a good earlier teacher. That choice introduces a checkpoint-selection oracle: the system must know when dense quality is high enough to preserve. The decisive missing experiment varies teacher age and anchoring onset under a fixed total compute budget. At ten times scale, storing teachers, computing patch Gram matrices, and running dense probes become material costs, though still smaller than wasting a frontier-scale pretraining run.
-- DINOv3 also uses post-training rather than one monolithic run: resolution adaptation, distillation, and text alignment extend the base model after self-supervised learning. That modularity connects it to [dino.txt](/paper%20shorts/2024/12/20/dinov2-meets-text-dino-txt.html), where a frozen DINOv2 backbone is aligned to language without relearning its visual geometry.
-- DINOv3 scales the DINO/iBOT recipe and introduces Gram anchoring to prevent local patch structure from collapsing into global semantics.
-- The 1.7-billion-image corpus and 6.7B model make full replication inaccessible, while anchor-checkpoint selection and web-data composition remain consequential.
-- More self-supervised training can improve classification while silently damaging dense vision; DINOv3 makes preserving patch relations an explicit optimization target.
+- DINOv3 turns a hidden scaling failure into a measurable one: global classification can improve while patch locality and dense quality decline.
+- Gram anchoring matches the patch-similarity matrix, allowing feature coordinates to change while preserving the geometry that dense probes use.
+- In the reported ablation, a 200k high-resolution teacher lifts ADE20K from 50.3 to 55.7 mIoU and lowers NYUv2 RMSE from 0.307 to 0.281, with ImageNet linear accuracy moving from 88.2 to 88.0.
+- The method depends on finding an earlier, spatially healthy teacher; anchoring to a 1M teacher is less effective, and the full 7B/data-scale recipe remains expensive to reproduce.
