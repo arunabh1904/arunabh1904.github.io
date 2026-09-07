@@ -15,40 +15,50 @@ summary: '2022 – DeepInteraction: 3D Object Detection via Modality Interaction
 
 **Code:** [fudan-zvg/DeepInteraction](https://github.com/fudan-zvg/DeepInteraction)
 
-### Method and reported result
-
-DeepInteraction challenges the assumption that fusion should collapse camera and LiDAR into one hybrid tensor. It maintains an image representation and a LiDAR BEV representation through the encoder, lets them update each other bidirectionally, and alternates object-query decoding against both streams.
-
 ## Summary
 
-> The paper's enduring question is what unification must preserve. A single coordinate frame simplifies reuse, but a single feature tensor can erase the neighborhood structure and failure profile that made each sensor complementary.
+> DeepInteraction treats modality fusion as an exchange protocol rather than a one-time concatenation. An image stream and a LiDAR BEV stream remain distinct through the encoder; bidirectional correspondence and attention update both, and a predictive decoder alternates between them around object queries. On nuScenes, the base R50 model reaches 70.8 mAP/73.4 NDS on test at 4.9 FPS on an A100, while the ablations show that both representational and predictive interaction contribute. The cost is explicit 2D–3D calibration and a larger, less efficiency-focused model.
 
 ## Core Insights
 
-The encoder has two jobs. Intra-modal learning improves each stream in its native representation. Multi-modal representational interaction projects and samples between image and LiDAR coordinates in both directions, so visual semantics can densify sparse geometry and geometry can sharpen image features. The decoder then performs predictive interaction: object queries alternate between the two representations rather than consulting one fused map.
+### Keep two representations alive
 
-The paper's ablations support the interaction claim. Using both representations in the decoder beats repeatedly using the LiDAR stream; adding cross-modal interaction improves over intra-modal processing alone; and the method improves its LiDAR-only baseline with both voxel and pillar backbones. Category gains are largest for some sparse or small classes, including 11.8 mAP for bicycles, 6.9 for motorcycles, and 5.9 for traffic cones in the reported nuScenes validation breakdown.
+Most multimodal detectors fuse image and LiDAR features into one hybrid tensor before decoding. DeepInteraction keeps an image-perspective representation and a LiDAR-BEV representation through the whole pipeline. Separate backbones first build the two streams. Each encoder layer then contains three parts: multi-modal representational interaction (MMRI), intra-modal learning (IML), and representational integration. The output is still two modality-specific tensors, but each has received information from the other.
 
-![Figure 1 from DeepInteraction, contrasting feature collapse with retained modality-specific representations](/assets/images/deepinteraction-paper-figure-1.png)
-*Fig 1: The left pipeline fuses once; the right keeps both representations alive and exchanges information during encoding and decoding. | source: [DeepInteraction](https://arxiv.org/abs/2208.11112)*
+![DeepInteraction source Figure 1: one fused stream versus two interacting streams](/assets/images/deepinteraction-paper-figure-1.png)
+*Fig 1: The paper contrasts one-shot feature fusion with DeepInteraction's two live representations, which exchange information in the encoder and again during predictive decoding. | source: [DeepInteraction, Figure 1](https://arxiv.org/abs/2208.11112)*
 
-![Figure 2 from DeepInteraction: 3D Object Detection via Modality Interaction](/assets/images/deepinteraction-3d-object-detection-via-modality-interaction-source-figure-2.webp)
-*Fig 2: Illustration of the multi-modal representational interactions. Given two modality-specific representations, the image-to-LiDAR feature interaction (a) spread the visual signal in the image representation to the LiDAR BEV representation, and the LiDAR-to-image feature interaction (b) takes cross-modal relative contexts from LiDAR representation to enhance the image representations. | source: [DeepInteraction: 3D Object Detection via Modality Interaction](https://arxiv.org/abs/2208.11112)*
+The reason to preserve the split is physical. Image features have broad semantic coverage but ambiguous depth; LiDAR features have metric geometry but missing and irregular returns. A single fused tensor may perform well while hiding which sensor supplied a cue and while erasing the neighborhood structure native to either view. DeepInteraction makes the interaction rule shared, not the representation itself.
 
-![Figure 3 from DeepInteraction: 3D Object Detection via Modality Interaction](/assets/images/deepinteraction-3d-object-detection-via-modality-interaction-source-figure-3.webp)
-*Fig 3: Illustration of our multi-modal predictive interaction. Our predictive interaction decoder (a) generates predictions via (b) progressively interacting with two modality-specific representations. | source: [DeepInteraction: 3D Object Detection via Modality Interaction](https://arxiv.org/abs/2208.11112)*
+### Cross-modal sampling is geometry-aware and directional
 
+MMRI builds dense mappings between image coordinates and BEV coordinates. For image-to-LiDAR interaction, the model projects LiDAR points into the cameras, completes the resulting sparse depth map, back-projects image pixels into 3D, and maps their ground-plane coordinates to BEV neighbors. A LiDAR BEV feature can then query image features that correspond to its location and receive visual context that fills sparse geometry. For LiDAR-to-image interaction, the model projects the LiDAR points in each BEV pillar into the cameras, so an image feature queries the BEV features that actually generated its geometric evidence. The cross-attention is applied over these mapped neighbors rather than over every image and BEV position.
 
-| Strategy | Benefit | Cost |
-| --- | --- | --- |
-| Single fused BEV | Simple shared interface | Can hide provenance and discard native structure. |
-| Two retained streams | Preserves sensor-specific evidence | Carries more memory through the network. |
-| Bidirectional encoder interaction | Improves both representations before prediction | Depends on calibrated cross-view sampling. |
-| Alternating query decoder | Lets each object use geometry and semantics separately | Adds architectural coupling to the detector. |
+![DeepInteraction source Figure 2: image-to-LiDAR and LiDAR-to-image interaction](/assets/images/deepinteraction-3d-object-detection-via-modality-interaction-source-figure-2.webp)
+*Fig 2: The two panels show the directional exchange: image features are sampled into LiDAR BEV in one direction, and LiDAR context is sampled back into image features in the other. | source: [DeepInteraction, Figure 2](https://arxiv.org/abs/2208.11112)*
+
+This is not symmetric averaging. The query remains in its native stream, and the other modality supplies keys and values. In practice, that lets the image stream sharpen the distinction between a tiny or occluded object and background while the LiDAR stream supplies metric context that a perspective feature cannot infer reliably. Repeating the operation across two representational interaction layers is an explicit choice to let the streams correct one another progressively.
+
+### Prediction alternates between the streams
+
+The decoder receives object queries and the boxes predicted by the previous layer. Its multi-modal predictive interaction (MMPI) layer crops a region of one modality around each current box, performs self-attention and cross-attention, and decodes the updated query. The layers alternate between image and LiDAR representations. For the LiDAR RoI, the projected box is enlarged twofold because driving objects occupy very few cells in BEV. This is object-conditioned interaction: the query chooses which local evidence matters after it has a provisional box.
+
+![DeepInteraction source Figure 3: predictive interaction decoder and MMPI layer](/assets/images/deepinteraction-3d-object-detection-via-modality-interaction-source-figure-3.webp)
+*Fig 3: The decoder generates predictions while successive MMPI layers interact with image and LiDAR RoIs; the model does not decode from one collapsed feature map. | source: [DeepInteraction, Figure 3](https://arxiv.org/abs/2208.11112)*
+
+The decoder ablation separates the two ideas. A LiDAR-only first layer reaches 65.1 mAP/70.1 NDS on nuScenes validation. Replacing it with the full alternating stack reaches 69.9/72.6; using five layers is the best point in the reported sweep, while six slightly reduces NDS. The gains are not simply “more decoder layers”: a DETR-style decoder on both streams reaches 68.6/71.6, one MMPI direction reaches 69.3/72.1, and MMPI on both streams reaches 69.9/72.6.
+
+### The results isolate interaction from backbone choice
+
+The base model uses nuScenes's six 1600×900 cameras and 32-beam LiDAR; it rescales the images to half resolution before the image branch. Its ResNet-50 image backbone is initialized from a Cascade Mask R-CNN model, and it uses two representational interaction layers, five predictive layers, and 200 queries. On nuScenes validation it reaches 69.9 mAP/72.6 NDS at 4.9 FPS on an A100, 3.1 FPS on an A6000, and 2.6 FPS on a V100. On the test split, the same base setting reaches 70.8/73.4. The larger Swin-Tiny model with test-time augmentation reaches 74.1/75.5, and the ensemble reaches 75.6/76.3; those rows include extra capacity or evaluation machinery.
+
+The encoder ablation provides the sharper mechanism test. IML alone reaches 68.1/71.9, MMRI alone 69.5/72.5, and both together 69.9/72.6. Replacing representational interaction with conventional representational fusion drops validation performance from 68.7/71.9 to 67.5/71.3. The same pattern survives a LiDAR backbone change: the displayed table rises from TransFusion-L's 54.5 to 60.0 mAP with PointPillars (+5.5), and from 65.1 to 69.9 with VoxelNet (+4.8). The surrounding paper text summarizes the latter comparison as +5.5 for voxel and +4.4 for pillars, so the table's row values are the safer boundary for the claim.
+
+The category breakdown explains where the retained streams matter most. Relative to the LiDAR-only TransFusion-L baseline, DeepInteraction gains 11.8 mAP on bicycles, 6.9 on motorcycles, and 5.9 on traffic cones. These are small, rare, or weakly observed objects for which image semantics and LiDAR geometry have unusually complementary failure modes.
 
 ## High-Level Takeaways
 
-- DeepInteraction informs whether representation sharing should mean a shared tensor or a shared interaction protocol. Its atomic units are image and LiDAR features plus object queries. Parameters are not fully shared, and the two feature spaces remain explicit until prediction.
-- The missing matched control gives a BEVFusion-style model the same parameter count, decoder depth, camera backbone, and latency, then tests corruption and calibration slices. At 10× temporal history, retaining two feature memories becomes expensive. The two-stream design would fail if a fused BEV with explicit sensor embeddings preserves the same robustness and rare-class gains with less memory, or if downstream dense tasks need a single scene tensor more than the detector needs native views.
-- DeepInteraction is the strongest counterpoint to “unified representation” as feature collapse. Later unified backbones must show that parameter sharing does not erase modality-specific information.
-- Sharing a model is not the same as forcing every sensor into one latent; sometimes the right shared object is the rule for exchanging evidence.
+- DeepInteraction keeps image and LiDAR representations separate while sharing bidirectional interaction operators in the encoder and decoder.
+- MMRI alone reaches 69.5/72.5 mAP/NDS on validation, MMPI alone 69.3/72.1, and their combination 69.9/72.6, showing that representation and prediction interaction are complementary.
+- The base R50 model reaches 70.8/73.4 on nuScenes test; larger and ensemble variants reach higher scores with different evaluation costs.
+- The strongest category gains are on bicycles (+11.8 mAP), motorcycles (+6.9), and traffic cones (+5.9), while calibration quality and interaction cost remain explicit limits.
