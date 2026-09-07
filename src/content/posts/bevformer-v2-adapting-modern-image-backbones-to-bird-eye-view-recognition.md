@@ -47,9 +47,11 @@ The proposal path has a clear failure mode. An occluded object or one near the b
 
 ### Longer temporal spacing changes the online contract
 
-BEVFormer v2 also replaces BEVFormer’s recurrent temporal self-attention with a warp-and-concatenate encoder. A historical BEV feature is bilinearly warped into the current frame with the relative $SE(3)$ transform, concatenated with the current BEV feature, and reduced with residual blocks. The model keeps the same number of historical features as the original design but samples them at a longer interval: 2 seconds rather than 0.5 seconds. That provides larger object displacement and more diverse ego positions without linearly increasing the number of stored features.
+BEVFormer v2 also replaces BEVFormer’s recurrent temporal self-attention with a warp-and-concatenate encoder. A historical BEV feature is bilinearly warped into the current frame with the relative $SE(3)$ transform, concatenated with the current BEV feature, and reduced with residual blocks. The model keeps the same number of historical features as the original design but samples them at a longer interval: the Table 6 ablation uses 2 seconds rather than 0.5 seconds. That provides larger object displacement and more diverse ego positions without linearly increasing the number of stored features.
 
-The paper also allows future BEV features in its offline 3D detection setting. That is useful for leaderboard accuracy but changes the deployment contract: a real-time system cannot use frames that have not arrived. The temporal encoder’s architecture and the perspective-supervision ablations should therefore be read separately. Table 2 and Table 3 are single-frame comparisons without temporal information; the main test configuration uses the temporal encoder and a different training/evaluation setup.
+The future-frame gain is measurable. In Table 6, the longer-interval model reaches 49.8 NDS / 38.8 mAP; adding bidirectional temporal features raises it to 52.9 / 42.3. Removing perspective supervision from that full setup lowers it to 50.7 / 39.7. Both temporal access and perspective supervision contribute, and the future frames make this an offline detector. A live system cannot consume observations that have not arrived.
+
+The main InternImage test configurations go further: Appendix Table 7 specifies a **4-second temporal interval and bidirectional features** for both backbones. They also use Group DETR in the BEV head, whereas the single-frame ablations retain Deformable DETR. Table 2 and Table 3 therefore isolate the perspective-based design within their own settings; the 63.4 NDS headline includes a larger backbone, different decoding, and future-frame access.
 
 ### The matched ablations support an optimization explanation
 

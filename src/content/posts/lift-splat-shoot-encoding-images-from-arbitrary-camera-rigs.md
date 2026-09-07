@@ -25,7 +25,7 @@ summary: '2020 – Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rig
 
 The problem LSS isolates is a coordinate mismatch. A camera feature lives at an image pixel, but a planner needs a map in the ego vehicle’s frame. Given image $X_k$, calibration $(E_k, I_k)$, and a discrete depth set $D$, LSS creates candidate points $(h,w,d)$ along every pixel ray. The geometry is fixed by calibration; the learned part decides how much feature evidence to assign to each candidate.
 
-For a pixel, a small network predicts a context vector $cinmathbb{R}^C$ and a categorical depth distribution $alpha$. The feature at depth $d$ is $c_d=alpha_d c$. A one-hot $alpha$ behaves like pseudo-LiDAR, placing the context at one range. A uniform $alpha$ behaves like an orthographic feature transform, spreading it along the ray. The learned distribution can therefore express uncertainty instead of turning an ambiguous image cue into a single, overconfident 3D location.
+For a pixel, a small network predicts a context vector $c\in\mathbb{R}^C$ and a categorical depth distribution $\alpha$. The feature at depth $d$ is $c_d=\alpha_d c$. A one-hot $\alpha$ behaves like pseudo-LiDAR, placing the context at one range. A uniform $\alpha$ behaves like an orthographic feature transform, spreading it along the ray. The learned distribution can therefore express uncertainty instead of turning an ambiguous image cue into a single, overconfident 3D location.
 
 The calibrated candidates from each camera are transformed into the ego frame and assigned to ground-plane pillars. Sum pooling produces one $C	imes X	imes Y$ tensor, independent of how many cameras supplied the candidates. A standard BEV CNN can then fuse overlapping views and support semantic segmentation or a cost-map head. This is the durable interface: the downstream model queries a metric map, while the view transformer absorbs the camera-specific coordinate systems.
 
@@ -36,8 +36,10 @@ The calibrated candidates from each camera are transformed into the ego frame an
 
 The outer product creates a frustum feature for every pixel and every depth bin. That is expressive, but it can be large before pooling. LSS follows a PointPillars-style representation in which points with the same ground-plane bin are summed. Instead of padding every pillar to a common number of points, the implementation sorts features by bin ID, takes a cumulative sum, and subtracts values at bin boundaries. The paper derives an analytic gradient for the whole pooling layer and reports a 2× training speedup over backpropagating through the individual operations.
 
-![Figure 2 from Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rigs by Implicitly Unprojecting to 3D](/assets/images/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs-source-figure-2.webp)
-*Fig 2: The source contrasts image-plane segmentation with the vehicle-centered frame needed by planning; LSS performs the calibrated lift and splat so candidate trajectories can be evaluated in that shared frame. | source: [Lift, Splat, Shoot, Figure 2](https://arxiv.org/abs/2008.05711)*
+Read the lifting diagram as a factorization: the context vector supplies feature channels, and the depth distribution supplies a weight for each column of the frustum. The network does not predict an unrelated context vector at every depth. It reuses one pixel’s visual evidence at several possible ranges, scaling each copy before calibration places it in the shared map.
+
+![LSS depth distribution and context vector forming a lifted frustum feature](/assets/images/lift-splat-shoot-source-figure-3-lift.png)
+*Fig 2: The outer product of a pixel’s context vector and depth distribution creates a channel-by-depth feature, retaining alternative ranges before BEV pooling. | source: [Lift, Splat, Shoot, Figure 3](https://arxiv.org/abs/2008.05711)*
 
 The concrete model uses EfficientNet-B0 image encoders and a ResNet-style BEV network. Input images are resized and cropped to $128	imes352$; the BEV grid spans $[-50,50]$ metres in both axes at $0.5$-metre cells, and depth candidates cover 4–45 metres in 1-metre steps. The final network has 14.3M trainable parameters and runs at 35 Hz on a Titan V in the paper’s setup. Those numbers describe a compact research configuration, while the frustum’s depth resolution and camera count remain the main memory levers.
 
@@ -52,11 +54,11 @@ The robustness experiment also separates redundancy from coverage. Dropping came
 
 ### The benchmark shows an interface, not solved depth
 
-On nuScenes, LSS reaches 32.06 car IoU and 32.07 vehicle IoU; on Lyft it reaches 43.09 and 44.64. For map tasks it reports 70.81 drivable-area IoU and 19.58 lane-boundary IoU on nuScenes. The model beats the paper’s CNN, frozen-encoder, and OFT baselines, showing that the architecture learns both useful context and a useful implicit depth distribution.
+On nuScenes, LSS reaches 32.06 car IoU and 32.07 vehicle IoU; on Lyft it reaches 43.09 and 44.64. The map benchmark in Table 2 reports 72.94 drivable-area IoU and 19.96 lane-boundary IoU on nuScenes. The later oracle-depth comparison lists a different LSS row, 70.81/19.58, so its paired comparison is kept separate below. The model beats the paper’s CNN, frozen-encoder, and OFT baselines, showing that the architecture learns both useful context and a useful implicit depth distribution.
 
 The oracle-depth comparison puts the remaining ambiguity in view. With one LiDAR scan, the PointPillars reference reaches 74.91 drivable-area IoU, 25.12 lane-boundary IoU, 40.26 car IoU, and 44.48 vehicle IoU, above LSS’s 70.81, 19.58, 32.06, and 32.07. The gap grows at night, and both camera and LiDAR models degrade roughly linearly with distance. LSS gives the planner a spatial map, but the camera does not acquire LiDAR’s direct range measurement.
 
-The planning experiment is deliberately narrower than its title suggests. The model scores a cost map against 1,000 K-means trajectory templates, each five seconds long at 0.25-second intervals. Its top-5, top-10, and top-20 accuracies are 15.52, 19.94, and 27.99, below the one-scan LiDAR reference at 19.27, 28.88, and 41.93. The demonstration establishes that BEV semantics can be queried by a planner; it does not train a policy to discover arbitrary controls or evaluate closed-loop interventions.
+The planning experiment is deliberately narrower than its title suggests. The model sums the learned spatial cost along each of 1,000 K-means trajectory templates, each five seconds long at 0.25-second intervals. Negated trajectory costs become softmax logits. During training, the expert trajectory’s nearest template under L2 distance supplies the classification target, so the planning loss can train the camera representation end to end. Its top-5, top-10, and top-20 accuracies are 15.52, 19.94, and 27.99, below the one-scan LiDAR reference at 19.27, 28.88, and 41.93. The demonstration establishes that BEV semantics can be queried by a planner; it does not train a policy to discover arbitrary controls or evaluate closed-loop interventions.
 
 ## High-Level Takeaways
 
