@@ -37,7 +37,7 @@ Read the diagram from the bottom up. Each branch first applies its own normaliza
 
 ### Asynchronous denoising and timing
 
-Video prediction and action prediction use asynchronous rectified-flow inference, so the planner can retain predictive context without paying the full video-generation cost at every action step. The timing ablation reports 382 ms and 79.3 PDMS with no video denoising, 565 ms and 89.5 PDMS with two video steps, and 644 ms and 89.4 PDMS with three. Two steps therefore recover nearly all of the displayed gain; the third adds latency without improving the score.
+Video prediction and action prediction use asynchronous rectified-flow inference, so the planner can retain predictive context without paying the full video-generation cost at every action step. Table 5 reports 382 ms and 79.3 PDMS with no video denoising, 475 ms and 89.3 PDMS with one step, 565 ms and 89.5 PDMS with two, and 644 ms and 89.4 PDMS with three. Most of the gain appears at one step; the second costs another 90 ms for only 0.2 PDMS, and the third adds latency without improving the score.
 
 ### What the matched ablations establish
 
@@ -51,5 +51,5 @@ The benchmark predicts eight waypoints over four seconds at 2 Hz in a short-hori
 
 - BrainWAM specializes semantic and predictive branches, then coordinates their action representations with gated CAB messages and CIF rather than raw-token mixing.
 - The matched ablation gives 87.8 PDMS for Tri-MoT, 88.1 for WAM-only, and 89.5 for BrainWAM (Table 3); CAB and CIF together outperform either module alone (Table 4).
-- Two video denoising steps reach 89.5 PDMS at 565 ms, while a third step costs latency without improving the score.
+- One video denoising step already reaches 89.3 PDMS at 475 ms; two reach 89.5 at 565 ms, while a third step costs latency without improving the score (Table 5).
 - NAVSIM is non-reactive, so reactive traffic, closed-loop latency, and forecast errors remain the decisive deployment tests.
