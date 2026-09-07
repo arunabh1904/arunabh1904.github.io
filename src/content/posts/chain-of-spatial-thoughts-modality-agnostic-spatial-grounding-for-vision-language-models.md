@@ -22,6 +22,8 @@ summary: "2026 – Chain of Spatial Thoughts: Modality-Agnostic Spatial Groundin
 
 ## Core Insights
 
+### Spatial hidden states carry geometry inside reasoning
+
 Space Tokens changes the interface between geometry and language. The method reserves a subset of the vocabulary, generates those positions like ordinary autoregressive tokens, and then uses their final hidden states as continuous spatial representations. Scene tokens align to VGGT-Omega features and reconstruct camera parameters, dense depth, and 3D point maps. Object tokens predict 3D boxes whose center, dimensions, and 6D rotation encode position, size, and orientation. The auxiliary decoders are used for training and verification; they do not have to run at inference time.
 
 ![Space Tokens three-stage training pipeline for continuous spatial representations and reasoning](/assets/images/space-tokens-pipeline-paper-figure.png)

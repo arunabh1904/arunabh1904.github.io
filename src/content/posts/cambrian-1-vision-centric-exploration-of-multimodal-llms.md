@@ -20,6 +20,8 @@ summary: "2024 – Cambrian-1: A Fully Open, Vision-Centric Exploration of Multi
 
 ## Core Insights
 
+### Test whether the benchmark needs visual evidence
+
 Cambrian-1 begins by asking whether a benchmark actually needs the image. The authors train models with 23 different vision backbones and compare each model with vision enabled, vision disabled, and random guessing. In the reported analysis, SQA-I3, MMMU, MathVista, and AI2D show less than a 5% gap between vision-enabled and vision-disabled scores. TextVQA and GQA have a nearly 40% gap between random guessing and the vision-disabled score, which the authors interpret as evidence of language bias. MMVP and MME Perception fall below random guessing without vision, making them more useful tests of grounding.
 
 ![Cambrian-1 benchmark analysis: vision-enabled versus vision-disabled performance and benchmark clusters](/assets/images/cambrian-1-vision-centric-exploration-of-multimodal-llms-source-figure-3.webp)

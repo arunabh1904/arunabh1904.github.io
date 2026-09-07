@@ -19,12 +19,16 @@ summary: "2024 – RAG-Driver: Generalisable Driving Explanations with Retrieval
 
 ## Core Insights
 
+### Retrieval changes the examples seen by the planner
+
 The paper moves adaptation from model weights to the prompt. A retrieval step selects expert demonstrations that the multimodal language model can condition on when interpreting the current driving scene. That is useful when annotations are scarce or data domains differ, because the system can change its evidence set without a training run. It also creates a new deployment dependency: irrelevant or misleading retrieval can change both the explanation and the predicted control.
 
 The retrieval key is deliberately hybrid. LanguageBind encodes an eight-frame, $224\times224$ video sequence into a 1,024-dimensional video vector; a second projector maps the 28-dimensional control signal into the same space, and triplet learning brings scenarios with similar action descriptions and justifications together. At inference, cosine search selects the two nearest driving experiences, then prefixes their video, explanation, justification, and control tokens before the current query. The overview therefore has a useful causal reading: memory changes the context seen by Vicuna-1.5 7B, while the decoder still predicts action explanation, action justification, or the next speed/course/acceleration/curvature signal.
 
 ![RAG-Driver: Generalisable Driving Explanations with Retrieval-Augmented In-Context Learning in Multi-Modal Large Language Model source figure: RAG-Driver overview from current query and control signal through retrieval to multimodal prediction.](/assets/images/rag-driver-generalisable-driving-explanations-with-retrieval-augmented-in-context-learning-paper-figure.webp)
 *Fig 1: The current video and control signal query a memory of driving experiences; two retrieved demonstrations are prefixed to the multimodal language model before it predicts an explanation, justification, or next control signal. | source: [RAG-Driver, Figure 2](https://arxiv.org/abs/2402.10828)*
+
+The video encoder makes retrieval depend on a short motion sequence rather than a single frame. Its eight sampled frames provide the visual embedding, while the control vector adds how the ego vehicle is moving. The retrieval key needs both because visually similar roads can require different maneuvers.
 
 ![Figure 3 from RAG-Driver: Generalisable Driving Explanations with Retrieval-Augmented In-Context Learning in Multi-Modal Large Language Model](/assets/images/rag-driver-generalisable-driving-explanations-with-retrieval-augmented-in-context-learning-source-figure-3.webp)
 *Fig 2: Video Encoder architecture. Video is first split into patches concatenated in time, where these patches are linear projected to video embedding. | source: [RAG-Driver, Figure 3](https://arxiv.org/abs/2402.10828)*
@@ -40,4 +44,4 @@ The deployment boundary is measurable too: training the retrieval engine takes a
 
 - RAG-Driver treats a retrieved multimodal demonstration, not a gradient update, as the primary unit of driving adaptation.
 - Its reported zero-shot result supports retrieval as a way to transfer explanation and control behavior, but not as proof that the retrieved evidence is causally used.
-- At larger deployment scale, retrieval coverage and failure detection are likely to matter more than decoder fluency; random- and oracle-retrieval controls would falsify an apparent retrieval gain.
+- Two demonstrations improve explanation scores but slightly worsen speed error in the ablation. Better retrieved language evidence does not guarantee that every control metric improves.

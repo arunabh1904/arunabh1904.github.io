@@ -21,6 +21,8 @@ summary: '2026 – ChronoVision trains a VLM to reconstruct latent visual states
 
 ## Core Insights
 
+### Reconstruct the state that a temporal answer depends on
+
 The evaluation is deliberately stricter than ordinary multiple-choice VQA. Vbvr-VQA samples six intervals from a source video, takes one final frame from each interval, randomly permutes them, and asks the model to recover the exact order. The dataset contains 100 task generators spanning fluid and crystallized intelligence, mental simulation, visuospatial cognition, and transformation tasks. Exact match is all-or-nothing: a plausible final frame is insufficient if the intermediate causal order is wrong.
 
 ![ChronoVision Vbvr-VQA task families for temporal transformations, mental simulation, and visuospatial reasoning](/assets/images/chronovision-temporal-reasoning-via-latent-state-reconstruction-source-figure-1.webp)

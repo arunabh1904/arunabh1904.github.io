@@ -19,6 +19,8 @@ summary: "2025 – DynRsl-VLM: Enhancing Autonomous Driving Perception with Dyna
 
 ## Core Insights
 
+### Object crops and global context provide different evidence
+
 Resolution is a deployment decision, not merely a vision-backbone setting. Fixed downsampling spends roughly the same visual budget everywhere and can discard the objects that matter most in driving. DynRsl-VLM instead keeps a flexible number of image features, then aligns them to text with an interface designed for that representation. The intended gain is perceptual coverage without an unbounded token cost.
 
 The input construction is more specific than simply zooming detected boxes. YOLOv8 proposes vehicle and pedestrian regions in the high-resolution image; DynRsl-VLM keeps each ROI, also forms combined regions whose boxes contain pairs or groups of entities, and includes a low-resolution full image for global context. A frozen ViT processes the resulting views, and two projection heads align multiple resolution-specific image features to one text feature with symmetric InfoNCE. The three figures therefore trace one idea at three levels: alignment losses, the full model path, and the ROI-plus-global image set that preserves both object detail and relations.
@@ -26,8 +28,12 @@ The input construction is more specific than simply zooming detected boxes. YOLO
 ![DynRsl-VLM: Enhancing Autonomous Driving Perception with Dynamic Resolution Vision-Language Models source figure: Architecture of the alignment module and the losses employed during model training.](/assets/images/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models-paper-figure.webp)
 *Fig 1: Architecture of the alignment module and the losses employed during model training. | source: [DynRsl-VLM, Figure 4](https://arxiv.org/abs/2503.11265)*
 
+The full architecture places the extra work before language generation. The image pipeline supplies several views, the alignment module connects them to text, and the decoder answers the driving question. The added views preserve evidence, but their value depends on the detector finding the relevant entities.
+
 ![Figure 1 from DynRsl-VLM: Enhancing Autonomous Driving Perception with Dynamic Resolution Vision-Language Models](/assets/images/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models-source-figure-1.webp)
 *Fig 2: The architecture of our model that acquires multi-resolution images, performs visual-text alignment, and conducts efficient computations. | source: [DynRsl-VLM, Figure 1](https://arxiv.org/abs/2503.11265)*
+
+A tight crop resolves an individual vehicle or pedestrian, while a combined crop preserves their relation. The global image supplies context that neither local crop can show. This three-part input explains why the method includes grouped regions rather than simply enlarging every detected box independently.
 
 ![Figure 2 from DynRsl-VLM: Enhancing Autonomous Driving Perception with Dynamic Resolution Vision-Language Models](/assets/images/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models-source-figure-2.webp)
 *Fig 3: Method for obtaining Region Images. This diagram illustrates the approach for acquiring Region Images, which include both individual entity regions and combined regions. | source: [DynRsl-VLM, Figure 2](https://arxiv.org/abs/2503.11265)*
@@ -40,5 +46,5 @@ The alignment figure should also be read precisely. The pretraining objective co
 ## High-Level Takeaways
 
 - DynRsl-VLM makes preservation of small and distant driving evidence the primary representation decision, then adapts the language-alignment interface to that variable input.
-- The abstract establishes a perceptual motivation but does not yet establish that dynamic resolution improves action quality or safety at a fixed latency.
+- Removing both added modules lowers the reported aggregate accuracy from 34.8 to 31.1. That supports their combined value for driving VQA, while action quality and fixed-latency safety remain outside the evaluation.
 - A matched token- and wall-clock-budget study should compare dynamic resolution with fixed-resolution and adaptive-cropping baselines; the claim weakens if any of them recover the same small-object evidence.

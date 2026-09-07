@@ -23,6 +23,8 @@ summary: "2025 – Alpamayo-R1: Bridging Reasoning and Action Prediction for Gen
 
 ## Core Insights
 
+### A causal trace conditions a continuous action expert
+
 The system makes the reasoning-to-action interface explicit. A chain is supposed to represent causal driving factors; a diffusion decoder converts the resulting state into a dynamically feasible trajectory; reinforcement learning rewards consistency between the two. This is stronger than attaching a rationale to an already chosen plan, but it means the quality of the causal trace, the action decoder, and the reward model all jointly determine the apparent safety gain.
 
 Read the overview from left to right: multi-camera observations and ego history enter the Cosmos-Reason backbone, which emits a decision-grounded Chain of Causation and discrete meta-actions; a separate flow-matching action expert then turns that state into continuous waypoints. SFT first teaches the trace/action format from CoC examples, while RL adds rewards for reasoning quality, reasoning-action consistency, and trajectory behavior. The qualitative panels make the intended interface concrete: the all-way-stop case tests whether the trace changes right-of-way behavior, while the long-tail examples test whether the same interface stays grounded across hazards and road conditions.
@@ -30,8 +32,12 @@ Read the overview from left to right: multi-camera observations and ego history 
 ![Alpamayo-R1: Bridging Reasoning and Action Prediction for Generalizable Autonomous Driving in the Long Tail source figure: Overview of Alpamayo-R1 architecture.](/assets/images/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail-paper-figure.webp)
 *Fig 1: Alpamayo-R1 combines multi-camera vision, navigation, and ego history in a Cosmos-Reason backbone, then decodes reasoning, meta-actions, and trajectories under imitation, supervised fine-tuning, and reinforcement-learning signals. | source: [Alpamayo-R1, Figure 1](https://arxiv.org/abs/2511.00088)*
 
+At an all-way stop, observing the other vehicles is not enough: the plan depends on who entered first. The example connects that ordering fact to a yielding maneuver. It illustrates the intended reasoning-to-action link, while the ablations below test whether reasoning supervision changes performance beyond one selected scene.
+
 ![Figure 8 from Alpamayo-R1: Bridging Reasoning and Action Prediction for Generalizable Autonomous Driving in the Long Tail](/assets/images/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail-source-figure-8.webp)
 *Fig 2: Policy improvements via eliciting reasoning: Alpamayo-R1 generates a correct reasoning trace at an all-way stop sign intersection and yields to other vehicles that enter the intersection earlier than ego. | source: [Alpamayo-R1, Figure 8](https://arxiv.org/abs/2511.00088)*
+
+The varied hazards make the desired representation concrete. A construction zone, a highway interaction, and low visibility call for different evidence and maneuvers. The trace is useful when it identifies the relevant constraint, rather than repeating a generic instruction to drive safely.
 
 ![Figure 2 from Alpamayo-R1: Bridging Reasoning and Action Prediction for Generalizable Autonomous Driving in the Long Tail](/assets/images/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail-source-figure-2.webp)
 *Fig 3: Qualitative examples pair observed hazards and road conditions with grounded reasoning and recommended maneuvers across urban, highway, construction, and low-visibility scenes. | source: [Alpamayo-R1, Figure 2](https://arxiv.org/abs/2511.00088)*
@@ -46,5 +52,5 @@ These results still leave a clear boundary: the simulator replays traffic agents
 ## High-Level Takeaways
 
 - Alpamayo-R1 makes a decision-grounded causal trace, rather than generic chain of thought, the interface between visual reasoning and diffusion trajectory prediction.
-- Its reported closed-loop and on-vehicle results are unusually relevant, but the abstract does not yet establish metric definitions, repeatability, or causal attribution across its dataset, model, decoder, and RL changes.
+- Reasoning reward alone improves the reasoning grade while worsening trajectory error and consistency. The reward design must make the trace answerable to the action, rather than optimizing text quality independently.
 - The decisive test holds the trajectory decoder and data fixed while scrambling, replacing, or counterfactually editing the causal trace; the central claim weakens if safety and planning accuracy remain unchanged.

@@ -23,6 +23,8 @@ summary: "2026 – Distilling Vision-Language Models for Robust Traffic Sign Per
 
 ## Core Insights
 
+### Language prototypes supervise an image-only classifier
+
 Traffic-sign defenses often specialize to one perturbation or sacrifice clean accuracy. LAMDA keeps the standard classifier objective but adds two directions of language supervision: descriptive prototypes provide richer visual semantics, while short class-name prototypes regularize the class geometry. The student therefore learns an image representation that is pulled toward stable language-defined directions without running a VLM on the vehicle.
 
 The evaluation uses clean data for training and tests shadow, natural-light, and printable RP2 attacks. The reported maximum gains are +12.5 percentage points under shadow attacks on GTSRB and +13.2 points under natural-light attacks on LISA. In the physical RP2 experiment, the baseline correctly classifies 6 of 16 images, compared with 12 of 16 for LAMDA. The two losses are complementary: language replacement with irrelevant prototypes removes much of the robustness gain.
@@ -32,8 +34,12 @@ The training diagram is easiest to interpret as a teacher path that disappears. 
 ![LAMDA training diagram with frozen language prototypes supervising an image-only traffic-sign classifier](/assets/images/lamda-training-paper-figure.png)
 *Fig 1: The text encoder and prototype banks are used as fixed train-time teachers and removed before deployment. | source: [LAMDA, Figure 2](https://arxiv.org/abs/2608.08815)*
 
+The printed patch test asks whether the learned representation survives a perturbation placed on a physical sign. Viewing distance changes how much of the patch and sign the camera resolves, so the four-distance sequence is a small test of physical transfer rather than another digitally transformed test image.
+
 ![Figure 4 from Distilling Vision-Language Models for Robust Traffic Sign Perception in Autonomous Vehicles](/assets/images/distilling-vision-language-models-for-robust-traffic-sign-perception-in-autonomous-vehicles-source-figure-4.webp)
 *Fig 2: An RP2 adversarial patch is evaluated on a Speed Limit 35 sign at four viewing distances, exposing how recognition robustness changes with distance. | source: [LAMDA, Figure 4](https://arxiv.org/abs/2608.08815)*
+
+The clean sign provides a visual reference for the domain being defended. Its class still depends on fine shape and text cues, which is why language prototypes can be useful supervision but cannot replace the image evidence at inference.
 
 ![Figure 1 from Distilling Vision-Language Models for Robust Traffic Sign Perception in Autonomous Vehicles](/assets/images/distilling-vision-language-models-for-robust-traffic-sign-perception-in-autonomous-vehicles-source-figure-1.webp)
 *Fig 3: A naturally lit Speed Limit 60 sign provides one clean-domain traffic-sign example used alongside adverse-light and attack conditions. | source: [LAMDA, Figure 1](https://arxiv.org/abs/2608.08815)*
