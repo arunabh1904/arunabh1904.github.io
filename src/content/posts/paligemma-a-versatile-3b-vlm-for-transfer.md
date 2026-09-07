@@ -9,58 +9,64 @@ tags:
 field: 'Vision-Language Models'
 summary: "2024 – PaliGemma: A Versatile 3B VLM for Transfer"
 ---
-## 2024 – PaliGemma
+
+## 2024 – PaliGemma: A Versatile 3B VLM for Transfer
 
 **arXiv:** [2407.07726](https://arxiv.org/abs/2407.07726)
 
-### Method and reported result
-
-PaliGemma is a small open VLM built for transfer, not a giant visual chat assistant. It combines a SigLIP-So400m vision encoder with a Gemma-2B language model, then exposes many vision tasks as text generation.
-
 ## Summary
 
-> That framing is practical: instead of building a separate head for captioning, VQA, detection, segmentation, remote sensing, and document tasks, the model learns a shared prefix-to-suffix interface that can be fine-tuned.
+> PaliGemma is a transferable base VLM built from a SigLIP-So400m image encoder, a Gemma-2B decoder, and a linear connector. Its main contribution is a disciplined training contract: prefix-LM multimodal pretraining at 224 pixels, short continued runs at 448 and 896 pixels, then task-specific transfer of the whole model. The shared image-in/text-out interface covers captioning, VQA, OCR, detection, segmentation, and video, but the released checkpoints are bases for adaptation rather than ready-made chat models.
 
 ## Core Insights
 
-The architecture is intentionally simple. Image tokens from SigLIP go through a linear projection into Gemma's token space. A task prefix describes what to do, and the decoder autoregressively generates the answer, caption, box tokens, or segmentation tokens.
-
-The training recipe has stages: reuse unimodal checkpoints, run multimodal pretraining, upcycle to higher image resolutions, then transfer to individual tasks. The release includes checkpoints at 224px, 448px, and 896px, which matters because many OCR, chart, document, and segmentation tasks are resolution sensitive.
+### One text interface can express many visual tasks
 
 ![Figure 1 from PaliGemma showing the SigLIP image encoder feeding a Gemma decoder language model](/assets/images/paligemma-a-versatile-3b-vlm-for-transfer-paper-figure.png)
-*Fig 1: Shows PaliGemma's core architecture: a SigLIP image encoder feeds a Gemma decoder language model through a projection layer. | source: [PaliGemma paper](https://arxiv.org/abs/2407.07726)*
+*Fig 1: PaliGemma’s architecture: a SigLIP image encoder feeds a Gemma decoder LM. | source: [PaliGemma, Figure 1](https://arxiv.org/abs/2407.07726)*
 
-![Figure 7 from PaliGemma: A Versatile 3B VLM for Transfer](/assets/images/paligemma-a-versatile-3b-vlm-for-transfer-source-figure-7.webp)
-*Fig 2: Training setup for Stage1. Left: The more is frozen or reset, the more performance deteriorates. | source: [PaliGemma: A Versatile 3B VLM for Transfer](https://arxiv.org/abs/2407.07726)*
+Figure 1 looks simple because the interface does most of the work. The SigLIP-So400m encoder turns an image into visual tokens; a zero-initialized linear projection maps them into Gemma-2B’s token dimension; a SentencePiece tokenizer maps a task prefix into text tokens; and the decoder generates a suffix. The suffix may be a caption or answer, a sequence of normalized location tokens for detection, or vector-quantized mask tokens for referring-expression segmentation. The model therefore shares a language-like output contract across tasks instead of adding a separate prediction head for every benchmark.
 
+At 224, 448, and 896 pixels, the image contributes 256, 1,024, and 4,096 tokens respectively. For video or multi-image transfers, PaliGemma encodes each image separately and concatenates the visual tokens; sixteen 224-pixel frames therefore occupy the same 4,096-token visual budget as one 896-pixel image. The choice is useful but expensive: resolution buys detail by increasing both input information and sequence length.
 
-**What to look at:**
-- The model is a base VLM for transfer, not primarily an instruction-tuned assistant.
-- Detection and segmentation are represented as generated token strings.
-- Higher-resolution checkpoints are part of the design, not an afterthought.
-- None of the pretraining tasks rely on outputs from a larger commercial VLM.
+The decoder uses prefix-LM masking. Image and prefix tokens attend bidirectionally, so the visual tokens can read the question or task before the answer is generated. The suffix remains autoregressive and receives the next-token loss. The paper’s ablation finds that extending the autoregressive loss to the prefix supplies extra signal but lowers average transfer performance; the model benefits from asking “what should I output?” rather than from learning to predict its own task prompt.
 
-### Reported evidence
+### Stages separate broad knowledge from usable specialization
 
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Vision backbone | SigLIP-So400m | Reuses a strong contrastive visual encoder. |
-| Language backbone | Gemma-2B | Keeps the total model under roughly 3B parameters. |
-| Transfer suite | Almost 40 tasks | Tests whether the base model is broadly adaptable. |
-| Resolution family | 224px, 448px, 896px | Lets users trade compute for fine visual detail. |
+PaliGemma starts from public unimodal checkpoints: SigLIP-So400m and raw pretrained Gemma-2B. Stage 1 then trains the complete multimodal model at 224 pixels on one billion examples, with a broad mixture of captioning, OCR, question answering, detection, and segmentation-related sequences. Unlike the common recipe of freezing the visual encoder, Stage 1 updates all components. The authors’ rationale is that captioning and structured tasks provide spatial and relational signals that contrastive pretraining alone does not.
 
-**Compact result slice:**
+Stage 2 keeps the same basic task mixture but upweights resolution-sensitive tasks and lengthens their suffixes. The 448-pixel checkpoint sees another 50 million examples; the 896-pixel checkpoint sees another 10 million. OCR can request all text in reading order, and detection or segmentation can request all annotated objects, so the model learns to spend the longer context on the cases that need it. Stage 3 fine-tunes all parameters for a target task. The base model is deliberately optimized for transfer density rather than zero-shot usability: a task prefix organizes the pretraining mixture, but the released checkpoint still needs a task-specific suffix format and examples.
 
-| Finding | Evidence |
-| ------- | -------- |
-| Broad transfer | The paper reports strong results across VLM benchmarks, remote sensing, video tasks, and referring segmentation. |
-| Low-data usability | Most tasks reach within 10% of full-data performance with 4k examples and within 20% with 256 examples. |
-| MMVP | PaliGemma-224 reaches 47.3% paired accuracy, compared with 38.7% for GPT-4V and 40.7% for Gemini in the paper's comparison. |
-| Practical training | A final Stage1 run takes just under 3 days on TPUv5e-256; Stage2 resolution increases take about 15 hours each. |
+The paper also adds 1,024 location tokens (loc0000 through loc1023) for normalized box coordinates and 128 segmentation tokens (seg000 through seg127). They are initialized from a small Gaussian rather than by copying nearby word embeddings. Matching average embedding norms improves the first few steps, but after training the standard initialization gives better perplexity and referring-segmentation transfer. The connector ablation points in the same direction: a simple linear projection reaches a 77.2 average transfer score when all weights are tuned, slightly above the 77.1 from a one-hidden-layer MLP, and is much better when only the connector is trainable.
+
+![Figure 7 from PaliGemma showing the effect of freezing or resetting model parts during Stage 1](/assets/images/paligemma-a-versatile-3b-vlm-for-transfer-source-figure-7.webp)
+*Fig 2: Training setup for Stage1. Left: The more is frozen or reset, the more performance deteriorates. Right: The effect of freezing ViT is most visible in some pretraining perplexities. | source: [PaliGemma, Figure 7](https://arxiv.org/abs/2407.07726)*
+
+Figure 2 is a diagnostic of the training contract. The left plot compares tuning (T), freezing (F), and resetting (R) the ViT and Gemma components. Resetting pretrained parts causes the largest loss; freezing the language model is especially damaging, while freezing the image encoder is close to full tuning after transfer but worsens spatial-task perplexity during pretraining. The right plot tracks captioning and detection perplexity as pretraining continues, showing where a frozen ViT changes the learning dynamics even when downstream transfer can remain close to full tuning. The lesson is not that every component must always be updated; it is that the base checkpoint is valuable because the multimodal stage can refine pretrained interfaces instead of relearning vision from pixels.
+
+### Resolution helps because it adds detail and capacity
+
+| Task or signal | 224 px | 448 px | 896 px | What changes |
+| --- | ---: | ---: | ---: | --- |
+| COCO caption CIDEr | 141.9 | 144.6 | — | Global captioning improves modestly |
+| VQAv2 accuracy | 83.2 | 85.6 | — | General visual questions benefit |
+| TextVQA accuracy | 55.5 | 73.2 | 76.5 | Small text needs the extra visual tokens |
+| DocVQA ANLS | 43.7 | 78.0 | 84.8 | Documents are strongly resolution-sensitive |
+| RefCOCO testA | 75.7 | 77.9 | 78.7 | Localization gains continue but taper |
+
+The resolution ablation is unusually useful because it separates image detail from model capacity. For resolution-sensitive tasks, feeding a 224-pixel image into a 448-pixel sequence recovers roughly half of the gain: the model gets the longer sequence but not new visual information. Native Stage 2 pretraining is best. Windowing a 448-pixel image into four 224-pixel crops is a fallback when continued pretraining is impossible, but it trails a native 448 checkpoint and saves at most about 5% training time because the Gemma computation is unchanged.
+
+Transfer is also more forgiving of data size than the base-model training cost suggests. With one simple recommended hyperparameter setting, most tasks come within 10% of their full-data score using 4,000 examples and within 20% using 256; in many cases 64 examples are enough to prototype. The exceptions include tasks such as SciCap and RefCOCO, where label smoothing, dropout, or more epochs matter. That result supports PaliGemma as a reusable starting point, not as evidence that few-shot fine-tuning is stable for every output vocabulary.
+
+The reported suite spans almost 40 tasks. At 448 pixels, PaliGemma reaches 144.6 COCO CIDEr, 85.6 VQAv2, 88.5 augmented ChartQA, 73.2 TextVQA, 78.0 DocVQA, and 77.9 RefCOCO testA; the 896 model reaches 76.5 TextVQA, 84.8 DocVQA, and 78.7 RefCOCO testA. Stage 1 takes slightly under three days on TPUv5e-256, each Stage 2 run about fifteen hours, and the paper reports 55% MFU or 5,189 tokens per second per device. These numbers describe a broad transfer recipe with per-task tuning and should not be read as one universal zero-shot score.
+
+### Transfer is the product, not zero-shot chat
+
+Use PaliGemma when many visual tasks need one compact, adaptable base model and the deployment team can afford task-specific fine-tuning. Choose the checkpoint at the task’s native resolution, especially for OCR, charts, documents, and small-object masks. Compare native Stage 2 pretraining with windowing at matched visual information and sequence length; compare linear and MLP connectors with the same trainable parameters; and report whether the checkpoint was transferred or instruction-tuned. PaliGemma’s evidence is broad but benchmark-specific, and its base checkpoints are not a substitute for a conversation-aligned model.
 
 ## High-Level Takeaways
 
-- PaliGemma informs whether teams need a large chat-oriented VLM or a compact base model designed for task transfer. SigLIP patch features are linearly projected into Gemma's token space, and captions, answers, boxes, and masks are all emitted autoregressively under task prefixes. Resolution upcycling from 224 to 448 and 896 pixels is the paper's practical compression tradeoff: spend more visual tokens only for tasks whose fine detail warrants them.
-- The nearly forty-task transfer suite establishes versatility, not that one checkpoint or resolution is universally optimal. The missing decision table is a compute-matched comparison of resolution, visual-token count, and task-specific fine-tuning data across OCR, localization, and semantic tasks. At ten times the image resolution or task count, autoregressive coordinate strings and context length become fragile bottlenecks. The transferable-base thesis would be falsified if specialized models with the same adaptation budget consistently dominate while a single instruction-tuned checkpoint transfers just as well.
-- PaliGemma made the "small open VLM as a transferable base model" story concrete. It is useful because it is inspectable, fine-tunable, and broad enough to cover more than chat.
-- PaliGemma is a compact VLM workhorse: simple architecture, many task interfaces, and enough resolution control to make transfer practical.
+- PaliGemma maps SigLIP image tokens and a task prefix into Gemma-2B, then emits captions, answers, boxes, or masks as text.
+- Prefix-LM masking lets image tokens read the task before suffix generation, while suffix-only loss and task prefixes make the transfer interface stable.
+- Native 448 and 896 checkpoints matter for text-rich and small-object tasks; windowing is a fallback with a measurable quality gap.
+- The 3B model is a transferable base: broad results and low-data adaptation are the evidence, while chat behavior still requires a separate transfer recipe.
