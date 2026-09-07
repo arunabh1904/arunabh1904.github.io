@@ -24,7 +24,7 @@ summary: '2023 – Direct Preference Optimization: Your Language Model Is Secret
 
 ## Summary
 
-> Direct Preference Optimization (DPO) rewrites a KL-constrained RLHF objective as a binary classification loss over preferred and dispreferred completions. In the usual pipeline, a reward model is fitted to preference pairs and a policy is then trained with online reinforcement learning. DPO uses the policy's log-probability ratio to a frozen reference model as an implicit reward, so the policy can be trained directly from an offline preference dataset without an explicit reward model, value model, or PPO loop. On controlled sentiment, Reddit TL;DR summarization, and single-turn dialogue, the paper finds a stronger reward–KL trade-off and results comparable to or better than its PPO baselines, with models up to 6B parameters. The derivation depends on the Bradley–Terry preference model and on a reference policy that covers the compared responses; offline data still bounds what the method can learn.
+> Direct Preference Optimization (DPO) rewrites a KL-constrained RLHF objective as a binary classification loss over preferred and dispreferred completions. The policy's log-probability ratio to a frozen reference model acts as an implicit reward, so an offline preference dataset can train the policy without a separately trained reward model or PPO loop. The source experiments show a stronger reward–KL frontier and competitive task results against PPO. The derivation relies on a Bradley–Terry preference model and on a reference policy that covers the compared responses.
 
 ## Core Insights
 
@@ -40,8 +40,8 @@ The left side of the figure contains two moving models: a reward model scores sa
 RLHF commonly optimizes a reward while keeping the policy near a reference model, usually the SFT checkpoint:
 
 $$
-\max_{\pi_\theta}\;\mathbb{E}_{x\sim D,\,y\sim\pi_\theta(y\mid x)}
-\left[r_\phi(x,y)-\beta D_{\mathrm{KL}}\left(\pi_\theta(y\mid x)\,\|\,\pi_{\mathrm{ref}}(y\mid x)\right)\right].
+\max_{\pi_\theta}\;\mathbb{E}_{x\sim D,\,y\sim\pi_\theta(y\mid x)}[r_\phi(x,y)]
+-\beta\,\mathbb{E}_{x\sim D}\left[D_{\mathrm{KL}}\left(\pi_\theta(\cdot\mid x)\,\|\,\pi_{\mathrm{ref}}(\cdot\mid x)\right)\right].
 $$
 
 The KL term limits the policy's ability to exploit reward-model mistakes, while also keeping generation near the distribution on which the reward model was trained. For a fixed reward $r$, the exact optimum has the Gibbs form
@@ -87,8 +87,8 @@ That choice makes DPO simple, but it also fixes the method's exposure. The model
 
 ### The source experiments test both optimization and task behavior
 
-![Figure 2: IMDb sentiment reward versus KL to the reference policy](/assets/images/direct-preference-optimization-dpo-source-figure-2.webp)
-*Fig 2: Reward–KL frontier on controlled IMDb sentiment generation; DPO reaches the highest expected reward across the tested divergence range, including comparisons with PPO using ground-truth rewards. | source: [Direct Preference Optimization, Figure 2 (left panel)](https://arxiv.org/abs/2305.18290)*
+![Figure 2 (left panel): IMDb sentiment reward versus KL to the reference policy](/assets/images/direct-preference-optimization-dpo-source-figure-2.webp)
+*Fig 2: Cropped source Figure 2 left panel: reward–KL frontier on controlled IMDb sentiment generation; DPO reaches the highest expected reward across the tested divergence range, including comparisons with PPO using ground-truth rewards. | source: [Direct Preference Optimization, Figure 2 (left panel)](https://arxiv.org/abs/2305.18290)*
 
 The plotted horizontal axis is sequence-level KL from the reference policy and the vertical axis is the true sentiment reward. The yellow DPO points form the upper frontier: for a similar amount of deviation from the reference, DPO reaches higher sentiment reward than the PPO and pseudo-supervised alternatives. This is the right intuition for the derivation. DPO and PPO target the same KL-constrained objective, but DPO moves directly along the policy family instead of estimating a reward and then trusting an actor–critic optimizer to find the frontier.
 
