@@ -9,50 +9,48 @@ tags:
 field: 'Video & Interactive World Models'
 summary: "2025 – VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding"
 ---
-## 2025 – VideoLLaMA 3
 
-**arXiv:** [2501.13106](https://arxiv.org/abs/2501.13106)
-
+**arXiv:** [2501.13106](https://arxiv.org/abs/2501.13106)<br>
 **GitHub:** [DAMO-NLP-SG/VideoLLaMA3](https://github.com/DAMO-NLP-SG/VideoLLaMA3)
-
-### Method and reported result
-
-VideoLLaMA 3 takes a vision-centric route to image and video understanding. It first adapts the vision encoder for variable-resolution images, aligns image-text data at scale, then adds video-specific training and token merging for temporal inputs.
 
 ## Summary
 
-> The key claim is that high-quality image-text learning carries a lot of the load for video. Video data still matters, but the model does not need to learn all semantics from video clips alone.
+> VideoLLaMA3 makes a practical bet: a strong image-language system can carry much of the semantic load for video, if the vision stack preserves detail and compresses redundant frames carefully. Four training stages build from variable-resolution image encoding to video-centric tuning; Any-resolution Vision Tokenization retains spatial detail, while Differential Frame Pruner removes similar temporal patches. The 2B model reports 59.6 VideoMME without subtitles, 68.0 PerceptionTest, and 65.4 MLVU-dev.
 
 ## Core Insights
 
-VideoLLaMA 3 is a vision-centric model for image and video understanding. Its training recipe treats high-quality image-text data as the base for video capability, then adds video-specific tuning instead of treating video as a separate problem. The framework also uses visual-token efficiency techniques so longer videos do not overwhelm the language context. The evidence compares image and video benchmarks against prior MLLMs. The caveat is that benchmark videos are still cleaner and shorter than many real temporal reasoning tasks. The takeaway is that video MLLMs need both temporal data and strong visual representation design.
+### Image quality is the first video capability
 
-![Figure 1: Performance Comparison of VideoLLaMA3 with the previous advanced image/video MLLM on various representative benchmarks from VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](/assets/images/videollama-3-frontier-multimodal-foundation-models-paper-figure.png)
-*Fig 1: Performance Comparison of VideoLLaMA3 with the previous advanced image/video MLLM on various representative benchmarks. | source: [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding paper](https://arxiv.org/abs/2501.13106)*
+![VideoLLaMA3 four-stage vision-centric training paradigm](/assets/images/videollama-3-frontier-multimodal-foundation-models-source-figure-2.webp)
+*Fig 1: VideoLLaMA3 moves from vision-encoder adaptation and image-text alignment to multi-task and video-centric fine-tuning, with the data mixture shown at each stage. | source: [VideoLLaMA 3, Figure 2](https://arxiv.org/abs/2501.13106)*
 
-![Figure 6 from VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](/assets/images/videollama-3-frontier-multimodal-foundation-models-source-figure-6.webp)
-*Fig 2: VideoLLaMA 3 reads chart images and produces grounded comparisons of trends, model strength, and parameter efficiency rather than only transcribing visible text. | source: [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](https://arxiv.org/abs/2501.13106)*
+The report’s curriculum is deliberately asymmetric. Stage 1 adapts the vision encoder to variable-resolution images. Stage 2 aligns the vision encoder, projector, and LLM on detailed scene, document, chart, grounding, and text data. Stage 3 adds multi-task image SFT plus general video data, and Stage 4 concentrates on video, streaming, temporal grounding, image-only, and text-only examples. The reported stage sizes are 15.57M, 21.97M, 19.05M, and 5.71M examples.
 
-![Figure 2 from VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](/assets/images/videollama-3-frontier-multimodal-foundation-models-source-figure-2.webp)
-*Fig 3: Training paradigm of VideoLLaMA3. The training of VideoLLaMA3 has four stages: (1) Vision Encoder Adaptation, (2) Vision-Language Alignment, (3) Multi-task Fine-tuning, and (4) Video-centric Fine-tuning. | source: [VideoLLaMA 3: Frontier Multimodal Foundation Models for Image and Video Understanding](https://arxiv.org/abs/2501.13106)*
+That order reflects an annotation economy. High-quality image-text pairs are easier to curate than long video explanations, and many video questions still depend on static visual skills such as OCR, chart reading, and fine-grained object recognition. VideoLLaMA3 therefore asks temporal tuning to specialize an already useful visual interface, rather than asking noisy video captions to teach all visual semantics from scratch.
 
+### Variable resolution and token pruning solve different bottlenecks
 
-**What to look at:**
-- High-quality image-text alignment is treated as the foundation for video.
-- Variable-resolution visual encoding helps preserve image detail.
-- Token merging makes longer video contexts cheaper.
+Any-resolution Vision Tokenization replaces fixed positional embeddings with 2D RoPE so images with different aspect ratios can be encoded without forcing every input into one square shape. This addresses spatial information loss. For videos, the model first applies 2×2 spatial downsampling, then Differential Frame Pruner compares corresponding patches in consecutive frames using pixel-space L1 distance; patches below the 0.1 threshold are treated as redundant and later patches are pruned. This addresses context length.
 
-### Reported evidence
+The two mechanisms should not be conflated. AVT changes how much spatial evidence enters the encoder. DiffFP is a temporal compression heuristic that assumes near-identical neighboring patches are less useful. It is cheap and interpretable, but it is not a learned event detector: a small pixel difference can still carry the decisive temporal cue, while a camera change can make redundant content look different.
 
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Training stages | Image alignment then video tuning | Uses image semantics before temporal specialization. |
-| Efficiency | Dynamic token merging | Compresses redundant visual tokens across frames. |
-| Evidence | Image and video benchmarks | Checks whether video gains preserve image understanding. |
+### Benchmark gains expose both the value and the boundary
+
+![VideoLLaMA3 benchmark comparison across image and video understanding tasks](/assets/images/videollama-3-frontier-multimodal-foundation-models-paper-figure.png)
+*Fig 2: The released comparison chart places VideoLLaMA3 against image and video MLLM baselines on representative image, general-video, perception, and long-video benchmarks. | source: [VideoLLaMA 3, Figure 1](https://arxiv.org/abs/2501.13106)*
+
+For the 2B model, Table 7 reports 59.6 on VideoMME without subtitles and 63.4 with subtitles, 68.0 on PerceptionTest, 65.5 on MVBench, 58.2 on ActivityNet-QA, 65.4 on MLVU-dev, 57.1 on LongVideoBench, 41.6 on LVBench, 63.4 on TempCompass, and 81.1 on NextQA. The model is evaluated with at most 180 frames and 16K visual tokens, greedy decoding, and benchmark-specific prompts. Charades-STA temporal grounding is scored by extracting predicted start/end times and computing mIoU, rather than by a dedicated temporal decoder.
+
+![VideoLLaMA3 chart-understanding case study](/assets/images/videollama-3-frontier-multimodal-foundation-models-source-figure-6.webp)
+*Fig 3: A chart case study shows the model comparing a price trend and then reasoning about model performance versus activated parameters, beyond OCR. | source: [VideoLLaMA 3, Figure 6](https://arxiv.org/abs/2501.13106)*
+
+The image-to-video transfer claim is visible in the mix of results: the same 2B model reaches 69.4 on InfoVQA, 59.2 on MathVista, and 67.3 on RealWorldQA in the report’s image evaluation. The chart example illustrates why the authors emphasize image data: reading the axes and interpreting a trend are prerequisites for many video questions too.
+
+The caveat is computational and temporal. The report acknowledges that high-resolution, long-video inference is not optimized for real-time use, and video annotations remain less diverse and reliable than image data. The 0.1 pixel-similarity threshold is also not a guarantee that a pruned patch was semantically irrelevant. A decisive follow-up would hold visual-token count and compute fixed while varying event duration, camera motion, and rare actions; if DiffFP removes the only frames that disambiguate event order, the efficiency gain is misleading.
 
 ## High-Level Takeaways
 
-- VideoLLaMA 3 informs whether video understanding should begin with a separate temporal model or with a strong image-language representation followed by temporal specialization. Its curriculum first establishes image–text alignment, then adds video data; variable-resolution encoding preserves spatial detail, while dynamic token merging compresses redundant evidence across frames before the language model consumes it.
-- The joint image and video benchmarks show that this route can add temporal capability without discarding image competence, but they do not isolate whether token merging preserves the events that matter rather than merely benchmark-level appearance. The missing study varies motion density and event duration at equal token budgets. At ten times the video length, rare actions may be merged away while context and decoding costs still grow. The thesis would fail if a temporally explicit model with the same compute consistently wins on long-horizon causal and event-order tests.
-- It connects the image VLM and video VLM stories. If static visual grounding is strong, video becomes a temporal extension rather than a separate world.
-- Video VLMs are constrained by visual token budgets. Good image features plus careful temporal compression are the practical path.
+- VideoLLaMA3’s main design decision is to make image understanding the foundation and reserve video tuning for temporal specialization.
+- AVT preserves spatial evidence across arbitrary shapes; DiffFP reduces temporal redundancy with a cheap pixel-space rule. They solve different parts of the token-budget problem.
+- The 2B results are broad, covering general video, long video, temporal reasoning, OCR, charts, and math, but the evaluation still uses fixed frame and token caps.
+- Pixel similarity is an efficiency signal, not a causal notion of importance. Long, rare, or subtle events remain the clearest stress test for the pruning strategy.

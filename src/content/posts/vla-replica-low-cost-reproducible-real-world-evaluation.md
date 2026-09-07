@@ -11,7 +11,6 @@ field: 'Robot Post-Training & Evaluation'
 summary: "2026 – VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation"
 ---
 
-## 2026 – VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation
 
 **arXiv:** [2605.20774](https://arxiv.org/abs/2605.20774)
 
@@ -27,10 +26,19 @@ summary: "2026 – VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-Worl
 *Fig 1: Shows the reproducibility controls: AprilTag and video-overlay alignment fix viewpoint geometry, task reference images fix object placement, and the same suite is then run across policies. | source: [VLA-REPLICA](https://arxiv.org/abs/2605.20774)*
 
 ![Figure 1 from VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation](/assets/images/vla-replica-low-cost-reproducible-real-world-evaluation-source-figure-1.webp)
-*Fig 2: Overview of the VLA-Replica benchmark. (a)1. Hardware components. (a)2. | source: [VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation](https://arxiv.org/abs/2605.20774)*
+*Fig 2: Overview of the benchmark's hardware, workspace, and task protocol, including the low-cost arm, cameras, lighting enclosure, and standardized tabletop scene. | source: [VLA-REPLICA, Figure 1](https://arxiv.org/abs/2605.20774)*
 
+### A benchmark is a physical interface contract
 
-The tasks span pick-and-place, object interaction, and memory-dependent behavior. Independent replicas produce consistent policy results, which is the paper's most important evidence: a benchmark is useful only if rebuilding it does not change the ranking. The controlled light box reduces nuisance variation while deliberate OOD settings reintroduce chosen shifts.
+VLA-REPLICA specifies a $\sim\$1,050 setup built around a 6-DoF SO-101 arm, an RGB webcam, a RealSense D455, and a 32-inch light box at roughly 5,600 K. Calibration uses a matrix for action normalization, while reference images and video overlays constrain camera pose and object placement. The point is not that this tabletop is realistic in every way; it is that another lab can rebuild the same interface to the policy.
+
+The suite contains ten tasks: four pick-and-place tasks, three object-interaction tasks, and three memory/counting tasks. The authors collect 500 demonstrations, 50 per task. Evaluation has 90 scenes: 50 in-distribution scenes, five per task across ten tasks, and 40 OOD scenes, five per task across eight selected tasks. OOD tests change color and shape; memory tasks train on counts 1 and 3 and test on 2, 4, and 5. Those details make “OOD” a specified intervention rather than a vague claim about generalization.
+
+### The reproduced numbers expose what the setup does and does not prove
+
+On the reproduced benchmark, the ID average success rates are ACT 18%, DiT-D 16%, DiT-F 12%, SmolVLA 26%, X-VLA 14%, $\pi_0$ 34%, and $\pi_{0.5}$ 54%. The OOD averages are 7.5%, 5%, 2.5%, 30%, 7.5%, 30%, and 35%, respectively. The sharp drop is itself useful evidence: a policy can rank well in a controlled scene and still fail when the object appearance or count changes. The memory/counting tasks are especially unforgiving because the policy must preserve information across time instead of reacting to one image.
+
+The reproducibility experiment uses one independently assembled second setup at a different location. It selects five ID and three OOD tasks with the highest original success rather than replaying every task, and reports average success of 49% versus 48% on ID and 55% versus 50% on OOD for the original and replica setups. That is encouraging evidence that the calibration and workspace controls transfer, but it is not a multi-lab variance estimate and the task selection biases the comparison toward easier behaviors.
 
 Low cost changes the cadence of evaluation. Instead of one lab reporting a small number of real trials, multiple groups can reproduce the setup and accumulate evidence about hardware, operator, and site variability.
 
@@ -43,7 +51,7 @@ Low cost changes the cadence of evaluation. Instead of one lab reporting a small
 ## High-Level Takeaways
 
 - VLA-REPLICA informs whether to centralize evaluation on expensive hardware or distribute a standardized low-cost real setup. Its unit is a real closed-loop trial with a fixed protocol and explicit shift condition. Replication across independently assembled systems is the scaling variable that matters.
-- The paper establishes initial cross-site consistency for a bounded task suite. A missing study measures how calibration drift, wear, and operator choices affect confidence intervals over months. At ten times the sites, protocol compliance becomes the bottleneck. The benchmark fails its central claim if inter-lab variance is comparable to the policy improvements it is meant to detect.
-- VLA-REPLICA complements SIMPLER: one scales simulation, the other makes real evaluation cheap enough to repeat.
-- A reproducible tabletop does not represent the breadth of household or industrial robotics.
-- A smaller real benchmark can be more decision-useful than a broader one that nobody else can reproduce.
+- The paper provides an initial second-setup check, not a population estimate of inter-lab variance. The next useful experiment is repeated assembly across sites and months with calibration drift, wear, and operator choice logged.
+- The OOD protocol is concrete but narrow: color, shape, and count changes do not cover contact dynamics, lighting outside the enclosure, or household clutter.
+- The reproduced ranking is most credible for the selected tasks; the authors' exclusion of already-low original tasks should remain attached to the claim.
+- A smaller real benchmark can be more decision-useful than a broader one that nobody else can rebuild, provided its selection effects and physical envelope are reported.
