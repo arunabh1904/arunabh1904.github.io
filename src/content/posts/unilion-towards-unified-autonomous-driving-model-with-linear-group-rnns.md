@@ -8,45 +8,47 @@ tags: [Other]
 field: 'BEV Perception & Mapping'
 summary: '2025 – UniLION: one linear-RNN backbone across sensors, time, and driving tasks'
 ---
-## 2025 – UniLION
 
 **arXiv:** [2511.01768](https://arxiv.org/abs/2511.01768)
 
-**Code:** [happinesslz/UniLION](https://github.com/happinesslz/UniLION)
-
 ## Summary
 
-> UniLION's important result is conditional reuse, not just a long task list. A model trained with temporal LiDAR and cameras can run without history or cameras at inference, using the same backbone and heads, although removing both inputs still produces a measurable accuracy penalty.
-
-UniLION converts LiDAR, multi-view images, and temporal observations into sparse 3D voxels, processes them with grouped linear RNNs, and serves detection, tracking, map segmentation, occupancy, motion prediction, and planning from a shared BEV feature. All results are reported on nuScenes or Occ3D-nuScenes; the paper does not report a matched end-to-end latency or memory comparison that establishes the system-level advantage of linear rather than quadratic sequence mixing.
+> UniLION turns sparse LiDAR, camera, and temporal voxels into one 3D backbone built from grouped linear RNNs, then fans a shared BEV representation into perception, prediction, and planning heads. Its strongest evidence is a sensor-ablation rather than a single leaderboard number: one model trained with LiDAR, cameras, and history can run after inputs disappear, although a LiDAR-only specialist remains better when LiDAR-only deployment is known in advance.
 
 ## Core Insights
 
-LiDAR and camera observations retain separate input encoders, but their voxels enter the same 3D backbone. Each UniLION block partitions sparse features along spatial axes, applies a linear group RNN for long-range interaction, and alternates voxel merging with voxel expansion. A learned 3D spatial descriptor restores positional structure that a linear recurrence alone models weakly. This replaces explicit camera-LiDAR and temporal fusion modules with one recurrent spatial operator; it does not eliminate calibration, view lifting, or modality-specific preprocessing.
+### A grouped linear recurrence replaces explicit fusion at token level
 
-![UniLION: Towards a Unified Autonomous Driving Model with Linear Group RNNs source figure: (a) presents the mainstream methods in implementing multi-modal fusion or temporal fusion.](/assets/images/unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns-paper-figure.webp)
-*Fig 1: (a) presents the mainstream methods in implementing multi-modal fusion or temporal fusion. | source: [UniLION: Towards a Unified Autonomous Driving Model with Linear Group RNNs](https://arxiv.org/abs/2511.01768)*
+UniLION keeps modality-specific front ends, but moves the fusion decision into a shared sparse 3D backbone. Dynamic voxelization produces LiDAR voxels; a camera encoder estimates depth and lifts the top four depth candidates per image feature into camera voxels. Temporal voxels from four consecutive frames are then concatenated with the current voxels. The backbone partitions sparse features into non-overlapping 3D windows, sorts them along alternating spatial axes, and groups up to 4,096 tokens for a linear group RNN. Four blocks progressively use windows `(13,13,32)`, `(13,13,16)`, `(13,13,8)`, and `(13,13,4)` with group sizes 4,096, 2,048, 1,024, and 512.
 
-![Figure 4 from UniLION: Towards a Unified Autonomous Driving Model with Linear Group RNNs](/assets/images/unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns-source-figure-4.webp)
-*Fig 2: The illustration of spatial information loss when flattening into 1D sequences. For example, there are two adjacent voxels in spatial position (indexed as 01 and 34) but are far in the 1D sequences along the X order. | source: [UniLION: Towards a Unified Autonomous Driving Model with Linear Group RNNs](https://arxiv.org/abs/2511.01768)*
+That choice changes what “fusion” means. There is no camera–LiDAR cross-attention module or temporal alignment module after token construction; the recurrence mixes the concatenated voxel sequence while voxel merging and expansion change resolution. A 3D spatial descriptor and voxel generation compensate for two weaknesses of flattening: nearby voxels can become far apart in a 1D order, and sparse foreground evidence can vanish during downsampling.
 
+![UniLION compares explicit fusion pipelines with one backbone and parallel task heads](/assets/images/unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns-paper-figure.webp)
+*Fig 1: The comparison contrasts explicit multi-modal and temporal fusion with UniLION's shared 3D backbone and decoupled task heads. | source: [UniLION: Towards a Unified Autonomous Driving Model with Linear Group RNNs, Figure 1](https://arxiv.org/abs/2511.01768)*
 
-The strongest unification test trains one LiDAR-camera-temporal model and removes inputs only at inference, without masked-modality training. Removing temporal history while retaining LiDAR and cameras is nearly neutral: 74.9 NDS and 50.7 RayIoU versus 75.4 and 51.3 with full temporal input. Removing both cameras and history drops the same model to 70.6 NDS and 43.4 RayIoU. A separately trained LiDAR-only model reaches 72.3 NDS and 46.8 RayIoU, so architectural compatibility does not erase the value of matching the training distribution to the deployed sensor set.
+The spatial descriptor is not cosmetic. In the paper's Figure 4, voxels numbered 01 and 34 are adjacent in the 2D grid but become separated by the scan order along the x axis. The descriptor supplies spatial coordinates so the recurrent operator does not have to infer all locality from sequence position alone. The design therefore buys long-range token interaction through linear-time recurrence while adding explicit spatial information where the sequence representation is lossy.
 
-| Inference configuration | NDS | Tracking AMOTA | Map mIoU | Occupancy RayIoU |
-| --- | ---: | ---: | ---: | ---: |
-| LiDAR only, trained LiDAR only | 72.3 | 72.6 | 71.7 | 46.8 |
-| LiDAR only, trained with LiDAR + camera + time | 70.6 | 70.2 | 68.6 | 43.4 |
-| LiDAR + camera, trained with LiDAR + camera + time | 74.9 | 76.2 | 72.2 | 50.7 |
-| LiDAR + camera + time | 75.4 | 76.5 | 73.3 | 51.3 |
+![Flattening a 3D window can separate adjacent voxels in sequence order](/assets/images/unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns-source-figure-4.webp)
+*Fig 2: The example shows why spatial descriptors are needed when a 2D neighborhood is flattened into a 1D recurrent sequence. | source: [UniLION: Towards a Unified Autonomous Driving Model with Linear Group RNNs, Figure 4](https://arxiv.org/abs/2511.01768)*
 
-The multi-task ablations expose a second trade-off. Adding detection and map segmentation together improves map mIoU from 68.3 to 71.7; adding occupancy then improves RayIoU by 2.7 points but slightly reduces detection. Dynamic loss balancing helps detection, tracking, and mapping while slightly degrading occupancy. One backbone can share representation and compute, but it does not make task gradients automatically compatible.
+### One rich training model provides fallbacks, with a distribution cost
 
-The training contract is also less monolithic than the architecture diagram suggests. Perception is trained in stages, temporal variants are initialized from single-frame perception, and motion and planning are trained after freezing the temporal perception model. UniLION therefore demonstrates a reusable architecture and representation, not one simultaneous end-to-end optimization over every task and sensor condition.
+The cleanest unification test is Table VIII. The authors train one model with LiDAR, cameras, and temporal input (LCT), then remove streams only at inference without masked-modality training. The full LCT-to-LCT configuration reaches 75.4 NDS, 76.5 AMOTA, 73.3 map mIoU, and 51.3 RayIoU. Removing history while retaining LiDAR and cameras gives 74.9 NDS, 76.2 AMOTA, 72.2 mIoU, and 50.7 RayIoU. Removing cameras and history and running the same model on LiDAR gives 70.6 NDS, 70.2 AMOTA, 68.6 mIoU, and 43.4 RayIoU.
+
+That last number is useful precisely because it is not the best LiDAR-only result. A LiDAR-only model trained and tested as L reaches 72.3 NDS, 72.6 AMOTA, 71.7 mIoU, and 46.8 RayIoU. Rich-sensor pretraining gives a graceful fallback, but it also creates a train–test mismatch when the missing sensor is known. The paper demonstrates architectural compatibility, not that one universal checkpoint dominates every deployment-specific specialist.
+
+On the full nuScenes validation setup, the LCT model reaches 73.2 mAP and 75.4 NDS for detection, 76.5 AMOTA for tracking, 73.3 map mIoU, and 51.3 RayIoU. Planning is 0.65 m average L2 and 0.18% collision without ego status; a separate ego-status row reaches 0.55 m and 0.06%, so those figures should not be compared as if they used the same inputs.
+
+### Multi-task sharing improves balance but does not remove interference
+
+UniLION trains detection, tracking, map segmentation, occupancy, motion, and planning from the shared BEV state, but the task heads still impose competing gradients. Adding dynamic loss balancing changes the R50 ablation from 73.3 NDS, 74.1 AMOTA, 71.2 mIoU, and 50.4 RayIoU to 73.6, 75.0, 71.8, and 50.2 respectively. The gain is broad but not monotonic: occupancy slightly falls while detection, tracking, and mapping improve.
+
+The training schedule also matters. Perception is trained first, temporal variants are initialized from single-frame perception, and motion and planning are trained after the temporal perception model is frozen. “Unified model” therefore describes parameter reuse and a common representation more strongly than it describes one jointly optimized end-to-end objective. The benchmarks are nuScenes and Occ3D-nuScenes, with six cameras and 2 Hz annotations; the paper does not report a matched hardware latency, memory, or throughput comparison that would quantify the practical benefit of the linear operator.
 
 ## High-Level Takeaways
 
-- UniLION makes sensor, temporal, and task unification a backbone decision: sparse voxels from different sources pass through one grouped recurrent operator and one shared BEV state.
-- Training with the richest sensor set gives a useful fallback path, but the LiDAR-only fallback remains weaker than a LiDAR-specialized model; graceful degradation still needs an explicit acceptance threshold.
-- Joint training helps some tasks and harms others, so loss balancing is a deployment decision rather than bookkeeping.
-- The evidence is confined to nuScenes-family benchmarks and does not establish the claimed efficiency advantage under matched hardware, latency, memory, calibration error, and sensor-failure tests.
+- UniLION makes sensor and task unification a backbone decision: heterogeneous sparse voxels share one recurrent 3D state before task-specific heads read it.
+- A rich-sensor checkpoint can survive missing history or cameras, but the LiDAR-only fallback remains weaker than a LiDAR-specialized model; graceful degradation needs an explicit acceptance threshold.
+- Spatial descriptors and voxel generation are the mechanisms that keep linear sequence mixing from losing local geometry and sparse foreground evidence.
+- Multi-task loss balancing shifts the compromise among tasks rather than eliminating interference.
+- The paper establishes broad benchmark coverage and input flexibility; matched efficiency, calibration failure, and sensor-corruption tests are still needed to establish a system-level advantage.

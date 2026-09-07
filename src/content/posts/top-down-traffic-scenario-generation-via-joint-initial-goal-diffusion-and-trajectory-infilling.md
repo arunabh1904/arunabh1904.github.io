@@ -12,36 +12,45 @@ field: 'Motion Forecasting & Planning'
 summary: "2026 – Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling"
 ---
 
-## 2026 – Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling
-
-**arXiv:** [2608.11407](https://arxiv.org/abs/2608.11407)<br />
-**Code:** [TrafficDiffuser](https://github.com/CL2-UWaterloo/TrafficDiffuser)
+**arXiv:** [2608.11407](https://arxiv.org/abs/2608.11407)
 
 ## Summary
 
-> TrafficDiffuser separates scenario generation from trajectory generation by modeling an agent's initial and goal states jointly. The initial-goal pair is a more interpretable high-level scenario object than an unconstrained sampled start, and fixing it turns future motion generation into trajectory infilling. On Argoverse 2, the paper reports a 55.3% reduction in speed-distribution distance and a 2.8-point reduction in off-road rate over the next-best initialization method.
+> TrafficDiffuser makes a traffic scenario explicit before it generates detailed motion. A diffusion model samples each agent's initial and goal states jointly from map context; an infiller then connects those endpoints by predicting distances from a bridge between them. The paired endpoints make an initial scene interpretable and turn trajectory synthesis into a constrained infilling problem. On Argoverse 2, the displayed tables improve speed-distribution distance and off-road rate while increasing initialization collisions. The paper’s headline percentage reductions disagree with those table values, so the absolute comparisons are the clearer evidence.
 
 ## Core Insights
 
-Many traffic simulators require initial agent states as input, which limits diversity and makes the sampled scene hard to interpret. TrafficDiffuser diffuses a set of high-level initial and goal states conditioned on map context, then uses those states as constraints for infilling trajectories. The model can condition generation on initial states, goal states, both, or neither, and can be integrated with existing trajectory generators.
+### Initial and goal states are a controllable scenario object
 
-The ablation exposes the value of the paired object. With both initial and goal states constrained, the reported ADE is 0.52 m and FDE and miss rate are zero in the displayed setting. Initial-only and unconstrained variants have nonzero endpoint errors, while a prior initialization method has 1.86 m ADE, 7.16 m FDE, and 43.84% miss rate. These numbers measure the chosen scenario-generation setup, not universal simulator realism.
+Most traffic simulators start with agent positions and ask a trajectory model to fill in behavior. TrafficDiffuser instead represents a high-level scenario as paired initial and goal states. Its TrafficGenerator denoises noisy agent states with a map summary, map polygons, temporal attention, and social attention. Because the goal is generated alongside the start, a sampled agent has an interpretable intended destination rather than an unexplained initial placement.
 
-![TrafficDiffuser overview showing joint initial-goal scenario generation followed by trajectory infilling](/assets/images/trafficdiffuser-overview-paper-figure.png)
-*Fig 1: TrafficDiffuser first generates a high-level scenario and then infills trajectories conditioned on it. | source: [TrafficDiffuser](https://arxiv.org/abs/2608.11407)*
+![TrafficDiffuser generates a high-level scenario and then infills trajectories conditioned on it](/assets/images/trafficdiffuser-overview-paper-figure.png)
+*Fig 1: The framework first denoises initial-goal states and then passes the pair through an infiller that produces a kinematically feasible trajectory. | source: [Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling, Figure 2](https://arxiv.org/abs/2608.11407)*
 
-![Figure 1 from Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling](/assets/images/top-down-traffic-scenario-generation-via-joint-initial-goal-diffusion-and-trajectory-infilling-source-figure-1.webp)
-*Fig 2: Illustration of proposed approach. (a) Generated high-level traffic scenario. (b) Infilled trajectories conditioned on the high-level scenario. | source: [Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling](https://arxiv.org/abs/2608.11407)*
+The infiller constructs a bridge between the endpoints and predicts the distance from that bridge at each time step. Hard constraints can hold the initial state, goal state, both, or neither. The model can also feed generated initial states into an existing trajectory generator such as PD-Traj, so the high-level representation is an interface to downstream simulators rather than a replacement for every motion model.
 
-![Figure 5 from Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling](/assets/images/top-down-traffic-scenario-generation-via-joint-initial-goal-diffusion-and-trajectory-infilling-source-figure-5.webp)
-*Fig 3: Diversity in Generated High-level Traffic Scenario. Each row contains an identical map, and the number of agents, and each column shows different scenarios. | source: [Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling](https://arxiv.org/abs/2608.11407)*
+![A single generated initial-goal pair becomes a set of infilled trajectories](/assets/images/top-down-traffic-scenario-generation-via-joint-initial-goal-diffusion-and-trajectory-infilling-source-figure-1.webp)
+*Fig 2: The proposed approach pairs blue initial positions with red goal positions and infills the trajectories between them. | source: [Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling, Figure 1](https://arxiv.org/abs/2608.11407)*
 
+### The paired endpoint makes feasibility measurable, but moves difficulty into goal sampling
 
-The decision is whether to make simulation conditions explicit before asking a model to generate motion. Joint initial-goal diffusion improves controllability, but it also transfers difficulty into goal-distribution modeling. A useful next test would measure downstream closed-loop behavior under held-out goals and compare the same trajectory generator with and without generated high-level constraints.
+On the trajectory-infilling table, constraining both initial and goal states gives ADE 0.52 m, FDE 0, and miss rate 0. Initial-only gives 0.53 m, 0.16 m, and 0.19%; goal-only gives 0.53 m, 0, and 0%; unconstrained infilling gives 0.53 m, 0.10 m, and 0.04%. The PD-Init comparison is 1.86 m ADE, 7.16 m FDE, and 43.84% miss rate. These numbers are from the displayed endpoint-conditioned setup with hard constraints, so they show that the infiller can connect a chosen pair; they do not establish that the generator samples the right pair for every traffic interaction.
+
+The diversity and initialization table makes that boundary visible. For generated initial states, TrafficDiffuser reports collision rate 9.80%, off-road rate 5.10%, and nearest-edge distance 1.81 m. PD-Init reports 4.22%, 5.36%, and 1.64 m. For generated goals, the corresponding values are 10.6%, 7.21%, and 2.02 m; ground-truth goals are 0.50%, 2.80%, and 1.86 m. TrafficDiffuser improves some distributional distances while increasing collision rate relative to the initialization baseline. The paired representation therefore improves control and interpretation without making realism automatically monotonic.
+
+### Diffusion supplies diversity under a fixed map, not a closed-loop simulator
+
+The source Figure 5 holds the map fixed within each row and varies agent count across columns and samples different initial-goal configurations across columns. The blue-to-red pair indicators make a useful intuition concrete: diversity is visible as different plausible endpoint assignments on the same road geometry, while the connecting line exposes whether an assignment is reachable. Guidance sampling is used for this qualitative visualization, whereas the quantitative Table I comparison is reported without guidance sampling for fairness.
+
+![TrafficDiffuser samples diverse reachable initial-goal pairs on the same maps](/assets/images/top-down-traffic-scenario-generation-via-joint-initial-goal-diffusion-and-trajectory-infilling-source-figure-5.webp)
+*Fig 3: Repeated samples on fixed maps show diversity in agent count and reachable initial-goal pairs. | source: [Top-down Traffic Scenario Generation via Joint Initial-Goal Diffusion and Trajectory Infilling, Figure 5](https://arxiv.org/abs/2608.11407)*
+
+The authors use Argoverse 2 Motion Forecasting data, z-normalize positions and speeds, and model five categories: vehicle, bus, pedestrian, bicycle, and motorcycle. Common-sense metrics measure collision, off-road, and nearest lane-edge behavior; Jensen–Shannon divergence measures speed, lateral deviation, local density, and nearest-agent distributions. The displayed speed JSD falls from SceneControl’s 0.16 to 0.068, a 57.5% reduction; the paper instead reports 55.3%. Off-road rate falls from PD-Init’s 5.36% to 5.10%, a 0.26-percentage-point reduction, or about 4.9% relative; the paper reports 2.8%. These source inconsistencies do not change the direction of either comparison, but the stated percentages should not be treated as calculations from the shown values. The model is not evaluated as a long-horizon closed-loop traffic world in this paper.
 
 ## High-Level Takeaways
 
-- TrafficDiffuser informs whether scalable traffic simulation should sample interpretable initial-goal scenarios before generating detailed trajectories.
-- The atomic training object is a top-down agent state pair followed by a trajectory infill sequence; map context conditions both stages.
-- The high-level pair offers controllability and distribution diagnostics, but goal sampling can become the new source of bias.
-- The conclusion would weaken if generated initial-goal pairs improve offline distances but reduce diversity or fail to produce useful closed-loop scenarios under held-out road layouts.
+- TrafficDiffuser makes scenario intent explicit by sampling initial and goal states together before detailed motion.
+- The infiller's hard endpoint constraints explain its zero miss-rate rows; they should not be read as unconstrained driving realism.
+- Initial-goal pairs expose a useful diagnostic for diversity, but goal-distribution modeling becomes the new bottleneck.
+- The quantitative comparison improves speed-distribution and off-road measures while worsening collision rate relative to PD-Init, so “better scenario generation” is metric-dependent.
+- The framework is most useful as a controllable scenario interface for a simulator or trajectory model; closed-loop policy behavior remains untested.
