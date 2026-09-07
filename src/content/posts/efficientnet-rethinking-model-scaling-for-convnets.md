@@ -23,46 +23,89 @@ summary: "2019 – EfficientNet — Rethinking Model Scaling for ConvNets"
 
 ## Summary
 
-> EfficientNet asks how to scale a ConvNet once a good baseline exists. Instead of independently increasing depth, width, or input resolution, compound scaling uses one coefficient to grow all three dimensions in a balanced way. The authors first search for an efficient baseline, EfficientNet-B0, then scale it to B1-B7 under resource constraints. The empirical case is ImageNet accuracy versus parameters/FLOPs, with transfer results showing that the same family works beyond ImageNet. Higher resolution needs enough depth and width to use the extra pixels, while width or depth alone can waste compute. The caveat is that the baseline architecture and search space still matter; compound scaling cannot rescue a weak base model.
+> EfficientNet asks how to spend a larger ConvNet budget once the basic architecture is fixed. Its compound rule grows depth, width, and image resolution together; around 1.8 billion FLOPs, the controlled B0 experiment reaches 81.1% ImageNet top-1 accuracy versus roughly 79% when scaling one axis alone. The B0–B7 family combines that rule with a searched mobile architecture and a tuned training recipe. Its efficiency is measured in parameters, operations, and a particular CPU benchmark—not a universal latency guarantee.
 
 ## Core Insights
 
-![Figure 2 from EfficientNet: compound scaling balances network width, depth, and resolution](/assets/images/efficientnet-paper-figure-2-model-scaling.png)
-*Fig 1: Width, depth, and input-resolution scaling each expand a different network axis; compound scaling increases all three in a balanced way. | source: [EfficientNet paper](https://arxiv.org/abs/1905.11946)*
+### More pixels need capacity that can use them
 
-![Figure 1 from EfficientNet — Rethinking Model Scaling for ConvNets](/assets/images/efficientnet-rethinking-model-scaling-for-convnets-source-figure-1.webp)
-*Fig 2: EfficientNet models trace a better ImageNet accuracy-to-parameter frontier than contemporary ConvNets, with B0 through B7 scaling along the leading edge. | source: [EfficientNet — Rethinking Model Scaling for ConvNets](https://arxiv.org/abs/1905.11946)*
+A wider network has more feature channels at each location. A deeper network performs more successive transformations. A higher-resolution input gives the network finer spatial evidence. Those changes can complement each other, but one cannot indefinitely compensate for neglecting the others. Extra pixels are less useful if the model lacks capacity to represent their detail; extra channels are less useful if the input has already discarded that detail.
 
-![Figure 3 from EfficientNet — Rethinking Model Scaling for ConvNets](/assets/images/efficientnet-rethinking-model-scaling-for-convnets-source-figure-3.webp)
-*Fig 3: Scaling only width, depth, or resolution improves ImageNet accuracy but saturates near 80%, motivating compound scaling across all three dimensions. | source: [EfficientNet — Rethinking Model Scaling for ConvNets](https://arxiv.org/abs/1905.11946)*
+The source diagram makes the three budgets visible. Width changes the horizontal size of a layer, depth adds layers, and resolution changes the spatial input size. Compound scaling changes all three. The authors motivate this balance through receptive field and representational capacity, then test it empirically. The intuition guides the experiment; it is not a theorem prescribing an optimal network for every dataset.
 
+![Depth, width, resolution, and compound scaling of a ConvNet](/assets/images/efficientnet-source-figure-2-scaling.png)
+*Fig 1: The five diagrams hold the basic layer pattern fixed while changing width, depth, resolution, or all three, separating architecture choice from how a network grows. | source: [EfficientNet, Figure 2](https://arxiv.org/abs/1905.11946)*
 
-### Method and reported result
+This extends the question raised by [ResNet](/paper%20shorts/2015/12/01/deep-residual-learning-for-image-recognition.html). Residual connections make additional depth easier to optimize. EfficientNet asks whether depth is the best place to spend the next unit of compute once that optimization is possible.
 
-EfficientNet argues that model scaling should be balanced, not improvised one axis at a time. Standard CNNs often grow by becoming deeper, wider, or by consuming higher-resolution images. Tan and Le show that scaling only one dimension leaves accuracy and efficiency on the table.
+### The exponents follow the cost of a convolution
 
-Their recipe starts with a mobile-sized architecture found by neural architecture search, EfficientNet-B0. From there, a single compound factor $\phi$ scales depth $\alpha^\phi$, width $\beta^\phi$, and resolution $\gamma^\phi$ together. That rule turns one searched micro-architecture into the B1-B7 family while keeping the accuracy-to-compute tradeoff unusually strong.
+A regular convolution costs approximately $HWk^2C_{in}C_{out}$ multiply-adds. Scaling both channel dimensions by $w$ multiplies this cost by $w^2$; scaling both spatial dimensions by $r$ multiplies it by $r^2$; repeating more layers by a factor $d$ adds a linear factor. This motivates
 
-### Reported evidence and cost
+$$
+\text{compute multiplier}\approx d\,w^2r^2.
+$$
 
-| Model | Params | FLOPs | ImageNet Top-1 | Notes |
-| ----- | ------ | ----- | -------------- | ----- |
-| EfficientNet-B0 | 5.3 M | 0.39 B | 77.3 % | Mobile-class baseline |
-| EfficientNet-B1 | 7.8 M | 0.70 B | 79.2 % | ≈ ResNet-152 accuracy, 27× cheaper |
-| EfficientNet-B4 | 19 M | 4.2 B | 83.0 % | Beats NASNet-A (331×48) with 7× fewer FLOPs |
-| EfficientNet-B7 | 66 M | 37 B | 84.3 % | 8.4× smaller & 6.1× faster than GPipe-NASNet |
+EfficientNet parameterizes those choices using one resource coefficient $\phi$:
 
-The reported training recipe uses 600 epochs on ImageNet with AutoAugment and dropout. On TPU-v3 and mobile-oriented hardware, the smaller B0-B3 models run in real time, which is part of why the family became popular outside leaderboard settings.
+$$
+d=\alpha^\phi,\qquad w=\beta^\phi,\qquad r=\gamma^\phi,
+\qquad \alpha\beta^2\gamma^2\approx2.
+$$
 
-### Where the evidence stops
+The constants allocate the budget; $\phi$ determines its scale. Increasing $\phi$ by one approximately doubles operations under this model. It does not double depth, width, and resolution separately, which would cost about $2\times2^2\times2^2=32$ times as much for regular convolutions.
 
-The compound scaling formula is easy to reuse, but the clean story depends on a strong searched baseline and a heavy training recipe. The paper is mainly optimized for classification; detection and segmentation need extra tuning. EfficientNet also makes clear that "efficient" can mean fewer FLOPs at inference while still requiring expensive architecture search and long training runs.
+The authors search at $\phi=1$ around the small B0 model and choose $\alpha=1.2$, $\beta=1.1$, and $\gamma=1.15$. Their product under the cost rule is about 1.92, close to the intended factor of two. They then reuse the constants when constructing larger models. Channel and layer rounding, and operators such as depthwise convolutions with different cost dependence, make this an approximate budget rule. Searching around a small model reduces search expense; it does not establish that the same constants remain optimal at every larger scale.
 
-EfficientNet's lasting lesson is that how you scale can matter more than how much you scale. Balanced depth, width, and resolution gave CNNs a better accuracy-efficiency frontier.
+### The strongest evidence keeps B0 fixed
 
-### MBConv layers in PyTorch
+The family’s leaderboard advantage mixes several ingredients, so Figure 8 asks a cleaner question: how do different scaling strategies behave when they start from the **same** EfficientNet-B0 architecture? Follow each line as compute increases. The three single-axis curves improve rapidly and then flatten around 80%; the compound curve continues upward over the plotted range.
+
+![Accuracy versus FLOPs for different ways of scaling EfficientNet-B0](/assets/images/efficientnet-source-figure-8-controlled.png)
+*Fig 2: Scaling depth, width, or resolution alone gives diminishing returns from the same B0 baseline; compound scaling reaches higher accuracy at comparable operation counts in this experiment. | source: [EfficientNet, Figure 8](https://arxiv.org/abs/1905.11946)*
+
+Table 7 provides a concrete comparison near 1.8–1.9 billion FLOPs:
+
+| Scaling from B0 | FLOPs | ImageNet top-1 |
+| --- | ---: | ---: |
+| Depth only, $d=4$ | 1.8B | 79.0% |
+| Width only, $w=2$ | 1.8B | 78.9% |
+| Resolution only, $r=2$ | 1.9B | 79.1% |
+| Compound, $d=1.4,w=1.2,r=1.3$ | 1.8B | 81.1% |
+
+The result supports coordinated scaling within this architecture and recipe. Table 3 also tests the idea beyond EfficientNet: a compound-scaled ResNet-50 reaches 78.8% at 16.7B FLOPs, compared with 78.1% for depth-only scaling at 16.2B. The comparison is close in compute, not exactly equal. MobileNetV1 and V2 show the same direction, giving the rule a broader empirical basis than the searched B0 family alone.
+
+### The baseline was searched for operations, not measured latency
+
+B0 comes from a neural architecture search over a mobile inverted-bottleneck space. Its objective combines accuracy with a FLOP penalty, targeting roughly 400 million operations. The authors explicitly choose FLOPs over latency because they are not targeting one hardware device.
+
+The resulting network uses MBConv blocks with squeeze-and-excitation. Its inverted bottleneck first expands channels, performs a depthwise spatial convolution, then projects back to a narrow output; squeeze-and-excitation reweights channels using image-dependent context. B0 mixes $3\times3$ and $5\times5$ spatial kernels and different stage repetition counts. Compound scaling preserves that basic operator pattern while changing the network’s dimensions.
+
+The original ImageNet Table 2 reports the following family points. These are the table’s rounded values; nearby ablation and latency tables contain slightly different accuracy values and should retain their own context.
+
+| Model | Parameters | FLOPs | Top-1 validation accuracy |
+| --- | ---: | ---: | ---: |
+| B0 | 5.3M | 0.39B | 77.1% |
+| B1 | 7.8M | 0.70B | 79.1% |
+| B4 | 19M | 4.2B | 82.9% |
+| B7 | 66M | 37B | 84.3% |
+
+B1 uses roughly 16 times fewer FLOPs than the 11B-FLOP ResNet-152 comparison, while exceeding its listed 77.8% accuracy. B7 has about 8.4 times fewer parameters than GPipe’s 557M, with both rounded to 84.3% in this table. These are whole-model comparisons. The paper itself attributes the gains to architecture, scaling, and training settings together.
+
+The training recipe includes RMSProp, SiLU, AutoAugment, stochastic depth, and dropout that increases from 0.2 for B0 to 0.5 for B7. The authors reserve 25,000 training images for early stopping, then report accuracy on the original validation set. Growing the model also changes regularization; the published family is more than a dimension multiplier applied to an otherwise untouched experiment.
+
+### Smaller operation counts need a hardware check
+
+Table 4 measures inference with batch size one on a single Intel Xeon E5-2690 CPU core, averaged over 20 runs. B1 takes 0.098 seconds against ResNet-152’s 0.554 seconds, a 5.7× speedup. B7 takes 3.1 seconds against GPipe’s 19.0 seconds, a 6.1× speedup. The latter is much faster than its comparator but still takes seconds per image. These measurements support efficiency on that CPU setup; they do not establish real-time performance on a phone or GPU.
+
+Transfer uses ImageNet-pretrained checkpoints fine-tuned on eight downstream datasets. For example, B7 reaches 91.7% on CIFAR-100 versus GPipe’s 91.3%, but 98.9% on CIFAR-10 versus 99.0%. The paper reports leading results on five of the eight datasets, including ties in its table. Its useful conclusion is strong transfer with far fewer parameters, while individual tasks still differ.
+
+The minimal block below preserves the earlier note’s channel-expansion, depthwise-convolution, projection, and same-shape residual path. It omits squeeze-and-excitation, stochastic depth, and B0’s variable kernel sizes, so it illustrates the inverted-bottleneck core rather than reproducing an EfficientNet block in full.
 
 ```python
+import torch
+import torch.nn as nn
+
 class MBConv(nn.Module):
     def __init__(self, in_ch: int, out_ch: int, stride: int = 1, expand: int = 6):
         super().__init__()
@@ -89,6 +132,8 @@ class MBConv(nn.Module):
 
 ## High-Level Takeaways
 
-- EfficientNet informs how to spend additional CNN compute across depth, width, and input resolution instead of scaling one axis by habit. The training unit remains an image, but compound scaling changes the capacity and spatial detail available to every block under a common FLOP multiplier.
-- The measured family shows that balanced scaling gives a better ImageNet accuracy-efficiency frontier around the searched B0 baseline; it does not prove universal coefficients across tasks or hardware. The missing experiment re-optimizes the coefficients for detection, segmentation, and memory-bound accelerators under measured latency rather than FLOPs. At 10× resolution, activation memory and data movement dominate. Compound scaling would fail as a general rule if hardware-aware single-axis or neural-architecture scaling consistently won at matched latency and energy.
-- EfficientNet made scaling feel like a design problem rather than a brute-force contest. B1 roughly matched ResNet-152 with 27x fewer FLOPs, while B7 topped ImageNet with a fraction of the parameters used by earlier NAS-heavy models.
+- Compound scaling allocates a compute budget across depth, width, and image resolution; the approximate $dw^2r^2$ cost explains why those dimensions cannot all double freely.
+- The same-B0 ablation is the cleanest scaling result: about 81.1% top-1 versus 79% at comparable operations.
+- B0’s searched MBConv architecture and the family’s regularization recipe contribute separately to its accuracy–efficiency advantage.
+- The 6.1× latency claim is a batch-one, single-core CPU comparison; B7 still takes 3.1 seconds per image there.
+- Reusing coefficients found around B0 makes larger-model design cheaper, while optimal scaling remains dependent on the architecture, task, and resource being measured.

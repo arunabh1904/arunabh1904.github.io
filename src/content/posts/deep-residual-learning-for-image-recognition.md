@@ -21,39 +21,69 @@ summary: "2015 – Deep Residual Learning for Image Recognition"
 
 ## Summary
 
-> ResNet addresses the degradation problem: deeper plain networks can have higher training error even though, in principle, extra layers could learn identity mappings. The residual block changes the target from learning H(x) directly to learning F(x) = H(x) - x, then adds the shortcut x back. Identity shortcuts add almost no parameters or compute but make very deep optimization tractable. The evidence covers ImageNet and CIFAR, including 50-, 101-, and 152-layer networks that outperform shallower baselines and win major recognition/detection tasks. The limitation is not conceptual but architectural: later work still had to refine normalization, bottlenecks, width, and training recipes. The lasting idea is that skip connections make depth usable.
+> ResNet makes extra depth easier to optimize by asking a block to learn a correction to its input. Its decisive comparison is a 34-layer network with and without parameter-free shortcuts: ImageNet top-1 error falls from 28.54% to 25.03%, and the deeper residual network also fits the training data better. Bottleneck blocks make 50–152 layers affordable. The 1,202-layer CIFAR experiment supplies the limit: residual learning can remove an optimization obstacle without making extra capacity generalize better.
 
 ## Core Insights
 
-![Residual block schematic](/assets/images/resnet.png)
-*Fig 1: The residual block makes the paper's intervention explicit: learn a residual branch $F(x)$ and add the identity $x$ before the next nonlinearity. | source: [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)*
+### The deeper network is failing on the training set
 
-![Figure 3 from Deep Residual Learning for Image Recognition](/assets/images/deep-residual-learning-for-image-recognition-source-figure-3.webp)
-*Fig 2: Example network architectures for ImageNet. Left: the VGG-19 model Simonyan2015 (19.6 billion FLOPs) as a reference. | source: [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)*
+The surprising result is not that a bigger network overfits. The plain 34-layer ImageNet network has higher **training** error than the plain 18-layer network. In principle, the additional layers could copy their inputs and reproduce the shallower solution. In practice, the optimizer does not find that solution within the training budget. The paper calls this the degradation problem.
 
-![Figure 1 from Deep Residual Learning for Image Recognition](/assets/images/deep-residual-learning-for-image-recognition-source-figure-1.webp)
-*Fig 3: Training error (left) and test error (right) on CIFAR-10 with 20-layer and 56-layer “plain” networks. The deeper network has higher training error, and thus test error. | source: [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)*
+The left panel below shows the deeper plain network staying above the shallower one. On the right, adding shortcuts reverses that ordering: the 34-layer residual model reaches lower training and validation error. Thin curves show training error; thick curves show center-crop validation error. The matched numerical comparison uses ten-crop testing, so the plotted validation curve and the table are different views of the experiment.
 
+![ImageNet training and validation curves for plain and residual networks](/assets/images/resnet-source-figure-4-training.png)
+*Fig 1: Increasing depth hurts the plain network's training fit but helps its residual counterpart; these shortcuts add no trainable parameters in the matched comparison. | source: [Deep Residual Learning, Figure 4](https://arxiv.org/abs/1512.03385)*
 
-### Method and reported result
+| ImageNet model | Plain top-1 error | Residual top-1 error | Evaluation |
+| --- | ---: | ---: | --- |
+| 18 layers | 27.94% | 27.88% | Validation, ten crops |
+| 34 layers | 28.54% | 25.03% | Validation, ten crops |
 
-ResNet made depth easier to optimize by changing what each block has to learn. Instead of learning a direct mapping $H(x)$, a residual block learns $F(x)=H(x)-x$ and adds the input back through an identity shortcut: $H(x)=F(x)+x$. If the best transformation is close to identity, the block can push $F(x)$ toward zero rather than forcing a stack of layers to relearn the input.
+This is stronger evidence than a deeper leaderboard entry alone. Both sides use batch normalization, the same initialization and training recipe, and the same depth and width within each row. The shortcuts in this experiment use identity mappings and zero-padding where dimensions increase. The authors also report healthy gradient norms in the plain networks, and three times as many iterations did not remove the degradation. “It fixes vanishing gradients” is therefore too narrow an account of the evidence: the intervention changes how an already trainable network represents the solution.
 
-Those shortcuts act like gradient highways without adding parameters or inference cost. They let the authors train 152-layer networks that were both deeper and more accurate than plain CNNs. Bottleneck blocks, built from 1x1, 3x3, and 1x1 convolutions, kept the compute manageable: ResNet-152 was far deeper than VGG-19 while using fewer FLOPs. An ensemble of ResNets achieved 3.57% top-5 error on ImageNet and won ILSVRC 2015.
+### Learn a correction while preserving an available signal
 
-### Reported evidence
+For a desired mapping $H(x)$, the residual branch learns $F(x)=H(x)-x$. The block adds the input back:
 
-| Model | Params | FLOPs | ImageNet‑1k Top‑5 (val) | Notes |
-| ----- | ------ | ----- | ----------------------- | ----- |
-| ResNet‑50 | 26 M | 3.8 GF | 6.7 % | single-crop |
-| ResNet‑152 | 60 M | 11.3 GF | 4.49 % | single-crop |
-| Ensemble (6 nets) | — | — | 3.57 % | ILSVRC 2015 winner |
+$$
+y = F(x;W)+x.
+$$
 
-Transfer mattered as much as classification. ResNet-101 backbones set state of the art on ImageNet detection, localization, and MS-COCO detection and segmentation in 2015.
+If little needs to change, the residual branch can approach zero. A plain stack must instead learn the identity through its weighted layers. This is a change in parameterization, not a claim that the residual model represents an entirely different family of functions. The paper interprets its smaller residual responses as evidence that learning perturbations around an existing signal is useful.
 
-### Where the evidence stops
+The original block applies ReLU **after** this addition. Its output is $\operatorname{ReLU}(F(x)+x)$, rather than the later pre-activation formulation. The elementwise sum also requires matching spatial sizes and channel counts. When those change, the paper tests either a subsampled, zero-padded shortcut or a learned $1\times1$ projection. The projection costs parameters; an identity shortcut does not. Even the identity case still performs an addition, so “no inference cost” is an approximation.
 
-ResNet is compelling because the intervention is so small: add the identity back, then let depth do useful work. The ablations make the degradation problem and its cure clear. The paper is less helpful on deployment tradeoffs, such as latency and energy, and later work had to clarify block variants such as projection shortcuts, BN/ReLU order, and pre-activation. Training 100-layer models also remains heavy when the dataset or compute budget is small.
+The shortcut ablation makes that distinction concrete. ResNet-34 with zero-padding reaches 25.03% top-1 error. Projections only at dimension changes reach 24.52%; projecting every shortcut reaches 24.19%. All three improve substantially over the plain model's 28.54%. Learned projections can help, but they are not what makes the main degradation result disappear.
+
+### The bottleneck spends spatial compute on fewer channels
+
+The figure compares a two-layer residual branch with the three-layer bottleneck used in ResNet-50/101/152. Follow the right branch: $256$ channels become $64$ through a $1\times1$ convolution, the $3\times3$ convolution works at width $64$, and another $1\times1$ restores width $256$. The shortcut carries the original wide representation around that narrower computation.
+
+![Basic and bottleneck residual blocks](/assets/images/resnet-source-figure-5-bottleneck.png)
+*Fig 2: The bottleneck narrows channels before the spatial convolution and restores them before addition, allowing more weighted layers at manageable compute. | source: [Deep Residual Learning, Figure 5](https://arxiv.org/abs/1512.03385)*
+
+For this illustrated block, ignoring biases and normalization, the three convolutions use $256\times64 + 9\times64^2 + 64\times256 = 69{,}632$ weights. A wide $256\rightarrow256$ shortcut projection alone would add $65{,}536$. That is why keeping ordinary shortcuts as identities matters especially in bottleneck networks: projecting the wide bypass can cost nearly as much as the entire residual branch.
+
+ResNet-50 uses 3, 4, 6, and 3 bottleneck blocks across its four stages. With three convolutions per block, the initial convolution, and the final classifier, this gives 50 weighted layers. ResNet-152 increases the stage counts to 3, 8, 36, and 3. It uses 11.3 billion multiply-adds in the paper's accounting, versus VGG-19's 19.6 billion; layer count alone is a poor estimate of computational cost.
+
+The ImageNet results also depend on how predictions are collected. ResNet-152 has 5.71% top-5 validation error with ten crops, and 4.49% with the paper's dense, multiscale single-model evaluation. The famous 3.57% is the **test-set result of a six-model ensemble**. Those numbers should not be labeled single-crop measurements or placed in one column without their evaluation protocols.
+
+### A thousand layers separate optimization from generalization
+
+The CIFAR-10 experiment pushes the argument beyond a convenient depth range. Across the left and middle panels, adding layers hurts plain networks but helps residual networks. The right panel asks a different question: once training works, does far more depth still improve test performance?
+
+![CIFAR-10 depth comparison including the 1202-layer residual network](/assets/images/resnet-source-figure-6-cifar.png)
+*Fig 3: Residual networks improve with depth through 110 layers, but the 1,202-layer model fits training data while performing worse on the test set. | source: [Deep Residual Learning, Figure 6](https://arxiv.org/abs/1512.03385)*
+
+The 1,202-layer network reaches below 0.1% training error, yet its test error is 7.93%. The 110-layer network's best test error is 6.43%, with 6.61% ± 0.16 across five runs. The authors attribute the deeper model's worse test result to overfitting: it has 19.4M parameters against 1.7M, on a 50,000-image training set. These experiments use basic crop/flip augmentation, weight decay, and no dropout. Residual learning made the large model optimizable; it did not supply the regularization needed to make that capacity worthwhile.
+
+### Better features transfer without explaining every competition gain
+
+Replacing VGG-16 with ResNet-101 in the baseline Faster R-CNN system raises COCO validation AP averaged over IoU thresholds from 21.2 to 27.2. That is 6.0 absolute points, approximately 28% relative. The appendix specifies a stride-16 shared feature map, RoI pooling before the final residual stage, and fixed batch-normalization statistics during detection fine-tuning. The transfer result is a concrete backbone comparison, not a classification score reused as evidence of localization.
+
+The stronger competition result adds further changes: box refinement, global context, multiscale testing, additional training images, and ensembling. The improved single model reaches 34.9 COCO test-dev AP; a three-network ensemble reaches 37.4. Those scores belong to the full detection system. The backbone comparison establishes that the learned representation transfers; it does not attribute all subsequent gains to the identity shortcut.
+
+The existing minimal PyTorch block below captures the original same-shape, post-addition-ReLU case. Both convolutions preserve `[batch, channels, height, width]`; a stage that changes that shape needs a matching shortcut.
 
 ```python
 import torch
@@ -78,11 +108,10 @@ class MiniResidual(nn.Module):
         return F.relu(out)
 ```
 
-ResNet's core idea is almost comically simple: add the identity back. That shortcut reshaped deep-learning practice, and today almost every high-performance architecture inherits some version of its skip-connection logic.
-
 ## High-Level Takeaways
 
-- ResNet informs the decision to add depth through residual updates rather than ask each block to relearn a complete transformation. The operative unit is a residual block applied across a mini-batch of images, with identity shortcuts carrying both activations and gradients across depth.
-- The ImageNet-to-detection transfer results show that the optimization benefit survives beyond classification. They do not isolate identity shortcuts from batch normalization, initialization, or the bottleneck block design as cleanly as a modern controlled study could.
-- At 10× depth, activation memory, normalization behavior, communication, and diminishing returns dominate the original degradation problem. The residual-learning claim would weaken if a plain network with matched depth, normalization, initialization, FLOPs, and training time reached the same accuracy and optimization stability.
-- The residual connection is a tiny architectural change with huge practical reach. It fixed the degradation problem in very deep CNNs, transferred well to detection and segmentation, and later became part of the default design vocabulary for modern deep networks, including Transformers.
+- The central failure is higher training error in a deeper plain network; parameter-free shortcuts reverse it under a matched ImageNet comparison.
+- Residual blocks learn changes relative to an available input, while dimension-changing projections remain a separate architectural choice.
+- Bottlenecks make depth economical by moving the expensive spatial convolution into a narrower channel space.
+- Ten-crop, multiscale single-model, and ensemble results measure different inference arrangements; the 3.57% ImageNet result uses six models.
+- The 1,202-layer CIFAR result exposes the boundary: easier optimization does not guarantee that additional capacity improves generalization.
