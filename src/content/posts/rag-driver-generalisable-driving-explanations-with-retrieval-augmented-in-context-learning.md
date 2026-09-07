@@ -44,4 +44,4 @@ The deployment boundary is measurable too: training the retrieval engine takes a
 
 - RAG-Driver treats a retrieved multimodal demonstration, not a gradient update, as the primary unit of driving adaptation.
 - Its reported zero-shot result supports retrieval as a way to transfer explanation and control behavior, but not as proof that the retrieved evidence is causally used.
-- Two demonstrations improve explanation scores but slightly worsen speed error in the ablation. Better retrieved language evidence does not guarantee that every control metric improves.
+- Two demonstrations improve explanation scores and speed error but slightly worsen course error in the ablation. Better retrieved language evidence does not guarantee that every control metric improves.
