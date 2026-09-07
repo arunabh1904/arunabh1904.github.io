@@ -15,8 +15,7 @@ summary: "2023 – GPT-Driver: Learning to Drive with GPT"
 
 **GitHub:** [PointsCoder/GPT-Driver](https://github.com/PointsCoder/GPT-Driver)
 
-### Method and reported result
-
+## Method
 GPT-Driver asks whether a language model can act as a motion planner when the driving scene is serialized into tokens. Instead of directly predicting a trajectory with a specialized planner, the system prompts and fine-tunes GPT-style models to produce future waypoints and rationales.
 
 ## Summary
@@ -27,29 +26,26 @@ GPT-Driver asks whether a language model can act as a motion planner when the dr
 
 GPT-Driver reformulates motion planning as GPT-style sequence generation. It serializes structured scene state into language-model tokens and predicts future waypoints plus a rationale. This gives the model an interpretable interface: the generated plan can be paired with an explanation of the driving decision. The evidence focuses on open-loop planning quality. The caveat is that open-loop waypoint prediction does not prove closed-loop safety, and LLM latency remains a deployment problem. The paper is useful as an early example of adapting pretrained language models to structured planning rather than raw perception.
 
+The prompting pipeline turns each detected object, predicted path, ego state, and map fact into a sentence. GPT-3.5 first identifies the critical objects, considers their predicted motion against a hypothetical ego path, chooses a high-level action, and then emits six waypoints over three seconds. The output is converted back to numeric coordinates for evaluation. This is more than a natural-language wrapper: tokenization changes the learning problem from regressing values such as 23.17 to selecting a sequence of familiar subword tokens, while the rationale exposes which objects the model considered relevant.
+
+On nuScenes, GPT-Driver reaches average L2 0.44 m and collision 0.17% under the ST-P3 metric grouping; under the UniAD grouping it reaches 0.84 m and 0.44%. The few-shot curve is the stronger result: at 10% of the training scenarios, GPT-Driver reaches 1.20 m L2 and 0.95% collision, versus UniAD’s 1.80 m and 1.31%. Fine-tuning is essential—few-shot in-context prompting alone reaches 3.17 m L2 and 5.30% collision—so the advantage is adaptation of the language model to the coordinate grammar, not generic prompting.
+
+The experiment is best understood as a planner-interface test rather than end-to-end visual driving. GPT-Driver receives detections, predicted object motion, ego state, history, and a mission goal that have already been structured by upstream systems. Its contribution is to serialize those facts, reason about critical objects, and emit six waypoints; any failure in perception or prediction is inherited before the language model gets to plan.
+
+Read the prompt figure from the reusable instruction block to the scene-specific facts and then to the six-coordinate answer. That layout explains why the rationale is useful for inspection while also exposing a risk: a fluent thought can name the right object without the numeric waypoint actually responding to it.
+
 ![Figure 1: Overview of GPT-Driver from GPT-Driver: Learning to Drive with GPT](/assets/images/gpt-driver-learning-to-drive-with-gpt-paper-figure.png)
 *Fig 1: GPT-Driver converts structured scene observations into language tokens, prompts a language model to reason about the scene, and decodes the response into a future trajectory. | source: [GPT-Driver: Learning to Drive with GPT paper](https://arxiv.org/abs/2310.01415)*
 
 ![Figure 2 from GPT-Driver: Learning to Drive with GPT](/assets/images/gpt-driver-learning-to-drive-with-gpt-source-figure-2.webp)
-*Fig 2: An example of input prompts provided to the LLM. The upper text box offers a universal context related to motion planning for every driving scenario. | source: [GPT-Driver: Learning to Drive with GPT](https://arxiv.org/abs/2310.01415)*
+*Fig 2: The prompt combines a reusable planning instruction with serialized perception, predicted motion, ego history, and the requested six-point trajectory. The layout makes the interface legible: structured scene facts enter as text, then the model returns both a decision rationale and coordinates. | source: [GPT-Driver: Learning to Drive with GPT](https://arxiv.org/abs/2310.01415)*
 
 
-**What to look at:**
-- Driving scene state is serialized into language tokens.
-- The model predicts future waypoints and rationales, not low-level control directly.
-- Open-loop planning metrics are useful but do not prove closed-loop safety.
 
-### Reported evidence
-
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Input | Structured scene tokens | Makes the driving problem legible to GPT-style models. |
-| Output | Future waypoints plus rationale | Adds interpretability to motion planning. |
-| Caveat | Open-loop and LLM latency | Needs closed-loop validation before real deployment. |
 
 ## High-Level Takeaways
 
 - GPT-Driver informs whether motion planning can be reframed as conditional language modeling over structured scene tokens and waypoint outputs. The atomic prediction is a discretized coordinate or waypoint token, with textual scene context and chain-of-thought-style supervision preceding the trajectory.
-- The formulation gains access to pretrained sequence modeling, but coordinate serialization, numerical precision, and rationale faithfulness become hidden design choices. The missing test matches data and backbone across tokenized waypoints, continuous regression, and a non-language autoregressive decoder. At 10× horizon, exposure error and token latency accumulate. The language-modeling claim would fail if the continuous decoder matched planning diversity and safety while using fewer steps and showing better metric precision.
+- The formulation gains access to pretrained sequence modeling, but coordinate serialization, numerical precision, and rationale faithfulness become hidden design choices.
 - GPT-Driver uses language as an intermediate planning representation rather than an explanation added after the decision.
 - LLMs can help expose the reasoning behind a plan, but driving needs that reasoning to stay grounded, fast, and controllable.
