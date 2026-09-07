@@ -16,7 +16,7 @@ summary: '2022 – BEVDet4D: align and fuse adjacent camera BEV features for mot
 
 ## Summary
 
-> BEVDet4D turns one previous camera-derived BEV feature into a short-term motion signal. It refines the two candidate features with a shallow extra BEV encoder, aligns history to the current ego frame, and concatenates the features before the main BEV encoder. The important design choice is the learning target: after ego-motion is removed, predicting a ego-motion-corrected spatial offset is easier than asking the network to infer velocity directly from two frames with inconsistent intervals. On nuScenes the compact model cuts mAVE from 0.909 to 0.337 at roughly the same reported speed, while the method remains a dense, two-frame memory with no object-level association or long-horizon persistence.
+> BEVDet4D turns one previous camera-derived BEV feature into a short-term motion signal. It refines the two candidate features with a shallow extra BEV encoder, aligns history to the current ego frame, and concatenates the features before the main BEV encoder. The important design choice is the learning target: predicting an ego-motion-corrected spatial offset is easier than asking the network to infer velocity directly from two frames with inconsistent intervals. On nuScenes the compact model cuts mAVE from 0.909 to 0.337 at roughly the same reported speed, while the method remains a dense, two-frame memory with no object-level association or long-horizon persistence.
 
 ## Core Insights
 
@@ -24,7 +24,7 @@ summary: '2022 – BEVDet4D: align and fuse adjacent camera BEV features for mot
 
 A single camera frame is weak at velocity because depth and time are entangled. BEVDet4D starts with BEVDet’s image encoder, view transformer, BEV encoder, and detection head, but retains the view-transformer feature from a previous frame. An extra BEV encoder, consisting of two residual units, first refines the candidate features. The historical feature is then aligned to the current ego coordinate system and concatenated with the current feature; the fused result enters the original BEV trunk. The system uses only two adjacent frames and keeps the fusion operation deliberately simple.
 
-The geometry removes the vehicle’s own translation and rotation. A parked car should then occupy nearly the same BEV cells in both features; a moving car leaves a residual whose size and direction encode displacement. Without alignment, the same parked car shifts whenever the ego vehicle moves, so the network has to disentangle ego motion from object motion before it can even learn velocity. For a moving object, the target is still defined in the current ego frame, which makes the time interval part of the learning problem.
+The geometry removes the vehicle’s own translation and rotation. A parked car should then occupy nearly the same BEV cells in both features; a moving car leaves a residual whose size and direction encode displacement. Without alignment, the same parked car shifts whenever the ego vehicle moves, so the network has to disentangle ego motion from object motion before it can even learn velocity. The target remains expressed in the current ego frame. Predicting displacement instead of velocity then removes the need to infer elapsed time from the feature difference.
 
 ![BEVDet4D: Temporal Cues in Multi-Camera 3D Detection source figure: The framework of the proposed BEVDet4D paradigm.](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-paper-figure.webp)
 *Fig 1: The extra BEV encoder refines both candidate features. History is then aligned to the current ego frame and concatenated with the current feature, before the main BEV encoder and detection head. | source: [BEVDet4D, Figure 2](https://arxiv.org/abs/2203.17054)*
@@ -52,15 +52,15 @@ The source compares temporal fusion before the extra BEV encoder, after that enc
 
 On nuScenes validation, BEVDet4D-Tiny reports 0.338 mAP, 0.476 NDS, 0.337 mAVE, and 15.5 FPS, versus BEVDet-Tiny’s 0.312 mAP, 0.392 NDS, 0.909 mAVE, and 15.6 FPS. BEVDet4D-Base reaches 0.421 mAP and 0.545 NDS at 1.9 FPS, compared with BEVDet-Base’s 0.393 and 0.472. With test-time augmentation, the base configuration reaches 55.2 NDS on validation; the submitted test result is 56.9 NDS. The paper reports the tiny model’s 62.9% mAVE reduction and 8.4-point NDS gain at nearly unchanged speed.
 
-Those results establish that a dense aligned feature pair is a strong short-term baseline. They do not establish object identity across long occlusions, map persistence, or robustness to stale history. The model has no object-centric queue: an object entering the camera view appears as new evidence, and a disappeared object can remain in the old feature until the current BEV encoder suppresses it. Later temporal attention and sparse-query methods change that memory contract rather than merely adding another layer.
+Those results establish that a dense aligned feature pair is a strong short-term baseline. They do not establish object identity across long occlusions, map persistence, or robustness to stale history. The model has no object-centric queue: an object entering the camera view appears as new evidence, and a disappeared object can remain in the old feature until the current BEV encoder suppresses it. The reported velocity gains concern this two-frame detection setup; they are not a tracking evaluation.
 
 ![Figure 1 from BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-source-figure-1.webp)
-*Fig 3: The nuScenes validation comparison places BEVDet4D’s compact and high-capacity configurations on the accuracy–speed frontier beside camera-only, radar, and LiDAR paradigms. | source: [BEVDet4D, Figure 1](https://arxiv.org/abs/2203.17054)*
+*Fig 3: The nuScenes validation comparison places BEVDet4D’s compact and high-capacity configurations on the accuracy–speed frontier beside other camera-only detectors. | source: [BEVDet4D, Figure 1](https://arxiv.org/abs/2203.17054)*
 
 ## High-Level Takeaways
 
 - BEVDet4D’s central operation is ego-aligning one historical BEV feature so that object motion appears as a spatial residual in the current frame.
 - The largest ablation change comes from replacing direct speed prediction with a spatial offset after alignment; the target and the memory geometry are coupled.
 - A shallow extra BEV encoder is the best fusion location in the reported study, while fusing after the main encoder nearly erases the gain.
-- The compact model improves mAVE from 0.909 to 0.337 at 15.5 FPS, but the evidence is a dense two-frame memory with an interval and interpolation contract.
+- The compact model improves mAVE from 0.909 to 0.337 at 15.5 FPS, with results depending on reference-frame spacing and the alignment implementation.
 - The interval sweep and stale-history boundary leave object birth, disappearance, and long-occlusion behavior outside the paper’s claim.
