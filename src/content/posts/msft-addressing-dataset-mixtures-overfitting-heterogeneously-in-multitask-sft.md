@@ -23,55 +23,58 @@ summary: "2026 – mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously
 
 ## Summary
 
-> MSFT studies multi-task supervised fine-tuning when datasets learn and overfit at different speeds. A fixed mixture can keep updating an easy task after it has overfit while harder tasks still need training. MSFT trains on an active mixture, detects the earliest-overfitting sub-dataset, removes it, rolls back to that dataset's best checkpoint, and continues. The paper reports gains across benchmarks, base models, dataset sizes, and task granularities. The operational caveat is that the method needs per-dataset validation signals and checkpoint management. The core idea is to allocate SFT compute by task dynamics rather than static mixture weights.
+> MSFT studies multi-task supervised fine-tuning when sub-datasets learn and overfit at different rates. A fixed mixture can keep updating an easy task after it has peaked while harder tasks are still under-trained. MSFT repeatedly rolls out training on the active mixture, identifies the earliest overfitting sub-dataset, rolls back to its best checkpoint, excludes it, and continues. The paper reports gains across six base models, ten benchmarks, dataset sizes, and task granularities.
 
 ## Core Insights
 
-![mSFT Figure 2 showing test-accuracy curves that peak at different epochs and the resulting peak-epoch differences across tasks](/assets/images/msft-heterogeneous-peak-epochs.webp)
-*Fig 1: Different subsets reach peak test accuracy at different epochs; the lower panel quantifies each task’s offset from the mixture’s shared stopping point. | source: [mSFT paper](https://arxiv.org/abs/2603.21606)*
+### One global stopping point is already a mixture decision
 
-![Figure 3 from mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-3.webp)
-*Fig 2: (b) Mean absolute shift in optimal compute across various model architectures and scales. | source: [mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](https://arxiv.org/abs/2603.21606)*
+Let $D_i$ be a sub-dataset and let
 
+$$
+c_i^*=\arg\max_c \operatorname{Metric}(\theta_c;D_i^{\mathrm{test}})
+$$
 
+be the compute at which its held-out metric peaks. Standard SFT sets every task’s compute to the same $c_{\mathrm{global}}$. If $c_{\mathrm{global}}>c_i^*$, task $i$ is overfit; if it is below $c_i^*$, a slower task is under-trained.
 
-### Method and reported result
+The Qwen3 8B experiment makes this mismatch concrete. It uses ten sub-datasets and shows that their absolute peak-epoch offsets from the overall mixture range from 0 for CommonsenseQA to 5 for HellaSwag; the average absolute difference between each task’s peak and the mixture’s peak is 1.93 epochs:
 
-mSFT targets a practical failure mode in multi-task supervised fine-tuning: different datasets learn and overfit at different speeds. A uniform compute budget treats every sub-dataset as if it has the same training dynamics, so easier or faster-learning tasks can start overfitting while harder tasks are still under-trained.
+![Test-accuracy curves and peak-epoch offsets for ten sub-datasets in Qwen3 8B SFT](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-2.png)
+*Fig 1: Test-set training curves and absolute peak-epoch offsets for ten Qwen3 8B sub-datasets. | source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT, Figure 2](https://arxiv.org/abs/2603.21606)*
 
-The proposed algorithm makes the mixture overfitting-aware. It trains on the active mixture, identifies the sub-dataset that overfits earliest, reverts to that sub-dataset's best checkpoint, removes it from the active set, and continues training on the remaining tasks. The result is a staged SFT procedure that spends compute where it is still useful instead of forcing every dataset through the same number of updates.
+This is more than a case for choosing a better global epoch. The update at each step is a weighted sum of sub-dataset gradients. Once one task begins supplying over-specialized gradients, continuing to sample it changes the trajectory seen by every other task.
 
-**What to look at:**
-- Figure 2 is the premise: benchmark sub-datasets peak at materially different epochs, so one global stopping point creates both overfitting and under-training.
-- Figure 3 is the reason the naive single-rollout fix is unstable: once one dataset is removed, the remaining tasks' optimal stopping points move.
-- Figure 6 is the practical claim: under a low compute budget, dataset exclusion can improve accuracy while reducing net FLOPs.
+### A precomputed exclusion schedule becomes stale
 
-_optimal compute shifts after excluding part of the data mixture source: [mSFT paper](https://arxiv.org/abs/2603.21606)_
-_optimal compute shifts after excluding part of the data mixture. source: [mSFT paper](https://arxiv.org/abs/2603.21606)_
+The obvious fix is to run one full-mixture sweep, record each $c_i^*$, then exclude tasks at those times in a second run. The paper calls this single-rollout searched SFT. It fails because the schedule changes the gradients that produced the original peaks.
 
-_accuracy and FLOPs trade off across compute budgets source: [mSFT paper](https://arxiv.org/abs/2603.21606)_
-_accuracy and FLOPs trade off across compute budgets. source: [mSFT paper](https://arxiv.org/abs/2603.21606)_
+The authors test this with ten equal-weighted sub-datasets of 1,800 examples each. After the first task overfits, they branch the run: one branch keeps the full mixture and the other removes that task. The remaining tasks’ optimal compute shifts. Even removing one tenth of the data changes later peak locations; across the reported model families and scales, the mean absolute shift is 0.91 epochs:
 
-### Reported evidence
+![Optimal-compute shifts after excluding one sub-dataset](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-3.webp)
+*Fig 2: Changes in each remaining benchmark’s optimal compute after one sub-dataset is removed; this is panel (a) of the source figure. | source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT, Figure 3](https://arxiv.org/abs/2603.21606)*
 
-| Question | Paper evidence | Why it matters |
-| -------- | -------------- | -------------- |
-| Does one SFT mixture overfit uniformly? | Figure 2 reports large peak-epoch differences across sub-datasets. | The method needs heterogeneous stopping to be worth the extra control logic. |
-| Does removing a dataset change the remaining optimum? | Figure 3 shows optimal compute shifts after excluding 1/10 of the mixture. | A single precomputed exclusion schedule can become stale. |
-| Does mSFT beat stronger baselines? | Table 2 reports 63.7 average accuracy for mSFT versus 62.5 for IES, 62.1 for DynamixSFT, and 61.9 for SFT across 10 benchmarks. | The gain is modest but consistent across model families and task groups. |
-| Is it compute-plausible? | Figure 6 reports +3.4 accuracy over SFT and -120.3 PFLOPs at compute budget $C=1$. | The best low-budget setting improves accuracy while saving training compute. |
-| What is the operational cost? | The loop needs periodic evals, peak detection, checkpoint rollback, and dataset exclusion. | mSFT is simple conceptually but more involved than ordinary SFT. |
+The sign matters. Some tasks need more compute after the early task is removed; others peak earlier. A static table of stopping points cannot capture this interaction.
 
-The implementation also exposes a fairly simple workflow: example mixtures live under `data/`, the default config targets `Qwen/Qwen2.5-3B`, and the reference setup assumes 4 RTX 3090 GPUs with an effective batch size of 64.
+### MSFT aligns the search with the training trajectory
 
-### Where the evidence stops
+MSFT keeps an exclusion set $E$ and starts from the base model. It rolls out the current active mixture $D\setminus E$ for a compute budget $C$, recorded in fractional-epoch increments. It evaluates every active sub-dataset, finds the one with the smallest peak compute, adds it to $E$, and rolls back to that task’s peak checkpoint. The next rollout starts from that checkpoint with the remaining active mixture. If no task overfits inside the current budget, the algorithm advances to the end of the rollout without exclusion.
 
-The paper's strength is that the algorithm is simple and addresses a real post-training nuisance. The main tradeoff is operational complexity. mSFT needs periodic evaluation, overfitting detection, checkpoint management, and staged dataset removal, which makes the training loop less straightforward than ordinary SFT. The method also depends on having evaluation signals that can reliably say when a sub-dataset has peaked.
+This roll-out/roll-back loop is the key design choice. Every later peak is searched under the gradient mixture that will actually be used after earlier exclusions. It also explains the operational cost: evaluation must be tracked per sub-dataset, intermediate checkpoints must be retained, and the training job must be able to resume from the selected rollback point.
 
-mSFT argues that multi-task SFT should not spend compute uniformly across heterogeneous datasets. If each task overfits on its own schedule, the training loop should notice and adapt.
+### The gains are broad, while the compute story depends on the budget
+
+Across six base models—OLMo 2 1B, Qwen2.5 0.5B/1.5B/3B/7B, and Qwen3 8B—and ten benchmarks, Table 2 reports average accuracy of 63.7 for MSFT, 62.5 for IES, 62.1 for DynamixSFT, and 61.9 for standard SFT. In the ablation against the two single-rollout variants, MSFT also reaches 63.7 versus 63.4 for SRO SFT and 62.1 for Soft SRO SFT.
+
+The budget sweep shows the most concrete systems tradeoff:
+
+![Accuracy and FLOPs changes for MSFT across compute budgets](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-6.png)
+*Fig 3: Accuracy, rollout overhead, and FLOPs changes across MSFT compute budgets. | source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT, Figure 6](https://arxiv.org/abs/2603.21606)*
+
+The same analysis reports robustness across 9K, 18K, and 27K dataset mixtures with 5, 10, and 15 tasks, and a +5.4% average improvement over SFT in that study. The method is therefore making a claim about a control loop, not just about one hand-tuned mix. Its reliance on task metrics remains the main practical boundary. Section 4.1 evaluates each benchmark test set every quarter epoch and reports the best checkpoint, so these results include selection on the reported benchmarks. A deployment study should use separate validation data for exclusion and rollback, then evaluate once on an untouched test set. A noisy or misaligned selection metric can exclude the wrong dataset.
 
 ## High-Level Takeaways
 
-- mSFT informs whether multitask fine-tuning should keep a static dataset mixture when tasks overfit at different rates. Its atomic unit is a supervised example tagged by dataset; validation behavior feeds back into the probability of sampling that dataset, turning the mixture into a training-control variable.
-- The method's value depends on whether per-dataset validation loss is a reliable early signal for downstream utility. The missing comparison holds total examples and optimizer steps fixed against static, temperature-based, and loss-proportional mixtures, including tasks whose validation loss is poorly correlated with quality. At 10× tasks, noisy validation signals and scheduler instability can cause oscillating or starved datasets. The claim would fail if a static mixture matched average and worst-task performance under the same compute.
-- Data mixture tuning is usually treated as a static weighting problem. mSFT reframes it as a training-dynamics problem: the right mixture can change over time because tasks saturate at different rates. That is especially relevant for post-training, where datasets often differ in size, difficulty, quality, and target behavior.
+- The relevant control variable in multi-task SFT is the active mixture over time, not only its initial sampling weights. Different datasets can peak at different compute levels even when they share a model and optimizer.
+- A one-shot schedule is insufficient because excluding a dataset changes the gradient trajectory and moves the remaining peaks. MSFT’s value comes from re-searching after every rollback.
+- The reported 63.7 average accuracy and the $C=1$ efficiency result are tied to the paper’s ten-task benchmark suite, test-set checkpoint-selection protocol, and FLOPs accounting. They support the mechanism without proving that every mixture benefits.
+- Use MSFT when per-dataset evaluation is reliable and checkpoint storage is available. If a task has no useful held-out metric, the algorithm has no principled signal for when to exclude it.
