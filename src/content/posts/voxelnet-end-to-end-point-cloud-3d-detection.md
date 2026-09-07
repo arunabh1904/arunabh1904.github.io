@@ -38,14 +38,14 @@ Only non-empty voxels are encoded, so the intermediate representation is a spars
 
 ### The strongest evidence is in full 3D detection
 
-VoxelNet evaluates both bird's-eye-view and full 3D boxes on the KITTI validation split, then reports an official test submission. The controlled hand-crafted baseline uses the same broad detector design and replaces the learned VFE features with BEV-style statistics. VoxelNet improves that baseline especially for pedestrians and cyclists, where local 3D shape matters more than ground-plane localization.
+VoxelNet evaluates both bird's-eye-view and full 3D boxes on the KITTI validation split, then reports an official test submission. The commonly used split has 3,712 training frames and 3,769 validation frames. The controlled hand-crafted baseline uses the same broad detector design and replaces the learned VFE features with BEV-style statistics. VoxelNet improves that baseline especially for pedestrians and cyclists, where local 3D shape matters more than ground-plane localization.
 
 For cars, the paper's Table 2 3D comparison is unusually revealing: LiDAR-only VoxelNet exceeds the cited MV method, which uses LiDAR and RGB, by 10.68, 2.78, and 6.29 percentage points on easy, moderate, and hard difficulty. Those differences belong to the **3D** table; they are not BEV gains. For pedestrian and cyclist detection, the paper reports roughly an 8% improvement over its hand-crafted comparison in BEV and roughly 12% in 3D. The widening gap is consistent with the representation hypothesis: height, surface orientation, and partial shape become part of the decision instead of being summarized before learning.
 
-The qualitative source panel makes the task concrete. It shows raw LiDAR structure alongside predicted boxes for cars, pedestrians, and cyclists; the boxes are projected into the camera view only for display.
+The qualitative source panel makes the task concrete. It shows one raw LiDAR scene with predicted 3D boxes colored by class for cars, pedestrians, and cyclists. The panel is a point-cloud visualization of the LiDAR detections; it does not show an RGB camera projection or imply that RGB was an input to the model.
 
-![VoxelNet qualitative detections from LiDAR](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-source-figure-1.webp)
-*Fig 3: LiDAR points and predicted boxes are shown for the three KITTI classes; the RGB projection is a visualization of LiDAR detections, not an input to the reported model. | source: [VoxelNet, Figure 6](https://arxiv.org/abs/1711.06396)*
+![VoxelNet source Figure 1: LiDAR detections with class-colored boxes](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-source-figure-1.webp)
+*Fig 1: A raw LiDAR scene with predicted 3D boxes for cars, pedestrians, and cyclists, colored by class. | source: [VoxelNet, Figure 1](https://arxiv.org/abs/1711.06396)*
 
 ### The representation has a measurable systems boundary
 

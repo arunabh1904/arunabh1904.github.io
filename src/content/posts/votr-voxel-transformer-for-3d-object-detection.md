@@ -39,8 +39,8 @@ Local Attention uses a three-dimensional radius of $(1,1,1)$ and searches every 
 
 The comparison with convolution is about coverage, not a claim that every distant voxel is useful. A fixed 3D kernel repeatedly samples the same geometric offsets and can miss the disconnected returns of an incomplete object. VoTr's query first enumerates candidate coordinates, keeps the occupied ones, and then lets feature similarity weight them. The source illustration is drawn in two dimensions, but the search rule is three-dimensional.
 
-![Fixed convolution neighborhood used as the VoTr comparison](/assets/images/votr-voxel-transformer-for-3d-object-detection-source-figure-1.webp)
-*Fig 3: A fixed 3D convolution samples a local geometric neighborhood around a query; VoTr replaces that fixed active-neighbor pattern with local or dilated occupied-voxel retrieval. | source: [VoTr, Figure 1](https://arxiv.org/abs/2109.02497)*
+![VoTr source Figure 1(a): fixed convolution neighborhood](/assets/images/votr-voxel-transformer-for-3d-object-detection-source-figure-1.webp)
+*Fig 1(a): A fixed 3D convolution samples a local geometric neighborhood around a query; VoTr replaces that fixed active-neighbor pattern with local or dilated occupied-voxel retrieval. | source: [VoTr, Figure 1(a)](https://arxiv.org/abs/2109.02497)*
 
 ### Fast Voxel Query turns retrieval into parallel lookup
 
