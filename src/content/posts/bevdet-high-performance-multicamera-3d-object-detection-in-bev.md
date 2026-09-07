@@ -23,7 +23,7 @@ summary: '2021 – BEVDet: High-Performance Multi-Camera 3D Object Detection in 
 
 ### The detector is a contract between two coordinate spaces
 
-BEVDet has four modules: an image-view encoder and neck, a Lift-Splat-style view transformer, a BEV encoder, and a CenterPoint detection head. The view transformer predicts a categorical depth distribution, places image features at calibrated 3D candidates, and pools them into the ego-frame grid. In the default setup the depth range is 1–60 metres, with a bin interval tied to the BEV feature resolution as $1.25r$; the BEV region covers roughly 51.2 metres and the common tiny model uses 0.8-metre cells.
+BEVDet has four modules: an image-view encoder and neck, a Lift-Splat-style view transformer, a BEV encoder, and a CenterPoint detection head. The view transformer predicts a categorical depth distribution, places image features at calibrated 3D candidates, and pools them into the ego-frame grid. In the default setup the depth range is 1–60 metres, with a bin interval tied to the BEV feature resolution as $1.25r$; the BEV grid spans −51.2 to +51.2 metres along each ground-plane axis and the common tiny model uses 0.8-metre cells.
 
 The point is not just modularity. Image resolution controls the evidence available before lifting, BEV resolution controls the metric grid after lifting, and the BEV encoder and head consume the result in yet another representation. A change called “higher resolution” therefore has no single cost or meaning.
 
