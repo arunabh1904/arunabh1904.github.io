@@ -20,7 +20,7 @@ summary: '2020 – DETR: object detection as direct set prediction'
 
 ## Core Insights
 
-### Mechanism
+### Hungarian matching gives every query one ownership contract
 
 The backbone feature map is flattened and combined with spatial positional encodings. The encoder lets every feature location reason globally; the decoder starts from N learned object queries and updates them through self-attention and encoder-decoder attention. A shared feed-forward head predicts a class, including a no-object class, and normalized center, width, and height for each slot.
 
@@ -31,25 +31,26 @@ Training makes the set contract explicit. Hungarian matching chooses the permuta
 
 This is why NMS is absent from the model definition. Duplicate suppression is learned through the matching loss and decoder self-attention. The queries are not fixed semantic labels: they are exchangeable slots whose meanings emerge from the training distribution.
 
-### Evidence
+### Global context shifts the AP profile toward large objects
 
 The main COCO validation table reports:
 
 | Model | AP | AP$_S$ | AP$_L$ | GFLOPs | FPS |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Faster R-CNN-FPN | 40.2 | 24.2 | 52.0 | 180 | 26 |
+| Faster R-CNN-FPN+ (tuned) | 42.0 | 26.6 | 53.4 | 180 | 26 |
 | DETR | 42.0 | 20.5 | 61.1 | 86 | 28 |
 | DETR-DC5 | 43.3 | 22.5 | 61.1 | 187 | 12 |
 | DETR-R101 | 43.5 | 21.9 | 61.8 | 152 | 20 |
 
-The comparison reveals the shape of the trade-off. DETR's large-object AP is 7.8 points above Faster R-CNN-FPN, but its small-object AP is 5.5 points lower. Doubling the feature resolution in DETR-DC5 improves small-object performance while making encoder attention much more expensive. The baseline ablations use a 300-epoch schedule with a learning-rate drop at 200; the long schedule used for the main Faster R-CNN comparison runs for 500 epochs with a drop at 400 and adds 1.5 AP. Training the baseline takes about three days on 16 V100 GPUs.
+The comparison reveals the shape of the trade-off. The paper's reported +7.8 AP_L and −5.5 AP_S sentence refers to the stronger Faster R-CNN-FPN+ row, which adds generalized IoU, random-crop augmentation, and the long 9x schedule; it is not a comparison with the untuned 40.2 AP / 24.2 AP_S / 52.0 AP_L row. Against that untuned row, DETR is +9.1 AP_L and −3.7 AP_S. Doubling the feature resolution in DETR-DC5 improves small-object performance while making encoder attention much more expensive. The baseline ablations use a 300-epoch schedule with a learning-rate drop at 200; the long schedule used for the main Faster R-CNN comparison runs for 500 epochs with a drop at 400 and adds 1.5 AP. Training the baseline takes about three days on 16 V100 GPUs.
 
 The encoder ablation gives a more causal explanation than the headline AP. With zero encoder layers, AP is 36.7; three layers reach 40.1, six reach 40.6, and twelve reach 41.6. The authors interpret the gain as global scene reasoning that separates instances before the decoder extracts them. Later decoder layers add 8.2 AP between the first and final layer. NMS helps the first layer, where queries have not yet communicated, but slightly hurts the final layers by removing true positives.
 
 ![Each decoder slot develops modes for locations and box sizes across the COCO validation set.](/assets/images/end-to-end-object-detection-with-transformers-source-figure-7.webp)
 *Fig 2: Across images, the 20 shown query slots specialize in different center locations and box-size modes, including a common image-wide-box mode. | source: [End-to-End Object Detection with Transformers, Figure 7](https://arxiv.org/abs/2005.12872)*
 
-### Boundary
+### Fixed slots remove heuristics but expose resolution limits
 
 A fixed query budget bounds how many objects can be represented, and convergence is sensitive to the optimizer, schedule, augmentation, and encoder resolution. The paper's evidence is 2D COCO detection; a learned query has no metric position or camera calibration. The panoptic extension shows that the set can feed a shared mask head, but it does not make the original detector a 3D or autonomous-driving system.
 

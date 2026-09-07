@@ -27,9 +27,9 @@ summary: '2021 – iBOT: Image BERT Pre-Training with Online Tokenizer'
 
 ## Core Insights
 
-### Mechanism
+### An EMA teacher turns masked prediction into soft token distillation
 
-For two augmented views, the student receives block-masked patches and the teacher receives the corresponding unmasked views. The class-token branch distills across views. The masked-image branch compares the student's outputs at masked locations with the teacher's soft patch distributions at those same locations. The teacher is an exponential-moving-average copy of the student, so it changes during pre-training instead of remaining a fixed tokenizer.
+For two augmented views, the student receives block-masked patches and the teacher receives the corresponding unmasked views. When multi-crop is enabled, the default recipe uses two 224×224 global crops and ten 96×96 local crops. iBOT applies MIM to the global crops only and randomizes the prediction ratio: a zero ratio makes a sample DINO-like, while a positive ratio masks both global crops. The class-token branch distills across views. The masked-image branch compares the student's outputs at masked locations with the teacher's soft patch distributions at those same locations. The teacher is an exponential-moving-average copy of the student, so it changes during pre-training instead of remaining a fixed tokenizer.
 
 ![iBOT combines cross-view class-token distillation with in-view masked patch-token distillation.](/assets/images/ibot-image-bert-pre-training-online-tokenizer-paper-figure.png)
 *Fig 1: The student is masked while the momentum teacher supplies class-token and patch-token targets; the two losses are cross-view semantic alignment and in-view masked prediction. | source: [iBOT, Figure 3](https://arxiv.org/abs/2111.07832)*
@@ -39,7 +39,7 @@ The online target addresses two limitations of earlier masked modeling. Pixel re
 ![Masked image modeling uses a visual tokenizer to provide targets for the student's hidden patches.](/assets/images/ibot-image-bert-pre-training-with-online-tokenizer-source-figure-2.webp)
 *Fig 2: Masked patches are predicted from a tokenizer's visual token distributions rather than from raw pixels. | source: [iBOT, Figure 2](https://arxiv.org/abs/2111.07832)*
 
-### Evidence
+### Soft patch targets support both classification and dense transfer
 
 The default setup uses ViT-S/16, ViT-B/16, ViT-L/16, or Swin-T, 224×224 images, 196 patch tokens for ViT, and an 8192-dimensional shared three-layer projection head. ImageNet-1K pre-training uses batch size 1024; ViT-S runs for 800 epochs, ViT-B for 400, and ViT-L for 250. The masking ratio is zero with probability 0.5 and uniformly sampled from 0.1 to 0.5 otherwise.
 
@@ -56,9 +56,9 @@ The dense transfer result supports the patch-level claim. With Cascade Mask R-CN
 ![Linear probing accuracy rises with iBOT model size in the paper's ImageNet comparison.](/assets/images/ibot-image-bert-pre-training-with-online-tokenizer-source-figure-1.webp)
 *Fig 3: ImageNet linear accuracy versus parameter count for iBOT and other self-supervised baselines. | source: [iBOT, Figure 1](https://arxiv.org/abs/2111.07832)*
 
-### Boundary
+### The tokenizer depends on a moving teacher and a matched protocol
 
-The online teacher creates a moving-target risk: a weak teacher can propagate a weak patch vocabulary, while keeping teacher and student doubles representation compute. The ablations show why soft targets matter: with the paper's small ViT-S setting, iBOT reaches 69.1 k-NN and 74.2 linear accuracy, while the DINO comparison is 67.9 and 72.5; hard-label variants are lower. The strongest headline gains also change pre-training data, model size, resolution, and fine-tuning recipes, so they are not a single clean attribution of patch masking. The method's value is most directly tested by matched comparisons of pixel targets, a frozen tokenizer, and online soft targets under the same backbone and schedule.
+The online teacher creates a moving-target risk: a weak teacher can propagate a weak patch vocabulary. It also adds a teacher forward pass on unmasked views, but the EMA teacher receives no backward pass, so saying that it doubles representation compute is too strong; the overhead depends on the crop and masking pipeline. The ablations show why soft targets matter: with the paper's small ViT-S setting, iBOT reaches 69.1 k-NN and 74.2 linear accuracy, while the DINO comparison is 67.9 and 72.5; hard-label variants are lower. The strongest headline gains also change pre-training data, model size, resolution, and fine-tuning recipes, so they are not a single clean attribution of patch masking. The method's value is most directly tested by matched comparisons of pixel targets, a frozen tokenizer, and online soft targets under the same backbone and schedule.
 
 ## High-Level Takeaways
 

@@ -22,7 +22,7 @@ summary: '2026 – a survey of one-stage detector design and the limits of cross
 
 ## Core Insights
 
-### Mechanism
+### One-stage is a placement in the pipeline, not one architecture
 
 “One-stage” describes where the proposal stage went; it does not identify one architecture. The survey's taxonomy separates default-box methods such as SSD, RetinaNet, and EfficientDet; grid-based YOLO variants; keypoint and center representations such as CornerNet and CenterNet; per-location anchor-free regression such as FCOS; and recent NMS-free training such as YOLOv10. The design decisions are orthogonal. A detector can change its label assignment while retaining a feature pyramid, or change its score calibration while keeping anchors.
 
@@ -31,7 +31,7 @@ summary: '2026 – a survey of one-stage detector design and the limits of cross
 
 The survey connects these choices to driving constraints. Multi-scale features and feature pyramids help distant pedestrians, cyclists, and signs; focal or quality-aware losses address the foreground-background and classification-localization imbalance; anchor-free heads remove anchor tuning but can create crowded-scene or keypoint-grouping problems; and NMS-free training targets post-processing latency. EfficientDet is used as the efficiency-oriented example, while YOLOX, FCOS, GFL, VFNet, RTMDet, and YOLOv10 illustrate other branches.
 
-### Evidence
+### The survey turns detector comparisons into a deployment checklist
 
 The paper's comparison is most useful as a checklist for a real evaluation:
 
@@ -53,7 +53,7 @@ The source's Figure 3 is a reading aid, not a new experiment. A detector that ap
 ![Speed-accuracy points collected across the survey's cited detector papers.](/assets/images/one-stage-detectors-speed-accuracy.webp)
 *Fig 3: The survey's cross-paper speed-accuracy plot should be read as a literature map, because datasets, input sizes, hardware, and reporting conventions differ. | source: [One-Stage Object Detectors in Autonomous Driving, Figure 3](https://arxiv.org/abs/2608.19014)*
 
-### Boundary
+### Cross-paper plots cannot answer a safety question
 
 The survey does not run a controlled benchmark on KITTI, Waymo, BDD100K, or another driving dataset, and it does not measure a single detector on a common device. Its strongest conclusion is therefore methodological: mAP and FPS should be joined by class-, range-, weather-, and occlusion-stratified recall, calibration, energy, and tail latency. The paper's future directions—small-object handling, adverse-weather robustness, edge optimization, deployment-centric metrics, and integration with tracking and planning—follow from that missing protocol.
 

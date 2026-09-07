@@ -27,7 +27,7 @@ summary: "2020 – EfficientDet: Scalable and Efficient Object Detection"
 
 ## Core Insights
 
-### Mechanism
+### BiFPN spends capacity on repeated cross-scale fusion
 
 A plain FPN sends information top-down. PANet adds a bottom-up path, while NAS-FPN searches for a topology that is harder to interpret and expensive to discover. BiFPN keeps both directions, removes nodes that only have one input, adds same-level skip edges, and repeats the bidirectional block. Every feature is processed with depthwise separable convolution. The network therefore spends its capacity on fusing genuinely different resolutions rather than on pass-through nodes.
 
@@ -36,21 +36,22 @@ A plain FPN sends information top-down. PANet adds a bottom-up path, while NAS-F
 
 The fusion itself is learned. For inputs I_i, fast normalized fusion uses non-negative scalar weights and computes the weighted sum divided by the sum of weights plus a small epsilon. It behaves like softmax fusion but avoids the expensive exponentials. The ablation reports 1.26–1.31 times GPU speedup with almost unchanged AP. This is a useful systems detail: the feature pyramid is not only a graph of connections; its normalization rule affects deployment cost.
 
-Compound scaling then uses phi to grow all parts of the detector. BiFPN depth is 3 + phi, its width is 64 times 1.35 to the power phi, the box and class networks grow in depth, and the input resolution is 512 + 128 phi. D7 and D7x share the same BiFPN and head; D7x uses the larger B7 backbone and the extra P8 feature level.
+The compound equations describe the D0–D6 progression. D6 already uses 1280-pixel input, the B6 backbone, a 384-channel BiFPN, eight BiFPN layers, and five box/class layers, so the input formula should not be extrapolated unchanged to D7. D7 keeps B6 and that head but raises the input to 1536; D7x keeps the 1536-pixel input, swaps in B7, and adds the P8 feature level. These are deliberate endpoint choices, not a claim that one linear formula exactly generates every family member.
 
-### Evidence
+### The table separates detector scale from accelerator latency
 
 The paper's Table 2 reports single-model, single-scale COCO results:
 
-| Model | Test-dev AP | Params | FLOPs | Titan V latency |
-| --- | ---: | ---: | ---: | ---: |
-| EfficientDet-D0 (512) | 34.6 | 3.9M | 2.5B | 12 ms |
-| EfficientDet-D1 (640) | 40.5 | 6.6M | 6.1B | 16 ms |
-| EfficientDet-D4 (1024) | 49.7 | 21M | 55B | 65 ms |
-| EfficientDet-D7 (1536) | 53.7 | 52M | 325B | 232 ms |
-| EfficientDet-D7x (1536) | 55.1 | 77M | 410B | 285 ms |
+| Model | Test-dev AP | Params | FLOPs | Titan V latency | V100 latency |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| EfficientDet-D0 (512) | 34.6 | 3.9M | 2.5B | 12 ms | 10.2 ms |
+| EfficientDet-D1 (640) | 40.5 | 6.6M | 6.1B | 16 ms | 13.5 ms |
+| EfficientDet-D4 (1024) | 49.7 | 21M | 55B | 65 ms | 42.8 ms |
+| EfficientDet-D6 (1280) | 52.6 | 52M | 226B | 169 ms | 92.8 ms |
+| EfficientDet-D7 (1536) | 53.7 | 52M | 325B | 232 ms | 122 ms |
+| EfficientDet-D7x (1536) | 55.1 | 77M | 410B | 285 ms | 153 ms |
 
-The headline D7x result is 4 AP above the earlier best detector in the paper's comparison and uses 7.4 times fewer FLOPs. The efficiency curve is visible in the source plot: D0 matches YOLOv3 at 28 times fewer FLOPs, while larger models continue to gain AP as the budget rises.
+The headline D7x result is 4 AP above the earlier best detector in the paper's comparison and uses 7.4 times fewer FLOPs. In Figure 1's plotted checkpoints, D0 matches YOLOv3 at 28 times fewer FLOPs, while larger models continue to gain AP as the budget rises. The table above reports the later test-dev checkpoint values and keeps the two GPU latency columns separate.
 
 The training schedule is part of the result. D0–D6 use 300 epochs on 32 TPUv3 cores; D7/D7x use 600 epochs on 128 TPUv3 cores. The source's validation curve shows EfficientDet-D1 moving from 34.6 AP at 30 epochs to 40.2 at 300 and 40.5 at 600, while RetinaNet-R50 moves from 35.5 to 39.2 and 39.5.
 
@@ -60,7 +61,7 @@ The training schedule is part of the result. D0–D6 use 300 epochs on 32 TPUv3 
 ![Validation AP versus training epochs for EfficientDet-D1 and RetinaNet-R50.](/assets/images/efficientdet-scalable-and-efficient-object-detection-source-figure-7.webp)
 *Fig 3: Both models improve with longer training; EfficientDet-D1 continues improving through the 300- and 600-epoch schedules. | source: [EfficientDet, Figure 7](https://arxiv.org/abs/1911.09070)*
 
-### Boundary
+### Training recipe and device decide where the curve is useful
 
 The ablations show that both parts matter. Under RetinaNet settings, replacing ResNet-50 with EfficientNet-B3 raises AP from 37.0 to 40.3; replacing FPN with BiFPN then raises it to 44.4. The paper's cross-paper leaderboard is still heterogeneous, and the authors reproduce RetinaNet with their trainer while taking several other baselines from their papers. Latency also depends on hardware and post-processing. D7x is efficient relative to its contemporaries, but 410B FLOPs and 285 ms on the reported Titan V are a poor fit for every edge system.
 
