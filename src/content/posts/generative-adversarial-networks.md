@@ -11,52 +11,67 @@ summary: "2014 – Generative Adversarial Networks"
 ---
 ## 2014 – Generative Adversarial Networks
 
-**arXiv:** [1406.2661](https://arxiv.org/abs/1406.2661)
-
-**GitHub:** [goodfeli/adversarial](https://github.com/goodfeli/adversarial)
-
-**Project page:** n/a
-
+**arXiv:** [1406.2661](https://arxiv.org/abs/1406.2661)<br>
+**GitHub:** [goodfeli/adversarial](https://github.com/goodfeli/adversarial)<br>
+**Project page:** n/a<br>
 **Conference:** NIPS 2014
 
 ## Summary
 
-> GANs train a generator and discriminator in a minimax game. The discriminator learns to distinguish real data from generated samples; the generator learns to make samples that fool the discriminator. In the idealized infinite-capacity case, the game reaches the data distribution and the discriminator cannot do better than chance. The practical appeal is that sampling is direct: no Markov chain, no explicit likelihood, and ordinary backpropagation through neural networks. The original experiments use small image datasets and qualitative samples, so the evidence is much weaker than later GAN work. The main caveats are training instability, mode collapse, and the absence of a likelihood metric. The lasting idea is adversarial learning as a generative modeling objective.
+> GANs replace explicit likelihood optimization with a learned density-ratio game. A generator maps noise to samples, a discriminator estimates whether they came from data, and alternating backpropagation updates both. The nonparametric analysis reduces the game to Jensen–Shannon divergence, with global solution $p_g=p_{data}$. On MNIST and the Toronto Face Database, experiments show direct samples and smooth latent interpolation; Parzen estimates are a noisy likelihood proxy. Finite networks can collapse modes or destabilize training, and the model has no explicit likelihood.
 
 ## Core Insights
 
-![Figure 1 from GAN: generator samples move through latent space while the discriminator separates real and generated data](/assets/images/generative-adversarial-networks-paper-figure.png)
-*Fig 1: The generator maps latent samples toward the data distribution while the discriminator separates real and generated samples; their adversarial updates move the two distributions toward equilibrium. | source: [GAN paper](https://arxiv.org/abs/1406.2661)*
+### The discriminator supplies a moving density ratio
 
-![Figure 2 from Generative Adversarial Networks](/assets/images/generative-adversarial-networks-source-figure-2.webp)
-*Fig 2: Visualization of samples from the model. Rightmost column shows the nearest training example of the neighboring sample, in order to demonstrate that the model has not memorized the training set. | source: [Generative Adversarial Networks](https://arxiv.org/abs/1406.2661)*
+The generator $G(z;\theta_g)$ maps noise $z\sim p_z$ to a sample, defining an implicit distribution $p_g$. The discriminator $D(x;\theta_d)$ estimates the probability that $x$ came from the data distribution. Their original objective is
 
-![Figure 3 from Generative Adversarial Networks](/assets/images/generative-adversarial-networks-source-figure-3.webp)
-*Fig 3: Digits obtained by linearly interpolating between coordinates in space of the full model. | source: [Generative Adversarial Networks](https://arxiv.org/abs/1406.2661)*
+$$
+\min_G\max_D\;V(D,G)=\mathbb E_{x\sim p_{data}}[\log D(x)]+\mathbb E_{z\sim p_z}[\log(1-D(G(z)))].
+$$
 
+For a fixed generator, the optimal discriminator is
 
-### Method and reported result
+$$
+D_G^*(x)=\frac{p_{data}(x)}{p_{data}(x)+p_g(x)}.
+$$
 
-GANs turn generative modelling into a contest. A generator $G$ maps random noise into synthetic samples, while a discriminator $D$ learns to tell real data from generated data. Training alternates between making $D$ better at the classification problem and making $G$ better at fooling $D$.
+Substituting it into the game gives $C(G)=-\log 4+2\,\mathrm{JSD}(p_{data}\|p_g)$. The ideal equilibrium is therefore precise: $p_g=p_{data}$ and $D(x)=1/2$. The discriminator is not merely a critic with an arbitrary reward; in the idealized derivation it estimates how much more likely a point is under data than under the generator.
 
-The paper's central promise is elegant: with enough capacity and ideal optimization, the generator recovers the true data distribution and the discriminator becomes maximally uncertain, outputting 0.5 everywhere. That framing recasts density estimation as a differentiable game rather than an explicit likelihood problem. It also gives the generator direct feedback in pixel space, which helped avoid some of the blurry samples associated with early likelihood-based models.
+![Source Figure 1 from Generative Adversarial Nets: the generator and discriminator approach distributional equilibrium](/assets/images/generative-adversarial-networks-source-figure-1.png)
+*Fig 1: The four panels move from separated data and generator densities to an equilibrium where the discriminator is flat and $p_g$ matches $p_{data}$; arrows show how the latent map changes the generated density. | source: [Generative Adversarial Nets](https://arxiv.org/abs/1406.2661)*
 
-### Reported evidence
+The panel sequence also shows what the theorem assumes away. It treats the discriminator as reaching its optimum while the generator changes slowly. The actual algorithm alternates $k$ discriminator updates with one generator update; the paper uses $k=1$, minibatches, and momentum because solving the inner game to completion would be expensive and could overfit a finite dataset.
 
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Evaluation style | Qualitative MNIST and small natural-image samples | The original evidence was visual sample quality, not a mature metric. |
-| Compute | Small models trained on a single K20Xm GPU | The idea was cheap to demonstrate before later GANs scaled up. |
-| Legacy metric gap | No likelihood-style benchmark | Helped push the field toward sample-quality metrics such as Inception Score and FID. |
+### The practical generator objective is a gradient choice
 
-### Where the evidence stops
+The minimax generator term $\log(1-D(G(z)))$ can saturate when an untrained generator produces samples that the discriminator rejects confidently. The paper therefore recommends maximizing $\log D(G(z))$ for the generator in practice. This non-saturating objective has the same fixed point but gives a stronger early gradient. That small change separates the ideal game from the optimization rule used to reach it.
 
-The formulation is beautiful, but the optimization is fragile. Training can diverge, generators can collapse to a small set of modes, and discriminators can saturate until the generator receives weak gradients. Much of the later GAN literature, including Wasserstein GANs and gradient penalties, is really a response to those failure modes.
+The original models are multilayer perceptrons. Generators use rectifier and sigmoid activations; discriminators use maxout units and dropout. Noise enters only the bottom layer of the generator. This is enough to show the mechanism, but it leaves several engineering decisions implicit in later GAN work: how to stabilize a discriminator, how to keep rare modes alive, and how to evaluate an implicit distribution without $p_g(x)$.
 
-GANs made adversarial training a viable but unstable route to generative modelling. Both halves mattered: the samples were striking, and the instability became an entire research program.
+### The experiments test sampling and a weak likelihood proxy
+
+![Source Figure 2 from Generative Adversarial Nets: random samples and nearest training examples](/assets/images/generative-adversarial-networks-source-figure-2.png)
+*Fig 2: The panels show random MNIST, face, and CIFAR-10 samples; the yellow rightmost column is the nearest training example for each neighboring sample, a visual check against simple memorization. | source: [Generative Adversarial Nets](https://arxiv.org/abs/1406.2661)*
+
+The paper evaluates MNIST, the Toronto Face Database, and CIFAR-10. For a quantitative signal it fits a Gaussian Parzen window to generated samples and reports test-set log-likelihood estimates. On MNIST, adversarial nets report $225\pm2$, compared with $214\pm1.1$ for Deep GSN, $138\pm2$ for DBN, and $121\pm1.6$ for stacked CAE. On TFD, the result is $2057\pm26$, below stacked CAE’s $2110\pm50$ but above DBN’s $1909\pm66$ and Deep GSN’s $1890\pm29$.
+
+Those numbers require careful reading. The MNIST comparison uses real-valued rather than binary images. On TFD, the bandwidth is cross-validated per fold and the reported error is across folds. The authors explicitly warn that Parzen estimates have high variance and behave poorly in high dimensions. The table is evidence that an implicit model can produce competitive samples under a then-available proxy, not a general likelihood victory.
+
+![Source Figure 3 from Generative Adversarial Nets: linear interpolation in the generator’s latent space](/assets/images/generative-adversarial-networks-source-figure-3.png)
+*Fig 3: Linear paths between latent coordinates produce smooth digit changes, showing that the learned generator map is structured beyond isolated memorized examples. | source: [Generative Adversarial Nets](https://arxiv.org/abs/1406.2661)*
+
+The samples are direct forward passes and do not depend on Markov-chain mixing. That is a meaningful systems advantage over contemporaneous models. The same property does not guarantee coverage: the generator can map many noise values to the same output, the paper’s “Helvetica scenario,” while the discriminator remains poorly synchronized.
+
+### The theorem leaves the difficult part in the optimizer
+
+The nonparametric proof does not cover finite MLP parameterizations, imperfect discriminator updates, or the geometry of the generator’s parameter space. The paper itself notes multiple critical points in that space and offers no guarantee that alternating updates reach the global equilibrium. It also does not define an explicit tractable density, so exact likelihood and calibrated uncertainty remain outside the training objective.
+
+That boundary explains the later research line. Wasserstein objectives, gradient penalties, architectural constraints, and precision/recall diagnostics all address pieces of the same gap. They preserve the adversarial idea while changing the metric, the optimization geometry, or the evidence used to detect missing modes.
 
 ## High-Level Takeaways
 
-- GANs inform whether a generator should learn through an adversarial density-ratio signal instead of an explicit likelihood. Each update couples a minibatch of real examples with generated samples; the discriminator and generator optimize opposing objectives but share no parameters.
-- The original experiments established that the game can produce sharp samples, not that it covers the data distribution or converges reliably. The missing decisive evidence is a seed-rich comparison of likelihood coverage, sample quality, and mode recovery against explicit-density models at matched compute. At 10× scale, discriminator overfitting, mode collapse, and oscillatory optimization intensify. The adversarial premise would fail if a non-adversarial model matched perceptual quality while covering rare modes and training more reliably.
-- The first experiments were small, mostly multilayer perceptrons on MNIST-like data, but the idea opened a much larger path. GANs made high-quality sample generation feel less like approximate density estimation and more like learned counterfeiting.
+- GANs make a density-ratio classifier the training interface for an implicit generator, removing MCMC and explicit likelihood from the sampling path.
+- The global $p_g=p_{data}$ result depends on an optimal discriminator and sufficient capacity; finite alternating updates create the actual research problem.
+- The original Parzen scores and nearest-example panels support feasibility, while mode coverage and high-dimensional likelihood remain unmeasured or weakly measured.
+- The right matched test keeps generator capacity, data, compute, and random seeds fixed while checking sharpness, rare-mode recall, and training stability against a non-adversarial model.

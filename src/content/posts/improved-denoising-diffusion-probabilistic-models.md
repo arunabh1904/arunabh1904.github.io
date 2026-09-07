@@ -3,78 +3,85 @@ title: Improved Denoising Diffusion Probabilistic Models
 date: '2021-02-18T00:00:00.000Z'
 section: paper-shorts
 postSlug: improved-denoising-diffusion-probabilistic-models
-legacyPath: >-
-  /paper
-  shorts/2021/06/01/improved-denoising-diffusion-probabilistic-models.html
+legacyPath: /paper shorts/2021/06/01/improved-denoising-diffusion-probabilistic-models.html
 tags:
   - Other
 field: 'Generative Modeling'
 summary: "2021 – Improved Denoising Diffusion Probabilistic Models"
 ---
-## 2021 – Improved Denoising Diffusion Probabilistic Models (ID DPM)
+## 2021 – Improved Denoising Diffusion Probabilistic Models (Improved DDPM)
 
-**arXiv:** [2102.09672](https://arxiv.org/abs/2102.09672)
-
-**GitHub:** [openai/improved-diffusion](https://github.com/openai/improved-diffusion)
-
+**arXiv:** [2102.09672](https://arxiv.org/abs/2102.09672)<br>
+**GitHub:** [openai/improved-diffusion](https://github.com/openai/improved-diffusion)<br>
 **Conference:** ICML 2021
 
 ## Summary
 
-> Improved DDPM keeps the diffusion framework but fixes practical weaknesses in likelihood and sampling speed. The paper learns reverse-process variances instead of using a fixed variance schedule, studies hybrid objectives that balance sample quality and likelihood, and introduces a cosine noise schedule that allocates denoising difficulty more smoothly. It also shows that fewer sampling steps can preserve quality better than expected. The evidence includes ImageNet and other image-generation experiments comparing FID, negative log-likelihood, and precision/recall. The caveat is that diffusion still requires sequential denoising, so faster sampling is an improvement rather than a full solution. The paper is important because it turned DDPM from a promising sampler into a more scalable generative modeling recipe.
+> Improved DDPM keeps the DDPM reverse chain and targets the two places where its practical story was weakest: likelihood and sampling cost. It learns reverse variances, combines the noise-prediction loss with a lightly weighted variational term, and replaces the linear schedule with a cosine schedule that preserves useful signal longer at 32×32 and 64×64 resolutions. The paper reports better likelihood/FID trade-offs and near-optimal sample quality with about 100 sampling steps for fully trained models. The evidence is a carefully separated set of image-scale ablations; sequential denoising remains the serving cost.
 
 ## Core Insights
 
-![Figure 3 from Improved DDPM: linear and cosine noise schedules preserve signal at different rates](/assets/images/improved-ddpm-paper-figure-3-noise-schedule.png)
-*Fig 1: Linear and cosine schedules destroy image signal at different rates; the cosine schedule retains recognizable structure for longer before reaching near-pure noise. | source: [Improved DDPM paper](https://arxiv.org/abs/2102.09672)*
+### Reverse variance is the interface between likelihood and fast sampling
 
-![Figure 5 from Improved Denoising Diffusion Probabilistic Models](/assets/images/improved-denoising-diffusion-probabilistic-models-source-figure-5.webp)
-*Fig 2: Throughout diffusion in the linear schedule and our proposed cosine schedule. | source: [Improved Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2102.09672)*
+Original DDPM fixes the reverse variance, even though the variational bound is sensitive to the earliest reverse transitions. Improved DDPM lets the network output an interpolation in log variance:
 
-![Figure 1 from Improved Denoising Diffusion Probabilistic Models](/assets/images/improved-denoising-diffusion-probabilistic-models-source-figure-1.webp)
-*Fig 3: The ratio for every diffusion step for diffusion processes of different lengths. | source: [Improved Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2102.09672)*
+$$
+\Sigma_\theta(x_t,t)=\exp\big(v\log\beta_t+(1-v)\log\tilde\beta_t\big),
+$$
 
+where $\beta_t$ and $\tilde\beta_t$ are the two posterior-variance endpoints. The network is not asked to predict an unconstrained variance from scratch; it chooses a point in a narrow, source-motivated range. The paper observes that the two endpoints are nearly equal for much of the chain, but differ where the model is reconstructing imperceptible detail. Those early terms contribute disproportionately to the variational bound.
 
-### Method and reported result
+![Source Figure 1 from Improved DDPM: posterior-variance endpoints across diffusion lengths](/assets/images/improved-denoising-diffusion-probabilistic-models-source-figure-1.webp)
+*Fig 1: The ratio between the posterior variance and the forward variance stays close to one for most timesteps, clarifying why learned variance mainly matters near the low-noise end of the chain. | source: [Improved Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2102.09672)*
 
-Nichol and Dhariwal made DDPMs faster and stronger without changing the basic denoising story. They learn the reverse-process variance $\Sigma_\theta$ instead of keeping it fixed, optimize a hybrid objective that mixes ELBO terms with the simple noise-prediction loss, and use a cosine noise schedule with importance-weighted terms for stabler gradients.
+To keep that likelihood signal from destabilizing the sample-quality objective, the paper uses
 
-Those changes let the sampler take larger steps through noise space. Denoising drops from 1000 steps to roughly 50-250 with little FID loss, while log-likelihoods reach parity with autoregressive models on ImageNet-64. The paper also makes a useful empirical claim: bigger UNets and more compute improve bits-per-dim and FID in a predictable scaling-law-like way.
+$$
+L_{hybrid}=L_{simple}+\lambda L_{vlb},\qquad \lambda=0.001,
+$$
 
-**Key results**
+and stops the gradient from the variational term through $\mu_\theta$. In effect, $L_{simple}$ remains responsible for the reverse mean while $L_{vlb}$ can teach the variance. This is why the correct description is a hybrid objective with a stop-gradient design, rather than a generic KL-plus-MSE loss.
 
-| Dataset / setting | Steps | FID ↓ | IS ↑ | NLL (bits/dim) |
-| ----------------- | ----- | ---- | ---- | --------------- |
-| CIFAR-10 32² | 250 | 2.92 | 9.89 | 3.40 |
-| CIFAR-10 32² (orig. DDPM) | 1000 | 3.17 | 9.46 | 3.69 |
-| ImageNet 64² (class-cond.) | 250 | 2.92 | — | 3.57 |
-| ImageNet 64² (BigGAN-deep, 100M params) | 1 | 4.06 | — | — |
+### The cosine schedule changes where information disappears
 
-The key result is speed without giving up quality: ID DPM matches or beats GANs while requiring about ten times fewer network evaluations than vanilla DDPM.
+For low-resolution images, the original linear schedule drives $\bar\alpha_t$ toward zero too early. Many late forward states are already nearly pure noise, so reverse steps in that region contribute little useful learning. Improved DDPM defines
 
-**Tiny PyTorch snippet – hybrid loss and learned variance**
-```python
-def iddpm_loss(model, x0, timesteps, betas, logvar_schedule):
-    """Hybrid loss from Nichol & Dhariwal (2021)."""
-    noise = torch.randn_like(x0)
-    sqrt_alphas_cum = torch.sqrt(torch.cumprod(1 - betas, 0))
-    sqrt_one_minus = torch.sqrt(1 - torch.cumprod(1 - betas, 0))
-    x_t = sqrt_alphas_cum[timesteps] * x0 + sqrt_one_minus[timesteps] * noise
+$$
+\bar\alpha_t=\frac{f(t)}{f(0)},\qquad f(t)=\cos^2\left(\frac{t/T+s}{1+s}\frac{\pi}{2}\right),\qquad s=0.008,
+$$
 
-    eps_hat, logvar_hat = model(x_t, timesteps)
+then derives $\beta_t=1-\bar\alpha_t/\bar\alpha_{t-1}$ and clips $\beta_t$ at 0.999.
 
-    mse = F.mse_loss(eps_hat, noise)
-    kl = 0.5 * (torch.exp(-logvar_hat) * (noise ** 2) + logvar_hat).mean()
-    return 0.5 * (mse + kl)
-```
-Switching to the cosine $\beta_t$ schedule from the appendix further sharpens FID at low step counts.
+![Source Figure 3 from Improved DDPM: latent states under linear and cosine schedules](/assets/images/improved-ddpm-paper-figure-3-noise-schedule.png)
+*Fig 2: At equally spaced forward times, the linear schedule has become almost pure noise during its last quarter, while the cosine schedule retains recognizable structure for longer. | source: [Improved Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2102.09672)*
 
-### Where the evidence stops
+![Source Figure 5 from Improved DDPM: cumulative signal under the two schedules](/assets/images/improved-denoising-diffusion-probabilistic-models-source-figure-5.webp)
+*Fig 3: The cosine schedule makes $\bar\alpha_t$ fall gradually through the middle of diffusion instead of discarding signal rapidly near the start; the change is a redistribution of denoising difficulty. | source: [Improved Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2102.09672)*
 
-The upgrades are attractive because they are almost drop-in: learn variance, adjust the objective, improve the schedule. They became part of the practical diffusion toolbox used by later systems. Sampling still needs dozens of UNet passes, large models remain memory-heavy, and classifier guidance can introduce bias, which later classifier-free methods address more cleanly.
+The paper also reduces gradient noise when optimizing the full variational objective by sampling timesteps with probability proportional to $\sqrt{\mathbb E[L_t^2]}$, estimated from a history of the previous ten loss terms. That resampling matters for likelihood training, but the authors report that it is not helpful for the less noisy hybrid objective.
+
+### The ablations separate likelihood from perceptual quality
+
+| Dataset and recipe | NLL (bits/dim) | FID |
+| --- | ---: | ---: |
+| ImageNet-64, 200K, 1K linear $L_{simple}$ | 3.99 | 32.5 |
+| ImageNet-64, 200K, 4K cosine $L_{hybrid}$ | 3.62 | 28.0 |
+| ImageNet-64, 1.5M, 4K cosine $L_{hybrid}$ | 3.57 | 19.2 |
+| ImageNet-64, 1.5M, 4K cosine $L_{vlb}$ | 3.53 | 40.1 |
+| CIFAR-10, 500K, 4K cosine $L_{hybrid}$ | 3.17 | 3.19 |
+| CIFAR-10, 500K, 4K cosine $L_{vlb}$ | 2.94 | 11.47 |
+
+The $L_{vlb}$ rows make the trade-off visible: direct likelihood improves bits per dimension but can hurt FID sharply. The hybrid objective is the paper’s compromise, not a claim that one scalar dominates both metrics. On class-conditional ImageNet-64 with 250 sampling steps, the large Improved Diffusion model reports FID 2.92, precision 0.82, and recall 0.71; BigGAN-deep reports FID 4.06, precision 0.86, and recall 0.59. The lower recall of BigGAN in this matched comparison is the evidence for a coverage advantage, while the precision difference shows the trade is not one-sided.
+
+### Learned variance makes shorter chains viable
+
+All models in the speed study are trained with 4,000 diffusion steps. The learned-variance hybrid model retains near-optimal FID with 100 sampling steps, whereas fixed-variance $L_{simple}$ models degrade more when the chain is strided. This is the source of the often-repeated “10× fewer steps” result: it compares a 4,000-step training schedule to a shorter inference subsequence, not a single-step generator.
+
+The scaling experiment varies ImageNet-64 U-Net capacity from 30M to 270M parameters. FID follows an approximately linear trend on a log-log compute plot, while NLL fits a power law less cleanly. That difference reinforces the central boundary: visual quality and likelihood can improve with the same compute, but they are not interchangeable objectives.
 
 ## High-Level Takeaways
 
-- Improved DDPM informs where to spend diffusion complexity: on the noise-prediction loss, learned reverse variance, schedule, or additional sampling steps. Its atomic unit remains a noisy image-timestep pair, but the hybrid objective adds likelihood pressure while the learned variance permits aggressive step reduction.
-- The results show better likelihood and useful samples with far fewer reverse steps in the tested image regimes; they do not isolate whether those gains persist with modern solvers and latent diffusion. A matched wall-clock factorial ablation of variance learning, cosine schedule, objective, and sampler is the missing decision table. At 10× scale, repeated high-resolution evaluations remain dominant. The recipe would be falsified if a fixed-variance model with a stronger solver matched NLL and FID at lower total compute.
-- ID DPM turned diffusion from a slow curiosity into a practical generator, paving the way for fast samplers and classifier-free guidance.
+- Learned reverse variance gives the sampler freedom to absorb uncertainty without asking the network to predict an arbitrary scale; the hybrid loss keeps that freedom from overwhelming mean prediction.
+- The cosine schedule is useful because low-resolution images need signal spread across the chain, not because cosine is a universal replacement for every noise schedule.
+- Direct $L_{vlb}$ improves likelihood in the reported ablations while degrading FID, so the paper’s practical choice is an explicit quality/likelihood compromise.
+- The matched speed result is near-optimal FID at about 100 sampling steps after 4,000-step training; high-resolution serving still pays for sequential network evaluations.
