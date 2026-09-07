@@ -16,8 +16,6 @@ topics:
 summary: '2026 – TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with <1 GB VRAM'
 ---
 
-## 2026 – TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with <1 GB VRAM
-
 **arXiv:** [2607.27205](https://arxiv.org/abs/2607.27205)
 
 **Project:** [TurboVLA](https://H-EmbodVis.github.io/TurboVLA) · **Code:** [H-EmbodVis/TurboVLA](https://github.com/H-EmbodVis/TurboVLA)
@@ -28,18 +26,22 @@ summary: '2026 – TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on 
 
 ## Core Insights
 
+### Remove the LLM from the execution path
+
 On LIBERO, the 0.2B-parameter configuration reaches 97.7% average success with 31.2 ms latency and 0.9 GB peak inference memory on an RTX 4090. It also reaches 60.2% across 50 RoboTwin 2.0 bimanual tasks and outperforms a matched $\pi_{0.5}$ baseline on four real-robot tasks. The result supports a sharp systems claim: concrete execution-level language conditioning does not always require a generative LLM in the control loop. It does not show that the same compact path can perform open-ended task decomposition or high-level planning.
 
 TurboVLA preserves token-level instruction features rather than compressing language to a task ID. Each camera produces spatial visual tokens with positional and view embeddings. The interaction stack alternates visual-to-instruction and instruction-to-visual cross-attention, so scene evidence can refine the instruction representation while language selects relevant visual features. Robot state bypasses this fusion stack and enters only at the action decoder.
 
+### Language is still part of the control loop
+
 ![TurboVLA architecture with compact vision and language encoders, bidirectional feature interaction, and parallel action-chunk decoding](/assets/images/turbovla-architecture.png)
-*Fig 1: TurboVLA replaces the LLM-centered $V\to L\to A$ path with compact modality encoders, bidirectional cross-attention, and a continuous action-chunk decoder. | source: [paper](https://arxiv.org/abs/2607.27205)*
+*Fig 1: TurboVLA replaces the LLM-centered $V\to L\to A$ path with compact modality encoders, bidirectional cross-attention, and a continuous action-chunk decoder. | source: [TurboVLA, Figure 3](https://arxiv.org/abs/2607.27205)*
 
 ![Figure 2 from TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with <1 GB VRAM](/assets/images/turbovla-real-time-vision-language-action-model-at-32-hz-on-an-rtx-4090-with-1-gb-vram-source-figure-2.webp)
-*Fig 2: From LLM-centric VLA to TurboVLA. (a) LLM-centric VLA predicts actions from large-language-model representations, whereas TurboVLA directly fuses visual and instruction features for continuous control. (b) TurboVLA achieves highly competitive LIBERO performance with substantially lower latency and model scale. | source: [TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with <1 GB VRAM](https://arxiv.org/abs/2607.27205)*
+*Fig 2: From LLM-centric VLA to TurboVLA. (a) LLM-centric VLA predicts actions from large-language-model representations, whereas TurboVLA directly fuses visual and instruction features for continuous control. (b) TurboVLA achieves competitive LIBERO performance with lower latency and model scale. | source: [TurboVLA, Figure 2](https://arxiv.org/abs/2607.27205)*
 
 ![Figure 4 from TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with <1 GB VRAM](/assets/images/turbovla-real-time-vision-language-action-model-at-32-hz-on-an-rtx-4090-with-1-gb-vram-source-figure-4.webp)
-*Fig 3: Real-world evaluation on the AgileX Piper platform. Left: our single-arm setup with a wrist-view RGB-D camera and a third-view RGB-D camera, together with the objects used in the four tasks. | source: [TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with <1 GB VRAM](https://arxiv.org/abs/2607.27205)*
+*Fig 3: Real-world evaluation on the AgileX Piper platform with wrist-view and third-view RGB-D cameras, the four task objects, and rollout comparisons. | source: [TurboVLA, Figure 4](https://arxiv.org/abs/2607.27205)*
 
 
 The policy is trained by behavior cloning with an $\ell_1$ loss on expert action chunks; it uses no language-modeling loss and no robot-data pretraining beyond each target benchmark. LIBERO training mixes all four suites for 80,000 steps and evaluates 50 rollouts for each of 40 tasks. RoboTwin uses one multitask model trained on the official clean demonstrations for 50 bimanual tasks. The real-world model starts from LIBERO, fine-tunes on 65 demonstrations per task, and runs 40 trials on each of four AgileX Piper tasks.
@@ -57,8 +59,7 @@ The ablations show that efficiency does not come from ignoring language. Removin
 ## High-Level Takeaways
 
 - TurboVLA informs whether an execution policy should inherit a large language backbone or use a smaller semantic encoder plus direct feature fusion. Its training unit is a continuous action chunk, not an action token. Visual and language parameters remain separate until a compact bidirectional module, and the only optimized objective is action imitation. For closed-set manipulation instructions with benchmark-scale linguistic variation, the reported evidence favors the compact path.
-- The expensive decision is where to place general reasoning. Removing the LLM cuts latency and memory, but also removes a natural place for broad semantic knowledge, compositional planning, and generative intermediate reasoning. The comparisons are not matched for pretraining data, architecture, or optimization, so the paper establishes a performance-efficiency frontier on these tasks rather than isolating the LLM's causal cost. At 10× instruction and environment diversity, linguistic coverage and long-horizon task planning are likelier to fail before the action decoder does.
-- A decisive test would compare a compact executor, an LLM-centric policy, and a hierarchical LLM-planner-plus-compact-executor under the same robot demonstrations, visual backbone, and wall-clock budget. Instructions should include novel compositions, ambiguous references, recovery steps, and long-horizon tasks. The compact-path claim should be rejected if its latency advantage disappears once it receives the planning machinery needed to match success on those harder instructions.
-- TurboVLA separates language-conditioned execution from general-purpose language generation, arguing that the former can use grounding-style cross-attention and continuous action decoding.
+- The expensive decision is where to place general reasoning. Removing the LLM cuts latency and memory, but also removes a natural place for broad semantic knowledge, compositional planning, and generative intermediate reasoning. The comparisons are not matched for pretraining data, architecture, or optimization, so the paper establishes a performance-efficiency frontier on these tasks rather than isolating the LLM's causal cost. The language ablation is the guardrail: removing language drops LIBERO-Goal from 97.4% to 11.6%, while a task-ID embedding reaches 95.4% and semantic instructions reach 97.7%.
+- A decisive test would compare a compact executor, an LLM-centric policy, and a hierarchical LLM-planner-plus-compact-executor under the same robot demonstrations, visual backbone, and wall-clock budget. Instructions should include novel compositions, ambiguous references, recovery steps, and long-horizon tasks. The current result is strongest for execution-level commands; it does not measure planning or open-ended task decomposition.
 - Most evidence is simulation; RoboTwin uses only the clean setting; real-world evaluation covers four tasks and 160 total trials; and the comparison mixes methods with different embodied pretraining and data. The authors explicitly scope the model to execution-level instructions rather than high-level planning.
-- For concrete manipulation commands, a small bidirectional vision-language interface can match large VLA policies while running at 32 Hz—but planning remains outside the claim.
+- For concrete manipulation commands, a small bidirectional vision-language interface can match large VLA policies while running at 32 Hz; the action horizon ablation also shows that more temporal context is not monotonic, with 12 steps best among the tested choices and 15 steps lower.

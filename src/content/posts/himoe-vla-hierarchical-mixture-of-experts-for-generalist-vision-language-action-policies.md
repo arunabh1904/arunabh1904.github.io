@@ -16,8 +16,6 @@ topics:
 summary: '2025 – HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vision-Language-Action Policies'
 ---
 
-## 2025 – HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vision-Language-Action Policies
-
 **arXiv:** [2512.05693](https://arxiv.org/abs/2512.05693)  
 **Code and models:** [ZhiyingDu/HiMoE-VLA](https://github.com/ZhiyingDu/HiMoE-VLA)
 
@@ -27,17 +25,21 @@ summary: '2025 – HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vis
 
 ## Core Insights
 
+### Route where action spaces diverge
+
 The resulting 4B-parameter VLA is pretrained end to end on 24.1M frames from Open X-Embodiment and public ALOHA data. It reaches 98.0% average success on LIBERO, 3.98 average completed tasks on CALVIN, 75.0% average stage success on real xArm7 tasks, and 63.7% on real ALOHA tasks. More important than those cross-paper rankings, controlled CALVIN mixtures show that dense co-training can turn added heterogeneous data into negative transfer while HiMoE turns it into a gain.
 
 ![HiMoE hierarchy with action-space experts at the boundaries heterogeneity-balancing experts nearby and shared transformer layers in the center](/assets/images/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies-paper-figure.png)
-*Fig 1: Shows where specialization is permitted: action-space MoEs handle incompatible controls, heterogeneity-balancing MoEs absorb residual variation, and central shared layers carry cross-domain knowledge. | source: [HiMoE-VLA](https://arxiv.org/abs/2512.05693)*
+*Fig 1: Shows where specialization is permitted: action-space MoEs handle incompatible controls, heterogeneity-balancing MoEs absorb residual variation, and central shared layers carry cross-domain knowledge. | source: [HiMoE-VLA, Figure 2](https://arxiv.org/abs/2512.05693)*
 
 ![Figure 1 from HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vision-Language-Action Policies](/assets/images/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies-source-figure-1.webp)
-*Fig 2: Overview of HiMoE-VLA. The left blue part illustrates the VLM backbone initialized from PaliGemma, and the right orange part depicts our proposed action module with a novel Hierarchical Mixture-of-Experts (HiMoE), which is responsible for processing different robot states and noisy actions and generating final action outputs. | source: [HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vision-Language-Action Policies](https://arxiv.org/abs/2512.05693)*
+*Fig 2: Overview of HiMoE-VLA. The left blue part illustrates the VLM backbone initialized from PaliGemma, and the right orange part depicts the hierarchical action module processing different robot states and noisy actions. | source: [HiMoE-VLA, Figure 1](https://arxiv.org/abs/2512.05693)*
 
 ![Figure 3 from HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vision-Language-Action Policies](/assets/images/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies-source-figure-3.webp)
-*Fig 3: Qualitative examples of real-world executions on (top row) the single-arm xArm7 and (bottom row) the dual-arm ALOHA robot. The snapshots cover representative stages across tasks such as Fruit-to-Plate, Block-on-Block, Cup-Handover, and Scoop. | source: [HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vision-Language-Action Policies](https://arxiv.org/abs/2512.05693)*
+*Fig 3: Qualitative examples of real-world executions on the single-arm xArm7 and dual-arm ALOHA robots, covering pick-place, stacking, handover, and scooping. | source: [HiMoE-VLA, Figure 3](https://arxiv.org/abs/2512.05693)*
 
+
+### The hierarchy turns mixed data into a controlled experiment
 
 HiMoE organizes the action Transformer into three zones. Action-Space MoE layers sit at the input and output boundaries, where joint-angle and end-effector representations differ most. Adjacent Heterogeneity-Balancing MoE layers absorb residual variation in embodiment, viewpoint, and scene. Dense middle layers integrate information across domains rather than routing the entire network into isolated robot-specific branches.
 
@@ -61,7 +63,6 @@ Real-robot results test both single- and dual-arm transfer. HiMoE-VLA averages 7
 
 - HiMoE-VLA informs how much of an action model should be shared when robot datasets disagree about their control interface. Separate heads prevent interference but fragment learning; one dense head maximizes sharing but can let incompatible gradients collide. The paper’s answer is structural: route the boundary layers by action space, use a second sparse stage for residual heterogeneity, and keep a dense integration core.
 - The controlled mixed-action experiment is the strongest evidence because it compares isolated and combined data under the same CALVIN evaluation. A stricter falsification test would withhold an embodiment or entirely new action space and remove its routing identity at adaptation time. Performance that depends on known dataset labels and carefully audited masks may not transfer to unlabeled mixtures or a control interface absent from pretraining.
-- At ten times the number of embodiments, metadata quality, per-expert batch size, and router balance become the main risks. The model already requires action-space labels, unified padded vectors, loss masks, two routing losses, and a MoE warm-up before full fine-tuning. Scaling succeeds only if those interfaces remain semantically correct. The next experiment should measure unseen-embodiment adaptation, expert utilization under long-tailed data, and wall-clock gains against separate-head and dense baselines at equal active compute.
-- HiMoE-VLA makes heterogeneous robot co-training an explicit specialization-versus-sharing problem across Transformer depth.
+- The hierarchy carries a real systems cost: the reported $N=32$, top-$K=4$ configuration adds about 7% training time and about 0.195 seconds per action chunk on an RTX 4090. Scaling therefore requires action-space labels, padded-vector masks, two routing losses, and a warm-up schedule to remain correct as expert batches become long-tailed.
 - Pretraining uses 16 A100 GPUs and known action-space metadata; evaluation remains simulation and tabletop manipulation on two physical platforms. Sparse routing adds latency, and the reported real-robot results require downstream fine-tuning.
 - Specialize where action spaces enter and leave the network, share the middle, and verify that extra robot data creates positive transfer rather than quietly increasing interference.
