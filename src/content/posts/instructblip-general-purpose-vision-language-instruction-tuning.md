@@ -34,7 +34,7 @@ The paper initializes from BLIP-2 and updates only the Q-Former during instructi
 
 ### The evaluation tests task and dataset transfer separately
 
-![Figure 2: Tasks and datasets used for vision-language instruction tuning](/assets/images/instructblip-general-purpose-vision-language-instruction-tuning-source-figure-2.webp)
+![Figure 2: Tasks and datasets used for vision-language instruction tuning](/assets/images/instructblip-general-purpose-vision-language-instruction-tuning-source-figure-2-white.png)
 *Fig 2: The training mixture spans 11 task families; yellow marks datasets used for instruction tuning and white marks held-out evaluation datasets. | source: [InstructBLIP: Towards General-purpose Vision-Language Models with Instruction Tuning, Figure 2](https://arxiv.org/abs/2305.06500)*
 
 The authors gather 26 public datasets across 11 categories: captioning, captioning with reading comprehension, visual reasoning, image question answering, knowledge-grounded question answering, question answering with reading comprehension, question generation, video QA, visual conversational QA, image classification, and LLaVA-Instruct-150K. Each task is converted into 10–15 natural-language templates. For datasets that normally reward short answers, some templates explicitly ask for a short or brief response; OCR tokens are appended to instructions for scene-text tasks.
@@ -51,7 +51,7 @@ The authors then lower the weight of multiple-choice A-OKVQA and raise the weigh
 
 ### Instruction tuning beats task labels on unseen tasks
 
-![Figure 4: Instruction tuning versus multitask training](/assets/images/instructblip-general-purpose-vision-language-instruction-tuning-source-figure-4.webp)
+![Figure 4: Instruction tuning versus multitask training](/assets/images/instructblip-general-purpose-vision-language-instruction-tuning-source-figure-4-white.png)
 *Fig 3: With the same BLIP-2 FlanT5-XL backbone, instruction tuning separates held-in performance from transfer to held-out datasets; the plotted averages use the paper’s stated dataset groups. | source: [InstructBLIP: Towards General-purpose Vision-Language Models with Instruction Tuning, Figure 4](https://arxiv.org/abs/2305.06500)*
 
 The chart separates memorizing task formats from generalizing a task interface. On held-in data, plain multitask training with instructions only at evaluation reaches a 92.5 average and training with a dataset identifier reaches 93.7, close to InstructBLIP’s 93.8. On held-out data, however, the same methods reach only 46.3 and 46.8, while InstructBLIP reaches 52.9; BLIP-2 without tuning is 46.1. A dataset name tells the model which training source it saw. A natural-language instruction gives it a reusable description of the requested operation, and the Q-Former can use that description while selecting visual evidence.
