@@ -15,40 +15,32 @@ summary: '2026 – Hi-Token makes bounding-box coordinates coarse-to-fine sequen
 
 ## Summary
 
-> Hi-Token changes the output representation, not the VLM backbone: each normalized box coordinate becomes axis-specific hundreds, tens, and ones tokens. The representation gives autoregressive grounding a coarse-to-fine order and much denser supervision per coordinate type; a training-only GRPO reward then improves low-overlap predictions. The reported strict-localization gains are substantial, but the paper does not isolate hierarchy, axis-specific vocabularies, and vocabulary size from one another.
+> Hi-Token changes the coordinate language of a generative VLM while leaving its backbone intact. A normalized coordinate is quantized to 1,000 bins and emitted as axis-specific hundreds, tens, and ones tokens, so each box becomes a 12-token coarse-to-fine sequence drawn from 60 coordinate types. Under a matched Qwen2.5-VL-3B recipe on 80K RefCOCO examples, Hi-Token SFT raises RefCOCO P@0.95 from 23.0 for flat coordinate tokens to 31.7. Hi-GAR then adds geometry-aware GRPO rewards and lifts the same model to 33.4 P@0.95 and 84.3 mIoU. The gains support a representation change plus a refinement stage; they do not isolate hierarchy, axis separation, and vocabulary size from one another.
 
 ## Core Insights
 
-### A box is twelve structured tokens
+Generative grounding has a peculiar failure mode: the model can identify the right object and still emit a box that is slightly too wide, too narrow, or shifted onto a neighbor. A flat vocabulary treats `<323>` and `<324>` as unrelated classes, even though their numerical meanings are adjacent. A shared vocabulary also leaves the difference between an $x$ coordinate and a $y$ coordinate implicit. Hi-Token makes those relationships visible to the autoregressive model without adding a specialist detection head.
 
-Flat coordinate vocabularies make nearby positions such as 323 and 324 unrelated symbols, often sharing one vocabulary across horizontal and vertical axes. Hi-Token instead emits three digit tokens for each coordinate and separates the $x$ and $y$ vocabularies. A box therefore uses 12 tokens drawn from 60 coordinate types. This increases output length, but it exposes place value and axis role while reusing each token far more often.
+![Hi-Token representation and Hi-GAR reward](/assets/images/hi-token-hierarchical-coordinate-tokenization-for-generative-visual-grounding-source-figure-1.webp)
+*Source Figure 1. The left side decomposes each box into axis-specific hundreds, tens, and ones tokens; the right side combines format validity, IoU, tiered coordinate checks, and strict-IoU bonuses under a validity gate during GRPO. [Hi-Token](https://arxiv.org/abs/2608.03471)*
 
+For a coordinate $v\in[0,1]$, the paper first maps it to $I_v=\lfloor v(1000-1)\rfloor$, then emits three tokens. A box therefore uses 12 tokens: three each for $x_{min}$, $y_{min}$, $x_{max}$, and $y_{max}$. The hundreds token anchors a coarse location, the tens token adjusts the interval, and the ones token aligns the boundary. This is only a local numerical bias—the representation is not globally topology-preserving—but it gives the model a better set of reusable pieces. On the 80K training split, flat coordinates use 1,000 token types and four tokens per box; Hi-Token uses 60 types and 12 tokens. The resulting mean raw supervision density is 50 times higher, and the average number of distinct training examples per type is 15,426 versus 318.
 
-![Figure 4 from Hi-Token: Hierarchical Coordinate Tokenization for Generative Visual Grounding](/assets/images/hi-token-hierarchical-coordinate-tokenization-for-generative-visual-grounding-source-figure-4.webp)
-*Fig 1: Hi-Token remains stable at tens transitions and retains useful small-object localization at moderate thresholds, while hundreds transitions and deterministic perturbations reveal localized geometric sensitivities. Panel (a) reports RefCOCO P@0.95 changes relative to the interior group (33.2) for two disjoint boundary groups. | source: [Hi-Token: Hierarchical Coordinate Tokenization for Generative Visual Grounding](https://arxiv.org/abs/2608.03471)*
+The controlled comparison is the important part. With the same Qwen2.5-VL-3B backbone, 80K paired examples, optimizer, schedule, decoding, and evaluator, flat SFT gives 58.3 mIoU, 64.1 P@0.5, and 23.0 P@0.95 on RefCOCO. Hi-Token SFT gives 72.4, 79.0, and 31.7. A specially tuned flat baseline reaches 68.5/74.0/26.3, narrowing the gap but changing the recipe; it is a stress test rather than a matched causal estimate. The result is therefore evidence for the structured output under the fixed training recipe, with a fair warning that better flat optimization accounts for part of the difference.
 
-![Figure 1 from Hi-Token: Hierarchical Coordinate Tokenization for Generative Visual Grounding](/assets/images/hi-token-hierarchical-coordinate-tokenization-for-generative-visual-grounding-source-figure-1.webp)
-*Fig 2: Overview of Hi-Token and the geometry-aware post-training framework. Left: Hi-Token represents each bounding box as a 12-token sequence by decomposing each coordinate into axis-specific hundreds, tens, and ones tokens. | source: [Hi-Token: Hierarchical Coordinate Tokenization for Generative Visual Grounding](https://arxiv.org/abs/2608.03471)*
+Hi-GAR addresses a different mismatch. SFT rewards the likelihood of individual tokens, while IoU cares about the shape of the complete box. The reward combines format validity, continuous IoU, coordinate checks at 5%, 1%, and 0.3% tolerances, and bonuses at IoU 0.5, 0.9, and 0.95. Its gate activates coordinate-level rewards only when predicted IoU exceeds 0.01; otherwise a lucky corner match should not overpower the fact that the box is effectively invalid.
 
+The ablation separates refinement from representation. Starting from Hi-Token SFT, IoU-only GRPO reaches 76.1 mIoU, 89.0 P@0.5, and 30.3 P@0.95. Full Hi-GAR without the gate reaches 80.4/91.9/31.3; with the gate it reaches 84.3/93.1/33.4. The reward's largest effect is on coarse and medium overlap: in the RefCOCO IoU distribution, predictions below 0.5 fall from 20.5% for Hi-Token SFT to 7.0% for Hi-R1, while the share at IoU ≥0.95 rises from 31.6% to 33.7%. Hi-GAR repairs bad boxes more decisively than it creates ultra-tight ones.
 
-Under a matched Qwen2.5-VL-3B setup with 80,000 RefCOCO training examples, Hi-Token SFT raises RefCOCO P@0.95 from 23.0 for flat-token SFT to 31.7. The paper reports a 50-fold mean increase in raw supervision density per coordinate type. A separately tuned flat baseline reaches 26.3, so tuning narrows the gap but does not close it in the reported comparison.
+![Hi-Token boundary and scale diagnostics](/assets/images/hi-token-hierarchical-coordinate-tokenization-for-generative-visual-grounding-source-figure-4.webp)
+*Source Figure 4. Boundary groups, object scale, and coordinate perturbation expose where the representation is fragile: near-hundreds transitions lose 2.4 P@0.95 points relative to the interior group, and one-bin or three-bin coordinate errors reduce IoU more for small objects than large ones. [Hi-Token](https://arxiv.org/abs/2608.03471)*
 
-### Hi-GAR targets broad geometric failures
-
-Hi-GAR combines box IoU, coordinate accuracy at multiple tolerances, threshold bonuses, and a validity gate that turns off coordinate-level rewards for nearly non-overlapping boxes. Relative to Hi-Token SFT, full Hi-GAR raises RefCOCO mIoU from 72.4 to 84.3 and P@0.5 from 79.0 to 93.1, while P@0.95 moves from 31.7 to 33.4. Its main role is therefore reducing poor-overlap outputs, not replacing the representation as the source of strict localization.
-
-| Setting on RefCOCO | mIoU | P@0.5 | P@0.95 |
-| --- | ---: | ---: | ---: |
-| Flat SFT, matched recipe | 58.3 | 64.1 | 23.0 |
-| Hi-Token SFT | 72.4 | 79.0 | 31.7 |
-| Full Hi-GAR with gate | 84.3 | 93.1 | 33.4 |
-
-The final Hi-R1 model also reports strong results across RefCOCO, RefCOCO+, and RefCOCOg. Cross-family leaderboard comparisons are contextual rather than controlled, because the systems do not share data or training regimes.
+The diagnostics keep the claim honest. On a five-split scale aggregate, small objects reach 1.30 P@0.95 versus 17.5 for medium and 39.0 for large objects. Hi-GAR raises small-object P@0.95 from 1.07 to 1.30, a real but modest repair. Coordinate-boundary effects also remain: near-hundreds examples have 30.8 P@0.95 versus 33.2 for interior examples. The representation helps, but its fixed 1,000-bin grid still turns a one-bin error into a large relative displacement for a tiny object.
 
 ## High-Level Takeaways
 
-- Coordinate tokenization is an architectural decision for generative grounding: it determines whether numerical proximity and axis semantics must be rediscovered from data.
-- The matched SFT comparison supports the tokenization change, while the reward ablation supports Hi-GAR as a low-IoU repair. Neither establishes which part of the representation—digit hierarchy, axis separation, or smaller vocabulary—causes the gain.
-- The fixed 1,000-bin space leaves a visible small-object boundary: ultra-strict localization is highly scale-sensitive, and the paper reports a P@0.95 of 1.30 for its small-object aggregate.
-- A decisive follow-up would vary hierarchy, axis vocabularies, vocabulary size, output length, and compute independently, then measure calibration and latency as well as IoU.
-- Generative grounding improves when the output language carries geometry instead of encoding every location as an unrelated word.
+- Hi-Token makes numerical proximity and axis role reusable in the output vocabulary: 60 coordinate types receive far denser supervision than 1,000 flat location types.
+- The matched SFT result is 31.7 versus 23.0 P@0.95 on RefCOCO; the extra-tuned flat baseline at 26.3 is the paper's important control, not a footnote.
+- Hi-GAR is a training-only repair. The validity gate cuts low-overlap predictions, moving the <0.5 IoU share from 20.5% to 7.0%, while strict P@0.95 moves only from 31.7 to 33.4.
+- Small objects and digit boundaries remain failure surfaces: the five-split small-object P@0.95 is 1.30, and near-hundreds coordinates trail interior ones by 2.4 points.
+- The causal story is coupled. A clean follow-up would vary digit hierarchy, axis vocabularies, vocabulary size, output length, and compute separately, then report calibration and latency alongside IoU.
