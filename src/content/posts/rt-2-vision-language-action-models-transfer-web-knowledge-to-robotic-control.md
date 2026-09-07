@@ -49,7 +49,7 @@ The bars make the interaction visible. A large randomly initialized model is not
 
 ### The generalization test is still a robot test
 
-The main study uses a seven-degree-of-freedom mobile manipulator and about 6,000 evaluation trajectories. Seen instructions cover more than 200 tasks: picking, knocking over, placing upright, moving, opening or closing drawers, and moving objects into or out of receptacles. The held-out evaluation contains more than 280 pick-and-place scenarios divided into unseen objects, backgrounds, and environments, each with easy and hard cases.
+The main study uses a seven-degree-of-freedom mobile manipulator and about 6,000 evaluation trajectories. Seen instructions cover more than 200 tasks: picking, knocking over, placing upright, moving, opening or closing drawers, and moving objects into or out of receptacles. The held-out evaluation contains more than 280 pick-and-place scenarios divided into unseen objects, backgrounds, and environments, each with easy and hard cases. All baselines use the same robot data: besides RT-1, they include RT-1 backbones using VC-1 or R3M visual representations and MOO, which adds a VLM-derived semantic-map channel.
 
 | Model | Seen | Unseen objects | Unseen backgrounds | Unseen environments | Unseen average |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -63,7 +63,7 @@ The open Language-Table experiment tests that interface on a different simulated
 
 ### Emergent behavior comes from recombination
 
-The quantitative emergent suite runs each instruction five times in an A/B framework, evaluating four models under the same scene conditions. Symbol tasks ask the robot to move objects near numbers, logos, or matching cards. Reasoning tasks add visual relations, arithmetic, nutrition, color, and multilingual commands. Human-recognition tasks refer to celebrities or people with a visual attribute.
+The quantitative emergent suite runs each instruction five times in an A/B framework, evaluating four models under the same scene conditions. Symbol tasks ask the robot to match objects with symbols such as X, 3, and Y or with matching cards. Reasoning tasks add logos, visual relations, arithmetic, nutrition, color, and multilingual commands. Human-recognition tasks refer to celebrities or people with a visual attribute.
 
 RT-2-PaLI-X-55B averages 82 on symbol understanding, 46 on reasoning, and 53 on person recognition, for 60 overall; RT-2-PaLM-E-12B averages 36, 43, and 43, for 40 overall; RT-1 averages 17. The PaLM-E model is better on the math subset, which the authors associate with its pretraining mixture. These are still learned motions applied to new semantic targets. For example, “put the strawberry into the correct bowl” asks the model to identify a relation and then reuse pick-and-place, while “use something to hammer a nail” can elicit a rock as the object choice without teaching a hammering motion.
 

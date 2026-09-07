@@ -33,14 +33,14 @@ $$
 \pi_\theta(a_{t:t+k}\mid s_t)
 $$
 
-With $k=1$, this is ordinary one-step closed-loop control. With $k$ equal to the episode length, it is open-loop after the first observation. The useful regime is between those endpoints: the policy learns the local rhythm of a manipulation while still receiving new visual evidence.
+If each chunk is executed before the next observation, $k=1$ gives ordinary one-step closed-loop control and an episode-length chunk gives open-loop control after the first observation. ACT later adds temporal ensembling, which queries the policy every step even when the predicted chunk is long. The useful regime is between those endpoints: the policy learns the local rhythm of a manipulation while still receiving new visual evidence.
 
 ![ACT CVAE architecture with multi-view inputs, a transformer action decoder, and a latent style variable](/assets/images/action-chunking-with-transformers-act-source-figure-4.png)
 *Fig 1: The training encoder compresses joints and a demonstrated action sequence into a latent style variable; the deployment decoder combines that variable with four camera views and joints to predict a 14-dimensional action sequence. | source: [Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware, Figure 4](https://arxiv.org/abs/2304.13705)*
 
 The left side of the source figure exists only during training. A BERT-like encoder reads the current joints and the demonstrated future actions, uses a learned CLS representation to parameterize a diagonal Gaussian, and produces $z$. The policy on the right sees images, joints, and $z$; at test time the encoder is discarded and $z$ is set to the zero mean of its prior. This is a practical CVAE design: the latent helps the decoder learn the range of human solutions without requiring a latent sample at deployment.
 
-The decoder processes four $480\times640$ RGB images with ResNet-18 encoders. Each view becomes $300\times512$ spatial features, giving 1,200 visual tokens after concatenation; projected joint state and $z$ add two more tokens. A transformer encoder fuses those 1,202 tokens, and a transformer decoder emits $k\times14$ target joint positions for the two seven-degree-of-freedom arms. The paper reports about 80M parameters, roughly five hours of training on one RTX 2080 Ti, and about 0.01 seconds per inference on that machine. It also reports better precision with L1 reconstruction and absolute target joint positions than with delta joint positions.
+The decoder processes four $480\times640$ RGB images with ResNet-18 encoders. Each view becomes $300\times512$ spatial features, giving 1,200 visual tokens after concatenation; projected joint state and $z$ add two more tokens. A transformer encoder fuses those 1,202 tokens, and a transformer decoder emits $k\times14$ targets for six arm joints and one gripper on each side. The paper reports about 80M parameters, roughly five hours of training on one RTX 2080 Ti, and about 0.01 seconds per inference on that machine. It also reports better precision with L1 reconstruction and absolute target joint positions than with delta joint positions.
 
 ### Temporal ensembling keeps the loop closed
 
@@ -61,7 +61,7 @@ The figure's colored squares are not separate controllers. The first row shows a
 
 ### Hardware and demonstrations set the operating point
 
-ALOHA uses two off-the-shelf ViperX six-degree-of-freedom follower arms, a WidowX leader for joint-space teleoperation, custom see-through grippers, and four Logitech webcams: front, top, and one on each wrist. Images and teleoperation are recorded at 50 Hz. Joint-space mapping avoids inverse-kinematics failures near singularities and lets the difference between leader and follower positions implicitly carry the force applied by the PID controller.
+ALOHA uses two off-the-shelf ViperX six-degree-of-freedom follower arms, two WidowX leader arms for joint-space teleoperation, custom see-through grippers, and four Logitech webcams: front, top, and one on each wrist. Images and teleoperation are recorded at 50 Hz. Joint-space mapping avoids inverse-kinematics failures near singularities and lets the difference between leader and follower positions implicitly carry the force applied by the PID controller.
 
 ![ALOHA bimanual workspace, camera viewpoints, gripper mechanism, and ViperX specifications](/assets/images/action-chunking-with-transformers-act-source-figure-1.webp)
 *Fig 3: The low-cost ALOHA setup combines two ViperX follower arms, four camera viewpoints, and custom grippers so demonstrations expose the visual and coordinated motion needed by fine bimanual tasks. | source: [Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware, Figure 3](https://arxiv.org/abs/2304.13705)*
@@ -72,7 +72,7 @@ The eight-task evaluation contains two simulated tasks and six real tasks. In si
 
 ### What the ablations actually isolate
 
-The chunk-length experiment disables temporal ensembling and trains separate policies for each $k$. Averaged over the four simulated settings, success rises from about 1% at $k=1$ to 44% at $k=100$, then tapers for $k=200$ and $400$. The drop near open-loop control is evidence for a responsiveness cost: longer chunks capture more coordination but cannot react quickly to an unexpected state.
+The chunk-length experiment disables temporal ensembling and trains separate policies for each $k$. Averaged over the four simulated settings, success rises from about 1% at $k=1$ to 44% at $k=100$, then tapers for $k=200$ and $400$. Because this experiment executes chunks without temporal ensembling, longer chunks delay the next observation. The authors attribute the decline to both reduced reactivity and the difficulty of modeling longer action sequences; the experiment does not isolate those two costs.
 
 Adding temporal ensembling separately tuned for each setting gives ACT a 3.3-point gain. That smaller effect is informative. Chunking changes the prediction target and reduces the effective horizon; ensembling mainly reconciles the errors left by overlapping predictions. The CVAE ablation is conditional on demonstration type: removing its objective barely changes scripted-data performance, but human-data success falls from 35.3% to 2%. Pauses and multiple valid handovers are part of the human distribution, so a single deterministic action sequence is a poor fit.
 
@@ -80,7 +80,7 @@ The final real-task numbers show both the promise and the boundary. ACT reaches 
 
 ### Where the method stops
 
-ACT still imitates the coverage and limitations of its demonstrations. The authors report that the system can pick up candy in all ten trials, pull both wrapper ends in eight, and unwrap none of ten: the final pry requires perception and contact behavior absent from the data. ALOHA also has no force-torque sensor and parallel grippers, which limits tasks involving high force, multiple fingers, or fine fingertip contact.
+ACT still imitates the coverage and limitations of its demonstrations. Even after 50 candy-unwrapping demonstrations, the system picks up candy in all ten initial trials, pulls both wrapper ends in eight, and unwraps none. The authors point to the hard-to-see wrapper seam and limited data. Allowing ten attempts on each of five candies changes the outcome: three of five are unwrapped. Recovery opportunities therefore change the measured result, while the one-attempt failure still exposes a perception bottleneck. ALOHA also has no force-torque sensor and parallel grippers, which limits tasks involving high force, multiple fingers, or fine fingertip contact.
 
 The decision lesson is specific: choose a chunk horizon from the disturbance timescale, then measure recovery after a state leaves the demonstration distribution. Temporal averaging cannot supply missing sensing, and a CVAE cannot turn inconsistent demonstrations into a physical model. ACT earns its gains by making short sequences and dense feedback work together.
 
