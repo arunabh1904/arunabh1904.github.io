@@ -31,7 +31,7 @@ summary: "2025 – VLAC: A Vision-Language-Action-Critic Model for Real-World Re
 *Fig 3: VLAC forward pass generates structured action tokens, reward tokens, and a value head is attached to estimate state value for PPO updates. | source: [VLAC, Figure 3](https://arxiv.org/abs/2509.15937)*
 
 
-VLAC is trained on more than 3,000 hours of human data, 1,200 hours of public robot data, and more than 15 hours of self-collected manipulation data; the authors sample 40 million training examples from that mixture. The critic is an 8B model in the RL experiments. On RoboFAC it separates successful from failed videos with VOC-F1 0.89 versus 0.44, which is more diagnostic than a terminal success label because it tests whether the score tracks a process rather than only its endpoint.
+VLAC is trained on more than 3,000 hours of human data, 1,200 hours of public robot data, and more than 15 hours of self-collected manipulation data; the authors sample 40 million training examples from that mixture. The critic is an 8B model in the RL experiments. On RoboFAC, VOC-F1 is 0.89 on successful videos and 0.44 on failed ones. This metric combines the correlation of predicted progress with frame order in forward and reversed videos; it is not a success-classification F1. The authors interpret the lower correlation on failures as sensitivity to interrupted or erroneous progress. That is useful process-level evidence, but it does not establish a calibrated success detector.
 
 ### The reward is a model interface
 
@@ -48,7 +48,7 @@ Dense progress is more informative than terminal success, but also easier to exp
 ## High-Level Takeaways
 
 - VLAC informs whether to hand-engineer rewards, learn a task-specific success detector, or train a visual-language process critic. Its atomic unit is a pair of observations plus a goal; progress labels come from ordering and curated negatives. Sharing the actor and critic interface buys transfer while creating correlated-failure risk.
-- The strongest evidence is the combination of RoboFAC discrimination (VOC-F1 0.89 on successful videos versus 0.44 on failed ones) and the four-task RL loop. A reward-model audit should compare critic gains with blinded completion, contact safety, and intervention rate, because a denser score can still reward visible motion.
+- The strongest evidence is the combination of RoboFAC progress-correlation contrast (VOC-F1 0.89 on successful videos versus 0.44 on failed ones) and the four-task RL loop. A reward-model audit should compare critic gains with blinded completion, contact safety, and intervention rate, because a denser score can still reward visible motion.
 - Time ordering is a useful source of scale but a real semantic assumption: pauses, retries, and necessary backtracking can receive the wrong sign. The image-difference filter reduces static-frame noise; it does not make progress causal.
 - VLAC makes the learned critic a reusable post-training interface. An independent critic or privileged contact/geometry ablation would test whether the shared model is improving exploration or merely sharing the policy's visual shortcuts.
 - The paper's useful boundary is explicit negative construction: regression, stagnation, irrelevant goals, and semantic mismatch matter as much as adding more demonstrations.
