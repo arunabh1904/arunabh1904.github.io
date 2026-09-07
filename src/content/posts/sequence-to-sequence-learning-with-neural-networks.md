@@ -11,53 +11,81 @@ tags:
 field: 'Language Models'
 summary: "2014 – Sequence to Sequence Learning with Neural Networks"
 ---
+
 ## 2014 – Sequence to Sequence Learning with Neural Networks
 
-**arXiv:** [1409.3215](https://arxiv.org/abs/1409.3215)
-
-**GitHub:** [bentrevett/pytorch-seq2seq](https://github.com/bentrevett/pytorch-seq2seq) (community implementation)
-
-**Project page / blog:** [Google Research Blog – "A neural network for machine translation"](https://research.googleblog.com/2014/12/a-neural-network-for-machine-translation.html)
-
-**Conference:** NeurIPS 2014
+**Paper:** [arXiv:1409.3215](https://arxiv.org/abs/1409.3215) · NeurIPS 2014
 
 ## Summary
 
-> This paper shows that a neural network can map variable-length input sequences to variable-length output sequences with an encoder-decoder LSTM. The encoder reads the source sentence into a fixed vector; the decoder generates the target sentence from that vector. Reversing the source sentence shortens the effective dependency path between corresponding source and target words. The main evidence is WMT 2014 English-French translation, where a deep LSTM achieves strong BLEU and improves an SMT system through reranking. The caveat is the fixed-vector bottleneck: long or information-dense inputs strain the representation, which later attention mechanisms addressed. The lasting idea is end-to-end sequence transduction with learned representations.
+> An encoder LSTM compresses a source sentence into a fixed state, and a decoder LSTM generates its translation. The surprising engineering result is that reversing the source words makes this much easier to train, even though it does not shorten the average source-to-target dependency. Five reversed LSTMs reach 34.81 BLEU on WMT'14 English–French, exceeding the 33.30 phrase-based baseline; a single reversed model reaches 30.59. The paper establishes a practical neural sequence interface while showing how input order, ensembles, search, and vocabulary limits shape the result.
 
 ## Core Insights
 
-![Figure 1: Our model reads an input sentence “ABC” and produces “WXYZ” as the output sentence from Sequence to Sequence Learning with Neural Networks](/assets/images/sequence-to-sequence-learning-with-neural-networks-paper-figure.png)
-*Fig 1: Our model reads an input sentence “ABC” and produces “WXYZ” as the output sentence. | source: [Sequence to Sequence Learning with Neural Networks paper](https://arxiv.org/abs/1409.3215)*
+### One state connects sequences of different lengths
 
-![Figure 2 from Sequence to Sequence Learning with Neural Networks](/assets/images/sequence-to-sequence-learning-with-neural-networks-source-figure-2.webp)
-*Fig 2: The figure shows a 2-dimensional PCA projection of the LSTM hidden states that are obtained after processing the phrases in the figures. The phrases are clustered by meaning, which in these examples is primarily a function of word order, which would be difficult to capture with a bag-of-words model. | source: [Sequence to Sequence Learning with Neural Networks](https://arxiv.org/abs/1409.3215)*
+A word-by-word classifier would need an alignment between the input and output positions. Translation cannot rely on that: a short source phrase can require a longer translation, and the order of its words may change. The encoder–decoder interface removes the need to assign each output to an input timestep in advance.
 
-![Figure 3 from Sequence to Sequence Learning with Neural Networks](/assets/images/sequence-to-sequence-learning-with-neural-networks-source-figure-3.webp)
-*Fig 3: The left plot shows the performance of our system as a function of sentence length, where the x-axis corresponds to the test sentences sorted by their length and is marked by the actual sequence lengths. There is no degradation on sentences with less than 35 words, there is only a minor degradation on the longest sentences. | source: [Sequence to Sequence Learning with Neural Networks](https://arxiv.org/abs/1409.3215)*
+The encoder reads the whole source sentence and passes its final state to a separate decoder. The decoder predicts a distribution over the next target word, conditioned on that state and the target prefix. It continues until it predicts an end-of-sentence token. Formally,
 
+$$
+p(y_{1:T'}\mid x_{1:T})=\prod_{t=1}^{T'}p(y_t\mid v,y_{<t}),
+$$
 
-### Method and reported result
+where $v$ is the encoder state. Training maximizes the probability of the correct translation; inference searches among possible continuations. The two LSTMs have separate parameters, so reading and generating need not use identical transitions.
 
-Sutskever et al. showed that translation could be treated as a general sequence-to-sequence problem. A multi-layer LSTM encodes the source sentence into a single vector, and a second LSTM decodes that vector into the target sentence one token at a time. Trained only on parallel text, a 4-layer model reached 34.8 BLEU on WMT'14 English to French, beating a strong phrase-based SMT baseline. Ensembles and SMT reranking pushed the score to 36.5.
+![Original seq2seq Figure 1 showing source encoding followed by target generation](/assets/images/seq2seq-source-figure-1-encoder-decoder.png)
+*Fig 1: The encoder finishes reading before the decoder begins generating. Each target prediction depends on the transferred state and earlier target words; the end token determines output length. | source: [Seq2seq, Figure 1](https://arxiv.org/abs/1409.3215)*
 
-The paper also contains one of those oddly practical details that becomes famous: reversing the input sentence shortened gradient paths and improved BLEU by about four points. The larger contribution, though, was the encoder-decoder abstraction. It gave neural machine translation and later sequence tasks a clean template: encode the input, decode the output, and learn the mapping end to end.
+The drawing makes the information constraint visible: the decoder has no attention connection back to the individual source positions. The actual model nevertheless has a substantial state. Four layers with 1,000 LSTM cells each use 8,000 real numbers for the sentence representation, counting hidden and cell states. “Fixed vector” does not mean a tiny embedding.
 
-### Reported evidence and cost
+### Reversal creates easy early connections without reducing the average distance
 
-| Dataset | Model | BLEU | Notes |
-| ------- | ----- | ---- | ----- |
-| WMT’14 En→Fr | 4-layer LSTM (reversed) | 34.8 | Single model, vocab 160k |
-| WMT’14 En→Fr | + SMT 1000-best rerank | 36.5 | Ensemble of 5 nets |
-| Training speed | – | – | ~1 week on 8 × K40 GPUs, ~3 days to converge |
-| Decoding | Beam = 12 | – | ~0.11 s / sentence on CPU |
+Suppose source words $a,b,c$ correspond roughly to target words $\alpha,\beta,\gamma$. Reading $a,b,c$ before generating $\alpha,\beta,\gamma$ leaves the earliest source word relatively far from the first target decision. Reading $c,b,a$ puts $a$ next to that decision. The network can establish some useful correspondences over short paths before it has learned to carry all information across long ones.
 
-### Where the evidence stops
+The subtle point is that the average distance between corresponding words is unchanged. Some paths become shorter and others longer. The authors attribute the improvement to reducing the *minimum* time lag and making optimization easier, while acknowledging that they do not have a complete explanation.
 
-The architecture was clean because it removed hand-built alignments, but the fixed-length vector became an obvious bottleneck for long sentences. Large vocabularies also made training expensive, and the lack of an official implementation left early adopters guessing about details. Attention mechanisms would soon address the bottleneck directly.
+Section 3.3 reports perplexity falling from 5.8 to 4.7 and decoded BLEU rising from about 25.9 to 30.6. The final Table 1 comparison gives 26.17 versus 30.59 at beam size 12. This is evidence that the way a sequence presents its dependencies can matter substantially even when the information and model family remain the same.
+
+Only the source is reversed; target sentences stay in their normal order during training and testing. Reversal also improves long-sentence behavior, beyond the early target words it directly brings closer. That observation motivates the authors' interpretation of better memory utilization.
+
+### The headline depends on an ensemble, and reranking is a different experiment
+
+The direct translation and SMT reranking results answer different questions. Direct decoding asks the neural system to produce its own translations. Reranking asks it to choose among 1,000 candidates already produced by an SMT system, using an equal combination of the neural and original scores.
+
+| WMT'14 English–French setting | BLEU |
+| --- | ---: |
+| Phrase-based SMT baseline | 33.30 |
+| Single forward LSTM, beam 12 | 26.17 |
+| Single reversed LSTM, beam 12 | 30.59 |
+| Five reversed LSTMs, beam 1 | 33.00 |
+| Five reversed LSTMs, beam 2 | 34.50 |
+| Five reversed LSTMs, beam 12 | 34.81 |
+| Five reversed LSTMs reranking SMT's 1,000-best list | 36.5 |
+
+Most of the ensemble's decoding gain from search arrives when the beam grows from one to two; increasing it to 12 adds only 0.31 BLEU. The paper notes that five models with beam two are cheaper than one model with beam 12. Spending compute on model diversity and spending it on a wider search are therefore distinct choices.
+
+The 34.81 result should not be attributed to a single model. Nor should 36.5 be described as pure neural generation. The latter inherits the SMT system's candidate set; its much higher oracle rescoring score, around 45 BLEU, shows that better selection remains possible within those candidates.
+
+### The learned state distinguishes who did what
+
+The source's representation plot is a small but useful test of what survives compression. Swapping John and Mary preserves the word set while changing the relationship. In the left panel, those sentences occupy different groups, with similar relationships among the verbs within each group.
+
+![Seq2seq source Figure 2 showing representations sensitive to word order and relatively stable across paraphrases](/assets/images/seq2seq-source-figure-2-word-order.png)
+*Fig 2: Subject–object reversals separate in the left projection. The right groups selected active/passive paraphrases by meaning. These examples probe what the encoder preserves; they are not a comprehensive semantic evaluation. | source: [Seq2seq, Figure 2](https://arxiv.org/abs/1409.3215)*
+
+The right panel provides the complementary observation: some changes in surface form, including active/passive phrasing, leave representations relatively close. Together the panels suggest sensitivity to relational meaning rather than only vocabulary. They are two-dimensional PCA projections of selected examples, so distances in this display cannot establish a general semantic guarantee.
+
+### Vocabulary and execution choices remain part of the method
+
+Training uses 12M parallel sentences, with 160,000 source words and 80,000 target words; out-of-vocabulary items become an unknown token. Names in the long translation examples expose this limitation directly. The source's length analysis reports little degradation over much of the tested range, so the fixed-state interface should not be presented as an observed universal failure on long sentences.
+
+Each model has 384M parameters. Four GPUs hold the recurrent layers and four divide the large output softmax; training takes about ten days. Grouping sentences of similar lengths into batches yields a reported twofold speedup by reducing wasted computation. These details explain why an apparently simple encoder–decoder still required careful execution design.
 
 ## High-Level Takeaways
 
-- Seq2seq informs the decision to learn translation as one conditional sequence model rather than assemble a phrase table, language model, and hand-built decoder. The atomic example is a parallel source-target sentence pair: an encoder compresses the source into a fixed vector, and a decoder predicts target tokens autoregressively.
-- The result established that end-to-end neural translation could beat a strong phrase-based system, but the fixed-vector bottleneck entangles sentence length with representation quality. A length-stratified comparison against an attention-equipped encoder-decoder is the missing decisive ablation. Scaling to much longer documents would fail through information compression and autoregressive exposure bias. The central claim would weaken if a modular or retrieval-based system matched BLEU and generalization under the same parallel-data and compute budget.
-- The encoder-decoder LSTM showed that a general neural network could outperform traditional translation systems. It did not solve sequence modelling by itself, but it gave the field the scaffold that attention and Transformers later expanded.
+- Separate encoding and decoding support variable lengths without a predefined positional alignment.
+- Reversing the source creates short early dependencies while leaving average alignment distance unchanged.
+- The 34.81 BLEU headline uses five models; the stronger 36.5 result additionally uses SMT candidates.
+- Narrow beam search captures most of the ensemble's search benefit in this experiment.
+- The state retains useful relational information, with vocabulary limits and selected-example evaluation still constraining the claim.
