@@ -36,7 +36,7 @@ The authors then use image similarity to control redundancy and coverage. The ap
 ![DINOv2 data curation and retrieval pipeline](/assets/images/dinov2-learning-robust-visual-features-without-supervision-source-figure-3.webp)
 *Fig 1: Curated and uncurated images are embedded, the uncurated pool is deduplicated, and visually related images are retrieved to augment the curated sources. The figure explains why data selection is part of the representation, even without labels or text. | source: [DINOv2, Figure 3](https://arxiv.org/abs/2304.07193)*
 
-The processing itself is a real systems contribution: the deduplication and retrieval run in under two days on 20 nodes, each equipped with eight V100-32GB GPUs. More importantly, “self-supervised” does not mean “distribution-free.” The retrieval queries define which concepts are overrepresented, and Table 15 includes training data from ADE20K, Cityscapes, Pascal VOC, KITTI, NYU Depth V2, and SUN RGB-D, along with designated train or base data from retrieval datasets. Near-duplicate validation and test images are removed, but many reported transfer tasks still have related training data in the pretraining mixture.
+The processing itself is a real systems contribution: the deduplication and retrieval run in under two days on 20 nodes, each equipped with eight V100-32GB GPUs. “Self-supervised” does not mean “distribution-free.” The retrieval queries define which concepts are overrepresented, and Table 15 includes training data from ADE20K, Cityscapes, Pascal VOC, KITTI, NYU Depth V2, and SUN RGB-D, along with designated train or base data from retrieval datasets. Near-duplicate validation and test images are removed, but many reported transfer tasks still have related training data in the pretraining mixture.
 
 ### Global invariance and patch detail use different targets
 
@@ -56,10 +56,10 @@ The data comparison is similarly useful. With the same ViT-g/14 and the same num
 
 Smaller DINOv2 models are distilled from a frozen ViT-g rather than trained from scratch. The distillation loop removes student masking and stochastic depth, applies the iBOT loss to the two global crops, and retains an exponential-moving-average student as the final model. This changes the deployment question: the 1.1B teacher supplies the target quality, while ViT-S/B/L checkpoints carry a smaller frozen feature grid.
 
-![DINOv2 distillation across image and pixel-level task groups](/assets/images/dinov2-learning-robust-visual-features-without-supervision-source-figure-5.webp)
-*Fig 2: The averaged eight-task view from the paper shows distilled ViT-L/14 approaching the ViT-g/14 teacher and exceeding a ViT-L/14 trained from scratch across the reported task groups. The plotted axes aggregate different metrics, so individual benchmark values need their table context. | source: [DINOv2, Figure 5](https://arxiv.org/abs/2304.07193)*
+![DINOv2 distillation across image and pixel-level task groups](/assets/images/dinov2-source-figure-5-distillation.png)
+*Fig 2: The left radar compares individual benchmarks; the right tables average metrics over eight task groups. Distilled ViT-L improves over scratch ViT-L, with lower values preferred on the depth axes and higher values on the accuracy axes. | source: [DINOv2, Figure 5](https://arxiv.org/abs/2304.07193)*
 
-For the individual metrics in the table accompanying the averaged radar, scratch ViT-L/14 scores 84.5 ImageNet, 72.2 segmentation, 1.10 depth RMSE, 90.2 classification, 75.8 fine-grained classification, 71.3 retrieval, 69.5 ImageNet-A/R/Sketch, and 67.3 video. Distillation changes those to 86.3, 73.3, 1.08, 91.2, 77.6, 76.3, 74.5, and 67.5. The distilled model beats scratch training on all 12 underlying benchmarks and sometimes approaches or exceeds the teacher. That is evidence for transferring a representation, not merely compressing logits for one classifier.
+In the table of eight task-group averages, scratch ViT-L/14 scores 84.5 ImageNet, 72.2 segmentation, 1.10 depth RMSE, 90.2 classification, 75.8 fine-grained classification, 71.3 retrieval, 69.5 ImageNet-A/R/Sketch, and 67.3 video. Distillation changes those to 86.3, 73.3, 1.08, 91.2, 77.6, 76.3, 74.5, and 67.5. The distilled model beats scratch training on all 12 underlying benchmarks and sometimes approaches or exceeds the teacher. That is evidence for transferring a representation, not merely compressing logits for one classifier.
 
 ### Frozen features are strong, but the probe protocol matters
 
@@ -67,8 +67,8 @@ On ImageNet-1k, the frozen ViT-g/14 reaches 83.5% k-NN and 86.5% linear top-1, v
 
 Patch tokens transfer without updating the backbone. With a simple linear segmentation probe, ViT-g/14 reaches 49.0 mIoU on ADE20K, 81.0 on Cityscapes, and 83.0 on Pascal VOC; the boosted multi-scale setup reaches 53.0, 81.0, and 86.2. A frozen-backbone ViT-Adapter plus Mask2Former reaches 60.2 ADE20K mIoU while keeping the backbone frozen. For depth, a DPT decoder on frozen ViT-g features reports RMSE 0.279 on NYU Depth V2, 2.11 on KITTI, and 0.338 when trained on NYU and transferred to SUN RGB-D. These are learned probes on frozen features, not zero-shot predictions.
 
-![DINOv2 patch features establish semantic correspondences across images](/assets/images/dinov2-learning-robust-visual-features-paper-figure.png)
-*Fig 3: The first three PCA components of patch features align corresponding parts across pose, category, and style changes after the first component is thresholded to remove background. The same feature space can match a plane wing with a bird wing, but this is a correspondence probe rather than a guarantee that every domain has the same visual parts. | source: [DINOv2, Figure 1](https://arxiv.org/abs/2304.07193)*
+![DINOv2 patch features establish semantic correspondences across images](/assets/images/dinov2-source-figure-1-pca.png)
+*Fig 3: Color-coded PCA components expose recurring parts in the patch features across changes in pose, category, and style. Background is removed before the displayed three-component projection. | source: [DINOv2, Figure 1](https://arxiv.org/abs/2304.07193)*
 
 The paper's qualitative PCA explains why the patch tokens are useful. It thresholds the first component to remove background, then computes three color-coded components across related images. Wings, limbs, and heads align across pose, style, and even category changes. The same representation can match a plane wing with a bird wing, but this is a feature-space correspondence probe, not a guarantee that every domain has the same visual parts.
 

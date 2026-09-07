@@ -52,12 +52,12 @@ The reason is visible in the paper's collapse decomposition. Centering alone pre
 
 ### Smaller patches buy semantic resolution with real throughput cost
 
-At $224\times224$, a ViT-S/16 has 197 tokens including the class token; ViT-S/8 has 785. The parameter count stays near 21M, but the self-attention sequence is four times longer in each image dimension. Table 1 measures 1007 images/s for ViT-S/16 and 180 for ViT-S/8 on a V100 with 128 samples per forward. The smaller patches improve the frozen representation: ViT-S/8 reaches 79.7% linear and 78.3% k-NN accuracy, while ViT-B/8 reaches 80.1% and 77.4%. The base model has 85M parameters, so the small ViT-S/8 is the more interesting efficiency point.
+At $224\times224$, a ViT-S/16 has 197 tokens including the class token; ViT-S/8 has 785. The parameter count stays near 21M, but the patch grid grows from $14\times14$ to $28\times28$. Doubling each spatial dimension quadruples the token count and makes the pairwise attention matrix roughly sixteen times larger. Table 1 measures 1007 images/s for ViT-S/16 and 180 for ViT-S/8 on a V100 with 128 samples per forward. The smaller patches improve the frozen representation: ViT-S/8 reaches 79.7% linear and 78.3% k-NN accuracy, while ViT-B/8 reaches 80.1% and 77.4%. The base model has 85M parameters, so the small ViT-S/8 is the more interesting efficiency point.
 
-![DINO k-NN accuracy versus throughput for different patch sizes](/assets/images/emerging-properties-self-supervised-vision-transformers-dino-source-figure-5.webp)
-*Fig 2: Smaller input patches improve k-NN accuracy without adding model parameters, but the curve moves left because the longer token sequence lowers throughput. The plotted ViT-B/8 and ViT-S/8 points expose this accuracy–systems trade-off. | source: [DINO, Figure 5](https://arxiv.org/abs/2104.14294)*
+![DINO k-NN accuracy versus throughput for different patch sizes](/assets/images/dino-source-figure-5-throughput.png)
+*Fig 2: In this 300-epoch sweep, smaller input patches improve k-NN accuracy without adding model parameters, but the curve moves left because the longer token sequence lowers throughput. The plotted ViT-B/8 and ViT-S/8 points expose this accuracy–systems trade-off. | source: [DINO, Figure 5](https://arxiv.org/abs/2104.14294)*
 
-Multi-crop has a similar budget trade-off. On two eight-GPU machines, two global crops alone reach 72.5% after 300 epochs in 45.9 hours and use 9.3 GB per GPU. Adding ten local crops reaches 76.1% in 72.6 hours and uses 15.4 GB; at 100 epochs, the ten-crop run reaches 74.6% in 24.2 hours while the global-only run reaches 67.8% in 15.3 hours. The authors' useful comparison is that the ten-crop recipe reaches about two points more than the 300-epoch global-only result after only 100 epochs, but it still costs more memory and 24.2 hours of training. More views eventually saturate: six local crops reach 75.9%, only 0.2 points below ten.
+Multi-crop has a similar budget trade-off. On two eight-GPU machines, two global crops alone reach 72.5% after 300 epochs in 45.9 hours and use 9.3 GB per GPU. Adding ten local crops reaches 76.1% in 72.6 hours and uses 15.4 GB; at 100 epochs, the ten-crop run reaches 74.6% in 24.2 hours while the global-only run reaches 67.8% in 15.3 hours. The authors' useful comparison is that the ten-crop recipe reaches about two points more than the 300-epoch global-only result after only 100 epochs, while using more memory per GPU. Its 24.2-hour training run is shorter than the 45.9-hour global-only baseline. More views eventually saturate: six local crops reach 75.9%, only 0.2 points below ten.
 
 ### Attention exposes structure the loss never names
 
@@ -73,7 +73,7 @@ The paper also shows transfer after fine-tuning: DINO reaches 81.5% ImageNet top
 ## High-Level Takeaways
 
 - DINO's core target is a momentum ensemble of the student evaluated on another crop; centering and sharpening make that target informative without labels or negative pairs.
-- Multi-crop is a representation choice and a systems choice: local views improve the local-to-global signal, while memory and throughput rise with every extra crop.
+- Multi-crop is a representation choice and a systems choice: local views improve the local-to-global signal, while extra crops increase memory use and computation.
 - Smaller patches improve the frozen k-NN representation at nearly unchanged parameter count, but the token sequence makes inference substantially slower.
 - Object-aligned attention is measured against PASCAL VOC and DAVIS, yet the maps remain smooth probes that need thresholding and do not replace a trained segmentation head.
 - The paper's strongest evidence is ImageNet-centered. DINO works on ResNet-50 too, so the experiments support a powerful objective–ViT combination rather than a claim that transformers alone create the effect.

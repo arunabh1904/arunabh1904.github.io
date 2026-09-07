@@ -43,7 +43,7 @@ The sequence is more revealing when its regressions are kept visible. Replacing 
 
 Moving that depthwise operation ahead of the channel expansion also initially hurts: 80.64% becomes 79.92%, while compute falls from 4.64 to 4.07 GFLOPs. But the spatial operator now acts on the narrow representation, making a larger kernel affordable. Increasing it from $3\times3$ to $7\times7$ recovers 80.57% at 4.15 GFLOPs. A $9\times9$ kernel gives the same mean and $11\times11$ is slightly worse. In the larger ResNet-200 regime, the appendix finds saturation already around $5\times5$. The transferable insight is the ordering of expensive operations, rather than a universal optimum of seven pixels.
 
-The smaller changes also resist an easy slogan. ReLU-to-GELU alone barely changes the score; retaining only the activation between the two channel-mixing layers raises 80.62% to 81.27%. Separate downsampling initially causes training divergence, and adding LayerNorm wherever resolution changes stabilizes it. Several choices work because the surrounding block has changed.
+The smaller changes also resist an easy slogan. ReLU-to-GELU alone barely changes the score; retaining only the activation between the two channel-mixing layers raises 80.62% to 81.27%. Separate downsampling initially causes training divergence. LayerNorm before each downsampling layer, after the stem, and after final global average pooling stabilizes the network. Several choices work because the surrounding block has changed.
 
 ### The ConvNeXt block separates spatial and channel mixing
 
