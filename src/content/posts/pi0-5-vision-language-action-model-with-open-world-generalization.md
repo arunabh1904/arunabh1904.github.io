@@ -21,7 +21,9 @@ summary: "2025 – Pi0.5: A Vision-Language-Action Model with Open-World General
 
 > π0.5 combines heterogeneous robot, web, and semantic-subtask data with a two-stage VLA recipe. It pretrains a discrete-token model for broad transfer, then adds a smaller flow-matching action expert for mobile manipulation. At test time the same model predicts a high-level subtask and the continuous action chunk that executes it.
 
-## The design joins two time scales
+## Core Insights
+
+### The design joins two time scales
 
 The model starts from a PaliGemma VLM and takes images, a language prompt, and proprioceptive state. During pretraining, robot actions are represented as FAST discrete tokens alongside text, image patches, and object locations. The mixture includes about 400 hours of mobile-manipulator data across roughly 100 homes, non-mobile robot data from diverse environments, laboratory cross-embodiment data, high-level subtask annotations, and web captioning, VQA, and localization data.
 
@@ -29,7 +31,7 @@ Post-training adds a separate action expert with random initialization. The mode
 
 The training schedule is part of the method. Pretraining runs for 280,000 discrete-token steps; post-training adds 80,000 steps with the combined text and flow objective, using $\alpha=10$ for the action term. At inference the model autoregressively decodes the subtask and then uses ten flow-denoising steps for the action chunk. The action expert is smaller than the VLM, so continuous control does not require repeatedly decoding the full language backbone.
 
-## What the architecture is actually combining
+### What the architecture is actually combining
 
 ![π0.5 combines discrete-token pretraining, semantic subtasks, and a flow-matching action expert](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-paper-figure.png)
 *Fig 1: The two-stage recipe first mixes robot, web, and high-level tasks with FAST tokens, then specializes a mobile-manipulation model with verbal instructions and a continuous flow expert. | source: [π0.5, Figure 3](https://arxiv.org/abs/2504.16054)*
@@ -38,7 +40,7 @@ Figure 1 shows why the paper calls the recipe hybrid. The broad stage supplies s
 
 The robot platforms have four cameras, two 6-DoF arms, grippers, a mobile base, and a torso lift. The action/state space is 18 or 19 dimensions. The system commands target arm poses, gripper states, torso lift, and base velocities at 50 Hz, with simple PD controllers and no additional trajectory planner or collision detector. That detail matters when comparing “end-to-end” control: the learned policy selects targets, while the low-level hardware controller tracks them.
 
-## Unseen homes, long tasks
+### Unseen homes, long tasks
 
 ![π0.5 breaks a general kitchen-cleaning command into executable subtasks in a new home](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-source-figure-2.webp)
 *Fig 2: A kitchen-cleaning rollout shows a single broad instruction followed by model-generated subtasks for drawer, utensil, and dish actions; each text step conditions the next low-level control segment. | source: [π0.5, Figure 2](https://arxiv.org/abs/2504.16054)*
@@ -50,7 +52,7 @@ The headline evaluation uses three kitchens and three bedrooms in real homes abs
 
 Figure 3 clarifies the generalization claim. The test homes are not merely new camera frames of training rooms; they introduce novel layouts, backgrounds, and object instances. The authors report consistent success across the real-home tasks and use the mock rooms to measure scaling and ablations. The remaining failure modes are concrete: difficult drawer handles, partial occlusion, and a high-level subtask that repeats an action instead of moving the task forward.
 
-## Which parts of the mixture matter?
+### Which parts of the mixture matter?
 
 For location scaling, the authors train on mobile-manipulation data from 3, 12, 22, 53, 82, and 104 locations. They hold the training steps at 40,000 so that the models see the same number of unique samples even though the location subsets differ in size. End-to-end performance on four mock tasks generally improves with the number of locations; the 104-location model approaches a control trained directly on the test homes. The result is evidence for environment diversity, not simply more gradient steps.
 

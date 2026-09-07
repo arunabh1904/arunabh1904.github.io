@@ -45,7 +45,7 @@ For cars, the paper's Table 2 3D comparison is unusually revealing: LiDAR-only V
 The qualitative source panel makes the task concrete. It shows one raw LiDAR scene with predicted 3D boxes colored by class for cars, pedestrians, and cyclists. The panel is a point-cloud visualization of the LiDAR detections; it does not show an RGB camera projection or imply that RGB was an input to the model.
 
 ![VoxelNet source Figure 1: LiDAR detections with class-colored boxes](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-source-figure-1.webp)
-*Fig 1: A raw LiDAR scene with predicted 3D boxes for cars, pedestrians, and cyclists, colored by class. | source: [VoxelNet, Figure 1](https://arxiv.org/abs/1711.06396)*
+*Fig 3: A raw LiDAR scene with predicted 3D boxes for cars, pedestrians, and cyclists, colored by class. | source: [VoxelNet, Figure 1](https://arxiv.org/abs/1711.06396)*
 
 ### The representation has a measurable systems boundary
 
