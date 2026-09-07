@@ -10,8 +10,8 @@ tags:
   - LLMs
   - Apple Silicon
 summary: >-
-  How Hermes Agent, an OpenAI-compatible localhost endpoint, llama.cpp, and an
-  already-downloaded Gemma GGUF fit together.
+  How Hermes Agent connects to a local OpenAI-compatible endpoint backed by
+  llama.cpp and an already-downloaded Gemma GGUF.
 ---
 # Running Hermes Agent with a Local GGUF
 
@@ -42,8 +42,6 @@ The figure shows the boundary that resolved the setup. A prompt does not travel 
 *Hermes owns the agent loop, tools, sessions, and skills. The custom endpoint is the interface. `llama-server` owns inference, and the GGUF supplies weights and tokenizer data. A model-load error below the API boundary can therefore be fixed without replacing the agent shell. Custom explanatory diagram, checked against the current [Hermes provider documentation](https://github.com/NousResearch/hermes-agent/blob/main/website/docs/integrations/providers.md).*
 
 This separation also changes how to debug. If Hermes cannot reach `/v1/chat/completions`, inspect the endpoint and configuration. If the endpoint returns HTTP `500` while loading a model, inspect the runtime, artifact, and hardware path. If text is generated but tools appear as plain text, inspect the server's chat template and tool-call support. Treating those as three different contracts avoids reinstalling the wrong layer.
-
-The API boundary is also the debugging boundary. Agent behavior, serving behavior, and model loading can fail independently, so each needs its own test.
 
 ## Install Hermes
 
@@ -81,7 +79,7 @@ The machine already had local Gemma GGUF artifacts in the Hugging Face cache, in
 
 `llama-server` was already installed via Homebrew, and it turned out to be the cleanest fully local setup.
 
-I started `llama-server` directly against the cached GGUF. This command records the setup that worked on April 4, 2026:
+I started `llama-server` directly against the cached GGUF. The command below records the setup that worked on April 4, 2026:
 
 ```bash
 llama-server \
@@ -101,7 +99,7 @@ A few details mattered in that run:
 - `--parallel 1` kept the memory footprint reasonable while still leaving enough room for the larger context window.
 - `--reasoning off` matched what I wanted anyway: no extra thinking overhead for a local smoke test.
 
-The context value is the main dated part of this recipe. Current Hermes documentation requires at least `64,000` tokens for agent use with tools because the system prompt, schemas, and working conversation already consume substantial context. A new setup should therefore size both Hermes and `llama-server` consistently, typically at `65536` or higher if the model and available memory support it, instead of copying the older `32768` value blindly.
+The context value is the main dated part of this recipe. `32768` was enough for this April 4 smoke test, but current Hermes documentation requires at least `64,000` tokens for agent use with tools because the system prompt, schemas, and working conversation already consume substantial context. A new setup should therefore size both Hermes and `llama-server` consistently, typically at `65536` or higher if the model and available memory support it, instead of copying the older `32768` value blindly.
 
 Once that server was up, it exposed the OpenAI-compatible endpoint Hermes wanted at:
 

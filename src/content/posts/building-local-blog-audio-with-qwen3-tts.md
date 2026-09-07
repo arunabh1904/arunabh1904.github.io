@@ -82,7 +82,7 @@ The last Qwen exports also ran at `1.10x` tempo. That choice shortened the files
 | --- | --- | --- |
 | Voice changed between chunks | One VoiceDesign prompt implies one speaker | Commit one concrete synthetic voice anchor. |
 | Reference preface repeated | Reference audio can be decoded and trimmed reliably | Decode generated acoustic codes only. |
-| Register flipped around joins | A fixed identity makes sentence-sized requests coherent | Keep one streaming context for an authored section. |
+| Register flipped around joins | A fixed identity makes sentence-sized requests coherent | Give each bounded paragraph group enough context, then decode it as one waveform. |
 | Delivery became too excited | A generic built-in voice is good enough | Select and version the actual narrator as an asset. |
 | Sentences sounded slow and rigid | More explicit silence sounds more human | Let punctuation and model context carry local timing. |
 | Audio skipped | Silence cleanup is harmless | Trim boundaries only; never rewrite silence inside speech. |
@@ -92,7 +92,7 @@ The last Qwen exports also ran at `1.10x` tempo. That choice shortened the files
 | *Cyclist* sounded wrong | Written spelling always supplies enough phonetic guidance | Apply a tested audio-only pronunciation lexicon. |
 | A file ended early | Successful model return implies complete narration | Enforce token, duration-per-word, ending, and ASR checks. |
 
-The table is the compact record. The deeper pattern changed over time. Early designs split the generation into pieces that were too small, then tried to repair continuity afterward. The section-sized Qwen design moved too far in the other direction: it gave the model enough room to drift before any check could localize the failure. The useful unit is large enough to carry one thought and small enough to reject independently.
+The table is the compact record of those iterations. The deeper pattern changed over time. Early designs split the generation into pieces that were too small, then tried to repair continuity afterward. The section-sized Qwen design moved too far in the other direction: it gave the model enough room to drift before any check could localize the failure. The useful unit is large enough to carry one thought and small enough to reject independently.
 
 ## The model contract must match the requested control
 
@@ -118,7 +118,7 @@ HUMAN_PARAGRAPH_PAUSE_SECONDS = 0.24
 HUMAN_HEADING_PAUSE_SECONDS = 0.55
 ```
 
-The model, preset, sampling settings, chunk seeds, speed, pause policy, pronunciation lexicon, and source digest enter the manifest profile. Change the article and that post becomes stale. Change a generation setting and every assigned post becomes stale. A rejected chunk receives a reviewed seed override, so rerunning the exporter reproduces the accepted sample instead of rolling the dice again.
+The model, preset, sampling settings, chunk seeds, speed, pause policy, pronunciation lexicon, and source digest enter the manifest profile. Change the article and that post becomes stale. Change a generation setting and every assigned post becomes stale. A rejected chunk receives a reviewed seed override, so the exporter can reuse its accepted cached sample instead of rolling the dice again. The seed records the choice; the cache preserves the accepted waveform. Keeping that artifact does not make it current when its source or generation profile changes.
 
 There is also a deployment boundary. Mistral's model card says the supplied reference voices and model inherit CC BY-NC 4.0. That fits this non-commercial personal site. A commercial product would need a model and voice license that permits its use; acoustic quality does not override licensing.
 
@@ -148,7 +148,7 @@ I wanted a maximum listening time of thirty minutes. Cutting every MP3 at thirty
 
 The default remains full-source narration. The exporter does not substitute a shorter narration sidecar merely to fit the default limit. It preserves the authored headings and prose in source order and omits only material that cannot be read usefully: raw markup, tables, captions, code, equations, and references. If the complete spoken article crosses its limit, the release must record a narrow per-post cap or revise the article itself.
 
-The autonomous-driving survey made the opposite editorial choice: keep the complete roughly 3,900-word narration. Its human-paced render crosses the default thirty-minute target, so the compiler gives that post a narrow reviewed cap. This is not a loophole that silently expands every asset. The source, manifest, and per-post limit record the exception. No exporter is allowed to crop the final MP3.
+The autonomous-driving survey used that explicit exception: keep the complete roughly 3,900-word narration. Its human-paced render crosses the default thirty-minute target, so the compiler gives that post a narrow reviewed cap. This is not a loophole that silently expands every asset. The source, manifest, and per-post limit record the exception. No exporter is allowed to crop the final MP3.
 
 The same refusal applies to incomplete synthesis. Each human-profile chunk has a 1,600-token acoustic ceiling. The exporter rejects chunks that are implausibly short or long for their word count. Those checks cannot judge prose, but they catch silence, early endings, and large continuation loops before assembly.
 

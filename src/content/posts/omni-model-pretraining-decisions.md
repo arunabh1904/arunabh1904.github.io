@@ -29,7 +29,7 @@ This is Part II of the series. [Part I: Tracing the VLM Progression](/blog/2026/
 
 ## Putting sensor state and actions into the language model
 
-One early approach expressed robot control as sequence modeling. [RT-1](/paper%20shorts/2022/12/13/rt-1-robotics-transformer-for-real-world-control-at-scale.html) turns images and instructions into tokens, quantizes each action dimension into one of 256 bins, and predicts the next action token. This allowed many tasks to share the same categorical training objective.
+One early approach expressed robot control as sequence modeling. [RT-1](/paper%20shorts/2022/12/13/rt-1-robotics-transformer-for-real-world-control-at-scale.html) turns images and instructions into tokens, quantizes each action dimension into one of 256 bins, and predicts the resulting categorical action values. This allowed many tasks to share the same categorical training objective.
 
 [PaLM-E](/paper%20shorts/2023/03/06/palm-e-embodied-multimodal-language-model.html) made the complementary change on the input side. It interleaves visual and continuous sensor embeddings with text, allowing the language model to answer embodied questions and produce plans. Low-level control still remained outside the decoder.
 
@@ -38,7 +38,7 @@ One early approach expressed robot control as sequence modeling. [RT-1](/paper%2
 ![RT-2 co-fine-tunes web vision-language examples and robot trajectories through one token interface](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-paper-figure.png)
 *RT-2 turns actions into text-shaped targets, so web knowledge and robot behavior can update one decoder. source: [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html)*
 
-Action tokenization made robot demonstrations compatible with a decoder already pretrained on images and language. This allowed a robot command such as *move the gripper left* to reuse semantic representations rather than learning the policy entirely from robot data. The representation is convenient for transfer, but it does not remove the structure of continuous control. Per-dimension bins quantize metric motion, and autoregressive decoding adds one serial step for every action token. The shared training objective therefore introduces quantization and control-latency costs.
+Action tokenization made robot demonstrations compatible with a decoder already pretrained on images and language. This allowed a robot command such as *move the gripper left* to reuse semantic representations rather than learning the policy entirely from robot data. The representation is convenient for transfer, but it does not remove the structure of continuous control. Per-dimension bins quantize metric motion. A token head that decodes those values serially also adds one inference step per action token; RT-1's released design avoids that extra action-token feedback, while later autoregressive VLAs make the latency trade explicit. The shared training objective therefore introduces quantization and, for serial heads, control-latency costs.
 
 ## Cross-embodiment data exposed hidden robot assumptions
 
