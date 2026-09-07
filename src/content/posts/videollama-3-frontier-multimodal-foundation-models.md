@@ -30,14 +30,14 @@ That order reflects an annotation economy. High-quality image-text pairs are eas
 
 ### Variable resolution and token pruning solve different bottlenecks
 
-![VideoLLaMA3 benchmark comparison across image and video understanding tasks](/assets/images/videollama-3-frontier-multimodal-foundation-models-paper-figure.png)
-*Fig 2: The released comparison chart places VideoLLaMA3 against image and video MLLM baselines on representative image, general-video, perception, and long-video benchmarks. | source: [VideoLLaMA 3, Figure 1](https://arxiv.org/abs/2501.13106)*
-
 Any-resolution Vision Tokenization replaces fixed positional embeddings with 2D RoPE so images with different aspect ratios can be encoded without forcing every input into one square shape. This addresses spatial information loss. For videos, the model first applies 2×2 spatial downsampling, then Differential Frame Pruner compares corresponding patches in consecutive frames using pixel-space L1 distance; patches below the 0.1 threshold are treated as redundant and later patches are pruned. This addresses context length.
 
 The two mechanisms should not be conflated. AVT changes how much spatial evidence enters the encoder. DiffFP is a temporal compression heuristic that assumes near-identical neighboring patches are less useful. It is cheap and interpretable, but it is not a learned event detector: a small pixel difference can still carry the decisive temporal cue, while a camera change can make redundant content look different.
 
 ### Benchmark gains expose both the value and the boundary
+
+![VideoLLaMA3 benchmark comparison across image and video understanding tasks](/assets/images/videollama-3-frontier-multimodal-foundation-models-paper-figure.png)
+*Fig 2: The released comparison chart places VideoLLaMA3 against image and video MLLM baselines on representative image, general-video, perception, and long-video benchmarks. | source: [VideoLLaMA 3, Figure 1](https://arxiv.org/abs/2501.13106)*
 
 For the 2B model, Table 7 reports 59.6 on VideoMME without subtitles and 63.4 with subtitles, 68.0 on PerceptionTest, 65.5 on MVBench, 58.2 on ActivityNet-QA, 65.4 on MLVU-dev, 57.1 on LongVideoBench, 41.6 on LVBench, 63.4 on TempCompass, and 81.1 on NextQA. The model is evaluated with at most 180 frames and 16K visual tokens, greedy decoding, and benchmark-specific prompts. Charades-STA temporal grounding is scored by extracting predicted start/end times and computing mIoU, rather than by a dedicated temporal decoder.
 

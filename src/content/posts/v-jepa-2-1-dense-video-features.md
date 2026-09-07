@@ -13,7 +13,7 @@ summary: '2026 – V-JEPA 2.1: Dense Features in Video Self-Supervised Learning'
 
 ## Summary
 
-> V-JEPA 2.1 asks why a representation can recognize an action yet produce noisy local features. Its answer is to supervise visible context tokens as well as masked tokens, apply the objective at intermediate layers, and train image and video pathways together. The ViT-G reaches 7.71 mAP on Ego4D short-term anticipation, 40.8 action Recall@5 on EPIC-KITCHENS-100, and reports a 20% grasping improvement over V-JEPA 2-AC in the robot evaluation.
+> V-JEPA 2.1 asks why a representation can recognize an action yet produce noisy local features. Its answer is to supervise visible context tokens as well as masked tokens, apply the objective at intermediate layers, and train image and video pathways together. The ViT-G reaches 7.71 mAP on Ego4D short-term anticipation and 40.8 action Recall@5 on EPIC-KITCHENS-100; in the robot evaluation, the matched grasping comparison improves from 60% to 70%, while a separate eight-step planning variant reaches 80%.
 
 ## Core Insights
 
