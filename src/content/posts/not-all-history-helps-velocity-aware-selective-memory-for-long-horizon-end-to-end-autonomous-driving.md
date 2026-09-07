@@ -18,7 +18,7 @@ summary: "2026 – Not All History Helps: Velocity-Aware Selective Memory for Lo
 
 ## Summary
 
-> StableDrive argues that planning history is useful only when it matches the current motion stage. Selective Momentum Memory gates the immediately previous plan before a causal Mamba update, while a Motion-Stage Training Scaffold teaches stage-aware behavior and is removed at inference. A fixed midpoint between the SMM-only and MSTS-trained endpoints gives one deployable planner. On full nuScenes validation it reports 1.20 m average L2, 0.66% average collision rate, and 0.85 m trajectory-consistency error; on transition-focused LT-nuScenes it reduces collision rate to 1.49% from MomAD's 3.08%. The evaluation remains offline and simulator-based.
+> StableDrive argues that planning history is useful only when it matches the current motion stage. Selective Momentum Memory gates the immediately previous plan before a causal Mamba update, while a Motion-Stage Training Scaffold teaches stage-aware behavior and is removed at inference. A fixed midpoint between the SMM-only and MSTS-trained endpoints gives one deployable planner. On full nuScenes validation it reports 1.20 m average L2, 0.66% average collision rate, and 0.85 m trajectory-consistency error; on transition-focused LT-nuScenes it reduces collision rate to 1.49% from MomAD's 3.08%. The evidence combines offline logged trajectories and non-reactive NAVSIM evaluation, with navhard using two-stage pseudo-simulation.
 
 ## Core Insights
 
@@ -28,7 +28,7 @@ StableDrive does not treat the history window as a second sensor stream that sho
 
 The training scaffold adds a second view of the same problem. It divides motion into stationary, accelerating, cruising, and decelerating stages and feeds stage tokens through a horizon-wise Mamba. Ground-truth kinematics supervise this scaffold during training; the scaffold is retired at inference. The model therefore learns a stage-conditioned response without requiring a privileged motion label at deployment.
 
-The released StableDrive point is a fixed midpoint, alpha = 0.5, between the SMM-only and MSTS-trained endpoints. The paper evaluates one checkpoint and one forward pass, rather than averaging two models or optimizing trajectories at test time.
+The released checkpoint averages the shared parameter tensors of the SMM-only and scaffold-retired MSTS endpoints with $\alpha=0.5$. Both endpoints have the same deployed architecture, so the averaged weights form one model evaluated with one forward pass.
 
 ![StableDrive framework with selective momentum memory and the train-and-retire motion-stage scaffold](/assets/images/not-all-history-helps-velocity-aware-selective-memory-for-long-horizon-end-to-end-autonomous-driving-source-figure-2.webp)
 *Fig 1: The framework shows the current candidate queries, one-cycle cached plans, SMM gating, and the MSTS branch that shapes training but is removed before deployment. | source: [Not All History Helps, Figure 2](https://arxiv.org/abs/2608.15573)*
@@ -37,7 +37,7 @@ Read the figure from left to right as a compatibility test. The current scene pr
 
 ### Measure long horizon where transitions occur
 
-The paper evaluates camera-only planning on the complete nuScenes split of 700 training, 150 validation, and 150 test scenes. Each sample predicts twelve half-second waypoints across six seconds. To stress the failure mode directly, LT-nuScenes selects 16 complete scenes, 642 inference frames, and 189 scored transition targets using ground-truth kinematics. It covers sustained stationary, acceleration, and deceleration segments while excluding turns and lane changes with explicit heading and displacement thresholds. NAVSIM adds 12,146 navtest samples from 136 logs and a harder two-stage set of 225 paired groups from 76 logs.
+The paper uses the standard nuScenes split of 700 training, 150 validation, and 150 test scenes and evaluates camera-only planning on the complete validation split. Each sample predicts twelve half-second waypoints across six seconds. To stress the failure mode directly, LT-nuScenes selects 16 complete scenes, 642 inference frames, and 189 scored transition targets using ground-truth kinematics. It covers sustained stationary, acceleration, and deceleration segments while excluding turns and lane changes with explicit heading and displacement thresholds. NAVSIM adds 12,146 navtest samples from 136 logs and a harder two-stage set of 225 paired groups from 76 logs.
 
 On full nuScenes validation, StableDrive's average L2 is 1.20 m, average collision rate is 0.66%, and average trajectory-consistency error is 0.85 m. Across horizons, L2 rises from 0.28 to 2.35 m and collision rate from 0.01% to 1.78%, exposing long-horizon accumulation. On LT-nuScenes, the average L2 is 1.32 m, collision rate 1.49%, and trajectory-consistency error 0.79 m; the matched MomAD reproduction reports 1.37 m, 3.08%, and 0.85 m.
 

@@ -23,7 +23,7 @@ summary: '2026 – Wiener filtering suppresses hallucination-associated directio
 
 For an image with a truthful caption representation x− and a hallucinatory representation x+, the paper constructs a residual d = x+ − x−. It treats the truthful activation as signal with covariance ΣT and the residual as hallucination-associated distortion with covariance ΣH. The additive model is a calibration construction induced by the paired samples; it is not a claim that a transformer literally stores independent “truth” and “hallucination” neurons.
 
-The ideal linear MMSE operator is A* = ΣT(ΣT + ΣH)−1. For a stable, interpretable edit, the authors eigendecompose ΣH = QΛQᵀ, measure the truthful variance τj² = qjᵀΣTqj in each distortion mode, and apply
+Under an approximately zero signal–residual cross-covariance assumption, the linear MMSE operator is A* = ΣT(ΣT + ΣH)−1. For a stable, interpretable edit, the authors eigendecompose ΣH = QΛQᵀ, measure the truthful variance τj² = qjᵀΣTqj in each distortion mode, and apply
 
 \[
 \tilde\gamma_j = \left(1 + \frac{\lambda_j}{\tau_j^2}\right)^{-\alpha}.
