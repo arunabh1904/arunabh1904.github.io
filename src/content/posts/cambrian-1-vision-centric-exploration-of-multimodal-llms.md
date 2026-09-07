@@ -9,48 +9,49 @@ tags:
 field: 'Vision-Language Models'
 summary: "2024 – Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs"
 ---
+
 ## 2024 – Cambrian-1
 
 **arXiv:** [2406.16860](https://arxiv.org/abs/2406.16860)
 
-### Method and reported result
-
-Cambrian-1 is less a single model trick and more a careful design study. It asks what happens when the visual side of a multimodal LLM is treated as a first-class object: which encoders matter, how high-resolution features should be aggregated, how data should be balanced, and how evaluation should expose visual weaknesses.
-
 ## Summary
 
-> The paper tests many vision encoders and introduces a Spatial Vision Aggregator to preserve richer visual information before it reaches the language model.
+> Cambrian-1 treats the visual side of a multimodal LLM as an experimental object. It compares 23 vision backbones, studies instruction-tuning choices, introduces the 2,638-example CV-Bench for spatial and object-centric questions, and proposes the Spatial Vision Aggregator (SVA) for combining high-resolution features. The resulting 8B, 13B, and 34B models use 576 visual tokens and report average benchmark scores of 73.1, 73.7, and 76.8 respectively. The paper's deeper claim is about evaluation: many popular VLM benchmarks can be answered with limited visual evidence, so a stronger language model can conceal a weak visual representation.
 
 ## Core Insights
 
-Cambrian-1 studies the vision components of multimodal LLMs instead of treating the visual encoder as a fixed detail. It compares many visual encoders, examines supervised and self-supervised representations, and introduces CV-Bench to focus on visual grounding. The paper's contribution is both a model family and an evaluation framework for understanding which visual choices actually improve MLLM behavior. The main lesson is that a stronger language model cannot fully compensate for weak perception. The caveat is benchmark interpretation: multimodal scores often mix language priors, OCR, grounding, and reasoning, so improvements need careful attribution.
+Cambrian-1 begins by asking whether a benchmark actually needs the image. The authors train models with 23 different vision backbones and compare each model with vision enabled, vision disabled, and random guessing. In the reported analysis, SQA-I3, MMMU, MathVista, and AI2D show less than a 5% gap between vision-enabled and vision-disabled scores. TextVQA and GQA have a nearly 40% gap between random guessing and the vision-disabled score, which the authors interpret as evidence of language bias. MMVP and MME Perception fall below random guessing without vision, making them more useful tests of grounding.
+
+![Cambrian-1 benchmark analysis: vision-enabled versus vision-disabled performance and benchmark clusters](/assets/images/cambrian-1-vision-centric-exploration-of-multimodal-llms-source-figure-3.webp)
+*Fig 1: The left panel sorts benchmarks by the gap between vision-enabled and vision-disabled models; the right panel clusters them into General, Knowledge, Chart & OCR, and Vision-Centric groups. | source: [Cambrian-1, Figure 3](https://arxiv.org/abs/2406.16860)*
+
+That analysis motivates CV-Bench. It repurposes classic 2D and 3D vision annotations as natural-language questions: 650 spatial-relationship examples, 788 object-count examples, 600 depth-order examples, and 600 relative-distance examples, for 2,638 manually inspected samples in total. The test asks for evidence such as which object is closer to the camera or how many instances appear in an image. It is a useful boundary around the headline scores because the answer cannot be recovered from a language-only prior as easily as a generic knowledge question.
+
+SVA addresses the next bottleneck: several encoders can preserve complementary information, but concatenating every feature map makes the language context too long. A learnable $L \times L$ query grid cross-attends to spatially corresponding regions of multiple encoder feature maps. The connector can be inserted at several language-model layers, so the model repeatedly accesses uncompressed visual features instead of compressing everything once at the input.
 
 ![Figure 8 from Cambrian-1: Spatial Vision Aggregator connects multiple vision encoders to the LLM](/assets/images/cambrian-1-paper-figure-8-sva.png)
-*Fig 1: The Spatial Vision Aggregator uses cross-attention to combine features from multiple vision encoders into a compact latent-token set inserted between LLM Transformer blocks. | source: [Cambrian-1 paper](https://arxiv.org/abs/2406.16860)*
+*Fig 2: SVA uses spatially aligned cross-attention to aggregate multiple vision encoders into a compact latent-token grid, with optional aggregation blocks inserted through the LLM. | source: [Cambrian-1, Figure 8](https://arxiv.org/abs/2406.16860)*
 
-![Figure 5 from Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs](/assets/images/cambrian-1-vision-centric-exploration-of-multimodal-llms-source-figure-5.webp)
-*Fig 2: Effect of Training Recipe on Model Performance. Boxplots display the distribution of benchmark scores across benchmark categories for different training recipes and types of visual encoders (Language-Supervised, Self-Supervised, and Other). | source: [Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs](https://arxiv.org/abs/2406.16860)*
+The connector ablation gives the intuition a measurable anchor. With four vision encoders and a Vicuna-1.5-7B backbone, SVA reaches 68.5 on General, 49.7 on Knowledge, 55.5 on OCR & Chart, and 53.2 on Vision-Centric benchmarks, versus 67.2, 48.9, 50.1, and 52.6 for concatenation. The gain is largest where high-resolution feature aggregation matters. A global resampler is a weaker comparison because it lacks SVA's spatial subregions and multi-layer access.
 
-![Figure 3 from Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs](/assets/images/cambrian-1-vision-centric-exploration-of-multimodal-llms-source-figure-3.webp)
-*Fig 3: Left: Performance comparison of MLLMs with visual input enabled and disabled across various benchmarks. Benchmarks are sorted by the difference between the average score with vision enabled and disabled. | source: [Cambrian-1: A Fully Open, Vision-Centric Exploration of Multimodal LLMs](https://arxiv.org/abs/2406.16860)*
+The data study is part of the model, not a postscript. Cambrian-1 uses a two-stage recipe with 1.2M adapter examples followed by 737K instruction examples, and it studies how data thresholds, mixture ratios, and system prompts change performance. The source Figure 5 makes the result visible: language-supervised, self-supervised, and other visual encoders respond differently to the training recipe, so a backbone ranking without a matched recipe is incomplete.
 
+![Cambrian-1 training-recipe comparison across visual encoder families](/assets/images/cambrian-1-vision-centric-exploration-of-multimodal-llms-source-figure-5.webp)
+*Fig 3: The source comparison shows the distribution of benchmark scores under different instruction-tuning recipes for language-supervised, self-supervised, and other visual encoders. | source: [Cambrian-1, Figure 5](https://arxiv.org/abs/2406.16860)*
 
-**What to look at:**
-- Vision encoder choice and connector design are treated as first-order variables.
-- Spatial Vision Aggregator preserves high-resolution features before the LLM sees them.
-- CV-Bench is useful because it stresses visual evidence rather than language priors.
+The final table reports Cambrian-1-8B at 73.1 average, ahead of LLaVA-NeXT-8B at 72.5, while using 576 visual tokens instead of LLaVA-NeXT's 2,880. At 34B, Cambrian-1 reaches 76.8 versus 76.0 for LLaVA-NeXT-34B. These comparisons support the vision-centric recipe, but they do not isolate SVA from the four-encoder ensemble, data curation, instruction recipe, and model scale.
 
-### Reported evidence
-
-| Signal | Detail | Why it matters |
-| ------ | ------ | -------------- |
-| Design axis | 20+ vision encoders tested | Shows visual backbone choice changes downstream VLM behavior. |
-| Connector | Spatial Vision Aggregator | Keeps more local visual evidence for the LLM. |
-| Benchmark | CV-Bench | Evaluates vision-centric reasoning failures. |
+| Decision | Cambrian-1's answer | Boundary |
+| --- | --- | --- |
+| Evaluation | Compare vision-on, vision-off, and random baselines; add CV-Bench | Benchmark language priors still affect any VQA protocol. |
+| Representation | Test many supervised and self-supervised vision backbones | Backbone quality depends on tuning and token budget. |
+| Connector | Spatially aligned cross-attention with repeated aggregation | More encoder features increase memory and serving complexity. |
+| Data | Balance adapter and instruction sources | Mixture thresholds can change the apparent backbone ranking. |
 
 ## High-Level Takeaways
 
-- Cambrian-1 informs where to spend the next unit of MLLM compute: on a larger language model, or on perception that preserves spatial evidence. Its experiments make the vision encoder and connector first-order design variables. Multiple visual backbones feed a Spatial Vision Aggregator, which retains local, high-resolution features before projecting them into the language stream; CV-Bench is then used to separate genuine visual competence from answers recoverable through language priors.
-- The paper establishes that weak perception remains a binding constraint even when the language model is strong, but it does not fully isolate whether gains come from complementary encoder features, extra visual compute, or the aggregator itself. That matched-compute ablation is the expensive missing comparison. At ten times the scale, feeding ever more spatial tokens and encoders could make context cost and data quality dominate. The central claim would be weakened if a single encoder with the same token and FLOP budget matched the multi-encoder system on grounding-heavy tests while retaining its general benchmark performance.
-- A lot of VLM work implicitly assumes the LLM is the hard part. Cambrian-1 pushes back: the quality of the visual representation and connector can decide whether the language model is reasoning over evidence or filling gaps from priors.
-- Better multimodal models are not only bigger language models. They also need better visual plumbing.
+- Cambrian-1's strongest contribution is a measurement discipline: first ask whether the benchmark needs visual evidence, then compare visual representations under a matched recipe.
+- CV-Bench turns depth, distance, position, and counting into a 2,638-example grounding surface that complements language-heavy VQA.
+- SVA's gain is specifically tied to spatially aligned aggregation and repeated access to high-resolution features; it is not evidence that every VLM needs four encoders.
+- The 576-token result is attractive for context cost, but the full system still pays for four vision towers and their preprocessing.
+- A clean deployment comparison should match activated vision FLOPs, visual-token count, instruction data, and latency before attributing the gain to the connector.
