@@ -29,7 +29,7 @@ For a pixel, a small network predicts a context vector $c\in\mathbb{R}^C$ and a 
 
 The calibrated candidates from each camera are transformed into the ego frame and assigned to ground-plane pillars. Sum pooling produces one $C	imes X	imes Y$ tensor, independent of how many cameras supplied the candidates. A standard BEV CNN can then fuse overlapping views and support semantic segmentation or a cost-map head. This is the durable interface: the downstream model queries a metric map, while the view transformer absorbs the camera-specific coordinate systems.
 
-![Figure 1 from Lift, Splat, Shoot, showing surround-camera images mapped into a vehicle-centered BEV prediction](/assets/images/lift-splat-shoot-paper-figure-1.png)
+![Figure 1 from Lift, Splat, Shoot, showing surround-camera images mapped into a vehicle-centered BEV prediction](/assets/images/lift-splat-shoot-source-figure-1-overview.png)
 *Fig 1: Surround-camera images are converted into vehicle, drivable-area, and lane semantics in one BEV frame; the colored BEV predictions are projected back onto the input views for visualization. | source: [Lift, Splat, Shoot, Figure 1](https://arxiv.org/abs/2008.05711)*
 
 ### The lift keeps alternatives; the splat pays for them
