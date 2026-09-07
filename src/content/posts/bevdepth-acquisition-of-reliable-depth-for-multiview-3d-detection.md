@@ -15,37 +15,56 @@ summary: '2022 – BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Obj
 
 **Code:** [Megvii-BaseDetection/BEVDepth](https://github.com/Megvii-BaseDetection/BEVDepth)
 
-### Method and reported result
-
-BEVDepth shows that a camera-only detector can use LiDAR as training supervision without requiring LiDAR at inference. It adds explicit sparse depth targets to a Lift-Splat camera-to-BEV transform, conditions the depth network on camera intrinsics, refines the lifted feature volume, and pools it efficiently into BEV.
-
 ## Summary
 
-> The key distinction is lifecycle. LiDAR supplies targets while the model learns; runtime inputs remain surround-camera images and calibration. This is privileged sensing, not sensor fusion.
+> BEVDepth treats the depth distribution inside Lift-Splat as a trainable geometric interface rather than an incidental attention map. Projected LiDAR points supervise that intermediate distribution during training, camera intrinsics and extrinsics condition its prediction, and a depth-refinement module can move or aggregate features along the ray before BEV pooling. Runtime input is still images plus calibration. The paper’s controlled oracle-depth gap and component ablation show why this helps; the 60.0/60.9 NDS test results add multi-frame fusion, efficient pooling, and different backbone contracts, so they should not be read as one isolated depth-loss gain.
 
 ## Core Insights
 
-The paper first audits the learned depth inside Lift-Splat-style detectors. Replacing learned depth with ground-truth depth raises its controlled detector from 0.282 to 0.470 mAP and from 0.327 to 0.515 NDS, showing that the view transform leaves substantial geometry on the table. BEVDepth then supervises the categorical depth distribution using projected LiDAR points, supplies intrinsics and extrinsics to the depth network, and uses a refinement module to reduce errors caused by imperfect unprojection.
+### The view transform is the hidden bottleneck
 
-The full system adds efficient voxel pooling and temporal fusion. On nuScenes test, the paper reports 60.9 NDS, the first camera-only result above 60 NDS at publication. That number does not mean sparse LiDAR labels solve monocular ambiguity everywhere: supervision is sparse, dynamic-object alignment can be imperfect, and the runtime camera still loses direct range observability in novel conditions.
+BEVDepth begins by looking inside a Lift-Splat-style detector. Its learned depth maps appear poor even when the detector reaches reasonable mAP, so the paper replaces the predicted distribution with alternatives. On the nuScenes validation split, the controlled detector goes from 0.282 mAP, 0.768 mATE, and 0.327 NDS with learned depth to 0.470, 0.393, and 0.515 with ground-truth depth from LiDAR. Random soft depth still reaches 0.245 mAP, while one-hot random depth falls to 0.176. A soft distribution can leave some activation at the correct range and spread nearby noise; a one-hot guess either lands on the object or misses it entirely.
 
-![BEVDepth pipeline with LiDAR depth supervision during training and a camera-only inference path](/assets/images/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection-source-figure-4.webp)
-*Fig 1: The red supervision path exists only during training; deployment runs from multi-view images through depth prediction, refinement, and efficient voxel pooling into the BEV detection head. | source: [BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection](https://arxiv.org/abs/2206.10092)*
+The depth metrics tell the same story. Across all foreground points, adding the explicit depth loss changes SILog from 54.58 to 27.62, AbsRel from 3.03 to 0.23, SqRel from 85.11 to 2.09, and RMSE from 19.45 to 5.78. In the paper’s best-region subset, the corresponding values are 27.87/0.38/6.96/8.29 without the loss and 14.12/0.10/1.04/4.55 with it. This is why a detector can survive a visually unconvincing depth map: the downstream head needs enough correctly placed or softly overlapping evidence, not uniformly accurate depth at every pixel.
+
+The base detector predicts image features $F_i^{2d}$ and a categorical depth tensor $D_i^{pred}$, forms a frustum feature $F_i^{3d}=F_i^{2d}\otimes D_i^{pred}$, and pools those features into BEV. BEVDepth adds supervision before the final detector can compensate for a bad placement.
 
 ![Figure 1 from BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection](/assets/images/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection-source-figure-1.webp)
-*Fig 2: The depth maps contrast Lift-Splat with BEVDepth; dashed boxes mark regions where Lift-Splat concentrates relatively accurate estimates near object-ground contact points. | source: [BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection](https://arxiv.org/abs/2206.10092)*
+*Fig 1: The source visualization contrasts Lift-Splat and BEVDepth depth maps; the dashed regions mark places where the baseline happens to predict useful depth even though much of its map is unreliable. | source: [BEVDepth, Figure 1](https://arxiv.org/abs/2206.10092)*
 
+### LiDAR teaches the distribution, then leaves the vehicle
 
-| Depth mechanism | Input at training | Input at inference | Role |
-| --- | --- | --- | --- |
-| Depth prediction | Images, calibration, sparse LiDAR targets | Images and calibration | Places context features along camera rays. |
-| Camera awareness | Intrinsics and extrinsics | Intrinsics and extrinsics | Adapts depth features to focal length and camera pose. |
-| Depth refinement | Lifted image feature volume | Lifted image feature volume | Corrects local errors before voxel pooling. |
-| Temporal fusion | Adjacent camera frames and ego motion | Adjacent camera frames and ego motion | Adds motion and multi-view geometric cues. |
+To make a target, BEVDepth projects each LiDAR point into each camera with its extrinsic rotation and translation and the camera intrinsic matrix. Points outside the view are discarded. Multiple points that land at one pixel are min-pooled in depth, then converted to a one-hot depth-bin target. A binary cross-entropy loss supervises the predicted categorical distribution. The LiDAR points therefore provide a sparse geometric teacher; they are not concatenated with the camera features at inference.
+
+That lifecycle is easy to blur in the headline. The deployed view transform still has to infer range from images, and its target covers measured surfaces rather than every pixel. Occlusion boundaries, moving objects, point sparsity, and camera changes can all make the teacher incomplete. The contribution is to make the intermediate representation answer a geometric question during training, not to turn the runtime camera into a LiDAR sensor.
+
+### Camera parameters tell DepthNet what a pixel means
+
+A pixel’s depth statistics depend on the camera that produced it. BEVDepth first maps camera intrinsics through an MLP and uses them to reweight the image feature with a squeeze-and-excitation block. It then feeds flattened rotation, translation, and intrinsic parameters to the depth network, giving it both the camera’s projection characteristics and the feature’s location in the ego frame. The target remains the same categorical depth representation; camera awareness is inside DepthNet rather than a camera-specific regression rescaling.
+
+This is a useful distinction for multi-camera systems with different fields of view. A shared DepthNet can learn that the same visual pattern carries a different geometric prior in a wide-angle side camera than in a forward camera, while the output still lands in the common BEV coordinate system.
+
+### Refinement repairs a soft placement before pooling
+
+Even a supervised distribution can assign a feature to a nearby depth bin. BEVDepth’s refinement module reshapes $F^{3d}$ from $[C_F,C_D,H,W]$ to $[C_FH,C_D,W]$ and applies convolutions on the $C_D\times W$ plane before reshaping back for voxel or pillar pooling. A kernel that spans the depth axis can aggregate neighboring hypotheses when confidence is low and can move an incorrectly placed feature toward a nearby consistent location. It is a rectification step on the lifted feature volume, not a second standalone monocular depth estimator.
+
+The kernel ablation makes that intuition testable. A $1\times3$ kernel, which does not mix along depth, gives 0.315 mAP and 0.357 NDS; a $3\times1$ kernel reaches 0.320 and 0.369; a $3\times3$ kernel reaches 0.322 and 0.367. The depth-axis interaction is doing the useful work, while the final two-dimensional kernel only adds context around it.
+
+![BEVDepth pipeline with LiDAR depth supervision during training and a camera-only inference path](/assets/images/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection-source-figure-4.webp)
+*Fig 2: Camera parameters condition DepthNet, projected LiDAR supplies the training target, and the lifted frustum is refined and pooled into BEV; the LiDAR supervision path disappears at inference. | source: [BEVDepth, Figure 4](https://arxiv.org/abs/2206.10092)*
+
+### The ablation separates geometry from temporal and systems gains
+
+On the nuScenes validation split, the component sequence starts at 0.282 mAP and 0.327 NDS. Adding depth loss gives 0.304/0.344; adding camera awareness gives 0.314/0.357; adding depth refinement gives 0.322/0.367; and multi-frame fusion gives 0.330/0.442. The source attributes the main depth-loss gain to classification, the camera-aware step to a 0.41 reduction in mATE, and refinement to a 0.8-point mAP improvement. BCE and L1 depth losses are close (0.322/0.367 versus 0.321/0.371), so the supervision target and feature path matter more than choosing between these two scalar losses.
+
+The final multi-frame implementation aligns frustum coordinates from different frames into the current ego frame, pools them, and concatenates the resulting BEV features. Efficient Voxel Pooling assigns a CUDA thread to each frustum feature instead of sorting and cumulative-summing the whole set. The paper reports an 80× speedup for the pooling operation and reduces state-of-the-art training time from five days to 1.5 days. These are important engineering additions, but they are separate from the controlled evidence that depth supervision fixes the view transform.
+
+On the test split, the submitted BEVDepth model reports 50.3 mAP and 60.0 NDS with a VovNet backbone and $640\times1600$ input. A ConvNeXT variant reaches 52.0 mAP and 60.9 NDS. The latter is the paper’s headline camera-only result, but its backbone and full system differ from the earlier ResNet-50 ablation. Keeping those contexts separate makes the causal claim legible.
 
 ## High-Level Takeaways
 
-- BEVDepth informs whether a camera-only production model should spend data-collection budget on LiDAR-equipped teacher vehicles. Its atomic unit is a pixel-by-depth-bin feature. The camera backbone and depth head are shared across views, while calibration conditions the prediction; the depth loss is auxiliary at training but structurally changes the runtime BEV.
-- The missing control compares sparse LiDAR supervision, dense offline reconstruction, stereo/video self-supervision, and no depth target under equal camera data and training compute. At 10× fleet data, target generation, calibration quality, and long-range label sparsity become the bottleneck rather than model capacity. The privileged-LiDAR recipe would fail if video-only geometry or future-point-cloud pretraining matches range-bucketed detection, calibration, and uncertainty without a LiDAR collection fleet.
-- LSS made depth a latent distribution; BEVDepth showed that explicitly supervising that latent can materially improve the camera-only detector.
-- A runtime sensor budget and a training supervision budget are different design variables.
+- BEVDepth’s central diagnosis is the oracle-depth gap: the camera detector has downstream capacity, but inaccurate lifting places evidence at the wrong range.
+- Projected LiDAR points supervise the categorical depth distribution during training; runtime still uses only images and calibration, so this is privileged supervision rather than sensor fusion.
+- Camera-aware DepthNet encodes intrinsics and extrinsics inside the predictor, while the refinement module mixes neighboring depth hypotheses before pooling.
+- The component ablation reaches 0.330 mAP / 0.442 NDS only after adding multi-frame fusion; the clean depth evidence is the earlier 0.282→0.322 mAP progression.
+- The test headline is 60.0 NDS for the VovNet system and 60.9 for the ConvNeXT variant. Sparse teacher coverage, calibration shifts, and camera-only range ambiguity remain deployment boundaries.
