@@ -24,7 +24,7 @@ summary: "2025 – RobustVLA: Robustness-Aware Reinforcement Post-Training for V
 *Fig 1: Traces the robustness claim from intervention to objective: perturbations expose return drift and error amplification, which motivate Jacobian, action-smoothing, and robust RL regularizers. | source: [RobustVLA](https://arxiv.org/abs/2511.01331)*
 
 ![Figure 4 from RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](/assets/images/robustvla-robustness-aware-reinforcement-post-training-source-figure-4.webp)
-*Fig 2: (a) Ablation studies on Jacobian weight, and action-smooth weight. (b-c) T-SNE visualization of the observation representations of the baseline RIPT-VLA and the proposed RobustVLA. “ ”: task success; “ ”: task failure. | source: [RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2511.01331)*
+*Fig 2: Regularization-weight ablations test how strongly to constrain input sensitivity and update drift. The representation plots compare successful and failed episodes; visual separation alone does not establish a robustness guarantee. | source: [RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2511.01331)*
 
 ![Figure 2 from RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](/assets/images/robustvla-robustness-aware-reinforcement-post-training-source-figure-2.webp)
 *Fig 3: RobustVLA evaluates observation perturbations—shifts, rotations, color changes, occlusions, and erasing—alongside action noise, covering both perception and control failures. | source: [RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2511.01331)*
@@ -34,7 +34,7 @@ summary: "2025 – RobustVLA: Robustness-Aware Reinforcement Post-Training for V
 
 Observation perturbations model shifts, rotations, color jitter, occlusions, and erasing in both first- and third-view inputs. Action perturbations add zero-mean Gaussian noise with standard deviations 0.1, 0.2, or 0.3. The theory separates their effects: an observation change is amplified by the policy Jacobian, while an action disturbance compounds with the drift between successive policy updates.
 
-The implementation follows that split. Its Jacobian term is a clamped squared gradient of the log action probability, $R_{\mathrm{Jac}}=\mathbb{E}\min(\|\nabla_s\log\pi_\theta(a\mid s)\|_2^2,G_{\max})$. Its smoothness term penalizes movement in the policy mean between the current and reference models, $R_{\mathrm{Smooth}}=\mathbb{E}\|\mu_\theta(s)-\mu_{\theta^-}(s)\|_2^2$. The robust objective is PPO plus $\alpha R_{\mathrm{Jac}}+\beta R_{\mathrm{Smooth}}$; the second term is about update-induced model drift, not simply smoothing a robot trajectory.
+The implementation follows that split. Its Jacobian term is a clamped squared gradient of the log action probability, $R_{\mathrm{Jac}}=\mathbb{E}\min(\|\nabla_s\log\pi_\theta(a\mid s)\|_2^2,G_{\max})$. Its smoothness term penalizes movement in the policy mean between the current and reference models, $R_{\mathrm{Smooth}}=\mathbb{E}\|\mu_\theta(s)-\mu_{\theta^-}(s)\|_2^2$. The minimized robust training loss is the PPO loss plus $\alpha R_{\mathrm{Jac}}+\beta R_{\mathrm{Smooth}}$; the second term is about update-induced model drift, not simply smoothing a robot trajectory.
 
 That distinction matters for interpreting the method. A policy can be insensitive to a small pixel change yet jump after an online update, or change gradually while remaining highly sensitive to the camera. The two penalties are intended to close those separate routes.
 
@@ -43,7 +43,7 @@ The paper shifts robustness from an evaluation afterthought into the post-traini
 | Perturbation | Regularizer | Intended effect |
 | --- | --- | --- |
 | Observation noise | Policy Jacobian penalty | Reduce sensitivity to irrelevant visual changes |
-| Action disturbance | Smoothness penalty | Prevent unstable reactions and oscillation |
+| Action disturbance | Smoothness penalty | Limit mean-action drift between policy updates |
 
 ### The gains survive matched perturbation tests, within LIBERO
 

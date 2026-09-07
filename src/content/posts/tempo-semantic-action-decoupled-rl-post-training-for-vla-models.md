@@ -27,8 +27,6 @@ summary: '2026 – TEMPO: Semantic-Action Decoupled RL Post-Training for VLA Mod
 ![TEMPO's slow semantic projection update and fast action-expert update with two reinforcement-learning loops](/assets/images/tempo-semantic-action-decoupled-rl-post-training-for-vla-models-source-figure-1.png)
 *Fig 1: The paper's interface is a frozen VLM, a slowly updated semantic projection, and a quickly updated action expert. Each trainable block has its own RL loop, so the semantic latent can move on a slower clock than the action policy. | source: [TEMPO, Figure 1](https://arxiv.org/abs/2608.07314)*
 
-![TEMPO with a frozen VLM, slowly updated semantic projection, quickly updated action expert, and separate replay buffers](/assets/images/tempo-two-timescale-post-training-framework.png)
-*Fig 2: This explanatory view expands the source diagram into the training state: the semantic and action loops share rollouts but use separate replay buffers, critics, and actor updates. The slow semantic loop limits latent drift while the fast action loop absorbs control feedback. | diagram based on [TEMPO](https://arxiv.org/abs/2608.07314)*
 
 ### One RL clock is a hidden architectural assumption
 
