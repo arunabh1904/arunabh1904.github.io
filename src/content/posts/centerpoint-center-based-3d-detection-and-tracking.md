@@ -16,7 +16,7 @@ summary: '2020 – CenterPoint: represent 3D actors by BEV centers, attributes, 
 
 ## Summary
 
-> CenterPoint changes the detector's output address. Instead of placing many oriented anchors over a BEV map, it finds one class-specific center per object and reads size, height, yaw, sub-voxel offset, and velocity at that location. A light second stage samples five geometric points on each proposal to recover detail that a strided center feature may miss. The same velocity output turns detection into greedy tracking. A single model reaches 58.0 mAP/65.5 NDS on nuScenes and 63.8 AMOTA, while the ablations show where the center abstraction helps and where sparse returns limit refinement.
+> CenterPoint changes where a detector reads its box predictions. Instead of placing many oriented anchors over a BEV map, it finds one class-specific center per object and reads size, height, yaw, sub-voxel offset, and velocity at that location. A light second stage samples five geometric points on each proposal to recover detail that a strided center feature may miss. The same velocity output turns detection into greedy tracking. A single model reaches 58.0 mAP/65.5 NDS on nuScenes and 63.8 AMOTA, while the ablations show where the center abstraction helps and where sparse returns limit refinement.
 
 ## Core Insights
 
@@ -27,7 +27,7 @@ CenterPoint first encodes a LiDAR cloud with a standard VoxelNet or PointPillars
 The representation is useful because a point has no intrinsic orientation. An anchor detector must decide which sizes and headings to place at every location before it can learn to correct them. CenterPoint asks the backbone to learn the relationship between a center feature and the object's extent and heading. This is especially relevant during a turn: an axis-aligned anchor is a poor geometric proxy for a rotated car, while the center remains the same kind of target.
 
 ![CenterPoint source Figure 1: anchor-based and center-based boxes during straight driving and a turn](/assets/images/centerpoint-center-based-3d-detection-and-tracking-source-figure-1.webp)
-*Fig 1: The source comparison shows axis-aligned anchor boxes struggling when the vehicle turns, while center points remain rotationally invariant and the box attributes are regressed afterward. | source: [CenterPoint, Figure 1](https://arxiv.org/abs/2006.11275)*
+*Fig 1: The source comparison shows axis-aligned anchor boxes struggling when the vehicle turns, while a center target needs no preset anchor heading; box orientation and extent are regressed afterward. | source: [CenterPoint, Figure 1](https://arxiv.org/abs/2006.11275)*
 
 The gain is not just a different parameterization. On Waymo validation, changing the output from anchors to centers improves level-2 mAPH by 4.3 points with a VoxelNet encoder and 4.5 points with PointPillars. On nuScenes validation, the corresponding mAP improvement is 3.8–4.1 points, with 1.1–1.8 points of NDS improvement. These comparisons keep the broad encoder and training setup fixed, so they isolate the proposal representation more closely than a leaderboard comparison does.
 
