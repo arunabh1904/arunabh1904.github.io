@@ -14,39 +14,57 @@ summary: '2022 – BEVFormer v2: strengthening BEV learning with perspective sup
 
 **Paper:** [CVPR 2023](https://openaccess.thecvf.com/content/CVPR2023/html/Yang_BEVFormer_v2_Adapting_Modern_Image_Backbones_to_Birds-Eye-View_Recognition_via_CVPR_2023_paper.html)
 
-### Method and reported result
-
-BEVFormer v2 asks why stronger 2D image backbones do not automatically produce stronger BEV detectors. Its answer is optimization: when supervision arrives only after view transformation, the image backbone receives an indirect signal for depth, orientation, and velocity. The model adds a perspective-view 3D detection head, then encodes its proposals as object queries for the BEV head.
-
 ## Summary
 
-> Perspective supervision gives the image backbone a direct 3D learning signal before BEV projection. The first-stage proposals also give the BEV decoder scene-conditioned queries instead of relying only on a fixed learned query bank.
+> BEVFormer v2 addresses an optimization mismatch in camera-BEV models: a BEV loss reaches the image backbone only after projection, attention, and sparse object decoding. A DD3D-style perspective head supplies dense image-aligned 3D supervision, then its filtered proposals become scene-conditioned reference points for a second-stage BEV decoder. The matched ResNet-101 ablation improves NDS from 42.6 to 45.1 and mAP from 35.5 to 37.4; the 63.4 NDS / 55.6 mAP InternImage-XL result is a larger, separately configured test point. Perspective supervision improves backbone adaptation, but it does not remove projection, calibration, occlusion, or online-temporal limits.
 
 ## Core Insights
 
-Across ResNet-50, DLA-34, ResNet-101, VoVNet-99, and InternImage-B backbones, adding perspective supervision improves nuScenes validation NDS by roughly three points and mAP by roughly two points. With InternImage-XL, the paper reports 63.4 NDS and 55.6 mAP on the nuScenes test set.
+### BEV supervision reaches the backbone too indirectly
 
-![BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision source figure: Overall architecture of BEVFormer v2.](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-paper-figure.webp)
-*Fig 1: BEVFormer v2 adds a perspective 3D head and hybrid object queries to temporal BEV encoding, jointly supervising perspective and BEV predictions from modern image backbones. | source: [BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](https://arxiv.org/abs/2211.10439)*
+A BEV detector first converts multi-view image features into grid-shaped BEV features and then asks a small set of object queries to predict 3D boxes. The gradient from a box loss therefore travels through view transformation, spatial cross-attention, BEV encoding, and a sparse decoder before it teaches the image backbone about depth or orientation. BEVFormer v2 calls this supervision implicit and sparse with respect to image features: only image locations sampled by attended BEV references contribute directly to the final error.
+
+The paper adds a perspective 3D detection head directly on the image features. Its FCOS3D-like head predicts 2D location, 3D center depth, projected-center offset, size, and orientation, along with confidence. The total objective is $\mathcal{L}_{total}=\lambda_{bev}\mathcal{L}_{bev}+\lambda_{pers}\mathcal{L}_{pers}$, with both weights set to one in the reported experiments. The perspective loss gives the backbone dense, direct feedback about the properties the BEV stage needs, while the BEV head and its original representation remain in place.
 
 ![Figure 2 from BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-source-figure-2.webp)
-*Fig 2: Comparison of perspective supervision (a) and BEV supervision (B). The supervision signals of the perspective detector are dense and direct to the image feature, while those of the BEV detector are sparse and indirect. | source: [BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](https://arxiv.org/abs/2211.10439)*
+*Fig 1: Perspective supervision compares image features directly with per-pixel 3D predictions, whereas BEV supervision reaches them through projected BEV features and a sparse set-prediction head. | source: [BEVFormer v2, Figure 2](https://arxiv.org/abs/2211.10439)*
+
+This framing explains why the paper focuses on backbone adaptation rather than only on a new BEV operator. Modern 2D backbones pretrained on COCO have strong visual features but no reason to encode driving-specific depth and orientation. The auxiliary head turns those missing properties into an explicit training signal without requiring extra LiDAR or depth-estimation pretraining.
+
+### The auxiliary head becomes a proposal generator
+
+Joint supervision would already help optimization, but BEVFormer v2 also uses the perspective head’s predictions in a two-stage detector. It filters perspective boxes with per-view 2D NMS at IoU 0.75, keeps the top $k_1=100$ proposals per camera, projects them into BEV, applies BEV NMS at IoU 0.3 to remove duplicate views, and keeps the top $k_2=100$ proposals. Their projected box centers become image-conditioned reference points for the BEV decoder.
+
+Those references are combined with learned content queries and learned positional embeddings. The per-image proposals tell deformable attention where an object is likely to be in this scene; the learned queries preserve a dataset-level spatial prior and can recover objects missed by the perspective head. This is why the method keeps both query types rather than replacing the learned bank entirely.
+
+![BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision source figure: Overall architecture of BEVFormer v2.](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-paper-figure.webp)
+*Fig 2: The perspective head and BEV head share the image backbone; perspective predictions provide the auxiliary loss and scene-conditioned proposals that join learned queries in the temporal BEV decoder. | source: [BEVFormer v2, Figure 1](https://arxiv.org/abs/2211.10439)*
 
 ![Figure 3 from BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-source-figure-3.webp)
-*Fig 3: The decoder of the BEV head in BEVFromer v2. The projected centers of the first-stage proposals are used as per-image reference points (purple ones), and they are combined with per-dataset learnded content queries and positional embeddings (blue ones) as hybrid object queries. | source: [BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](https://arxiv.org/abs/2211.10439)*
+*Fig 3: Projected centers from filtered perspective proposals become per-image reference points, while learned content and positional embeddings preserve a stable query prior for the second-stage BEV decoder. | source: [BEVFormer v2, Figure 3](https://arxiv.org/abs/2211.10439)*
 
+The proposal path has a clear failure mode. An occluded object or one near the boundary of adjacent camera views may be missed by the perspective head, so the learned references are necessary as a fallback. Conversely, a false perspective proposal is given a privileged place to be sampled by the second stage. The query design moves scene association earlier in the decoder; it does not make the proposal set ground truth.
 
-| Comparison | NDS | mAP |
-| --- | ---: | ---: |
-| BEV-only, ResNet-101 | 42.6 | 35.5 |
-| Perspective + BEV, ResNet-101 | 45.1 | 37.4 |
-| BEVFormer v2, InternImage-XL test | 63.4 | 55.6 |
+### Longer temporal spacing changes the online contract
 
-The comparison supports the optimization claim more strongly than a claim about universal architecture quality. The paper evaluates a spectrum of backbones, but explicitly notes that compute limited its exploration of still larger models.
+BEVFormer v2 also replaces BEVFormer’s recurrent temporal self-attention with a warp-and-concatenate encoder. A historical BEV feature is bilinearly warped into the current frame with the relative $SE(3)$ transform, concatenated with the current BEV feature, and reduced with residual blocks. The model keeps the same number of historical features as the original design but samples them at a longer interval: the Table 6 ablation uses 2 seconds rather than 0.5 seconds. That provides larger object displacement and more diverse ego positions without linearly increasing the number of stored features.
+
+The future-frame gain is measurable. In Table 6, the longer-interval model reaches 49.8 NDS / 38.8 mAP; adding bidirectional temporal features raises it to 52.9 / 42.3. Removing perspective supervision from that full setup lowers it to 50.7 / 39.7. Both temporal access and perspective supervision contribute, and the future frames make this an offline detector. A live system cannot consume observations that have not arrived.
+
+The main InternImage test configurations go further: Appendix Table 7 specifies a **4-second temporal interval and bidirectional features** for both backbones. They also use Group DETR in the BEV head, whereas the single-frame ablations retain Deformable DETR. Table 2 and Table 3 therefore isolate the perspective-based design within their own settings; the 63.4 NDS headline includes a larger backbone, different decoding, and future-frame access.
+
+### The matched ablations support an optimization explanation
+
+On the nuScenes validation split with a ResNet-101 backbone and no temporal information, the BEV-only detector reaches 42.6 NDS and 35.5 mAP. Perspective-only reaches 41.2/32.3, while Perspective & BEV reaches 45.1/37.4. Replacing the perspective head with a second BEV head gives 42.8/35.0. The two-stage structure by itself is therefore not enough; the useful ingredient is the perspective view’s direct and dense supervision plus its image-conditioned proposals.
+
+The effect repeats across backbones initialized from COCO. For ResNet-50, NDS rises from 40.0 to 42.8 and mAP from 32.7 to 34.9; for DLA-34, 40.3 to 43.5 and 33.8 to 35.8; for VoVNet-99, 44.1 to 46.7 and 36.7 to 39.6; for InternImage-B, 45.5 to 48.5 and 39.8 to 41.7. Training also converges faster: after 24, 48, and 72 epochs, the ResNet-50 BEV-only model reaches 37.9/40.0/41.0 NDS, while Perspective & BEV reaches 41.4/42.8/42.8. More BEV-only epochs narrow the gap only slightly.
+
+The full test table uses stronger and differently pretrained components. BEVFormer v2 with InternImage-B reaches 62.0 NDS and 54.0 mAP; InternImage-XL reaches 63.4 and 55.6, surpassing the cited BEVStereo entry by 2.4 NDS and 3.1 mAP. The source contrasts these COCO-initialized backbones with V2-99 backbones pretrained on depth estimation and then fine-tuned with DD3D. The scale result is compelling, but it is not the same controlled comparison as the ResNet-101 ablation.
 
 ## High-Level Takeaways
 
-- A shared BEV loss may be too remote to train an image backbone to preserve the 3D cues that projection needs.
-- Auxiliary supervision is most convincing here because the gain repeats across backbone families and model sizes.
-- Perspective proposals serve two roles: they improve the image features and initialize the BEV decoder with image-conditioned hypotheses.
-- The result does not remove projection error; it improves the features and queries presented to the BEV stage.
+- BEVFormer v2 adds a dense perspective 3D loss because a sparse BEV decoder gives the image backbone an indirect geometric signal.
+- The perspective head also supplies filtered, per-image proposal centers; learned queries remain as a fallback for missed or occluded objects.
+- The matched ResNet-101 comparison supports the mechanism: Perspective & BEV reaches 45.1 NDS / 37.4 mAP, while a two-BEV-head control stays at 42.8 / 35.0.
+- Gains repeat across COCO-initialized backbones and shorten convergence, while the InternImage-XL 63.4 NDS / 55.6 mAP point uses a separate scale and temporal contract.
+- The warp-and-concatenate temporal encoder can use future frames offline, and the perspective route still inherits calibration, occlusion, and projection limits.
