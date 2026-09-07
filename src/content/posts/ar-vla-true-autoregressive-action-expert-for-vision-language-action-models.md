@@ -16,8 +16,6 @@ topics:
 summary: '2026 – AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models'
 ---
 
-## 2026 – AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models
-
 **arXiv:** [2603.10126](https://arxiv.org/abs/2603.10126)  
 **Project, code, and videos:** [arvla.insait.ai](https://arvla.insait.ai/)
 
@@ -27,15 +25,19 @@ summary: '2026 – AR-VLA: True Autoregressive Action Expert for Vision-Language
 
 ## Core Insights
 
+### Persistent state is the action interface
+
 That distinction matters in the paper’s matched BridgeV2 experiment. With the same PaliGemma-3B backbone and roughly 300M-parameter action module, AR-VLA reaches 61.5% average success in SIMPLER, versus 49.0% for the reproduced FAST-token head and 51.0% for the reproduced flow-matching head. Its advantage is not universal: Diffusion Policy remains better on PushT, and ACT is better on human-demonstration ALOHA insertion.
 
 
 ![Figure 3 from AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-source-figure-3.webp)
-*Fig 1: AR-VLA connects a vision-language backbone to an autoregressive action expert that runs asynchronously, separating semantic reasoning from continuous action generation. | source: [AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](https://arxiv.org/abs/2603.10126)*
+*Fig 1: AR-VLA connects a vision-language backbone to an autoregressive action expert that runs asynchronously, separating semantic reasoning from continuous action generation. | source: [AR-VLA, Figure 3](https://arxiv.org/abs/2603.10126)*
 
 ![Figure 5 from AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-source-figure-5.webp)
-*Fig 2: Simulation benchmarks setups. We do simulation evaluation spanning generalist and specialist policies, with diverse embodiment, action space, and task. | source: [AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](https://arxiv.org/abs/2603.10126)*
+*Fig 2: Simulation benchmark setups span generalist and specialist policies with different embodiments, action spaces, and task demands. | source: [AR-VLA, Figure 5](https://arxiv.org/abs/2603.10126)*
 
+
+### Re-anchoring makes stale perception usable
 
 The action expert is a causal Transformer over continuous robot states and actions. A linear layer maps each action vector to one token, and a deterministic regression head maps the next hidden state back to an action. Its hybrid key-value cache has two update rules: a token-wise FIFO retains recent proprioception and executed actions, while a single visual-language block is replaced whenever the backbone produces a new observation embedding.
 
@@ -52,13 +54,16 @@ Training separates motion modeling from visual grounding. Phase one learns next-
 | ALOHA insertion, human demonstrations | 6.7% | ACT: 20.0%; Diffusion Policy: 1.7% | Reveals task-dependent failure |
 | Effective latency per action | 46.25 ms | OpenVLA: 321.72 ms; flow matching: 84.26 ms | Model-side comparison, not full robot-loop latency |
 
+### History is tested as a control variable
+
 The ablations support the memory mechanism more directly than the headline benchmarks. Removing action-only pretraining drops SIMPLER success from 61.5% to 37.5% at the standard training budget; doubling the no-pretraining budget recovers only to 54.2%. With no historical dropout, validation action error is low but task success is zero, showing that pure next-action fit can produce a history shortcut. Replacing temporal anchoring with static visual positions yields 3.1% success, while a 20-step history reaches 61.5%; longer 40-step history slips to 59.4%.
+
+The purpose-built history tasks make the same point in closed loop. AR-VLA reaches 66.7% on PushT2, where the already-visited goal is no longer observable, versus 34.0% for action chunking and 44.0% for diffusion. On the real-world Stack3 task, a 40-step cache reaches 81.2%, compared with 43.8% for a four-step cache and 56.3% for flow matching. These tests support persistent action state, while the PushT specialist result (60.4% versus 65.2% for Diffusion Policy) prevents the claim from becoming “autoregression always wins.”
 
 ## High-Level Takeaways
 
 - AR-VLA informs a system-level choice: should temporal continuity live inside a persistent controller, or be approximated by repeatedly asking a snapshot-conditioned model for action chunks? The evidence favors persistent motor state when perception and control run at different frequencies. The hybrid cache gives a concrete interface—refresh semantic context as a block, retain kinematics as a stream—and the pretraining result suggests that action-only trajectories can improve the controller before expensive vision-language alignment.
 - The strongest causal test would compare persistent autoregression with a recurrent or cached flow-matching controller at equal backbone, parameters, data, control rate, and wall-clock latency. Current comparisons change both the action objective and the memory structure. The specialist rows already show that autoregression is not automatically superior: chunked methods win on PushT and one insertion setting.
-- At ten times the rollout length, cache policy and error accumulation become the likely bottlenecks. The action expert conditions on its own executed history, so small out-of-distribution mistakes can compound. Visual input is still a sequence of replaceable snapshots rather than a persistent visual memory. The decisive next test is a partially observable, long-horizon physical benchmark with delayed perception, controlled cache lengths, recovery after induced errors, and several seeds.
-- AR-VLA turns the VLA action head into a stateful high-frequency process rather than a stateless chunk generator.
+- The history-aware tasks are the clearest evidence: AR-VLA reaches 66.7% on PushT2 and 81.2% on Stack3 with a long cache, but the 40-step cache is slightly worse than 20 steps on SIMPLER. The controller remembers more, yet it also has more opportunities to preserve its own mistakes.
 - The strongest controlled results use a small set of simulated and tabletop tasks. Comparisons do not isolate memory from objective under a fully matched recurrent baseline, and the paper notes error accumulation, possible damage to VLM priors without insulation, and snapshot-based visual processing.
 - Preserve action history across control steps and timestamp slow visual context; do not assume that calling a within-chunk decoder “autoregressive” gives a robot temporal memory.
