@@ -51,10 +51,10 @@ The pretraining mixture contains 9.18M image-sentence pairs over 180K distinct i
 | --- | ---: | --- |
 | VQA v2.0 | 72.5 accuracy | test-standard; binary/number/other subcategories are also reported |
 | GQA | 60.3 accuracy | test-standard; raw questions and images at fine-tuning |
-| NLVR2 | 76.2 accuracy / 42.1 consistency | unreleased Test-U; two image-statement pairs per example |
-| NLVR2 without LXMERT pretraining | about 50.9 accuracy | BERT-style alternatives and no-pretraining controls |
+| NLVR2 | 76.2 accuracy / 42.1 consistency on Test-U; 74.5 / 39.7 on public Test-P | two image-statement pairs per example; the paper reports both splits |
+| NLVR2 controls | 50.9 Test-U for BERT+2/3/4/5 CrossAtt, Train+BERT, and Train+scratch; BERT+1 CrossAtt reaches 52.4 | no LXMERT pretraining; Table 3 controls |
 
-The headline NLVR2 comparison is a 22-point absolute increase over the prior 54% result, alongside a consistency score of 42.1. It is a stronger transfer test than VQA or GQA because NLVR2 images and statements are not used in LXMERT pretraining. For VQA and GQA, the pretraining mixture already contains related image-question examples, so their scores demonstrate a strong initialization but do not isolate zero-shot dataset transfer.
+The headline NLVR2 comparison is a 22-point absolute increase over the prior 54% result on the unreleased Test-U split, alongside a consistency score of 42.1. The paper’s footnote reports 74.5 accuracy and 39.7 consistency on the public Test-P split, so those numbers should not be mixed. NLVR2 is a stronger transfer test than VQA or GQA because its images and statements are not used in LXMERT pretraining. For VQA and GQA, the pretraining mixture already contains related image-question examples, so their scores demonstrate a strong initialization but do not isolate zero-shot dataset transfer.
 
 The ablations give the mechanism more resolution. Removing the image-QA loss lowers the development scores from 69.9/60.0/74.9 to 68.9/58.2/72.4 on VQA/GQA/NLVR2. Replacing the two visual objectives with no vision tasks gives 66.3/57.1/50.9; RoI regression and detected-label classification together recover 69.9/60.0/74.9. Adding QA pretraining beats simply adding other QA examples at fine-tuning, and loading BERT weights helps early but eventually underperforms the from-scratch LXMERT pretraining. These controls support complementary visual and cross-modal supervision rather than a generic “more data” explanation.
 
