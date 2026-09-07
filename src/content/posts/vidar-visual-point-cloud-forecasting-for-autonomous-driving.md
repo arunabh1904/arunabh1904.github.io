@@ -14,11 +14,11 @@ summary: '2023 – ViDAR: pretrain visual driving encoders by forecasting future
 **Code:** [OpenDriveLab/ViDAR](https://github.com/OpenDriveLab/ViDAR)
 
 ## Summary
->
+
 > ViDAR turns multi-view video into a geometric forecasting task: a history encoder predicts future LiDAR point clouds through a latent BEV representation, and a future decoder rolls that representation forward under specified ego-motion. Its Latent Rendering operator prevents the pretraining signal from collapsing into identical responses along each camera ray.
 >
 > The paper is persuasive because it connects one failure mode to one operator. Differentiable ray casting can tell the model that something lies somewhere on a ray, but not which depth is geometrically meaningful. Latent Rendering first makes depth responses conditional along a ray and then weights the feature expectation by that conditional occupancy.
->
+
 ## Core Insights
 
 ### A ray is a line, not a surface

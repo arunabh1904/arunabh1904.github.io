@@ -12,11 +12,11 @@ summary: '2024 – DriveWorld: pretrain persistent dynamic and static scene stat
 **arXiv:** [2405.04390](https://arxiv.org/abs/2405.04390)
 
 ## Summary
->
+
 > DriveWorld treats a driving scene as a persistent 4D state. Static structure is propagated from BEV features, while a stochastic dynamic state is updated through a memory bank and rolled forward with actions. The same latent is trained to reconstruct present and future occupancy and actions, then conditioned with task prompts for downstream detection, mapping, tracking, motion forecasting, occupancy, and planning.
 >
 > The supervision is rich rather than self-supervised: the pretraining targets come from multi-frame LiDAR occupancy, and OpenScene additionally supplies occupancy flow. That distinction matters when reading the transfer results. The interesting claim is that a representation trained to preserve what moves, what stays put, and what the ego vehicle will do can be reused across tasks with different temporal needs.
->
+
 ## Core Insights
 
 ### Separate the things that move from the things that should persist

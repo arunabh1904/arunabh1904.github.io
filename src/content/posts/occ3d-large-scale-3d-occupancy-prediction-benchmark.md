@@ -16,11 +16,11 @@ summary: '2023 – Occ3D: visibility-aware dense 3D occupancy benchmarks'
 **Code:** [Tsinghua-MARS-Lab/Occ3D](https://github.com/Tsinghua-MARS-Lab/Occ3D)
 
 ## Summary
->
+
 > Occ3D makes occupancy prediction a measurable camera task by releasing dense, visibility-aware voxel labels. Its most important design choice is epistemic: an unobserved voxel is kept as unobserved instead of being silently counted as free or as a hallucinated completion.
 >
 > The benchmark is also a reconstruction pipeline. Multi-frame LiDAR, object motion, ray visibility, mesh filling, and camera semantics all shape the target before a model sees it. That makes Occ3D useful for evaluating models while keeping the provenance of each voxel in view.
->
+
 ## Core Insights
 
 ### Occupancy expands the question beyond boxes

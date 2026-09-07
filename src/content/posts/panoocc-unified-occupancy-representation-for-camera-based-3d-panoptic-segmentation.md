@@ -14,11 +14,11 @@ summary: '2023 – PanoOcc: coarse-to-fine voxel queries for camera-based 3D pan
 **Code:** [Robertwyq/PanoOcc](https://github.com/Robertwyq/PanoOcc)
 
 ## Summary
->
+
 > PanoOcc uses one camera-derived 3D voxel state for semantic occupancy, detection, and instance assignment. It keeps height explicit while doing the expensive interaction at coarse resolution, then restores detail with 3D upsampling and refines foreground instances using the detection head.
 >
 > The result is a useful architecture decision rather than a claim that dense voxels are free. The paper's matched query and efficiency ablations show when a 3D volume is worth its cost, while its evaluation on sparse LiDAR points leaves a clear limit on what the panoptic score measures.
->
+
 ## Core Insights
 
 ### A voxel query keeps the missing axis visible
