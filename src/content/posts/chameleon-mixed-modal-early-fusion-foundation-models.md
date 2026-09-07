@@ -16,34 +16,39 @@ summary: "2024 – Chameleon: Mixed-Modal Early-Fusion Foundation Models"
 
 ### Method and reported result
 
-Chameleon trains token-based, early-fusion models that can understand and generate images and text in arbitrary order within one sequence. The paper contributes a training and alignment recipe for keeping this unified setting stable.
+Chameleon trains token-based, early-fusion models that can understand and generate images and text in arbitrary order within one sequence. Images become discrete tokens, text remains a BPE sequence, and a single autoregressive transformer is trained on text-only, paired, and interleaved documents. The paper reports competitive text performance, strong image captioning and VQA results, and non-trivial image and mixed-modal generation from the same model family.
 
 ## Summary
 
-> Early fusion makes a direct architectural claim: one transformer can model mixed documents instead of bolting a vision encoder onto a language model after pre-training. The evidence spans visual question answering, captioning, text generation, image generation, and long-form mixed-modal generation.
+> Chameleon asks a clean architectural question: can a transformer treat an image-text document as one language-like sequence from the beginning? The answer is promising, but the price is paid in visual token count, tokenizer fidelity, and unusually delicate shared-modality training.
 
 ## Core Insights
 
-![Chameleon early-fusion transformer representing text and images as one interleaved discrete token sequence](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-paper-figure.png)
-*Fig 1: Shows Chameleon's defining constraint: one autoregressive transformer consumes and emits interleaved text and image tokens rather than delegating generation to a separate decoder. | source: [Chameleon](https://arxiv.org/abs/2405.09818)*
+![Chameleon architecture: text and images represented as interleaved discrete tokens for one transformer](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-paper-figure.png)
+*Fig 1: Chameleon represents text, images, and code as discrete tokens and feeds the interleaved sequence to one transformer trained end to end. | source: [Chameleon, Figure 1](https://arxiv.org/abs/2405.09818)*
 
-![Figure 23 from Chameleon: Mixed-Modal Early-Fusion Foundation Models](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-source-figure-23.webp)
-*Fig 2: The inter-annotator agreement on the questions in the absolute evaluation. | source: [Chameleon: Mixed-Modal Early-Fusion Foundation Models](https://arxiv.org/abs/2405.09818)*
+The unification happens at the token interface. Chameleon's image tokenizer maps a 512 × 512 image to 1,024 discrete tokens from an 8,192-entry codebook, while the text vocabulary also contains those image-codebook entries. That is a wonderfully simple interface: the model can place an image before a question, between paragraphs, or after an answer without changing the transformer. It also makes the bottleneck visible. A 512 × 512 image already consumes 1,024 autoregressive positions, and the paper reports that the tokenizer reconstructs images with substantial text poorly. Early fusion therefore buys ordering flexibility by spending context and by asking one codebook to preserve both semantic content and appearance.
 
-![Figure 19 from Chameleon: Mixed-Modal Early-Fusion Foundation Models](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-source-figure-19.webp)
-*Fig 3: Task categories and examples of prompts. Image attributions: Seguin 2010; Agriflanders 2009; Tuszyński 2015; Sokolov 2022. | source: [Chameleon: Mixed-Modal Early-Fusion Foundation Models](https://arxiv.org/abs/2405.09818)*
+![Chameleon evaluation task categories and example prompts](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-source-figure-19.webp)
+*Fig 2: The paper's mixed-modal evaluation spans prompt types such as advice, explanation, comparison, identification, and reasoning, with examples that interleave text and images. | source: [Chameleon, Figure 19](https://arxiv.org/abs/2405.09818)*
 
+![Chameleon inter-annotator agreement counts for the absolute evaluation](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-source-figure-23.webp)
+*Fig 3: Inter-annotator agreement counts for questions in the paper's absolute evaluation, showing how much of the human judgment signal is shared across raters. | source: [Chameleon, Figure 23](https://arxiv.org/abs/2405.09818)*
 
-| Decision | Chameleon's answer | Tradeoff |
+The data recipe is as important as the diagram. The first training stage includes 2.9 trillion text-only tokens, 1.4 billion text-image pairs producing about 1.5 trillion text-image tokens, and 400 billion tokens of interleaved image-text data. The second stage lowers the weight of the first-stage mixture and adds higher-quality and instruction data. This matters because “one sequence” only becomes useful when the training distribution contains the orderings and compositions the model will see at inference.
+
+The paper also shows why a shared transformer is not automatically stable. Above 8B parameters and roughly 1T tokens, late divergence appeared when modalities with different entropy competed through shared softmax layers. QK normalization, norm reordering, dropout choices, and z-loss regularization form a stability recipe; uncontrolled growth in the final-layer output norm was a strong warning signal for future loss divergence. This is a useful operational lesson, not evidence that early fusion is intrinsically stable. The modality mixture, normalization, optimizer, and model scale are coupled in that experiment.
+
+| Decision | Evidence in Chameleon | Cost or boundary |
 | --- | --- | --- |
-| Representation | Discrete image and text tokens in one stream | Visual fidelity depends on tokenization and sequence budget. |
-| Sharing | Early fusion throughout the transformer | Shared capacity may create modality interference. |
-| Objective | Next-token prediction | A simple unified objective, but expensive for long visual sequences. |
+| Representation | Discrete image and text tokens in one stream | Image fidelity and OCR depend on the visual tokenizer. |
+| Sharing | One transformer processes arbitrary image-text orderings | Different modality entropies can interfere during training. |
+| Objective | Next-token prediction for all modalities | Long visual sequences consume context and decoding steps. |
 
 ## High-Level Takeaways
 
-- Chameleon informs the decision to use one early-fusion token stream for multimodal understanding and generation instead of separate language and image systems. Its atomic unit is a discrete text or image token, and one Transformer shares sequence processing across arbitrary image-text orderings after modality-specific tokenization.
-- The single next-token objective makes the interface clean, but image quantization and visual-token count determine both reconstruction quality and sequence cost. The paper's stable-training recipe shows that early fusion can work at useful scale; it does not establish that discrete visual tokens are compute-optimal against continuous diffusion or decoupled visual encoders.
-- A decisive comparison would hold data, parameters, and training FLOPs fixed across discrete early fusion, a continuous-image hybrid, and a shared backbone with separate visual routes. At 10× visual context, token length and modality interference are the likely bottlenecks. The early-fusion claim would fail if a separated design matched mixed-document quality and generation while using materially less training and inference compute.
-- Strong unified generation does not establish that a fully shared representation is best for every visual understanding or action task.
-- Chameleon is the clean baseline for asking whether early fusion is worth its sequence-length and interference costs.
+- Chameleon is the clean baseline for early fusion: one autoregressive sequence can contain text, images, and code without a separate image-generation route.
+- The decisive engineering variable is visual bandwidth. The 1,024-token representation is flexible, but image detail and OCR quality are constrained by the tokenizer before the language model sees the input.
+- The stability figures turn “multimodal interference” into a measurable training concern: monitor output norms and test the normalization recipe before scaling the mixture.
+- Its benchmark breadth shows that the interface can support many tasks; it does not establish that discrete early fusion is compute-optimal against continuous visual encoders or diffusion decoders.
+- A fair follow-up would match data, parameters, and FLOPs across early fusion, a decoupled visual route, and a continuous-image hybrid, then measure both mixed-document quality and long-context cost.

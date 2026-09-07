@@ -16,33 +16,39 @@ summary: "2024 – Janus: Decoupling Visual Encoding for Unified Multimodal Unde
 
 ### Method and reported result
 
-Janus keeps an autoregressive multimodal transformer but separates the visual encodings used for understanding and generation. The paper argues that a single visual representation is asked to retain incompatible levels of detail for those two jobs.
+Janus keeps one autoregressive transformer but uses separate visual encoders for understanding and image generation. The understanding route uses a SigLIP encoder and adaptor for semantic features; the generation route uses a VQ tokenizer and adaptor for discrete image tokens. The paper reports strong multimodal-understanding results for its 1.3B model and competitive text-to-image generation, arguing that the visual interface—not the shared transformer—is where the main conflict lies.
 
 ## Summary
 
-> Understanding needs semantic, task-relevant features; generation needs fine visual detail. Janus decouples those interfaces while preserving one shared transformer for multimodal processing. This is an architectural way to reduce representational conflict without giving up a unified model.
+> Janus separates the things that need to be invariant from the things that need to be reconstructed. Understanding wants a compact semantic description; generation wants a fine-grained image code. Sharing the transformer preserves cross-modal reasoning while allowing each visual route to keep the information its task actually needs.
 
 ## Core Insights
 
-![Janus architecture with separate visual encoders for understanding and image generation feeding one autoregressive transformer](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-paper-figure.png)
-*Fig 1: Exposes Janus's core separation: understanding and generation use different visual encoders while language modeling remains shared, avoiding one visual codebook serving incompatible semantic and pixel objectives. | source: [Janus](https://arxiv.org/abs/2410.13848)*
+![Janus architecture with separate visual understanding and generation encoders feeding one autoregressive transformer](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-paper-figure.png)
+*Fig 1: Janus decouples visual encoding for understanding and generation while routing both representations through one unified autoregressive transformer. | source: [Janus, Figure 2](https://arxiv.org/abs/2410.13848)*
 
-![Figure 1 from Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-source-figure-1.webp)
-*Fig 2: Janus exceeds similarly sized MobileVLM, LLaVA-Phi, InstructBLIP, and Show-o variants across a broad set of multimodal understanding benchmarks. | source: [Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](https://arxiv.org/abs/2410.13848)*
+A single visual representation has an awkward job. For question answering, the encoder should discard nuisance detail and expose high-level semantics; for image generation, it must preserve local appearance well enough to reconstruct pixels or image codes. Janus makes that tension explicit. SigLIP features are flattened and mapped into the language-model space for understanding, while a VQ tokenizer turns target images into codebook IDs for generation. The language model can therefore share sequence reasoning without forcing one encoder to optimize two incompatible information bottlenecks.
 
-![Figure 3 from Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-source-figure-3.webp)
-*Fig 3: Our Janus adopts a three-stage training procedure. We use flame symbols/snowflake symbols in the diagram to indicate the module updates/does not update its parameters. | source: [Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation](https://arxiv.org/abs/2410.13848)*
+![Janus multimodal understanding and visual-generation benchmark results](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-source-figure-1.webp)
+*Fig 2: Janus's reported understanding and visual-generation results are compared with similarly sized multimodal and image-generation systems. | source: [Janus, Figure 1](https://arxiv.org/abs/2410.13848)*
 
+The training schedule is part of the design, not a footnote. Stage I freezes the encoders and language model while learning the two adaptors and image head. Stage II unfreezes the language model for unified pretraining on pure text, multimodal understanding, and visual-generation data. Stage III performs mixed supervised fine-tuning while keeping the generation encoder fixed. This staged path first teaches interfaces to speak the language model's embedding space, then lets the shared reasoning core adapt, and finally aligns behavior. It also means that “decoupling” is tested together with a particular optimization curriculum.
 
-| Question | Janus's answer |
-| --- | --- |
-| What is shared? | The multimodal transformer. |
-| What is specialized? | Visual encoders for understanding and generation. |
-| What decision does it inform? | Whether one visual tokenizer must serve every capability. |
+![Janus three-stage training procedure and module update schedule](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-source-figure-3.webp)
+*Fig 3: The training diagram marks which adaptors, heads, encoders, and the language model are updated or frozen across the three stages. | source: [Janus, Figure 3](https://arxiv.org/abs/2410.13848)*
+
+The radar chart is useful as a capability map rather than a single score. Janus's 1.3B system expands across POPE, VQA, GQA, MMMU, MMBench, MM-Vet, SEED-Bench, and GenEval while using the same transformer for both task families. The result supports the practical compromise, but it does not isolate the cause: Janus also has two encoders, adaptors, a generation head, staged data, and a particular base language model. A capacity- and compute-matched comparison against a stronger shared tokenizer is still needed.
+
+| Design question | Janus's answer | Cost or boundary |
+| --- | --- | --- |
+| What is shared? | The autoregressive language-model core | Shared layers can still experience task interference. |
+| What is specialized? | Semantic understanding and generative visual encoders | More modules and separate token spaces must be maintained. |
+| What is optimized? | Text loss for understanding and image-token loss for generation | The curriculum and data ratios affect attribution. |
 
 ## High-Level Takeaways
 
-- Janus informs whether a unified multimodal model must also impose a unified visual representation. It keeps a shared transformer for cross-modal reasoning but gives understanding and generation distinct visual encoders, acknowledging that semantic invariance and pixel-level fidelity demand different compression. The architecture shares the expensive sequence model while specializing the interfaces where representational conflict is strongest.
-- Its results support decoupling as a practical compromise, but the paper needs a tighter capacity-matched comparison against one stronger tokenizer and against fully separate models. Without that, gains could come from extra parameters rather than reduced interference. At ten times the modality or resolution scale, the number of specialized interfaces may proliferate and the shared transformer can still suffer gradient conflict. The thesis would be falsified if a single dual-purpose tokenizer matches both understanding and generation under equal compute, or if separate transformers outperform despite losing sharing.
-- Separate routes add components and do not remove the need to measure interference in the shared transformer.
-- Share reasoning capacity when it transfers; specialize visual representations when their information requirements differ.
+- Janus is a useful middle point between a fully shared visual representation and two entirely separate models.
+- Its deepest idea is information allocation: semantic understanding and pixel reconstruction should not be forced through the same visual code.
+- The three-stage schedule explains how the routes become usable, but it also makes the final gains a property of architecture plus curriculum.
+- A decisive follow-up would match total parameters, data, and training FLOPs against one stronger dual-purpose encoder and against separate transformers.
+- Share the expensive reasoning core when transfer is valuable; specialize the visual interfaces when their information requirements diverge.
