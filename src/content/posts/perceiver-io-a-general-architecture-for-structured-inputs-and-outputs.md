@@ -31,8 +31,8 @@ Let the input be $x\in\mathbb{R}^{M\times C}$, the latent array be $z\in\mathbb{
 
 The central question is whether one latent workspace can serve many output structures. The source architecture diagram makes the data flow explicit:
 
-![Perceiver IO encode, process, and decode path](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-paper-figure.png)
-*Figure 1: Adapted/recreated from source Figure 2. Arbitrary input elements are compressed into latents, latent self-attention performs the expensive processing, and output queries read the information needed for each output element. The graphic is a local adaptation of the source diagram; source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs](https://arxiv.org/abs/2107.14795).*
+![Perceiver IO encode, process, and decode path](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-2.png)
+*Fig 1: Arbitrary input elements are compressed into latents, latent self-attention performs the expensive processing, and output queries read the information needed for each output element. | source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs, Figure 2](https://arxiv.org/abs/2107.14795)*
 
 A standard Transformer repeatedly builds queries and keys over the full input, which makes each self-attention layer quadratic in sequence length. Perceiver IO uses attention non-homogeneously: input-to-latent cross-attention sees $M$ inputs once, latent processing sees only $N$ elements, and latent-to-output cross-attention sees $O$ queries. The model does not require the latent array to preserve the input’s grid or sequence layout.
 
@@ -43,7 +43,7 @@ The latent array is deliberately task agnostic. Output semantics enter through t
 The source’s domain overview shows the same interface spanning unlike data shapes:
 
 ![Perceiver IO across language, vision, multimodal autoencoding, and symbolic game outputs](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-1.webp)
-*Figure 2: Source Figure 1. The same encode–process–decode template is applied to multitask language, dense optical flow, video+audio+label autoencoding, and StarCraft II outputs. Source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs](https://arxiv.org/abs/2107.14795).*
+*Fig 2: The same encode–process–decode template is applied to multitask language, dense optical flow, video+audio+label autoencoding, and StarCraft II outputs. | source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs, Figure 1](https://arxiv.org/abs/2107.14795)*
 
 This query mechanism is why outputs can be computed in parallel: each output point depends on its query and the shared latent array. For very large outputs, the authors subsample output points during training and decode the full array in batches at test time. The output interface is flexible, but query design remains part of the model: a poor query does not tell the latent representation what to retrieve.
 
@@ -60,7 +60,7 @@ The encoder and decoder are linear in input and output index sizes, while latent
 The multimodal autoencoding experiment is an unusually clear stress test. The model serializes 50,000 video patches, 30,000 raw audio samples, and one 700-dimensional class label into a common input array. It uses 512-channel latents and reports a 88× compression setting with 784 latents:
 
 ![Multimodal audio-video-label autoencoding at 88× compression](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-4.webp)
-*Figure 3: Source Figure 4. Inputs are on the left and reconstructions on the right for the 88× compression setting. The model masks the class label 50% of the time, samples 512 audio values and 512 pixels during training, and fully decodes at test time. Source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs](https://arxiv.org/abs/2107.14795).*
+*Fig 3: Inputs are on the left and reconstructions on the right for the 88× compression setting; audio, video, and labels share the latent workspace. | source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs, Figure 4](https://arxiv.org/abs/2107.14795)*
 
 The table makes the tradeoff visible: at 88× compression, audio PSNR is 26.97, video PSNR is 24.37, and top-1 classification accuracy is 10.2%. At 176× and 352×, reconstruction quality changes as the latent bottleneck tightens. The authors also show that increasing the classification-loss weight can reach 45% top-1 accuracy while retaining 20.7 video PSNR, which is evidence that the shared latent can support competing modalities when the loss balance is chosen deliberately.
 

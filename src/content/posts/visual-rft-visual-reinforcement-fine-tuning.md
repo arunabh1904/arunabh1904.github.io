@@ -32,7 +32,7 @@ and updates the policy with a verifiable reward plus a KL term to a reference po
 The source’s headline comparison shows whether that contract improves several visual tasks at once:
 
 ![Visual-RFT results across open-vocabulary detection, few-shot detection, reasoning grounding, and fine-grained classification](/assets/images/visual-rft-visual-reinforcement-fine-tuning-source-figure-1.webp)
-*Figure 1: Source Figure 1. Visual-RFT is compared with the base Qwen2-VL-2B policy and its SFT counterpart across COCO/LVIS detection, LISA grounding, and four fine-grained classification datasets. The metrics differ by task, so the figure is evidence for task-specific reward design rather than one universal visual score. Source: [Visual-RFT: Visual Reinforcement Fine-Tuning](https://arxiv.org/abs/2503.01785).*
+*Fig 1: Headline results across open-vocabulary detection, few-shot detection, LISA grounding, and fine-grained classification. | source: [Visual-RFT: Visual Reinforcement Fine-Tuning, Figure 1](https://arxiv.org/abs/2503.01785)*
 
 For detection, predicted boxes are sorted by confidence and matched to ground-truth boxes using an IoU threshold. The reward is
 
@@ -53,7 +53,7 @@ where accuracy is exact class agreement. This decomposition is the important mec
 The qualitative classification examples explain why the paper asks the model to produce a reasoning trace. SFT tends to emit a short label; Visual-RFT can spend tokens on visual evidence before committing to the class:
 
 ![Qualitative fine-grained classification examples comparing SFT with Visual-RFT](/assets/images/visual-rft-visual-reinforcement-fine-tuning-source-figure-4.webp)
-*Figure 2: Source Figure 4. The examples show SFT answers beside Visual-RFT answers with explicit visual reasoning. The figure illustrates the behavior encouraged by the format and classification rewards; it does not by itself establish that every reasoning trace is faithful. Source: [Visual-RFT: Visual Reinforcement Fine-Tuning](https://arxiv.org/abs/2503.01785).*
+*Fig 2: SFT and Visual-RFT qualitative classification examples with explicit visual reasoning. | source: [Visual-RFT: Visual Reinforcement Fine-Tuning, Figure 4](https://arxiv.org/abs/2503.01785)*
 
 The training settings are deliberately data-limited. The fine-grained classification and few-shot detection experiments use small per-category sets, with the classification study described as roughly 100 examples in the one-shot setting and the main short runs using 200 training steps. LISA reasoning grounding uses 239 images and 500 fine-tuning steps. These details matter because the result is about adapting a capable LVLM with a small, verifiable signal, not about replacing large-scale visual pretraining.
 

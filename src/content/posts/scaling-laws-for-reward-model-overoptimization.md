@@ -30,7 +30,7 @@ The synthetic setup makes the source of every label explicit. The gold model sco
 What exactly is being replaced by the synthetic setup? The source’s real and synthetic pipelines answer that question:
 
 ![Real and synthetic reward-model training setups, with human comparisons replaced by gold-model comparisons in the controlled experiment](/assets/images/scaling-laws-for-reward-model-overoptimization-source-figure-2.webp)
-*Figure 1: The paper’s real and synthetic reward-model setups. In the synthetic version, the gold reward model supplies the comparison labels so the authors can vary proxy size and optimization pressure while keeping the target fixed. Source Figure 2: [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760).*
+*Fig 1: Real and synthetic reward-model training setups; the synthetic path replaces human comparison labels with gold-model labels. | source: [Scaling Laws for Reward Model Overoptimization, Figure 2](https://arxiv.org/abs/2210.10760)*
 
 The distinction matters because “a better reward model” has two separate effects here: it can fit the proxy labels better, and it can remain aligned with the held-out gold score farther into optimization. The experiment is designed to measure the second effect.
 
@@ -52,10 +52,10 @@ $$
 
 These are empirical descriptions of the measured regime, not a claim that reward must follow either function at arbitrary distance. The RL expression is especially a local fit near the origin, where its logarithmic behavior should not be read literally.
 
-The following adapted plot makes the mechanism visible. Dashed curves are proxy scores; solid curves are gold scores. The proxy keeps improving, while the gold score bends over and can decline. Increasing reward-model size shifts the bend, but does not remove it:
+The source figure makes the mechanism visible. Dashed curves are proxy scores; solid curves are gold scores. The proxy keeps improving, while the gold score bends over and can decline. Increasing reward-model size shifts the bend, but does not remove it:
 
-![Adapted reward-model overoptimization curves for best-of-n and RL](/assets/images/scaling-laws-for-reward-model-overoptimization-paper-figure.png)
-*Figure 2: Adapted from source Figure 1. The left panel shows best-of-$n$; the right shows RL. Larger proxy reward models postpone the proxy–gold divergence, while the gold score still has a finite peak. The plotted graphic is an adaptation of the source figure; source: [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760).*
+![Reward-model overoptimization curves for best-of-n and RL](/assets/images/scaling-laws-for-reward-model-overoptimization-source-figure-1.png)
+*Fig 2: Reward-model size scaling for best-of-$n$ and RL; proxy scores keep rising while gold scores eventually bend over. | source: [Scaling Laws for Reward Model Overoptimization, Figure 1](https://arxiv.org/abs/2210.10760)*
 
 A subtle comparison follows. RL is less KL-efficient than best-of-$n$: it needs more movement from the initial policy to reach the same proxy or gold score. Yet RL reaches a higher gold peak in these experiments, while best-of-$n$ and RL trace similar proxy–gold trajectories. Raw KL therefore cannot compare optimization pressure across optimizers. It is a coordinate on a frontier whose shape depends on the optimizer.
 
@@ -66,7 +66,7 @@ Reward-model size is not the only control. Holding the reward model at 12M param
 The source’s validation-loss plot shows why a held-out proxy diagnostic is informative but not sufficient:
 
 ![Gold reward at best-of-1000 versus proxy reward-model validation loss](/assets/images/scaling-laws-for-reward-model-overoptimization-source-figure-6.webp)
-*Figure 3: Gold reward at best-of-1000 as a function of reward-model validation loss, averaged over the reported runs. Lower validation loss is associated with better gold reward in this controlled range, but the plot does not identify how far a policy may safely be optimized. Source Figure 6: [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760).*
+*Fig 3: Gold reward at best-of-1000 versus proxy reward-model validation loss. | source: [Scaling Laws for Reward Model Overoptimization, Figure 6](https://arxiv.org/abs/2210.10760)*
 
 Larger policies show a weaker, limited result: in the two policy sizes studied, the absolute gold improvement changes, but the overoptimization gap and peak KL are similar. The authors also vary a KL penalty. It can keep the policy closer to the initial model and make optimization converge earlier, which is useful as an early-stopping control, but it does not improve the underlying policy–gold frontier. A penalty limits movement; it does not add information to a misspecified reward. The PPO update also has a recent-policy KL mechanism, so this initial-policy distance should not be conflated with every KL term in the optimizer.
 

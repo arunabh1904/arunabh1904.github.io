@@ -39,8 +39,8 @@ be the compute at which its held-out metric peaks. Standard SFT sets every task�
 
 The Qwen3 8B experiment makes this mismatch concrete. It uses ten sub-datasets and shows that their peak epochs range from 0 for CommonsenseQA to 5 for HellaSwag; the average absolute difference between each task’s peak and the mixture’s peak is 1.93 epochs:
 
-![Test-accuracy curves and peak-epoch offsets for ten sub-datasets in Qwen3 8B SFT](/assets/images/msft-heterogeneous-peak-epochs.webp)
-*Figure 1: Adapted from source Figure 2. The upper panel shows different sub-datasets peaking at different epochs; the lower panel reports each task’s absolute peak-epoch difference from the overall mixture. The graphic is a local adaptation of the source panels. Source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](https://arxiv.org/abs/2603.21606).*
+![Test-accuracy curves and peak-epoch offsets for ten sub-datasets in Qwen3 8B SFT](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-2.png)
+*Fig 1: Test-set training curves and absolute peak-epoch offsets for ten Qwen3 8B sub-datasets. | source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT, Figure 2](https://arxiv.org/abs/2603.21606)*
 
 This is more than a case for choosing a better global epoch. The update at each step is a weighted sum of sub-dataset gradients. Once one task begins supplying over-specialized gradients, continuing to sample it changes the trajectory seen by every other task.
 
@@ -51,7 +51,7 @@ The obvious fix is to run one full-mixture sweep, record each $c_i^*$, then excl
 The authors test this with ten equal-weighted sub-datasets of 1,800 examples each. After the first task overfits, they branch the run: one branch keeps the full mixture and the other removes that task. The remaining tasks’ optimal compute shifts. Even removing one tenth of the data changes later peak locations; across the reported model families and scales, the mean absolute shift is 0.91 epochs:
 
 ![Optimal-compute shifts after excluding one sub-dataset](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-3.webp)
-*Figure 2: Source Figure 3a. Positive and negative bars show how each remaining benchmark’s optimal compute moves after one sub-dataset is removed. The figure is the source panel; source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](https://arxiv.org/abs/2603.21606).*
+*Fig 2: Changes in each remaining benchmark’s optimal compute after one sub-dataset is removed; this is panel (a) of the source figure. | source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT, Figure 3](https://arxiv.org/abs/2603.21606)*
 
 The sign matters. Some tasks need more compute after the early task is removed; others peak earlier. A static table of stopping points cannot capture this interaction.
 
@@ -67,8 +67,8 @@ Across six base models—OLMo 2 1B, Qwen2.5 0.5B/1.5B/3B/7B, and Qwen3 8B—and 
 
 The budget sweep shows the most concrete systems tradeoff:
 
-![Accuracy and FLOPs changes for MSFT across compute budgets](/assets/images/msft-arxiv-x9.png)
-*Figure 3: Adapted crop of source Figure 6. At compute budget $C=1$, the paper reports a 3.4-point accuracy gain and 120.3 PFLOPs saved relative to SFT. Larger budgets add rollout overhead, so the gain and cost must be read together. The crop preserves the source values; source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT](https://arxiv.org/abs/2603.21606).*
+![Accuracy and FLOPs changes for MSFT across compute budgets](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-6.png)
+*Fig 3: Accuracy, rollout overhead, and FLOPs changes across MSFT compute budgets. | source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT, Figure 6](https://arxiv.org/abs/2603.21606)*
 
 The same analysis reports robustness across 9K, 18K, and 27K dataset mixtures with 5, 10, and 15 tasks, and a +5.4% average improvement over SFT in that study. The method is therefore making a claim about a control loop, not just about one hand-tuned mix. Its reliance on held-out task metrics remains the main practical boundary: a noisy or misaligned per-task metric can exclude the wrong dataset.
 

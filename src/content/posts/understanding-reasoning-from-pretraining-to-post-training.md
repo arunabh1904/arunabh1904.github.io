@@ -35,8 +35,8 @@ The testbed keeps the action space and verifier explicit. Decoder-only Transform
 
 The evaluation contains 1,480 tactical puzzles divided into difficulty bins B1–B5. The aggregate pass@k analysis uses B1–B4 because B5 is rarely solved; B5 remains useful for inspecting failure mechanisms. This design asks a clean question: does the prior learned from human games change how efficiently a policy converts verifiable RL experience into correct moves?
 
-![Adapted view of the pretraining, synthetic-trace SFT, and verifiable-RL pipeline](/assets/images/pretraining-posttraining-overview.png)
-*Figure 1: Adapted summary of the paper’s pipeline and analyses. Human game sequences feed pretraining; sampled search trees feed SFT; the chess environment checks each proposed move before returning the next state. The right-hand panels summarize the paper’s fitted level, slope, and policy-shift analyses. Adapted from Sections 2–4 of [Understanding Reasoning from Pretraining to Post-Training](https://arxiv.org/abs/2607.16097).*
+![Pretraining, synthetic-trace SFT, and verifiable-RL pipeline](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-1.png)
+*Fig 1: Human-game pretraining, synthetic-trace SFT, and verifiable RL are connected to the paper’s scaling and policy analyses. | source: [Understanding Reasoning from Pretraining to Post-Training, Figure 1](https://arxiv.org/abs/2607.16097)*
 
 ### RL compute has two inputs from pretraining: level and slope
 
@@ -52,7 +52,7 @@ where $R^{\mathrm{ref}}_{N,T}$ is the fitted pass@1 reward at a reference RL com
 The source Figure 3 separates the two correlations instead of collapsing them into a single “reasoning scale”:
 
 ![Pretraining loss predicts the fitted RL level, while token exposure predicts the local RL slope](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-3.webp)
-*Figure 2: Source Figure 3. At reference compute levels from $10^{16}$ to $10^{20}$ FLOPs, lower pretraining validation loss predicts a higher fitted reward, with Spearman $\rho$ tightening from −0.93 to −0.99. The slope $B_{N,T}$ correlates with pretraining tokens at Pearson $r=0.84$; the joint model reports $R^2=0.84$. Source: [Understanding Reasoning from Pretraining to Post-Training](https://arxiv.org/abs/2607.16097).*
+*Fig 2: Pretraining loss predicts fitted RL level, token exposure predicts local RL slope, and the joint fit is shown at right. | source: [Understanding Reasoning from Pretraining to Post-Training, Figure 3](https://arxiv.org/abs/2607.16097)*
 
 The fitted joint law uses an exponential function of pretraining loss for the reference level and a log-linear function of model size and token count for the slope. In plain terms, lower loss gives RL a better starting level, while more token exposure is associated with faster local improvement. That interpretation is more informative than saying that “bigger models reason better,” because size alone is not the strongest variable in the slope fit.
 
@@ -69,7 +69,7 @@ A single curve does not reveal what improved. The paper classifies move-probabil
 The difficulty breakdown makes the tradeoff concrete:
 
 ![Policy-update categories across chess puzzle difficulty bins](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-5.webp)
-*Figure 3: Source Figure 5. Easy puzzles are dominated by amplification of a correct mode already present in the SFT policy. Harder puzzles show more tail discovery, but also more reinforcement of wrong modes. Each panel reports the proportions of the paper’s policy-update categories through 750 RL steps. Source: [Understanding Reasoning from Pretraining to Post-Training](https://arxiv.org/abs/2607.16097).*
+*Fig 3: RL update categories across puzzle difficulty: ground-truth amplification, tail discovery, and wrong-mode amplification. | source: [Understanding Reasoning from Pretraining to Post-Training, Figure 5](https://arxiv.org/abs/2607.16097)*
 
 This explains why pass@1 can keep improving while pass@16 is mixed or degrades for larger models under the fixed RL budgets. RL can make one answer more decisive without making the candidate distribution broadly better. It also widens search and branching in the traces, while maximum reasoning depth stays roughly flat; the model becomes better at proposing and committing to useful branches, not simply at writing longer continuations.
 
