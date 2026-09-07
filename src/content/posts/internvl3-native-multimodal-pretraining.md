@@ -13,41 +13,40 @@ summary: '2025 – InternVL3: Native Multimodal Pretraining'
 
 **arXiv:** [2504.10479](https://arxiv.org/abs/2504.10479)
 
-### Method and reported result
-
-InternVL3 trains language and multimodal data together in one main pretraining stage, adds Variable Visual Position Encoding (V2PE) for long mixed contexts, and then applies supervised fine-tuning, mixed preference optimization, and test-time scaling. The architecture remains a ViT–MLP–LLM stack. InternVL3-78B reports 72.2 on MMMU in the abstract; the report's local OpenCompass table lists a 79.5 score for the 78B model.
-
 ## Summary
 
-> “Native multimodal” describes when joint learning happens, not whether every parameter starts from zero. InternVL3 initializes its ViT and language model from pretrained base models, then optimizes them together on text and multimodal data. V2PE compresses visual position growth so more visual evidence can fit inside a finite language context.
+> InternVL3 uses “native multimodal” to describe joint learning during the main pretraining stage, not random initialization. A pretrained ViT and language model are connected through an MLP and optimized together on text and multimodal data. Variable Visual Position Encoding (V2PE) assigns visual tokens fractional position increments so high-resolution and multi-image context consumes less of the language position axis. InternVL3-78B reports 72.2 on MMMU in the abstract, while the report's OpenCompass table lists 79.5; later SFT, preference optimization, and test-time selection are part of the full system.
 
 ## Core Insights
 
+InternVL3 keeps the familiar ViT–MLP–LLM stack but changes when the pieces learn together. Its ViT and language model begin from pretrained weights, and the visual path uses pixel unshuffle so a 448 × 448 tile becomes 256 visual tokens before entering the language model. “Native” therefore means that text-only, image-text, video-text, and interleaved examples appear in the main pretraining mixture while all model parameters are jointly optimized. It does not mean that the visual or language abstractions were learned from scratch in isolation.
+
 ![InternVL3 multimodal benchmark table across InternVL3, Qwen2.5-VL, and other models](/assets/images/internvl3-native-multimodal-pretraining-source-figure-1.webp)
-*Fig 1: The report compares multimodal benchmark results across InternVL3 variants, Qwen2.5-VL, earlier InternVL models, and closed-source systems. | source: [InternVL3, Figure 1](https://arxiv.org/abs/2504.10479)*
+*Fig 1: The report's comparison table places InternVL3 variants beside Qwen2.5-VL, earlier InternVL models, and other multimodal systems across MMMU, MathVista, charts, documents, OCR, and video. | source: [InternVL3, Figure 1](https://arxiv.org/abs/2504.10479)*
 
-![InternVL3 OpenCompass academic leaderboard versus model scale and competing MLLMs](/assets/images/internvl3-native-multimodal-pretraining-source-figure-2.webp)
-*Fig 2: OpenCompass academic scores are plotted against parameter count, showing the InternVL3 family scaling from small models to the 78B point. | source: [InternVL3, Figure 2](https://arxiv.org/abs/2504.10479)*
+The position mechanism addresses the next bottleneck. Ordinary positions advance by one for every token, so a high-resolution image can consume the same position range that the text needs for reasoning. V2PE advances textual positions by 1 but gives each image a smaller increment δ, selected per image from {1, 1/2, …, 1/256}. Relative order inside the image is preserved while the image occupies less of the position axis; δ = 1 recovers the conventional scheme. This is context allocation, not free computation: the visual encoder and attention still process the tokens.
 
-The architectural detail that makes the training schedule usable is V2PE. A normal positional sequence advances by one for every token, so a high-resolution image can consume the same position range that text needs for reasoning. V2PE advances textual positions by 1 but visual positions by a smaller δ, chosen per image from a set of fractional values. Relative order inside an image is preserved, while the image occupies less of the position axis. At inference, δ can be selected based on input length; δ = 1 recovers the conventional scheme. This is a context-allocation mechanism, not a claim that visual tokens become computationally free—the attention and ViT still process them.
+The loss makes the “conditioning” claim precise. InternVL3 computes the autoregressive objective on text tokens, while visual tokens provide context for those predictions rather than becoming direct reconstruction targets. This lets the visual pathway receive learning signal through language grounding without requiring the model to reproduce every visual code. It also means that the quality of captions, questions, and structured multimodal labels determines which visual distinctions are rewarded.
 
-InternVL3 also clarifies a common ambiguity around native multimodal pretraining. The authors use pretrained ViT and language-model base weights to reduce cost; “native” means that text-only, image-text, video-text, and interleaved samples are jointly exposed during the main pretraining stage instead of adding vision only after a completed language model. The loss is autoregressive but computed only on text tokens. Visual tokens provide conditioning context and receive gradients through their role in predicting text, while the model is not asked to reproduce every visual token directly.
+![InternVL3 OpenCompass academic leaderboard versus model scale and competing multimodal LLMs](/assets/images/internvl3-native-multimodal-pretraining-source-figure-2.webp)
+*Fig 2: The OpenCompass comparison plots academic scores against model scale, including the InternVL3 family and competing multimodal LLMs. | source: [InternVL3, Figure 2](https://arxiv.org/abs/2504.10479)*
 
-The sampling study is unusually concrete. The report finds a 1:3 language-to-multimodal ratio under a fixed total budget, with approximately 50B language tokens and 150B multimodal tokens. That mixture helps preserve language competence while giving the visual pathway enough supervision. Every model parameter is jointly optimized during this stage, but SFT, MPO, and test-time scaling also contribute to the reported endpoint. For reasoning evaluation, the test-time procedure uses best-of-N responses selected by a visual process reward model, so a leaderboard score may include additional inference compute.
+The sampling study gives the main pretraining tradeoff a measurable shape. The report uses a 1:3 language-to-multimodal ratio under a fixed total budget, roughly 50B language tokens and 150B multimodal tokens. That mixture preserves language competence while giving the visual pathway enough exposure. The final scores then add supervised fine-tuning, mixed preference optimization, and test-time scaling; for reasoning, best-of-N responses are selected with a visual process reward model. A leaderboard number can therefore include extra inference compute beyond one forward pass.
 
-The benchmark figures show a strong scaling curve, but they should be read with the recipe attached. InternVL3 changes the position scheme, data mixture, post-training, inference-time selection, and infrastructure together. The results support the integrated pipeline; they do not isolate how much of the gain comes from native pretraining versus V2PE, data, MPO, scale, or test-time compute.
+The two benchmark views should be read with those distinctions attached. The abstract's 72.2 MMMU figure and the report's 79.5 OpenCompass entry are different evaluations, and the table mixes model variants and protocols. The figures support the integrated pipeline—initialization, V2PE, data mixture, post-training, and test-time selection—not an isolated causal claim that native pretraining alone explains the gain.
 
 | Decision | InternVL3's answer | Boundary |
 | --- | --- | --- |
-| Training schedule | Joint text and multimodal pretraining | Strong base models are still used for ViT and LLM initialization. |
+| Initialization | Pretrained ViT and language-model weights | Native multimodal training is not random initialization. |
 | Position budget | V2PE assigns visual tokens fractional position increments | Visual attention and encoder cost still scale with visual input. |
 | Loss | Predict text tokens conditioned on visual tokens | Direct visual reconstruction is not the training target. |
+| Data ratio | Roughly 1:3 language to multimodal tokens | The mixture trades language retention against visual exposure. |
 | Reasoning | SFT + MPO + best-of-N visual process reward | Reported inference scores may use extra test-time compute. |
 
 ## High-Level Takeaways
 
-- InternVL3's “native” claim is about joint optimization and exposure, not training a multimodal model from random initialization.
-- V2PE preserves visual order while slowing visual position growth, which is a practical way to fit high-resolution and multi-image context into a language window.
-- The 1:3 language-to-multimodal mixture and text-only loss explain how the recipe protects language ability while learning visual grounding.
-- The 72.2 MMMU headline and 79.5 OpenCompass table entry are different evaluations; preserve that distinction when comparing models.
-- A clean ablation would hold base weights, data, post-training, and test-time sampling fixed while changing only the multimodal training schedule and position encoding.
+- InternVL3's native claim is about joint optimization and exposure during main pretraining, while strong pretrained base models remain part of the recipe.
+- V2PE preserves visual order while slowing visual position growth, helping high-resolution and multi-image context fit inside a language window.
+- The 1:3 mixture and text-only loss explain how the model protects language ability while learning visual grounding, but they make supervision quality central.
+- Keep the 72.2 MMMU abstract score separate from the 79.5 OpenCompass table entry; they are not interchangeable evaluations.
+- The clean causal test would hold base weights, data, post-training, and test-time sampling fixed while changing only the multimodal schedule and position encoding.

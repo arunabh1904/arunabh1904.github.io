@@ -14,38 +14,34 @@ summary: "2024 – MM1: Methods, Analysis & Insights from Multimodal LLM Pre-tra
 **arXiv:** [2403.09611](https://arxiv.org/abs/2403.09611)  
 **Conference:** Technical report
 
-### Method and reported result
-
-MM1 is a controlled ablation study of multimodal LLM pre-training. It varies image-encoder pretraining, resolution, visual-token count, connector architecture, and data mixture, then scales the selected recipe to dense and mixture-of-experts language models up to 30B parameters. Its central result is a prioritization rule: visual evidence and training data matter more consistently than connector ornamentation in the tested regime.
-
 ## Summary
 
-> MM1 is less a proposal for one magical architecture than a guide to spending experiment budget. Preserve more useful visual evidence, choose the data mixture for the evaluation regime, and only then spend time polishing the connector.
+> MM1 is a controlled study of where multimodal pretraining budget actually pays off. Around a fixed decoder-only language model, it varies the image encoder, resolution, visual-token count, connector, and data mixture, then scales the selected recipe to dense and MoE models up to 30B. Its practical lesson is a prioritization rule: preserve useful visual evidence and choose the data mixture before polishing the connector.
 
 ## Core Insights
+
+MM1 starts with a deliberately small base configuration: a 1.2B decoder-only language model, ViT-L/14 at 336 × 336, a C-Abstractor producing 144 image tokens, and a 45% captioned, 45% interleaved, 10% text-only data mixture. Each ablation changes one architecture or data choice at a time and evaluates zero-, four-, and eight-shot captioning and VQA.
 
 ![MM1 model and data ablation axes: image encoder, connector, resolution, visual tokens, and data mixture](/assets/images/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training-paper-figure.png)
 *Fig 1: MM1's ablation plan varies visual encoders, connector types, resolution, image-token count, objectives, and data mixtures around a fixed decoder-only language model. | source: [MM1, Figure 3](https://arxiv.org/abs/2403.09611)*
 
-MM1 starts with a small base configuration so one decision can be changed at a time: a 1.2B decoder-only language model, ViT-L/14 at 336 × 336, a C-Abstractor producing 144 image tokens, and a mixture of 45% captioned images, 45% interleaved image-text documents, and 10% text-only data. That setup makes the figure actionable. The question is not “which connector sounds modern?” but “which part of the visual-to-language path is throwing away the evidence the decoder needs?”
+The strongest architecture signal is resolution. Moving from 224 to 336 pixels produces roughly a 3% improvement across metrics, while doubling the ViT from L to H gives a usually smaller increase of under 1%. The connector study points in the same direction: increasing resolution or visual-token count helps, while average pooling, attention pooling, and C-Abstractor do not separate cleanly at matched settings. More tokens preserve local evidence, but they make every multimodal context longer and more expensive.
 
-The strongest architecture signal is resolution. In the encoder ablation, moving from 224 to 336 pixels produced roughly a 3% improvement across metrics, while doubling the ViT from L to H produced a usually smaller gain of under 1%. The connector study points in the same direction: increasing resolution or the number of visual tokens helped, while average pooling, attention pooling, and C-Abstractor did not separate cleanly at matched settings. The intuitive tradeoff is detail versus sequence cost. More tokens preserve local evidence, but they also make every multimodal context longer and more expensive.
+Data changes what those tokens are used for. Captioned pairs are short and highly image-relevant, so they lift zero-shot performance. Interleaved documents contain longer text, multiple images, and relationships resembling few-shot context; MM1 reports that at least about 50% interleaved data is important for maintaining strong four- and eight-shot results. Text-only data helps preserve language performance. In the paper's ablations, a 5:5:1 caption/interleaved/text mix offers a useful balance, while the small VeCap synthetic-caption component improves few-shot performance by 2.4 and 4 percentage points in the reported comparison.
 
-Data changes what those tokens are used for. Captioned pairs are short and highly image-relevant, so they lift zero-shot performance. Interleaved documents contain longer text, multiple images, and relationships that resemble few-shot context; MM1 reports that at least about 50% interleaved data was important for maintaining strong 4- and 8-shot results. Text-only data helps preserve language performance. In the paper's ablations, a 5:5:1 caption/interleaved/text mix offered a useful balance, and the small VeCap synthetic-caption component improved few-shot performance by 2.4 and 4 percentage points in the reported comparison.
-
-The final scaled recipe uses a ViT-H at 378 × 378 with 144 visual tokens, a C-Abstractor, and a 45% interleaved, 45% paired-caption, 10% text-only mixture. MM1 then trains dense 3B, 7B, and 30B models for about 400B tokens and builds 3B- and 7B-MoE variants. Those results show the recipe scales, but the paper's strongest lesson remains experimental allocation: resolution, token budget, encoder quality, and data composition should be swept before assuming a fancier connector will transfer.
+The final scaled recipe uses ViT-H at 378 × 378 with 144 visual tokens, a C-Abstractor, and a 45% interleaved, 45% paired-caption, 10% text-only mixture. MM1 trains dense 3B, 7B, and 30B models for about 400B tokens and builds 3B- and 7B-MoE variants. The reported 30B pretraining model reaches 71.9 VQAv2 and 59.3 OKVQA at 16-shot in Table 3, with comparisons qualified by prompt and data differences. The scaling result supports the recipe; it does not turn the small-scale component ranking into a universal law.
 
 | Lever | What MM1 observed | Practical interpretation |
 | --- | --- | --- |
-| Resolution | 224 → 336 gave an approximately 3% boost in the encoder ablation | Preserve visual evidence before adding decoder complexity. |
-| Visual-token count | More tokens improved zero- and few-shot scores | Budget tokens against context and latency. |
+| Resolution | 224 → 336 gives an approximately 3% boost in the encoder ablation | Preserve visual evidence before adding decoder complexity. |
+| Visual-token count | More tokens improve zero- and few-shot scores | Budget tokens against context and latency. |
 | Connector type | No clear winner among tested connectors | Do not over-invest before fixing representation and data. |
 | Data mixture | Caption, interleaved, and text-only data serve different regimes | Choose the mixture for the capability being measured. |
 
 ## High-Level Takeaways
 
-- MM1 turns multimodal pretraining into an experiment-allocation problem: test resolution, encoder quality, token count, and data mixture first.
-- Its connector conclusion is deliberately local to the tested encoders, token budgets, and tasks; it is not a universal claim that connector design never matters.
-- Interleaved data is a mechanism for learning multi-image and long-context behavior, while caption data aligns local visual evidence and text.
-- The reported ranking can change when latency, tail memory, higher resolutions, or different downstream tasks become the objective.
-- A good replication should keep end-to-end compute and average visual-token budget fixed while sweeping connector, resolution, and mixture separately.
+- MM1 turns multimodal pretraining into experiment allocation: test resolution, encoder quality, token count, and data mixture first.
+- Interleaved data is a mechanism for multi-image and long-context behavior, while caption data aligns local visual evidence and text.
+- Its connector conclusion is local to the tested encoders, token budgets, and tasks; stronger encoders or latency-constrained settings may change the ranking.
+- The reported 30B numbers are few-shot pretraining results with protocol-specific prompts, so they should not be compared to instruction-tuned scores as if they were the same task.
+- The paper's surprise is that the apparently unglamorous visual bandwidth and data decisions dominate the connector choice in the tested regime.

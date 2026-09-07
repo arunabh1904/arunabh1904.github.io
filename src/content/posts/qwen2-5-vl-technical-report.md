@@ -13,29 +13,25 @@ summary: '2025 – Qwen2.5-VL Technical Report'
 
 **arXiv:** [2502.13923](https://arxiv.org/abs/2502.13923)
 
-### Method and reported result
-
-Qwen2.5-VL extends Qwen2-VL's variable-resolution design with a redesigned vision transformer, window attention, dynamic FPS sampling, and multimodal rotary positions aligned to absolute time. It also trains on structured document, grounding, and agent data and expands the long-context stage to 32,768 tokens. The paper reports a model family that handles high-resolution documents and long videos while retaining the Qwen2.5 language backbone.
-
 ## Summary
 
-> Qwen2.5-VL turns “how much visual input should I keep?” into both a spatial and temporal decision. Native-resolution images get variable token budgets; videos choose their sampling rate; absolute time keeps an event at 12 seconds distinct from the twelfth sampled frame.
+> Qwen2.5-VL extends adaptive visual bandwidth along two axes: native-resolution images and dynamically sampled video. Window attention keeps most visual processing local, while a few full-attention layers exchange information across windows; absolute-time M-RoPE then distinguishes elapsed time from frame rank. The 72B model reports 70.2 on MMMU, 74.8 on MathVista, 96.4 on DocVQA, 885 on OCRBench, and 70.4 on MVBench. Those scores arrive with a 4T-token curriculum, structured targets, and long-context training, so the endpoint is a systems result rather than a single attention trick.
 
 ## Core Insights
 
-![Qwen2.5-VL framework with native-resolution images, dynamic FPS video sampling, and absolute-time M-RoPE](/assets/images/qwen2-5-vl-paper-figure-1.jpg)
-*Fig 1: The framework maps native-resolution images and dynamically sampled video frames to variable-length token sequences, while M-RoPE aligns temporal IDs to absolute time. | source: [Qwen2.5-VL, Figure 1](https://arxiv.org/abs/2502.13923)*
+Qwen2.5-VL redesigns the visual encoder around high-resolution cost. Patch features retain their native spatial layout; window attention handles most layers locally, and only four layers use full attention to exchange information across windows. The report uses windows up to 112 × 112 patches. This preserves small cells in a chart or document without paying global quadratic cost at every layer, though the number of patches and the resulting language context still grow with the input.
 
-The visual encoder is redesigned around the cost of high resolution. Patch features retain native size, window attention makes most layers scale roughly with local windows rather than a global quadratic map, and only a few layers use full attention to exchange information across windows. The input is therefore not resized into one canonical square before perception. The model can preserve the small cells of a chart or the layout of a document, but the sequence and memory footprint grow with what the input contains.
+![Qwen2.5-VL's vision encoder, window-attention blocks, dynamic FPS sampling, and absolute-time position IDs](/assets/images/qwen2-5-vl-technical-report-source-figure-1.webp)
+*Fig 1: The source architecture diagram connects native-resolution image and video tokens to window attention, dynamic FPS sampling, and temporal IDs aligned to elapsed seconds. | source: [Qwen2.5-VL, Figure 1](https://arxiv.org/abs/2502.13923)*
 
-The temporal extension is the more interesting part for video. Dynamic FPS sampling chooses how many frames to keep, while the temporal coordinates in M-RoPE are aligned to absolute time. Two clips with the same number of frames can therefore represent different durations, and an event's position is not confused with its rank in a sampled list. This is a useful distinction for localization and long videos, although it does not by itself recover events that the sampler never observes.
+The temporal change is more than a new frame sampler. Dynamic FPS chooses how many frames to keep, while M-RoPE's temporal coordinates are aligned to absolute time. Two clips with the same number of frames can therefore represent different durations, and an event at 12 seconds is not confused with “the twelfth sampled frame.” The encoding cannot recover an event the sampler never observes, but it prevents the sampler's rank from becoming the model's only clock.
 
-![Qwen2.5-VL's vision encoder, window-attention blocks, and absolute-time position IDs](/assets/images/qwen2-5-vl-technical-report-source-figure-1.webp)
-*Fig 2: The source architecture diagram shows variable image and video token sequences, window attention in the visual transformer, dynamic FPS sampling, and time IDs aligned to elapsed seconds. | source: [Qwen2.5-VL, Figure 1](https://arxiv.org/abs/2502.13923)*
+The training table explains why the model can support these behaviors. Visual pretraining uses about 1.5T tokens; multimodal pretraining adds about 2T tokens of pure text, interleaved data, VQA, video, grounding, and agent examples; long-context pretraining adds roughly 0.6T tokens and raises the sequence length to 32,768. The ViT is trained first, then the ViT and language model are jointly trained, and the final stage adds long-video, long-document, and long-agent data. Structured outputs—coordinates, points, document elements, and UI actions—make spatial relations part of the supervision rather than an afterthought.
 
-The training table makes the compute tradeoff explicit. Visual pretraining uses about 1.5T tokens with image caption, knowledge, and OCR data; multimodal pretraining uses about 2T tokens with pure text, interleaved data, VQA, video, grounding, and agent tasks; long-context pretraining adds about 0.6T tokens and raises sequence length to 32,768. The ViT is trained first, then ViT and language model are jointly trained, and the final stage adds long video, long document, and long-agent data. These phases explain why the endpoint cannot be attributed to dynamic resolution alone.
+![Qwen2.5-VL benchmark comparison across document, reasoning, video, and general multimodal tasks](/assets/images/qwen2-5-vl-paper-figure-1.jpg)
+*Fig 2: This table-derived view collects the paper's reported comparisons for Qwen2.5-VL-72B, Qwen2.5-VL-32B, Qwen2-VL-72B, and reference systems; it is a visual rendering of reported benchmark values, not a source-paper figure. | source: [Qwen2.5-VL, benchmark tables](https://arxiv.org/abs/2502.13923)*
 
-The model's structured outputs are part of the same design. Grounding coordinates, points, document elements, and UI actions become language-compatible targets, so the visual encoder is trained to preserve not only appearance but also spatial relations and affordances. That broadens the use case from “answer a question about the frame” to “identify, localize, and act,” while making the visual token budget and the supervision format jointly responsible for behavior.
+The reported scores show the breadth of the recipe: Qwen2.5-VL-72B reaches 70.2 on MMMU, 74.8 on MathVista, 96.4 on DocVQA, 885 on OCRBench, 70.4 on MVBench, and 50.9 Charades-STA mIoU. These metrics span reasoning, documents, OCR, video understanding, and temporal localization. They are useful evidence that the integrated system works across modalities; they do not establish that window attention, dynamic FPS, or absolute time is individually responsible for each gain.
 
 | Design choice | Benefit | Operational risk |
 | --- | --- | --- |
@@ -43,11 +39,12 @@ The model's structured outputs are part of the same design. Grounding coordinate
 | Window attention | Reduces most visual-encoder cost | Global interactions are limited to selected layers. |
 | Dynamic FPS | Allocates frames to video content | Sampling can miss short events. |
 | Absolute-time M-RoPE | Distinguishes elapsed time from frame index | Temporal position alone does not guarantee temporal reasoning. |
+| Structured targets | Teaches grounding and UI actions directly | Target formats and annotation quality affect generalization. |
 
 ## High-Level Takeaways
 
-- Qwen2.5-VL extends adaptive visual bandwidth along two axes: image resolution and video sampling rate.
-- Absolute time is useful because frame order is not a clock, especially when clips have different FPS or duration.
-- The 1.5T + 2T + 0.6T training stages, structured targets, and long-context curriculum are material parts of the result.
-- Serving quality should be measured as an accuracy–latency curve with worst-case documents and long videos, not only an average benchmark score.
-- The key ablation is matched visual evidence and compute: fixed resolution versus native resolution, and fixed FPS versus dynamic FPS, under the same token budget.
+- Qwen2.5-VL extends adaptive visual bandwidth in both space and time: resolution for images, frame rate for video.
+- The four full-attention layers and local windows are a cost allocation inside the encoder, not a guarantee that high-resolution serving is cheap.
+- Absolute time helps when clips differ in duration or sampling rate, but it cannot repair missed frames or weak temporal supervision.
+- The 1.5T + 2T + 0.6T curriculum, structured targets, and 32,768-token stage are material parts of the benchmark result.
+- The decisive deployment test is a matched compute ablation: native versus fixed resolution and dynamic versus fixed FPS under the same token budget and worst-case latency.
