@@ -34,12 +34,12 @@ The experiment is best understood as a planner-interface test rather than end-to
 The overview places perception before the language interface. Its inputs are already structured scene facts, so the model is being tested as a planner rather than asked to discover objects directly in pixels.
 
 ![Figure 1: Overview of GPT-Driver from GPT-Driver: Learning to Drive with GPT](/assets/images/gpt-driver-learning-to-drive-with-gpt-paper-figure.png)
-*Fig 1: GPT-Driver converts structured scene observations into language tokens, prompts a language model to reason about the scene, and decodes the response into a future trajectory. | paper Figure 1; source: [GPT-Driver: Learning to Drive with GPT paper](https://arxiv.org/abs/2310.01415)*
+*Fig 1: GPT-Driver converts structured scene observations into language tokens, prompts a language model to reason about the scene, and decodes the response into a future trajectory. | source: [GPT-Driver: Learning to Drive with GPT paper, Figure 1](https://arxiv.org/abs/2310.01415)*
 
 Read the prompt from the reusable instruction block through the scene-specific facts to the six-coordinate answer. The rationale exposes which objects the model mentions, but faithfulness requires the numeric path to respond to those objects as well. Correct prose and correct geometry remain distinct outputs to check.
 
 ![Figure 2 from GPT-Driver: Learning to Drive with GPT](/assets/images/gpt-driver-learning-to-drive-with-gpt-source-figure-2.webp)
-*Fig 2: The prompt combines a reusable planning instruction with serialized perception, predicted motion, ego history, and the requested six-point trajectory. The layout makes the interface legible: structured scene facts enter as text, then the model returns both a decision rationale and coordinates. | paper Figure 2; source: [GPT-Driver: Learning to Drive with GPT](https://arxiv.org/abs/2310.01415)*
+*Fig 2: The prompt combines a reusable planning instruction with serialized perception, predicted motion, ego history, and the requested six-point trajectory. The layout makes the interface legible: structured scene facts enter as text, then the model returns both a decision rationale and coordinates. | source: [GPT-Driver: Learning to Drive with GPT, Figure 2](https://arxiv.org/abs/2310.01415)*
 
 
 ## High-Level Takeaways

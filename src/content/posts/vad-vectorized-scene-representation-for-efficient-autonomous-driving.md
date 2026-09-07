@@ -36,12 +36,12 @@ The useful abstraction is therefore a shared coordinate language between percept
 The representation comparison shows why instance identity matters. A lane is an ordered geometric object with a direction, and an agent has its own future motion. Keeping those structures explicit lets planning losses operate on distances and directions directly. It does not remove the BEV image backbone; the change is how the planner represents the scene extracted from it.
 
 ![Figure 1 from VAD comparing rasterized scene representation with vectorized scene representation](/assets/images/vad-vectorized-scene-representation-for-efficient-autonomous-driving-paper-figure.png)
-*Fig 1: Shows the representational shift: VAD keeps agents, maps, and ego plans as vectors instead of flattening the scene into dense raster grids. | paper Figure 1; source: [VAD paper](https://arxiv.org/abs/2303.12077)*
+*Fig 1: Shows the representational shift: VAD keeps agents, maps, and ego plans as vectors instead of flattening the scene into dense raster grids. | source: [VAD paper, Figure 1](https://arxiv.org/abs/2303.12077)*
 
 Read the architecture in four stages: images become BEV features, queries extract agents and map vectors, the ego query attends to both, and geometric losses constrain its future waypoints. The collision, boundary, and lane-direction terms supervise the plan in the same coordinates as those vectors.
 
 ![Figure 2 from VAD: Vectorized Scene Representation for Efficient Autonomous Driving](/assets/images/vad-vectorized-scene-representation-for-efficient-autonomous-driving-source-figure-2.webp)
-*Fig 2: The four phases turn multi-view features into agent and map vectors, forecast other agents, and decode a constrained ego plan. The arrows show where vector instances enter the planning query, which is the paper’s efficiency/safety interface. | paper Figure 2; source: [VAD: Vectorized Scene Representation for Efficient Autonomous Driving](https://arxiv.org/abs/2303.12077)*
+*Fig 2: The four phases turn multi-view features into agent and map vectors, forecast other agents, and decode a constrained ego plan. The arrows show where vector instances enter the planning query, which is the paper’s efficiency/safety interface. | source: [VAD: Vectorized Scene Representation for Efficient Autonomous Driving, Figure 2](https://arxiv.org/abs/2303.12077)*
 
 
 ## High-Level Takeaways

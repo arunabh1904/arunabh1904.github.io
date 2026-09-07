@@ -26,12 +26,12 @@ The first figure is a diagnostic of the compression itself. Darker entries mean 
 
 
 ![Figure 4 from Driving on Registers](/assets/images/driving-on-registers-source-figure-4.webp)
-*Fig 1: Cosine similarity between scene tokens. Darker indicates lower cosine similarity. | paper Figure 4; source: [Driving on Registers](https://arxiv.org/abs/2601.05083)*
+*Fig 1: Cosine similarity between scene tokens. Darker indicates lower cosine similarity. | source: [Driving on Registers, Figure 4](https://arxiv.org/abs/2601.05083)*
 
 The architecture separates proposing a path from judging it. Learned queries generate multiple trajectories, but the scorer receives a fresh, detached embedding of each candidate. This makes the scoring task depend on the proposed geometry and scene evidence rather than a hidden generator state. Runtime weights then choose how the predicted safety, comfort, and efficiency components affect selection.
 
 ![Figure 1 from Driving on Registers](/assets/images/driving-on-registers-source-figure-1.webp)
-*Fig 2: DrivoR architecture. The proposed architecture is composed of three transformer blocks: one encoder (perception) and two decoders (trajectory and scoring). | paper Figure 1; source: [Driving on Registers](https://arxiv.org/abs/2601.05083)*
+*Fig 2: DrivoR architecture. The proposed architecture is composed of three transformer blocks: one encoder (perception) and two decoders (trajectory and scoring). | source: [Driving on Registers, Figure 1](https://arxiv.org/abs/2601.05083)*
 
 
 The compression ablations make the efficiency claim causal. Register-based compression reaches 90.0 PDMS on NAVSIM-v1 with 64 scene tokens, close to the 90.2 of a model that consumes roughly 16,000 tokens, while adding only 0.6M parameters. A pooling baseline reaches 89.7, and a transformer decoder with the same 64-token budget reaches 89.3. Pretraining matters even more: the pretrained ViT is over 15 PDMS points better than the same design trained from scratch. Increasing trajectory proposals from 1 to 64 raises PDMS from 80.1 to 90.0, after which the curve saturates.

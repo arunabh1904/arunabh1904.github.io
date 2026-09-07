@@ -34,7 +34,7 @@ The architecture makes the division of labor explicit. The VLM turns visual cont
 Read the figure left to right. The upper branch explains the semantic condition, the lower branch supplies the sparse and dense scene evidence, and the right-hand stack repeatedly denoises noisy trajectories. The small trajectory strip at the bottom is the key visual: the model is producing a set of continuous paths, not asking the language model to spell out coordinates one token at a time.
 
 ![Figure 1 from DiffVLA showing the perception-enhanced diffusion VLA framework](/assets/images/diffvla-vision-language-guided-diffusion-planning-for-autonomous-driving-paper-figure.png)
-*Fig 1: Shows DiffVLA's perception-enhanced diffusion VLA framework, where vision-language guidance and agent-map context condition trajectory diffusion. | paper Figure 1; source: [DiffVLA paper](https://arxiv.org/abs/2505.19381)*
+*Fig 1: Shows DiffVLA's perception-enhanced diffusion VLA framework, where vision-language guidance and agent-map context condition trajectory diffusion. | source: [DiffVLA paper, Figure 1](https://arxiv.org/abs/2505.19381)*
 
 
 ## High-Level Takeaways

@@ -36,17 +36,17 @@ The deeper design choice is that occupancy acts as a spatial veto on an otherwis
 Read the pipeline from left to right. The BEV feature is only the common substrate; the important arrows are the query interfaces that turn agents and map elements into motion context, then turn that context into an ego plan. The qualitative panel below is useful for the same reason: each row lets you follow one scene through tracking, mapping, forecasting, occupancy, and the final trajectory.
 
 ![Figure 2 from UniAD showing the planning-oriented pipeline from multi-view images to perception, prediction, occupancy, and planning](/assets/images/uniad-planning-oriented-autonomous-driving-paper-figure.png)
-*Fig 1: Shows UniAD's pipeline: BEV features feed tracking and mapping, those queries support motion and occupancy, and the planner consumes the resulting scene knowledge. | paper Figure 2; source: [UniAD paper](https://arxiv.org/abs/2212.10156)*
+*Fig 1: Shows UniAD's pipeline: BEV features feed tracking and mapping, those queries support motion and occupancy, and the planner consumes the resulting scene knowledge. | source: [UniAD paper, Figure 2](https://arxiv.org/abs/2212.10156)*
 
 The qualitative outputs let you trace those interfaces through a single scene. Tracking identifies actors, motion expands each actor into possible futures, and occupancy exposes where those futures consume space. The final ego path is the end of that chain; a plausible path alone would hide which intermediate prediction made it possible.
 
 ![Figure 3 from UniAD: Planning-oriented Autonomous Driving](/assets/images/uniad-planning-oriented-autonomous-driving-source-figure-3.webp)
-*Fig 2: The qualitative panel aligns surround-view images with BEV outputs for tracking, mapping, motion, occupancy, and the ego plan. Reading across a row shows how the same scene queries become a trajectory decision. | paper Figure 3; source: [UniAD: Planning-oriented Autonomous Driving](https://arxiv.org/abs/2212.10156)*
+*Fig 2: The qualitative panel aligns surround-view images with BEV outputs for tracking, mapping, motion, occupancy, and the ego plan. Reading across a row shows how the same scene queries become a trajectory decision. | source: [UniAD: Planning-oriented Autonomous Driving, Figure 3](https://arxiv.org/abs/2212.10156)*
 
 The comparison of task arrangements clarifies what joint optimization adds. Sharing an image backbone reduces duplication, but independent heads still need a rule for connecting their outputs. UniAD makes those connections part of the model, which also means errors and competing losses can propagate through them.
 
 ![Figure 1 from UniAD: Planning-oriented Autonomous Driving](/assets/images/uniad-planning-oriented-autonomous-driving-source-figure-1.webp)
-*Fig 3: The figure contrasts separate task models, a shared-backbone multi-task stack, direct end-to-end planning, and UniAD’s integrated perception-prediction-planning design. | paper Figure 1; source: [UniAD: Planning-oriented Autonomous Driving](https://arxiv.org/abs/2212.10156)*
+*Fig 3: The figure contrasts separate task models, a shared-backbone multi-task stack, direct end-to-end planning, and UniAD’s integrated perception-prediction-planning design. | source: [UniAD: Planning-oriented Autonomous Driving, Figure 1](https://arxiv.org/abs/2212.10156)*
 
 
 ## High-Level Takeaways

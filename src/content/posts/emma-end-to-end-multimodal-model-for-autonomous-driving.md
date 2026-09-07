@@ -34,12 +34,12 @@ The scale comparison separates foundation-model initialization from data. On nuS
 Read the overview as one prompt/output contract reused across tasks: a task instruction and camera context enter the shared model, textual predictions come out, and small decoders turn them into boxes, road graphs, or waypoints.
 
 ![Figure 1: EMMA overview diagram from EMMA: End-to-End Multimodal Model for Autonomous Driving](/assets/images/emma-end-to-end-multimodal-model-for-autonomous-driving-paper-figure.png)
-*Fig 1: EMMA frames perception, scene understanding, and driving decisions as language generation from a shared multimodal model instead of separate task-specific heads. | paper Figure 1; source: [EMMA: End-to-End Multimodal Model for Autonomous Driving paper](https://arxiv.org/abs/2410.23262)*
+*Fig 1: EMMA frames perception, scene understanding, and driving decisions as language generation from a shared multimodal model instead of separate task-specific heads. | source: [EMMA: End-to-End Multimodal Model for Autonomous Driving paper, Figure 1](https://arxiv.org/abs/2410.23262)*
 
 Sampling makes the ambiguity of the future explicit: several continuations can be consistent with the same history. Figure 3 tracks ADE at five seconds as the sample count grows. The gain flattens after about twelve, so more decoding has diminishing value even before its computational cost is considered.
 
 ![Figure 3 from EMMA: End-to-End Multimodal Model for Autonomous Driving](/assets/images/emma-end-to-end-multimodal-model-for-autonomous-driving-source-figure-3.webp)
-*Fig 2: ADE@5s improves as EMMA samples more trajectory candidates, then flattens after roughly 12 samples. The curve shows why multi-sampling is valuable for long-horizon multimodal behavior but cannot substitute for a better single-sample decoder indefinitely. | paper Figure 3; source: [EMMA: End-to-End Multimodal Model for Autonomous Driving](https://arxiv.org/abs/2410.23262)*
+*Fig 2: ADE@5s improves as EMMA samples more trajectory candidates, then flattens after roughly 12 samples. The curve shows why multi-sampling is valuable for long-horizon multimodal behavior but cannot substitute for a better single-sample decoder indefinitely. | source: [EMMA: End-to-End Multimodal Model for Autonomous Driving, Figure 3](https://arxiv.org/abs/2410.23262)*
 
 
 ## High-Level Takeaways
