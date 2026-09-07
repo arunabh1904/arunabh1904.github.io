@@ -15,37 +15,31 @@ summary: '2022 – PETRv2: A Unified Framework for 3D Perception from Multi-Came
 
 **Code:** [megvii-research/PETR](https://github.com/megvii-research/PETR)
 
-### Method and reported result
-
-PETRv2 extends PETR's 3D position-aware image tokens across time and tasks. Ego pose aligns historical 3D coordinates before their position embeddings meet current queries. Separate query families then use the same multiview features for object detection, BEV segmentation, and 3D lane detection.
-
 ## Summary
 
 > The paper unifies the interface, not the output representation. Boxes use sparse 3D detection queries, BEV segmentation uses patch queries, and lanes use ordered anchor-point queries.
 
 ## Core Insights
 
-Coordinate alignment gives historical features the position they occupy in the current ego frame. A feature-guided position encoder modulates geometric embeddings with appearance so the same nominal coordinate can carry different evidence. In the main nuScenes test configuration, PETRv2 reports 49.0 mAP and 58.2 NDS; its multiscale variant reaches 50.8 mAP and 59.1 NDS. Average velocity error drops from PETR's 0.808 m/s to 0.343 m/s.
+PETRv2 keeps PETR's frustum-derived 3D position-aware image features, then transforms the previous frame's coordinates into the current ego frame before concatenating the two feature sets. A feature-guided position encoder uses image appearance to modulate the geometric embedding, so a nominal location can carry different evidence when the scene changes. One decoder serves three query contracts: detection queries are initialized over 3D space, segmentation queries over BEV patches, and lane queries as ordered 3D points. The shared feature interface is therefore narrower than “one output for every task.”
+
+In the main nuScenes test configuration, PETRv2 reports 49.0 mAP and 58.2 NDS; the multiscale variant reaches 50.8 mAP and 59.1 NDS. Average velocity error drops from PETR's 0.808 m/s to 0.343 m/s. Those numbers combine temporal modeling, a changed encoder, and training choices, so the component ablation is more informative than the headline.
 
 
 ![Figure 3 from PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](/assets/images/petrv2-unified-3d-perception-from-multicamera-images-source-figure-3.webp)
-*Fig 1: The definition of three kinds of queries for multi-task learning. The det query is defined in the whole 3D space while the seg query is initialized under the BEV space. | source: [PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](https://arxiv.org/abs/2206.01256)*
+*Fig 1: Detection queries cover the 3D space, segmentation queries are initialized under BEV, and lane queries use ordered points. The query geometry is the task contract: it lets the decoder reuse calibrated evidence without pretending that boxes, regions, and curves have the same output structure. | source: [PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](https://arxiv.org/abs/2206.01256)*
 
 ![Figure 1 from PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](/assets/images/petrv2-unified-3d-perception-from-multicamera-images-source-figure-1.webp)
-*Fig 2: The paradigm of the proposed PETRv2. The 2D features are extracted by the backbone network from the multi-view images and the 3D coordinates are generated following the same way as PETR liu2022petr. | source: [PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](https://arxiv.org/abs/2206.01256)*
+*Fig 2: Previous-frame frustum coordinates are pose-transformed into the current ego frame, concatenated with current image features, and passed through the feature-guided position encoder before task-specific queries decode boxes, BEV segmentation, and lanes. | source: [PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images](https://arxiv.org/abs/2206.01256)*
 
 
-| Added component | Validation effect | Interpretation |
-| --- | --- | --- |
-| Temporal frames without coordinate alignment | +2.7 NDS, +0.5 mAP | History helps, but unaligned geometry limits it. |
-| Coordinate alignment | Further +2.1 NDS, +0.9 mAP | Ego-frame consistency carries most temporal value. |
-| Feature-guided position encoding | Final 49.6 NDS, 40.1 mAP | Appearance adapts the geometric prior. |
+The component ablation makes the temporal claim testable. Adding history without coordinate alignment improves the reported validation result by 2.7 NDS and 0.5 mAP. Aligning the previous 3D coordinates adds another 2.1 NDS and 0.9 mAP, showing why simply concatenating frames is not equivalent to temporal fusion. Adding feature-guided position encoding reaches 49.6 NDS and 40.1 mAP in that ablation. The gain is therefore a chain: memory supplies another view, pose puts it in the same metric frame, and appearance conditions the position code.
 
-The robustness study is as important as the leaderboard. Extrinsic noise degrades every variant; feature-guided encoding reduces but does not remove the loss. Dropping one camera reduces mAP, especially the wide rear camera. A delay of roughly 83 ms lowers mAP by 3.19 points, and delays above 0.3 s produce a much larger collapse. Temporal modeling does not substitute for sensor synchronization.
+The robustness study gives that chain a boundary. Extrinsic noise degrades every variant; feature guidance reduces the loss without removing it. Dropping one camera hurts mAP, especially for the wide rear view. An approximately 83 ms delay lowers mAP by 3.19 points, while delays above 0.3 s cause a much larger collapse. PETRv2's temporal alignment assumes the pose and timestamp contract it is given; the model cannot recover information that arrives from the wrong frame.
 
 ## High-Level Takeaways
 
-- PETRv2 informs how one camera representation can support detection, mapping, and lanes without forcing one query geometry on all three. The shared object is a set of calibrated, position-aware image features. Task capacity stays explicit through query initialization and heads; temporal sharing occurs through aligned coordinates.
-- The rejection test compares this task-query design with a dense BEV trunk at matched resolution and latency, including extrinsic noise, camera loss, and timestamp jitter. PETRv2 loses if global attention or position encoding becomes brittle under real calibration drift, or if dense BEV gives stronger task consistency. At more tasks, query families and their competing gradients become the likely capacity bottleneck.
-- PETR establishes 3D position embeddings; PETRv2 makes them temporal and multi-task. StreamPETR later retains selected PETR queries as recurrent object state instead of replaying the historical token set.
-- A unified camera model can share calibrated evidence while giving boxes, maps, and lanes different query contracts—and synchronization remains part of the model.
+- PETRv2 shares calibrated, position-aware image features while giving boxes, BEV regions, and lanes separate query geometries.
+- The temporal gain comes from pose-aligning previous frustum coordinates before attention; frame concatenation alone is a weaker control.
+- Extrinsic noise, camera loss, and delay tests are part of the model result because the representation assumes accurate calibration and synchronization.
+- PETR provides the spatial interface; PETRv2 makes it temporal and multi-task, while StreamPETR later compresses selected object queries into recurrent state.
