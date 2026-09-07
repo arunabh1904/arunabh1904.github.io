@@ -24,11 +24,15 @@ summary: '2026 – G-MARK: Grounded Multi-Agent Reasoning for Cooperative Drivin
 
 ## Core Insights
 
+Read the method figure from left to right: each vehicle contributes agent and observation nodes, conservative association builds object hypotheses, and context enrichment attaches provenance, visibility, uncertainty, disagreement, and path relevance before a task head reads the graph. The second figure shifts the question from architecture to operating point: how much serialized evidence is communicated for a given trajectory error. Together they explain why G-MARK is a delayed-fusion system—the graph preserves evidence until the downstream question decides which relationships matter.
+
 ![G-MARK pipeline from per-agent evidence graphs through conservative association and context enrichment to task heads](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-1.webp)
-*Fig 1: G-MARK preserves agent, observation, and hypothesis nodes through conservative association, then adds provenance and planning context before task-specific heads; the graph keeps delayed fusion inspectable instead of collapsing evidence into one object list. | source: [G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](https://arxiv.org/abs/2608.19964)*
+*Fig 1: G-MARK preserves agent, observation, and hypothesis nodes through conservative association, then adds provenance and planning context before task-specific heads; the graph keeps delayed fusion inspectable instead of collapsing evidence into one object list. | source: [G-MARK, Figure 1](https://arxiv.org/abs/2608.19964)*
+
+The operating-point plot separates communication from prediction quality. G-MARK sends a compact graph, but its future-trajectory error is slightly worse than V2V-GoT in the task table. The useful result is how much communication is saved for that loss in accuracy, rather than a claim that less evidence always predicts better.
 
 ![Figure 2 from G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-2.webp)
-*Fig 2: G-MARK reaches the lowest trajectory error with near-zero communicated megabytes, while competing cooperative-driving methods trade much higher bandwidth for worse planning accuracy. | source: [G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](https://arxiv.org/abs/2608.19964)*
+*Fig 2: G-MARK trades slightly higher future-trajectory error than V2V-GoT for a much smaller structured payload; the operating point should be read as a communication trade-off, not the best trajectory error. | source: [G-MARK, Figure 2](https://arxiv.org/abs/2608.19964)*
 
 
 ### The graph preserves how an object became believable
@@ -47,13 +51,14 @@ The evaluation uses the official V2V4Real-derived V2V-GoT-QA split: about 110,00
 | --- | ---: | ---: | ---: |
 | Occluding objects, F1@0.5 m ↑ | 0.428 | 0.301 | +42.2% |
 | Invisible objects, F1@0.5 m ↑ | 0.494 | 0.440 | +12.3% |
-| Object motion, average L2 ↓ | 3.822 | 7.610 | +49.8% |
+| Object motion (Q5), average L2 ↓ | 3.822 | 8.050 | +52.5% |
+| Object motion (Q7), average L2 ↓ | 3.822 | 7.610 | +49.8% |
 | Control settings, action L1 ↓ | 0.076 | 0.088 | +13.1% |
 | Future trajectory, average L2 ↓ | 2.710 | 2.620 | -3.4% |
 
 The ablations identify which structure matters. Removing partner evidence drives invisible-object F1 from 0.494 to 0.000. Removing provenance lowers that F1 to 0.396 and doubles control error from 0.076 to 0.152. Replacing the graph with flat object features also hurts both tasks, though less sharply. These controls support provenance-aware cooperative evidence; they do not show that a knowledge graph is the only representation capable of storing it.
 
-G-MARK reports a 0.0159 MB structured payload per sample, compared with roughly 0.4 MB for feature-fusion and language-mediated baselines. Its future-trajectory point is therefore a useful bandwidth trade: near-parity rather than best error, at much lower reported communication. The CPU task solver adds less than 1.4 ms per sample, but those timings exclude upstream perception; temporal tasks still take 32.4–33.4 ms mainly because previous-frame context must be loaded.
+G-MARK reports a 0.0159 MB structured payload per sample, giving 25.2× lower communication than the intermediate-fusion methods and 25.6× lower communication than V2V-GoT. Its future-trajectory point is therefore a useful bandwidth trade: near-parity rather than best error, at much lower reported communication. The CPU task solver adds less than 1.4 ms per sample, but those timings exclude upstream perception; temporal tasks still take 32.4–33.4 ms mainly because previous-frame context must be loaded.
 
 ## High-Level Takeaways
 
