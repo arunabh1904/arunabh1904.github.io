@@ -21,45 +21,39 @@ summary: '2026 – Scaling Native Multimodal Pre-Training From Scratch'
 
 ## Summary
 
-> Native multimodal pre-training shares one Transformer across text and image patches from the start, but the two objectives need not want the same compute allocation. This paper fits separate IsoFLOP frontiers for language loss and multimodal loss across six model sizes and three image-text mixture ratios. Language allocation is nearly invariant to the mixture once text compute is held fixed; multimodal allocation is not. As the multimodal ratio increases, the loss-minimizing recipe shifts toward more training tokens and slower parameter growth.
+> This study fits compute-optimal frontiers for a decoder-only native multimodal model trained from scratch on text and continuous image patches. Language and multimodal objectives share parameters but prefer different allocations: language scaling is nearly invariant to the multimodal ratio, while multimodal scaling becomes more token-hungry as that ratio rises. The resulting Pareto frontier connects model size, text tokens, multimodal tokens, and data composition under one compute budget.
 
 ## Core Insights
 
-That asymmetry is the paper's main result. It means a single aggregate scaling law can conceal a real resource conflict: the text objective may tolerate the added modality without changing its preferred parameter-token balance, while the multimodal objective becomes increasingly data-hungry. The fitted joint Pareto frontier turns that conflict into a planning tool, but its exponents are measured only up to 3B active parameters and should not be treated as a universal recipe for frontier-scale runs.
+### Two objectives share a model but not a frontier
 
-The experiments train auxiliary-loss-free MoE decoder-only Transformers with 71M, 128M, 340M, 590M, 874M, and 3B activated non-embedding parameters. Images are converted directly to continuous $32\times32$ patch embeddings by one projection layer rather than a separate vision encoder. The available corpus contains 250B text tokens and 75B multimodal tokens; mixture ratio $r$ ranges from 0.1 to 0.3 for multimodal runs, with $r=0$ as the text-only control.
+The experiments use auxiliary-loss-free MoE transformers with 71M, 128M, 340M, 590M, 874M, and 3B active non-embedding parameters. A single projection turns 32×32 image patches into continuous embeddings; there is no separate vision encoder. The corpus contains 250B text tokens and 75B multimodal tokens. Multimodal runs use ratios $r\in\{0.1,0.2,0.3\}$, with $r=0$ as the text-only control.
 
-For each compute budget, the authors vary model size and token count under $C\approx6ND$, fit a parabola to the IsoFLOP profile, and use its minimum to estimate $N_{\mathrm{opt}}$ and $D_{\mathrm{opt}}$. A second estimator takes the lower envelope of every training curve. Agreement between these methods is useful because either one alone can confuse a noisy local minimum with a scaling law.
+For each budget, the authors vary $N$ and $D$ under $C=6ND$ and fit a parabola to the loss against model size. The minimum estimates $N_{\mathrm{opt}}$, then $D_{\mathrm{opt}}=C/(6N_{\mathrm{opt}})$. A lower envelope over complete training curves supplies an independent check. The use of two estimators matters: a single under-sampled IsoFLOP curve could mistake an irregular checkpoint for the true compute optimum.
 
-| Objective | Mixture ratio $r$ | Fitted parameter exponent $a$ in $N_{\mathrm{opt}}\propto C^a$ | Token exponent $b=1-a$ |
-| --- | ---: | ---: | ---: |
-| Language | 0.0 | 0.697 | 0.303 |
-| Language | 0.1 | 0.684 | 0.316 |
-| Language | 0.2 | 0.667 | 0.333 |
-| Language | 0.3 | 0.663 | 0.337 |
-| Multimodal | 0.1 | 0.709 | 0.291 |
-| Multimodal | 0.2 | 0.679 | 0.321 |
-| Multimodal | 0.3 | 0.643 | 0.357 |
+![IsoFLOP profiles for the language objective across multimodal ratios](/assets/images/scaling-native-multimodal-pre-training-from-scratch-source-figure-1.webp)
+*Fig 1: At fixed text compute, each multimodal ratio produces a parabolic loss profile over model size; the stars mark the fitted compute-optimal model sizes. | source: [Scaling Native Multimodal Pre-Training From Scratch, Figure 1](https://arxiv.org/abs/2607.22043)*
 
-The small drift in language exponents is not reproduced monotonically by the independent envelope estimator, so the authors interpret language allocation as composition-invariant within fitting error. Both estimators, however, show the same decline for the multimodal parameter exponent. At $r=0.3$, a compute increase should therefore buy relatively more tokens than at $r=0.1$ if minimizing the multimodal loss is the target.
+### Language allocation stays stable while multimodal allocation moves
 
-![Joint language-multimodal Pareto frontier and fitted parameter-token allocations across mixture ratios](/assets/images/native-multimodal-pareto-frontier.png)
-*Fig 1: Sweeping the mixture ratio traces different language–multimodal trade-offs at fixed total compute; the fitted allocation changes with the target mixture. | source: [paper](https://arxiv.org/abs/2607.22043)*
+The language fits are $N_{\mathrm{opt}}\propto C^a$ with $a=0.697,0.684,0.667,0.663$ for $r=0,0.1,0.2,0.3$, and $D_{\mathrm{opt}}\propto C^b$ with the complementary exponents 0.303, 0.316, 0.333, and 0.337. The envelope cross-check does not reproduce a monotonic decline, so the paper treats the small drift as fitting noise rather than evidence that multimodal data changes the language allocation law.
 
-![Figure 1 from Scaling Native Multimodal Pre-Training From Scratch](/assets/images/scaling-native-multimodal-pre-training-from-scratch-source-figure-1.webp)
-*Fig 2: IsoFLOP curves (language objective). For a range of model sizes, we adjust the number of training tokens to maintain a constant final FLOPs, setting the cosine cycle length to match this target compute budget. | source: [Scaling Native Multimodal Pre-Training From Scratch](https://arxiv.org/abs/2607.22043)*
+The multimodal objective behaves differently. Its IsoFLOP exponents are $a=0.709,0.679,0.643$ for $r=0.1,0.2,0.3$, with token exponents $b=0.291,0.321,0.357$. The envelope estimator follows the same downward trend in $a$. Increasing the multimodal share therefore shifts compute toward data: at $r=0.3$, buying capacity without enough multimodal tokens is a worse use of the budget than it is at $r=0.1.
 
-![Figure 2 from Scaling Native Multimodal Pre-Training From Scratch](/assets/images/scaling-native-multimodal-pre-training-from-scratch-source-figure-2.webp)
-*Fig 3: Language-objective training curves across model sizes and multimodal mixture ratios form a shared lower envelope used to fit the compute-allocation law. | source: [Scaling Native Multimodal Pre-Training From Scratch](https://arxiv.org/abs/2607.22043)*
+![Training-curve envelopes for the language objective](/assets/images/scaling-native-multimodal-pre-training-from-scratch-source-figure-2.webp)
+*Fig 2: The lower envelope of language training curves yields a compute law and an independent allocation estimate; the fitted frontier is nearly the same across mixture ratios. | source: [Scaling Native Multimodal Pre-Training From Scratch, Figure 2](https://arxiv.org/abs/2607.22043)*
 
+### The downstream effect is transfer, not a free accuracy gain
 
-The downstream evidence adds two narrower findings. Holding the text budget at 250B tokens, adding up to 75B multimodal tokens changes the average over 16 text benchmarks by less than one point at every model scale. On the text-only abstract-spatial portion of SpatialEval, multimodal models outperform text-only controls and the gap widens with scale. Multimodal in-context learning also appears only after enough capacity and data: the 3-shot gain is near zero at 71M parameters but reaches 2.43 points at 3B, with most of the benefit concentrated in spatial reasoning rather than OCR or recognition.
+With the text budget fixed at 250B, adding up to 75B multimodal tokens changes the average over 16 text benchmarks by less than one percentage point at every model scale. That is a preservation result, not evidence that vision improves every language task. The sharper transfer appears on the text-only abstract spatial-reasoning subtasks of SpatialEval: multimodal runs consistently beat text-only controls, and the gap widens toward 3B parameters.
+
+The same model family acquires multimodal in-context learning without parameter updates. At 71M parameters, one- and three-shot templates offer essentially no average gain; at 874M the three-shot gain reaches about 1.80 points, and at 3B it reaches 2.43 points. The gains are concentrated in spatial reasoning, while OCR and recognition categories can plateau or decline with extra shots. This pattern ties the scaling result to a mechanism: multimodal pretraining appears to teach reusable relational structure, but it does not uniformly improve visual recognition.
+
+The authors combine the two objectives in a joint Pareto analysis. At total compute, $r=0.1$ yields approximately $N_{\mathrm{opt}}\propto C_{\mathrm{total}}^{0.69}$, while $r=0.3$ yields approximately $C_{\mathrm{total}}^{0.66}$ for parameters and $C_{\mathrm{total}}^{0.34}$ for tokens. These are planning curves within one model family, not a replacement for a held-out downstream sweep.
 
 ## High-Level Takeaways
 
-- This paper informs the allocation of a native multimodal pre-training budget across active parameters, total tokens, and modality mixture. Its atomic units are text tokens and continuous image-patch tokens optimized by shared parameters. The evidence argues against choosing model size from a text-only Chinchilla curve and then filling the remaining budget with images. The multimodal objective's preferred allocation changes with the amount of multimodal data.
-- The expensive decision is committing a large run to exponents estimated from smaller models, one architecture family, one image-text corpus, and training loss as the proxy objective. The study provides fitted scaling behavior within its measured range, not evidence that downstream utility or a different tokenizer obeys the same frontier. At 10× scale, data quality and patch-token redundancy may dominate before the fitted compute curve does.
-- Before a frontier run, the decisive experiment is a prospective holdout sweep: train several configurations just beyond the fitted compute range, vary mixture ratio and patch compression independently, and select on both held-out multimodal loss and task utility. The claim should be rejected if the predicted allocation fails out of range, if a stronger image encoder changes the exponents, or if equal-loss configurations produce materially different downstream behavior.
-- The work extends compute-optimal language-model analysis to a shared native multimodal system by fitting the language and multimodal objectives separately before reconciling them on a Pareto frontier.
-- Models stop at 3B active parameters; the visual data comes from one image-text family; images use one direct patch-embedding scheme; and the scaling fits optimize smoothed training loss rather than a held-out multimodal likelihood or downstream score.
-- In native multimodal training, the language objective keeps roughly the same allocation law, but the multimodal objective asks for progressively more data as its mixture share grows.
+- Native multimodal pretraining creates separate language and multimodal allocation laws inside shared parameters.
+- More multimodal data makes the multimodal objective more token-hungry, so text-only compute ratios are unsafe defaults.
+- Spatial transfer and few-shot gains emerge with scale, while average text ability stays within about one point.
+- The frontier is measured only through 3B active parameters, one patch-embedding design, one corpus family, and smoothed training loss; larger runs need prospective validation.

@@ -14,32 +14,39 @@ summary: "2025 – Scaling Laws for Native Multimodal Models"
 **arXiv:** [2504.07951](https://arxiv.org/abs/2504.07951)  
 **Conference:** ICCV 2025 (oral)
 
-### Method and reported result
-
-Scaling Laws for Native Multimodal Models trains 457 models across different architectures and mixtures to compare early fusion, late fusion, and modality-expert designs. The study tests whether attaching a pretrained vision encoder is inherently better than learning multimodal representations from the start.
-
 ## Summary
 
-> The authors find no inherent late-fusion advantage in their study. Early-fusion models perform better at lower parameter counts, train more efficiently, and are simpler to deploy; adding Mixture of Experts lets the model learn modality-specific weights and improves performance.
+> Across 457 native multimodal models, this study compares early fusion, late fusion, dense training, and sparse MoE training under scaling-law fits. In the tested image-text regime, early and late fusion have almost identical loss-versus-FLOP exponents, but early fusion is stronger at small sizes, uses less memory, and trains faster. Sparse early fusion improves loss at the same active-parameter cost and develops modality-specific experts without requiring hand-written modality routing.
 
 ## Core Insights
 
-![Scaling curves comparing early fusion late fusion and mixture-of-experts native multimodal models](/assets/images/scaling-laws-for-native-multimodal-models-paper-figure.png)
-*Fig 1: Summarizes the architecture trade-off: early and late fusion reach similar loss scaling, but allocate compute differently between parameters and tokens; sparse early fusion shifts that allocation further toward data. | source: [Scaling Laws for Native Multimodal Models](https://arxiv.org/abs/2504.07951)*
+### Equal loss scaling does not imply equal systems cost
 
-![Figure 12 from Scaling Laws for Native Multimodal Models](/assets/images/scaling-laws-for-native-multimodal-models-source-figure-12.webp)
-*Fig 2: MoE specialization frequency. Percentage of text and image tokens routed to each expert on interleaved data from Obelics. | source: [Scaling Laws for Native Multimodal Models](https://arxiv.org/abs/2504.07951)*
+The early-fusion model linearly projects 14×14 image patches into the text width and feeds them to one transformer; the late-fusion line follows a CLIP-style vision encoder before the decoder. Both are trained from scratch on interleaved, image-caption, and text-only data, with a 1k multimodal context. The reported average validation laws are close: early fusion follows $L\propto C^{-0.0492}$ and late fusion $L\propto C^{-0.0494}$. At small model sizes, however, Figure 3 puts early fusion slightly below late fusion, and the gap narrows as parameter count grows.
 
+The difference is in how the compute budget is spent. Table 2 gives early fusion $N_{\mathrm{opt}}\propto C^{0.526}$ and $D_{\mathrm{opt}}\propto C^{0.468}$ for the average loss, while late fusion uses approximately $C^{0.636}$ and $C^{0.462}$ respectively. Late fusion therefore spends more of a fixed budget on parameters, including a separate visual encoder, whereas early fusion can spend more on tokens. Figure 4's matched 16-H100 comparison shows the practical consequence: early fusion trains faster and consumes less memory for the same compute budget.
 
-| Decision | Evidence in the paper |
-| --- | --- |
-| Early vs. late fusion | No inherent advantage for late fusion in the studied regime. |
-| Small-model efficiency | Early fusion is stronger at lower parameter counts. |
-| Specialization | MoE modality-specific weights improve the native model. |
+![Scaling laws for early fusion, late fusion, and sparse early-fusion MoE models](/assets/images/scaling-laws-for-native-multimodal-models-paper-figure.png)
+*Fig 1: The upper panel compares validation-loss scaling; the lower panel shows how the parameter-to-token trade-off changes with compute for early, late, and sparse early fusion. | source: [Scaling Laws for Native Multimodal Models, Figure 1](https://arxiv.org/abs/2504.07951)*
+
+### Mixture composition changes which resource is valuable
+
+The default early-fusion mixture is 45% image-caption, 45% interleaved, and 10% text-only data. The authors also fit 40-20-40, 30-30-40, and 20-40-40 mixtures. The compute exponents remain similar, but the balance moves: when image-caption data is increased, the fitted token exponent rises and the parameter exponent falls. The paper's explanation is mechanistic: image-caption examples contain more image tokens, so adding that domain increases the token burden; increasing interleaved and text-only data supplies relatively more text tokens.
+
+That is why a single “multimodal Chinchilla ratio” would be misleading. The fitted average losses remain predictable, but the best way to use more compute depends on the token composition of the mixture. The paper also reports that early fusion can catch up to an LLM-initialized model with longer native training: fewer than 100B multimodal tokens match on image-caption data, while interleaved and text-only performance may require up to 1T tokens.
+
+### Learned specialization beats a fixed modality split
+
+Sparse early fusion uses a dropless top-1 MoE with eight experts and a 0.01 load-balancing loss. At the same active-parameter cost, sparse models beat dense early-fusion models, especially at smaller sizes; their fitted average law is $L\propto C^{-0.0474}$ with a lower multiplicative loss constant. The sparse law also favors tokens more heavily than parameters, reflecting the total expert capacity hidden behind each active path.
+
+The routing ablation matters. Modality-aware routing sends image tokens to image experts and text tokens to text experts, but the learned modality-agnostic router performs better on both image-caption and interleaved data. The source Figure 13 visualizes why: experts in the early layer are close to unimodal, middle layers share more, and the final layers specialize again. The system discovers a useful division of labor while preserving the option to share representations.
+
+![Expert token specialization frequency in the first MoE layer](/assets/images/scaling-laws-for-native-multimodal-models-source-figure-12.webp)
+*Fig 2: The source plot shows the fraction of text and image tokens assigned to each expert in layer 0; experts are strongly modality-skewed even though the router was not given modality labels. | source: [Scaling Laws for Native Multimodal Models, Figure 13](https://arxiv.org/abs/2504.07951)*
 
 ## High-Level Takeaways
 
-- This study informs the architectural choice between early fusion and late fusion for native multimodal training. In the reported regime, a shared early-fusion stream is simpler and more efficient at smaller parameter counts, while modality-aware mixture-of-experts weights recover specialization without duplicating the whole model. The result argues that modality-specific capacity can live inside a unified transformer rather than behind separate towers.
-- The evidence rejects an inherent late-fusion advantage only for the tested modalities, tokenization, and compute range. A decisive missing comparison would equalize active parameters, communication cost, context length, and modality-specific preprocessing across both designs. At ten times the number of modalities or sequence length, shared attention and routing contention may reverse the result. The claim would be falsified if late fusion becomes more sample- or compute-efficient once high-bandwidth modalities and matched systems costs are included.
-- Scaling-law conclusions are conditional on the architectures, modalities, objectives, and mixtures studied; they should guide a proxy-run plan, not replace one.
-- Treat early fusion plus learned specialization as a serious baseline rather than assuming a pretrained visual tower is necessary.
+- Early and late fusion have similar loss scaling here, but their parameter-token trade-offs and system costs differ.
+- Sparse early fusion can add capacity and specialization at fixed active-parameter cost.
+- Learned routing outperforms a hand-written modality split in the tested image-text mixtures.
+- The conclusions are bounded by the 275M–3.7B model range, image-text data families, and validation-loss proxy; broader modalities and serving costs need fresh scaling runs.
