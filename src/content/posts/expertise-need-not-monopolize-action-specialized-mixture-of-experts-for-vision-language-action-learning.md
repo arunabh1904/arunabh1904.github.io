@@ -16,8 +16,6 @@ topics:
 summary: '2025 – Expertise Need Not Monopolize: Action-Specialized Mixture of Experts for Vision-Language-Action Learning'
 ---
 
-## 2025 – Expertise Need Not Monopolize: Action-Specialized Mixture of Experts for Vision-Language-Action Learning
-
 **arXiv:** [2510.14300](https://arxiv.org/abs/2510.14300)
 
 ## Summary
@@ -26,17 +24,21 @@ summary: '2025 – Expertise Need Not Monopolize: Action-Specialized Mixture of 
 
 ## Core Insights
 
+### Selection and contribution are different decisions
+
 The paper’s main architectural claim is narrower than “MoE helps.” A conventional router uses the same logits both to select experts and to weight their outputs, while a load-balancing loss pushes those logits toward uniform utilization. AdaMoE adds a second scale adapter: the router decides which experts participate, and the adapter independently adjusts how much the selected experts contribute. This separates capacity allocation from task-dependent weighting.
 
 ![AdaMoE architecture separating expert selection from contribution scaling while retaining shared and routed experts](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-paper-figure.png)
-*Fig 1: Identifies AdaMoE's change to a vanilla router: shared experts preserve the inherited FFN path, routed experts add capacity, and an independent scale adapter controls how much selected action experts contribute. | source: [AdaMoE](https://arxiv.org/abs/2510.14300)*
+*Fig 1: Identifies AdaMoE's change to a vanilla router: shared experts preserve the inherited FFN path, routed experts add capacity, and an independent scale adapter controls how much selected action experts contribute. | source: [AdaMoE, Figure 1](https://arxiv.org/abs/2510.14300)*
 
 ![Figure 3 from Expertise Need Not Monopolize: Action-Specialized Mixture of Experts for Vision-Language-Action Learning](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-source-figure-3.webp)
-*Fig 2: Architecture variants for decoupling expert selection and weighting. (a) Vanilla MoE couples selection and weighting through a single router. (b) CSMoE concatenates router outputs with action tokens for scale adaptation. (c) AdaMoE (Ours) additively combines independent router and scale adapter weights, achieving decoupling of expert selection from contribution weighting. | source: [Expertise Need Not Monopolize: Action-Specialized Mixture of Experts for Vision-Language-Action Learning](https://arxiv.org/abs/2510.14300)*
+*Fig 2: Architecture variants for decoupling expert selection and weighting. (a) Vanilla MoE couples selection and weighting through a single router. (b) CSMoE concatenates router outputs with action tokens for scale adaptation. (c) AdaMoE additively combines independent router and scale-adapter weights. | source: [AdaMoE, Figure 3](https://arxiv.org/abs/2510.14300)*
 
 ![Figure 2 from Expertise Need Not Monopolize: Action-Specialized Mixture of Experts for Vision-Language-Action Learning](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-source-figure-2.webp)
-*Fig 3: Expert routing intensity changes over time and across manipulation tasks, showing that action-specialized experts divide responsibility dynamically rather than monopolizing fixed skills. | source: [Expertise Need Not Monopolize: Action-Specialized Mixture of Experts for Vision-Language-Action Learning](https://arxiv.org/abs/2510.14300)*
+*Fig 3: Expert routing intensity changes over time and across manipulation tasks, showing that action-specialized experts divide responsibility dynamically rather than monopolizing fixed skills. | source: [AdaMoE, Figure 2](https://arxiv.org/abs/2510.14300)*
 
+
+### Sparse capacity stays attached to a flow policy
 
 The base policy consumes multi-view RGB, language, and proprioception, then produces an action chunk through conditional flow matching. AdaMoE modifies only its action expert. For every action token, an always-active shared path captures reusable manipulation structure, while top-$k$ routing activates specialized paths. The final expert coefficient is the sum of a router contribution and an independently learned scale-adapter contribution.
 
@@ -51,6 +53,8 @@ This design targets a real optimization conflict. Load balancing needs broad exp
 | Vanilla MoE with collapsed router | 94.2% dense | 94.9% | Routing can help even without meaningful multi-expert use |
 | Additive adapter vs. load-balanced vanilla MoE | 94.4% | 96.0% | Supports decoupling selection from weighting |
 
+### Routing helps, but routing is not yet skill discovery
+
 The real-robot improvement spans all four reported tasks: Stack Plate rises from 70% to 84%, Click Bell from 38% to 62%, Adjust Bottle from 52% to 60%, and Place Cup from 40% to 80%. Because both models receive the same RoboTwin initialization and real-data protocol, this is useful paired evidence. The paper does not report uncertainty intervals across independently trained seeds, so the apparent 21.5-point average gain mixes training variance with 50-trial binomial evaluation noise.
 
 The ablations complicate the specialization story. A vanilla MoE whose router collapses onto one expert still reaches 94.9% on LIBERO, above the 94.2% dense model and the 94.4% load-balanced vanilla MoE. The authors interpret this as adaptive output scaling from the router itself. Four experts outperform eight by 0.4 points, and the best load-balance coefficient reaches 96.0% while weaker or stronger regularization yields 94.5% and 95.1%. Sparse capacity helps, but routing dynamics are sensitive and not synonymous with interpretable skill decomposition.
@@ -59,7 +63,6 @@ The ablations complicate the specialization story. A vanilla MoE whose router co
 
 - AdaMoE informs whether to scale the action module through more active dense compute or through conditional capacity inherited from an existing VLA. It is attractive when control latency constrains active parameters and a costly pretrained policy must be retained. The shared-expert path protects common behavior, while separate selection and weighting give the routed capacity more freedom than a standard load-balanced gate.
 - The decisive missing control is a parameter- and compute-matched dense action expert trained for several seeds. The paper compares against the original dense model, but does not report total parameters, active parameters, realized device latency, or training cost in the main evidence. The claim that specialization causes the gain would weaken if a widened dense head or a single adaptively scaled expert matched AdaMoE, especially because the collapsed-router variant already improves over dense.
-- At ten times the task diversity, the bottleneck is likely router optimization rather than nominal parameter count. Load balance is already sensitive on four LIBERO suites, and top-$k$ sparse kernels can add dispatch overhead even when FLOPs stay flat. The next test should report active and total capacity, tokens per expert, wall-clock latency, multi-seed variance, and transfer to unseen tasks while holding the pretrained backbone and training budget fixed.
+- The practical bottleneck is router behavior, not the word “expert.” Four experts beat eight (96.0% versus 95.6%), and the best load-balance coefficient is 0.01; both weaker and stronger regularization reduce average success. A useful deployment comparison must report active and total parameters, tokens per expert, wall-clock latency, and multi-seed variance.
 - AdaMoE scales a flow-matching VLA’s action expert with inherited sparse capacity and separates expert selection from expert weighting.
-- Gains are evaluated on LIBERO, 19 RoboTwin tasks, and four tabletop real-robot tasks. Compute and latency accounting, multi-seed uncertainty, and a parameter-matched dense control are not reported.
 - Sparse action capacity is promising, but the useful mechanism may be adaptive routing and scaling as much as cleanly separated manipulation experts.
