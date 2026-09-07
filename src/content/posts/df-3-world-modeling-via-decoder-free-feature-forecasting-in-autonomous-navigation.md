@@ -28,7 +28,7 @@ A second pass concatenates task queries with that forecast and sends them throug
 
 The asymmetric attention mask lets prediction queries read all historical context but prevents historical tokens from reading those prediction queries. Historical tokens can still attend to each other. This protects their representation from the injected forecast state; it is not a causal mask imposing an order among the already observed frames.
 
-Training aligns predicted features with frozen-encoder features of the actual future image using cosine similarity and Huber loss. Forecast queries and task queries can be trained separately, so forecasting does not require an end-to-end pixel reconstruction objective.
+Training aligns predicted features with frozen-encoder features of the actual future image using cosine similarity and Huber loss. Writing the forecast as $\hat F$ and its frozen-encoder target as $F$, the paper's objective is $\mathcal L_{\mathrm{sim}}=\mathbb E_t[1-\cos(\hat F,F)+\lambda_{\mathrm{huber}}\operatorname{Huber}(\hat F,F)]$. Cosine alignment constrains direction; Huber loss also constrains feature magnitude. The loss applies to spatial and prefix tokens. Forecast queries and task queries can be trained separately, so forecasting does not require an end-to-end pixel reconstruction objective.
 
 ### Warping and correlation supply complementary motion evidence
 
