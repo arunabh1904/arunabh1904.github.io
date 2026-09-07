@@ -34,7 +34,7 @@ The open-data claim is therefore stronger than “we released a large dataset.�
 
 The visual path is a standard ViT plus connector plus language model, but two implementation choices determine whether detailed supervision survives. Molmo encodes a low-resolution full image and overlapping high-resolution crops. The connector combines the third-to-last and tenth-to-last ViT layers, attention-pools each 2×2 patch window, and maps the result through an MLP. Earlier features preserve local evidence while later features supply stronger semantics, so the connector is not forced to choose one representation for both jobs.
 
-The crop ablation makes the intuition concrete. On the paper's 11-task average, a single crop scores 62.8, non-overlapping multi-crops 75.7, and overlapping multi-crops 76.9. At test time the model sees 36 crops even though it was trained with 12, a deliberate stress test of whether the model learned a crop composition rule rather than memorized one layout. Overlap preserves context at crop boundaries; without it, a small object can become a fragment with no surrounding relation.
+The crop ablation makes the intuition concrete. On the paper's 11-task average, a single crop scores 62.8, non-overlapping multi-crops 75.7, and overlapping multi-crops 76.9. The main academic evaluation uses 36 crops after training with 12, but the authors keep training and test crop counts matched for captioning, pointing, and counting because those behaviors degrade under a mismatch. Overlap preserves context at crop boundaries; without it, a small object can become a fragment with no surrounding relation.
 
 ### The evidence separates data design from raw scale
 
@@ -47,7 +47,7 @@ The crop ablation makes the intuition concrete. On the paper's 11-task average, 
 
 The scale curve rises from 74.9 with no PixMo-Cap data to 75.5 at 89,000 images, 76.3 at 178,000, and 76.9 at 712,000. Removing documents lowers the reported average to 75.8; removing pointing lowers it to 76.2. These are useful component clues, though the paper does not turn them into a cost-normalized causal comparison between human annotation, weak web captions, and synthetic data.
 
-Pointing also has an ordering effect. On the two counting benchmarks, training on pointing before counting reaches 89.4 and 86.3, while counting before pointing reaches 81.5 and 77.6. The result suggests that spatially grounded examples can teach a representation on which later count queries are easier to express. It is a training-schedule result, not proof that pointing is universally the best first task.
+Pointing also has an output-order effect. On the two counting benchmarks, the point-then-count chain-of-thought strategy reaches 89.4 and 86.3, while count-then-point reaches 81.5 and 77.6. The result suggests that spatially grounded intermediate outputs make the count easier to express. It is a counting-strategy ablation, not evidence that a universal training curriculum should always put pointing first.
 
 ## High-Level Takeaways
 
