@@ -31,7 +31,7 @@ BrainWAM uses a three-stage training contract. A Wan2.2-TI2V-5B world-model bran
 CAB sends bidirectional cross-attention messages between the two action-token streams with zero-initialized residual gates. CIF then concatenates the refined streams, processes them with a lightweight Transformer, and element-wise averages its two outputs before the final decoder. The result is a controlled interface: the joint stage can learn how much semantic information to borrow without rewriting either specialist.
 
 ![BrainWAM framework coordinating semantic and predictive action pathways](/assets/images/brainwam-framework-paper-figure.png)
-*Fig 1 (paper Figure 3): The blue WAM branch carries history, noisy future video, and predictive action tokens; the pink VLA branch carries scene and instruction semantics; CAB exchanges action-level messages and CIF fuses the refined streams for decoding. | source: [BrainWAM](https://arxiv.org/abs/2608.12854)*
+*Fig 1: The blue WAM branch carries history, noisy future video, and predictive action tokens; the pink VLA branch carries scene and instruction semantics; CAB exchanges action-level messages and CIF fuses the refined streams for decoding. | source: [BrainWAM, Figure 3](https://arxiv.org/abs/2608.12854)*
 
 Read the diagram from the bottom up. Each branch first applies its own normalization, attention, and feed-forward blocks. The center bridge passes gated cross-attention messages in both directions, while the upper CIF block combines the resulting action intents. The inset makes the distinction from raw-token fusion visible: only compact action tokens cross the boundary, rather than the VLM and video-token pools competing in every attention layer.
 
