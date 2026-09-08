@@ -56,6 +56,7 @@
     "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
   },
   "building-local-blog-audio-with-qwen3-tts": {
+    "acoustic_decoding": "seeded-flow-matching",
     "audio_prosody_rewrites": {
       "time stamps drift, or one sensor": "time stamps drift or one sensor"
     },
@@ -64,24 +65,27 @@
     "chunk_max_chars": 900,
     "chunk_seed_overrides": {
       "22": 1905,
+      "23": 1905,
       "31": 1905,
+      "32": 1905,
       "8": 1906
     },
     "chunking_policy": "heading-with-following-paragraph-groups-v3",
     "decode_policy": "whole-request-codec-decode-v2",
-    "digest": "2ead217f33f611c42c2f546448059fd4c8823575fea519bce800968ee4d612e2",
-    "duration_seconds": 1355.368583,
+    "digest": "2709ef318bd6b270c1fc72ca12642885257a811d440d8990ac50409199687eed",
+    "duration_seconds": 1405.27625,
     "file": "/assets/audio/blog/building-local-blog-audio-with-qwen3-tts.mp3",
     "heading_pause_seconds": 0.55,
+    "inference_runtime": "mlx-audio==0.5.3",
     "language": "English",
     "max_audio_seconds": 1800,
     "max_generation_tokens": 1600,
     "max_seconds_per_word": 0.72,
     "min_seconds_per_word": 0.24,
     "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16",
-    "narration_chunk_count": 34,
+    "narration_chunk_count": 35,
     "narration_mode": "full-source",
-    "narration_word_count": 3260,
+    "narration_word_count": 3366,
     "narrator_seed": 1904,
     "output_gain_db": -1.0,
     "paragraph_pause_seconds": 0.24,
@@ -96,10 +100,12 @@
       "timestamps": "time stamps"
     },
     "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+    "sampling_controls_applied": false,
     "sampling_seed_version": "voxtral-casual-heading-context-v3",
+    "semantic_decoding": "argmax",
     "sentence_pause_policy": "model-natural-with-explicit-structure-v1",
     "silence_threshold": 0.008,
-    "source_sha256": "47d2da1fbde7b0043224c63d44ce03f7b80269a21d12d90ec5556e788164fea6",
+    "source_sha256": "4fa3c6cb18aad39d5192caf8f3461d95b35d8f8858a4a50bf6a287d767020cee",
     "speed": 1.0,
     "synthesis_profile": "human",
     "table_policy": "skip-rows-require-spoken-takeaway-v1",
@@ -581,6 +587,7 @@
     "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
   },
   "post-training-vision-language-action-models-zero-to-hero": {
+    "acoustic_decoding": "seeded-flow-matching",
     "audio_prosody_rewrites": {
       "time stamps drift, or one sensor": "time stamps drift or one sensor"
     },
@@ -590,10 +597,11 @@
     "chunk_seed_overrides": {},
     "chunking_policy": "heading-with-following-paragraph-groups-v3",
     "decode_policy": "whole-request-codec-decode-v2",
-    "digest": "e79b1c6b76e5762ca6b03cbebb9b041c11ea101ce55d213a054bdf05d0b57408",
-    "duration_seconds": 1015.280083,
+    "digest": "f46f6469dd4ba16a365dde10ae19426244dcb06084f43ae40bb8e155cae8d5ed",
+    "duration_seconds": 1023.179417,
     "file": "/assets/audio/blog/post-training-vision-language-action-models-zero-to-hero.mp3",
     "heading_pause_seconds": 0.55,
+    "inference_runtime": "mlx-audio==0.5.3",
     "language": "English",
     "max_audio_seconds": 1800,
     "max_generation_tokens": 1600,
@@ -615,10 +623,12 @@
       "timestamps": "time stamps"
     },
     "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+    "sampling_controls_applied": false,
     "sampling_seed_version": "voxtral-casual-heading-context-v3",
+    "semantic_decoding": "argmax",
     "sentence_pause_policy": "model-natural-with-explicit-structure-v1",
     "silence_threshold": 0.008,
-    "source_sha256": "487385bb8fcdfbc2e2f69026ceb981744cd238fa06d8d68b9a69c1a0be1dde28",
+    "source_sha256": "3cba65a3ff1a8f6df9f9de32c4ea96e311d4ce9b6b1c48b5b9f86e7d491321cb",
     "speed": 1.0,
     "synthesis_profile": "human",
     "table_policy": "skip-rows-require-spoken-takeaway-v1",
@@ -629,6 +639,7 @@
     "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
   },
   "replacing-openclaw-with-hermes-agent-using-local-weights": {
+    "acoustic_decoding": "seeded-flow-matching",
     "audio_prosody_rewrites": {
       "time stamps drift, or one sensor": "time stamps drift or one sensor"
     },
@@ -637,14 +648,16 @@
     "chunk_max_chars": 900,
     "chunk_seed_overrides": {
       "1": 1905,
+      "6": 1905,
       "8": 1906
     },
     "chunking_policy": "heading-with-following-paragraph-groups-v3",
     "decode_policy": "whole-request-codec-decode-v2",
-    "digest": "e9cf028131897edcc32b78d6213fff90f63aa530fb5dcc82c8f48ee4e11e0d29",
-    "duration_seconds": 387.977458,
+    "digest": "571971e875141caf2920cbc771454d538bf3f1b4f8453eb2e36b77ebf59ceb05",
+    "duration_seconds": 384.171208,
     "file": "/assets/audio/blog/replacing-openclaw-with-hermes-agent-using-local-weights.mp3",
     "heading_pause_seconds": 0.55,
+    "inference_runtime": "mlx-audio==0.5.3",
     "language": "English",
     "max_audio_seconds": 1800,
     "max_generation_tokens": 1600,
@@ -653,7 +666,7 @@
     "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16",
     "narration_chunk_count": 10,
     "narration_mode": "full-source",
-    "narration_word_count": 900,
+    "narration_word_count": 887,
     "narrator_seed": 1904,
     "output_gain_db": -1.0,
     "paragraph_pause_seconds": 0.24,
@@ -666,10 +679,12 @@
       "timestamps": "time stamps"
     },
     "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+    "sampling_controls_applied": false,
     "sampling_seed_version": "voxtral-casual-heading-context-v3",
+    "semantic_decoding": "argmax",
     "sentence_pause_policy": "model-natural-with-explicit-structure-v1",
     "silence_threshold": 0.008,
-    "source_sha256": "eb308f8c9fc8999e16514b2f1f8c25a67049f81929a5d1e0692ff88d77f0ce26",
+    "source_sha256": "84a015081c2f0d4e312a779785da8999c6074ce2b82273ecdd7dfd838bd5ce99",
     "speed": 1.0,
     "synthesis_profile": "human",
     "table_policy": "skip-rows-require-spoken-takeaway-v1",
