@@ -420,6 +420,7 @@
     "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
   },
   "omni-model-pretraining-decisions": {
+    "acoustic_decoding": "seeded-flow-matching",
     "audio_prosody_rewrites": {
       "time stamps drift, or one sensor": "time stamps drift or one sensor"
     },
@@ -432,10 +433,11 @@
     },
     "chunking_policy": "heading-with-following-paragraph-groups-v3",
     "decode_policy": "whole-request-codec-decode-v2",
-    "digest": "8d6895ccd868569cdef4ae7dcf934dd18afd41b808a063dccdb0e1c42fe9d690",
-    "duration_seconds": 1005.601958,
+    "digest": "5ad95c839020950965e0bd473d78d4530677cb1ec3fac54a7879cc6b5c619498",
+    "duration_seconds": 1008.570667,
     "file": "/assets/audio/blog/omni-model-pretraining-decisions.mp3",
     "heading_pause_seconds": 0.55,
+    "inference_runtime": "mlx-audio==0.5.3",
     "language": "English",
     "max_audio_seconds": 1800,
     "max_generation_tokens": 1600,
@@ -444,7 +446,7 @@
     "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16",
     "narration_chunk_count": 24,
     "narration_mode": "full-source",
-    "narration_word_count": 2227,
+    "narration_word_count": 2253,
     "narrator_seed": 1904,
     "output_gain_db": -1.0,
     "paragraph_pause_seconds": 0.24,
@@ -457,10 +459,12 @@
       "timestamps": "time stamps"
     },
     "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+    "sampling_controls_applied": false,
     "sampling_seed_version": "voxtral-casual-heading-context-v3",
+    "semantic_decoding": "argmax",
     "sentence_pause_policy": "model-natural-with-explicit-structure-v1",
     "silence_threshold": 0.008,
-    "source_sha256": "2862b88b9a4803b7aa1be8fa0fa8ad24145ae08b7841cd1c02cc6f2953c37536",
+    "source_sha256": "012857bb281b368382128c01bbcd40fffd988341ce4d4699fe027e23d2657912",
     "speed": 1.0,
     "synthesis_profile": "human",
     "table_policy": "skip-rows-require-spoken-takeaway-v1",
@@ -523,6 +527,7 @@
     "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
   },
   "open-weight-models-that-fit-on-a-64-gb-macbook-pro": {
+    "acoustic_decoding": "seeded-flow-matching",
     "audio_prosody_rewrites": {
       "time stamps drift, or one sensor": "time stamps drift or one sensor"
     },
@@ -534,19 +539,20 @@
     },
     "chunking_policy": "heading-with-following-paragraph-groups-v3",
     "decode_policy": "whole-request-codec-decode-v2",
-    "digest": "8ed8f69d7901054d76bc970a3cb7cbc0c645f6c02e41ec25348e0084c9becde8",
-    "duration_seconds": 496.225958,
+    "digest": "e624d9c244cbfaa4fcae4303b97b7560973f32f286a2759d64f7ef0a48f7881e",
+    "duration_seconds": 520.105958,
     "file": "/assets/audio/blog/open-weight-models-that-fit-on-a-64-gb-macbook-pro.mp3",
     "heading_pause_seconds": 0.55,
+    "inference_runtime": "mlx-audio==0.5.3",
     "language": "English",
     "max_audio_seconds": 1800,
     "max_generation_tokens": 1600,
     "max_seconds_per_word": 0.72,
     "min_seconds_per_word": 0.24,
     "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16",
-    "narration_chunk_count": 11,
+    "narration_chunk_count": 12,
     "narration_mode": "full-source",
-    "narration_word_count": 989,
+    "narration_word_count": 1034,
     "narrator_seed": 1904,
     "output_gain_db": -1.0,
     "paragraph_pause_seconds": 0.24,
@@ -559,10 +565,12 @@
       "timestamps": "time stamps"
     },
     "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+    "sampling_controls_applied": false,
     "sampling_seed_version": "voxtral-casual-heading-context-v3",
+    "semantic_decoding": "argmax",
     "sentence_pause_policy": "model-natural-with-explicit-structure-v1",
     "silence_threshold": 0.008,
-    "source_sha256": "74cfa9e3afbd60127965997e22b8a845f890b916602cbdf62beb935fd8cfb61e",
+    "source_sha256": "56ed32e1447e726469cc7e2cb861b0198372ac296932455faf4451e1df4f5ebd",
     "speed": 1.0,
     "synthesis_profile": "human",
     "table_policy": "skip-rows-require-spoken-takeaway-v1",
@@ -672,6 +680,7 @@
     "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
   },
   "running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro": {
+    "acoustic_decoding": "seeded-flow-matching",
     "audio_prosody_rewrites": {
       "time stamps drift, or one sensor": "time stamps drift or one sensor"
     },
@@ -683,10 +692,11 @@
     },
     "chunking_policy": "heading-with-following-paragraph-groups-v3",
     "decode_policy": "whole-request-codec-decode-v2",
-    "digest": "6f92ee3b292eed8eec4a63b3643109ebd7159522f37f3156827891476f596fa6",
-    "duration_seconds": 425.794417,
+    "digest": "22bc984b0b542da55a35539971e1989bf4e47b18b2a1fee9b4969805754c22cb",
+    "duration_seconds": 424.91025,
     "file": "/assets/audio/blog/running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro.mp3",
     "heading_pause_seconds": 0.55,
+    "inference_runtime": "mlx-audio==0.5.3",
     "language": "English",
     "max_audio_seconds": 1800,
     "max_generation_tokens": 1600,
@@ -708,10 +718,12 @@
       "timestamps": "time stamps"
     },
     "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+    "sampling_controls_applied": false,
     "sampling_seed_version": "voxtral-casual-heading-context-v3",
+    "semantic_decoding": "argmax",
     "sentence_pause_policy": "model-natural-with-explicit-structure-v1",
     "silence_threshold": 0.008,
-    "source_sha256": "abbfe0d33bb905fa45f43832f9dc04a8f39f555c8afab7c3404653b4e2437c0a",
+    "source_sha256": "ecd44473fc89fff7804694781f0e70ef5f97285c12fcb492cd585415a41a8f3d",
     "speed": 1.0,
     "synthesis_profile": "human",
     "table_policy": "skip-rows-require-spoken-takeaway-v1",
@@ -722,6 +734,7 @@
     "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
   },
   "running-gemma-4-locally-on-a-64-gb-macbook-pro": {
+    "acoustic_decoding": "seeded-flow-matching",
     "audio_prosody_rewrites": {
       "time stamps drift, or one sensor": "time stamps drift or one sensor"
     },
@@ -734,10 +747,11 @@
     },
     "chunking_policy": "heading-with-following-paragraph-groups-v3",
     "decode_policy": "whole-request-codec-decode-v2",
-    "digest": "24690491133c3fb6d2108ab9d1a0bc65315c472fb12f6ed069d339290903c84e",
-    "duration_seconds": 583.538625,
+    "digest": "552cf761b4c2184822b5c517809973e7e168fabb6c0d9eeb9fb173e797f1fd3d",
+    "duration_seconds": 579.911458,
     "file": "/assets/audio/blog/running-gemma-4-locally-on-a-64-gb-macbook-pro.mp3",
     "heading_pause_seconds": 0.55,
+    "inference_runtime": "mlx-audio==0.5.3",
     "language": "English",
     "max_audio_seconds": 1800,
     "max_generation_tokens": 1600,
@@ -746,7 +760,7 @@
     "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16",
     "narration_chunk_count": 12,
     "narration_mode": "full-source",
-    "narration_word_count": 1238,
+    "narration_word_count": 1240,
     "narrator_seed": 1904,
     "output_gain_db": -1.0,
     "paragraph_pause_seconds": 0.24,
@@ -761,10 +775,12 @@
       "timestamps": "time stamps"
     },
     "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+    "sampling_controls_applied": false,
     "sampling_seed_version": "voxtral-casual-heading-context-v3",
+    "semantic_decoding": "argmax",
     "sentence_pause_policy": "model-natural-with-explicit-structure-v1",
     "silence_threshold": 0.008,
-    "source_sha256": "60a8be9c1b8ab367d7dfb9df0551e503dde4940da33f96416452eeef2a89ee69",
+    "source_sha256": "2fe4e5ba390525cc6eaeb904d6d3c4d365d30d1093ed864c5d4b87a4464fcf6a",
     "speed": 1.0,
     "synthesis_profile": "human",
     "table_policy": "skip-rows-require-spoken-takeaway-v1",
@@ -775,6 +791,7 @@
     "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
   },
   "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro": {
+    "acoustic_decoding": "seeded-flow-matching",
     "audio_prosody_rewrites": {
       "time stamps drift, or one sensor": "time stamps drift or one sensor"
     },
@@ -787,10 +804,11 @@
     },
     "chunking_policy": "heading-with-following-paragraph-groups-v3",
     "decode_policy": "whole-request-codec-decode-v2",
-    "digest": "d96f877273db9677284e6c9c2f39305fa1be8efceb1687bc181a6bb4c6e02c55",
-    "duration_seconds": 599.727083,
+    "digest": "bf8d34c6c6788a02110fd360a02853e2bce83857f2ab82c9bede5a03b4c71c14",
+    "duration_seconds": 597.291875,
     "file": "/assets/audio/blog/running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro.mp3",
     "heading_pause_seconds": 0.55,
+    "inference_runtime": "mlx-audio==0.5.3",
     "language": "English",
     "max_audio_seconds": 1800,
     "max_generation_tokens": 1600,
@@ -799,7 +817,7 @@
     "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16",
     "narration_chunk_count": 22,
     "narration_mode": "full-source",
-    "narration_word_count": 1246,
+    "narration_word_count": 1266,
     "narrator_seed": 1904,
     "output_gain_db": -1.0,
     "paragraph_pause_seconds": 0.24,
@@ -829,10 +847,12 @@
       "timestamps": "time stamps"
     },
     "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+    "sampling_controls_applied": false,
     "sampling_seed_version": "voxtral-casual-heading-context-v3",
+    "semantic_decoding": "argmax",
     "sentence_pause_policy": "model-natural-with-explicit-structure-v1",
     "silence_threshold": 0.008,
-    "source_sha256": "c7692b33ec245788d6d7b7f43575ac74a94e9249097a8826929ad54f61e6b106",
+    "source_sha256": "121df7ff6472f1f48b6b6e3e13efafd8361660600147714a1f2042e96cd3f545",
     "speed": 1.0,
     "synthesis_profile": "human",
     "table_policy": "skip-rows-require-spoken-takeaway-v1",
@@ -843,6 +863,7 @@
     "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
   },
   "running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro": {
+    "acoustic_decoding": "seeded-flow-matching",
     "audio_prosody_rewrites": {
       "time stamps drift, or one sensor": "time stamps drift or one sensor"
     },
@@ -855,10 +876,11 @@
     },
     "chunking_policy": "heading-with-following-paragraph-groups-v3",
     "decode_policy": "whole-request-codec-decode-v2",
-    "digest": "b3f98c191fa7dd01d9cbf4d7c5e8350cbe1e9239a31b278a4192172e6bf6fc11",
-    "duration_seconds": 521.061667,
+    "digest": "7fe8171e385d77a002b6db2cad1ded84990482ef6f5d6393c8e97dd1d89646a7",
+    "duration_seconds": 525.964083,
     "file": "/assets/audio/blog/running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro.mp3",
     "heading_pause_seconds": 0.55,
+    "inference_runtime": "mlx-audio==0.5.3",
     "language": "English",
     "max_audio_seconds": 1800,
     "max_generation_tokens": 1600,
@@ -867,7 +889,7 @@
     "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16",
     "narration_chunk_count": 11,
     "narration_mode": "full-source",
-    "narration_word_count": 1187,
+    "narration_word_count": 1231,
     "narrator_seed": 1904,
     "output_gain_db": -1.0,
     "paragraph_pause_seconds": 0.24,
@@ -880,10 +902,12 @@
       "timestamps": "time stamps"
     },
     "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+    "sampling_controls_applied": false,
     "sampling_seed_version": "voxtral-casual-heading-context-v3",
+    "semantic_decoding": "argmax",
     "sentence_pause_policy": "model-natural-with-explicit-structure-v1",
     "silence_threshold": 0.008,
-    "source_sha256": "90f3e70e527c65644ed1ba75ec66011e1b47799d7cdba915a9758a5a2aabd7e5",
+    "source_sha256": "464ffdf2f97345d37eb49bc01c602732682e375699b3ce3b2ede664aa38c1ecf",
     "speed": 1.0,
     "synthesis_profile": "human",
     "table_policy": "skip-rows-require-spoken-takeaway-v1",
