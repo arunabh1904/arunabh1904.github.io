@@ -161,6 +161,8 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
         "8": 1906,
         "22": 1905,
         "31": 1905,
+        "23": 1905,
+        "32": 1905,
     },
     "code-is-cheap-understanding-isnt": {
         "14": 1905,
@@ -202,6 +204,7 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
     "replacing-openclaw-with-hermes-agent-using-local-weights": {
         "1": 1905,
         "8": 1906,
+        "6": 1905,
     },
     "running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro": {
         "8": 1905,
