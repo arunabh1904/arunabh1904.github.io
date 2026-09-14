@@ -47,7 +47,7 @@ const undo = document.getElementById("undo");
 const notice = document.getElementById("action-status");
 const SWIPE_THRESHOLD = 90;
 const SWIPE_AXIS_LOCK = 12;
-const SWIPE_EXIT_DURATION = 560;
+const SWIPE_EXIT_DURATION = 160;
 let index = state.catalog ? 0 : state.cards.findIndex(card => !card.reviewed);
 let lastDecision = null;
 notice.textContent = "";
@@ -55,12 +55,13 @@ if (index < 0) index = state.cards.length;
 if (transport.catalog) document.getElementById("catalog-link").onclick = event => { event.preventDefault(); transport.catalog(); };
 let activePointer = null;
 let actionInFlight = false;
+const pending = new Set();
 
 function escapeHtml(value) { return String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;", "'":"&#39;"}[char])); }
 function current() { return state.cards[index]; }
 function nextUnreviewed(start) { const nextIndex = state.cards.findIndex((card, candidate) => candidate >= start && !card.reviewed); return nextIndex < 0 ? state.cards.length : nextIndex; }
 function showNotice(message, state = "success") { notice.textContent = message; notice.dataset.state = state; }
-function updateControls() { const card = current(); previous.disabled = index <= 0 || actionInFlight; next.disabled = index >= state.cards.length || actionInFlight; actionControls.forEach(button => button.disabled = !card || actionInFlight); undo.disabled = actionInFlight || !(card?.reviewedAction || lastDecision); }
+function updateControls() { const card = current(); previous.disabled = index <= 0 || actionInFlight; next.disabled = index >= state.cards.length || actionInFlight; actionControls.forEach(button => button.disabled = !card || actionInFlight || pending.has(card.id)); undo.disabled = actionInFlight || !(card?.reviewedAction || lastDecision) || pending.has((card?.reviewedAction ? card : lastDecision)?.id); }
 function moveBetweenPapers(delta) { if (actionInFlight || activePointer) return; const target = Math.max(0, Math.min(state.cards.length, index + delta)); if (target === index) return; index = target; render(); }
 function render() {
   if (!current()) {
@@ -99,29 +100,59 @@ function render() {
 function resetSwipe(card) { card.style.transition = "transform 420ms cubic-bezier(.2,.8,.2,1)"; card.style.transform = ""; window.setTimeout(() => { if (!actionInFlight) card.style.transition = ""; }, 420); }
 function animateSwipeExit(card, direction, axis = "x") { return new Promise(resolve => { card.style.transition = `transform ${SWIPE_EXIT_DURATION}ms cubic-bezier(.2,.8,.2,1)`; card.style.transform = axis === "x" ? `translateX(${direction * 125}vw) rotate(${direction * 18}deg)` : `translateY(${direction * 115}vh)`; window.setTimeout(resolve, SWIPE_EXIT_DURATION); }); }
 async function act(action, swipeDirection = 0) {
-  const card = action === "undo" ? (current()?.reviewedAction ? current() : lastDecision) : current(); if (!card) return;
-  if (actionInFlight) return;
-  actionInFlight = true; updateControls();
-  showNotice(action === "add_to_blog" ? "Adding to blog…" : action === "skip" ? "Recording…" : "Undoing…");
+  const card = action === "undo" ? (current()?.reviewedAction ? current() : lastDecision) : current();
+  if (!card || actionInFlight || pending.has(card.id)) return;
+  actionInFlight = true;
+  pending.add(card.id);
+  updateControls();
+  const before = {reviewed:card.reviewed, reviewedAction:card.reviewedAction, labels:[...card.labels]};
   const active = document.getElementById("active-card");
-  if (swipeDirection && active) await animateSwipeExit(active, swipeDirection);
-  let response;
-  try { response = await transport.act(card, action); }
-  catch (error) { if (active) resetSwipe(active); showNotice((error.message || "Could not confirm that action.") + " Reload to check the saved decision.", "error"); actionInFlight = false; updateControls(); return; }
-  if (!response.ok) { if (active) resetSwipe(active); showNotice("Could not record that action. Please try again.", "error"); actionInFlight = false; updateControls(); return; }
-  if (response.version !== undefined) card.version = response.version;
-  if (action === "undo") {
-    index = state.cards.indexOf(card); lastDecision = null;
-    card.reviewed = false; card.labels = []; card.reviewedAction = null;
-    showNotice("Undone · card reopened"); actionInFlight = false; render(); return;
+  // Start persistence before the animation. The remote adapter journals the
+  // decision synchronously; network acknowledgement never gates the next card.
+  let request;
+  try { request = Promise.resolve(transport.act(card, action)); }
+  catch (error) {
+    pending.delete(card.id); actionInFlight = false;
+    showNotice(error.message || "Could not save this decision locally.", "error");
+    if (active) resetSwipe(active); updateControls(); return;
   }
-  card.reviewed = true; card.reviewedAction = action; lastDecision = card;
-  card.labels = card.labels.filter(label => label !== "skip" && label !== "blog");
-  card.labels.push(action === "add_to_blog" ? "blog" : "skip");
-  showNotice(action === "add_to_blog" ? "Added to blog · draft queued" : "Marked not relevant");
-  index = nextUnreviewed(index + 1); actionInFlight = false; render();
+  const settled = request.then(response => {
+    if (!response.ok) throw new Error("Could not record that action.");
+    return response;
+  }).then(response => ({response}), error => ({error}));
+  if (swipeDirection && active) await animateSwipeExit(active, swipeDirection);
+  if (transport.optimistic) advance();
+  const {response, error} = await settled;
+  pending.delete(card.id);
+  if (error) {
+    Object.assign(card, before);
+    if (lastDecision === card) lastDecision = null;
+    if (!transport.optimistic && active) resetSwipe(active);
+    actionInFlight = false;
+    showNotice((error.message || "Could not confirm that action.") + " Reload to check the saved decision.", "error");
+    render();
+    return;
+  }
+  if (response.version !== undefined) card.version = response.version;
+  if (!transport.optimistic) advance();
+  updateControls();
+  if (!pending.size) showNotice(action === "undo" ? "Undone · card reopened" : "All decisions saved");
+
+  function advance() {
+    if (action === "undo") {
+      index = state.cards.indexOf(card); lastDecision = null;
+      card.reviewed = false; card.labels = []; card.reviewedAction = null;
+    } else {
+      card.reviewed = true; card.reviewedAction = action; lastDecision = card;
+      card.labels = [action === "add_to_blog" ? "blog" : "skip"];
+      index = nextUnreviewed(index + 1);
+    }
+    actionInFlight = false;
+    showNotice(pending.size ? `${pending.size} decision(s) saving…` : "Decision saved");
+    render();
+  }
 }
-function beginSwipe(card, target, id, x, y) { if (actionInFlight || activePointer || target.closest("a,button,textarea,select")) return; activePointer = {id, x, y, axis:null}; card.style.transition = "none"; }
+function beginSwipe(card, target, id, x, y) { if (actionInFlight || pending.has(current()?.id) || activePointer || target.closest("a,button,textarea,select")) return; activePointer = {id, x, y, axis:null}; card.style.transition = "none"; }
 function moveActiveSwipe(card, id, x, y) {
   if (!activePointer || activePointer.id !== id) return null;
   const dx = x - activePointer.x; const dy = y - activePointer.y;
@@ -144,46 +175,143 @@ next.onclick = () => moveBetweenPapers(1);
 document.onkeydown = event => { if (event.target.closest("input,textarea,select,button,a")) return; if (event.key === "ArrowUp") moveBetweenPapers(-1); if (event.key === "ArrowDown") moveBetweenPapers(1); if (event.key === "ArrowLeft") act("skip"); if (event.key === "ArrowRight") act("add_to_blog"); };
 render();
 }
-/** Adapt cloud persistence to the original shared swipe deck. */
-let readerKey = '', selectedBatch = '';
+/** Cloud writes are journaled before the deck advances, then drained in order.
+ * A reload reconciles uncertain writes using the existing per-paper revision.
+ * The journal contains decisions, never the reader credential or paper text.
+ */
+let readerKey = '', selectedBatch = '', loading = false;
 const API_URL = 'https://script.google.com/macros/s/AKfycbwuocbg260zCges5Ai0JJQg3ftWNbqEO8GD1D-cStyYbdqnO8Po3pS0Xx10Ocs-TbYs/exec';
 const rpc = async (method, ...args) => {
   const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 30000);
   try {
     const response = await fetch(API_URL, {method:'POST', credentials:'omit',
       headers:{'Content-Type':'text/plain'}, body:JSON.stringify({key:readerKey,method,args}), signal:controller.signal});
-    if (!response.ok) throw new Error('Reader service unavailable. Reload to check saved decisions.');
+    if (!response.ok) throw new Error('Reader service unavailable.');
     const result = await response.json();
     if (!result.ok) throw new Error(result.error);
     return result.data;
   } finally { clearTimeout(timeout); }
 };
+function createDecisionQueue(storage, storageKey, call, status) {
+  let entries = JSON.parse(storage.getItem(storageKey) || '[]'), running = null, failure = null;
+  const waiters = new Map();
+  const persist = () => storage.setItem(storageKey, JSON.stringify(entries));
+  async function reconcile(entry) {
+    const data = await call('readerData', entry.batch);
+    const card = data.decisions?.[entry.id] || data.cards.find(card => card.id === entry.id);
+    if (!card) throw new Error('Pending paper is absent from this deck. Reopen its original report.');
+    if (card.version === entry.version) return null;
+    if (card.version === entry.version + 1 &&
+        (entry.action === 'undo' ? !card.reviewed : card.reviewedAction === entry.action)) {
+      return {ok:true, version:card.version};
+    }
+    const error = new Error('This paper changed in another session. Reload to review the saved decision.');
+    error.conflict = true; throw error;
+  }
+  function drain() {
+    if (running) return running;
+    failure = null;
+    running = (async () => {
+      while (entries.length) {
+        const entry = entries[0];
+        try {
+          let result = entry.attempted ? await reconcile(entry) : null;
+          if (!result) {
+            entry.attempted = true; persist();
+            result = await call('recordFeedback', entry.batch, entry.id, entry.action, entry.version);
+          }
+          // Checkpoint before resolving; a failed checkpoint is reconciled on reload.
+          const remaining = entries.slice(1);
+          storage.setItem(storageKey, JSON.stringify(remaining));
+          entries = remaining;
+          waiters.get(entry.id)?.resolve({ok:true, version:result.version});
+          waiters.delete(entry.id);
+          status(entries.length, null);
+        } catch (error) {
+          if (error.conflict) {
+            // A definite competing revision cancels only this stale intent.
+            const remaining = entries.slice(1);
+            storage.setItem(storageKey, JSON.stringify(remaining)); entries = remaining;
+            waiters.get(entry.id)?.reject(error); waiters.delete(entry.id);
+          }
+          failure = error;
+          status(entries.length, error);
+          break; // Keep the entire unsaved journal; never claim cloud success.
+        }
+      }
+    })().finally(() => { running = null; });
+    return running;
+  }
+  return {
+    get pending() { return entries.length; },
+    async flush() { await drain(); if (failure) throw failure; },
+    enqueue(batch, card, action) {
+      if (entries.some(entry => entry.id === card.id)) throw new Error('This paper is still saving.');
+      const entry = {batch, id:card.id, action, version:card.version, attempted:false};
+      // Failure to journal must stop the optimistic transition.
+      storage.setItem(storageKey, JSON.stringify([...entries, entry]));
+      entries.push(entry);
+      const promise = new Promise((resolve, reject) => waiters.set(card.id, {resolve, reject}));
+      status(entries.length, null);
+      void drain();
+      return promise;
+    }
+  };
+}
+let decisions;
+function queueStatus(count, error) {
+  const notice = document.getElementById('action-status');
+  notice.dataset.state = error ? 'error' : 'success';
+  notice.textContent = error ? `${count} decision(s) waiting to save. ${error.message} ` : count ? `${count} decision(s) saving…` : 'All decisions saved';
+  if (error) {
+    const retry = document.createElement('button'); retry.textContent = 'Retry saving';
+    retry.onclick = () => decisions.flush().then(() => loadDeck(selectedBatch)).catch(() => {}); notice.append(retry);
+  }
+}
 async function loadDeck(batch) {
+  if (loading) return;
+  loading = true;
   try {
+    await decisions.flush(); // Also reconciles a response lost before reload.
     const data = await rpc('readerData', batch || '');
     selectedBatch = data.batch;
     const picker = document.getElementById('batches');
     picker.hidden = false; picker.replaceChildren();
     for (const name of [...data.batches, 'catalog']) {
       const option = document.createElement('option'); option.value = name;
-      option.textContent = name === 'catalog' ? 'Blog queue' : name.startsWith('catchup-') ? 'Missed-week catch-up' : name;
+      option.textContent = name === 'catalog' ? 'Blog queue' : name.startsWith('catchup-') ? 'Catch-up · ' + name.slice(8) : name;
       option.selected = name === data.batch; picker.append(option);
     }
     picker.onchange = () => loadDeck(picker.value);
+    // Capture the batch: switching decks cannot redirect an in-flight decision.
+    const batchId = data.batch;
     startDeck(data, {
+      optimistic: true,
       catalog: () => loadDeck('catalog'),
-      act: async (card, action) => {
-        const result = await rpc('recordFeedback', selectedBatch, card.id, action, card.version);
-        return {ok: true, version: result.version};
-      }
+      act: (card, action) => decisions.enqueue(batchId, card, action)
     });
   } catch (error) {
-    document.getElementById('deck').textContent = 'Could not open this deck. Reopen the private link in your email, or retry.';
-    document.getElementById('action-status').textContent = error.message || String(error);
-  }
+    if (decisions.pending) queueStatus(decisions.pending, error);
+    else {
+      document.getElementById('deck').textContent = 'Could not open this deck. Reopen the private link in your email, or retry.';
+      document.getElementById('action-status').textContent = error.message || String(error);
+    }
+  } finally { loading = false; }
 }
-const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-readerKey = params.get('key') || '';
-loadDeck(params.get('batch') || '');
+async function initializeReader() {
+  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  readerKey = params.get('key') || '';
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(API_URL + readerKey));
+  const namespace = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
+  decisions = createDecisionQueue(sessionStorage, 'paper-radar-pending-' + namespace, rpc, queueStatus);
+  window.addEventListener('beforeunload', event => {
+    if (decisions.pending) { event.preventDefault(); event.returnValue = ''; }
+  });
+  window.addEventListener('online', () => decisions.flush().catch(() => {}));
+  await loadDeck(params.get('batch') || '');
+}
+initializeReader().catch(error => {
+  document.getElementById('action-status').textContent = 'Reader could not initialize: ' + error.message;
+});
 
 </script></body></html>
