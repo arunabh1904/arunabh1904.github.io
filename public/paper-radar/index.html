@@ -180,14 +180,18 @@ render();
  * The journal contains decisions, never the reader credential or paper text.
  */
 let readerKey = '', selectedBatch = '', loading = false;
-const API_URL = 'https://script.google.com/macros/s/AKfycbwuocbg260zCges5Ai0JJQg3ftWNbqEO8GD1D-cStyYbdqnO8Po3pS0Xx10Ocs-TbYs/exec';
+const API_URL = 'https://paper-radar-reader-api.paper-radar-reader-api.workers.dev';
+// Preserve the journal namespace across the API migration. Existing unsaved
+// decisions reconcile through the new authoritative backend after a reload.
+const JOURNAL_API_ID = 'https://script.google.com/macros/s/AKfycbwuocbg260zCges5Ai0JJQg3ftWNbqEO8GD1D-cStyYbdqnO8Po3pS0Xx10Ocs-TbYs/exec';
 const rpc = async (method, ...args) => {
   const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 30000);
   try {
     const response = await fetch(API_URL, {method:'POST', credentials:'omit',
       headers:{'Content-Type':'text/plain'}, body:JSON.stringify({key:readerKey,method,args}), signal:controller.signal});
-    if (!response.ok) throw new Error('Reader service unavailable.');
-    const result = await response.json();
+    let result;
+    try { result = await response.json(); } catch { throw new Error('Reader service unavailable.'); }
+    if (!response.ok && !result.error) throw new Error('Reader service unavailable.');
     if (!result.ok) throw new Error(result.error);
     return result.data;
   } finally { clearTimeout(timeout); }
@@ -301,7 +305,7 @@ async function loadDeck(batch) {
 async function initializeReader() {
   const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
   readerKey = params.get('key') || '';
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(API_URL + readerKey));
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JOURNAL_API_ID + readerKey));
   const namespace = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
   decisions = createDecisionQueue(sessionStorage, 'paper-radar-pending-' + namespace, rpc, queueStatus);
   window.addEventListener('beforeunload', event => {
