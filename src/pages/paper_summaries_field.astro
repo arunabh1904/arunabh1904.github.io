@@ -51,7 +51,8 @@ const topicDefinitions = [
     x: 650,
     y: 345,
     fields: [
-      'BEV Perception & Mapping',
+      'BEV Perception',
+      'Mapping',
       'Motion Forecasting & Planning',
       'Autonomous Driving: VLA & Planning',
       'Autonomous Driving: VLMs & Evaluation',
@@ -146,7 +147,8 @@ const fieldNodes = [
   { field: 'Vision-Language-Action & Robotics', label: 'VLA + robotics', x: 430, y: 48 },
   { field: 'Robot Post-Training & Evaluation', label: 'Robot PT', x: 585, y: 225 },
   { field: 'Autonomous Driving: VLA & Planning', label: 'Driving VLA', x: 702, y: 225 },
-  { field: 'BEV Perception & Mapping', label: 'BEV + maps', x: 730, y: 405 },
+  { field: 'BEV Perception', label: 'BEV perception', x: 716, y: 405 },
+  { field: 'Mapping', label: 'Mapping', x: 708, y: 485 },
   { field: 'Motion Forecasting & Planning', label: 'Forecasting', x: 585, y: 445 },
   { field: 'Autonomous Driving: VLMs & Evaluation', label: 'Driving VLMs', x: 718, y: 115 },
   { field: 'Reinforcement Learning', label: 'RL', x: 565, y: 555 },
@@ -243,7 +245,7 @@ const formatDate = (date: Date) =>
         <div class="knowledge-map__heading">
           <div>
             <p class="panel-kicker">Knowledge graph</p>
-            <h2>Six lenses, sixteen fields</h2>
+            <h2>{topicDefinitions.length} themes, {fieldNodes.length} fields</h2>
           </div>
           <p>Lines mark shared territory. Select any node to narrow the library.</p>
         </div>
@@ -252,7 +254,7 @@ const formatDate = (date: Date) =>
           <svg viewBox="0 0 780 590" role="img" aria-labelledby="map-title map-description">
             <title id="map-title">Research topics and connected paper fields</title>
             <desc id="map-description">
-              Six broad research themes connect to sixteen fields. Fields can connect to more than one
+              {topicDefinitions.length} broad research themes connect to {fieldNodes.length} fields. Fields can connect to more than one
               theme.
             </desc>
 

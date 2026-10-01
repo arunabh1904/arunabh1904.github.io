@@ -6,7 +6,7 @@ postSlug: unitr-unified-efficient-multimodal-transformer-for-bev
 legacyPath: /paper shorts/2023/08/15/unitr-unified-efficient-multimodal-transformer-for-bev.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2023 – UniTR: A Unified and Efficient Multi-Modal Transformer for Bird's-Eye-View Representation"
 ---
 

@@ -8,7 +8,7 @@ tags:
   - Autonomous Driving
   - LiDAR
   - Scene Completion
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2026 – Towards Real-Time and Adaptable LiDAR Scene Completion"
 ---
 

@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: gafusion-adaptive-lidar-camera-fusion
 legacyPath: /paper shorts/2024/06/17/gafusion-adaptive-lidar-camera-fusion.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2024 – GAFusion: guide camera BEV with LiDAR depth, occupancy, scale, and time'
 ---
 

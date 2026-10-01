@@ -6,7 +6,7 @@ postSlug: bevfusion-multi-task-multi-sensor-unified-bev
 legacyPath: /paper shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2022 – BEVFusion: Multi-Task Multi-Sensor Fusion with Unified Bird's-Eye View Representation"
 ---
 ## 2022 – BEVFusion

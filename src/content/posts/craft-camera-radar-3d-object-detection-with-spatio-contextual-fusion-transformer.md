@@ -6,7 +6,7 @@ postSlug: craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-t
 legacyPath: /paper shorts/2022/09/14/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – CRAFT: Camera-Radar 3D Object Detection with Spatio-Contextual Fusion Transformer'
 ---
 ## 2022 – CRAFT

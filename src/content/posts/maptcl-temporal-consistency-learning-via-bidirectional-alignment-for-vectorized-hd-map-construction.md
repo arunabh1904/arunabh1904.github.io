@@ -8,7 +8,7 @@ tags:
   - Autonomous Driving
   - HD Maps
   - Temporal Consistency
-field: 'BEV Perception & Mapping'
+field: 'Mapping'
 summary: "2026 – MapTCL: Temporal Consistency Learning via Bidirectional Alignment for Vectorized HD Map Construction"
 ---
 

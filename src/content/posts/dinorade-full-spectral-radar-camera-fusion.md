@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: dinorade-full-spectral-radar-camera-fusion
 legacyPath: /paper shorts/2026/04/09/dinorade-full-spectral-radar-camera-fusion.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2026 – DinoRADE: dense radar-camera fusion with DINOv3 features'
 ---
 

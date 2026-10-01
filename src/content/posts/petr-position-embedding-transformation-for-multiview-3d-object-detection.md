@@ -6,7 +6,7 @@ postSlug: petr-position-embedding-transformation-for-multiview-3d-object-detecti
 legacyPath: /paper shorts/2022/03/10/petr-position-embedding-transformation-for-multiview-3d-object-detection.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – PETR: Position Embedding Transformation for Multi-View 3D Object Detection'
 ---
 ## 2022 – PETR

@@ -8,7 +8,7 @@ tags:
   - Autonomous Driving
   - LiDAR
   - Self-Supervised Learning
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2026 – GhostPoint: Self-Supervised Representation Learning by Hallucinating Occluded LiDAR Structure"
 ---
 

@@ -8,7 +8,7 @@ tags:
   - Autonomous Driving
   - LiDAR
   - Generative Modeling
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2026 – Cyclops: LiDAR as a Camera That Dreams in Color"
 ---
 

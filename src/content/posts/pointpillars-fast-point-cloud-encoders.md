@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: pointpillars-fast-point-cloud-encoders
 legacyPath: /paper shorts/2018/12/14/pointpillars-fast-point-cloud-encoders.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2018 – PointPillars: collapse height early and run LiDAR perception as 2D convolution'
 ---
 ## 2018 – PointPillars

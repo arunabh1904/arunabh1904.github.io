@@ -6,7 +6,7 @@ postSlug: bevdet-high-performance-multicamera-3d-object-detection-in-bev
 legacyPath: /paper shorts/2021/12/22/bevdet-high-performance-multicamera-3d-object-detection-in-bev.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2021 – BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View'
 ---
 ## 2021 – BEVDet

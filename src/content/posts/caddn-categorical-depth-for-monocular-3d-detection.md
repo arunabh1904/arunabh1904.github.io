@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: caddn-categorical-depth-for-monocular-3d-detection
 legacyPath: /paper shorts/2021/03/01/caddn-categorical-depth-for-monocular-3d-detection.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2021 – CaDDN: supervise a depth distribution that lifts image features into 3D'
 ---
 

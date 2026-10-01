@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: voxelnet-end-to-end-point-cloud-3d-detection
 legacyPath: /paper shorts/2017/11/17/voxelnet-end-to-end-point-cloud-3d-detection.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2017 – VoxelNet: learn point-cloud features inside metric voxels'
 ---
 ## 2017 – VoxelNet

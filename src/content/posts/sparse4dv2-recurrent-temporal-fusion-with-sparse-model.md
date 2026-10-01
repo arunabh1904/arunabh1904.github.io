@@ -6,7 +6,7 @@ postSlug: sparse4dv2-recurrent-temporal-fusion-with-sparse-model
 legacyPath: /paper shorts/2023/05/23/sparse4dv2-recurrent-temporal-fusion-with-sparse-model.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – Sparse4D v2: Recurrent Temporal Fusion with a Sparse Model'
 ---
 ## 2023 – Sparse4D v2

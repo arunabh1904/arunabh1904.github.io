@@ -6,7 +6,7 @@ postSlug: bev-mae-bird-eye-view-masked-autoencoders-for-point-cloud-pretraining
 legacyPath: /paper shorts/2022/12/12/bev-mae-bird-eye-view-masked-autoencoders-for-point-cloud-pretraining.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2022 – BEV-MAE: Bird's-Eye-View Masked Autoencoders for Point-Cloud Pretraining"
 ---
 ## 2022 – BEV-MAE

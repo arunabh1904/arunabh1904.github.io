@@ -6,7 +6,7 @@ postSlug: nlspn-non-local-spatial-propagation-network-for-depth-completion
 legacyPath: /paper shorts/2020/07/20/nlspn-non-local-spatial-propagation-network-for-depth-completion.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2020 – NLSPN: Non-Local Spatial Propagation Network for Depth Completion'
 ---
 ## Summary

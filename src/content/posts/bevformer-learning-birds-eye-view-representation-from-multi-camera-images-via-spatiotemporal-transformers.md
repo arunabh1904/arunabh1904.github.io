@@ -6,7 +6,7 @@ postSlug: bevformer-learning-birds-eye-view-representation-from-multi-camera-ima
 legacyPath: /paper shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2022 – BEVFormer: Learning Bird's-Eye-View Representation from Multi-Camera Images via Spatiotemporal Transformers"
 ---
 ## 2022 – BEVFormer

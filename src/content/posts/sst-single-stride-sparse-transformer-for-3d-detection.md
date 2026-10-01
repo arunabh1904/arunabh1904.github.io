@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: sst-single-stride-sparse-transformer-for-3d-detection
 legacyPath: /paper shorts/2021/12/13/sst-single-stride-sparse-transformer-for-3d-detection.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2021 – SST: preserve high-resolution sparse LiDAR features without a downsampling pyramid'
 ---
 ## 2021 – SST

@@ -8,7 +8,7 @@ tags:
   - Bird's-Eye View
   - Radar-Camera Fusion
   - Autonomous Driving
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 topics:
   - autonomy
   - learning

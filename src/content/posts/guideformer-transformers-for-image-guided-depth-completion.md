@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: guideformer-transformers-for-image-guided-depth-completion
 legacyPath: /paper shorts/2022/06/19/guideformer-transformers-for-image-guided-depth-completion.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – GuideFormer: transfer RGB structure into sparse-depth features with guided attention'
 ---
 ## Summary

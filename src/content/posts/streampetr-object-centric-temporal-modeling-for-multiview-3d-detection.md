@@ -6,7 +6,7 @@ postSlug: streampetr-object-centric-temporal-modeling-for-multiview-3d-detection
 legacyPath: /paper shorts/2023/03/21/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – StreamPETR: Object-Centric Temporal Modeling for Efficient Multi-View 3D Object Detection'
 ---
 ## 2023 – StreamPETR

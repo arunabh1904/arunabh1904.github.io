@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: cross-view-sequential-visual-localization-with-spatio-temporal-context-modeling-for-autonomous-driving
 legacyPath: /paper shorts/2026/08/11/cross-view-sequential-visual-localization-with-spatio-temporal-context-modeling-for-autonomous-driving.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'Mapping'
 summary: '2026 – recurrent temporal context sharpens satellite candidates before cross-view localization refinement'
 ---
 

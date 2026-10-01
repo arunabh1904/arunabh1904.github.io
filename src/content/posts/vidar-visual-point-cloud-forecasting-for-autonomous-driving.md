@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: vidar-visual-point-cloud-forecasting-for-autonomous-driving
 legacyPath: /paper shorts/2023/12/29/vidar-visual-point-cloud-forecasting-for-autonomous-driving.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – ViDAR: pretrain visual driving encoders by forecasting future point clouds'
 ---
 

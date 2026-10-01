@@ -6,7 +6,7 @@ postSlug: votr-voxel-transformer-for-3d-object-detection
 legacyPath: /paper shorts/2021/09/06/votr-voxel-transformer-for-3d-object-detection.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2021 – VoTr: Voxel Transformer for 3D Object Detection'
 ---
 ## 2021 – VoTr

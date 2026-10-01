@@ -6,7 +6,7 @@ postSlug: unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation
 legacyPath: /paper shorts/2023/08/21/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – UniM²AE: Multi-Modal Masked Autoencoders with Unified 3D Representation for Autonomous Driving'
 ---
 

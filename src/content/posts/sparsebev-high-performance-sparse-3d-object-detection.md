@@ -6,7 +6,7 @@ postSlug: sparsebev-high-performance-sparse-3d-object-detection
 legacyPath: /paper shorts/2023/08/18/sparsebev-high-performance-sparse-3d-object-detection.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – SparseBEV: High-Performance Sparse 3D Object Detection from Multi-Camera Videos'
 ---
 ## 2023 – SparseBEV

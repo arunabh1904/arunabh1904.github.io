@@ -6,7 +6,7 @@ postSlug: second-sparsely-embedded-convolutional-detection
 legacyPath: /paper shorts/2018/10/06/second-sparsely-embedded-convolutional-detection.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2018 – SECOND: Sparsely Embedded Convolutional Detection'
 ---
 ## 2018 – SECOND

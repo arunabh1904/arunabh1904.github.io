@@ -6,7 +6,7 @@ postSlug: maptrv2-an-end-to-end-framework-for-online-vectorized-hd-map-construct
 legacyPath: /paper shorts/2023/08/10/maptrv2-an-end-to-end-framework-for-online-vectorized-hd-map-construction.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'Mapping'
 summary: "2023 – MapTRv2: An End-to-End Framework for Online Vectorized HD Map Construction"
 ---
 ## Summary

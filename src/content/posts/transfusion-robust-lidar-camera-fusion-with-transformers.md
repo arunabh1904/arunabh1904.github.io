@@ -6,7 +6,7 @@ postSlug: transfusion-robust-lidar-camera-fusion-with-transformers
 legacyPath: /paper shorts/2022/03/22/transfusion-robust-lidar-camera-fusion-with-transformers.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – TransFusion: Robust LiDAR-Camera Fusion for 3D Object Detection with Transformers'
 ---
 ## 2022 – TransFusion

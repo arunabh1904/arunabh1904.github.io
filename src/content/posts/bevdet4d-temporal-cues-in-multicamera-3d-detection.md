@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: bevdet4d-temporal-cues-in-multicamera-3d-detection
 legacyPath: /paper shorts/2022/03/31/bevdet4d-temporal-cues-in-multicamera-3d-detection.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – BEVDet4D: align and fuse adjacent camera BEV features for motion-aware detection'
 ---
 ## 2022 – BEVDet4D

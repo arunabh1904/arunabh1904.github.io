@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: rpgfusion-4d-radar-prior-guided-fusion
 legacyPath: /paper shorts/2026/06/01/rpgfusion-4d-radar-prior-guided-fusion.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2026 – RPGFusion: use 4D-radar priors to localize and densify camera evidence'
 ---
 

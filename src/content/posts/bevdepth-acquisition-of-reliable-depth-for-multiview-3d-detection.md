@@ -6,7 +6,7 @@ postSlug: bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection
 legacyPath: /paper shorts/2022/06/21/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection'
 ---
 ## 2022 – BEVDepth

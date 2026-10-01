@@ -6,7 +6,7 @@ postSlug: petrv2-unified-3d-perception-from-multicamera-images
 legacyPath: /paper shorts/2022/06/02/petrv2-unified-3d-perception-from-multicamera-images.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – PETRv2: A Unified Framework for 3D Perception from Multi-Camera Images'
 ---
 ## 2022 – PETRv2

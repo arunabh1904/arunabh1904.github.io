@@ -6,7 +6,7 @@ postSlug: detr3d-multiview-images-via-3d-to-2d-queries
 legacyPath: /paper shorts/2021/10/14/detr3d-multiview-images-via-3d-to-2d-queries.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2021 – DETR3D: 3D Object Detection from Multi-View Images via 3D-to-2D Queries'
 ---
 ## 2021 – DETR3D

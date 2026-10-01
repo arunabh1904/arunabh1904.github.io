@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: doppler-aware-lidar-radar-fusion-for-weather-robust-3d-detection
 legacyPath: /paper shorts/2025/10/23/doppler-aware-lidar-radar-fusion-for-weather-robust-3d-detection.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2025 – DLRFusion: preserving radar Doppler during LiDAR fusion'
 ---
 

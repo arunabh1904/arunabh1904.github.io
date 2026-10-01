@@ -6,7 +6,7 @@ postSlug: rtmap-real-time-recursive-mapping-with-change-detection-and-localizati
 legacyPath: /paper shorts/2025/07/01/rtmap-real-time-recursive-mapping-with-change-detection-and-localization.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'Mapping'
 summary: "2025 – RTMap: Real-Time Recursive Mapping with Change Detection and Localization"
 ---
 

@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: panoocc-unified-occupancy-representation-for-camera-based-3d-panoptic-segmentation
 legacyPath: /paper shorts/2023/06/16/panoocc-unified-occupancy-representation-for-camera-based-3d-panoptic-segmentation.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – PanoOcc: coarse-to-fine voxel queries for camera-based 3D panoptic occupancy'
 ---
 

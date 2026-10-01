@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: deeplidar-surface-normal-guided-depth-completion
 legacyPath: /paper shorts/2018/12/02/deeplidar-surface-normal-guided-depth-completion.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2018 – DeepLiDAR: combine direct completion with an intermediate surface-normal path'
 ---
 ## Summary

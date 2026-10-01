@@ -6,7 +6,7 @@ postSlug: pointpainting-sequential-fusion-for-3d-object-detection
 legacyPath: /paper shorts/2019/11/22/pointpainting-sequential-fusion-for-3d-object-detection.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2019 – PointPainting: Sequential Fusion for 3D Object Detection'
 ---
 ## 2019 – PointPainting

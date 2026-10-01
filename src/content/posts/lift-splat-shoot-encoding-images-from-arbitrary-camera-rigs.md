@@ -6,7 +6,7 @@ postSlug: lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs
 legacyPath: /paper shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2020 – Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rigs by Implicitly Unprojecting to 3D'
 ---
 ## 2020 – Lift, Splat, Shoot

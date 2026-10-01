@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: is-fusion-instance-scene-multimodal-fusion
 legacyPath: /paper shorts/2024/06/17/is-fusion-instance-scene-multimodal-fusion.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2024 – IS-Fusion: combine dense scene fusion with proposal-level interaction'
 ---
 

@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: crn-camera-radar-net-for-3d-perception
 legacyPath: /paper shorts/2023/04/03/crn-camera-radar-net-for-3d-perception.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – CRN: let radar guide camera lifting before BEV fusion'
 ---
 ## 2023 – CRN

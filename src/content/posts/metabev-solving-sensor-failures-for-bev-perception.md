@@ -6,7 +6,7 @@ postSlug: metabev-solving-sensor-failures-for-bev-perception
 legacyPath: /paper shorts/2023/04/19/metabev-solving-sensor-failures-for-bev-perception.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – MetaBEV: Solving Sensor Failures for BEV Detection and Map Segmentation'
 ---
 

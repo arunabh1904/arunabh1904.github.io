@@ -6,7 +6,7 @@ postSlug: rcbevdet-radar-camera-fusion-in-bev
 legacyPath: /paper shorts/2024/03/25/rcbevdet-radar-camera-fusion-in-bev.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2024 – RCBEVDet: Radar-Camera Fusion in Bird's-Eye View for 3D Object Detection"
 ---
 
