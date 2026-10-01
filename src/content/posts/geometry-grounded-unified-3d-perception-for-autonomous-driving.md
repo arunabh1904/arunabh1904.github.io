@@ -8,7 +8,7 @@ tags:
   - Autonomous Driving
   - 3D Perception
   - Multi-Task Learning
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2026 – Geometry-Grounded Unified 3D Perception for Autonomous Driving"
 ---
 

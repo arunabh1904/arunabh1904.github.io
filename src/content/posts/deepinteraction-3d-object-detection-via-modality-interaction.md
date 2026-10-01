@@ -6,7 +6,7 @@ postSlug: deepinteraction-3d-object-detection-via-modality-interaction
 legacyPath: /paper shorts/2022/08/23/deepinteraction-3d-object-detection-via-modality-interaction.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – DeepInteraction: 3D Object Detection via Modality Interaction'
 ---
 ## 2022 – DeepInteraction

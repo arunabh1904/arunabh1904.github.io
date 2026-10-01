@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving
 legacyPath: /paper shorts/2023/03/23/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – NVAutoNet: production-oriented camera-to-BEV perception'
 ---
 

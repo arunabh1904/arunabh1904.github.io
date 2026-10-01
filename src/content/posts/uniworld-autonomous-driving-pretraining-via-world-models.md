@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: uniworld-autonomous-driving-pretraining-via-world-models
 legacyPath: /paper shorts/2023/08/14/uniworld-autonomous-driving-pretraining-via-world-models.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – UniWorld: pretrain camera BEV features by predicting current and future 4D occupancy'
 ---
 

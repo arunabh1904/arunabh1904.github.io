@@ -6,7 +6,7 @@ postSlug: toponet-graph-based-topology-reasoning-for-driving-scenes
 legacyPath: /paper shorts/2023/04/11/toponet-graph-based-topology-reasoning-for-driving-scenes.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'Mapping'
 summary: "2023 – TopoNet: Graph-based Topology Reasoning for Driving Scenes"
 ---
 ## Summary

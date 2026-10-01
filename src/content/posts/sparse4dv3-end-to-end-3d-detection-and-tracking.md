@@ -6,7 +6,7 @@ postSlug: sparse4dv3-end-to-end-3d-detection-and-tracking
 legacyPath: /paper shorts/2023/11/20/sparse4dv3-end-to-end-3d-detection-and-tracking.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – Sparse4D v3: Advancing End-to-End 3D Detection and Tracking'
 ---
 ## 2023 – Sparse4D v3

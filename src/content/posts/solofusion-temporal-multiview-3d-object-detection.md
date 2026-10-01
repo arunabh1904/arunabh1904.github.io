@@ -6,7 +6,7 @@ postSlug: solofusion-temporal-multiview-3d-object-detection
 legacyPath: /paper shorts/2022/10/05/solofusion-temporal-multiview-3d-object-detection.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – Time Will Tell: New Outlooks and a Baseline for Temporal Multi-View 3D Object Detection (SOLOFusion)'
 ---
 ## 2022 – SOLOFusion

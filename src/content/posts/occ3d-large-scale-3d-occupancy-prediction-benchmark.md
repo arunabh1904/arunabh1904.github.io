@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: occ3d-large-scale-3d-occupancy-prediction-benchmark
 legacyPath: /paper shorts/2023/04/27/occ3d-large-scale-3d-occupancy-prediction-benchmark.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – Occ3D: visibility-aware dense 3D occupancy benchmarks'
 ---
 

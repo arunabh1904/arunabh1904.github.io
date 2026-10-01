@@ -6,7 +6,7 @@ postSlug: voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking
 legacyPath: /paper shorts/2023/03/20/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – VoxelNeXt: Fully Sparse VoxelNet for 3D Object Detection and Tracking'
 ---
 ## 2023 – VoxelNeXt

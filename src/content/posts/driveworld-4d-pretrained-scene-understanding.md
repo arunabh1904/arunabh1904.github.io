@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: driveworld-4d-pretrained-scene-understanding
 legacyPath: /paper shorts/2024/05/07/driveworld-4d-pretrained-scene-understanding.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2024 – DriveWorld: pretrain persistent dynamic and static scene state for many driving tasks'
 ---
 

@@ -6,7 +6,7 @@ postSlug: sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion
 legacyPath: /paper shorts/2022/11/19/sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – Sparse4D: Multi-View 3D Object Detection with Sparse Spatial-Temporal Fusion'
 ---
 ## 2022 – Sparse4D

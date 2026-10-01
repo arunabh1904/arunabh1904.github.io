@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: grace-bev-graceful-degradation-under-sensor-failures
 legacyPath: /paper shorts/2026/05/29/grace-bev-graceful-degradation-under-sensor-failures.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2026 – Grace-BEV: reliability-aware camera-LiDAR fusion under sensor failure'
 ---
 

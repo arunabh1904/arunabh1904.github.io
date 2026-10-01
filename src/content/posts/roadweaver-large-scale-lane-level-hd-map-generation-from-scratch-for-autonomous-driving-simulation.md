@@ -8,7 +8,7 @@ tags:
   - Autonomous Driving
   - HD Maps
   - Simulation
-field: 'BEV Perception & Mapping'
+field: 'Mapping'
 summary: "2026 – RoadWeaver: Large-Scale Lane-Level HD Map Generation from Scratch for Autonomous Driving Simulation"
 ---
 

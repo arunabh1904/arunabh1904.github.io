@@ -6,7 +6,7 @@ postSlug: scene-reconstruction-as-mapping-priors-for-3d-detection
 legacyPath: /paper shorts/2026/05/21/scene-reconstruction-as-mapping-priors-for-3d-detection.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2026 – Scene Reconstruction as Mapping Priors for 3D Detection"
 ---
 

@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb
 legacyPath: /paper shorts/2017/09/21/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2017 – Sparse-to-Dense: complete sparse runtime range measurements with RGB'
 ---
 ## 2017 – Sparse-to-Dense

@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: multi-modal-traffic-sign-detection-with-semantic-attributes-for-autonomous-driving
 legacyPath: /paper shorts/2026/08/21/multi-modal-traffic-sign-detection-with-semantic-attributes-for-autonomous-driving.html
 tags: [Autonomous Driving]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2026 – Multi-Modal Traffic Sign Detection with Semantic Attributes for Autonomous Driving'
 ---
 

@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: centerpoint-center-based-3d-detection-and-tracking
 legacyPath: /paper shorts/2020/06/19/centerpoint-center-based-3d-detection-and-tracking.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2020 – CenterPoint: represent 3D actors by BEV centers, attributes, and velocity'
 ---
 ## 2020 – CenterPoint

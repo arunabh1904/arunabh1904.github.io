@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: crkd-camera-radar-distillation-from-lidar-camera
 legacyPath: /paper shorts/2024/06/17/crkd-camera-radar-distillation-from-lidar-camera.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2024 – CRKD: train a camera-radar student with a stronger LiDAR-camera teacher'
 ---
 

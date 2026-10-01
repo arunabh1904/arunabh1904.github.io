@@ -8,7 +8,7 @@ tags:
   - Autonomous Driving
   - HD Maps
   - Semi-Supervised Learning
-field: 'BEV Perception & Mapping'
+field: 'Mapping'
 summary: "2026 – PseudoMapLabeler: Confidence-Aware Pseudo-Label Generation for Semi-Supervised Online Mapping"
 ---
 

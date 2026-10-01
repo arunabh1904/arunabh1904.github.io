@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns
 legacyPath: /paper shorts/2025/11/03/unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2025 – UniLION: one linear-RNN backbone across sensors, time, and driving tasks'
 ---
 

@@ -6,7 +6,7 @@ postSlug: maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-co
 legacyPath: /paper shorts/2022/08/30/maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-construction.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'Mapping'
 summary: "2022 – MapTR: Structured Modeling and Learning for Online Vectorized HD Map Construction"
 ---
 ## Summary

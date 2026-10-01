@@ -8,7 +8,7 @@ tags:
   - Autonomous Driving
   - 3D Detection
   - Reconstruction Priors
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: "2026 – Map-Det3D: Metric Feed-Forward 3D Reconstruction Prior for Multi-view 3D Object Detection from Streaming Inputs"
 ---
 

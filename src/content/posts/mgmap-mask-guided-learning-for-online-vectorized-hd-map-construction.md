@@ -6,7 +6,7 @@ postSlug: mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction
 legacyPath: /paper shorts/2024/04/01/mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'Mapping'
 summary: "2024 – MGMap: Mask-Guided Learning for Online Vectorized HD Map Construction"
 ---
 

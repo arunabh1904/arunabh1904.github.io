@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition
 legacyPath: /paper shorts/2022/11/18/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – BEVFormer v2: strengthening BEV learning with perspective supervision'
 ---
 ## 2022 – BEVFormer v2

@@ -6,7 +6,7 @@ postSlug: futr3d-unified-sensor-fusion-framework-for-3d-detection
 legacyPath: /paper shorts/2022/03/20/futr3d-unified-sensor-fusion-framework-for-3d-detection.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2022 – FUTR3D: A Unified Sensor Fusion Framework for 3D Detection'
 ---
 

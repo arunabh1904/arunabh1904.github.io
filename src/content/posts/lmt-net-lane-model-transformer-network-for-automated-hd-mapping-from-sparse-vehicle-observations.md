@@ -6,7 +6,7 @@ postSlug: lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-s
 legacyPath: /paper shorts/2024/09/19/lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations.html
 tags:
   - Other
-field: 'BEV Perception & Mapping'
+field: 'Mapping'
 summary: "2024 – LMT-Net: Lane Model Transformer Network for Automated HD Mapping from Sparse Vehicle Observations"
 ---
 

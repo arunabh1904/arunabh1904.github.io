@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: dsvt-dynamic-sparse-voxel-transformer
 legacyPath: /paper shorts/2023/01/15/dsvt-dynamic-sparse-voxel-transformer.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – DSVT: bounded local attention over variable-density sparse voxels'
 ---
 ## 2023 – DSVT

@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: occany-generalized-unconstrained-urban-3d-occupancy
 legacyPath: /paper shorts/2026/03/24/occany-generalized-unconstrained-urban-3d-occupancy.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2026 – OccAny: metric occupancy from out-of-domain, uncalibrated urban images'
 ---
 

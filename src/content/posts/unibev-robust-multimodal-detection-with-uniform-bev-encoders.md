@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: unibev-robust-multimodal-detection-with-uniform-bev-encoders
 legacyPath: /paper shorts/2023/09/25/unibev-robust-multimodal-detection-with-uniform-bev-encoders.html
 tags: [Other]
-field: 'BEV Perception & Mapping'
+field: 'BEV Perception'
 summary: '2023 – UniBEV: one detector for camera, LiDAR, and fused operating modes'
 ---
 
