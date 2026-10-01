@@ -4,9 +4,7 @@ date: '2026-09-15T09:00:00.000Z'
 section: paper-shorts
 postSlug: neurosymbead-a-large-scale-neuro-symbolic-caption-dataset-for-omni-directional-embodied-autonomous-d
 legacyPath: /paper shorts/2026/09/15/neurosymbead-a-large-scale-neuro-symbolic-caption-dataset-for-omni-directional-embodied-autonomous-d.html
-tags:
-- Autonomous Driving
-- Research
+tags: ["Autonomous Driving", "Research"]
 field: 'Autonomous Driving: VLMs & Evaluation'
 summary: '2026 – NeuroSymbEAD: A Large Scale Neuro-Symbolic Caption Dataset for Omni-Directional Embodied Autonomous Driving'
 ---

@@ -4,9 +4,7 @@ date: '2026-09-29T09:00:00.000Z'
 section: paper-shorts
 postSlug: vision-language-action-autonomous-driving-agent-with-language-based-memory
 legacyPath: /paper shorts/2026/09/29/vision-language-action-autonomous-driving-agent-with-language-based-memory.html
-tags:
-- Autonomous Driving
-- Research
+tags: ["Autonomous Driving", "Research"]
 field: 'Autonomous Driving: VLA & Planning'
 summary: 2026 – Vision-Language-Action Autonomous Driving Agent with Language-based Memory
 ---

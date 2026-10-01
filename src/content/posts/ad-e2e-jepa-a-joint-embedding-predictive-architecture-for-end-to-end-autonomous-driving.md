@@ -4,9 +4,7 @@ date: '2026-09-28T09:00:00.000Z'
 section: paper-shorts
 postSlug: ad-e2e-jepa-a-joint-embedding-predictive-architecture-for-end-to-end-autonomous-driving
 legacyPath: /paper shorts/2026/09/28/ad-e2e-jepa-a-joint-embedding-predictive-architecture-for-end-to-end-autonomous-driving.html
-tags:
-- Autonomous Driving
-- Research
+tags: ["Autonomous Driving", "Research"]
 field: 'Autonomous Driving: VLA & Planning'
 summary: '2026 – AD-E2E-JEPA: A Joint-Embedding Predictive Architecture For End-to-End Autonomous Driving'
 ---

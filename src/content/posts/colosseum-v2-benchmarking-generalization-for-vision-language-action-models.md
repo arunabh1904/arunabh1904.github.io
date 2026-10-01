@@ -4,9 +4,7 @@ date: '2026-10-01T09:00:00.000Z'
 section: paper-shorts
 postSlug: colosseum-v2-benchmarking-generalization-for-vision-language-action-models
 legacyPath: /paper shorts/2026/10/01/colosseum-v2-benchmarking-generalization-for-vision-language-action-models.html
-tags:
-- Robotics
-- Benchmark
+tags: ["Robotics", "Benchmark"]
 field: Robot Post-Training & Evaluation
 summary: '2026 – Colosseum V2: Benchmarking Generalization for Vision-Language-Action Models'
 ---

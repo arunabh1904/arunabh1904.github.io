@@ -4,9 +4,7 @@ date: '2026-09-19T09:00:00.000Z'
 section: paper-shorts
 postSlug: planning-aligned-pretraining-of-bev-representations-with-sparse-action-conditioned-targets-for-end-t
 legacyPath: /paper shorts/2026/09/19/planning-aligned-pretraining-of-bev-representations-with-sparse-action-conditioned-targets-for-end-t.html
-tags:
-- Autonomous Driving
-- Research
+tags: ["Autonomous Driving", "Research"]
 field: 'Autonomous Driving: VLA & Planning'
 summary: 2026 – Planning-Aligned Pretraining of BEV Representations with Sparse Action-Conditioned Targets for End-to-End Autonomous Driving
 ---

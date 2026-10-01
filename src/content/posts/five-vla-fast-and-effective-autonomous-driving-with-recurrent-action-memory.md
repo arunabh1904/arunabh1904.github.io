@@ -4,9 +4,7 @@ date: '2026-09-16T09:00:00.000Z'
 section: paper-shorts
 postSlug: five-vla-fast-and-effective-autonomous-driving-with-recurrent-action-memory
 legacyPath: /paper shorts/2026/09/16/five-vla-fast-and-effective-autonomous-driving-with-recurrent-action-memory.html
-tags:
-- Autonomous Driving
-- Research
+tags: ["Autonomous Driving", "Research"]
 field: 'Autonomous Driving: VLA & Planning'
 summary: '2026 – FIVE-VLA: Fast and EffectIVE Autonomous Driving with Recurrent Action Memory'
 ---
