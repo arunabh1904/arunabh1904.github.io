@@ -125,6 +125,7 @@ HUMAN_NARRATION_POSTS = frozenset(
         "attention-mechanisms-demystified",
         "building-local-blog-audio-with-qwen3-tts",
         "code-is-cheap-understanding-isnt",
+        "from-bev-features-to-lane-graphs-and-changing-maps",
         "from-ppo-to-grpo-rl-for-reasoning-and-vlas",
         "from-seeing-to-doing-the-evolution-of-vision-language-models",
         "how-to-read-scaling-laws-for-language-models",
@@ -157,6 +158,13 @@ HUMAN_SAMPLING_SEED_VERSION = "voxtral-casual-heading-context-v3"
 # Seed overrides are voice- and chunk-policy-specific. Record only deterministic
 # rerolls that pass the complete request-level audit.
 HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
+    "from-bev-features-to-lane-graphs-and-changing-maps": {
+        "11": 1905,
+        "16": 1905,
+        "41": 1905,
+        "54": 1905,
+        "64": 1905,
+    },
     "building-local-blog-audio-with-qwen3-tts": {
         "8": 1906,
         "22": 1905,
@@ -229,6 +237,9 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
     },
 }
 HUMAN_POST_PRONUNCIATION_LEXICONS = {
+    "from-bev-features-to-lane-graphs-and-changing-maps": {
+        "BEVDet4D": "B E V Det four D",
+    },
     "attention-mechanisms-demystified": {
         "scaleddotproductattention": "scaled dot product attention",
         "iscausal=True": "is causal equals true",
@@ -277,6 +288,7 @@ HUMAN_POST_PRONUNCIATION_LEXICONS = {
 # These long-form canaries keep complete source narration. Their narrow caps
 # allow a human pace without weakening the corpus-wide default.
 HUMAN_MAX_AUDIO_SECONDS = {
+    "from-bev-features-to-lane-graphs-and-changing-maps": 50 * 60,
     "from-seeing-to-doing-the-evolution-of-vision-language-models": 40 * 60,
     "how-unified-sensor-models-are-built-for-autonomous-driving": 32 * 60,
 }
