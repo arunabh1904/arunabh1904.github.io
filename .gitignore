@@ -22,3 +22,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Merge email preview and Python bytecode
+notes-email.json
+scripts/notifications/__pycache__/
