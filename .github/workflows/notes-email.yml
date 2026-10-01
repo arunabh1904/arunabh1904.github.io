@@ -1,0 +1,49 @@
+name: Email merged notes
+
+on:
+  push:
+    branches: [main]
+    paths: ['src/content/posts/**']
+  workflow_dispatch:
+    inputs:
+      base_sha:
+        description: Commit immediately before the notes merge (full SHA)
+        required: true
+      head_sha:
+        description: Merged commit on main (full SHA)
+        required: true
+
+permissions:
+  contents: read
+
+# Serialize retries for one merge without cancelling other merges.
+concurrency:
+  group: notes-email-${{ inputs.head_sha || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  email:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Summarize changed Arxiv Notes
+        id: notes
+        env:
+          NOTES_BASE_SHA: ${{ inputs.base_sha || github.event.before }}
+          NOTES_HEAD_SHA: ${{ inputs.head_sha || github.sha }}
+        run: node scripts/notifications/notes-email.mjs
+      - name: Email merge summary
+        if: steps.notes.outputs.count != '0'
+        env:
+          NOTES_GMAIL_ADDRESS: ${{ secrets.NOTES_GMAIL_ADDRESS }}
+          NOTES_GMAIL_APP_PASSWORD: ${{ secrets.NOTES_GMAIL_APP_PASSWORD }}
+        run: python3 scripts/notifications/send_notes_email.py
