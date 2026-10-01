@@ -4,9 +4,7 @@ date: '2026-09-23T09:00:00.000Z'
 section: paper-shorts
 postSlug: anchorreasoning-a-visual-grounding-and-causal-reasoning-dataset-in-long-tail-autonomous-driving-scen
 legacyPath: /paper shorts/2026/09/23/anchorreasoning-a-visual-grounding-and-causal-reasoning-dataset-in-long-tail-autonomous-driving-scen.html
-tags:
-- Autonomous Driving
-- Research
+tags: ["Autonomous Driving", "Research"]
 field: 'Autonomous Driving: VLMs & Evaluation'
 summary: '2026 – AnchorReasoning: A Visual Grounding and Causal Reasoning Dataset in Long-Tail Autonomous Driving Scenarios'
 ---

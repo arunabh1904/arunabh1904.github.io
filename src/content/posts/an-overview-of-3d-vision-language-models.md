@@ -4,10 +4,7 @@ date: '2026-09-04T09:00:00.000Z'
 section: paper-shorts
 postSlug: an-overview-of-3d-vision-language-models
 legacyPath: /paper shorts/2026/09/04/an-overview-of-3d-vision-language-models.html
-tags:
-- 3D Vision
-- Vision-Language Models
-- Survey
+tags: ["3D Vision", "Vision-Language Models", "Survey"]
 field: Vision-Language Models
 summary: 2026 – An overview of 3D Vision-Language Models
 ---

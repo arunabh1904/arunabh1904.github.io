@@ -4,9 +4,7 @@ date: '2026-09-16T09:00:00.000Z'
 section: paper-shorts
 postSlug: wzplanner-safe-end-to-end-path-planning-for-autonomous-driving-in-work-zones
 legacyPath: /paper shorts/2026/09/16/wzplanner-safe-end-to-end-path-planning-for-autonomous-driving-in-work-zones.html
-tags:
-- Autonomous Driving
-- Research
+tags: ["Autonomous Driving", "Research"]
 field: Motion Forecasting & Planning
 summary: '2026 – WZPlanner: Safe End-to-End Path Planning for Autonomous Driving in Work Zones'
 ---

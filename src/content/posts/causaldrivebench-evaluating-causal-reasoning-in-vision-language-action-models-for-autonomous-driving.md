@@ -4,9 +4,7 @@ date: '2026-09-26T09:00:00.000Z'
 section: paper-shorts
 postSlug: causaldrivebench-evaluating-causal-reasoning-in-vision-language-action-models-for-autonomous-driving
 legacyPath: /paper shorts/2026/09/26/causaldrivebench-evaluating-causal-reasoning-in-vision-language-action-models-for-autonomous-driving.html
-tags:
-- Autonomous Driving
-- Research
+tags: ["Autonomous Driving", "Research"]
 field: 'Autonomous Driving: VLMs & Evaluation'
 summary: '2026 – CausalDriveBench: Evaluating Causal Reasoning in Vision-Language-Action Models for Autonomous Driving'
 ---
