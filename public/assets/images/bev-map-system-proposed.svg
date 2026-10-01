@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1640" viewBox="0 0 1000 1640" role="img" aria-labelledby="title desc">
+<title id="title">Proposed mapping system: observations, priors, topology, and verified updates</title>
+<desc id="desc">Current sensors and recent memory form observation features. An aligned SD map and optional historical map supply separate priors. Structured decoders produce road elements and relations. The current graph serves planning, while visibility and alignment checks govern permanent updates to versioned storage.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="none" stroke="#334155" stroke-width="1.4"/></marker></defs>
+<rect width="1000" height="1640" fill="#fcfbf8"/>
+<g font-family="Arial, sans-serif" fill="#17212b">
+<text x="48" y="58" font-size="30" font-weight="700">From observations to a map that can change</text>
+<text x="48" y="91" font-size="19" fill="#52616b">Proposed implementation · author’s integration of the reviewed literature</text>
+
+<g stroke="#334155" stroke-width="2" fill="#fff">
+<rect x="48" y="128" width="430" height="124" rx="12"/><rect x="522" y="128" width="430" height="124" rx="12"/>
+<rect x="48" y="301" width="430" height="162" rx="12" fill="#e9f3f3"/><rect x="522" y="301" width="430" height="162" rx="12" fill="#f7eedf"/>
+<rect x="48" y="527" width="904" height="151" rx="12"/>
+<rect x="48" y="736" width="430" height="158" rx="12"/><rect x="522" y="736" width="430" height="158" rx="12"/>
+<rect x="48" y="963" width="430" height="204" rx="12" fill="#e9f3f3"/><rect x="522" y="963" width="430" height="204" rx="12" fill="#f7eedf"/>
+<rect x="48" y="1232" width="430" height="132" rx="12"/><rect x="522" y="1232" width="430" height="132" rx="12"/>
+</g>
+
+<g font-size="24" font-weight="700">
+<text x="70" y="166">Current sensor evidence</text><text x="544" y="166">External map priors</text>
+<text x="70" y="340">Observation BEV + memory</text><text x="544" y="340">Retrieve, align, encode</text>
+<text x="70" y="566">Prior-conditioned features and map queries</text>
+<text x="70" y="775">Geometry and attributes</text><text x="544" y="775">Typed relationships</text>
+<text x="70" y="1003">Current local scene graph</text><text x="544" y="1003">Change verification</text>
+<text x="70" y="1272">Planning interface</text><text x="544" y="1272">Versioned persistent map</text>
+</g>
+<g font-size="21" fill="#334155">
+<text x="70" y="202">Cameras · optional LiDAR / radar</text><text x="70" y="232">Calibration · timestamps · ego pose</text>
+<text x="544" y="202">Noisy SD road graph</text><text x="544" y="232">Optional prior vectors / point cloud</text>
+<text x="70" y="377">Lift / retrieve image features</text><text x="70" y="409">Warp recent spatial + vector memory</text><text x="70" y="441">Keep visibility and pose uncertainty</text>
+<text x="544" y="377">Vector tokens + raster features</text><text x="544" y="409">Version · age · coverage · uncertainty</text><text x="544" y="441">Missing prior is an explicit condition</text>
+<text x="70" y="605">Attention / gated fusion · retain independent discovery queries</text>
+<text x="70" y="640">Train with absent and conflicting priors; preserve evidence provenance</text>
+<text x="70" y="815">Lane segments · boundaries · curbs</text><text x="70" y="848">Crossings · stop lines · controls</text><text x="70" y="879">Instance identity + uncertainty</text>
+<text x="544" y="815">Successor · lateral neighbor</text><text x="544" y="848">Lane–control · lane–stop-line</text><text x="544" y="879">Lane–crossing · boundary ownership</text>
+<text x="70" y="1044">Observed / inferred / unresolved</text><text x="70" y="1077">Geometry + directed topology</text><text x="70" y="1110">Current signals and restrictions</text><text x="70" y="1143">Hypotheses remain distinguishable</text>
+<text x="544" y="1044">Inputs: source map + sensor evidence</text><text x="544" y="1077">Check visibility and registration</text><text x="544" y="1110">Accumulate evidence across visits</text><text x="544" y="1143">Add / revise / remove / defer</text>
+<text x="70" y="1311">Usable now, with uncertainty</text><text x="70" y="1344">Temporary restrictions can expire</text>
+<text x="544" y="1311">Confirmed edits + retained evidence</text><text x="544" y="1344">Audit · rollback · retrieve next visit</text>
+</g>
+
+<g fill="none" stroke="#334155" stroke-width="2.3" marker-end="url(#arrow)">
+<path d="M263 252 V299"/><path d="M737 252 V299"/>
+<path d="M263 463 V525"/><path d="M737 463 V525"/>
+<path d="M263 678 V734"/><path d="M737 678 V734"/>
+<path d="M263 894 V928 H500 V946 H263 V961"/>
+<path d="M737 894 V928 H500 V946 H737 V961"/>
+<path d="M263 1167 V1230"/><path d="M737 1167 V1230"/>
+</g>
+<text x="552" y="1206" font-size="18" fill="#77511e">Only when the update policy is satisfied</text>
+<path d="M48 1416 H952" stroke="#cbd5d1" stroke-width="1.5"/>
+<text x="48" y="1453" font-size="22" font-weight="700">What the papers contribute</text>
+<g font-size="19" fill="#52616b">
+<text x="48" y="1489">MapTRv2 / LaneSegNet: structured geometry · TopoNet / TopoLogic: relations</text>
+<text x="48" y="1521">SMERF / SEPT / Score: map conditioning · MapTracker: temporal identity</text>
+<text x="48" y="1553">RTMap: change-aware association · TbV: real-change and visibility evaluation</text>
+<text x="48" y="1599">Update policy, provenance, and the expanded output contract are proposed here.</text>
+</g>
+</g>
+</svg>

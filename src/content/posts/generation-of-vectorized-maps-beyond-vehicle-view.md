@@ -5,7 +5,7 @@ section: paper-shorts
 postSlug: generation-of-vectorized-maps-beyond-vehicle-view
 legacyPath: /paper shorts/2026/09/07/generation-of-vectorized-maps-beyond-vehicle-view.html
 tags: ["Autonomous Driving", "Mapping"]
-field: BEV Perception & Mapping
+field: Mapping
 summary: 2026 – Generation of Vectorized Maps Beyond Vehicle View
 ---
 
