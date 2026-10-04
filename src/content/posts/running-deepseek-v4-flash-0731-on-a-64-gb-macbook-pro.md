@@ -15,11 +15,9 @@ summary: >-
 ---
 # Can DeepSeek V4 Flash 0731 Run on a 64 GB MacBook Pro?
 
-I wanted the same practical answer I measured for Qwen and Gemma: can I fit the exact `DeepSeek-V4-Flash-0731` checkpoint on my `64 GB` M5 Max MacBook Pro, and can I serve it at an interactive speed?
+The official `DeepSeek-V4-Flash-0731` checkpoint is about `167 GB` on disk. The maintained vLLM recipe gives it a `200 GB` accelerator-memory target, including room beyond the weights. It cannot reside in the `64 GB` unified memory of this M5 Max MacBook Pro.
 
-No. The official checkpoint is about `167 GB` on disk, and the maintained vLLM recipe assigns it a `200 GB` minimum accelerator-memory target. That is before leaving room for the inference runtime, activations, and KV cache. A `64 GB` Mac can call the hosted model and can serve a local application backed by that API, but it cannot load the official weights into unified memory.
-
-This is a sizing analysis dated August 13, 2026, not a benchmark. I did not manufacture latency numbers for a model that cannot load on the machine.
+This sizing analysis records the August 13, 2026 release and serving configuration. It contains no local inference measurements.
 
 ## Why active parameters do not determine fit
 
@@ -36,10 +34,6 @@ The official [`DeepSeek-V4-Flash-0731` repository](https://huggingface.co/deepse
 
 This table separates storage from inference. Downloading `167 GB` to the SSD proves only that the files fit on disk. It does not make them resident in memory, and macOS swap does not convert a `64 GB` laptop into a `200 GB` inference server. An experimental engine could offload experts and stream weights, but a deficit above `100 GB` moves the problem from GPU or unified-memory bandwidth to transfers from much slower storage. That is a systems experiment, not a sensible daily serving plan.
 
-Active parameters price the arithmetic for one token. Total parameters price residency. Sparse experts change the first number, not the second.
-
-The `13B` active count is still useful: it explains why DeepSeek can reduce the arithmetic performed for each token. It answers a compute question, not the fit question.
-
 For a dense model, almost every layer uses almost every weight for every token. For this MoE model, the router activates six of 256 routed experts per token, alongside shared components. That sparsity cuts expert computation, but the next token can select other experts. Unless the runtime accepts the large latency cost of repeatedly fetching missing experts, all routed experts remain part of the resident model state.
 
 The `0731` checkpoint also includes an attached DSpark speculative-decoding module. DeepSeek says the release keeps the preview architecture and changes post-training, while the public model card describes the official checkpoint as new weights plus the draft module. That is why `0731` is about `7 GB` larger than the roughly `160 GB` preview repository even though both use the same `284B`-total, `13B`-active backbone.
@@ -49,8 +43,6 @@ The practical memory model is therefore:
 $$
 \text{serving memory} \approx \text{all resident weights} + \text{runtime workspace} + \text{KV cache} + \text{request headroom}.
 $$
-
-Active parameters mainly affect the work to generate the next token. Total stored parameters dominate whether the checkpoint can load at all.
 
 ## What self-hosting requires
 
@@ -70,11 +62,11 @@ vllm serve deepseek-ai/DeepSeek-V4-Flash-0731 \
   --speculative-config '{"method":"dspark","num_speculative_tokens":7,"draft_sample_method":"greedy"}'
 ```
 
-That command is evidence of the intended serving stack, not a command to paste into the Mac. It assumes supported CUDA hardware, specialized MoE and sparse-attention kernels, and enough aggregate memory for the weights plus serving state. MLX and `llama.cpp` were meaningful choices in my Qwen and Gemma benchmarks because those checkpoints fit. Runtime preference is secondary when the DeepSeek checkpoint misses the machine's memory budget by more than `100 GB`.
+This launch assumes CUDA hardware, expert parallelism, and the documented MoE and sparse-attention kernels. Changing the Mac runtime does not remove the resident-weight requirement.
 
 ## The serving path
 
-On this laptop, I would treat DeepSeek as a remote inference backend. DeepSeek's API currently maps the model name `deepseek-v4-flash` to `DeepSeek-V4-Flash-0731`, exposes an OpenAI-compatible base URL, and supports the one-million-token context window. The model uses thinking mode by default, so I would set that behavior explicitly instead of allowing hidden reasoning work to distort latency and token cost.
+On this laptop, I would treat DeepSeek as a remote inference backend. At the time of this analysis, DeepSeek's API mapped the model name `deepseek-v4-flash` to `DeepSeek-V4-Flash-0731`, exposed an OpenAI-compatible base URL, and supported the one-million-token context window. The model uses thinking mode by default, so I would set that behavior explicitly instead of allowing hidden reasoning work to distort latency and token cost.
 
 ```python
 import os
@@ -106,13 +98,6 @@ This still lets a local browser app expose a service on the Mac: the UI, retriev
 
 DeepSeek's API docs announced pricing effective August 16, 2026, so I would read the [live pricing page](https://api-docs.deepseek.com/quick_start/pricing/) rather than treat a dated comparison as current. The durable comparison is architectural. API use converts a large fixed hardware commitment into metered requests. Self-hosting becomes rational only when privacy, sustained use, or deployment control repays a server with at least roughly `200 GB` of accelerator memory.
 
-## Recommendation
+## Capacity limit
 
-For this `64 GB` M5 Max, my recommendation is:
-
-1. Do not download the official `0731` weights expecting MLX, `llama.cpp`, or Ollama to make them fit.
-2. Use `deepseek-v4-flash` through DeepSeek's API when the exact checkpoint matters.
-3. Keep Qwen or Gemma as the local model when offline use, privacy, or predictable laptop latency matters more than matching DeepSeek's model behavior.
-4. Consider self-hosting DeepSeek V4 Flash only on a supported accelerator configuration with at least the vLLM recipe's `200 GB` memory floor and enough additional capacity for the context and concurrency you actually need.
-
-The important number is not `13B active`. For a fit decision, it is `167 GB` of weights against `64 GB` of unified memory. That comparison ends the local benchmark before the first token.
+The official checkpoint exceeds unified memory by about `103 GB`. Local use of this exact release therefore requires a remote backend; local inference requires a smaller checkpoint.

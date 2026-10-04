@@ -23,7 +23,7 @@ const stories = CALM_BLOG_STORIES as Record<string, { steps: StoryStep[] }>;
 type ExplainerManifest = Record<string, { frames: Array<{ src: string; title: string; source: string; description: string }> }>;
 
 describe('Blog GIF visual system', () => {
-  it('replaces every Blog GIF with a manual frame explainer', async () => {
+  it('requires registered manual frames for any Blog storyboard in use', async () => {
     const postFiles = await fg('**/*.{md,mdx}', { cwd: postsDir, absolute: true });
     const referenced = new Set<string>();
 
@@ -38,7 +38,10 @@ describe('Blog GIF visual system', () => {
       }
     }
 
-    expect([...referenced].sort()).toEqual([...CALM_BLOG_GIFS].sort());
+    // Articles may omit storyboards when a source figure explains the method better.
+    for (const filename of referenced) {
+      expect(CALM_BLOG_GIFS).toContain(filename);
+    }
   });
 
   it('renders one legible, bounded image for every complete storyboard state', async () => {

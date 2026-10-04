@@ -14,33 +14,15 @@ summary: >-
 ---
 # Benchmarking Gemma 4 on a 64 GB MacBook Pro
 
-I wanted one concrete answer: on a 64 GB M5 Max MacBook Pro, which Gemma 4 model should I actually run locally, and through which runtime?
+This benchmark compares Gemma 4 inference on a `64 GB` M5 Max using MLX, `llama.cpp`, and Ollama. On the long-prompt suite, MLX reached the first token sooner for every tested model. The `26B A4B` model combined `2.18 s` time to first token with `104.36 tok/s` decode; `31B` took `13.50 s` and decoded at `23.73 tok/s`.
 
 These measurements are a hardware-and-software snapshot from April 4, 2026, not a permanent runtime leaderboard. Google subsequently released Gemma 4 12B Unified on June 3, so that model is outside this benchmark. I also have not rerun the earlier Ollama failure on current releases.
-
-Within the measured snapshot:
-
-- Best model that fits: `Gemma 4 31B`
-- Best daily balance: `Gemma 4 26B A4B`
-- Fastest usable runtime I tested on this machine: `MLX`
-- Most direct low-level path: `llama.cpp`
-- Ollama `0.20.2` crashed before first token in this run
 
 ## Model memory requirements
 
 Google's Gemma 4 documentation lists approximate Q4 inference memory requirements of `3.2 GB` for `E2B`, `5 GB` for `E4B`, `15.6 GB` for `26B A4B`, and `17.4 GB` for `31B` ([Google docs](https://ai.google.dev/gemma/docs/core)). Those estimates describe weight/runtime memory, not the full memory and latency cost of a long active context.
 
-So on a 64 GB machine, all four models are realistic local targets, including the two workstation-class ones that matter most for serious use:
-
-- `Gemma 4 26B A4B`
-- `Gemma 4 31B`
-
-The `26B A4B` model is the more interesting everyday laptop option. It is MoE, so only `4B` parameters are active per generated token, even though the full model still has to sit in memory. The `31B` model is the strongest dense option that still makes sense on this machine. Google also lists `128K` context for the small models and `256K` for the larger ones, but those windows carry a substantial latency cost ([Google docs](https://ai.google.dev/gemma/docs/core), [Gemma 4 31B card](https://huggingface.co/google/gemma-4-31B-it)).
-
-My model recommendation is simple:
-
-- If you want the best Gemma 4 model that comfortably fits, start with `31B`.
-- If you want the model I would actually pay the most attention to for daily use, it is `26B A4B`.
+All four weight configurations fit this machine's memory budget. The `26B A4B` model activates `4B` parameters per token while retaining the full expert bank in memory; `31B` is dense. Google lists `128K` context for the small models and `256K` for the larger ones ([Google docs](https://ai.google.dev/gemma/docs/core), [Gemma 4 31B card](https://huggingface.co/google/gemma-4-31B-it)). The tests below use much shorter contexts and measure latency, not model quality.
 
 ## Benchmark design
 
@@ -69,31 +51,9 @@ The output task was intentionally boring and deterministic: read background text
 
 One important caveat: this is a fastest-practical-path comparison, not a perfect same-weights lab setup. I used the most direct current artifact for each runtime. That means the `E2B` comparison is not perfectly apples-to-apples: official `llama.cpp` GGUF for `E2B` is `Q8_0`, while the MLX and Ollama paths use 4-bit artifacts.
 
-The remaining controls kept the comparison about runtime behavior rather than hidden work:
-
-- I disabled Gemma's thinking mode anywhere I could, because otherwise you are partly benchmarking extra reasoning tokens instead of raw runtime behavior.
-- I kept the benchmark text-only, which meant running `llama.cpp` without a multimodal projector. That was the cleanest way to measure prompt processing and decode speed instead of image overhead.
-- I used a boring deterministic output task and pinned temperature to `0`. That made throughput differences much easier to trust.
-- I split the test into short and long prompts on purpose. A runtime can look fine at `512` tokens and then feel much worse once prompt processing climbs into the `8K` range.
-- I tried Ollama with native `gemma4:*` tags, not a hacked local import path, so the Ollama result reflects the current easy path.
+Thinking mode was disabled where supported, and `llama.cpp` ran without a multimodal projector. Ollama used native `gemma4:*` tags. These choices keep reasoning and image processing outside the timed text-generation path.
 
 ## Benchmark results
-
-I came into this expecting `llama.cpp` to win on raw speed.
-
-That is not what the machine gave me.
-
-For the smaller models, MLX was clearly faster on this M5 Max. For `26B A4B`, the story got more nuanced: `llama.cpp` and MLX were effectively tied on the short prompt, but MLX pulled ahead once the prompt got long. For `31B`, MLX was the cleaner win, especially on prompt processing and time to first token.
-
-The frame-by-frame comparison keeps the model/runtime rows fixed while the input changes from `512` to `8192` tokens. Decode speed moves modestly; time to first token moves enough to change how the model feels.
-
-<div class="architecture-comparison blog-frame-explainer" data-blog-frame-explainer="local-gemma-long-prompt-latency.gif"><div class="blog-frame-explainer__viewport"><a href="/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-01.webp"><img src="/assets/images/blog-explainer-frames/local-gemma-long-prompt-latency/frame-01.webp" alt="Manual explainer comparing short- and long-prompt time to first token and decode throughput for Gemma 4 on MLX and llama.cpp"></a></div></div>
-
-*Long prompts expose prefill as the practical bottleneck. The `31B` weights fit, but TTFT rises to `13.5 s` on MLX and `24.2 s` on llama.cpp in the measured long suite. `26B A4B` retains roughly `100 tok/s` decode while reaching the first token much sooner. Custom visualization of this post's benchmark tables; measurements are from one 64 GB M5 Max on April 4, 2026.*
-
-This is the distinction the memory table cannot show. Capacity answers whether a model can load. Decode throughput answers how quickly it continues once generation has started. Prefill latency answers whether an `8K` document or agent state feels interactive at all. For daily use, the last quantity makes `26B A4B` a different product from `31B` even though both fit comfortably.
-
-Local inference has three thresholds: load, start, and continue. Weight memory controls the first; prefill controls the second; decode throughput controls the third.
 
 ### Short-context results
 
@@ -127,29 +87,12 @@ MLX wins the small-model tests by a healthy margin. `26B A4B` is the exception t
 
 ## The measured Ollama failure
 
-I wanted a clean Ollama column here. I could not get one.
-
 In this April 4 run, using the then-current native Gemma 4 tags like `gemma4:e2b-it-q4_K_M`, Ollama `0.20.2` failed before first token with a Metal backend compilation error and returned HTTP `500` from `/api/generate`. The key error was the same `bfloat` vs `half` cooperative tensor mismatch in Metal Performance Primitives that other Apple M5 users have reported upstream ([issue #13460](https://github.com/ollama/ollama/issues/13460), [issue #14432](https://github.com/ollama/ollama/issues/14432), [issue #13867](https://github.com/ollama/ollama/issues/13867)).
 
-That matters because it changes the recommendation:
-
-- This is not a general "Gemma 4 cannot run on Apple Silicon" problem.
-- It is not even a general "M5 cannot run local models" problem.
-- `llama.cpp` and MLX both worked on the same machine.
-- The failure was specific to the Ollama Apple/Metal path in this April 4 environment.
+MLX and `llama.cpp` both ran on the same hardware. The observed failure was specific to Ollama's Apple/Metal path in this environment.
 
 The linked upstream issue #13460 is now closed, so this result should not be read as a current compatibility claim without a rerun. For reproducing this benchmark snapshot, Ollama was not a viable column. For choosing a runtime now, retest the current Ollama release rather than inheriting that failure.
 
-## Recommendation
+## What the measurements establish
 
-Within this measured snapshot, if I cared about the strongest local Gemma 4 model, I would start with `31B`.
-
-If I cared about the model I would actually want to use every day on this machine, I would pay the closest attention to `26B A4B`.
-
-If I cared about the fastest usable runtime on this machine, the answer is no longer "obviously llama.cpp." These measurements point toward:
-
-1. `MLX` first
-2. `llama.cpp` second
-3. `Ollama` only after a fresh compatibility run
-
-If you do not want a terminal workflow, this maps cleanly to a tiny local browser chat app. Both `MLX` and `llama.cpp` are reasonable backends if the goal is simply to serve Gemma locally and talk to it.
+For these artifacts and prompt lengths, MLX is the faster starting point, particularly during prefill. `26B A4B` offers much lower long-prompt latency than `31B` in both working runtimes. The deterministic output task does not establish which model gives better answers; that requires a separate quality evaluation. Ollama requires a fresh compatibility test because its recorded failure belongs to the April 4 environment.

@@ -17,13 +17,11 @@ summary: >-
 
 # Building Local Blog Audio That Sounds Human
 
-Local Blog audio means that every post has a static MP3 generated on my Mac and served from GitHub Pages. That sounds like a text-to-speech feature. It became a publishing compiler: one system has to decide what the article says aloud, hold a voice steady for thousands of words, reject incomplete output, and prove that the file a listener receives was built from the prose on the page.
+Each Blog post has a static MP3 generated on my Mac and served from GitHub Pages. The exporter extracts spoken prose, synthesizes bounded requests, checks their content, and records the source revision in a manifest. The design changed as voice drift, reference leakage, decoder seams, and inserted speech appeared in successive exports.
 
 I learned that distinction by shipping the wrong thing several times. One release changed voices between chunks. Another repeated part of its voice-reference sentence before nearly every chunk. A later version removed that preface but sounded too excited, flipped register around thirty-five seconds, skipped near forty-two seconds, and pronounced *cyclist* badly. The next system passed its manifest and waveform checks yet still inserted strange phrases, repeated clauses, and rushed through transitions. The files were technically valid. They did not sound human.
 
 The human narration profile now uses Voxtral 4B TTS with its fixed `casual_female` voice. Each heading shares a bounded request with the prose that follows it, each request is decoded as one waveform, and the compiler normalizes its edges before assembly. Pairing headings with their prose reduces the opportunity for the casual voice to improvise around tiny prompts. Local speech recognition audits every request for wrong words, inserted fillers, and unaligned audio that may contain a laugh or other non-verbal artifact. The VLM and autonomous-driving posts remain the long-form canaries because they expose voice, pacing, pronunciation, and continuity failures quickly.
-
-> The central lesson was uncomfortable: provenance checks can prove which inputs produced a file, and waveform checks can prove that its samples are valid. Neither can prove that the voice said the right words with believable timing. Audio needs compiler invariants, speech-content audits, and a listener's ear.
 
 ## What “local” means
 
@@ -54,13 +52,9 @@ The compiler now gives each source form a spoken contract. Headings, paragraphs,
 | Images and captions | Skip | Verbalize the mechanism before and interpret it after. |
 | References | Skip | Keep citations on the page without reading the bibliography aloud. |
 
-This rule changed how I write. If an argument only works while the reader can inspect a diagram, the prose is incomplete. If a table contains the conclusion but the paragraph after it merely says “as shown above,” the narration has nowhere to go. Audio became a second structural review of every post.
-
-The fix belongs in the article first. I do not ask the voice model to invent a bridge that the prose failed to write.
+Skipping a table or diagram removes its content from narration. The surrounding prose must therefore state the comparison or result that later paragraphs depend on.
 
 ## The failures changed the architecture
-
-This project did not converge through one parameter sweep. Each failure invalidated an assumption in the design.
 
 The first assumption was that a good voice description creates a stable speaker. I used Qwen3-TTS VoiceDesign and repeated the same request for every chunk: warm, measured, close-miked, and restrained. The broad style survived. The person did not. Each chunk redesigned the voice, so timbre, pitch, register, and energy moved across an article.
 
@@ -92,11 +86,9 @@ The last Qwen exports also ran at `1.10x` tempo. That choice shortened the files
 | *Cyclist* sounded wrong | Written spelling always supplies enough phonetic guidance | Apply a tested audio-only pronunciation lexicon. |
 | A file ended early | Successful model return implies complete narration | Enforce token, duration-per-word, ending, and ASR checks. |
 
-The table is the compact record of those iterations. The deeper pattern changed over time. Early designs split the generation into pieces that were too small, then tried to repair continuity afterward. The section-sized Qwen design moved too far in the other direction: it gave the model enough room to drift before any check could localize the failure. The useful unit is large enough to carry one thought and small enough to reject independently.
+Sentence-sized requests reset delivery too often; section-sized requests allowed repetition and drift to spread. Bounded paragraph groups preserve local context while keeping each failed generation independently replaceable.
 
 ## The model contract must match the requested control
-
-Qwen3-TTS Base solved a real problem: one reference clip could anchor a reusable speaker. It did not solve delivery control. VoiceDesign and CustomVoice expose instruction control; Base does not. The lesson is narrower than “use a better model.” Choose the checkpoint whose control surface matches the job, then verify that every declared setting reaches inference.
 
 I tested three preset voices from [Voxtral 4B TTS](https://huggingface.co/mistralai/Voxtral-4B-TTS-2603) on the same technical passage. `hi_female` read it accurately, but the `hi` preset carries the Indian-English identity that its name implies. That was the wrong default for this corpus even though the transcript passed. `neutral_female` repeated a phrase for roughly 20 seconds. `casual_female` was quicker and sounded the most conversational once the compiler supplied the missing structural pauses.
 
@@ -133,8 +125,6 @@ The exporter packs each heading with following prose up to 900 characters. Conse
 The first Voxtral exporter requested streamed output in eight-second pieces. MLX-Audio includes overlap-aware decoding, but direct concatenation still left audible seams inside some paragraphs. The static-site compiler does not need low-latency playback, so it now asks Voxtral to decode each bounded request as one waveform. The exporter then trims excess edge silence, keeps the speech at `1.0x`, and inserts 240 milliseconds between paragraph groups or 550 milliseconds between authored sections. The heading-to-prose pause remains inside one model decode. No filter is allowed to search the finished speech for silence and rewrite it.
 
 Short headings were unexpectedly brittle because two or three words give an expressive model little linguistic context. The first ASR audit caught longer inventions such as “man man saw,” but allowed one- and two-word insertions. Listening then found the more embarrassing failures: “um,” “yeah,” laughter, and elongated sounds around headings. Rerolling can replace a rare bad sample, but repeated failure at the same prompt shape is a compiler bug. Binding every heading to its following paragraph removed that prompt shape entirely.
-
-This boundary improves both sound and debugging. A failed paragraph group is cheap to identify and replace. A whole-file transcript can say that the average error is acceptable while hiding one repeated clause; a request transcript points to the exact generation that produced it.
 
 ## Pronunciation fixes belong to the audio compiler
 
@@ -180,14 +170,8 @@ The VLM and autonomous-driving posts were the migration canaries. The VLM post s
 
 Before the audio PR is committed, the worktree fetches `origin/main` again. A concurrent Blog edit can make a completed MP3 stale during a long corpus run. Only assets whose source and profile digests still match are eligible to ship.
 
-The interval between the two PRs is an incomplete Blog release. It is not a reason to combine prose and generated binaries into one ambiguous review. The publishing workflow now treats the follow-up audio PR, its deployment, and its live hash verification as part of the same task unless I explicitly choose a text-only release.
+## What the iterations established
 
-## Audio became an editorial constraint
+Voice selection, chunk boundaries, and content validation solved different failures. A fixed voice stabilized identity. Heading-plus-prose requests reduced improvisation around short prompts. Single-waveform decoding removed intermediate joins, and chunk-level ASR localized insertions that whole-file error rates concealed. Source hashes then verified that production served the accepted artifact.
 
-The technical work ended up changing the prose more than I expected. A listener cannot glance back at a table, infer that “this” names the left panel, or hold five unexplained acronyms while a sentence detours through a citation. The spoken path makes missing transitions obvious.
-
-That pressure is useful. The page can remain the richer artifact, with code, equations, figures, links, tables, and references, while the prose itself carries a complete argument. The narration compiler removes objects that require vision. It should not remove the reasoning those objects support.
-
-I started with a player. What I actually built is a second rendering contract for the Blog. The source must be final. The narrator must be versioned. The generation boundary must preserve enough context to sound human. Duration limits must reshape the script rather than cut the ending. And production must serve the exact waveform that passed both machine checks and a listener's ear.
-
-That is the part I would carry into any generated-media feature. A model call creates an artifact. A product needs a compiler, a release protocol, and evidence that the artifact people receive is the one you meant to make.
+The remaining limitation is perceptual quality. Speech recognition can miss a laugh, awkward pacing, or a change in delivery even when the words match. The exporter therefore combines deterministic source checks, waveform inspection, local transcription, and listening rather than treating any one check as sufficient.

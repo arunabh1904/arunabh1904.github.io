@@ -12,23 +12,17 @@ summary: A technical history of how vision-language models moved from task-speci
 ---
 # Tracing the VLM Progression
 
-Vision-language models have become incredibly popular over the last few years. Rightfully so! Grounding language in images or video is a huge generalization unlock. It has pushed one model family across classification, detection, alignment, generation, grounding, temporal reasoning, and finally action.
+Vision-language models first fused detected image regions with words for retrieval, question answering, and referring expressions. CLIP replaced pairwise fusion with independently encoded image and text vectors at web scale. Generative models then connected visual features to language decoders, and instruction tuning turned those decoders into visual assistants.
 
-VLMs really started to click with CLIP's image-text alignment, moved through LLaVA's visual instruction tuning, and continued into video understanding and robotics. That arc is useful but incomplete. CLIP did not begin vision-language learning; earlier models already fused detected regions with words. Its real shift was scale: natural language became an open vocabulary for classification. Visual chat required a second bridge, connecting pretrained vision encoders to language models before instruction tuning turned them into assistants.
-
-A better way to understand this progression is to ask what the representation needs to preserve. We start by connecting detected regions to words, then move through image-text alignment, conditional generation, and instruction tuning. Grounding and video add location, detail, and time. Decision and action add geometry, control timing, and consequences. Each step unlocks a new output, but it can also throw away information the next step needs. Fluent generation can hide weak visual evidence, longer context does not guarantee temporal understanding, and reasoning cannot recover pixels the encoder never preserved. Let's unpack how these capabilities came together.
+The later progression concerns what those interfaces omit. Grounding adds locations to generated words. Dynamic resolution preserves detail that fixed image resizing loses. Video adds timestamps and persistent identity. Robot policies add continuous actions and feedback from the states those actions create. These branches share components, but they impose different requirements on the visual representation.
 
 ## Image-text alignment
 
-CLIP is the natural place to start because it made image-text alignment work at internet scale. But it was not the first model to connect images and words.
-
 Earlier models started with regions from an object detector and made those regions interact with words. [ViLBERT](/paper%20shorts/2019/08/06/vilbert-pretraining-task-agnostic-visiolinguistic-representations.html) kept vision and language in separate streams, then connected them through co-attention. [LXMERT](/paper%20shorts/2019/08/20/lxmert-learning-cross-modality-encoder-representations.html) used separate object, language, and cross-modal encoders. [UNITER](/paper%20shorts/2019/09/25/uniter-universal-image-text-representation-learning.html) put both modalities in one transformer and trained several alignment objectives together. These models could already answer visual questions, retrieve images, resolve referring expressions, and reason over detected objects.
 
-The recipe was powerful but heavy. The detector decided which regions reached the model, so a missed proposal was gone before language ever saw the image. Every image-text pair then had to run through cross-modal attention. That worked for curated tasks, but it was a poor way to search across hundreds of millions of images and captions.
+The detector and pairwise fusion imposed two costs. The detector decided which regions reached the model, so a missed proposal was gone before language ever saw the image. Every image-text pair then had to run through cross-modal attention. That worked for curated tasks, but it was a poor way to search across hundreds of millions of images and captions.
 
 CLIP removed the expensive fusion step by encoding images and text independently, then comparing the resulting vectors. Retrieval became a nearest-neighbor lookup instead of a fresh transformer pass for every image-text pair. The same design reduced the pressure to preserve spatial correspondence because the loss only required the correct caption to match the correct image.
-
-CLIP's success came from its simplicity. Contrast images against the text found alongside them on the internet, then build a similarity index of sorts in a shared vector space. This completely sidesteps a fixed class ontology. Adding a concept no longer means collecting labels and retraining a classifier head. Do it across a large enough corpus and batch, and voilà: classification becomes retrieval against language.
 
 [CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html) trained this recipe on 400 million image-text pairs. In each batch, an image encoder $f_I$ and a text encoder $f_T$ map both sides into the shared space. The contrastive loss pulls matched pairs together and pushes mismatched pairs apart. The score for image $i$ and text $j$ is their normalized embedding dot product divided by temperature $\tau$:
 
@@ -130,8 +124,6 @@ Qwen2-VL's architecture makes the difference visible: a tall document, a short e
 
 The small equation gets few tokens because it is a small image, not because the model has already decided that it is easy. Dynamic resolution allocates bandwidth from the input geometry; deciding which regions deserve another look is a further problem. More context can preserve the document's words, but the decoder still has to use the right ones.
 
-This is why visual tokens deserve their own accounting. A comparison between two VLMs is difficult to interpret unless it matches the input pixels, resizing policy, visual-token count, compute, and latency. Otherwise, an apparent architectural improvement may simply come from letting one model look more closely.
-
 ### Vision moved earlier into training
 
 Once the connector worked, the next gains came from what the model saw and when it saw it. [Eagle 2](/paper%20shorts/2025/01/01/eagle-2-post-training-data-strategies-for-frontier-vision-language-models.html) varies data quality, task balance, filtering, and training order instead of treating every instruction example as interchangeable. The useful accounting is not only how many examples we have, but what behavior each source teaches and which capabilities regress as its weight increases.
@@ -142,11 +134,11 @@ That does not mean starting every weight from scratch. [InternVL3](/paper%20shor
 
 The small visual prefix is no longer the only interface. [Qwen3-VL](/paper%20shorts/2025/11/26/qwen3-vl-technical-report.html) uses long interleaved context, dynamic visual tokenization, explicit video timestamps, and features from multiple vision layers. Visual evidence can enter at several points in the sequence instead of arriving as one fixed-length image prefix.
 
-Three choices now need to be kept separate. Which components receive updates: the connector, the language model, or the full stack? When do text and multimodal data enter training? Which modalities can the model generate? A model can share a training stage without sharing every output objective. Better data, more visual tokens, a stronger language model, and longer context also often arrive together, so a release-level gain cannot isolate one architectural choice.
+Native multimodal pretraining changes the stage at which modalities learn together. It does not by itself specify which weights are updated, how visual tokens are compressed, or which modalities the decoder can generate. Those choices distinguish the following generative branch.
 
-## Detour: models that also generate images
+## A parallel branch: generating images
 
-Before continuing from generated answers to grounded answers, there is a separate branch worth keeping. The models above treat images as inputs and text as the primary output. Unified multimodal models ask a different question: can the same model also generate images?
+Unified multimodal models extend the output from text to images. Their main split is whether to express image generation through the same discrete prediction objective or share the transformer while retaining a continuous image objective.
 
 One approach converts every modality into discrete tokens. [Unified-IO 2](/paper%20shorts/2023/12/28/unified-io-2-autoregressive-multimodal-model.html) represents vision, language, audio, and action tasks in a shared token space. [Chameleon](/paper%20shorts/2024/05/16/chameleon-mixed-modal-early-fusion-foundation-models.html) trains on interleaved image and text tokens. [Emu3](/paper%20shorts/2024/09/28/emu3-next-token-prediction-multimodal-model.html) applies next-token prediction across tokenized text, images, and video.
 
@@ -158,8 +150,6 @@ The same conflict appears in visual encoding. [Janus](/paper%20shorts/2024/10/17
 
 ![Janus shares one transformer while separating the visual paths for understanding and image generation](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-paper-figure.png)
 *Janus keeps the autoregressive transformer shared but gives visual understanding and image generation separate encoders. source: [Janus](/paper%20shorts/2024/10/17/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation.html)*
-
-This branch changes what the model generates. The main VLM line still has an unresolved problem on the input side: can the words in an answer be tied back to the visual evidence that produced them?
 
 ## Grounding
 
@@ -175,8 +165,6 @@ Location-aware captioning provided one bridge from generation to grounding. An o
 The supervision determines what the representation must preserve. A caption can often be produced from global semantics. A region caption adds correspondence. A box adds extent, a mask adds shape, and a track adds identity through time. [Cambrian-1](/paper%20shorts/2024/06/01/cambrian-1-vision-centric-exploration-of-multimodal-llms.html) makes the same point from the architecture side by varying the vision encoder, connector, and vision-heavy data instead of assuming that a stronger language model will compensate for weak visual features.
 
 Grounding is still not geometry. A point such as $(0.63, 0.41)$ identifies a pixel location, but not its depth, camera pose, object orientation, free space, or uncertainty in physical units. [SpatialVLM](/paper%20shorts/2024/01/22/spatialvlm-spatial-reasoning-capabilities.html) adds spatial relations and measurements rather than relying on ordinary captions. Driving and robotics go further by using depth, multiple views, calibration, maps, object pose, and proprioception. Grounding tells us where the evidence appeared in an image. Geometry tells us what that evidence means in the world.
-
-A useful test is a counterfactual. If changing the light from red to green does not change the answer, we have reason to question whether the model used that evidence. If masking the light causes the model to abstain, while changing an irrelevant car leaves the answer alone, the prediction is easier to trust. These edits give us a diagnostic, not a guarantee: we still need to check that the edit preserved the rest of the scene and that the question actually depended on the light.
 
 ## Video-language models: sampling, packing, and time
 
@@ -195,7 +183,7 @@ Packing more frames helps only if the model preserves what changes between them.
 
 The first three tasks test whether the model represents time. The fourth begins to test a world model. If two different actions produce the same plausible continuation, the model may understand video statistics without representing which changes are controllable.
 
-## Detour: JEPA predicts in representation space
+## A parallel branch: predictive video representations
 
 The video-language models above still turn visual evidence into words. JEPA changes the pretraining target instead. A joint-embedding predictive architecture hides part of a video and predicts its representation from the visible context. The target can discard unpredictable texture while preserving the state and motion needed to understand what happens next.
 
@@ -206,11 +194,9 @@ The video-language models above still turn visual evidence into words. JEPA chan
 
 A useful exchange between [Rohan Anil](https://x.com/_arohan_/status/2007597891381031029) and [Yann LeCun](https://x.com/ylecun/status/2007907701989232684) gets at the deeper point. JEPA is not defined by opposition to language models or generative decoders. It changes where the predictive burden sits. Instead of asking a decoder to reproduce every unpredictable detail in input space, the encoder learns a latent target that keeps what is useful and suppresses what is not. Preventing that latent space from collapsing is therefore part of the learning problem, not an implementation detail.
 
-A predictive representation is a learned bottleneck. Its value comes from throwing away variation that does not help prediction. Its risk is throwing away the local geometry and motion that a later controller needs.
-
 The global-versus-local problem therefore returns even without language. A strong video embedding can still be poor at depth or local motion. [V-JEPA 2.1](/paper%20shorts/2026/03/15/v-jepa-2-1-dense-video-features.html) extends V-JEPA 2’s masked-patch prediction with supervision on visible context tokens and intermediate layers. Those tokens now have a reason to retain local structure instead of only helping predict missing regions. A local prediction target does not guarantee locally useful features everywhere else.
 
-JEPA gives us a predictive latent state rather than a language answer. It will reappear in the pretraining story for world models, but it is not the next step in the VLM lineage. To return to that line, the next output contract changes from describing a scene to deciding what should happen in it.
+JEPA supplies predictive features for later tasks rather than extending the language decoder itself. Its connection to robotics is the action-conditioned predictor, which must retain enough local geometry to evaluate candidate actions.
 
 ## From answers to decisions and actions
 
@@ -218,7 +204,7 @@ JEPA gives us a predictive latent state rather than a language answer. It will r
 
 Autonomous driving puts nearly every VLM weakness in the same frame: small distant objects, metric geometry, traffic rules, rare hazards, temporal prediction, uncertainty, and a hard latency limit.
 
-There is no agreement on where language should sit. [GPT-Driver](/paper%20shorts/2023/10/01/gpt-driver-learning-to-drive-with-gpt.html) and [Driving with LLMs](/paper%20shorts/2023/10/01/driving-with-llms-fusing-object-level-vector-modality.html) turn driving state into a form a language model can reason over. [DriveVLM](/paper%20shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models.html) combines scene reasoning with a conventional planner. [AsyncDriver](/paper%20shorts/2024/06/01/asyncdriver-asynchronous-llm-enhanced-planner-for-autonomous-driving.html) lets the slower language path run separately from faster planning. [VLM-AD](/paper%20shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-through-vision-language-supervision.html) uses a VLM as supervision without putting the full model in the control loop.
+There is no agreement on where language should sit. [GPT-Driver](/paper%20shorts/2023/10/01/gpt-driver-learning-to-drive-with-gpt.html) and [Driving with LLMs](/paper%20shorts/2023/10/01/driving-with-llms-fusing-object-level-vector-modality.html) turn driving state into a form a language model can reason over. [DriveVLM](/paper%20shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models.html) combines scene reasoning with a conventional planner. [AsyncDriver](/paper%20shorts/2024/06/01/asyncdriver-asynchronous-llm-enhanced-planner-for-autonomous-driving.html) lets the slower language path run separately from faster planning. [VLM-AD](/paper%20shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision.html) uses a VLM as supervision without putting the full model in the control loop.
 
 Calling all of these “VLMs for driving” hides the actual design choice:
 
@@ -230,33 +216,17 @@ Calling all of these “VLMs for driving” hides the actual design choice:
 | Offline teacher or data labeler | rich supervision without online cost | teacher errors become training targets |
 | Unified end-to-end policy | fewer hand-built interfaces | difficult attribution, calibration, and safety validation |
 
-My current read is that the near-term system will remain hybrid. Let the VLM handle semantics, intent, rare-scenario interpretation, annotation, and auxiliary supervision. Keep metric perception, motion forecasting, constraints, and high-rate control explicit.
-
-End-to-end systems may still win. We just do not get that conclusion from a fluent rationale or a lower open-loop trajectory error. The evidence has to survive closed-loop driving.
-
 ### Testing whether decisions use visual evidence
 
 Fluent language can hide weak dependence on visual evidence. [DriveBench](/paper%20shorts/2025/01/01/are-vlms-ready-for-autonomous-driving-drivebench.html), [IDKB](/paper%20shorts/2024/09/01/can-lvlms-obtain-a-drivers-license-idkb.html), [TOD3Cap](/paper%20shorts/2024/03/01/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes.html), and [AutoTrust](/paper%20shorts/2024/12/01/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving.html) probe different parts of this problem, including visual corruption, 3D detail, and trustworthiness in driving scenes.
 
-The same issue appears outside driving. OCR benchmarks can sometimes be solved through document templates. Visual question answering can reward answer priors. Video benchmarks can leak the event through a single frame. Robotics benchmarks can reward memorized scene layouts.
-
-A useful benchmark should test whether the answer changes with the relevant evidence:
-
-- Does performance fall when the relevant region or frame is corrupted?
-- Does the answer follow a changed sign, object state, position, timestamp, or instruction?
-- Can the model distinguish “not visible” from “not present”?
-- Do irrelevant edits leave the answer unchanged?
-- Does confidence track evidence quality and distribution shift?
-- Does the rationale identify evidence that actually changes the decision?
-- Does an open-loop gain survive closed-loop execution?
-
-Final-answer accuracy can reward memorized priors. Corruptions, counterfactual edits, evidence localization, and calibrated abstention make visual dependence part of the evaluation.
+These evaluations separate language fluency from visual dependence. Corrupting a relevant region tests whether the answer used it; changing an irrelevant region tests stability. Event localization and 3D captioning add requirements that a single representative frame or an answer prior may not satisfy.
 
 Post-training can then reward the behavior exposed by those tests. [Visual-RFT](/paper%20shorts/2025/03/03/visual-rft-visual-reinforcement-fine-tuning.html) uses task-specific signals such as intersection-over-union for detection. [GRIT](/paper%20shorts/2025/05/21/grit-teaching-mllms-to-think-with-images.html) interleaves language reasoning with explicit region references, making parts of the trace visually inspectable. These methods can teach the decoder to use visual features more reliably. They cannot recover a sign, object, or motion that the visual encoder already discarded.
 
 A controlled diagnostic helps separate those failures. Supplying the relevant crop or a structured scene description tests whether the model can reason once the evidence is explicit. Masking or editing the relevant pixels tests whether the original answer depended on them. The first intervention gives the model a different input, so success does not show that its original perception worked. The second tests visual dependence.
 
-For deployment, an aggregate score is less informative than the conditions under which the model fails. Evidence sensitivity, calibrated uncertainty, and recovery behavior can matter even when they do not improve the overall average. [Part III](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html) takes the post-training story further, covering rewards, preferences, interventions, critics, and online rollouts after a robot begins changing its own data distribution.
+The next step is to test whether better visual grounding changes executed behavior. [Part III](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html) covers the rewards, interventions, and rollouts used once a policy begins creating its own training states.
 
 ### Robot actions close the loop
 
@@ -294,40 +264,24 @@ The final row is a placement choice: a separate expert can itself use regression
 
 A caption has no control frequency. An action does. A policy must fit sensing, inference, communication, and actuation inside a deadline. It must also decide how long an action chunk remains valid before new evidence should interrupt it. Longer chunks reduce inference calls and improve temporal coherence. Shorter chunks respond faster to disturbances.
 
-Only part of the web-trained model transfers cleanly:
+## The changes in representation
 
-- semantic concepts, object knowledge, and instruction following can transfer;
-- embodiment, contact, calibration, and control timing must be learned or represented explicitly;
-- action data are expensive because they must cover not only desired behavior but recovery states created by the policy.
+The main branches differ in their output and in the information their training objectives force the model to retain.
 
-Language is a good interface for the task. It does not make units, embodiment, contact, or control latency disappear.
-
-## Recap: what the representation must preserve
-
-The history becomes easier to read when each paper is reduced to four questions. What does the model produce? Where can visual evidence be lost? Which supervision forces the new capability? Does the evaluation actually require that evidence? The table below applies those questions to the main literature threads.
-
-| Literature thread | Start with | Main output | Reading exercise |
+| Literature thread | Start with | Main output | Change from the earlier interface |
 | --- | --- | --- | --- |
-| Cross-modal pretraining | [ViLBERT](/paper%20shorts/2019/08/06/vilbert-pretraining-task-agnostic-visiolinguistic-representations.html), [LXMERT](/paper%20shorts/2019/08/20/lxmert-learning-cross-modality-encoder-representations.html), [UNITER](/paper%20shorts/2019/09/25/uniter-universal-image-text-representation-learning.html) | fused word-region representation | draw both streams, mark where they interact, and list the assumptions introduced by detector regions |
-| Image-text contrastive learning | [CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html), [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html), [SigLIP 2](/paper%20shorts/2025/02/20/siglip-2-multilingual-vision-language-encoders.html) | similarity or retrieval score | derive the softmax and sigmoid losses, then state which spatial information each objective can ignore |
-| Generative vision-language models | [BLIP](/paper%20shorts/2022/01/28/blip-bootstrapping-language-image-pretraining.html), [Flamingo](/paper%20shorts/2022/04/29/flamingo-visual-language-model-for-few-shot-learning.html), [PaLI](/paper%20shorts/2022/09/14/pali-jointly-scaled-multilingual-language-image-model.html), [BLIP-2](/paper%20shorts/2023/01/30/blip-2-bootstrapping-language-image-pretraining.html), [PaliGemma](/paper%20shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html) | generated text | compare the trainable components, visual bottleneck, and route into the language decoder |
-| Instruction-tuned multimodal LLMs | [LLaVA](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html), [InstructBLIP](/paper%20shorts/2023/05/11/instructblip-general-purpose-vision-language-instruction-tuning.html), [LLaVA-1.5](/paper%20shorts/2023/10/05/improved-baselines-with-visual-instruction-tuning-llava-1-5.html), [MM1](/paper%20shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html), [Eagle 2](/paper%20shorts/2025/01/01/eagle-2-post-training-data-strategies-for-frontier-vision-language-models.html) | assistant response | separate the effects of the visual encoder, connector, pretraining mixture, instruction mixture, and preference data |
-| Unified multimodal generation, a parallel branch | [Unified-IO 2](/paper%20shorts/2023/12/28/unified-io-2-autoregressive-multimodal-model.html), [Chameleon](/paper%20shorts/2024/05/16/chameleon-mixed-modal-early-fusion-foundation-models.html), [Transfusion](/paper%20shorts/2024/08/20/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model.html), [Emu3](/paper%20shorts/2024/09/28/emu3-next-token-prediction-multimodal-model.html), [Janus](/paper%20shorts/2024/10/17/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation.html) | text, images, or mixed sequences | mark what is actually shared: context, transformer, tokenizer, objective, encoder, or output head |
-| Open-vocabulary detection and grounding | [Detic](/paper%20shorts/2022/01/07/detic-detecting-twenty-thousand-classes-using-image-level-supervision.html), [OWL-ViT](/paper%20shorts/2022/05/12/owl-vit-simple-open-vocabulary-object-detection-with-vision-transformers.html), [MDETR](/paper%20shorts/2021/04/26/mdetr-modulated-detection-for-end-to-end-multimodal-understanding.html), [Kosmos-2](/paper%20shorts/2023/06/26/kosmos-2-grounding-multimodal-language-models.html), [Molmo](/paper%20shorts/2024/09/01/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models.html), [SpatialVLM](/paper%20shorts/2024/01/22/spatialvlm-spatial-reasoning-capabilities.html) | boxes, points, grounded text, or metric relations | estimate the visual-token budget and mark the strongest supervision: caption, box, point, mask, relation, or metric target |
-| Video-language models | [LLaVA-OneVision](/paper%20shorts/2024/08/06/llava-onevision-easy-visual-task-transfer.html), [VideoLLaMA 3](/paper%20shorts/2025/01/01/videollama-3-frontier-multimodal-foundation-models.html), [Molmo 2](/paper%20shorts/2026/01/15/molmo-2-video-understanding-and-grounding.html) | text, timestamp, or track | design one temporal edit that changes the answer and one irrelevant edit that should not |
-| Predictive video representations, a parallel branch | [V-JEPA 2](/paper%20shorts/2025/06/11/v-jepa-2-self-supervised-video-models.html), [V-JEPA 2.1](/paper%20shorts/2026/03/15/v-jepa-2-1-dense-video-features.html) | latent state or predicted representation | identify what the target is allowed to discard, then test whether local motion and geometry survive |
-| Vision-language decision and action models | [DriveVLM](/paper%20shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models.html), [VLM-AD](/paper%20shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision.html), [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html), [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html), [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html), [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html) | rationale, plan, trajectory, or action | reconstruct the action distribution, horizon, control rate, inference path, and recovery mechanism |
-
-The frame-by-frame explainer below holds the mug-and-tray scene fixed and changes only the required output:
-
-<div class="architecture-comparison blog-frame-explainer" data-blog-frame-explainer="blog-vlm-evidence-contract.gif"><div class="blog-frame-explainer__viewport"><a href="/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-01.webp"><img src="/assets/images/blog-explainer-frames/blog-vlm-evidence-contract/frame-01.webp" alt="Manual explainer comparing the outputs of CLIP, LLaVA, Molmo, and Pi0 on the same mug-and-tray scene"></a></div></div>
-
-*CLIP compares an image with text. LLaVA generates text from visual tokens. Molmo uses pointing data to bind a phrase to a location. Pi0 produces continuous robot actions through a flow-based action expert. The panels compare outputs, not a literal model lineage. Explanatory synthesis based on [CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html), [LLaVA](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html), [Molmo](/paper%20shorts/2024/09/01/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models.html), and [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html).*
+| Cross-modal pretraining | [ViLBERT](/paper%20shorts/2019/08/06/vilbert-pretraining-task-agnostic-visiolinguistic-representations.html), [LXMERT](/paper%20shorts/2019/08/20/lxmert-learning-cross-modality-encoder-representations.html), [UNITER](/paper%20shorts/2019/09/25/uniter-universal-image-text-representation-learning.html) | fused word-region representation | word-region interaction, limited by the detector proposals |
+| Image-text contrastive learning | [CLIP](/paper%20shorts/2021/02/28/learning-transferable-visual-models-from-natural-language-supervision.html), [SigLIP](/paper%20shorts/2023/10/01/sigmoid-loss-for-language-image-pre-training-siglip.html), [SigLIP 2](/paper%20shorts/2025/02/20/siglip-2-multilingual-vision-language-encoders.html) | similarity or retrieval score | independent encoders make retrieval scalable; dense correspondence is weakly constrained |
+| Generative vision-language models | [BLIP](/paper%20shorts/2022/01/28/blip-bootstrapping-language-image-pretraining.html), [Flamingo](/paper%20shorts/2022/04/29/flamingo-visual-language-model-for-few-shot-learning.html), [PaLI](/paper%20shorts/2022/09/14/pali-jointly-scaled-multilingual-language-image-model.html), [BLIP-2](/paper%20shorts/2023/01/30/blip-2-bootstrapping-language-image-pretraining.html), [PaliGemma](/paper%20shorts/2024/07/10/paligemma-a-versatile-3b-vlm-for-transfer.html) | generated text | visual prefixes or cross-attention condition a pretrained generator |
+| Instruction-tuned multimodal LLMs | [LLaVA](/paper%20shorts/2023/04/01/visual-instruction-tuning-llava.html), [InstructBLIP](/paper%20shorts/2023/05/11/instructblip-general-purpose-vision-language-instruction-tuning.html), [LLaVA-1.5](/paper%20shorts/2023/10/05/improved-baselines-with-visual-instruction-tuning-llava-1-5.html), [MM1](/paper%20shorts/2024/03/14/mm1-methods-analysis-and-insights-from-multimodal-llm-pre-training.html), [Eagle 2](/paper%20shorts/2025/01/01/eagle-2-post-training-data-strategies-for-frontier-vision-language-models.html) | assistant response | instruction data and decoder adaptation turn generation into assistant behavior |
+| Unified multimodal generation, a parallel branch | [Unified-IO 2](/paper%20shorts/2023/12/28/unified-io-2-autoregressive-multimodal-model.html), [Chameleon](/paper%20shorts/2024/05/16/chameleon-mixed-modal-early-fusion-foundation-models.html), [Transfusion](/paper%20shorts/2024/08/20/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model.html), [Emu3](/paper%20shorts/2024/09/28/emu3-next-token-prediction-multimodal-model.html), [Janus](/paper%20shorts/2024/10/17/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation.html) | text, images, or mixed sequences | shared context supports multiple output modalities, with shared or specialized losses |
+| Open-vocabulary detection and grounding | [Detic](/paper%20shorts/2022/01/07/detic-detecting-twenty-thousand-classes-using-image-level-supervision.html), [OWL-ViT](/paper%20shorts/2022/05/12/owl-vit-simple-open-vocabulary-object-detection-with-vision-transformers.html), [MDETR](/paper%20shorts/2021/04/26/mdetr-modulated-detection-for-end-to-end-multimodal-understanding.html), [Kosmos-2](/paper%20shorts/2023/06/26/kosmos-2-grounding-multimodal-language-models.html), [Molmo](/paper%20shorts/2024/09/01/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models.html), [SpatialVLM](/paper%20shorts/2024/01/22/spatialvlm-spatial-reasoning-capabilities.html) | boxes, points, grounded text, or metric relations | location supervision binds language to an explicit region or physical relation |
+| Video-language models | [LLaVA-OneVision](/paper%20shorts/2024/08/06/llava-onevision-easy-visual-task-transfer.html), [VideoLLaMA 3](/paper%20shorts/2025/01/01/videollama-3-frontier-multimodal-foundation-models.html), [Molmo 2](/paper%20shorts/2026/01/15/molmo-2-video-understanding-and-grounding.html) | text, timestamp, or track | sampling, timestamps, and tracks expose temporal evidence to the decoder |
+| Predictive video representations, a parallel branch | [V-JEPA 2](/paper%20shorts/2025/06/11/v-jepa-2-self-supervised-video-models.html), [V-JEPA 2.1](/paper%20shorts/2026/03/15/v-jepa-2-1-dense-video-features.html) | latent state or predicted representation | latent prediction learns temporal features without a language output target |
+| Vision-language decision and action models | [DriveVLM](/paper%20shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models.html), [VLM-AD](/paper%20shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision.html), [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html), [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html), [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html), [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html) | rationale, plan, trajectory, or action | outputs change the next observation and must meet a control deadline |
 
 Across this history, every new capability asks vision to preserve something it could previously ignore. Region-based models connected words to detected objects. CLIP made images searchable through language at web scale. Generative bridges gave those features to a language model, and instruction tuning turned the result into an assistant. Grounding tied words back to pixels. Video added time. Driving and robotics made the remaining shortcuts expensive because a plausible sentence could now produce a bad physical decision.
 
-My strongest bet is a shared semantic model with separate high-bandwidth paths for geometry, time, image generation, and control. I would replace that hybrid with one token stream only when it wins under matched data, pixels, tokens, parameters, compute, and latency. The win also has to hold on fine grounding, metric spatial reasoning, temporal counterfactuals, calibration, and closed-loop recovery.
+The recurring split is between shared semantic context and specialized representations for detail, time, and control. BLIP-2 and LLaVA place that split at the visual connector. Janus separates visual encoders by task. Pi0 separates the action expert from the language vocabulary. The reviewed results support these specific designs; they do not isolate a universal benefit from either sharing or specialization.
 
-Until then, “one model for everything” is a research program, not an architectural result.
-
-For further reading, I split the robotics side of this story into two posts. [Pre-Training for Robotics](/blog/2026/07/15/omni-model-pretraining-decisions.html) looks at how multimodal and robot data shape a base policy. [Post-Training for Robotics](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html) looks at how deployment feedback and failures refine that policy. Together, they show how the VLM capabilities in this post are carried into robot behavior.
+[Pre-Training for Robotics](/blog/2026/07/15/omni-model-pretraining-decisions.html) follows the action-representation and data branches. [Post-Training for Robotics](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html) follows the shift from demonstrations to feedback collected under the policy.

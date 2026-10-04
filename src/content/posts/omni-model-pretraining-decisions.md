@@ -15,15 +15,9 @@ summary: How robot pretraining moved from web semantics and action tokens to cro
 
 _Updated August 22, 2026._
 
-Robot data is expensive. Pretraining asks how much a policy can learn before we collect enough experience on this robot, this task, and this deployment. Internet data can teach the word *drawer*, what drawers look like, and which instruction refers to which handle. It cannot teach how a sticky drawer feels, how far this arm can reach, or what to do after the gripper slips.
+Robot pretraining began with two complementary interfaces. RT-1 represented actions as discrete targets; PaLM-E let a language model consume visual and continuous state. RT-2 joined web-trained visual semantics to tokenized robot control. Subsequent work changed the training corpus, action horizon, and decoder because semantic transfer alone did not solve control bandwidth or cross-robot adaptation.
 
-That is why robot pretraining is more than adding action tokens to a VLM. Web data supplies semantics. Human video supplies time and interaction. Robot trajectories supply contact, embodiment, intervention, and recovery. We need all three precisely because they teach different things.
-
-A simple history would list RT-1, PaLM-E, RT-2, OpenVLA, and Pi0 in order. The more useful history follows what changed. One branch turned robot actions into tokens. Another let a language model read continuous sensor state. RT-2 joined the two. Cross-embodiment datasets then mixed incompatible robots. Action chunks changed the target from one command to a short trajectory, while world models predicted how an action would change the state.
-
-Each step brings something useful and leaves something behind. Action tokens reuse a pretrained decoder but waste sequence length on smooth motion. Pooled vision can recognize the peg while losing the millimeters needed to insert it. Video can predict plausible movement without learning which robot command caused it.
-
-This post traces which visual, temporal, and motor priors transfer into a robot policy and how they enter the model. It also asks what evidence would show that the transfer affects closed-loop control.
+The resulting branches remain distinct. Open X-Embodiment expands the robots and tasks represented in training. ACT and Diffusion Policy predict action chunks. FAST compresses those chunks for autoregressive decoding, while Pi0 uses a continuous action expert. Video pretraining supplies motion structure before action-conditioned data connects that structure to robot commands.
 
 This is Part II of the series. [Part I: Tracing the VLM Progression](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html) follows the visual interfaces that made language grounding possible. [Part III: Post-Training for Robotics](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html) begins after deployment, when the policy creates its own data.
 
@@ -49,7 +43,7 @@ A policy trained on one robot can absorb its camera pose, controller, gripper, a
 ![Open X-Embodiment pools tasks, scenes, and robot morphologies into a shared training corpus](/assets/images/open-x-embodiment-robotic-learning-datasets-and-rt-x-models-paper-figure.png)
 *Cross-embodiment training made the dataset itself an architectural decision. The shared model still needs a schema that says what each robot observation and action means. source: [Open X-Embodiment](/paper%20shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html)*
 
-Normalization is not enough. Mapping every action dimension into $[-1,1]$ does not make a joint delta, a camera-frame end-effector delta, and a torque command physically equivalent. A usable cross-robot corpus must record coordinate frame, units, control mode, frequency, horizon, joint topology, gripper semantics, sensor availability, and calibration.
+Scaling each action dimension into $[-1,1]$ preserves neither units nor controller semantics. Cross-robot training therefore depends on the coordinate frame, control mode, frequency, horizon, and embodiment recorded with each trajectory.
 
 Cross-embodiment training also changes what *more data* means. Repeating the same task on the same table lowers variance. New scenes, operators, tasks, failures, and robots expand the states and decisions represented in the corpus. Sliding a two-second window forward by one frame may create hundreds of examples without creating hundreds of independent experiences.
 
@@ -84,7 +78,7 @@ Action chunks made the target longer. A naive tokenizer assigns one bin to every
 
 Low-frequency coefficients describe the broad motion, while higher frequencies capture abrupt corrections. The autoregressive policy therefore predicts the overall trajectory shape before its finer details. This ordering introduces a smoothness prior. Common low-frequency motion is represented compactly, while a rare high-frequency correction may require more tokens or be attenuated by compression.
 
-The tokenizer therefore affects the policy beyond output formatting. It determines which temporal details are compact and which physical errors are nearby in token space. It also determines the autoregressive sequence length and the likelihood optimized during post-training.
+FAST retains autoregressive learning, so compression reduces the number of decoder steps without eliminating sequential inference. This is the constraint that continuous action heads address next.
 
 ## Continuous action experts separated semantics from control
 
@@ -100,7 +94,7 @@ Separating semantic processing from motor generation also allows the action path
 ![Pi0.5 combines tokenized high-level outputs with a continuous low-level action expert](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-paper-figure.png)
 *Pi0.5 uses FAST tokens during mixture pretraining and adds a continuous action expert during post-training. source: [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html)*
 
-I would retain this separation when the action space has physical units, control bandwidth, geometry, or latency requirements that differ from language. The semantic trunk can remain shared, while the motor path is specialized for execution.
+These papers separate two decisions that RT-2 combined: how robot and web examples share a training objective, and how the deployed model produces motor commands. Pi0.5 changes representation between stages; OpenVLA-OFT changes it during adaptation.
 
 ## Human video supplied time without robot actions
 
@@ -147,41 +141,13 @@ Pixel reconstruction alone is insufficient evidence for this claim. The predicte
 
 Equal example percentages do not create equal training pressure across text, images, video, and robot episodes. Text becomes a relatively short token sequence, while video expands into frames and patches. One robot episode also produces many overlapping observation windows and action chunks. Each source therefore consumes different compute and contributes a different number of prediction targets.
 
-<div class="architecture-comparison blog-frame-explainer" data-blog-frame-explainer="blog-multimodal-gradient-budget.gif"><div class="blog-frame-explainer__viewport"><a href="/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-01.webp"><img src="/assets/images/blog-explainer-frames/blog-multimodal-gradient-budget/frame-01.webp" alt="Manual explainer showing equal text, image, video, and action example shares expanding into unequal training units, compute, and shared-parameter updates"></a></div></div>
+Example counts therefore need target counts, compute, and temporal overlap to be interpretable. A batch of adjacent windows from one episode contains fewer independent decisions than the same number of diverse episodes.
 
-*Equal example shares do not create equal target counts, FLOPs, or parameter updates. The values are illustrative. The accounting follows the mixed-modal and action interfaces described across [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html), [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html), and [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html).*
-
-Keep five ledgers:
-
-1. sampled examples or episodes;
-2. predicted tokens, patches, latent targets, or action dimensions;
-3. FLOPs and wall-clock time;
-4. update norm by objective and module;
-5. effective independent decisions after temporal overlap.
-
-Increasing the web mixture can improve semantics while weakening metric state. Increasing one robot source can overfit its controller and reduce broader visual-language performance. I would track capability retention alongside gradient norm and gradient cosine similarity in the shared modules. Sampling percentage alone does not describe how strongly each objective updates the shared model.
+Mixture weights also determine which objectives update the shared modules. Gradient norms and alignment can diagnose interference, but the relevant result is retained capability and adaptation on held-out robots. Sampling percentage alone does not measure either.
 
 Pretraining scale needs the same accounting. Episode count, control steps, unique scenes, task diversity, embodiments, failures, robot hours, model size, and compute describe different axes. The relevant outcome is transfer, measured through zero-shot behavior and the rate of adaptation on a held-out robot.
 
-## How to read a robot pretraining paper
-
-I start by identifying what the paper claims to transfer. It may be object knowledge, spatial detail, temporal structure, a motor skill, or a model of action consequences. The next step is to trace where that knowledge enters the deployed policy.
-
-These questions usually expose what changed:
-
-| Question | What it reveals |
-| --- | --- |
-| What is one training target? | A word, patch, future latent, scalar action, chunk, or trajectory |
-| Which parameters already have a prior? | Whether the motor path is truly pretrained or starts from random weights |
-| What is shared across embodiments? | Semantics, visible motion, end-effector geometry, or raw controller units |
-| Where is information compressed? | Pooled vision, fixed visual queries, action bins, frequency coefficients, or latent actions |
-| Does the objective see interventions? | Whether the model learns correlation, behavior, or action-conditioned consequence |
-| What is held out? | Objects, scenes, tasks, embodiments, perturbations, or longer horizons |
-| What wins at equal budget? | Whether gains survive matched data, compute, active parameters, and latency |
-
-A frozen encoder tests whether the pretrained features already contain what the robot needs. Full fine-tuning tests whether those weights are a useful starting point. World-model reconstruction tests prediction. Closed-loop planning tests whether that prediction helps the robot. These claims should not be collapsed into one transfer score.
-
-## What pretraining must preserve
+## The changes in training target
 
 | Leap | What the model learned to predict | What it bought | What remained unresolved |
 | --- | --- | --- | --- |
@@ -194,8 +160,6 @@ A frozen encoder tests whether the pretrained features already contain what the 
 | Video and latent-action pretraining | temporal change before robot labels | cheap interaction and motion priors | latent change is not yet executable action |
 | Action-conditioned world models | consequences under proposed actions | planning and counterfactual ranking | causal fidelity over long rollouts |
 
-Every new target asks the model to preserve more: first semantics, then geometry, motion, actions, and consequences. The action representation decides how much of that knowledge reaches the controller. I would start with a strong vision-language model for semantics, dense visual features that persist through time, and a continuous action expert for control. Discrete action tokens are useful when they make web and robot data easier to train together. I would not assume those same tokens should run the robot. The motor path should be pretrained too, unless an ablation shows that random initialization is good enough.
+The main progression is a separation of semantic transfer from motor generation. RT-2 shares the output vocabulary; FAST makes that vocabulary more efficient for trajectories; Pi0 and OpenVLA-OFT move control into continuous outputs. Pi0.5 uses both at different training stages. These are alternative allocations of learning and inference work, not successive proofs that one action representation dominates.
 
-If the model claims to plan, train it to predict action-conditioned futures and check that a changed action changes the future. If it claims cross-robot transfer, define the shared physical quantity before pooling controls. If it claims scale, report independent decisions and few-shot transfer, not only token count and training loss.
-
-The VLM can know what a drawer is. The temporal model can track that it moved. The world model must preserve what the robot caused. The policy must choose and execute the action before the deadline. Pretraining succeeds when those components transfer useful structure without removing the geometric, temporal, and control distinctions required during execution.
+Video-based world models add a separate requirement: the predicted future must depend on the proposed action. V-JEPA 2 makes that connection in an action-conditioned stage after video pretraining. The remaining test is whether the resulting predictor improves closed-loop planning and reduces the robot data needed for transfer.
