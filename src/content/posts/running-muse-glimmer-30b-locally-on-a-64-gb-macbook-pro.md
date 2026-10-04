@@ -34,7 +34,7 @@ The official [GGUF release](https://huggingface.co/meta-models/Muse-Glimmer-30B-
 
 The vision projector adds about `1.4 GB`; Meta's DFlash speculative draft model adds about `1.6 GB`. Even the `20 GB` quant plus both auxiliaries leaves a credible memory budget on this machine. Context still consumes KV-cache capacity, so “supports 131K” should not be read as “131K will feel interactive.”
 
-I tested the smaller official quant because it is the obvious starting point. It is an official Meta artifact rather than an untracked community conversion, and its exact size is `16,756,683,904` bytes.
+The measured artifact was `Muse-Glimmer-30B-KQuant-17GB-Q4_K_M.gguf`, at `16,756,683,904` bytes.
 
 ## Benchmark setup
 
@@ -71,13 +71,11 @@ I report two first-token measurements. *First generated token* includes hidden r
 
 The largest correction was explicit placement. `--gpu-layers all` lifted the short decode rate from `9.92` to `27.90 tok/s`, a `2.8×` change before speculation entered the comparison. It also cut the long prompt's first generated token from `32.26 s` to `17.10 s`. A model that fits in unified memory can still run slowly if the engine chooses a conservative CPU/GPU split.
 
-Fit is only the first threshold. Runtime placement decides whether resident weights become an interactive product or a slow systems demo.
-
 DFlash then changed decode rather than fit. With `--spec-type draft-dflash` active, the server accepted `87.9%` of proposed short-suite draft tokens and `79.8%` on the long suite. Short decode rose from `27.90` to `48.31 tok/s`; long decode rose from `26.62` to `35.47 tok/s`. The speedup is smaller at `8K` because prompt processing is unchanged by speculative generation and dominates more of the request.
 
 Reasoning creates a second latency boundary. In the short DFlash suite, the server began hidden generation at `1.01 s`, while the first visible integer arrived at `2.67 s`. A client that reports only transport-level time to first token still makes the chat experience look faster than it feels, although the gap is no longer severe.
 
-Meta reports `26.6 tok/s` without DFlash and `50.2 tok/s` with DFlash on an M5 Max, using ExecuTorch, batch size one, and greedy decoding. My short `llama.cpp` results of `27.90` and `48.31 tok/s` are remarkably close, but they remain separate measurements from a different runtime and harness. The agreement is useful evidence that the optimized local path is working; it is not a cross-runtime benchmark victory.
+Meta reports `26.6 tok/s` without DFlash and `50.2 tok/s` with DFlash on an M5 Max using ExecuTorch, batch size one, and greedy decoding. My short-suite `llama.cpp` results were `27.90` and `48.31 tok/s`. The runtimes and harnesses differ, so this agreement is not a controlled comparison.
 
 ## Serve Glimmer locally
 
@@ -107,10 +105,8 @@ For vision, download the matching projector from the official GGUF repository an
 
 The reusable harness for this run is in [`scripts/bench_llama_server_local.py`](https://github.com/arunabh1904/arunabh1904.github.io/blob/main/scripts/bench_llama_server_local.py). It refuses to run on an occupied port so that a stale local server cannot silently contaminate the measurements.
 
-## Recommendation
+## Remaining bottleneck
 
-I would run Glimmer locally when I want one current model that can cover text and images without putting pressure on a `64 GB` memory budget. I would start with the official `17 GB Q4_K_M`, add the projector only when the application needs vision, and keep the context well below the advertised maximum until the workload proves otherwise.
+Full Metal offload produced the largest measured speedup; DFlash then improved decode. The next bottleneck is prefill: the `8,193`-token DFlash request still took `17.94 s` to expose an answer. Prompt reuse and a smaller active context are the next experiments for an agent that repeatedly sends long histories.
 
-I would use the full-Metal DFlash configuration for rapid local chat. Nearly `48 tok/s` on the short suite is fluid, and the model still leaves ample memory headroom. I would remain careful with agent loops that repeatedly inject `8K` of state: speculative decoding accelerates generation, not the entire prefill, so the long suite still took almost `18 s` to expose an answer. The next optimization target is prompt reuse or a smaller active context, not a larger quant.
-
-For the broader laptop decision, see [which current open-weight models fit on a 64 GB Mac](/blog/2026/08/13/open-weight-models-that-fit-on-a-64-gb-macbook-pro.html). Glimmer is the most interesting new model in that list because it fits with room to spare. DeepSeek V4 Flash is the opposite case: its official checkpoint is about `167 GB`, so [serving it from this Mac means using an API](/blog/2026/08/13/running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro.html), not finding a cleverer local runtime.
+The [capacity comparison](/blog/2026/08/13/open-weight-models-that-fit-on-a-64-gb-macbook-pro.html) covers other local candidates. The [DeepSeek analysis](/blog/2026/08/13/running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro.html) covers the opposite constraint: its roughly `167 GB` official checkpoint exceeds this machine's memory before runtime tuning begins.

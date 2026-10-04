@@ -20,7 +20,7 @@ Attention is a learned memory interface. Keys say what stored content can be mat
 
 The mechanism began as an escape hatch from a fixed-size memory. An encoder-decoder recurrent neural network had to compress a source sentence into one hidden state and ask that state to preserve everything the decoder might need. Attention let each decoding step reach back to the encoder states directly. The Transformer made the larger move in 2017: it removed recurrence from the main sequence path and used attention itself to route information between positions.
 
-What I find interesting is how much of the original idea survived. Most later variants do not replace query-key matching and value retrieval. They change where the keys and values come from, how much must be cached, which positions are eligible, or whether the past remains stored token by token at all.
+Later variants change four parts of that memory: the number of key-value heads, the representation cached per token, the positions read by each query, and whether past tokens remain individually stored. These are separate branches, so modern layers often combine them.
 
 ## The encoder-decoder bottleneck
 
@@ -45,8 +45,6 @@ The Transformer generalized the same idea. Instead of using attention as an acce
 | 2019–2023 | MQA and GQA | Query heads share fewer key-value heads, shrinking the inference cache. |
 | 2020 onward | Linear attention and fast-weight memory | The token-by-token KV history is folded into a fixed-size recurrent state. |
 | 2024 onward | MLA, learned sparsity, gating, and hybrids | Models compress the cache, select fewer positions, manage finite memory, or combine cheap mixers with periodic full retrieval. |
-
-This timeline is a lineage, not a claim that each idea appeared only once. Modern architectures combine branches from several rows.
 
 ## Scaled dot-product attention
 
@@ -191,15 +189,9 @@ That cost created several distinct design families:
 | Layer composition | Hybrid attention | Alternate cheap recurrent/local mixers with periodic full attention | Better efficiency-quality balance, more system complexity |
 | Output control | Gated attention | Scale retrieved features before the residual update | More control and stability, little change to core attention cost |
 
-The table is the map: these methods are not one flat list because they solve different problems. The next comparison holds the incoming token sequence fixed and changes only the representation retained for future queries. Watch what is still individually addressable after each write.
-
-<div className="architecture-comparison blog-frame-explainer" data-blog-frame-explainer="blog-attention-memory.gif"><div className="blog-frame-explainer__viewport"><a href="/assets/images/blog-explainer-frames/blog-attention-memory/frame-01.webp"><img src="/assets/images/blog-explainer-frames/blog-attention-memory/frame-01.webp" alt="Manual explainer comparing the memory retained by multi-head attention, grouped-query attention, multi-head latent attention, and Gated DeltaNet" /></a></div></div>
-
-*MHA stores a full K/V history for every head. GQA shares fewer full histories across query heads. DeepSeek-V2's MLA projects token state into a smaller cached latent. Gated DeltaNet instead superposes history into one fixed-size recurrent state, while hybrid stacks periodically restore explicit attention. Custom explanatory synthesis based on [GQA](https://arxiv.org/abs/2305.13245), [DeepSeek-V2](https://arxiv.org/abs/2405.04434), and [Gated DeltaNet](https://arxiv.org/abs/2412.06464).*
+The comparison keeps the input sequence fixed and changes what remains available for later queries.
 
 The irreversible choice is the memory carrier. GQA preserves token-addressable K/V vectors but reduces how many independent copies exist. MLA keeps a token-indexed cache but compresses each token through learned latent projections. Delta-rule models stop retaining a token-indexed history at all: later writes share finite state, so targeted update and forgetting become part of retrieval quality. A hybrid does not erase that distinction; it spends most layers on bounded memory and inserts occasional layers that can still inspect explicit positions.
-
-Attention variants are memory policies. Each one decides what remains addressable after a write, and its characteristic failure follows from what that policy discards.
 
 ### Share the cache
 
@@ -291,7 +283,7 @@ The `is_causal=False` in the single-token helper is deliberate. Every key in the
 
 Multi-head latent attention (MLA), introduced with DeepSeek-V2, attacks the same cache bottleneck differently. GQA stores fewer full K/V heads; MLA stores a lower-dimensional latent representation and reconstructs the state needed by attention. This makes MLA a learned cache-compression mechanism embedded inside the layer.
 
-The distinction matters operationally. GQA is relatively simple and widely supported. MLA can preserve more head-specific information at a similar cache budget, but its projections, positional treatment, and inference path are more involved. They are alternative cache designs, not two names for the same kind of sharing.
+GQA reduces the number of full K/V heads. MLA instead compresses each token into a shared latent while preserving head-specific projections. Serving MLA therefore requires a different projection and positional-encoding path, rather than only a smaller head count.
 
 DeepSeek-V2's ablations provide one useful but bounded comparison. In that model family, the authors report that their GQA and MQA variants underperformed MHA, while the tuned MLA configuration slightly exceeded MHA with a much smaller cache. That result supports MLA as a viable learned compression scheme; it does not establish that MLA will beat GQA at smaller scales, under a different training recipe, or on hardware without an optimized MLA path.
 
@@ -472,8 +464,6 @@ The design principle is more important than any one ratio. Recurrent or linear l
 
 Attention Residuals changes a different axis: depth rather than token position. A standard PreNorm residual stream accumulates every earlier layer with fixed unit weight. AttnRes instead lets a layer apply softmax attention over preceding layer outputs, and Block AttnRes groups layers to bound the resulting memory and communication cost. It is therefore not another KV-cache replacement. It is an orthogonal retrieval path that asks which earlier representation depth should contribute, completing the Kimi trajectory from selective token memory to selective depth memory.
 
-This is the modern endpoint of the history. The original RNN bottleneck motivated direct retrieval from an explicit sequence; current long-context systems reintroduce compressed recurrent memory for efficiency, then retain selective attention layers because exact retrieval still matters.
-
 ### What the evidence supports
 
 The most useful empirical results compare one mechanism against a nearby alternative inside the same training recipe. They should not be read as a universal leaderboard across attention families.
@@ -487,15 +477,8 @@ The most useful empirical results compare one mechanism against a nearby alterna
 
 Raschka's larger caveat is the right one: there is still no single matched-data, matched-compute study that trains GQA, MLA, sparse attention, gated attention, recurrent memory, and their hybrids under one controlled recipe. Kernel maturity also changes observed throughput. A theoretically cheaper hybrid can lose to conventional GQA on a local system if its recurrent or latent-attention path lacks an optimized kernel.
 
-## Choose the failure you can afford
+## From explicit retrieval back to recurrent memory
 
-Attention still answers one question: for this output position, which sources match the current need, and what content should they contribute? The variants differ in where they pay for that answer.
+The original encoder-decoder bottleneck motivated direct access to every source position. MQA and GQA retain that access while sharing K/V heads. MLA compresses each stored token. Sparse attention changes which stored tokens are read. Linear attention and delta-rule models instead merge history into finite state, bringing back a capacity limit that explicit attention avoided.
 
-- MHA pays for independent heads and full token-level memory.
-- GQA and MQA reduce the number of cached K/V heads.
-- MLA compresses the cached representation.
-- Sliding-window and learned sparse attention reduce the positions examined.
-- Linear and delta-rule methods replace an explicit token history with a fixed-size state.
-- Hybrid models spend most layers on cheap memory updates and reserve some layers for stronger retrieval.
-
-No variant dominates every regime. Full attention preserves exact access but grows expensive with context. Cache-sharing methods are simpler but reduce K/V capacity. Latent, sparse, and recurrent methods buy more efficiency with new approximation, tuning, kernel, or serving burdens. The right comparison is therefore not “which attention name is newest?” but “which bottleneck dominates this model, and which retrieval failure can it afford?”
+Hybrid stacks combine the two memory types because the costs differ: recurrent updates bound state size, while attention layers retain a token-indexed retrieval path. The unresolved comparison is how much explicit history a workload needs under matched training compute and a working inference kernel. Cache size, prefill throughput, decode latency, and long-range retrieval accuracy measure different parts of that trade.

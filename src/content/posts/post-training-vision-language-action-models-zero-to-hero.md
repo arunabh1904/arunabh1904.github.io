@@ -17,19 +17,9 @@ summary: How robot post-training moved from behavior cloning and interventions t
 
 _Updated August 22, 2026._
 
-Post-training sounds like the final step after pretraining. In robotics, it is a repeated loop. The policy is deployed, a failure is attributed, the model is updated, and the change returns to the robot for evaluation.
+Robot post-training has developed along three branches: adapting the action decoder with demonstrations, collecting corrections in states reached by the policy, and optimizing rewards from fresh rollouts. They address different limits of behavior cloning: a slow output interface, missing recovery states, and the inability to improve beyond the collected actions.
 
-A robot fails while closing a drawer. The outcome tells us that the rollout failed. It does not tell us whether the camera missed the handle, the planner chose a bad approach, the trajectory drifted, the gripper slipped, the controller lagged, or the success detector fired too early.
-
-That attribution gap is the part I find most interesting. A robot action changes the next observation, so one mistake can create an unfamiliar state or an irreversible contact. The optimization step is usually straightforward once the target is defined. The difficult part is deciding which action, state, or model component the failure provides evidence about.
-
-The progression follows how precisely the feedback locates the mistake. Behavior cloning learns expert actions in expert states. Intervention data adds corrections in states created by the policy. Preferences compare behaviors, while process critics assign progress inside a rollout. Interactive RL closes the loop by collecting the next batch from the updated policy.
-
-The policy-improvement system looks like this:
-
-<div class="compact-flow-diagram"><a href="/assets/images/robot-post-training-loop.svg"><img src="/assets/images/robot-post-training-loop.svg" alt="Robot post-training loop from a pretrained policy through adaptation, deployment, failure mining, conservative optimization, safety evaluation, canary deployment, and new evidence"></a></div>
-
-*A candidate update returns to deployment only after safety and regression evaluation, and the resulting rollout becomes evidence for the next iteration.*
+The feedback determines which branch is available. DAgger queries an expert on learner states. Preference methods use judgments about recorded behavior. Process critics estimate progress within a trajectory. Interactive RL collects new attempts after each update. Their comparisons depend on how accurately the feedback identifies the action or transition responsible for the outcome.
 
 This is Part III of the series. [Part I](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html) asks what visual evidence the model preserves. [Part II](/blog/2026/07/15/omni-model-pretraining-decisions.html) asks how semantics, dynamics, and motor priors enter the policy. This part starts when the pretrained policy reaches deployment and begins creating its own data.
 
@@ -45,9 +35,10 @@ $$
 
 The action $a$ may be one discrete bin, a sequence of FAST tokens, a continuous chunk, or a diffusion denoising target. This choice determines the loss, inference path, control rate, and level at which a later correction can assign credit.
 
-The action head can change while retaining the pretrained visual-language model. OpenVLA originally predicts action tokens autoregressively. [OpenVLA-OFT](/paper%20shorts/2025/02/27/openvla-oft-optimizing-speed-and-success.html) replaces them during adaptation with parallel continuous chunks trained through an L1 loss. In its experiments, the new head improves both control speed and task success.
+The action head can change while retaining the pretrained visual-language model. [OpenVLA-OFT](/paper%20shorts/2025/02/27/openvla-oft-optimizing-speed-and-success.html) replaces serial action-token decoding with parallel chunks and continuous L1 regression. In its single-view LIBERO comparison, success rises from 76.5% for the reported OpenVLA baseline to 90.2% with parallel decoding and chunking, then 95.3% with continuous L1 outputs. The often-quoted 97.1% result also adds inputs and changes the comparison setting. This is evidence that adaptation can alter the control interface without rebuilding pretraining.
 
-SFT should be the first serious baseline on a new robot. Compare full tuning with adapters and try several chunk lengths. Include both clean demonstrations and recoveries, using only action heads that meet the deployment deadline. Measure task success, robot-data efficiency, control rate, latency, and semantic forgetting together.
+![OpenVLA-OFT contrasts serial token decoding with parallel continuous action chunks](/assets/images/openvla-oft-optimizing-speed-and-success-paper-figure.png)
+*OpenVLA-OFT separates decoding order from action parameterization. Parallel chunks reduce repeated language-model calls; regression changes the target from discrete bins to continuous actions. Source: [OpenVLA-OFT, Figure 2](https://arxiv.org/abs/2502.19645).*
 
 SFT remains limited to the states represented in its training data. It can learn a better action for those states, but does not determine which policy-induced states should enter the next dataset.
 
@@ -76,8 +67,6 @@ FAST exposes a categorical token likelihood that fits directly into SFT and pref
 
 [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html) uses a different action representation at each stage. FAST tokens allow web and robot tasks to share a discrete pretraining objective. A continuous expert added during post-training provides finer control and faster inference. The representation used for heterogeneous pretraining is therefore separated from the representation used during execution.
 
-I would evaluate the tokenizer in closed loop, reporting reconstruction error and sequence length alongside control latency, contact-heavy success, and perturbation recovery. A tokenizer can improve offline likelihood while attenuating a high-frequency correction required during execution.
-
 ### Alpamayo keeps reasoning tokenized and trajectories continuous
 
 Driving provides a different division between discrete and continuous outputs. [Alpamayo-R1](/paper%20shorts/2025/10/30/alpamayo-r1-bridging-reasoning-and-action-prediction-for-generalizable-autonomous-driving-in-the-long-tail.html) generates a tokenized Chain of Causation that names the relevant actors, causal factors, and decision. A diffusion decoder then uses that state to produce a continuous, dynamically feasible trajectory.
@@ -94,8 +83,6 @@ FAST tokenizes the trajectory so one decoder can predict actions autoregressivel
 The closed-loop problem predates VLAs. A supervised policy trains on expert states, then deploys under the state distribution created by its own actions. One mistake changes the next observation and can compound across the remaining horizon. [DAgger](/paper%20shorts/2011/04/11/dagger-reduction-of-imitation-learning-to-no-regret-online-learning.html) addresses this shift through iterative data collection.
 
 DAgger runs the learner, queries the expert in the states the learner reaches, and adds those corrected actions to the dataset. Human takeovers, joystick corrections, recovery demonstrations, and successful reruns are modern forms of the same loop.
-
-Behavior cloning learns an action in the states we collected. Interactive imitation changes which states we collect in the first place.
 
 Corrections are most informative near the policy's competence boundary. Repeated easy successes add little new supervision, while catastrophic failures may be unsafe or too far outside the recoverable region. Near misses, ambiguous objects, perturbations, and recoverable contact errors identify states where a different local action can change the outcome.
 
@@ -129,17 +116,14 @@ The method should follow the evidence:
 | Human takeover | failure window near the intervention | every previous action deserves rejection |
 | Safety violation | explicit constraint label | one scalar captures severity and task success |
 
-The deployment event must therefore support both the comparison label and the likelihood assumed by the optimizer. Implementing DPO does not establish either condition.
-
 ## Process supervision localized the failure
 
 Suppose the gripper misses the handle at step 42 and a human takes over at step 47. The terminal bit says the episode failed. The intervention says behavior was unacceptable by step 47. Neither tells us that every earlier action was wrong.
 
-<div class="architecture-comparison blog-frame-explainer" data-blog-frame-explainer="blog-vla-feedback-attribution.gif"><div class="blog-frame-explainer__viewport"><a href="/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-01.webp"><img src="/assets/images/blog-explainer-frames/blog-vla-feedback-attribution/frame-01.webp" alt="Manual explainer comparing episode outcomes, Action Preference Optimization, and process or interactive feedback on the same robot failure"></a></div></div>
-
-*A terminal outcome labels the whole rollout. An intervention narrows the failure to a local window. A process critic can narrow it further, but only if the critic reads the state correctly. Custom synthesis based on [Action Preference Optimization](/paper%20shorts/2025/06/08/action-preference-optimization-for-robotic-policy-refinement.html), [VLAC](/paper%20shorts/2025/09/19/vlac-vision-language-action-critic-for-real-world-rl.html), and [RIPT-VLA](/paper%20shorts/2025/05/22/ript-vla-interactive-post-training-for-vision-language-action-models.html).*
-
 A process critic replaces an episode-level failure label with an estimate of progress at intermediate states. [VisualPRM](/paper%20shorts/2025/03/13/visualprm-process-reward-model-for-multimodal-reasoning.html) provides the general recipe: label intermediate errors, train a critic, and validate it against held-out human judgment before optimization. [VLAC](/paper%20shorts/2025/09/19/vlac-vision-language-action-critic-for-real-world-rl.html) applies this idea to robotics by predicting signed progress and completion between two observations.
+
+![VLAC generates action and reward tokens with a value head for PPO](/assets/images/vlac-vision-language-action-critic-for-real-world-rl-source-figure-3.webp)
+*VLAC makes the learning signal part of the forward pass: action tokens select behavior, reward tokens estimate progress, and a value head supports PPO. Critic errors can therefore influence subsequent policy updates. Source: [VLAC, Figure 3](https://arxiv.org/abs/2509.15937).*
 
 A single scalar can obscure disagreements among progress, completion, safety, uncertainty, and failure type. Pixels may also omit contact, controller lag, or the state of an occluded gripper. A robot critic may therefore need tracked objects, geometry, proprioception, and controller state in addition to images.
 
@@ -159,13 +143,16 @@ $$
 \right].
 $$
 
-Clipping bounds the size of the policy update, but does not establish that the reward assigns the correct credit.
+Clipping removes the incentive to move sampled action ratios farther in the rewarded direction beyond the clip interval. It does not enforce a global bound on the policy change or validate the reward.
 
 The policy gradient also has to match the action generator. For a diffusion actor, [DPPO](/paper%20shorts/2024/09/01/dppo-diffusion-policy-policy-optimization.html) treats the denoising steps themselves as the stochastic policy. A denoised trajectory does not have the same likelihood as one categorical token or Gaussian action. Using the wrong likelihood assigns credit to the wrong part of generation.
 
 Binary success can still provide a useful reward when the rollout system creates comparable groups. [RIPT-VLA](/paper%20shorts/2025/05/22/ript-vla-interactive-post-training-for-vision-language-action-models.html) and [SimpleVLA-RL](/paper%20shorts/2025/09/11/simplevla-rl-scaling-vla-training-via-reinforcement-learning.html) run multiple attempts and learn from their relative outcomes. A group in which every attempt succeeds or every attempt fails contains no ranking signal, making task sampling part of the learning algorithm.
 
-The rollout system should sample tasks near the policy's competence boundary and keep resets comparable. It should also record the policy version and reject groups with no reward variation. These controls determine whether the optimizer receives an informative comparison.
+![RIPT-VLA and SFT success on LIBERO-LONG across demonstration counts](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-source-figure-2.webp)
+*RIPT-VLA compares interactive post-training with SFT under one to ten demonstrations on LIBERO-LONG. This is evidence about the value of policy-generated experience in the reported simulator setup. Source: [RIPT-VLA, Figure 2](https://arxiv.org/abs/2505.17016).*
+
+Group-relative learning therefore couples optimization to task selection. As the policy improves, the sampler must find tasks with informative outcome variation; otherwise collection cost grows without a corresponding learning signal.
 
 ## Specialist reinforcement learning followed by distillation
 
@@ -193,33 +180,11 @@ The evaluation ladder should move from cheap diagnosis to physical evidence:
 
 Each evaluation level should be validated against the more expensive level that follows it. [SIMPLER](/paper%20shorts/2024/05/09/simpler-evaluating-real-world-robot-policies-in-simulation.html) tests whether simulation preserves the ranking of real policies, rather than whether simulated success appears plausible in isolation. [VLA-REPLICA](/paper%20shorts/2026/05/20/vla-replica-low-cost-reproducible-real-world-evaluation.html) extends this progression toward reproducible physical trials. A cheaper metric is useful when it predicts the robot result used for the deployment decision.
 
-## The rollout system became the training system
+## What changes between updates
 
-Once deployment data trains the next policy, every trajectory needs a history. Store the policy, critic, tokenizer, action head, controller, task, robot, sensor calibration, timestamps, interventions, reward components, termination reason, and evaluator version. Also record whether the rollout trained SFT, preferences, the critic, RL, or nothing at all.
+Interactive methods change both the policy and the data distribution. A rollout from an older fleet policy, a relabeled reward from a new critic, or an action sequence produced by a different tokenizer is a different training object. Policy, evaluator, action-interface, and controller versions are needed to reconstruct the update and compare it with correction-only training.
 
-This provenance is part of the experiment. A fleet may collect a rollout from a policy several updates behind the learner. A new tokenizer can make old likelihoods incomparable, while a critic update can relabel the same trajectory. Without versioned records, the evidence used for a gradient update cannot be reconstructed.
-
-The launch gate should check lower-confidence-bound success, unsafe contacts, intervention rate, latency, regression slices, and automatic rollback. A higher average is not enough if a safety-critical slice gets worse.
-
-The metric I ultimately care about is reliable policy improvement per robot-hour, human-hour, annotation-hour, and unit of compute.
-
-## How to read a robot post-training paper
-
-Start with what happened on the robot, not the optimizer name. Ask how local the label is, which policy created the state, and what likelihood or reward the update assumes.
-
-| Question | What it reveals |
-| --- | --- |
-| What is one action event? | token, chunk, diffusion path, or continuous expert output |
-| Who created the state? | expert, current policy, stale fleet policy, or simulator |
-| What did the evaluator observe? | outcome, correction, preference, progress, or safety constraint |
-| Where is credit assigned? | whole episode, intervention window, action token, or denoising step |
-| What prevents reward exploitation? | held-out humans, critic ensembles, constraints, or real task success |
-| What must not regress? | semantics, old tasks, control rate, safety, or calibration robustness |
-| What is the next evidence layer? | offline, simulation, reproducible robot, or canary deployment |
-
-The optimizer follows from these answers. PPO cannot correct a reward that assigns the wrong credit. DPO cannot create a matched counterfactual, and a process critic cannot infer contact from observations that do not contain it.
-
-## What the feedback can support
+## From demonstrations to policy-generated data
 
 | Leap | New feedback unit | What it changed | Remaining risk |
 | --- | --- | --- | --- |
@@ -233,10 +198,6 @@ The optimizer follows from these answers. PPO cannot correct a reward that assig
 | Interactive RL | fresh rollout group and environment reward | improved the data distribution while learning | reward exploitation and rollout cost |
 | Specialist distillation | improved specialist trajectory | protected the generalist from direct RL instability | loss of specialist behavior during distillation |
 
-The feedback becomes more precise as we move down the table. A terminal bit says the rollout ended badly. An intervention says behavior crossed a boundary near this state. A correction says what to do from the reached state. A process critic marks which transition made progress. A matched replay is the rare case that can show what another action would have caused. The central requirement is accurate attribution: each event should identify the state, action, or transition it provides evidence about before that evidence changes the policy.
+These branches do not form a simple ranking by feedback quality. An expert correction supplies a target action in one reached state. A preference supplies a comparison. A process critic supplies a learned progress estimate, and RL supplies outcomes under the current policy. Each can add information unavailable to demonstrations, but each also introduces a different attribution error.
 
-I would start with an action representation that matches the controller and use SFT as the baseline. Corrections should be collected in states reached by the policy. Preference optimization requires a defensible comparison, while RL requires a reward and rollout system that have been validated through cheaper evaluations.
-
-My strongest bet is a process critic conditioned on persistent objects, geometry, contact, controller state, and task progress. It should identify the earliest defensible failure window and support a conservative update. That update must then be tested for physical success and retention of older skills before deployment.
-
-A policy can learn reliably from deployment only when the update remains no broader than the evidence and every consequence is traceable to the policy that created it.
+The open comparison is how much physical improvement each feedback source buys at equal interaction and human effort. That requires tracking recovery success, retained skills, and control latency alongside task completion. A higher simulated success rate alone cannot resolve the choice between correction SFT, preference learning, process rewards, and direct RL.
