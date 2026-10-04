@@ -61,31 +61,31 @@ $$
 
 Each term has one job:
 
-- $QK^\top$ measures how well each query matches every eligible key.
-- Dividing by $\sqrt{d_k}$ controls the scale of those logits.
-- Softmax turns each row into non-negative weights that sum to $1$.
-- Multiplying by $V$ returns a weighted mixture of content.
+- The query–key dot products $QK^\top$ measure how well each query matches every eligible key.
+- Dividing by the square root of the key dimension $\sqrt{d_k}$ controls the scale of those logits.
+- Softmax turns each row into non-negative weights that sum to 1.
+- Multiplying by the value matrix $V$ returns a weighted mixture of content.
 
 Queries, keys, and values are separate because discoverability and payload are different jobs. A token may need to advertise one feature for matching while returning a richer representation once selected. In a library analogy, the query is the search phrase, the key is the catalog entry, and the value is the book content.
 
-The scaling term is not cosmetic. If query and key components are independent with mean zero and variance one, their dot product has variance $d_k$. As the key dimension grows, unscaled logits can push softmax into saturated regions with very small gradients. Dividing by $\sqrt{d_k}$ keeps comparisons trainable instead of making the model prematurely overconfident.
+The scaling term is not cosmetic. If query and key components are independent with mean zero and variance one, their dot-product variance equals the key dimension $d_k$. As the key dimension grows, unscaled logits can push softmax into saturated regions with very small gradients. Dividing by the square root of the key dimension $\sqrt{d_k}$ keeps comparisons trainable instead of making the model prematurely overconfident.
 
 ## Self-attention
 
-In self-attention, one sequence supplies all three roles. For an input matrix $X \in \mathbb{R}^{n \times d_{\text{model}}}$,
+In self-attention, one sequence supplies all three roles. The input matrix $X \in \mathbb{R}^{n \times d_{\text{model}}}$ is projected into queries, keys, and values:
 
 $$
 Q=XW^Q,\qquad K=XW^K,\qquad V=XW^V,
 $$
 
-followed by
+The query–key scores then become attention weights, which mix the values:
 
 $$
 A=\operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right),
 \qquad Y=AV.
 $$
 
-Each row of $A$ says where one token looks; the corresponding row of $Y$ is that token rewritten after gathering context. A token therefore does not keep one fixed meaning through the network. The representation of `bank`, for example, can become financial or geographic as successive layers retrieve different surrounding evidence.
+Each row of the attention matrix $A$ says where one token looks; the corresponding row of the output matrix $Y$ is that token rewritten after gathering context. A token therefore does not keep one fixed meaning through the network. The representation of `bank`, for example, can become financial or geographic as successive layers retrieve different surrounding evidence.
 
 Consider the sentence with bidirectional self-attention, where the whole sentence is visible:
 
@@ -108,7 +108,7 @@ In a decoder-only model, a causal mask removes future positions before softmax. 
 
 ## Efficient PyTorch implementation
 
-The explicit equations are useful for reasoning, but a production implementation should not build the $T\times T$ score matrix and save the full probability matrix in high-bandwidth memory. PyTorch's [`scaled_dot_product_attention`](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention) keeps the same semantics while dispatching to an appropriate backend, including fused attention kernels when the device, dtype, and tensor layout support them.
+The explicit equations are useful for reasoning, but a production implementation should not build the square token-by-token score matrix and save the full probability matrix in high-bandwidth memory. PyTorch's [`scaled_dot_product_attention`](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention) keeps the same semantics while dispatching to an appropriate backend, including fused attention kernels when the device, dtype, and tensor layout support them.
 
 The complete causal multi-head block for a full input sequence is therefore short. The projections produce `[batch, time, 3 * d_model]`; reshaping exposes the head axis expected by SDPA; `is_causal=True` applies the autoregressive mask without allocating a dense mask in Python.
 
@@ -161,7 +161,7 @@ Three details carry most of the performance. The combined QKV projection reduces
 
 ## Multi-head and cross-attention
 
-Multi-head attention repeats the same operation under several learned projections. Each head has its own $W^Q$, $W^K$, and $W^V$, so the layer can represent several routing patterns before concatenating their outputs. Heads do not reliably map to neat human concepts such as “the syntax head,” but parallel projections do let different token relationships coexist.
+Multi-head attention repeats the same operation under several learned projections. Each head has its own query projection $W^Q$, key projection $W^K$, and value projection $W^V$, so the layer can represent several routing patterns before concatenating their outputs. Heads do not reliably map to neat human concepts such as “the syntax head,” but parallel projections do let different token relationships coexist.
 
 Cross-attention changes the source rather than the scoring rule. Queries come from one representation; keys and values come from another. A translation decoder can query encoder states, text tokens can query image features, and a learned output query can retrieve from a latent workspace.
 
@@ -357,7 +357,7 @@ Raschka's Qwen example places this output gate alongside zero-centered QK-Norm a
 
 ### Replace history with state
 
-Linear attention changes the memory representation more radically. Softmax is applied after $QK^\top$, which couples every query to every key. Kernelized linear attention applies a feature map $\phi$ to queries and keys separately, allowing the multiplication to be reassociated. Instead of retaining every K/V pair, the model can update fixed-size running statistics such as
+Linear attention changes the memory representation more radically. Softmax is applied after the query–key dot products $QK^\top$, which couples every query to every key. Kernelized linear attention applies a feature map $\phi$ to queries and keys separately, allowing the multiplication to be reassociated. Instead of retaining every K/V pair, the model can update fixed-size running statistics such as
 
 $$
 S_t=S_{t-1}+\phi(k_t)v_t^\top,
@@ -365,7 +365,7 @@ S_t=S_{t-1}+\phi(k_t)v_t^\top,
 z_t=z_{t-1}+\phi(k_t),
 $$
 
-and retrieve with
+Retrieval reads the memory matrix and divides by the accumulated normalization:
 
 $$
 y_t=
@@ -375,13 +375,13 @@ $$
 
 This state does not grow with sequence length, which is attractive for long-context decoding. The cost is that individual token associations are superposed inside finite memory. Unlike a KV cache, the state cannot always recover one earlier value cleanly once many associations interfere.
 
-DeltaNet addresses that capacity problem with a delta-rule update. It first asks what value the current key already retrieves,
+DeltaNet addresses that capacity problem with a delta-rule update. It first predicts the value already stored under the current key:
 
 $$
 \hat v_t=S_{t-1}^\top k_t,
 $$
 
-then writes only the prediction error. Here $S$ has shape $d_k\times d_v$, so the outer product below updates the same key-by-value memory:
+The update writes only the difference between the observed and retrieved values. The memory matrix $S\in\mathbb{R}^{d_k\times d_v}$ has one axis for key dimensions and one for value dimensions. An outer product preserves those dimensions:
 
 $$
 S_t=S_{t-1}+\beta_t k_t(v_t-\hat v_t)^\top.
@@ -389,7 +389,7 @@ $$
 
 The write strength $0\leq\beta_t\leq1$ determines how strongly the new association replaces the old one. Gated DeltaNet adds a decay factor before this targeted correction, giving the model two distinct controls: decay weakens existing memory broadly, while the delta rule repairs the association addressed by the current key. Kimi Delta Attention makes the decay finer-grained by moving from one scalar per head toward channel-wise control over the recurrent state.
 
-Before implementing the delta rule, start with the simpler additive linear-attention recurrence above. Its state update is easiest to see one decode step at a time. With the positive feature map $\phi(x)=\operatorname{ELU}(x)+1$, the following code updates $S_t$ and $z_t$ without retaining a token-length dimension. It is vectorized over batches and heads, and `torch.compile` can fuse its pointwise and contraction graph on supported backends.
+Before implementing the delta rule, start with the simpler additive linear-attention recurrence above. Its state update is easiest to see one decode step at a time. With the positive feature map $\phi(x)=\operatorname{ELU}(x)+1$, the following code updates the memory matrix $S_t$ and normalization vector $z_t$ without retaining a token-length dimension. It is vectorized over batches and heads, and `torch.compile` can fuse its pointwise and contraction graph on supported backends.
 
 ```python
 @torch.compile

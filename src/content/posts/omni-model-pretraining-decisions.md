@@ -43,7 +43,7 @@ A policy trained on one robot can absorb its camera pose, controller, gripper, a
 ![Open X-Embodiment pools tasks, scenes, and robot morphologies into a shared training corpus](/assets/images/open-x-embodiment-robotic-learning-datasets-and-rt-x-models-paper-figure.png)
 *Cross-embodiment training made the dataset itself an architectural decision. The shared model still needs a schema that says what each robot observation and action means. source: [Open X-Embodiment](/paper%20shorts/2023/10/13/open-x-embodiment-robotic-learning-datasets-and-rt-x-models.html)*
 
-Scaling each action dimension into $[-1,1]$ preserves neither units nor controller semantics. Cross-robot training therefore depends on the coordinate frame, control mode, frequency, horizon, and embodiment recorded with each trajectory.
+Scaling each action dimension into a common normalized range $[-1,1]$ preserves neither units nor controller semantics. Cross-robot training therefore depends on the coordinate frame, control mode, frequency, horizon, and embodiment recorded with each trajectory.
 
 Cross-embodiment training also changes what *more data* means. Repeating the same task on the same table lowers variance. New scenes, operators, tasks, failures, and robots expand the states and decisions represented in the corpus. Sliding a two-second window forward by one frame may create hundreds of examples without creating hundreds of independent experiences.
 

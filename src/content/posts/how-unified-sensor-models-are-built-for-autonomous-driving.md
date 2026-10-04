@@ -37,7 +37,7 @@ Cameras capture color and texture at high spatial resolution. That makes them us
 
 The encoder must retain a distant cyclist without losing the context of the surrounding intersection. Convolutional backbones remain attractive because their local computation maps well to optimized inference libraries. [NVAutoNet](/paper%20shorts/2023/03/23/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving.html), for example, combines efficient CNN backbones with precomputed camera-to-BEV geometry and reports 53 FPS for the full multitask network on NVIDIA DRIVE Orin. Feature pyramids combine high-resolution maps that retain precise spatial detail with lower-resolution maps whose larger receptive fields capture more of the scene; [EfficientDet](/paper%20shorts/2020/04/01/efficientdet-scalable-and-efficient-object-detection.html) makes this exchange bidirectional and learns how strongly to weight each input.
 
-[ConvNeXt](/paper%20shorts/2022/01/10/a-convnet-for-the-2020s.html) modernizes ResNet with a patchify stem, depthwise $7\times7$ spatial mixing, inverted bottlenecks, and LayerNorm. Its controlled path shows that a pure CNN can absorb many post-ViT design choices without attention.
+[ConvNeXt](/paper%20shorts/2022/01/10/a-convnet-for-the-2020s.html) modernizes ResNet with a patchify stem, depthwise 7-by-7 spatial mixing, inverted bottlenecks, and LayerNorm. Its controlled path shows that a pure CNN can absorb many post-ViT design choices without attention.
 
 Vision transformers can connect distant image regions directly, but full attention across every token from every surround camera is too expensive. [Deformable DETR](/paper%20shorts/2020/10/08/deformable-detr-deformable-transformers-for-end-to-end-object-detection.html) replaces dense attention over image features with a small set of learned samples around each query's reference point.
 
@@ -115,7 +115,7 @@ $$
 S_t = f\left(\operatorname{Align}(S_{t-1}, \Delta T_t), X_t, \Delta t, H_t\right),
 $$
 
-where $S_{t-1}$ is the prior state, $X_t$ is current evidence, $\Delta T_t$ is the ego-frame transform, $\Delta t$ is elapsed time, and $H_t$ is sensor health. The methods below differ mainly in the representation of $S_t$ and its update rule.
+The prior state $S_{t-1}$ is aligned using the ego-frame transform $\Delta T_t$, then updated with current evidence $X_t$, elapsed time $\Delta t$, and sensor health $H_t$. The methods below differ mainly in the representation of the updated state $S_t$ and its update rule.
 
 In particular, warping a stored cyclist into the current ego frame only corrects the vehicle’s motion. It does not tell us how far the cyclist moved while occluded. That needs an actor-motion prediction, followed by correction when new measurements arrive.
 

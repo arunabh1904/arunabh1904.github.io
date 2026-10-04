@@ -30,15 +30,15 @@ $$
 = -\frac{1}{T}\sum_{t=1}^{T}\log p_\theta(x_t \mid x_{<t}).
 $$
 
-This is cross-entropy, measured in *nats* when $\log$ is the natural logarithm. A model that gives the observed next token more probability has lower loss. It is a proper scoring rule: a confident error hurts more than admitted uncertainty.
+This is cross-entropy, measured in *nats* when the log operator $\log$ denotes the natural logarithm. A model that gives the observed next token more probability has lower loss. It is a proper scoring rule: a confident error hurts more than admitted uncertainty.
 
 Three quantities describe different parts of that measurement:
 
 **Entropy $H(p)$** is the irreducible uncertainty of the true token distribution $p$, under one tokenizer and one data distribution. It belongs to the source, not to a particular model.
 
-**Cross-entropy $H(p, q_\theta)$** is the expected negative log-probability assigned by model $q_\theta$ to data from $p$. Lower cross-entropy means the model predicts the held-out distribution better.
+**Cross-entropy $H(p, q_\theta)$** is the expected negative log-probability assigned by model distribution $q_\theta$ to data from the true distribution $p$. Lower cross-entropy means the model predicts the held-out distribution better.
 
-**Perplexity $\operatorname{PPL}$** is $\exp(H(p,q_\theta))$ when cross-entropy is measured in nats. It turns an additive loss into an effective branching factor, which is useful for intuition but easy to misuse in comparison.
+**Perplexity $\operatorname{PPL}$** is exponentiated cross-entropy $\exp(H(p,q_\theta))$ when cross-entropy is measured in nats. It turns an additive loss into an effective branching factor, which is useful for intuition but easy to misuse in comparison.
 
 The relationship is exact:
 
@@ -46,11 +46,11 @@ $$
 H(p,q_\theta) = H(p) + D_{\mathrm{KL}}(p\,\Vert\,q_\theta).
 $$
 
-Entropy is the floor for that tokenization and distribution; the KL divergence is the model's excess loss above it. We almost never know the true $H(p)$ for natural language, so a measured cross-entropy is not "how much entropy the model has." It is a score for one model on one held-out sample. It changes if the tokenizer, document mixture, de-duplication policy, or evaluation corpus changes.
+Entropy is the floor for that tokenization and distribution; the KL divergence is the model's excess loss above it. We almost never know the true entropy $H(p)$ for natural language, so a measured cross-entropy is not "how much entropy the model has." It is a score for one model on one held-out sample. It changes if the tokenizer, document mixture, de-duplication policy, or evaluation corpus changes.
 
-Perplexity is exponentiated cross-entropy. A value of $20$ can be read as an effective choice among roughly twenty equally likely continuations. The intuition is useful, but exponentiation can hide the additive quantity being optimized.
+Perplexity is exponentiated cross-entropy. A value of 20 can be read as an effective choice among roughly twenty equally likely continuations. The intuition is useful, but exponentiation can hide the additive quantity being optimized.
 
-A drop from $2.0$ to $1.9$ nats has the same loss difference as a drop from $3.0$ to $2.9$ nats. Both reduce perplexity by about $9.5\%$. Compare and fit loss in log space. Report perplexity when the multiplicative view helps.
+A drop from 2.0 to 1.9 nats has the same loss difference as a drop from 3.0 to 2.9 nats. Both reduce perplexity by about 9.5%. Compare and fit loss in log space. Report perplexity when the multiplicative view helps.
 
 ## Kaplan et al.: three curves, not one parameter curve
 
@@ -67,9 +67,9 @@ $$
 L(N,D) \approx L_\infty + \frac{A}{N^\alpha} + \frac{B}{D^\beta}.
 $$
 
-This is a useful schematic, not Kaplan's exact fitting equation. $L_\infty$ is the irreducible floor for the stated setup. The parameter term captures limited capacity. The data term captures limited coverage and repetition.
+This is a useful schematic, not Kaplan's exact fitting equation. The irreducible floor $L_\infty$ belongs to the stated setup. The parameter term captures limited capacity. The data term captures limited coverage and repetition.
 
-Training compute couples the terms because dense-Transformer cost is roughly proportional to $ND$, up to architecture and system constants. Hold either $N$ or $D$ fixed and the other eventually delivers diminishing returns. Its term is no longer the bottleneck.
+Training compute couples the terms because dense-Transformer cost is roughly proportional to the product of parameter count and token count $ND$, up to architecture and system constants. Hold either parameter count $N$ or token count $D$ fixed and the other eventually delivers diminishing returns. Its term is no longer the bottleneck.
 
 Kaplan's compute-optimal prescription had a surprising consequence. At fixed compute, it favored a very large model trained on relatively few tokens, well short of convergence. In that fitted regime, optimal parameter count grew much faster than token count.
 
@@ -79,7 +79,7 @@ The result depended on the curve, WebText2, the optimizer, and the accounting th
 
 Chinchilla revisited the allocation rather than disputing the premise. Hoffmann et al. trained more than 400 models from 70M to over 16B parameters. Training length ranged from 5B to 500B tokens.
 
-All three fitting approaches placed the compute-optimal solution near equal exponents: $N_{\mathrm{opt}} \propto C^{0.5}$ and $D_{\mathrm{opt}} \propto C^{0.5}$. Each scale step should fund both parameters and tokens, not primarily parameters.
+All three fitting approaches placed the compute-optimal solution near equal exponents. Optimal parameter count follows approximately square-root scaling $N_{\mathrm{opt}} \propto C^{0.5}$, and optimal token count follows the same scaling $D_{\mathrm{opt}} \propto C^{0.5}$. Each scale step should fund both parameters and tokens, not primarily parameters.
 
 ![Chinchilla paper Figure 1: compute-optimal parameter counts against training FLOPs, including the Kaplan prediction and named language models](/assets/images/chinchilla-compute-frontier-paper-figure.png)
 *The solid curves are three Chinchilla fitting approaches; the dashed line is the Kaplan prediction. The plot is a recipe comparison at fixed training FLOPs, not a benchmark leaderboard. source: [Hoffmann et al., “Training Compute-Optimal Large Language Models”](https://arxiv.org/abs/2203.15556)*
@@ -90,7 +90,7 @@ The flagship comparison held training compute roughly fixed. Chinchilla used 70B
 
 A smaller deployed model can also reduce inference cost. In that case, the pretraining optimum and serving optimum happen to point in the same direction.
 
-The disagreement is exact. Kaplan scales parameters roughly as $C^{0.73}$ and tokens as $C^{0.27}$; Chinchilla puts both near $C^{0.5}$. Both optimize validation loss at fixed training compute. The estimated frontier changed.
+The disagreement is exact. Kaplan estimates compute exponents of roughly 0.73 for parameters and 0.27 for tokens; Chinchilla puts both near 0.5. Both optimize validation loss at fixed training compute. The estimated frontier changed.
 
 The shorthand of about twenty tokens per parameter describes the fitted dense-model frontier. It depends on the data, tokenizer, architecture, context length, and objective used to estimate that frontier.
 
