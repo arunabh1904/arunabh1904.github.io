@@ -45,7 +45,7 @@ This frame also separates two ideas that are routinely conflated. **On-policy** 
 
 ## PPO: learn the baseline
 
-[Proximal Policy Optimization](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html) made actor-critic policy gradients operationally simple. The actor collects trajectories under $\pi_{\mathrm{old}}$. A value network estimates expected future return, and Generalized Advantage Estimation turns temporal-difference residuals into lower-variance $\hat A_t$. The actor then reuses the rollout for several minibatch epochs under a clipped surrogate:
+[Proximal Policy Optimization](/paper%20shorts/2017/07/01/proximal-policy-optimization-ppo.html) made actor-critic policy gradients operationally simple. The actor collects trajectories under the rollout policy $\pi_{\mathrm{old}}$. A value network estimates expected future return, and Generalized Advantage Estimation turns temporal-difference residuals into lower-variance advantage estimates $\hat A_t$. The actor then reuses the rollout for several minibatch epochs under a clipped surrogate:
 
 $$
 L^{\mathrm{CLIP}}(\theta)=
@@ -58,7 +58,7 @@ r_t(\theta)\hat A_t,
 \right],
 $$
 
-where $r_t=\pi_\theta(a_t\mid s_t)/\pi_{\mathrm{old}}(a_t\mid s_t)$.
+The probability ratio $r_t=\pi_\theta(a_t\mid s_t)/\pi_{\mathrm{old}}(a_t\mid s_t)$ compares the current policy with the rollout policy for the sampled action.
 
 The clipping rule answers a narrow question: how much should the optimizer trust an advantage computed under the old policy? Once a probability ratio moves beyond the allowed band in the apparently beneficial direction, the objective stops rewarding additional movement. PPO does not guarantee a bounded global KL, validate the reward, or make old trajectories current again. It merely makes a few passes over fresh data less destructive.
 
@@ -68,7 +68,7 @@ The critic adds a learned estimate at every prefix, even when the reward arrives
 
 ## DPO: store the contrast
 
-[Direct Preference Optimization](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) is often placed between PPO and GRPO as if it were a newer policy-gradient algorithm. It changes the problem more radically. DPO assumes the evidence already arrives as fixed pairs: for prompt $x$, response $y_w$ is preferred to $y_l$. Under a Bradley–Terry preference model and KL-regularized reward optimum, the implicit reward can be expressed through policy-to-reference log-ratios. The training objective becomes
+[Direct Preference Optimization](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) is often placed between PPO and GRPO as if it were a newer policy-gradient algorithm. It changes the problem more radically. DPO assumes the evidence already arrives as fixed pairs: for a prompt $x$, the chosen response $y_w$ is preferred to the rejected response $y_l$. Under a Bradley–Terry preference model and KL-regularized reward optimum, the implicit reward can be expressed through policy-to-reference log-ratios. The training objective becomes
 
 $$
 \mathcal{L}_{\mathrm{DPO}} =
@@ -91,7 +91,7 @@ For VLAs, the “matched” condition is particularly fragile. Two text answers 
 
 ## GRPO: sample the contrast
 
-[DeepSeekMath](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html) makes a different trade. For each question, the current policy samples $G$ answers. An exact or learned verifier produces rewards $r_1,\ldots,r_G$, and GRPO normalizes them within that question:
+[DeepSeekMath](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html) makes a different trade. For each question, the current policy samples a group of $G$ candidate answers. An exact or learned verifier produces rewards $r_1,\ldots,r_G$, and GRPO normalizes them within that question:
 
 $$
 \hat A_i =
@@ -120,7 +120,7 @@ Systems such as [DAPO](https://arxiv.org/abs/2503.14476) turn this observation i
 
 Later work names the pathology directly. [Advantage Collapse in GRPO](https://arxiv.org/abs/2605.21125) reports that homogeneous groups erase the learning signal and proposes sampling around advantage variance. Its experiments report substantially fewer collapsed groups and higher reasoning accuracy. The precise numbers are system-dependent; the structural result is not. A group-relative method cannot learn from a group with no relative information.
 
-A second failure is temporal credit. Under outcome supervision, the same $\hat A_i$ weights every token in an answer. A correct final result reinforces the dead ends and lucky guesses along its path; an incorrect result penalizes any sound steps it contained. Larger groups reduce baseline variance but do not identify the decisive token.
+A second failure is temporal credit. Under outcome supervision, the same advantage $\hat A_i$ weights every token in an answer. A correct final result reinforces the dead ends and lucky guesses along its path; an incorrect result penalizes any sound steps it contained. Larger groups reduce baseline variance but do not identify the decisive token.
 
 Process rewards can address that, but they move difficulty into the verifier. A process critic must distinguish a recoverable detour from an invalid step, remain calibrated on current-policy traces, and resist optimization. The value model disappeared; a trustworthy process model can quietly reintroduce equivalent complexity.
 
@@ -174,7 +174,7 @@ Simulation restores cheap resets, but creates a new estimator boundary: an advan
 
 ### Continuous-action likelihoods
 
-Autoregressive action tokens expose $\log\pi(a_t\mid s_t)$ directly. Modern VLAs often produce continuous chunks through diffusion or flow matching. A naïve PPO ratio over the final action ignores the stochastic denoising trajectory that generated it.
+Autoregressive action tokens expose action log-probabilities $\log\pi(a_t\mid s_t)$ directly. Modern VLAs often produce continuous chunks through diffusion or flow matching. A naïve PPO ratio over the final action ignores the stochastic denoising trajectory that generated it.
 
 [DPPO](https://arxiv.org/abs/2409.00588) treats denoising as an augmented Markov decision process and applies policy optimization to the diffusion policy's actual stochastic transitions. This is more than an implementation detail. If the likelihood ratio does not correspond to the deployed sampler, clipping controls the wrong distribution.
 
