@@ -152,13 +152,21 @@ The release gate now has four layers.
 
 First, deterministic checks validate source SHA, full-source extraction, narrator profile, measured duration, chunk count, and MP3 presence. The compiler refuses a profile mismatch or an asset beyond its reviewed limit.
 
-Second, local Whisper transcribes every cached synthesis chunk with word timestamps. The audit compares each transcript with the exact text sent to TTS, normalizes harmless spelled acronyms such as `C L I P`, and then applies five gates: aggregate word error rate must stay below 8%, no invented insertion may exceed two words, inserted fillers and non-lexical tokens are forbidden even when they contain one word, no chunk may exceed 50% error, and no untranscribed prefix, suffix, or internal region may exceed 1.5 seconds. The last two checks matter because laughter or an elongated sound may not appear as a normal word in the transcript.
+Second, local speech recognition transcribes every cached synthesis chunk with word timestamps. Whisper remains the default recognizer; Moondream Parakeet Redux is an optional local backend. The audit compares each transcript with the exact text sent to TTS, normalizes harmless spelled acronyms such as `C L I P`, and then applies five gates: aggregate word error rate must stay below 8%, no invented insertion may exceed two words, inserted fillers and non-lexical tokens are forbidden even when they contain one word, no chunk may exceed 50% error, and no untranscribed prefix, suffix, or internal region may exceed 1.5 seconds. The last two checks matter because laughter or an elongated sound may not appear as a normal word in the transcript.
 
 Third, waveform checks reject NaNs, infinities, denormals, clipping, and suspicious internal silence that can reveal a decoder seam. MP3 encoding can overshoot a clean floating-point waveform, so the exporter also leaves one decibel of headroom before encoding. These checks remain separate from speech-content QA because a repeated phrase can have a perfectly clean waveform. I then listen at the opening, inside long requests, at paragraph and heading joins, around every rerolled request, at difficult pronunciations, and at the ending. ASR is useful evidence. It is not an ear.
 
 Fourth, the ordinary site gates still run: targeted exporter tests, `git diff --check`, the full repository CI command, GitHub checks, and the Pages deployment. The live route must return HTTP 200. Each changed MP3 is fetched with a cache-busting query and its SHA-256 must match the committed asset.
 
 The first two canaries passed the earlier content and deployment gates: low aggregate WER, no long insertion artifacts, no high-error chunks, and exact production hashes. Listening still rejected them. One used an accent-specific preset that should never have been the unexamined corpus default. Both exposed joins inside prose. The next revision removed those joins but let tiny heading prompts improvise sounds that the threshold ignored. Each failure changed the release gate. A passing transcript and hash are evidence, not proof that a long-form narration sounds continuous or appropriate.
+
+## Where Moondream fits
+
+[Moondream Parakeet Redux](https://huggingface.co/moondream/parakeet-redux) is a speech recognizer. It can check the narration, but it does not generate the narrator's voice. The local Photon runtime returns word timestamps, so it can feed the same insertion, error, and unaligned-audio checks. A local 25-second opening sample confirmed that interface with Moondream 2.6.1. That small check establishes compatibility, not corpus-wide recognition accuracy.
+
+The audit accepts an explicit recognizer choice and records the backend, model, runtime, source digest, and MP3 hash. It caches transcripts by waveform content and recognizer settings. Changing a chunk therefore invalidates its transcript, while an unchanged chunk can reuse its recognition result. The narration remains full source, and the acceptance thresholds remain unchanged.
+
+A recognizer can mishear a model name or silently omit a vocal artifact. Compare disputed regions with another recognizer and listen to the audio; do not lower the gate until a failing sample passes. Chunk recognition also does not test the assembled transition, so the opening, request joins, and ending still require a continuity check.
 
 ## Blog shipping now means two pull requests
 
