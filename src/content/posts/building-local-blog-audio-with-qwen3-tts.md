@@ -101,7 +101,7 @@ HUMAN_MODEL = "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16"
 HUMAN_VOICE = "casual_female"
 HUMAN_NARRATOR_SEED = 1904
 
-# Accepted request arguments, unused by Voxtral in mlx-audio 0.5.3:
+# Accepted request arguments, unused by Voxtral in mlx-audio 0.5.8:
 HUMAN_TEMPERATURE = 0.3
 HUMAN_TOP_K = 50
 HUMAN_TOP_P = 0.9
@@ -115,6 +115,16 @@ HUMAN_HEADING_PAUSE_SECONDS = 0.55
 The model, preset, requested settings, chunk seeds, speed, pause policy, pronunciation lexicon, and source digest enter the manifest profile. New exports also record the runtime and distinguish requested sampling arguments from the decoding method that actually runs. The exporter pins that runtime so an upgrade requires another control check. Change the article and that post becomes stale. Change a generation setting and every assigned post becomes stale. A rejected chunk receives a reviewed seed override, so the exporter can reuse its accepted cached sample instead of rolling the dice again. The seed records the choice; the cache preserves the accepted waveform. Keeping that artifact does not make it current when its source or generation profile changes.
 
 There is also a deployment boundary. Mistral's model card says the supplied reference voices and model inherit CC BY-NC 4.0. That fits this non-commercial personal site. A commercial product would need a model and voice license that permits its use; acoustic quality does not override licensing.
+
+## Opening defects can come from the runtime
+
+The October rebuild reproduced two failures with MLX-Audio 0.5.3: a repeated opening in the Qwen benchmark post and extra speech before its final section. Moondream's chunk transcript exposed both. Changing the pause between requests cannot repair words already generated inside a request.
+
+An [upstream Voxtral fix](https://github.com/Blaizzy/mlx-audio/pull/989), released in [MLX-Audio 0.5.8](https://github.com/Blaizzy/mlx-audio/releases/tag/v0.5.8), corrects the first-frame generation path. The old path took an extra language-model step after the prompt's begin-audio state. The fixed path decodes the first frame directly from that state. This addresses a generation defect before waveform assembly.
+
+The rebuild pins 0.5.8 and retains the same checkpoint, fixed voice, bounded requests, and full waveform decode. A local comparison removed the repeated opening from the numeric canary. That result does not certify every chunk; the complete content and waveform gates still apply. Temperature, top-k, and top-p remain unused by this Voxtral implementation.
+
+The runtime now enters both the post digest and the waveform cache key. An upgrade cannot silently reuse speech produced by the old decoder. Old seed overrides are also cleared because they were reviewed against the previous generation path. New overrides require another audit. This is why a source hash alone was never an adequate release contract.
 
 ## Paragraph groups are the failure boundary
 

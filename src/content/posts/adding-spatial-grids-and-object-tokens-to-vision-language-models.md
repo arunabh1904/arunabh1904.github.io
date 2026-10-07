@@ -46,7 +46,13 @@ An image cell refers to a region of a particular camera image. A bird's-eye-view
 
 The simplest adapter normalizes each 256-channel feature, then applies a learned map to 4,096 channels. It produces the same 256 tokens. A linear layer needs 256 times 4,096 weights, plus an optional bias: approximately one million parameters. This is a useful baseline because every output token retains a clear source cell.
 
-For input cell feature $x_i$, write the projected feature as $z_i=W x_i+b$. Here $W$ has 4,096 rows and 256 columns. The projection expands the representation width, but a linear map can have rank at most 256. A nonlinear MLP can change the representation more flexibly; it still cannot recover evidence that the encoder discarded.
+For each input cell, a linear projection multiplies its feature vector by a learned matrix and adds a bias. The matrix has 4,096 rows and 256 columns.
+
+$$
+z_i=W x_i+b.
+$$
+
+The projection expands the representation width, but a linear map can have rank at most 256. A nonlinear MLP can change the representation more flexibly; it still cannot recover evidence that the encoder discarded.
 
 Choose normalization deliberately. Layer normalization removes per-token scale information. If feature magnitude carries calibrated confidence, supply that confidence as a separate field before normalization destroys it. Measure the projected feature norms against the reader's existing embeddings, and test an explicit learned scale. Similar norms help numerical conditioning; they do not prove semantic compatibility.
 
@@ -59,7 +65,7 @@ This is different from sequence concatenation. Appending four vectors along the 
 ![Four adjacent grid cells become one wider vector before projection; the output has fewer spatial tokens.](/assets/images/spatial-adapter-grid.svg)
 *Author's proposed implementation. Merge adjacent cells in a fixed order, project their combined channels, and update the output grid metadata. The operation preserves the grouped values before the learned projection, but reduces their independent access in the reader.*
 
-The following PyTorch component implements the example. It expects an ordinary row-major grid, not the internal packed order of a particular vision encoder. It intentionally excludes padding and position construction so those contracts remain visible.
+The PyTorch component implements this local merge and projection. It expects an ordinary row-major grid, not the internal packed order of a particular vision encoder. It intentionally excludes padding and position construction so those contracts remain visible.
 
 ```python
 import torch
@@ -140,13 +146,13 @@ The record separates measured state from inferred attributes. For example, an in
 
 Use separate small encoders for appearance, geometry, and attributes. Concatenate their outputs and project the result to the reader width. Geometry can pass through an MLP or a Fourier feature encoding followed by an MLP. Fourier features express coordinates at several frequencies; their scales must match the physical distances the task needs to distinguish.
 
-For object $j$, let $f_j$ be its appearance feature, $g_j$ its geometry, and $a_j$ its attributes. Let $G$ and $A$ encode geometry and attributes. A proposed object token is:
+For each object, the proposed projector receives three feature groups: normalized appearance, encoded geometry, and encoded attributes. The equation uses lowercase f for appearance, g for geometry, and a for attributes. Uppercase G and A denote the geometry and attribute encoders.
 
 $$
 z_j=P\bigl([\operatorname{LN}(f_j);G(g_j);A(a_j)]\bigr).
 $$
 
-The brackets mean channel concatenation within one object. The projector mixes appearance, location, and state into a reader-width vector. It does not merge different objects. If one token loses important detail, allocate a small fixed group per object, such as appearance and state tokens, and include an object-group identifier so the association remains explicit.
+The three feature groups are concatenated along the channel axis within one object. The projector mixes appearance, location, and state into a reader-width vector. It does not merge different objects. If one token loses important detail, allocate a small fixed group per object, such as appearance and state tokens, and include an object-group identifier so the association remains explicit.
 
 Region features must follow the same transforms as the boxes. If an image is cropped or resized, transform the box before pooling its features. If point features are pooled inside a 3D box, specify whether coordinates are local to the object or global to the scene. Local coordinates describe shape; scene coordinates describe position. Both may be useful, but neither should silently replace the other.
 
