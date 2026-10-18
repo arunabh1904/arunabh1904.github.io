@@ -34,8 +34,6 @@ The official [GGUF release](https://huggingface.co/meta-models/Muse-Glimmer-30B-
 
 The vision projector adds about `1.4 GB`; Meta's DFlash speculative draft model adds about `1.6 GB`. Even the `20 GB` quant plus both auxiliaries leaves a credible memory budget on this machine. Context still consumes KV-cache capacity, so “supports 131K” should not be read as “131K will feel interactive.”
 
-The measured artifact was `Muse-Glimmer-30B-KQuant-17GB-Q4_K_M.gguf`, at `16,756,683,904` bytes.
-
 ## Benchmark setup
 
 I ran the model on:
@@ -71,7 +69,7 @@ I report two first-token measurements. *First generated token* includes hidden r
 
 The largest correction was explicit placement. `--gpu-layers all` lifted the short decode rate from `9.92` to `27.90 tok/s`, a `2.8×` change before speculation entered the comparison. It also cut the long prompt's first generated token from `32.26 s` to `17.10 s`. A model that fits in unified memory can still run slowly if the engine chooses a conservative CPU/GPU split.
 
-DFlash then changed decode rather than fit. With `--spec-type draft-dflash` active, the server accepted `87.9%` of proposed short-suite draft tokens and `79.8%` on the long suite. Short decode rose from `27.90` to `48.31 tok/s`; long decode rose from `26.62` to `35.47 tok/s`. The speedup is smaller at `8K` because prompt processing is unchanged by speculative generation and dominates more of the request.
+DFlash then changed decode rather than fit. With `--spec-type draft-dflash` active, the server accepted `87.9%` of proposed short-suite draft tokens and `79.8%` on the long suite. Short decode rose from `27.90` to `48.31 tok/s`; long decode rose from `26.62` to `35.47 tok/s`. The smaller decode gain at `8K` accompanies lower draft acceptance, but this run does not isolate its cause. Prompt processing is outside the decode measurement; it helps explain why the end-to-end gain is smaller still.
 
 Reasoning creates a second latency boundary. In the short DFlash suite, the server began hidden generation at `1.01 s`, while the first visible integer arrived at `2.67 s`. A client that reports only transport-level time to first token still makes the chat experience look faster than it feels, although the gap is no longer severe.
 

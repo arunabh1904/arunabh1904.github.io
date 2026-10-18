@@ -18,8 +18,6 @@ Industry research rarely fails because nobody had an idea. It fails because the 
 
 [Eugene Vinitsky's guide to good research](https://emerge-lab.github.io/papers/an-unsolicited-guide-to-good-research.pdf) stayed with me because it treats that survival as a craft rather than a heroic breakthrough. Eugene leads the [EMERGE Lab](https://emerge-lab.github.io/), but his advice transfers cleanly to industry.
 
-Those constraints change the work without changing its central questions. A researcher still needs to decide what matters, design experiments that produce knowledge, and collaborate without losing momentum. Good ideas help. Clear judgment and reliable execution determine whether those ideas survive contact with an organization.
-
 ## Build taste
 
 Research taste is the ability to decide what deserves attention. The literature grows faster than anyone can read it, while consequential ideas remain much rarer than papers. A new researcher experiences that gap as overload. An experienced one builds a compressed map: foundational results, useful extensions, unresolved questions, and noise.
@@ -36,8 +34,6 @@ Interest is not the same as comfort. Work that teaches you something usually sit
 
 ## Do not block
 
-Serious research increasingly depends on the same coordination as serious engineering. The relevant skill is not simply being agreeable. It is keeping information and decisions moving across people who hold different pieces of the system.
-
 My simplest rule is: do not block. Surface constraints early, give honest timing, and leave enough context for someone else to proceed. An explicit blocker can be routed or planned around; a hidden one quietly stalls several people at once.
 
 Apply the same rule to yourself. Ask for help when someone else likely has the missing context. Do not spend days privately rediscovering an answer the team already knows. When the uncertainty is genuinely yours, step away long enough to stop repeating the same failed approach. A walk or a night's sleep often changes the representation of the problem, which is more useful than another hour of force.
@@ -50,10 +46,10 @@ Documentation is part of the experiment. Future you needs to know what changed, 
 
 Visibility only helps when the work is legible. A presentation should maximize what the audience understands, not how much detail the author can display. Proving that you did the work and helping someone reason about it are different goals.
 
-## Throughput is rigor
+## Throughput and rigor
 
 Compute changes the value of good judgment because it determines how quickly a question can meet evidence. Keep the GPUs busy, but make each run interpretable. Velocity without rigor produces noise; rigor without enough throughput leaves important decisions unresolved. A good research system makes the two reinforce each other.
 
-In industry, time-to-evidence is part of rigor. A perfect result that arrives after the decision is not influence; it is an archive.
+A rigorous result can still arrive too late to inform a decision. Turnaround time matters alongside experimental design.
 
-That is what I took from Eugene's guide. None of these practices guarantees a breakthrough. Together they give a good idea enough structure to meet evidence, become legible to collaborators, and influence a real decision. In industry, that system matters more than the romance of the isolated insight.
+That is what I took from Eugene's guide: make each run interpretable, leave enough context for collaborators, and get the evidence to the people who need it in time.

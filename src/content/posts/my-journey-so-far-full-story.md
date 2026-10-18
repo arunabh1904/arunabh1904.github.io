@@ -24,8 +24,6 @@ Most of my schooling was in Jaipur, and like many aspiring engineers, I spent th
 
 Despite working hard, I did not clear the IIT exam. At 18, that failure felt crushing, like I had let everyone down after years of preparation. Even now, at 33, the memory still makes my body tense up.
 
-The lesson was not simply to work harder. I had already worked hard in Kota. I had to learn that effort can still end in failure, that a failure can feel physically real without becoming a permanent verdict, and that an absorbing escape like DOTA can be both refuge and trap. Resilience began to mean choosing what to do after the result, not denying how much the result hurt.
-
 ## MIT Manipal
 
 I stayed back an extra year, prepared again, and eventually got accepted to MIT, Manipal. It was not an IIT, but it was a solid engineering school, and I had a chance to reset. I did not use that chance immediately. I stayed in my introverted shell, played even more DOTA, often 6-8 hours a day, and picked up smoking cigarettes, which is still the worst habit I have ever had. I skipped many classes during my first two years, and at one point my cumulative GPA was 0.74, not out of 4, but out of 10.
@@ -42,8 +40,6 @@ Even with that ridiculous ending, the concept was real. A similar design is now 
 
 ![The areca-nut harvesting robot built for my undergraduate thesis](/assets/images/IMG_8842.jpg)
 *Our undergraduate prototype climbed an areca palm and used a remotely controlled cutter. source: personal project archive*
-
-Undergrad changed my direction because the late start still compounded. The GPA recovery proved I could rebuild after wasting time; the robot proved that I cared most when engineering had a physical consequence for someone else. The reversed video was classic *jugaad*. It is funny in retrospect and was not a substitute for a working demonstration, but the underlying problem made robotics feel worth pursuing.
 
 ## Depression
 
@@ -66,7 +62,7 @@ Those experiences helped me find a purpose and clarify what I wanted to work on.
 
 I was accepted into three schools. I still remember rereading the first acceptance email about five times because I could not quite believe it. I packed my bags and moved to the United States to study robotics at the Colorado School of Mines.
 
-Recovery did not arrive as one clean insight. Friends changed my immediate environment, loss changed my sense of time, and robotics supplied a direction concrete enough to act on. Purpose did not make depression trivial; it made the next application, course, or volunteer shift easier to choose. The application mix-up also left me with a practical habit I still keep: verify the mundane details and preserve a backup path, because an administrative error can be as consequential as an academic one.
+Recovery did not arrive as one clean insight. Friends changed my immediate environment, loss changed my sense of time, and robotics supplied a direction concrete enough to act on. Purpose did not make depression trivial; it made the next application, course, or volunteer shift easier to choose.
 
 ## Colorado School of Mines
 
@@ -92,7 +88,7 @@ We eventually deployed the Husky inside CSM's Edgar Mine, where it navigated wit
 ![The hexapod robot used for a graduate robotics project](/assets/images/hexy.jpg)
 *The hexapod project paired a 1D LiDAR and Pixy camera with a small mobile platform. source: personal project archive*
 
-Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grades mattered, but the projects I took on, the problems I solved, and the people I learned from shaped me more. My advice to current graduate students is simple: take on projects that stretch you, use the resources around you, and follow problems that genuinely excite you. That is how progress starts to compound.
+Looking back, the best thing I did was build a strong foundation in the skills I cared about and then find practical ways to use them. Grades mattered, but the projects I took on, the problems I solved, and the people I learned from shaped me more.
 
 ## Breaking into robotics
 
@@ -112,13 +108,13 @@ The process felt mechanical compared with the work I wanted to do. That was the 
 
 Right after grad school, I landed at DEKA and joined a small, tight-knit team building autonomous robots for FedEx's last-mile deliveries. DEKA was mostly known for medical devices, so the robotics project felt like new territory. I started in planning, but I soon found my way into robot perception and machine learning. That team is where I really expanded my skills, diving into PyTorch, TensorFlow, TensorRT, CUDA, and OpenCL.
 
-My graduate research had focused entirely on optimal control, so I had no idea where to start when DEKA asked me to train a neural network. I remember putting on my headphones and typing because action felt better than waiting to feel ready. That discomfort started the work that eventually led to my first patent.
+My graduate research had focused entirely on optimal control, so I had no idea where to start when DEKA asked me to train a neural network. I remember putting on my headphones and typing because action felt better than waiting to feel ready. That discomfort started the work that eventually led to my first [patent](https://patents.justia.com/inventor/arunabh-mishra).
 
 I read constantly, learned how to collect training data, and built the mechanisms we needed. Our data-collection robot was essentially a modified wheelchair with carefully calibrated cameras. I spent countless hours driving it, adjusting camera angles, and checking that we covered the necessary views.
 
 Then I labeled the data myself. I wanted to prove to my manager and to myself that the concept could work. Eventually I learned to train the network, built visualizations that exposed its behavior, and deployed the model in real time on a Jetson Xavier.
 
-Some of this work may look straightforward to someone graduating with an ML degree today. I was learning it from scratch on the job, so each small success mattered. The experience taught me that uncertainty is often where the fastest learning begins. Also, file a lot of [patents](https://patents.justia.com/inventor/arunabh-mishra).
+Some of this work may look straightforward to someone graduating with an ML degree today. I was learning it from scratch on the job, so each small success mattered. The experience taught me that uncertainty is often where the fastest learning begins.
 
 DEKA opened the door to my dream job. The projects taught me technical skills, but they also changed how I approach unfamiliar problems and work with other people. I made close friends there whom I still talk to today.
 
@@ -126,7 +122,7 @@ DEKA opened the door to my dream job. The projects taught me technical skills, b
 
 Joining Zoox realized a long-held goal: working on autonomous driving. I am now a technical lead on the Perception team, where I lead a broader initiative to make our autonomy systems more capable and efficient. But I also had imposter syndrome when I moved into the role. I was surrounded by incredibly talented people and felt out of place at first. The way through it was not one dramatic breakthrough. It was a series of small wins: understanding the system, making good technical decisions, and helping the team ship. The work has to improve a system that runs on real vehicles, so technical quality and production usefulness are inseparable.
 
-One part of that work I am particularly proud of is where it began. Around the middle of last year, I started prototyping the idea as a small side project. At first, it was simply something I wanted to test. Once we had enough evidence that the approach could work, the project grew into a dedicated team and roadmap. Over the last couple of quarters, we turned it into a production improvement that made the system more efficient while improving quality, and we shipped the result earlier this year.
+One part of that work I am particularly proud of is where it began. I started prototyping the idea as a small side project. At first, it was simply something I wanted to test. Once we had enough evidence that the approach could work, the project grew into a dedicated team and roadmap. We turned it into a production improvement that made the system more efficient while improving quality, and we shipped the result.
 
 That transition from a side project to a team also changed my role. Moving from an IC role back into technical leadership was intentional. By then, I had enough experience under my belt to be useful in both modes: I could go deep on the hard technical decisions, but I could also set direction, explain tradeoffs, and help other people execute. I also participate in a broader research committee across Zoox, which gives me exposure to technical direction outside my immediate area.
 

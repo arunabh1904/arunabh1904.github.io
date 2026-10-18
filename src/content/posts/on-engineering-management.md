@@ -9,14 +9,14 @@ tags:
   - Engineering Management
   - Leadership
   - Career
-summary: How judgment, evidence, trust, delegation, and visible progress turn engineering management into compounding team capability.
+summary: What I am learning about technical judgment, trust, feedback, and giving engineers room to own meaningful problems.
 ---
 
 # On Engineering Management
 
 An engineering manager’s job is to help a team improve business outcomes under real constraints while creating the conditions for people to grow. The role spans coaching, architecture, hiring, planning, conflict resolution, performance management, communication, and process design. But those activities are mechanisms toward a broader goal, not the final output. The output is a team that can repeatedly identify an important problem, make a sound decision, and turn that decision into a working system. Kamil Sindi’s [Managers Playbook](https://github.com/ksindi/managers-playbook) is a resource I keep returning to, and it has deeply influenced how I think about the job.
 
-A good engineering manager is not judged by the number of meetings they attend, the decisions that pass through them, or how indispensable they appear. The real test is whether the team makes better decisions, moves with greater conviction, and becomes more capable over time. Management, at its best, creates a compounding loop. Good decisions create progress. Progress creates information. Information improves judgment. Better judgment gives the team greater autonomy and the ability to take on harder problems. A manager’s job is to keep that loop moving.
+A good engineering manager is not judged by the number of meetings they attend, the decisions that pass through them, or how indispensable they appear. The real test is whether the team makes better decisions, moves with greater conviction, and becomes more capable over time.
 
 ---
 
@@ -24,7 +24,7 @@ I love writing code! Some of the most gratifying moments in my career have come 
 
 A good manager keeps technical work grounded in its purpose and aligned with the goals of the business or organization. What user problem does the work solve? What capability does it unlock? What constraint does it remove? What becomes possible once it is complete?
 
-That does not mean every technical decision needs an immediate return. Foundational research, reliability work, infrastructure, and technical debt reduction all matter. But each type of work still needs a theory of impact: how will it affect the business a few weeks or a few months from now? A team may spend more time designing an interface up front so that the next integration is easier. It may also slow down an implementation because a rushed system accrues technical debt and becomes harder to replace once production depends on it. The return can be delayed, but it cannot be undefined.
+That does not mean every technical decision needs an immediate return. Foundational research, reliability work, infrastructure, and technical debt reduction all matter. But each type of work still needs a theory of impact: how will it affect the business, and when could we expect to see evidence? A team may spend more time designing an interface up front so that the next integration is easier. It may also slow down an implementation because a rushed system accrues technical debt and becomes harder to replace once production depends on it. The return can be delayed, but it cannot be undefined.
 
 A theory of impact is stronger when the engineer doing the work helps shape it. That participation matters especially for stretch goals. The manager can set the goal, explain why it matters, and make the constraints clear, but the engineer should help choose the path. Buy-in turns an assigned task into an owned decision. It also creates room for growth while keeping the engineer and manager aligned on what success means.
 
@@ -34,19 +34,19 @@ Leading by example is different from leading through dependency. If I take over 
 
 ---
 
-Go slow to go fast. Before committing to an expensive direction, a team should explore broadly. That means reading the literature, understanding previous attempts, establishing a baseline, writing down assumptions, and examining failure modes. The team should then build the smallest prototype that can either increase its confidence in the direction or reveal a reason to change it.
+Before committing to an expensive direction, a team should explore broadly. That means reading the literature, understanding previous attempts, establishing a baseline, writing down assumptions, and examining failure modes. The team should then build the smallest prototype that can either increase its confidence in the direction or reveal a reason to change it.
 
 The depth of investigation should match the cost and reversibility of the decision. A small, reversible product change does not require weeks of consensus-building. The team can make a reasonable decision, instrument it, and learn. An architecture that will define the system for years deserves more care. Expensive decisions deserve cheap evidence: a prototype, benchmark, ablation, trace, or small production experiment that can turn an abstract disagreement into an empirical question. The manager’s role is not to build the whole system, but to help the team create enough evidence to make a better decision.
 
 Before the work begins, the team should know which uncertainty it is trying to reduce, how much time it will spend, and what result would change the decision. Careful thinking should make execution more decisive, not postpone it.
 
-Sometimes, even after months of work, the results do not justify continuing in the same direction. I like the phrase “strong opinions, weakly held” because it captures how I think about these moments. The phrase does not mean weak conviction. Deep conviction often carries difficult work forward, but it must remain accountable to evidence. When results contradict the plan, the team has to update the plan rather than defend the time already spent. Otherwise, sunk cost can keep a six-month project alive even when a one-week experiment could have disproved its central assumption. Battle scars should sharpen future questions, not fossilize conclusions that the evidence no longer supports.
+Sometimes, even after months of work, the results do not justify continuing in the same direction. I like the phrase “strong opinions, weakly held” because it captures how I think about these moments. The phrase does not mean weak conviction. Deep conviction often carries difficult work forward, but it must remain accountable to evidence. When results contradict the plan, the team has to update the plan rather than defend the time already spent. Otherwise, sunk cost can keep a six-month project alive even when a one-week experiment could have disproved its central assumption.
 
 ---
 
 Every person on the team, no matter how new or junior, should be able to express an opinion freely. Healthy teams question the framing of a problem, examine the data, expose missing assumptions, and propose alternatives. Silence can look like alignment, but it can also mean people no longer believe disagreement is worth the cost. I have seen teams fail at both ends of this spectrum. Some suppress disagreement in the name of speed, producing superficial alignment and delayed resistance. Others let discussion continue indefinitely in the name of inclusion until nobody knows who owns the decision. Inclusion does not give everyone veto power. It gives each relevant perspective a genuine chance to change the team’s model of the problem.
 
-Before a decision, the goal is to surface the strongest arguments and choose the best direction. Once the team decides, the goal shifts to coordinated execution, and everyone rebases onto the chosen direction. People are more willing to support a decision they opposed when they understand the reasoning, know their concerns were considered, and can see what evidence would justify revisiting it. The decision should make the desired outcome, accepted tradeoffs, owner, success criteria, and conditions for reconsideration explicit. Once that context is clear, the team can commit to the direction and test it against reality. A team that learns from execution will usually beat one that keeps defending its forecast. Time spent executing often beats even a very strong prior.
+Before a decision, the goal is to surface the strongest arguments and choose the best direction. Once the team decides, the goal shifts to coordinated execution, and everyone rebases onto the chosen direction. People are more willing to support a decision they opposed when they understand the reasoning, know their concerns were considered, and can see what evidence would justify revisiting it. The decision should make the desired outcome, accepted tradeoffs, owner, success criteria, and conditions for reconsideration explicit. Once that context is clear, the team can commit to the direction and test it against reality. A team that learns from execution will usually beat one that keeps defending its forecast.
 
 ---
 
@@ -66,7 +66,7 @@ The same consistency should apply to expectations. People should know what good 
 
 I’ve often seen 1:1s become status meetings. Most updates can be written asynchronously or handled in standups. The value of a 1:1 lies in the private context around the work. I use the meeting for questions that are difficult to ask in a project forum: What is taking more energy than it should? Where do you need more context or authority? Which part of your work is helping you grow? What are you avoiding? What do you believe the team is getting wrong? I do not treat these as a checklist. A question matters only if the answer changes what one of us understands or does next. The goal is to surface issues while they are still small enough to address.
 
-Feedback is a gift in both directions, and I try to be as intentional about receiving it as I am about giving it. When I ask, “What am I doing that makes your job harder?” I need to listen without defending my intent because my response determines whether the person answers honestly the next time. Questions are only one part of coaching. I also bring observations, context, feedback, and a point of view. Sometimes I ask, “What do you think?” Sometimes I explain how I would reason about the problem. Sometimes the person needs a direct decision. If I only ask questions and never offer judgment, I leave them alone with a problem I should be helping solve.
+I try to be as intentional about receiving it as I am about giving it. When I ask, “What am I doing that makes your job harder?” I need to listen without defending my intent because my response determines whether the person answers honestly the next time. Questions are only one part of coaching. I also bring observations, context, feedback, and a point of view. Sometimes I ask, “What do you think?” Sometimes I explain how I would reason about the problem. Sometimes the person needs a direct decision. If I only ask questions and never offer judgment, I leave them alone with a problem I should be helping solve.
 
 A 1:1 also needs follow-through. If someone raises the same concern three times and nothing changes, the meeting teaches that person that honesty is a waste of time. A 1:1 should end with a clear next step, an owner, or an explicit decision not to act. The manager should then follow up.
 
@@ -93,7 +93,5 @@ Retrospectives are one way to decide where that capacity should go. In a retrosp
 ---
 
 I keep coming back to four ideas: give people the context they need, let them own meaningful problems, be clear about the standard, and keep ego out of the way. In practice, that means explaining why the work matters, inviting disagreement before a decision, and giving engineers room to choose the path. Once the team commits to a direction, it ships, measures what happens, and lets the evidence change the plan.
-
-Working alongside the team on technical problems lets me understand the tradeoffs, offer useful feedback, and remove blockers without taking the problem back. I want engineers to take on broader scope and the team to keep moving without waiting for me. That works only when problems surface early, expectations stay clear, and the plan leaves room to explore new ideas, improve reliability, and remove recurring friction.
 
 I am still learning how to do this job well. These principles help me see what is working and where I need to improve. I will not always have the best answer, and I will get things wrong. What matters is recognizing it, updating my thinking, and continuing to learn from the people around me.

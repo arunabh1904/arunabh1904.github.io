@@ -34,7 +34,7 @@ The official [`DeepSeek-V4-Flash-0731` repository](https://huggingface.co/deepse
 
 This table separates storage from inference. Downloading `167 GB` to the SSD proves only that the files fit on disk. It does not make them resident in memory, and macOS swap does not convert a `64 GB` laptop into a `200 GB` inference server. An experimental engine could offload experts and stream weights, but a deficit above `100 GB` moves the problem from GPU or unified-memory bandwidth to transfers from much slower storage. That is a systems experiment, not a sensible daily serving plan.
 
-For a dense model, almost every layer uses almost every weight for every token. For this MoE model, the router activates six of 256 routed experts per token, alongside shared components. That sparsity cuts expert computation, but the next token can select other experts. Unless the runtime accepts the large latency cost of repeatedly fetching missing experts, all routed experts remain part of the resident model state.
+This model activates six of 256 routed experts per token, alongside shared components. The smaller active count reduces computation, while the full expert bank determines weight capacity.
 
 The `0731` checkpoint also includes an attached DSpark speculative-decoding module. DeepSeek says the release keeps the preview architecture and changes post-training, while the public model card describes the official checkpoint as new weights plus the draft module. That is why `0731` is about `7 GB` larger than the roughly `160 GB` preview repository even though both use the same `284B`-total, `13B`-active backbone.
 

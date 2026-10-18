@@ -16,7 +16,7 @@ import { attentionMechanismsPlayground } from '../../lib/python-playground-examp
 
 # How Attention Stores and Retrieves Context
 
-Attention is a learned memory interface. Keys say what stored content can be matched, values carry the content itself, and a query retrieves the mixture needed at the current position. That separation is how attention stores and retrieves context.
+Attention is a learned memory interface. Keys say what stored content can be matched, values carry the content itself, and a query retrieves the mixture needed at the current position.
 
 The mechanism began as an escape hatch from a fixed-size memory. An encoder-decoder recurrent neural network had to compress a source sentence into one hidden state and ask that state to preserve everything the decoder might need. Attention let each decoding step reach back to the encoder states directly. The Transformer made the larger move in 2017: it removed recurrence from the main sequence path and used attention itself to route information between positions.
 
@@ -189,8 +189,6 @@ That cost created several distinct design families:
 | Layer composition | Hybrid attention | Alternate cheap recurrent/local mixers with periodic full attention | Better efficiency-quality balance, more system complexity |
 | Output control | Gated attention | Scale retrieved features before the residual update | More control and stability, little change to core attention cost |
 
-The comparison keeps the input sequence fixed and changes what remains available for later queries.
-
 The irreversible choice is the memory carrier. GQA preserves token-addressable K/V vectors but reduces how many independent copies exist. MLA keeps a token-indexed cache but compresses each token through learned latent projections. Delta-rule models stop retaining a token-indexed history at all: later writes share finite state, so targeted update and forgetting become part of retrieval quality. A hybrid does not erase that distinction; it spends most layers on bounded memory and inserts occasional layers that can still inspect explicit positions.
 
 ### Share the cache
@@ -353,7 +351,7 @@ def gated_causal_sdpa(q, k, v, gate_logits, dropout_p=0.0):
     return retrieved * torch.sigmoid(gate_logits)
 ```
 
-Raschka's Qwen example places this output gate alongside zero-centered QK-Norm and partial RoPE. Those two choices alter score normalization and positional encoding; they are useful co-designs, not parts of the definition of gating. Keeping the axes separate explains why an architecture can combine gated full attention with GQA, MLA, or a local window.
+[Raschka's Qwen implementation example](https://sebastianraschka.com/llm-architecture-gallery/gated-attention/) places this output gate alongside zero-centered QK-Norm and partial RoPE. Those two choices alter score normalization and positional encoding; they are useful co-designs, not parts of the definition of gating. Keeping the axes separate explains why an architecture can combine gated full attention with GQA, MLA, or a local window.
 
 ### Replace history with state
 
@@ -451,7 +449,7 @@ Decode is naturally recurrent; prefill must expose parallel matrix work. Yang et
 
 ### Mix cheap memory with exact retrieval
 
-Fixed-size recurrent memory is efficient but necessarily capacity-limited. Modern hybrid architectures therefore use cheap sequence mixers for most layers and periodically restore a full or compressed softmax-attention layer. Qwen-style hybrids combine runs of Gated DeltaNet with gated full attention; other systems substitute Lightning Attention or Mamba-style state-space blocks. Ali's Kimi K3 account gives the ratio a concrete form: 23 four-layer groups, each with three Kimi Delta Attention layers followed by one gated MLA layer.
+Fixed-size recurrent memory is efficient but necessarily capacity-limited. Modern hybrid architectures therefore use cheap sequence mixers for most layers and periodically restore a full or compressed softmax-attention layer. Qwen-style hybrids combine runs of Gated DeltaNet with gated full attention; other systems substitute Lightning Attention or Mamba-style state-space blocks.
 
 The Gated DeltaNet paper shows the same design choice at two scales. Its H1 and H2 stacks interleave recurrent modules with sliding-window attention; the block diagram then exposes the query, key, value, update, and output-gate paths.
 
@@ -475,7 +473,7 @@ The most useful empirical results compare one mechanism against a nearby alterna
 | Gated Attention | Head-specific elementwise output gating gave the strongest result among the tested gate positions and improved training stability. | Whether the same gain survives every architecture, scale, and normalization recipe. |
 | Kimi Linear | The authors report that the KDA hybrid surpassed full attention in their controlled short-context, long-context, and RL-scaling comparisons. | Independent matched-data comparisons and the maturity of optimized kernels across different hardware. |
 
-Raschka's larger caveat is the right one: there is still no single matched-data, matched-compute study that trains GQA, MLA, sparse attention, gated attention, recurrent memory, and their hybrids under one controlled recipe. Kernel maturity also changes observed throughput. A theoretically cheaper hybrid can lose to conventional GQA on a local system if its recurrent or latent-attention path lacks an optimized kernel.
+[Raschka's comparison](https://magazine.sebastianraschka.com/p/visual-attention-variants) raises a useful limitation: these results do not come from one matched-data, matched-compute study of all the attention families. Kernel maturity also changes observed throughput. A theoretically cheaper hybrid can lose to conventional GQA on a local system if its recurrent or latent-attention path lacks an optimized kernel.
 
 ## From explicit retrieval back to recurrent memory
 

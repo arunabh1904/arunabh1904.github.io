@@ -56,14 +56,14 @@ Language post-training usually assumes a token sequence with a tractable log pro
 
 The action representation is part of the policy. Change it, and the same physical correction may go from one token edit to a coordinated change across an entire trajectory.
 
-### FAST compresses the trajectory before it becomes language
+### Action representations change the update
 
-FAST compresses the temporal redundancy in a trajectory before tokenization. It transforms a continuous action chunk into frequency coefficients and quantizes them. Broad low-frequency motion appears before finer corrections, after which byte-pair encoding compresses recurring patterns. Smooth trajectories therefore become shorter token sequences for an autoregressive VLM.
+As [Part II explains](/blog/2026/07/15/omni-model-pretraining-decisions.html), FAST transforms action chunks into quantized frequency coefficients and compresses them into tokens. The post-training consequence is a categorical likelihood over a whole trajectory.
 
 ![FAST action tokenization transforms a trajectory into frequency coefficients and compact tokens](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-paper-figure.jpg)
 *FAST transforms continuous action chunks into frequency coefficients and compresses the resulting discrete sequence before autoregressive prediction. source: [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html)*
 
-FAST exposes a categorical token likelihood that fits directly into SFT and preference objectives. Its token order also affects credit assignment: early low-frequency tokens define the broad motion, while later tokens refine it. A sequence-level preference can therefore penalize an otherwise valid approach because one high-frequency correction is wrong.
+That likelihood fits directly into SFT and preference objectives. Token order also affects credit assignment: early low-frequency tokens define the broad motion, while later tokens refine it. A sequence-level preference can therefore penalize an otherwise valid approach because one high-frequency correction is wrong.
 
 [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html) uses a different action representation at each stage. FAST tokens allow web and robot tasks to share a discrete pretraining objective. A continuous expert added during post-training provides finer control and faster inference. The representation used for heterogeneous pretraining is therefore separated from the representation used during execution.
 
