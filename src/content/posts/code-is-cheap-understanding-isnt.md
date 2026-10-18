@@ -61,23 +61,17 @@ The adult in the room asks a more boring question: why does this thing need to e
 
 ## Match model to task
 
-“Big-model smell” is not what happens when an overpowered model over-engineers a small change. In the model chatter around [Claude Fable 5](https://www.anthropic.com/claude/fable), the phrase is closer to a compliment: the model feels broad enough to understand an underspecified problem, exercise judgment, and keep making sensible decisions without having every intermediate step dictated. [Simon Willison described that impression](https://simonwillison.net/2026/Jun/9/claude-fable-5/) as a combination of slowness, expense, and an unusually deep store of knowledge. [Shlok Khemani's account](https://www.shloked.com/writing/fable-5-first-impressions) emphasizes the more important part for agentic work: given a vague objective, the model inferred the intended result and found a coherent path toward it.
+[Simon Willison describes “big-model smell”](https://simonwillison.net/2026/Jun/9/claude-fable-5/) as a combination of slowness, expense, and an unusually deep store of knowledge. The model feels broad enough to understand an underspecified problem, exercise judgment, and keep making sensible decisions without having every intermediate step dictated.
 
 That smell is real, and sometimes it is exactly what I want. Difficult architecture, deep synthesis, and long-running work benefit from a model that can resolve ambiguity instead of merely executing instructions. But capability does not imply universal deployment. A two-line utility fix can still be a poor place to spend the slowest, most expensive form of judgment.
 
-My workflow is increasingly heterogeneous, but there are two separate choices hiding inside that statement: the working environment and the model. I use [Cursor](https://www.cursor.com/) when I want to stay close to the implementation and [Claude Code](https://www.anthropic.com/claude-code) when a bounded job can run more independently. Within either kind of harness, I can route execution among models such as [GLM-5.2](https://z.ai/blog/glm-5.2), [Grok 4.5](https://x.ai/news/grok-4-5), or OpenAI's deliberately tiered [Terra and Sol](https://openai.com/index/previewing-gpt-5-6-sol/) according to the task's ambiguity, duration, latency, and cost.
-
 The most useful practitioner pattern I found in the surrounding X discussion is not a new leaderboard winner but a division of cognitive labor. [Willison reports](https://simonwillison.net/2026/Jul/3/judgement/) telling Fable to use its own judgment to send routine coding to lower-power subagents. The frontier model spends its scarce capability deciding what the work is, how to decompose it, and what deserves review; cheaper models perform the bounded execution. That is the model stack I want: not one brain applied indiscriminately, but a manager that knows when the task needs judgment and when it only needs throughput.
 
-Those exact names will age. That is fine. Use the expensive model when ambiguity, consequence, or deep reasoning justifies it. Use faster and cheaper models for execution after the problem has been reduced to something mechanical. Use subagents when work is genuinely independent. Do not send a genius to alphabetize a list.
-
-This is not only thrift. It is architecture.
+Use the expensive model when ambiguity, consequence, or deep reasoning justifies it. Use faster and cheaper models for execution after the problem has been reduced to something mechanical. Use subagents when work is genuinely independent. Do not send a genius to alphabetize a list.
 
 ## Tokens are a system resource
 
-We already reason about CPU, memory, bandwidth, latency, storage, GPU utilization, and cloud spend. Intelligence cost belongs in the same design conversation. Tokens are a resource. Good agentic engineering does not give every worker the full history of the repository. It does not pay a frontier model to rediscover what another investigation already established. It keeps context boundaries clean, routes easy work to cheaper models, and escalates hard decisions. It distinguishes an extra million tokens buying useful thought from an extra million tokens buying beautifully articulated wandering.
-
-The agent stack may end up looking familiar to anyone who has designed distributed systems: specialized components, constrained interfaces, careful information flow, isolation where useful, observability, retries, escalation paths, and expensive resources reserved for the places that require them. The point is not to minimize token use at all costs. The point is to spend intelligence deliberately.
+We already reason about CPU, memory, bandwidth, latency, storage, GPU utilization, and cloud spend. Intelligence cost belongs in the same design conversation. Tokens are a resource. Good agentic engineering does not give every worker the full history of the repository. It does not pay a frontier model to rediscover what another investigation already established. It distinguishes an extra million tokens buying useful thought from an extra million tokens buying beautifully articulated wandering.
 
 ## Parallel work changes the job
 
@@ -113,19 +107,9 @@ There is something important in the friction itself. If a machine can generate c
 
 ## What remains
 
-The amount of human labor required to produce software will probably fall. Pretending otherwise does not help anyone. If one engineer can direct five, ten, or twenty capable agents, the economics of engineering organizations change. The shift may be uneven and gradual, but its direction is hard to ignore.
-
-Imagine two engineers in that organization. One has become extraordinarily good at generating things. Every task invokes the largest model. Every problem becomes a giant agent run. The engineer produces enormous diffs, consumes enormous amounts of inference, and understands a shrinking fraction of what ships. The other understands the system and the business. They decompose ambiguous problems, know when a small model will do, keep context clean, run independent work in parallel, delete aggressively, challenge the output, and take responsibility for what reaches production.
-
 [![An engineer routes distinct tasks to small specialist robots while reserving one large machine for the hardest work.](/assets/images/agentic-engineering-orchestration.png)](/assets/images/agentic-engineering-orchestration.png)
 _Agent manager, imagined by OpenAI ImageGen._
 
-Which one do you retain?
-
-The answer says a great deal about where the profession is going. The future does not belong to whoever can generate the most code. Code is becoming abundant. The durable skill is understanding what should be built, why it should exist, what context matters, and how to marshal increasingly capable machines to build it well.
-
-Writing software was always about building. Code is how we do it. Agents are tools too.
-
-Do not become a slop cannon. Do not worship the largest model. Do not outsource your learning. Spend intelligence deliberately. Understand the system. Understand the business. Build things that deserve to survive.
+Code is becoming abundant. The durable skill is understanding what should be built, why it should exist, what context matters, and how to marshal increasingly capable machines to build it well.
 
 Code is getting cheap. Understanding is not.

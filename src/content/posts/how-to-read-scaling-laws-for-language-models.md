@@ -50,7 +50,7 @@ Entropy is the floor for that tokenization and distribution; the KL divergence i
 
 Perplexity is exponentiated cross-entropy. A value of 20 can be read as an effective choice among roughly twenty equally likely continuations. The intuition is useful, but exponentiation can hide the additive quantity being optimized.
 
-A drop from 2.0 to 1.9 nats has the same loss difference as a drop from 3.0 to 2.9 nats. Both reduce perplexity by about 9.5%. Compare and fit loss in log space. Report perplexity when the multiplicative view helps.
+A drop from 2.0 to 1.9 nats has the same loss difference as a drop from 3.0 to 2.9 nats. Both reduce perplexity by about 9.5%. Cross-entropy loss is already a mean negative log-probability. Whether a scaling fit takes another logarithm of that loss depends on the fitted model. Report perplexity when the multiplicative view helps.
 
 ## Kaplan et al.: three curves, not one parameter curve
 

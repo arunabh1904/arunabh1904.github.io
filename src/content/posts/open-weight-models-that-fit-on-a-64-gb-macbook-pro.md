@@ -1,5 +1,5 @@
 ---
-title: Which Current Open-Weight Models Fit on a 64 GB MacBook Pro?
+title: Which Open-Weight Models Fit on a 64 GB MacBook Pro?
 date: '2026-08-13T04:00:00.000Z'
 section: blog
 blogGroup: local-ai-lab
@@ -13,7 +13,7 @@ summary: >-
   An August 13, 2026 fit guide for Muse Glimmer, Ministral, Granite, Nemotron,
   Mistral Small 4, and DeepSeek V4 Flash on a 64 GB Apple Silicon machine.
 ---
-# Which Current Open-Weight Models Fit on a 64 GB MacBook Pro?
+# Which Open-Weight Models Fit on a 64 GB MacBook Pro?
 
 A `64 GB` Apple Silicon machine needs room for model weights, the KV cache, runtime workspace, and macOS. This comparison uses the artifacts available on August 13, 2026.
 
@@ -23,8 +23,8 @@ File sizes come from the linked repositories. Only Glimmer has a local benchmark
 
 | Model | Practical local artifact | Artifact size | `64 GB` verdict | Why I would choose it |
 | --- | --- | ---: | --- | --- |
-| `Muse Glimmer 30B` | Official `Q4_K_M` GGUF | `16.76 GB` | Comfortable | Current dense vision-language model with an official Mac-oriented quant |
-| `Ministral 3 14B Instruct` | Official `Q4_K_M` GGUF | `8.24 GB` | Very comfortable | Simplest current general-purpose serving target in this set |
+| `Muse Glimmer 30B` | Official `Q4_K_M` GGUF | `16.76 GB` | Comfortable | Dense vision-language model with an official Mac-oriented quant |
+| `Ministral 3 14B Instruct` | Official `Q4_K_M` GGUF | `8.24 GB` | Very comfortable | Smallest official quantized artifact in this set |
 | `Granite 4.1 30B` | Official `Q4_K_M` GGUF | `17.49 GB` | Comfortable | Apache-licensed text model aimed at instruction following, tools, and RAG |
 | `Nemotron 3 Nano 30B-A3B` | Community MLX 4-bit conversion | About `17.8 GB` | Comfortable with a caveat | Only about `3B` parameters active per token, but the convenient Mac artifact is not NVIDIA's official release |
 | `Mistral Small 4 119B-A6B` | Official `NVFP4` checkpoint | About `70.8 GB` | No | Active compute is small; resident weights still exceed the laptop budget |

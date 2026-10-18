@@ -56,7 +56,7 @@ Single-step behavior cloning predicts a new action at every control step. This k
 [ACT](/paper%20shorts/2023/04/23/action-chunking-with-transformers-act.html) changes the target from one command to a short sequence of future actions. Each prediction represents a coherent movement rather than a single instant, while temporal ensembling smooths overlapping chunks. The policy therefore makes fewer independent high-level decisions across the same physical trajectory.
 
 ![ACT predicts coherent action chunks instead of one control target at a time](/assets/images/action-chunking-with-transformers-act-paper-figure.png)
-*Action chunking changes one training target from a scalar command into a short trajectory. source: [ACT](/paper%20shorts/2023/04/23/action-chunking-with-transformers-act.html)*
+*Action chunking changes one training target from one timestep's action vector into a short trajectory. source: [ACT](/paper%20shorts/2023/04/23/action-chunking-with-transformers-act.html)*
 
 Chunking alone does not handle several valid futures. If the robot can pass an obstacle on the left or the right, ordinary regression may average both paths into a collision. [Diffusion Policy](/paper%20shorts/2023/03/07/diffusion-policy-visuomotor-policy-learning-via-action-diffusion.html) instead denoises a complete continuous trajectory, preserving multiple possible action chunks.
 
@@ -71,12 +71,12 @@ Action results should therefore report the predicted horizon, the executed prefi
 
 Action chunks made the target longer. A naive tokenizer assigns one bin to every action dimension at every timestep, creating a long sequence of nearly repeated values. The language decoder spends the same autoregressive bandwidth on those values that it spends on words.
 
-[FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html) compresses the trajectory as a time series before presenting it to the language model. A discrete cosine transform separates broad motion from high-frequency corrections, quantization converts the coefficients into integers, and byte-pair encoding compresses recurring patterns. The resulting action sequence is substantially shorter than per-dimension tokenization over every timestep.
+[FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html) compresses the trajectory as a time series before presenting it to the language model. A discrete cosine transform separates broad motion from high-frequency corrections. Quantization converts the coefficients into integers and introduces loss; byte-pair encoding then losslessly compresses recurring patterns in that integer sequence. The resulting action sequence is substantially shorter than per-dimension tokenization over every timestep.
 
 ![FAST converts an action chunk into frequency coefficients and compact autoregressive tokens](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-paper-figure.jpg)
 *FAST spends tokens on the shape of a trajectory rather than every value at every timestep. source: [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html)*
 
-Low-frequency coefficients describe the broad motion, while higher frequencies capture abrupt corrections. The autoregressive policy therefore predicts the overall trajectory shape before its finer details. This ordering introduces a smoothness prior. Common low-frequency motion is represented compactly, while a rare high-frequency correction may require more tokens or be attenuated by compression.
+Low-frequency coefficients describe the broad motion, while higher frequencies capture abrupt corrections. The autoregressive policy therefore predicts the overall trajectory shape before its finer details. This ordering introduces a smoothness prior. Common low-frequency motion is represented compactly. Whether coefficient quantization removes a control-relevant correction needs to be tested on the target task.
 
 FAST retains autoregressive learning, so compression reduces the number of decoder steps without eliminating sequential inference. This is the constraint that continuous action heads address next.
 

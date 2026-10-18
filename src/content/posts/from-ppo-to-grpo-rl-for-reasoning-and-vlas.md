@@ -96,10 +96,10 @@ For VLAs, the “matched” condition is particularly fragile. Two text answers 
 $$
 \hat A_i =
 \frac{r_i-\bar r}
-{\operatorname{std}(r_1,\ldots,r_G)}.
+{\operatorname{std}(r_1,\ldots,r_G)+\epsilon},\qquad \epsilon>0.
 $$
 
-The normalized completion reward replaces the learned value model. PPO-style likelihood ratios, clipping, and a reference-policy KL penalty remain. The baseline is no longer “what return did the critic expect from this prefix?” It is “how did this answer compare with the other answers sampled for the same question?”
+Here the small positive stabilizer defines the zero-variance case: equal rewards give zero reward advantage. The normalized completion reward replaces the learned value model. PPO-style likelihood ratios, clipping, and a reference-policy KL penalty remain. The baseline is no longer “what return did the critic expect from this prefix?” It is “how did this answer compare with the other answers sampled for the same question?”
 
 ![PPO uses a learned value model; GRPO removes it and uses a same-prompt group baseline](/assets/images/deepseekmath-grpo-paper-figure.png)
 *GRPO keeps the actor, reference model, and reward signal while removing PPO's critic. The saved model is exchanged for multiple completions per prompt. source: [DeepSeekMath](https://arxiv.org/abs/2402.03300)*
@@ -114,11 +114,11 @@ Math and code fit unusually well. A sampler can produce eight solutions without 
 
 ## When the group says nothing
 
-If all sampled answers are correct, every normalized reward is zero. If all are wrong, the same thing happens. Easy and impossible questions consume generation without supplying a gradient. Near-zero variance also makes normalization noisy. A fixed prompt distribution therefore becomes progressively inefficient as the policy improves.
+If all sampled answers are correct, every normalized reward is zero. If all are wrong, the same thing happens. Those groups consume generation without supplying a reward-based policy gradient; a separate KL penalty can still contribute to the update. Near-zero variance also makes normalization noisy. A fixed prompt distribution therefore becomes progressively inefficient as the policy improves.
 
 Systems such as [DAPO](https://arxiv.org/abs/2503.14476) turn this observation into engineering: dynamically sample prompts that still produce informative outcomes, prevent overly long trajectories from dominating the token budget, and make clipping asymmetric enough to avoid suppressing useful low-probability actions. DAPO reports 50 on AIME 2024 with Qwen2.5-32B, but its larger lesson is that “GRPO” names only the core estimator. Sampling, filtering, token accounting, and reward design determine whether the estimator receives usable batches.
 
-Later work names the pathology directly. [Advantage Collapse in GRPO](https://arxiv.org/abs/2605.21125) reports that homogeneous groups erase the learning signal and proposes sampling around advantage variance. Its experiments report substantially fewer collapsed groups and higher reasoning accuracy. The precise numbers are system-dependent; the structural result is not. A group-relative method cannot learn from a group with no relative information.
+Later work names the pathology directly. [Advantage Collapse in GRPO](https://arxiv.org/abs/2605.21125) reports that homogeneous groups erase the learning signal and proposes sampling around advantage variance. Its experiments report substantially fewer collapsed groups and higher reasoning accuracy.
 
 A second failure is temporal credit. Under outcome supervision, the same advantage $\hat A_i$ weights every token in an answer. A correct final result reinforces the dead ends and lucky guesses along its path; an incorrect result penalizes any sound steps it contained. Larger groups reduce baseline variance but do not identify the decisive token.
 
@@ -159,7 +159,7 @@ That hybrid has become more relevant as reasoning policies improve. [Self-Superv
 | PPO | Current-policy rollouts | Return or learned reward per trajectory/step | Learned value model; old and reference policies | Rollouts plus critic training | Critic error and stale on-policy data |
 | DPO | Fixed preference dataset | Matched chosen/rejected pair | Frozen reference log-ratio | Preference collection | No exploration beyond dataset coverage |
 | GRPO | Current-policy groups | Usually one verifiable reward per completion | Same-prompt group mean; reference KL | Multiple generations and verification | Homogeneous groups and coarse token credit |
-| On-policy GKD | Student-generated prefixes | Teacher next-token distribution | Teacher distribution | Student generation plus teacher inference | Cannot exceed a flawed teacher without another objective |
+| On-policy GKD | Student-generated prefixes | Teacher next-token distribution | Teacher distribution | Student generation plus teacher inference | Teacher targets can reinforce teacher errors |
 | RL + distillation | Current-policy groups/prefixes | External outcome plus teacher/process targets | Group/critic plus teacher/reference | Most expensive stack | Conflicting reward and imitation signals |
 
 ## Why robots change the assumptions
