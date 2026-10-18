@@ -30,6 +30,8 @@ The occupancy decoder upsamples the coarse volume with 3D deconvolutions. A dete
 ![PanoOcc's unified voxel, temporal, detection, and panoptic pipeline](/assets/images/panoocc-unified-occupancy-representation-for-camera-based-3d-panoptic-segmentation-paper-figure.webp)
 *Fig 1: Multi-view and multi-frame images become aligned voxel features, which are decoded into shared 3D detection and panoptic segmentation outputs. | source: [PanoOcc, Figure 2](https://arxiv.org/abs/2306.10013)*
 
+[Open the full-size source figure](/assets/images/panoocc-unified-occupancy-representation-for-camera-based-3d-panoptic-segmentation-paper-figure.webp)
+
 ### Coarse-to-fine changes the cost profile
 
 At roughly 40,000 queries, the matched query-form ablation reports 70.7 mIoU for 50 x 50 x 16 3D voxels, versus 68.8 for TPVFormer's tri-plane representation and 56.2 for BEVFormer-style 2D BEV queries. Holding the horizontal grid at 50 x 50, increasing the height from 4 to 16 raises mIoU from 60.8 to 66.1. The experiment isolates why a volume helps: vertical structure carries semantic evidence that a flat feature map must compress or infer later.
@@ -46,9 +48,13 @@ In the paper's full comparison, PanoOcc-Base uses 24 / 6.0 GB and 203 ms for 71.
 ![PanoOcc's optional occupancy sparsification](/assets/images/panoocc-unified-occupancy-representation-for-camera-based-3d-panoptic-segmentation-source-figure-3.webp)
 *Fig 2: Occupancy sparsification prunes predicted empty regions during the 3D upsampling path; the illustration is a simplified BEV view of a 3D process. | source: [PanoOcc, Figure 3](https://arxiv.org/abs/2306.10013)*
 
+[Open the full-size source figure](/assets/images/panoocc-unified-occupancy-representation-for-camera-based-3d-panoptic-segmentation-source-figure-3.webp)
+
 ### Temporal context helps the hard classes, but the metric is sparse
 
 PanoOcc-Base reaches 70.7 mIoU on nuScenes semantic segmentation, Base-T reaches 71.6 with four frames at 0.5-second intervals, and Large-T reaches 74.5 with an InternImage-XL backbone. On camera-based panoptic segmentation, Large-T reports PQ 62.1, PQ-dagger 66.2, RQ 75.1, SQ 82.1, and detection mAP 48.4. The temporal category ablation shows particularly large gains for motorcycle (+11.7 mIoU) and trailer (+8.2), classes that are often occluded.
+
+The protocol behind those rows uses the 700/150/150 nuScenes split, 24 training epochs, and an R101-DCN backbone for the Base model. The temporal variants fuse four frames at 0.5-second intervals. For Occ3D occupancy, the model is trained with the camera-visibility mask and a 0.4 m label grid, so the occupancy score is visibility-conditioned rather than a claim about every voxel behind an occluder.
 
 The caveat is built into the evaluation: semantic and panoptic predictions are assigned to sparse LiDAR points, and PQ is not a dense voxel metric. The camera model remains below LiDARMultiNet's reported PQ 81.8 and mAP 63.8. The sparse architecture keeps only 5% of voxels after three pruning stages and lowers mIoU from 65.4 to 63.9 in its own small-model ablation, making the quality-efficiency trade explicit.
 

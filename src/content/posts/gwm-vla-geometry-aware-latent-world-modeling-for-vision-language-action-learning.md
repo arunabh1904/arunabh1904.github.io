@@ -30,6 +30,8 @@ The latent world model does not try to generate a future RGB frame. It predicts 
 ![Figure 2 from GWM-VLA: Geometry-Aware Latent World Modeling for Vision-Language-Action Learning](/assets/images/gwm-vla-geometry-aware-latent-world-modeling-for-vision-language-action-learning-source-figure-2.webp)
 *Fig 1: The frozen VGGT-Ω encoder aggregates every camera view at a timestep; shared latent-action tokens then drive both next-view prediction and continuous action generation. | source: [GWM-VLA: Geometry-Aware Latent World Modeling for Vision-Language-Action Learning, Figure 2](https://arxiv.org/abs/2608.07619)*
 
+[Open figure at full size](/assets/images/gwm-vla-geometry-aware-latent-world-modeling-for-vision-language-action-learning-source-figure-2.webp)
+
 Read Fig. 1 from left to right. The observation first becomes a per-timestep geometric state. Qwen3-VL-2B produces a group of learnable latent-action tokens for each position in the shared horizon. Those tokens are consumed twice: the latent world model uses them to predict the next target-view state, and the flow-matching head uses them with proprioception to produce an action chunk. The two paths therefore train one action representation against both visual change and executable control.
 
 ### Share the action representation instead of adding another query bank
@@ -40,6 +42,8 @@ The action term uses conditional flow matching on the ground-truth action chunk.
 
 ![Figure 1 from GWM-VLA: Geometry-Aware Latent World Modeling for Vision-Language-Action Learning](/assets/images/gwm-vla-geometry-aware-latent-world-modeling-for-vision-language-action-learning-source-figure-1.webp)
 *Fig 2: The comparison isolates GWM-VLA’s three choices: cross-view geometric aggregation, target-view patch prediction with register context, and shared latent-action conditioning. | source: [GWM-VLA: Geometry-Aware Latent World Modeling for Vision-Language-Action Learning, Figure 1](https://arxiv.org/abs/2608.07619)*
+
+[Open figure at full size](/assets/images/gwm-vla-geometry-aware-latent-world-modeling-for-vision-language-action-learning-source-figure-1.webp)
 
 Fig. 2 is useful as a decision diagram. VLA-JEPA also predicts action-conditioned latent transitions, but it encodes views independently and adds embodied-action representations for the policy. GWM-VLA moves the geometric interaction earlier, narrows the prediction target to a selected view, and reuses the latent action tokens. That combination explains what the ablations test; the paper is not claiming that every world model needs to predict pixels or every camera stream.
 

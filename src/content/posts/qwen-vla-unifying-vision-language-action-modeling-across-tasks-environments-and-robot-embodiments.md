@@ -28,11 +28,17 @@ That mixture lets the authors frame manipulation, navigation, and trajectory pre
 ![Qwen-VLA overview showing the Qwen vision-language backbone, DiT action decoder, and unified embodied task interface](/assets/images/qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments-paper-figure.png)
 *Fig 1: The Qwen-VLA overview shows the shared vision-language backbone feeding a DiT action decoder for manipulation, navigation, and trajectory tasks. | source: [Qwen-VLA, Figure 1](https://arxiv.org/abs/2605.30280)*
 
+[Open figure at full size](/assets/images/qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments-paper-figure.png)
+
 ![Figure 2 from Qwen-VLA: Unifying Vision-Language-Action Modeling across Tasks, Environments, and Robot Embodiments](/assets/images/qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments-source-figure-2.webp)
 *Fig 2: Training recipe of Qwen-VLA. Stage I (T2A) trains the DiT action decoder to reconstruct actions from text alone, building a structured action prior without visual input; later stages ground it in images and rewards. | source: [Qwen-VLA, Figure 2](https://arxiv.org/abs/2605.30280)*
 
+[Open figure at full size](/assets/images/qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments-source-figure-2.webp)
+
 ![Figure 3 from Qwen-VLA: Unifying Vision-Language-Action Modeling across Tasks, Environments, and Robot Embodiments](/assets/images/qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments-source-figure-3.webp)
 *Fig 3: RoboInF examples show short-horizon reach–grasp–place sequences and a long-horizon task segmented into subtasks. | source: [Qwen-VLA, Figure 3](https://arxiv.org/abs/2605.30280)*
+
+[Open figure at full size](/assets/images/qwen-vla-unifying-vision-language-action-modeling-across-tasks-environments-and-robot-embodiments-source-figure-3.webp)
 
 
 ### The prompt carries the embodiment contract

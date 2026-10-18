@@ -28,6 +28,8 @@ PixMo is not one caption corpus. The authors combine three human-annotated sets�
 ![Figure 1: PixMo datasets and the capabilities they support](/assets/images/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models-paper-figure.png)
 *Fig 1: This source Figure 1 maps three human-annotated PixMo datasets and four synthetic datasets to the Molmo capabilities they are intended to teach; the important design choice is the mix of language and spatial supervision. | source: [Molmo and PixMo, Figure 1](https://arxiv.org/abs/2409.17146)*
 
+[Open figure at full size](/assets/images/molmo-and-pixmo-open-weights-and-open-data-for-state-of-the-art-vision-language-models-paper-figure.png)
+
 The open-data claim is therefore stronger than “we released a large dataset.” The paper releases enough of the ingredients to inspect how a model acquires a behavior. It also exposes a limit: human speech, transcription, point validation, and synthetic generation are an annotation pipeline with its own coverage and cultural biases. Openness makes those choices easier to study; it does not make them free or neutral.
 
 ### Crops and the connector make that supervision usable

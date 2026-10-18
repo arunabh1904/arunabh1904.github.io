@@ -33,6 +33,8 @@ CAB sends bidirectional cross-attention messages between the two action-token st
 ![BrainWAM framework coordinating semantic and predictive action pathways](/assets/images/brainwam-framework-paper-figure.png)
 *Fig 1: The blue WAM branch carries history, noisy future video, and predictive action tokens; the pink VLA branch carries scene and instruction semantics; CAB exchanges action-level messages and CIF fuses the refined streams for decoding. | source: [BrainWAM, Figure 3](https://arxiv.org/abs/2608.12854)*
 
+[Open figure at full size](/assets/images/brainwam-framework-paper-figure.png)
+
 Read the diagram from the bottom up. Each branch first applies its own normalization, attention, and feed-forward blocks. The center bridge passes gated cross-attention messages in both directions, while the upper CIF block combines the resulting action intents. The inset makes the distinction from raw-token fusion visible: only compact action tokens cross the boundary, rather than the VLM and video-token pools competing in every attention layer.
 
 ### Asynchronous denoising and timing
@@ -45,7 +47,7 @@ On NAVSIM v1, Table 1 reports 89.5 PDMS, with the largest gains in drivable-area
 
 The paper’s attention analysis gives a mechanism for the Tri-MoT result. Action tokens attend more strongly to semantic VLM tokens than to video-generator tokens across most layers, especially in shallow layers. The raw-token model therefore takes the easier semantic shortcut while the predictive branch is still being denoised; CAB delays the interaction until both branches have compact action representations.
 
-The benchmark predicts eight waypoints over four seconds at 2 Hz in a short-horizon, non-reactive NAVSIM simulation. The asynchronous schedule and frozen specialists are part of the computation contract. A matched-latency reactive evaluation would determine whether action-space coordination improves traffic safety beyond the reported offline score.
+The VLA branch takes multi-view images, driving instructions, and ego history; the WAM branch supplies future video and action dynamics. NAVSIM scores eight waypoints over four seconds at 2 Hz in a short-horizon, non-reactive simulation. Each of the three stages runs for 100K steps on eight H20 GPUs with a per-GPU batch size of six, and inference uses three action denoising steps with truncated video denoising. The appendix reports 475–644 ms latency and says this does not meet strict in-vehicle real-time requirements; a matched-latency reactive evaluation would determine whether action-space coordination improves traffic safety beyond the reported offline score.
 
 ## High-Level Takeaways
 

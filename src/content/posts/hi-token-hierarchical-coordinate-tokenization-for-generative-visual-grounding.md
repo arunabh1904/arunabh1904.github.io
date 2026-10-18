@@ -26,6 +26,8 @@ Generative grounding has a peculiar failure mode: the model can identify the rig
 ![Hi-Token representation and Hi-GAR reward](/assets/images/hi-token-hierarchical-coordinate-tokenization-for-generative-visual-grounding-source-figure-1.webp)
 *Fig 1: The left side decomposes each box into axis-specific hundreds, tens, and ones tokens; the right side combines format validity, IoU, tiered coordinate checks, and strict-IoU bonuses under a validity gate during GRPO. | source: [Hi-Token, Figure 1](https://arxiv.org/abs/2608.03471)*
 
+[Open figure at full size](/assets/images/hi-token-hierarchical-coordinate-tokenization-for-generative-visual-grounding-source-figure-1.webp)
+
 For a coordinate $v\in[0,1]$, the paper first maps it to $I_v=\lfloor v(1000-1)\rfloor$, then emits three tokens. A box therefore uses 12 tokens: three each for $x_{min}$, $y_{min}$, $x_{max}$, and $y_{max}$. The hundreds token anchors a coarse location, the tens token adjusts the interval, and the ones token aligns the boundary. This is only a local numerical bias—the representation is not globally topology-preserving—but it gives the model a better set of reusable pieces. On the 80K training split, flat coordinates use 1,000 token types and four tokens per box; Hi-Token uses 60 types and 12 tokens. The resulting mean raw supervision density is 50 times higher, and the average number of distinct training examples per type is 15,426 versus 318.
 
 ### Matched training separates representation from tuning
@@ -40,6 +42,8 @@ The ablation separates refinement from representation. Starting from Hi-Token SF
 
 ![Hi-Token boundary and scale diagnostics](/assets/images/hi-token-hierarchical-coordinate-tokenization-for-generative-visual-grounding-source-figure-4.webp)
 *Fig 2: Boundary groups, object scale, and coordinate perturbation expose where the representation is fragile: near-hundreds transitions lose 2.4 P@0.95 points relative to the interior group, and one-bin or three-bin coordinate errors reduce IoU more for small objects than large ones. | source: [Hi-Token, Figure 4](https://arxiv.org/abs/2608.03471)*
+
+[Open figure at full size](/assets/images/hi-token-hierarchical-coordinate-tokenization-for-generative-visual-grounding-source-figure-4.webp)
 
 ### Tiny objects expose the fixed coordinate grid
 

@@ -33,6 +33,8 @@ The ViT variant uses a Qwen2.5-VL 7B backbone with continuous visual features. I
 ![DriveVLA-W0 autoregressive and diffusion world-model objectives](/assets/images/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving-paper-figure.png)
 *Fig 1: The VQ path predicts discrete visual tokens autoregressively, while the ViT path denoises a future-image latent from current visual/action features; both share multimodal context with the action objective. | source: [DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving, Figure 2](https://arxiv.org/abs/2510.12796)*
 
+[Open figure at full size](/assets/images/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving-paper-figure.png)
+
 ### A smaller expert keeps inference practical
 
 The full VLA backbone is valuable for representation learning but expensive for every control update. DriveVLA-W0 pairs it with a 500M Action Expert in a Mixture-of-Experts design. The two experts form their own queries, keys, and values, concatenate them for one joint-attention operation, then route outputs back to their streams. The action expert reads the large model’s context without running the full VLA head for every generated waypoint.
@@ -41,6 +43,8 @@ The same interface compares three action decoders. A query-based expert updates 
 
 ![DriveVLA-W0 mixture-of-experts action decoders](/assets/images/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving-source-figure-3.webp)
 *Fig 2: The large VLA Expert shares joint attention with a 500M Action Expert; the three panels then compare query-based, autoregressive, and flow-matching action interfaces. | source: [DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving, Figure 3](https://arxiv.org/abs/2510.12796)*
+
+[Open figure at full size](/assets/images/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving-source-figure-3.webp)
 
 ### Benchmark results and the scaling curve
 
@@ -51,6 +55,8 @@ The main scaling test uses 70 million frames from more than one million clips, a
 ![DriveVLA-W0 world modeling and data scaling](/assets/images/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving-source-figure-1.webp)
 *Fig 3: The source plot contrasts sparse action supervision with joint visual/action supervision and shows the world-model curve continuing to improve as the in-house frame count grows. | source: [DriveVLA-W0: World Models Amplify Data Scaling Law in Autonomous Driving, Figure 1](https://arxiv.org/abs/2510.12796)*
 
+[Open figure at full size](/assets/images/drivevla-w0-world-models-amplify-data-scaling-law-in-autonomous-driving-source-figure-1.webp)
+
 The transfer experiment in Figure 4 and Table 7 gives the proposed explanation a sharper test. A model is pretrained on NuPlan and fine-tuned on NAVSIM, where visuals are related but the action distribution shifts toward long-tail maneuvers. Action-only VQ pretraining drops PDMS from 68.7 when trained from scratch to 62.2 after pretraining. The W0-VQ model rises from 80.7 to 85.6 instead. Predicting future images encourages environment features that transfer across the action-distribution shift, rather than overfitting the source dataset’s controls.
 
 ### The best action interface changes with data scale
@@ -58,6 +64,8 @@ The transfer experiment in Figure 4 and Table 7 gives the proposed explanation a
 Table 4 reveals a useful reversal. On the 103k-frame NAVSIM training set, the query expert reaches 88.4 PDMS, ahead of flow matching at 87.2 and autoregressive decoding at 85.3. On the 70M-frame in-house set, the autoregressive expert has the lowest ADE and collision—1.0069 m and 2.95%—ahead of flow matching at 1.0362 m and 3.98% and the query expert at 1.1248 m and 4.53%. The authors interpret this reversal as a shift from precision on a simple trajectory distribution to capacity and teacher-forced learning on a more complex one; the rankings alone do not isolate those causes. Flow matching is continuous, yet its sampling and optimization burden becomes a liability at this scale.
 
 The representation ablations point to the same causal story. Table 5 raises PDMS from 84.1 for vision-only 6V pretraining to 85.6 for interleaved vision-action 6VA pretraining. Table 6 gives 83.3, 84.2, and 85.6 for VA, 2VA, and 6VA temporal context. In Appendix Table 8, the longer-context 6VA model also has better future-image FID (4.610 versus 9.847 for 2VA) and higher planning PDMS (85.6 versus 84.1). The action-conditioned future is doing more than adding a reconstruction head: it forces the visual representation to preserve the consequences of ego motion.
+
+The training contract is narrower than the world-model name suggests. Stage 1 pretrains the VLA on a 6VA sequence—five prior vision-action pairs plus the current frame—with joint action and world-model losses. Stage 2 attaches the 500M Action Expert, switches to 2VA, and continues updating the VLA backbone with action loss only. NAVSIM uses one front-view camera; the in-house run pretrains for 50k steps and fine-tunes for 30k on the 70M-frame set. Appendix B.3 finds that a second frame one second in the past gives the best 85.6 PDMS, while a four-second gap adds too much scene variation. Appendix C.2 exposes the remaining boundary: a coarse “go straight” command is ambiguous at a Y-junction, and the world model can miss oncoming vehicles at complex intersections.
 
 ### Latency and evidence boundaries
 

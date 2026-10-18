@@ -14,13 +14,13 @@ summary: '2026 – Driving on Registers: compact camera-aware tokens for end-to-
 
 ## Summary
 
-> Driving on Registers introduces DrivoR, a camera-only planner built around a pretrained vision transformer. Camera-aware register tokens compress thousands of multiview image tokens into a small scene representation. One lightweight decoder generates candidate trajectories; another scores them with interpretable safety, comfort, and efficiency components. DrivoR makes compression task-aware. It does not ask a small token set to reconstruct every geometric fact; it asks the registers to preserve enough scene evidence to generate and rank driving trajectories.
+> Driving on Registers introduces DrivoR, a camera-based planner built around a pretrained vision transformer. Camera-aware register tokens compress thousands of multiview image tokens into a small scene representation. One lightweight decoder generates candidate trajectories; another scores them with interpretable safety, comfort, and efficiency components. DrivoR makes compression task-aware. It does not ask a small token set to reconstruct every geometric fact; it asks the registers to preserve enough scene evidence to generate and rank driving trajectories.
 
 ## Core Insights
 
 ### Registers compress the scene for proposal and scoring
 
-The architecture separates proposal from evaluation. That matters because multimodal planning needs both a diverse candidate set and a scorer that can reject unsafe or inefficient candidates. At inference, score weights can be changed to alter behavior without retraining the visual backbone. DrivoR adds 16 camera-specific registers to each of four camera views, retrieves those tokens from a pretrained DINOv2 ViT, and passes the resulting 64 scene tokens to lightweight trajectory and scoring decoders. The scorer receives detached trajectory embeddings, so it cannot backpropagate through the proposal details or quietly reuse the generator's latent shortcut.
+The architecture separates proposal from evaluation. That matters because multimodal planning needs both a diverse candidate set and a scorer that can reject unsafe or inefficient candidates. At inference, score weights can be changed to alter behavior without retraining the visual backbone. DrivoR adds 16 camera-specific registers to each of four camera views, retrieves those tokens from a pretrained DINOv2 ViT, and passes the resulting 64 scene tokens to lightweight trajectory and scoring decoders. The trajectory decoder also receives ego status—poses, velocities, accelerations, and driving command—so camera-based means no LiDAR input, not no state input. The scorer receives detached trajectory embeddings, so it cannot backpropagate through the proposal details or quietly reuse the generator's latent shortcut.
 
 The first figure is a diagnostic of the compression itself. Darker entries mean lower cosine similarity: front-camera registers separate into distinct scene roles, while back-camera registers tend to collapse. That pattern is a useful warning against counting tokens alone; the registers have to specialize to preserve planning evidence.
 
@@ -28,15 +28,19 @@ The first figure is a diagnostic of the compression itself. Darker entries mean 
 ![Figure 4 from Driving on Registers](/assets/images/driving-on-registers-source-figure-4.webp)
 *Fig 1: Cosine similarity between scene tokens. Darker indicates lower cosine similarity. | source: [Driving on Registers, Figure 4](https://arxiv.org/abs/2601.05083)*
 
-The architecture separates proposing a path from judging it. Learned queries generate multiple trajectories, but the scorer receives a fresh, detached embedding of each candidate. This makes the scoring task depend on the proposed geometry and scene evidence rather than a hidden generator state. Runtime weights then choose how the predicted safety, comfort, and efficiency components affect selection.
+[Open figure at full size](/assets/images/driving-on-registers-source-figure-4.webp)
 
 ![Figure 1 from Driving on Registers](/assets/images/driving-on-registers-source-figure-1.webp)
 *Fig 2: DrivoR architecture. The proposed architecture is composed of three transformer blocks: one encoder (perception) and two decoders (trajectory and scoring). | source: [Driving on Registers, Figure 1](https://arxiv.org/abs/2601.05083)*
 
+[Open figure at full size](/assets/images/driving-on-registers-source-figure-1.webp)
 
-The compression ablations make the efficiency claim causal. Register-based compression reaches 90.0 PDMS on NAVSIM-v1 with 64 scene tokens, close to the 90.2 of a model that consumes roughly 16,000 tokens, while adding only 0.6M parameters. A pooling baseline reaches 89.7, and a transformer decoder with the same 64-token budget reaches 89.3. Pretraining matters even more: the pretrained ViT is over 15 PDMS points better than the same design trained from scratch. Increasing trajectory proposals from 1 to 64 raises PDMS from 80.1 to 90.0, after which the curve saturates.
+
+The compression ablations make the efficiency claim causal. On the NAVSIM-v1 `navval` ablations, register-based compression reaches 90.0 PDMS with 64 scene tokens, close to the 90.2 of a model that consumes roughly 16,000 tokens, while adding only 0.6M parameters. A pooling baseline reaches 89.7, and a transformer decoder with the same 64-token budget reaches 89.3. Pretraining matters even more: the pretrained ViT is over 15 PDMS points better than the same design trained from scratch. Increasing trajectory proposals from 1 to 64 raises PDMS from 80.1 to 90.0, after which the curve saturates.
 
 The reported deployment numbers expose what is and is not compressed. On NAVSIM-v2, DrivoR reaches 48.3 EPDMS with 41M parameters, 351 GFLOPs, 0.5 GB peak memory, and 110 ms throughput on an A100; the visual backbone still dominates runtime. On the HUGSIM test, the no-fine-tuning model obtains 49.8 road completion and 35.7 HD-Score, so the simulator result should not be read as real-world driving. Runtime score weights are a useful control surface, but the paper also shows a traffic-light case where the scorer attends to the rear camera, reminding us that interpretable subscores do not prove causal grounding.
+
+Training details qualify the score comparisons. The common ablation run trains for 10 epochs on `navtrain`, with ablation scores reported on `navval`. The final NAVSIM-v1 model instead trains for 25 epochs on `navtrain+navval` and reaches 93.7 PDMS on `navtest`, while NAVSIM-v2 uses 10 epochs on `navtrain`. Adding 134K synthetic SimScale annotations raises EPDMS from the base 48.3 to 54.6, so the data regime belongs beside the score. The authors also report correcting HUGSIM's acceleration-bound and heading bugs before reproducing its results.
 
 | Design | Role |
 | --- | --- |

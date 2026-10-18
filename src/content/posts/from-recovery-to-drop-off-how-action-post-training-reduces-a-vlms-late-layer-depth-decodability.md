@@ -35,13 +35,15 @@ The layer profile matters more than the aggregate drop. The base VLM's depth dec
 
 Across L28–L35, the base VLM rises by 0.040 while the VLA falls by 0.123. That inversion is the paper's useful diagnostic: a policy can retain a respectable middle-layer representation while action post-training specifically damages the layers where the base model consolidates depth.
 
-
-![Figure 2 from From Recovery to Drop-off: How Action Post-training Reduces a VLM](/assets/images/from-recovery-to-drop-off-how-action-post-training-reduces-a-vlms-late-layer-depth-decodability-source-figure-2.webp)
+![Figure 2 from From Recovery to Drop-off: How Action Post-training Reduces a VLM](/assets/images/from-recovery-to-drop-off-how-action-post-training-reduces-a-vlms-late-layer-depth-decodability-source-figure-2-readable.png)
 *Fig 1: Dense Prediction Transformer probing schematic. A LIBERO observation is fed to the VLM/VLA backbone; a capacity-matched DPT head decodes depth from the visual tokens at every decoder layer, supervised by a Depth-Anything-3 teacher. | source: [From Recovery to Drop-off, Figure 2](https://arxiv.org/abs/2608.08904)*
+
+[Open figure at full size](/assets/images/from-recovery-to-drop-off-how-action-post-training-reduces-a-vlms-late-layer-depth-decodability-source-figure-2-readable.png)
 
 ![Figure 1 from From Recovery to Drop-off: How Action Post-training Reduces a VLM](/assets/images/from-recovery-to-drop-off-how-action-post-training-reduces-a-vlms-late-layer-depth-decodability-source-figure-1.webp)
 *Fig 2: The cliff, qualitatively. DPT-probe depth readouts of the same LIBERO observation (Obs.; Depth-Anything-3; Molmo2-ER DPT head, MolmoAct2-LIBERO DPT head) at the first and final decoder layer. | source: [From Recovery to Drop-off, Figure 1](https://arxiv.org/abs/2608.08904)*
 
+[Open figure at full size](/assets/images/from-recovery-to-drop-off-how-action-post-training-reduces-a-vlms-late-layer-depth-decodability-source-figure-1.webp)
 
 ### A subtractive intervention localizes the cliff
 

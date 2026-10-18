@@ -30,6 +30,8 @@ The paper’s distinction is who supplies the explanation. Events come from part
 ![NARRATE’s instrumented vehicle and dual-timing explanation protocol](/assets/images/narrate-data-collection-paper-figure.png)
 *Fig 1: NARRATE combines multi-sensor driving, real-time event tagging, in-vehicle explanation, and a video-cued post-drive interview; short or deferred events are revisited after the drive. | source: [NARRATE, Figure 1](https://arxiv.org/abs/2608.14767)*
 
+[Open figure at full size](/assets/images/narrate-data-collection-paper-figure.png)
+
 The final 2,050 events come from 2,138 raw tags after excluding erroneous or unlocatable events and three without a valid explanation. Participant-disjoint stratified splits contain 1,402 train, 272 validation, and 376 test events across 24, five, and six participants. There are 1,273 in-vehicle explanations, 1,110 post-drive explanations, and 333 events with both. Post-drive explanations are longer: median 19 words versus 13 in-vehicle, which is a measurable difference between reflection and real-time narration rather than a nuisance to average away.
 
 ### The labels represent reasoning at both span and event scale
@@ -38,6 +40,8 @@ Situational Awareness labels follow Endsley’s three levels. L1 Perception mark
 
 ![Representative NARRATE events with action, context, frames, and explanations](/assets/images/narrate-a-multimodal-real-world-australian-driving-dataset-for-human-centred-explanations-in-automated-driving-source-figure-2.webp)
 *Fig 2: Each representative event pairs an action and context label with three front-centre frames and the driver’s in-vehicle and post-drive explanations. | source: [NARRATE, Figure 2](https://arxiv.org/abs/2608.14767)*
+
+[Open figure at full size](/assets/images/narrate-a-multimodal-real-world-australian-driving-dataset-for-human-centred-explanations-in-automated-driving-source-figure-2.webp)
 
 The annotation is not an unsupported single-pass label. Annotator A labels the full dataset; B and C independently label SA on a stratified 303-event reliability subset covering all participants, and C additionally labels context. L1 three-way Fleiss’ kappa is 0.580, L2 is 0.050 under a prevalence-heavy label, and L3 is 0.203 because annotator B used Projection conservatively. The A–C pairwise L3 kappa is 0.690. Context agreement is stronger: fine-grained exact agreement is 82.2% and high-level exact agreement 85.8%, with αMASI of 0.852 and 0.861. These numbers make the ambiguity visible, especially for “future risk” language.
 

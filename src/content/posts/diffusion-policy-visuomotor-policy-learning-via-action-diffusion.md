@@ -38,6 +38,8 @@ The controller predicts $T_p$ actions, executes only $T_a$, then observes again.
 ![Diffusion Policy conditions action-sequence denoising on an observation history](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-paper-figure.png)
 *Fig 1: The policy starts from noisy actions, repeatedly predicts the denoising direction, and uses either FiLM-conditioned temporal convolutions or a causal action transformer with observation cross-attention. | source: [Diffusion Policy, Figure 2](https://arxiv.org/abs/2303.04137)*
 
+[Open figure at full size](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-paper-figure.png)
+
 Figure 1 explains why this is more than “diffusion for actions.” The output is a sequence with internal temporal structure; the observation enters as context at every denoising stage. Causal attention prevents a later action token from leaking information backward through the action sequence, while cross-attention preserves visual conditioning. The policy therefore represents multiple smooth ways to reach the same local goal without an explicit mixture-of-Gaussians head.
 
 ### Evidence from simulation and real robots
@@ -49,10 +51,14 @@ The Push-T experiment shows the cost of averaging modes. In the real setup, the 
 ![Diffusion Policy executes the multimodal sequence needed for sauce pouring and spreading](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-source-figure-10.webp)
 *Fig 2: The six-degree-of-freedom sauce tasks combine scooping, pouring or periodic spreading, and self-termination; the table below the source figure compares human, LSTM-GMM, and Diffusion Policy outcomes. | source: [Diffusion Policy, Figure 10](https://arxiv.org/abs/2303.04137)*
 
+[Open figure at full size](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-source-figure-10.webp)
+
 The sauce experiment is a useful stress test because idle actions and periodic contact are part of the task. For pouring, Diffusion Policy obtains IoU 0.74 and success 0.79 versus human IoU 0.79 and success 1.00; for spreading, it obtains coverage 0.77 and success 1.00 versus human 0.79 and 1.00. LSTM-GMM reaches 0.06/0 for pouring and 0.27/0 for spreading. These numbers are not just a win on a clean trajectory: the controller handles viscosity, varied initial positions, and perturbations to the dough, but still has failures when grasping or contact geometry is wrong.
 
 ![Position control gives Diffusion Policy a different latency and smoothness trade-off from velocity control](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-source-figure-4.webp)
 *Fig 3: The source ablation compares velocity and position control across the simulated tasks; position control improves the diffusion variants, while latency and horizon still impose a responsiveness trade-off. | source: [Diffusion Policy, Figure 4](https://arxiv.org/abs/2303.04137)*
+
+[Open figure at full size](/assets/images/diffusion-policy-visuomotor-policy-learning-via-action-diffusion-source-figure-4.webp)
 
 Figure 3 is a control-interface result, not an architectural footnote. Position commands let the receding-horizon policy absorb small image and network delays without integrating velocity errors at every step. The paper warns that comparisons are asymmetric: Diffusion Policy uses position control, while several baselines are strongest with velocity control. A matched action-space comparison is therefore needed before attributing every gain to the sampler.
 

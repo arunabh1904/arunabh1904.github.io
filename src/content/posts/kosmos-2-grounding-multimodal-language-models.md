@@ -25,6 +25,8 @@ summary: '2023 – Kosmos-2: Grounding Multimodal Language Models to the World'
 ![Figure 3: The pipeline for constructing grounded image-text pairs](/assets/images/kosmos-2-grounding-multimodal-language-models-source-figure-3.png)
 *Fig 1: A grounding model locates noun chunks, then dependency expansion connects each retained region to a fuller referring expression. | source: [KOSMOS-2: Grounding Multimodal Large Language Models to the World, Figure 3](https://arxiv.org/abs/2306.14824)*
 
+[Open figure at full size](/assets/images/kosmos-2-grounding-multimodal-language-models-source-figure-3.png)
+
 KOSMOS-2 starts with the data interface, not a new detector head. GRIT is built from a subset of COYO-700M and LAION-2B image-text pairs. First, spaCy extracts noun chunks from a caption such as “a dog in a field of flowers.” A pretrained grounding model such as GLIP proposes boxes for those chunks; non-maximum suppression removes overlapping proposals, and only matches with confidence above 0.65 are kept. Pairs with no retained box are discarded.
 
 The second step makes the text more useful than a list of isolated nouns. The pipeline traverses sentence-dependency children to expand “a dog” into “a dog in a field of flowers,” then drops expressions contained inside a longer retained expression. The box detected for “a dog” is assigned to the expanded phrase. Figure 1 shows why this matters: the final pair links a visually localized dog to the complete referring expression, while “a field of flowers” and “flowers” are removed as redundant substrings.
@@ -36,6 +38,8 @@ The resulting GRIT corpus contains 90,614,680 images, 137,349,210 objects, and 1
 ![Figure 1: Grounding and referring in KOSMOS-2](/assets/images/kosmos-2-grounding-multimodal-language-models-source-figure-1.webp)
 *Fig 2: KOSMOS-2 keeps ordinary text, phrase spans, and box coordinates in one multimodal sequence, supporting both visual understanding and region-linked generation. | source: [KOSMOS-2: Grounding Multimodal Large Language Models to the World, Figure 1](https://arxiv.org/abs/2306.14824)*
 
+[Open figure at full size](/assets/images/kosmos-2-grounding-multimodal-language-models-source-figure-1.webp)
+
 For an image of width $W$ and height $H$, KOSMOS-2 divides each axis into $P=32$ bins. Each location token denotes one cell in this 2D grid, with the cell center used to reconstruct a coordinate; at the model’s 224×224 input, a cell spans 7×7 pixels. This gives $32\times32=1{,}024$ possible location tokens. A box uses its discretized top-left and bottom-right corners: `<box><loc1><loc2></box>`. A phrase is wrapped as `<p> text span </p>`, so the combined form resembles a Markdown hyperlink: `<p> text span </p><box><loc1><loc2></box>`. Multiple boxes use a delimiter inside the box span.
 
 This makes grounding an ordinary next-token prediction problem. The model receives image embeddings from the KOSMOS-1 vision encoder and resampler, then predicts text and location tokens under the same causal objective. A `<grounding>` token tells it when a response should connect language to the visual world. A user can also provide a box in the input; the model reads its location tokens and generates a description. In Figure 2, the model writes “a campfire” together with its box and links “It” to a second region, so referring and grounding share one sequence interface.
@@ -46,6 +50,8 @@ The 1.6B-parameter model is initialized from KOSMOS-1. Its vision encoder has 24
 
 ![Figure 4: Input format for phrase grounding and referring expression comprehension](/assets/images/kosmos-2-grounding-multimodal-language-models-source-figure-4.webp)
 *Fig 3: The two grounding evaluations mark a text span and ask the model to emit its region, using surrounding caption context for phrase grounding and the expression alone for referring comprehension. | source: [KOSMOS-2: Grounding Multimodal Large Language Models to the World, Figure 4](https://arxiv.org/abs/2306.14824)*
+
+[Open figure at full size](/assets/images/kosmos-2-grounding-multimodal-language-models-source-figure-4.webp)
 
 Phrase grounding gives the model a caption and asks for boxes around marked phrases. The evaluation includes the preceding words as context: “A man in a blue hard hat and `<p>orange safety vest</p>`” is less ambiguous than the phrase alone when several people appear. Referring expression comprehension also maps text to a box, but removes the surrounding caption: the input is only a marked expression such as “A man in a blue hard hat and orange safety vest,” and the model must emit its box. In both tasks, location tokens are converted back to coordinates; a prediction is correct only when IoU exceeds 0.5, and a malformed sequence such as a box with one location token is counted as a negative.
 

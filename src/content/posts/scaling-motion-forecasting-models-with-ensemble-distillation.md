@@ -27,6 +27,8 @@ Each teacher emits a Gaussian mixture over a trajectory, with mixture weights, m
 ![Ensemble distillation's inference-compute tradeoff](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-paper-figure.png)
 *Fig 1: On WOMD, teacher ensembles improve metrics as inference FLOPs grow; distilled students occupy a much cheaper operating region. | source: [Scaling Motion Forecasting Models with Ensemble Distillation, Figure 4](https://arxiv.org/abs/2404.03843)*
 
+[Open figure at full size](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-paper-figure.png)
+
 Because teacher modes do not align, NMS first greedily selects modes that cover the most total likelihood and then refines them with a k-means-like update. This produces a smaller mixture that still represents distinct futures. The same aggregation is used to reduce the student's output when it emits more modes than the benchmark allows.
 
 ### Distillation transfers evidence, not only a softened label
@@ -38,6 +40,8 @@ The distillation term is the negative log likelihood of samples drawn from the a
 ![The ensemble-to-student training pipeline](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-3.webp)
 *Fig 2: NMS merges unmatched teacher modes into a compact teacher distribution; the student learns from its samples alongside the ground-truth loss. | source: [Scaling Motion Forecasting Models with Ensemble Distillation, Figure 3](https://arxiv.org/abs/2404.03843)*
 
+[Open figure at full size](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-3.webp)
+
 The experimental protocol uses Wayformer early fusion with hidden size 256, two encoder layers, eight decoder layers, 64 teacher modes, AdamW, batch size 256, and one million steps. WOMD predicts up to eight agents from one second of history over an eight-second future; Argoverse 2 predicts one focal agent from five seconds of history over six seconds. All reported metrics use six final trajectories, and the WOMD training set duplicates classified U-turn and left/right-turn examples at 5%.
 
 ### The student keeps much of the ensemble gain at a different cost point
@@ -47,7 +51,11 @@ On the WOMD leaderboard table, the single Wayformer baseline reports minFDE 1.12
 ![Ensemble scaling on Argoverse](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-5.webp)
 *Fig 3: Argoverse ensembles and distilled students follow the same quality-versus-relative-FLOPs pattern, with students moving the curve toward deployable compute. | source: [Scaling Motion Forecasting Models with Ensemble Distillation, Figure 5](https://arxiv.org/abs/2404.03843)*
 
+[Open figure at full size](/assets/images/scaling-motion-forecasting-models-with-ensemble-distillation-source-figure-5.webp)
+
 The temperature ablation makes the precision-coverage tradeoff explicit: increasing `τ` spreads probability mass toward lower-ranked trajectories, and `τ=8` is the reported optimum for the soft-mAP/minADE balance. Distillation can therefore improve the student even when it is smaller than the teacher, but it inherits the ensemble's blind spots and depends on expensive teacher inference during training.
+
+The appendix isolates the mode-correspondence choice behind that result. With 64 teacher modes reduced to six and a 28-model teacher ensemble, a learned mapping between teacher and student modes gives the best overall result; a fixed bijection is competitive for smaller ensembles but falls behind as the ensemble grows. The student is therefore learning how to represent an aggregated distribution, not merely copying a softened label.
 
 ## High-Level Takeaways
 

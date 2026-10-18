@@ -35,19 +35,25 @@ Behavior cloning sees only the states that human drivers happened to visit. Giga
 ![Figure 2 from Scaling Self-Play for End-to-End Driving](/assets/images/scaling-self-play-for-end-to-end-driving-paper-figure.png)
 *Fig 1: The pipeline moves from vectorized self-play RL, through pixel self-play DAgger, to sim-to-real perception adaptation while keeping the planning target explicit. | source: [Scaling Self-Play for End-to-End Driving, Figure 2](https://arxiv.org/abs/2606.19641)*
 
+[Open figure at full size](/assets/images/scaling-self-play-for-end-to-end-driving-paper-figure.png)
+
 The throughput plot shows where that compromise pays off. Render-only speed is high, but the gap narrows once a CNN or DrivoR policy runs inside the loop. At that point, the simulator is no longer the only bottleneck, yet a lightweight renderer still makes millions of student-induced states affordable.
 
 ![Figure 1 from Scaling Self-Play for End-to-End Driving](/assets/images/scaling-self-play-for-end-to-end-driving-source-figure-1.webp)
 *Fig 2: Gigapixel's agent steps per second stay well above HUGSIM and RAP across render resolutions, although policy computation becomes the limiting cost for larger models. | source: [Scaling Self-Play for End-to-End Driving, Figure 1](https://arxiv.org/abs/2606.19641)*
 
+[Open figure at full size](/assets/images/scaling-self-play-for-end-to-end-driving-source-figure-1.webp)
+
 ### Distill a privileged teacher on the student's own mistakes
 
-The teacher is a 2.7-million-parameter permutation-invariant Gigaflow policy trained for 25 billion agent steps with vector observations and randomized reward preferences. Training starts from 335,000 twenty-second nuPlan scenarios; vehicles are policy-controlled, while pedestrians, cyclists, and traffic lights are log-replayed. For each state visited by the student population, the simulator forks a parallel copy and rolls the teacher forward for a future trajectory for every agent. The student therefore learns on its own state distribution, while every agent in the scene supplies supervision.
+The teacher is a 2.7-million-parameter permutation-invariant Gigaflow policy trained for 25 billion agent steps with ego-centric vectorized observations and a randomized per-agent reward-preference vector. Training starts from 335,000 twenty-second nuPlan scenarios; vehicles are policy-controlled, while pedestrians, cyclists, and traffic lights are log-replayed. The student sees an ego-centric perspective rendering plus ego context and the same preference conditioning, emits a trajectory, and an LQR controller executes it. For each state visited by the student population, the simulator forks a parallel copy and rolls the teacher forward for a future trajectory for every agent. The student therefore learns on its own state distribution, while every agent in the scene supplies supervision.
 
 This is self-play DAgger rather than direct pixel RL. The student outputs a trajectory, not low-level actions, and an LQR controller executes the first receding-horizon action. The paper's comparison is unusually clear: pixel DAgger reaches a Gigapixel driving score of 60 in roughly 3,000× fewer agent steps than pixel RL in the lighter CNN experiment. The figure below captures the reason: DAgger gets a teacher label at each state without paying the variance and sample cost of learning the whole pixel policy with RL.
 
 ![Figure 3 from Scaling Self-Play for End-to-End Driving](/assets/images/scaling-self-play-for-end-to-end-driving-source-figure-3.webp)
 *Fig 3: Pixel self-play DAgger rises toward the vectorized teacher much faster than pixel self-play RL across the measured agent-step budgets. | source: [Scaling Self-Play for End-to-End Driving, Figure 3](https://arxiv.org/abs/2606.19641)*
+
+[Open figure at full size](/assets/images/scaling-self-play-for-end-to-end-driving-source-figure-3.webp)
 
 ### Transfer the planner, then adapt only what sees the world
 

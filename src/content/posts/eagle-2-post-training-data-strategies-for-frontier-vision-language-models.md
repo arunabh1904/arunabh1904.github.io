@@ -29,6 +29,8 @@ Eagle 2 is unusually useful because it exposes the work between “we fine-tuned
 ![Eagle 2 step-by-step ablation](/assets/images/eagle-2-post-training-data-strategies-for-frontier-vision-language-models-source-figure-2.webp)
 *Fig 1: The average over 13 benchmarks rises as data categories and later curation stages are added; the plotted star values are 58.8 for the baseline, 69.7 after Stage-1.5, and 73.5 after the mixture of visual encoders. | source: [Eagle 2, Figure 2](https://arxiv.org/abs/2501.14818)*
 
+[Open figure at full size](/assets/images/eagle-2-post-training-data-strategies-for-frontier-vision-language-models-source-figure-2.webp)
+
 The loop has two halves. Passive collection watches new datasets; proactive searching starts from error analysis and asks which missing category might address a weak benchmark. The final pool spans general VQA, OCR, charts and tables, science, mathematics, grounding and counting, captioning, knowledge, and text-only data. The authors use a similarity score based on the product of image and text similarity to find overlap, then use manual inspection and rules to remove mismatched question-answer pairs, irrelevant images, repeated text, and numerical answers whose precision is not supported by the image. They also cluster image embeddings with k-means before subset selection, so chart data does not collapse into whichever format happened to be most common.
 
 ### A broad stage supports a smaller iteration loop
@@ -37,6 +39,8 @@ The distribution matters more than a single impressive data count. Stage-1.5 con
 
 ![Eagle 2 data mixture by training stage](/assets/images/eagle-2-post-training-data-strategies-for-frontier-vision-language-models-source-figure-4.webp)
 *Fig 2: Stage-1.5 is broad and captioning-heavy; Stage-2 shifts the mixture toward general VQA, OCR, science, math, and text-only examples while reducing captioning and grounding/counting. The chart reports source proportions, not capability scores. | source: [Eagle 2, Figure 4](https://arxiv.org/abs/2501.14818)*
+
+[Open figure at full size](/assets/images/eagle-2-post-training-data-strategies-for-frontier-vision-language-models-source-figure-4.webp)
 
 That staged view changes how to read the ablation table. Under the initial two-stage recipe, adding chart, table, and OCR QA gives the largest immediate jump in the average, from 61.3 to 65.0. Under the three-stage recipe, introducing Stage-1.5 moves the average from the Cambrian-7B reference to 69.7, and adding Stage-2 reaches 70.9. Naive subset selection falls to 70.6; formatting and filtering recover 71.2; advanced selection, augmentation, re-updating Stage-1.5, and the mixture of vision encoders bring the sequence to 71.8, 72.1, 72.4, and 73.5. The paper's text reports a 45-point OCRBench gain after formatting and filtering, so “cleaning” changes the learned behavior rather than merely shrinking a file.
 

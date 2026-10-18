@@ -25,12 +25,14 @@ An intersection camera sees several approaches, lanes, and agents at once. “Le
 
 Grounded questions specify spatiotemporal object references; free-form questions identify objects through infrastructure-aware descriptions. The task families cover positions, relationships, motion, and interactions including near-miss-oriented reasoning. Unlike ego-view spatial QA, the reference system is roadside infrastructure and intersection topology.
 
+The 407K QA pairs use an 8:2 train/test split with no scene overlap. Queue dynamics, multi-agent conflicts, and abnormal events account for 16.8% of the questions, while more than 30% involve speeding or lane-changing rather than regular passing.
+
 Follow the metadata into the QA templates in the source figure. The map and trajectory annotations determine what can be asked reliably; language expansion does not create missing measurements.
 
 ![Roadside metadata, template questions, and quality-control pipeline; source Figure 3](/assets/images/inter-3d-vqa-source-figure-3.webp)
 *Fig 1: Inter-3D VQA constructs questions from synchronized geometry and infrastructure annotations, then applies language expansion and checks. Both reference-frame consistency and annotation quality constrain the benchmark. | source: [Paper, Figure 3](https://arxiv.org/abs/2608.28762)*
 
-[View full-size figure](/assets/images/inter-3d-vqa-source-figure-3.webp)
+[Open figure at full size](/assets/images/inter-3d-vqa-source-figure-3.webp)
 
 Inter-Metrics reports textual consistency, numerical accuracy, and semantic correctness separately. Numeric fields use scalar or Euclidean errors before the protocol converts them to a score. Therefore, 0.589 is a numerical benchmark score, not 58.9% collision-free driving and not a distance in meters. The shared scene-level split and five-run evaluation help comparisons, while model-specific adaptation settings still differ.
 
@@ -43,7 +45,7 @@ The architecture keeps local object attributes and global scene structure separa
 ![Object and scene LiDAR branches injected through gated decoder adapters; source Figure 5](/assets/images/inter-3d-vqa-source-figure-5.webp)
 *Fig 2: Inter-Geo supplies both object-level and scene-level geometric context through decoder cross-attention. This preserves the original camera–text input path while adding a specialized geometry interface. | source: [Paper, Figure 5](https://arxiv.org/abs/2608.28762)*
 
-[View full-size figure](/assets/images/inter-3d-vqa-source-figure-5.webp)
+[Open figure at full size](/assets/images/inter-3d-vqa-source-figure-5.webp)
 
 | Model | Grounded text score | Grounded numerical score | Grounded semantic score |
 | --- | ---: | ---: | ---: |

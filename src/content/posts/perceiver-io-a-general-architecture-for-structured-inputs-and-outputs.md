@@ -34,6 +34,8 @@ The central question is whether one latent workspace can serve many output struc
 ![Perceiver IO encode, process, and decode path](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-2.png)
 *Fig 1: Arbitrary input elements are compressed into latents, latent self-attention performs the expensive processing, and output queries read the information needed for each output element. | source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs, Figure 2](https://arxiv.org/abs/2107.14795)*
 
+[Open figure at full size](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-2.png)
+
 A standard Transformer repeatedly builds queries and keys over the full input, which makes each self-attention layer quadratic in sequence length. Perceiver IO uses attention non-homogeneously: input-to-latent cross-attention sees $M$ inputs once, latent processing sees only $N$ elements, and latent-to-output cross-attention sees $O$ queries. The model does not require the latent array to preserve the input’s grid or sequence layout.
 
 ### Queries carry the semantics of the requested output
@@ -44,6 +46,8 @@ The source’s domain overview shows the same interface spanning unlike data sha
 
 ![Perceiver IO across language, vision, multimodal autoencoding, and symbolic game outputs](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-1.webp)
 *Fig 2: The same encode–process–decode template is applied to multitask language, dense optical flow, video+audio+label autoencoding, and StarCraft II outputs. | source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs, Figure 1](https://arxiv.org/abs/2107.14795)*
+
+[Open figure at full size](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-1.webp)
 
 This query mechanism is why outputs can be computed in parallel: each output point depends on its query and the shared latent array. For very large outputs, the authors subsample output points during training and decode the full array in batches at test time. The output interface is flexible, but query design remains part of the model: a poor query does not tell the latent representation what to retrieve.
 
@@ -62,6 +66,8 @@ The multimodal autoencoding experiment is an unusually clear stress test. The mo
 ![Multimodal audio-video-label autoencoding at 88× compression](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-4.webp)
 *Fig 3: Inputs are on the left and reconstructions on the right for the 88× compression setting; audio, video, and labels share the latent workspace. | source: [Perceiver IO: A General Architecture for Structured Inputs & Outputs, Figure 4](https://arxiv.org/abs/2107.14795)*
 
+[Open figure at full size](/assets/images/perceiver-io-a-general-architecture-for-structured-inputs-and-outputs-source-figure-4.webp)
+
 The table makes the tradeoff visible: at 88× compression, audio PSNR is 26.97, video PSNR is 24.37, and top-1 classification accuracy is 10.2%. At 176× and 352×, reconstruction quality changes as the latent bottleneck tightens. The authors also show that increasing the classification-loss weight can reach 45% top-1 accuracy while retaining 20.7 video PSNR, which is evidence that the shared latent can support competing modalities when the loss balance is chosen deliberately.
 
 ### The architecture is competitive where its interface matters
@@ -69,6 +75,8 @@ The table makes the tradeoff visible: at 88× compression, audio PSNR is 26.97, 
 On GLUE, a SentencePiece Perceiver IO model reaches 81.2 average versus 81.1 for BERT Base at a comparable FLOPs budget. Byte-level Perceiver IO avoids subword tokenization and reaches 81.0 at 113B reported FLOPs; the larger Perceiver IO++ reaches 81.8 at 241B FLOPs. On optical flow, Perceiver IO obtains 1.81 EPE on Sintel clean and 2.42 on Sintel final, compared with RAFT’s 1.95 and 2.57 in the reported AutoFlow comparison. The model uses no cost volumes or explicit warping, and its latent representation does not maintain a 2D layout.
 
 These results establish that a general interface can be competitive, not that input structure is irrelevant. The optical-flow experiment still uses patch extraction, positional features, and RAFT’s AutoFlow augmentation parameters. Perceiver IO moves the burden from a fixed architecture to the input features, output queries, latent capacity, and loss weighting.
+
+The appendix tests whether the same query interface can stand in for a structured set encoder. In AlphaStar, Perceiver IO consumes the 512-unit entity set and uses each unit representation as an output query; after behavioral cloning on human data, it preserves an 87% win rate against the Elite bot while reducing encoder FLOPs by about 3×. The ImageNet result (84.5% top-1) uses a single class query, while AudioSet reaches 43.3 mAP with raw audio and video or 44.9 with mel-spectrogram input, so these task-specific input and query recipes demonstrate interface breadth rather than one universal training setup.
 
 ## High-Level Takeaways
 

@@ -27,6 +27,8 @@ The baseline implements an edge by appending the parent QA as text prefixed with
 ![DriveLM's object-level and task-level dependencies connect scene questions to behavior and motion](/assets/images/drivelm-source-figure-1.png)
 *Fig 1: Trace how facts about separate objects feed the planning question before converging on behavior and motion. The graph defines information dependencies; it does not prove that generated explanations faithfully describe the model's internal decision process. | source: [DriveLM, Figure 1](https://arxiv.org/abs/2312.14150)*
 
+[Open figure at full size](/assets/images/drivelm-source-figure-1.png)
+
 ### Behavior compresses the graph before numerical trajectory generation
 
 The behavior stage gathers perception, prediction, and planning answers into a coarse driving decision. Speed and steering each have five categories, producing a pair such as slow and straight. Several different hazards can imply the same behavior, so this intermediate representation compresses diverse scene reasoning into a small action vocabulary.
@@ -35,10 +37,14 @@ Motion generation then receives the image and behavior description. Each waypoin
 
 ### The datasets separate human judgment from scalable expert labels
 
-DriveLM-nuScenes annotates 4,871 keyframes, averaging 91.4 QA pairs per frame. Some factual perception answers come from existing annotations; humans provide much of the prediction and planning supervision. DriveLM-CARLA instead uses privileged simulator information and the PDM-Lite rule-based expert to generate roughly 1.6 million QA pairs across 64,285 frames. Its smaller keyframe subset concentrates on changes in the expert's decision.
+DriveLM-nuScenes annotates 4,871 keyframes, averaging 91.4 QA pairs per frame; the split is 4,072 training frames and 799 validation frames. Some factual perception answers come from existing annotations; humans provide much of the prediction and planning supervision. DriveLM-CARLA instead uses privileged simulator information and the PDM-Lite rule-based expert to generate roughly 1.6 million QA pairs across 64,285 frames. PDM-Lite reaches a 44% driving score on the official CARLA Leaderboard 2.0 validation routes, while its smaller keyframe subset concentrates on changes in the expert's decision.
+
+The baseline uses LoRA fine-tuning for 10 epochs on nuScenes and 6 on CARLA. At inference it runs selected P1–P3, behavior, and motion subgraphs interactively, so it does not answer every annotated question in one pass.
 
 ![Human annotation and quality checks in nuScenes compared with rule-based QA generation in CARLA](/assets/images/drivelm-driving-with-graph-visual-question-answering-source-figure-2.webp)
 *Fig 2: The two branches trade annotation diversity against generation scale. Human judgment supplies open-ended nuScenes answers, while privileged simulator state and an expert's rules produce CARLA labels. | source: [DriveLM, Figure 2](https://arxiv.org/abs/2312.14150)*
+
+[Open figure at full size](/assets/images/drivelm-driving-with-graph-visual-question-answering-source-figure-2.webp)
 
 That distinction affects evaluation. More uniform rule-generated answers can be easier to reproduce than varied human explanations. PDM-Lite's closed-loop driving score measures the data-collection expert; it must not be attributed to the trained VLM agent, whose reported planning evaluation is open loop.
 

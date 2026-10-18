@@ -25,6 +25,8 @@ VoxelNet starts from a point $\mathbf{p}_i=[x_i,y_i,z_i,r_i]$ and augments it wi
 ![Figure 3 from VoxelNet: End-to-End Point Cloud 3D Detection](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-source-figure-3.webp)
 *Fig 1: The VFE layer applies the same pointwise transform to every point, pools a voxel-level feature, and returns that context to the point features before the next layer. | source: [VoxelNet, Figure 3](https://arxiv.org/abs/1711.06396)*
 
+[Open Figure 3 at full resolution](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-source-figure-3.webp)
+
 The max operation makes the final representation insensitive to the order in which points arrived, while the centroid offsets preserve local surface geometry. A flat road patch and a vertical object can occupy similar voxel volume but produce different patterns of relative offsets. This is the paper's core departure from a fixed occupancy, height, or density statistic: the local descriptor is learned jointly with the box objective. In the reported car model, the stack is VFE(7, 32) followed by VFE(32, 128); pedestrians and cyclists use a separate point cap because their smaller objects need more of the available returns.
 
 ### Voxelization makes a variable cloud tensor-shaped, then reintroduces density
@@ -33,6 +35,8 @@ A high-definition scan may contain roughly 100,000 points, but a voxel can conta
 
 ![VoxelNet architecture from raw point cloud to 3D detections](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-paper-figure.webp)
 *Fig 2: The end-to-end pipeline first learns voxel features, then applies 3D convolutional middle layers and an RPN to predict 3D boxes. | source: [VoxelNet, Figure 2](https://arxiv.org/abs/1711.06396)*
+
+[Open Figure 2 at full resolution](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-paper-figure.webp)
 
 Only non-empty voxels are encoded, so the intermediate representation is a sparse four-dimensional tensor. The car configuration's two VFE layers feed a $64\times2\times400\times352$ middle tensor, which is reshaped to $128\times400\times352$ after the vertical dimension is reduced. The RPN has three convolutional branches with different strides, upsamples them to a common resolution, concatenates them, and predicts classification and seven-parameter box residuals. This is a carefully chosen handoff: VFE handles unordered local sets, the middle network aggregates neighboring voxels, and the RPN receives a regular map. It is also where the cost returns. More than 90% of the possible voxels are empty, yet the middle layers operate after the sparse-to-dense transition.
 
@@ -47,7 +51,11 @@ The qualitative source panel makes the task concrete. It shows one raw LiDAR sce
 ![VoxelNet source Figure 1: LiDAR detections with class-colored boxes](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-source-figure-1.webp)
 *Fig 3: A raw LiDAR scene with predicted 3D boxes for cars, pedestrians, and cyclists, colored by class. | source: [VoxelNet, Figure 1](https://arxiv.org/abs/1711.06396)*
 
+[Open Figure 1 at full resolution](/assets/images/voxelnet-end-to-end-point-cloud-3d-detection-source-figure-1.webp)
+
 ### The representation has a measurable systems boundary
+
+The model is trained from scratch. On KITTI's 7,481 training frames, the paper keeps 3,712 for training and 3,769 for validation with disjoint sequences; its test numbers come from an official server submission. Per-box perturbations with collision checks, global scale in $[0.95,1.05]$, and global yaw in $[-\pi/4,\pi/4]$ provide the augmentation behind that split.
 
 The reported inference time is 225 ms on a TitanX GPU with a 1.7 GHz CPU: 5 ms to compute voxel input features, 20 ms in the feature-learning network, 170 ms in the convolutional middle layers, and 30 ms in the RPN. The breakdown explains the lineage that follows. Learning local shape is not the dominant cost; dense 3D context aggregation is. Random point caps also make the representation depend on range and occupancy, and the KITTI crop is much smaller than a full surround-sensor scene. VoxelNet establishes the learned voxel interface, but its own timing makes the case for sparse middle layers and early height compression.
 

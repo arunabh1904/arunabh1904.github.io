@@ -30,16 +30,20 @@ OpenDriveVLA's basic design choice is to give the language model several spatial
 ![OpenDriveVLA's four-stage training pipeline](/assets/images/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model-paper-figure.png)
 *Fig 1: The source pipeline moves from hierarchical feature alignment to driving instruction tuning, agent-environment-ego interaction modeling, and trajectory planning tuning. | source: [OpenDriveVLA, Figure 3](https://arxiv.org/abs/2503.23463)*
 
+[Open figure at full size](/assets/images/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model-paper-figure.png)
+
 The figure should be read as a dependency chain. Stage 1 teaches the model what each structured token means. Stage 2 gives it language tasks over driving scenes. Stage 2.5 makes agent motion and its relation to the ego vehicle explicit. Stage 3 finally asks for the ego trajectory. This order reduces the burden on the planning loss: it does not have to discover perception, language grounding, and action geometry at the same time.
 
 ### Staged supervision turns one VLA into several specialists
 
-The training data combines TOD3Cap, nuCaption, nuScenesQA, nuX, and GPT-Driver-style trajectory examples. Stage 1 aligns visual features while keeping the 2D encoder frozen. Stage 2 uses driving instruction and question-answer data. Stage 2.5 predicts agent motion conditioned on scene, map, and ego context, which gives the model a behavior-aware intermediate task. Stage 3 predicts a discrete waypoint sequence conditioned on the visual tokens, ego state, and driving command.
+The training data combines TOD3Cap, nuCaption, nuScenesQA, nuX, and GPT-Driver-style trajectory examples. Stage 1 aligns visual features while keeping the visual encoder and LLM frozen. Stage 2 uses driving instruction and question-answer data with the visual encoder frozen; Stage 2.5 predicts agent motion conditioned on scene, map, and ego context, which gives the model a behavior-aware intermediate task. Stage 3 predicts a discrete waypoint sequence conditioned on the visual tokens, ego state, and driving command: the source uses a three-second horizon sampled every 0.5 seconds, or six waypoints. The 2D ResNet-101 backbone is kept frozen in the final stage, while the projectors and language model are tuned.
 
 The command test makes the action interface concrete. In the source qualitative example, the same scene is evaluated with the original “keep forward” instruction and a modified “turn right” instruction. The planned path changes with the command, which is evidence for command conditioning. It is not proof that arbitrary natural-language commands are safe to execute or that every intermediate answer is grounded: the appendix reports a Figure 8 scene caption claiming that no pedestrians are visible in the right-front view even though one is present. The VLA can therefore follow a command while still hallucinating about a safety-relevant object.
 
 ![Instruction-following example with keep-forward and turn-right commands](/assets/images/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model-source-figure-3.webp)
 *Fig 2: The qualitative source example compares the planned action under “keep forward” and “turn right” while showing the accompanying QA predictions. | source: [OpenDriveVLA, Figure 4](https://arxiv.org/abs/2503.23463)*
+
+[Open figure at full size](/assets/images/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model-source-figure-3.webp)
 
 The important path through this figure is from changed instruction to changed trajectory. The middle answers are a trace of what the model says about the scene, but they are not independent perception evidence; the appendix counterexample shows why. A language-conditioned trajectory without reliable grounding would be a prompt sensitivity test, not a driving result.
 
@@ -52,6 +56,8 @@ The staged ablation on the 0.5B model isolates where the structure helps. Adding
 ![Structured instance, map, and scene tokens in a nuScenes example](/assets/images/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model-source-figure-5.webp)
 *Fig 3: The source example labels instance, map, and scene tokens with their spatial context before the language model receives them. | source: [OpenDriveVLA, Figure 6](https://arxiv.org/abs/2503.23463)*
 
+[Open figure at full size](/assets/images/opendrivevla-towards-end-to-end-autonomous-driving-with-large-vision-language-action-model-source-figure-5.webp)
+
 The token example explains why a language model can use these inputs without treating them as a flat caption. Object boxes, map boundaries, and scene context occupy different roles, and the tokenization keeps those roles inspectable. The remaining question is whether the same structure survives action feedback; this paper does not test that in a reactive simulator.
 
 ## High-Level Takeaways
@@ -59,4 +65,4 @@ The token example explains why a language model can use these inputs without tre
 - OpenDriveVLA acts through a discrete waypoint sequence conditioned on structured visual tokens, ego state, history, and a command.
 - Staged alignment and agent-motion supervision improve collision metrics in the 0.5B ablation while average L2 barely moves.
 - Scaling from 3B to 7B saturates on the reported open-loop averages, and ST-P3 and UniAD metrics can rank variants differently.
-- The open-loop tables leave the main deployment question unanswered: whether spatial token grounding survives reactive feedback under the same controller and command coverage.
+- The open-loop tables leave the main deployment question unanswered: whether spatial token grounding survives reactive feedback under the same controller and command coverage. The appendix also flags the lack of explicit chain-of-thought at inference and autoregressive decoding latency as deployment constraints.

@@ -33,6 +33,8 @@ The overview separates temporal evidence from road structure. ActorNet encodes o
 ![LaneGCN source Figure 1: separate actor and lane encoders followed by fusion and prediction](/assets/images/lanegcn-learning-lane-graph-representations-for-motion-forecasting-paper-figure.png)
 *Fig 1: Actor history and lane topology enter through different encoders. Their features meet in actor-map fusion, so the trajectory predictor receives both observed motion and structured road context. | source: [LaneGCN, Figure 1](https://arxiv.org/abs/2007.13732)*
 
+[Open figure at full size](/assets/images/lanegcn-learning-lane-graph-representations-for-motion-forecasting-paper-figure.png)
+
 ### Dilation follows the road instead of crossing empty space
 
 An ordinary graph convolution can use the same transformation for every neighbor. LaneConv instead uses a distinct weight matrix for each connection type:
@@ -45,6 +47,8 @@ A message from a predecessor can therefore mean something different from a messa
 
 ![LaneGCN source Figure 3: centerlines converted into lane-segment nodes with typed neighbors](/assets/images/lanegcn-source-figure-3-typed-graph.png)
 *Fig 2: The red node has predecessor, successor, left, and right relationships shown in different colors. These edge types retain road meaning that spatial proximity alone cannot supply. | source: [LaneGCN, Figure 3](https://arxiv.org/abs/2007.13732)*
+
+[Open figure at full size](/assets/images/lanegcn-source-figure-3-typed-graph.png)
 
 Long-range propagation uses powers of the predecessor and successor adjacency matrices, at dilation sizes 1, 2, 4, 8, 16, and 32. These are graph-hop distances, not fixed meter ranges. A distant successor can send information along a curved lane without requiring a large square receptive field that also covers irrelevant surroundings. Left and right connections remain separate from these along-lane dilations.
 
@@ -60,6 +64,8 @@ Follow the arrows inside FusionNet below. A2L and L2A have opposite directions, 
 
 ![LaneGCN source Figure 2: ActorNet, MapNet, ordered interaction blocks, and multimodal header](/assets/images/lanegcn-learning-lane-graph-representations-for-motion-forecasting-source-figure-2.webp)
 *Fig 3: FusionNet sends actor features into lane nodes, propagates them through the lane graph, returns map context to actors, and then applies direct actor interaction. The order makes map-conditioned social information available before decoding. | source: [LaneGCN, Figure 2](https://arxiv.org/abs/2007.13732)*
+
+[Open figure at full size](/assets/images/lanegcn-learning-lane-graph-representations-for-motion-forecasting-source-figure-2.webp)
 
 The module ablation makes this interpretation testable:
 

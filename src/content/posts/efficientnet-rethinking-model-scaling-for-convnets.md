@@ -36,6 +36,8 @@ The source diagram makes the three budgets visible. Width changes the horizontal
 ![Depth, width, resolution, and compound scaling of a ConvNet](/assets/images/efficientnet-source-figure-2-scaling.png)
 *Fig 1: The five diagrams hold the basic layer pattern fixed while changing width, depth, resolution, or all three, separating architecture choice from how a network grows. | source: [EfficientNet, Figure 2](https://arxiv.org/abs/1905.11946)*
 
+[open full-size figure](/assets/images/efficientnet-source-figure-2-scaling.png)
+
 This extends the question raised by [ResNet](/paper%20shorts/2015/12/01/deep-residual-learning-for-image-recognition.html). Residual connections make additional depth easier to optimize. EfficientNet asks whether depth is the best place to spend the next unit of compute once that optimization is possible.
 
 ### The exponents follow the cost of a convolution
@@ -63,6 +65,8 @@ The family’s leaderboard advantage mixes several ingredients, so Figure 8 asks
 
 ![Accuracy versus FLOPs for different ways of scaling EfficientNet-B0](/assets/images/efficientnet-source-figure-8-controlled.png)
 *Fig 2: Scaling depth, width, or resolution alone gives diminishing returns from the same B0 baseline; compound scaling reaches higher accuracy at comparable operation counts in this experiment. | source: [EfficientNet, Figure 8](https://arxiv.org/abs/1905.11946)*
+
+[open full-size figure](/assets/images/efficientnet-source-figure-8-controlled.png)
 
 Table 7 provides a concrete comparison near 1.8–1.9 billion FLOPs:
 

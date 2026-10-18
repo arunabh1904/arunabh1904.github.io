@@ -25,6 +25,7 @@ The coordinates are emitted as tokens inside the same sequence as the language. 
 
 ![Figure 1 from GRIT: Teaching MLLMs to Think with Images](/assets/images/grit-teaching-mllms-to-think-with-images-source-figure-1.webp)
 *Fig 1: A language-only trace is compared with a trace that interleaves coordinate boxes and text; the boxes make the regions referenced by the reasoning visible in the rendered output. | source: [GRIT, Figure 1](https://arxiv.org/abs/2505.15879)*
+[Open figure at full size](/assets/images/grit-teaching-mllms-to-think-with-images-source-figure-1.webp)
 
 ### A box is a generated token, not a second image lookup
 
@@ -34,6 +35,7 @@ GRPO-GR samples four completions for each input and normalizes their rewards wit
 
 ![Figure 2 from GRIT: Teaching MLLMs to Think with Images](/assets/images/grit-teaching-mllms-to-think-with-images-source-figure-2.webp)
 *Fig 2: GRPO-GR samples a group of completions, scores format and valid boxes together with optional counting and answer signals, then uses the group-normalized advantage for the model update. | source: [GRIT, Figure 2](https://arxiv.org/abs/2505.15879)*
+[Open figure at full size](/assets/images/grit-teaching-mllms-to-think-with-images-source-figure-2.webp)
 
 The experiment is unusually small and unusually explicit about its boundary. Qwen2.5-VL-3B and InternVL3-2B train for 200 steps on 20 image-question-answer triplets from VSR and TallyQA, using eight A100 GPUs for about 12 hours. Evaluation covers those sources plus GQA, MathVista, MME, and OVDEval; it reports answer accuracy across the sets and grounding IoU where annotated boxes are available. GRIT beats direct-query, chain-of-thought, one-shot, and few-shot SFT baselines on the combined tests, while remaining below human-written traces on the cross-modal correlation measure.
 

@@ -27,6 +27,8 @@ What does “unified” mean when the inputs are not even laid out in the same s
 ![UniTR source Figure 3: modality-specific tokenizers and shared intra- and inter-modal transformer blocks](/assets/images/unitr-paper-figure-3.png)
 *Fig 1: UniTR uses different tokenizers, then shares transformer computation for intra-modal learning and cross-modal interaction before pooling enriched LiDAR tokens to BEV. | source: [UniTR, Figure 3](https://arxiv.org/abs/2308.07732)*
 
+[Open the full-size source figure](/assets/images/unitr-paper-figure-3.png)
+
 The intra-modal block partitions each modality in its native space: image tokens use 2D windows within each camera, while LiDAR tokens use sparse 3D windows. Both streams pass through shared attention weights as parallel sets. This avoids separate transformer parameter sets and exposes a scheduling advantage, but does not halve FLOPs: both token sets still pass through the block. Sharing weights without sharing neighborhoods is what makes the representation reusable.
 
 ### Fuse in the two spaces that each sensor understands
@@ -50,6 +52,8 @@ The matched ablation makes the role of each space visible:
 UniTR uses a one-step end-to-end task-training scheme instead of the separate single-modal pretraining plus joint fusion stage used by the comparison methods. That does not mean the backbone starts from random weights: the paper says it is pretrained on ImageNet and nuImages. The experiments use nuScenes, with 40,157 annotated samples, six cameras, and a 32-beam LiDAR. The detection setup uses 256×704 images, LiDAR voxel size 0.3×0.3×8 m, AdamW on eight A100 GPUs, batch size 24, and ten epochs. The segmentation setup trains for twenty epochs.
 
 In the isolated parallel-backbone ablation, a serial camera-LiDAR encoder takes 51 ms and reaches 72.2 NDS/68.5 mAP; the parallel shared encoder takes 33 ms and reaches 72.4/69.0. The paper notes that this table measures the transformer backbone on the same A100 workstation, while the 88.7 ms comparison includes the reported full model latency. TensorRT lowers the latter to 50.2 ms at the same validation accuracy. The efficiency claim is therefore about a concrete deployment path, not only a smaller FLOP count.
+
+The detection comparison uses one model without test-time augmentation on the validation and test results. That keeps the 88.7 ms figure tied to the same single-model accuracy claim; TensorRT is a deployment measurement of that model rather than an extra accuracy-producing ensemble.
 
 Map segmentation tests whether the representation carries semantic structure beyond boxes. UniTR reaches 73.2 mIoU and its LSS-enhanced variant 74.7 mIoU on nuScenes validation, compared with 62.7 for the cited BEVFusion result. Low-beam experiments also show that the shared backbone remains useful as geometry becomes sparse: at 1-beam LiDAR, parallel processing reaches 59.5 NDS versus 57.6 for the serial variant; at 32 beams, parallel and serial processing are nearly tied at 73.3 and 73.2, both above the 70.5 LiDAR-only row.
 

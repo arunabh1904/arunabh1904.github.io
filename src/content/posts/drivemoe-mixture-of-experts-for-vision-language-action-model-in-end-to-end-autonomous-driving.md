@@ -28,10 +28,14 @@ DriveMoE addresses two averaging problems that look similar but occur at differe
 ![Figure 2 from DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving](/assets/images/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving-paper-figure.webp)
 *Fig 1: DriveMoE keeps fixed temporal views for motion estimation, adds a router-selected dynamic view, and sends the fused representation to a skill-specialized flow-matching action model. The trajectory is finally converted to steering, braking, and acceleration by a shared PID controller. | source: [DriveMoE, Figure 2](https://arxiv.org/abs/2505.16278)*
 
-Drive-π0 uses two sequential front images, ego state, a fixed prompt, and a PaliGemma-3B VLM with a flow-matching trajectory module. DriveMoE retains that temporal front-view input and adds one top-ranked dynamic camera view. The vision router receives the GPS target and scene context, assigns logits to front, side, and rear cameras, and is trained with inexpensive view labels derived from route geometry and scenario rules. Projector layers concatenate the selected view with the fixed-view tokens. The point is not to compress every image into a smaller bag of patches; it is to preserve the spatial structure of the view that matters for the current maneuver.
+[Open figure at full size](/assets/images/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving-paper-figure.webp)
+
+Drive-π0 uses two sequential front images, ego state, a fixed prompt, and a PaliGemma-3B VLM with a flow-matching trajectory module. DriveMoE retains that temporal front-view input and adds one top-ranked dynamic camera view. The vision router receives the GPS target and scene context, assigns logits to front, side, and rear cameras, and is trained with inexpensive view labels derived from route geometry and scenario rules. Projector layers concatenate the selected view with the fixed-view tokens. The action state includes current and historical position, velocity, acceleration, and heading, and the model predicts ten future waypoints. The point is not to compress every image into a smaller bag of patches; it is to preserve the spatial structure of the view that matters for the current maneuver.
 
 ![Figure 1 from DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving](/assets/images/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving-source-figure-1.webp)
 *Fig 2: The paper contrasts vanilla all-view encoding, query-based compression, and the Vision MoE, then contrasts one averaged trajectory distribution with skill-routed behavior distributions. | source: [DriveMoE, Figure 1](https://arxiv.org/abs/2505.16278)*
+
+[Open figure at full size](/assets/images/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving-source-figure-1.webp)
 
 ### Whole-trajectory routing preserves a shared behavior choice
 
@@ -39,6 +43,8 @@ The action router operates inside the flow-matching transformer. The token-level
 
 ![Figure 3 from DriveMoE: Mixture-of-Experts for Vision-Language-Action Model in End-to-End Autonomous Driving](/assets/images/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving-source-figure-3.webp)
 *Fig 3: The Vision MoE uses the GPS target to select a context-relevant camera. The selected dynamic view and fixed temporal views are projected and concatenated before entering the language model. | source: [DriveMoE, Figure 3](https://arxiv.org/abs/2505.16278)*
+
+[Open figure at full size](/assets/images/drivemoe-mixture-of-experts-for-vision-language-action-model-in-end-to-end-autonomous-driving-source-figure-3.webp)
 
 Training is staged to keep the routers from collapsing. In stage one, the Vision and Action MoEs select ground-truth experts while the routers learn jointly with the VLM and action experts. In stage two, selection switches to the router outputs, exposing the action model to its own mistakes. The reported setup trains for 12 epochs and then six more, with learning rate $5\times10^{-5}$, gradient accumulation to an effective batch size of 128, and flow-matching loss weight 1. Router losses are weighted 10 in stage one and 5 in stage two. The same PID controller is used for every method; the seventh waypoint sets desired speed and the tenth sets steering.
 
@@ -56,7 +62,7 @@ Relative to Drive-π0, the default trajectory-level model improves DS by 18.37 p
 
 The vision ablation isolates the value of selecting a view. A fixed front-plus-back configuration reaches DS 63.26 and SR 31.82 at 260 ms, while an unsupervised dynamic view reaches 69.71/44.09. Adding explicit router supervision reaches 74.22/48.64 at the same 260 ms and 5,100 MB batch-one memory. The vision router accuracy is 88.85%; the action router accuracy is 65.40%. For action routing, the trajectory-level variant reaches 73.88 DS and 48.64% SR in the direct style comparison, versus 65.62 and 32.27 for token-level routing.
 
-The efficiency comparison clarifies the scale of the extra machinery. Drive-π0 with two fixed views has 2,606M parameters, 3,400G FLOPs, and 240 ms latency. DriveMoE with two dynamic views has 3,008M parameters, 3,896G FLOPs, and 260 ms latency. Feeding six fixed views instead would cost 7,576G FLOPs and 700 ms in the paper’s measurement. Table 8’s two-view baseline scores 63.26 DS; it differs from the front-temporal baseline at 55.85 in the main results. The paper also lists 260 ms for that fixed front-plus-back view combination in Table 3 versus 240 ms in Table 8, so the small reported latency margin should not be treated as a precisely isolated hardware saving.
+The efficiency comparison clarifies the scale of the extra machinery. Drive-π0 with two fixed views has 2,606M parameters, 3,400G FLOPs, and 240 ms latency. DriveMoE with two dynamic views has 3,008M parameters, 3,896G FLOPs, and 260 ms latency. Feeding six fixed views instead would cost 7,576G FLOPs and 700 ms in the paper’s measurement. Table 8’s two-view baseline scores 63.26 DS; it differs from the front-temporal baseline at 55.85 in the main results. The paper also lists 260 ms for that fixed front-plus-back view combination in Table 3 versus 240 ms in Table 8, so the small reported latency margin should not be treated as a precisely isolated hardware saving. Its nuScenes appendix remains open-loop and explicitly warns that this metric cannot stand in for driving performance.
 
 ## High-Level Takeaways
 

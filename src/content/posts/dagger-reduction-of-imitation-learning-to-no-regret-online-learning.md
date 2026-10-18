@@ -49,8 +49,10 @@ The important object is the state distribution. The learner is not merely given 
 
 ### The algorithm in one picture
 
-![DAgger aggregates learner-induced states with expert labels over repeated rollouts](/assets/images/dagger-reduction-of-imitation-learning-to-no-regret-online-learning-source-figure-2.png)
+![DAgger aggregates learner-induced states with expert labels over repeated rollouts](/assets/images/dagger-reduction-of-imitation-learning-to-no-regret-online-learning-source-figure-2-readable.png)
 *Fig 1: The plotted falls per lap drop rapidly for DAgger as the rollout data moves onto learner-induced recovery states; SMILe improves more slowly and supervised cloning remains high. | source: [Ross et al., Figure 2](https://proceedings.mlr.press/v15/ross11a.html)*
+
+[Open figure at full size](/assets/images/dagger-reduction-of-imitation-learning-to-no-regret-online-learning-source-figure-2-readable.png)
 
 Figure 1 is the Super Tux Kart result, not a generic algorithm diagram. All methods use one training lap per iteration, roughly 1,000 points per lap, and a linear controller updated at 5 Hz. The supervised baseline keeps collecting nearly identical expert laps, so it does not learn how to recover from a deviation. DAgger is already near zero falls after five iterations and reports no falls after fifteen; SMILe remains around two falls per lap after twenty iterations. The mechanism is visible in the x-axis: more data helps only when it comes from states that expose the learner's failure modes.
 
@@ -60,8 +62,10 @@ In Super Tux Kart, a human labels the correct analog steering value from image f
 
 Super Mario Bros. supplies a different failure mode. The near-optimal expert has the simulator's hidden state and can plan consequences; the learner receives a sparse 22-by-22 feature grid over the last four images, the last six actions, and Mario's state, for 27,152 binary features. Four independent linear SVMs predict the buttons left, right, jump, and speed at 5 Hz. Stages have difficulty 1, a 60-second limit, and average total distance around 4,200–4,300 units.
 
-![DAgger variants learn to recover from Mario states that the expert never visits](/assets/images/dagger-reduction-of-imitation-learning-to-no-regret-online-learning-source-figure-4.png)
+![DAgger variants learn to recover from Mario states that the expert never visits](/assets/images/dagger-reduction-of-imitation-learning-to-no-regret-online-learning-source-figure-4-readable.png)
 *Fig 2: Average distance per stage separates the on-policy schedules from supervised cloning; D0.5 reaches about 3,030 distance units while the indicator schedule reaches about 2,980. | source: [Ross et al., Figure 4](https://proceedings.mlr.press/v15/ross11a.html)*
+
+[Open figure at full size](/assets/images/dagger-reduction-of-imitation-learning-to-no-regret-online-learning-source-figure-4-readable.png)
 
 The supervised controller often gets stuck against an obstacle because expert demonstrations show Mario jumping while still far away. DAgger encounters the stuck state, asks the expert what to do there, and learns the recovery. After twenty iterations, the paper reports about 3,030 distance units for $\beta_i=0.5^{i-1}$ and about 2,980 for the indicator schedule. The slower $0.9^{i-1}$ schedule is still improving at the end, showing that mixture decay is a data-coverage choice rather than a cosmetic hyperparameter.
 

@@ -21,10 +21,16 @@ summary: '2026 – recurrent temporal context sharpens satellite candidates befo
 
 The input is one satellite crop and six ordered ground images. DINOv2 supplies a coarse and a fine feature pyramid. For the current ground frame, the spatio-temporal enhancer uses the previous recurrent state as Key and Value and the current feature as Query; spatial position encodings keep the temporal exchange from becoming an unstructured average. The enhanced coarse feature enters Stage 1, which classifies cells on a 19×19 satellite grid. Stage 2 receives the top-K mask and uses fine ground/satellite features to predict a local offset. A bad coarse cell cannot be repaired by a better offset regressor, so the useful place for memory is before candidate pruning.
 
+The training objective encodes that boundary: cross-entropy supervises the grid class, while the offset loss is applied only when the Stage-1 mask contains the ground-truth cell. A rejected cell receives no fine-regression gradient, so candidate recall is a prerequisite for learning accurate offsets.
+
 ![Cross-view sequential localization framework with recurrent context, coarse grid matching, and mask-guided refinement](/assets/images/cross-view-sequential-visual-localization-paper-figure.webp)
 *Fig 1: The recurrent state improves coarse candidate selection before fine offset regression; the displayed framework is the paper’s Figure 2. | source: [Cross-View Sequential Visual Localization, Figure 2](https://arxiv.org/abs/2608.10660)*
 
+[open full-size figure](/assets/images/cross-view-sequential-visual-localization-paper-figure.webp)
+
 The candidate-recall view makes the design easier to evaluate. With the full model, a top-64 mask covers 99.98% of ground-truth cells while retaining 17.73% of the search grid. The refinement stage therefore sees almost every plausible answer without evaluating all 361 cells. That is a retrieval claim, not evidence that the recurrent state has learned a vehicle motion model.
+
+The data contract is equally specific. CVIS contains 38,863 sequence samples from 118,549 front-camera images, split into 24,872/6,218/7,773 train/validation/test pairs. Each sequence is sampled to six frames, and each satellite crop covers about 72.96 m × 72.96 m at 0.114 m/pixel with a random offset up to 5 m. KITTI-CVL is serialized into 1,077 sequences with an 862/107/108 split and 0.2 m/pixel, 256 m × 256 m satellite maps. These fixed crop and sampling choices are part of what the reported transfer and field results measure.
 
 ### The ablations separate representation, position, and time
 

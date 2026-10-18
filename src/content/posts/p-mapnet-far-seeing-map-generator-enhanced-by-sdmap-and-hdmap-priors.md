@@ -32,6 +32,8 @@ The source architecture locates the two commitments. The SD branch adds context 
 ![P-MapNet source Figure 2 shows SD-map cross-attention followed by optional masked-autoencoder HD-map refinement](/assets/images/pmapnet-source-figure-2.png)
 *Fig 1: The SD prior conditions perception with the current road skeleton. The HD prior is learned from masked training maps and refines the resulting raster prediction, adding a separate inference cost. | source: [P-MapNet, Figure 2](https://arxiv.org/abs/2403.10521)*
 
+[open full-size figure](/assets/images/pmapnet-source-figure-2.png)
+
 ### Attention handles approximate alignment; reconstruction learns completion
 
 OpenStreetMap geometry and GPS pose are only weakly aligned with sensor BEV features. P-MapNet downsamples the BEV representation and uses its queries to attend to encoded raster-map tokens. This allows feature retrieval across positions rather than requiring pixelwise concatenation to be correct.
@@ -60,6 +62,8 @@ The appendix's negative example is essential to interpreting the refinement stag
 
 ![P-MapNet source Figure 8 shows near-side forks disappearing as SD-map and learned HD-map priors are added](/assets/images/pmapnet-source-figure-8.png)
 *Fig 2: The nearby forks expose a conflict between observations and prior structure. Better long-range completion does not ensure that local branches survive, even when the final map looks more regular. | source: [P-MapNet, Figure 8](https://arxiv.org/abs/2403.10521)*
+
+[open full-size figure](/assets/images/pmapnet-source-figure-8.png)
 
 Including service roads in OSM does not automatically fix the issue. Those roads are often absent from benchmark annotations, so the model can learn to suppress them as noise. In the category ablation, including service roads gives 58.53 mIoU versus 60.20 without them. Dataset consistency can therefore reward removing real-world detail.
 

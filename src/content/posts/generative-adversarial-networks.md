@@ -40,6 +40,7 @@ Substituting it into the game gives $C(G)=-\log 4+2\,\mathrm{JSD}(p_{data}\|p_g)
 
 ![Source Figure 1 from Generative Adversarial Nets: the generator and discriminator approach distributional equilibrium](/assets/images/generative-adversarial-networks-source-figure-1.png)
 *Fig 1: The four panels move from separated data and generator densities to an equilibrium where the discriminator is flat and $p_g$ matches $p_{data}$; arrows show how the latent map changes the generated density. | source: [Generative Adversarial Nets, Figure 1](https://arxiv.org/abs/1406.2661)*
+[Open figure at full size](/assets/images/generative-adversarial-networks-source-figure-1.png)
 
 The panel sequence also shows what the theorem assumes away. It treats the discriminator as reaching its optimum while the generator changes slowly. The actual algorithm alternates $k$ discriminator updates with one generator update; the paper uses $k=1$, minibatches, and momentum because solving the inner game to completion would be expensive and could overfit a finite dataset.
 
@@ -53,6 +54,7 @@ The original models are multilayer perceptrons. Generators use rectifier and sig
 
 ![Source Figure 2 from Generative Adversarial Nets: random samples and nearest training examples](/assets/images/generative-adversarial-networks-source-figure-2.png)
 *Fig 2: The panels show random MNIST, face, and CIFAR-10 samples; the yellow rightmost column is the nearest training example for each neighboring sample, a visual check against simple memorization. | source: [Generative Adversarial Nets, Figure 2](https://arxiv.org/abs/1406.2661)*
+[Open figure at full size](/assets/images/generative-adversarial-networks-source-figure-2.png)
 
 The paper evaluates MNIST, the Toronto Face Database, and CIFAR-10. For a quantitative signal it fits a Gaussian Parzen window to generated samples and reports test-set log-likelihood estimates. On MNIST, adversarial nets report $225\pm2$, compared with $214\pm1.1$ for Deep GSN, $138\pm2$ for DBN, and $121\pm1.6$ for stacked CAE. On TFD, the result is $2057\pm26$, below stacked CAE’s $2110\pm50$ but above DBN’s $1909\pm66$ and Deep GSN’s $1890\pm29$.
 
@@ -60,6 +62,7 @@ Those numbers require careful reading. The MNIST comparison uses real-valued rat
 
 ![Source Figure 3 from Generative Adversarial Nets: linear interpolation in the generator’s latent space](/assets/images/generative-adversarial-networks-source-figure-3.png)
 *Fig 3: Linear paths through latent space produce smooth digit changes. This tests continuity of the learned mapping; smooth interpolation alone does not establish mode coverage or rule out memorization. | source: [Generative Adversarial Nets, Figure 3](https://arxiv.org/abs/1406.2661)*
+[Open figure at full size](/assets/images/generative-adversarial-networks-source-figure-3.png)
 
 The samples are direct forward passes and do not depend on Markov-chain mixing. That is a meaningful systems advantage over contemporaneous models. The same property does not guarantee coverage: the generator can map many noise values to the same output, the paper’s “Helvetica scenario,” while the discriminator remains poorly synchronized.
 

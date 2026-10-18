@@ -32,6 +32,8 @@ The BEV-aligned mask also makes the decoder target fixed in space. One BEV featu
 ![BEV-MAE: Bird's-Eye-View Masked Autoencoders for Point-Cloud Pretraining source figure: Overall pipeline of BEV-MAE.](/assets/images/bev-mae-bird-eye-view-masked-autoencoders-for-point-cloud-pretraining-paper-figure.webp)
 *Fig 1: Points are grouped into non-empty BEV cells, masked cells receive a shared point token, and a lightweight decoder predicts local geometry and density from the encoded BEV features. | source: [BEV-MAE, Figure 3](https://arxiv.org/abs/2212.05758)*
 
+[Open figure at full resolution](/assets/images/bev-mae-bird-eye-view-masked-autoencoders-for-point-cloud-pretraining-paper-figure.webp)
+
 ### Reconstruct shape and density, not just occupancy
 
 For each masked cell, the decoder predicts a fixed set of $L=20$ points even though the original cell can contain a different number of returns. The target points are represented by offsets from the cell center and normalized by the BEV cell size. A Chamfer-distance loss compares the predicted set with the variable-cardinality target, so the decoder learns local surface structure without requiring an arbitrary point ordering. Coordinate normalization prevents cells at different absolute positions from producing unstable regression scales.
@@ -51,6 +53,8 @@ The plot uses **GPU-hours**, whereas Table 1 gives estimated elapsed hours on ei
 ![Figure 1 from BEV-MAE: Bird's-Eye-View Masked Autoencoders for Point-Cloud Pretraining](/assets/images/bev-mae-bird-eye-view-masked-autoencoders-for-point-cloud-pretraining-source-figure-1.webp)
 *Fig 2: BEV-MAE’s Waymo accuracy–pretraining-time curve compares methods after CenterPoint fine-tuning on 20% labels; the points encode both representation quality and the cost of acquiring it. | source: [BEV-MAE, Figure 1](https://arxiv.org/abs/2212.05758)*
 
+[Open figure at full resolution](/assets/images/bev-mae-bird-eye-view-masked-autoencoders-for-point-cloud-pretraining-source-figure-1.webp)
+
 ### Pretraining matters most when labels are scarce
 
 Table 3 uses the MV-JAR data-efficiency benchmark’s splits and fine-tuning settings, rather than Table 1’s OpenPCDet comparison. Its 20%-label scores therefore belong to a different experiment. Within this protocol, the transfer pattern becomes clearer as the label budget changes. With 5% labeled Waymo data, BEV-MAE raises L2 mAP from 44.41 to 51.63 and L2 APH from 40.34 to 47.77, gains of 7.22 and 7.43. At 10%, the gains are 3.85 and 4.29; at 20%, 2.72 and 3.19; at 50%, 0.73 and 0.71; and at 100%, only 0.85 and 0.92. The authors interpret the small full-label gain as a sign that detector capacity has become the bottleneck.
@@ -63,7 +67,7 @@ The decoder study supports simplicity. A one-layer convolution reaches 66.70/64.
 
 Against random occupied-voxel masking, BEV-guided masking reaches 66.70 L2 mAP / 64.25 L2 APH versus 66.63 / 64.16, while reducing GPU memory from 12.6 GB to 4.1 GB and training cost from $1.4\times$ to $1\times$. The method works across a broad 50–80% mask range, with 70% best in the reported ablation. Its efficiency is therefore not only a consequence of masking fewer points; it comes from choosing cells that line up with the downstream BEV feature and decoder.
 
-The nuScenes result is strong but has a separate model contract. Vanilla BEV-MAE with TransFusion-L reports 71.7 NDS / 67.0 mAP, while the modified-model variant reports 73.6 / 69.6. The transfer experiments use only coordinates as point input features for compatibility across sensor types; this describes the input, not the removal of the density reconstruction target. Pretraining and fine-tuning on the same dataset work better, and the authors note that Waymo’s point density is about five times nuScenes’. A combined nuScenes+Waymo pretraining set improves both targets, but the cross-sensor gap means the density prior is not automatically universal.
+The nuScenes result is strong but has a separate model contract. Vanilla BEV-MAE with TransFusion-L reports 71.7 NDS / 67.0 mAP, while the modified-model variant reports 73.6 / 69.6. The nuScenes input concatenates one labeled frame with nine consecutive unlabeled sweeps, and the cross-dataset transfer experiments use only point coordinates as input features for sensor compatibility; this describes the input, not the removal of the density reconstruction target. Pretraining and fine-tuning on the same dataset work better, and the authors note that Waymo’s point density is about five times nuScenes’. A combined nuScenes+Waymo pretraining set improves both targets, but the cross-sensor gap means the density prior is not automatically universal.
 
 ## High-Level Takeaways
 

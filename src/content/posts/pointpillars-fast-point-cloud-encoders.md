@@ -27,6 +27,8 @@ At the paper's default $0.16^2$ m ground-plane resolution, a KITTI frame contain
 ![PointPillars network converting pillars into a pseudo-image before a 2D backbone and detection head](/assets/images/pointpillars-fast-point-cloud-encoders-paper-figure.webp)
 *Fig 1: The network groups points into pillars, learns one feature per non-empty pillar, scatters those features into a BEV pseudo-image, and predicts oriented boxes with a 2D backbone and SSD head. | source: [PointPillars, Figure 2](https://arxiv.org/abs/1812.05784)*
 
+[Open Figure 2 at full resolution](/assets/images/pointpillars-fast-point-cloud-encoders-paper-figure.webp)
+
 The height axis is gone before the backbone starts. That is the reason the method is fast: all later spatial computation is a standard 2D operation. It is also the representation boundary. A pillar feature can learn useful vertical statistics, but a later camera or radar branch cannot recover which height-specific structure was merged into that vector.
 
 ### The speed comes from the whole memory path
@@ -38,11 +40,15 @@ The paper's runtime breakdown makes that handoff concrete on its desktop CPU/GPU
 ![PointPillars speed versus BEV accuracy on KITTI](/assets/images/pointpillars-fast-point-cloud-encoders-source-figure-1.webp)
 *Fig 2: The KITTI test-set plot compares LiDAR-only methods (blue circles) with LiDAR-and-vision methods (red squares) on BEV accuracy and speed. | source: [PointPillars, Figure 1](https://arxiv.org/abs/1812.05784)*
 
+[Open Figure 1 at full resolution](/assets/images/pointpillars-fast-point-cloud-encoders-source-figure-1.webp)
+
 The plot shows why the 2D layout matters: PointPillars occupies a favorable speed–accuracy region among LiDAR-only methods and competes with several fusion systems. The paper also reports a PyTorch pipeline at 42.4 Hz and a 45.5% speedup after replacing the encoder, backbone, and head kernels with TensorRT. The implementation, host transfer, NMS, and GPU generation are all part of the number.
 
 ### KITTI accuracy isolates the learned encoder, with a dataset caveat
 
 On the authors' KITTI validation split, the moderate BEV AP for cars, pedestrians, and cyclists is 87.98, 63.55, and 69.71; the corresponding moderate 3D AP is 77.98, 57.86, and 66.02. The paper reports state-of-the-art results on both BEV and 3D test benchmarks using only LiDAR, including comparisons against methods that use images. The source Figure 1 plot is a **test-set** comparison, while these numbers are validation values; the two contexts should not be conflated.
+
+All weights are randomly initialized. The experimental split is 3,712 training and 3,769 validation samples, while the test submission uses a larger training pool and holds out a separate 784-sample minival. The distinction matters because the reported test and validation numbers use different training pools.
 
 The encoder ablation keeps the downstream network and training procedure fixed. Learned encoders outperform fixed statistics across resolutions, and the gap grows when pillars become larger because a fixed summary has less capacity to describe the more varied points inside a cell. VoxelNet is marginally stronger in the matched encoder table, but it is orders of magnitude slower and has many more parameters. PointPillars wins the useful operating point by changing the representation before the backbone.
 
@@ -54,6 +60,8 @@ The paper's failure panel pairs the BEV point cloud with boxes projected into th
 
 ![PointPillars failure cases on KITTI](/assets/images/pointpillars-fast-point-cloud-encoders-source-figure-4.webp)
 *Fig 3: KITTI failure cases are shown in BEV and projected views, exposing misses and localization errors after the point cloud has been summarized into vertical pillars. | source: [PointPillars, Figure 4](https://arxiv.org/abs/1812.05784)*
+
+[Open Figure 4 at full resolution](/assets/images/pointpillars-fast-point-cloud-encoders-source-figure-4.webp)
 
 The examples should be read with the tokenizer in mind. Returns from objects separated in height can share one pillar, distant objects contribute fewer points, and the fixed point cap can discard crowded local evidence. Those limits are less visible in the speed curve than in the failure examples. They also explain why the paper's “105 Hz” operating point, obtained with $0.28^2$ m pillars, loses most of its accuracy on pedestrians and cyclists while car performance stays relatively stable.
 

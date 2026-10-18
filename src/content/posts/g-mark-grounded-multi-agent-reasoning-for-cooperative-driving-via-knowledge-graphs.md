@@ -29,10 +29,14 @@ Read the method figure from left to right: each vehicle contributes agent and ob
 ![G-MARK pipeline from per-agent evidence graphs through conservative association and context enrichment to task heads](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-1.webp)
 *Fig 1: G-MARK preserves agent, observation, and hypothesis nodes through conservative association, then adds provenance and planning context before task-specific heads; the graph keeps delayed fusion inspectable instead of collapsing evidence into one object list. | source: [G-MARK, Figure 1](https://arxiv.org/abs/2608.19964)*
 
+[Open figure at full size](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-1.webp)
+
 The operating-point plot separates communication from prediction quality. G-MARK sends a compact graph, but its future-trajectory error is slightly worse than V2V-GoT in the task table. The useful result is how much communication is saved for that loss in accuracy, rather than a claim that less evidence always predicts better.
 
-![Figure 2 from G-MARK: Grounded Multi-Agent Reasoning for Cooperative Driving via Knowledge Graphs](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-2.webp)
+![G-MARK planning accuracy versus communication cost, extracted from source Figure 2](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-2-pdf-crop.png)
 *Fig 2: G-MARK trades slightly higher future-trajectory error than V2V-GoT for a much smaller structured payload; the operating point should be read as a communication trade-off, not the best trajectory error. | source: [G-MARK, Figure 2](https://arxiv.org/abs/2608.19964)*
+
+[Open figure at full size](/assets/images/g-mark-grounded-multi-agent-reasoning-for-cooperative-driving-via-knowledge-graphs-source-figure-2-pdf-crop.png)
 
 
 ### The graph preserves how an object became believable

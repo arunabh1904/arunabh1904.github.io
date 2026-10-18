@@ -32,6 +32,8 @@ The base detector predicts image features $F_i^{2d}$ and a categorical depth ten
 ![Figure 1 from BEVDepth: Acquisition of Reliable Depth for Multi-View 3D Object Detection](/assets/images/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection-source-figure-1.webp)
 *Fig 1: The source visualization contrasts Lift-Splat and BEVDepth depth maps; the dashed regions mark places where the baseline happens to predict useful depth even though much of its map is unreliable. | source: [BEVDepth, Figure 1](https://arxiv.org/abs/2206.10092)*
 
+[Open figure at full resolution](/assets/images/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection-source-figure-1.webp)
+
 ### LiDAR teaches the distribution, then leaves the vehicle
 
 To make a target, BEVDepth projects each LiDAR point into each camera with its extrinsic rotation and translation and the camera intrinsic matrix. Points outside the view are discarded. Multiple points that land at one pixel are min-pooled in depth, then converted to a one-hot depth-bin target. A binary cross-entropy loss supervises the predicted categorical distribution. The LiDAR points therefore provide a sparse geometric teacher; they are not concatenated with the camera features at inference.
@@ -53,13 +55,17 @@ The kernel ablation makes that intuition testable. A $1\times3$ kernel, which do
 ![BEVDepth pipeline with LiDAR depth supervision during training and a camera-only inference path](/assets/images/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection-source-figure-4.webp)
 *Fig 2: Camera parameters condition DepthNet, projected LiDAR supplies the training target, and the lifted frustum is refined and pooled into BEV; the LiDAR supervision path disappears at inference. | source: [BEVDepth, Figure 4](https://arxiv.org/abs/2206.10092)*
 
+[Open figure at full resolution](/assets/images/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection-source-figure-4.webp)
+
 ### The ablation separates geometry from temporal and systems gains
 
 The component study trains a ResNet-50 model for 24 epochs at 256×704 input without class-balanced group sampling. On the nuScenes validation split, the sequence starts at 0.282 mAP and 0.327 NDS. Adding depth loss gives 0.304/0.344; adding camera awareness gives 0.314/0.357; adding depth refinement gives 0.322/0.367; and multi-frame fusion gives 0.330/0.442. The source attributes the main depth-loss gain to classification, the camera-aware step to a reduction in mATE from 0.747 to 0.706 metres (0.041 metres), and refinement to a 0.8-point mAP improvement. BCE and L1 depth losses are close (0.322/0.367 versus 0.321/0.371), so the supervision target and feature path matter more than choosing between these two scalar losses.
 
+Benchmark comparisons use the official nuScenes 700/150/150 scene split and train for 20 epochs with CBGS. Validation comparisons use no test-time augmentation, so their training protocol differs from the 24-epoch component ablation.
+
 The final multi-frame implementation aligns frustum coordinates from different frames into the current ego frame, pools them, and concatenates the resulting BEV features. Efficient Voxel Pooling assigns a CUDA thread to each frustum feature instead of sorting and cumulative-summing the whole set. The paper reports an 80× speedup for the pooling operation and reduces state-of-the-art training time from five days to 1.5 days. These are important engineering additions, but they are separate from the controlled evidence that depth supervision fixes the view transform.
 
-On the test split, the submitted BEVDepth model reports 50.3 mAP and 60.0 NDS with a VovNet backbone and $640\times1600$ input. A ConvNeXT variant reaches 52.0 mAP and 60.9 NDS. The test submission trains on both the training and validation splits and uses test-time augmentation. The latter score is the paper’s headline camera-only result, but its backbone and full system differ from the earlier ResNet-50 ablation. Keeping those contexts separate makes the causal claim legible.
+The test submission trains on train plus validation and uses one model with test-time augmentation. It reports 50.3 mAP and 60.0 NDS with a VovNet backbone and $640\times1600$ input. A ConvNeXT variant reaches 52.0 mAP and 60.9 NDS. The latter score is the paper’s headline camera-only result, but its backbone and full system differ from the earlier ResNet-50 ablation. Keeping those contexts separate makes the causal claim legible.
 
 ## High-Level Takeaways
 

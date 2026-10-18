@@ -42,6 +42,8 @@ The RAG path aligns three modalities—eight-frame video, historical control val
 
 The result table shows the division of labor. On BDD-X, the final model reaches action BLEU4/CIDEr/METEOR of 38.6/337.4/35.5, versus RAGDriver's 34.3/260.8/30.7; its speed and course RMSE are 0.65 and 3.85, versus 0.69 and 4.48. On DriveLM, behavior accuracy is 74.60%, speed and steering accuracy are 81.61% and 81.90%, and ADE is 0.84 m, compared with DriveLM-Agent's 61.60%, 65.40%, 81.61%, and 1.51 m. Removing environmental predicates largely removes the retrieval benefit, which is why the binary rule context matters more than simply adding another visual neighbor.
 
+The ablations separate these gains instead of treating “safety” as one score. PDCE supplies most of the low-level numeric improvement; MLN and RAG have little effect on low-level accuracy, while RAG slightly raises speed RMSE and lowers course RMSE. MLN post-verification reduces traffic-rule violations on both datasets, but PDCE and RAG do not help much on DriveLM's mostly straight scenes. The rule layer is therefore useful as a targeted correction, not evidence that every component improves every driving output.
+
 ![Figure 3 from SafeAuto: Knowledge-Enhanced Safe Autonomous Driving with Multimodal Foundation Models](/assets/images/safeauto-knowledge-enhanced-safe-autonomous-driving-with-multimodal-foundation-models-source-figure-3.webp)
 *Fig 2: Across PDCE σ values, speed and course RMSE remain below the original CE baselines, showing the numeric loss is not tuned to one narrow setting. | source: [SafeAuto: Knowledge-Enhanced Safe Autonomous Driving with Multimodal Foundation Models, Figure 3](https://arxiv.org/abs/2503.00211)*
 

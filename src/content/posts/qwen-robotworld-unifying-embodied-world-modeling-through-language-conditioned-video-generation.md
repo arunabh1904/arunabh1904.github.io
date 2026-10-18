@@ -28,7 +28,7 @@ summary: '2026 – Qwen-RobotWorld: Unifying Embodied World Modeling through Lan
 
 Robot manipulation exposes joint or end-effector commands, driving exposes vehicle motion, and navigation exposes heading or waypoint instructions. Qwen-RobotWorld maps more than 20 embodiments and 500 action categories into natural-language descriptions, allowing one conditional video objective to see them as the same kind of transition: current observation plus language action produces future visual state.
 
-The data mixture is deliberately general plus expert. The Embodied World Knowledge corpus contains approximately 8.6M video-text pairs and more than 200M observation frames. Roughly 30% is general-world data; the embodied portion includes about 5.9M manipulation samples, about 200K driving samples, 6K+ indoor-navigation episodes, and human-to-robot transfer data across 14 morphologies. The SFT recipe reserves about 5% for multi-view concatenation and about 5% for a combined navigation/driving bucket; manipulation dominates the remainder. This balance explains both the broad interface and the model's stronger manipulation evidence.
+The data mixture is deliberately general plus expert. The Embodied World Knowledge corpus contains approximately 8.6M video-text pairs and more than 200M observation frames. Roughly 30% is general-world data; the embodied portion includes about 5.9M manipulation samples, about 200K driving samples, 6K+ indoor-navigation episodes, and human-to-robot transfer data across 14 morphologies. The SFT recipe uses roughly 70% embodied and 30% general data; within the embodied portion, manipulation receives about 90%, while multi-view concatenation and navigation/driving each receive about 5%. This balance explains both the broad interface and the model's stronger manipulation evidence.
 
 ### Double-stream MMDiT couples semantics and visual dynamics at every layer
 
@@ -37,12 +37,16 @@ The frozen Qwen2.5-VL action encoder produces semantic hidden states. The Wan VA
 ![Qwen-RobotWorld couples a frozen language-action encoder with video latents in a 60-layer double-stream MMDiT](/assets/images/qwen-robotworld-unifying-embodied-world-modeling-through-language-conditioned-video-generation-paper-figure.png)
 *Fig 1: The architecture combines frozen Qwen2.5-VL action tokens, Wan VAE state latents, and repeated double-stream MMDiT blocks before unpatchifying the predicted video. | source: [Qwen-RobotWorld, Figure 3](https://arxiv.org/abs/2606.17030)*
 
+[Open figure at full size](/assets/images/qwen-robotworld-unifying-embodied-world-modeling-through-language-conditioned-video-generation-paper-figure.png)
+
 Asymmetric 3D RoPE assigns 16 dimensions to time and 56 each to height and width, reflecting the claim that neighboring frames are more correlated than spatial locations. Training uses T2I, T2V, and TI2V general objectives before a four-phase embodied SFT schedule increases multi-view, wrist-view, synchronized-view, and long-horizon data while retaining general videos in every batch.
 
 Scene2Robot reuses the same backbone for human-to-robot transfer. Its three segments are a human scene demonstration with hands masked, a simulated robot reference, and a noisy generation segment. The first two receive timestep-zero conditioning and are excluded from denoising loss; only the output segment is trained. Joint attention can therefore read scene appearance, target morphology and motion, and language while synthesizing the robot execution.
 
 ![Scene2Robot conditions generation on a scene video, simulated robot video, and language action](/assets/images/qwen-robotworld-unifying-embodied-world-modeling-through-language-conditioned-video-generation-source-figure-4.webp)
 *Fig 2: The three contiguous segments turn human-to-robot transfer into conditional video editing: scene context, robot reference, and generated execution. | source: [Qwen-RobotWorld, Figure 4](https://arxiv.org/abs/2606.17030)*
+
+[Open figure at full size](/assets/images/qwen-robotworld-unifying-embodied-world-modeling-through-language-conditioned-video-generation-source-figure-4.webp)
 
 ### Benchmark strength is broad, but the evidence is mostly generation quality
 
@@ -52,6 +56,8 @@ On WorldModelBench, it scores 8.99, third overall and first among the open-sourc
 
 ![RoboTwin-IF examples show language-grounded manipulation across task types and horizons](/assets/images/qwen-robotworld-unifying-embodied-world-modeling-through-language-conditioned-video-generation-source-figure-8.webp)
 *Fig 3: The qualitative grid spans basic manipulation, relative positioning, bimanual collaboration, and long-horizon multi-step instructions in RoboTwin-IF. | source: [Qwen-RobotWorld, Figure 8](https://arxiv.org/abs/2606.17030)*
+
+[Open figure at full size](/assets/images/qwen-robotworld-unifying-embodied-world-modeling-through-language-conditioned-video-generation-source-figure-8.webp)
 
 The report also shows qualitative mobility and human-to-robot transfer, but those examples do not establish that an agent can act safely from generated frames. A language caption can unify data while discarding timing, force, and low-level control variables. The central test is therefore intervention consistency and downstream use: does changing only the object, destination, or action alter the right future, and does a policy trained or evaluated on that future improve under held-out tasks?
 

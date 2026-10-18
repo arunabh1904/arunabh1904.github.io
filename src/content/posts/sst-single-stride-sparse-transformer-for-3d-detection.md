@@ -25,6 +25,8 @@ Waymo frames cover roughly $150\text{ m}\times150\text{ m}$, while a vehicle is 
 ![Relative object size in COCO and Waymo](/assets/images/sst-single-stride-sparse-transformer-for-3d-detection-source-figure-2.webp)
 *Fig 1: The relative-size distribution is shifted sharply toward small objects in Waymo: 0.54% exceed $S_{\mathrm{rel}}=0.04$, versus 73.03% in COCO. | source: [SST, Figure 2](https://arxiv.org/abs/2112.06375)*
 
+[Open Figure 1 at full resolution](/assets/images/sst-single-stride-sparse-transformer-for-3d-detection-source-figure-2.webp)
+
 The authors first vary stride in a PointPillars pilot trained on 20% of Waymo. The four stage strides are D3: $\{1,2,4,8\}$, D2: $\{1,2,4,4\}$, D1: $\{1,2,2,2\}$, and D0: $\{1,1,1,1\}$. Performance improves from D3 to D1 for all classes. D0 helps cyclists and only slightly changes pedestrians, but vehicle performance falls because a fully single-stride convolution has too little receptive field for larger objects. D0 with dilation 2 in its last stages recovers vehicle performance while harming small-object detail; D0 with $5\times5$ kernels improves all classes but has the highest latency. The pilot establishes both parts of the design: preserving resolution helps, but attention must supply context.
 
 ### Sparse Regional Attention restores context without filling the grid
@@ -38,6 +40,8 @@ SST uses six SRA blocks with two attention modules per block, eight heads, 128 i
 ![SST architecture with regional and shifted regional attention](/assets/images/sst-single-stride-sparse-transformer-for-3d-detection-paper-figure.webp)
 *Fig 2: SST keeps sparse tokens at one stride, alternates regional and shifted-regional SRA blocks, then recovers a dense feature map for the existing detection head. | source: [SST, Figure 4](https://arxiv.org/abs/2112.06375)*
 
+[Open Figure 2 at full resolution](/assets/images/sst-single-stride-sparse-transformer-for-3d-detection-paper-figure.webp)
+
 The dense handoff has a subtle problem. LiDAR observes object surfaces, so the voxel at an object's center is often empty. A conventional head can therefore receive a zero feature exactly where it wants to place a box. SST adds two $3\times3$ convolutions before the head to fill most of these holes. This makes the final dense operation a learned recovery layer rather than evidence that the backbone itself has become dense.
 
 ### Pedestrian results expose the resolution benefit
@@ -47,6 +51,8 @@ On Waymo validation, the one-frame SST model reports 78.71 Level-1 AP and 70.02 
 The distance breakdown clarifies where the architecture helps. SST_1f gains 12.8 pedestrian AP over the PointPillars counterpart at 0–30 m, while its advantage at 50 m and beyond is small. Aligning and concatenating three frames raises the long-range SST result by 10.4 AP over SST_1f, because multiple sweeps provide the sparse tokens that attention can connect. For vehicles, recall also rises over PointPillars across length groups: 41.31/80.85/13.41 versus 40.60/73.11/10.59 for objects shorter than 4 m, 4–8 m, and longer than 8 m. The single-stride design does not only help small pedestrians; its context mechanism keeps large objects viable.
 
 The alternative comparison uses 20% Waymo data and a 2080 Ti. PointPillars-SS reports 64.01 vehicle AP and 60.85 pedestrian AP at 60 ms; SparsePillars-SS falls to 51.57 and 61.55 at 67 ms because submanifold sparse convolution cannot propagate through empty gaps; SST reaches 67.86 and 70.94 at 97 ms with 1.6M parameters and 6.8 GB reported memory. The comparison isolates why attention is needed in the single-stride setting: keeping tokens high-resolution without a mechanism for crossing empty space is not enough.
+
+The pilot and headline numbers use different budgets. The stride comparison samples 20% of Waymo (32,000 frames) for a 12-epoch PointPillars study, while the main experiments use 798/202/150 train/validation/test sequences and a 24-epoch schedule. The reported models also differ in temporal input and stage: three-frame variants concatenate ego-pose-aligned clouds, and the TS variants add LiDAR-RCNN refinement. In the appendix test submission, SST TS 3f reaches 83.05 Level-1 pedestrian AP, so that server result should not be conflated with the 83.81 validation number above.
 
 ### The cost is memory and unresolved sparse resampling
 

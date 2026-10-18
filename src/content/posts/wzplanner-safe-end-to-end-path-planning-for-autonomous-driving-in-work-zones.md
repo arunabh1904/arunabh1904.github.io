@@ -28,7 +28,7 @@ The generator replays the scenario with synchronized RGB, LiDAR, and calibration
 ![Source Figure 3: WAVE synthetic and real-data annotation pipeline](/assets/images/october-2609.19393-s2-f3.webp)
 *Fig 1: Human scenario design and trajectory recording supply the geometry that WAVE transforms into calibrated training labels. Synthetic variation expands coverage without making those labels independently observed human driving decisions. | source: [WZPlanner, Figure 3](https://arxiv.org/html/2609.19393v1#S2.F3)*
 
-[Open figure at full resolution](/assets/images/october-2609.19393-s2-f3.webp)
+[Open figure at full size](/assets/images/october-2609.19393-s2-f3.webp)
 
 The real subset is **5,178 existing WorkZone3D frames**, not a new independently captured collection. WAVE retains its camera, six VLP-16 LiDAR units, GPS/vehicle state, calibration, and boxes, then adds lane/work-zone curves and trajectories through global-frame alignment and GUI correction. A 152-frame consistency audit reports 94.1% without flags, but it is a single-rater, AI-assisted visual screening. That supports apparent overlay consistency, not centimetre-accurate independent 3D ground truth.
 
@@ -47,7 +47,7 @@ Original BoundaryFormer uses a pretrained Swin backbone and a two-layer token pr
 ![Source Figure 5: BoundaryFormer slots and separate trajectory decoder](/assets/images/october-2609.19393-s5-f5.webp)
 *Fig 2: The original architecture tests whether trajectories should share boundary slots or receive a dedicated global decoder. This figure depicts BF; the later BF++ changes the backbone, geometry representation, and typed queries. | source: [WZPlanner, Figure 5](https://arxiv.org/html/2609.19393v1#S5.F5)*
 
-[Open figure at full resolution](/assets/images/october-2609.19393-s5-f5.webp)
+[Open figure at full size](/assets/images/october-2609.19393-s5-f5.webp)
 
 BF++ develops that distinction with a ConvNeXt-Tiny backbone. Images resize to **768 × 432**; stride-16/32 features pass through 1 × 1 convolution and GroupNorm to width 256 and combine on a 48 × 27 grid. Calibrated flat-ground coordinates provide positional information. A three-layer Transformer uses **10 lane, six work-zone, and one trajectory query**. The trajectory query emits two independently parameterized, confidence-scored centerlines. Curves use 38 anchors from 1.5 to 100 m, visibility and valid-range predictions, and two refinement passes sampling projected image evidence.
 

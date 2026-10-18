@@ -30,7 +30,7 @@ The source graph diagram explains what “symbolic” means here: labels, positi
 ![Source Figure 2: ego-centric knowledge-graph construction for individual and grouped objects](/assets/images/october-2609.16919-s3-f2.webp)
 *Fig 1: The graph exposes semantic and geometric relations between the ego vehicle, individual objects, and object groups. Those relations become the ingredients of captions. | source: [NeuroSymbEAD, Figure 2](https://arxiv.org/html/2609.16919v1#S3.F2)*
 
-[Open figure at full resolution](/assets/images/october-2609.16919-s3-f2.webp)
+[Open figure at full size](/assets/images/october-2609.16919-s3-f2.webp)
 
 Relative bearing is computed from the box center using `atan2`; box faces are identified from the source's consistent vertex ordering to derive orientation. The captions combine semantic class, dynamic state, distance, relative direction, and applicable motion or heading attributes. Group captions cluster objects by category, motion state, and coarse front/back and left/right location. The resulting hierarchy compresses repeated objects into a group description while retaining individual references.
 
@@ -43,7 +43,7 @@ The source example makes that construction visible. Read the scene geometry and 
 ![Source Figure 3a: captions generated from a KITTI-360 scene and its selected object attributes](/assets/images/october-2609.16919-s3-f3-sf1.webp)
 *Fig 2: Object attributes are assembled into explicit ego-relative descriptions. This is the caption-generation panel of source Figure 3, separated from its spatial-relation panel. | source: [NeuroSymbEAD, Figure 3a](https://arxiv.org/html/2609.16919v1#S3.F3)*
 
-[Open figure at full resolution](/assets/images/october-2609.16919-s3-f3-sf1.webp)
+[Open figure at full size](/assets/images/october-2609.16919-s3-f3-sf1.webp)
 
 The optional scene-map construction accumulates point clouds over a local window. Since the static map does not fully represent moving actors, object point clouds can be placed into the corresponding oriented boxes. That reconstruction is distinct from caption generation itself, for which the structured boxes provide the necessary inputs.
 

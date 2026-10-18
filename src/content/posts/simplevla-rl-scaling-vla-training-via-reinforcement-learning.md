@@ -24,18 +24,24 @@ summary: "2025 – SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning
 ![SimpleVLA-RL loop comparing limited offline supervised trajectories with on-policy rollouts grouped for advantage estimation](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-paper-figure.png)
 *Fig 1: The extra signal comes from closed-loop trajectories: the policy samples actions, the environment returns success or failure, and group-relative advantages update the action-token distribution. | source: [SimpleVLA-RL, Figure 2](https://arxiv.org/abs/2509.09674)*
 
+[Open figure at full size](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-paper-figure.png)
+
 ### The rollout engine is part of the algorithm
 
 The paper starts from an OpenVLA-OFT variant with a discrete action-token head. The implementation configures a 256-token discretized action vocabulary; that is a token-space setting, not a 256-step rollout. During rollout, the policy interacts with the environment until success or a horizon limit, rather than generating a static text-like sequence. Eight trajectories are sampled per input group, and the binary terminal reward is propagated uniformly to the action tokens in that trajectory. GRPO normalizes each trajectory against the mean and standard deviation of its group, so a group of all successes or all failures produces no useful advantage.
 
 SimpleVLA-RL addresses that failure mode explicitly. Dynamic sampling rejects homogeneous groups and continues sampling until each retained group contains both outcomes. It widens the GRPO ratio clip from $[0.8,1.2]$ to $[0.8,1.28]$, allowing low-probability tokens more room to increase, and raises rollout temperature from 1.0 to 1.6. The objective removes KL regularization, reducing memory and avoiding a fixed reference policy that could suppress new action patterns. These choices are coupled: more exploration only helps when the sampler preserves mixed outcomes and the optimizer can reinforce the rare successful trajectory.
 
-![Figure 2 from SimpleVLA-RL: benchmark, data-scarcity, pushcut, and generalization overview](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-source-figure-1.webp)
-*Fig 2: The source paper’s Figure 2 summarizes the four claims: data-scarce LIBERO improvement, RoboTwin and real-world gains, emergent pushcut behavior, and held-out spatial/object/goal generalization. | source: [SimpleVLA-RL, Figure 2](https://arxiv.org/abs/2509.09674)*
+![Figure 1 from SimpleVLA-RL: benchmark, data-scarcity, pushcut, and generalization overview](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-source-figure-1.webp)
+*Fig 2: The source paper’s Figure 1 summarizes the four claims: data-scarce LIBERO improvement, RoboTwin and real-world gains, emergent pushcut behavior, and held-out spatial/object/goal generalization. | source: [SimpleVLA-RL, Figure 1](https://arxiv.org/abs/2509.09674)*
+
+[Open figure at full size](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-source-figure-1.webp)
 
 ### The reported gains span horizons and data regimes
 
 The framework uses 8 NVIDIA A800 80GB GPUs, learning rate $5\times10^{-6}$, batch size 64, eight samples per group, mini-batch size 128, clip ratios $0.2/0.28$, temperature 1.6, and greedy evaluation repeated three times. The action-chunk length is eight in LIBERO and 25 in RoboTwin1.0/2.0. This implementation uses parallel decoding and a token cross-entropy head rather than the official continuous L1 head. Because the input and output interfaces differ, the authors cannot reuse the official checkpoints: “SFT from scratch” means re-running supervised fine-tuning from the pretrained OpenVLA/OFT initialization with the official datasets and hyperparameters, not training a foundation model from random weights.
+
+The headline comparisons also use different data budgets by benchmark: each LIBERO suite uses 500 demonstrations for SFT and 500 rollout scenarios for RL; RoboTwin1.0 uses 50 demonstrations and 100 rollout scenarios per task; RoboTwin2.0 uses 1,000 of each. Success rates average 50 held-out scenarios for LIBERO and RoboTwin1.0, and 100 held-out scenarios for RoboTwin2.0. This separates the one-trajectory scarcity result from the full-data baselines and from the evaluation rollouts.
 
 On LIBERO, OpenVLA-OFT rises from 91.0% average SFT success to 99.1%; LIBERO-LONG rises from 86.5% to 98.5%. On RoboTwin1.0, the mean rises from 39.8% to 70.4%. Across 12 RoboTwin2.0 tasks, the mean rises from 38.3% to 68.8%, above π0 at 49.2% and RDT at 33.3%. The horizon breakdown matters: gains remain +43.6 points on short tasks, +25.4 on medium tasks, and +22.4 on long and extra-long tasks rather than appearing only on easy episodes.
 
@@ -43,6 +49,8 @@ The data-scarcity experiment is sharper than the headline average. With one demo
 
 ![Figure 3 from SimpleVLA-RL: higher rollout temperature improves LIBERO-LONG learning](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-source-figure-4.webp)
 *Fig 3: The source paper’s Figure 3 shows that temperature 1.6 reaches a higher LIBERO-LONG plateau about 15 points above temperature 1.0 and gets there earlier. | source: [SimpleVLA-RL, Figure 3](https://arxiv.org/abs/2509.09674)*
+
+[Open figure at full size](/assets/images/simplevla-rl-scaling-vla-training-via-reinforcement-learning-source-figure-4.webp)
 
 ### RL can discover a shortcut, but it still needs a capable prior
 

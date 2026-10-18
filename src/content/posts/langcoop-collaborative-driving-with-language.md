@@ -32,6 +32,8 @@ The modularity is more than a naming choice. Different stages can use different 
 ![LangCoop modular reasoning and language packet pipeline](/assets/images/langcoop-collaborative-driving-with-language-source-figure-1.webp)
 *Fig 1: Each CAV turns a front-view observation into scene, object, goal, and intent descriptions, packages them with metadata, exchanges the result, and predicts a driving signal from local and received information. | source: [LangCoop: Collaborative Driving with Language, Figure 1](https://arxiv.org/abs/2504.13406)*
 
+[Open figure at full size](/assets/images/langcoop-collaborative-driving-with-language-source-figure-1.webp)
+
 ### LangPack is a semantic packet with a control contract
 
 A LangPack contains the sender’s metadata, scene description, object description, navigation goal, and future intent. On receipt, a vehicle transforms the other agent’s coordinates and aligns the information in time before combining it with its own front-view perception. The receiver can then ask the LVLM for one of three output forms: discrete waypoints, a continuous trajectory parameterized by speed and curvature, or direct throttle/brake/steer controls.
@@ -40,6 +42,8 @@ The unit of communication is therefore not simply a caption. It is a packet that
 
 ![LangCoop communicated intent changing a following vehicle’s behavior](/assets/images/langcoop-collaborative-driving-with-language-source-figure-2.webp)
 *Fig 2: At two timestamps, the sender’s intent changes to “slow down” near an intersection and the following vehicle’s planned behavior adapts while both retain local BEV and front-view context. | source: [LangCoop: Collaborative Driving with Language, Figure 2](https://arxiv.org/abs/2504.13406)*
+
+[Open figure at full size](/assets/images/langcoop-collaborative-driving-with-language-source-figure-2.webp)
 
 ### Continuous trajectories beat zero-shot coordinates
 
@@ -63,7 +67,7 @@ Table 7 tests heterogeneous pairs. Pairing GPT-4o-mini with Gemini-2.0 improves 
 
 ### Deployment boundaries
 
-Language makes the packet human-readable, but readability is not integrity. The paper does not report packet delay, loss, malformed messages, decoding latency, message-length distributions beyond the average package size, or a detector for incorrect object descriptions and intents. It also uses zero-shot commercial and open LVLMs whose outputs may vary with prompt wording; the paper explicitly observes prompt sensitivity. A safety evaluation should replay the same scenes with delayed, dropped, truncated, and confidently false packets, then measure whether the receiver falls back to local perception or executes the communicated error. Equal-bandwidth feature and structured-token baselines would also clarify how much of the gain comes from language itself versus a better selected representation.
+Language makes the packet human-readable, but readability is not integrity. The paper does not report packet delay, loss, malformed messages, decoding latency, message-length distributions beyond the average package size, or a detector for incorrect object descriptions and intents. It also uses zero-shot commercial and open LVLMs whose outputs may vary with prompt wording; the paper explicitly observes prompt sensitivity, and even an explicit “avoid collisions” instruction materially changes performance. The authors also note that detailed vehicle dynamics are not yet integrated into the planner. A safety evaluation should replay the same scenes with delayed, dropped, truncated, and confidently false packets, then measure whether the receiver falls back to local perception or executes the communicated error. Equal-bandwidth feature and structured-token baselines would also clarify how much of the gain comes from language itself versus a better selected representation.
 
 ## High-Level Takeaways
 

@@ -22,10 +22,14 @@ summary: "2024 – Can LVLMs Obtain a Driver's License?"
 
 The Intelligent Driving Knowledge Base combines three sources. Driving Handbook Data comes from 206 documents and 23,847 pages of laws, regulations, techniques, and defensive-driving guidance. Driving Test Data collects country- and vehicle-conditioned theory questions. Driving Road Data turns traffic-sign knowledge into visual scenes using CARLA and additional sign scenes from Bench2Drive. The simulated collection drove for about 20 hours and produced roughly 400,000 camera frames before filtering to 112,388 annotated road samples.
 
+The handbook pipeline uses LayoutLMv3 for layout detection, PaddleOCR for text, and DBSCAN to restore multi-column order before duplicate and irrelevant entries are removed; road samples are filtered by the sign’s pose and distance to the ego vehicle.
+
 That progression is the paper’s central idea: a capable driving system needs more than object recognition. It needs to connect a rule to a sign, a country, a vehicle, and the action an ego vehicle should take. The data covers 15 countries and nine languages across car, truck, bus, and motorcycle categories. The knowledge taxonomy assigns 22.2% to laws and regulations, 38.6% to signs and signals, 22.0% to driving techniques, and 17.1% to defensive driving.
 
 ![IDKB examples from its three data sources](/assets/images/can-lvlms-obtain-a-drivers-license-idkb-source-figure-3.webp)
 *Fig 1: IDKB combines handbook explanations, country-specific driving-test questions, and visual road-sign questions from its simulated and extracted road data. | source: [Can LVLMs Obtain a Driver’s License?, Figure 3](https://arxiv.org/abs/2409.02914)*
+
+[Open figure at full size](/assets/images/can-lvlms-obtain-a-drivers-license-idkb-source-figure-3.webp)
 
 The paper reports a small bookkeeping inconsistency that is worth preserving. Its main text and source counts give 1,016,956 questions: 50,501 handbook items, 854,067 driving-test items, and 112,388 road items. Table 5 prints 1,016,959 total and a 931,553:85,406 train:test split, while separately listing 830,057 multiple-choice and 187,435 open-QA items; those printed subtotals do not form an exact partition. I therefore treat the source counts and rounded “about 1.017 million” headline as the reliable scale, rather than silently reconciling the table. The split uses all handbook data plus 90% of test and road data for training, reserving the remaining 10% of the latter sources for testing. That split is suitable for measuring the dataset’s training utility, but it is not a jurisdiction-held-out test.
 
@@ -36,12 +40,16 @@ IDKB evaluates 15 representative LVLMs with the same prompts. Driving Test Data 
 ![Performance of 15 LVLMs on IDKB](/assets/images/can-lvlms-obtain-a-drivers-license-idkb-paper-figure.png)
 *Fig 2: Overall IDKB, Driving Test, and Driving Road scores show a consistent gap between proprietary models and most open models, while road-sign performance is often higher than written-test performance. | source: [Can LVLMs Obtain a Driver’s License?, Figure 1](https://arxiv.org/abs/2409.02914)*
 
+[Open figure at full size](/assets/images/can-lvlms-obtain-a-drivers-license-idkb-paper-figure.png)
+
 GPT-4o reaches an IDKB score of 0.64 and Gemini-1.5-flash 0.58. XComposer2 is the strongest open model at 0.45; most open models fall around 0.35–0.40, with BLIP2 at 0.27 and VisualGLM at 0.29. The asymmetry is informative: models generally perform better on Driving Road Data than on Driving Test Data. Recognizing a traffic sign is narrower than answering a question about law, responsibility, vehicle control, or defensive driving.
 
 The multi-answer task is also a useful stress test. Some models improve over single-answer questions, while others fail to output the complete set and receive no partial credit. Instruction following magnifies the same issue: proprietary models reach about 0.99 on the required answer format, while Yi-VL-6B reaches only 0.11. A low score can therefore reflect knowledge, output discipline, or both; the paper reports these components separately so they are not conflated.
 
 ![IDKB distribution by source, country, language, vehicle, and knowledge domain](/assets/images/can-lvlms-obtain-a-drivers-license-idkb-source-figure-4.webp)
 *Fig 3: The dataset’s source, geographic, language, vehicle, and knowledge distributions make coverage visible instead of hiding it inside one million items. | source: [Can LVLMs Obtain a Driver’s License?, Figure 4](https://arxiv.org/abs/2409.02914)*
+
+[Open figure at full size](/assets/images/can-lvlms-obtain-a-drivers-license-idkb-source-figure-4.webp)
 
 ### Fine-tuning knowledge can influence planning, within an open-loop test
 

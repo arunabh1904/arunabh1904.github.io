@@ -26,6 +26,8 @@ A fused detector usually assumes that both feature branches exist and that their
 ![UniBEV source Figure 2: uniform BEV encoders and channel-normalized fusion](/assets/images/unibev-robust-multimodal-detection-with-uniform-bev-encoders-paper-figure.webp)
 *Fig 1: Shared BEV queries guide separate deformable encoders for camera and LiDAR features; CNW then fuses the aligned outputs before the detector head. | source: [UniBEV, Figure 2](https://arxiv.org/abs/2309.14516)*
 
+[Open the full-size source figure](/assets/images/unibev-robust-multimodal-detection-with-uniform-bev-encoders-paper-figure.webp)
+
 This differs from the usual BEVFusion path, where LSS explicitly predicts camera depth while the LiDAR branch already lives in metric space. It also differs from MetaBEV's deformable fusion block: a stronger fusion module cannot fully repair a mismatch created earlier in the two BEV encoders. UniBEV's claim is therefore about alignment and operating-mode continuity, not about a more elaborate decoder.
 
 ### Normalize the channels that remain
@@ -36,6 +38,8 @@ CNW assigns each modality a learned vector of channel weights. Before fusion, th
 
 ![UniBEV source Figure 1: BEVFusion, MetaBEV, and UniBEV fusion interfaces](/assets/images/unibev-robust-multimodal-detection-with-uniform-bev-encoders-source-figure-1.webp)
 *Fig 2: The source comparison distinguishes concatenation, deformable fusion, and UniBEV's uniform encoders with channel-normalized weighting. | source: [UniBEV, Figure 1](https://arxiv.org/abs/2309.14516)*
+
+[Open the full-size source figure](/assets/images/unibev-robust-multimodal-detection-with-uniform-bev-encoders-source-figure-1.webp)
 
 The fusion ablation isolates the modest but consistent advantage of CNW:
 
@@ -49,7 +53,7 @@ The table makes the decision boundary clear. Normalized averaging prevents a mis
 
 ### Modality dropout is the actual fallback mechanism
 
-UniBEV uses ResNet-101 with FPN for images and VoxelNet for LiDAR. The authors initialize those branches from FCOS3D and CenterPoint, train for 36 epochs on four A40 GPUs, and retrain the comparison models with the same no-augmentation pipeline because MetaBEV code was unavailable. The default dropout probability is 0.5; of the remaining dropped-modality cases, half keep LiDAR and half keep cameras. Training therefore sees both sensors in 50% of iterations and each single sensor in 25%.
+UniBEV uses ResNet-101 with FPN for images and VoxelNet for LiDAR. The authors initialize those branches from FCOS3D and CenterPoint, then retrain the comparison models under the same no-augmentation pipeline because MetaBEV code was unavailable. The default dropout probability is 0.5; of the remaining dropped-modality cases, half keep LiDAR and half keep cameras. Training therefore sees both sensors in 50% of iterations and each single sensor in 25%.
 
 With one set of weights, UniBEV reaches 68.5 NDS/64.2 mAP on L+C, 65.3/58.2 on LiDAR only, and 42.4/35.0 on cameras only. The average is 58.7 NDS/52.5 mAP, above BEVFusion's 43.5 mAP average and MetaBEV's 48.7 under the paper's retrained protocol. Inference speed is 1.6 FPS on a V100 with both modalities, compared with 0.7 for BEVFusion and 1.4 for MetaBEV; camera-only and LiDAR-only inputs are 2.5 and 3.9 FPS.
 

@@ -30,7 +30,7 @@ The source overview connects the tasks to the perturbation dimensions. The chang
 ![Source Figure 2: Colosseum V2 tasks, robot morphologies, and perturbation factors](/assets/images/october-2605.27759-s1-f2.webp)
 *Fig 1: The benchmark crosses manipulation tasks with controlled changes to observations, instructions, and physical configuration. Separate single-arm and bimanual suites expose different coordination demands. | source: [Colosseum V2, Figure 2](https://arxiv.org/html/2605.27759v4#S1.F2)*
 
-[Open figure at full resolution](/assets/images/october-2605.27759-s1-f2.webp)
+[Open figure at full size](/assets/images/october-2605.27759-s1-f2.webp)
 
 ### The benchmark changes more than visual appearance
 
@@ -62,7 +62,7 @@ The perturbation figure reports changes in unnormalized success, with aggregatio
 ![Source Figure 5: per-perturbation success changes for ACT and pi0.5](/assets/images/october-2605.27759-s3-f5.webp)
 *Fig 2: Perturbation effects differ across model families and robot setups. This figure filters tasks by minimum baseline success, so its averages should be read alongside the all-task base scores. | source: [Colosseum V2, Figure 5](https://arxiv.org/html/2605.27759v4#S3.F5)*
 
-[Open figure at full resolution](/assets/images/october-2605.27759-s3-f5.webp)
+[Open figure at full size](/assets/images/october-2605.27759-s3-f5.webp)
 
 ACT changes little under all four language perturbations. The authors interpret this as evidence that it may ignore language, rather than evidence of perfect semantic generalization. π0.5 is more sensitive to language corruption, including paraphrases. This distinction matters: an observation can identify a task well enough for a policy to succeed even when the command is useless. A stronger language-grounding test would hold the scene fixed while requiring different valid actions for different instructions.
 

@@ -25,6 +25,8 @@ summary: "2024 – LocCa: Visual Pretraining with Location-aware Captioners"
 ![Figure 1 from LocCa showing captioning, automatic referring expression, and grounded captioning pretraining tasks](/assets/images/locca-visual-pretraining-with-location-aware-captioners-paper-figure.png)
 *Fig 1: One visual encoder feeds a shared decoder for captions, descriptions followed by boxes, and boxes followed by descriptions. Changing the output sequence makes spatial information necessary without adding a separate region encoder. | source: [LocCa, Figure 1](https://arxiv.org/abs/2403.19596)*
 
+[Open figure at full size](/assets/images/locca-visual-pretraining-with-location-aware-captioners-paper-figure.png)
+
 Figure 1 is a single encoder with three output contracts. Cap maps an image to a caption. AREF (automatic referring expression) maps a generated region description to its box. GCAP (grounded captioning) maps a box to its regional caption. During pretraining, the model does not receive the box as a privileged input for one task and the caption as a privileged input for the other. It predicts both sides sequentially from the image, using task prefixes to indicate the sequence:
 
 - “Cap:” followed by the image caption;
@@ -46,6 +48,8 @@ The clean RefCOCO evaluation isolates that transfer. RefCOCO, RefCOCO+, and RefC
 ![Figure 2 from LocCa showing COCO detection before and after reward tuning](/assets/images/locca-visual-pretraining-with-location-aware-captioners-source-figure-2.png)
 *Fig 2: COCO detection is limited to 25 predicted boxes. Paired bars show the downstream detector before and after reward tuning, so the benefit of visual pretraining can be distinguished from the later optimization step. | source: [LocCa, Figure 2](https://arxiv.org/abs/2403.19596)*
 
+[Open figure at full size](/assets/images/locca-visual-pretraining-with-location-aware-captioners-source-figure-2.png)
+
 Figure 2 shows a second transfer interface. For COCO detection, LocCa uses an Objects365-pretrained decoder that can emit up to 25 box sequences, first trains by likelihood and then applies reinforcement tuning against an mAP-related reward. The pretrained visual encoder is what changes the starting point: location-aware LocCa is already more object-sensitive before reward tuning, and the gap remains after it. The result is not zero-shot detection from the three pretraining tasks; it is evidence that a location-aware visual encoder makes a downstream autoregressive detector easier to train.
 
 ### The localization gain does not erase global features
@@ -64,6 +68,8 @@ The encoder also transfers into PaLI-3. With a 224-pixel LocCa-L encoder, the Pa
 
 ![Figure 3 from LocCa showing resolution and coordinate-token ablations](/assets/images/locca-visual-pretraining-with-location-aware-captioners-source-figure-3.png)
 *Fig 3: The left panel varies pretraining and transfer resolution; the right compares ordinary string tokens with dedicated coordinate tokens. Scores average referring-expression accuracy over the reported RefCOCO and RefCOCO+ splits. | source: [LocCa, Figure 3](https://arxiv.org/abs/2403.19596)*
+
+[Open figure at full size](/assets/images/locca-visual-pretraining-with-location-aware-captioners-source-figure-3.png)
 
 Figure 3 separates two implementation questions from the pretraining idea. Transferring a 224-pixel encoder at 384 or 640 pixels improves RefCOCO, and pretraining at the larger resolution improves it again; the model benefits from both more image detail and the encoder’s native positional geometry. String-token coordinates perform about as well as special coordinate tokens, so LocCa’s simple decision to tokenize integer coordinates with the same SentencePiece vocabulary is not the source of the localization gain.
 

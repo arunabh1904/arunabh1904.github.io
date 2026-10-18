@@ -29,6 +29,8 @@ That map is not immediately treated as the final student label. It is rasterized
 ![Scene-level refinement produces a teacher prior before a second prediction pass trains the student](/assets/images/pseudomaplabeler-confidence-aware-pseudo-label-generation-for-semi-supervised-online-mapping-source-figure-1.webp)
 *Fig 1: Follow the refined map into the teacher, then follow its output into the student loss. The clipped prior and the final pseudo-label are different artifacts; the teacher gets another chance to interpret the images. | source: [PseudoMapLabeler, Figure 1](https://arxiv.org/abs/2608.12600)*
 
+[open full-size figure](/assets/images/pseudomaplabeler-confidence-aware-pseudo-label-generation-for-semi-supervised-online-mapping-source-figure-1.webp)
+
 Accumulation is offline within each 20-second nuScenes scene. The method does not require one globally consistent map covering all locations, and temporal priors reset between scenes. Using a scene's repeated observations to generate training labels should not be mistaken for an online controller having access to future observations.
 
 ### Confidence should vary along a line
@@ -39,6 +41,8 @@ The intuition is that one confident fragment and many repeated detections should
 
 ![Per-class confidence maps remove unreliable parts of accumulated vector predictions](/assets/images/pseudomaplabeler-confidence-aware-pseudo-label-generation-for-semi-supervised-online-mapping-source-figure-2.webp)
 *Fig 2: Noisy overlapping predictions become class-specific confidence fields. Spatial clipping preserves supported stretches while cutting away uncertain ends and intersections, instead of accepting or rejecting every polyline as a whole. | source: [PseudoMapLabeler, Figure 2](https://arxiv.org/abs/2608.12600)*
+
+[open full-size figure](/assets/images/pseudomaplabeler-confidence-aware-pseudo-label-generation-for-semi-supervised-online-mapping-source-figure-2.webp)
 
 For polylines, the method samples confidence along the points and keeps sufficiently long contiguous segments above a class-specific percentile threshold. Here p=30 means retaining the top 30% of sampled confidence values within each class. Pedestrian-crossing polygons follow a stricter rule: every point must pass, so a partial crossing polygon is not emitted as a valid element. The segment-level argument therefore applies directly to line classes, with a separate polygon policy.
 

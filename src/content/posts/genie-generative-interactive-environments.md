@@ -24,6 +24,8 @@ summary: "2024 – Genie: Generative Interactive Environments"
 ![Genie training architecture: a video tokenizer and latent action model feed an action-conditioned dynamics model](/assets/images/genie-generative-interactive-environments-paper-figure.png)
 *Fig 1: Genie tokenizes video, infers latent actions between frames, and conditions a dynamics model on both streams to generate future frames. | source: [Genie, Figure 3](https://arxiv.org/abs/2402.15391)*
 
+[Open figure at full size](/assets/images/genie-generative-interactive-environments-paper-figure.png)
+
 A conventional world model assumes that every transition carries an action label. Genie instead asks whether the transition itself contains enough information to discover a useful interface. Its latent-action encoder sees the history of frames and the next frame; a decoder must reconstruct that next frame from the history and a compact code. A VQ-VAE objective restricts the codebook to eight discrete actions in the reported experiments. The code therefore has a practical pressure behind it: it must explain the meaningful change between frames, while remaining small enough for a person or policy to select.
 
 That interface is learned from raw pixels, rather than from the video tokenizer’s discrete frame tokens. This detail matters. In the input ablation, the pixel-input model has higher controllability than the token-input alternative: on Platformers, ΔₜPSNR is 1.91 versus 1.33, and on Robotics it is 2.07 versus 1.65. The tokenizer is good at reconstructing a compact visual state, but it can discard the very motion cues the action encoder needs to separate one intervention from another.
@@ -34,6 +36,8 @@ The video tokenizer uses a spatiotemporal VQ-VAE and an ST-transformer. Spatial 
 
 ![Genie latent-action model: frame history and next frame are encoded and reconstructed through a small discrete action codebook](/assets/images/genie-generative-interactive-environments-source-figure-5.webp)
 *Fig 2: The latent-action model encodes frame history plus the next frame, then reconstructs the next frame from the history and a quantized action code. | source: [Genie, Figure 5](https://arxiv.org/abs/2402.15391)*
+
+[Open figure at full size](/assets/images/genie-generative-interactive-environments-source-figure-5.webp)
 
 This separation gives each component a legible job. The tokenizer decides what visual state can be carried cheaply, the latent-action model decides which changes deserve an intervention label, and the dynamics model learns consequences. At test time a player supplies an initial image and repeatedly chooses a latent action; the tokenizer and dynamics model close the loop one frame at a time. The model can also regenerate a training video from its starting frame and inferred actions, or produce a new trajectory by changing them.
 
@@ -46,7 +50,11 @@ The data ablation is a useful corrective to a “just scale it” reading. A 580
 ![Consistent latent actions in the robotics model: the same controls produce semantically consistent trajectories from different starts](/assets/images/genie-generative-interactive-environments-source-figure-12.webp)
 *Fig 3: The robotics model applies the same learned latent actions repeatedly from three starting frames; the reported controls have the semantics down, up, and left. | source: [Genie, Figure 13](https://arxiv.org/abs/2402.15391)*
 
+[Open figure at full size](/assets/images/genie-generative-interactive-environments-source-figure-12.webp)
+
 The transfer experiment is intriguing but narrower than the headline. A separate 2.5B model trained on action-free robot videos reaches FVD 82.7, and its repeated latent actions move the arm and deform objects consistently. A frozen Internet-video latent-action model can also label expert videos from an unseen CoinRun environment; a policy adapted with as few as 200 expert samples reaches the oracle behavioral-cloning score in the reported plot. That last step still uses a small action-labeled set to map latent codes to real controls, so the action-free claim belongs to representation learning, not to the entire deployed control pipeline.
+
+The deployment boundary is also concrete: the main model keeps only 16 frames of history and runs at roughly 1 FPS. Those limits make the generated worlds useful for short visual interaction, but they leave long-horizon consistency and real-time control unresolved.
 
 ## High-Level Takeaways
 

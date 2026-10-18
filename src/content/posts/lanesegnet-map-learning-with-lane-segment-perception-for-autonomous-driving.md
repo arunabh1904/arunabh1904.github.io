@@ -38,6 +38,8 @@ The source figure contrasts attention around a single center with attention spre
 ![LaneSegNet source Figure 3 compares object-centered deformable attention with head-specific reference regions along lane boundaries](/assets/images/lanesegnet-source-figure-3.png)
 *Fig 1: Each lane-attention head samples around a different region of the predicted lane. Distributed regions cover its length, while local offsets preserve detail near a boundary or marking change. | source: [LaneSegNet, Figure 3](https://arxiv.org/abs/2312.16108)*
 
+[open full-size figure](/assets/images/lanesegnet-source-figure-3.png)
+
 The first decoder layer is a deliberate exception: all heads for one query begin at the same learned reference point. Later layers distribute them using the preceding lane prediction. Separating initial location learning from subsequent shape refinement improves convergence. The ablation gives 28.8 mAP without either design, 29.1 with heads-to-regions alone, 30.6 with identical initialization alone, and 32.6 with both.
 
 ### Structured sharing works better than mixing output categories

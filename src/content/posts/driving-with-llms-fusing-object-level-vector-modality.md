@@ -27,6 +27,8 @@ This makes a useful experiment possible. If an LLM receives the right objects an
 ![Object vectors enter the Vector Encoders and Vector-Former before the language model produces actions and a reason](/assets/images/driving-with-llms-fusing-object-level-vector-modality-source-figure-1.webp)
 *Fig 1: Follow the lower path from structured state to language embeddings. The scene is already vectorized before the LLM sees it; the illustrated control loop does not establish closed-loop driving performance. | source: [Driving with LLMs, Figure 1](https://arxiv.org/abs/2310.01957)*
 
+[Open figure at full size](/assets/images/driving-with-llms-fusing-object-level-vector-modality-source-figure-1.webp)
+
 ### Caption pretraining teaches the interface before asking it to explain actions
 
 MLPs encode the four vector types, and cross-attention aggregates them into learned latent vectors. The ego feature is added to each latent, anchoring the representation to the controlled vehicle. A Vector-Former then combines latent processing with the question tokens to produce embeddings the language model can consume. LLaMA-7B supplies the pretrained language backbone; LoRA provides trainable adaptation during the second stage.
@@ -56,6 +58,8 @@ Perceiver-BC uses the same vector interface and roughly the same 25 million trai
 
 ![The model explains braking at a red light and answers a hypothetical question about the light turning green](/assets/images/driving-with-llms-fusing-object-level-vector-modality-source-figure-4.webp)
 *Fig 2: The second question changes a condition in language while retaining the observed scene. It demonstrates conditional dialogue about an action, rather than a measured rollout after the traffic signal changes. | source: [Driving with LLMs, Figure 4](https://arxiv.org/abs/2310.01957)*
+
+[Open figure at full size](/assets/images/driving-with-llms-fusing-object-level-vector-modality-source-figure-4.webp)
 
 GPT-3.5 grades answers against the structured observation and question. Pretraining raises its score from 7.48 to 8.39 out of ten; human grading of 230 sampled QA pairs rises from 6.63 to 7.71. The ordering agrees, but the evaluator is lenient: randomly shuffled answers still receive 3.88 from GPT versus 0.26 from humans. Since GPT also generates the training labels, the human check is especially useful, although it remains a small language-evaluation sample.
 

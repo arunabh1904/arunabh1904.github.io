@@ -36,6 +36,8 @@ Follow the overview from the image tiles through the projection. Each tile becom
 ![Vision Transformer patch embedding and encoder architecture](/assets/images/vit-source-figure-1-architecture.png)
 *Fig 1: A shared projection turns image patches into tokens, learned positions preserve their arrangement, and a pre-normalized Transformer builds the class-token representation. | source: [Vision Transformer, Figure 1](https://arxiv.org/abs/2010.11929)*
 
+[Open figure at full resolution](/assets/images/vit-source-figure-1-architecture.png)
+
 The patch operation already makes a spatial assumption: nearby pixels are grouped and processed together. The architecture uses fewer image-specific priors than a CNN, especially in global attention, but it is not devoid of spatial structure. Nor does the paper establish exact translation invariance; it shows that useful spatial relationships can be learned from data.
 
 The sequence length is $N=HW/P^2$. At fixed image size, halving patch width doubles the number of patches along each axis, making four times as many tokens and roughly sixteen times as many patch-to-patch attention scores. Parameters need not grow with that token count. This is why a model can become substantially more expensive without becoming substantially larger in parameter count.
@@ -47,6 +49,8 @@ The plot compares transfer to ImageNet after pretraining on ImageNet, ImageNet-2
 ![ImageNet transfer accuracy as pretraining dataset size increases](/assets/images/vit-source-figure-3-data-scale.png)
 *Fig 2: ViT’s advantage depends on pretraining scale; larger variants gain disproportionately on JFT, while BiT ResNets are stronger in the smaller-data regime of this study. | source: [Vision Transformer, Figure 3](https://arxiv.org/abs/2010.11929)*
 
+[Open figure at full resolution](/assets/images/vit-source-figure-3-data-scale.png)
+
 Appendix Table 5 gives the controlled transfer numbers below. All use 384-pixel fine-tuning without the extra techniques used for the headline ImageNet result.
 
 | Pretraining data | ViT-B/16 | ViT-L/16 | ImageNet top-1 after fine-tuning |
@@ -57,7 +61,7 @@ Appendix Table 5 gives the controlled transfer numbers below. All use 384-pixel 
 
 This is a result for the paper’s architecture and regularization choices. It does not prove that every Transformer needs 300 million images. The authors tune basic regularization for the smaller datasets, and the public ImageNet-21k model already transfers well. A second experiment keeps JFT-subset hyperparameters fixed and measures linear few-shot accuracy on frozen features; that supports the crossover too, but it is a different evaluation from full fine-tuning.
 
-The main pretraining is supervised. JFT labels and ImageNet labels teach the visual representations; the fact that the network resembles a language Transformer does not make its training objective next-token prediction. The paper’s masked-patch experiment is a separate preliminary study.
+The main pretraining is supervised, and the authors de-duplicate the pretraining datasets against downstream test sets. JFT labels and ImageNet labels teach the visual representations; the fact that the network resembles a language Transformer does not make its training objective next-token prediction. The paper’s masked-patch experiment is a separate preliminary study.
 
 ### High-resolution transfer changes the token budget
 
@@ -81,6 +85,8 @@ Figure 7 inspects three parts of the representation. On the left, patch-projecti
 
 ![Learned patch filters, positional similarities, and attention distances in ViT](/assets/images/vit-source-figure-7-representations.png)
 *Fig 3: Patch filters capture local structure, position embeddings recover spatial relationships, and attention heads mix local and global evidence across depth. | source: [Vision Transformer, Figure 7](https://arxiv.org/abs/2010.11929)*
+
+[Open figure at full resolution](/assets/images/vit-source-figure-7-representations.png)
 
 The positional ablation supports a modest conclusion. ImageNet five-shot linear accuracy is 61.38% without positions and 64.21% with the default learned 1D positions; learned 2D and relative alternatives are about 64.0%. Position matters here, while the tested encoding variants are close. These five-shot values are not the paper’s fully fine-tuned classification scores.
 

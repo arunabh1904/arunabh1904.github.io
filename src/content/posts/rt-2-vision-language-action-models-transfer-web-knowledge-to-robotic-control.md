@@ -34,6 +34,8 @@ That bridge is powerful because it shares weights at the point where semantic co
 ![RT-2 evaluation scenes for unseen objects, backgrounds, and environments](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-source-figure-3.webp)
 *Fig 1: The controlled evaluation changes object categories, scene backgrounds, and kitchen environments separately, with easy and hard variants that expose where visual transfer survives a distribution shift. | source: [RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control, Figure 3](https://arxiv.org/abs/2307.15818)*
 
+[Open figure at full size](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-source-figure-3.webp)
+
 The source figure is useful because it shows what “generalization” means in this paper. A new object, a new visual context, and a new physical workspace are different tests; they should not be collapsed into one open-world score. The robot still executes familiar pick, place, and move behaviors while the semantic and visual conditions change.
 
 ### Co-fine-tuning protects the visual prior
@@ -44,6 +46,8 @@ The important control is not simply “pretrained versus unpretrained.” The au
 
 ![RT-2-PaLI-X scaling and training ablation across unseen settings](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-source-figure-8.webp)
 *Fig 2: The ablation compares scratch training, robot-only fine-tuning, and co-fine-tuning at 5B and 55B; capacity and retained web data both raise the average unseen-condition score. | source: [RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control, Figure 6](https://arxiv.org/abs/2307.15818)*
+
+[Open figure at full size](/assets/images/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control-source-figure-8.webp)
 
 The bars make the interaction visible. A large randomly initialized model is not enough, and a pretrained model can still forget useful web concepts when robot actions are the only fine-tuning signal. Keeping the original tasks in the mixture is the paper's way of making low-level action learning coexist with semantic recognition.
 

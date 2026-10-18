@@ -25,14 +25,18 @@ summary: "2026 – VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-Worl
 ![VLA-REPLICA procedure for aligning camera and robot poses reproducing object placement and running standardized policy evaluations](/assets/images/vla-replica-low-cost-reproducible-real-world-evaluation-paper-figure.png)
 *Fig 1: Shows the reproducibility controls: AprilTag and video-overlay alignment fix viewpoint geometry, task reference images fix object placement, and the same suite is then run across policies. | source: [VLA-REPLICA](https://arxiv.org/abs/2605.20774)*
 
+[Open figure at full size](/assets/images/vla-replica-low-cost-reproducible-real-world-evaluation-paper-figure.png)
+
 ![Figure 1 from VLA-REPLICA: A Low-Cost, Reproducible Benchmark for Real-World VLA Evaluation](/assets/images/vla-replica-low-cost-reproducible-real-world-evaluation-source-figure-1.webp)
 *Fig 2: Overview of the benchmark's hardware, workspace, and task protocol, including the low-cost arm, cameras, lighting enclosure, and standardized tabletop scene. | source: [VLA-REPLICA, Figure 1](https://arxiv.org/abs/2605.20774)*
 
+[Open figure at full size](/assets/images/vla-replica-low-cost-reproducible-real-world-evaluation-source-figure-1.webp)
+
 ### A benchmark is a physical interface contract
 
-VLA-REPLICA specifies a $\sim\$1,050 setup built around a 6-DoF SO-101 arm, an RGB webcam, a RealSense D455, and a 32-inch light box at roughly 5,600 K. Calibration uses a matrix for action normalization, while reference images and video overlays constrain camera pose and object placement. The point is not that this tabletop is realistic in every way; it is that another lab can rebuild the same interface to the policy.
+VLA-REPLICA specifies a roughly USD 1,050 setup built around a 6-DoF SO-101 arm, an RGB webcam, a RealSense D455, and a 32-inch light box at roughly 5,600 K. Each arm is calibrated in a standard L-shaped pose, recording servo offsets and joint limits; the benchmark maps raw encoder actions to a universal joint-angle action with $u=D^{-1}(a-a_{\mathrm{offset}})$ and applies the inverse mapping on a new arm. The appendix gives camera-pose tolerances of $\pm0.01$ m and $\pm1^\circ$ before the final overlay match. Camera overlays and an AprilTag then constrain viewpoint geometry, while reference images constrain object placement. The point is not that this tabletop is realistic in every way; it is that another lab can rebuild the same interface to the policy.
 
-The suite contains ten tasks: four pick-and-place tasks, three object-interaction tasks, and three memory/counting tasks. The authors collect 500 demonstrations, 50 per task. Evaluation has 90 scenes: 50 in-distribution scenes, five per task across ten tasks, and 40 OOD scenes, five per task across eight selected tasks. OOD tests change color and shape; memory tasks train on counts 1 and 3 and test on 2, 4, and 5. Those details make “OOD” a specified intervention rather than a vague claim about generalization.
+The suite contains ten tasks: four pick-and-place tasks, three object-interaction tasks, and three memory/counting tasks. The authors collect 500 demonstrations, 50 per task. Every policy is trained or fine-tuned for 40,000 steps on that same target-domain set, and each task result averages five runs. Evaluation has 90 scenes: 50 in-distribution scenes, five per task across ten tasks, and 40 OOD scenes, five per task across eight selected tasks. OOD tests change color and shape; memory tasks train on counts 1 and 3 and test on 2, 4, and 5. Those details make “OOD” a specified intervention rather than a vague claim about generalization.
 
 ### The reproduced numbers expose what the setup does and does not prove
 

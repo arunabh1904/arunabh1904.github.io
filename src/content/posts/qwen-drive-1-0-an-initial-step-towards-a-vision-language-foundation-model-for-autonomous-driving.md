@@ -34,12 +34,20 @@ The training diagram makes the gradient boundary visible. First the new percepti
 ![Qwen-Drive source Figure 4, Stage 2: joint adaptation of perception and vision-language components](/assets/images/qwen-drive-source-figure-4-stage-2.png)
 *Fig 1: Stage 2 updates the shared visual-language pathway using geometric and language supervision. The source figure is cropped to this training stage. | source: [Qwen-Drive, Figure 4](https://arxiv.org/abs/2609.00111)*
 
+[Open figure at full size](/assets/images/qwen-drive-source-figure-4-stage-2.png)
+
 The distinction matters when interpreting the paper's claim of a unified model. Perception losses can change the shared features during Stage 2; planning and reinforcement rewards do not continue updating those features in Stages 3 and 4. The method demonstrates compatibility between tasks with staged adaptation. It does not demonstrate unrestricted joint optimization of perception, language, and control.
 
 ![Qwen-Drive source Figure 4, Stage 3: a trainable Planning Expert reads a frozen vision-language model](/assets/images/qwen-drive-source-figure-4-stage-3.png)
 *Fig 2: Stage 3 trains trajectory generation on fixed scene representations; the optional reasoning trace is a condition, not a text-generation target. Cropped from the source training diagram. | source: [Qwen-Drive, Figure 4](https://arxiv.org/abs/2609.00111)*
 
+[Open figure at full size](/assets/images/qwen-drive-source-figure-4-stage-3.png)
+
 Data alignment is part of the method. Two occupancy datasets can both use a $200\times200\times16$ array while assigning different physical positions to the same index. Qwen-Drive keeps their native label grids and samples predicted features onto each grid. That avoids silently treating equal tensor shapes as equal geometry. It also masks source-specific class supervision rather than treating an unannotated class as absent.
+
+The external probe is useful precisely because it exposes where this alignment still breaks. Qwen-Drive reaches 43.95 mAP and 60.99 map mIoU on nuScenes, and 43.45 mAP and 71.27 map mIoU on OpenScene. A separate head-only comparison exposes negative transfer before joint backbone adaptation: a head trained only on nuScenes falls from 34.13 NDS there to 16.50 on OpenScene. Mixed-source head training raises OpenScene NDS to 41.86, while nuScenes occupancy mIoU drops by 26.6%. These are modified NDS scores with attribute error fixed to zero because the unified labels contain no attributes. The shared head is therefore an inspectable 3D probe, not evidence that the two datasets have interchangeable occupancy ground truth.
+
+For planning, the sensor contract is narrower than the perception evaluation: samples use front, front-left, and front-right cameras at the current time plus three 0.5-second history frames, with current images resized to 720p and historical images to 320p. The six-camera nuScenes and eight-camera OpenScene rigs belong to the single-frame BEV-perception experiments; they are not the planning input for every trajectory result.
 
 Stage 2's effective mixture is 12.7% perception, 31.0% general vision-language, and 56.3% driving vision-language examples. Stage 3 uses about 2.83M planning examples, with a reasoning condition for 24.2%. On the paper's knowledge, reasoning, and recognition aggregate, the adapted model scores 66.41 against the base model's 67.40. Retention is measured here; it is not inferred from leaving the architecture unchanged.
 

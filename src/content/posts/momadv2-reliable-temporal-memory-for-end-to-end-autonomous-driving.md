@@ -55,7 +55,11 @@ The source figure makes the deployment boundary clear. Expert trajectories appea
 ![MomADv2 source Figure 3: supervised flow correction from a planner trajectory and bounded inference-time refinement](/assets/images/momadv2-source-figure-3.png)
 *Fig 1: Training interpolates from the planner trajectory toward the expert. Inference starts from the planner's own path and applies a gated correction; no expert trajectory is available. | source: [MomADv2, Figure 3](https://arxiv.org/abs/2608.23405)*
 
+[Open figure at full size](/assets/images/momadv2-source-figure-3.png)
+
 The implementation first accumulates displacement outputs into absolute positions and normalizes them before flow training. Planner trajectories and query conditions are detached under the flow loss. Otherwise, the auxiliary objective could change the starting proposal while learning to correct it, making the refinement task a moving target. The residual gate preserves the original planner as an anchor, though it can also limit recovery when that anchor is badly wrong.
+
+Appendix A.6 describes the nuScenes adaptation stage: initialize from the pretrained MomAD stack, then freeze the image backbone, sparse perception, motion branch, and most of the planning head while adapting SSM-Q and FM-Ref for 10 epochs. That is a stage-specific budget; the main implementation section separately lists 20 epochs for nuScenes, two for Bench2Drive, and 100 for NAVSIM. The nuScenes and Bench2Drive branches use multi-view camera images, while NAVSIM keeps TransFuser’s perception modules and ResNet-34 backbone. The temporal modules are evaluated within those different baseline systems.
 
 ### Keep the evaluation protocols and teacher supervision separate
 

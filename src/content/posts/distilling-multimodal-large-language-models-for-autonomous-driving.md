@@ -27,7 +27,11 @@ The language branch is trained for trajectory estimation and visual question ans
 ![DiMA’s BEAM-token and distillation architecture](/assets/images/distilling-multimodal-large-language-models-for-autonomous-driving-source-figure-2.webp)
 *Fig 1: A multi-view scene encoder produces BEAM tokens for the planning transformer and the MLLM; language, distillation, and surrogate losses shape the shared representation during training. | source: [Distilling Multi-modal Large Language Models for Autonomous Driving, Figure 2](https://arxiv.org/abs/2501.09757)*
 
+[Open figure at full size](/assets/images/distilling-multimodal-large-language-models-for-autonomous-driving-source-figure-2.webp)
+
 The training sources make the supervision concrete. NuScenes provides about 28,000 open-loop planning samples with 22,000/6,000 training/validation examples. DriveLM contributes a 4,000-sample subset with 300,000 QA pairs, and the authors generate additional QA from numerical annotations with Llama-3-70B. The MLLM can be removed after training when the vision branch is used for planning; an optional dual branch combines both at inference for a slower, language-aware mode.
+
+Training is two-stage: the vision-only planner is pretrained for 60 epochs, then the vision planner and MLLM are jointly trained for 30 more; the second stage uses LoRA for the language model.
 
 ### The useful comparison is matched by evaluation protocol
 
@@ -35,6 +39,8 @@ Planning predicts two waypoints per second for three seconds. The paper reports 
 
 ![DiMA on long-tail overtaking and three-point-turn scenarios](/assets/images/distilling-multimodal-large-language-models-for-autonomous-driving-source-figure-1.webp)
 *Fig 2: On manually selected nuScenes long-tail cases, DiMA lowers trajectory L2 for overtaking from VAD’s 1.06 m to 0.66 m and for a zero-shot three-point turn from 1.57 m to 1.05 m; the latter appears only in validation. | source: [Distilling Multi-modal Large Language Models for Autonomous Driving, Figure 1](https://arxiv.org/abs/2501.09757)*
+
+[Open figure at full size](/assets/images/distilling-multimodal-large-language-models-for-autonomous-driving-source-figure-1.webp)
 
 The targeted split contains 689 validation scenes where the ego vehicle must turn. DiMA-VAD-Tiny reaches 0.81 m average L2 versus VAD-Tiny’s 1.08 m, while DiMA-VAD-Base reaches 0.71 m. In the long-tail table, overtaking improves from 1.14 m for VAD-Tiny to 0.69 m for DiMA-VAD-Tiny, and the zero-shot three-point-turn case improves from 1.55 m to 1.17 m. The visual figure is persuasive because it shows the path, but the table is the proper source for aggregate comparisons.
 

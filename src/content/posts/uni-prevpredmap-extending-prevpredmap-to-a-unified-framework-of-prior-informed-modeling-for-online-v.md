@@ -33,11 +33,15 @@ The figure shows the same retrieved information entering two places. Convolution
 ![Uni-PrevPredMap source Figure 2 shows tri-mode training, tile retrieval, BEV conditioning, and query generation](/assets/images/uni-prevpredmap-source-figure.png)
 *Fig 1: Temporal and external map vectors share retrieval and rasterization, then condition the BEV encoder and query generator. Training also supplies empty priors so the mapper learns an independent perception path. | source: [Uni-PrevPredMap v4, Figure 2; figure crop](https://arxiv.org/abs/2504.06647v4)*
 
+[open full-size figure](/assets/images/uni-prevpredmap-source-figure.png)
+
 This differs from [MapTracker](/paper%20shorts/2024/03/23/maptracker-tracking-with-strided-memory-fusion-for-consistent-vector-hd-mapping.html)'s persistent vector latents and explicit track supervision. Uni-PrevPredMap carries predicted geometry through a rasterized prior. Its authors identify that representation as a possible reason for weaker crossing AP than MapTracker when external maps are absent. A common interface simplifies reuse but can discard instance detail.
 
 ### Prior availability becomes a training condition
 
 Training alternates among no-prior, temporal-only, and temporal-plus-map modes. The main nuScenes ratio is 0.50:0.30:0.20. External map vectors receive instance-level displacement sampled from −6 to 6 meters on selected elements. Empty heatmaps represent unavailable priors. At inference, the model chooses the available mode instead of requiring continuous map coverage.
+
+nuScenes uses 700 training and 150 validation scenes from 1,000 twenty-second sequences. Each sequence has six cameras. Argoverse 2 uses 700 training and 150 validation logs. Its sequences last 15 seconds, use seven cameras, and include 3D vector maps. Evaluation covers a 30 m front/rear and 15 m left/right range. Chamfer-distance AP uses thresholds of 0.5, 1.0, and 1.5 m. The Argoverse 2 comparison uses its own 2.5 Hz sampling, so its mAP should not be read as a direct nuScenes replication.
 
 The implementation uses ResNet-50, LSS/BEVPoolv2, 0.3-meter BEV cells, 100 instance queries, 20 point queries, and six decoder layers. AdamW training uses batch size 16 on four A100 GPUs. The principal nuScenes comparison uses 24 epochs; a longer schedule uses 72. Argoverse 2 adds elevation-aware map evaluation under its own sampling and training setup.
 

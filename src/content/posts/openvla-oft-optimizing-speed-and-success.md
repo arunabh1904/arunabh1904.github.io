@@ -28,11 +28,17 @@ A pretrained policy need not keep the interface it learned with. The first figur
 ![OpenVLA-OFT comparison of autoregressive versus parallel decoding and discrete versus continuous action prediction](/assets/images/openvla-oft-optimizing-speed-and-success-paper-figure.png)
 *Fig 1: Isolates the fine-tuning choices: OpenVLA-OFT replaces sequential discrete token generation with parallel action decoding and continuous regression or diffusion objectives. | source: [OpenVLA-OFT, Figure 2](https://arxiv.org/abs/2502.19645)*
 
+[Open figure at full size](/assets/images/openvla-oft-optimizing-speed-and-success-paper-figure.png)
+
 ![Figure 1 from Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success (OpenVLA-OFT)](/assets/images/openvla-oft-optimizing-speed-and-success-source-figure-1.webp)
 *Fig 2: OpenVLA-OFT+ on the bimanual ALOHA robot. The optimized fine-tuning recipe adds parallel decoding, action chunking, continuous actions, and FiLM language conditioning for the real-robot setting. | source: [OpenVLA-OFT, Figure 1](https://arxiv.org/abs/2502.19645)*
 
+[Open figure at full size](/assets/images/openvla-oft-optimizing-speed-and-success-source-figure-1.webp)
+
 ![Figure 3 from Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success (OpenVLA-OFT)](/assets/images/openvla-oft-optimizing-speed-and-success-source-figure-3.webp)
 *Fig 3: LIBERO simulation benchmark task suites used to compare fine-tuning design choices. | source: [OpenVLA-OFT, Figure 3](https://arxiv.org/abs/2502.19645)*
+
+[Open figure at full size](/assets/images/openvla-oft-optimizing-speed-and-success-source-figure-3.webp)
 
 
 ### Parallel chunks expose the throughput tradeoff

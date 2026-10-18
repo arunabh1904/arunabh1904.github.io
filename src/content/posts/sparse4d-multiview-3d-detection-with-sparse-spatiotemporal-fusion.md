@@ -28,6 +28,8 @@ DETR3D samples around one projected reference point. Sparse4D gives each hypothe
 ![Sparse4D follows an object through past camera views](/assets/images/sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion-source-figure-1.webp)
 *Fig 1: Sampling points follow the hypothesized object through earlier views, then their evidence is fused into the feature used to refine its current box. The alignment depends on both ego motion and the estimated object velocity. | source: [Sparse4D, Figure 1](https://arxiv.org/abs/2211.10581)*
 
+[Open figure at full resolution](/assets/images/sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion-source-figure-1.webp)
+
 To find a point in an earlier frame, the model first subtracts the object's estimated displacement under constant velocity, then transforms the result into that frame's ego coordinate system. Camera calibration projects it into each image. This separates two motions that can otherwise look similar: a stationary parked car moves across the image when the ego car moves, while another vehicle also changes position in the world. The velocity estimate need not be perfect at the first layer because later refinement updates both the box and the locations queried from history.
 
 For one hypothesis, the sampled evidence has axes for keypoint, timestamp, camera, feature scale, and channel. Fusion follows a specific order. Predicted group-wise weights first combine cameras and scales for each point and timestamp. A sequential concatenation-and-linear update then combines timestamps, and summation combines the keypoints. This is feature fusion over a finite image-history window; it should not be confused with the persistent instance-state recurrence introduced in Sparse4D v2.
@@ -38,6 +40,8 @@ Projecting a box into a camera does not verify its depth. Two boxes at different
 
 ![Sparse4D architecture with temporal feature queue and depth reweighting](/assets/images/sparse4d-paper-figure-2.png)
 *Fig 2: Each refinement module combines inter-instance self-attention, sparse 4D aggregation, depth reweighting, and box updates. The image-feature queue retains past observations; the depth module tests the geometric plausibility of the evidence gathered around each anchor. | source: [Sparse4D, Figure 2](https://arxiv.org/abs/2211.10581)*
+
+[Open figure at full resolution](/assets/images/sparse4d-paper-figure-2.png)
 
 Depth supervision comes from the centers of matched, annotated 3D boxes. The method does not require an additional dense LiDAR depth target, but it still requires 3D box supervision. In the component ablation, neither learned points nor depth reweighting alone improves mAP at the displayed precision: the baseline is 43.2, depth reweighting gives 43.1, and learned points give 43.2. Together they reach 43.6, while NDS rises from 53.3 to 54.1 and orientation error falls from 0.408 to 0.363. The contribution is modest and complementary, rather than an isolated depth module explaining the whole temporal gain.
 
@@ -57,9 +61,11 @@ Object compensation lowers velocity error after ego alignment, while mAP slips s
 ![Sparse4D refinement and history ablations](/assets/images/sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion-source-figure-5.webp)
 *Fig 3: Left: successive outputs from one six-module decoder. Middle: separately trained decoder depths. Right: history length at 320×800 without learned points. These are three different experiments, and their curves show diminishing returns rather than one interchangeable depth-or-time budget. | source: [Sparse4D, Figure 5](https://arxiv.org/abs/2211.10581)*
 
+[Open figure at full resolution](/assets/images/sparse4d-multiview-3d-detection-with-sparse-spatiotemporal-fusion-source-figure-5.webp)
+
 The history curve rises from 40.1 NDS without history to 49.5 with three historical frames and 51.0 with ten. The longer window still helps, but much less at its margin. Memory constraints prevented the authors from testing further; this first version must retain and sample past image features. The depth panel also distinguishes mAP from NDS: ten modules give the displayed peak mAP of 38.1, whereas the highest displayed NDS is 50.0 at twelve modules.
 
-The main four-frame ResNet-101 validation model uses 640×1600 images. Moving to nine frames raises mAP/NDS from 43.6/54.1 to 44.5/54.7; a 48-epoch variant reaches 44.4/55.0. The strongest test row uses DD3D-pretrained VoVNet-99, nine frames with six historical fusion features randomly detached during training, and 48 epochs to reach 51.1/59.5, without CBGS or test-time augmentation. Those configurations should not be substituted for the smaller motion ablation. Likewise, the separate 900×1600 compute comparison reports 1019.2→1113.8 GFLOPs from one to four frames, not a measured end-to-end latency guarantee.
+The source uses the official 700/150/150 nuScenes split, six cameras and 2 Hz key frames. It initializes the network from FCOS3D, trains the validation and ablation models for 24 epochs, and trains test submissions for 48; random historical-feature detachment is a memory-saving training measure, and CBGS and test-time augmentation are not used. The main four-frame ResNet-101 validation model uses 640×1600 images. Moving to nine frames raises mAP/NDS from 43.6/54.1 to 44.5/54.7; a 48-epoch variant reaches 44.4/55.0. The strongest test row uses DD3D-pretrained VoVNet-99, nine frames with six historical fusion features randomly detached during training, and 48 epochs to reach 51.1/59.5. Those configurations should not be substituted for the smaller motion ablation. Likewise, the separate 900×1600 compute comparison reports 1019.2→1113.8 GFLOPs from one to four frames, not a measured end-to-end latency guarantee.
 
 ## High-Level Takeaways
 

@@ -25,9 +25,11 @@ Pose-DiT reads projected penultimate-layer states through cross-attention and pr
 
 The source figure separates the three training stages. Notice that the continuous action head is added after the language-and-geometry representation is trained.
 
-![Source Figure 2 shows the 3D-MoE architecture, routing curriculum, and three-stage training pipeline.](/assets/images/3d-moe-source-figure-2.png)
+![Source Figure 2 shows the 3D-MoE architecture, routing curriculum, and three-stage training pipeline.](/assets/images/3d-moe-source-figure-2-readable.png)
 
 *Fig 1: Source Figure 2 connects object features, language tokens, expert routing, and the later Pose-DiT action head. Each training stage changes which capability is learned. | source: [3D-MoE, version 2](https://arxiv.org/abs/2501.16698v2)*
+
+[Open figure at full size](/assets/images/3d-moe-source-figure-2-readable.png)
 
 ### Object tokens carry an assumption about perception
 

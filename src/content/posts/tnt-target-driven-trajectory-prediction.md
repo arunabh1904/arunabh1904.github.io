@@ -40,6 +40,8 @@ The pipeline below separates three selections that can otherwise blur together. 
 ![TNT source Figure 2: context encoding and the target, motion, and scoring stages](/assets/images/tnt-target-driven-trajectory-prediction-paper-figure.png)
 *Fig 1: Candidate endpoints are scored and refined before trajectories are generated. A separate scorer then evaluates the complete paths and selects a compact set, rather than treating endpoint probability as the final trajectory score. | source: [TNT, Figure 2](https://arxiv.org/abs/2008.08294)*
 
+[Open figure at full size](/assets/images/tnt-target-driven-trajectory-prediction-paper-figure.png)
+
 ### Candidate design determines which futures are easy to represent
 
 The first stage predicts a probability and a continuous offset for every sampled location. Its classification target is the candidate nearest the ground-truth endpoint; Huber regression refines that candidate's location. The offset matters: the Argoverse target-stage ablation improves fifty-candidate minFDE from 0.69 to 0.53 m when refinement is enabled. Discretization supplies coverage without forcing the answer to lie exactly on the grid.
@@ -72,6 +74,8 @@ The retained example below shows the same progression visually. Many targets and
 
 ![TNT source Figure 4, example crop: fifty targets, fifty trajectories, and six selected trajectories](/assets/images/tnt-target-driven-trajectory-prediction-source-figure-4.webp)
 *Fig 2: One Argoverse example traces candidate targets through motion estimation to the selected six paths. The reduction removes redundancy, but its usefulness depends on retaining distinct routes and speeds rather than merely the highest endpoint scores. | source: [TNT, Figure 4, example crop](https://arxiv.org/abs/2008.08294)*
+
+[Open figure at full size](/assets/images/tnt-target-driven-trajectory-prediction-source-figure-4.webp)
 
 ### The benchmark result depends on both split and output budget
 

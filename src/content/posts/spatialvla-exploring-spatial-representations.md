@@ -30,7 +30,9 @@ Follow the two spatial interfaces in the overview. The observation branch adds d
 ![Depth-aware image encoding and adaptive action-token prediction; source Figure 2](/assets/images/spatialvla-source-figure-2.webp)
 *Fig 1: SpatialVLA combines 3D position embeddings with an action vocabulary organized around translation, rotation, and gripper state. The two interfaces are trained together. | source: [Paper, Figure 2](https://arxiv.org/abs/2501.15830)*
 
-[View full-size figure](/assets/images/spatialvla-source-figure-2.webp)
+[Open figure at full size](/assets/images/spatialvla-source-figure-2.webp)
+
+[Open figure at full size](/assets/images/spatialvla-source-figure-2.webp)
 
 ### Adapt the grid when the robot changes
 
@@ -41,7 +43,9 @@ For a new robot, the method fits the action distribution again and adapts the sp
 ![Action distributions converted into nonuniform translation and rotation grids; source Figure 3](/assets/images/spatialvla-source-figure-3.webp)
 *Fig 2: Adaptive grid boundaries allocate resolution according to observed action frequency. Their geometry changes when the target robot has a different movement distribution. | source: [Paper, Figure 3](https://arxiv.org/abs/2501.15830)*
 
-[View full-size figure](/assets/images/spatialvla-source-figure-3.webp)
+[Open figure at full size](/assets/images/spatialvla-source-figure-3.webp)
+
+[Open figure at full size](/assets/images/spatialvla-source-figure-3.webp)
 
 Table IV isolates useful effects on the Fractal/Bridge mixture. Removing Ego3D encoding reduces eggplant-placement success from 87.5% to 37.5%, while replacing the learned distribution with uniform discretization gives 54.2%. The gains are not universal: one grasp-carrot submetric improves without Ego3D. On LIBERO, adapted spatial embeddings with LoRA improve the four suites over the unadapted LoRA variant, but SpatialVLA's 78.1% average still includes only 55.5% success on LIBERO-Long.
 

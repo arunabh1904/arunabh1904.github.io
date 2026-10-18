@@ -27,6 +27,8 @@ summary: "2024 – InternVL 2.5: Expanding Performance Boundaries of Open-Source
 ![Figure 1 from InternVL 2.5 showing model performance on the OpenCompass leaderboard](/assets/images/internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models-paper-figure.png)
 *Fig 1: The model family improves the eight-benchmark OpenCompass VQA aggregate across sizes. The plotted ranking measures that evaluation slice; it does not cover the full range of multimodal behavior. | source: [InternVL 2.5, Figure 1](https://arxiv.org/abs/2412.05271)*
 
+[Open figure at full size](/assets/images/internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models-paper-figure.png)
+
 InternVL 2.5 keeps the ViT–MLP–LLM pattern rather than introducing a new fusion block. Its InternViT-6B or InternViT-300M encoder produces visual tokens, a randomly initialized two-layer MLP maps them into the language model’s input space, and the LLM generates the response with next-token prediction. A 448 × 448 tile initially yields 1,024 visual tokens; pixel unshuffle reduces that to 256 before the language model sees it. The reduction is what makes dynamic high resolution practical: the system can tile a wide or tall image without sending every raw patch into the LLM.
 
 The tile allocator matches the input aspect ratio to a set of 448-pixel grids. A single image can receive up to the dataset’s maximum tile count and an optional square thumbnail supplies a global view. For multi-image examples, the tile budget is divided across images and each is tagged as Image-1, Image-2, and so on. Video uses one 448-pixel tile per frame; 32 or 64 frames already produce 8,192 or 16,384 visual tokens. Figure 1 is a leaderboard rather than an architecture diagram, so the right interpretation is not that one scalar summarizes “multimodal intelligence.” It is evidence that the same token interface can scale from single-image OCR to multi-image and video inputs, with context length and tile policy as explicit constraints.
@@ -46,6 +48,8 @@ The loss and data plumbing are part of the model. Random JPEG compression at qua
 ![Figure 5 from InternVL 2.5 showing data configuration by modality](/assets/images/internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models-source-figure-5.webp)
 *Fig 2: Dataset configuration. In InternVL 2.0 and 2.5, data augmentation is applied selectively, enabled for image datasets and disabled for videos and text. | source: [InternVL 2.5, Figure 5](https://arxiv.org/abs/2412.05271)*
 
+[Open figure at full size](/assets/images/internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models-source-figure-5.webp)
+
 The fine-tuning mixture grows from 5.1M samples in InternVL 1.5 to 7.3M in InternVL 2.0 and 16.3M in InternVL 2.5. By token count, single-image data contribute 45.92%, multi-image 9.37%, video 39.79%, and pure text 4.92%. Figure 2 shows why one augmentation policy is inappropriate: image datasets use JPEG augmentation and up to 6–36 tiles, multi-image datasets use larger tile budgets, videos disable JPEG augmentation and use one tile per frame, and text has no tile dimension.
 
 The paper’s most human-facing finding is that a few thousand repetitive or anomalous samples can make a fully trainable model loop in long answers and chain-of-thought. The filter therefore uses three text paths: domain-specific LLM quality scoring, repetition detection with manual review, and heuristic rules for abnormal lengths, repeated lines, or long zero sequences. Multimodal data use repetition detection and heuristics with manual verification. The authors do not claim that filtering solves all repetition; they say it reduces the failure enough to make test-time scaling more useful.
@@ -54,6 +58,8 @@ The paper’s most human-facing finding is that a few thousand repetitive or ano
 
 ![Figure 10 from InternVL 2.5 showing LongVideoBench performance as input frames increase](/assets/images/internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models-source-figure-10.webp)
 *Fig 3: Performance on LongVideoBench with varying input video frames. | source: [InternVL 2.5, Figure 10](https://arxiv.org/abs/2412.05271)*
+
+[Open figure at full size](/assets/images/internvl-2-5-expanding-performance-boundaries-of-open-source-multimodal-models-source-figure-10.webp)
 
 On MMMU validation, InternVL2.5-78B reaches 70.1% when the better of direct answering and chain-of-thought (CoT) is reported, compared with 62.7% for InternVL2-Llama3-76B. Figure 3 makes the test-time contract visible for video: InternVL 2.5 continues to benefit from more frames in the reported LongVideoBench sweep, whereas InternVL 2.0 tends to peak around 16–32 and degrade as frames increase. More frames increase the visual context and cost; the curve is evidence for a scalable input policy, not a claim that 128 frames is always the correct setting.
 

@@ -26,6 +26,8 @@ summary: '2019 – ViLBERT: Pretraining Task-Agnostic Visiolinguistic Representa
 ![ViLBERT architecture with separate visual and language streams connected by co-attention](/assets/images/vilbert-paper-figure-1.png)
 *Fig 1: ViLBERT processes region features and word tokens in parallel, inserting sparse co-attention blocks where one stream can read the other. The dashed repeat block makes the different visual and linguistic depths explicit. | source: [ViLBERT, Figure 1](https://arxiv.org/abs/1908.02265)*
 
+[Open figure at full size](/assets/images/vilbert-paper-figure-1.png)
+
 ViLBERT starts with a set of image regions rather than pixels. A Faster R-CNN with a ResNet-101 backbone, pretrained on Visual Genome, supplies 10–36 high-scoring regions per image. Each region is a mean-pooled visual feature plus a projected five-dimensional location vector containing normalized top-left and bottom-right coordinates and the fraction of image area it covers. A special `IMG` region is the mean-pooled whole-image feature. The language side starts from BERT-base embeddings and processes WordPiece tokens.
 
 The two streams do not share every layer. A co-attentional Transformer layer keeps each modality’s queries but swaps keys and values across the streams. The visual update is therefore conditioned on language, and the language update is conditioned on regions; residual connections and feed-forward layers then finish each Transformer block. The paper gives the text stream more standalone processing because its words need sentence context, while detector regions already arrive as high-level visual summaries. That is the useful architectural bet: interaction is placed where it can align the modalities without forcing a region feature through the same depth as a word sequence.
@@ -36,6 +38,8 @@ The model uses a 1024-dimensional visual stream with eight attention heads and i
 
 ![ViLBERT pretraining tasks for masked multimodal learning and image-text alignment](/assets/images/vilbert-pretraining-task-agnostic-visiolinguistic-representations-source-figure-3.png)
 *Fig 2: ViLBERT’s two proxy tasks either reconstruct masked words or region categories from the remaining pair, or classify whether the complete image-caption pair belongs together. | source: [ViLBERT, Figure 3](https://arxiv.org/abs/1908.02265)*
+
+[Open figure at full size](/assets/images/vilbert-pretraining-task-agnostic-visiolinguistic-representations-source-figure-3.png)
 
 The masked multimodal task hides about 15% of words and regions. Text masking follows BERT. For a masked region, the feature is zeroed 90% of the time and left unchanged 10% of the time; the target is a distribution over detector semantic classes, trained with KL divergence rather than direct feature regression. The choice is deliberate: a caption can identify “dog” without reconstructing the exact region vector. In the alignment task, the model uses the `IMG` and `CLS` outputs, combines them elementwise, and predicts whether the pair matches. Since Conceptual Captions supplies aligned pairs only, negatives come from replacing either the image or caption with one from another example.
 

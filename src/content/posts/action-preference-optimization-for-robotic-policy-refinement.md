@@ -24,6 +24,8 @@ summary: "2025 – Human-Assisted Robotic Policy Refinement via Action Preferenc
 ![Action Preference Optimization pipeline from human-assisted deployment and interventions to adaptively weighted VLA fine-tuning](/assets/images/action-preference-optimization-for-robotic-policy-refinement-paper-figure.png)
 *Fig 1: APO closes the deployment loop: the operator corrects a failed or risky autonomous attempt, and the labels plus decoded action errors determine the next update. | source: [Action Preference Optimization, Figure 1](https://arxiv.org/abs/2506.07127)*
 
+[Open figure at full size](/assets/images/action-preference-optimization-for-robotic-policy-refinement-paper-figure.png)
+
 ### A takeover is evidence about a local action, not a clean preference pair
 
 Real intervention data is temporally asymmetric. When the operator takes over at step $t$, the preceding $K=10$ actions are annotated as undesirable, the human-corrected actions as desirable, and the autonomous actions outside that window remain ordinary interaction data. The paper uses a binary desirability objective related to KTO and regularizes the updated policy against the reference checkpoint. This is a better fit for an irreversible robot than fabricating a noisy rejected action: once the robot has moved the object, the counterfactual “what would have happened from exactly the same state?” is usually unavailable.
@@ -39,6 +41,8 @@ This is the paper’s most VLA-specific idea. The preference label says which si
 ![Figure 4 from APO: success and intervention frequency during lifelong refinement](/assets/images/action-preference-optimization-for-robotic-policy-refinement-source-figure-4.webp)
 *Fig 2: APO’s Coffee_D0 and StackThree_D0 success rates rise over rollout iterations while human intervention frequency falls. | source: [APO, Figure 4](https://arxiv.org/abs/2506.07127)*
 
+[Open figure at full size](/assets/images/action-preference-optimization-for-robotic-policy-refinement-source-figure-4.webp)
+
 ### The controlled results separate preference learning from generic replay
 
 The main RoboMimic comparison fine-tunes OpenVLA from 300 expert demonstrations, collects 50 interaction trajectories per task, and evaluates 50 trials per task under each of three unseen seeds, reporting the average success rate. APO reaches 60%, 54%, 46%, and 32% on Coffee_D0, StackThree_D0, ThreePieceAssembly_D0, and Square_D0, respectively, for a 48.0% mean. The base policy averages 40.5%; KTO averages 43.5%; and trajectory-preference TPO averages 41.5%. Dagger and weighted behavior cloning do not improve the mean. These numbers support the claim that the intervention labels and adaptive weighting together help; they do not show that any preference method is universally superior.
@@ -48,7 +52,9 @@ The disruption experiment is a useful boundary check. With only 20 interaction t
 ![Figure 6 from APO: learned recovery behaviors during rollout](/assets/images/action-preference-optimization-for-robotic-policy-refinement-source-figure-6.webp)
 *Fig 3: The learned policy retries a failed grasp and makes successive gripper adjustments when an insertion is obstructed. | source: [APO, Figure 6](https://arxiv.org/abs/2506.07127)*
 
-The real-world test makes the recovery story concrete. For square insertion, the base policy scores 65% in-distribution, 25% under position disruption, 10% under background disruption, and 25% under texture disruption; APO reaches 85%, 55%, 30%, and 55%. The paper also reports gains on the π0-FAST model, where APO reaches 76% Coffee_D0, 74% StackThree_D0, and 95% Insert Square. The work remains limited to autoregressive VLAs and manually operated interventions; the authors do not claim the objective transfers unchanged to diffusion or regression policies.
+[Open figure at full size](/assets/images/action-preference-optimization-for-robotic-policy-refinement-source-figure-6.webp)
+
+The real-world test makes the recovery story concrete. For square insertion, the base policy scores 65% in-distribution, 25% under position disruption, 10% under background disruption, and 25% under texture disruption; APO reaches 85%, 55%, 30%, and 55%. The paper also reports gains on the π0-FAST model, where APO reaches 76% Coffee_D0, 74% StackThree_D0, and 95% Insert Square. That transfer has a representation caveat: adaptive reweighting needs the discrete cosine-transform action tokens to decode back to continuous actions, and the implementation falls back to weight 1 when decoding fails, so those examples receive no action-distance emphasis. The work remains limited to autoregressive VLAs and manually operated interventions; the authors do not claim the objective transfers unchanged to diffusion or regression policies.
 
 ## High-Level Takeaways
 

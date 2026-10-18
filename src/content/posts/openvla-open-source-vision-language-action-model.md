@@ -33,6 +33,8 @@ The interface preserves the strengths of a VLM—language conditioning, a mature
 ![OpenVLA architecture and tokenized action interface](/assets/images/openvla-open-source-vision-language-action-model-paper-figure.png)
 *Fig 1: OpenVLA maps image patches and an instruction into a Llama 2 7B backbone, then de-tokenizes the predicted action tokens into seven robot controls. The visual encoder concatenates DINOv2 and SigLIP features; the projector aligns them to the language space. | source: [OpenVLA: An Open-Source Vision-Language-Action Model, Figure 2](https://arxiv.org/abs/2406.09246)*
 
+[Open figure at full size](/assets/images/openvla-open-source-vision-language-action-model-paper-figure.png)
+
 ### Why the data mixture matters as much as the backbone
 
 The full Open X-Embodiment collection contained more than 2M trajectories from over 70 robot datasets when the paper was written. OpenVLA curates 970k of them into a common setting: manipulation data with at least one third-person camera and single-arm end-effector control. Octo’s mixture weights are reused to favor diverse tasks and scenes, and DROID is first included conservatively at 10% before being removed for the final third of training because its action-token accuracy remained low. The resulting model sees many embodiments, but the common action and camera assumptions narrow what “out of the box” means.
@@ -46,10 +48,14 @@ On the 17-task BridgeData V2 WidowX suite, OpenVLA reaches 70.6% average success
 ![BridgeData V2 results across generalization categories](/assets/images/openvla-open-source-vision-language-action-model-source-figure-2.webp)
 *Fig 2: Across 170 BridgeData V2 rollouts, OpenVLA leads the generalization categories overall, with semantic generalization as the exception against RT-2-X. The bars cover visual, motion, physical, semantic, and language-grounding tests; detailed task results are in Table 4. | source: [OpenVLA: An Open-Source Vision-Language-Action Model, Figure 3](https://arxiv.org/abs/2406.09246)*
 
+[Open figure at full size](/assets/images/openvla-open-source-vision-language-action-model-source-figure-2.webp)
+
 The Google mobile-manipulator evaluation checks whether that advantage survives a different robot and task distribution. OpenVLA averages 85.0%, compared with 78.3% for RT-2-X, 33.3% for RT-1-X, and 26.7% for Octo. The in-distribution scores are 88.0% and 72.0% for OpenVLA and RT-2-X; on out-of-distribution tasks, both reach 82.9%. Read together with BridgeData, the plots support a narrower conclusion than “the 7B model is universally better”: the open model transfers strongly when the task semantics and physical control conventions remain close enough to the curated robot data, while RT-2-X retains an edge on internet-style semantic knowledge in the BridgeData categories.
 
 ![Google robot results for in-distribution and out-of-distribution tasks](/assets/images/openvla-open-source-vision-language-action-model-source-figure-3.webp)
 *Fig 3: On 60 Google-robot rollouts, OpenVLA and RT-2-X are close overall and far ahead of RT-1-X and Octo. The plot separates in-distribution from OOD tasks; Table 6 contains the per-task results. | source: [OpenVLA: An Open-Source Vision-Language-Action Model, Figure 4](https://arxiv.org/abs/2406.09246)*
+
+[Open figure at full size](/assets/images/openvla-open-source-vision-language-action-model-source-figure-3.webp)
 
 ### Fine-tuning and cost are part of the result
 

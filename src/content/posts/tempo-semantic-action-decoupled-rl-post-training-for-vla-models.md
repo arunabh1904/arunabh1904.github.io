@@ -25,7 +25,9 @@ summary: '2026 – TEMPO: Semantic-Action Decoupled RL Post-Training for VLA Mod
 ## Core Insights
 
 ![TEMPO's slow semantic projection update and fast action-expert update with two reinforcement-learning loops](/assets/images/tempo-semantic-action-decoupled-rl-post-training-for-vla-models-source-figure-1.png)
-*Fig 1: The paper's interface is a frozen VLM, a slowly updated semantic projection, and a quickly updated action expert. Each trainable block has its own RL loop, so the semantic latent can move on a slower clock than the action policy. | source: [TEMPO, Figure 1](https://arxiv.org/abs/2608.07314)*
+*Fig 1: The paper's interface is a frozen VLM, a slowly updated semantic projection, and a quickly updated action expert. Each trainable block has its own RL loop, so the semantic latent can move on a slower clock than the action policy. | source: [TEMPO, Figure 1](https://arxiv.org/abs/2608.07314v1)*
+
+[Open figure at full size](/assets/images/tempo-semantic-action-decoupled-rl-post-training-for-vla-models-source-figure-1.png)
 
 
 ### One RL clock is a hidden architectural assumption
@@ -40,7 +42,7 @@ $$
 \rho = \frac{f_{\mathrm{action}}}{f_{\mathrm{semantic}}}.
 $$
 
-The paper's effective ratio also depends on how many gradient updates each loop performs and on its action dimensionality: $\rho = N_a d_s/(N_s d_a)$. Thus “5:1” names an update schedule, not necessarily five times the number of environment rollouts or five times the total compute. The expensive design choice is not only which parameters to expose to RL. It is how often each exposed interface is allowed to move.
+The paper's effective ratio also depends on how many critic updates each loop performs and on each loop's delayed-actor schedule: $\rho = N_a d_s/(N_s d_a)$. Thus “5:1” names an update schedule, not necessarily five times the number of environment rollouts or five times the total compute. The expensive design choice is not only which parameters to expose to RL. It is how often each exposed interface is allowed to move.
 
 ### The ratio ablation carries the mechanism claim
 

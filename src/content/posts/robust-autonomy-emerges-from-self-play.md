@@ -40,6 +40,8 @@ The overview connects the throughput claim to the representation. Map geometry a
 ![GIGAFLOW source overview of parallel worlds, local structured observations, and the shared policy](/assets/images/robust-autonomy-emerges-from-self-play-paper-figure.png)
 *Fig 1: Parallel worlds feed structured local observations to one shared policy. The representation avoids rendering sensor images and supports batched inference across many different actors. | source: [GIGAFLOW, Figure 2](https://arxiv.org/abs/2502.03349)*
 
+[Open figure at full size](/assets/images/robust-autonomy-emerges-from-self-play-paper-figure.png)
+
 The memory design is equally important. Instead of keeping every actor's large observation sets in the rollout buffer, the system stores world states and reconstructs observations for training minibatches. Static map features are cached in spatial hashes. During training it drops 40% of road-boundary features and 50% of lane features, reducing memory while also exposing the policy to missing observations. This is structured-state augmentation, not a learned camera perception stack.
 
 ### One policy can still encounter different driving preferences
@@ -72,6 +74,8 @@ Scaling changes qualitative behavior. Diagnostic merges that fail at $10^8$ tran
 
 ![GIGAFLOW source Figure 3B showing a multi-lane merge at successive training scales](/assets/images/gigaflow-source-figure-3b-bottleneck.png)
 *Fig 2: Read downward as training grows. White cells in the right-hand matrices mark successful agents across 100 rollouts; reliable collective merging appears later than simple collision avoidance. Cropped source bottleneck panel. | source: [GIGAFLOW, Figure 3B](https://arxiv.org/abs/2502.03349)*
+
+[Open figure at full size](/assets/images/gigaflow-source-figure-3b-bottleneck.png)
 
 The matrices matter more than a single clean trajectory. They show whether a behavior repeats across actors and trials. This is still one selected diagnostic, with all participants controlled by the shared policy; it is not a universal transition count for learning negotiation with arbitrary human drivers.
 

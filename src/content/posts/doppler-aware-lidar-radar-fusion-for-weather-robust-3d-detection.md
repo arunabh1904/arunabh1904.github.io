@@ -28,6 +28,8 @@ That caveat matters. The model can exploit motion-related contrast, but its Dopp
 ![DLRFusion framework with separate LiDAR, radar power, and Doppler branches](/assets/images/dlrfusion-paper-figure.webp)
 *Fig 1: DLRFusion encodes LiDAR, radar power, and compensated Doppler separately, then repeats three modality interactions across sparse and BEV stages; the displayed framework is the paper’s Figure 2. | source: [Doppler-Aware LiDAR-RADAR Fusion for Weather-Robust 3D Detection, Figure 2](https://openaccess.thecvf.com/content/ICCV2025/html/Chae_Doppler-Aware_LiDAR-RADAR_Fusion_for_Weather-Robust_3D_Detection_ICCV_2025_paper.html)*
 
+[Open the full-size source figure](/assets/images/dlrfusion-paper-figure.webp)
+
 ### The interaction order encodes a hypothesis
 
 Each of three MPII stages first uses Doppler to update radar power. Its kernelized attention combines a motion-emphasis term, which favors similar projected features, with a separation term that keeps meaningful differences from collapsing. The resulting radar-power feature updates LiDAR voxels through KNN attention. A direct Doppler–LiDAR path runs in parallel because motion cues can be lost if they have to pass through power first. The refined branches are then sent through separate BEV encoders and repeated at the next stage.
@@ -36,7 +38,7 @@ The ablation supports this causal ordering. At IoU 0.5, power–LiDAR interactio
 
 ### Weather results are strong under a clear protocol
 
-K-RADAR supplies seven weather conditions. The authors evaluate the Sedan class in a driving corridor with x∈(0,72 m), y∈(−6.4,6.4 m), z∈(−2,6 m), 0.4 m voxels, and three MPII stages; training uses Adam with batch size 4. At IoU 0.5, DLRFusion’s total is 73.2 BEV AP / 45.7 3D AP, compared with 71.3 / 40.4 for LOD-PDR. At IoU 0.3, it reaches 82.9 / 74.8 versus 82.1 / 73.2. The 3D improvement is more pronounced than the BEV improvement, which is consistent with a cue that helps decide whether returns belong to an object in 3D rather than merely improving its ground-plane footprint.
+K-RADAR supplies seven weather conditions. The authors evaluate the Sedan class in a driving corridor with x∈(0,72 m), y∈(−6.4,6.4 m), z∈(−2,6 m), 0.4 m voxels, and three MPII stages. At IoU 0.5, DLRFusion’s total is 73.2 BEV AP / 45.7 3D AP, compared with 71.3 / 40.4 for LOD-PDR. At IoU 0.3, it reaches 82.9 / 74.8 versus 82.1 / 73.2. The 3D improvement is more pronounced than the BEV improvement, which is consistent with a cue that helps decide whether returns belong to an object in 3D rather than merely improving its ground-plane footprint.
 
 The radar-only encoding ablation also reaches 49.9 BEV AP / 19.9 3D AP at IoU 0.5 only when preprocessing and separate power/Doppler encoding are both enabled. The comparison is not a proof that every radar stack needs the same kernels, but it does isolate the cost of collapsing Doppler into one undifferentiated feature channel.
 

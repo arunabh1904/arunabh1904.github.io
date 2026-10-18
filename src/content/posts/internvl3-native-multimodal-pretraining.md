@@ -26,12 +26,16 @@ InternVL3 keeps the familiar ViT–MLP–LLM stack but changes when the pieces l
 ![InternVL3 multimodal benchmark table across InternVL3, Qwen2.5-VL, and other models](/assets/images/internvl3-native-multimodal-pretraining-source-figure-1.webp)
 *Fig 1: The report's comparison table places InternVL3 variants beside Qwen2.5-VL, earlier InternVL models, and other multimodal systems across MMMU, MathVista, charts, documents, OCR, and video. | source: [InternVL3, Figure 1](https://arxiv.org/abs/2504.10479)*
 
+[Open figure at full size](/assets/images/internvl3-native-multimodal-pretraining-source-figure-1.webp)
+
 The position mechanism addresses the next bottleneck. Ordinary positions advance by one for every token, so a high-resolution image can consume the same position range that the text needs for reasoning. V2PE advances textual positions by 1 but gives each image a smaller increment δ, selected per image from {1, 1/2, …, 1/256}. Relative order inside the image is preserved while the image occupies less of the position axis; δ = 1 recovers the conventional scheme. This is context allocation, not free computation: the visual encoder and attention still process the tokens.
 
 The loss makes the “conditioning” claim precise. InternVL3 computes the autoregressive objective on text tokens, while visual tokens provide context for those predictions rather than becoming direct reconstruction targets. This lets the visual pathway receive learning signal through language grounding without requiring the model to reproduce every visual code. It also means that the quality of captions, questions, and structured multimodal labels determines which visual distinctions are rewarded.
 
 ![InternVL3 OpenCompass academic leaderboard versus model scale and competing multimodal LLMs](/assets/images/internvl3-native-multimodal-pretraining-source-figure-2.webp)
 *Fig 2: The OpenCompass comparison plots academic scores against model scale, including the InternVL3 family and competing multimodal LLMs. | source: [InternVL3, Figure 2](https://arxiv.org/abs/2504.10479)*
+
+[Open figure at full size](/assets/images/internvl3-native-multimodal-pretraining-source-figure-2.webp)
 
 The sampling study gives the main pretraining tradeoff a measurable shape. The report uses a 1:3 language-to-multimodal ratio under a fixed total budget, roughly 50B language tokens and 150B multimodal tokens. That mixture preserves language competence while giving the visual pathway enough exposure. The final scores then add supervised fine-tuning, mixed preference optimization, and test-time scaling; for reasoning, best-of-N responses are selected with a visual process reward model. A leaderboard number can therefore include extra inference compute beyond one forward pass.
 

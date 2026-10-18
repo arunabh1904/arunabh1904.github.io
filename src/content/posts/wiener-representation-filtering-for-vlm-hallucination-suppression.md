@@ -34,6 +34,8 @@ The sharpness α changes how strongly the ordering is expressed. All modes remai
 ![Figure 4: Hallucination covariance spectra for three VLMs](/assets/images/wiener-representation-filtering-paper-figure.webp)
 *Fig 1: This source Figure 4 shows a few large eigenvalue spikes followed by a long decaying tail in LLaVA-7B, MiniGPT-4, and mPLUG-Owl2; the spectrum motivates continuous, direction-dependent attenuation. | source: [Wiener Representation Filtering, Figure 4](https://arxiv.org/abs/2608.08167)*
 
+[Open figure at full size](/assets/images/wiener-representation-filtering-paper-figure.webp)
+
 ### Deep layers and anisotropy do the empirical work
 
 The controlled ablation is more informative than the headline average. On MiniGPT-4, baseline CHAIR sentence/object rates are 23.0/8.4. Subtracting only the mean residual gives 22.0/8.2, and uniform shrinkage gives 24.0/8.5. Editing layers 14–24 reaches 14.0/5.0; editing the deeper 24–32 range reaches 13.0/4.9 with BLEU 0.162. This pattern says the useful correction is structured and appears late in the language backbone: a global offset or isotropic contraction cannot reproduce it.
@@ -53,8 +55,12 @@ These CHAIR results average 500 MSCOCO validation images across three seeds. The
 ![Figure 2: Qualitative hallucination reduction](/assets/images/wiener-representation-filtering-for-vlm-hallucination-suppression-source-figure-2.webp)
 *Fig 2: This source Figure 2 compares a baseline and Wiener-filtered description of a complex meme, marking hallucinated and truthful text to show which claims disappear. | source: [Wiener Representation Filtering, Figure 2](https://arxiv.org/abs/2608.08167)*
 
+[Open figure at full size](/assets/images/wiener-representation-filtering-for-vlm-hallucination-suppression-source-figure-2.webp)
+
 ![Figure 3: Dolan–Moré MME profiles](/assets/images/wiener-representation-filtering-for-vlm-hallucination-suppression-source-figure-3.webp)
 *Fig 3: This source Figure 3 plots the fraction of ten MME subsets within a performance ratio of the best method for mPLUG-Owl2 and LLaVA-1.5; it tests whether the edit helps beyond CHAIR-style captions. | source: [Wiener Representation Filtering, Figure 3](https://arxiv.org/abs/2608.08167)*
+
+[Open figure at full size](/assets/images/wiener-representation-filtering-for-vlm-hallucination-suppression-source-figure-3.webp)
 
 The boundary is the calibration contract. A new model, domain, or hallucination taxonomy can change ΣH, the best layers, and the sharpness. The paper's evidence supports a training-free post-hoc edit for the evaluated backbones; it does not establish one universal hallucination subspace or guarantee that suppressing a frequent false positive will preserve rare but correct details.
 

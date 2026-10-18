@@ -24,6 +24,8 @@ summary: '2026 – Xiaomi-Robotics-1: Scaling VLA Models with Real-World Traject
 ![Figure 1 from Xiaomi-Robotics-1: Scaling VLA Models with Real-World Trajectories](/assets/images/xiaomi-robotics-1-scaling-vla-with-real-world-trajectories-source-figure-1.webp)
 *Fig 1: Overview. Xiaomi-Robotics-1 combines robot trajectories, 100K hours of UMI data, and vision-language data, then measures data and model scaling before adapting to unseen environments and tasks. | source: [Xiaomi-Robotics-1, Figure 1](https://arxiv.org/abs/2607.15330)*
 
+[Open figure at full size](/assets/images/xiaomi-robotics-1-scaling-vla-with-real-world-trajectories-source-figure-1.webp)
+
 The scale comes from UMI handheld grippers and egocentric cameras rather than robot-only teleoperation. The corpus spans homes, commercial premises, industrial sites, offices, and outdoor settings. The authors cut trajectories into equal-length segments and use Qwen3.5-27B to caption how the grippers and interacting objects changed. A producer–consumer labeling pipeline processes the 100K-hour corpus in roughly two weeks. The resulting prompt describes a target state transition, so the model learns to move the current observation toward a language-specified outcome instead of merely imitating a task name.
 
 ### Pretraining and post-training use different contracts

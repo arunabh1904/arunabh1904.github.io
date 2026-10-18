@@ -24,11 +24,17 @@ FAST targets a subtle failure in autoregressive policies. With the usual 256-bin
 ![Figure 1 from FAST: Efficient Action Tokenization for Vision-Language-Action Models](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-paper-figure.jpg)
 *Fig 1: FAST compresses action trajectories into a shorter sequence while retaining the smooth structure needed for dexterous control; the paper reports up to 5× faster VLA training in the illustrated comparison. | source: [FAST, Figure 1](https://arxiv.org/abs/2501.09747)*
 
+[Open figure at full size](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-paper-figure.jpg)
+
 ![Figure 2 from FAST: Efficient Action Tokenization for Vision-Language-Action Models](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-source-figure-2.webp)
 *Fig 2: Left: FAST tokenization enables training of autoregressive Transformers for dexterous robot control via simple next-token prediction. Right: FAST outperforms binning tokenization as control frequency rises. | source: [FAST, Figure 2](https://arxiv.org/abs/2501.09747)*
 
+[Open figure at full size](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-source-figure-2.webp)
+
 ![Figure 8 from FAST: Efficient Action Tokenization for Vision-Language-Action Models](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-source-figure-8.webp)
 *Fig 3: FAST+ compression ratios on robot datasets unseen during tokenizer training; the ratio compares naïve token count with FAST+ token count. | source: [FAST, Figure 8](https://arxiv.org/abs/2501.09747)*
+
+[Open figure at full size](/assets/images/fast-efficient-action-tokenization-for-vision-language-action-models-source-figure-8.webp)
 
 The compression is measurable before training a policy. On one-second chunks, the average token count falls from 35 to 20 on BridgeV2 (1.75×), 105 to 29 on DROID (3.6×), 140 to 28 on 20-Hz table bussing (5×), and 700 to 53 on 50-Hz T-shirt folding (13.2×). FAST is not lossless: the DCT scale controls the reconstruction-versus-compression trade-off, so these comparisons use settings with comparable reconstruction error.
 

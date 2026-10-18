@@ -24,8 +24,12 @@ summary: "2025 – Scaling Laws of Motion Forecasting and Planning"
 
 The model predicts discrete motion tokens for eight agents with an encoder-decoder Transformer. The study uses 5 seconds of history to predict 11 seconds of future, creates overlapping examples with a 1.5-second sliding window, and trains on 59.8 million run segments, 5.6 million miles, and 541 million examples. The model series spans 900K to 118M parameters across seven compute budgets. Each iso-FLOP band varies parameters and training examples, then fits a parabola to find the minimum validation loss.
 
+At train time, those eight modeled agents receive global autonomous-vehicle-frame roadgraph, traffic-light state history, and agent-state history inputs, including position, heading, velocity, and box extents. The study therefore scales a fixed state-based perception interface; it does not test raw-camera perception or a learned sensor front end.
+
 ![The encoder-decoder motion model used in the scaling study](/assets/images/scaling-laws-of-motion-forecasting-and-planning-source-figure-1.webp)
 *Fig 1: The study scales a shared scene encoder and autoregressive motion decoder, with the same interface across model and data budgets. | source: [Scaling Laws of Motion Forecasting and Planning, Figure 1](https://arxiv.org/abs/2506.08228)*
+
+[Open figure at full size](/assets/images/scaling-laws-of-motion-forecasting-and-planning-source-figure-1.webp)
 
 The fitted optima are `N_opt ∝ C^0.63` and `D_opt ∝ C^0.44`. The ratio is the practical insight: a new compute budget should increase parameters faster than examples, but still spend substantial capacity on data. The authors also note that at equal compute, their motion-optimal models are about 50× smaller than the language-model comparison they use, suggesting that the data distribution and task interface matter as much as the raw Transformer recipe.
 
@@ -35,6 +39,8 @@ The compute-optimal cross-entropy follows a power-law trend with an added consta
 
 ![Training loss across the study's compute range](/assets/images/scaling-laws-of-motion-forecasting-and-planning-paper-figure.png)
 *Fig 2: Each curve is a training run; moving right increases FLOPs while the colored family varies parameter count. The convergence pattern supports a scaling fit within the measured range, not an assumption that the same slope holds indefinitely. | source: [Scaling Laws of Motion Forecasting and Planning, Figure 2](https://arxiv.org/abs/2506.08228)*
+
+[Open figure at full size](/assets/images/scaling-laws-of-motion-forecasting-and-planning-paper-figure.png)
 
 The open-loop analysis aggregates 64 rollouts to 12 trajectories and reports that minADE and weighted ADE improve as compute-optimal training compute grows. The authors explicitly caution that a power law for distance metrics would require many more orders of magnitude. That caveat matters because the plotted fit is a compact description of the observed range, while the actual ablation found a parabolic form could fit the points better.
 

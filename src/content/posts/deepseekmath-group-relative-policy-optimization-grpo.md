@@ -40,6 +40,8 @@ The source diagram makes the resource trade-off visible. PPO's value model and g
 ![DeepSeekMath source Figure 4: PPO's learned value baseline versus GRPO's within-question group baseline](/assets/images/deepseekmath-source-figure-4-comparison.png)
 *Fig 1: Follow the lower path from several answers to their rewards and group-relative advantages. The value model disappears, but the reward model, reference model, and sampling workload remain. | source: [DeepSeekMath, Figure 4](https://arxiv.org/abs/2402.03300)*
 
+[Open figure at full size](/assets/images/deepseekmath-source-figure-4-comparison.png)
+
 Equal rewards leave no outcome contrast to learn from. The written normalization is also undefined when the standard deviation is zero, so an implementation must handle that case explicitly. With a numerical safeguard, the reward-driven advantage becomes zero; the separate KL regularizer can still supply a gradient. “No useful reward contrast” is more precise than saying the entire training objective necessarily stops updating.
 
 ### The old policy and the reference policy have different jobs
@@ -79,6 +81,8 @@ Figure 7 samples answers at temperature 0.7 and varies their number. Majority@K 
 
 ![DeepSeekMath source Figure 7: majority-vote and pass-at-K accuracy before and after reinforcement learning](/assets/images/deepseekmath-source-figure-7-sampling.png)
 *Fig 2: RL raises majority-vote accuracy, while the high-budget pass-at-K curves change little or worsen. More probability reaches correct answers without a comparable expansion of sampled solution coverage. | source: [DeepSeekMath, Figure 7](https://arxiv.org/abs/2402.03300)*
+
+[Open figure at full size](/assets/images/deepseekmath-source-figure-7-sampling.png)
 
 Compare orange with purple for majority voting, and blue with green for pass@K. On GSM8K, RL improves the majority result while its large-K coverage is lower; on MATH, the large-K coverage curves are close. The authors interpret this as making existing correct responses more likely. It is evidence about these models, benchmarks, and sampling budgets, not a universal conclusion that reinforcement learning cannot learn new reasoning behavior.
 

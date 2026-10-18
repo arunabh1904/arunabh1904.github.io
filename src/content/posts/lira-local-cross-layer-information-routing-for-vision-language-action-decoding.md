@@ -26,13 +26,15 @@ The layer-aligned interface assumes that the decoder block at depth $i$ should c
 
 This is a routing change, not a new backbone or training recipe. The action head and supervised objective remain unchanged, and the paper reports no additional trainable parameters relative to VLA-Adapter. The relevant decision is therefore where to spend interface complexity: a narrow local window can expose complementary evidence without paying for unrestricted all-layer attention.
 
-
 ![Figure 2 from LIRA: Local Cross-Layer Information Routing for Vision-Language-Action Decoding](/assets/images/lira-local-cross-layer-information-routing-for-vision-language-action-decoding-source-figure-2.webp)
 *Fig 1: Overview of LIRA. The Prismatic-style VLM processes visual-language task tokens together with learnable LIRA Query tokens, while Action Query tokens initialize an action decoder composed of Parallel Fusion Blocks (PFBs). | source: [LIRA, Figure 2](https://arxiv.org/abs/2608.07596)*
+
+[Open figure at full size](/assets/images/lira-local-cross-layer-information-routing-for-vision-language-action-decoding-source-figure-2.webp)
 
 ![Figure 1 from LIRA: Local Cross-Layer Information Routing for Vision-Language-Action Decoding](/assets/images/lira-local-cross-layer-information-routing-for-vision-language-action-decoding-source-figure-1.webp)
 *Fig 2: Zero-shot transfer to LIBERO-Plus. The same language instruction is tested under background, object-layout, and lighting perturbations without target-domain fine-tuning. | source: [LIRA, Figure 1](https://arxiv.org/abs/2608.07596)*
 
+[Open figure at full size](/assets/images/lira-local-cross-layer-information-routing-for-vision-language-action-decoding-source-figure-1.webp)
 
 ### The local window is the useful inductive bias
 

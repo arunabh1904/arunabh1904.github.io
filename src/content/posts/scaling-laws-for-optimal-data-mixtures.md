@@ -34,6 +34,8 @@ It makes only the bias term depend on the mixture, so the optimal $h$ is indepen
 ![Small-scale mixture runs extrapolated to larger models and unseen weights](/assets/images/scaling-laws-for-optimal-data-mixtures-paper-figure.png)
 *Fig 1: The source figure pairs fitted small-scale loss curves with predictions at new domain weights and a larger model; the right panel compares the additive and joint optima against alternatives. | source: [Scaling Laws for Optimal Data Mixtures, Figure 1](https://arxiv.org/abs/2507.09404)*
 
+[Open figure at full size](/assets/images/scaling-laws-for-optimal-data-mixtures-paper-figure.png)
+
 ### A few proxy runs can predict, but errors are domain-specific
 
 The experiments fit laws on small runs and evaluate them on larger models and new weights. For LLMs, training uses SlimPajama domains with 412M–1.4B fitting models and evaluates a 7B model at 150B tokens. Native multimodal fitting uses 106M–932M models and evaluates 2.3B and 8B models at 100–160B tokens. The large-vision experiment fits up to 531M and evaluates a 1.1B model.
@@ -42,8 +44,12 @@ The mean relative error is usually low, but it is not uniform. In the validation
 
 The fitting procedure is part of the method. Because the joint law can have up to 37 parameters for eight domains, the authors use random initializations and basin-hopping around L-BFGS, rather than repeatedly starting L-BFGS on a fixed grid. In Figure 2, basin-hopping reaches a low Huber objective with fewer L-BFGS calls than the repeated-start baseline; the shaded bands show the 25–75% quantiles over 100 trials.
 
-![Basin-hopping versus repeated L-BFGS fitting for the joint mixture law](/assets/images/scaling-laws-for-optimal-data-mixtures-source-figure-2.webp)
-*Fig 2: Huber fitting loss versus L-BFGS calls on the three-domain multimodal experiment; basin-hopping converges faster across the repeated trials. | source: [Scaling Laws for Optimal Data Mixtures, Figure 2](https://arxiv.org/abs/2507.09404)*
+Most fitting runs use a constant learning rate so one run supplies many token-budget points. The final 7B OpenHermes comparison switches to cosine decay, so it tests the selected weights directly rather than validating the scaling-law extrapolation on that run.
+
+![Basin-hopping versus repeated L-BFGS fitting for the joint mixture law](/assets/images/scaling-laws-for-optimal-data-mixtures-source-figure-2-readable.png)
+*Fig 2: Source plot cropped from the paper. Huber fitting loss versus L-BFGS calls on the three-domain multimodal experiment; basin-hopping converges faster across the repeated trials. | source: [Scaling Laws for Optimal Data Mixtures, Figure 2](https://arxiv.org/abs/2507.09404)*
+
+[Open figure at full size](/assets/images/scaling-laws-for-optimal-data-mixtures-source-figure-2-readable.png)
 
 ### Optimize mixture weights after deciding what success means
 
@@ -51,6 +57,8 @@ For multimodal pre-training, the three domains are text-only, interleaved docume
 
 ![Optimal domain weights across multimodal compute budgets](/assets/images/scaling-laws-for-optimal-data-mixtures-source-figure-5.webp)
 *Fig 3: The simplex places text, image-caption, and interleaved domains at its vertices; markers show optimal weights across model sizes and token counts, while color encodes training tokens. | source: [Scaling Laws for Optimal Data Mixtures, Figure 5](https://arxiv.org/abs/2507.09404)*
+
+[Open figure at full size](/assets/images/scaling-laws-for-optimal-data-mixtures-source-figure-5.webp)
 
 The end-to-end tests are persuasive because the target changes. For the 7B language models, the mixture optimized for OpenHermes reaches CORE 58, compared with 56 for the average-training-domain optimum, 53 for uniform weights, and 52 for the base SlimPajama distribution. For native multimodal and large-vision models, optimized mixtures also beat uniform and prior-work mixtures on their reported validation losses. The method does not claim that one mixture wins everywhere; it gives a way to specify the target first and solve for the weights.
 

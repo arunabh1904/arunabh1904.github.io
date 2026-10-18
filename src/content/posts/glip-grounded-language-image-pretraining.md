@@ -28,6 +28,8 @@ A conventional detector asks, “Which of my fixed classes does this region belo
 ![GLIP prompt-conditioned zero-shot detections](/assets/images/glip-paper-figure-1.png)
 *Fig 1: The user writes the categories or description into a prompt, and GLIP returns boxes for cars, pistols, holes, raccoons, or other mentioned concepts without a task-specific class head. | source: [GLIP, Figure 1](https://arxiv.org/abs/2112.03857)*
 
+[Open figure at full size](/assets/images/glip-paper-figure-1.png)
+
 The paper adds a second ingredient because a late dot product is not enough. In the deep-fusion variant, cross-modality multi-head attention passes information between visual regions and language tokens in the last encoder layers. The visual representation therefore depends on the prompt before the final matching step. That is why prompt wording can carry domain knowledge: “stingray” is a weak visual cue, while “stingray, which is flat and round” supplies a useful shape prior.
 
 ### Self-training supplies boxes for a much larger vocabulary
@@ -37,10 +39,16 @@ The training scale comes from self-training, but the semantics come from languag
 ![GLIP zero-shot transfer across ODinW datasets](/assets/images/glip-grounded-language-image-pretraining-source-figure-9.webp)
 *Fig 2: Zero-shot AP50 on five Object Detection in the Wild datasets. The first three contain categories not present in the Objects365 vocabulary, where grounding data is especially helpful; the last two are covered by Objects365. | source: [GLIP, Figure 5](https://arxiv.org/abs/2112.03857)*
 
-The transfer result is clearest on categories absent from Objects365. Adding gold grounding data from GLIP-T (B) to GLIP-T (C) raises Pothole from 3.6 to 17.0 AP50, EgoHands from 0.5 to 49.1, and Raccoon from 47.0 to 51.5. The covered Cottontail Rabbits category instead moves slightly down, from 71.6 to 71.1. Grounding data expands missing semantic coverage; it does not improve every category uniformly. The larger GLIP-L reaches 25.7 on Pothole and 45.5 on EgoHands, so greater scale is not a monotonic improvement on every small downstream dataset either.
+[Open figure at full size](/assets/images/glip-grounded-language-image-pretraining-source-figure-9.webp)
+
+The transfer result is clearest on categories absent from Objects365. Moving from the deep-fused GLIP-T (B) to GLIP-T (C), which adds gold grounding data, raises Pothole from 3.6 to 17.0 AP50, EgoHands from 0.5 to 49.1, and Raccoon from 47.0 to 51.5. The covered Cottontail Rabbits category instead moves slightly down, from 71.6 to 71.1. Grounding data expands missing semantic coverage; it does not improve every category uniformly. The larger GLIP-L reaches 25.7 on Pothole and 45.5 on EgoHands, so greater scale is not a monotonic improvement on every small downstream dataset either.
+
+For the headline COCO zero-shot row, the pre-training pool excludes COCO images; the source reports the GLIP-L variant that adds COCO only on test-dev because its expanded grounding set overlaps COCO validation. The 49.8 AP result is therefore a domain-transfer measurement, while the 61.5 AP variant is a different training condition.
 
 ![GLIP manual prompt tuning](/assets/images/glip-grounded-language-image-pretraining-source-figure-10.webp)
 *Fig 3: Adding the attributes “flat and round” to the stingray prompt improves AP50 from 4.6 to 9.7 on Aquarium, with no model update or annotated examples. The gain is a useful demonstration of language-conditioned localization, not a guarantee that descriptive prompts always help. | source: [GLIP, Figure 6](https://arxiv.org/abs/2112.03857)*
+
+[Open figure at full size](/assets/images/glip-grounded-language-image-pretraining-source-figure-10.webp)
 
 ### Deep fusion makes prompt tuning effective
 

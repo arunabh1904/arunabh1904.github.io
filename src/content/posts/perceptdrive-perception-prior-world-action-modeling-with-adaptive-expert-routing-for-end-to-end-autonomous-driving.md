@@ -28,12 +28,14 @@ summary: '2026 – PerceptDrive: Perception Prior World-Action Modeling with Ada
 
 ### Turn frozen specialists into retained interfaces
 
-PerceptDrive begins with a practical compromise. A single VLM can learn to drive, but its compressed representation may discard geometry, motion, or semantic detail that a specialist already encodes. Stage 1 adapts InternVL3 to driving questions. Stage 1b then distills three frozen providers into separate geometry, semantic, and dynamics priors while replaying the language data. Stage 2 feeds those priors, ego state, and command into a shared world-action model.
+PerceptDrive begins with a practical compromise. A single VLM can learn to drive, but its compressed representation may discard geometry, motion, or semantic detail that a specialist already encodes. Stage 1 adapts InternVL3 to driving questions. Stage 1b then distills three frozen providers—VGGT for geometry, V-JEPA 2 for spatiotemporal semantics, and Wan 2.1 for dynamics—into separate priors while replaying the language data. Stage 2 feeds those priors, a frozen dense V-JEPA 2 stream, ego state, and command into a shared world-action model. At inference the input is one front-facing camera with a four-frame history, aligned ego state, and navigation command; the target is eight ego-centric BEV waypoints over four seconds at 0.5-second intervals.
 
 The separation is architectural and supervisory. Each prior gets its own query bank, while global, action, and temporal banks provide shared context. Retention losses keep a branch from collapsing into the easiest signal during joint training. The model then predicts an action-free future latent and an action-conditioned future alongside the final trajectory, so the world representation has to say what the scene may do before it is asked to choose a maneuver.
 
 ![PerceptDrive world-action architecture with specialist priors and adaptive routing](/assets/images/perceptdrive-perception-prior-world-action-modeling-with-adaptive-expert-routing-for-end-to-end-autonomous-driving-paper-figure.png)
 *Fig 1: The source overview traces frozen expert providers into separate retained query banks, a routed shared model, future prediction, and one trajectory output. | source: [PerceptDrive, Figure 2](https://arxiv.org/abs/2607.20175)*
+
+[Open figure at full size](/assets/images/perceptdrive-perception-prior-world-action-modeling-with-adaptive-expert-routing-for-end-to-end-autonomous-driving-paper-figure.png)
 
 The useful intuition is that the query banks are contracts. Geometry can preserve where things are, dynamics can preserve how they move, and semantics can preserve what they mean. The router is allowed to use all three, but the branch losses prevent the shared backbone from making them indistinguishable before that choice happens.
 
@@ -43,6 +45,8 @@ The router is a dense soft simplex: every expert remains active, with scene-depe
 
 ![Comparison of direct, fused, and routed expert-prior paradigms](/assets/images/perceptdrive-perception-prior-world-action-modeling-with-adaptive-expert-routing-for-end-to-end-autonomous-driving-source-figure-1.webp)
 *Fig 2: The source comparison contrasts implicit VLM conditioning, unseparated expert fusion, and PerceptDrive's separated priors with scene-conditioned routing. | source: [PerceptDrive, Figure 1](https://arxiv.org/abs/2607.20175)*
+
+[Open figure at full size](/assets/images/perceptdrive-perception-prior-world-action-modeling-with-adaptive-expert-routing-for-end-to-end-autonomous-driving-source-figure-1.webp)
 
 That comparison clarifies what the router buys. Static fusion assumes the same prior mixture is useful for every scene; direct VLM conditioning leaves the mixture implicit. PerceptDrive makes the choice observable and trainable while keeping the runtime graph fixed. The cost is a second source of supervision: the policy depends on a quality target derived from privileged trajectories that will not be available on the road.
 
@@ -57,7 +61,9 @@ The paper reports 2.82B active parameters and 409.6 MI308X GPU-hours for trainin
 ![PerceptDrive qualitative trajectories with front-view and BEV context](/assets/images/perceptdrive-perception-prior-world-action-modeling-with-adaptive-expert-routing-for-end-to-end-autonomous-driving-source-figure-3.webp)
 *Fig 3: The source qualitative examples pair the camera observation and BEV context with the generated trajectory on NAVSIM navtest. | source: [PerceptDrive, Figure 3](https://arxiv.org/abs/2607.20175)*
 
-The evaluation boundary matters. NAVSIM is non-reactive, so other agents do not respond to the ego plan. PerceptDrive's 34.5 EPDMS on navhard v2 shows a harder distribution, but it still does not establish recovery from policy-induced state changes. The next experiment should carry the routed representation and its one-pass constraint into a reactive benchmark while measuring how much privileged-data construction contributes.
+[Open figure at full size](/assets/images/perceptdrive-perception-prior-world-action-modeling-with-adaptive-expert-routing-for-end-to-end-autonomous-driving-source-figure-3.webp)
+
+The evaluation boundary matters. The WAM trains on navtrain, while the offline privileged trajectory pools also use navtrain only; navtest reports direct v1 PDMS and v2 EPDMS, and navhard reports the two-stage pseudo-simulation score. NAVSIM is non-reactive, so other agents do not respond to the ego plan. PerceptDrive's 34.5 EPDMS on navhard v2 shows a harder distribution, but it still does not establish recovery from policy-induced state changes. The next experiment should carry the routed representation and its one-pass constraint into a reactive benchmark while measuring how much privileged-data construction contributes.
 
 ## High-Level Takeaways
 

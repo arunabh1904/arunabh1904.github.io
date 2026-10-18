@@ -28,6 +28,8 @@ The Hierarchical Scene Fusion (HSF) module starts with a VoxelNet LiDAR BEV and 
 ![IS-Fusion scene and instance collaboration pipeline](/assets/images/is-fusion-paper-figure.webp)
 *Fig 1: IS-Fusion builds hierarchical scene context, selects top-K instance candidates, aggregates local multimodal evidence, and propagates the refined instances back into BEV; the displayed framework is the paper’s Figure 2. | source: [IS-Fusion: Instance-Scene Collaborative Fusion for Multimodal 3D Object Detection, Figure 2](https://openaccess.thecvf.com/content/CVPR2024/html/Yin_IS-Fusion_Instance-Scene_Collaborative_Fusion_for_Multimodal_3D_Object_Detection_CVPR_2024_paper.html)*
 
+[Open the full-size source figure](/assets/images/is-fusion-paper-figure.webp)
+
 ### Instance fusion is a feedback path, not a second detector
 
 Instance-Guided Fusion (IGF) reads a BEV heatmap and keeps the top K=200 candidates. Each instance query aggregates information from neighboring instances and samples D=16 locations from the multimodal feature. Cross-attention lets the proposal retrieve image and point evidence around its own geometry; an Instance-to-Scene transformer then writes the refined instance context back into the scene BEV before the final decoder.
@@ -38,7 +40,7 @@ The hyperparameter study also bounds the proposal strategy. Increasing K from 64
 
 ### Leaderboard numbers need their inference recipe
 
-The nuScenes split has 700 training, 150 validation, and 150 test scenes with six calibrated cameras. IS-Fusion uses 384×1056 images, 0.075×0.075×0.2 m voxels, a 180×180 BEV feature map, and trains end-to-end for 10 epochs with AdamW and a maximum learning rate of 10⁻³. The validation comparison reports 72.8 mAP / 74.0 NDS and 3.2 FPS, comparable to the listed multimodal systems.
+The nuScenes split has 700 training, 150 validation, and 150 test scenes with six calibrated cameras. IS-Fusion uses 384×1056 images, 0.075×0.075×0.2 m voxels, a 180×180 BEV feature map, and trains end-to-end for 10 epochs. The validation comparison reports 72.8 mAP / 74.0 NDS and 3.2 FPS, comparable to the listed multimodal systems.
 
 On the test set, the base IS-Fusion model reports 73.0 / 75.2, while IS-Fusion† reports 76.5 / 77.4 with model ensemble and test-time augmentation. The base number is the cleaner architecture comparison. The † number is useful as a leaderboard operating point, but it combines multiple models, point-cloud rotations, and flips, so it should not be read as a single-model latency result.
 

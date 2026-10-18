@@ -26,8 +26,12 @@ summary: "2025 – RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bim
 
 RoboTwin 2.0 starts with a natural-language task and an annotated object library, RoboTwin-OD, containing 731 objects across 147 categories. An MLLM retrieves relevant object and skill information, writes executable task code, and runs that code through the simulator. Execution logs report failures; a multimodal observer can inspect rendered observations and localize errors that logs alone do not describe. The loop terminates after a successful program or after repeated failed refinements, and only successful demonstrations enter the expert trajectory set.
 
+The repair budget is explicit: each candidate program is executed ten times per iteration to expose stochastic failures, while the code agent receives both the structured execution log and the observer’s localized diagnosis. Refinement stops when the success rate across those ten runs reaches the configured target or after five unsuccessful refinements; the code-generation evaluation uses a threshold above 50%. This makes the generated trajectory set depend on a bounded verification loop rather than on a single lucky simulation.
+
 ![RoboTwin 2.0 pipeline from task language through MLLM code generation, simulation feedback, and randomized trajectories](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-paper-figure.png)
 *Fig 1: The data factory turns a task description into executable skill code, uses simulation and visual feedback to repair it, and randomizes successful rollouts for policy training. | source: [RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation, Figure 2](https://arxiv.org/abs/2506.18088)*
+
+[Open figure at full size](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-paper-figure.png)
 
 Fig. 1 is the mechanism to keep in mind. Code generation is only the first guess. The simulator provides a cheap test of whether the two arms, object affordances, and API calls actually produce the requested outcome. The observer is optional, which makes its cost visible: symbolic execution feedback can be enough for some failures, while image-based diagnosis supplies information about contact and scene state that a log cannot encode.
 
@@ -38,10 +42,14 @@ The pipeline randomizes five axes: scene clutter, lighting, background textures,
 ![Figure 1 from RoboTwin 2.0 showing the object library, benchmark scale, and data-generation system](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-source-figure-1.webp)
 *Fig 2: RoboTwin 2.0 joins a 50-task benchmark, 731-object library, five embodiments, domain randomization, and an open data-generation pipeline. | source: [RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation, Figure 1](https://arxiv.org/abs/2506.18088)*
 
+[Open figure at full size](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-source-figure-1.webp)
+
 The grasp augmentation has a clear embodiment boundary. Across 50 tasks, automated data-collection success rises from 52.2% in RoboTwin 1.0 to 60.5% in RoboTwin 2.0 on average. The largest gains are on lower-DoF platforms: Aloha-AgileX improves 65.1%→78.8%, Piper 2.4%→25.1%, and ARX-X5 68.6%→74.2%. Franka and UR5 change little (67.3%→67.2% and 57.6%→57.1%), which is consistent with flexible 7-DoF arms already having enough reachable grasp options.
 
 ![Figure 4 from RoboTwin 2.0 visualizing domain randomization and its texture library](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-source-figure-4.webp)
 *Fig 3: Domain randomization changes clutter, lighting, table height, backgrounds, and textures while retaining the task structure. | source: [RoboTwin 2.0: A Scalable Data Generator and Benchmark for Bimanual Manipulation, Figure 4](https://arxiv.org/abs/2506.18088)*
+
+[Open figure at full size](/assets/images/robotwin-2-scalable-data-generator-and-benchmark-source-figure-4.webp)
 
 Fig. 3 explains why “more synthetic data” is too vague. A policy sees the same task under controlled changes, so a success can be attributed to a variation axis. The benchmark later reuses those axes at test time, making the data generator and the evaluation protocol deliberately coupled.
 

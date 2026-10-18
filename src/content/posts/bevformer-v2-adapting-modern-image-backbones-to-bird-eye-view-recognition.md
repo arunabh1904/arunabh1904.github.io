@@ -29,7 +29,9 @@ The paper adds a perspective 3D detection head directly on the image features. I
 ![Figure 2 from BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-source-figure-2.webp)
 *Fig 1: Perspective supervision compares image features directly with per-pixel 3D predictions, whereas BEV supervision reaches them through projected BEV features and a sparse set-prediction head. | source: [BEVFormer v2, Figure 2](https://arxiv.org/abs/2211.10439)*
 
-This framing explains why the paper focuses on backbone adaptation rather than only on a new BEV operator. Modern 2D backbones pretrained on COCO have strong visual features but no reason to encode driving-specific depth and orientation. The auxiliary head turns those missing properties into an explicit training signal without requiring extra LiDAR or depth-estimation pretraining.
+[Open figure at full resolution](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-source-figure-2.webp)
+
+This framing explains why the paper focuses on backbone adaptation rather than only on a new BEV operator. Modern 2D backbones pretrained on COCO have strong visual features but no reason to encode driving-specific depth and orientation. The auxiliary head turns those missing properties into an explicit training signal without requiring extra LiDAR or depth-estimation pretraining. The controlled experiments use the official 700/150/150 nuScenes split, six cameras sampled at 2 Hz, and COCO-initialized backbones; V2-99 comparison rows carry DD3D depth pretraining and should not be read as the same initialization.
 
 ### The auxiliary head becomes a proposal generator
 
@@ -40,8 +42,12 @@ Those references are combined with learned content queries and learned positiona
 ![BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision source figure: Overall architecture of BEVFormer v2.](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-paper-figure.webp)
 *Fig 2: The perspective head and BEV head share the image backbone; perspective predictions provide the auxiliary loss and scene-conditioned proposals that join learned queries in the temporal BEV decoder. | source: [BEVFormer v2, Figure 1](https://arxiv.org/abs/2211.10439)*
 
+[Open figure at full resolution](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-paper-figure.webp)
+
 ![Figure 3 from BEVFormer v2: Adapting Modern Image Backbones to Bird’s-Eye-View Recognition via Perspective Supervision](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-source-figure-3.webp)
 *Fig 3: Projected centers from filtered perspective proposals become per-image reference points, while learned content and positional embeddings preserve a stable query prior for the second-stage BEV decoder. | source: [BEVFormer v2, Figure 3](https://arxiv.org/abs/2211.10439)*
+
+[Open figure at full resolution](/assets/images/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition-source-figure-3.webp)
 
 The proposal path has a clear failure mode. An occluded object or one near the boundary of adjacent camera views may be missed by the perspective head, so the learned references are necessary as a fallback. Conversely, a false perspective proposal is given a privileged place to be sampled by the second stage. The query design moves scene association earlier in the decoder; it does not make the proposal set ground truth.
 

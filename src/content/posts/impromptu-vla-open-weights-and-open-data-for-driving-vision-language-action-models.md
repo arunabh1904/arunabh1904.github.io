@@ -29,8 +29,12 @@ The curation also makes the sources comparable. Clips are aligned to 2 Hz, keep 
 
 The taxonomy is generated with Qwen2.5-VL-72B and then reviewed by people. On 200 nuScenes images, the reported classification F1 is 0.90 for temporary rules, 0.81 for unconventional obstacles, and 0.91 for challenging road conditions; unclear boundaries are too rare in that check for a useful F1. All generated annotations receive accept/reject review or minor correction. The validation is evidence that the labels can be made usable, while the dependence on a VLM for the first pass leaves room for model-specific blind spots.
 
+The appendix separates that taxonomy check from the planning data contract. Its nuScenes classification experiment uses only the front camera and three seconds of past and future context, while the retained Q&A clips use 1.5 seconds of past context and five seconds of future context. The authors also note that not every clip has every task: vulnerable-road-user and motion-intention labels depend on ground-truth fields supplied by the source dataset. Missing task labels therefore reflect structured source coverage rather than a negative answer.
+
 ![Visual abstract of the Impromptu VLA dataset and its four corner-case categories](/assets/images/impromptu-vla-open-weights-and-open-data-for-driving-vision-language-action-models-source-figure-1.webp)
 *Fig 1: The paper's visual abstract connects the four scene categories to the 80K-clip dataset and the reported NeuroNCAP and trajectory results. | source: [Impromptu VLA, Figure 1](https://arxiv.org/abs/2505.23757)*
+
+[Open figure at full size](/assets/images/impromptu-vla-open-weights-and-open-data-for-driving-vision-language-action-models-source-figure-1.webp)
 
 The visual abstract is useful because it shows the intended causal chain: category definition changes the data mixture, the mixture changes what the VLA sees during adaptation, and the evaluation checks both safety-like behavior and geometric prediction. It does not show a new architecture. The proposed intervention is the training distribution and its annotations.
 
@@ -43,11 +47,13 @@ The open-loop result is more modest but helps locate the trade-off. For the 3B m
 ![Dataset source counts, category distributions, and trajectory coverage](/assets/images/impromptu-vla-open-weights-and-open-data-for-driving-vision-language-action-models-source-figure-2.webp)
 *Fig 2: The source paper compares how the eight datasets contribute clips, how the four categories are distributed, and how the retained trajectories cover driving behavior. | source: [Impromptu VLA, Figure 2](https://arxiv.org/abs/2505.23757)*
 
+[Open figure at full size](/assets/images/impromptu-vla-open-weights-and-open-data-for-driving-vision-language-action-models-source-figure-2.webp)
+
 Figure 2 makes the selection decision inspectable. The source datasets do not contribute equally, and a large clip count alone does not guarantee coverage of the four corner cases. The distribution plots are therefore part of the result: they show which gaps the benchmark is trying to fill before any model is trained.
 
 ### The boundary is still data attribution
 
-The paper shows that a rare-scene curriculum can improve a VLM-based planner, but it does not isolate which ingredient is responsible. There is no matched experiment that separately removes the taxonomy, the human review, the language explanations, and the trajectory labels while keeping the selected clips fixed. The NeuroNCAP test is simulated and nuScenes-based; the open-loop test cannot measure recovery after an incorrect action. The authors also acknowledge possible bias from Qwen2.5-VL-generated classifications and annotations.
+The paper shows that a rare-scene curriculum can improve a VLM-based planner, but it does not isolate which ingredient is responsible. There is no matched experiment that separately removes the taxonomy, the human review, the language explanations, and the trajectory labels while keeping the selected clips fixed. The NeuroNCAP test is simulated and nuScenes-based; the open-loop test cannot measure recovery after an incorrect action. The authors also acknowledge possible bias from Qwen2.5-VL-generated classifications and annotations. The task-availability rule adds another boundary: a model may be evaluated on different subsets for different heads because source datasets do not expose every label.
 
 The practical decision is therefore narrow: use targeted, multi-task corner-case data when the failure mode is underrepresented, and verify it with a closed-loop test. The evidence would weaken that decision if a category-balanced image-only set, or a random 80K subset with the same training budget, matched the gains. That comparison is the missing control.
 

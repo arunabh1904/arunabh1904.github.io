@@ -26,10 +26,14 @@ The paper's central idea is interface continuity. A single image, a sequence of 
 ![LLaVA-OneVision network architecture](/assets/images/llava-onevision-easy-visual-task-transfer-source-figure-1.webp)
 *Fig 1: The same projector-and-LLM interface consumes a single image, multiple images, or video frames; the visual signal changes while the language path stays shared. | source: [LLaVA-OneVision, Figure 1](https://arxiv.org/abs/2408.03326)*
 
+[Open figure at full size](/assets/images/llava-onevision-easy-visual-task-transfer-source-figure-1.webp)
+
 The less obvious decision is how to keep those modalities comparable. A 384×384 SigLIP input yields 729 tokens. For a high-resolution single image, Higher AnyRes splits the image into crops, encodes them, then bilinearly interpolates the crop features if their total would exceed a threshold. For multi-image input, each image is padded into a 384×384 frame and receives 729 tokens. For video, each frame is encoded and then pooled to 196 tokens so more frames fit. The authors choose the maximum visual sequences to be roughly equal: $(1+9)\times729=7,290$ for a single image, $12\times729=8,748$ for multi-image, and $32\times196=6,272$ for video.
 
 ![LLaVA-OneVision Higher AnyRes representation](/assets/images/llava-onevision-easy-visual-task-transfer-source-figure-2.webp)
 *Fig 2: Higher AnyRes preserves more spatial crops and uses bilinear interpolation to fit them into a bounded sequence; original AnyRes resizes and splits more aggressively. The tradeoff is resolution versus token count, not a new temporal encoder. | source: [LLaVA-OneVision, Figure 2](https://arxiv.org/abs/2408.03326)*
+
+[Open figure at full size](/assets/images/llava-onevision-easy-visual-task-transfer-source-figure-2.webp)
 
 ### Mixed training builds on an established image interface
 

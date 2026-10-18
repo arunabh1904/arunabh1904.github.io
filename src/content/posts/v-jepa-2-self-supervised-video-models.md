@@ -23,16 +23,22 @@ summary: '2025 – V-JEPA 2: Self-Supervised Video Models for Understanding and 
 ![V-JEPA 2 overview from web-scale video pretraining to video QA, probes, and robot planning](/assets/images/v-jepa-2-paper-figure-1.png)
 *Fig 1: V-JEPA 2 pretrains a video encoder on internet video and images, then branches into language alignment, attentive probes, and action-conditioned robot planning. | source: [V-JEPA 2, Figure 1](https://arxiv.org/abs/2506.09985)*
 
+[Open figure at full size](/assets/images/v-jepa-2-paper-figure-1.png)
+
 V-JEPA 2 uses a joint-embedding predictive objective: the encoder sees a masked view of a video, the predictor fills the missing representation, and an EMA encoder supplies the target. The loss is applied only to masked patches. That choice deliberately favors predictable structure over pixel-level detail. Grass texture or individual leaves may be unpredictable and irrelevant to planning, while a moving object’s trajectory is worth preserving.
 
 The pretraining set contains more than one million hours of video and one million images. The encoder scales from 300M to 1B parameters, uses 3D rotary position embeddings, and is trained with a progressive resolution schedule so the model can move beyond short 16-frame clips. The resulting representation is not itself a language model and does not receive action labels; language alignment and action conditioning are downstream stages.
 
+The scaling study attributes the gain to several separable changes: moving from 2M to 22M videos adds 1.0 average accuracy point, scaling the encoder adds 1.5, extending training adds 0.8, and the higher-resolution/longer-clip schedule supplies the remaining improvement to 88.2% across six frozen-probe tasks. The result is a recipe effect, not evidence that parameter count alone explains the gain.
+
+![V-JEPA 2 scaling recipe across data, model size, training, and resolution](/assets/images/v-jepa-2-self-supervised-video-models-source-figure-3-crop.png)
+*Fig 2: The report’s scaling study starts from a ViT-L/16 baseline and shows the average classification accuracy gained by data scaling, model scaling, longer training, and higher resolution. | source: [V-JEPA 2, Figure 3](https://arxiv.org/abs/2506.09985)*
+
+[Open figure at full size](/assets/images/v-jepa-2-self-supervised-video-models-source-figure-3-crop.png)
+
 ### Passive video and robot interaction have different jobs
 
 The action-conditioned extension, V-JEPA 2-AC, freezes the pretrained encoder and learns a roughly 300M-parameter block-causal transformer. It receives per-frame visual features, seven-dimensional end-effector states, and seven-dimensional state differences as actions. Training uses teacher forcing plus a two-step rollout loss, which asks the predictor to tolerate feeding its own representation back into the next step.
-
-![V-JEPA 2 scaling recipe across data, model size, training, and resolution](/assets/images/v-jepa-2-self-supervised-video-models-source-figure-3.webp)
-*Fig 2: The report’s ViT-L ablation shows the average classification accuracy gained by data scaling, model scaling, longer training, and higher resolution. | source: [V-JEPA 2, Figure 3](https://arxiv.org/abs/2506.09985)*
 
 The robot data are “unlabeled” only in a specific sense: the authors discard rewards, task names, and success flags, but use raw video plus end-effector state signals. They sample 4-second, 16-frame clips at 4 FPS and train on under 62 hours after dropping shorter videos. At deployment, a goal image is encoded, candidate action sequences are rolled forward in latent space, and the Cross-Entropy Method selects the sequence whose predicted representation is closest to the goal. Only the first action is executed before replanning.
 

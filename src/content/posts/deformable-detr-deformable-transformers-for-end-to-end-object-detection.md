@@ -29,6 +29,8 @@ In DETR, every image query can compare itself with every location in the feature
 ![Deformable attention predicts offsets and weights around a reference point, then aggregates only those sampled image features.](/assets/images/deformable-detr-deformable-attention-source-figure-2.svg)
 *Fig 1: The deformable attention module samples a small set of learned locations around each query reference point instead of comparing against every image location. | source: [Deformable DETR, Figure 2](https://arxiv.org/abs/2010.04159)*
 
+[open full-size figure](/assets/images/deformable-detr-deformable-attention-source-figure-2.svg)
+
 In the encoder, each feature-map pixel is its own reference point. In the decoder, an object query predicts a normalized reference point, and the box head predicts offsets relative to that point. This couples the attention route to the box being refined: a useful reference point makes it easier to retrieve evidence for the corresponding object. With K fixed, encoder attention is linear in the number of feature-map pixels, while decoder cross-attention depends on the number of queries and sampled points rather than the full image area.
 
 ### Fast convergence and iterative boxes separate the gains
@@ -44,6 +46,8 @@ The main COCO validation comparison separates the convergence claim from the opt
 | ++ two-stage Deformable DETR | 50 | 46.2 | 28.8 | 173 G | 19 FPS |
 
 These are COCO 2017 validation results with ResNet-50 backbones; runtime was measured on an NVIDIA Tesla V100. DETR-DC5+ is the fairer short-schedule control because it adds focal loss and raises the query count to 300. The source table reports the same 173 GFLOPs and 19 FPS for the base, iterative-refinement, and two-stage Deformable DETR rows, but the two-stage variant uses 340 GPU-hours versus 325 for the other two. The base result therefore says more than the 46.2 AP endpoint: it reaches a higher AP than the 500-epoch DETR-DC5 model in one tenth of the training epochs, while the modified 50-epoch control remains at 36.2 AP.
+
+The default attention contract is 8 heads, 4 samples per head at each of 4 feature levels, and 300 object queries. In the iterative variant, each decoder layer reuses the previous box as its reference and blocks gradients through the inverse-sigmoid box state, which is why the refinement row is a distinct optimization change rather than merely more decoder depth.
 
 The attention ablation explains the gain. Moving from one feature level to multi-scale inputs adds 1.7 AP and 2.9 small-object AP. Increasing the samples per head from one to four adds 0.9 AP. Allowing the attention operation itself to exchange information across scales adds another 1.5 AP. In the reported setting, adding FPN does not improve performance because the multi-scale deformable attention already performs the cross-level exchange.
 

@@ -26,8 +26,12 @@ summary: '2026 – Beyond Flat Policies: Hierarchical Post-Training for Embodied
 ![Figure 2 from Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](/assets/images/beyond-flat-policies-hierarchical-post-training-for-embodied-agents-source-figure-2.webp)
 *Fig 1: HiRoC separates interaction, planner SFT, subgoal-conditioned executor SFT, and executor RL. The planner stays frozen while the executor learns to turn each current subgoal into an action chunk. | source: [Beyond Flat Policies, Figure 2](https://arxiv.org/abs/2608.05999)*
 
+[Open figure at full size](/assets/images/beyond-flat-policies-hierarchical-post-training-for-embodied-agents-source-figure-2.webp)
+
 ![Figure 3 from Beyond Flat Policies: Hierarchical Post-Training for Embodied Agents](/assets/images/beyond-flat-policies-hierarchical-post-training-for-embodied-agents-source-figure-3.webp)
 *Fig 2: HiRoC's LIBERO-Plus zero-shot success rates across camera, robot-tilt, language, lighting, background, noise, layout, and their average. The improvement is broad across perturbations, but the benchmark does not equalize all baseline training recipes. | source: [Beyond Flat Policies, Figure 3](https://arxiv.org/abs/2608.05999)*
+
+[Open figure at full size](/assets/images/beyond-flat-policies-hierarchical-post-training-for-embodied-agents-source-figure-3.webp)
 
 
 ### Hierarchy creates a new alignment problem
@@ -35,6 +39,8 @@ summary: '2026 – Beyond Flat Policies: Hierarchical Post-Training for Embodied
 A flat VLA receives the same global instruction throughout an episode. HiRoC instead asks a Qwen2.5-VL-3B planner for the next semantic subgoal and conditions OpenVLA-OFT on that subgoal. This makes task stage explicit, but it also changes the executor's language distribution: demonstrations usually contain global task descriptions, not planner-generated intermediate commands.
 
 HiRoC addresses that mismatch before reinforcement learning. The authors reorganize trajectories into subgoal–action chunks and apply supervised fine-tuning to the executor. Without this distribution-misalignment stage, the RL run starts much lower and does not recover the same final success. The hierarchy therefore earns its gain only when the executor first learns the planner's interface.
+
+The planner SFT data come from cleaned and reannotated multimodal VLA-OS trajectories, whose labels change noisy global descriptions into immediate next subgoals. The executor uses the resulting subgoal–action dataset for its own LoRA SFT warm-up; only then does online GRPO begin. The planner replans every 20 executor calls, and each action chunk has length 8, so the hierarchy's interface fixes both what the executor is asked to follow and how long it acts before new semantic context arrives.
 
 During online training, the planner stays frozen. The executor receives a global episode advantage and local advantages over subtask segments. Freezing avoids moving the subgoal distribution while the executor adapts, but it also fixes planner mistakes: sparse success rewards cannot improve a decomposition that is wrong or poorly timed.
 

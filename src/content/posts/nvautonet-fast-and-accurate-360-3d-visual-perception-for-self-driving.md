@@ -28,6 +28,8 @@ This choice is tied to the operating range. A 0.25 m Cartesian grid out to 200 m
 ![NVAutoNet camera-to-BEV multitask pipeline](/assets/images/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving-paper-figure.webp)
 *Fig 1: NVAutoNet extracts multi-camera CNN features, lifts them into a shared BEV, and decodes obstacles, freespace, and parking outputs; this is the paper’s Figure 1. | source: [NVAutoNet: Fast and Accurate 360° 3D Visual Perception for Self Driving, Figure 1](https://arxiv.org/abs/2303.12976)*
 
+[Open figure at full resolution](/assets/images/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving-paper-figure.webp)
+
 ### One BEV supports several task contracts
 
 The shared BEV backbone feeds lightweight task heads. Obstacles use set prediction with one-to-one matching and a greedy candidate restriction rather than NMS. Freespace is represented as a radial distance map: each angular bin predicts the nearest boundary, which is compact and directly useful to a planner. Parking spaces use oriented boxes and a profile label for angled, parallel, and perpendicular maneuvers. An adaptive loss-balancing procedure rescales task losses by their epoch-level totals, then uses manually chosen task priorities in a second training round.
@@ -35,11 +37,15 @@ The shared BEV backbone feeds lightweight task heads. Obstacles use set predicti
 ![NVAutoNet polynomial camera-to-BEV projection and lookup indexing](/assets/images/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving-source-figure-2.webp)
 *Fig 2: The source’s Figure 2 explains how calibrated camera pixels become polynomial polar curves and then precomputed BEV indices for efficient feature lifting. | source: [NVAutoNet: Fast and Accurate 360° 3D Visual Perception for Self Driving, Figure 2](https://arxiv.org/abs/2303.12976)*
 
+[Open figure at full resolution](/assets/images/nvautonet-fast-and-accurate-360-3d-visual-perception-for-self-driving-source-figure-2.webp)
+
 The multitask design is practical, but its shared representation does not make every task equally easy. In the obstacle evaluation, the overall mAP is 0.465 and the safety-region mAP is 0.595. Vehicle AP is 0.638, while person AP is 0.351; orientation error averages 6.542° for vehicles but 53.4° for persons. For freespace, near and front regions perform better because they have denser camera coverage. Parking mean IoU for true positives is about 86%, with parallel spaces hardest because their widths are inconsistently labeled.
 
 ### Embedded speed comes with a data boundary
 
 The in-house corpus contains 2.2M training scenes, 400K validation scenes, and 177K test scenes from real, simulated, and augmented-reality data. It uses eight cameras, five obstacle classes, three freespace classes, and three parking classes. TensorRT on DRIVE Orin measures 18.72 ms end to end, or 53 FPS, including camera encoders, uplifting/fusion, and BEV heads.
+
+The obstacle metric is also part of that proprietary contract: greedy centroid matching accepts a prediction only when radial error is below 10% and azimuth error below 2°, and safety mAP restricts the score to a 100-metre-long by 20-metre-wide ego zone. The reported mAP therefore does not transfer directly to a public 3D detection benchmark.
 
 The platform transfer experiment is a useful practical check. A model pretrained on the car platform reaches 0.168 mAP on the truck validation set without truck fine-tuning, while fine-tuning it reaches 0.286–0.300 as the truck data grows from 50K to 150K scenes. A truck-only model reaches 0.146–0.210 over the same sizes. The evidence supports inexpensive adaptation, but labels are generated from LiDAR at a different mounting height than the cameras, and the proprietary corpus prevents a matched public benchmark that isolates the architecture from data scale.
 

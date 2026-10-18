@@ -31,6 +31,8 @@ The source evaluation diagram makes the boundary explicit. Zero-shot supplies a 
 ![GPT-3 source Figure 2.1 comparing zero-shot, one-shot, few-shot, and fine-tuning](/assets/images/gpt3-paper-figure-2-1-eval-strategies.png)
 *Fig 1: Demonstrations become context in few-shot evaluation, while fine-tuning uses examples to update parameters. More prompt examples consume input space without creating a separate trained checkpoint. | source: [GPT-3, Figure 2.1](https://arxiv.org/abs/2005.14165)*
 
+[Open figure at full size](/assets/images/gpt3-paper-figure-2-1-eval-strategies.png)
+
 A simple translation prompt can end after an unfinished target label:
 
 ```text
@@ -54,6 +56,8 @@ Figure 1.2 is more informative than a single best score. It tests removing inser
 
 ![GPT-3 source Figure 1.2 showing symbol-removal accuracy against contextual examples at three model sizes](/assets/images/gpt3-source-figure-1-2-context-scaling.png)
 *Fig 2: Larger models extract more benefit from additional demonstrations on this symbol-removal task. Instructions help at low example counts; the plotted curves describe one diagnostic, not a universal capacity threshold. | source: [GPT-3, Figure 1.2](https://arxiv.org/abs/2005.14165)*
+
+[Open figure at full size](/assets/images/gpt3-source-figure-1-2-context-scaling.png)
 
 Read the slopes as sensitivity to usable evidence in the prompt. The figure does not show an inner gradient update or prove a particular meta-learning algorithm inside the Transformer. It shows that scale changes how effectively the pretrained model conditions on examples.
 

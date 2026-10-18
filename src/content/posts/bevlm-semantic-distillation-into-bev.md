@@ -28,7 +28,7 @@ The diagram makes the comparison concrete: the two UniAD branches share an image
 ![Comparison of original image tokens, pre-fusion image features, and BEV features; source Figure 2](/assets/images/bevlm-source-figure-2.webp)
 *Fig 1: The representation study separates domain alignment from the change to BEV coordinates. Sharing the UniAD image backbone provides a closer comparison than an unadapted VLM. | source: [Paper, Figure 2](https://arxiv.org/abs/2603.06576)*
 
-[View full-size figure](/assets/images/bevlm-source-figure-2.webp)
+[Open figure at full size](/assets/images/bevlm-source-figure-2.webp)
 
 | InternVL3-1B input | Projector trained | DriveLM object-existence accuracy |
 | --- | --- | ---: |
@@ -48,9 +48,11 @@ Notice the two heads on the same grid. The language task encourages features use
 ![Shared BEV encoder trained with frozen-language VQA and object detection; source Figure 3](/assets/images/bevlm-source-figure-3.webp)
 *Fig 2: Semantic distillation updates the BEV representation through language supervision while retaining detection loss. The resulting encoder is subsequently used in conventional driving pipelines. | source: [Paper, Figure 3](https://arxiv.org/abs/2603.06576)*
 
-[View full-size figure](/assets/images/bevlm-source-figure-3.webp)
+[Open figure at full size](/assets/images/bevlm-source-figure-3.webp)
 
-One distillation epoch uses equal weights for VQA and detection losses. It takes about 35 hours with the 1B teacher or 100 hours with the 8B teacher on eight A100-80GB GPUs. The resulting frozen encoder is inserted into UniAD or VAD, whose task heads are trained separately. The language model is not the deployed planner in these experiments.
+One distillation epoch uses equal weights for VQA and detection losses. It takes about 35 hours with the 1B teacher or 100 hours with the 8B teacher on eight A100-80GB GPUs. After distillation, the BEV encoder is frozen while the UniAD and VAD task heads are trained for 20 and 12 epochs respectively. The language model is not the deployed planner in these experiments.
+
+The semantic control is decisive. Replacing the pretrained teacher with a randomly initialized auxiliary decoder drops UniAD's NeuroNCAP score from 2.38 to 1.75 and raises collision rate from 0.56 to 0.73; CLIP-based alternatives reach only 2.02 and 2.07. The VQA-data ablation also separates the sources of the gain: behavior plus planning reduces average impact speed from 6.11 to 3.97 m/s, while all four question types give the highest overall NeuroNCAP score. An appendix failure case still crashes both models, although the distilled model brakes earlier and reduces impact severity.
 
 For UniAD, the 8B-distilled encoder increases mean NeuroNCAP score from 2.38 to 3.05 and reduces mean collision rate from 0.56 to 0.47 across 50 random-seed runs. Standard deviations are substantial. The 1B variant improves score to 2.93 but barely changes collision rate, from 0.56 to 0.54; earlier braking and lower impact velocity explain part of the improvement. Better score therefore does not mean collisions have been eliminated.
 

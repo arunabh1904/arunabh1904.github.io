@@ -92,6 +92,8 @@ That choice makes DPO simple, but it also fixes the method's exposure. The model
 
 The plotted horizontal axis is sequence-level KL from the reference policy and the vertical axis is the true sentiment reward. The yellow DPO points form the upper frontier: for a similar amount of deviation from the reference, DPO reaches higher sentiment reward than the PPO and pseudo-supervised alternatives. This is the right intuition for the derivation. DPO and PPO target the same KL-constrained objective, but DPO moves directly along the policy family instead of estimating a reward and then trusting an actor–critic optimizer to find the frontier.
 
+The backbones and preference construction differ across the three tests. Controlled IMDb uses GPT-2-large on 2–8-token prefixes; a sentiment classifier scores four completions for each of 25,000 prefixes and yields six preference pairs per prefix. TL;DR fine-tunes the same GPT-J SFT model for every learned-policy comparison, while Anthropic-HH starts from Pythia-2.8B and first fits a reference model to the chosen completions. The CNN/DailyMail transfer reuses the Reddit-trained policies, and PPO has additional unlabeled Reddit prompts that DPO does not use.
+
 | Experiment | Reported result | Measurement boundary |
 | --- | --- | --- |
 | Controlled IMDb sentiment | DPO produces the most efficient reward–KL frontier; the sweep contains 22 runs | Ground-truth sentiment classifier, not human preference quality |

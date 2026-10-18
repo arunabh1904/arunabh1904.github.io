@@ -28,13 +28,19 @@ In the module, each view feature and the projected question are compared by cosi
 ![TS-VLM: Text-Guided SoftSort Pooling for Vision-Language Models in Multi-View Driving Reasoning source figure: The overall architecture of TS-VLM.](/assets/images/ts-vlm-text-guided-softsort-pooling-for-vision-language-models-in-multi-view-driving-reasoning-paper-figure.webp)
 *Fig 1: TS-VLM uses the question text to softly sort and pool multi-view image tokens, then feeds the selected visual representation into a text-to-text answer model. | source: [TS-VLM, Figure 3](https://arxiv.org/abs/2505.12670)*
 
+[Open figure at full size](/assets/images/ts-vlm-text-guided-softsort-pooling-for-vision-language-models-in-multi-view-driving-reasoning-paper-figure.webp)
+
 The performance-size plot compares answer quality with parameter count, not with driving safety. Its useful question is whether a much smaller text-conditioned pooling model can retain the language scores of larger systems. The measured latency and FLOPs below add the computational evidence that parameter count alone leaves out.
 
 ![Figure 1 from TS-VLM: Text-Guided SoftSort Pooling for Vision-Language Models in Multi-View Driving Reasoning](/assets/images/ts-vlm-text-guided-softsort-pooling-for-vision-language-models-in-multi-view-driving-reasoning-source-figure-1.webp)
 *Fig 2: Model performance vs. model size on the DriveLM benchmark across four metrics: BLEU-4, METEOR, ROUGE-L, and CIDEr. Each circle represents a model, where the x-axis indicates model size (in millions of parameters, log scale), and the y-axis shows the performance score (↑ = better). | source: [TS-VLM, Figure 1](https://arxiv.org/abs/2505.12670)*
 
+[Open figure at full size](/assets/images/ts-vlm-text-guided-softsort-pooling-for-vision-language-models-in-multi-view-driving-reasoning-source-figure-1.webp)
+
 
 The paper's full comparison is on the DriveLM-NuScenes benchmark under one shared test set and an NVIDIA P100 environment. The 65.4M-parameter TS-VLM-Small reaches BLEU-4 56.82, METEOR 41.91, ROUGE-L 74.64, and CIDEr 3.39; the 20.1M Tiny model still reaches 53.59, 39.17, 73.72, and 3.33. Tiny uses 13.81B FLOPs and 0.11 GB, while the Small model uses 25.47B FLOPs and 0.31 GB; their measured per-frame inference times are 49.59 ms and 56.30 ms. On the Tiny ablation, SoftSort reaches BLEU-4 53.59 and CIDEr 3.331, versus 52.50 and 3.275 for hard top-one pooling and 50.80 and 3.249 for uniform pooling. SinkhornSort is more than 180× more expensive without improving the language metrics.
+
+DriveLM-nuScenes contains 4,871 frames and more than 440,000 question-answer pairs across 33 tasks, with a 90/5/5 train/validation/test split. Those shared splits make the model-size comparison interpretable, while the benchmark remains a single-frame-per-example reasoning evaluation.
 
 This figure-to-table path also states the boundary clearly. The evaluation is multi-view visual question answering and planning-language generation, not a closed-loop control policy; the reported latency is per frame on a P100, not an end-to-end vehicle control loop. The method can still discard a safety-critical view when its text query does not make that view salient, so a view-dropout or unexpected-hazard test under matched latency is the right deployment check.
 

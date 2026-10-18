@@ -27,6 +27,8 @@ The model embeds agent histories and static/dynamic road graph features into an 
 ![Scene Transformer's masking strategies and factorized encoder-decoder](/assets/images/scene-transformer-a-unified-architecture-for-predicting-multiple-agent-trajectories-paper-figure.png)
 *Fig 1: The left masks define MP, CMP, and GCP queries; the right alternates attention over time and agents and cross-attends to the road graph. | source: [Scene Transformer, Figure 2](https://arxiv.org/abs/2106.08417)*
 
+[Open figure at full size](/assets/images/scene-transformer-a-unified-architecture-for-predicting-multiple-agent-trajectories-paper-figure.png)
+
 The decoder predicts seven values per agent-time cell: three position coordinates, three Laplace uncertainty parameters, and heading. A six-future output is trained with a reduce-min objective. For marginal prediction, each agent chooses its closest future independently; for joint prediction, the displacement loss is aggregated over the selected agents and time before choosing one coherent future. That small change in the loss changes the semantics of the output modes.
 
 ### Factorized attention preserves the two dependencies that matter
@@ -36,7 +38,11 @@ Naively attending over all `A × T` states is expensive and can make identical m
 ![Scene Transformer's marginal and joint prediction illustration](/assets/images/scene-transformer-a-unified-architecture-for-predicting-multiple-agent-trajectories-source-figure-1.webp)
 *Fig 2: Marginal futures can be individually plausible while joint futures preserve a consistent interaction between agents. | source: [Scene Transformer, Figure 1](https://arxiv.org/abs/2106.08417)*
 
+[Open figure at full size](/assets/images/scene-transformer-a-unified-architecture-for-predicting-multiple-agent-trajectories-source-figure-1.webp)
+
 ### Joint loss improves consistency, but marginal and joint scores are different questions
+
+Argoverse evaluates a single agent over three seconds. WOMD evaluates up to eight agents independently in the marginal setting, but exactly two interacting agents with scene-level metrics in the joint setting. Future traffic-light state is masked from the model.
 
 On Argoverse, the marginal model reports minADE 0.80, minFDE 1.23, and miss rate 0.13 at six predictions. On the WOMD test split, its vehicle/pedestrian/cyclist minADE is 1.17/0.60/1.17, with mAP 0.27/0.23/0.20. For the joint interactive task, the multi-task joint model reports scene-level minSADE 1.74/1.41/1.95 and minSFDE 4.06/3.26/4.68 for vehicles/pedestrians/cyclists, with SMR 0.50/0.64/0.71 and mAP 0.13/0.04/0.03.
 
@@ -44,6 +50,14 @@ Those numbers should not be compared as if they were one leaderboard. Marginal m
 
 ![Scene Transformer's goal-conditioned prediction examples](/assets/images/scene-transformer-a-unified-architecture-for-predicting-multiple-agent-trajectories-source-figure-3.webp)
 *Fig 3: Supplying a goal changes the same scene model into a goal-conditioned predictor, with the remaining agents and road graph still in context. | source: [Scene Transformer, Figure 3](https://arxiv.org/abs/2106.08417)*
+
+[Open figure at full size](/assets/images/scene-transformer-a-unified-architecture-for-predicting-multiple-agent-trajectories-source-figure-3.webp)
+
+### Training masks and inference cost
+
+The multi-task experiment trains motion-prediction, conditional-motion, and goal-conditioned masks one third of the time each across 44K interactive segments without significantly degrading the standard motion metrics. Appendix A reports a 15.3M-parameter baseline trained for about three days on a TPU, with data augmentation and padding masks kept separate from the task mask. Inference took 52 ms for 32 agents and 175 ms for 128 agents on an unoptimized V100; the cost grows with scene size.
+
+The source also reports that average metrics miss slices where speed or the number of agents moves out of distribution, so the goal-conditioned examples are capability evidence rather than closed-loop planning validation.
 
 ## High-Level Takeaways
 

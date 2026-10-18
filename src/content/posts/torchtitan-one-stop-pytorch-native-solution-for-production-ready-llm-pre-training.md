@@ -36,6 +36,8 @@ Each GPU can now form a $5\times12$ partial output. Those outputs contain contri
 ![TorchTitan source Figure 3: column-wise and row-wise tensor-parallel matrix multiplication across two GPUs](/assets/images/torchtitan-source-figure-3-tensor-parallel.png)
 *Fig 1: Column sharding produces separate intermediate features; row sharding produces partial outputs of the same shape. All-reduce sums those outputs into the complete result. Cropped from the source tensor-parallel example. | source: [TorchTitan, Figure 3](https://arxiv.org/abs/2410.06511v3)*
 
+[View figure at full size](/assets/images/torchtitan-source-figure-3-tensor-parallel.png)
+
 This explains why tensor parallelism is sensitive to interconnect speed. TorchTitan pairs it with sequence parallelism for normalization and dropout activations, and uses loss parallelism to avoid gathering the entire vocabulary dimension just to compute cross-entropy. Asynchronous tensor parallelism further divides matrix multiplication into chunks so communication of one chunk can overlap computation of another. Its reported implementation relies on fast intra-node links and SymmetricMemory support.
 
 ### More parallelism can enable a workload without accelerating each token

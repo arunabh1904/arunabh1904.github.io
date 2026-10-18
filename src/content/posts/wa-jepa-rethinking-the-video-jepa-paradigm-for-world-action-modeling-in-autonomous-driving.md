@@ -52,13 +52,15 @@ The source figure visualizes that claim. Read each prediction against its own ta
 ![WA-JEPA source Figure 3: future latent predictions and targets visualized with method-specific PCA bases](/assets/images/wa-jepa-source-figure-3.png)
 *Fig 1: Compare each prediction with its own target over time. Flow matching retains more target structure; separate PCA bases mean colors should not be matched directly across methods. | source: [WA-JEPA, Figure 3](https://arxiv.org/abs/2608.20974)*
 
+[Open figure at full size](/assets/images/wa-jepa-source-figure-3.png)
+
 Two target-referenced measures support the visual reading. The excess directional-similarity gap falls from 0.30 with regression to 0.10 with flow matching. Predicted temporal-change magnitude relative to the target rises from 0.45 to 0.80, where one indicates a match. These measure preservation of learned representations, not the physical correctness of every future object motion.
 
 ### The headline score belongs to a corrected metric
 
 Table 1 reports both an older EPDMS formulation and one with corrected human-reference penalty-filter aggregation. WA-JEPA scores 88.0 under the older column and 91.7 under the corrected column. Its 1.6-point lead over SparseDriveV2 and 1.3-point lead over Discrete-WAM use the corrected values throughout. Comparing 91.7 directly with an older paper's uncorrected score would manufacture an advantage from the evaluator change.
 
-The main score averages ten fixed inference-noise seeds. Appendix C reports a mean of 91.7014 and standard deviation of 0.0531, with the model parameters and scenarios held fixed. This demonstrates low sensitivity to those sampling seeds; it does not estimate variation across independent training runs or new driving distributions.
+Stage 1 uses nuPlan video and Stage 2 uses NAVSIM navtrain. The main navtest score averages ten fixed inference-noise seeds. Appendix C reports a mean of 91.7014 and standard deviation of 0.0531, with the model parameters and scenarios held fixed. This demonstrates low sensitivity to those sampling seeds; it does not estimate variation across independent training runs or new driving distributions.
 
 Stage 1 masking also contributes: no additional driving pretraining gives 89.5 EPDMS, patch masking gives 91.0, full-future masking 91.3, and their combination 91.7. The encoder comparison favors V-JEPA 2 initialization, but pretrained encoders differ in data and training as well as objective. It is not a controlled proof that the video objective alone explains the entire gap.
 

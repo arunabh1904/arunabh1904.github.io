@@ -29,6 +29,8 @@ A robot needs a continuous trajectory, not a sentence describing one. Discretizi
 ![π0 architecture connecting a PaliGemma backbone to a 300M-parameter action expert across robot embodiments](/assets/images/pi0-vision-language-action-flow-model-for-general-robot-control-source-figure-3.webp)
 *Fig 1: The model combines Internet-pretrained image-language tokens with robot state and noisy action tokens; a smaller action expert predicts a 50-step continuous chunk for single-arm, bimanual, and mobile systems. | source: [π0: A Vision-Language-Action Flow Model for General Robot Control, Figure 3](https://arxiv.org/abs/2410.24164)*
 
+[Open figure at full size](/assets/images/pi0-vision-language-action-flow-model-for-general-robot-control-source-figure-3.webp)
+
 PaliGemma provides the roughly 3B-parameter VLM backbone. The action expert adds about 300M parameters, initialized from scratch, for a total of about 3.3B. Its robotics-specific tokens use separate weights, analogous to a two-expert transformer: image and language inputs use the pretrained path, while joint state and noisy actions use the smaller action path. Attention uses three ordered blocks: images and language, robot state, then noisy actions. Each action position can read every action position and the preceding context; earlier blocks cannot read the noisy actions. This lets the whole chunk coordinate while the observation and state representations remain reusable across flow steps.
 
 Formally, the policy models $p(A_t\mid o_t)$, where $A_t=[a_t,\ldots,a_{t+H-1}]$ and $H=50$. The observation contains two or three RGB images, a language command, and joint angles. During training, a clean action chunk $A_t$ is mixed with Gaussian noise:
@@ -45,6 +47,8 @@ The network predicts the vector field $A_t-\epsilon$ with a squared flow-matchin
 
 ![π0 pretraining mixture and relative dataset weights across robot platforms](/assets/images/pi0-vision-language-action-flow-model-for-general-robot-control-source-figure-4.webp)
 *Fig 2: The pretraining mixture combines proprietary dexterous data with OXE, Bridge v2, and DROID; the pie charts show why the resulting model's coverage is dominated by several distinct robot configurations. | source: [π0: A Vision-Language-Action Flow Model for General Robot Control, Figure 4](https://arxiv.org/abs/2410.24164)*
+
+[Open figure at full size](/assets/images/pi0-vision-language-action-flow-model-for-general-robot-control-source-figure-4.webp)
 
 The source figure is best read as a data recipe, not as a claim that every slice is equally represented. Figure 4 specifies the OXE MagicSoup subset plus Bridge v2 and DROID as the open component, about 9.1% of the training mixture. The proprietary portion contributes 903M timesteps: 106M from single-arm robots and 797M from dual-arm robots. Those data cover 68 broadly defined tasks across seven robot configurations. The paper weights each task-robot combination by $n^{0.43}$, where $n$ is its sample count, to reduce domination by overrepresented combinations.
 
@@ -70,6 +74,8 @@ For the longest evaluation, the model is fine-tuned on laundry folding, table bu
 
 ![Pi0 long-task progress for fine-tuned, scratch, and out-of-box policies across seven tasks](/assets/images/pi0-source-figure-13-long-task-progress.png)
 *Fig 3: Solid bars combine robot pretraining and task fine-tuning, hatched bars omit robot pretraining, and outlined bars omit task fine-tuning. The vertical axis measures average task progress, including partial completion. | source: [π0: A Vision-Language-Action Flow Model for General Robot Control, Figure 13](https://arxiv.org/abs/2410.24164)*
+
+[Open figure at full size](/assets/images/pi0-source-figure-13-long-task-progress.png)
 
 Read the three bars as different missing experiences. The out-of-box policy can already make progress on laundry, but task fine-tuning substantially improves the sequence. On box building and to-go packing, the out-of-box bars are near zero while both trained-on-task policies improve: broad experience alone does not provide the final routine. Packing eggs is the counterexample to a universal pretraining gain, since the scratch policy slightly exceeds the fine-tuned model. These scores measure stages completed, so a policy that reliably starts a routine can score above zero while never finishing it. The source figure groups table bussing under tasks present in pretraining, while the accompanying long-task discussion describes it as absent; that classification is inconsistent in the paper.
 

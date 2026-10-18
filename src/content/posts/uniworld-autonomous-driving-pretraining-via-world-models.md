@@ -26,6 +26,8 @@ The image backbone and 2D-to-3D view transform produce a BEV feature map. UniWor
 ![UniWorld's multi-camera occupancy pretraining path](/assets/images/uniworld-autonomous-driving-pretraining-via-world-models-source-figure-2.webp)
 *Fig 1: Multi-view images become BEV features, while fused LiDAR becomes a 4D occupancy target; the pretraining decoder is discarded for downstream tasks. | source: [UniWorld, Figure 2](https://arxiv.org/abs/2308.07234)*
 
+[Open the full-size source figure](/assets/images/uniworld-autonomous-driving-pretraining-via-world-models-source-figure-2.webp)
+
 This target changes what a feature must preserve. Monocular depth mostly constrains a visible surface; a voxel target forces the representation to preserve the 3D arrangement of point-supported surfaces and empty target cells across height. Because those labels come from fused LiDAR, this is not an explicit completion label for space hidden behind an occluder. A future occupancy target adds temporal context without requiring a learned image generator.
 
 ### Three frames help; five can reintroduce motion noise
@@ -40,6 +42,8 @@ On BEVFormer with an FCOS3D initialization, the frame ablation reports:
 | 5 | 0.429 | 0.525 | 0.659 |
 
 The three-frame setting is best in this table. More points are not automatically better: static background becomes denser, but moving objects can be fused into the wrong place. This is the central world-model tradeoff in UniWorld. Additional frames add coverage until motion contamination from misaligned moving objects outweighs the benefit of denser static geometry.
+
+The two-layer 3D-convolutional occupancy decoder is removed before fine-tuning. An optional label-assisted path handles dynamics more explicitly: the unlabeled UniWorld-3D row reaches 0.438 mAP / 0.534 NDS, while adding explicit semantic occupancy supervision reaches 0.445 / 0.544. This is a useful boundary for the label-free claim because the stronger dynamic-scene target can still use labeled 3D data to separate moving objects before LiDAR fusion.
 
 The method transfers across tasks. On BEVFormer with ImageNet initialization, UniWorld-3D raises mAP/NDS from 0.371/0.479 to 0.397/0.500; UniWorld-4D reaches 0.390/0.501. The 4D version slightly improves NDS while lowering mAP relative to 3D, which matches the authors' explanation that future prediction introduces uncertainty in object position. On semantic occupancy, BEVStereo improves from 42.78 to 45.92 mIoU (+3.14 points).
 

@@ -30,6 +30,8 @@ The architecture figure shows where those representations meet. Follow the vecto
 ![SEPT source Figure 2 shows raster and vector SD-map branches enhancing camera BEV features before lane, area, topology, and keypoint heads](/assets/images/sept-source-figure-2.png)
 *Fig 1: Vector-map attention and raster-map transformation precede the shared fusion stage. The keypoint head adds supervision about intersections to the same representation used by the ordinary perception heads. | source: [SEPT, Figure 2](https://arxiv.org/abs/2505.12246)*
 
+[open full-size figure](/assets/images/sept-source-figure-2.png)
+
 ### Feature modulation is not explicit map registration
 
 GPS error and coarse road geometry prevent a rasterized SD map from lining up perfectly with camera BEV features. SEPT compares projected raster features with the vector-enhanced BEV features, pools their difference into a global vector, and predicts a scale and bias for every channel. These feature-wise transformations improve the representation without estimating a corrected GPS pose or a per-pixel geometric warp.

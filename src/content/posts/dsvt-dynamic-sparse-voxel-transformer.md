@@ -29,6 +29,8 @@ The important unit is therefore a bounded set, not the geometric window itself. 
 ![DSVT dynamic set partitioning with X-axis and Y-axis layers](/assets/images/dsvt-dynamic-sparse-voxel-transformer-source-figure-2.webp)
 *Fig 1: Occupied voxels inside a window are divided into equal-size X-axis subsets, then repartitioned by Y-axis order in the next layer so tokens from different previous subsets can exchange information. | source: [DSVT, Figure 2](https://arxiv.org/abs/2301.06051)*
 
+[Open figure at full resolution](/assets/images/dsvt-dynamic-sparse-voxel-transformer-source-figure-2.webp)
+
 The rotated partition is what prevents the bounded sets from becoming permanent information islands. The first layer sorts the window in X-axis order; the next sorts it in Y-axis order. A token can therefore meet a different group in the following layer without global attention. The hybrid window partition adds a second form of mixing by changing the window shape across successive blocks, improving inter-window propagation while keeping the local tensor contract.
 
 ### The architecture keeps geometry until a learned pooling step
@@ -37,6 +39,8 @@ The pillar version, DSVT-P, uses a single-stride backbone: occupied tokens retai
 
 ![DSVT block and overall perception architecture](/assets/images/dsvt-dynamic-sparse-voxel-transformer-paper-figure.webp)
 *Fig 2: The complete DSVT architecture contains paired X-axis and Y-axis attention layers inside each block, then projects the voxel features to a BEV backbone and perception head. | source: [DSVT, Figure 3](https://arxiv.org/abs/2301.06051)*
+
+[Open figure at full resolution](/assets/images/dsvt-dynamic-sparse-voxel-transformer-paper-figure.webp)
 
 This is why the paper reports separate pillar and voxel points. A pillar tokenizer has already collapsed height; a voxel tokenizer keeps 3D coordinates and pays more for the pooling and later backbone. The attention module is shared conceptually, but the input geometry is not interchangeable.
 
@@ -50,6 +54,8 @@ The paper also tests DSVT outside detection. On nuScenes it reports 72.7 NDS and
 
 ![DSVT accuracy versus speed on Waymo](/assets/images/dsvt-dynamic-sparse-voxel-transformer-source-figure-1.webp)
 *Fig 3: The Waymo validation plot compares mAPH/L2 against speed on an NVIDIA A100 with an AMD EPYC 7513 CPU; the paper's TensorRT point is part of this deployment context. | source: [DSVT, Figure 1](https://arxiv.org/abs/2301.06051)*
+
+[Open figure at full resolution](/assets/images/dsvt-dynamic-sparse-voxel-transformer-source-figure-1.webp)
 
 ### The benchmark number needs its training context
 

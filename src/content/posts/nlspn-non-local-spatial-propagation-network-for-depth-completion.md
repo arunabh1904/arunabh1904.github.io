@@ -24,6 +24,8 @@ NLSPN predicts eight two-dimensional offsets per pixel from RGB and sparse depth
 ![NLSPN source Figure 3f shows learned neighbors aligned with surfaces near depth boundaries](/assets/images/nlspn-source-figure-3f.png)
 *Fig 1: The learned connections remain mostly within the same colored surface even near an edge. Choosing where to sample reduces the burden on affinity weights to suppress irrelevant foreground–background mixtures afterward. | source: [NLSPN, Figure 3f](https://arxiv.org/abs/2007.10042)*
 
+[Open Figure 1 at full resolution](/assets/images/nlspn-source-figure-3f.png)
+
 A ResNet-34 encoder–decoder predicts the initial dense depth, confidence, offsets, and raw affinities. The propagation layer then performs 18 refinement steps in the default setting, using deformable-convolution sampling for the learned neighborhood. The system still needs sparse depth at inference and pays for repeated dense image-space updates.
 
 ### Affinity normalization decides how much mixing is available
@@ -43,9 +45,13 @@ NLSPN multiplies each candidate neighbor affinity by the confidence of the sampl
 ![NLSPN Figure 2 shows joint prediction of initial depth, confidence, offsets, and affinities](/assets/images/nlspn-non-local-spatial-propagation-network-for-depth-completion-source-figure-2.webp)
 *Fig 2: The shared network predicts both the starting depth and the rules for refining it. Confidence modifies source contributions inside propagation, while learned offsets determine which source pixels are considered. | source: [NLSPN, Figure 2](https://arxiv.org/abs/2007.10042)*
 
+[Open Figure 2 at full resolution](/assets/images/nlspn-non-local-spatial-propagation-network-for-depth-completion-source-figure-2.webp)
+
 ### Small matched gains clarify the larger benchmark result
 
 The component ablations use only 10,000 KITTI training images, smaller 912-by-228 crops, and 20 training epochs. Their errors should not be compared directly with the full-data test score.
+
+The full-data recipes explain that boundary. NYUv2 uses roughly 50,000 images from the official training split, resized to $320\times240$ and center-cropped to $304\times228$. KITTI Depth Completion contains more than 90,000 RGB–LiDAR pairs; training ignores the top 100 pixels and uses center crops of $1216\times240$. Both use 18 propagation steps. The KITTI leaderboard score therefore comes from a different data volume and objective than the reduced-data component table.
 
 | Reduced-data KITTI validation configuration | RMSE, mm |
 | --- | ---: |

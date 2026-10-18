@@ -32,12 +32,16 @@ The model is a high-level policy. Its text output names skills from a small low-
 ![PaLM-E capabilities across visual reasoning, grounded dialogue, perception, and planning](/assets/images/palm-e-embodied-multimodal-language-model-source-figure-2.webp)
 *Fig 1: The large PaLM-E model answers visual questions, performs multimodal reasoning, and produces grounded descriptions and plans; these examples show the breadth of the shared output space rather than a single robot-control benchmark. | source: [PaLM-E, Figure 2](https://arxiv.org/abs/2303.03378)*
 
+[Open figure at full size](/assets/images/palm-e-embodied-multimodal-language-model-source-figure-2.webp)
+
 Figure 1 is a capability map. The model can answer a visual question or produce a textual plan because both tasks use the same autoregressive interface. The robot-facing interpretation still depends on the skill vocabulary and the controller attached to the generated text. This distinction prevents the general VLM examples from being read as evidence of direct torque or end-effector control.
 
 ### Transfer is the main experiment
 
 ![PaLM-E transfer across embodied domains with a shared model and mixed pretraining](/assets/images/palm-e-embodied-multimodal-language-model-source-figure-3.webp)
 *Fig 2: The paper compares separate in-domain models with one model trained on a mixture of robotics and general vision-language data; the shared mixture improves several embodied tasks despite containing only 8.9% embodied samples. | source: [PaLM-E, Figure 3](https://arxiv.org/abs/2303.03378)*
+
+[Open figure at full size](/assets/images/palm-e-embodied-multimodal-language-model-source-figure-3.webp)
 
 The full mixture is dominated by WebLI, VQ2A, VQG, Conceptual Captions, and Object Aware data. The paper's sampling table assigns 3.1% to real mobile-manipulator data, 4.2% to Language Table, and 1.6% to TAMP, for 8.9% embodied data in total. This makes the transfer claim testable: the robot tasks are not simply a giant robot-only corpus hidden behind a language model.
 

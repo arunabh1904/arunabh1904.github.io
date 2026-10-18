@@ -28,6 +28,8 @@ summary: '2019 – UNITER: Universal Image-Text Representation Learning'
 ![UNITER model and its pretraining objectives](/assets/images/uniter-universal-image-text-representation-learning-source-figure-1.webp)
 *Fig 1: UNITER projects detector regions and WordPiece tokens into one sequence, then applies a shared Transformer to support masked language, masked regions, matching, and word-region alignment. | source: [UNITER, Figure 1](https://arxiv.org/abs/1909.11740)*
 
+[Open figure at full size](/assets/images/uniter-universal-image-text-representation-learning-source-figure-1.webp)
+
 The image embedder starts with Faster R-CNN features from a Visual Genome detector. For each region, UNITER projects both the pooled visual feature and a seven-dimensional location vector—normalized coordinates, width, height, and area—then sums and layer-normalizes them. The text embedder does the same for WordPiece and position embeddings. A modality embedding tells the shared Transformer which tokens came from which side. Once concatenated, all regions and words can attend to one another at every layer.
 
 That early fusion is a deliberate contrast with the two-stream models in this lineage. It makes fine-grained interaction cheap inside a single pair: a phrase can update its representation using the region it describes, and a region can use the surrounding words. It also makes retrieval expensive at scale, because an image and a caption cannot be encoded independently before matching. UNITER’s base model has 12 layers, 768 hidden dimensions, and 86M parameters; the large model doubles the depth to 24 layers, uses 1,024 hidden dimensions, and has 303M parameters.
@@ -44,6 +46,8 @@ The training schedule samples one objective per mini-batch, so the same encoder 
 
 ![UNITER downstream data splits and pretraining overlap controls](/assets/images/uniter-universal-image-text-representation-learning-source-figure-4-white.png)
 *Fig 2: The source split diagram shows which image-text examples belong to training, validation, and test for the downstream datasets, with COCO evaluation images removed from pretraining. | source: [UNITER, Figure 4](https://arxiv.org/abs/1909.11740)*
+
+[Open figure at full size](/assets/images/uniter-universal-image-text-representation-learning-source-figure-4-white.png)
 
 UNITER pretrains on image-sentence pairs from COCO Captions, Visual Genome Dense Captions, Conceptual Captions, and SBU Captions. To make the in-domain split fair, the authors merge the raw COCO training and validation data, remove downstream evaluation images, and use URL matching to remove overlapping Flickr30K images; 222 images are eliminated through that split construction. They apply the same URL matching to the out-of-domain Conceptual Captions and SBU mixture, excluding 109 images from training. The out-of-domain mixture tests whether data that look less like the target images can substitute for in-domain pairs.
 

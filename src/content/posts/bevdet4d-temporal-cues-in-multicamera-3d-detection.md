@@ -29,6 +29,8 @@ The geometry removes the vehicle’s own translation and rotation. A parked car 
 ![BEVDet4D: Temporal Cues in Multi-Camera 3D Detection source figure: The framework of the proposed BEVDet4D paradigm.](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-paper-figure.webp)
 *Fig 1: The extra BEV encoder refines both candidate features. History is then aligned to the current ego frame and concatenated with the current feature, before the main BEV encoder and detection head. | source: [BEVDet4D, Figure 2](https://arxiv.org/abs/2203.17054)*
 
+[Open figure at full resolution](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-paper-figure.webp)
+
 ### The target matters as much as the memory
 
 The paper’s ablation makes the target-design story unusually clear. Directly concatenating unaligned history while predicting speed gives 1.544 mAVE and 37.6 NDS, worse than the BEVDet baseline’s 0.909 mAVE and 39.2 NDS. Translating the previous feature into the current frame reduces mAVE to 1.186, but this is still a poor match for a speed target because the time between the two sampled frames is not constant. Replacing speed with the ego-motion-corrected spatial offset drops mAVE to 0.479 and raises NDS to 44.0 in the same ablation configuration.
@@ -42,6 +44,8 @@ The reference frame is selected from unlabeled 12 Hz camera sweeps, whose interv
 ![Figure 4 from BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-source-figure-4.webp)
 *Fig 2: The source sweeps the interval between current and reference frames; the useful range is configuration-dependent, with the default chosen near the middle of the 12 Hz sweep. | source: [BEVDet4D, Figure 4](https://arxiv.org/abs/2203.17054)*
 
+[Open figure at full resolution](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-source-figure-4.webp)
+
 Alignment itself has a systems trade-off. If the feature is aligned inside the view transformer, the geometric mapping remains exact but the acceleration path is harder to preserve. If it is aligned after view transformation, interpolation enables the optimized path and doubles the reported tiny-model speed at a 0.8-metre grid, from 7.8 to 15.6 FPS; mAVE changes from 0.479 to 0.499. At a 0.4-metre grid the NDS values are nearly identical (45.2 versus 45.3), so finer spatial resolution reduces the interpolation error.
 
 ### Fusion depth determines whether history helps
@@ -50,12 +54,16 @@ The source compares temporal fusion before the extra BEV encoder, after that enc
 
 ### The reported gain is real but local
 
+The benchmark contract is the official nuScenes 700/150/150 scene split, ten detection classes, a 51.2-metre ground-plane region of interest, and a default 0.8-metre BEV grid. The default models train for 20 epochs with class-balanced sampling; validation speed is averaged over 6,019 samples. The headline test model is trained on train plus validation and uses one model with test-time augmentation, while the 55.2 validation number is the corresponding augmented result.
+
 On nuScenes validation, BEVDet4D-Tiny reports 0.338 mAP, 0.476 NDS, 0.337 mAVE, and 15.5 FPS, versus BEVDet-Tiny’s 0.312 mAP, 0.392 NDS, 0.909 mAVE, and 15.6 FPS. BEVDet4D-Base reaches 0.421 mAP and 0.545 NDS at 1.9 FPS, compared with BEVDet-Base’s 0.393 and 0.472. With test-time augmentation, the base configuration reaches 55.2 NDS on validation; the submitted test result is 56.9 NDS. The paper reports the tiny model’s 62.9% mAVE reduction and 8.4-point NDS gain at nearly unchanged speed.
 
 Those results establish that a dense aligned feature pair is a strong short-term baseline. They do not establish object identity across long occlusions, map persistence, or robustness to stale history. The model has no object-centric queue: an object entering the camera view appears as new evidence, and a disappeared object can remain in the old feature until the current BEV encoder suppresses it. The reported velocity gains concern this two-frame detection setup; they are not a tracking evaluation.
 
 ![Figure 1 from BEVDet4D: Temporal Cues in Multi-Camera 3D Detection](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-source-figure-1.webp)
 *Fig 3: The nuScenes validation comparison places BEVDet4D’s compact and high-capacity configurations on the accuracy–speed frontier beside other camera-only detectors. | source: [BEVDet4D, Figure 1](https://arxiv.org/abs/2203.17054)*
+
+[Open figure at full resolution](/assets/images/bevdet4d-temporal-cues-in-multicamera-3d-detection-source-figure-1.webp)
 
 ## High-Level Takeaways
 

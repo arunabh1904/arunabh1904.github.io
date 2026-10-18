@@ -50,6 +50,8 @@ The decisive experiment uses 80-response banks for 186 problems from five 2025�
 ![Source Figure 6 comparing the candidate ceiling with plurality and reference-free pointwise selection](/assets/images/test-time-scaling-reducer-gap.png)
 *Fig 1: The dashed ceiling asks whether a correct candidate exists. The other curves measure submitted answers under specific reducers; their separation is a selection failure, not a shortage of generated candidates. | source: [Test-Time Scaling, Figure 6](https://arxiv.org/abs/2608.04001)*
 
+[Open figure at full size](/assets/images/test-time-scaling-reducer-gap.png)
+
 The arrows compare the ceiling with the *better* of plurality and pointwise selection, giving the 5.38–14.52-point range in the summary. Comparing the ceiling with pointwise selection alone gives larger gaps, 8.06–16.13 points. Those are two different comparisons, not interchangeable estimates of one reducer's error.
 
 The gap is the central systems result. More sampling compute can create useful candidates without improving the submitted answer at the same rate. In another 120-question block, selecting the response with the highest mean token log-probability falls from 75.56% to 65.83% as the bank grows. A larger bank amplifies a misaligned selector.

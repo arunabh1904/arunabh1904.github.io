@@ -65,6 +65,8 @@ The appendix proves expected-gradient equivalence to trajectory-level centering 
 
 The evaluation configuration lists a memory buffer of 50 keyframes, even though the motivation focuses on approximately ten-second dependencies. At 0.4 s spacing that buffer can cover a longer interval. Buffer capacity, typical clip length, and the measured dependency horizon are different quantities.
 
+The horizon ablation makes that distinction concrete. Appendix D.8 finds that 20 frames, or 8 seconds, are generally sufficient for the all-way-stop set, while 10 frames, or 4 seconds, are usually enough on general driving. Longer histories help minADE, minFDE, and corner distance by exposing more alternative memory states, but task-specific stop and go success do not track ADE monotonically.
+
 ### Average prediction improves, but diversity and oracle metrics can worsen
 
 Stop evaluation averages over **50,533 pre-stop keyframes from 2,479 clips**, using six sampled trajectories. AD-Memo reaches 1.866 m average ADE, 89.26% stop success, 45.01% go success, and 51.66% arrival-order QA accuracy. The no-memory model with the same RL recipe obtains 1.952 m, 88.92%, 43.76%, and 35.32%. Reference-memory SFT attains 89.53% QA accuracy versus 45.99% with its own memory, exposing substantial remaining memory-generation error.

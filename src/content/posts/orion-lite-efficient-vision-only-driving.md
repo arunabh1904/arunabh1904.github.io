@@ -30,9 +30,9 @@ The overview shows two simultaneous targets. The student planning token matches 
 ![Latent planning-token distillation combined with trajectory supervision; source Figure 1](/assets/images/orion-lite-source-figure-1.webp)
 *Fig 1: Orion-Lite retains the teacher-trained visual and temporal representation, replacing the language module with a shallow decoder. Joint feature matching and trajectory supervision train the student planning path. | source: [Paper, Figure 1](https://arxiv.org/abs/2604.08266)*
 
-[View full-size figure](/assets/images/orion-lite-source-figure-1.webp)
+[Open figure at full size](/assets/images/orion-lite-source-figure-1.webp)
 
-The feature loss is an L1 distance averaged over batch and planning-token channels. The decoder and VAE planner are updated together; the inherited visual modules stay frozen. The paper trains on the standard Bench2Drive base set of 1,000 clips for twenty epochs, taking about twenty hours on one RTX A6000. Teacher training and the inherited perception representation are additional costs.
+The feature loss is an L1 distance averaged over batch and planning-token channels. The decoder and VAE planner are updated together; the inherited visual modules stay frozen. Bench2Drive clips contain six cameras, five radars, and one LiDAR sweep, but Orion-Lite discards radar and LiDAR and trains on RGB cameras only. The distillation split uses 950 clips for training and 50 for open-loop validation; closed-loop evaluation covers 220 routes across 44 interactive scenarios. The paper reports Driving Score, Success Rate, Efficiency, Comfortness, and Multi-Ability closed loop, plus Avg. L2 and box-collision rate open loop. Teacher training and the inherited perception representation are additional costs.
 
 ### The strongest result combines two training signals
 

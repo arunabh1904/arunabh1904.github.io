@@ -29,6 +29,8 @@ This sequence matters because a generic BEV summary answers “what is in the sc
 ![SIPTraj couples agent-conditioned BEV grounding with physics-guided iterative decoding](/assets/images/siptraj-architecture-paper-figure.png)
 *Fig 1: The architecture routes sensor BEV features and agent history through HASE, then conditions PGID on a physical descriptor before producing trajectories. | source: [SIPTraj: Map-Free End-to-End Trajectory Prediction via Physics-Guided Scene Interaction, Figure 2](https://arxiv.org/abs/2608.00779)*
 
+[Open figure at full size](/assets/images/siptraj-architecture-paper-figure.png)
+
 The HASE ablation supports this intuition. With only agent-to-scene aggregation, mADE5 is 1.3821 and mFDE1 is 7.9634. Adding scene-to-agent grounding and relation refinement improves them to 1.2754 and 7.4218. Global scene fusion reaches 1.2031 and 7.0852 before PGID is added. The largest early gain comes when local scene evidence is written back into the agent state, rather than when another generic global feature is appended.
 
 ### PGID turns kinematics into a representation pathway
@@ -47,6 +49,8 @@ Both datasets use two seconds of history and six seconds of future. The paper us
 
 ![Map-based, prior map-free, and SIPTraj designs show where topology and physics enter](/assets/images/siptraj-map-free-end-to-end-trajectory-prediction-via-physics-guided-scene-interaction-source-figure-1.webp)
 *Fig 2: The comparison shows HD-map dependence in one family, shallow agent–scene coupling in prior map-free models, and HASE plus physics conditioning in SIPTraj. | source: [SIPTraj: Map-Free End-to-End Trajectory Prediction via Physics-Guided Scene Interaction, Figure 1](https://arxiv.org/abs/2608.00779)*
+
+[Open figure at full size](/assets/images/siptraj-map-free-end-to-end-trajectory-prediction-via-physics-guided-scene-interaction-source-figure-1.webp)
 
 The method's decision is attractive when map coverage is unreliable and sensor-derived BEV already exists. Its unresolved cost is a larger, more structured decoder and a need for reliable instantaneous kinematics. A physics-aware representation can enforce smoothness while still missing a road rule or reacting incorrectly to a sensor-induced BEV error.
 

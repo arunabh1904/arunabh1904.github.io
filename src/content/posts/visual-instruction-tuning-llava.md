@@ -27,9 +27,13 @@ LLaVA takes CLIP ViT-L/14 grid features and projects each feature into Vicuna's 
 ![LLaVA's visual features and instruction tokens entering the language model](/assets/images/visual-instruction-tuning-llava-paper-figure.png)
 *Fig 1: Image features pass through the learned projection W, while instruction tokens enter through the language path. Both condition the generated answer. | source: [Paper, Figure 1](https://arxiv.org/abs/2304.08485)*
 
+[Open figure at full size](/assets/images/visual-instruction-tuning-llava-paper-figure.png)
+
 Follow the two arrows into the model in Figure 1. The image arrives through the vision encoder and projector; the question arrives through ordinary language embeddings. Asking a different question does not change the CLIP features in this architecture. It changes how the language model uses them. This is the useful separation behind the recipe: the visual representation can remain fixed while the model learns whether the user wants a description, an object count, or an explanation of something unusual.
 
 The two training stages teach different parts of that interface. First, 595K filtered CC3M image-caption pairs train only the projection matrix, with both CLIP and Vicuna frozen. Predicting captions gives the projector an initial mapping that the existing language model can use. Second, instruction tuning updates both the projector and Vicuna while keeping CLIP frozen. The paper's “end-to-end” label for this stage therefore does not mean that every component is updated. The loss covers the assistant's answer tokens, including the stopping behavior, rather than teaching the model to predict the user's questions.
+
+The appendix fixes this recipe at one alignment epoch with learning rate $2\times10^{-3}$ and batch size 128, followed by three instruction-tuning epochs at $2\times10^{-5}$ and batch size 32. The projector is initialized before Vicuna is allowed to adapt, so the schedule preserves the same trainable boundary described above.
 
 ### A teacher can write visual instructions without receiving pixels
 

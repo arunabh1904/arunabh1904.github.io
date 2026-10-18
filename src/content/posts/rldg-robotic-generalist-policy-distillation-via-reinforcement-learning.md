@@ -24,16 +24,22 @@ summary: "2024 – RLDG: Robotic Generalist Policy Distillation via Reinforcemen
 ![RLDG workflow training specialist reinforcement-learning policies collecting their rollouts and distilling them into a generalist robot policy](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-paper-figure.png)
 *Fig 1: The specialist and generalist have different jobs: RL optimizes a narrow reward, while supervised distillation transfers the resulting state-action distribution into one policy that can handle several tasks. | source: [RLDG, Figure 1](https://arxiv.org/abs/2412.09858)*
 
+[Open figure at full size](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-paper-figure.png)
+
 ### The data boundary is the method
 
-RLDG first trains separate vision-based policies with HIL-SERL, an intervention-enabled RL system built on RLPD. After convergence, each specialist is rolled out to construct a balanced dataset. Connector Insertion uses separate USB, Ethernet, and VGA specialists, with equal episodes per connector; the resulting generalist is tested zero-shot on Type-C, HDMI, DisplayPort, and 3-pin XLR. For FMB Assembly, RL is used only for the precision-critical insertion segment and human demonstrations provide grasping and transport data. Each generalist is fine-tuned on the combined state-action data with its native supervised objective: cross-entropy over discretized action bins for OpenVLA, and diffusion training for Octo.
+RLDG first trains separate vision-based policies with HIL-SERL, an intervention-enabled RL system built on RLPD. After convergence, each specialist is rolled out to construct a balanced dataset. Connector Insertion uses separate USB, Ethernet, and VGA specialists, with equal episodes per connector; the resulting generalist is tested zero-shot on Type-C, HDMI, DisplayPort, and 3-pin XLR. For FMB Single Object Assembly, RL starts with the object already grasped and learns only the precision-critical insertion segment, whose board tolerance is ±1.5 mm. Human demonstrations provide grasping and transport data. Each generalist is fine-tuned on the combined state-action data with its native supervised objective: cross-entropy over discretized action bins for OpenVLA, and diffusion training for Octo.
 
 This boundary lets the reward be task-specific without making the final policy task-specific. The setup is a Franka Panda with a wrist-mounted RealSense D405. A 1 kHz impedance controller executes 6D end-effector delta-pose commands; data collection, RL, and Octo run at 10 Hz, while OpenVLA runs at 4 Hz. OpenVLA is the 7B model pretrained on 970k Open X-Embodiment demonstrations and discretizes each action dimension into 256 bins. Octo uses a continuous diffusion head. Both generalists are fine-tuned from pretrained checkpoints using only wrist-camera images, so the comparison tests the source of the training data under a matched observation interface.
+
+The specialist training is itself a staged data pipeline. For Connector Insertion, Pick and Place, and FMB Insertion, the authors first collect positive and negative SpaceMouse trajectories to train a binary success classifier, seed HIL-SERL with 20 demonstrations, and run RL for roughly 1–3 hours until the specialist reaches 100% success; failed rollouts are filtered before distillation.
 
 ### RL data is better at the contact boundary
 
 ![Figure 4 from RLDG: generalist success rates on seen and unseen manipulation tasks](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-source-figure-4.webp)
 *Fig 2: RL-generated rollouts improve both OpenVLA and Octo over human-demonstration fine-tuning on seen tasks and on held-out connectors or scenes. | source: [RLDG, Figure 4](https://arxiv.org/abs/2412.09858)*
+
+[Open figure at full size](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-source-figure-4.webp)
 
 The paired comparison keeps the task, observation and action spaces, training configuration, and number of successful episodes fixed; only the data source changes. On precise FMB Insertion and Connector Insertion, OpenVLA gains 33 and 23 percentage points over its human-data counterpart, while Octo gains 10 and 37 points. For Pick and Place, OpenVLA moves from 16/20 to 19/20 successes and Octo from 1/20 to 4/20. The improvement transfers: OpenVLA is more than twice as successful on unseen Connector Insertion, and Octo rises from 0/20 to 4/20 on unseen Pick and Place.
 
@@ -41,6 +47,8 @@ The multi-stage result is the most useful deployment pattern. Combining RL data 
 
 ![Figure 6 from RLDG: cycle time for specialist and distilled policies](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-source-figure-6.webp)
 *Fig 3: Cycle time compares RL specialists, human-data generalists, and RLDG generalists; missing bars indicate a policy was not trained for that whole task or recorded no successes. | source: [RLDG, Figure 6](https://arxiv.org/abs/2412.09858)*
+
+[Open figure at full size](/assets/images/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning-source-figure-6.webp)
 
 ### The gain is mostly action quality, with a real trade-off
 

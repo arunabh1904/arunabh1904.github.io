@@ -32,6 +32,8 @@ The source figure traces the additional input from retrieved map to BEV attentio
 ![SMERF source Figure 2 shows road polyline and road-type encoding followed by transformer map attention into a camera BEV model](/assets/images/smerf-source-figure-2.png)
 *Fig 1: Polyline geometry and road-type labels become map tokens. BEV queries consult those tokens alongside image features before the unchanged lane-topology decoder predicts the scene. | source: [SMERF, Figure 2](https://arxiv.org/abs/2311.04079)*
 
+[open full-size figure](/assets/images/smerf-source-figure-2.png)
+
 ### Geometry and road type become one token per polyline
 
 The system retrieves OpenStreetMap data around the ego vehicle and transforms it into ego coordinates using position and heading. It samples 11 points per polyline, normalizes coordinates to the BEV range, and applies sine/cosine embeddings. Road types contribute one-hot semantic features, including pedestrian, highway, residential, service, bus-way, truck-road, and a catch-all category.

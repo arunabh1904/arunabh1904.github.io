@@ -31,6 +31,8 @@ On nuScenes, GPT-Driver reaches average L2 0.44 m and collision 0.17% under the 
 
 The experiment is best understood as a planner-interface test rather than end-to-end visual driving. GPT-Driver receives detections, predicted object motion, ego state, history, and a mission goal that have already been structured by upstream systems. Its contribution is to serialize those facts, reason about critical objects, and emit six waypoints; any failure in perception or prediction is inherited before the language model gets to plan.
 
+The benchmark boundary is equally specific. The paper uses roughly 1,000 nuScenes scenarios and about 40,000 key frames, splits the scenarios into training, validation, and testing sets, fine-tunes on the training split, and reports the main comparison on validation. Its three-second evaluation computes waypoint L2 error and collision rate by placing an ego box at each predicted waypoint against the logged ground-truth boxes. The authors could not measure GPT inference time through the OpenAI API, and they leave closed-loop evaluation for future work, so the reported gains do not establish real-time or free-running safety.
+
 The overview places perception before the language interface. Its inputs are already structured scene facts, so the model is being tested as a planner rather than asked to discover objects directly in pixels.
 
 ![Figure 1: Overview of GPT-Driver from GPT-Driver: Learning to Drive with GPT](/assets/images/gpt-driver-learning-to-drive-with-gpt-paper-figure.png)

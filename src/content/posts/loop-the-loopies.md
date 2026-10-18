@@ -43,6 +43,8 @@ $$
 ![Source comparison of layer-loop and whole-model recurrence schedules](/assets/images/loopie-layer-loop-vs-model-loop.png)
 *Fig 1: Layer-loop finishes repeated applications within one stored block before moving onward. Whole-model recurrence returns to earlier blocks after traversing the stack, changing where repeated computation sits in the execution schedule. | source: [Loopie paper](https://arxiv.org/abs/2607.16051)*
 
+[Open figure at full size](/assets/images/loopie-layer-loop-vs-model-loop.png)
+
 Read the diagram as an execution order, not as extra independent weights. Reusing a block twice means applying the same transformation to two different intermediate states. It creates additional computation while tying the parameters across those effective depths.
 
 Both schedules reuse parameters across effective depth, but layer-loop keeps repeated applications adjacent. That shortens the reuse distance for weights and gradients, keeps the repetitions inside one pipeline stage, and shares a block across neighboring effective depths rather than positions separated by a full model traversal. In a 6B-A0.6B experiment, layer-loop initially trails model-loop but passes it after roughly 1.2 trillion tokens.
@@ -76,6 +78,8 @@ Figure 5 compares the reported layer-loop variant with an ablation that the auth
 
 ![Loopie source Figure 5 comparing downstream score against pretraining tokens for the recurrence ablation](/assets/images/loop-the-loopies-source-figure-5.webp)
 *Fig 2: The horizontal axis counts training tokens. The upper curve reaches comparable benchmark scores earlier, which is a sample-efficiency comparison rather than a direct measurement of inference or training throughput. | source: [Loopie, Figure 5](https://arxiv.org/abs/2607.16051)*
+
+[Open figure at full size](/assets/images/loop-the-loopies-source-figure-5.webp)
 
 The plot's “2.14× speedup” annotation marks a horizontal separation at a chosen score; it should not be read as a universal wall-clock multiplier. There is also a source labeling inconsistency: the legend says 5B while the caption and surrounding discussion describe 6B-A0.6B. The qualitative comparison is visible, but that inconsistency limits precise attribution of the plotted configuration.
 

@@ -26,6 +26,8 @@ InternVL3.5 is easier to understand as three coupled control loops. The first co
 ![InternVL3.5 training recipe](/assets/images/internvl3-5-reasoning-and-efficiency-source-figure-3.webp)
 *Fig 1: InternVL3.5 uses roughly 250B pre-training tokens, 130B SFT tokens, and a 270K-sample Cascade RL stage; InternVL3.5-Flash adds roughly 30B-token visual consistency and router training. | source: [InternVL3.5, Figure 3](https://arxiv.org/abs/2508.18265)*
 
+[Open figure at full size](/assets/images/internvl3-5-reasoning-and-efficiency-source-figure-3.webp)
+
 Cascade RL addresses a practical problem with multimodal reinforcement learning. Offline RL is efficient because rollouts can be reused, but it can plateau; online RL can improve the policy but is expensive and unstable. InternVL3.5 uses MPO as an offline warm-up, combining preference, quality, and generation losses, then uses GSPO online without a reference-model constraint. The warm-up matters mechanically: it supplies higher-quality rollouts to the online stage, so GSPO starts from a policy that already has useful answers instead of spending its budget discovering them.
 
 The ablation is stronger than the headline. On the 8B model, the SFT checkpoint averages 53.6 over the paper's reasoning set, MPO reaches 56.3, and Cascade RL reaches 60.3. For InternVL3.5-241B-A28B, the corresponding numbers are 60.4, 62.4, and 66.9. The efficiency comparison gives the tradeoff: on the same 8B setup, MPO costs about 0.3K GPU hours for 56.3, GSPO needs about 5.5K hours for 57.3 after one episode and 11.0K for 58.2 after two, while Cascade RL reaches 60.3 at about 5.8K hours. This is not a universal cost law, but it explains why the authors put offline RL before online RL.
@@ -36,6 +38,8 @@ The second loop is ViR. In standard InternVL3.5, each image patch becomes 1,024 
 
 ![InternVL3.5 overall capability comparison](/assets/images/internvl3-5-reasoning-and-efficiency-source-figure-1.webp)
 *Fig 2: InternVL3.5 scores are averaged across general multimodal, reasoning, text, and agentic benchmarks; hatched bars are closed-source models. This figure is a breadth comparison, not a single-task causal ablation. | source: [InternVL3.5, Figure 1](https://arxiv.org/abs/2508.18265)*
+
+[Open figure at full size](/assets/images/internvl3-5-reasoning-and-efficiency-source-figure-1.webp)
 
 The Flash table shows the quality cost of this allocation. For 8B, Flash's overall score is 79.8 versus 80.2 for InternVL3.5; at 38B it is 83.4 versus 83.9, and at the 241B MoE scale it is 84.5 versus 85.0. On high-resolution DocVQA, 8B Flash scores 91.9 versus 92.3, while InfoVQA is 76.0 versus 76.2. The model spends full resolution where the evidence is dense, then compresses elsewhere. The 50% visual-token reduction is therefore paired with a performance comparison, not presented as a free architectural shortcut.
 

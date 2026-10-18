@@ -27,11 +27,15 @@ XCoT does not ask a language model to invent a free-form explanation and hope th
 ![XCoT training-data construction pipeline](/assets/images/xcot-vla-executable-chain-of-thought-for-vision-language-action-driving-source-figure-2.webp)
 *Fig 1: The pipeline extracts longitudinal and lateral evidence, assigns causal scene semantics, and compresses the resulting Reason–Action pair into executable tokens such as LEFT_TURN_PREPARE, DECELERATE, and RED_LIGHT_HOLD. | source: [XCoT-VLA, Figure 2](https://arxiv.org/abs/2608.10976)*
 
+[Open figure at full size](/assets/images/xcot-vla-executable-chain-of-thought-for-vision-language-action-driving-source-figure-2.webp)
+
 That construction makes the intermediate representation action-facing. A token is useful only if it says something the trajectory generator can execute. It also makes the data recipe central: 3.1 million general samples receive automatic Reason–Action labels, 200,000 complex samples receive human annotations, and 320,000 targeted lane-change samples use rule-based labels. The lane-change slice is therefore both an ablation target and a deliberate source of supervision, so its gains should not be read as a pure test of general reasoning.
+
+Stage I jointly trains the Reason and Control FFN branches with teacher-forced XCoT labels and flow matching. The optional Stage II XCPO update freezes the visual front end, shared self-attention, Control FFN, and trajectory head, and updates only the Reason FFN and XCoT head; this version reports no quantitative XCPO result. The reported planning metrics are route-aligned ADE/FDE over six seconds on open-loop sets, while the 12 Hz analysis covers only the reasoning interface.
 
 ### Deterministic routing gives reasoning and control different jobs
 
-At each step, the model autoregressively predicts a short XCoT sequence (z_t). The sequence remains in the multimodal context and conditions 24 trajectory queries, which a flow-matching decoder turns into a six-second motion sequence. All non-trajectory tokens use a Reason FFN, while trajectory queries use a Control FFN after shared multimodal self-attention. This is a small architectural distinction with a useful intuition: semantic tokens can encode “why now,” while the control branch remains responsible for “where and how far.”
+At each step, the model autoregressively predicts a short XCoT sequence $z_t$. The sequence remains in the multimodal context and conditions 24 trajectory queries, which a flow-matching decoder turns into a six-second motion sequence. All non-trajectory tokens use a Reason FFN, while trajectory queries use a Control FFN after shared multimodal self-attention. This is a small architectural distinction with a useful intuition: semantic tokens can encode “why now,” while the control branch remains responsible for “where and how far.”
 
 The separation also protects the action head during fine-tuning. In the training-stability table, joint XCoT fine-tuning raises six-second longitudinal ADE from 1.2997 to 1.6005 and two-second longitudinal ADE from 0.2774 to 1.1684. Decoupled fine-tuning keeps two-second longitudinal ADE at 0.2766 and improves six-second lateral ADE from 0.2302 to 0.1872. It still leaves a long-horizon longitudinal weakness, so the mechanism is a stability trade rather than a free improvement.
 
@@ -43,6 +47,8 @@ On the general-distribution set, XCoT-VLA lowers ADE-6s-Long from 1.6452 for tra
 
 ![Qualitative XCoT versus trajectory-only SFT planning](/assets/images/xcot-vla-executable-chain-of-thought-for-vision-language-action-driving-source-figure-4.webp)
 *Fig 2: The four open-loop cases show XCoT producing earlier lane changes, traffic-light compliance, and efficiency-oriented maneuvers relative to trajectory-only SFT. These are representative cases, not a closed-loop safety evaluation. | source: [XCoT-VLA, Figure 4](https://arxiv.org/abs/2608.10976)*
+
+[Open figure at full size](/assets/images/xcot-vla-executable-chain-of-thought-for-vision-language-action-driving-source-figure-4.webp)
 
 The efficiency claim is also scoped. On an H100, the reasoning-interface estimate is 38.6–66.3 ms for two to six XCoT tokens across the reported input lengths, versus 279.1–306.8 ms for a 40–80-token verbose-CoT interface. The estimate includes time to first token and 3.25 ms per decoded token, but excludes perception preprocessing, trajectory postprocessing, and full-stack scheduling. The paper therefore establishes a compact open-loop interface, not yet a demonstrated closed-loop driving advantage.
 

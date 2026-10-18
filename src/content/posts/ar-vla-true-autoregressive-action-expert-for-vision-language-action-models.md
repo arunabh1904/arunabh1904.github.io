@@ -30,11 +30,15 @@ summary: '2026 – AR-VLA: True Autoregressive Action Expert for Vision-Language
 That distinction matters in the paper’s matched BridgeV2 experiment. With the same PaliGemma-3B backbone and roughly 300M-parameter action module, AR-VLA reaches 61.5% average success in SIMPLER, versus 49.0% for the reproduced FAST-token head and 51.0% for the reproduced flow-matching head. Its advantage is not universal: Diffusion Policy remains better on PushT, and ACT is better on human-demonstration ALOHA insertion.
 
 
-![Figure 3 from AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-source-figure-3.webp)
+![Figure 3 from AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-source-figure-3-readable.png)
 *Fig 1: AR-VLA connects a vision-language backbone to an autoregressive action expert that runs asynchronously, separating semantic reasoning from continuous action generation. | source: [AR-VLA, Figure 3](https://arxiv.org/abs/2603.10126)*
 
-![Figure 5 from AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-source-figure-5.webp)
+[Open figure at full size](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-source-figure-3-readable.png)
+
+![Figure 5 from AR-VLA: True Autoregressive Action Expert for Vision-Language-Action Models](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-source-figure-5-readable.png)
 *Fig 2: Simulation benchmark setups span generalist and specialist policies with different embodiments, action spaces, and task demands. | source: [AR-VLA, Figure 5](https://arxiv.org/abs/2603.10126)*
+
+[Open figure at full size](/assets/images/ar-vla-true-autoregressive-action-expert-for-vision-language-action-models-source-figure-5-readable.png)
 
 
 ### Re-anchoring makes stale perception usable

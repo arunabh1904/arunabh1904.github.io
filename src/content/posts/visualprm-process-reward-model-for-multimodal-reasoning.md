@@ -36,8 +36,10 @@ The data and evaluation sets answer different questions, which the source figure
 
 ![Examples from VisualPRM400K automatic supervision and VisualProcessBench human step labels](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-2.webp)
 *Fig 1: VisualPRM400K attaches Monte Carlo expected-accuracy labels to generated solution steps, while VisualProcessBench contains human correctness judgments for evaluating critics. | source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning, Figure 2](https://arxiv.org/abs/2503.10291)*
+[Open figure at full size](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-2.webp)
 
 VisualProcessBench contains 2,866 samples and 26,950 human step labels drawn from MMMU, MathVista, MathVision, MathVerse’s Vision-Only split, DynaMath, and WeMath. The benchmark includes incorrect steps throughout a solution, not only the first error, and reports macro F1 over correct and incorrect step judgments, with an overall micro average across data sources. That makes it a test of critic discrimination rather than a proxy for final answer accuracy.
+The labels were produced by 13 human annotators over 39 person-days, with positive, negative, and neutral labels; the authors spot-checked roughly 10% of each split and sent inconsistent splits back for re-annotation. This annotation cost and review protocol are part of what makes the benchmark more informative than a final-answer-only score.
 
 ### Value and advantage labels ask different process questions
 
@@ -47,6 +49,7 @@ The source schematic below compares the two process-modeling choices:
 
 ![Value-based and advantage-based process reward modeling](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-3.png)
 *Fig 2: Value-based and advantage-based process reward modeling compare expected correctness with step-to-step improvement. | source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning, Figure 3](https://arxiv.org/abs/2503.10291)*
+[Open figure at full size](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-3.png)
 
 At inference, VisualPRM reads all steps and produces a score for each in one forward pass by using a “+” placeholder and the probability of generating it. For Best-of-$N$, a policy samples candidate solutions at temperature 0.7 and the critic aggregates their step scores to select one response. The main experiments use $N=8$ and evaluate MMMU, MathVista, MathVision, MathVerse-VO, DynaMath, WeMath, and LogicVista.
 
@@ -56,6 +59,7 @@ The source Figure 1 compares pass@1 with Best-of-8 under an open-source critic a
 
 ![Best-of-8 multimodal reasoning results with different policy and critic models](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-1.webp)
 *Fig 3: Best-of-8 results with an open-source critic and VisualPRM across policy-model families and scales. | source: [VisualPRM: An Effective Process Reward Model for Multimodal Reasoning, Figure 1](https://arxiv.org/abs/2503.10291)*
+[Open figure at full size](/assets/images/visualprm-process-reward-model-for-multimodal-reasoning-source-figure-1.webp)
 
 The reported Best-of-8 gains are 8.0 points for MiniCPM-V2.6, 3.7 for QwenVL2.5-7B, 8.4 for InternVL2.5-8B, 8.9 for InternVL2.5-26B, 6.3 for InternVL2.5-38B, and 5.9 for InternVL2.5-78B. The critic therefore adds value through ranking, not by making the policy generate a better single sample.
 

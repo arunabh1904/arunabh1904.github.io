@@ -31,6 +31,8 @@ The source planning panel starts with a real observation at the top. The blue re
 ![MuZero source Figure 1A: representation creates the root and learned dynamics expands hypothetical actions](/assets/images/muzero-source-figure-1a-planning.png)
 *Fig 1: The real observation initializes the search once. Dynamics advances latent states under hypothetical actions, while policy and value predictions guide search. Cropped from the source planning panel. | source: [MuZero, Figure 1A](https://arxiv.org/abs/1911.08265)*
 
+[Open figure at full size](/assets/images/muzero-source-figure-1a-planning.png)
+
 This reduces what the model must preserve, but also narrows what it has demonstrated. A model trained for one reward and action space is not automatically an interpretable simulator or a reliable predictor under a changed objective. The original dynamics function is deterministic; explicit stochastic transitions are left for future work.
 
 ### Search improves the targets that the model later learns
@@ -55,6 +57,8 @@ The Go experiment increases thinking time far beyond the training search budget 
 
 ![MuZero source Figure 3B: Atari performance against the number of search simulations at evaluation](/assets/images/muzero-source-figure-3b-search-budget.png)
 *Fig 2: Atari's aggregate score improves modestly and levels off around 100 simulations. The learned policy already performs well with one simulation; additional search has diminishing value. Cropped from the source ablation. | source: [MuZero, Figure 3B](https://arxiv.org/abs/1911.08265)*
+
+[Open figure at full size](/assets/images/muzero-source-figure-3b-search-budget.png)
 
 Read the nearly flat right side as a deployment trade-off: more search calls do not buy proportionate improvement. The authors suggest greater model inaccuracy as one explanation. Strong performance with one simulation is also consistent with the policy head internalizing useful search behavior during training. This does not imply that search was unnecessary for producing that policy.
 

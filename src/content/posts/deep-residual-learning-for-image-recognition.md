@@ -34,6 +34,8 @@ The left panel below shows the deeper plain network staying above the shallower 
 ![ImageNet training and validation curves for plain and residual networks](/assets/images/resnet-source-figure-4-training.png)
 *Fig 1: Increasing depth hurts the plain network's training fit but helps its residual counterpart; these shortcuts add no trainable parameters in the matched comparison. | source: [Deep Residual Learning, Figure 4](https://arxiv.org/abs/1512.03385)*
 
+[open full-size figure](/assets/images/resnet-source-figure-4-training.png)
+
 | ImageNet model | Plain top-1 error | Residual top-1 error | Evaluation |
 | --- | ---: | ---: | --- |
 | 18 layers | 27.94% | 27.88% | Validation, ten crops |
@@ -62,6 +64,8 @@ The figure compares a two-layer residual branch with the three-layer bottleneck 
 ![Basic and bottleneck residual blocks](/assets/images/resnet-source-figure-5-bottleneck.png)
 *Fig 2: The bottleneck narrows channels before the spatial convolution and restores them before addition, allowing more weighted layers at manageable compute. | source: [Deep Residual Learning, Figure 5](https://arxiv.org/abs/1512.03385)*
 
+[open full-size figure](/assets/images/resnet-source-figure-5-bottleneck.png)
+
 For this illustrated block, ignoring biases and normalization, the three convolutions use $256\times64 + 9\times64^2 + 64\times256 = 69{,}632$ weights. A wide $256\rightarrow256$ shortcut projection alone would add $65{,}536$. That is why keeping ordinary shortcuts as identities matters especially in bottleneck networks: projecting the wide bypass can cost nearly as much as the entire residual branch.
 
 ResNet-50 uses 3, 4, 6, and 3 bottleneck blocks across its four stages. With three convolutions per block, the initial convolution, and the final classifier, this gives 50 weighted layers. ResNet-152 increases the stage counts to 3, 8, 36, and 3. It uses 11.3 billion multiply-adds in the paper's accounting, versus VGG-19's 19.6 billion; layer count alone is a poor estimate of computational cost.
@@ -74,6 +78,8 @@ The CIFAR-10 experiment pushes the argument beyond a convenient depth range. Acr
 
 ![CIFAR-10 depth comparison including the 1202-layer residual network](/assets/images/resnet-source-figure-6-cifar.png)
 *Fig 3: Residual networks improve with depth through 110 layers, but the 1,202-layer model fits training data while performing worse on the test set. | source: [Deep Residual Learning, Figure 6](https://arxiv.org/abs/1512.03385)*
+
+[open full-size figure](/assets/images/resnet-source-figure-6-cifar.png)
 
 The 1,202-layer network reaches below 0.1% training error, yet its test error is 7.93%. The 110-layer network's best test error is 6.43%, with 6.61% ± 0.16 across five runs. The authors attribute the deeper model's worse test result to overfitting: it has 19.4M parameters against 1.7M, on a 50,000-image training set. These experiments use basic crop/flip augmentation, weight decay, and no dropout. Residual learning made the large model optimizable; it did not supply the regularization needed to make that capacity worthwhile.
 

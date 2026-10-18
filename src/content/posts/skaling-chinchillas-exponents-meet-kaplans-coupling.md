@@ -68,12 +68,16 @@ Farseer contains 404 runs from 100M to 6.4B parameters plus seven larger far-ext
 ![Skaling source Figure 1 comparing residual patterns and per-configuration error ratios](/assets/images/skaling-chinchillas-exponents-meet-kaplans-coupling-source-figure-1.webp)
 *Fig 1: Opposite error signs occupy different corners under the additive fit. Skaling reduces this structured bias; the right panel compares error magnitudes, where red favors Skaling rather than indicating positive prediction error. | source: [Skaling, Figure 1](https://arxiv.org/abs/2608.07222)*
 
+[Open figure at full size](/assets/images/skaling-chinchillas-exponents-meet-kaplans-coupling-source-figure-1.webp)
+
 The first two panels share a signed-error scale, while the third uses an error-ratio scale. Read the corner pattern before the average: a model can fit the middle well while systematically missing configurations with too much data for their size, or too little. Random interior holdouts may not expose the decision that matters for a larger run.
 
 The full Farseer far corner is nearly tied. The stronger result is consistency across imbalanced boundaries and under sparse profiling. The L-shaped design sweeps tokens only for the smallest models and model size only at short training horizons. Table 1's fitting-grid costs fall from $5.0\times10^{22}$ to $5.1\times10^{21}$ FLOPs on Farseer, about 9.8-fold, and from $3.1\times10^{21}$ to $6.5\times10^{20}$ on SK-Grid, about 4.8-fold. Skaling stays near or below full-grid Chinchilla error in most reported regimes; a universal tenfold saving would overstate the second grid.
 
 ![Skaling source Figure 4 showing random versus L-shaped training grids and held-out extrapolation regions](/assets/images/skaling-source-figure-4-grid-design.png)
 *Fig 2: Blue L-shaped edges reserve training for cheap configurations; the upper-right interior is held out. The evaluation panel separately tests larger models, longer training, and the far corner. | source: [Skaling, Figure 4](https://arxiv.org/abs/2608.07222)*
+
+[Open figure at full size](/assets/images/skaling-source-figure-4-grid-design.png)
 
 The L does not recover every possible two-dimensional surface. It works here because the chosen functional form supplies a strong assumption about how edge trends combine. Its success must therefore be measured on the expensive held-out region, not inferred from how neatly it fits the edges.
 

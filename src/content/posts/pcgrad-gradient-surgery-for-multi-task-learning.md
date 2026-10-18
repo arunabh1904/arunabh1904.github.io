@@ -45,6 +45,8 @@ The source figure traces the same operation. Panel (b) modifies the blue gradien
 ![PCGrad source Figure 2: conflicting gradients, each projection, and an unchanged nonconflicting pair](/assets/images/pcgrad-gradient-surgery-for-multi-task-learning-paper-figure.webp)
 *Fig 1: Panels (b) and (c) remove each gradient's conflicting component relative to the other. Panel (d) preserves a nonconflicting pair, allowing constructive transfer rather than forcing all task gradients to be orthogonal. | source: [PCGrad, Figure 2](https://arxiv.org/abs/2001.06782)*
 
+[View figure at full size](/assets/images/pcgrad-gradient-surgery-for-multi-task-learning-paper-figure.webp)
+
 With many tasks, sequential projections depend on order. A later projection can change an earlier relationship, so this is not a simultaneous solution to every pairwise constraint. Random shuffling makes the treatment symmetric in expectation. The MT50 appendix ablation performs worse with a fixed task order, supporting that implementation choice.
 
 ### Direction and magnitude both matter in the robot experiments
@@ -57,6 +59,8 @@ The rightmost panel asks what caused the gain. One ablation keeps only the corre
 
 ![PCGrad source Figure 3: MT10 and MT50 learning curves and direction-versus-magnitude ablations](/assets/images/pcgrad-gradient-surgery-for-multi-task-learning-source-figure-3.webp)
 *Fig 2: The left panels measure success against environment samples. The right panel separates direction and magnitude changes; retaining both performs better than either ablation in this MT10 experiment. | source: [PCGrad, Figure 3](https://arxiv.org/abs/2001.06782)*
+
+[View figure at full size](/assets/images/pcgrad-gradient-surgery-for-multi-task-learning-source-figure-3.webp)
 
 ### Better joint results can still include a regression
 

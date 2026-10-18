@@ -30,16 +30,20 @@ DINOv3 ViT-S/16 is frozen and its multi-level features are upsampled through an 
 ![DinoRADE radar-camera architecture with spectral radar processing and local cross-attention](/assets/images/dinorade-full-spectral-radar-camera-fusion-paper-figure.webp)
 *Fig 1: DinoRADE preserves the radar BEV stream, samples DINOv3 features around projected 3D queries, and adaptively fuses the two modalities before a CenterPoint head; this is the paper’s Figure 1. | source: [DinoRADE: Full Spectral Radar-Camera Fusion with Vision Foundation Model Features for Multi-class Object Detection in Adverse Weather, Figure 1](https://arxiv.org/abs/2604.08074)*
 
+[Open the full-size source figure](/assets/images/dinorade-full-spectral-radar-camera-fusion-paper-figure.webp)
+
 ### Local alignment is a better use of a vision foundation model
 
 The cross-attention offsets are learned around a calibrated reference, which gives the model room for imperfect projection, object extent, and annotation noise without discarding geometry. A gated adaptive fusion then lets the radar feature dominate when the image is unreliable. The ablation makes this ordering visible on K-RADAR v2.1: radar-only scores 61.65 3D AP / 66.68 BEV AP; adding camera features reaches 69.61 / 74.96; adding the learned weighted lift reaches 71.38 / 75.32. Replacing DINOv3 with a fine-tuned ResNet-50 gives 68.43 / 72.42, so the comparison supports the feature choice under this training recipe, not a universal foundation-model advantage.
 
 ### Read the headline through the dataset split
 
-The sedan-only K-RADAR v1.1 comparison reports 70.8 total 3D AP for DinoRADE, 12.1 points above the strongest listed radar-camera result. The broader v2.1 table reports 36.99 3D mAP and 39.61 BEV mAP across Sedan, Bus/Truck, Pedestrian, Bicycle, and Motorcycle. Motorcycle reaches only 3.77 AP and Bicycle 21.89, while the authors note that some vulnerable-road-user cells contain fewer than 2% of training objects and that annotations can be missing.
+The sedan-only K-RADAR v1.1 comparison reports 70.8 total 3D AP for DinoRADE, 12.1 points above the strongest listed radar-camera result. The broader v2.1 table reports 36.99 3D mAP and 39.61 BEV mAP across Sedan, Bus/Truck, Pedestrian, Bicycle, and Motorcycle. The source evaluates about 35,000 synchronized radar-camera frames with the official KITTI protocol; seven box labels exist, but the table excludes the severely underrepresented Pedestrian Group and Bicycle Group labels. Motorcycle reaches only 3.77 AP and Bicycle 21.89, while the authors note that some vulnerable-road-user cells contain fewer than 2% of training objects and that annotations can be missing.
 
 ![DinoRADE occlusion examples](/assets/images/dinorade-full-spectral-radar-camera-fusion-source-figure-4.webp)
 *Fig 2: The source’s Figure 4 shows partially, heavily, and fully occluded examples, the cases where radar’s metric support is most valuable. | source: [DinoRADE: Full Spectral Radar-Camera Fusion with Vision Foundation Model Features for Multi-class Object Detection in Adverse Weather, Figure 4](https://arxiv.org/abs/2604.08074)*
+
+[Open the full-size source figure](/assets/images/dinorade-full-spectral-radar-camera-fusion-source-figure-4.webp)
 
 The headline result should therefore be read as two related tests: a controlled sedan comparison on v1.1 and a five-class, weather-diverse evaluation on v2.1. They do not share exactly the same label space or difficulty. Weather and class slices are essential before deciding whether the system improves a deployed stack, especially when the camera gate may help one regime and hide another.
 

@@ -31,6 +31,8 @@ The word “apparent” is doing real work. Annotators identify the visible road
 ![CAViAR structured questions for one accident video](/assets/images/caviar-causal-question-answering.webp)
 *Fig 1: One dashcam sequence is annotated with environmental MCQs, accident type, dense captions, apparent agent roles, and an apparent rule-violation category. | source: [CAViAR, Figure 1](https://arxiv.org/abs/2608.19380)*
 
+[Open figure at full size](/assets/images/caviar-causal-question-answering.webp)
+
 Two primary annotators produce labels and two reviewers check cross-field consistency. GPT-4 is used only to normalize grammar under an instruction not to add or change facts; human labels remain the source of truth. This makes the dataset useful for grounding research, while the absence of formal independent agreement means that the labels should not be treated as an adjudication standard.
 
 ### Perceptual recognition and responsibility reasoning separate sharply
@@ -39,6 +41,8 @@ The benchmark evaluates Cosmos-Reason2, Qwen3-VL, and InternVL3 at 2B and 8B sca
 
 ![CAViAR accident-type confusion matrices](/assets/images/caviar-a-causal-video-dataset-for-fine-grained-accident-reasoning-in-real-world-scenarios-source-figure-2.webp)
 *Fig 2: Row-normalized accident-type confusion matrices aggregated over the six base and fine-tuned models at 16 FPS; each regime contains N=4,494 predictions. Both collapse toward Rear-End and rarely recover Side-by-Side or Head-on. | source: [CAViAR, Figure 2](https://arxiv.org/abs/2608.19380)*
+
+[Open figure at full size](/assets/images/caviar-a-causal-video-dataset-for-fine-grained-accident-reasoning-in-real-world-scenarios-source-figure-2.webp)
 
 The separation is visible in Table 5. Averaged over the six model configurations, lighting accuracy is 98.6% for base and 98.7% after fine-tuning. Weather is 58.4%/62.6%, road condition 65.3%/74.0%, and accident type 33.1%/35.4%. Accident-type macro-F1 is only 18.6%/21.1%, showing that raw accuracy is mostly a class-prior measure. On open-ended responsibility, the best apparent-at-fault score is 2.27/5 and the best affected-agent score is 2.70/5; rule violation is weaker still, peaking at 0.82/5. A model can name a relevant vehicle while failing to connect the agent, action, and rule.
 

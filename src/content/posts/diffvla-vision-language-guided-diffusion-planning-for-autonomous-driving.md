@@ -36,6 +36,7 @@ Read the figure left to right. The upper branch explains the semantic condition,
 ![Figure 1 from DiffVLA showing the perception-enhanced diffusion VLA framework](/assets/images/diffvla-vision-language-guided-diffusion-planning-for-autonomous-driving-paper-figure.png)
 *Fig 1: Shows DiffVLA's perception-enhanced diffusion VLA framework, where vision-language guidance and agent-map context condition trajectory diffusion. | source: [DiffVLA paper, Figure 1](https://arxiv.org/abs/2505.19381)*
 
+[Open figure at full size](/assets/images/diffvla-vision-language-guided-diffusion-planning-for-autonomous-driving-paper-figure.png)
 
 ## High-Level Takeaways
 

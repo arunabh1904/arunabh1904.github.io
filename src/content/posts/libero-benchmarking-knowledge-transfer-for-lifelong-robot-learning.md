@@ -28,6 +28,8 @@ summary: "2023 – LIBERO: Benchmarking Knowledge Transfer for Lifelong Robot Le
 ![LIBERO's four task suites separate spatial, object, goal, and entangled knowledge transfer](/assets/images/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning-paper-figure.png)
 *Fig 1: The benchmark contains three ten-task suites that isolate spatial, object, and goal changes, plus LIBERO-100 with entangled transfer; the lower panel maps these suites to five lifelong-learning questions. | source: [LIBERO, Figure 1](https://arxiv.org/abs/2306.03310)*
 
+[Open figure at full size](/assets/images/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning-paper-figure.png)
+
 LIBERO-SPATIAL, LIBERO-OBJECT, and LIBERO-GOAL each contain ten tasks. Spatial tasks reuse the objects and goal while changing relationships; Object tasks request a new object; Goal tasks keep objects and layout fixed while changing the desired behavior. LIBERO-100 contains 100 mixed tasks, split in this paper into 90 short-horizon LIBERO-90 tasks for pretraining and 10 long-horizon LIBERO-LONG tasks for downstream lifelong learning. Together the four suites contain 130 standardized, language-conditioned tasks with 50 teleoperated trajectories per task.
 
 This decomposition gives a useful diagnostic. A policy can fail because it cannot remember a new object, because it cannot preserve a previously learned manipulation, or because its action repertoire does not transfer to a new goal. A single average success rate hides those causes.
@@ -36,6 +38,8 @@ This decomposition gives a useful diagnostic. A policy can fail because it canno
 
 ![LIBERO's procedural pipeline maps activity language to a scene, initial state, and PDDL goal](/assets/images/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning-source-figure-2.webp)
 *Fig 2: Task generation extracts behavioral templates from Ego4D language, chooses a compatible Robosuite scene, and writes PDDL for object placement, initial status, and the predicates that terminate the task. | source: [LIBERO, Figure 2](https://arxiv.org/abs/2306.03310)*
+
+[Open figure at full size](/assets/images/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning-source-figure-2.webp)
 
 The generator has three linked decisions. First, language annotations from Ego4D are summarized into templates such as “Open …” and combined with simulator objects to produce an instruction. Second, a scene and initial state $\mu_0$ are written in PDDL, including object categories, placements, and statuses. Third, the goal $g$ is a conjunction of predicates such as $\operatorname{Open}(X)$, $\operatorname{TurnOff}(X)$, $\operatorname{On}(A,B)$, or $\operatorname{In}(A,B)$. The episode ends when all goal predicates are true.
 
@@ -46,7 +50,11 @@ That construction keeps the language, scene, and success condition tied together
 ![LIBERO's FWT, NBT, and AUC metrics expose forward transfer, forgetting, and overall sequential performance](/assets/images/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning-source-figure-3.webp)
 *Fig 3: The metrics track how quickly a policy learns the current task, how much success drops on earlier tasks, and the combined area under the sequential success curve. | source: [LIBERO, Figure 3](https://arxiv.org/abs/2306.03310)*
 
+[Open figure at full size](/assets/images/libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning-source-figure-3.webp)
+
 For task $i$, the paper evaluates success at epochs $e\in\{0,5,\ldots,50\}$ and selects the best current-task checkpoint. Forward transfer (FWT) averages all eleven evaluation points on the current task's learning curve, holding the values after the best checkpoint at that checkpoint's score. Higher FWT therefore rewards faster acquisition without penalizing later fluctuations past the selected checkpoint. Negative backward transfer (NBT) measures the drop on previously seen tasks, so lower means less forgetting. AUC combines current-task learning and retention, so higher is better overall. The metrics are computed from success rate rather than training loss because manipulation loss is a weak proxy for task completion.
+
+The protocol is deliberately small and repeated: each checkpoint is evaluated on 20 test rollouts of at most 600 environment steps, and the reported means and standard errors average three seeds (100, 200, and 300). The lifelong runs therefore compare sequential behavior under a fixed evaluation budget, rather than estimating an asymptotic success rate. Experience Replay stores up to 1,000 trajectories after each task, while PACKNET reserves 25% of parameters as the task-specific protected fraction; these implementation choices are part of the algorithm comparison.
 
 The distinction changes the algorithm ranking. With a fixed RESNET-T policy, LIBERO-LONG gives sequential fine-tuning (SEQL) FWT $0.54\pm0.01$, NBT $0.63\pm0.01$, and AUC $0.15\pm0.00$. Experience Replay (ER) trades some forward transfer for better retention: $0.48\pm0.02$, $0.32\pm0.04$, and $0.32\pm0.01$. PACKNET pushes NBT down to $0.08\pm0.01$, but FWT falls to $0.22\pm0.01$ and AUC to $0.25\pm0.00$. In the shorter LIBERO suites, PACKNET often wins AUC; on the long suite, its partitioned capacity appears to limit new learning. EWC is worse than SEQL on several suites, showing that a regularizer can protect old parameters while still harming useful adaptation.
 

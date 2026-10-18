@@ -32,7 +32,11 @@ Follow the arrows entering the decoder's middle attention block: queries come fr
 ![Original Transformer source architecture with encoder, masked decoder, and cross-attention](/assets/images/attention-is-all-you-need-paper-figure.png)
 *Fig 1: The middle decoder attention block reads encoder states through cross-attention. The lower block reads only the target prefix. Feed-forward layers transform each position after information is exchanged. | source: [Transformer, Figure 1](https://arxiv.org/abs/1706.03762)*
 
+[Open figure at full size](/assets/images/attention-is-all-you-need-paper-figure.png)
+
 The original normalization order is also visible: each sublayer computes $\mathrm{LayerNorm}(x+\mathrm{Sublayer}(x))$. This is post-normalization. It should not be silently replaced in the paper's description with the pre-normalization arrangement used by many later models.
+
+Each layer also applies the same two-layer position-wise feed-forward network independently at every position, with ReLU and $d_{ff}=2048$ between the $d_{model}=512$ input and output widths. The model shares one weight matrix across the source and target embedding tables and the pre-softmax projection, and scales embedding outputs by $\sqrt{d_{model}}$.
 
 ### Attention first chooses positions, then mixes their values
 
@@ -46,6 +50,8 @@ The scaling is about the distribution of logits and gradients. If independent qu
 
 ![Transformer source Figure 2 showing the complete scaled attention and multi-head computation](/assets/images/transformer-source-figure-2-attention.png)
 *Fig 2: The left pipeline forms, scales, and masks compatibility scores before softmax mixes values. The right repeats that computation after learned projections, concatenates head outputs, and projects them back. | source: [Transformer, Figure 2](https://arxiv.org/abs/1706.03762)*
+
+[Open figure at full size](/assets/images/transformer-source-figure-2-attention.png)
 
 ```python
 # Attention(Q, K, V) = softmax(Q @ K.T / sqrt(d_k)) @ V
@@ -119,6 +125,8 @@ Learned positional embeddings reach 25.7 development BLEU versus 25.8 for sinuso
 ### The training recipe changes how the result should be read
 
 The big model reaches 28.4 BLEU on English–German after 3.5 days on eight P100 GPUs; the base trains for about 12 hours. Published comparisons include different architectures and estimated training costs, so they demonstrate a strong practical recipe rather than a perfectly controlled hardware benchmark.
+
+The benchmark inputs also differ: WMT14 English–German has about 4.5M sentence pairs with a shared 37K BPE vocabulary, while English–French uses 36M pairs and a 32K word-piece vocabulary. Batches contain roughly 25K source and 25K target tokens, so the headline scores are tied to a particular data scale and batching rule.
 
 Checkpoint averaging is part of evaluation: five recent checkpoints for the base and 20 for the big model, followed by beam size four and a length penalty. The development ablations omit averaging. Those numbers should not be mixed with the final test scores as if they were the same protocol.
 

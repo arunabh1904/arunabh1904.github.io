@@ -46,6 +46,7 @@ $$
 
 ![Source Figure 2 from DDPM: forward noising and learned reverse denoising](/assets/images/ddpm-paper-figure-2-graphical-model.png)
 *Fig 1: The forward chain moves $x_0$ toward Gaussian noise, while the learned reverse transitions move from $x_T$ back toward a data sample; the two directions share the same timestep structure but only the reverse path is learned. | source: [Denoising Diffusion Probabilistic Models, Figure 2](https://arxiv.org/abs/2006.11239)*
+[Open figure at full size](/assets/images/ddpm-paper-figure-2-graphical-model.png)
 
 This graphical model is the useful mental split. Corruption is known, cheap, and differentiable in closed form. Learning concentrates on the conditional reverse steps, where the target noise is available because the corruption process generated it.
 
@@ -65,6 +66,7 @@ The main CIFAR-10 model uses $T=1000$, a linear $\beta_t$ schedule from $10^{-4}
 
 ![Source Figure 6 from DDPM: progressive CIFAR-10 generation across reverse time](/assets/images/denoising-diffusion-probabilistic-models-source-figure-6.webp)
 *Fig 2: Each row shows the model's estimate of the clean CIFAR-10 image at successive reverse times; broad structure appears before the final texture and edges. | source: [Denoising Diffusion Probabilistic Models, Figure 6](https://arxiv.org/abs/2006.11239)*
+[Open figure at full size](/assets/images/denoising-diffusion-probabilistic-models-source-figure-6.webp)
 
 The progressive panel is more informative than a final sample grid because it shows where the chain spends its representational work. Early reverse states recover large-scale shape and color; later states add local detail. That ordering is also why the chain can be read as progressive lossy decompression: a noisy intermediate preserves some coarse information and discards fine detail.
 
@@ -78,6 +80,7 @@ The progressive panel is more informative than a final sample grid because it sh
 
 ![Source Figure 1 from DDPM: four unconditional CelebA-HQ face samples (retained crop)](/assets/images/denoising-diffusion-probabilistic-models-source-figure-1.webp)
 *Fig 3: This retained crop shows four unconditional CelebA-HQ faces from source Figure 1; the original source figure also contains CIFAR-10 samples, which are omitted here for legibility. | source: [Denoising Diffusion Probabilistic Models, Figure 1](https://arxiv.org/abs/2006.11239)*
+[Open figure at full size](/assets/images/denoising-diffusion-probabilistic-models-source-figure-1.webp)
 
 The training-set versus test-set FID distinction is material. It prevents the headline 3.17 from being read as a universal estimate of generalization, and it makes the later sampler and evaluation improvements easier to compare honestly. The original paper’s strongest contribution is the combination of a simple corruption process, a stable noise target, and a reverse chain that produced competitive samples without adversarial training.
 

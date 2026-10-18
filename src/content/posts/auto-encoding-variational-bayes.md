@@ -47,7 +47,9 @@ This decomposition makes the trade-off explicit. The decoder must explain the ob
 ![Source Figure 2 from Auto-Encoding Variational Bayes: lower-bound optimization against wake-sleep](/assets/images/auto-encoding-variational-bayes-source-figure-2.webp)
 *Fig 1: Across MNIST and Frey Face latent dimensions, the AEVB curves rise to a better variational bound faster than wake-sleep; the plot is evidence about optimization, not a sample-quality ranking. | source: [Auto-Encoding Variational Bayes, Figure 2](https://arxiv.org/abs/1312.6114)*
 
-The plot makes the amortization claim concrete. One encoder is updated for every minibatch, rather than running a separate iterative inference procedure for each example. On MNIST the comparison spans $N_z=3,5,10,20,200$; on Frey Faces it spans $N_z=2,5,10,20$. The extra latent coordinates do not visibly cause the bound to overfit in these experiments, which the paper attributes to the KL regularizer.
+[Open figure at full size](/assets/images/auto-encoding-variational-bayes-source-figure-2.webp)
+
+The plot makes the amortization claim concrete. One encoder is updated for every minibatch, rather than running a separate iterative inference procedure for each example. The encoder and decoder use 500 hidden units on MNIST and 200 on Frey Faces. On MNIST the comparison spans $N_z=3,5,10,20,200$; on Frey Faces it spans $N_z=2,5,10,20$. The extra latent coordinates do not visibly cause the bound to overfit in these experiments, which the paper attributes to the KL regularizer.
 
 ### Reparameterization replaces the score-function gradient
 
@@ -66,12 +68,16 @@ The experimental algorithm uses minibatches of $M=100$ points and $L=1$ latent s
 ![Source Figure 3 from Auto-Encoding Variational Bayes: estimated marginal likelihood on two MNIST training-set sizes](/assets/images/auto-encoding-variational-bayes-source-figure-3.webp)
 *Fig 2: With three latent variables, AEVB and wake-sleep improve the estimated marginal likelihood online, while MCEM is much slower on the larger MNIST training set. | source: [Auto-Encoding Variational Bayes, Figure 3](https://arxiv.org/abs/1312.6114)*
 
+[Open figure at full size](/assets/images/auto-encoding-variational-bayes-source-figure-3.webp)
+
 For the marginal-likelihood experiment, the authors use 100-hidden-unit encoder and decoder networks, three latent variables, the first 1,000 training and test points, and 50 posterior samples per point for the estimator. The small and large panels use $N_{train}=1{,}000$ and $50{,}000$. MCEM uses a Hybrid Monte Carlo sampler and is not an online algorithm; the paper therefore treats its behavior on the full MNIST set as a scalability boundary rather than as a cleaner baseline.
 
 The paper also gives a useful representation check. In two dimensions, it maps a grid through the inverse Gaussian CDF and decodes each latent point. The result is a smooth manifold of faces or digits, but smooth interpolation is a property of this prior, decoder, and training setup. It is not evidence that every semantic factor has become an independent latent coordinate.
 
 ![Source Figure 4 from Auto-Encoding Variational Bayes: learned two-dimensional Frey Face and MNIST manifolds](/assets/images/auto-encoding-variational-bayes-source-figure-4.png)
 *Fig 3: Decoding a grid in the Gaussian latent prior yields continuous face and digit manifolds, showing how the learned decoder organizes nearby latent points. | source: [Auto-Encoding Variational Bayes, Figure 4](https://arxiv.org/abs/1312.6114)*
+
+[Open figure at full size](/assets/images/auto-encoding-variational-bayes-source-figure-4.png)
 
 The closest comparison, wake-sleep, also uses a recognition model and has the same per-datapoint complexity, but its wake and sleep objectives do not jointly optimize a marginal-likelihood bound. Its advantage is support for discrete latent variables. AEVB’s gain is narrower and more consequential: for continuous latents, the encoder and decoder can be trained together with one differentiable bound.
 

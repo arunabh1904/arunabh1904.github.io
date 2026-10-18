@@ -54,6 +54,8 @@ The LLaVA-1.5-HD extension avoids enlarging a pretrained ViT's individual input 
 ![LLaVA-1.5-HD splitting an image into local tiles and retaining a downsampled global view](/assets/images/improved-baselines-with-visual-instruction-tuning-llava-1-5-source-figure-2.webp)
 *Fig 1: The upper path preserves local detail through separately encoded tiles; the lower path supplies a downsampled view of the whole scene. Both feature sequences condition the language model. | source: [Paper, Figure 2](https://arxiv.org/abs/2310.03744)*
 
+[Open figure at full size](/assets/images/improved-baselines-with-visual-instruction-tuning-llava-1-5-source-figure-2.webp)
+
 Figure 1 shows why the lower path matters. A tile can preserve a person's hand or the edge of the ironing board, but its encoder cannot see how that crop relates to the entire car. The downsampled image restores an overall scene view. The language model receives both kinds of evidence; it must combine them, since the separate tile encoders never jointly attend across crop boundaries.
 
 The appendix adds three details that the diagram leaves implicit. Features belonging only to padding are discarded, reducing wasted visual tokens. A row-end token records the shape of the merged spatial grid before flattening. The input resolution is selected from a predefined set supporting up to six tiles, balancing retained detail against unnecessary padding and compute. Thus the method is flexible across supported shapes, not an unlimited-resolution interface with constant cost.
@@ -64,6 +66,8 @@ The HD variant uses the existing alignment setup and proceeds to instruction tun
 
 ![Normalized benchmark results for different language-model backbones in LLaVA-1.5](/assets/images/improved-baselines-with-visual-instruction-tuning-llava-1-5-source-figure-3.webp)
 *Fig 2: Each axis is normalized to the best tested language-model variant on that benchmark. The shapes expose capability differences that an overall score can hide. | source: [Paper, Figure 3](https://arxiv.org/abs/2310.03744)*
+
+[Open figure at full size](/assets/images/improved-baselines-with-visual-instruction-tuning-llava-1-5-source-figure-3.webp)
 
 In Figure 2, compare MMBench with its Chinese version, MMBench-CN. Vicuna-1.5 and LLaMA-2-Chat are close on the former but separate on the latter. Their shared model family does not imply identical language-conditioning behavior. The paper connects the difference to their language instruction-tuning data, including multilingual ShareGPT conversations. That explanation is plausible and source-supported, but the comparison does not isolate every difference in their training histories.
 

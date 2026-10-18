@@ -14,7 +14,7 @@ summary: '2017 – Sparse-to-Dense: complete sparse runtime range measurements w
 
 ## Summary
 
-> Sparse-to-Dense treats a few range measurements as runtime evidence, not as labels hidden behind a camera-only model. An RGB image supplies boundaries and semantic regularities; sparse depth fixes metric scale; an encoder-decoder fills the unobserved pixels. On NYU-Depth-v2, 100 random samples cut the reported RGB-only RMSE by more than half, and on KITTI the same order of sparsity reduces RMSE from 6.266 m to 4.303 m. The paper also shows saturation and blurry boundaries, so the useful promise is graceful completion under a known sampling contract rather than arbitrary recovery of metric geometry from appearance.
+> Sparse-to-Dense treats a few range measurements as runtime evidence, not as labels hidden behind a camera-only model. An RGB image supplies boundaries and semantic regularities; sparse depth fixes metric scale; an encoder-decoder fills the unobserved pixels. On NYU-Depth-v2, 100 random samples roughly halve the reported RGB-only RMSE, and on KITTI the same order of sparsity reduces RMSE from 6.266 m to 4.303 m. The paper also shows saturation and blurry boundaries, so the useful promise is graceful completion under a known sampling contract rather than arbitrary recovery of metric geometry from appearance.
 
 ## Core Insights
 
@@ -27,6 +27,10 @@ The architecture figure shows why the model is two-dimensional at the interface 
 ![Figure 2 from Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-source-figure-2.webp)
 *Fig 1: The RGB and sparse-depth inputs enter dataset-specific ResNet encoders and meet in an upsampling decoder that produces a full-resolution depth map. The two drawings reflect the different KITTI and NYU memory budgets. | source: [Sparse-to-Dense, Figure 2](https://arxiv.org/abs/1709.07492)*
 
+[Open Figure 2 at full resolution](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-source-figure-2.webp)
+
+ImageNet initializes the ResNet encoders except the four-channel first layer. NYU uses 249 scenes for training and 215 for testing, with 654 labeled test images; KITTI uses half of its 22 odometry sequences for training, all 46k training images, and a 3,200-image evaluation subset. The density study trains a separate network for each requested sample count, so its curve compares optimized models rather than one model exposed to changing densities.
+
 ### The useful ablation is the input density curve
 
 On NYU-Depth-v2, the RGB-only model in the paper reaches RMSE 0.514. With 20, 50, and 200 sparse depth samples, the RGB-plus-depth model reaches 0.351, 0.281, and 0.230 respectively. The gain is not simply an extra training signal: those samples are available at inference and supply absolute scale that the RGB branch cannot infer reliably indoors. As density increases, the sparse-depth-only model also improves, and the color cue becomes less important once the sampled geometry is sufficiently informative.
@@ -37,6 +41,8 @@ The density figure should be read horizontally within each dataset rather than b
 
 ![Figure 5 from Sparse-to-Dense: Depth Prediction from Sparse Depth and RGB](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-source-figure-5.webp)
 *Fig 2: On the NYU-Depth-v2 indoor split, RGBd error falls quickly as the expected number of sparse depth samples increases and then saturates; the paired threshold plots show the same diminishing-return pattern. The KITTI density results are reported separately in the paper's table. | source: [Sparse-to-Dense, Figure 5](https://arxiv.org/abs/1709.07492)*
+
+[Open Figure 5 at full resolution](/assets/images/sparse-to-dense-depth-prediction-from-sparse-depth-and-rgb-source-figure-5.webp)
 
 
 ### Architecture choices matter after the sensor contract is fixed

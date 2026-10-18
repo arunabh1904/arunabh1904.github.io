@@ -24,7 +24,9 @@ summary: "2025 – VideoLLaMA 3: Frontier Multimodal Foundation Models for Image
 ![VideoLLaMA3 four-stage vision-centric training paradigm](/assets/images/videollama-3-frontier-multimodal-foundation-models-source-figure-2.webp)
 *Fig 1: VideoLLaMA3 moves from vision-encoder adaptation and image-text alignment to multi-task and video-centric fine-tuning, with the data mixture shown at each stage. | source: [VideoLLaMA 3, Figure 2](https://arxiv.org/abs/2501.13106)*
 
-The report’s curriculum is deliberately asymmetric. Stage 1 adapts the vision encoder to variable-resolution images. Stage 2 aligns the vision encoder, projector, and LLM on detailed scene, document, chart, grounding, and text data. Stage 3 adds multi-task image SFT plus general video data, and Stage 4 concentrates on video, streaming, temporal grounding, image-only, and text-only examples. The reported stage sizes are 15.57M, 21.97M, 19.05M, and 5.71M examples.
+[Open figure at full size](/assets/images/videollama-3-frontier-multimodal-foundation-models-source-figure-2.webp)
+
+The report’s curriculum is deliberately asymmetric. Stage 1 adapts the SigLIP vision encoder and projector to variable-resolution images while keeping the language decoder frozen. Stage 2 aligns the vision encoder, projector, and LLM on detailed scene, document, chart, grounding, and text data, unfreezing all parameters. Stage 3 adds multi-task image SFT plus general video data and introduces the video compressor during instruction tuning. Stage 4 concentrates on video, streaming, temporal grounding, image-only, and text-only examples while training the full model. The reported stage sizes are 15.57M, 21.97M, 19.05M, and 5.71M examples.
 
 That order reflects an annotation economy. High-quality image-text pairs are easier to curate than long video explanations, and many video questions still depend on static visual skills such as OCR, chart reading, and fine-grained object recognition. VideoLLaMA3 therefore asks temporal tuning to specialize an already useful visual interface, rather than asking noisy video captions to teach all visual semantics from scratch.
 
@@ -39,10 +41,14 @@ The two mechanisms should not be conflated. AVT changes how much spatial evidenc
 ![VideoLLaMA3 benchmark comparison across image and video understanding tasks](/assets/images/videollama-3-frontier-multimodal-foundation-models-paper-figure.png)
 *Fig 2: The released comparison chart places VideoLLaMA3 against image and video MLLM baselines on representative image, general-video, perception, and long-video benchmarks. | source: [VideoLLaMA 3, Figure 1](https://arxiv.org/abs/2501.13106)*
 
+[Open figure at full size](/assets/images/videollama-3-frontier-multimodal-foundation-models-paper-figure.png)
+
 For the 2B model, Table 7 reports 59.6 on VideoMME without subtitles and 63.4 with subtitles, 68.0 on PerceptionTest, 65.5 on MVBench, 58.2 on ActivityNet-QA, 65.4 on MLVU-dev, 57.1 on LongVideoBench, 41.6 on LVBench, 63.4 on TempCompass, and 81.1 on NextQA. The model is evaluated with at most 180 frames and 16K visual tokens, greedy decoding, and benchmark-specific prompts. Charades-STA temporal grounding is scored by extracting predicted start/end times and computing mIoU, rather than by a dedicated temporal decoder.
 
 ![VideoLLaMA3 chart-understanding case study](/assets/images/videollama-3-frontier-multimodal-foundation-models-source-figure-6.webp)
 *Fig 3: A chart case study shows the model comparing a price trend and then reasoning about model performance versus activated parameters, beyond OCR. | source: [VideoLLaMA 3, Figure 6](https://arxiv.org/abs/2501.13106)*
+
+[Open figure at full size](/assets/images/videollama-3-frontier-multimodal-foundation-models-source-figure-6.webp)
 
 The image-to-video transfer claim is visible in the mix of results: the same 2B model reaches 69.4 on InfoVQA, 59.2 on MathVista, and 67.3 on RealWorldQA in the report’s image evaluation. The chart example illustrates why the authors emphasize image data: reading the axes and interpreting a trend are prerequisites for many video questions too.
 

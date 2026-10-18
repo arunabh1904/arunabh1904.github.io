@@ -29,6 +29,8 @@ Space Tokens changes the interface between geometry and language. The method res
 ![Space Tokens three-stage training pipeline for continuous spatial representations and reasoning](/assets/images/space-tokens-pipeline-paper-figure.png)
 *Fig 1: The three-stage pipeline first learns spatial representations, then trains the VLM to use them in next-token reasoning, and finally refines the policy with reinforcement learning. | source: [Chain of Spatial Thoughts, Figure 2](https://arxiv.org/abs/2608.10278)*
 
+[Open figure at full size](/assets/images/space-tokens-pipeline-paper-figure.png)
+
 The three stages separate “encode geometry” from “use geometry.” Stage 1 injects spatial tokens into a chain-of-thought prompt and backpropagates representation and reconstruction losses. Stage 2 freezes the projection layers and adds teacher-forced next-token prediction so the VLM must incorporate the tokens into its answer. Stage 3 uses GRPO with the VSI-Bench task metric as its reward: fuzzy matching for multiple-choice answers and mean relative accuracy for numeric answers. All three stages fine-tune pretrained VLMs with LoRA; the underlying VLM architecture is unchanged at inference.
 
 The data protocol also explains why a compact latent can help. Training uses one epoch of VICA-322K, samples 32 frames from each video, resizes them to 448 × 448, and uses six selected frames in the reasoning prompt. The paper reports that six informative frames reach 68.6 on VSI-Bench in the prompt-frame ablation, compared with 67.6 for all 32 frames. Selecting evidence before reasoning is part of the method's effective token budget.
@@ -36,10 +38,14 @@ The data protocol also explains why a compact latent can help. Training uses one
 ![Space Tokens prompt with six selected frames and decoded scene-level and object-level spatial tokens](/assets/images/chain-of-spatial-thoughts-modality-agnostic-spatial-grounding-for-vision-language-models-source-figure-1.webp)
 *Fig 2: The supplementary prompt example enlarges the six frames selected for reasoning and shows the scene and object spatial tokens used to answer a room-size question. | source: [Chain of Spatial Thoughts, Figure S1](https://arxiv.org/abs/2608.10278)*
 
+[Open figure at full size](/assets/images/chain-of-spatial-thoughts-modality-agnostic-spatial-grounding-for-vision-language-models-source-figure-1.webp)
+
 The VSI-Bench table makes the improvement specific. The pretrained Qwen3-VL-8B baseline scores 59.8 overall; the Space Tokens version scores 64.1, with gains of 15.8 points on room size and 5.1 on absolute distance. The SenseNova-SI-1.3 variant moves from 67.6 to 68.9, with a 9.5-point room-size gain. On the OOD evaluation using the stage 1–2 model, BLINK improves from 64.4 to 64.9 and NExT-QA from 74.4 to 80.0, while CV-Bench drops from 88.4 to 86.9. The gains are therefore strongest on geometry-heavy reasoning, not uniformly positive across visual tasks.
 
 ![Space Tokens qualitative reconstruction and 3D bounding-box comparison](/assets/images/chain-of-spatial-thoughts-modality-agnostic-spatial-grounding-for-vision-language-models-source-figure-4.webp)
 *Fig 3: The qualitative comparison shows decoded 3D scenes and object boxes beside VGGT-Omega references; orange and green boxes distinguish predictions from ground truth. | source: [Chain of Spatial Thoughts, Figure 4](https://arxiv.org/abs/2608.10278)*
+
+[Open figure at full size](/assets/images/chain-of-spatial-thoughts-modality-agnostic-spatial-grounding-for-vision-language-models-source-figure-4.webp)
 
 The qualitative figure is a verification tool rather than a claim of reconstruction parity. The paper explicitly notes that the lightweight decoders use limited supervision and are not expected to match a specialized 3D model perfectly. Their role is to show that the latent tokens carry decodable geometry while the reasoning model uses them.
 

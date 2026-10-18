@@ -32,6 +32,8 @@ The source-choice ablation tests that distinction directly. With response distil
 ![Complete CRKD teacher–student architecture, with radar heatmap supervision, masked features, relation loss, and response distillation](/assets/images/crkd-source-figure-2-full-architecture.png)
 *Fig 1: The purple path connects an early radar representation to the teacher's later objectness heatmap. The remaining paths transfer gated camera features, fused features, spatial relations, and detection responses while ground-truth detection supervision remains active. | source: [CRKD, Figure 2](https://openaccess.thecvf.com/content/CVPR2024/papers/Zhao_CRKD_Enhanced_Camera-Radar_Object_Detection_with_Cross-modality_Knowledge_Distillation_CVPR_2024_paper.pdf)*
 
+[Open the full-size source figure](/assets/images/crkd-source-figure-2-full-architecture.png)
+
 ### Shared cameras do not imply identical camera features
 
 Teacher and student use the same camera modality and compatible BEV grids, but their camera features are gated using different companion sensors. Each gate reads concatenated modality features and applies sigmoid weights before convolutional fusion. The teacher's gated camera map can therefore carry LiDAR-informed geometry that is absent from the student's radar-informed map.
@@ -40,6 +42,8 @@ The supplementary comparison makes that distinction visible. The ungated camera 
 
 ![Ungated and gated camera BEV feature maps from the CRKD LiDAR–camera teacher](/assets/images/crkd-supplement-figure-1-gated-features.png)
 *Fig 2: The teacher's camera features change after gating with LiDAR context. The right-hand map exposes clearer scene structure, explaining why an apparently camera-to-camera loss can still transfer information from another sensor. | source: [CRKD supplement, Figure 1](https://openaccess.thecvf.com/content/CVPR2024/supplemental/Zhao_CRKD_Enhanced_Camera-Radar_CVPR_2024_supplemental.pdf)*
+
+[Open the full-size source figure](/assets/images/crkd-supplement-figure-1-gated-features.png)
 
 Mask-scaling distillation applies an L2 feature loss to foreground regions in both gated camera and fused BEV maps. It expands the masks for farther or faster objects, where view transformation and temporal alignment can displace features. This gives uncertain object boundaries some tolerance instead of insisting that teacher and student activate at exactly the same cells. A separate relation loss compares multi-scale cosine-affinity matrices, transferring which scene locations have related features rather than only their absolute feature values.
 
@@ -60,10 +64,14 @@ The headline 3.5-point mAP improvement includes the gated architecture change. D
 
 Improvement is also metric-specific. Full CRKD improves orientation and localization over the original baseline, yet mean velocity error is 0.331 m/s versus 0.304 for the gated student. Prioritizing dynamic classes improves detection AP without guaranteeing better velocity estimates. The main comparison uses single-frame camera input, but the supplement includes the current radar sweep plus six previous sweeps; “single frame” is not a claim that every sensor contributes only one instant.
 
+The LiDAR–camera teacher is trained first and frozen during the 20-epoch distillation stage, and the reported evaluation uses no test-time augmentation. This makes the gain a privileged-training result: the extra LiDAR branch shapes supervision during training, then disappears at inference.
+
 The qualitative examples show two different benefits. In the upper row, CRKD removes false student detections. In the lower row, it detects a car the teacher misses and rejects some of the teacher's false positives. That is possible because the student still receives radar evidence and ground-truth supervision: it is not restricted to reproducing the teacher's output exactly. These selected cases do not overturn the aggregate gap—teacher mAP is 66.1, versus 46.7 for CRKD.
 
 ![CRKD qualitative examples comparing student errors and teacher errors with corrected camera–radar predictions](/assets/images/crkd-source-figure-3-complementary-detections.png)
 *Fig 3: Red denotes ground truth and blue CRKD. The upper row compares the yellow student predictions; the lower row compares the green teacher predictions. Radar points are magenta, and matched borders connect BEV regions to close-ups. | source: [CRKD, Figure 3](https://openaccess.thecvf.com/content/CVPR2024/papers/Zhao_CRKD_Enhanced_Camera-Radar_Object_Detection_with_Cross-modality_Knowledge_Distillation_CVPR_2024_paper.pdf)*
+
+[Open the full-size source figure](/assets/images/crkd-source-figure-3-complementary-detections.png)
 
 The supplementary slices further bound the robustness claim. Relative to the gated student, rainy-scene mAP rises from 47.27 to 49.59, but night mAP changes only from 23.94 to 24.14. The largest range-group gain is within 20 meters, 58.54 to 61.59 mAP. Distillation helps across these slices, while their unequal gains prevent treating radar availability as a general solution to darkness, range, or sensor noise.
 

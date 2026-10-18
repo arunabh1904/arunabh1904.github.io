@@ -33,16 +33,22 @@ The released checkpoint averages the shared parameter tensors of the SMM-only an
 ![StableDrive framework with selective momentum memory and the train-and-retire motion-stage scaffold](/assets/images/not-all-history-helps-velocity-aware-selective-memory-for-long-horizon-end-to-end-autonomous-driving-source-figure-2.webp)
 *Fig 1: The framework shows the current candidate queries, one-cycle cached plans, SMM gating, and the MSTS branch that shapes training but is removed before deployment. | source: [Not All History Helps, Figure 2](https://arxiv.org/abs/2608.15573)*
 
+[Open figure at full size](/assets/images/not-all-history-helps-velocity-aware-selective-memory-for-long-horizon-end-to-end-autonomous-driving-source-figure-2.webp)
+
 Read the figure from left to right as a compatibility test. The current scene proposes a new plan; the memory module decides how much of the previous plan still agrees with it; the stage scaffold teaches the model why that agreement should differ between braking and cruising. The useful object is not “more temporal context.” It is a filtered transition from one plan to the next.
 
 ### Measure long horizon where transitions occur
 
-The paper uses the standard nuScenes split of 700 training, 150 validation, and 150 test scenes and evaluates camera-only planning on the complete validation split. Each sample predicts twelve half-second waypoints across six seconds. To stress the failure mode directly, LT-nuScenes selects 16 complete scenes, 642 inference frames, and 189 scored transition targets using ground-truth kinematics. It covers sustained stationary, acceleration, and deceleration segments while excluding turns and lane changes with explicit heading and displacement thresholds. NAVSIM adds 12,146 navtest samples from 136 logs and a harder two-stage set of 225 paired groups from 76 logs.
+The paper uses the standard nuScenes split of 700 training, 150 validation, and 150 test scenes and evaluates camera-only planning on the complete validation split. Each sample predicts twelve half-second waypoints across six seconds. To stress the failure mode directly, LT-nuScenes selects 16 complete scenes, 642 inference frames, and 189 scored transition targets using ground-truth kinematics; trajectory-consistency error uses the 176 targets with a valid preceding cycle. It covers sustained stationary, acceleration, and deceleration segments while excluding turns and lane changes with explicit heading and displacement thresholds. NAVSIM adds 12,146 navtest samples from 136 logs and a harder two-stage set of 225 paired groups from 76 logs.
 
 On full nuScenes validation, StableDrive's average L2 is 1.20 m, average collision rate is 0.66%, and average trajectory-consistency error is 0.85 m. Across horizons, L2 rises from 0.28 to 2.35 m and collision rate from 0.01% to 1.78%, exposing long-horizon accumulation. On LT-nuScenes, the average L2 is 1.32 m, collision rate 1.49%, and trajectory-consistency error 0.79 m; the matched MomAD reproduction reports 1.37 m, 3.08%, and 0.85 m.
 
+The same camera-only planner reaches 90.4 PDMS on NAVSIM v1 navtest, 90.0 EPDMS on NAVSIM v2 navtest, and 42.6 EPDMS on the v2 two-stage navhard split, 5.7 points above the previous best 36.9. NAVSIM training uses 103,288 samples from 1,192 logs; navtest has 12,146 samples from 136 logs, while navhard contains 225 paired follow-up groups from 76 logs. The v2 scores use the corrected official EPDMS implementation and its two-stage follow-up aggregation.
+
 ![StableDrive qualitative comparison with MomAD under long-horizon planning](/assets/images/not-all-history-helps-velocity-aware-selective-memory-for-long-horizon-end-to-end-autonomous-driving-source-figure-1.webp)
 *Fig 2: The qualitative source case contrasts a stale MomAD plan that diverges and collides with StableDrive's selectively weighted history, which stays near the ground-truth path. | source: [Not All History Helps, Figure 1](https://arxiv.org/abs/2608.15573)*
+
+[Open figure at full size](/assets/images/not-all-history-helps-velocity-aware-selective-memory-for-long-horizon-end-to-end-autonomous-driving-source-figure-1.webp)
 
 The case explains why collision rate changes more than short-horizon L2. A stale plan can look locally plausible while its terminal mode is already incompatible with the current velocity. In this example, suppressing that mode before the recurrent update is consistent with avoiding the later collision; the qualitative panel does not by itself prove that causal path.
 
@@ -52,7 +58,7 @@ The endpoint ablation separates the two training ingredients. The SMM-only endpo
 
 The history-length comparison is a useful negative result. One frame gives 1.20 m L2, 0.66% collision, and 0.85 m trajectory-consistency error. Two frames degrade them to 1.27 m, 0.83%, and 0.93 m; four frames recover only to 1.24 m, 0.87%, and 0.89 m. Longer context is not a substitute for deciding whether a particular prior is still compatible.
 
-The deployment cost is measurable: on one RTX 4090 the fixed model has 87.153M active parameters, 192.728G FLOPs, 192.3 ms latency, and 5.2 FPS in FP16. Those numbers are hardware-specific, and the NAVSIM protocol is non-reactive, so the paper has not yet shown that selective memory remains stable when other agents respond to the ego vehicle.
+The deployment cost is measurable: on one RTX 4090 the fixed model has 87.153M active parameters, 192.728G FLOPs, 192.3 ms latency, and 5.2 FPS in FP16. MSTS is removed, then the shared parameters of the SMM-only and MSTS-trained endpoints are averaged at fixed $\alpha=0.5$; navtest and navhard remain evaluation-only. The paper also notes a selection limit: a good candidate can be present in the generated set and still be rejected by the score head. Those deployment numbers are hardware-specific, and the NAVSIM protocol is non-reactive, so the paper has not yet shown that selective memory remains stable when other agents respond to the ego vehicle.
 
 ## High-Level Takeaways
 

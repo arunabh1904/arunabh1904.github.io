@@ -26,6 +26,8 @@ summary: '2021 – MDETR: Modulated Detection for End-to-End Multimodal Understa
 ![MDETR output for the text query “A pink elephant”](/assets/images/mdetr-modulated-detection-for-end-to-end-multimodal-understanding-source-figure-1.webp)
 *Fig 1: Given “A pink elephant,” MDETR selects the pink elephant and labels its box through the query, even though the training data contain neither pink nor blue elephants as fixed detector classes. The colors shown are the pixels, not segmentation masks. | source: [MDETR, Figure 1](https://arxiv.org/abs/2104.12763)*
 
+[Open figure at full size](/assets/images/mdetr-modulated-detection-for-end-to-end-multimodal-understanding-source-figure-1.webp)
+
 Earlier vision-language systems usually begin with a detector trained on a fixed object vocabulary. MDETR makes the detector itself text-conditioned. A convolutional backbone produces spatial image features with 2D positional embeddings. RoBERTa produces text features. Modality-specific linear layers project both sequences into one space, concatenate them, and feed them to a Transformer encoder. A DETR-style decoder then lets learned object queries cross-attend to the fused image-text sequence and predict boxes.
 
 The output is not a category label such as “dog” or “chair.” For each matched query, MDETR predicts a distribution over the token positions that refer to the box. Unmatched queries predict the `∅` no-object class. Hungarian matching pairs predicted queries with ground-truth boxes, while L1 and generalized-IoU losses supervise the geometry. This changes the output contract: the same model can answer “the person in the blue shirt,” “objects to the left of the table,” or a new attribute combination without adding a classifier head.
@@ -36,6 +38,8 @@ The first alignment loss is soft token prediction. For a matched box, the target
 
 ![MDETR’s text-aligned boxes supporting a visual question answer](/assets/images/mdetr-modulated-detection-for-end-to-end-multimodal-understanding-source-figure-5-white.png)
 *Fig 2: On the question “What is on the table?”, MDETR assigns boxes to relevant question words and predicts “laptop,” making the visual evidence for the answer inspectable. | source: [MDETR, Figure 5](https://arxiv.org/abs/2104.12763)*
+
+[Open figure at full size](/assets/images/mdetr-modulated-detection-for-end-to-end-multimodal-understanding-source-figure-5-white.png)
 
 The figure is useful because it shows the shared interface doing two jobs. The boxes are conditioned on the question, and the answer head can use those query representations rather than a detector’s unrelated object inventory. The paper’s GQA extension adds question-type-specific queries and heads for relation, object, global, category, and attribute questions. It does not simply append a classifier to a frozen detector.
 

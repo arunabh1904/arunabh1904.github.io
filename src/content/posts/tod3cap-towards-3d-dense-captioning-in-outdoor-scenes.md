@@ -33,9 +33,11 @@ Camera features enter a BEVFormer-style encoder: temporal attention incorporates
 ![TOD3Cap fuses camera and LiDAR BEV features, proposes objects, and passes scene-aware object queries to a frozen language decoder](/assets/images/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes-source-figure-3.webp)
 *Fig 1: Follow the two inputs to the Relation Q-Former: object proposals identify what to describe, while the BEV feature map supplies surrounding evidence. The adapter translates those contextualized queries into prompts for the frozen LLaMA decoder. | source: [TOD3Cap, Figure 3](https://arxiv.org/abs/2403.19589)*
 
+[Open figure at full size](/assets/images/tod3cap-towards-3d-dense-captioning-in-outdoor-scenes-source-figure-3.webp)
+
 The Relation Q-Former embeds proposals with an MLP and lets them interact with other proposals and the scene's BEV features through self-attention. Another projection and adapter align the resulting object queries with LLaMA-7B. The language backbone stays frozen; learning concentrates on perception and the interface that supplies visual evidence to it.
 
-Training is staged: 24 epochs of detector pretraining, 10 epochs of captioner training with the detector frozen, and 10 epochs of joint refinement at a lower learning rate. This final stage updates the detector and captioning interface together while the LLaMA backbone remains frozen. To avoid decoding hundreds of sentences simultaneously, training matches proposals to ground truth and randomly samples a subset for caption supervision. This is a practical distinction between constructing all object proposals and paying language-decoding cost for all of them in every update.
+Training is staged: 24 epochs of detector pretraining, 10 epochs of captioner training with the detector frozen, and 10 epochs of joint refinement at a lower learning rate. This final stage updates the detector and captioning interface together while the LLaMA backbone remains frozen. The training-strategy ablation removes each phase; omitting captioner pretraining costs 8.8 CIDEr points at both the 0.25 and 0.5 IoU thresholds, showing that the sequence is part of the reported performance. To avoid decoding hundreds of sentences simultaneously, training matches proposals to ground truth and randomly samples a subset for caption supervision. This is a practical distinction between constructing all object proposals and paying language-decoding cost for all of them in every update.
 
 ### The metric makes a fluent caption conditional on localization
 
@@ -55,6 +57,8 @@ Camera appearance and LiDAR geometry are complementary under this protocol. The 
 
 ![TOD3Cap predicted and ground-truth boxes and captions, with incorrect descriptive phrases marked in red](/assets/images/tod3cap-source-figure-4.png)
 *Fig 2: Several boxes align well while parts of the captions still differ, including clothing color and an object's relationship to its neighbors. Correct spatial grounding is necessary, but does not guarantee every generated attribute. | source: [TOD3Cap, Figure 4](https://arxiv.org/abs/2403.19589)*
+
+[Open figure at full size](/assets/images/tod3cap-source-figure-4.png)
 
 The qualitative failures show why detection and language need separate inspection. A caption can correctly identify a pedestrian and its motion while inventing clothing details; another can locate a bus but describe the wrong neighboring object. Aggregate language similarity can obscure such local factual mistakes.
 

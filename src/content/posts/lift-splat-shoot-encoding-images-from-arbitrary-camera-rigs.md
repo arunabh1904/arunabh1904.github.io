@@ -27,7 +27,7 @@ The problem LSS isolates is a coordinate mismatch. A camera feature lives at an 
 
 For a pixel, a small network predicts a context vector $c\in\mathbb{R}^C$ and a categorical depth distribution $\alpha$. The feature at depth $d$ is $c_d=\alpha_d c$. A one-hot $\alpha$ behaves like pseudo-LiDAR, placing the context at one range. A uniform $\alpha$ behaves like an orthographic feature transform, spreading it along the ray. The learned distribution can therefore express uncertainty instead of turning an ambiguous image cue into a single, overconfident 3D location.
 
-The calibrated candidates from each camera are transformed into the ego frame and assigned to ground-plane pillars. Sum pooling produces one $C	imes X	imes Y$ tensor, independent of how many cameras supplied the candidates. A standard BEV CNN can then fuse overlapping views and support semantic segmentation or a cost-map head. This is the durable interface: the downstream model queries a metric map, while the view transformer absorbs the camera-specific coordinate systems.
+The calibrated candidates from each camera are transformed into the ego frame and assigned to ground-plane pillars. Sum pooling produces one $C\times X\times Y$ tensor, independent of how many cameras supplied the candidates. A standard BEV CNN can then fuse overlapping views and support semantic segmentation or a cost-map head. This is the durable interface: the downstream model queries a metric map, while the view transformer absorbs the camera-specific coordinate systems.
 
 ![Figure 1 from Lift, Splat, Shoot, showing surround-camera images mapped into a vehicle-centered BEV prediction](/assets/images/lift-splat-shoot-source-figure-1-overview.png)
 *Fig 1: Surround-camera images are converted into vehicle, drivable-area, and lane semantics in one BEV frame; the colored BEV predictions are projected back onto the input views for visualization. | source: [Lift, Splat, Shoot, Figure 1](https://arxiv.org/abs/2008.05711)*
@@ -41,7 +41,7 @@ Read the lifting diagram as a factorization: the context vector supplies feature
 ![LSS depth distribution and context vector forming a lifted frustum feature](/assets/images/lift-splat-shoot-source-figure-3-lift.png)
 *Fig 2: The outer product of a pixel’s context vector and depth distribution creates a channel-by-depth feature, retaining alternative ranges before BEV pooling. | source: [Lift, Splat, Shoot, Figure 3](https://arxiv.org/abs/2008.05711)*
 
-The concrete model uses EfficientNet-B0 image encoders and a ResNet-style BEV network. Input images are resized and cropped to $128	imes352$; the BEV grid spans $[-50,50]$ metres in both axes at $0.5$-metre cells, and depth candidates cover 4–45 metres in 1-metre steps. The final network has 14.3M trainable parameters and runs at 35 Hz on a Titan V in the paper’s setup. Those numbers describe a compact research configuration, while the frustum’s depth resolution and camera count remain the main memory levers.
+The concrete model uses EfficientNet-B0 image encoders and a ResNet-style BEV network. Input images are resized and cropped to $128\times352$; the BEV grid spans $[-50,50]$ metres in both axes at $0.5$-metre cells, and depth candidates cover 4–45 metres in 1-metre steps. The final network has 14.3M trainable parameters and runs at 35 Hz on a Titan V in the paper’s setup. Those numbers describe a compact research configuration, while the frustum’s depth resolution and camera count remain the main memory levers.
 
 ### Calibration is part of the learned representation
 

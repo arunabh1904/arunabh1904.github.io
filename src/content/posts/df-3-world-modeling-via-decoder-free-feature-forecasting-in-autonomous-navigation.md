@@ -26,6 +26,8 @@ A second pass concatenates task queries with that forecast and sends them throug
 ![DF3 reuses frozen ViT blocks for feature forecasting and task-query prediction](/assets/images/df3-source-figure-2.png)
 *Fig 1: The central query pass predicts an intermediate future representation. The right-hand pass probes that forecast for a task using the same frozen terminal blocks, with lightweight heads providing the final output. | source: [DF3, Figure 2](https://arxiv.org/abs/2608.02428)*
 
+[Open figure at full size](/assets/images/df3-source-figure-2.png)
+
 The asymmetric attention mask lets prediction queries read all historical context but prevents historical tokens from reading those prediction queries. Historical tokens can still attend to each other. This protects their representation from the injected forecast state; it is not a causal mask imposing an order among the already observed frames.
 
 Training aligns predicted features with frozen-encoder features of the actual future image using cosine similarity and Huber loss. Writing the forecast as $\hat F$ and its frozen-encoder target as $F$, the paper's objective is $\mathcal L_{\mathrm{sim}}=\mathbb E_t[1-\cos(\hat F,F)+\lambda_{\mathrm{huber}}\operatorname{Huber}(\hat F,F)]$. Cosine alignment constrains direction; Huber loss also constrains feature magnitude. The loss applies to spatial and prefix tokens. Forecast queries and task queries can be trained separately, so forecasting does not require an end-to-end pixel reconstruction objective.
@@ -52,6 +54,8 @@ The latency reduction is about 70%, while accuracy is lower by 1.9 points at the
 
 ![Future segmentation from DF3 compared with ground-truth-feature outputs](/assets/images/df3-source-figure-3.png)
 *Fig 2: Follow the car and cyclists across the context, target, oracle, and forecast columns. DF3 preserves much of the broad motion while boundaries and thin structures become coarse; average segmentation accuracy does not price every such error equally. | source: [DF3, Figure 3](https://arxiv.org/abs/2608.02428)*
+
+[Open figure at full size](/assets/images/df3-source-figure-3.png)
 
 ### Local correspondence and simulator transfer have clear boundaries
 

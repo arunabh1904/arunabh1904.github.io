@@ -26,7 +26,9 @@ CRAFT begins with separate modality-specific features. A DLA-34 image backbone a
 ![CRAFT source Figure 2: proposal-level camera-radar fusion architecture](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-paper-figure.webp)
 *Fig 1: The source pipeline first predicts camera proposals, associates radar points around each proposal in polar coordinates, exchanges image and radar features with consecutive cross-attention layers, and then predicts a fusion score and box offsets. | source: [CRAFT, Figure 2](https://arxiv.org/abs/2209.06535)*
 
-The proposal boundary makes the design's responsibility clear. The camera supplies object coverage and semantic context; radar is asked mainly to correct location and velocity. A proposal with no trustworthy radar support is still allowed to pass through as a camera prediction. This fallback is part of the model rather than a post-hoc rule for handling missing sensors.
+[Open figure at full resolution](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-paper-figure.webp)
+
+The proposal boundary makes the design's responsibility clear. The camera supplies object coverage and semantic context; radar is asked mainly to correct location and velocity. A proposal with no trustworthy radar support is still allowed to pass through as a camera prediction. This fallback is part of the model rather than a post-hoc rule for handling missing sensors. The paper's camera detector is trained from scratch on nuScenes, without DDAD15M depth pretraining; its weights are then frozen while the fusion modules train for 24 epochs. The reported fusion runs use the official 700/150/150 split, 448×800 images, six radar sweeps (about 0.5 seconds after motion compensation), at most 2,048 radar points, and no fusion test-time augmentation.
 
 ### Soft Polar Association matches the sensor error
 
@@ -46,8 +48,10 @@ On the nuScenes validation split, CRAFT-I, the camera-only version with the same
 
 The strict-distance table makes the role of radar easier to see than the aggregate mAP. For cars at a 0.5 m center-distance threshold, CRAFT reaches 50.4 AP on test versus 22.3 for CenterFusion; at 1 m it reaches 66.9 versus 45.7. On validation, CRAFT improves CRAFT-I from 19.6 to 51.9 AP at 0.5 m and from 45.4 to 68.8 at 1 m. The method is correcting metric localization, not merely adding a class score to a camera detection.
 
-![CRAFT source Figure 4: performance by object distance and radar support](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-source-figure-4.webp)
+![CRAFT source Figure 4: performance by object distance and radar support](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-source-figure-4-readable.png)
 *Fig 2: The source analysis separates performance by object distance and by the number of associated radar points. The large improvements at longer range and with more returns show when radar has enough support to correct camera depth. | source: [CRAFT, Figure 4](https://arxiv.org/abs/2209.06535)*
+
+[Open figure at full resolution](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-source-figure-4-readable.png)
 
 The paper reports a 32.2% relative improvement for objects beyond 35 m in the distance analysis. The point-count curve gives the complementary boundary: with few or no valid radar points, the gain is much smaller; with more points, the fusion has enough range evidence to move an imprecise camera proposal. This is why the architecture keeps a camera fallback instead of forcing every proposal through a radar update.
 
@@ -57,6 +61,8 @@ The qualitative panel marks radar-refined predictions in blue and camera-only pr
 
 ![CRAFT source Figure 5: camera-only and radar-refined qualitative detections](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-source-figure-5.webp)
 *Fig 3: Blue circles identify proposals refined with radar and red circles identify proposals that remain camera-only because no valid radar return was found. The panel makes the model's fallback visible in complex, rainy, and night scenes. | source: [CRAFT, Figure 5](https://arxiv.org/abs/2209.06535)*
+
+[Open figure at full resolution](/assets/images/craft-camera-radar-3d-object-detection-with-spatio-contextual-fusion-transformer-source-figure-5.webp)
 
 The detection-head ablation supports the same interpretation. In the car-only nuScenes validation ablation, removing the location-offset head drops car AP from 69.6 to 53.1, and removing velocity drops it to 65.4 while worsening mAVE from 0.31 to 1.21. Adding dimension or rotation regression also lowers car AP to 65.1 or 65.7. The irregular, ambiguous radar points help correct position and motion more reliably than they help estimate object size or heading. CRAFT's practical boundary is therefore the quality of the camera proposal, the calibration and timestamps used to associate sensors, and whether the scene supplies a valid radar return.
 

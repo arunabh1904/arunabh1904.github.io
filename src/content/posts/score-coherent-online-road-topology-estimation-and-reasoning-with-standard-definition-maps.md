@@ -30,6 +30,8 @@ The source architecture shows the distinction between conditioning the shared BE
 ![Score source Figure 2 shows SD-map positional sampling, temporal BEV fusion, lane and boundary queries, and relationship prediction](/assets/images/score-source-figure-2.png)
 *Fig 1: SD-map samples seed lane queries while temporal features supply observation history. Separate lane, boundary, and traffic representations feed geometry prediction and pairwise relationship estimation. Figure copyright © 2025 IEEE. | source: [Score, Figure 2](https://arxiv.org/abs/2507.01397)*
 
+[open full-size figure](/assets/images/score-source-figure-2.png)
+
 ### Denoising stabilizes learning; geometry supplements association
 
 During training, Score adds noisy ground-truth lane-segment queries in isolated denoising groups. These supply a less ambiguous reconstruction task alongside Hungarian matching. They are training supervision, not ground-truth information available at inference. One-to-many matching provides additional positive matches, while resampling increases exposure to turning scenes that are scarce in the training set.

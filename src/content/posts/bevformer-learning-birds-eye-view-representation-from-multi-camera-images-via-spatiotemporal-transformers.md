@@ -30,6 +30,8 @@ The architecture figure is easiest to read in three passes. The left side is the
 ![Figure 2 from BEVFormer showing the BEV encoder with spatial cross-attention and temporal self-attention](/assets/images/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers-paper-figure.png)
 *Fig 1: The encoder first reads the previous BEV at each query, then samples projected image features around several 3D heights before producing the next BEV feature field. | source: [BEVFormer, Figure 2](https://arxiv.org/abs/2203.17270)*
 
+[Open Figure 1 at full resolution](/assets/images/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers-paper-figure.png)
+
 ### Memory helps because it is aligned before it is attended
 
 A previous BEV cannot simply be concatenated with the current grid: the ego vehicle moved, so the same cell index no longer denotes the same world location. BEVFormer warps the previous feature map according to ego-motion and lets each current query attend to both its present query and nearby locations in the aligned history. At the first frame, the current BEV queries substitute for the unavailable historical features in the temporal-attention operation. This turns the recurrent state into a spatial memory rather than a raw frame cache.
@@ -38,6 +40,8 @@ The visibility experiment makes that mechanism concrete. The source figure divid
 
 ![Figure 3 from BEVFormer: Learning Bird's-Eye-View Representation from Multi-Camera Images via Spatiotemporal Transformers](/assets/images/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers-source-figure-3.webp)
 *Fig 2: Temporal BEV features raise recall most in the 0–40% visibility group and reduce translation, orientation, and velocity errors. Scale changes little; the attribute gain is not uniform across visibility groups. | source: [BEVFormer, Figure 3](https://arxiv.org/abs/2203.17270)*
+
+[Open Figure 2 at full resolution](/assets/images/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers-source-figure-3.webp)
 
 ### The ablation separates receptive field, memory, and latency
 
@@ -54,14 +58,15 @@ The final visualization pairs 3D boxes in the camera views with their BEV projec
 ![Figure 4 from BEVFormer: Learning Bird's-Eye-View Representation from Multi-Camera Images via Spatiotemporal Transformers](/assets/images/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers-source-figure-4.webp)
 *Fig 3: The same predicted 3D boxes are shown in multiple camera views and in the BEV workspace; the examples make cross-view consistency visible while retaining small and distant-object mistakes. | source: [BEVFormer, Figure 4](https://arxiv.org/abs/2203.17270)*
 
+[Open Figure 3 at full resolution](/assets/images/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers-source-figure-4.webp)
 
-_BEV queries, spatial cross-attention, temporal self-attention, and detection/segmentation heads. source: [BEVFormer paper](https://arxiv.org/abs/2203.17270)
+For each current sample, BEVFormer randomly selects three earlier samples from the previous two seconds. It builds those history features without gradients; inference then carries the previous BEV forward chronologically. The frame ablation reaches 0.448/0.490/0.510/0.517 NDS with one through four training frames and levels off at five, which motivates the four-frame default.
 
+On Waymo, the five cameras cover only about 252 degrees while labels span 360 degrees, so the paper removes boxes invisible to every camera, samples every fifth training frame, and evaluates vehicles only.
 
-**What to look at:**
-- BEV queries define the dense bird's-eye grid.
-- Spatial cross-attention connects each BEV cell to camera evidence.
-- Temporal self-attention carries history without recomputing a long video window.
+The shared BEV state is also a multi-task result. With joint detection and map segmentation, BEVFormer reaches 0.520 NDS and 23.9 lane IoU, compared with 0.517 NDS for detection alone and 25.7 lane IoU when the lane head is trained alone. Road IoU also falls from 80.1 to 77.5. The paper calls this negative transfer, even as vehicle segmentation and detection improve.
+
+The calibration appendix measures sensitivity to noisy extrinsics. At noise level 4, temporal BEVFormer drops 14.3% NDS. Training with noisy extrinsics reduces the drop to 8.9%, while a global-attention variant drops 4.0%.
 
 ## High-Level Takeaways
 

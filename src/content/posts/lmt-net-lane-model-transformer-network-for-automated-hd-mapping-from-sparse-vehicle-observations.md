@@ -27,6 +27,8 @@ An existing preprocessing method aligns traces and boundary observations with an
 ![LMT-Net uses trace-derived center queries to read encoded traces and lane observations](/assets/images/lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations-paper-figure.png)
 *Fig 1: Follow the separate routes into the decoder: observed geometry supplies context, while trace-derived center points specify where to predict a lane pair. A second head connects those pairs into a graph. | source: [LMT-Net, Figure 1](https://arxiv.org/abs/2409.12409)*
 
+[open full-size figure](/assets/images/lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations-paper-figure.png)
+
 The polyline encoder includes each point's successor coordinates to preserve direction, applies within-polyline attention, and max-pools a variable-length sequence into one token. Trace and boundary inputs use type-specific encoders. The transformer exchanges information across these tokens before decoding the lane pairs. Concatenating two decoded tokens lets a separate MLP predict a directed edge, retained above a 0.8 probability threshold. Geometry and connectivity are trained jointly with boundary regression and binary cross-entropy losses; independent edge predictions do not themselves enforce a globally valid road graph.
 
 ### Relative lane width and absolute placement answer different questions
@@ -35,6 +37,8 @@ The source examples show why aggregation alone is insufficient. Markings can be 
 
 ![Raw fleet traces, aggregated observations, and human lane boundaries in two road settings](/assets/images/lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations-source-figure-2.webp)
 *Fig 2: Yellow raw traces become red driven paths and green observed boundaries; blue ground truth reveals gaps and noise in those inputs. Sparse observations constrain the map without already containing a complete lane model. | source: [LMT-Net, Figure 2](https://arxiv.org/abs/2409.12409)*
+
+[open full-size figure](/assets/images/lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations-source-figure-2.webp)
 
 Evaluation separates mean boundary-point error (mBPE) from mean lane-width error (mLWE). A pair can have the correct separation while both endpoints are shifted, so low width error does not establish accurate global placement. The authors prioritize relative width partly because localization can compensate for small common offsets.
 

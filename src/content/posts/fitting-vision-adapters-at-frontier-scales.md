@@ -29,6 +29,8 @@ What changes when the language model grows? The source plot separates the image-
 
 *Fig 1: Source Figure 2, cropped from the PDF. The paired curves separate language-only performance from the contribution of visual input across model sizes. | source: [Fitting Vision Adapters at Frontier Scales](https://arxiv.org/abs/2610.05897)*
 
+[Open figure at full size](/assets/images/frontier-adapters-source-figure-2.png)
+
 ### Width matching is only the first test
 
 A connector that outputs the correct number of channels passes a tensor-shape test. It does not yet pass a meaning test. Suppose a camera feature contains a direction that separates road paint from shadows. A randomly initialized output layer sends that direction into an arbitrary direction in the language model's input space. Answer supervision must make the new direction useful to the frozen reader.

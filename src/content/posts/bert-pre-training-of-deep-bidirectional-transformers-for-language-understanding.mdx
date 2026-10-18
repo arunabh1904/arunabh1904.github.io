@@ -39,6 +39,8 @@ The source transfer diagram shows the other half of the recipe. Pretraining lear
 ![BERT source Figure 1 showing pretraining and downstream fine-tuning with a shared encoder architecture](/assets/images/bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding-paper-figure.png)
 *Fig 1: The encoder architecture transfers from pretraining to downstream tasks, while output heads change. Fine-tuning updates all parameters; the diagram does not imply one frozen model serves every task unchanged. | source: [BERT, Figure 1](https://arxiv.org/abs/1810.04805)*
 
+[Open figure at full size](/assets/images/bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding-paper-figure.png)
+
 ### Selection, corruption, and supervision are three different masks
 
 BERT selects 15% of eligible WordPiece positions for prediction. Among those selected positions, 80% become `[MASK]`, 10% become a random token, and 10% remain unchanged. Every selected position retains its original token as the label, including those left unchanged or replaced by something else. Unselected positions contribute no masked-LM loss.
@@ -90,6 +92,8 @@ A sentence pair is packed as `[CLS] A [SEP] B [SEP]`. “Sentence” here can me
 
 ![BERT source Figure 2 showing token, segment, and position embeddings added at each sequence position](/assets/images/bert-source-figure-2-input-embeddings.png)
 *Fig 2: Segment identity switches from A to B after the first separator, while position indices continue across the packed sequence. The three embedding types are added, so representation width stays unchanged. | source: [BERT, Figure 2](https://arxiv.org/abs/1810.04805)*
+
+[Open figure at full size](/assets/images/bert-source-figure-2-input-embeddings.png)
 
 The segment row answers which span a token belongs to; the position row answers where it appears in the complete input. Neither supplies an attention barrier between the spans. Their tokens can interact, which lets a question condition passage representations before an answer-span head scores start and end positions.
 

@@ -33,6 +33,7 @@ where $\beta_t$ and $\tilde\beta_t$ are the two posterior-variance endpoints. Th
 
 ![Source Figure 1 from Improved DDPM: posterior-variance endpoints across diffusion lengths](/assets/images/improved-denoising-diffusion-probabilistic-models-source-figure-1.webp)
 *Fig 1: The ratio between the posterior variance and the forward variance stays close to one for most timesteps, clarifying why learned variance mainly matters near the low-noise end of the chain. | source: [Improved Denoising Diffusion Probabilistic Models, Figure 1](https://arxiv.org/abs/2102.09672)*
+[Open figure at full size](/assets/images/improved-denoising-diffusion-probabilistic-models-source-figure-1.webp)
 
 To keep that likelihood signal from destabilizing the sample-quality objective, the paper uses
 
@@ -54,9 +55,11 @@ then derives $\beta_t=1-\bar\alpha_t/\bar\alpha_{t-1}$ and clips $\beta_t$ at 0.
 
 ![Source Figure 3 from Improved DDPM: latent states under linear and cosine schedules](/assets/images/improved-ddpm-paper-figure-3-noise-schedule.png)
 *Fig 2: At equally spaced forward times, the linear schedule has become almost pure noise during its last quarter, while the cosine schedule retains recognizable structure for longer. | source: [Improved Denoising Diffusion Probabilistic Models, Figure 3](https://arxiv.org/abs/2102.09672)*
+[Open figure at full size](/assets/images/improved-ddpm-paper-figure-3-noise-schedule.png)
 
 ![Source Figure 5 from Improved DDPM: cumulative signal under the two schedules](/assets/images/improved-denoising-diffusion-probabilistic-models-source-figure-5.webp)
 *Fig 3: The cosine schedule makes $\bar\alpha_t$ drop roughly linearly through the middle of diffusion and change very little near either endpoint, avoiding the linear schedule's abrupt early loss of signal. | source: [Improved Denoising Diffusion Probabilistic Models, Figure 5](https://arxiv.org/abs/2102.09672)*
+[Open figure at full size](/assets/images/improved-denoising-diffusion-probabilistic-models-source-figure-5.webp)
 
 The paper also reduces gradient noise when optimizing the full variational objective by sampling timesteps with probability proportional to $\sqrt{\mathbb E[L_t^2]}$, estimated from a history of the previous ten loss terms. That resampling matters for likelihood training, but the authors report that it is not helpful for the less noisy hybrid objective.
 

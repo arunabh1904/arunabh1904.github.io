@@ -61,6 +61,8 @@ The source's Seaquest example follows a short event sequence. At A, an enemy app
 ![DQN source Figure 3: predicted value around the appearance and destruction of a Seaquest enemy](/assets/images/playing-atari-with-dqn-source-figure-3.webp)
 *Fig 1: Value rises when an enemy creates a reward opportunity, peaks before the hit, and drops after that opportunity is consumed. This source panel plots the remaining expected return, not cumulative game score. | source: [Playing Atari with Deep Reinforcement Learning, Figure 3](https://arxiv.org/abs/1312.5602)*
 
+[Open figure at full size](/assets/images/playing-atari-with-dqn-source-figure-3.webp)
+
 The drop after the hit is therefore not necessarily evidence that the action was bad. A value estimate describes reward still available from the current state. Consuming an opportunity can increase realized score while reducing future value. The plot is an intuitive qualitative check; it does not establish that all predicted values are calibrated.
 
 Figure 2 separately shows noisy episode rewards alongside smoother average predicted Q-values on a fixed state set. Smooth Q-values are easier to monitor, but can look reassuring even when values are systematically wrong. The authors observed no divergence in these runs; that observation is weaker than a convergence guarantee for nonlinear off-policy learning.

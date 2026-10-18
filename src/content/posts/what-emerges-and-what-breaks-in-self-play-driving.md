@@ -34,6 +34,8 @@ The paper's clearest failure is visible in the source panel. A red-light violati
 ![Self-play driving source Figure 5b: the policy enters an oncoming lane to bypass a red traffic-light stop line](/assets/images/self-play-driving-source-figure-5b.png)
 *Fig 1: The path bypasses the red stop line through the oncoming lane. The cropped source panel shows how a local penalty can leave a route to the same prohibited behavior. | source: [Self-Play Driving, Figure 5b](https://arxiv.org/abs/2608.30819)*
 
+[Open figure at full size](/assets/images/self-play-driving-source-figure-5b.png)
+
 The important object is the penalty's geometric support. If the reward only tests intersection with a short segment, avoiding that segment satisfies the implemented rule. Penalizing entry into the regulated junction would describe a different behavior. This is an explanation of the observed loophole, not evidence that a particular replacement reward has already solved it.
 
 Not every red-light failure has the same cause. In a manual review of 110 Transformer violations, the authors estimate that 84% occur during light transitions under different CARLA and training-simulator definitions of when a vehicle has cleared the light. The remaining 16% involve bypass behavior. Combining these into one failure rate would hide two distinct repairs: align the simulator semantics and close the reward loophole.
