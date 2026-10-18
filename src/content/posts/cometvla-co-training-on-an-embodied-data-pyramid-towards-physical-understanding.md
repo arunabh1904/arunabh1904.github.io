@@ -36,7 +36,7 @@ Read the attention grid as carefully as the module diagram. It specifies which r
 ![CometVLA architecture and attention visibility with a GAP interface and gradient boundary; source Figure 3](/assets/images/cometvla-source-figure-3.webp)
 *Fig 1: A compact GAP interface connects autoregressive multimodal modeling to continuous control. The stop-gradient boundary isolates the action expert loss while other objectives continue training the backbone. | source: [Paper, Figure 3](https://arxiv.org/abs/2608.30289)*
 
-[View full-size figure](/assets/images/cometvla-source-figure-3.webp)
+[Open figure at full size](/assets/images/cometvla-source-figure-3.webp)
 
 The appendix specifies thirty-action chunks, four flow-matching inference steps, and bimanual actions padded from fourteen to thirty-two dimensions. Co-training runs for 100,000 steps across thirty-two H200 GPUs, followed by task-specific fine-tuning. Although the main objective is written as a sum of three losses, the appendix gives VLA and VLM task scales of 1.0 and 0.1. Those mixture and weighting choices belong to the recipe.
 

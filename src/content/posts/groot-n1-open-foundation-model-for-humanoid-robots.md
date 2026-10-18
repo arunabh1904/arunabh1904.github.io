@@ -29,6 +29,8 @@ The backbone does not need to expose a final-layer semantic summary for control.
 ![Figure 1 from GR00T N1 showing the data pyramid for robot foundation model training](/assets/images/groot-n1-open-foundation-model-for-humanoid-robots-source-figure-1.webp)
 *Fig 1: The data pyramid places web and human videos at the broad base, synthetic and neural trajectories in the middle, and scarce real-robot data at the embodiment-specific top. | source: [GR00T N1: An Open Foundation Model for Generalist Humanoid Robots, Figure 1](https://arxiv.org/abs/2503.14734)*
 
+[Open figure at full size](/assets/images/groot-n1-open-foundation-model-for-humanoid-robots-source-figure-1.webp)
+
 Fig. 1 is a data allocation picture, not a quality ranking. Human video supplies visual and behavioral breadth without robot actions. Simulation supplies controllable state-action trajectories. Neural video generation expands the number of counterfactual robot-like sequences. Real robot data grounds the policy in the target hardware. The upper layers are more faithful to the deployment embodiment, but much smaller; the point of the recipe is to make the lower layers useful without letting them replace that grounding.
 
 ### Give action-less video a common label space
@@ -45,6 +47,8 @@ The simulation evaluation uses 24 RoboCasa tasks, 9 DexMimicGen cross-embodiment
 
 ![Figure 7 from GR00T N1 showing the simulation task families](/assets/images/groot-n1-open-foundation-model-for-humanoid-robots-source-figure-7.webp)
 *Fig 2: The simulation suite spans RoboCasa kitchen tasks, DexMimicGen cross-embodiment manipulation, and GR-1 tabletop tasks, linking the benchmark to the model’s heterogeneous training data. | source: [GR00T N1: An Open Foundation Model for Generalist Humanoid Robots, Figure 7](https://arxiv.org/abs/2503.14734)*
+
+[Open figure at full size](/assets/images/groot-n1-open-foundation-model-for-humanoid-robots-source-figure-7.webp)
 
 Read Fig. 2 as a coverage check. The rows do not show one homogeneous manipulation problem: they move from kitchen semantics to bimanual dexterity and humanoid tabletop control. That makes the average useful for measuring breadth, but it also means the average can conceal which embodiment is doing the work.
 

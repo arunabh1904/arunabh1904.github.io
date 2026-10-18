@@ -22,6 +22,8 @@ summary: '2026 – Molmo 2: Video Understanding and Grounding'
 ![Molmo2 data and model overview for dense captions, QA, pointing, tracking, and spatio-temporal localization](/assets/images/molmo-2-video-understanding-and-grounding-source-figure-1.webp)
 *Fig 1: Molmo2 constructs open video data for captions, QA, pointing, tracking, and temporal localization, then trains a model to answer in language or grounding coordinates. | source: [Molmo2, Figure 1](https://arxiv.org/abs/2601.10611)*
 
+[Open figure at full size](/assets/images/molmo-2-video-understanding-and-grounding-source-figure-1.webp)
+
 Molmo2’s strongest idea is easy to miss if the paper is read as another benchmark table: the output space is designed around evidence. A caption says what happened, but a point says where and when it happened; a track adds identity across frames. The authors build seven new video datasets and two multi-image datasets, including 520k pointing and tracking instances, 104k videos with dense captions, 212k long-form QA instances, and roughly 1.3M long-video QA instances. The data are constructed without distilling from closed VLMs.
 
 The caption pipeline uses human speech rather than forcing annotators to type long descriptions. Workers record detailed descriptions of clips, the audio is transcribed, and frame-level visual details from Molmo are used to enrich the transcript. The pointing pipeline asks for spatial-temporal coordinates; the tracking format adds an integer object ID so the model can follow multiple entities. These choices make the requested evidence explicit in the training target instead of asking a generic language loss to discover it accidentally.
@@ -36,6 +38,8 @@ The three-stage recipe is intentionally short and compositional: 32k steps of im
 
 ![Molmo2 message-tree attention mask for packed multimodal examples](/assets/images/molmo-2-video-understanding-and-grounding-source-figure-3.webp)
 *Fig 2: The message-tree encoding lets several annotations share visual input while a custom mask prevents one annotation branch from attending to another. | source: [Molmo2, Figure 3](https://arxiv.org/abs/2601.10611)*
+
+[Open figure at full size](/assets/images/molmo-2-video-understanding-and-grounding-source-figure-3.webp)
 
 The packing system is more than an implementation footnote. It selects examples jointly under token and crop budgets; message trees linearize about four annotations per example while preserving branch isolation. The authors report 3.8 examples per 16,384-token sequence and 15× training efficiency. This is how the recipe can afford dense, long answers without letting padding and repeated visual encoding consume the budget.
 

@@ -38,6 +38,8 @@ If each chunk is executed before the next observation, $k=1$ gives ordinary one-
 ![ACT CVAE architecture with multi-view inputs, a transformer action decoder, and a latent style variable](/assets/images/action-chunking-with-transformers-act-source-figure-4.png)
 *Fig 1: The training encoder compresses joints and a demonstrated action sequence into a latent style variable; the deployment decoder combines that variable with four camera views and joints to predict a 14-dimensional action sequence. | source: [Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware, Figure 4](https://arxiv.org/abs/2304.13705)*
 
+[Open figure at full size](/assets/images/action-chunking-with-transformers-act-source-figure-4.png)
+
 The left side of the source figure exists only during training. A BERT-like encoder reads the current joints and the demonstrated future actions, uses a learned CLS representation to parameterize a diagonal Gaussian, and produces $z$. The policy on the right sees images, joints, and $z$; at test time the encoder is discarded and $z$ is set to the zero mean of its prior. This is a practical CVAE design: the latent helps the decoder learn the range of human solutions without requiring a latent sample at deployment.
 
 The decoder processes four $480\times640$ RGB images with ResNet-18 encoders. Each view becomes $300\times512$ spatial features, giving 1,200 visual tokens after concatenation; projected joint state and $z$ add two more tokens. A transformer encoder fuses those 1,202 tokens, and a transformer decoder emits $k\times14$ targets for six arm joints and one gripper on each side. The paper reports about 80M parameters, roughly five hours of training on one RTX 2080 Ti, and about 0.01 seconds per inference on that machine. It also reports better precision with L1 reconstruction and absolute target joint positions than with delta joint positions.
@@ -57,6 +59,8 @@ Here $i=0$ is the oldest prediction. A smaller $m$ lets newer observations take 
 ![ACT action chunks and temporal ensemble for a shared target timestep](/assets/images/action-chunking-with-transformers-act-source-figure-5.png)
 *Fig 2: Overlapping chunks provide multiple estimates for the same future action; exponential weights combine those estimates so new observations can correct an older plan without an abrupt switch. | source: [Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware, Figure 5](https://arxiv.org/abs/2304.13705)*
 
+[Open figure at full size](/assets/images/action-chunking-with-transformers-act-source-figure-5.png)
+
 The figure's colored squares are not separate controllers. The first row shows a chunk predicted at one observation; the lower grid shows later chunks overlapping it. The outlined column is one target timestep, and the weighted sum turns several forecasts into the command actually sent to the low-level controller. This is why temporal ensembling can smooth motion while preserving feedback.
 
 ### Hardware and demonstrations set the operating point
@@ -65,6 +69,8 @@ ALOHA uses two off-the-shelf ViperX six-degree-of-freedom follower arms, two Wid
 
 ![ALOHA bimanual workspace, camera viewpoints, gripper mechanism, and ViperX specifications](/assets/images/action-chunking-with-transformers-act-source-figure-1.webp)
 *Fig 3: The low-cost ALOHA setup combines two ViperX follower arms, four camera viewpoints, and custom grippers so demonstrations expose the visual and coordinated motion needed by fine bimanual tasks. | source: [Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware, Figure 3](https://arxiv.org/abs/2304.13705)*
+
+[Open figure at full size](/assets/images/action-chunking-with-transformers-act-source-figure-1.webp)
 
 The real-world dataset contains 50 demonstrations for each task, except Thread Velcro with 100. Episodes last 8–14 seconds, or 400–700 control steps, so each task has about 10–20 minutes of recorded motion but 30–60 minutes of wall-clock collection after resets and operator mistakes. The policy predicts the leader's joint positions as future targets while observing the follower's current positions. That choice preserves the force relationship that the follower's low-level controller will realize.
 

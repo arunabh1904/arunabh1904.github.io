@@ -33,6 +33,7 @@ The source’s headline comparison shows whether that contract improves several 
 
 ![Visual-RFT results across open-vocabulary detection, few-shot detection, reasoning grounding, and fine-grained classification](/assets/images/visual-rft-visual-reinforcement-fine-tuning-source-figure-1.webp)
 *Fig 1: Headline results across open-vocabulary detection, few-shot detection, LISA grounding, and fine-grained classification. | source: [Visual-RFT: Visual Reinforcement Fine-Tuning, Figure 1](https://arxiv.org/abs/2503.01785)*
+[Open figure at full size](/assets/images/visual-rft-visual-reinforcement-fine-tuning-source-figure-1.webp)
 
 For detection, predicted boxes are sorted by confidence and matched to ground-truth boxes using an IoU threshold. The reward is
 
@@ -54,6 +55,7 @@ The qualitative classification examples explain why the paper asks the model to 
 
 ![Qualitative fine-grained classification examples comparing SFT with Visual-RFT](/assets/images/visual-rft-visual-reinforcement-fine-tuning-source-figure-4.webp)
 *Fig 2: SFT and Visual-RFT qualitative classification examples with explicit visual reasoning. | source: [Visual-RFT: Visual Reinforcement Fine-Tuning, Figure 4](https://arxiv.org/abs/2503.01785)*
+[Open figure at full size](/assets/images/visual-rft-visual-reinforcement-fine-tuning-source-figure-4.webp)
 
 The training settings are deliberately data-limited. The fine-grained classification and few-shot detection experiments use small per-category sets, with the classification study described as roughly 100 examples in the one-shot setting and the main short runs using 200 training steps. LISA reasoning grounding uses 239 images and 500 fine-tuning steps. These details matter because the result is about adapting a capable LVLM with a small, verifiable signal, not about replacing large-scale visual pretraining.
 

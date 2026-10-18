@@ -28,6 +28,8 @@ The Gaussian Spatial Tokenizer adds a mean, scale parameters, and an opacity-lik
 ![GaussVLA source Figure 2, cropped Gaussian Spatial Tokenizer: lift patches into 3D, parameterize geometry, then pool spatial tokens](/assets/images/gaussvla-source-figure-2-gst.png)
 *Fig 1: The tokenizer supplies a 3D position and learned geometric features before spatial pooling. This crop isolates the GST panel from the paper's full architecture diagram. | source: [GaussVLA, Figure 2](https://arxiv.org/abs/2608.24959)*
 
+[Open figure at full size](/assets/images/gaussvla-source-figure-2-gst.png)
+
 One detail is easy to miss: the confidence predictor reads semantic features, not a measured depth-uncertainty input. The authors interpret its learned behavior as depth-aware because the confidence-weighted consistency objective links it to geometric error, and appendix probes test related correlations. It should not be treated as a calibrated probability that the depth is correct.
 
 The 128 learned pooling queries compress 256 patch features per camera. A low-confidence patch receives less attention through a logarithmic confidence bias. Intuitively, the policy can emphasize a stable surface over an ambiguous boundary; whether that behavior remains reliable under a new depth failure is an empirical question. More pooling queries barely help beyond the default: increasing 128 to 256 changes LIBERO success from 93.5% to 93.6% while increasing reported latency from 12.97 to 14.1 ms.

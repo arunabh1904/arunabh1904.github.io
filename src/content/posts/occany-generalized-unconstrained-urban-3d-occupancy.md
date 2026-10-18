@@ -30,6 +30,8 @@ The reconstruction stage starts from MUSt3R, freezes its encoder, and trains a d
 ![OccAny accepts sequential, monocular, and surround-view images and produces occupancy and promptable features](/assets/images/occany-generalized-unconstrained-urban-3d-occupancy-paper-figure.webp)
 *Fig 1: The source’s Figure 1 shows the generalized input modes and the metric occupancy and segmentation outputs of OccAny. | source: [OccAny: Generalized Unconstrained Urban 3D Occupancy, Figure 1](https://arxiv.org/abs/2603.23502)*
 
+[Open the full-size source figure](/assets/images/occany-generalized-unconstrained-urban-3d-occupancy-paper-figure.webp)
+
 ### Novel views turn occlusion into an inference-time resource
 
 The rendering stage receives sampled camera poses along the predicted trajectory and reconstructs pointmaps and segmentation features for those novel views. A smaller rendering encoder is initialized from the reconstruction stage and distilled from its larger 24-block encoder. At inference, Test-Time View Augmentation samples forward and lateral shifts, aggregates original and rendered pointmaps, and voxelizes them with trilinear interpolation. It is a completion operation: a synthesized view can hypothesize a surface hidden from the input cameras. That completion adds a learned prior, not a new sensor observation.
@@ -37,7 +39,9 @@ The rendering stage receives sampled camera poses along the predicted trajectory
 ![OccAny two-stage reconstruction and novel-view-rendering training pipeline](/assets/images/occany-generalized-unconstrained-urban-3d-occupancy-source-figure-2.webp)
 *Fig 2: The source’s Figure 2 shows reconstruction, scene-memory formation, Segmentation Forcing, and the novel-view rendering stage trained from sampled poses. | source: [OccAny: Generalized Unconstrained Urban 3D Occupancy, Figure 2](https://arxiv.org/abs/2603.23502)*
 
-The result is a deliberate accuracy–compute trade. In the reported six-input, six-render-view surround configuration, reconstruction takes 93.8 ms and rendering 123.2 ms, with about 651M parameters in the forward path. The strongest ablation changes happen when test-time view augmentation is removed, which means the headline generalization is partly an inference-time computation result rather than a purely feed-forward representation result.
+[Open the full-size source figure](/assets/images/occany-generalized-unconstrained-urban-3d-occupancy-source-figure-2.webp)
+
+The result is a deliberate accuracy–compute trade. In the reported six-input, six-render-view surround configuration, reconstruction takes 93.8 ms and rendering 123.2 ms, with about 651M parameters in the forward path. The ablation quantifies the dependency on test-time view augmentation: removing TTVA drops sequence IoU from 25.91 to 19.64 and monocular IoU from 24.03 to 11.55, while forward, rotational, and lateral views recover the gap incrementally. The headline generalization is therefore partly an inference-time computation result rather than a purely feed-forward representation result.
 
 ### Geometry travels farther than semantics
 

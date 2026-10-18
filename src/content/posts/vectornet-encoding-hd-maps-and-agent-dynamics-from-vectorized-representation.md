@@ -30,6 +30,8 @@ The hierarchy below makes two different relationships explicit. Vectors within o
 ![VectorNet source Figure 2: vector inputs, local polyline graphs, global interaction, and prediction](/assets/images/vectornet-source-figure-2-hierarchy.png)
 *Fig 1: Local graphs compress the segments of each map element or agent history into one polyline feature. Global attention exchanges information between those features before trajectory prediction and the training-only completion task. | source: [VectorNet, Figure 2](https://arxiv.org/abs/2005.04259)*
 
+[Open figure at full size](/assets/images/vectornet-source-figure-2-hierarchy.png)
+
 ### Local pooling and global attention do different jobs
 
 Inside a polyline, a shared MLP embeds each segment. Max pooling summarizes the embedded segments, and that summary is concatenated back onto each segment's own feature. Repeating the operation lets a segment representation incorporate information about the entire polyline. A final max pool yields one polyline embedding. The implementation uses three local graph layers, with layer normalization and ReLU in the MLPs.
@@ -61,6 +63,8 @@ The figure crop below pairs a prediction with attention over the same scene. Gra
 
 ![VectorNet source Figure 4, one example pair: trajectory prediction and corresponding attention](/assets/images/vectornet-encoding-hd-maps-and-agent-dynamics-from-vectorized-representation-source-figure-4.webp)
 *Fig 2: This example pair is cropped from the paper's qualitative figure. The prediction is shown beside attention over map and agent features; stronger attention on relevant lanes illustrates context selection, not a guarantee of correct motion. | source: [VectorNet, Figure 4, example crop](https://arxiv.org/abs/2005.04259)*
+
+[Open figure at full size](/assets/images/vectornet-encoding-hd-maps-and-agent-dynamics-from-vectorized-representation-source-figure-4.webp)
 
 The full paper includes a case where attention selects a reasonable lane but the trajectory is still inaccurate. That separates representation from decoding: finding the road geometry does not determine how fast an agent will travel or which plausible future it will choose. The simple decoder is deliberately compatible with a later multimodal predictor. The reported Argoverse test comparison uses one predicted trajectory, with 4.01 m final displacement error and 1.81 m ADE.
 

@@ -42,7 +42,11 @@ The visible source diagram below shows one pair of views for clarity. In the ful
 ![DINO student and momentum-teacher self-distillation](/assets/images/emerging-properties-self-supervised-vision-transformers-dino-source-figure-2.webp)
 *Fig 1: One view pair passes through student and teacher networks; the teacher is centered, stop-gradient is applied to its target, and an exponential moving average updates its weights. The paper expands this pair into its multi-crop loss. | source: [DINO, Figure 2](https://arxiv.org/abs/2104.14294)*
 
+[Open figure at full resolution](/assets/images/emerging-properties-self-supervised-vision-transformers-dino-source-figure-2.webp)
+
 The teacher logits are centered by a batch statistic updated with its own exponential moving average, then divided by a low temperature to sharpen the distribution. The student uses temperature 0.1; the teacher temperature is warmed from 0.04 to 0.07 during the first 30 epochs. These are target-generation choices, not cosmetic normalization. The center removes a dominant output dimension, while sharpening prevents the target from becoming uniform.
+
+k-NN evaluation freezes the features and sweeps the neighbor count, with 20 neighbors selected for the reported protocol; linear probing and fine-tuning are separate evaluations.
 
 ### Collapse is a balance between two failure modes
 
@@ -57,6 +61,8 @@ At $224\times224$, a ViT-S/16 has 197 tokens including the class token; ViT-S/8 
 ![DINO k-NN accuracy versus throughput for different patch sizes](/assets/images/dino-source-figure-5-throughput.png)
 *Fig 2: In this 300-epoch sweep, smaller input patches improve k-NN accuracy without adding model parameters, but the curve moves left because the longer token sequence lowers throughput. The plotted ViT-B/8 and ViT-S/8 points expose this accuracy–systems trade-off. | source: [DINO, Figure 5](https://arxiv.org/abs/2104.14294)*
 
+[Open figure at full resolution](/assets/images/dino-source-figure-5-throughput.png)
+
 Multi-crop has a similar budget trade-off. On two eight-GPU machines, two global crops alone reach 72.5% after 300 epochs in 45.9 hours and use 9.3 GB per GPU. Adding ten local crops reaches 76.1% in 72.6 hours and uses 15.4 GB; at 100 epochs, the ten-crop run reaches 74.6% in 24.2 hours while the global-only run reaches 67.8% in 15.3 hours. The authors' useful comparison is that the ten-crop recipe reaches about two points more than the 300-epoch global-only result after only 100 epochs, while using more memory per GPU. Its 24.2-hour training run is shorter than the 45.9-hour global-only baseline. More views eventually saturate: six local crops reach 75.9%, only 0.2 points below ten.
 
 ### Attention exposes structure the loss never names
@@ -65,6 +71,8 @@ The last-layer class-token attention of DINO ViT-S/8 often isolates an object or
 
 ![Attention-derived masks from supervised and DINO ViTs](/assets/images/emerging-properties-self-supervised-vision-transformers-dino-source-figure-4.webp)
 *Fig 3: Thresholding a single best class-token attention head at 60% mass produces more object-aligned masks for DINO than for supervised ViTs on these examples; the bottom table reports PASCAL VOC Jaccard scores. | source: [DINO, Figure 4](https://arxiv.org/abs/2104.14294)*
+
+[Open figure at full resolution](/assets/images/emerging-properties-self-supervised-vision-transformers-dino-source-figure-4.webp)
 
 This is a representation probe, not a segmentation system. The attention maps are smooth and were never optimized against masks; choosing a head and a threshold is part of the evaluation. The dense transfer result is also deliberately lightweight: on DAVIS-2017, the authors match features between consecutive frames without training a task head or fine-tuning the backbone. ViT-B/8 reaches 71.4 on mean $\mathcal{J}\&\mathcal{F}$, compared with 62.3 for ViT-B/16. In retrieval, frozen DINO ViT-S/16 features trained on Google Landmarks v2 reach 51.5/24.3 mAP on the Medium/Hard Oxford splits and 75.3/51.6 on the corresponding Paris splits. These results suggest that spatial and instance information survives the image-level pretext task, but they do not establish universal dense-task performance.
 

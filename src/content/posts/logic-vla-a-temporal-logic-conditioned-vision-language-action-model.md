@@ -30,6 +30,8 @@ The source panel isolates how the formula acquires meaning. Follow the two paths
 ![Logic-VLA source Figure 1, cropped pretraining panel: robustness-supervised logic encoding](/assets/images/logic-vla-source-figure-1.png)
 *Fig 1: Formula–trajectory robustness trains the logic encoder before its embedding becomes a VLA condition. The trajectory encoder and regression head are discarded for deployment. Cropped from the pretraining panel. | source: [Logic-VLA, Figure 1](https://arxiv.org/abs/2608.20556)*
 
+[Open figure at full size](/assets/images/logic-vla-source-figure-1.png)
+
 Robustness pretraining uses a bounded transformation of normalized signal temporal logic robustness, trained with Huber loss. This asks the representation to distinguish formulas by their consequences for trajectories rather than their textual similarity. It does not make the final policy a symbolic solver or install a runtime shield.
 
 ### Preference learning needs more than a relative winner

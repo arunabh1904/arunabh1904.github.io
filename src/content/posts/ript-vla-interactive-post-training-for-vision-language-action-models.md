@@ -24,6 +24,8 @@ summary: "2025 – RIPT-VLA: Interactive Post-Training for Vision-Language-Actio
 ![RIPT-VLA training progression from broad pretraining and supervised fine-tuning to interactive reinforcement post-training](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-paper-figure.png)
 *Fig 1: The additional stage is interactive post-training, where the SFT policy generates the states it must learn to handle instead of only replaying demonstration states. | source: [RIPT-VLA, Figure 1](https://arxiv.org/abs/2505.17016)*
 
+[Open figure at full size](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-paper-figure.png)
+
 ### A group of rollouts turns a binary outcome into relative credit
 
 For a fixed initial observation and language goal, RIPT-VLA samples $K$ trajectories. If rollout $k$ has reward $R_k\in\{0,1\}$, its leave-one-out baseline is the mean reward of the other $K-1$ rollouts. A successful trajectory is then rewarded for being better than its siblings, and a failed trajectory is penalized when the group contains a success. PPO clips the ratio between the updated policy and the sampling policy. This avoids learning a value function for a long-horizon VLA and makes the credit signal comparable within the same initial context.
@@ -35,6 +37,8 @@ The important engineering choice is dynamic rollout sampling. A group where ever
 ![Figure 6 from RIPT-VLA: performance as the one-shot cross-scenario rollout context set grows](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-source-figure-6.webp)
 *Fig 2: With one SFT demonstration in a new scenario, adding unlabeled initial contexts for rollout improves cross-scenario success; one context already gives RIPT a 36.8-point advantage over SFT. | source: [RIPT-VLA, Figure 6](https://arxiv.org/abs/2505.17016)*
 
+[Open figure at full size](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-source-figure-6.webp)
+
 The context dataset contains only initial observations and goals; it needs no action annotation. Figure 2 shows why this can be a cheap scaling axis. In the one-shot cross-scenario setting, RIPT starts 36.8 points above SFT with one rollout context and continues improving as the context set grows to 40. More contexts expose the policy to different object placements and visual starting states while the reward remains the same binary task completion signal.
 
 The robustness check is unusually concrete. In LIBERO-LONG, the typical initial object-position standard deviation is about 2.5 cm. Performance remains stable through that scale and begins to degrade beyond 2.0× it; even at 7.0×, or 17.5 cm, RIPT remains above the SFT baseline. This is evidence for robustness to setup variation within the benchmark, not evidence that any real-world reset distribution can be substituted for matched contexts.
@@ -44,9 +48,13 @@ The robustness check is unusually concrete. In LIBERO-LONG, the typical initial 
 ![Figure 2 from RIPT-VLA: few-shot LIBERO-LONG success across demonstration counts](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-source-figure-2.webp)
 *Fig 3: On LIBERO-LONG, RIPT preserves an advantage from one through ten demonstrations and gains 20.8 points over SFT with one demonstration. | source: [RIPT-VLA, Figure 2](https://arxiv.org/abs/2505.17016)*
 
+[Open figure at full size](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-source-figure-2.webp)
+
 The two base models make the scale distinction clear. QueST is a 20M-parameter tokenized-skill VLA; OpenVLA-OFT is a 7B model with a continuous action head. On the four LIBERO suites, QueST rises from 82.7% average success to 93.6% with RIPT: Goal 80.8→92.7, Spatial 87.4→95.6, Object 93.6→98.4, and Long 68.8→87.5. OpenVLA-OFT is already at 96.7% and still reaches 97.5% after RIPT. In the broader evaluation, QueST improves to 94.3% on LIBERO-90 and 92.2% on MetaWorld45; with five demonstrations it reaches 71.4% on LIBERO-LONG versus 50.2% for QueST SFT.
 
 Cross-scenario generalization rises as high as 3.5%→97.2% with five or fewer demonstrations in the paper’s paired tasks. Cross-goal transfer is harder: with three demonstrations, average success is 0.7% for SFT and 59.7% after RIPT; at ten demonstrations, the comparison is 29.4% versus 79.7%. The method needs a nonzero initial capability and a reliable binary task evaluator. It does not test real-robot wear, unsafe exploration, or a reward that is delayed beyond a clean simulator success predicate.
+
+The evaluation protocol keeps the data bill visible: LIBERO and MetaWorld tasks use 50 expert demonstrations for training and 50 held-out rollouts for evaluation. The cross-scenario plots evaluate 50 held-out contexts in the new scenario and average three random seeds. The reported gains therefore come from interactive rollouts over fixed task contexts, not from quietly adding action labels to the context set.
 
 ## High-Level Takeaways
 

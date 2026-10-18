@@ -23,6 +23,8 @@ The difficulty is perspective. For a distant, nearly horizontal road, neighborin
 ![DeepLiDAR Figure 2 illustrates depth sensitivity to the same surface-normal error at different ranges](/assets/images/deeplidar-source-figure-2.png)
 *Fig 1: The yellow normal has the same angular error in both examples, but its distant ray intersection produces a much larger red depth error. Useful local orientation is not equally reliable as a distance constraint at every range. | source: [DeepLiDAR, Figure 2](https://arxiv.org/abs/1812.00488)*
 
+[Open Figure 2 at full resolution](/assets/images/deeplidar-source-figure-2.png)
+
 The normal-guided path is learned, not a separate analytic plane-fitting solver at inference. It first predicts normals from RGB and sparse depth, then combines those normals with sparse depth to predict a dense map. The parallel color path predicts dense depth from RGB and sparse depth directly. Both paths retain metric input; “color pathway” does not mean monocular-only estimation.
 
 ### Fuse the two depth estimates where each is useful
@@ -31,6 +33,8 @@ Each path produces a spatial score map from its final features. A softmax conver
 
 ![DeepLiDAR Figure 3 shows color and normal pathways, a confidence mask, and weighted depth fusion](/assets/images/deeplidar-source-figure-3.png)
 *Fig 2: The upper path predicts depth directly; the lower path first predicts normals and then depth. Their attention maps decide how to combine outputs, while the separate confidence mask controls sparse-depth reliability in the normal pathway. | source: [DeepLiDAR, Figure 3](https://arxiv.org/abs/1812.00488)*
+
+[Open Figure 3 at full resolution](/assets/images/deeplidar-source-figure-3.png)
 
 The learned attention maps put more normal-path weight on many nearby regions and more color-path weight on some distant regions. This matches the geometric motivation, but the weights remain features optimized for final depth accuracy. They are not a proof that one branch has a known uncertainty at every pixel.
 
@@ -52,7 +56,7 @@ DeepLiDAR predicts a soft confidence mask from the color pathway and supplies it
 | Binary confidence mask | 756.32 | Learned sparse-depth reliability |
 | Early-fusion architecture | 767.82 | Deep completion unit's late fusion |
 
-These are retrained ablations on validation data. The separate held-out test result is 758.38 mm RMSE and 226.50 mm MAE, compared with 814.73 and 249.95 for the cited Sparse-to-Dense model. DeepLiDAR does not win every metric in that table: Spade-RGBsD has lower inverse-depth RMSE, 2.17 versus 2.56, and lower inverse-depth MAE, 0.95 versus 1.15. The paper's headline ranking uses ordinary depth RMSE, which emphasizes large absolute errors. Runtime is 0.07 seconds per image on a GTX 1080 Ti.
+These are retrained ablations on validation data. The held-out KITTI test split contains 1,000 samples with hidden ground truth and is scored by the server, whose leaderboard is ranked by depth RMSE. Its result is 758.38 mm RMSE and 226.50 mm MAE, compared with 814.73 and 249.95 for the cited Sparse-to-Dense model. DeepLiDAR does not win every metric in that table: Spade-RGBsD has lower inverse-depth RMSE, 2.17 versus 2.56, and lower inverse-depth MAE, 0.95 versus 1.15. The paper's headline ranking uses ordinary depth RMSE, which emphasizes large absolute errors. Runtime is 0.07 seconds per image on a GTX 1080 Ti.
 
 Training also matters. The authors render 50,000 synthetic CARLA examples with depth and normals, then fine-tune on KITTI, deriving normal targets from depth by local plane fitting. They train normal prediction first, then the two depth pathways, and finally their combined output. “End-to-end” describes the final joint optimization; it does not mean every component starts from scratch together or that normal supervision is absent.
 

@@ -30,6 +30,8 @@ This initialization matters because a learned or random query must spend decoder
 ![TransFusion source Figure 2: LiDAR queries followed by soft image fusion](/assets/images/transfusion-paper-figure-2.png)
 *Fig 1: The first decoder layer predicts initial 3D boxes from LiDAR object queries; the second layer uses those predictions to guide spatially modulated cross-attention over camera features. | source: [TransFusion, Figure 2](https://arxiv.org/abs/2203.11496)*
 
+[Open Figure 1 at full resolution](/assets/images/transfusion-paper-figure-2.png)
+
 ### SMCA turns calibration into a locality hint
 
 Point-level fusion projects each LiDAR return to one image pixel. That correspondence is brittle when an object has few returns, when useful texture lies between them, or when calibration is slightly wrong. TransFusion keeps the complete image feature maps as a memory bank. The predicted query box is projected into its relevant camera, and spatially modulated cross-attention multiplies the attention map by a two-dimensional Gaussian around the projected box center. The radius comes from the projected 3D box, so larger or farther geometry changes the area the query can inspect.
@@ -38,6 +40,8 @@ The query is therefore encouraged to look near the object but can choose several
 
 ![TransFusion source Figure 1: hard point-to-pixel fusion under bad illumination and sparse returns](/assets/images/transfusion-robust-lidar-camera-fusion-with-transformers-source-figure-1.webp)
 *Fig 2: The source failure cases show bad illumination and the sparse projected points that waste dense image evidence; a small calibration offset can move those points outside the object. | source: [TransFusion, Figure 1](https://arxiv.org/abs/2203.11496)*
+
+[Open Figure 2 at full resolution](/assets/images/transfusion-robust-lidar-camera-fusion-with-transformers-source-figure-1.webp)
 
 The optional image-guided query initialization addresses a different failure. A LiDAR heatmap can miss a small or distant object entirely. TransFusion collapses each image feature map along height, uses cross-attention with the LiDAR BEV features to form an image-guided BEV hint, averages its heatmap with the LiDAR-only heatmap, and selects queries from the result. The image branch suggests where a candidate may exist; the LiDAR branch still supplies the geometric anchor.
 
@@ -48,13 +52,18 @@ The paper's qualitative attention maps are more informative than a claim that th
 ![TransFusion source Figure 3: object-query projections and cross-attention maps](/assets/images/transfusion-robust-lidar-camera-fusion-with-transformers-source-figure-3.webp)
 *Fig 3: The first row projects query predictions onto nuScenes and Waymo images; the second shows the cross-attention maps. The queries select relevant image regions beyond the sparse LiDAR points. | source: [TransFusion, Figure 3](https://arxiv.org/abs/2203.11496)*
 
+[Open Figure 3 at full resolution](/assets/images/transfusion-robust-lidar-camera-fusion-with-transformers-source-figure-3.webp)
+
 TransFusion-L evaluates the first decoder stage without camera fusion. This gives a LiDAR-only baseline, and the authors say fusion can be disabled when a camera failure is known. Keeping fusion enabled with missing images is a different test: the model must tolerate corrupted image features, as the experiments below show. On nuScenes test, TransFusion-L reaches 65.5 mAP/70.2 NDS, and the fused model reaches 68.9/71.7 without test-time augmentation or a model ensemble. The fused model also reports 71.8 AMOTA on the nuScenes tracking test, compared with 68.6 for TransFusion-L.
+The set-prediction assignment also lets the detector emit all query predictions without NMS. In the supplement's matched validation comparison, TransFusion stays at 65.60 mAP with or without NMS, while a reproduced CenterPoint baseline drops from 57.41 to 45.70 when NMS is removed. That is a property of the assignment and decoder design, not a consequence of soft image fusion alone.
 
 ### Robustness is measured with controlled sensor failures
 
 The image-quality experiments use the nuScenes validation split with shortened 12-epoch training and compare TransFusion against two hard-fusion baselines built on the same LiDAR model: point-wise concatenation (CC) and PointAugmenting (PA). At night, TransFusion reaches 55.2 mAP, compared with 51.0 for PA and 49.4 for CC; in daytime it reaches 65.7, compared with 64.3 and 63.4. When images are dropped, TransFusion falls from 65.6 mAP with all views to 65.1 with one missing image, 63.9 with three, and 61.7 with six. CC falls to 39.5 and PA to 47.0 when six images are missing.
 
 The calibration test randomly translates the camera-to-LiDAR transform. At a one-meter offset, TransFusion loses 0.49 mAP percentage points; PA loses 2.33 and CC 2.85, all in the paper's 12-epoch validation stress test. The paper's explanation is specific: the calibration projects the query into an approximate image region, but the cross-attention can still choose useful pixels around it. This is a robustness mechanism supported by the perturbation, rather than a claim that calibration no longer matters.
+
+Training is two-stage: the LiDAR backbone and first decoder layer train before fusion and image-guided query initialization. The nuScenes image backbone is frozen DLA34 at half resolution, and the model consumes ten previous LiDAR sweeps; Waymo uses a single sweep, 798/202 train/validation scenes, and cameras covering only about 250 degrees. The robustness study removes the fade strategy, so its absolute scores are a stress-test comparison rather than the main leaderboard recipe.
 
 ## High-Level Takeaways
 

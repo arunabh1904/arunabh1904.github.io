@@ -27,6 +27,8 @@ The planning prompt combines that scene summary with route, ego pose, and veloci
 ![DriveVLM's semantic planning branch exchanges geometry and trajectory guidance with the conventional driving pipeline](/assets/images/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models-paper-figure.png)
 *Fig 1: Follow both cross-branch connections: 3D perception provides object geometry to scene analysis, while the slow trajectory guides fast refinement. The lower planner can keep operating between VLM updates. | source: [DriveVLM, Figure 1](https://arxiv.org/abs/2402.12289)*
 
+[Open figure at full size](/assets/images/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models-paper-figure.png)
+
 ### The dual system has two concrete interfaces
 
 The perception interface projects detected 3D boxes into the image and matches them to the VLM's critical-object boxes using category agreement and an overlap threshold. The paper's “approximate IoU” divides intersection area by the projected detector-box area, rather than by the union. Matched objects contribute measured centers, orientations, and history as language prompts. Unmatched objects remain available through image-derived tokens, so an unfamiliar object need not disappear merely because the conventional detector lacks its class.
@@ -49,10 +51,12 @@ These are open-loop comparisons against logged futures, averaged over the report
 
 ### SUP-AD measures decision-relevant description on deliberately difficult clips
 
-SUP-AD contains 1,000 clips spanning over 40 scenario categories, mined for unusual objects and changing driving maneuvers. Annotators typically choose a keyframe 0.5–1 second before the maneuver; recorded vehicle motion supplies waypoint labels. This curated distribution emphasizes situations where an explanation may matter, rather than estimating their prevalence in ordinary driving.
+SUP-AD contains 1,000 clips spanning over 40 scenario categories, mined for unusual objects and changing driving maneuvers. Annotators typically choose a keyframe 0.5–1 second before the maneuver; recorded vehicle motion supplies waypoint labels. The data use a 7.5:1:1.5 train/validation/test split, and training co-tunes random samples from Talk2Car, BDD-X, DRAMA, SUTD, and LLaVA at a 1:1 ratio to the SUP-AD and nuScenes data volume to preserve general VLM ability. The default Qwen-VL input is the current image plus frames from one, two, and three seconds earlier, while the reported deployment configuration is separately optimized. This curated distribution emphasizes situations where an explanation may matter, rather than estimating their prevalence in ordinary driving.
 
 ![SUP-AD construction-scene annotation links workers and blocked road space to a sequence of driving actions](/assets/images/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models-source-figure-2.webp)
 *Fig 2: Separate the workers' effect on speed from the construction zone's effect on the available path. The annotation connects object-specific influences to a sequence of meta-actions and a more detailed decision. | source: [DriveVLM, Figure 2](https://arxiv.org/abs/2402.12289)*
+
+[Open figure at full size](/assets/images/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models-source-figure-2.webp)
 
 The scene-description metric uses GPT-4 to match extracted facts to annotations, with partial credit and penalties for unsupported additions. Meta-actions use sequence matching with lower penalties for selected conservative actions and alternative acceptable sequences. DriveVLM scores 0.71 on description and 0.37 on meta-actions, versus 0.38 and 0.19 for GPT-4V. The comparison mixes supervised fine-tuning with GPT-4V in-context prompting, so it evaluates the configured systems rather than isolating foundation-model quality.
 

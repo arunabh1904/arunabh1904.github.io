@@ -30,6 +30,8 @@ The cropped source panel shows the attention pattern and frame sampling. Read ea
 ![StreamPI source Figure 2, cropped attention-mask and interval-sampling panels](/assets/images/streampi-source-figure-2.png)
 *Fig 1: Each cached temporal unit binds images to the instruction. Bidirectional diagonal blocks allow local fusion, while causal cross-frame attention makes the historical representation reusable. The source is cropped to its mask and sampling panels. | source: [StreamPI, Figure 2](https://arxiv.org/abs/2608.26067)*
 
+[Open figure at full size](/assets/images/streampi-source-figure-2.png)
+
 “No additional parameters” does not mean no adaptation. The authors fully fine-tune the inherited weights, using three or five frames during training. The contribution is a change in information flow and training distribution, without a separate video encoder or memory network. Preserving the parameter shapes alone does not prove that all pretrained capabilities survive that fine-tuning.
 
 ### Temporal spacing is part of the input distribution

@@ -28,6 +28,8 @@ Each element has an instance embedding, and each sampled point has a shared poin
 ![MapTRv2 Figure 4 compares structured attention and image-feature sampling choices](/assets/images/maptrv2-an-end-to-end-framework-for-online-vectorized-hd-map-construction-paper-figure.png)
 *Fig 1: The middle panel separates communication between map elements from communication along each element. The right panel asks a different question: whether those queries retrieve visual evidence through a BEV map, projected camera views, or both. | source: [MapTRv2, Figure 4](https://arxiv.org/abs/2308.05736)*
 
+[open full-size figure](/assets/images/maptrv2-an-end-to-end-framework-for-online-vectorized-hd-map-construction-paper-figure.png)
+
 The isolated attention ablation excludes the extra one-to-many matching branch. Under that setup, decoupled attention uses 8,458 MB instead of 10,443 MB and raises mAP from 57.1 to 57.6. At 125 instance queries, vanilla attention runs out of memory on the tested 24-GB GPU, while decoupled attention uses 10,378 MB. The practical gain is room for more structured predictions. It is not an inference-speed win in this comparison: FPS falls slightly from 14.7 to 14.1.
 
 ### More positive matches spend training memory to improve convergence
@@ -40,6 +42,8 @@ Dense losses complement this assignment change. LiDAR points supply training dep
 
 ![MapTRv2 Figure 7 compares validation accuracy across training epochs](/assets/images/maptrv2-an-end-to-end-framework-for-online-vectorized-hd-map-construction-source-figure-7.webp)
 *Fig 2: MapTRv2 reaches 61.5 mAP at 24 epochs, above MapTR's 58.7 at 110. The curve demonstrates better convergence in epochs; the additional training branch means it should not be read as an equal reduction in training compute. | source: [MapTRv2, Figure 7](https://arxiv.org/abs/2308.05736)*
+
+[open full-size figure](/assets/images/maptrv2-an-end-to-end-framework-for-online-vectorized-hd-map-construction-source-figure-7.webp)
 
 ### Direct image sampling depends on the geometry available for supervision
 

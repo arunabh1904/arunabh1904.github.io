@@ -29,6 +29,7 @@ KTO changes the feedback required for preference optimization. DPO expects a cho
 
 ![KTO implied human value curves showing loss aversion and a reference point for preferred and rejected outcomes](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-paper-figure.png)
 *Fig 1: The paper compares the implied value curves of prospect theory, PPO-Clip, and DPO. The reference point and asymmetric gain/loss response motivate KTO; these are conceptual value curves rather than measured KTO outcomes. | source: [KTO, Figure 1](https://arxiv.org/abs/2402.01306)*
+[Open figure at full size](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-paper-figure.png)
 
 In the default objective, the log probability ratio of a completion under the policy and reference model is compared with that reference point. Desirable examples use a sigmoid of the difference; undesirable examples reverse its sign. In practice, the reference point is estimated using mismatched prompt–response pairs within the microbatch, clamped nonnegative, and excluded from backpropagation. This is a convenient biased estimate, not an exact per-prompt KL calculation.
 
@@ -38,6 +39,7 @@ The first comparison asks whether the broader human-aware loss family matters at
 
 ![Figure 2 from KTO: Model Alignment as Prospect Theoretic Optimization](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-2.webp)
 *Fig 2: Across model sizes, HALO objectives such as DPO and offline PPO score closer to or above the SFT target than SLiC and conditional SFT in GPT-4-judged comparisons. | source: [KTO, Figure 2](https://arxiv.org/abs/2402.01306)*
+[Open figure at full size](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-2.webp)
 
 | Design choice | KTO's answer | Operational consequence |
 | --- | --- | --- |
@@ -47,8 +49,11 @@ The first comparison asks whether the broader human-aware loss family matters at
 
 The KTO-specific comparison comes next. In Figure 3, SFT+KTO is competitive with SFT+DPO across Pythia and Llama scales. KTO alone is better than DPO alone for the Llama 7B, 13B, and 30B models, with the gap significant at 7B and 30B after the paper's multiple-comparison correction. The authors also note that KTO is more sensitive to learning rate than the other hyperparameters and recommend a larger practical learning rate than DPO; the exact setting is part of the result, not an implementation footnote.
 
+Two stress tests sharpen the claim. On Llama-7B, KTO can discard up to 90% of the desirable examples while retaining the undesirable examples and still outperforming DPO after reweighting the two classes. On Llama-13B and 30B, KTO remains competitive even without an SFT stage, whereas DPO without SFT tends to ramble and hallucinate longer conversations. These results support the data-interface claim, but they remain tied to the paper's preference-derived labels and language-model evaluation.
+
 ![Figure 3 from KTO: Model Alignment as Prospect Theoretic Optimization](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-3.webp)
 *Fig 3: KTO is competitive with DPO across the Pythia and Llama scales; for the Llama models, KTO alone matches the reported SFT-plus-DPO comparison more closely than DPO alone. | source: [KTO, Figure 3](https://arxiv.org/abs/2402.01306)*
+[Open figure at full size](/assets/images/kto-model-alignment-as-prospect-theoretic-optimization-source-figure-3.webp)
 
 ### Binary feedback changes the data contract
 

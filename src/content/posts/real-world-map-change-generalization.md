@@ -31,6 +31,8 @@ The qualitative comparison reveals what aggregate scores hide. Follow the outdat
 ![Source Figure 4 compares camera observations, old maps, predictions, and updated labels for four real changes](/assets/images/real-map-change-source-figure.png)
 *Fig 1: Small geometry changes are easier to correct than new medians or road layouts. The lower examples preserve substantial obsolete structure despite sensor evidence of a changed scene. | source: [Real World Map Change Generalization, Figure 4; figure crop](https://arxiv.org/abs/2406.01961)*
 
+[open full-size figure](/assets/images/real-map-change-source-figure.png)
+
 ### The model can learn to denoise instead of consult sensors
 
 The network uses pretrained camera and LiDAR BEV features and a MapTR-like vector decoder. Shared point MLPs and pooled polyline features encode prior geometry and class into hierarchical query tokens. Those tokens replace fixed queries and are refined against sensor BEV. Randomly inserting padding avoids tying particular query positions permanently to prior availability.

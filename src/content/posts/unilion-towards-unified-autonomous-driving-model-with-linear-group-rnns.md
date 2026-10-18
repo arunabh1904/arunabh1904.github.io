@@ -26,10 +26,14 @@ That choice changes what “fusion” means. There is no camera–LiDAR cross-at
 ![UniLION compares explicit fusion pipelines with one backbone and parallel task heads](/assets/images/unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns-paper-figure.webp)
 *Fig 1: The comparison contrasts explicit multi-modal and temporal fusion with UniLION's shared 3D backbone and decoupled task heads. | source: [UniLION: Towards a Unified Autonomous Driving Model with Linear Group RNNs, Figure 1](https://arxiv.org/abs/2511.01768)*
 
+[Open the full-size source figure](/assets/images/unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns-paper-figure.webp)
+
 The spatial descriptor is not cosmetic. In the paper's Figure 4, voxels numbered 01 and 34 are adjacent in the 2D grid but become separated by the scan order along the x axis. The descriptor supplies spatial coordinates so the recurrent operator does not have to infer all locality from sequence position alone. The design therefore buys long-range token interaction through linear-time recurrence while adding explicit spatial information where the sequence representation is lossy.
 
 ![Flattening a 3D window can separate adjacent voxels in sequence order](/assets/images/unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns-source-figure-4.webp)
 *Fig 2: The example shows why spatial descriptors are needed when a 2D neighborhood is flattened into a 1D recurrent sequence. | source: [UniLION: Towards a Unified Autonomous Driving Model with Linear Group RNNs, Figure 4](https://arxiv.org/abs/2511.01768)*
+
+[Open the full-size source figure](/assets/images/unilion-towards-unified-autonomous-driving-model-with-linear-group-rnns-source-figure-4.webp)
 
 ### One rich training model provides fallbacks, with a distribution cost
 
@@ -43,7 +47,7 @@ On the full nuScenes validation setup, the LCT model reaches 73.2 mAP and 75.4 N
 
 UniLION trains detection, tracking, map segmentation, occupancy, motion, and planning from the shared BEV state, but the task heads still impose competing gradients. Adding dynamic loss balancing changes the R50 ablation from 73.3 NDS, 74.1 AMOTA, 71.2 mIoU, and 50.4 RayIoU to 73.6, 75.0, 71.8, and 50.2 respectively. The gain is broad but not monotonic: occupancy slightly falls while detection, tracking, and mapping improve.
 
-The training schedule also matters. Perception is trained first, temporal variants are initialized from single-frame perception, and motion and planning are trained after the temporal perception model is frozen. “Unified model” therefore describes parameter reuse and a common representation more strongly than it describes one jointly optimized end-to-end objective. The benchmarks are nuScenes and Occ3D-nuScenes, with six cameras and 2 Hz annotations; the paper does not report a matched hardware latency, memory, or throughput comparison that would quantify the practical benefit of the linear operator.
+The training schedule also matters. Single-frame perception starts with detection and mapping, then adds occupancy under a reduced augmentation set; temporal variants start from that checkpoint, and motion and planning are trained after temporal perception is frozen. “Unified model” therefore describes parameter reuse and a common representation more strongly than it describes one jointly optimized end-to-end objective. The benchmarks are nuScenes and Occ3D-nuScenes, with six cameras and 2 Hz annotations; the paper does not report a matched hardware latency, memory, or throughput comparison that would quantify the practical benefit of the linear operator.
 
 ## High-Level Takeaways
 
@@ -51,4 +55,4 @@ The training schedule also matters. Perception is trained first, temporal varian
 - A rich-sensor checkpoint can survive missing history or cameras, but the LiDAR-only fallback remains weaker than a LiDAR-specialized model; graceful degradation needs an explicit acceptance threshold.
 - Spatial descriptors and voxel generation are the mechanisms that keep linear sequence mixing from losing local geometry and sparse foreground evidence.
 - Multi-task loss balancing shifts the compromise among tasks rather than eliminating interference.
-- The paper establishes broad benchmark coverage and input flexibility; matched efficiency, calibration failure, and sensor-corruption tests are still needed to establish a system-level advantage.
+- The paper establishes broad benchmark coverage and input flexibility; matched hardware efficiency and broader sensor-corruption or temporal-failure tests are still needed. Its misalignment study is a controlled extrinsic perturbation rather than a full sensor-drop evaluation.

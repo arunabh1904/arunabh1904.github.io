@@ -29,6 +29,8 @@ What changes when the same scene is degraded? The source example makes the input
 
 *Fig 1: Source Figure 1 illustrates how visual perturbations can change a model's response to a driving scene. Aggregate accuracy and confidence require separate evaluation. | source: [Towards Reliable Vision-Language Models for Autonomous Driving](https://arxiv.org/abs/2610.01531)*
 
+[Open figure at full size](/assets/images/driving-vlm-reliability-source-figure-1.png)
+
 ### Accuracy and confidence serve different decisions
 
 Accuracy asks how often an answer is correct. Confidence is useful when a system must decide whether to trust that answer, gather more evidence, or defer. A model that is usually correct can still fail the second task if its wrong answers receive its highest confidence.

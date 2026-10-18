@@ -29,6 +29,8 @@ MapTCL retains ordinary supervised mapping losses and adds prediction-to-predict
 ![MapTCL adds vector and raster consistency branches around an existing temporal mapper](/assets/images/maptcl-temporal-consistency-learning-via-bidirectional-alignment-for-vectorized-hd-map-construction-source-figure-2.webp)
 *Fig 1: The orange and blue branches compare current predictions with warped history during training. Removing them at inference leaves the central mapper, including its original GRU-based temporal fusion, intact. | source: [MapTCL, Figure 2](https://arxiv.org/abs/2608.05209)*
 
+[open full-size figure](/assets/images/maptcl-temporal-consistency-learning-via-bidirectional-alignment-for-vectorized-hd-map-construction-source-figure-2.webp)
+
 “No inference overhead” therefore means no additional serving machinery relative to the chosen baseline. It does not mean that the deployed system becomes stateless or that consistency matching is free during training.
 
 ### Matching in both directions avoids making history the sole authority
@@ -54,6 +56,8 @@ The original geographically overlapping split gives much higher absolute nuScene
 
 ![Successive maps under vehicle occlusion compared across temporal mappers](/assets/images/maptcl-temporal-consistency-learning-via-bidirectional-alignment-for-vectorized-hd-map-construction-source-figure-4.webp)
 *Fig 2: Read downward through time, then compare the MapTCL column with ground truth. The occluding truck changes visibility while the underlying map should remain stable; this is the continuity that single-frame accuracy can miss. | source: [MapTCL, Figure 4](https://arxiv.org/abs/2608.05209)*
+
+[open full-size figure](/assets/images/maptcl-temporal-consistency-learning-via-bidirectional-alignment-for-vectorized-hd-map-construction-source-figure-4.webp)
 
 ### Consistency helps only while the paired evidence remains trustworthy
 

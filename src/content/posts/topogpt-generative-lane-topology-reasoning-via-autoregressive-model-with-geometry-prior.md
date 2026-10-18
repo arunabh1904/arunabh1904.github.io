@@ -32,6 +32,8 @@ The two-stage diagram makes the transfer boundary visible. Map-only pretraining 
 ![TopoGPT source Figure 3 shows map-only autoregressive pretraining and camera-conditioned alignment fine-tuning with LoRA](/assets/images/topogpt-source-figure-3.png)
 *Fig 1: The first stage learns lane structure from maps. The second aligns BEV features with frozen scene-encoder targets and adapts the generator with LoRA, so inference can condition on camera observations. | source: [TopoGPT, Figure 3](https://arxiv.org/abs/2606.31814)*
 
+[open full-size figure](/assets/images/topogpt-source-figure-3.png)
+
 ### A lane becomes four control-point tokens
 
 TopoGPT normalizes heterogeneous map annotations by merging adjacent lane instances along non-branching paths. The remaining splits represent topological events such as merges and forks. It fits each centerline with a cubic Bézier curve whose first and last control points are fixed to the original endpoints; the two intermediate points describe shape. Quantized two-dimensional control-point locations become a group of four tokens. Lane groups are sorted spatially, separated by a special token, and terminated with an end-of-sequence token.
@@ -42,6 +44,8 @@ The tokenization figure shows why data preparation is part of the method. Mergin
 
 ![TopoGPT source Figure 4 shows map instance merging, raster scene conditioning, and four Bézier control-point tokens per lane](/assets/images/topogpt-source-figure-4.png)
 *Fig 2: One lane graph becomes both a directional raster condition and an ordered token target. Endpoint-preserving curve fitting connects sequence prediction to the geometry later used for lane association. | source: [TopoGPT, Figure 4](https://arxiv.org/abs/2606.31814)*
+
+[open full-size figure](/assets/images/topogpt-source-figure-4.png)
 
 Pretraining draws approximately 2.07M scenes from Waymo Motion, 1.01M from nuPlan, and 0.25M from Argoverse 2 Motion. A scene encoder reads a two-channel raster containing lane directions. The autoregressive transformer learns the lane sequence with teacher-forced cross-entropy. Crucially, training sometimes removes lanes from the raster condition or drops the condition entirely while retaining the full target graph. That creates a completion problem instead of letting the network rely exclusively on a nearly complete input map.
 

@@ -32,15 +32,17 @@ summary: "2026 – mSFT: Addressing Dataset Mixtures Overfitting Heterogeneously
 Let $D_i$ be a sub-dataset and let
 
 $$
-c_i^*=\arg\max_c \operatorname{Metric}(\theta_c;D_i^{\mathrm{test}})
+c_i^*=\arg\max_c \operatorname{Metric}(\theta_c;D_i^{\mathrm{val}})
 $$
 
 be the compute at which its held-out metric peaks. Standard SFT sets every task’s compute to the same $c_{\mathrm{global}}$. If $c_{\mathrm{global}}>c_i^*$, task $i$ is overfit; if it is below $c_i^*$, a slower task is under-trained.
 
 The Qwen3 8B experiment makes this mismatch concrete. It uses ten sub-datasets and shows that their absolute peak-epoch offsets from the overall mixture range from 0 for CommonsenseQA to 5 for HellaSwag; the average absolute difference between each task’s peak and the mixture’s peak is 1.93 epochs:
 
-![Test-accuracy curves and peak-epoch offsets for ten sub-datasets in Qwen3 8B SFT](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-2.png)
-*Fig 1: Test-set training curves and absolute peak-epoch offsets for ten Qwen3 8B sub-datasets. | source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT, Figure 2](https://arxiv.org/abs/2603.21606)*
+![Validation-accuracy curves and peak-epoch offsets for ten sub-datasets in Qwen3 8B SFT](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-2.png)
+*Fig 1: Validation-set training curves and absolute peak-epoch offsets for ten Qwen3 8B sub-datasets. | source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT, Figure 2](https://arxiv.org/abs/2603.21606)*
+
+[Open figure at full size](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-2.png)
 
 This is more than a case for choosing a better global epoch. The update at each step is a weighted sum of sub-dataset gradients. Once one task begins supplying over-specialized gradients, continuing to sample it changes the trajectory seen by every other task.
 
@@ -52,6 +54,8 @@ The authors test this with ten equal-weighted sub-datasets of 1,800 examples eac
 
 ![Optimal-compute shifts after excluding one sub-dataset](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-3.webp)
 *Fig 2: Changes in each remaining benchmark’s optimal compute after one sub-dataset is removed; this is panel (a) of the source figure. | source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT, Figure 3](https://arxiv.org/abs/2603.21606)*
+
+[Open figure at full size](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-3.webp)
 
 The sign matters. Some tasks need more compute after the early task is removed; others peak earlier. A static table of stopping points cannot capture this interaction.
 
@@ -70,11 +74,15 @@ The budget sweep shows the most concrete systems tradeoff:
 ![Accuracy and FLOPs changes for MSFT across compute budgets](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-6.png)
 *Fig 3: Accuracy, rollout overhead, and FLOPs changes across MSFT compute budgets. | source: [MSFT: Addressing Dataset Mixtures Overfitting Heterogeneously in Multi-task SFT, Figure 6](https://arxiv.org/abs/2603.21606)*
 
-The same analysis reports robustness across 9K, 18K, and 27K dataset mixtures with 5, 10, and 15 tasks, and a +5.4% average improvement over SFT in that study. The method is therefore making a claim about a control loop, not just about one hand-tuned mix. Its reliance on task metrics remains the main practical boundary. Section 4.1 evaluates each benchmark test set every quarter epoch and reports the best checkpoint, so these results include selection on the reported benchmarks. A deployment study should use separate validation data for exclusion and rollback, then evaluate once on an untouched test set. A noisy or misaligned selection metric can exclude the wrong dataset.
+[Open figure at full size](/assets/images/msft-addressing-dataset-mixtures-overfitting-heterogeneously-in-multitask-sft-source-figure-6.png)
+
+The same analysis reports robustness across 9K, 18K, and 27K dataset mixtures with 5, 10, and 15 tasks, and a +5.4% average improvement over SFT in that study. The method is therefore making a claim about a control loop, not just about one hand-tuned mix. Its reliance on task metrics remains the main practical boundary. Section 4.1 evaluates each benchmark validation set every quarter epoch and reports the best checkpoint, so these results include selection on the reported benchmarks. A deployment study should use separate validation data for exclusion and rollback, then evaluate once on an untouched test set. A noisy or misaligned selection metric can exclude the wrong dataset.
+
+At the most restrictive budget, $C=1$, the paper reports a +3.4% accuracy gain while reducing compute by 120.3 PFLOPs on average; this is the case with no extra roll-out overhead. Larger budgets add search overhead, so the efficiency result is tied to the paper's FLOPs accounting and task mixture.
 
 ## High-Level Takeaways
 
 - The relevant control variable in multi-task SFT is the active mixture over time, not only its initial sampling weights. Different datasets can peak at different compute levels even when they share a model and optimizer.
 - A one-shot schedule is insufficient because excluding a dataset changes the gradient trajectory and moves the remaining peaks. MSFT’s value comes from re-searching after every rollback.
-- The reported 63.7 average accuracy and the $C=1$ efficiency result are tied to the paper’s ten-task benchmark suite, test-set checkpoint-selection protocol, and FLOPs accounting. They support the mechanism without proving that every mixture benefits.
+- The reported 63.7 average accuracy and the $C=1$ efficiency result are tied to the paper’s ten-task benchmark suite, validation-set checkpoint-selection protocol, and FLOPs accounting. They support the mechanism without proving that every mixture benefits.
 - Use MSFT when per-dataset evaluation is reliable and checkpoint storage is available. If a task has no useful held-out metric, the algorithm has no principled signal for when to exclude it.

@@ -30,7 +30,9 @@ How does a predicted region change the action context? Source Figure 2 follows t
 ![GeoCoTDrive source Figure 2: predicted image boxes select geometry features that are inserted before trajectory generation](/assets/images/geocotdrive-source-figure-2.png)
 *Fig 1: The model predicts planning-relevant boxes, samples geometry features within each box, and inserts the projected features into the autoregressive context before planning. | source: [GeoCoTDrive, Figure 2](https://arxiv.org/abs/2610.10390)*
 
-Figure reproduced without modification under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). [Open the full-size figure](/assets/images/geocotdrive-source-figure-2.png).
+Figure reproduced without modification under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+[Open the full-size figure](/assets/images/geocotdrive-source-figure-2.png)
 
 ### Project feature channels while retaining sampled positions
 
@@ -61,6 +63,8 @@ Training has two stages. First, both the vision encoder and language model learn
 Second, the vision and geometry encoders stay frozen while the language model and geometry aligner train for three epochs. The peak learning rate is $2\times10^{-5}$, again with a cosine schedule. Autoregressive supervision covers the grounding answer and planning answer; prompt, image, and inserted continuous geometry features are excluded from the token loss. The experiments use eight A800 GPUs.
 
 During this second stage, the sampler uses ground-truth boxes. At inference, it uses the model's boxes. That change is a concrete exposure gap: the planner learns with correctly retrieved regions, then must tolerate retrieval errors at deployment. The grounding evaluation reaches 38.93 mIoU and 21.04 recall at IoU 0.7, so precise region selection remains far from complete. Perturbation experiments also show planning performance declining as grounding quality falls.
+
+The training-stage ablation keeps the division explicit: Stage I alone provides the driving QA/planning adaptation, Stage II alone provides geometry-interleaved planning, and the combined recipe is best across the reported planning metrics. The gain therefore depends on both a driving-adapted VLM and localized geometric conditioning, rather than on inserting geometry into an otherwise generic language model.
 
 ### Separate selective-retrieval evidence from driving safety
 

@@ -31,8 +31,12 @@ The memory is built from scenarios where the base model’s predicted trajectory
 
 The compression is substantial. The base model’s last-layer representation has 2,800 tokens, each 1,536-dimensional; 16 learnable queries reduce it to a 16×256 retrieval feature. The action decoder represents its candidates as an $M\times8\times3$ trajectory cluster: $M$ proposals, eight future waypoints, and three coordinates per waypoint. The memory therefore keeps the information needed to correct planning without replaying every image token. The paper reports memory pools of about 4K cases for Base and 10K for Scale, with no retraining when the pool is expanded.
 
+The base VLM is InternVL3, domain-pretrained on 3.1 million question–answer pairs from 12 driving datasets; about 775K filtered pairs are retained for NAVSIM training. The VLM is then frozen while the trajectory and score heads are optimized. Memory generation marks a case as a failure when its PDM oracle score falls below $\beta=0.5$, so the pool is curated by the benchmark scorer rather than by a learned uncertainty estimate.
+
 ![DriveVLA-M0 memory generation and retrieval-augmented test-time training](/assets/images/drivevla-m0-overview-paper-figure.png)
 *Fig 1: The upper path records low-scoring scenarios and their intermediate features; the lower path retrieves similar map/agent cases and adapts separate action-decoder branches with LoRA before selecting a trajectory. | source: [DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving, Figure 2](https://arxiv.org/abs/2608.10413)*
+
+[Open figure at full size](/assets/images/drivevla-m0-overview-paper-figure.png)
 
 ### Retrieval is split by the kind of similarity
 
@@ -45,12 +49,16 @@ The deployment implementation adds a useful guard for empty-road scenes. Agent-o
 ![DriveVLA-M0 map and agent retrieval attention](/assets/images/drivevla-m0-failure-aware-memory-augmentation-for-autonomous-driving-source-figure-3.webp)
 *Fig 2: In the query scene and retrieved cases, the map embedding highlights road topology while the agent embedding concentrates on surrounding traffic; yellow denotes stronger attention than gray-purple. | source: [DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving, Figure 3](https://arxiv.org/abs/2608.10413)*
 
+[Open figure at full size](/assets/images/drivevla-m0-failure-aware-memory-augmentation-for-autonomous-driving-source-figure-3.webp)
+
 ### NAVSIM results and the decisive ablations
 
 The paper evaluates NAVSIM v1, a non-reactive benchmark that scores a short planned trajectory against BEV scene abstractions, and NAVSIM v2 navhard, which adds a two-stage pseudo-closed-loop protocol and four extended metrics. Table 1 reports 92.3 PDMS for DriveVLA-M0-Base and 94.1 for DriveVLA-M0-Scale on navtest. The scaled memory model uses a front camera and exceeds the listed VLA baselines, although the table still measures the benchmark’s planned-trajectory protocol. On navhard, Table 2 reports 47.0 EPDMS for DriveVLA-M0-Base; its displayed Stage 1 and Stage 2 rows include extended-comfort values of 64.4 and 72.1, respectively.
 
 ![DriveVLA-M0 performance on navtest and navhard](/assets/images/drivevla-m0-failure-aware-memory-augmentation-for-autonomous-driving-source-figure-1.webp)
 *Fig 3: The paper contrasts a classic VLA failure path with retrieval-guided correction and plots the resulting navtest and navhard scores; the retrieved route is intended to move the selected trajectory toward the safer candidates. | source: [DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving, Figure 1](https://arxiv.org/abs/2608.10413)*
+
+[Open figure at full size](/assets/images/drivevla-m0-failure-aware-memory-augmentation-for-autonomous-driving-source-figure-1.webp)
 
 Table 3 isolates the retrieval key. The no-memory base is 91.0 PDMS, language-only retrieval falls to 90.7, map retrieval reaches 91.7, and map-plus-agent retrieval reaches 92.3. The map branch therefore captures more useful driving structure than a language embedding, while the agent branch adds another 0.6 over map-only and improves no-at-fault collision, progress, and time-to-collision sub-scores by 0.5 each. The gain is evidence for the split representation, not for memory retrieval in the abstract.
 

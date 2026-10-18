@@ -30,6 +30,8 @@ That storage limit is not a four-frame reasoning horizon. Each saved query has a
 ![StreamPETR comparison of dense BEV, perspective-history, and object-query temporal fusion.](/assets/images/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection-source-figure-1.webp)
 *Fig 1: Compare what crosses time in each column: a dense grid, repeated access to image features, or updated object queries. The right column propagates a compact state, allowing old evidence to survive without retaining every historical image feature. | source: [StreamPETR, Figure 1](https://arxiv.org/abs/2303.11926)*
 
+[Open figure at full resolution](/assets/images/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection-source-figure-1.webp)
+
 Current queries include fresh learned hypotheses and propagated queries from the previous frame. The default uses 644 fresh queries plus 256 propagated ones. Hybrid attention lets them interact with all stored queries, then spatial cross-attention retrieves current image evidence. Fresh queries remain necessary for objects absent from memory; recurrence alone cannot discover a new arrival.
 
 The memory ablation supports the compression argument. Moving from no memory to one stored frame raises mAP from 31.7 to 39.4 at the same reported 27.7 FPS. Two frames reach 40.1 mAP at 27.4 FPS, and four reach 40.2 at 27.1 FPS. Most of the gain arrives with a small queue, consistent with the fact that recurrent entries already summarize earlier observations.
@@ -42,6 +44,8 @@ Motion-aware layer normalization then encodes relative ego pose, estimated objec
 
 ![StreamPETR recurrent memory queue and propagation transformer.](/assets/images/streampetr-paper-figure-3.png)
 *Fig 2: Ego transformation updates the memory coordinates before the propagation transformer combines memory, fresh queries, and current images. Top-scoring output queries replenish the queue. The future segment depicts subsequent online updates, not future-frame input to the current prediction. | source: [StreamPETR, Figure 3](https://arxiv.org/abs/2303.11926)*
+
+[Open figure at full resolution](/assets/images/streampetr-paper-figure-3.png)
 
 Table 6 reports 37.8 mAP and 48.3 NDS without the proposed motion conditioning. Explicit object-motion compensation gives 38.0 and 48.1, slightly worsening NDS. Ego-pose-conditioned normalization reaches 39.8 and 50.1; including time and velocity reaches 40.2 and 50.5. The authors attribute the weak explicit-compensation result to error propagation. That is their explanation for the ablation, not a claim that explicit motion models always fail.
 
@@ -57,10 +61,14 @@ The temporal representation ablation separates memory from initialization. Objec
 
 The lightweight model uses ResNet-50, 256 × 704 images, perspective pretraining, and a reduced 300-fresh-plus-128-propagated query set. It reaches 45.0 mAP and 55.0 NDS at 31.7 FPS on an RTX 3090 in FP32. That is separate from the 900-query ablations and the much larger test model. Table 1 lists SOLOFusion at 11.4 FPS, giving about 2.78 times the throughput; the paper’s phrase “1.8× faster” describes the approximate increase over that baseline, not a 1.8 throughput ratio.
 
+The paper uses only key frames at training and inference, with no CBGS. Ablation models train for 24 epochs, comparison models for 60, and the ViT-L test model for 24 to avoid overfitting. The Waymo comparison also uses 24 epochs and changes the memory-save interval at test time, so its score is not a direct nuScenes transfer.
+
 The strongest ViT-L model reaches 62.0 mAP and 67.6 NDS on nuScenes test without test-time augmentation or future frames. Against the listed LiDAR CenterPoint result, its NDS is slightly higher, but translation error is 0.470 versus 0.262 metres. Tracking reaches 65.3 AMOTA versus CenterPoint’s 63.8, yet has more identity switches, 1,037 versus 760, and worse AMOTP, 0.876 versus 0.555. “Comparable to LiDAR” describes some aggregate scores, not parity in every useful attribute.
 
 ![StreamPETR detections with remote false positives highlighted in source examples.](/assets/images/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection-source-figure-6.webp)
 *Fig 3: The BEV view compares blue predictions with green ground truth; red circles mark failures. Nearby crowded objects are handled well in this scene, while remote objects generate false positives. Recurrent object memory does not eliminate uncertain distant evidence. | source: [StreamPETR, Figure 6](https://arxiv.org/abs/2303.11926)*
+
+[Open figure at full resolution](/assets/images/streampetr-object-centric-temporal-modeling-for-multiview-3d-detection-source-figure-6.webp)
 
 The approach also transfers to DETR3D: the appendix reports 34.7 to 39.6 mAP with throughput changing only from 6.3 to 6.2 FPS. This supports object-query recurrence as an interface that can wrap different spatial retrieval mechanisms, while the smaller gain leaves room for the underlying image-sampling design to matter.
 

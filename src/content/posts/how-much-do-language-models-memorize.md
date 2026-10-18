@@ -45,6 +45,8 @@ The capacity experiment sums these gains over training samples and varies the da
 ![Source Figure 1 showing memorization plateaus for GPT-style models trained on uniform random data](/assets/images/how-much-do-language-models-memorize-paper-figure.png)
 *Fig 1: The dashed line grows with the dataset's information content. Each model eventually falls below it and approaches a plateau, distinguishing more available data from more information retained in the weights. | source: [Memorization paper, Figure 1](https://arxiv.org/abs/2505.24832)*
 
+[Open figure at full size](/assets/images/how-much-do-language-models-memorize-paper-figure.png)
+
 The horizontal axis counts datapoints; the vertical axis counts memorized bits. Following one colored curve to the right holds the architecture fixed while changing data size. Comparing plateau heights across colors then estimates how capacity changes with model size.
 
 ### The bits-per-parameter estimate is an empirical lower bound
@@ -63,12 +65,16 @@ With the stronger reference, unintended memorization first rises and then falls 
 
 The double-descent analysis relates dataset information to estimated model capacity. Near the capacity boundary, held-out performance worsens before improving as data grows further. The authors interpret this as pressure to reuse shared structure once storing samples individually is no longer sufficient. That is an explanation supported by the controlled trend, rather than a universal theorem that all language-model generalization begins at one sharp storage threshold.
 
+Appendix A.3 adds a distributional qualification. In a deduplicated 20M-parameter model trained past capacity, the most memorized sequences have unusually high TF-IDF, and all but three of the top twenty contain Japanese, Chinese, Hebrew, or Greek tokens. One Japanese sequence can be regurgitated from a single token. Memorization therefore concentrates in rare, atypical examples even after duplicate documents are removed.
+
 ### Extraction and membership inference answer separate questions
 
 The prefix-completion experiment gives the model 8, 16, or 32 tokens and asks it to reproduce the remainder of a 64-token sequence. Training extraction falls sharply with dataset size, but eventually becomes comparable to held-out extraction instead of necessarily reaching zero.
 
 ![Source Figure 10 comparing extraction of training and held-out sequences at different prefix lengths](/assets/images/how-much-do-language-models-memorize-source-figure-10.webp)
 *Fig 2: Solid training curves approach dashed held-out curves at large dataset sizes. Nonzero extraction alone therefore cannot establish training membership; longer prefixes also change how much information the prompt already supplies. | source: [Memorization paper, Figure 10](https://arxiv.org/abs/2505.24832)*
+
+[Open figure at full size](/assets/images/how-much-do-language-models-memorize-source-figure-10.webp)
 
 Read the separation between solid and dashed curves of the same color, not only their absolute height. A long prefix can make a continuation predictable for both training and test examples. Under this controlled, deduplicated setup, matching extraction rates supports the authors' generalization account; it does not prove every extractable string in an arbitrary deployed model is harmless or unseen.
 

@@ -32,6 +32,8 @@ This target is narrower than a dense world model but operationally sharper. The 
 ![Auto-JEPA predicts a future-trajectory latent and uses it to retrieve and select an executable path](/assets/images/auto-jepa-a-latent-world-model-of-continuous-intent-for-end-to-end-autonomous-driving-source-figure-3.webp)
 *Fig 1: Training aligns the predicted intent with a frozen trajectory target; inference retrieves 300 candidates, then applies a scene scorer and drivable-area gate. | source: [Auto-JEPA: A Latent World Model of Continuous Intent for End-to-End Autonomous Driving, Figure 3](https://arxiv.org/abs/2607.29031)*
 
+[Open figure at full size](/assets/images/auto-jepa-a-latent-world-model-of-continuous-intent-for-end-to-end-autonomous-driving-source-figure-3.webp)
+
 ### Retrieval supplies geometry that the latent predictor does not have to generate
 
 The trajectory memory contains 110,335 ground-truth trajectory–latent pairs encoded by the same frozen trajectory encoder. Flat-cosine retrieval selects the top 300 candidates. A fine-tuned scene-conditioned scorer uses collision, drivable-area, time-to-collision, comfort, and ego-progress labels to rank them, while an independent gate rejects proposals that fail the drivable-area threshold. The division of labor is useful: the JEPA predictor says what kind of motion is appropriate, memory lookup instantiates a path that exists in the logged distribution, and selection chooses the safest available member of that local set.
@@ -46,6 +48,8 @@ The source Figure 1 illustrates the intended behavior. Occluding a non-interacti
 
 ![Occluding an interacting lead vehicle changes the selected trajectory more than occluding a non-interacting vehicle](/assets/images/auto-jepa-a-latent-world-model-of-continuous-intent-for-end-to-end-autonomous-driving-source-figure-1.webp)
 *Fig 2: The qualitative intervention contrasts a non-interacting vehicle, which leaves the plan unchanged, with an interacting lead vehicle, whose occlusion shifts the plan. | source: [Auto-JEPA: A Latent World Model of Continuous Intent for End-to-End Autonomous Driving, Figure 1](https://arxiv.org/abs/2607.29031)*
+
+[Open figure at full size](/assets/images/auto-jepa-a-latent-world-model-of-continuous-intent-for-end-to-end-autonomous-driving-source-figure-1.webp)
 
 The evaluator is NAVSIM, a data-driven non-reactive benchmark. Auto-JEPA therefore demonstrates a strong camera-only open-loop planning interface. Its limitations are structural: it cannot synthesize a maneuver absent from 110,335 logged trajectories, it does not predict other agents, and the scorer and gate must remain calibrated as route and traffic distributions change.
 

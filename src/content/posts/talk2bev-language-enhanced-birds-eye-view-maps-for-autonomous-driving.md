@@ -27,6 +27,8 @@ To connect a BEV object to an image, the pipeline selects nearby LiDAR points an
 ![Talk2BEV links BEV objects to camera crops and adds language descriptions before querying the scene](/assets/images/talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving-paper-figure.png)
 *Fig 1: The object identifier connects two kinds of evidence: BEV geometry and image-derived semantics. A richer caption cannot repair an incorrect object association, while accurate geometry alone cannot identify a vehicle's special role. | source: [Talk2BEV, Figure 2](https://arxiv.org/abs/2310.02251)*
 
+[Open figure at full size](/assets/images/talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving-paper-figure.png)
+
 ### Spatial tools keep arithmetic outside the language decoder
 
 The language model returns structured fields for its interpretation of the query, whether it can be answered, any spatial function calls, and an explanation. The operator API can filter objects in a direction, find nearby objects, or calculate distances. A request for the two nearest vehicles in front becomes a composition of front filtering and nearest-neighbor selection.
@@ -35,6 +37,8 @@ This separation is especially useful across camera views. Two objects may never 
 
 ![A bulldozer and a truck in different camera views are linked through BEV coordinates for a distance query](/assets/images/talk2bev-source-figure-6.png)
 *Fig 2: The query resolves the construction vehicle and material-carrying truck to object IDs, then invokes a distance function. Shared map coordinates make the cross-camera relation available without requiring a single image containing both vehicles. | source: [Talk2BEV, Figure 6](https://arxiv.org/abs/2310.02251)*
+
+[Open figure at full size](/assets/images/talk2bev-source-figure-6.png)
 
 ### The spatial ablation is more decisive than the caption-model ranking
 
@@ -47,9 +51,11 @@ Replacing predicted maps with ground-truth BEV raises MiniGPT-4's average from 0
 ![Different crop captions lead to different answers about a police car and construction equipment](/assets/images/talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving-source-figure-8.webp)
 *Fig 3: Calling the same crop a white truck or a police car changes the inferred purpose. The downstream language model inherits the captioner's distinction before it answers the scene question. | source: [Talk2BEV, Figure 8](https://arxiv.org/abs/2310.02251)*
 
+[Open figure at full size](/assets/images/talk2bev-language-enhanced-birds-eye-view-maps-for-autonomous-driving-source-figure-8.webp)
+
 ### Human verification improves the benchmark without making it a control test
 
-Talk2BEV-Bench contains 1,000 nuScenes BEV scenarios and over 20,000 questions. Ground-truth maps provide the reference objects; dense captions and OCR are refined by humans. GPT-4 then generates candidate questions and answers, which humans verify again. Multiple-choice questions cover instance attributes, counting, and visual reasoning, while spatial queries use set-overlap or distance metrics.
+Talk2BEV-Bench contains 1,000 nuScenes BEV scenarios and over 20,000 questions. Ground-truth maps provide the reference objects; dense captions and OCR are refined by humans. GPT-4 generates five questions for each of four evaluation dimensions per scene, and humans verify the resulting questions and answers again. Multiple-choice questions cover instance attributes, counting, and visual reasoning, while spatial queries use set-overlap or distance metrics.
 
 The human checks matter because an automatically generated question can repeat a caption's mistake. Nevertheless, the benchmark is built around annotated objects and curated questions. It does not establish that arbitrary free-form requests are answered reliably, nor that a textual recommendation produces a safe trajectory. The reversing-car dialogue is a qualitative illustration of intent reasoning, rather than a closed-loop intervention study. No quantified real-time control result is reported.
 

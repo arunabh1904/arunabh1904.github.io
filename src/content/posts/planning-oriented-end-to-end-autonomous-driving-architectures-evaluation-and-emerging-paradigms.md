@@ -38,6 +38,8 @@ Open-loop trajectory metrics compare a predicted path with the logged future und
 ![Open-loop errors can become different states under reactive evaluation](/assets/images/planning-oriented-end-to-end-autonomous-driving-architectures-evaluation-and-emerging-paradigms-source-figure-4.webp)
 *Fig 1: The source sequence shows how a small open-loop deviation can lead to a different state, making non-reactive replay and closed-loop evaluation test different policy properties. | source: [Planning-Oriented End-to-End Autonomous Driving, Figure 4](https://arxiv.org/abs/2608.20111)*
 
+[Open figure at full size](/assets/images/planning-oriented-end-to-end-autonomous-driving-architectures-evaluation-and-emerging-paradigms-source-figure-4.webp)
+
 The figure's causal path is the survey's most important evaluation intuition. A logged frame gives every method the same starting point, so displacement error can be compared cleanly. Once the ego plan changes the state, the next observation is policy-dependent. A low open-loop error can coexist with poor recovery, while a larger logged error can still lead to a safe reactive route. The metrics should therefore be read as different contracts, not placed in one ranking without qualification.
 
 ### Read foundation-model claims through action
@@ -46,7 +48,7 @@ The review treats world models and VLA systems as extensions of the same plannin
 
 That perspective also changes what a useful ablation looks like. A world-model paper should compare action-conditioned prediction against an equally trained visual-only predictor and measure downstream plan selection. A VLA paper should hold the visual input and planner fixed while removing language supervision or command conditioning. A structured planner should report whether its auxiliary map, object, or motion losses change the final planning metric under the same compute and data budget.
 
-The survey is careful about its evidence boundary. It follows recent methods, benchmark repositories, leaderboards, code, and project pages through June 2026, but public methods and protocol-compatible results are overrepresented. It does not fit a meta-analysis, normalize every metric implementation, or establish research priority from publication order. Its value is a claim map: before comparing two numbers, identify what state distribution, controller, sensor setup, benchmark version, and safety wrapper produced them.
+The review makes its evidence boundary explicit. Its structured narrative search covers IEEE Xplore, ACM, SpringerLink, ScienceDirect, arXiv, OpenReview, CVF, NeurIPS, benchmark repositories, and official project pages from 2015 through June 2026, with backward and forward citation tracing from methods and benchmarks such as PilotNet, UniAD, NAVSIM, and Bench2Drive. It includes planning outputs, benchmarks, world-model or VLA mechanisms, public resources, and safety or evaluation critiques, while excluding perception-only studies and proprietary systems without enough detail for comparison. Public methods and protocol-compatible results are therefore overrepresented; this is a claim map, not a meta-analysis or universal leaderboard.
 
 ## High-Level Takeaways
 

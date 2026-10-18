@@ -20,14 +20,20 @@ summary: "2025 – RobustVLA: Robustness-Aware Reinforcement Post-Training for V
 
 ## Core Insights
 
-![RobustVLA loop injecting observation and action perturbations then applying stability Jacobian and smoothness regularization during reinforcement post-training](/assets/images/robustvla-robustness-aware-reinforcement-post-training-paper-figure.png)
-*Fig 1: Traces the robustness claim from intervention to objective: perturbations expose return drift and error amplification, which motivate Jacobian, action-smoothing, and robust RL regularizers. | source: [RobustVLA](https://arxiv.org/abs/2511.01331)*
+![Figure 1 from RobustVLA: injecting observation and action perturbations then applying stability Jacobian and smoothness regularization during reinforcement post-training](/assets/images/robustvla-robustness-aware-reinforcement-post-training-paper-figure.png)
+*Fig 1: Traces the robustness claim from intervention to objective: perturbations expose return drift and error amplification, which motivate Jacobian, action-smoothing, and robust RL regularizers. | source: [RobustVLA, Figure 1](https://arxiv.org/abs/2511.01331)*
+
+[Open figure at full size](/assets/images/robustvla-robustness-aware-reinforcement-post-training-paper-figure.png)
 
 ![Figure 4 from RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](/assets/images/robustvla-robustness-aware-reinforcement-post-training-source-figure-4.webp)
-*Fig 2: Regularization-weight ablations test how strongly to constrain input sensitivity and update drift. The representation plots compare successful and failed episodes; visual separation alone does not establish a robustness guarantee. | source: [RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2511.01331)*
+*Fig 2: Regularization-weight ablations test how strongly to constrain input sensitivity and update drift. The representation plots compare successful and failed episodes; visual separation alone does not establish a robustness guarantee. | source: [RobustVLA, Figure 4](https://arxiv.org/abs/2511.01331)*
+
+[Open figure at full size](/assets/images/robustvla-robustness-aware-reinforcement-post-training-source-figure-4.webp)
 
 ![Figure 2 from RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](/assets/images/robustvla-robustness-aware-reinforcement-post-training-source-figure-2.webp)
-*Fig 3: RobustVLA evaluates observation perturbations—shifts, rotations, color changes, occlusions, and erasing—alongside action noise, covering both perception and control failures. | source: [RobustVLA: Robustness-Aware Reinforcement Post-Training for Vision-Language-Action Models](https://arxiv.org/abs/2511.01331)*
+*Fig 3: RobustVLA evaluates observation perturbations—shifts, rotations, color changes, occlusions, and erasing—alongside action noise, covering both perception and control failures. | source: [RobustVLA, Figure 2](https://arxiv.org/abs/2511.01331)*
+
+[Open figure at full size](/assets/images/robustvla-robustness-aware-reinforcement-post-training-source-figure-2.webp)
 
 
 ### The two penalties target different failure paths
@@ -39,6 +45,8 @@ The implementation follows that split. Its Jacobian term is a clamped squared gr
 That distinction matters for interpreting the method. A policy can be insensitive to a small pixel change yet jump after an online update, or change gradually while remaining highly sensitive to the camera. The two penalties are intended to close those separate routes.
 
 The paper shifts robustness from an evaluation afterthought into the post-training objective. The tradeoff is familiar: too much regularization can suppress necessary high-frequency corrections or adaptation to real changes.
+
+RobustVLA-C adds a curriculum around the same objective. Algorithm 1 updates the reference policy after each optimization block and raises the injected noise when a moving-average success rate exceeds an upper threshold, lowering it when success falls below a lower threshold. The curriculum therefore changes the perturbation schedule, while the Jacobian and smoothness terms remain the mechanisms that shape the policy update.
 
 | Perturbation | Regularizer | Intended effect |
 | --- | --- | --- |

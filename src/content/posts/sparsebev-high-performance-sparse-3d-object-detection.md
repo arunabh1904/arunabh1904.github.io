@@ -34,6 +34,8 @@ Here, $D$ contains pairwise distances between query centres in BEV, and each que
 ![SparseBEV architecture with scale-adaptive attention, temporal sampling, and query-conditioned mixing.](/assets/images/sparsebev-high-performance-sparse-3d-object-detection-paper-figure.webp)
 *Fig 1: The three right-hand panels show different adaptations: neighbourhood size in BEV, sampling locations across frames, and weights for mixing sampled features. The query controls all three, so a fixed sparse representation can gather object-specific support. | source: [SparseBEV, Figure 2](https://arxiv.org/abs/2308.09244)*
 
+[Open the full-size source figure](/assets/images/sparsebev-high-performance-sparse-3d-object-detection-paper-figure.webp)
+
 Table 4 raises mAP from 41.4 with ordinary self-attention to 45.4 with the linear distance penalty. Squared-distance and square-root-distance penalties reach 43.8 and 44.3. The appendix provides a narrower control: allowing a separate learned coefficient per head but sharing it across queries already gives 44.8 mAP. Query-specific coefficients add another 0.6 point. Much of the improvement therefore comes from multiscale spatial interaction, with a smaller additional benefit from conditioning the scale on each object.
 
 ### Temporal sampling must follow both the vehicle and the object
@@ -53,6 +55,8 @@ Ego alignment produces the dominant gain; constant-velocity object alignment imp
 ![SparseBEV ablations varying temporal frames and sampling points per frame.](/assets/images/sparsebev-high-performance-sparse-3d-object-detection-source-figure-5.webp)
 *Fig 2: More historical frames improve NDS in the reported sweep, with diminishing increments. Sixteen sampling points per frame perform best among the tested budgets; doubling to 32 does not keep improving the score. | source: [SparseBEV, Figure 5](https://arxiv.org/abs/2308.09244)*
 
+[Open the full-size source figure](/assets/images/sparsebev-high-performance-sparse-3d-object-detection-source-figure-5.webp)
+
 The default uses eight frames approximately half a second apart. Sixteen points per frame means 128 sampled positions per query before mixing. Historical context is useful, but the authors report latency growing with the frame count because sampled features are stacked along time. Sparsity avoids a full BEV grid; it does not make history free.
 
 ### The query controls how evidence is combined, as well as where it comes from
@@ -64,6 +68,8 @@ Table 6 isolates this decoder choice. Attention-weighted aggregation without mix
 ### Real-time, dual-branch, and future-frame results are separate configurations
 
 The 23.5 FPS result uses ResNet-50, 704 × 256 images, perspective pretraining on nuImages, and 400 queries. It reaches 44.8 mAP and 55.8 NDS on validation. Timing uses PyTorch FP32 on one RTX 3090. The ablations instead use 900 queries, which explains why their best row does not exactly match that operating point. Decoder layers can also be removed at inference without retraining to trade accuracy for speed.
+
+The common ablation protocol uses ResNet-50 initialized from nuImages, eight 704×256 frames, and 900 queries without CBGS. The 400-query real-time row is therefore a tuned validation configuration; the test table's future-frame rows are a different evaluation boundary.
 
 On the test set, a V2-99 backbone initialized from DD3D reaches 54.3 mAP and 62.7 NDS with one branch. A dual-branch version combines a low-frame-rate high-resolution stream for appearance with a high-frame-rate low-resolution stream for temporal information, reaching 55.6 and 63.6. The 60.3 mAP and 67.5 NDS result returns to a single branch but uses future frames. It is an offline result, not evidence for causal driving performance at that score.
 

@@ -35,6 +35,8 @@ The architecture study then keeps that recipe fixed and changes the network in s
 ![ConvNeXt modernization path from ResNet-50 and ResNet-200 through macro design, depthwise convolution, inverted bottlenecks, large kernels, and micro-design changes](/assets/images/a-convnet-for-the-2020s-source-figure-2.webp)
 *Fig 1: Separates the training baseline from the accepted architecture changes and records ImageNet-1K accuracy and GFLOPs after each step. | source: [A ConvNet for the 2020s, Figure 2](https://arxiv.org/abs/2201.03545)*
 
+[Open figure at full resolution](/assets/images/a-convnet-for-the-2020s-source-figure-2.webp)
+
 Read the foreground bars as the small-model trajectory and the gray bars as the larger-model experiment. The hatched kernel-size rows are trials that were not adopted, while the star-marked line tracks GFLOPs. Accuracy and computation therefore move on different scales: the chart is useful precisely because a step can improve one and worsen the other.
 
 ### Some useful changes initially make the model worse
@@ -57,6 +59,8 @@ At the network level, a $224\times224$ image becomes a $56\times56$ feature map 
 
 ![Swin Transformer, ResNet, and ConvNeXt blocks compared side by side](/assets/images/a-convnet-for-the-2020s-source-figure-4.webp)
 *Fig 2: Shows the shared inverted-bottleneck shape and the operator change: Swin uses windowed self-attention, while ConvNeXt uses one large depthwise convolution for spatial mixing. | source: [A ConvNet for the 2020s, Figure 4](https://arxiv.org/abs/2201.03545)*
+
+[Open figure at full resolution](/assets/images/a-convnet-for-the-2020s-source-figure-4.webp)
 
 ### Scaling works with both model capacity and pretraining data
 

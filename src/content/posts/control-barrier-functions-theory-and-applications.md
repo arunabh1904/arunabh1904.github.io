@@ -48,7 +48,7 @@ Read the source diagram as a feedback controller with an inserted filter. The no
 ![Desired action filtered by an active set invariance filter before reaching the system; source Figure 4](/assets/images/control-barrier-functions-source-figure-4.webp)
 *Fig 1: The safety filter sits between a nominal controller and the physical system. This crop preserves the original feedback diagram while omitting surrounding page text. | source: [Paper, Figure 4](https://arxiv.org/abs/1903.11199)*
 
-[View full-size figure](/assets/images/control-barrier-functions-source-figure-4.webp)
+[Open figure at full size](/assets/images/control-barrier-functions-source-figure-4.webp)
 
 The survey develops extensions for higher-relative-degree constraints, where the input affects a safety quantity only after multiple time derivatives. It also describes applications to stepping-stone walking, automotive lane keeping and speed regulation, Segway balance, and long-duration autonomy. These are demonstrations of particular modeled constraints rather than a shared benchmark with one overall success rate. In the lane-keeping example, the barrier includes lateral velocity and available lateral acceleration, so current position alone is insufficient to assess recoverability.
 

@@ -35,6 +35,8 @@ The architecture follows that distinction. ResNet-101 supplies quarter-resolutio
 ![CaDDN source architecture showing depth probabilities weighting image features, frustum sampling into voxels, and a BEV detection head](/assets/images/caddn-source-figure-2-architecture.png)
 *Fig 1: The depth branch controls where the image features enter the frustum volume. Camera calibration then connects that volume to metric voxels, and height-channel compression produces the BEV input to the detector. | source: [CaDDN, Figure 2](https://arxiv.org/abs/2103.01100)*
 
+[Open Figure 1 at full resolution](/assets/images/caddn-source-figure-2-architecture.png)
+
 ### Geometry changes the grid; supervision changes what survives the transformation
 
 CaDDN fills a regular voxel grid by projecting each voxel center into the frustum and sampling its features with trilinear interpolation. This is a backward sampling operation: the metric grid asks which image location and depth bin can supply its feature. It is different from pushing every image feature forward and accumulating it wherever it lands.
@@ -45,6 +47,8 @@ The visual comparison below shows why explicit depth supervision matters. The un
 
 ![Input image above unsupervised and depth-supervised CaDDN BEV features, showing smeared rays becoming localized object evidence](/assets/images/caddn-categorical-depth-for-monocular-3d-detection-source-figure-1.webp)
 *Fig 2: The lower-left BEV map spreads similar features along viewing rays. The lower-right map, trained with depth-distribution supervision, concentrates responses near object locations. | source: [CaDDN, Figure 1](https://arxiv.org/abs/2103.01100)*
+
+[Open Figure 2 at full resolution](/assets/images/caddn-categorical-depth-for-monocular-3d-detection-source-figure-1.webp)
 
 | KITTI validation component ablation | Moderate-car 3D AP, IoU 0.7 |
 | --- | ---: |
@@ -67,7 +71,11 @@ The entropy plot shows where ambiguity remains. Entropy is lowest around six met
 ![CaDDN depth-distribution entropy against ground-truth depth, with foreground and background curves and confidence bands](/assets/images/caddn-source-figure-6-depth-entropy.png)
 *Fig 3: Mean entropy reaches a minimum near six meters and generally increases with distance. Foreground and background curves differ, and the shaded bands show 95% confidence intervals within ground-truth depth bins. | source: [CaDDN, Figure 6](https://arxiv.org/abs/2103.01100)*
 
+[Open Figure 3 at full resolution](/assets/images/caddn-source-figure-6-depth-entropy.png)
+
 The benchmark boundary is just as important as the mechanism. KITTI test moderate-car AP is 13.41 for 3D boxes and 18.91 for BEV boxes; these measure different overlap conditions and should not be mixed with the validation ablations. On the front-camera Waymo evaluation, vehicle 3D mAP at LEVEL_1 and IoU 0.7 is 5.03 overall, with 14.54 within 30 meters and 1.47 at 30–50 meters. The representation substantially improves the paper's monocular baseline, while absolute long-range detection remains difficult.
+
+KITTI has 7,481 labeled training samples and 7,518 test samples; the paper uses the usual 3,712/3,769 train/validation split for ablations and combines both halves for the test submission. Waymo has 798 training and 202 validation sequences, but CaDDN uses only the front camera and samples every third training frame, yielding 51,564 images. The image backbone and depth-distribution branch start from DeepLabV3 pretrained on MS-COCO, while the remaining modules are random.
 
 ## High-Level Takeaways
 

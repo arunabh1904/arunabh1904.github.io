@@ -44,6 +44,8 @@ HCA compresses much more aggressively, at 128 tokens per entry, and attends acro
 ![DeepSeek V4 source Figure 3 showing compressed sparse attention with a learned indexer and local window](/assets/images/deepseek-v4-source-figure-3-compressed-attention.png)
 *Fig 1: The indexer selects compressed history on the right, while a separate local window supplies recent detail on the left. Compression reduces stored entries; selection reduces how many enter the main attention computation. | source: [DeepSeek V4 report, Figure 3](https://arxiv.org/abs/2606.19348)*
 
+[Open figure at full size](/assets/images/deepseek-v4-source-figure-3-compressed-attention.png)
+
 Follow the two routes into the top attention block. Recent tokens can arrive through the local branch without surviving the long-history selector. Older evidence must be represented in compressed memory and, for CSA, selected as relevant. A large nominal context therefore still leaves two possible failure points: losing a distinction during compression or failing to retrieve its compressed representation.
 
 The indexer itself has a cost. Selecting 512 entries does not make the full attention system constant-cost in context length, because the candidate memory still grows. The reported efficiency comes from the complete mixture of compression, selection, shared KV storage, and precision choices.

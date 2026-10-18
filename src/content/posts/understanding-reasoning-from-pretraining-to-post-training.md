@@ -37,6 +37,7 @@ The evaluation contains 1,480 tactical puzzles divided into difficulty bins B1�
 
 ![Pretraining, synthetic-trace SFT, and verifiable-RL pipeline](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-1.png)
 *Fig 1: Human-game pretraining, synthetic-trace SFT, and verifiable RL are connected to the paper’s scaling and policy analyses. | source: [Understanding Reasoning from Pretraining to Post-Training, Figure 1](https://arxiv.org/abs/2607.16097)*
+[Open figure at full size](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-1.png)
 
 ### RL compute has two inputs from pretraining: level and slope
 
@@ -53,6 +54,7 @@ The source Figure 3 separates the two correlations instead of collapsing them in
 
 ![Pretraining loss predicts the fitted RL level, while token exposure predicts the local RL slope](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-3.webp)
 *Fig 2: Pretraining loss predicts fitted RL level, token exposure predicts local RL slope, and the joint fit is shown at right. | source: [Understanding Reasoning from Pretraining to Post-Training, Figure 3](https://arxiv.org/abs/2607.16097)*
+[Open figure at full size](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-3.webp)
 
 The fitted joint law uses an exponential function of pretraining loss for the reference level and a log-linear function of model size and token count for the slope. In plain terms, lower loss gives RL a better starting level, while more token exposure is associated with faster local improvement. That interpretation is more informative than saying that “bigger models reason better,” because size alone is not the strongest variable in the slope fit.
 
@@ -70,6 +72,7 @@ The difficulty breakdown makes the tradeoff concrete:
 
 ![Policy-update categories across chess puzzle difficulty bins](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-5.webp)
 *Fig 3: RL update categories across puzzle difficulty: ground-truth amplification, tail discovery, and wrong-mode amplification. | source: [Understanding Reasoning from Pretraining to Post-Training, Figure 5](https://arxiv.org/abs/2607.16097)*
+[Open figure at full size](/assets/images/understanding-reasoning-from-pretraining-to-post-training-source-figure-5.webp)
 
 This explains why pass@1 can keep improving while pass@16 is mixed or degrades for larger models under the fixed RL budgets. RL can make one answer more decisive without making the candidate distribution broadly better. It also widens search and branching in the traces, while maximum reasoning depth stays roughly flat; the model becomes better at proposing and committing to useful branches, not simply at writing longer continuations.
 

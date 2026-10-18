@@ -31,6 +31,8 @@ The source overview follows a vehicle toward a junction. Geometry becomes useful
 ![OpenLane-V2 source Figure 1 illustrates centerlines, direction, traffic elements, and relations through a junction](/assets/images/openlane-v2-source-figure.png)
 *Fig 1: The scene representation adds directed lane connectivity and lane-control associations to geometric perception. A nearby traffic light is useful only when the model identifies the lanes it governs. | source: [OpenLane-V2, Figure 1; figure crop](https://arxiv.org/abs/2304.10440)*
 
+[open full-size figure](/assets/images/openlane-v2-source-figure.png)
+
 Subset_A inherits Argoverse 2's seven-camera scenes from six US cities; subset_B inherits nuScenes' six-camera scenes from Boston and Singapore. Each subset has 700/150/150 train/validation/test scene segments, sampled at 2 Hz over a 100 × 50 m annotation region. Calibration and ego poses accompany the images. Subset_B's map heights are set to zero because its source maps lack elevation; the shared “3D” task should not obscure that distinction.
 
 ### Human annotation supplies the regulatory relation

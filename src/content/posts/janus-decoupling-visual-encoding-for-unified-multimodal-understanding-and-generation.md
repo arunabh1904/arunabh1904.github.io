@@ -27,17 +27,27 @@ Janus does not claim that every understanding system must use invariant semantic
 ![Janus architecture with separate visual understanding and generation encoders feeding one autoregressive transformer](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-paper-figure.png)
 *Fig 1: Janus decouples visual encoding for understanding and generation while routing both representations through one unified autoregressive transformer. | source: [Janus, Figure 2](https://arxiv.org/abs/2410.13848)*
 
+[Open figure at full size](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-paper-figure.png)
+
 The radar chart is useful because it separates the two sides of the claim. In the paper's reported 1.3B result, Janus reaches 69.4 MMBench, 63.7 SEED-Bench, and 87.0 POPE, exceeding the listed LLaVA-v1.5 and Qwen-VL-Chat 7B comparisons on those metrics. On generation, the same model reaches 61% GenEval accuracy and 8.53 FID on COCO-30K, compared with 53% GenEval for unified Show-o and 55% for SDXL. The comparison is encouraging, but the model has two encoders, adaptors, a generation head, and a staged curriculum; the numbers do not isolate which addition produced the gain.
 
 ![Janus multimodal understanding and visual-generation benchmark results](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-source-figure-1.webp)
 *Fig 2: Janus's reported understanding and visual-generation results are compared with similarly sized multimodal and image-generation systems. | source: [Janus, Figure 1](https://arxiv.org/abs/2410.13848)*
 
+[Open figure at full size](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-source-figure-1.webp)
+
 The schedule is part of the method. Stage I freezes the visual encoders and language model while learning the understanding adaptor, generation adaptor, and image head. Stage II unfreezes the language model for unified pretraining on pure text, multimodal understanding, and visual-generation data. Stage III performs mixed supervised fine-tuning while keeping the generation encoder fixed. First the routes learn to speak the language model's embedding space; then the shared reasoning core adapts; finally the model is aligned for dialogue and generation.
+
+Janus uses one unweighted autoregressive cross-entropy objective: understanding examples incur loss on text tokens, while generation examples incur loss only on image tokens. Stage I uses 1.25M ShareGPT4V image-text pairs and about 1.2M ImageNet samples; Stage II mixes understanding, text, and generation data in a 2:3:5 ratio, showing ImageNet only for the first 120k steps before switching to broader text-to-image data. Stage III uses a 7:3:10 ratio and masks system and user prompts during instruction tuning. The generation path is trained for classifier-free guidance by replacing the text condition with a pad token 10% of the time, then uses guidance scale 5 at inference. These choices matter when attributing the reported gain to decoupled encoders rather than to the curriculum itself.
 
 ![Janus three-stage training procedure and module update schedule](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-source-figure-3.webp)
 *Fig 3: The training diagram marks which adaptors, heads, encoders, and the language model are updated or frozen across the three stages. | source: [Janus, Figure 3](https://arxiv.org/abs/2410.13848)*
 
-This curriculum makes the interface hypothesis testable, but it also limits attribution. The base is DeepSeek-LLM 1.3B with a 4,096-token context; the understanding encoder is SigLIP-Large-Patch16-384, and the generation encoder uses a 16,384-entry codebook with 16× downsampling. A capacity-matched comparison against one stronger dual-purpose encoder would need to hold the parameter count, visual-token budget, data, and training steps fixed.
+[Open figure at full size](/assets/images/janus-decoupling-visual-encoding-for-unified-multimodal-understanding-and-generation-source-figure-3.webp)
+
+Table 5 tests a stronger shared encoder, a tokenizer distilled from SigLIP. It reaches 52.7 MMBench under joint training versus 62.1 when trained only for understanding, exposing interference even with better semantic features. Janus reaches 69.4, but its 8.53 FID is worse than that shared tokenizer's 7.11. Decoupling improves the understanding side of this comparison without winning every generation metric.
+
+The task-specific controls sharpen the boundary: SigLIP-only understanding reaches 70.6 MMBench, while generation-only training reaches 8.92 FID. Janus is close to the former and better than the latter. These controls support sharing the transformer with specialized visual routes, while the changed encoders and curriculum still belong in the attribution.
 
 | Design question | Janus's answer | Cost or boundary |
 | --- | --- | --- |

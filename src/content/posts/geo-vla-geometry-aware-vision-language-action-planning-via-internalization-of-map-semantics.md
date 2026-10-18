@@ -23,18 +23,20 @@ summary: '2026 – Geo-VLA: Geometry-Aware Vision-Language-Action Planning via I
 
 A turning vehicle can remain close to an expert trajectory initially and still cut across the wrong part of an intersection. Geo-VLA targets the road relationships behind that failure: lane structure, curvature, junction layout, drivable boundaries, and topology. These constrain the set of feasible paths even when the visible objects are easy to recognize.
 
-Geo-QA pairs a front-view image with an offline local map annotation. GPT-5.4 generates a question and map-grounded answer within one of five balanced categories. The answer also acts as a textual description for contrastive image-text training. The map is a source of training supervision; it is not secretly supplied to the deployed planner.
+Geo-QA pairs a front-view image with an offline local map annotation. GPT-5.4 generates a question and map-grounded answer within one of five balanced categories, with 600 examples per category. The answer also acts as a textual description for contrastive image-text training. The map is a source of training supervision; it is not secretly supplied to the deployed planner.
 
 The source figure shows the separation between dataset construction and the planner. Its map-and-image pair produces QA supervision on the left. On the right, visual-language adaptation precedes action-decoder training. The flame markers refer to different stages, so they should not be read as every component updating simultaneously.
 
 ![Geo-VLA source Figure 3: offline maps produce geometry questions, followed by representation adaptation and action-decoder fine-tuning](/assets/images/geo-vla-source-figure-3.png)
 *Fig 1: Offline maps supervise geometry-aware visual-language adaptation. The original action decoder is then trained against expert trajectories; map annotations and contrastive heads are absent at inference. | source: [Geo-VLA, Figure 3](https://arxiv.org/abs/2608.21440)*
 
+[Open figure at full size](/assets/images/geo-vla-source-figure-3.png)
+
 The intuition is that “follow the curve of this lane” supplies a relationship that an ordinary object caption may omit. It can teach the image representation which road features matter without requiring a complete map reconstruction. That compression is also a limit: an answer describing topology does not retain every metric detail or guarantee correct geometry in a new location.
 
 ### Contrastive alignment and answer prediction teach different relationships
 
-Geometry pretraining updates parameter-efficient adapters in the vision encoder and language backbone, together with temporary projection heads. A symmetric contrastive objective aligns images with their map-semantic descriptions across a batch. Autoregressive QA supervision trains the backbone to use those relationships when answering the corresponding question.
+Geometry pretraining updates rank-16 LoRA adapters in the vision encoder and language backbone, together with temporary projection heads. A symmetric contrastive objective aligns images with their map-semantic descriptions across a batch. Autoregressive QA supervision trains the backbone to use those relationships when answering the corresponding question.
 
 After pretraining, the projection heads are discarded and the adapted backbone is fixed. The original action decoder is fine-tuned under its baseline imitation-learning protocol. This staged design keeps the deployed input interface and action representation unchanged. The claim is therefore compatible adaptation of an existing planner, not a new trajectory-generation algorithm.
 

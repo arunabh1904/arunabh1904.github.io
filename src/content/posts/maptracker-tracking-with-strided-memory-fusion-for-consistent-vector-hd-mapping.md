@@ -31,6 +31,8 @@ The figure shows two complementary memories. BEV memory stores a spatial field a
 ![MapTracker source Figure 2 shows raster and vector memory buffers with distance-strided fusion](/assets/images/maptracker-source-figure.png)
 *Fig 1: BEV memory preserves spatial evidence while vector memory preserves element identity. Selected historical entries are motion-aligned before they refine the current field and its tracked instances. | source: [MapTracker, Figure 2; figure crop](https://arxiv.org/abs/2403.15951)*
 
+[open full-size figure](/assets/images/maptracker-source-figure.png)
+
 Each buffer holds the last 20 frames. The default retrieval chooses up to four distinct states whose vehicle positions are nearest to 1, 5, 10, and 15 meters from the current position. Dense features are geometrically warped and convolutionally fused; vector latents use a pose-conditioned MLP and per-instance cross-attention. Recent history stabilizes the current estimate, while separated viewpoints reduce redundancy.
 
 Training uses five-frame clips sampled from the current frame and four of the previous ten. It first pretrains image/BEV features with segmentation, warms the vector decoder, and then trains jointly. Focal and Dice raster losses, track-aware classification and curve regression, and transformation supervision support the two memories. Pose perturbation during training exposes the vector branch to alignment error.

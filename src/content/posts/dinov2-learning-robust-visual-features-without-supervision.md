@@ -36,6 +36,8 @@ The authors then use image similarity to control redundancy and coverage. The ap
 ![DINOv2 data curation and retrieval pipeline](/assets/images/dinov2-learning-robust-visual-features-without-supervision-source-figure-3.webp)
 *Fig 1: Curated and uncurated images are embedded, the uncurated pool is deduplicated, and visually related images are retrieved to augment the curated sources. The figure explains why data selection is part of the representation, even without labels or text. | source: [DINOv2, Figure 3](https://arxiv.org/abs/2304.07193)*
 
+[Open figure at full resolution](/assets/images/dinov2-learning-robust-visual-features-without-supervision-source-figure-3.webp)
+
 The processing itself is a real systems contribution: the deduplication and retrieval run in under two days on 20 nodes, each equipped with eight V100-32GB GPUs. “Self-supervised” does not mean “distribution-free.” The retrieval queries define which concepts are overrepresented, and Table 15 includes training data from ADE20K, Cityscapes, Pascal VOC, KITTI, NYU Depth V2, and SUN RGB-D, along with designated train or base data from retrieval datasets. Near-duplicate validation and test images are removed, but many reported transfer tasks still have related training data in the pretraining mixture.
 
 ### Global invariance and patch detail use different targets
@@ -45,6 +47,8 @@ DINOv2 combines an image-level DINO loss with an iBOT-style patch loss. The clas
 The two losses use separate projection heads. Teacher outputs use Sinkhorn-Knopp centering for three iterations, and the student uses softmax normalization. A KoLeo regularizer spreads the normalized class tokens by penalizing small nearest-neighbor distances within a GPU batch. The authors also run a short high-resolution phase at $518\times518$ rather than paying the cost of high-resolution training throughout.
 
 The training loop is engineered for scale. FlashAttention-style kernels reduce attention memory, sequence packing forwards $224$ and $98$-pixel crops in one block-diagonal sequence, and efficient stochastic depth skips dropped residual computations. Fully Sharded Data Parallel shards the student, teacher, and AdamW state across GPUs. Against the iBOT implementation on the same hardware, the authors report about twice the speed with one-third the memory. ViT-g uses width 1536, 24 heads, 40 blocks, SwiGLU feed-forward layers, and about 1.1B parameters; the 64-dimensional head size is chosen to make the attention kernels efficient.
+
+Training runs for 625,000 iterations, with a 100,000-iteration warmup and cosine decay.
 
 ### The ablations separate retrieval, dense prediction, and stability
 
@@ -59,6 +63,8 @@ Smaller DINOv2 models are distilled from a frozen ViT-g rather than trained from
 ![DINOv2 distillation across image and pixel-level task groups](/assets/images/dinov2-source-figure-5-distillation.png)
 *Fig 2: The left radar compares individual benchmarks; the right tables average metrics over eight task groups. Distilled ViT-L improves over scratch ViT-L, with lower values preferred on the depth axes and higher values on the accuracy axes. | source: [DINOv2, Figure 5](https://arxiv.org/abs/2304.07193)*
 
+[Open figure at full resolution](/assets/images/dinov2-source-figure-5-distillation.png)
+
 In the table of eight task-group averages, scratch ViT-L/14 scores 84.5 ImageNet, 72.2 segmentation, 1.10 depth RMSE, 90.2 classification, 75.8 fine-grained classification, 71.3 retrieval, 69.5 ImageNet-A/R/Sketch, and 67.3 video. Distillation changes those to 86.3, 73.3, 1.08, 91.2, 77.6, 76.3, 74.5, and 67.5. The distilled model beats scratch training on all 12 underlying benchmarks and sometimes approaches or exceeds the teacher. That is evidence for transferring a representation, not merely compressing logits for one classifier.
 
 ### Frozen features are strong, but the probe protocol matters
@@ -69,6 +75,8 @@ Patch tokens transfer without updating the backbone. With a simple linear segmen
 
 ![DINOv2 patch features establish semantic correspondences across images](/assets/images/dinov2-source-figure-1-pca.png)
 *Fig 3: Color-coded PCA components expose recurring parts in the patch features across changes in pose, category, and style. Background is removed before the displayed three-component projection. | source: [DINOv2, Figure 1](https://arxiv.org/abs/2304.07193)*
+
+[Open figure at full resolution](/assets/images/dinov2-source-figure-1-pca.png)
 
 The paper's qualitative PCA explains why the patch tokens are useful. It thresholds the first component to remove background, then computes three color-coded components across related images. Wings, limbs, and heads align across pose, style, and even category changes. The same representation can match a plane wing with a bird wing, but this is a feature-space correspondence probe, not a guarantee that every domain has the same visual parts.
 

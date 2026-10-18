@@ -30,6 +30,8 @@ The matching detail matters. The method generates nearer and farther noise range
 ![Sparse4D v3 temporal instance denoising and attention masks](/assets/images/sparse4dv3-paper-figure-4.png)
 *Fig 1: Noisy anchors receive matches before decoding and some noise groups recur into the next frame. Attention masks isolate these groups from one another and from normal instances, so training cannot shortcut through another group's target information. | source: [Sparse4D v3, Figure 4](https://arxiv.org/abs/2311.11722)*
 
+[Open the full-size source figure](/assets/images/sparse4dv3-paper-figure-4.png)
+
 Temporal noise makes the auxiliary task resemble the actual recurrent input: the decoder must correct an imperfect hypothesis inherited from a previous frame. The noisy branches disappear at inference. In the cumulative ablation, single-frame denoising improves mAP/NDS from 43.9/53.9 to 44.7/54.8. After the attention change, adding temporal denoising moves them from 45.8/55.1 to 46.2/55.7, but AMOTA falls from 47.2 to 45.7 at that intermediate step. The complete recipe improves tracking; every individual addition does not improve every metric monotonically.
 
 ### Separate geometric relevance from semantic similarity
@@ -45,13 +47,15 @@ Every matched positive is encouraged to have high classification confidence. Tha
 ![Sparse4D v3 convergence and localization-aware ranking curves](/assets/images/sparse4dv3-source-figure-6.png)
 *Fig 2: The right panels evaluate pedestrians with a 0.5 m matching threshold. With centerness, high-ranked detections have lower translation error and better low-recall precision, showing why a class score alone is an incomplete ranking signal. | source: [Sparse4D v3, Figure 6](https://arxiv.org/abs/2311.11722)*
 
+[Open the full-size source figure](/assets/images/sparse4dv3-source-figure-6.png)
+
 The curves explain a change in measured localization without requiring every predicted box to move: ranking changes which boxes enter a thresholded evaluation. In the ablation, centerness lowers translation error from 0.581 to 0.563 m, but orientation error rises from 0.454 to 0.517 rad and NDS falls from 55.7 to 55.4. Adding yawness partially repairs that orientation trade-off, reaching 0.476 rad, 0.553 m translation error, and 56.1 NDS. Quality is multidimensional, and optimizing a distance-based score can expose a weakness in another dimension.
 
 ### Persistent instances provide identity, with a finite lifecycle
 
 Tracking adds ID assignment to the detector's inference output. An instance gets an ID when its current confidence reaches 0.25, and that ID follows it through temporal propagation. An old instance's retention score is updated with the maximum of its new confidence and 0.6 times its previous score. The top 600 instances are retained among the 900 candidates, including lower-confidence hypotheses that have not yet earned an ID.
 
-These are two separate decisions: a current score controls whether a detection is emitted, while confidence decay helps determine which state survives for another frame. A weak observation need not immediately erase a track, but an instance displaced from the top-k memory can lose continuity. The tracking extension requires no new association network or tracking-specific fine-tuning; the paper reports doing so without adding ID supervision to the detector. It is still a learned recurrent detector with thresholds and memory selection, not a guarantee of identity preservation through arbitrary occlusion.
+These are two separate decisions: a current score controls whether a detection is emitted, while confidence decay helps determine which state survives for another frame. A weak observation need not immediately erase a track, but an instance displaced from the top-k memory can lose continuity. The tracking extension requires no new association network or tracking-specific fine-tuning; the paper reports doing so without adding ID supervision to the detector. The model is trained for 100 epochs without CBGS using sequential cached-frame iteration, and dense depth regression is an auxiliary stabilizer. It is still a learned recurrent detector with thresholds and memory selection, not a guarantee of identity preservation through arbitrary occlusion.
 
 On nuScenes test, the causal DD3D-pretrained VoVNet-99 model reaches 57.0 mAP, 65.6 NDS, 57.4 AMOTA, and 669 ID switches. Its AMOTA is slightly below the listed DORT result of 57.6, while its ID-switch count is lower than DORT's 774. The larger EVA02-Large causal row reaches 69.4 NDS and 64.3 AMOTA. Adding eight future frames—four seconds at 2 FPS—raises those to 71.9 and 67.7. Table 6 lists 66.8 mAP for that offline row, whereas the surrounding prose says 68.2; the table value is used here rather than silently combining the inconsistent numbers.
 

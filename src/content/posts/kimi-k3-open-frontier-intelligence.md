@@ -36,24 +36,34 @@ Attention Residuals apply the same selective-access idea over depth. Learned pse
 ![Kimi K3 architecture across token, depth, and expert mixing](/assets/images/kimi-k3-architecture-paper-figure.png)
 *Fig 1: The architecture combines KDA with periodic gated MLA, Block Attention Residuals across earlier blocks, Stable LatentMoE with shared and routed experts, and a native MoonViT-V2 vision path. | source: [Kimi K3, Figure 2](https://arxiv.org/abs/2607.24653)*
 
+[Open figure at full size](/assets/images/kimi-k3-architecture-paper-figure.png)
+
 The stabilizers are part of the scaling story. RMS normalization before the routed up-projection limits variation in the aggregate latent expert output; SiTU-GLU caps both multiplicative branches while retaining SwiGLU's near-origin response; and Quantile Balancing sets expert biases from router-score quantiles without changing the mixture weights or router gradients. Those choices address activation outliers and expert-load imbalance that become visible only when 896 experts are in play.
 
 ### Native vision and context extension change the training problem
 
 Kimi K3 trains the roughly 0.4B-parameter, 27-layer MoonViT-V2 from scratch with next-token prediction. The report compares it with a SigLIP-initialized MoonViT-3D: the from-scratch tower has lower, less spiky gradient norms and matches the initialized baseline across vision evaluations. Images and videos share the vision pathway; spatial attention is factored from temporal attention, temporal pooling compresses frames, and a 2×2 pixel shuffle reduces visual tokens before projection into the shared backbone.
 
+The training setup is native multimodal from the beginning: interleaved visual and text tokens share one next-token objective rather than a later vision-to-language alignment stage. The pretraining corpus mixes filtered and deduplicated web text, code, mathematics, and knowledge with captions, interleaved image-text documents, OCR, perception, video, and programmatic visual data. The 2.5× scaling comparison therefore changes the data mixture alongside the architecture.
+
 Table 1 gives the scale precisely: 2.78T total parameters, 104.2B activated, 93 layers, 896 routed experts, 16 active per token, two shared experts, and 401M total ViT parameters. The model has no explicit positional embedding; KDA's recurrent decay carries positional information. Context grows from 8K to 64K during pretraining and from 256K to 1M in cooldown. Long-context data is cleaned, upsampled, and synthesized so tasks require information spread across the full context rather than only local patterns.
 
 ![Reinforcement-learning capability and assistant-step curves](/assets/images/kimi-k3-open-frontier-intelligence-source-figure-8.webp)
 *Fig 2: Across coding, tool use, web development, search, workflows, and visual tasks, increasing RL FLOPs raises scores alongside the average number of assistant steps. | source: [Kimi K3, Figure 8](https://arxiv.org/abs/2607.24653)*
 
+[Open figure at full size](/assets/images/kimi-k3-open-frontier-intelligence-source-figure-8.webp)
+
 The report fits an approximately 2.5× improvement in overall scaling efficiency over Kimi K2, but the comparison changes model size, architecture, data, optimizer, and training recipe together. It is evidence for the K3 system recipe, not an isolated causal estimate for KDA or the expert router.
+
+The million-token claim is also a systems result. FlashKDA and KDA Context Parallelism compose fixed-size recurrent states across devices; MoonEP keeps routed-expert token loads balanced; and KDA-aware prefix caching keeps long contexts reusable. A model checkpoint alone does not reproduce that context or serving behavior.
 
 ### RL turns long context into a usable capability
 
-Post-training proceeds from supervised agent trajectories to specialist RL policies, then Multi-Teacher On-Policy Distillation (MOPD) consolidates them. The RL specialists span general tasks, general agents, and coding agents, each at low, high, and max reasoning effort, for nine expert models. Partial rollouts can pause and resume across iterations while sandbox and generation state persist, avoiding a synchronization barrier at the longest trajectories. Quantization-aware training runs through SFT and RL with MXFP4 expert weights and MXFP8 activations, so rollout and training use the deployment precision.
+Post-training proceeds from supervised agent trajectories to specialist RL policies, then Multi-Teacher On-Policy Distillation (MOPD) consolidates them. The RL specialists span general tasks, general agents, and coding agents, each at low, high, and max reasoning effort, for nine expert models. Partial rollouts can pause and resume across iterations while sandbox and generation state persist, avoiding a synchronization barrier at the longest trajectories. Effort control starts with a per-problem token budget and penalizes trajectories that exceed a stage-specific multiple; a separate verbosity budget limits reward-model preferences for unnecessarily long answers. MOPD supplies a clipped per-token log-ratio reward from the domain-and-effort teacher, rather than merely averaging the nine policies. Quantization-aware training runs through SFT and RL with MXFP4 expert weights and MXFP8 activations, so rollout and training use the deployment precision.
 
 The reported table puts the model's strengths and limits in the same frame: GPQA Diamond 93.5, ProgramBench 77.8, Terminal-Bench 2.1 88.3, FrontierSWE 81.2, and BrowseComp 91.2. Kimi K3 is 0.5 points below GPT-5.6 Sol on Terminal-Bench and 5.4 points below Claude Fable 5 on FrontierSWE, while HLE-Full is 43.5 without tools and 56.0 with tools and CritPt is 23.4. These comparisons use max reasoning effort, varying harnesses, third-party leaderboard snapshots, fallback behavior, and internal tests, so the small gaps are not clean architecture comparisons.
+
+The primary report fixes K3's decoding protocol at maximum effort and temperature 1.0, using top-$p=0.95$ for single-step reasoning and vision tasks and top-$p=1.0$ for agentic tasks. Vision scores average three runs (five for ZeroBench-main), while Terminal-Bench 2.1 may use the best result across Kimi Code, Claude Code, and Codex harnesses. Those choices make the leaderboard useful as a system snapshot, but they also bound what can be inferred about the model alone.
 
 ## High-Level Takeaways
 

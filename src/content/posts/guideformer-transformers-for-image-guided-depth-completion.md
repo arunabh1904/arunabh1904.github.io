@@ -23,6 +23,8 @@ The depth feature supplies the query, while the color feature supplies the keys 
 ![GuideFormer Figure 1 shows two branches, guided attention, and confidence-weighted depth fusion](/assets/images/guideformer-source-figure-1.png)
 *Fig 1: Each branch emits one depth map and one confidence map. The four labeled outputs are therefore two estimates plus their weights, not four candidate depths. Guided attention transfers features before the final depth estimates are combined. | source: [GuideFormer, Figure 1](https://openaccess.thecvf.com/content/CVPR2022/papers/Rho_GuideFormer_Transformers_for_Image_Guided_Depth_Completion_CVPR_2022_paper.pdf)*
 
+[Open figure at full resolution](/assets/images/guideformer-source-figure-1.png)
+
 The attention operates through window-based blocks in a hierarchical encoder–decoder. It should not be pictured as every full-resolution depth pixel attending to every camera pixel globally in one step. Patch merging, bottleneck processing, upsampling, and skip connections carry information across scales while preserving dense output detail.
 
 ### Guide the sparse branch before asking it to organize itself
@@ -33,6 +35,8 @@ The intuition is tied to sparsity: early depth features may lack enough observat
 
 ![GuideFormer Figure 3 compares pre-guide, post-guide, and bidirectional guidance](/assets/images/guideformer-source-figure-3.png)
 *Fig 2: Read upward from each pair of inputs. Pre-guide sends color information into depth before depth self-attention; post-guide reverses that order. The bidirectional variant adds a second cross-modal transfer, increasing both interaction and model size. | source: [GuideFormer, Figure 3](https://openaccess.thecvf.com/content/CVPR2022/papers/Rho_GuideFormer_Transformers_for_Image_Guided_Depth_Completion_CVPR_2022_paper.pdf)*
+
+[Open figure at full resolution](/assets/images/guideformer-source-figure-3.png)
 
 A separate architectural choice determines which color features provide that guidance. Parallel guidance connects the two encoders at corresponding stages. Sequential guidance runs the color encoder–decoder first, then uses its decoded features to guide the depth encoder at matching resolutions. The best sequential pre-guide result is 754.17 mm, slightly better than the 755.09-mm parallel bidirectional result, while using 130 million rather than 163 million parameters. Richer, decoded guidance can therefore be more useful than adding another direction of communication.
 
@@ -51,6 +55,8 @@ The CNN–transformer comparison also exposes the cost. With sequential concaten
 Both branches produce dense depth and confidence scores. A softmax over the two scores yields per-pixel fusion weights. Sequential pre-guide improves from 758.26 mm when using only the depth-branch output to 754.17 with the fused output. The color branch still contains useful complementary information after its features have guided the depth branch.
 
 Training uses MSE on valid ground-truth pixels, with auxiliary losses for each branch. The model trains on KITTI alone for 30 epochs on eight V100 GPUs, without additional pretraining data. The authors report that their Adam recipe with small weight decay trains more reliably than the larger-weight-decay AdamW settings they tried; that is a task-specific observation, not a general optimizer ranking.
+
+The KITTI contract is 86K training samples plus officially selected 1K validation and 1K test samples. Ground truth aggregates 11 consecutive LiDAR frames but marks only about 16% of pixels; training bottom-crops to 1216×352 and then randomly crops to 1216×320. The held-out scores therefore measure annotated depth locations under this crop and sparse-supervision protocol.
 
 On the held-out KITTI test set, GuideFormer reaches 721.48 mm RMSE versus PENet's 730.08 and NLSPN's 741.68. Its MAE is 207.76 mm, worse than NLSPN's 199.59. GuideFormer uses L2 supervision while NLSPN combines L1 and L2, which helps explain why the methods rank differently across metrics. KITTI's aggregated ground truth labels only part of each image, so the reported metric evaluates annotated locations rather than every predicted pixel. The paper does not test deployment under calibration drift, unfamiliar scan patterns, or sensor loss.
 

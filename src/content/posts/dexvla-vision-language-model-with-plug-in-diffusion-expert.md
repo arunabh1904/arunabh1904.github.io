@@ -37,6 +37,8 @@ The diffusion loss teaches continuous action denoising; next-token prediction te
 ![DexVLA connects Qwen2-VL reasoning and action tokens to a multi-head billion-parameter diffusion expert](/assets/images/dexvla-vision-language-model-with-plug-in-diffusion-expert-paper-figure.png)
 *Fig 1: Stage 1 trains the diffusion expert alone on cross-embodiment data; Stages 2 and 3 connect it to the VLM for embodiment alignment and task adaptation, while separate output heads handle robot configurations. | source: [DexVLA, Figure 2](https://arxiv.org/abs/2502.05855)*
 
+[Open figure at full size](/assets/images/dexvla-vision-language-model-with-plug-in-diffusion-expert-paper-figure.png)
+
 Figure 1 shows the critical asymmetry. Stage 1 discards the VLM during diffusion-expert pretraining, so the large expert learns motor patterns without competing with language alignment. Stage 2 brings back the VLM, projection, and expert on embodiment-specific data while freezing the VLM visual encoder. Stage 3 uses task-specific demonstrations for difficult skills. The authors train on about 100 hours of demonstrations and report 60 Hz inference on one Nvidia A6000, but the three stages still require distinct data and optimization runs.
 
 Substep reasoning is the bridge to long horizons. Instead of using a single instruction such as “fold the shirt” for an entire trajectory, demonstrations are annotated with intermediate descriptions such as “smooth wrinkles,” “align sleeves,” and “secure folds,” typically about every five seconds. These descriptions are trained as intermediate language outputs, so the model learns to generate a substep and use it to guide the diffusion expert. It is an implicit high-level policy inside the VLA, rather than an external SayCan call.
@@ -46,12 +48,16 @@ Substep reasoning is the bridge to long horizons. Instead of using a single inst
 ![DexVLA generates implicit substeps for laundry folding, dryer unloading, and sorting from direct prompts](/assets/images/dexvla-vision-language-model-with-plug-in-diffusion-expert-source-figure-2.webp)
 *Fig 2: Direct prompting turns one long instruction into a sequence of generated substeps for laundry, dryer, and sorting tasks; success requires both dexterous control and state-dependent decomposition. | source: [DexVLA, Figure 3](https://arxiv.org/abs/2502.05855)*
 
+[Open figure at full size](/assets/images/dexvla-vision-language-model-with-plug-in-diffusion-expert-source-figure-2.webp)
+
 The no-Stage-3 test uses one set of parameters across bin picking, shirt folding, and easy table bussing. Every method is fine-tuned on the same data and for the same number of epochs. Across ten trials per task, DexVLA scores 0.92 on shirt folding, while Diffusion Policy, Octo, and OpenVLA complete essentially none of the shirt-folding steps. This is a normalized task score, not a binary success rate, so the number means substantial partial completion.
 
 On two embodiments absent from Stage 1 and Stage 2—Franka with a dexterous hand for drink pouring and bimanual UR5e for packing—the model is fine-tuned with 100 demonstrations per novel task. Averaged over ten trials, DexVLA scores 0.90 across the two tasks and outperforms the same OpenVLA, Octo, and Diffusion Policy comparisons. The control is meaningful because the baselines receive the same per-task training epochs, but the tasks remain carefully selected and the scoring rubrics are supplied in the appendix.
 
 ![DexVLA evaluates single-arm, bimanual, mobile, and dexterous-hand embodiments](/assets/images/dexvla-vision-language-model-with-plug-in-diffusion-expert-source-figure-4.webp)
 *Fig 3: The experiments span bimanual UR5e, Franka, mobile AgileX, and Franka with a dexterous hand, exposing the action expert to different kinematics and camera configurations. | source: [DexVLA, Figure 4](https://arxiv.org/abs/2502.05855)*
+
+[Open figure at full size](/assets/images/dexvla-vision-language-model-with-plug-in-diffusion-expert-source-figure-4.webp)
 
 On the LIBERO simulation benchmark, Table 5 reports 97.2% on Spatial, 99.1% on Object, 95.6% on Goal, and 97.3% averaged for DexVLA. The comparisons include Diffusion Policy at 79.7 average, OpenVLA at 84.1, π0-FAST at 93.9, and π0 at 97.1. These are useful as a controlled VLA comparison, but the simulated tasks do not settle visual or contact robustness in a new home.
 

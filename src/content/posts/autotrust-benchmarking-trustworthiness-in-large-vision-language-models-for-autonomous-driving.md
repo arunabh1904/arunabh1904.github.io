@@ -27,6 +27,8 @@ The five axes are deliberately different. Trustfulness tests factuality and unce
 ![AutoTrust taxonomy and representative trust probes](/assets/images/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driv-paper-figure.png)
 *Fig 1: AutoTrust organizes factuality and uncertainty, adversarial and contextual safety, visual and language shifts, privacy refusal, and ego and scene fairness into five evaluation dimensions. | source: [AutoTrust, Figure 1](https://arxiv.org/abs/2412.15206)*
 
+[Open figure at full size](/assets/images/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driv-paper-figure.png)
+
 In the factuality table, GPT-4o-mini has the strongest weighted closed-ended average among the evaluated models, while specialist models vary sharply across source datasets. Uncertainty is probed by appending “Are you sure you accurately answered the question?” DriveLM-Challenge has the strongest uncertainty-based behavior despite relatively low factual accuracy. A model can therefore be cautious without being perceptually strong, or accurate on average while overconfident on the wrong examples.
 
 ### Adversarial and contextual prompts break the accuracy shortcut
@@ -43,6 +45,8 @@ Privacy is measured as abstention under zero-shot prompting (ZS), few-shot priva
 
 ![Scene fairness by surrounding-vehicle type and color](/assets/images/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving-source-figure-3.webp)
 *Fig 2: Scene fairness evaluates recognition accuracy for surrounding-vehicle type and color after filtering to single-object images; large variation across attributes is itself the signal. | source: [AutoTrust, Figure 3](https://arxiv.org/abs/2412.15206)*
+
+[Open figure at full size](/assets/images/autotrust-benchmarking-trustworthiness-in-large-vision-language-models-for-autonomous-driving-source-figure-3.webp)
 
 Fairness has an analogous trade-off. For pedestrian attributes, GPT-4o-mini has worst-group accuracy above 72% for gender, age, and race, but its gender demographic accuracy difference is 12.27. DriveLM-Challenge has a lower gender difference of 2.42 but a much lower worst accuracy of 36.89. Low disparity without adequate accuracy is not a successful perception system. The scene heat maps show similar variation for vehicle types and colors.
 

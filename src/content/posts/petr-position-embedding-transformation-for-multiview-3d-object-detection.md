@@ -30,6 +30,8 @@ The architecture figure should be read from left to right and then back through 
 ![PETR: Position Embedding Transformation for Multi-View 3D Object Detection source figure: The architecture of the proposed PETR paradigm.](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-source-figure-2-white.png)
 *Fig 1: Camera-frustum coordinates are transformed into 3D position embeddings, added to multiview image features, and read by object queries that decode 3D boxes and classes. | source: [PETR, Figure 2](https://arxiv.org/abs/2203.05625)*
 
+[Open Figure 1 at full resolution](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-source-figure-2-white.png)
+
 ### Give each query a starting location in 3D
 
 PETR also uses geometry to initialize the decoder queries. It learns anchor points in normalized 3D space and maps their coordinates through a two-layer MLP to create the initial query embeddings. The anchor gives a query a spatial starting point; attention can still retrieve evidence globally across cameras.
@@ -42,6 +44,8 @@ The paper's ablation compares positional encoding choices rather than only decod
 
 PETR's strongest externally pretrained test configuration reports 44.1 mAP and 50.4 NDS. A 1056×384 setting is reported at 10.7 FPS, but that throughput is tied to the paper's hardware and implementation. Global query-to-image attention also scales with the number of camera tokens, so the flexible retrieval pattern has a predictable resolution and camera-count cost.
 
+The paper's leaderboard and ablations use different baselines. The main nuScenes experiments use the standard 700/150/150 scene split, six cameras, and a 24-epoch schedule without test-time augmentation; Tables 3–5 instead use a single C5 feature from ResNet-50 and omit CBGS to isolate the position and query components. The 44.1 mAP/50.4 NDS test row uses a V2-99 backbone initialized with external data, so it should not be read as the same from-scratch recipe as the core ablations.
+
 ### Global attention can gather cross-view evidence
 
 The qualitative figure pairs predicted boxes in BEV with their projections in the camera views. Read the same object across panels: a box is useful only when its metric footprint and image projections agree. The examples show PETR's ability to produce coherent cross-view boxes, but they do not measure calibration error or long-range depth accuracy.
@@ -49,10 +53,14 @@ The qualitative figure pairs predicted boxes in BEV with their projections in th
 ![Figure 6 from PETR: Position Embedding Transformation for Multi-View 3D Object Detection](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-source-figure-6.webp)
 *Fig 2: Qualitative detection results are shown in BEV and image views at a 0.25 score threshold with a ResNet-101 backbone; the paired views make cross-view box consistency visible. | source: [PETR, Figure 6](https://arxiv.org/abs/2203.05625)*
 
+[Open Figure 2 at full resolution](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-source-figure-6.webp)
+
 The attention visualization makes the retrieval mechanism inspectable. For a truck query, strong responses appear in both front-left and back-left views, so the decoder can combine non-adjacent camera evidence for one object. The map is a learned attention pattern, not a calibrated depth probability or a guarantee that every highlighted pixel contributed causally to the box.
 
 ![Figure 7 from PETR: Position Embedding Transformation for Multi-View 3D Object Detection](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-source-figure-7.webp)
 *Fig 3: The attention map for a truck query responds in both the front-left and back-left cameras, illustrating global cross-view retrieval from 3D position-aware features. | source: [PETR, Figure 7](https://arxiv.org/abs/2203.05625)*
+
+[Open Figure 3 at full resolution](/assets/images/petr-position-embedding-transformation-for-multiview-3d-object-detection-source-figure-7.webp)
 
 PETR pays for that flexibility with implicit depth learning. Its 64 depth samples are hypotheses, and the decoder must learn to select evidence across them. The paper does not provide an explicit per-pixel depth ground truth target in the core formulation, so a matched comparison with depth-supervised lifting remains useful when range-specific localization matters.
 

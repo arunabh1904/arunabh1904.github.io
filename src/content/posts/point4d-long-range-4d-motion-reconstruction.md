@@ -36,7 +36,7 @@ Adjacent chunks are aligned by a similarity transform estimated from depth in th
 
 ### The descriptor ablation identifies the useful change
 
-Training initializes the encoder and geometry heads from Depth Anything 3 and learns the decoder from scratch. Dynamic and static datasets provide motion and stationary-point supervision. The loss combines signed-log 3D position regression, confidence, reprojection consistency, and visibility. Training samples 16–64-frame videos, with 750 query pixels per frame and additional sampling near edges; it runs on eight H100 GPUs for 150 epochs.
+Training initializes the encoder and geometry heads from Depth Anything 3 and learns the decoder from scratch. Dynamic and static datasets provide motion and stationary-point supervision. The loss combines signed-log 3D position regression, confidence, reprojection consistency, and visibility. Training samples 16–64-frame videos and 750 query pixels per frame, with 40% of queries drawn from Sobel edge regions; it runs for 150 total epochs, with a 10-epoch warmup followed by cosine decay.
 
 | Query formulation | PointOdyssey long-video survival | Dynamic Replica long-video survival |
 | --- | ---: | ---: |
@@ -46,7 +46,7 @@ Training initializes the encoder and geometry heads from Depth Anything 3 and le
 
 Table 3 shows why changing coordinates alone is insufficient. A source patch can be uninformative for the queried state, and on Dynamic Replica that variant is worse than 2D queries. The reusable descriptor makes the full mechanism work. Single-chunk results are competitive rather than uniformly best, supporting the narrower interpretation that long-video gains arise from chaining.
 
-The main comparison includes iterative trackers as well as feed-forward models. Point4D has the best average rank in the long-video table, but not the best value in every dataset column: SpatialTrackerV2 has lower PointOdyssey endpoint error. Dense-query throughput also differs from sparse-query throughput. Finally, predicted depth and successive similarity transforms can accumulate error, and no coordinate representation can recover motion without sufficient evidence when a point disappears for a full chunk.
+The main comparison includes iterative trackers as well as feed-forward models. Long-video scores include static and dynamic points after one global scale alignment per sequence, while the single-chunk table isolates dynamic points with per-frame-pair rescaling. Point4D has the best average rank in the long-video table, but not the best value in every dataset column: SpatialTrackerV2 has lower PointOdyssey endpoint error. Dense-query throughput also differs from sparse-query throughput. Finally, predicted depth and successive similarity transforms can accumulate error, and no coordinate representation can recover motion without sufficient evidence when a point disappears for a full chunk.
 
 ## High-Level Takeaways
 

@@ -32,7 +32,7 @@ The source figure exposes the deployment split. Follow the observation to the cl
 ![Cloud backbone and local robot action decoder; source Figure 14](/assets/images/gemini-robotics-source-figure-14.webp)
 *Fig 1: The model combines a cloud VLA backbone with an onboard decoder that produces action chunks. Effective control frequency and observation-to-action latency measure different properties of this system. | source: [Paper, Figure 14](https://arxiv.org/abs/2503.20020)*
 
-[View full-size figure](/assets/images/gemini-robotics-source-figure-14.webp)
+[Open figure at full size](/assets/images/gemini-robotics-source-figure-14.webp)
 
 ### Robot data and specialization are part of the result
 

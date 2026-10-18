@@ -28,6 +28,8 @@ Two discriminators evaluate that tuple. One distinguishes expert actions from po
 ![Panel b of CounterAlign Figure 2: the relabeling discriminator receives the same observation with original or substituted instructions and action chunks](/assets/images/counteralign-source-figure-2b.png)
 *Fig 1: The relabeling discriminator compares instruction–action pairings while holding the observation fixed. Cropped to panel b of the source figure so the semantic supervision is readable. | source: [CounterAlign, Figure 2b](https://arxiv.org/html/2608.21740v1#S3.F2)*
 
+[Open figure at full size](/assets/images/counteralign-source-figure-2b.png)
+
 Relabeling can also produce a valid alternative. CounterAlign therefore treats jointly changed instructions and actions as unlabeled examples under non-negative positive–unlabeled learning. It does not force every synthetic pair to be a failure. That distinction matters whenever several commands share a valid intermediate motion: a useful negative must expose a semantic error without penalizing an action that could satisfy either command.
 
 ### Relabeling changes the reward and critic before the actor
@@ -40,7 +42,7 @@ That separates CounterAlign from the experience-collection route discussed in [�
 
 ### The gains depend on the perturbation
 
-The following success rates come from Table 1. Each cell compares behavior-cloned π0.5 with CounterAlign, in that order; the paper reports 100 evaluation trials.
+The following success rates come from Table 1. The base $\pi_{0.5}$ policy is trained on LIBERO and evaluated on LIBERO-PRO under four perturbation families: object appearance, object position, semantically equivalent language, and changed task. Each cell compares behavior-cloned π0.5 with CounterAlign, in that order; the paper reports 100 evaluation trials.
 
 | LIBERO-PRO suite | Changed object position | Changed task |
 | --- | --- | --- |

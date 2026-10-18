@@ -28,6 +28,8 @@ Two deformable decoder branches extract traffic-element queries from front-view 
 ![TopoNet Figure 2 shows the two perception branches and graph-based lane-query updates](/assets/images/toponet-graph-based-topology-reasoning-for-driving-scenes-paper-figure.png)
 *Fig 1: Trace the traffic branch across the top: its original queries reach the detection head, while embedded copies supply semantic messages to lane queries below. This preserves image-space localization while allowing traffic information to influence lane reasoning. | source: [TopoNet, Figure 2](https://arxiv.org/abs/2304.05277)*
 
+[open full-size figure](/assets/images/toponet-graph-based-topology-reasoning-for-driving-scenes-paper-figure.png)
+
 This asymmetry is deliberate. The paper reports that too much feedback into traffic queries hurts attribute prediction. A traffic light's appearance and image position remain useful for recognizing it, even when its semantic effect must be expressed in a different feature space to help locate the controlled lane. Removing the embedding lowers traffic detection from 48.1 to 46.9 and overall score from 35.6 to 35.2. The gain is modest, but supports keeping the two uses of a traffic query distinct.
 
 ### Predicted relationships control typed messages at the next decoder layer
@@ -60,6 +62,8 @@ Under the main subset_A protocol, TopoNet reports 28.5 lane detection, 4.1 laneâ
 
 ![TopoNet Figure 5 shows a bus occluding an intersection and incomplete predicted topology](/assets/images/toponet-graph-based-topology-reasoning-for-driving-scenes-source-figure-5.webp)
 *Fig 2: The bus hides much of the intersection, and the predicted lane graph remains incomplete. The authors also identify one erroneous laneâ€“light annotation in this example, so disagreement with ground truth is not uniformly a model failure. | source: [TopoNet, Figure 5](https://arxiv.org/abs/2304.05277)*
+
+[open full-size figure](/assets/images/toponet-graph-based-topology-reasoning-for-driving-scenes-source-figure-5.webp)
 
 The failure case shows the limit of relational context when visual evidence is missing. This model uses no temporal input, and the paper acknowledges that merging or pruning is still needed for clean graph outputs. Its contribution is learned scene-relationship reasoning, not a completed driving policy or an assurance of reliable inference through large occlusions.
 

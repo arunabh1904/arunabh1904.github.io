@@ -29,6 +29,8 @@ A YOLO11-nano detector selects a lead vehicle, maps its box onto Alpamayo-R1's $
 ![Attention-steering pipeline from detector box through visual-token selection to a bounded pre-softmax bias and a changed trajectory](/assets/images/attention-steering-overview.webp)
 *Fig 1: The intervention is external and weight-free: detection chooses visual-token columns, a bounded bias changes their attention mass, and the original diffusion decoder produces the trajectory. | source: [Inference-Time Attention Steering, Figure 1](https://arxiv.org/abs/2608.17095)*
 
+[Open figure at full size](/assets/images/attention-steering-overview.webp)
+
 $$
 \tilde{z}_{q,j}=z_{q,j}+b_j,\qquad
 b_j=\begin{cases}
@@ -42,6 +44,8 @@ The clamp $\beta=4$ bounds the perturbation, while a sink guard excludes the fir
 ![Detector box aligned to the merged visual-token grid used by the attention-steering hook](/assets/images/attention-steering-grounding.webp)
 *Fig 2: Actor grounding is only as precise as the detector-to-token projection: every selected grid cell becomes an attended key column across the exposed action-decoder layers. | source: [Inference-Time Attention Steering, Figure 2](https://arxiv.org/abs/2608.17095)*
 
+[Open figure at full size](/assets/images/attention-steering-grounding.webp)
+
 The evaluation uses Alpamayo-R1-10B with a 36-layer Qwen3-VL backbone, four front-camera context frames, and 64 predicted waypoints over 6.4 seconds. Baseline and steered diffusion samples share a seed. The paired zero-bias condition is therefore bit-identical, which is essential because cross-seed trajectory variation is about 30 times larger than the measured steering effect.
 
 | Intervention | Mean trajectory ADE | Mean maximum lateral shift | Scope |
@@ -54,6 +58,8 @@ The evaluation uses Alpamayo-R1-10B with a 36-layer Qwen3-VL backbone, four fron
 
 ![Baseline and attention-steered trajectories showing a late-layer dose response across bias magnitudes](/assets/images/attention-steering-trajectories.webp)
 *Fig 3: The paired trajectories move monotonically as the late-layer bias grows, but displacement alone does not establish safer or actor-specific behavior. | source: [Inference-Time Attention Steering, Figure 3](https://arxiv.org/abs/2608.17095)*
+
+[Open figure at full size](/assets/images/attention-steering-trajectories.webp)
 
 ### Unchanged reasoning text is a routing result
 

@@ -29,6 +29,10 @@ The annotation problem is that a single image shows the present while planning d
 ![VLM-AD teacher and student training pipeline](/assets/images/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision-paper-figure.png)
 *Fig 1: The VLM converts a front-view video frame, camera parameters, prompts, and projected future path into freeform and structured labels; an arbitrary end-to-end driver learns from those labels during training. | source: [VLM-AD, Figure 2](https://arxiv.org/abs/2412.14446)*
 
+[Open figure at full size](/assets/images/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision-paper-figure.png)
+
+For the UniAD integration, the perception and mapping stage runs for six epochs from BEVFormer weights, then the end-to-end VLM-AD stage runs for 20 epochs with the image backbone and BEV encoder frozen. The teacher set covers 700 nuScenes scenes and 28,032 usable frames; its action labels are heavily skewed toward “go straight” (62%), “no turn” (89.4%), and “no lane action” (97.3%). A five-participant check found at least 90% accuracy for each structured action type (lane action reaches 96%), while freeform reasoning receives the lowest score. Feeding consecutive front-view images also increases annotation time by about 80% and often confuses temporal continuity.
+
 This is a useful distinction from using a VLM as a runtime planner. The teacher is an annotation instrument. Its errors can still enter the dataset, but its latency and token-generation cost do not enter the deployed driving loop.
 
 ### Two auxiliary heads distill different kinds of knowledge
@@ -37,6 +41,8 @@ The planning module exposes an ego feature to two plug-in heads. The text-alignm
 
 ![VLM-AD framework with freeform text alignment and structured action classification](/assets/images/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision-source-figure-1.webp)
 *Fig 2: The deployed end-to-end model keeps its original planning path while the auxiliary text-alignment and action-classification heads inject teacher supervision during training. | source: [VLM-AD, Figure 1](https://arxiv.org/abs/2412.14446)*
+
+[Open figure at full size](/assets/images/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision-source-figure-1.webp)
 
 The two signals do different work. Freeform text supplies a high-dimensional semantic target, while structured labels constrain the behavior at a smaller, more stable vocabulary. In the UniAD ablation, Q1 freeform supervision alone reaches 0.89 m average L2 and 0.24% average collision rate; Q2 structured labels alone reach 0.91 m and 0.29%; combining them reaches 0.88 m and 0.19%. The result supports complementarity, but does not prove that the natural-language rationale itself is faithful to the student's causal computation.
 

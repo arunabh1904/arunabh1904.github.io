@@ -27,6 +27,8 @@ The decoder combines prior-map queries, initialized from map geometry and class,
 ![RTMap jointly associates prior elements, predicts new geometry, estimates pose, and updates a persistent map](/assets/images/rtmap-real-time-recursive-mapping-with-change-detection-and-localization-paper-figure.png)
 *Fig 1: The same association separates three outcomes: a matched landmark can constrain pose, an outdated one can trigger removal, and a new observation can extend the map. The cloud then fuses accepted geometry across traversals. | source: [RTMap, Figure 2](https://arxiv.org/abs/2507.00980)*
 
+[open full-size figure](/assets/images/rtmap-real-time-recursive-mapping-with-change-detection-and-localization-paper-figure.png)
+
 A coarse GPS pose retrieves the local prior. The network also predicts a pose correction, while an optional explicit optimizer solves alignment from matched vertices. These are alternative pose estimates, not two independent demonstrations of downstream driving safety.
 
 ### Uncertainty changes how much each vertex should influence the answer
@@ -37,6 +39,8 @@ The explicit localization solver rejects new and outdated elements, then minimiz
 
 ![Matched, obsolete, and new RTMap queries evolve across decoder layers](/assets/images/rtmap-real-time-recursive-mapping-with-change-detection-and-localization-source-figure-3.webp)
 *Fig 2: Blue matched queries settle near valid geometry, while red obsolete queries remain uncertain; green queries recover newly observed elements. Uncertainty and confidence inform association, but do not by themselves distinguish permanent removal from temporary occlusion. | source: [RTMap, Figure 3](https://arxiv.org/abs/2507.00980)*
+
+[open full-size figure](/assets/images/rtmap-real-time-recursive-mapping-with-change-detection-and-localization-source-figure-3.webp)
 
 The paper uses a Gaussian-style weighted residual in its optimizer despite Laplace coordinate training. It should be read as an uncertainty-aware estimation design, rather than one unchanged probabilistic model carried exactly through every stage.
 

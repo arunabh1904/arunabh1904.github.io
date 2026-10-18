@@ -30,6 +30,8 @@ SigLIP turns every image–text pairing in a batch into binary matching problems
 ![Figure 1: SigLIP 2 training recipe](/assets/images/siglip-2-paper-figure-1.svg)
 *Fig 1: This source Figure 1 combines SigLIP's sigmoid alignment with decoder-based captioning and referring expressions, then adds self-distillation and masked prediction for local features. | source: [SigLIP 2: Multilingual Vision-Language Encoders, Figure 1](https://arxiv.org/abs/2502.14786)*
 
+[Open figure at full size](/assets/images/siglip-2-paper-figure-1.svg)
+
 The data mixture is also part of the representation. WebLI contributes 10 billion images and 12 billion alt-texts across 109 languages; the default mixture is 90% English web pages and 10% non-English pages, with filtering for representation bias. The multilingual proportion is modest, but it prevents a separate language-specific encoder from being the only route to cross-lingual retrieval.
 
 ### Preserve the image's geometry when the task needs it
@@ -39,8 +41,12 @@ The fixed-resolution checkpoints still resize images to square grids. NaFlex ins
 ![Figure 2: Per-language retrieval on Crossmodal-3600](/assets/images/siglip-2-multilingual-vision-language-encoders-source-figure-2.webp)
 *Fig 2: This source Figure 2 compares per-language image–text retrieval for SigLIP, SigLIP 2, and mSigLIP across Crossmodal-3600's 36 languages; SigLIP 2 nearly matches the multilingual specialist while retaining stronger English results. | source: [SigLIP 2: Multilingual Vision-Language Encoders, Figure 2](https://arxiv.org/abs/2502.14786)*
 
+[Open figure at full size](/assets/images/siglip-2-multilingual-vision-language-encoders-source-figure-2.webp)
+
 ![Figure 3: NaFlex and fixed-resolution SigLIP 2](/assets/images/siglip-2-multilingual-vision-language-encoders-source-figure-3.webp)
 *Fig 3: This source Figure 3 compares one aspect-preserving NaFlex checkpoint with separate square-input checkpoints as sequence length changes; NaFlex interpolates between trained resolutions but does not extrapolate reliably beyond them. | source: [SigLIP 2: Multilingual Vision-Language Encoders, Figure 3](https://arxiv.org/abs/2502.14786)*
+
+[Open figure at full size](/assets/images/siglip-2-multilingual-vision-language-encoders-source-figure-3.webp)
 
 The plots show why “variable resolution” needs a boundary. NaFlex wins on most OCR and screen retrieval tasks, where distortion is costly. On natural-image benchmarks, the distilled fixed-resolution B model can still win, and the authors explicitly report poor extrapolation beyond the sequence lengths used in training. Flexibility reduces checkpoint count; it does not remove the need to train the resolution regime a deployment will use.
 

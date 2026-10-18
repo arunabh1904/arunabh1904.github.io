@@ -34,7 +34,7 @@ The source corpus contains **850 nuScenes trainval recordings**, each about 20 s
 ![Source Figure 3: CausalDriveBench construction and validation pipeline](/assets/images/october-2609.32157-s4-f3.webp)
 *Fig 1: Graph extraction, question generation, and alternative-trajectory synthesis depend on shared scene evidence. Human graph review and separate QA and trajectory audits constrain different sources of annotation error. | source: [CausalDriveBench, Figure 3](https://arxiv.org/html/2609.32157v1#S4.F3)*
 
-[Open figure at full resolution](/assets/images/october-2609.32157-s4-f3.webp)
+[Open figure at full size](/assets/images/october-2609.32157-s4-f3.webp)
 
 | Stage | Inputs, transformation, and label origin |
 | --- | --- |

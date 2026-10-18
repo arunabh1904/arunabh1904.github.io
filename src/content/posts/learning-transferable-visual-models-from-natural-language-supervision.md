@@ -31,6 +31,8 @@ summary: "2021 – Learning Transferable Visual Models From Natural Language Sup
 ![CLIP contrastive pretraining and zero-shot prediction](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
 *Fig 1: CLIP learns one image and one text embedding for every pair in a batch, scores all image-text combinations, and later uses class descriptions as the rows of a zero-shot classifier. | source: [CLIP, Figure 1](https://arxiv.org/abs/2103.00020)*
 
+[Open figure at full size](/assets/images/clip-paper-figure-1-contrastive-pretraining.png)
+
 For a batch of $N$ image-caption pairs, CLIP produces $N$ image embeddings and $N$ text embeddings, L2-normalizes them, and computes an $N\times N$ cosine-similarity matrix. The diagonal entries are the observed pairs; the other $N^2-N$ entries are in-batch negatives. A learned temperature scales the logits, and the loss averages cross-entropy in both directions: image-to-text and text-to-image. The encoders interact only through this similarity matrix, rather than through cross-attention over every image region and word.
 
 At test time, the labels do not need to be the closed-set symbols seen during training. The text encoder embeds prompts such as “a photo of a {label},” and the image encoder chooses the class whose text embedding has the highest similarity. The classifier is therefore synthesized from language for each task. A phrase can describe a breed, an action, or a place without adding a new output head, provided the web data and the prompt give the visual encoder enough evidence to learn it.
@@ -44,12 +46,16 @@ The authors first tried caption generation and a bag-of-words prediction baselin
 ![CLIP’s zero-shot transfer efficiency as the image corpus grows](/assets/images/learning-transferable-visual-models-from-natural-language-supervision-source-figure-2-white.png)
 *Fig 2: The source efficiency plot shows zero-shot ImageNet accuracy rising faster for CLIP’s contrastive objective than for the captioning baselines as more image-text pairs are processed. | source: [CLIP, Figure 2](https://arxiv.org/abs/2103.00020)*
 
+[Open figure at full size](/assets/images/learning-transferable-visual-models-from-natural-language-supervision-source-figure-2-white.png)
+
 The training sweep includes ResNet-50, ResNet-101, three compute-scaled ResNets, and ViT-B/32, ViT-B/16, and ViT-L/14. The base text encoder is a 12-layer, 512-wide Transformer with a 49,152-token lower-cased BPE vocabulary and a 76-token context limit. The ResNet scaling sweep also widens the text encoder proportionally while holding its depth fixed. All models train from scratch for 32 epochs with a batch size of 32,768, Adam with decoupled weight decay, a cosine learning-rate schedule, mixed precision, and a learned temperature whose logit scale is clipped for stability. The best reported default is ViT-L/14 with one extra epoch at 336-pixel resolution; the largest ResNet takes 18 days on 592 V100 GPUs, and the largest Vision Transformer takes 12 days on 256 V100 GPUs.
 
 ### Zero-shot breadth is the result, not just ImageNet accuracy
 
 ![CLIP zero-shot transfer compared with a supervised ResNet-50 linear probe](/assets/images/learning-transferable-visual-models-from-natural-language-supervision-source-figure-5-white.png)
 *Fig 3: Each bar compares zero-shot CLIP with a linear classifier fitted to ResNet-50 features across the paper’s 27-dataset suite; CLIP is ahead on 16 datasets, including ImageNet. | source: [CLIP, Figure 5](https://arxiv.org/abs/2103.00020)*
+
+[Open figure at full size](/assets/images/learning-transferable-visual-models-from-natural-language-supervision-source-figure-5-white.png)
 
 | Evidence | Reported result | What it establishes |
 | --- | ---: | --- |

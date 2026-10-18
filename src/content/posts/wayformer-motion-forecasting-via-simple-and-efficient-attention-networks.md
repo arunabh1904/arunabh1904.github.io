@@ -25,6 +25,8 @@ Wayformer represents each modality as a tensor with spatial and temporal axes, a
 ![Wayformer's encoder-decoder architecture for multimodal scene inputs](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-paper-figure.png)
 *Fig 1: A homogeneous scene encoder projects traffic lights, road geometry, histories, and agent interactions into a shared representation before a trajectory decoder predicts mixture components. | source: [Wayformer, Figure 1](https://arxiv.org/abs/2207.05844)*
 
+[Open figure at full size](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-paper-figure.png)
+
 The decoder uses learned queries and cross-attention to produce a Gaussian mixture over trajectories. The benchmark models emit 64 mixture components, then aggregate them to the six modes required by the evaluation. That distinction matters: the internal distribution is richer than the final `k=6` predictions used for minADE, minFDE, miss rate, overlap, and mAP.
 
 ### Efficiency comes from exploiting the token geometry
@@ -34,6 +36,8 @@ Joint attention over spatial and temporal tokens has cost `O(S_m² × T²)`. Fac
 ![Wayformer's factorized-attention comparison](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-source-figure-5.webp)
 *Fig 2: Factorized attention traces quality and latency tradeoffs for early, late, and hierarchical fusion; the same nominal reduction can have different effects because road tokens are tiled in cross-modal encoders. | source: [Wayformer, Figure 5](https://arxiv.org/abs/2207.05844)*
 
+[Open figure at full size](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-source-figure-5.webp)
+
 The result is not simply “factorized is faster.” The authors find similar quality for sequential and interleaved attention, but latency improves most clearly for late fusion. In early and hierarchical fusion, tiling roadgraph tokens to the common temporal dimension can erase the expected savings. This is a good example of why a complexity expression must be checked against the actual tokenization.
 
 ### Latent queries buy a predictable quality-speed tradeoff
@@ -42,6 +46,10 @@ Across the fusion variants, latent queries speed models by roughly 2–16× with
 
 ![Wayformer's latent-query reduction curve](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-source-figure-6.webp)
 *Fig 3: Reducing the latent token count lowers latency while exposing the point at which compressing the scene begins to cost minADE. | source: [Wayformer, Figure 6](https://arxiv.org/abs/2207.05844)*
+
+[Open figure at full size](/assets/images/wayformer-motion-forecasting-via-simple-and-efficient-attention-networks-source-figure-6.webp)
+
+The source's limitations sharpen the benchmark claim. Ego-centric encoding repeats scene work for dense scenes; the sparse state input omits visual cues and fine vehicle geometry such as wheel angle; and the per-agent, temporally conditionally independent future assumptions cannot represent the full combinatorial joint future. Wayformer is therefore a useful efficiency and quality point for state-based forecasting, rather than a complete perception or interaction model.
 
 The benchmark setup uses 1 second of history and 8 seconds of future at 5 Hz on WOMD, and 2 seconds of history and 3 seconds of future at 10 Hz on Argoverse. Models train with AdamW for 1M steps, batch size 256, and a linear learning-rate decay. The Argoverse leaderboard result additionally ensembles 15 replicas, each with 10 decoders, before reducing the mixture to six trajectories.
 

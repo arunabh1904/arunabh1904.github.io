@@ -33,6 +33,12 @@ The closed-loop CARLA result is also more informative than the abstract speed cl
 
 The useful abstraction is therefore a shared coordinate language between perception and planning. Agent vectors expose who can collide with the ego vehicle; boundary and lane vectors expose where the vehicle may travel and in which direction. VAD can apply those three constraints directly to future waypoints, whereas a dense raster would need another step to recover instance identity, geometry, and lane direction. That coupling explains both the efficiency gain and the failure mode: a compact but incorrect vector is more dangerous than a blurry feature map because it can impose the wrong safety constraint with confidence.
 
+### The training and evaluation protocols define the claim
+
+VAD is trained for 60 epochs on nuScenes with a batch size of one per GPU across eight RTX 3090s, AdamW, cosine annealing, and an initial learning rate of $2\times10^{-4}$. The source uses two seconds of history and plans three seconds ahead. Its open-loop benchmark has 1,000 roughly 20-second nuScenes scenes from six cameras at 2 Hz, reporting displacement error and collision rate; the closed-loop test is CARLA Town05, scored with route completion and driving score. Those are complementary tests, not interchangeable evidence: the former compares logged futures, while the latter lets the policy’s actions affect the route.
+
+The planning constraint also makes a deliberate uncertainty reduction. VAD predicts multiple future modes for each agent but keeps only the highest-confidence mode when applying the collision constraint. The paper names using all modes for planning as future work, along with richer traffic information such as lane graphs, road signs, traffic lights, and speed limits.
+
 The representation comparison shows why instance identity matters. A lane is an ordered geometric object with a direction, and an agent has its own future motion. Keeping those structures explicit lets planning losses operate on distances and directions directly. It does not remove the BEV image backbone; the change is how the planner represents the scene extracted from it.
 
 ![Figure 1 from VAD comparing rasterized scene representation with vectorized scene representation](/assets/images/vad-vectorized-scene-representation-for-efficient-autonomous-driving-paper-figure.png)

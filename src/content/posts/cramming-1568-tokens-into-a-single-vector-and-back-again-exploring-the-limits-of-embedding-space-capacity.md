@@ -39,7 +39,9 @@ What receives the gradient? Source Figure 2 makes the distinction visible. The m
 ![Cramming source Figure 2: a trainable memory vector precedes teacher-forced text tokens in a frozen language model](/assets/images/cramming-1568-source-figure-2.png)
 *Fig 1: A separate memory vector is optimized for each passage. The frozen language model predicts target tokens from that vector and the correct preceding tokens during training. | source: [Kuratov et al., Figure 2](https://aclanthology.org/2025.acl-long.948/)*
 
-Figure extracted from the ACL proceedings under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); page text and the original caption are omitted. [Open the full-size figure](/assets/images/cramming-1568-source-figure-2.png).
+Figure extracted from the ACL proceedings under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); page text and the original caption are omitted.
+
+[Open figure at full size](/assets/images/cramming-1568-source-figure-2.png)
 
 There is no learned projection from an arbitrary small encoder into this space. The optimized variable already has the decoder's required width. A general encoder would have to learn how to produce useful vectors for unseen inputs in one forward pass; this experiment instead searches directly for a vector for each known target.
 
@@ -91,7 +93,9 @@ Would averaging two successful memories preserve the text? Source Figure 8 tests
 ![Cramming source Figure 8: reconstruction accuracy falls when interpolating between different memory vectors for the same sequence](/assets/images/cramming-1568-source-figure-8.png)
 *Fig 2: Both endpoint memories reconstruct the same sequence, but linear interpolation between them introduces errors. These solutions do not form one continuously correct basin along the tested paths. | source: [Kuratov et al., Figure 8](https://aclanthology.org/2025.acl-long.948/)*
 
-Figure extracted from the ACL proceedings under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); page text and the original caption are omitted. [Open the full-size figure](/assets/images/cramming-1568-source-figure-8.png).
+Figure extracted from the ACL proceedings under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); page text and the original caption are omitted.
+
+[Open figure at full size](/assets/images/cramming-1568-source-figure-8.png)
 
 This experiment does not show that a trained encoder cannot learn a useful organization. It shows that per-example reconstruction optimization does not automatically supply one. Smooth interpolation, nearest-neighbor retrieval, and compositional use as context require their own evidence.
 

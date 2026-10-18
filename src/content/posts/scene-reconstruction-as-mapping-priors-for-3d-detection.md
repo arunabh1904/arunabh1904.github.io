@@ -35,6 +35,8 @@ MPA3D first averages within each modality and voxel. A LiDAR-conditioned multipl
 ![MPA3D separately encodes current sensors and reconstructed priors before hierarchical fusion](/assets/images/scene-reconstruction-as-mapping-priors-for-3d-detection-paper-figure.png)
 *Fig 1: Follow the two gated additions: LiDAR conditions the surfel contribution, then their combined feature conditions the Gaussian contribution. Separate aggregation prevents raw point counts from determining each prior's influence. | source: [MPA3D, Figure 2](https://arxiv.org/abs/2605.22997)*
 
+[Open the full-size source figure](/assets/images/scene-reconstruction-as-mapping-priors-for-3d-detection-paper-figure.png)
+
 The gates are feature modulation with Swish activations, not calibrated probabilities that a map is correct. Training randomly drops surfel or Gaussian priors so the model can operate when reconstruction is unavailable. This missing-prior setting assumes the underlying sensor inputs remain available; it does not establish robustness to arbitrary camera or LiDAR failures.
 
 ### The matched ablations are more diagnostic than the leaderboard

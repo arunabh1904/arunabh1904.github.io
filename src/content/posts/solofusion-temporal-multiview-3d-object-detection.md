@@ -30,12 +30,16 @@ The architecture figure is easiest to read as a budget allocation. Follow the im
 ![SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection source figure: The framework of SOLOFusion.](/assets/images/solofusion-temporal-multiview-3d-object-detection-paper-figure.webp)
 *Fig 1: High-resolution short-term two-view depth matching and low-resolution long-term BEV feature fusion provide complementary temporal baselines before the detection head. | source: [SOLOFusion, Figure 7](https://arxiv.org/abs/2210.02443)*
 
+[Open figure at full resolution](/assets/images/solofusion-temporal-multiview-3d-object-detection-paper-figure.webp)
+
 ### Long history buys localization potential
 
 The paper's analysis defines localization potential from how far apart a 3D point projects between temporal views. The source Figure 5 plots the relative increase as more timesteps are added; each camera heatmap uses a different scale, so compare trends within a panel. The intuition is simple: a distant object can move several feature pixels over a long baseline even when a nearby frame produces a subpixel displacement. That extra separation makes depth matching identifiable.
 
 ![Figure 5 from SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection](/assets/images/solofusion-temporal-multiview-3d-object-detection-source-figure-5.webp)
 *Fig 2: Relative localization potential rises as more timesteps create larger temporal baselines; each camera heatmap has its own scale, so the within-panel trend is the meaningful comparison. | source: [SOLOFusion, Figure 5](https://arxiv.org/abs/2210.02443)*
+
+[Open figure at full resolution](/assets/images/solofusion-temporal-multiview-3d-object-detection-source-figure-5.webp)
 
 The ablation follows that geometry. Starting from a single-frame BEVDepth baseline, adding one historical frame improves velocity strongly but changes mAP only slightly. Increasing the long-term history from one to 16 frames raises mAP from 31.6 to 37.7 and improves translation error from 0.734 to 0.655; 41 frames no longer helps because the visible regions overlap less. This is a localization result, not simply a bigger temporal feature tensor.
 
@@ -46,9 +50,11 @@ Short-term stereo has the opposite bottleneck: high-resolution features are info
 ![Figure 1 from SOLOFusion: Time Will Tell for Temporal Multi-View 3D Object Detection](/assets/images/solofusion-temporal-multiview-3d-object-detection-source-figure-1.webp)
 *Fig 3: Candidate depth hypotheses project farther apart between temporal views as the baseline grows, which is the geometric signal that the short- and long-term matching modules exploit. | source: [SOLOFusion, Figure 1](https://arxiv.org/abs/2210.02443)*
 
+[Open figure at full resolution](/assets/images/solofusion-temporal-multiview-3d-object-detection-source-figure-1.webp)
+
 Table 6 makes the complementarity concrete. The non-temporal baseline has mATE 0.722 m at 17.6 FPS. Short-term fusion reduces the error to 0.670 m at 12.2 FPS, while long-term fusion reaches 0.650 m at 15.9 FPS. Both together reach 0.605 m at 11.4 FPS. The corresponding absolute reductions are 0.052 m, 0.072 m, and 0.117 m: the combined result retains much of each component's benefit. These are distances, not percentage-point changes or a sum of mAP and localization improvements. Short-term-only memory remains 3.3 GB; adding long-term state raises the measured footprint to 3.6 GB.
 
-The reported test model ranked first on the camera-only nuScenes track at submission. Comparisons across methods still involve different training and test-time settings, so the controlled component table gives clearer evidence for the proposed temporal trade-off.
+The reported test model ranked first on the camera-only nuScenes track at submission. The source uses 750/150/150 nuScenes scenes, six 900×1600 cameras, and key-frame annotations every 0.5 seconds. Its appendix specifies ImageNet-pretrained ResNet-50/101 backbones, 16 historical timesteps and seven depth hypotheses, with past BEV features saved for sequential inference. CBGS is not directly applicable to this sequential pipeline, so the authors match its training-iteration budget without using the sampler; the headline test row also uses no extra depth training or test-time augmentation. Comparisons across methods still involve different training and test-time settings, so the controlled component table gives clearer evidence for the proposed temporal trade-off.
 
 ### History also tests the calibration contract
 

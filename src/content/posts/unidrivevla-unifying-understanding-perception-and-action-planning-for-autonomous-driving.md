@@ -29,10 +29,14 @@ A 2D VLA preserves the semantic behavior of its pretrained VLM but has weak spat
 ![UniDriveVLA architecture with understanding, perception, and action experts](/assets/images/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving-paper-figure.png)
 *Fig 1: The model separates understanding, perception, and action into expert-specific paths while retaining a masked joint-attention interface for coordinated driving. | source: [UniDriveVLA, Figure 3](https://arxiv.org/abs/2604.02190)*
 
+[Open figure at full size](/assets/images/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving-paper-figure.png)
+
 Masked joint attention is the guardrail. Understanding tokens remain causal and cannot read later perception or action tokens. Perception tokens can read preceding semantic context, while action tokens can aggregate both semantic and spatial information. The model therefore keeps a shared decision process without asking the semantic expert to solve every spatial objective. The figure is best read as a visibility map: specialization is only useful if the attention mask preserves a direction of information flow.
 
 ![Masked joint attention across prefix, perception, and suffix token groups](/assets/images/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving-source-figure-4.webp)
 *Fig 2: The mask lets perception tokens use semantic context and action tokens use both semantic and spatial context, while preserving the causal behavior of the language prefix. | source: [UniDriveVLA, Figure 4](https://arxiv.org/abs/2604.02190)*
+
+[Open figure at full size](/assets/images/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving-source-figure-4.webp)
 
 ### Sparse perception provides spatial evidence without a dense takeover
 
@@ -44,12 +48,14 @@ The paper's representation analysis supports the motivation rather than proving 
 
 ### The controlled ablation is stronger than the leaderboard claim
 
-On Bench2Drive, UniDriveVLA reports 78.37 driving score, 51.82% success, 198.86 efficiency, and 11.78 comfortness. Its fine-grained scores are 38.75% for merging, 80.00% for overtaking, 50.00% for emergency braking, 30.00% for giving way, and 58.95% for traffic signs, for a 51.53% mean. These are closed-loop CARLA results with six-view 900×1600 inputs and Think2Drive-generated demonstrations.
+On Bench2Drive, UniDriveVLA reports 78.37 driving score, 51.82% success, 198.86 efficiency, and 11.78 comfortness. Its fine-grained scores are 38.75% for merging, 80.00% for overtaking, 50.00% for emergency braking, 30.00% for giving way, and 58.95% for traffic signs, for a 51.53% mean. These are closed-loop CARLA results with six-view 900×1600 inputs and Think2Drive-generated demonstrations. Table 1 defines its Avg. L2 over a two-second horizon at 2 Hz, and the UniDriveVLA Bench2Drive row is 0.72 m. The benchmark contract is different on nuScenes: its 1,000 sequences come from Boston and Singapore and support open-loop perception and planning, with planning reported under ST-P3 and UniAD protocols and with or without ego-state input. The 0.53 m figure comes from Table 5's nuScenes occupancy ablation, so it should not be read as the Bench2Drive horizon result; the 78.37 closed-loop Driving Score and that open-loop ablation remain evidence from different evaluation regimes.
 
 The shared-decoder ablation is more diagnostic. Replacing the shared-weight decoder with MoT changes general VQA from 31.1 to 45.5, DriveBench from 50.8 to 54.9, planning L2 from 0.641 to 0.533 m, and collision rate from 0.175 to 0.140. The action and perception additions also matter in the nuScenes ablation: adding ego state lowers L2 from 0.75 to 0.61, detection lowers collision rate to 0.10, and occupancy reaches the best L2 of 0.53 in that controlled sequence. The table does not show a matched compute sweep, and the model's motion prediction remains behind specialized baselines. The central claim is therefore “decoupling helps this unified recipe,” not “three experts always beat a shared model.”
 
 ![Vanilla 2D VLA, 3D-enhanced VLA, and UniDriveVLA](/assets/images/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving-source-figure-1.webp)
 *Fig 3: The paper's motivating comparison frames UniDriveVLA as a compromise between semantic preservation and spatial perception, with continuous action prediction added as a third requirement. | source: [UniDriveVLA, Figure 1](https://arxiv.org/abs/2604.02190)*
+
+[Open figure at full size](/assets/images/unidrivevla-unifying-understanding-perception-and-action-planning-for-autonomous-driving-source-figure-1.webp)
 
 ## High-Level Takeaways
 

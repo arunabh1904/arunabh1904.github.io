@@ -29,15 +29,21 @@ A fixed 224 × 224 resize makes the visual bottleneck independent of the questio
 ![Qwen2-VL capability overview across video understanding, grounding, multilingual OCR, documents, formula recognition, and UI interaction](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-paper-figure.jpg)
 *Fig 1: The paper's capability overview shows the tasks enabled by the variable-resolution vision-language interface, including video chat, grounding, multilingual OCR, document understanding, and UI interaction. | source: [Qwen2-VL, Figure 1](https://arxiv.org/abs/2409.12191)*
 
+[Open figure at full size](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-paper-figure.jpg)
+
 The overview is useful only when tied to the bottleneck. The model is not getting “more pixels for free”; it is choosing where to spend visual tokens. Dense text and diagrams can receive more bandwidth, while simple images remain cheaper. That makes the accuracy-throughput curve input-dependent, which is the intended trade rather than an accidental side effect.
 
 ![Qwen2-VL native-resolution inputs and dynamic token packing](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-source-figure-2.webp)
 *Fig 2: Native-resolution images and video frames are packed as variable-length visual sequences before entering the Qwen2 language decoder. | source: [Qwen2-VL, Figure 2](https://arxiv.org/abs/2409.12191)*
 
+[Open figure at full size](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-source-figure-2.webp)
+
 M-RoPE supplies the missing geometry after variable packing. Text uses the three coordinate components in the usual one-dimensional way. Image tokens hold time fixed while height and width identify their patch location; video increments time across frames while retaining the spatial grid. The decoder can therefore distinguish a patch above an object from the corresponding patch in a later frame, instead of seeing only a long undifferentiated token list.
 
 ![Qwen2-VL Multimodal Rotary Position Embedding across temporal, height, and width axes](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-source-figure-3.webp)
 *Fig 3: M-RoPE decomposes position into temporal, height, and width components so text, image grids, and video frames share a coordinate system. | source: [Qwen2-VL, Figure 3](https://arxiv.org/abs/2409.12191)*
+
+[Open figure at full size](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-source-figure-3.webp)
 
 The video recipe makes the budget concrete. Training samples videos at 2 FPS, uses a depth-two 3D convolution to form temporal tubes, and caps each video's visual sequence at 16,384 tokens. The three training phases are vision alignment, full multimodal pretraining, and instruction tuning with the ViT locked. Across pretraining, the paper reports about 1.4T tokens with loss applied only to text tokens: images and video condition language predictions rather than becoming reconstruction targets. A fast event can still be missed if the sampling rate or token cap never represents it.
 

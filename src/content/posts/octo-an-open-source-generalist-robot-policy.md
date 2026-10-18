@@ -42,10 +42,14 @@ The training target is a DDPM-style denoising objective. The paper compares this
 ![Octo zero-shot and fine-tuning evaluation setups across nine robot systems](/assets/images/octo-an-open-source-generalist-robot-policy-source-figure-2.webp)
 *Fig 1: The evaluation spans third-person and wrist-camera setups, single and dual arms, long-horizon tasks, and precise insertion, separating out-of-box control from adaptation to new interfaces. | source: [Octo: An Open-Source Generalist Robot Policy, Figure 4](https://arxiv.org/abs/2405.12213)*
 
+[Open figure at full size](/assets/images/octo-an-open-source-generalist-robot-policy-source-figure-2.webp)
+
 The source figure is a useful warning against treating “nine robots” as one benchmark. Zero-shot tasks use setups represented in pretraining and delta end-effector actions. Fine-tuning tasks introduce force-torque observations, joint-position control, new embodiments, or bimanual coordination. A policy can perform well on the first test while still needing a new action head or sensor adapter for the second.
 
 ![Octo zero-shot success as model size increases on UR5 and WidowX tasks](/assets/images/octo-an-open-source-generalist-robot-policy-source-figure-4.webp)
 *Fig 2: Zero-shot success rises from Octo-Tiny through Octo-Small to Octo-Base on both UR5 and WidowX, showing a capacity effect under the same task interfaces. | source: [Octo: An Open-Source Generalist Robot Policy, Figure 6](https://arxiv.org/abs/2405.12213)*
+
+[Open figure at full size](/assets/images/octo-an-open-source-generalist-robot-policy-source-figure-4.webp)
 
 The scaling plot is small but informative. Octo-Tiny, Octo-Small, and Octo-Base contain about 10M, 27M, and 93M parameters. The larger model is more robust to initial scene configuration and less likely to make an early grasp attempt. Scaling helps perception and policy capacity, but the plot is measured on one language-conditioned task per robot with ten trials, so it is not a universal scaling law.
 

@@ -31,6 +31,8 @@ The source diagram locates the two interventions. Query encoding changes the dec
 ![MapEX source Figure 3 shows existing-map queries, sensor BEV attention, and pre-attributed matching](/assets/images/mapex-source-figure.png)
 *Fig 1: Explicit geometry and class seed existing-map queries. Known synthetic correspondences are assigned before Hungarian matching, while ordinary queries remain available for elements missing from the prior. | source: [MapEX, Figure 3; figure crop](https://arxiv.org/abs/2311.10517)*
 
+[open full-size figure](/assets/images/mapex-source-figure.png)
+
 When a synthetic modification preserves a usable correspondence to the original label, pre-attribution assigns that query to its source element before ordinary Hungarian matching. A displacement criterion filters assignments; deleted or inserted elements have no such match. Those correspondences are training metadata from the corruption process, not an oracle available when a real road changes.
 
 ### Five synthetic scenarios expose different information budgets

@@ -34,6 +34,8 @@ The position handling is the subtle part. A post-RoPE cache encodes the old abso
 ![FlashDrive streaming inference reusing visual context across driving frames](/assets/images/flashdrive-streaming-paper-figure.png)
 *Fig 1: FlashDrive inserts only the newest frame into each camera block and reuses a pre-RoPE KV cache; the diagram shows why the mask and shifted rotary positions are needed. | source: [FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving, Figure 2](https://arxiv.org/abs/2608.12932)*
 
+[Open figure at full size](/assets/images/flashdrive-streaming-paper-figure.png)
+
 ### Repairing the action expert’s cache shift
 
 The cache is an approximation, so the action expert sees a slightly different distribution from full recomputation. The paper measures roughly 0.3 m worse minADE1 and 0.2 m worse minADE6 without a correction (Figure 3b). Reasoning tokens are less affected because they mostly use recent context; the continuous action expert integrates the full cache through cross-attention and amplifies the mismatch.
@@ -42,6 +44,8 @@ FlashDrive freezes the VLA backbone and fine-tunes only the action expert. Durin
 
 ![FlashDrive streaming fine-tuning and action-expert accuracy](/assets/images/flashdrive-flash-vision-language-action-inference-for-autonomous-driving-source-figure-3.webp)
 *Fig 2: The accuracy bars compare full recomputation, uncorrected streaming, and streaming with action-expert fine-tuning. Fine-tuning recovers most of the error increase caused by cache reuse. | source: [FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving, Figure 3(b)](https://arxiv.org/abs/2608.12932)*
+
+[Open figure at full size](/assets/images/flashdrive-flash-vision-language-action-inference-for-autonomous-driving-source-figure-3.webp)
 
 ### Compressing reasoning and action denoising
 
@@ -54,6 +58,8 @@ Finally, W4A8 quantization addresses both memory and arithmetic. Four-bit weight
 ![FlashDrive latency and open-loop trajectory error](/assets/images/flashdrive-flash-vision-language-action-inference-for-autonomous-driving-source-figure-1.webp)
 *Fig 3: The source comparison places the 716.9 ms Alpamayo path beside the 151.4 ms FlashDrive path and shows minADE1 improving while minADE6 changes only slightly. | source: [FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving, Figure 1](https://arxiv.org/abs/2608.12932)*
 
+[Open figure at full size](/assets/images/flashdrive-flash-vision-language-action-inference-for-autonomous-driving-source-figure-1.webp)
+
 ### What the tables establish
 
 Table 1 is the main accounting. System optimizations alone reduce latency to 513.3 ms. Streaming, speculative reasoning, and adaptive flow matching then produce a 176.0 ms algorithmic path; W4A8 reaches 151.4 ms, a 4.7× reduction from the 716.9 ms baseline and a control rate increase from 1.4 to 6.6 Hz. The paper defines minADE6@6.4s as the minimum average displacement error against ground truth among six predicted trajectories over the next 6.4 seconds; minADE1 uses one trajectory over the same horizon. At the final setting, minADE1@6.4s is 1.573 m versus 1.705 m and minADE6@6.4s is 0.844 m versus 0.767 m. The speedup has a small six-sample error cost, rather than preserving every metric exactly.
@@ -61,6 +67,8 @@ Table 1 is the main accounting. System optimizations alone reduce latency to 513
 Table 2 tests portability. With one trajectory, speedups range from 4.0× on Jetson Thor to 6.0× on an RTX 4090. With six trajectories, FlashDrive reaches 9.6× on Jetson Thor, 10.0× on RTX 5090, and 10.6× on the RTX PRO 6000; the unoptimized baseline runs out of memory on the RTX 3090 and RTX 4090 while FlashDrive still runs. Table 3 adds a closed-loop AlpaSim check: per-step rollout latency falls from 1150 to 463 ms, collision rate from 0.19 to 0.15, and off-road rate from 0.41 to 0.32. Wrong-lane rate rises from 0.45 to 0.51, a reminder that the stack changes failure modes as well as speed.
 
 The evidence supports a systems conclusion: eliminating repeated work across the complete pipeline matters more than shrinking one head in isolation. The boundary is equally concrete. Results are measured on a particular VLA, GPU stack, and AlpaSim protocol; rare hazards, sensor timing, and vehicle-level closed-loop control still need matched-hardware tests.
+
+The training and evaluation pools are also specific: streaming fine-tuning uses roughly 600K windows sampled from 4K clips, DFlash uses one window from each of 60K clips, and open-loop evaluation uses 100 clips with 12K sliding-window inputs at 10 FPS. The 100-clip AlpaSim check is a separate closed-loop sample, so the 4.7× latency result and the event-rate changes are measured on different protocols.
 
 ## High-Level Takeaways
 

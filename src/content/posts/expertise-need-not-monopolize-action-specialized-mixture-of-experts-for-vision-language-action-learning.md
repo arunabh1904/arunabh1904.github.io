@@ -31,11 +31,17 @@ The paper’s main architectural claim is narrower than “MoE helps.” A conve
 ![AdaMoE architecture separating expert selection from contribution scaling while retaining shared and routed experts](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-paper-figure.png)
 *Fig 1: Identifies AdaMoE's change to a vanilla router: shared experts preserve the inherited FFN path, routed experts add capacity, and an independent scale adapter controls how much selected action experts contribute. | source: [AdaMoE, Figure 1](https://arxiv.org/abs/2510.14300)*
 
+[Open figure at full size](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-paper-figure.png)
+
 ![Figure 3 from Expertise Need Not Monopolize: Action-Specialized Mixture of Experts for Vision-Language-Action Learning](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-source-figure-3.webp)
 *Fig 2: Architecture variants for decoupling expert selection and weighting. (a) Vanilla MoE couples selection and weighting through a single router. (b) CSMoE concatenates router outputs with action tokens for scale adaptation. (c) AdaMoE additively combines independent router and scale-adapter weights. | source: [AdaMoE, Figure 3](https://arxiv.org/abs/2510.14300)*
 
+[Open figure at full size](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-source-figure-3.webp)
+
 ![Figure 2 from Expertise Need Not Monopolize: Action-Specialized Mixture of Experts for Vision-Language-Action Learning](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-source-figure-2.webp)
 *Fig 3: Expert routing intensity changes over time and across manipulation tasks, showing that action-specialized experts divide responsibility dynamically rather than monopolizing fixed skills. | source: [AdaMoE, Figure 2](https://arxiv.org/abs/2510.14300)*
+
+[Open figure at full size](/assets/images/expertise-need-not-monopolize-action-specialized-mixture-of-experts-for-vision-language-action-learning-source-figure-2.webp)
 
 
 ### Sparse capacity stays attached to a flow policy

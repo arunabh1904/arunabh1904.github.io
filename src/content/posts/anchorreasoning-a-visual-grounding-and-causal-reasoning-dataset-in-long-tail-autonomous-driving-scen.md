@@ -30,7 +30,7 @@ The source pipeline exposes both the spatial annotation and the reasoning chain.
 ![Source Figure 1: AnchorReasoning annotation pipeline and visually grounded reasoning example](/assets/images/october-2609.28366-s1-f1.webp)
 *Fig 1: Selected image regions are linked to attributes, implications, a combined rationale, and a driving plan. Human, model-assisted, and rule-based stages contribute different labels. | source: [AnchorReasoning, Figure 1](https://arxiv.org/html/2609.28366v1#S1.F1)*
 
-[Open figure at full resolution](/assets/images/october-2609.28366-s1-f1.webp)
+[Open figure at full size](/assets/images/october-2609.28366-s1-f1.webp)
 
 ### How the annotations are created and checked
 

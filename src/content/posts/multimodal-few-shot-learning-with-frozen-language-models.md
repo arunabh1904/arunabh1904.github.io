@@ -24,12 +24,16 @@ summary: '2021 – Multimodal Few-Shot Learning with Frozen Language Models'
 ![Frozen examples of open-ended multimodal generation](/assets/images/multimodal-few-shot-frozen-lm-paper-figure-1.png)
 *Fig 1: Frozen conditions open-ended completions on images and text together; the examples also show that several decoding seeds may be needed to avoid repetition or unrelated language-model continuations. | source: [Frozen, Figure 1](https://arxiv.org/abs/2106.13884)*
 
+[Open figure at full size](/assets/images/multimodal-few-shot-frozen-lm-paper-figure-1.png)
+
 Frozen starts with a 7B autoregressive Transformer trained on the C4 text corpus. Its weights, including the token embedding and self-attention layers, stay fixed. An NF-ResNet-50 vision encoder produces one pooled image vector. A learned linear map expands that vector to $D\times n$ values and reshapes them into $n$ embeddings of the same width $D$ as a language token. The authors test prefix lengths of one, two, and four and find two works best in their configuration.
 
 Caption training updates the visual pathway only. The frozen language model still computes the next-token likelihood, and gradients flow through its attention operations into the image encoder and projection. The learned prefix therefore has to express an image in a coordinate system the language model already knows how to continue. Fine-tuning the language model is an available control, but it generalizes worse in the reported transfer experiments. The authors attribute this to overfitting on roughly three million Conceptual Captions pairs, a much smaller corpus than the language model’s text pretraining data.
 
 ![Frozen inference interface for VQA, outside-knowledge questions, and few-shot classification](/assets/images/multimodal-few-shot-learning-with-frozen-language-models-source-figure-3.webp)
 *Fig 2: The same prefix interface supports an image question, an image plus a knowledge-seeking question, or an ordered support set of images and labels before a new query. | source: [Frozen, Figure 3](https://arxiv.org/abs/2106.13884)*
+
+[Open figure at full size](/assets/images/multimodal-few-shot-learning-with-frozen-language-models-source-figure-3.webp)
 
 The interface is more flexible than the training example suggests. During training, the model sees one image followed by its caption. At inference, image prefixes and text embeddings can be interleaved in an arbitrary sequence. A few support examples can therefore teach a new task format or associate a new word with a visual category without gradient updates. This is prefix tuning with a dynamic, image-conditioned prefix rather than a fixed learned prompt.
 

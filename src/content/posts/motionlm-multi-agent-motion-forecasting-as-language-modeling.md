@@ -25,6 +25,8 @@ Each trajectory is normalized in the agent frame and converted into 2 Hz displac
 ![MotionLM's scene encoder, causal decoder, and rollout aggregation pipeline](/assets/images/motionlm-multi-agent-motion-forecasting-as-language-modeling-paper-figure.png)
 *Fig 1: Scene features condition an autoregressive decoder, which rolls out motion tokens before NMS and k-means reduce many samples to the benchmark's modes. | source: [MotionLM, Figure 2](https://arxiv.org/abs/2309.16534)*
 
+[Open figure at full size](/assets/images/motionlm-multi-agent-motion-forecasting-as-language-modeling-paper-figure.png)
+
 The decoder embeds the token, timestep, and agent position, then applies self-attention over the flattened sequence. A staircase mask exposes all agents' histories up to the previous timestep and blocks future tokens. The factorization is
 `p(A_1, ..., A_T | S) = product_t p(A_t | A_<t, S)`,
 with `p(A_t | A_<t, S)` factorized across agents. This is a compact way to express an interactive rollout: reaction is causal across time, rather than an unsupported same-timestep dependency.
@@ -36,11 +38,15 @@ The authors compare marginal prediction, temporally causal conditional predictio
 ![MotionLM's causal Bayesian-network view of joint rollouts](/assets/images/motionlm-multi-agent-motion-forecasting-as-language-modeling-source-figure-4.webp)
 *Fig 2: A temporally causal rollout lets later agent reactions depend on earlier joint actions; the acausal graph has access to information unavailable at prediction time. | source: [MotionLM, Figure 4](https://arxiv.org/abs/2309.16534)*
 
+[Open figure at full size](/assets/images/motionlm-multi-agent-motion-forecasting-as-language-modeling-source-figure-4.webp)
+
 ### More interaction and more rollouts buy different kinds of quality
 
 On the WOMD interactive test set, MotionLM reports minADE 0.8911, minFDE 2.0067, miss rate 0.4115, and mAP 0.2178, compared with JFP's 0.8817/1.9905/0.4233/0.2050. Its joint prediction overlap is 0.02607, close to JFP's 0.02671 and below Scene Transformer's 0.04336. In the interaction-frequency ablation, ensemble mAP rises from 0.2007 at 0.125 Hz to 0.2150 at 2 Hz; the single-replica result rises from 0.1558 to 0.1687. The model therefore benefits when agents can “see” one another repeatedly during the 8-second rollout.
 
 The sampling curve is separate from the architecture curve. With one to 512 rollouts per replica, ensemble mAP increases from 0.1524 to 0.2150, while the single-replica result increases from 0.0578 to 0.1687. The final reported interactive result uses 512 rollouts per replica and six retained modes after NMS plus k-means; the appendix notes that 32 rollouts already surpass the previous top entry.
+
+Training uses teacher forcing: every prefix is a ground-truth token sequence while the cross-entropy objective is optimized, then each sampled action becomes the next input during rollout. Errors can therefore compound even though the discrete objective is stable. The paper evaluates the WOMD forecasting distribution rather than closed-loop driving, and it explicitly cautions that observational data cannot establish interventions in general; the temporal mask removes some spurious future leakage but does not turn the benchmark into causal deployment evidence.
 
 ## High-Level Takeaways
 

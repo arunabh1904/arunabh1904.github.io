@@ -23,12 +23,14 @@ summary: '2026 – GeoWAM: Visual Geometry World Action Models for Autonomous Dr
 
 A future image must describe appearance as well as physical layout. For planning, a painted texture may matter less than the position of a road edge or another vehicle. GeoWAM changes the prediction target: historical multiview images become geometric and ego-motion tokens, which a decoder forecasts into future geometry. A point-map head can turn those tokens into a 3D position for each future image pixel.
 
-The encoder and point head initialize from DVGT-2. Three historical frames predict eight future frames at 2 Hz, covering four seconds. During geometry pretraining, the model samples two to eight camera views from sequences spanning seven driving datasets. Planning fine-tuning uses eight views on NAVSIM. This is a substantial geometric pretraining recipe, not simply a different output head attached to an otherwise matched video generator.
+The encoder and point head initialize from DVGT-2. Three historical frames predict eight future frames at 2 Hz, covering four seconds. During geometry pretraining, the model samples two to eight camera views from sequences spanning seven driving datasets. Planning fine-tuning uses eight views on NAVSIM. The first stage runs for 161 epochs; the second fine-tunes the geometry-pretrained checkpoint on NAVSIM navtrain for 40 epochs, with the future decoder and action head receiving the higher learning rate. This is a substantial geometric pretraining recipe, not simply a different output head attached to an otherwise matched video generator.
 
 The cropped source diagram isolates the memory, future-geometry branch, and future-pose branch. Follow the geometry tokens first: they can produce a dense point map and also serve as context for the pose decoder. The trajectory head then reads predicted and historical ego tokens to regress one path. No image generation, trajectory anchors, or iterative action sampling sit on this path.
 
 ![GeoWAM source Figure 2: predicted future geometry conditions an ego-pose decoder and a deterministic trajectory head](/assets/images/geowam-source-figure-2.png)
 *Fig 1: Future geometry has two uses: dense point-map prediction and context for ego-motion prediction. The action branch reads geometric features rather than reconstructing a future video first. Cropped to the prediction modules. | source: [GeoWAM, Figure 2](https://arxiv.org/abs/2608.23486)*
+
+[Open figure at full size](/assets/images/geowam-source-figure-2.png)
 
 This is an inverse-dynamics-like arrangement: predicted scene evolution helps infer ego motion. It is not an action-conditioned simulator that can answer what would happen under any proposed maneuver. The distinction matters when deciding whether the model can support counterfactual planning or only generate a trajectory consistent with its forecast.
 

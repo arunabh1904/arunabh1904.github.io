@@ -32,14 +32,20 @@ Simple-BEV begins with a metric volume spanning 100×10×100 m and discretized i
 ![Simple-BEV source Figure 1: ray splatting versus voxel-to-image bilinear sampling](/assets/images/simple-bev-what-really-matters-for-multi-sensor-bev-perception-source-figure-1.webp)
 *Fig 1: Splatting starts from image pixels and pushes features along rays; Simple-BEV starts from each 3D voxel and pulls a bilinear image feature at its projected coordinate. | source: [Simple-BEV, Figure 1](https://arxiv.org/abs/2206.07959)*
 
+[Open figure at full resolution](/assets/images/simple-bev-what-really-matters-for-multi-sensor-bev-perception-source-figure-1.webp)
+
 The distinction changes how the two operators cover distance. Splatting can place multiple samples into nearby voxels but may leave far voxels with few or no samples at fixed depth intervals. Pull-based sampling gives every voxel a feature, although far voxels sample densely packed image regions. The paper's distance breakdown shows splatting ahead at close range and bilinear sampling ahead at medium and long range. That is a geometric explanation for why a parameter-free operator can remain competitive.
 
 ![Simple-BEV source Figure 2: IoU by distance for splatting and bilinear sampling](/assets/images/simple-bev-what-really-matters-for-multi-sensor-bev-perception-source-figure-2.webp)
 *Fig 2: The distance curves show the geometric trade-off: splatting helps nearby voxels, while pull-based sampling is stronger at medium and long range. | source: [Simple-BEV, Figure 2](https://arxiv.org/abs/2206.07959)*
 
+[Open figure at full resolution](/assets/images/simple-bev-what-really-matters-for-multi-sensor-bev-perception-source-figure-2.webp)
+
 ### The matched lifting table is smaller than the training effects
 
 The camera-only experiments use nuScenes vehicle segmentation: 28,130 training samples and 6,019 validation samples, six cameras, and IoU as the metric. The ResNet-101 is initialized from COCO detection; the BEV ResNet-18 starts from scratch. Training runs for 25,000 iterations with AdamW and a one-cycle schedule. The 200×8×200 volume and 200×200 output are held fixed while the authors vary lifting, resolution, batch size, and augmentation.
+
+All experiments assume synchronized sensors and known camera intrinsics and relative poses. Training randomly resizes and crops images in [0.8, 1.2], randomizes the reference camera, and can drop one camera; evaluation uses the front camera as reference without cropping. The labels are the Lift-Splat vehicle superclass—bicycle, bus, car, construction vehicle, emergency vehicle, motorcycle, trailer, and truck—so the IoU and the radar gains describe dense vehicle-mask parsing rather than 3D detection.
 
 | Camera-only choice | IoU | Interpretation |
 | --- | ---: | --- |

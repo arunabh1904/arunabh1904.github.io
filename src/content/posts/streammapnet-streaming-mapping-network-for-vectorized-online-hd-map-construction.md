@@ -31,6 +31,8 @@ The architecture figure separates spatial retrieval from temporal reuse. Follow 
 ![StreamMapNet source Figure 2 shows image features, BEV, decoder queries, and a recurrent memory buffer](/assets/images/streammapnet-source-figure.png)
 *Fig 1: The memory buffer supplies both BEV features and refined map queries. Their separate paths retain spatial context and candidate geometry while the current images provide new observations. | source: [StreamMapNet, Figure 2; figure crop](https://arxiv.org/abs/2308.12570)*
 
+[open full-size figure](/assets/images/streammapnet-source-figure.png)
+
 The previous BEV is warped using ego motion and fused through a GRU followed by layer normalization. High-confidence queries are propagated through a pose-conditioned residual MLP; their reference polylines are transformed geometrically. Fresh queries remain available for newly visible elements. An auxiliary transformation loss asks the propagated latent to decode the correctly transformed geometry rather than merely preserve a useful class embedding.
 
 Compared with [MapTR](/paper%20shorts/2022/08/30/maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-construction.html), the change is therefore not just a larger input window. The model processes one current frame while a recurrent state summarizes history. Training stops gradients through the previous frame and begins with four single-frame epochs before streaming. The main schedules use 24 nuScenes epochs and 30 Argoverse 2 epochs, with eight RTX 3090 GPUs and ordinary classification, curve, and transformation losses.

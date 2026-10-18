@@ -30,6 +30,8 @@ The point is not just modularity. Image resolution controls the evidence availab
 ![Figure 1 from BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View](/assets/images/bevdet-high-performance-multicamera-3d-object-detection-in-bev-source-figure-1.webp)
 *Fig 1: BEVDet separates image-view encoding, categorical-depth lifting, BEV encoding, and the task head; each boundary exposes a different accuracy and compute trade-off. | source: [BEVDet, Figure 1](https://arxiv.org/abs/2112.11790)*
 
+[Open Figure 1 at full resolution](/assets/images/bevdet-high-performance-multicamera-3d-object-detection-in-bev-source-figure-1.webp)
+
 ### BEV augmentation repairs a training-distribution mismatch
 
 Each nuScenes sample contains six camera images, so the image encoder sees roughly six times as many image tensors as the downstream BEV trunk sees training examples. Image-space augmentation changes the features before the view transform, and the pixel-wise geometry largely decouples that change from the BEV encoder and detection head. In the paper’s ablation, image-view augmentation alone peaks at 23.0 mAP by epoch 4 and finishes at 17.4; adding BEV-space augmentation raises the peak to 31.6 by epoch 17 and finishes at 31.2. A BEV encoder makes image-only augmentation actively harmful in some configurations, while BEV augmentation targets the coordinate system that is actually being overfit.
@@ -51,6 +53,8 @@ The ordinary view transform accumulates every frustum feature into its voxel. BE
 ![Figure 3 from BEVDet: High-Performance Multi-Camera 3D Object Detection in Bird-Eye View](/assets/images/bevdet-high-performance-multicamera-3d-object-detection-in-bev-source-figure-3.webp)
 *Fig 2: The auxiliary index turns repeated voxel accumulation into a regular reduction over occurrence slots; the optimization is valid when the camera rig is fixed at inference. | source: [BEVDet, Figure 3](https://arxiv.org/abs/2112.11790)*
 
+[Open Figure 2 at full resolution](/assets/images/bevdet-high-performance-multicamera-3d-object-detection-in-bev-source-figure-3.webp)
+
 That implementation reduces BEVDet-Tiny’s reported latency from 137 ms to 64 ms, a 53.3% reduction. The same paper therefore supports two separate conclusions: a view transform can dominate wall time even when it is one arrow in the architecture diagram, and a fixed-rig optimization can be a deployment constraint. A changing camera mount, calibration update, or variable camera count requires rebuilding the mapping rather than reusing the cached indices.
 
 ### The benchmark trades appearance for geometry
@@ -58,6 +62,8 @@ That implementation reduces BEVDet-Tiny’s reported latency from 137 ms to 64 m
 On the nuScenes validation set, the tiny configuration reaches 31.2 mAP and 39.2 NDS at 15.6 FPS with 215.3 GFLOPs; the larger BEVDet-Base reaches 39.3 mAP and 47.2 NDS at 1.9 FPS. On the test set, a single BEVDet model with test-time augmentation reports 42.2 mAP and 48.2 NDS. The tiny model uses only $704\times256$ images, about one eighth the input pixel count of the $1600\times900$ FCOS3D comparison, yet reports higher validation mAP and much higher throughput in the paper’s hardware setup.
 
 The metric breakdown explains what the BEV representation buys. BEVDet is strong on translation, scale, orientation, and velocity, where a ground-plane coordinate system helps the detector reason about metric relationships. Its attribute error is worse than image-view FCOS3D and PGD, consistent with compressing color and texture into a spatial grid. The result is a useful geometry-first baseline, not evidence that BEV makes every visual property easier.
+
+The benchmark uses 1,000 nuScenes scenes with six cameras, split 700/150/150 across train, validation, and test, and evaluates ten classes. The standard comparisons and the augmentation ablation use a 20-epoch schedule with class-balanced grouping and sampling; the test submission trains BEVDet-Base on train plus validation and adds test-time augmentation. That boundary matters for the 42.2 mAP/48.2 NDS test row: it is not the same fitted model or evaluation protocol as the tiny validation point.
 
 ## High-Level Takeaways
 

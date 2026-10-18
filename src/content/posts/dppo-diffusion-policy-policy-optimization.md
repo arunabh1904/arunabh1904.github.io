@@ -24,6 +24,8 @@ summary: "2024 – DPPO: Diffusion Policy Policy Optimization"
 ![Diffusion Policy MDP unrolling denoising states inside each environment action step for policy-gradient optimization](/assets/images/dppo-diffusion-policy-policy-optimization-paper-figure.png)
 *Fig 1: The reduction that makes the update tractable: each denoising transition has a Gaussian likelihood, while environment reward is paid only after the final action is executed. | source: [DPPO, Figure 3](https://arxiv.org/abs/2409.00588)*
 
+[Open figure at full size](/assets/images/dppo-diffusion-policy-policy-optimization-paper-figure.png)
+
 ### The policy gradient follows denoising time, not just robot time
 
 A Diffusion Policy first samples noise and repeatedly denoises an action chunk. The robot then executes only part of that chunk before observing the next state. DPPO keeps both clocks explicit. For environment state $s_t$, the inner chain contains $a_t^K, a_t^{K-1}, \ldots, a_t^0$; the denoising transition from $a_t^{k+1}$ to $a_t^k$ is Gaussian, so its log-likelihood can be evaluated exactly. The final action marginal $p_\theta(a_t^0\mid s_t)$ is not available as one tractable density; DPPO instead optimizes the explicit Gaussian transitions along the denoising path. Only the final $a_t^0$ advances the physical environment and receives its reward. The resulting trajectory is therefore a chain of inner denoising MDPs joined by environment transitions.
@@ -35,6 +37,8 @@ PPO is applied to those inner transitions. An environment discount handles futur
 ![Figure 7 from DPPO: Diffusion Policy Policy Optimization](/assets/images/dppo-diffusion-policy-policy-optimization-source-figure-7.webp)
 *Fig 2: State and pixel comparisons on the difficult Square and Transport tasks from ROBOMIMIC. | source: [DPPO, Figure 7](https://arxiv.org/abs/2409.00588)*
 
+[Open figure at full size](/assets/images/dppo-diffusion-policy-policy-optimization-source-figure-7.webp)
+
 The paper does not fine-tune every pretraining denoising step by default. A policy may use up to 100 DDPM steps, but DPPO can freeze the early steps and update only the last $K'$ steps. This reduces memory and training time without sacrificing final performance in the reported settings. For pixel policies and long-horizon furniture tasks, the authors use DDIM with five denoising steps during fine-tuning; stochasticity is retained for training by setting its noise parameter to one and removed for evaluation. They also clip the exploration noise to a task-dependent floor, typically $0.01$–$0.1$, and use at least $0.1$ when evaluating likelihoods to avoid unstable large log-probabilities.
 
 Figure 2 isolates the policy-class comparison. For state input, DPPO reaches roughly 100% on the easier Lift and Can tasks, and above 90% on the harder Transport task; its MLP and UNet variants are similar, with the MLP training somewhat faster. With pixel input, DPPO improves Square more quickly and to a higher level than the Gaussian ViT baseline, while Gaussian does not improve from its 0% pretrained Transport success. The comparison uses the same action execution horizon, $T_a=4$ for Lift, Can, and Square and $T_a=8$ for Transport, so the result is about the stochastic policy parameterization rather than a longer controller horizon.
@@ -44,7 +48,11 @@ Figure 2 isolates the policy-class comparison. For state input, DPPO reaches rou
 ![Figure 4 from DPPO: Diffusion Policy Policy Optimization](/assets/images/dppo-diffusion-policy-policy-optimization-source-figure-4.webp)
 *Fig 3: The bimanual ROBOMIMIC Transport task and the One-leg, Lamp, and Round-table FURNITURE-BENCH tasks used for long-horizon evaluation. | source: [DPPO, Figure 4](https://arxiv.org/abs/2409.00588)*
 
+[Open figure at full size](/assets/images/dppo-diffusion-policy-policy-optimization-source-figure-4.webp)
+
 The data regime is deliberately modest. ROBOMIMIC policies use 300 state or 100 pixel demonstrations, with sparse reward equal to one on task completion. FURNITURE-BENCH policies use 50 simulated human demonstrations, execute eight actions from each predicted chunk, and receive sparse stage-completion reward. On the six furniture settings, DPPO improves from its pretrained policy while Gaussian-MLP collapses to zero in all three medium-randomness tasks and in low-randomness Round-table. The paper’s most concrete deployment result is One-leg: after simulation fine-tuning, DPPO succeeds on 16 of 20 hardware trials (80%) zero-shot, whereas Gaussian reaches 88% in simulation but 0% on hardware. Adding behavior-cloning regularization to Gaussian avoids total collapse but limits it to 53% simulation and 50% hardware.
+
+The comparisons are repeated at different scales: GYM curves average five seeds, while ROBOMIMIC and FURNITURE-BENCH curves average three. DPPO is fine-tuned with the environment’s dense GYM reward or sparse manipulation reward and does not replay expert demonstrations during the online update; the demonstrations define the pretrained policy. This makes the gain a test of policy-gradient adaptation around the learned action distribution, rather than another offline-data method.
 
 The qualitative explanation is more specific than “diffusion is robust.” In the hardware rollouts, the fine-tuned policy corrects a small peg-to-hole misalignment before releasing, while the pretrained policy sometimes pushes the peg down and lets it topple. The paper’s Avoid study likewise shows noise being injected through multiple denoising steps while the denoising process keeps samples near the demonstrated action manifold. That is a plausible reason for transfer, but the paper presents it as a mechanism supported by diagnostic experiments, not as a guarantee for arbitrary real-world dynamics.
 

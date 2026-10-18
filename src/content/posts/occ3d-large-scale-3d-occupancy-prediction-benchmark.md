@@ -37,6 +37,8 @@ The two releases make the scale concrete. The first row is the native Occ3D-nuSc
 ![Occ3D's semi-automatic label generation pipeline](/assets/images/occ3d-large-scale-3d-occupancy-prediction-benchmark-source-figure-2.webp)
 *Fig 1: Occ3D densifies LiDAR, assigns labels, reconstructs surfaces, reasons about occlusion, and applies image-guided refinement before producing occupancy labels. | source: [Occ3D, Figure 2](https://arxiv.org/abs/2304.14365)*
 
+[Open the full-size source figure](/assets/images/occ3d-large-scale-3d-occupancy-prediction-benchmark-source-figure-2.webp)
+
 ### The label is a chain of geometric decisions
 
 The pipeline first separates dynamic objects from static scene points. It aggregates dynamic points in object coordinates, aggregates static points in global coordinates, uses KNN to label otherwise unannotated frames, and fills remaining surface holes with mesh reconstruction. Naively accumulating all points would smear a moving car across time; separating the coordinate systems is what keeps density from becoming motion blur.
@@ -46,6 +48,8 @@ Visibility reasoning then casts rays from LiDAR origins. A voxel that reflects a
 ![Occ3D's visibility masks and image-guided refinement](/assets/images/occ3d-large-scale-3d-occupancy-prediction-benchmark-source-figure-3.webp)
 *Fig 2: LiDAR and camera rays distinguish occupied, free, and unobserved voxels; image-guided refinement clears voxels before the first depth with a matching pixel label. | source: [Occ3D, Figure 3](https://arxiv.org/abs/2304.14365)*
 
+[Open the full-size source figure](/assets/images/occ3d-large-scale-3d-occupancy-prediction-benchmark-source-figure-3.webp)
+
 The last refinement step addresses a subtle failure: pose drift and LiDAR noise can make an object's reconstructed surface too thick. Along a ray from a camera pixel, the first voxel with the same semantic label is retained and previously traversed occupied voxels are marked free. The 3D-2D consistency check in the paper shows why this is more than cosmetic; multi-frame aggregation improves recall but can lower precision, while voxel size, mesh reconstruction, and refinement trade those errors in different directions.
 
 ### CTF-Occ spends computation where geometry is uncertain
@@ -53,6 +57,8 @@ The last refinement step addresses a subtle failure: pose drift and LiDAR noise 
 Occ3D also introduces CTF-Occ. Its pyramid voxel encoder predicts whether a voxel is empty, selects foreground or uncertain tokens, refines only the top-k candidates with spatial cross-attention, and upsamples between levels. An implicit MLP decoder can query a semantic label at an arbitrary coordinate. In the matched Occ3D-nuScenes table, CTF-Occ reaches 28.53 mIoU versus BEVFormer's 26.88, a 1.65 point gain. On Occ3D-Waymo it reaches 18.73 versus 16.76, a 1.97 point gain; the paper's corresponding vehicle comparison is 28.09 IoU versus TPVFormer's 17.86, a 10.23 point gain.
 
 The label grid and the model evaluation grid should not be conflated. Occ3D-Waymo publishes 5 cm labels, but the paper's CTF-Occ experiments use a 0.4 m voxel size on both datasets. The 18.73 mIoU result therefore evaluates the benchmark at that coarser model grid; it is not a 5 cm-resolution camera prediction score.
+
+Those matched experiments use an FCOS3D-pretrained ResNet-101 and 640×960 Waymo or 928×1600 nuScenes images. CTF-Occ starts from a learnable 200×200×256 voxel embedding, runs four encoder layers before selection, and then keeps a 0.2 top-k ratio at each dataset-specific pyramid stage. The reported camera comparison therefore fixes both the input scale and the coarse evaluation grid while testing the token-selection mechanism.
 
 The ablation explains the source of that gain: on Waymo, the combination of OHEM and top-k token selection reaches 18.43 mIoU, whereas removing both targeted selection and hard-example weighting gives 14.06. The model is not simply “using a finer grid”; it is reallocating cross-attention toward occupied and ambiguous regions in a space dominated by empty voxels.
 

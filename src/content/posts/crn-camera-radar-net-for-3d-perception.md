@@ -31,6 +31,8 @@ Radar-assisted view transformation constructs two versions of image context: one
 ![CRN architecture showing radar-assisted view transformation and multimodal feature aggregation.](/assets/images/crn-camera-radar-net-for-3d-perception-paper-figure.webp)
 *Fig 1: Follow the two radar paths: occupancy helps lift camera features, while radar context remains available for later BEV fusion. Depth supervision trains the camera branch but is not an inference input. | source: [CRN, Figure 2](https://arxiv.org/abs/2304.00670)*
 
+[Open figure at full resolution](/assets/images/crn-camera-radar-net-for-3d-perception-paper-figure.webp)
+
 Table 5 isolates view transformation by withholding point features from later aggregation. Camera depth alone gives 33.2 mAP; replacing it with binary radar occupancy falls to 24.3. Combining depth with learned radar assistance reaches 44.8 mAP and reduces translation error from 0.716 to 0.521 metres. Radar should guide dense lifting without becoming its sole geometric support.
 
 Even pooling contains a geometric choice. CRN averages frustum features landing in each BEV cell instead of summing them. Nearby cells receive more frustum contributions because of perspective. Averaging limits that distance-dependent change in magnitude, so a larger response need not merely mean more samples landed there.
@@ -43,6 +45,8 @@ CRN’s multimodal deformable attention predicts separate sampling offsets and w
 
 ![Fused, image, and radar feature maps around occluded vehicles and radar clutter.](/assets/images/crn-camera-radar-net-for-3d-perception-source-figure-4.webp)
 *Fig 2: Compare fusion, image, and radar columns at the marked locations. Camera features miss occluded and distant vehicles; radar introduces wall clutter and weak pedestrian evidence. Fusion combines useful responses while suppressing some misleading ones. | source: [CRN, Figure 4](https://arxiv.org/abs/2304.00670)*
+
+[Open figure at full resolution](/assets/images/crn-camera-radar-net-for-3d-perception-source-figure-4.webp)
 
 Table 6 shows overlapping benefits. BEVFusion-style convolution reaches 42.4 mAP; deeper convolutions reach 42.8, and adding radar-assisted transformation reaches 44.3. Deformable aggregation alone reaches 44.5, with both CRN components reaching 45.2. Better lifting and adaptive fusion partly solve the same localization problem, explaining why their gains are not additive. These aggregation experiments differ from Table 5 and should not be combined into one cumulative sequence.
 
@@ -66,10 +70,14 @@ The authors suggest classification tolerates sparse features better than regress
 
 The real-time ResNet-50 model with 256 × 704 images reaches 49.0 mAP and 56.0 NDS on nuScenes validation at 20.4 FPS. The 57.5 mAP and 62.4 NDS test result uses the larger ConvNeXt-B model. Timing uses batch size one, FP16, and an RTX 3090. Previous BEV features are cached, so temporal input adds work to the BEV head without re-encoding historical images. Radar sweeps are also accumulated; these results do not describe an isolated image and instantaneous radar scan.
 
+The standard ablation contract is two image frames at 256 × 704 with an R50 backbone, trained for 24 epochs without CBGS; the radar branch accumulates six prior sweeps and the BEV path keeps three previous feature maps at one-second intervals. The test table separately marks test-time augmentation, so the 57.5/62.4 ConvNeXt-B row and the 20.4-FPS validation row should not be read as one configuration.
+
 For long-range cars, CRN reaches 7.0 AP at 60–100 metres versus 4.8 for the compared LiDAR CenterPoint model—a relative gain from a low absolute level. This experiment doubles class evaluation ranges and disables usual points-in-box filtering. The appendix notes resulting inconsistencies between visible objects and annotations. It supports camera–radar fusion at distance under that protocol, rather than general LiDAR replacement.
 
 ![CRN long-range detections in day, rain, and night, with bottom-row failures highlighted.](/assets/images/crn-camera-radar-net-for-3d-perception-source-figure-7.webp)
 *Fig 3: Day, rain, and night examples use green ground-truth boxes, blue predictions, and black radar points. Inspect the bottom-row red circles too: rare or occluded objects without useful radar returns remain difficult. | source: [CRN, Figure 7](https://arxiv.org/abs/2304.00670)*
+
+[Open figure at full resolution](/assets/images/crn-camera-radar-net-for-3d-perception-source-figure-7.webp)
 
 CRN improves night mAP from the reproduced BEVDepth baseline’s 16.8 to 30.4, but remains below its own daytime 55.1. Under complete radar dropout, it retains 43.8 car AP versus BEVFusion’s 34.4; under complete camera dropout, it reaches 12.8 versus BEVFusion’s 14.3. Adaptive fusion improves several failure cases without making both sensors dispensable.
 

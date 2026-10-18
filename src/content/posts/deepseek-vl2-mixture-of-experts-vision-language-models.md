@@ -29,10 +29,14 @@ The vision path replaces DeepSeek-VL's fixed 384 × 384 and 1024 × 1024 views w
 ![DeepSeek-VL2 dynamic tiling turns one high-resolution image into local tiles plus a global view](/assets/images/deepseek-vl2-mixture-of-experts-vision-language-models-source-figure-3.webp)
 *Fig 1: Dynamic tiling divides an image into local 384 × 384 tiles, encodes them with a shared vision encoder, and flattens the merged features with separator tokens. | source: [DeepSeek-VL2, Figure 3](https://arxiv.org/abs/2412.10302)*
 
+[Open figure at full size](/assets/images/deepseek-vl2-mixture-of-experts-vision-language-models-source-figure-3.webp)
+
 The architecture keeps a LLaVA-style path—vision encoder, vision-language adaptor, then a decoder-only language model—but changes the compute profile inside the language model. DeepSeekMoE routes each token to a sparse expert subset, and MLA stores a compressed latent key-value state rather than a full KV cache. The model family therefore separates total capacity from active computation, while the visual path turns a variable grid of image tiles into a variable-length visual sequence.
 
 ![DeepSeek-VL2 architecture with dynamic visual tokens, a VL adaptor, and a sparse MoE language model](/assets/images/deepseek-vl2-mixture-of-experts-vision-language-models-source-figure-2.webp)
 *Fig 2: The source architecture connects dynamically tiled image tokens through a VL adaptor to the DeepSeek-MoE language model, which predicts text tokens. | source: [DeepSeek-VL2, Figure 2](https://arxiv.org/abs/2412.10302)*
+
+[Open figure at full size](/assets/images/deepseek-vl2-mixture-of-experts-vision-language-models-source-figure-2.webp)
 
 The training schedule preserves the asymmetry between conditioning and output. Stage 1 trains the vision encoder and adaptor while freezing the language model. Stage 2 unfreezes all components for roughly 800B image-text training tokens, and stage 3 performs supervised fine-tuning with all parameters unlocked. The next-token loss is computed on text tokens, so visual tokens condition the answer rather than becoming direct reconstruction targets. The SFT data adds regenerated VQA responses, cleaned OCR/document examples, detailed reasoning data, grounding coordinates, and text-only instructions to preserve language ability.
 
@@ -40,6 +44,8 @@ The benchmark results show where dynamic resolution matters. In the full model's
 
 ![DeepSeek-VL2 average benchmark performance versus activated parameters](/assets/images/deepseek-vl2-source-figure-1-performance.png)
 *Fig 3: The paper compares average multimodal performance against activated parameters across the DeepSeek-VL2, InternVL2, and Qwen2-VL families; its average combines MMBench v1.1, MMStar, MMMU (validation), MathVista (test-mini), AI2D (test), and OCRBench scaled to 0–100. | source: [DeepSeek-VL2, Figure 1](https://arxiv.org/abs/2412.10302)*
+
+[Open figure at full size](/assets/images/deepseek-vl2-source-figure-1-performance.png)
 
 The efficiency boundary is operational. Dynamic tile counts can make batches uneven, expert routing can create load imbalance, and the report describes separate pipeline strategies for text-only and image batches. The authors also report that the 3B, 16B, and 27B variants can fit on single GPUs with 10GB, 40GB, and 80GB memory respectively. These are deployment facts for the reported implementation, not guarantees across arbitrary serving stacks.
 

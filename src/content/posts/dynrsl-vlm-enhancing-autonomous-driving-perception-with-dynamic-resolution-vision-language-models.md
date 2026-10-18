@@ -28,18 +28,26 @@ The input construction is more specific than simply zooming detected boxes. YOLO
 ![DynRsl-VLM: Enhancing Autonomous Driving Perception with Dynamic Resolution Vision-Language Models source figure: Architecture of the alignment module and the losses employed during model training.](/assets/images/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models-paper-figure.webp)
 *Fig 1: Architecture of the alignment module and the losses employed during model training. | source: [DynRsl-VLM, Figure 4](https://arxiv.org/abs/2503.11265)*
 
+[Open figure at full size](/assets/images/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models-paper-figure.webp)
+
 The full architecture places the extra work before language generation. The image pipeline supplies several views, the alignment module connects them to text, and the decoder answers the driving question. The added views preserve evidence, but their value depends on the detector finding the relevant entities.
 
 ![Figure 1 from DynRsl-VLM: Enhancing Autonomous Driving Perception with Dynamic Resolution Vision-Language Models](/assets/images/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models-source-figure-1.webp)
 *Fig 2: The architecture of our model that acquires multi-resolution images, performs visual-text alignment, and conducts efficient computations. | source: [DynRsl-VLM, Figure 1](https://arxiv.org/abs/2503.11265)*
+
+[Open figure at full size](/assets/images/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models-source-figure-1.webp)
 
 A tight crop resolves an individual vehicle or pedestrian, while a combined crop preserves their relation. The global image supplies context that neither local crop can show. This three-part input explains why the method includes grouped regions rather than simply enlarging every detected box independently.
 
 ![Figure 2 from DynRsl-VLM: Enhancing Autonomous Driving Perception with Dynamic Resolution Vision-Language Models](/assets/images/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models-source-figure-2.webp)
 *Fig 3: Method for obtaining Region Images. This diagram illustrates the approach for acquiring Region Images, which include both individual entity regions and combined regions. | source: [DynRsl-VLM, Figure 2](https://arxiv.org/abs/2503.11265)*
 
+[Open figure at full size](/assets/images/dynrsl-vlm-enhancing-autonomous-driving-perception-with-dynamic-resolution-vision-language-models-source-figure-2.webp)
+
 
 The paper does report a task-level check. On the NuInstruct test set, the full model reaches 35.5 on planning with reasoning, compared with 35.2 for BEV-InMLLM and 31.4 for MV-MLLM. In the module ablation, the reported aggregated accuracy is 34.8 for the full model, 33.2 without dynamic-resolution extraction, 34.1 without dynamic image-text alignment, and 31.1 without both. The training protocol uses three uniformly sampled frames per video, 224 × 224 crops, a frozen base MLLM with only the added components optimized, AdamW at 1e−4, cosine annealing, and 20 epochs. This connects the figures to a measurable claim: the ROI path and alignment path each retain signal that disappears when both are removed.
+
+NuInstruct contains 11,850 keyframes from 850 videos, 55,204 unique instances, and 91,355 instruction-response pairs across four tasks. Its video-level split is 7.5:1.5:1.5, preserving the task and camera-view distributions across train, validation, and test.
 
 The alignment figure should also be read precisely. The pretraining objective combines image-guided text generation (ITG), symmetric image-text contrastive learning (ITC/InfoNCE), and image-text matching (ITM); it is not an InfoNCE-only interface. The language decoder then consumes the aligned multi-resolution features. YOLOv8 proposes vehicle and pedestrian boxes, combined boxes preserve relations, and the downsampled full image supplies global context. The system therefore trades a fixed resize for detector-dependent cropping and extra views. The evaluation is still VQA-style NuInstruct rather than closed-loop driving, and it does not report a matched wall-clock or token-budget comparison against adaptive cropping or fixed high-resolution baselines.
 

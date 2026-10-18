@@ -28,22 +28,28 @@ The overview connects three representations: video features, language, and numer
 ![DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model source figure: DriveGPT4 overview.](/assets/images/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model-paper-figure.webp)
 *Fig 1: DriveGPT4 aligns video and language during pretraining, mixes driving and instruction data during fine-tuning, and decodes both textual explanations and low-level control signals. | source: [DriveGPT4, Figure 2](https://arxiv.org/abs/2310.01412)*
 
+[Open the full-size figure](/assets/images/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model-paper-figure.webp)
+
 The comparison with GPT-4V distinguishes recognizing a scene from obeying a control-output format. A useful description still has to become speed and turning-angle values that the evaluation can parse. The shown examples illustrate that interface difference; the quantitative control results below measure it across the test set.
 
 ![Figure 6 from DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](/assets/images/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model-source-figure-6.webp)
 *Fig 2: Comparison of DriveGPT4 and GPT4-V. GPT4-V is prompted with BDD-X QA pairs before the comparison. | source: [DriveGPT4, Figure 6](https://arxiv.org/abs/2310.01412)*
+
+[Open the full-size figure](/assets/images/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model-source-figure-6.webp)
 
 BDD-X pairs an observed action with a human justification. Those labels let the model learn both what the vehicle does and how people explain it, but agreement with an explanation is not evidence that the explanation caused the predicted control.
 
 ![Figure 1 from DriveGPT4: Interpretable End-to-end Autonomous Driving via Large Language Model](/assets/images/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model-source-figure-1.webp)
 *Fig 3: BDD-X examples pair video clips with an action description and a natural-language justification, such as stopping for a red light or changing lanes for faster traffic. | source: [DriveGPT4, Figure 1](https://arxiv.org/abs/2310.01412)*
 
+[Open the full-size figure](/assets/images/drivegpt4-interpretable-end-to-end-autonomous-driving-via-large-language-model-source-figure-1.webp)
+
 
 BDD-X makes the evaluation legible because it pairs driving video with human-facing explanations. The dataset has about 20,000 clips, with 16,803 for training and 2,123 for testing; each clip is represented by eight frames from a front-view monocular RGB camera. The model predicts the next-step speed and turning angle as text-compatible tokens, with the speed in m/s and the relative turning angle in degrees. Stage-one alignment freezes CLIP and LLaMA2 while training the projector on 593K CC3M image-text pairs and 703K WebVid-2M video-text pairs. Stage two first uses 223K general instruction examples and then 56K driving examples, including 16K BDD-X QAs and 40K ChatGPT-generated driving QAs.
 
 The full test set and hard split expose different difficulty levels. On the full BDD-X test set, DriveGPT4 reaches CIDEr 99.10, BLEU-4 18.32, and ROUGE-L 44.73 for combined action description and justification; on the hard split it reaches 57.29, 12.28, and 42.07 respectively. For control, speed RMSE is 1.30 m/s with 60.88% within 0.5 m/s, and turning-angle RMSE is 8.98° with 72.89% within 0.5°. The ablations show why the data recipe is part of the result: removing either BDD-X QAs or ChatGPT QAs lowers the corresponding capabilities, and removing the general-data mix causes a severe drop in broad question answering. Figure 6 adds the complementary qualitative boundary: GPT-4V can describe the scene but does not reliably emit the fixed-format numerical controls.
 
-The evidence remains open-loop and one-step. The BDD-X test split is filtered for inconsistent control and text reasoning, the ChatGPT score is averaged over three unstable evaluations, and the paper does not close the loop in a simulator or vehicle. A fluent explanation can therefore share features with the control prediction without proving that the language evidence caused the action; a control-only versus joint-training comparison would test that causal claim.
+The evidence remains open-loop and one-step. The BDD-X test split is filtered for inconsistent control and text reasoning, and DriveGPT4 uses eight frames where ADAPT uses 32 because of memory and speed costs, so the comparison also has an input-context difference. The ChatGPT score is averaged over three unstable evaluations, and the paper does not close the loop in a simulator or vehicle. A fluent explanation can therefore share features with the control prediction without proving that the language evidence caused the action; a control-only versus joint-training comparison would test that causal claim.
 
 ## High-Level Takeaways
 

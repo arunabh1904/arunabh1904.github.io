@@ -25,6 +25,8 @@ summary: "2024 – PaliGemma: A Versatile 3B VLM for Transfer"
 ![Figure 1 from PaliGemma showing the SigLIP image encoder feeding a Gemma decoder language model](/assets/images/paligemma-a-versatile-3b-vlm-for-transfer-paper-figure.png)
 *Fig 1: PaliGemma’s architecture: a SigLIP image encoder feeds a Gemma decoder LM. | source: [PaliGemma, Figure 1](https://arxiv.org/abs/2407.07726)*
 
+[Open figure at full size](/assets/images/paligemma-a-versatile-3b-vlm-for-transfer-paper-figure.png)
+
 Figure 1 looks simple because the interface does most of the work. The SigLIP-So400m encoder turns an image into visual tokens; a zero-initialized linear projection maps them into Gemma-2B’s token dimension; a SentencePiece tokenizer maps a task prefix into text tokens; and the decoder generates a suffix. The suffix may be a caption or answer, a sequence of normalized location tokens for detection, or vector-quantized mask tokens for referring-expression segmentation. The model therefore shares a language-like output contract across tasks instead of adding a separate prediction head for every benchmark.
 
 At 224, 448, and 896 pixels, the image contributes 256, 1,024, and 4,096 tokens respectively. For video or multi-image transfers, PaliGemma encodes each image separately and concatenates the visual tokens; sixteen 224-pixel frames therefore occupy the same 4,096-token visual budget as one 896-pixel image. The choice is useful but expensive: resolution buys detail by increasing both input information and sequence length.
@@ -41,6 +43,8 @@ The paper also adds 1,024 location tokens (loc0000 through loc1023) for normaliz
 
 ![Figure 7 from PaliGemma showing the effect of freezing or resetting model parts during Stage 1](/assets/images/paligemma-a-versatile-3b-vlm-for-transfer-source-figure-7.webp)
 *Fig 2: The left panel tests whether vision and language weights are tuned, frozen, or reset. The right panel follows pretraining perplexity, exposing effects of a frozen visual encoder that can be less obvious after downstream transfer. | source: [PaliGemma, Figure 7](https://arxiv.org/abs/2407.07726)*
+
+[Open figure at full size](/assets/images/paligemma-a-versatile-3b-vlm-for-transfer-source-figure-7.webp)
 
 Figure 2 is a diagnostic of the training contract. The left plot compares tuning (T), freezing (F), and resetting (R) the ViT and Gemma components. Resetting pretrained parts causes the largest loss; freezing the language model is especially damaging, while freezing the image encoder is close to full tuning after transfer but worsens spatial-task perplexity during pretraining. The right plot tracks captioning and detection perplexity as pretraining continues, showing where a frozen ViT changes the learning dynamics even when downstream transfer can remain close to full tuning. The lesson is not that every component must always be updated; it is that the base checkpoint is valuable because the multimodal stage can refine pretrained interfaces instead of relearning vision from pixels.
 

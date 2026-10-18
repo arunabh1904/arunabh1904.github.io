@@ -29,7 +29,11 @@ The representation is useful because a point has no intrinsic orientation. An an
 ![CenterPoint source Figure 1: anchor-based and center-based boxes during straight driving and a turn](/assets/images/centerpoint-center-based-3d-detection-and-tracking-source-figure-1.webp)
 *Fig 1: The source comparison shows axis-aligned anchor boxes struggling when the vehicle turns, while a center target needs no preset anchor heading; box orientation and extent are regressed afterward. | source: [CenterPoint, Figure 1](https://arxiv.org/abs/2006.11275)*
 
+[Open Figure 1 at full resolution](/assets/images/centerpoint-center-based-3d-detection-and-tracking-source-figure-1.webp)
+
 The gain is not just a different parameterization. On Waymo validation, changing the output from anchors to centers improves level-2 mAPH by 4.3 points with a VoxelNet encoder and 4.5 points with PointPillars. On nuScenes validation, the corresponding mAP improvement is 3.8–4.1 points, with 1.1–1.8 points of NDS improvement. These comparisons keep the broad encoder and training setup fixed, so they isolate the proposal representation more closely than a leaderboard comparison does.
+
+The Waymo breakdown shows where that change matters. For objects with relative yaw of 30–45 degrees, center-based mAPH rises from 45.4 to 51.6 for vehicles and from 26.5 to 35.7 for pedestrians; the advantage is smaller in the 0–15 degree bin. The center representation therefore helps with the orientation mismatch that motivates it, rather than providing a uniform gain across every box.
 
 ### Five samples repair the center feature's blind spot
 
@@ -49,6 +53,10 @@ CenterPoint-Voxel reaches 71.8 level-2 mAPH for vehicles and 66.4 for pedestrian
 
 ![CenterPoint source Figure 3: qualitative Waymo detections](/assets/images/centerpoint-center-based-3d-detection-and-tracking-source-figure-3.webp)
 *Fig 2: The source qualitative panel shows the raw point cloud in blue, predicted boxes in green, and LiDAR points inside predicted boxes in red on Waymo validation. It is a detection visualization, not a camera image. | source: [CenterPoint, Figure 3](https://arxiv.org/abs/2006.11275)*
+
+[Open Figure 2 at full resolution](/assets/images/centerpoint-center-based-3d-detection-and-tracking-source-figure-3.webp)
+
+The benchmark protocols also set the scale of these numbers. Waymo has 798 training and 202 validation sequences from a 64-beam LiDAR, with LEVEL 2 including boxes that contain at least one point; nuScenes has 700, 150, and 150 sequences for training, validation, and test, with 28k, 6k, and 6k annotated frames from a 32-beam sensor. The nuScenes pipeline merges non-annotated frames into their following annotated frame before augmentation. This is why the dense Waymo result and the sparse nuScenes refinement comparison should not be read as the same training regime.
 
 ## High-Level Takeaways
 

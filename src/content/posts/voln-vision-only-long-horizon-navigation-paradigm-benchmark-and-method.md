@@ -32,12 +32,17 @@ VoLN-UAV makes this concrete with 7,210 simulated episodes across 17 AirSim envi
 ![VoLN two-phase method aligning visual goals with semantics before predicting short-horizon waypoints and stopping decisions](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-paper-figure.png)
 *Fig 1: Separates representation learning from control: phase I aligns visual goal views without exposing route language, then phase II predicts closed-loop waypoint chunks and when to stop. | source: [VoLN, Figure 5](https://arxiv.org/abs/2607.21400)*
 
+[Open figure at full size](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-paper-figure.png)
+
 ![Figure 6 from VoLN: Vision-Only Long-Horizon Navigation—Paradigm, Benchmark, and Method](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-source-figure-6.webp)
 *Fig 2: Successful and failed rollouts. The successful path follows active-beacon locations into the goal; the failed path is diverted near passive billboards. | source: [VoLN, Figure 6](https://arxiv.org/abs/2607.21400)*
+
+[Open figure at full size](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-source-figure-6.webp)
 
 ![Figure 1 from VoLN: Vision-Only Long-Horizon Navigation—Paradigm, Benchmark, and Method](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-source-figure-1.webp)
 *Fig 3: The instruction-based setting exposes route-level information through language and global guidance, whereas VoLN specifies the destination visually and presents route-relevant cues within the observable scene. | source: [VoLN, Figure 1](https://arxiv.org/abs/2607.21400)*
 
+[Open figure at full size](/assets/images/voln-vision-only-long-horizon-navigation-paradigm-benchmark-and-method-source-figure-1.webp)
 
 ### Local cues replace a route script, not the need for memory
 

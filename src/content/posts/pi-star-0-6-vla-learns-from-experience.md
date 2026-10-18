@@ -20,14 +20,18 @@ summary: '2025 – π*0.6: A VLA That Learns From Experience'
 
 ### Make a sparse terminal label useful over a whole episode
 
-RECAP starts from a problem that is easy to describe and hard to train: a robot may fail only at the last step, but the data before that failure contains many actions that were still useful. The method labels each episode by its final outcome and trains a distributional value function to estimate the remaining steps to success. The terminal reward is 0 for success, a large negative constant for failure, and −1 for intermediate steps. Values are normalized to ((-1,0)) per task, so the critic represents progress and failure severity rather than a raw time scale shared by espresso, laundry, and box assembly.
+RECAP starts from a problem that is easy to describe and hard to train: a robot may fail only at the last step, but the data before that failure contains many actions that were still useful. The method labels each episode by its final outcome and trains a distributional value function to estimate the remaining steps to success. The terminal reward is 0 for success, a large negative constant for failure, and −1 for intermediate steps. Values are normalized to $(-1,0)$ per task, so the critic represents progress and failure severity rather than a raw time scale shared by espresso, laundry, and box assembly.
 
 The value function is a smaller VLM initialized from Gemma 3. It predicts a 201-bin return distribution `p(V | observation, task)`. RECAP takes the expected value, compares an action’s estimated advantage to a task-specific threshold, and inserts a binary “Advantage: positive” or “Advantage: negative” indicator into the VLA input. The threshold is set from the 30th percentile of values predicted for the task. That indicator changes the action likelihood while leaving the rest of the prompt and the high-level subtask prediction intact.
+
+The policy being conditioned is itself a two-part model: π*0.6 uses a Gemma 3 4B VLM, an 860M flow-matching action expert that emits 50 Hz action chunks, and parallel discrete FAST-action prediction. The KI recipe lets the discrete-token objective train the backbone while stopping gradients from the flow-matching action expert into it. The value model is a separate 670M Gemma 3 VLM. This division explains why RECAP can add a textual advantage condition without replacing the continuous controller or requiring its exact action likelihood.
 
 This is useful for a flow-matching VLA because the continuous action expert does not expose the same simple tractable likelihood as a Gaussian policy. RECAP instead trains the model on all data with the indicator as a condition, using discrete action-token likelihoods together with the flow-matching loss. Good actions can be selected by the positive condition without throwing away every lower-quality trajectory, and the model can still use the negative condition to represent the behavior distribution from which improvement is extracted.
 
 ![Tasks learned by π*0.6, including espresso making, box assembly, and laundry folding](/assets/images/pi-star-0-6-paper-figure-2.png)
 *Fig 1: RECAP is tested on deformable laundry, cardboard boxes, and espresso preparation, where progress errors and task duration both matter. | source: [π*0.6: A VLA That Learns From Experience, Figure 2](https://arxiv.org/abs/2511.14759)*
+
+[Open figure at full size](/assets/images/pi-star-0-6-paper-figure-2.png)
 
 Fig. 1 shows why the reward problem is not a toy benchmark. Boxes bend and stick, espresso requires liquid handling and sequencing, and laundry changes shape across items. A terminal success label is sparse in each case, but the resulting deployment episodes expose different failure modes that the value model can learn to recognize.
 
@@ -37,6 +41,8 @@ The training loop has three stages that can be repeated. First, run the current 
 
 ![Figure 3 from π*0.6 showing the VLA, advantage signal, and value function](/assets/images/pi-star-0-6-vla-learns-from-experience-source-figure-3.webp)
 *Fig 2: A smaller value model estimates advantage from observations and the task, then conditions the larger VLA; the VLA’s flow-matching action expert remains tied to the shared pretrained backbone. | source: [π*0.6: A VLA That Learns From Experience, Figure 3](https://arxiv.org/abs/2511.14759)*
+
+[Open figure at full size](/assets/images/pi-star-0-6-vla-learns-from-experience-source-figure-3.webp)
 
 Follow Fig. 2 upward from the value function. The critic sees the same observation and language context, produces an advantage estimate, and sends only a binarized condition to the policy. The action expert still generates continuous chunks through flow matching. The VLA is therefore not replaced with a value-weighted low-level controller; the critic steers which behavior mode the VLA should reproduce.
 

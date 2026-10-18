@@ -30,13 +30,19 @@ The model first predicts future video latents and an ego trajectory through a sh
 
 The feature loss compares cosine distance at VGGT-$\Omega$ layers 11, 17, and 23, separately for camera, register, and patch tokens. Those groups give the loss three different handles: view configuration, global context, and local geometry. The depth term works on pixels that pass finite/positive-depth checks and exceed a frame-adaptive confidence threshold; it compares $\log(\hat D+10^{-6})$ with $\log(D^{gt}+10^{-6})$ using Smooth-L1 ($\beta=0.1$). Thus feature matching asks whether the predicted sequence has the same scene layout and cross-frame correspondences, while depth matching penalizes a car, curb, or lead vehicle being at the wrong relative distance. The combined objective is $L_{4D}=L_{feat}+L_{depth}$, with a half-cosine warm-up during the first half epoch of the consistency stage.
 
+The input contract is three historical front-view frames plus the current observation, current ego state, and a text driving instruction. Future video and the ego trajectory are predicted at 2 Hz over four seconds. Stage I trains the joint video-action flow-matching objective on `navtrain` for 40 epochs; Stage II continues for 40 epochs with 4D consistency supervision, while inference uses ten denoising steps. The geometric teacher is therefore a training signal rather than an additional sensor or deployed module.
+
 ![4D-WAM overview with geometric foundation-model supervision and decision-oriented timestep sampling](/assets/images/4d-wam-overview-paper-figure.png)
 *Fig 1: The deployed backbone jointly predicts video and actions; during training, predicted and ground-truth futures pass through a frozen geometric teacher, whose feature and dense-depth responses send gradients back to the backbone. The lower mask shows why history remains a stable condition while video and action tokens can interact. | source: [4D-WAM](https://arxiv.org/abs/2608.10107)*
+
+[Open figure at full size](/assets/images/4d-wam-overview-paper-figure.png)
 
 The second intervention changes where compute is spent during denoising. A 20-step analysis over 1,000 NAVSIM validation scenes measures each intermediate action against the final action. The mean error drops sharply in the first high-noise steps and reaches a plateau at normalized timestep $\theta=0.90$. 4D-WAM therefore samples the decision region $[0.90,1]$ more often than the refinement region $[0,0.90)$; with a 50% decision-region mass, the sampler uses $s=9.0$. This is a training allocation, not an extra inference module. Agreement with the final action measures when the trajectory stabilizes within this sampler; it does not show that an early or final trajectory is correct.
 
 ![Figure 3 from 4D-WAM: 4D Consistent World Modeling for Autonomous Driving](/assets/images/4d-wam-4d-consistent-world-modeling-for-autonomous-driving-source-figure-3.webp)
 *Fig 2: Early decision phenomenon in WAMs. (a) Both video and action branches finalize driving decisions in an extremely high-noise region. (b) The action-to-final MSE rapidly decreases and plateaus at $\theta = 0.90$, marking the driving decision point that separates the decision and refinement regions. | source: [4D-WAM: 4D Consistent World Modeling for Autonomous Driving](https://arxiv.org/abs/2608.10107)*
+
+[Open figure at full size](/assets/images/4d-wam-4d-consistent-world-modeling-for-autonomous-driving-source-figure-3.webp)
 
 ### What the ablations establish
 

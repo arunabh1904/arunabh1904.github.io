@@ -22,10 +22,14 @@ summary: "2025 – Scaling Laws for Native Multimodal Models"
 
 The early-fusion model linearly projects 14×14 image patches into the text width and feeds them to one transformer; the late-fusion line follows a CLIP-style vision encoder before the decoder. Both are trained from scratch on interleaved, image-caption, and text-only data, with a 1k multimodal context. The reported average validation laws are close: early fusion follows $L\propto C^{-0.0492}$ and late fusion $L\propto C^{-0.0494}$. At small model sizes, however, Figure 3 puts early fusion slightly below late fusion, and the gap narrows as parameter count grows.
 
+The fits use held-out cross-entropy on Obelics interleaved documents, HQITP image-caption pairs, and DCLM text, with causal attention for text tokens and bidirectional attention for image tokens. The downstream ranking is checked separately with 1.5B models pretrained for 300B tokens and then supervised-finetuned on the LLaVA mixture.
+
 The difference is in how the compute budget is spent. Table 2 gives early fusion $N_{\mathrm{opt}}\propto C^{0.526}$ and $D_{\mathrm{opt}}\propto C^{0.468}$ for the average loss, while late fusion uses approximately $N_{\mathrm{opt}}\propto C^{0.636}$ and $D_{\mathrm{opt}}\propto C^{0.462}$. These late-fusion exponents should not be read as a literal parameter/token split that must sum to one: the paper defines its compute as $C\approx6(N_vD_v+ND)$, with $N_v$ and $D_v$ for the separate vision encoder and $N,D$ for the multimodal decoder. The result is that late fusion's compute-optimal decoder is more parameter-heavy, while early fusion benefits more from tokens. Figure 4's matched 16-H100 comparison shows the practical consequence: early fusion trains faster and consumes less memory for the same compute budget.
 
 ![Scaling laws for early fusion, late fusion, and sparse early-fusion MoE models](/assets/images/scaling-laws-for-native-multimodal-models-paper-figure.png)
 *Fig 1: The upper panel compares validation-loss scaling; the lower panel shows how the parameter-to-token trade-off changes with compute for early, late, and sparse early fusion. | source: [Scaling Laws for Native Multimodal Models, Figure 1](https://arxiv.org/abs/2504.07951)*
+
+[Open figure at full size](/assets/images/scaling-laws-for-native-multimodal-models-paper-figure.png)
 
 ### Mixture composition changes which resource is valuable
 
@@ -41,6 +45,8 @@ The routing ablation matters. Modality-aware routing sends image tokens to image
 
 ![Expert token specialization frequency in the first MoE layer](/assets/images/scaling-laws-for-native-multimodal-models-source-figure-12.webp)
 *Fig 2: The source plot shows the fraction of text and image tokens assigned to each expert in layer 0; experts are strongly modality-skewed even though the router was not given modality labels. | source: [Scaling Laws for Native Multimodal Models, Figure 13](https://arxiv.org/abs/2504.07951)*
+
+[Open figure at full size](/assets/images/scaling-laws-for-native-multimodal-models-source-figure-12.webp)
 
 ## High-Level Takeaways
 

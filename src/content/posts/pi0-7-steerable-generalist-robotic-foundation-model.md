@@ -27,6 +27,8 @@ The model is about 5B parameters: a Gemma 3 4B VLM backbone with the MEM-style h
 ![Figure 2 from π0.7 showing the VLA, high-level policy, world model, and prompt context](/assets/images/pi0-7-steerable-generalist-robotic-foundation-model-source-figure-2.webp)
 *Fig 1: π0.7 combines history-aware visual control with subtask language, generated subgoal images, episode metadata, and optional high-level policy or world-model context. | source: [π0.7: A Steerable Generalist Robotic Foundation Model, Figure 2](https://arxiv.org/abs/2604.15483)*
 
+[Open figure at full size](/assets/images/pi0-7-steerable-generalist-robotic-foundation-model-source-figure-2.webp)
+
 Read Fig. 1 as a deployment graph rather than a single transformer block. The high-level policy or a human supplies the next semantic subtask. A lightweight world model, initialized from BAGEL-14B, turns that subtask and the current observation into visual goals. The main VLA then conditions its action expert on the latest context. Those auxiliary models run asynchronously, so they are part of the system’s runtime budget even though they are not inside the low-level action expert.
 
 ### Subgoal images make the desired state visible
@@ -45,6 +47,8 @@ The architecture’s cross-embodiment claim is concrete. The model sees no shirt
 
 ![Figure 5 from π0.7 showing selected long-horizon evaluation tasks](/assets/images/pi0-7-steerable-generalist-robotic-foundation-model-source-figure-5.webp)
 *Fig 2: Selected evaluations contrast a coarse “take out the trash” instruction with step-by-step coaching for an unseen toaster task. | source: [π0.7: A Steerable Generalist Robotic Foundation Model, Figure 5](https://arxiv.org/abs/2604.15483)*
+
+[Open figure at full size](/assets/images/pi0-7-steerable-generalist-robotic-foundation-model-source-figure-5.webp)
 
 Fig. 2 captures the paper’s distinction between direct composition and coached composition. π0.7 follows 3–6 open-ended instructions in 14 scenarios across four unseen kitchens and two unseen bedrooms, and handles unusual referential instructions better than π0.5 and π0.6. On the reverse-fridge task, generated subgoal images are critical because the world model converts an unusual language request into a visual target that breaks the dataset’s usual direction of motion.
 

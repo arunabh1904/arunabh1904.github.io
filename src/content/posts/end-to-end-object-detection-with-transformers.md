@@ -29,6 +29,10 @@ Training makes the set contract explicit. Hungarian matching chooses the permuta
 ![DETR predicts a set of detections in parallel and uses bipartite matching during training.](/assets/images/end-to-end-object-detection-with-transformers-paper-figure.webp)
 *Fig 1: The model turns detection into parallel set prediction, with bipartite matching assigning predictions to ground-truth boxes. | source: [End-to-End Object Detection with Transformers, Figure 1](https://arxiv.org/abs/2005.12872)*
 
+[open full-size figure](/assets/images/end-to-end-object-detection-with-transformers-paper-figure.webp)
+
+The canonical comparison uses a ResNet-50 backbone and a six-layer encoder plus six-layer decoder with width 256 and eight attention heads. It trains on COCO 2017's 118k images and evaluates on 5k validation images with 100 learned query slots. The baseline ablations use a 300-epoch schedule, while the long Faster R-CNN comparison uses 500 epochs; that schedule difference is part of the convergence claim.
+
 This is why NMS is absent from the model definition. Duplicate suppression is learned through the matching loss and decoder self-attention. The queries are not fixed semantic labels: they are exchangeable slots whose meanings emerge from the training distribution.
 
 ### Global context shifts the AP profile toward large objects
@@ -50,12 +54,16 @@ The encoder ablation gives a more causal explanation than the headline AP. With 
 ![Each decoder slot develops modes for locations and box sizes across the COCO validation set.](/assets/images/end-to-end-object-detection-with-transformers-source-figure-7.webp)
 *Fig 2: Across images, the 20 shown query slots specialize in different center locations and box-size modes, including a common image-wide-box mode. | source: [End-to-End Object Detection with Transformers, Figure 7](https://arxiv.org/abs/2005.12872)*
 
+[open full-size figure](/assets/images/end-to-end-object-detection-with-transformers-source-figure-7.webp)
+
 ### Fixed slots remove heuristics but expose resolution limits
 
 A fixed query budget bounds how many objects can be represented, and convergence is sensitive to the optimizer, schedule, augmentation, and encoder resolution. The paper's evidence is 2D COCO detection; a learned query has no metric position or camera calibration. The panoptic extension shows that the set can feed a shared mask head, but it does not make the original detector a 3D or autonomous-driving system.
 
 ![DETR-R101 produces aligned masks for things and stuff with a small panoptic head.](/assets/images/end-to-end-object-detection-with-transformers-source-figure-9.webp)
 *Fig 3: DETR-R101's panoptic head produces unified qualitative predictions for object and stuff regions. | source: [End-to-End Object Detection with Transformers, Figure 9](https://arxiv.org/abs/2005.12872)*
+
+[open full-size figure](/assets/images/end-to-end-object-detection-with-transformers-source-figure-9.webp)
 
 ## High-Level Takeaways
 

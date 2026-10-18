@@ -27,6 +27,8 @@ A camera patch can contain several objects at different depths, while a LiDAR vo
 ![UniM²AE source Figure 1: image-plane alignment versus unified 3D interaction](/assets/images/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation-source-figure-1.webp)
 *Fig 1: The source comparison shows why UniM²AE aligns features in a 3D volume rather than forcing masked camera and LiDAR inputs to share an image-plane layout. | source: [UniM²AE, Figure 1](https://arxiv.org/abs/2308.10421)*
 
+[Open the full-size source figure](/assets/images/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation-source-figure-1.webp)
+
 The shared volume can then be mapped back to each modality. After interaction, the fused volume is sampled at masked LiDAR voxel positions and projected to the corresponding camera coordinates. That gives each modality a decoder target in its native space while allowing the encoder to borrow information from the other sensor. The shared object is therefore geometric enough for correspondence and detailed enough for reconstruction.
 
 ### Mask each stream, then exchange evidence in the volume
@@ -36,11 +38,13 @@ The camera branch splits six views into patches; the LiDAR branch voxelizes the 
 ![UniM²AE source Figure 2: masked token branches, 3D interaction, and native reconstruction decoders](/assets/images/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation-source-figure-2.webp)
 *Fig 2: Masked camera patches and LiDAR voxels meet in the height-preserving volume, exchange information through MMIM, and return to their original modalities for reconstruction. | source: [UniM²AE, Figure 2](https://arxiv.org/abs/2308.10421)*
 
-The pretraining setup covers a perception-sized region of 100×100 m in x and y and -5 to 3 m in z, with 0.5×0.5×4 m voxels. The models train for 200 epochs on eight GPUs with a base learning rate of 2.5e-5. The LiDAR decoder reconstructs point content with Chamfer distance and predicts empty voxels with binary cross-entropy; the camera decoder uses pixel MSE. The reconstruction heads disappear during downstream fine-tuning.
+[Open the full-size source figure](/assets/images/unim2ae-multimodal-masked-autoencoders-with-unified-3d-representation-source-figure-2.webp)
+
+The pretraining setup covers a perception-sized region of 100×100 m in x and y and -5 to 3 m in z, with 0.5×0.5×4 m voxels. The models train for 200 epochs. The LiDAR decoder reconstructs point content with Chamfer distance and predicts empty voxels with binary cross-entropy; the camera decoder uses pixel MSE. The reconstruction heads disappear during downstream fine-tuning.
 
 ### The strongest evidence is data efficiency plus the interaction ablation
 
-UniM²AE is evaluated on nuScenes for 3D detection and BEV map segmentation. For data efficiency, the authors fine-tune with 20%, 40%, 60%, 80%, or 100% of the labeled data. At 20% labeled camera-LiDAR data, random initialization reaches 51.5 mAP/50.9 NDS, while UniM²AE reaches 55.9/52.8. The comparison is not only a full-data leaderboard: it tests whether the pretraining signal helps when labels are scarce.
+UniM²AE is evaluated on nuScenes for 3D detection and BEV map segmentation, using the paper's 700/150/150 train/validation/test split. For data efficiency, the authors fine-tune with 20%, 40%, 60%, 80%, or 100% of the labeled data. At 20% labeled camera-LiDAR data, random initialization reaches 51.5 mAP/50.9 NDS, while UniM²AE reaches 55.9/52.8. The comparison is not only a full-data leaderboard: it tests whether the pretraining signal helps when labels are scarce.
 
 The downstream full-data table uses SST-based variants and reports a protocol detail that changes the interpretation. BEVFusion-SST reaches 68.2 mAP/71.5 NDS; the plain UniM²AE row reaches 68.4/71.9, while the daggered row fine-tuned with the pre-trained MMIM reaches 69.7/72.7. The latter is the source of the paper's 1.5 mAP and 1.2 NDS improvement. For BEV map segmentation, UniM²AE improves BEVFusion-SST by 6.5 mIoU and beats X-Align by 2.1 in the reported setup.
 

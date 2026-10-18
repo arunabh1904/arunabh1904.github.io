@@ -24,6 +24,8 @@ summary: '2023 – BLIP-2: Bootstrapping Language-Image Pre-training with Frozen
 ![Figure 1 from BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models](/assets/images/blip-2-bootstrapping-language-image-pretraining-source-figure-1.webp)
 *Fig 1: Overview of BLIP-2’s framework: a two-stage Q-Former bridges a frozen image encoder and a frozen large language model. | source: [BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models, Figure 1](https://arxiv.org/abs/2301.12597)*
 
+[Open figure at full size](/assets/images/blip-2-bootstrapping-language-image-pretraining-source-figure-1.webp)
+
 The left half of the figure is a compression problem. The frozen image encoder may emit hundreds of patch features, but the Q-Former always returns the same 32 query vectors. The right half is an interface problem: a fully connected layer maps those vectors into the frozen LLM's embedding space, where they act as soft visual prompts. The LLM never needs to update its text weights to accept an image, and the bridge never has to expose every patch token to the decoder.
 
 The fixed interface is also the main inductive bias. If a visual detail is not selected by the queries, the frozen language model cannot recover it later from the raw image. A stronger encoder can improve the evidence available to the queries, while a stronger LLM can improve how that evidence is verbalized; neither removes the information bottleneck.
@@ -40,8 +42,10 @@ The first stage jointly optimizes three objectives over image-text pairs:
 
 The three masks are the important detail. ITC prevents leakage, ITM lets the two modalities interact to judge a pair, and ITG makes the queries carry everything the decoder will need. Representation pretraining is therefore not a warm-up added for convenience; it establishes what information the fixed visual interface is expected to preserve.
 
-![Figure 2: Effect of vision-language representation learning on vision-to-language generative learning](/assets/images/blip-2-bootstrapping-language-image-pretraining-source-figure-5.webp)
-*Fig 2: Zero-shot VQAv2 accuracy for ViT-g/OPT-6.7B with and without first-stage representation learning; removing that stage causes the score to collapse during generative training. | source: [BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models, Figure 5](https://arxiv.org/abs/2301.12597)*
+![Figure 2: Left panel of the source Figure 5, showing the effect of vision-language representation learning on vision-to-language generative learning](/assets/images/blip-2-bootstrapping-language-image-pretraining-source-figure-5-left-crop.png)
+*Fig 2: Left panel of source Figure 5: zero-shot VQAv2 accuracy for ViT-g/OPT-6.7B with and without first-stage representation learning; removing that stage causes the score to collapse during generative training. | source: [BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models, Figure 5](https://arxiv.org/abs/2301.12597)*
+
+[Open figure at full size](/assets/images/blip-2-bootstrapping-language-image-pretraining-source-figure-5-left-crop.png)
 
 The plot gives the clearest evidence for the two-stage design. With representation learning, the red curve stays around the mid-50s as generative training proceeds. Without it, the blue curve falls from roughly 29 at 16k iterations to roughly 15 by 48k and never recovers. The OPT weights are frozen; the changing behavior comes from the trainable Q-Former and projection learning visual prompts that no longer preserve the earlier visual alignment. The first stage prevents the second stage from becoming a fragile attempt to discover the modality bridge through language loss alone.
 

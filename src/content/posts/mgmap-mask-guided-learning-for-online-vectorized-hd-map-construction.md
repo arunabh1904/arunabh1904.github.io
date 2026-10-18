@@ -27,6 +27,8 @@ MGMap first builds enhanced multi-scale BEV features with a pyramid of residual 
 ![MGMap's BEV feature pyramid, mask-activated queries, and local patch refinement](/assets/images/mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction-paper-figure.png)
 *Fig 1: The middle panel uses a whole-instance mask to initialize shape-aware queries. The right panel returns to neighborhoods around predicted points, allowing local geometry to correct a broadly plausible shape. | source: [MGMap, Figure 2](https://arxiv.org/abs/2404.00876)*
 
+[open full-size figure](/assets/images/mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction-paper-figure.png)
+
 The instance masks receive bipartite-matched raster supervision during training. A deformable transformer still performs the main coordinate decoding; masks do not replace the vector output with a segmentation map. They change the evidence carried into that decoder.
 
 ### Local mask patches provide a second chance to locate a boundary
@@ -37,6 +39,8 @@ This creates a useful hierarchy of questions. The instance mask asks which pixel
 
 ![A mask preserves a local road-boundary bend that a sparse decoder smooths away](/assets/images/mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction-source-figure-1.webp)
 *Fig 2: Compare the highlighted green boundary with ground truth: the mask-guided version preserves the local change in direction. The example connects a missed image detail to a specific error in the vector map. | source: [MGMap, Figure 1](https://arxiv.org/abs/2404.00876)*
+
+[open full-size figure](/assets/images/mgmap-mask-guided-learning-for-online-vectorized-hd-map-construction-source-figure-1.webp)
 
 The standard output uses at most 50 instances with 20 points per instance on a 200×100 BEV grid. The paper evaluates dividers, road boundaries, and pedestrian crossings. It does not predict directed lane connectivity merely by producing these vectors.
 

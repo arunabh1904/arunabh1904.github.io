@@ -27,6 +27,8 @@ BEVFusion concatenates camera and LiDAR BEV features after their branches have b
 ![MetaBEV source Figure 3: feature encoders, BEV-Evolving decoder, and task heads](/assets/images/metabev-paper-figure-3.png)
 *Fig 1: MetaBEV starts with modality-specific BEV features, then updates dense meta-BEV queries through available sensor features before sending the result to detection or segmentation heads. | source: [MetaBEV, Figure 3](https://arxiv.org/abs/2304.09801)*
 
+[Open figure at full resolution](/assets/images/metabev-paper-figure-3.png)
+
 The distinction is more than “attention is stronger than convolution.” A missing modality changes the set of values supplied to a query, rather than requiring a placeholder feature map to pass through a fixed element-wise operation. The query state becomes the stable interface; the available evidence becomes conditional input.
 
 ### Train the failure mode and measure the failure mode
@@ -51,8 +53,12 @@ MetaBEV also targets joint 3D detection and map segmentation. The M²oE design r
 
 The corruption study also gives the architectural claim a stronger boundary than a single missing-sensor table. With 66.6% of LiDAR points removed, MetaBEV reports 55% NDS, 11.7 points above the competitor. In zero-shot corruption tests it beats BEVFusion on 11 of 12 cases; in-domain training improves both methods, with MetaBEV retaining the advantage. These are simulated patterns with known masks and degrees. They do not cover a camera with drifting calibration, a LiDAR with biased range, or a failure that is present but semantically wrong.
 
+For the multitask table, the segmentation head starts from the multimodal detection checkpoint and is fine-tuned for another 10 epochs. The appendix also reports that extending switched-modality segmentation from 8 to 20 epochs raises the missing-LiDAR and missing-camera mIoU from 54.4/53.7 to 63.4/58.3, so the main table’s shorter fallback schedule is a measured training-budget choice.
+
 ![MetaBEV source Figure 5: map segmentation under camera blur, weather, and digital corruption](/assets/images/metabev-solving-sensor-failures-for-bev-perception-source-figure-5.webp)
 *Fig 2: The corruption sweep compares map mIoU and retention across blur, weather, and digital camera failures, making the zero-shot robustness claim concrete. | source: [MetaBEV, Figure 5](https://arxiv.org/abs/2304.09801)*
+
+[Open figure at full resolution](/assets/images/metabev-solving-sensor-failures-for-bev-perception-source-figure-5.webp)
 
 ## High-Level Takeaways
 

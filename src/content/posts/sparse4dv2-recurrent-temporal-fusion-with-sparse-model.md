@@ -28,6 +28,8 @@ An instance contains three different objects: a structured 3D box, an appearance
 ![Sparse4D v2 propagates instance features through time](/assets/images/sparse4dv2-recurrent-temporal-fusion-with-sparse-model-source-figure-1.webp)
 *Fig 1: In the recurrent panel, each frame samples its own image evidence and combines it with the carried instance feature. Earlier observations survive through that feature rather than through an expanding image-feature queue. | source: [Sparse4D v2, Figure 1b](https://arxiv.org/abs/2305.14018)*
 
+[Open the full-size source figure](/assets/images/sparse4dv2-recurrent-temporal-fusion-with-sparse-model-source-figure-1.webp)
+
 This separation is useful because geometry has an explicit transformation rule while an arbitrary semantic vector does not. The model need not learn ego-motion compensation by rotating hidden features. It updates the physical state, re-encodes that state, and lets attention decide which historical content remains useful. Recurrence can carry information from many previous frames, but a fixed state cannot preserve every observation losslessly, and confidence-based selection can drop an object.
 
 The decoder reserves capacity for new arrivals. A single-frame layer first evaluates 900 current-frame hypotheses, then contributes its best 300 to five temporal layers alongside 600 propagated instances. The total stays at 900 rather than growing whenever memory is added. In the paired ablation without camera-parameter encoding, keeping this proposal layer raises mAP/NDS from 38.4/50.4 to 41.9/52.4. The benefit comes from letting new objects compete before historical hypotheses occupy most of the capacity.
@@ -38,6 +40,8 @@ Sparse sampling sounds inexpensive, but a straightforward implementation materia
 
 ![Sparse4D v2 combines fresh proposals with propagated instances](/assets/images/sparse4dv2-recurrent-temporal-fusion-with-sparse-model-paper-figure.webp)
 *Fig 2: One current-frame layer supplies fresh hypotheses, while five subsequent layers combine them with projected historical instances through temporal cross-attention, self-attention, and image sampling. Anchor count stays fixed across the transition. | source: [Sparse4D v2, Figure 2](https://arxiv.org/abs/2305.14018)*
+
+[Open the full-size source figure](/assets/images/sparse4dv2-recurrent-temporal-fusion-with-sparse-model-paper-figure.webp)
 
 On RTX 3090 with ResNet-50 and 256×704 images, the operator ablation gives:
 
@@ -58,6 +62,8 @@ In v1, aggregation weights are predicted without explicitly encoding camera para
 V2 also replaces v1's instance-level depth-reweight module with multi-scale dense depth supervision from LiDAR points during training. A small per-scale depth head predicts depth at an equivalent focal length and rescales it for the actual camera; those heads are inactive at inference. The resulting model remains camera-only at deployment, but its training requirements differ from v1's 3D-box-center depth targets.
 
 Removing this supervision drops the displayed mAP/NDS from 43.9/53.9 to 35.4/43.5. The authors mark the latter run as unstable, with gradient collapse under the revised ImageNet initialization and augmentation recipe. That is evidence that depth targets stabilize this training setup, not an equal-convergence estimate of a universal 8.5-point benefit. The full paper also trains for 100 epochs, so comparing its strongest model with v1 does not isolate recurrence alone.
+
+Across the benchmark, the paper uses the 700/150/150 nuScenes split and six views sampled at 2 Hz; all runs train for 100 epochs without CBGS. The ablations fix ResNet-50 with ImageNet-1K initialization at 256×704, which keeps the camera-conditioning and depth-supervision comparisons on a common recipe.
 
 ### The speed comparison changes with resolution and initialization
 

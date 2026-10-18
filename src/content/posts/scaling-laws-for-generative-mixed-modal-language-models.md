@@ -41,6 +41,8 @@ The source Figure 5 plots $0.5(L_{\text{Text}}+L_{\text{Speech}})/L_{\text{Speec
 ![Source Figure 5: Speech-text competition ratio across model sizes and training updates](/assets/images/scaling-laws-for-generative-mixed-modal-language-models-source-figure-5.png)
 *Fig 1: The source plot makes the scale transition visible: 350M and 2.7B remain above the dashed competition barrier, while 30B crosses it late in training. | source: [Scaling Laws for Generative Mixed-Modal Language Models, Figure 5](https://arxiv.org/abs/2301.03728)*
 
+[Open figure at full size](/assets/images/scaling-laws-for-generative-mixed-modal-language-models-source-figure-5.png)
+
 ### Competition appears in the training dynamics
 
 The average perplexity can decrease smoothly while one submodality stops improving. In the source Figure 6, speech perplexity in a 2.7B Speech|Text run flattens for roughly 15,000 updates before improving again. Across 6.7B runs, the fraction of non-text loss in a flat regime correlates with the fitted interaction parameter $\alpha_{i,j}$, while the authors find no analogous correlation with $\beta_{i,j}$. Their interpretation is coordinate-ascent-like optimization: shared capacity temporarily serves one modality more effectively, then the balance shifts.
@@ -49,6 +51,8 @@ The other correlations are similarly operational. The mixed-modality optimal bat
 
 ![Speech-token perplexity flattening during a mixed-modal run](/assets/images/scaling-laws-for-generative-mixed-modal-language-models-source-figure-6.webp)
 *Fig 2: Speech-token perplexity in the 2.7B Speech|Text run flattens for the shaded region, roughly 15,000 updates, even though the mixed training process continues. | source: [Scaling Laws for Generative Mixed-Modal Language Models, Figure 6](https://arxiv.org/abs/2301.03728)*
+
+[Open figure at full size](/assets/images/scaling-laws-for-generative-mixed-modal-language-models-source-figure-6.webp)
 
 ## High-Level Takeaways
 

@@ -23,14 +23,18 @@ summary: '2024 – DriveWorld: pretrain persistent dynamic and static scene stat
 
 The Memory State-Space Model (MSSM) has two complementary paths. The Dynamic Memory Bank stores a history of BEV features and updates the latent state from past actions. Motion-aware layer normalization injects object velocity and the relative time interval into this update, giving the model a way to distinguish a moving car from a static curb. Static Scene Propagation takes a BEV feature from another frame, transforms it into a static latent, and combines it with the dynamic state. The authors deliberately avoid asking one recurrent vector to remember both regimes.
 
-That division is visible in the paper's ablation. Adding static propagation helps detection; adding the dynamic memory is especially useful for tracking but can initially spread context that hurts precise localization. Motion-aware normalization then improves the perception metrics, and a task prompt helps each decoder read the shared state differently. The mechanism is more informative than the final score: temporal memory is not automatically useful until the model is told which information should move and which should remain anchored.
+That division is visible in the paper's ablation. An RSSM baseline reaches 0.381 mAP/0.494 NDS; adding static propagation raises it to 0.429/0.528, while adding the dynamic memory moves it to 0.425/0.524. Motion-aware normalization and the task prompt then recover 0.432/0.531 and 0.436/0.534. Dynamic memory helps tracking but can initially spread context that hurts precise localization, so the later controls are what make the broad temporal state useful for precise detection. The mechanism is more informative than the final score: temporal memory is not automatically useful until the model is told which information should move and which should remain anchored.
 
 ![DriveWorld's overall 4D pretraining and downstream prediction framework](/assets/images/driveworld-4d-pretrained-scene-understanding-paper-figure.webp)
 *Fig 1: DriveWorld separates Static Scene Propagation from a Dynamic Memory Bank, then decodes occupancy and actions for current and future frames. | source: [DriveWorld, Figure 2](https://arxiv.org/abs/2405.04390)*
 
+[Open the full-size source figure](/assets/images/driveworld-4d-pretrained-scene-understanding-paper-figure.webp)
+
 ### Train a rollout, then ask different heads to read it
 
 During pretraining, a posterior sees the current images and actions to infer a stochastic state, while a prior predicts that state from history and previous actions. A KL term aligns them so the model can later roll forward without access to future observations. Cross-entropy reconstructs current and future 3D occupancy; an L1 loss reconstructs actions. The OpenScene setting adds an L2 occupancy-flow loss. A text encoder turns prompts such as “predict the 3D occupancy of the current scene” or “plan with current and future scenes” into conditioning features before each task head.
+
+The supplementary dataset description puts the scale in context: OpenScene spans more than 120 hours across Boston, Pittsburgh, Las Vegas, and Singapore, and supplies semantic occupancy plus flow. The OpenScene transfer numbers therefore combine the 4D objective with a larger, flow-labeled pretraining corpus.
 
 The reported downstream transfer is broad:
 
@@ -46,6 +50,8 @@ The table mixes task-specific baselines, so the source-reported percentage-point
 
 ![DriveWorld's qualitative current and future occupancy predictions](/assets/images/driveworld-4d-pretrained-scene-understanding-source-figure-7.webp)
 *Fig 2: Qualitative predictions reconstruct the current scene and forecast 2 seconds into the future. | source: [DriveWorld, Figure 7](https://arxiv.org/abs/2405.04390)*
+
+[Open the full-size source figure](/assets/images/driveworld-4d-pretrained-scene-understanding-source-figure-7.webp)
 
 ### What the result does and does not establish
 

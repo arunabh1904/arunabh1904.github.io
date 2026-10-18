@@ -45,12 +45,16 @@ CLIP’s symmetric softmax loss must normalize each image against every text and
 ![Cross-device SigLIP loss computation accumulates independent pair losses without materializing one global softmax](/assets/images/sigmoid-loss-for-language-image-pre-training-siglip-paper-figure.png)
 *Fig 1: Three devices circulate embedding chunks to evaluate a global batch of twelve. The highlighted 4 × 4 block is the similarity matrix currently held in memory; successive blocks contribute to the same global objective. | source: [SigLIP, Figure 1](https://arxiv.org/abs/2303.15343)*
 
+[Open figure at full size](/assets/images/sigmoid-loss-for-language-image-pre-training-siglip-paper-figure.png)
+
 Figure 1 is best read as a memory diagram. Each device begins with four image and four text embeddings and evaluates its local 4 × 4 block. It then swaps text chunks, computes the next block, and accumulates the pair losses. After every text chunk has visited every image chunk, a cross-device sum completes the objective. The largest live similarity block stays 4 × 4 in this toy setup, rather than becoming one global 12 × 12 matrix. The loss is still pairwise across the global batch; the implementation changes how that work is scheduled.
 
 ### Batch size is useful until it is not
 
 ![Figure 2 from SigLIP showing batch-size effects for SigLiT, SigLIP, and mSigLIP](/assets/images/sigmoid-loss-for-language-image-pre-training-siglip-source-figure-2.png)
 *Fig 2: Batch-size ablations for SigLiT (18B examples), SigLIP (9B), and mSigLIP (30B). Sigmoid helps at smaller batches, both objectives plateau near 32k, and multilingual scaling beyond 32k hurts XM3600 retrieval. | source: [SigLIP, Figure 2](https://arxiv.org/abs/2303.15343)*
+
+[Open figure at full size](/assets/images/sigmoid-loss-for-language-image-pre-training-siglip-source-figure-2.png)
 
 Figure 2 separates three regimes. In locked-image tuning (SigLiT), sigmoid is clearly ahead below roughly 16k examples per batch; as the batch grows, the softmax gap closes. In from-scratch SigLIP, both objectives flatten around 32k, and a 307k batch hurts both. In multilingual mSigLIP, the same 32k plateau appears even though the data cover more than 100 languages. A larger batch can put more languages or harder negatives together, but the paper does not observe a reliable gain beyond that point. The practical conclusion is a resource target: 32k is a strong default, not a lower bound on useful scale.
 

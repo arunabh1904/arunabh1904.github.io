@@ -30,7 +30,9 @@ Where does the teacher enter this computation? Source Figure S1 separates the or
 ![ViRA source Figure S1: a frozen vision foundation model supervises spatial dependency and scene semantic alignment during planner training](/assets/images/vira-source-figure-s1.jpg)
 *Fig 1: Spatial and scene-level losses transfer a frozen teacher's representation into the planner encoder. The teacher and alignment heads are removed at inference. | source: [ViRA, Figure S1](https://arxiv.org/abs/2610.09695)*
 
-Figure reproduced without modification under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). [Open the full-size figure](/assets/images/vira-source-figure-s1.jpg).
+Figure reproduced without modification under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+[Open the full-size figure](/assets/images/vira-source-figure-s1.jpg)
 
 ### Align relationships at two scales
 
@@ -75,7 +77,9 @@ Source Figure 6 connects the planning gains to BEV perception quality. Its gain 
 ![ViRA source Figure 6: BEV segmentation quality and EPDMS gains across teacher choices, with and without auxiliary perception supervision](/assets/images/vira-source-figure-6.jpg)
 *Fig 2: Teacher comparisons change when detection and segmentation supervision is removed. Planning gains use separate baselines of 83.6 with auxiliary tasks and 82.6 without them. | source: [ViRA, Figure 6](https://arxiv.org/abs/2610.09695)*
 
-Figure reproduced without modification under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). [Open the full-size figure](/assets/images/vira-source-figure-6.jpg).
+Figure reproduced without modification under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+[Open the full-size figure](/assets/images/vira-source-figure-6.jpg)
 
 The result narrows the title's question. “Better representation” cannot be ranked independently of the planner's losses. A teacher can supply information that auxiliary tasks already teach, or supply information they miss. A randomly initialized teacher lowers TransFuser from 83.6 to 82.0 EPDMS and reduces BEV mIoU from 36.4 to 30.7. This control supports transfer of learned visual information over a generic benefit from adding regularization.
 

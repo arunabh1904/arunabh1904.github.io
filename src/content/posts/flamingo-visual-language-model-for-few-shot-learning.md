@@ -28,6 +28,8 @@ The fixed output count controls the cost of the later text-to-vision attention. 
 ![Flamingo's frozen encoders, trainable resamplers, and interleaved visual-text sequence](/assets/images/flamingo-source-figure-3-resampler.png)
 *Fig 1: Each visual input is encoded and resampled before entering newly trained blocks among the frozen language-model layers. The text stream retains the positions of the image markers. | source: [Paper, Figure 3](https://arxiv.org/abs/2204.14198)*
 
+[Open figure at full size](/assets/images/flamingo-source-figure-3-resampler.png)
+
 In Figure 1, follow the dog and cat through the separate visual paths, then look at the text sequence on the right. The first image and its description provide an example of the desired behavior; the second image is the query. At inference, changing that demonstration changes the task context without updating weights. The resampler does not itself perform few-shot learning: that behavior depends on the language model using the interleaved sequence and the training mixture having taught it how such sequences work.
 
 ### Start the added visual pathway at zero contribution
@@ -36,6 +38,8 @@ Flamingo inserts cross-attention and feed-forward blocks among the pretrained la
 
 ![Flamingo's gated cross-attention and feed-forward additions to a frozen language block](/assets/images/flamingo-source-figure-4-gated-attention.png)
 *Fig 2: Purple modules add trainable visual conditioning; blue modules retain the pretrained language computation. Zero-initialized tanh gates initially suppress the added residual contributions. | source: [Paper, Figure 4](https://arxiv.org/abs/2204.14198)*
+
+[Open figure at full size](/assets/images/flamingo-source-figure-4-gated-attention.png)
 
 Read Figure 2 from the bottom up. The visual branch can compute an attention result, but at initialization its gate contributes zero to the language state. The original pretrained computation is therefore preserved before the new pathway has learned anything useful. As training opens the gates, visual information can influence the frozen language layers. Freezing weights does not freeze their activations: the same language parameters process increasingly visual-conditioned inputs.
 
@@ -50,6 +54,8 @@ This makes the repeated unit manageable: read one visual input, incorporate it i
 ### Interleaved training data teaches the structure of the eventual prompt
 
 The training mixture combines approximately 43 million M3W webpages, 1.8 billion ALIGN image-text pairs, 312 million LTIP image-text pairs, and 27 million VTP video-text pairs. M3W preserves the placement of images among text, using document structure to construct the sequence. Paired caption datasets provide broad visual-language coverage, while interleaved webpages supply examples of repeatedly moving between visual and textual context.
+
+Training minimizes a weighted sum of per-dataset next-token likelihoods and accumulates gradients across datasets; the authors find this better than round-robin updates. The mixture weights are therefore part of the training method, not just a data inventory. In the M3W stream, a sampled 256-token document subsequence includes at most five images, so the 32-shot evaluation result tests length generalization in addition to visual prompting.
 
 Removing M3W drops the short-run ablation score from 70.7 to 53.4, compared with 60.9 after removing paired image-text data. Both sources matter. The comparison is not a pure experiment on interleaving with data volume and content held fixed: removing a dataset also changes the training distribution and work performed per update. Still, the large loss from removing M3W supports the paper's central connection between training-sequence structure and multimodal prompting.
 

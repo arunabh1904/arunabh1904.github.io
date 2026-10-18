@@ -34,10 +34,14 @@ For two augmented views, the student receives block-masked patches and the teach
 ![iBOT combines cross-view class-token distillation with in-view masked patch-token distillation.](/assets/images/ibot-image-bert-pre-training-online-tokenizer-paper-figure.png)
 *Fig 1: The student is masked while the momentum teacher supplies class-token and patch-token targets; the two losses are cross-view semantic alignment and in-view masked prediction. | source: [iBOT, Figure 3](https://arxiv.org/abs/2111.07832)*
 
+[Open figure at full resolution](/assets/images/ibot-image-bert-pre-training-online-tokenizer-paper-figure.png)
+
 The online target addresses two limitations of earlier masked modeling. Pixel reconstruction spends capacity on color and texture detail, while a frozen discrete tokenizer imports a vocabulary trained with another architecture and dataset. iBOT instead lets the target representation become more semantic through class-token self-distillation. The projection heads for class and patch tokens share parameters, allowing that global semantic signal to shape the patch-token space. The target remains a distribution rather than a hard token id, which preserves ambiguity in image patches.
 
 ![Masked image modeling uses a visual tokenizer to provide targets for the student's hidden patches.](/assets/images/ibot-image-bert-pre-training-with-online-tokenizer-source-figure-2.webp)
 *Fig 2: Masked patches are predicted from a tokenizer's visual token distributions rather than from raw pixels. | source: [iBOT, Figure 2](https://arxiv.org/abs/2111.07832)*
+
+[Open figure at full resolution](/assets/images/ibot-image-bert-pre-training-with-online-tokenizer-source-figure-2.webp)
 
 ### Soft patch targets support both classification and dense transfer
 
@@ -55,6 +59,8 @@ The dense transfer result supports the patch-level claim. With Cascade Mask R-CN
 
 ![Linear probing accuracy rises with iBOT model size in the paper's ImageNet comparison.](/assets/images/ibot-image-bert-pre-training-with-online-tokenizer-source-figure-1.webp)
 *Fig 3: ImageNet linear accuracy versus parameter count for iBOT and other self-supervised baselines. | source: [iBOT, Figure 1](https://arxiv.org/abs/2111.07832)*
+
+[Open figure at full resolution](/assets/images/ibot-image-bert-pre-training-with-online-tokenizer-source-figure-1.webp)
 
 ### The tokenizer depends on a moving teacher and a matched protocol
 

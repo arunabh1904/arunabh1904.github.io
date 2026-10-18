@@ -30,10 +30,16 @@ The motivation is visible before the method is. LVIS has roughly 1,200 detection
 ![Detic comparison of category coverage across detection, classification, and caption datasets](/assets/images/detic-paper-figure-1.png)
 *Fig 1: LVIS has far fewer images per category than ImageNet and Conceptual Captions, motivating image-level supervision for vocabulary expansion. | source: [Detic, Figure 1](https://arxiv.org/abs/2201.02605)*
 
+[Open figure at full size](/assets/images/detic-paper-figure-1.png)
+
 Detic therefore keeps localization and classification on separate diets. Images with boxes use the ordinary RPN, box-regression, and classification losses. An image-labeled example updates only the classifier: the method chooses the largest proposal and applies the image label to that feature. This choice is deliberately boring. Prediction-based weak supervision tries to select a proposal whose current class score is high, creating a chicken-and-egg loop: a weak detector makes a bad assignment, then learns from that bad assignment. The max-size proposal is more likely to cover the main object, and it tends to remain the same as the detector changes during training.
+
+The experiment is also staged rather than a single unconstrained mixture. Detection and image-labeled batches are sampled in a 1:1 ratio; the authors first train a converged base-class detector for a 4× schedule, then fine-tune it for another 4× schedule with the image-level data. ImageNet and Conceptual Captions inputs use 320×320 crops while detection inputs use the larger detection resolution. The reported gains therefore include both the max-size objective and this controlled co-training recipe.
 
 ![Detic assigned boxes during training](/assets/images/detic-detecting-twenty-thousand-classes-using-image-level-supervision-source-figure-4.webp)
 *Fig 2: Prediction-based training jumps between blue candidate boxes and can select a region that misses the object; Detic's red max-size assignment is more stable and usually covers it. On an annotated IN-L subset, max-size covered 92.8% of target objects versus 69.0% for the prediction-based method. | source: [Detic, Figure 4](https://arxiv.org/abs/2201.02605)*
+
+[Open figure at full size](/assets/images/detic-detecting-twenty-thousand-classes-using-image-level-supervision-source-figure-4.webp)
 
 ### Stable weak assignments outperform predicted ones
 
@@ -47,6 +53,8 @@ The large-vocabulary experiment makes the boundary clear. The Swin-B model uses 
 
 ![Detic 21K-class qualitative detections](/assets/images/detic-detecting-twenty-thousand-classes-using-image-level-supervision-source-figure-5.webp)
 *Fig 3: Qualitative 21K-class predictions on OpenImages and Objects365; purple labels are LVIS classes and green labels are novel classes. The examples show vocabulary transfer, not a claim that image labels supply precise boxes. | source: [Detic, Figure 5](https://arxiv.org/abs/2201.02605)*
+
+[Open figure at full size](/assets/images/detic-detecting-twenty-thousand-classes-using-image-level-supervision-source-figure-5.webp)
 
 ## High-Level Takeaways
 

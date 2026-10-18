@@ -26,10 +26,14 @@ The paper separates the policy that can afford to reason about futures from the 
 
 The world-model choice follows the benchmark. On nuScenes, WPT uses Drive-OccWorld, an occupancy model that predicts future 4D occupancy. On Bench2Drive, it uses an instance-based model that forecasts future agent states and lane topology. This is a practical design rather than one universal simulator: the teacher sees future structure in the representation available for each dataset.
 
+The policy rows in the paper are camera-input models; the nuScenes boxes and 4D occupancy or agent-and-lane forecasts are annotations and training-time world-model signals rather than extra student sensors. Drive-OccWorld is frozen for the 12-epoch nuScenes run, and the instance-based Bench2Drive setup runs for 6 epochs.
+
 ![WPT framework showing teacher and student policies interacting with a world model during training](/assets/images/wpt-world-to-policy-transfer-via-online-world-model-distillation-paper-figure.webp)
 *Fig 1: During training, a world model rolls out candidate futures and a reward model selects the teacher trajectory; query and reward distillation then train a world-model-free student. | source: [WPT: World-to-Policy Transfer via Online World Model Distillation, Figure 2](https://arxiv.org/abs/2511.20095)*
 
-Follow Fig. 1 from the teacher branch to the student branch. The teacher’s planning queries are aligned with the student’s queries using `L_policy = ||Q_S − Q_T||₂`. The teacher’s best trajectory `τ_T*` is selected by its final reward, and the student is trained to match that score with `L_reward = ||r_final(τ_S) − r_final(τ_T*)||₂`. The student is therefore asked to reproduce both a useful internal plan and the world-model-informed preference over trajectories. After training, the world model, teacher, and reward model leave the inference path.
+[Open figure at full size](/assets/images/wpt-world-to-policy-transfer-via-online-world-model-distillation-paper-figure.webp)
+
+Follow Fig. 1 from the teacher branch to the student branch. The teacher’s planning queries are aligned with the student’s queries using $L_{\mathrm{policy}} = \lVert Q_S - Q_T\rVert_2$. The teacher’s best trajectory $\tau_T^*$ is selected by its final reward, and the student is trained to match that score with $L_{\mathrm{reward}} = \lVert r_{\mathrm{final}}(\tau_S) - r_{\mathrm{final}}(\tau_T^*)\rVert_2$. The student is therefore asked to reproduce both a useful internal plan and the world-model-informed preference over trajectories. After training, the world model, teacher, and reward model leave the inference path.
 
 ### Turn future interaction into inspectable rewards
 
@@ -37,6 +41,8 @@ WPT combines an imitation reward with five simulation signals: no collision (NC)
 
 ![Figure 1 from WPT comparing training paradigms for autonomous-driving policies](/assets/images/wpt-world-to-policy-transfer-via-online-world-model-distillation-source-figure-1.webp)
 *Fig 2: The paper contrasts imitation learning, runtime world-model policies, simulator-based reinforcement learning, and WPT’s training-only world-model interaction. | source: [WPT: World-to-Policy Transfer via Online World Model Distillation, Figure 1](https://arxiv.org/abs/2511.20095)*
+
+[Open figure at full size](/assets/images/wpt-world-to-policy-transfer-via-online-world-model-distillation-source-figure-1.webp)
 
 Fig. 2 explains the deployment claim. WPT is not saying that a student can forecast the world by itself. It says the teacher can use future-aware evaluation during training, then compress the resulting planning preference into a policy whose inputs and runtime graph look like the baseline policy. This is why the student must be reported separately from the teacher.
 
@@ -46,13 +52,13 @@ The nuScenes experiment uses 1,000 twenty-second scenes with approximately 1.4 m
 
 Those values are open-loop planning metrics. They are useful for controlled trajectory comparison, but they do not replace closed-loop driving. Bench2Drive provides that second test: WPT trains on 950 of 1,000 clips, reserves 50 for open-loop validation, and evaluates closed loop on 220 predefined routes. The baseline reports 65.23 driving score and 34.10% success. The student reaches 72.61 and 45.45%; the teacher reaches 79.23 and 54.54%. The student’s 64 ms planning latency matches the baseline, while the teacher takes 312 ms with online reward scoring (286 ms without it), giving the student a 4.9× latency advantage over the full teacher path.
 
-The student keeps much of the teacher’s efficiency profile as well: its reported efficiency is 188.52 versus 188.63 for the teacher. It does not retain every teacher gain, however. That gap is the practical point of WPT: predictive reasoning can be distilled, but compression still changes behavior in the cases where the teacher’s rollout search matters most.
+The student keeps much of the teacher’s efficiency profile as well: its reported efficiency is 188.52 versus 188.63 for the teacher. The appendix reports 168 GPU-hours for WPT-Student versus 488 for its baseline, while WPT-Teacher uses 248 versus 464 for Baseline-T. It does not retain every teacher gain, however. That gap is the practical point of WPT: predictive reasoning can be distilled, but compression still changes behavior in the cases where the teacher’s rollout search matters most.
 
 ### Ablations identify the expensive ingredients
 
 The reward ablation starts from a teacher without the proposed reward model at 0.72 m L2 and 0.71% collision. Adding imitation reward during training gives 0.78 m and 0.23%; adding all simulation rewards during training gives 0.62 m and 0.14%; enabling reward scoring at inference reaches 0.61 m and 0.11%. Removing TTC increases collision to 0.25%, the largest single simulation-reward degradation in the table. The result makes safety supervision more specific than the generic statement that “more reward” helps: TTC carries the largest reported safety contribution, while the other signals add smaller improvements.
 
-The occupancy-source ablation separates the world model from the reward design. With imitation reward only, ground-truth occupancy gives 0.64 m and 0.16% collision, while world-model occupancy gives 0.69 m and 0.22%. With all rewards, ground-truth occupancy gives 0.65 m and 0.11%, while world-model occupancy gives 0.61 m and 0.11%. Predictive occupancy is not always the cleaner signal, but it produces the best combined planning result when the student is trained on the same kind of future representation it will inherit from the teacher.
+The occupancy-source ablation is a teacher-policy study: Table 5 starts from Baseline-T and varies the occupancy used to score its candidate trajectories. With imitation reward only, ground-truth occupancy gives 0.64 m and 0.16% collision, while world-model occupancy gives 0.69 m and 0.22%. With all rewards, ground-truth occupancy gives 0.65 m and 0.11%, while world-model occupancy gives 0.61 m and 0.11%. The authors attribute the latter advantage to alignment with the predictive structure, but the table also shows that predictive occupancy is not uniformly better.
 
 The distillation ablation starts at the baseline’s 0.88 m and 1.06%. Query distillation alone gives 0.69 m and 0.86%; adding imitation-reward distillation gives 0.68 m and 0.25%; adding simulation-reward distillation gives the final 0.66 m and 0.24%. This is evidence for the two-loss design rather than for a single feature-matching shortcut.
 

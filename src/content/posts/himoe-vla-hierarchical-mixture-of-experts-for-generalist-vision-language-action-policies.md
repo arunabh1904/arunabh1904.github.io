@@ -32,11 +32,17 @@ The resulting 4B-parameter VLA is pretrained end to end on 24.1M frames from Ope
 ![HiMoE hierarchy with action-space experts at the boundaries heterogeneity-balancing experts nearby and shared transformer layers in the center](/assets/images/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies-paper-figure.png)
 *Fig 1: Shows where specialization is permitted: action-space MoEs handle incompatible controls, heterogeneity-balancing MoEs absorb residual variation, and central shared layers carry cross-domain knowledge. | source: [HiMoE-VLA, Figure 2](https://arxiv.org/abs/2512.05693)*
 
+[Open figure at full size](/assets/images/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies-paper-figure.png)
+
 ![Figure 1 from HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vision-Language-Action Policies](/assets/images/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies-source-figure-1.webp)
 *Fig 2: Overview of HiMoE-VLA. The left blue part illustrates the VLM backbone initialized from PaliGemma, and the right orange part depicts the hierarchical action module processing different robot states and noisy actions. | source: [HiMoE-VLA, Figure 1](https://arxiv.org/abs/2512.05693)*
 
+[Open figure at full size](/assets/images/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies-source-figure-1.webp)
+
 ![Figure 3 from HiMoE-VLA: Hierarchical Mixture-of-Experts for Generalist Vision-Language-Action Policies](/assets/images/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies-source-figure-3.webp)
 *Fig 3: Qualitative examples of real-world executions on the single-arm xArm7 and dual-arm ALOHA robots, covering pick-place, stacking, handover, and scooping. | source: [HiMoE-VLA, Figure 3](https://arxiv.org/abs/2512.05693)*
+
+[Open figure at full size](/assets/images/himoe-vla-hierarchical-mixture-of-experts-for-generalist-vision-language-action-policies-source-figure-3.webp)
 
 
 ### The hierarchy turns mixed data into a controlled experiment

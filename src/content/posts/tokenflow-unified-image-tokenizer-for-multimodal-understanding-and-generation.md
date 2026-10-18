@@ -33,6 +33,8 @@ where each distance compares an input feature to its corresponding semantic or p
 ![Source Figure 3 from TokenFlow: dual encoders, codebooks, shared mapping, and decoders](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-paper-figure.png)
 *Fig 1: TokenFlow jointly chooses an index from semantic and pixel distances, then decodes the aligned index through separate semantic and pixel paths for downstream understanding and image reconstruction. | source: [TokenFlow, Figure 3](https://arxiv.org/abs/2412.03069)*
 
+[Open figure at full size](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-paper-figure.png)
+
 The training objective combines semantic feature loss, vector-quantization and commitment terms, and pixel reconstruction:
 
 $$
@@ -46,6 +48,8 @@ The model also uses multi-scale VQ. With 131,072 entries, the paper reports code
 ![Source Figure 5 from TokenFlow: single-pass and multi-step sampling comparison](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-source-figure-5.webp)
 *Fig 2: Single-pass top-$k=1200$, top-$p=0.8$ sampling produces inconsistent local patterns, while repeated narrowing within a scale yields more coherent generations. | source: [TokenFlow, Figure 5](https://arxiv.org/abs/2412.03069)*
 
+[Open figure at full size](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-source-figure-5.webp)
+
 TokenFlow’s next-scale generator predicts image tokens autoregressively, but the paper finds that independent top-$k$/top-$p$ choices can break correlations among tokens at the same scale. Its multi-step sampler first uses broad sampling, then resamples the same scale with smaller $k$ and $p$ values. For the 256×256 evaluation, it uses three steps per scale with top-$k=[1200,100,1]$ and top-$p=[0.8,0.8,1.0]$ across all scales except the first, for 25 model runs in total. The comparison is therefore about a tokenizer and an inference policy together. A single-pass baseline does not test the same system.
 
 ### The scorecard shows a real but bounded unification
@@ -54,6 +58,8 @@ The tokenizer is trained on LAION and COYO-700M, with 50-epoch ImageNet-1K ablat
 
 ![Source Figure 1 from TokenFlow: multimodal understanding benchmark comparison](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-source-figure-1.webp)
 *Fig 3: TokenFlow-XL’s 14B Qwen-backed model is compared with continuous and discrete visual-input systems across nine understanding benchmarks; the radar makes the cross-benchmark trade-offs visible. | source: [TokenFlow, Figure 1](https://arxiv.org/abs/2412.03069)*
+
+[Open figure at full size](/assets/images/tokenflow-unified-image-tokenizer-for-multimodal-understanding-and-generation-source-figure-1.webp)
 
 | Task | TokenFlow result | What the protocol fixes |
 | --- | ---: | --- |
@@ -65,7 +71,11 @@ The tokenizer is trained on LAION and COYO-700M, with 50-epoch ImageNet-1K ablat
 
 The same-backbone comparison is the cleanest understanding result: TokenFlow-XL with Vicuna-13B is 1.7% above LLaVA-1.5 13B on the paper’s average, while the stronger Qwen2.5-14B variant is the source of the reported 7.2% improvement. The generation evaluation also avoids FID because the authors argue it correlates poorly with human judgments for that task. These results establish a strong Pareto point, but they do not isolate every cost: semantic teacher choice, codebook size, residual levels, backbone, dataset, and sampling schedule all move together across the headline comparisons.
 
+The appendix makes the remaining gap explicit: at 384×384, TokenFlow-XL is still 2.9% below its continuous SigLIP-SO400M teacher under the matched LLaVA-1.5 setup, which the authors attribute to vector-quantization distillation. The paper validates the tokenizer in separate understanding and generation systems; it leaves a jointly trained interleaved vision-language model as future work.
+
 The key ablation is more specific. Starting from a single CLIP-distilled codebook gives reconstruction rFID 8.07. Shared mapping reduces it to 3.96, MSVQ to 2.18, and CLIP initialization with the semantic encoder unfrozen to 2.16 while raising MME-Perception, SEED-Bench, and TextVQA. The mechanism is therefore not “two encoders are always better”; it is the ability to keep semantic alignment while recovering the pixel detail that the semantic codebook alone cannot decode.
+
+The codebook-size sweep also puts a useful limit on the scaling story: utilization stays above 95% at 131,072 entries and understanding/reconstruction improve, but class-conditional generation degrades slightly beyond 32,768 because the autoregressive model has a harder distribution to learn. TokenFlow therefore uses 32,768 entries for text-to-image generation rather than treating the largest codebook as universally best.
 
 ## High-Level Takeaways
 

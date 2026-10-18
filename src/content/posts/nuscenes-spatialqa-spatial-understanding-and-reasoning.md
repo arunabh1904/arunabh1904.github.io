@@ -23,14 +23,16 @@ summary: "2025 – NuScenes-SpatialQA: Spatial Understanding and Reasoning for D
 
 The benchmark builds camera-specific 3D scene graphs from the nuScenes validation split: 150 scenes, roughly 6,000 keyframes, and six camera views. Nodes carry object position, dimensions, category, and a generated identifying caption. Edges encode distance, lateral and longitudinal offsets, and relative bearing. Templates turn these values into qualitative comparisons, numeric questions, direct reasoning, and situational reasoning.
 
-This changes the source of geometric truth relative to [SpatialVLM](/paper%20shorts/2024/01/22/spatialvlm-spatial-reasoning-capabilities.html). SpatialVLM constructs training targets using estimated geometry from internet images; NuScenes-SpatialQA evaluates models against an existing 3D annotation system. A language model still generates object descriptions, but it does not supply the metric answers. The paper describes the corpus as over 3.3 million questions; its rounded totals vary between the statistics paragraph and comparison table.
+This changes the source of geometric truth relative to [SpatialVLM](/paper%20shorts/2024/01/22/spatialvlm-spatial-reasoning-capabilities.html). SpatialVLM constructs training targets using estimated geometry from internet images; NuScenes-SpatialQA evaluates models against an existing 3D annotation system. A language model still generates object descriptions, but it does not supply the metric answers. The paper reports approximately 3.5 million questions: about 2.5 million qualitative, 0.6 million quantitative, and 0.2 million reasoning questions.
+
+The captions are produced only after 3D-to-2D projection and quality filtering: the pipeline keeps fully visible objects with boxes wider and taller than 40 pixels, groups appearances by instance, selects among the three largest crops by grayscale brightness, pads the chosen crop by 100 pixels, and then captions it with Llama-3.2-11B-Instruct. LiDAR-derived 3D annotations, rather than the caption model, supply the numeric positions and relations.
 
 Read the pipeline by following one object: its annotated 3D box provides position, its projected image crop provides an identifying description, and the graph supplies the spatial relation used in the answer.
 
 ![Annotation and caption pipelines feeding scene graphs and spatial questions; source Figure 2](/assets/images/nuscenes-spatialqa-source-figure-2.webp)
 *Fig 1: The benchmark separates object descriptions from geometric answer generation. Captions identify the target, while annotated scene graphs determine the spatial quantities. | source: [Paper, Figure 2](https://arxiv.org/abs/2504.03164)*
 
-[View full-size figure](/assets/images/nuscenes-spatialqa-source-figure-2.webp)
+[Open figure at full size](/assets/images/nuscenes-spatialqa-source-figure-2.webp)
 
 ### Separate the metrics before comparing models
 

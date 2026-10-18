@@ -25,13 +25,17 @@ summary: '2026 – EXIMO: VLM-Guided Exploration of VLA Policies'
 ![Figure 2 from EXIMO: VLM-Guided Exploration of VLA Policies](/assets/images/eximo-vlm-guided-exploration-of-vla-policies-source-figure-2-interaction.png)
 *Fig 1: During exploration, the VLM receives an image history and the global task, reasons about what has already happened, and emits the next natural-language instruction. The example asks the robot to pick up the blue plate before placing objects on the rack. | source: [EXIMO, Figure 2](https://arxiv.org/abs/2608.19891)*
 
+[Open figure at full size](/assets/images/eximo-vlm-guided-exploration-of-vla-policies-source-figure-2-interaction.png)
+
 ![Figure 3 from EXIMO: VLM-Guided Exploration of VLA Policies](/assets/images/eximo-vlm-guided-exploration-of-vla-policies-source-figure-2.webp)
 *Fig 2: Across 22 ALOHA tasks, the plot compares VLM-orchestrated GROD, GROD without orchestration, and GROD fine-tuned on the collected data. Success, time to success, and episode length show why a better collection policy can matter before RL begins. | source: [EXIMO, Figure 3](https://arxiv.org/abs/2608.19891)*
+
+[Open figure at full size](/assets/images/eximo-vlm-guided-exploration-of-vla-policies-source-figure-2.webp)
 
 
 ### The VLM improves the data before RL begins
 
-EXIMO starts from Gemini Robotics On-Device (GROD), a language-conditioned diffusion policy that already performs skills such as pick-and-place. A Gemini VLM sees the task and the history of environment observations, then issues the next natural-language subgoal in a closed loop. GROD executes that subgoal. A ground-truth task detector keeps only successful episodes, so the collection policy can fail without adding those failures to the imitation set.
+EXIMO starts from the 3B Gemini Robotics On-Device (GROD) policy, a PaliGemma-backed language-conditioned diffusion policy trained on ALOHA teleoperation that already performs skills such as pick-and-place. A Gemini VLM sees the task and the history of environment observations, then issues the next natural-language subgoal in a closed loop. GROD executes that subgoal. A ground-truth task detector keeps only successful episodes, so the collection policy can fail without adding those failures to the imitation set.
 
 The supervised stage removes the VLM from deployment. EXIMO trains GROD on the successful state-action trajectories while conditioning each action chunk on the original task goal, not the VLM's intermediate instruction. The model therefore learns the orchestrated behavior as one goal-conditioned policy. This is the paper's main data decision: pay for VLM inference during collection, then compile the useful trajectories into the smaller controller.
 

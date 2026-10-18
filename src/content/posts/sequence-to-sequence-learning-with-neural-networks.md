@@ -37,6 +37,8 @@ where $v$ is the encoder state. Training maximizes the probability of the correc
 ![Original seq2seq Figure 1 showing source encoding followed by target generation](/assets/images/seq2seq-source-figure-1-encoder-decoder.png)
 *Fig 1: The encoder finishes reading before the decoder begins generating. Each target prediction depends on the transferred state and earlier target words; the end token determines output length. | source: [Seq2seq, Figure 1](https://arxiv.org/abs/1409.3215)*
 
+[Open figure at full size](/assets/images/seq2seq-source-figure-1-encoder-decoder.png)
+
 The drawing makes the information constraint visible: the decoder has no attention connection back to the individual source positions. The actual model nevertheless has a substantial state. Four layers with 1,000 LSTM cells each use 8,000 real numbers for the sentence representation, counting hidden and cell states. “Fixed vector” does not mean a tiny embedding.
 
 ### Reversal creates easy early connections without reducing the average distance
@@ -67,12 +69,16 @@ Most of the ensemble's decoding gain from search arrives when the beam grows fro
 
 The 34.81 result should not be attributed to a single model. Nor should 36.5 be described as pure neural generation. The latter inherits the SMT system's candidate set; its much higher oracle rescoring score, around 45 BLEU, shows that better selection remains possible within those candidates.
 
+The direct neural scores also use an 80,000-word target vocabulary and are penalized when a reference translation contains an out-of-vocabulary word. The 34.81 comparison is therefore a strong direct-generation result under a fixed vocabulary, not an open-vocabulary test.
+
 ### The learned state distinguishes who did what
 
 The source's representation plot is a small but useful test of what survives compression. Swapping John and Mary preserves the word set while changing the relationship. In the left panel, those sentences occupy different groups, with similar relationships among the verbs within each group.
 
 ![Seq2seq source Figure 2 showing representations sensitive to word order and relatively stable across paraphrases](/assets/images/seq2seq-source-figure-2-word-order.png)
 *Fig 2: Subject–object reversals separate in the left projection. The right groups selected active/passive paraphrases by meaning. These examples probe what the encoder preserves; they are not a comprehensive semantic evaluation. | source: [Seq2seq, Figure 2](https://arxiv.org/abs/1409.3215)*
+
+[Open figure at full size](/assets/images/seq2seq-source-figure-2-word-order.png)
 
 The right panel provides the complementary observation: some changes in surface form, including active/passive phrasing, leave representations relatively close. Together the panels suggest sensitivity to relational meaning rather than only vocabulary. They are two-dimensional PCA projections of selected examples, so distances in this display cannot establish a general semantic guarantee.
 

@@ -32,6 +32,8 @@ The source diagram shows two routes into the predicted adjacency matrix. One use
 ![TopoLogic source Figure 2 shows a geometric-distance branch and a lane-query-similarity branch combining into a graph convolution update](/assets/images/topologic-source-figure-2.png)
 *Fig 1: Geometry supplies an explicit endpoint criterion, while separate predecessor and successor embeddings supply semantic similarity. Their fused adjacency guides graph-based feature updates during iterative lane decoding. | source: [TopoLogic, Figure 2](https://arxiv.org/abs/2405.14747)*
 
+[open full-size figure](/assets/images/topologic-source-figure-2.png)
+
 ### Query similarity compensates when geometry is wrong
 
 Distance becomes unreliable when the predicted lane itself is misplaced. TopoLogic therefore also projects lane queries through two different MLPs, takes pairwise inner products, and applies a sigmoid. Separate predecessor and successor projections preserve directional roles. Learnable coefficients combine the similarity and geometric matrices.

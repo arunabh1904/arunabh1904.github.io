@@ -23,20 +23,28 @@ summary: "2026 – LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness
 ## Core Insights
 
 ![LIBERO-Para controlled evaluation design varying action and object paraphrases between fine-tuning and testing](/assets/images/libero-para-paraphrase-robustness-in-vla-models-paper-figure.png)
-*Fig 1: Shows why the benchmark is diagnostic: action wording and object wording vary on separate axes, letting a failure be localized to linguistic generalization rather than task execution alone. | source: [LIBERO-Para](https://arxiv.org/abs/2603.28301)*
+*Fig 1: Shows why the benchmark is diagnostic: action wording and object wording vary on separate axes, letting a failure be localized to linguistic generalization rather than task execution alone. | source: [LIBERO-Para, Figure 2](https://arxiv.org/html/2603.28301v3#S1.F2)*
+
+[Open figure at full size](/assets/images/libero-para-paraphrase-robustness-in-vla-models-paper-figure.png)
 
 ![Figure 1 from LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models](/assets/images/libero-para-paraphrase-robustness-in-vla-models-source-figure-1.webp)
-*Fig 2: Illustration of paraphrase robustness gap under data-scarce fine-tuning: VLA models can overfit to seen instruction phrasings during fine-tuning and fail to generalize to paraphrased variants at deployment. | source: [LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models](https://arxiv.org/abs/2603.28301)*
+*Fig 2: Illustration of paraphrase robustness gap under data-scarce fine-tuning: VLA models can overfit to seen instruction phrasings during fine-tuning and fail to generalize to paraphrased variants at deployment. | source: [LIBERO-Para, Figure 1](https://arxiv.org/html/2603.28301v3#S1.F1)*
+
+[Open figure at full size](/assets/images/libero-para-paraphrase-robustness-in-vla-models-source-figure-1.webp)
 
 ![Figure 3 from LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models](/assets/images/libero-para-paraphrase-robustness-in-vla-models-source-figure-3.webp)
 *Fig 3: Examples of axis-specific paraphrases. Object variations modify target object references (e.g., same-polarity substitution, addition), while action variations cover lexical, structural, and pragmatic realizations grounded in established taxonomies. | source: [LIBERO-Para: A Diagnostic Benchmark for Paraphrase Robustness in VLA Models](https://arxiv.org/abs/2603.28301)*
 
+[Open figure at full size](/assets/images/libero-para-paraphrase-robustness-in-vla-models-source-figure-3.webp)
+
 
 ### The benchmark makes language the intervention
 
-LIBERO-Para evaluates seven VLA configurations from 0.6B to 7.5B parameters, spanning four architecture families. It generates 4,092 paraphrases across 43 action and object variation types, then keeps the scene, controller, and intended task fixed. Each success rate is averaged over five seeds for a task–paraphrase configuration; the appendix does not report standard deviations. That setup turns “language understanding” into a testable change: if a policy fails, the visual scene and motor target have not moved with the wording.
+LIBERO-Para evaluates seven VLA configurations from 0.6B to 7.5B parameters, spanning four architecture families. It is built on LIBERO-Goal, where every task starts from the same initial state, so the instruction is the cue that identifies the task. The benchmark generates 4,092 paraphrases across 43 action and object variation types, holds the scene, controller, and intended task fixed, and reserves every paraphrase for evaluation rather than fine-tuning. Each success rate is averaged over five seeds for a task–paraphrase configuration; the appendix does not report standard deviations. That setup turns “language understanding” into a testable change: if a policy fails, the visual scene and motor target have not moved with the wording.
 
 The drop is large even when the original LIBERO instruction is solved reliably. On LIBERO-Goal, OpenVLA-OFT falls from 97.9% on the original wording to 64.7% on LIBERO-Para; Xiaomi-Robotics-0 drops from 98.8% to 76.0%. The strongest and weakest models differ, but none is invariant to the intervention.
+
+The controls also test whether more downstream data or a frozen language backbone solves the problem. Expanding OpenVLA-OFT's task-level fine-tuning data fourfold produces nearly the same paraphrase drop (32.4 versus 33.2 points). Freezing the $\pi_{0.5}$ VLM and tuning only its action expert lowers LIBERO-Goal success from 97.6% to 78.6% and does not improve LIBERO-Para robustness, so the benchmark exposes both surface memorization and the cost of restricting adaptation.
 
 | Variation | Diagnostic target |
 | --- | --- |

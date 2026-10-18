@@ -32,6 +32,8 @@ The training recipe keeps DINO's global objective and iBOT's patch objective, bu
 ![Figure 8: Gram anchoring evolution on dense and global benchmarks](/assets/images/dinov3-gram-anchoring-paper-figure.png)
 *Fig 1: This source Figure 8 tracks VOC, ADE20K, and ObjectNet during Gram refinement; dense curves recover quickly when patch relationships are anchored, while global performance changes only mildly. | source: [DINOv3, Figure 8](https://arxiv.org/abs/2508.10104)*
 
+[View full-size figure](/assets/images/dinov3-gram-anchoring-paper-figure.png)
+
 That diagnosis changes what a training dashboard should monitor. ImageNet linear accuracy is a useful global probe, but it cannot tell whether a patch selected on a dog's ear still retrieves nearby fur or instead retrieves unrelated regions with the same image-level semantics. Dense probes and patch-similarity maps are not optional diagnostics once the intended use includes segmentation, depth, or correspondence.
 
 ### Gram anchoring preserves relationships rather than coordinates
@@ -61,7 +63,13 @@ The ×2 row gives the clearest intuition: the high-resolution teacher supplies a
 ![Figure 3: High-resolution DINOv3 patch similarity maps](/assets/images/dinov3-source-figure-3.webp)
 *Fig 2: This source Figure 3 visualizes cosine similarity from a red-marked patch to all patches at 4096×4096 input resolution; the map shows the dense feature interface the Gram objective is designed to keep coherent. | source: [DINOv3, Figure 3](https://arxiv.org/abs/2508.10104)*
 
-The scale itself is part of the engineering boundary. The paper starts from an approximately 17-billion-image public-post pool and curates 1,689 million images into LVD-1689M; the flagship has 7B parameters (6.7B in the model table). Replication therefore requires both substantial data curation and a reliable checkpoint-selection strategy. Gram anchoring makes the trade-off explicit: more training is useful only if the objective protects the spatial information downstream tasks need.
+[View full-size figure](/assets/images/dinov3-source-figure-3.webp)
+
+The scale has a concrete data recipe. DINOv3 starts from an approximately 17-billion-image public-post pool, builds a k-means hierarchy with 200M, 8M, 800k, 100k, and 25k clusters, and balances it into the 1,689-million-image LVD-1689M set. Retrieval around selected seed datasets and raw ImageNet-1k, ImageNet-22k, and Mapillary data supply the other pieces; homogeneous ImageNet-1k batches make up 10% of training. In the 200k-step data ablation, the full mix reaches 84.6 k-NN and 87.2 linear accuracy on ImageNet-1k, ahead of the raw, clustering-only, and retrieval-only alternatives on the combined set of downstream probes.
+
+The model is a 40-block ViT-7B with 16-pixel patches, 4 registers, 4096-wide embeddings, 32 attention heads, and RoPE-box jittering. Its pretraining objective combines DINO, iBOT, Sinkhorn-Knopp normalization, and a distributed KoLeo regularizer. The initial stage runs for 1M iterations with two 256-pixel global plus eight 112-pixel local crops. After Gram refinement, a separate 10k-iteration mixed-resolution phase uses 512/768 global and 112/168/224/336 local crops; the paper reports that removing Gram anchoring from this phase makes dense performance degrade.
+
+The smaller ViT students use the fixed 7B model directly, without an EMA teacher or Gram anchoring, then run a 1M-iteration distillation stage and a 250k cosine learning-rate cooldown before high-resolution adaptation. This is why the 7B Gram result and the practical DINOv3 checkpoints should not be read as one identical training run.
 
 ## High-Level Takeaways
 

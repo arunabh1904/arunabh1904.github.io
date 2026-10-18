@@ -30,6 +30,8 @@ The repository pools 60 existing datasets across 22 robot embodiments, 21 instit
 ![RT-1-X and RT-2-X input and action interfaces across heterogeneous robots](/assets/images/open-x-embodiment-source-figure-3-white.png)
 *Fig 1: The common interface feeds an image and instruction into RT-1-X or RT-2-X, then maps their discretized end-effector outputs to robot-specific rates, grippers, and motion variables. | source: [Open X-Embodiment: Robotic Learning Datasets and RT-X Models, Figure 3](https://arxiv.org/abs/2310.08864)*
 
+[Open figure at full size](/assets/images/open-x-embodiment-source-figure-3-white.png)
+
 The repository uses RLDS serialized records while retaining diverse sensor and action spaces. The RT-X policy experiments make a narrower choice: they select nine manipulators, one canonical camera view per dataset, common image resizing, and seven end-effector action dimensions plus termination. These experimental actions are normalized and bucketed into 256 values, then de-normalized for the target robot. The entire 60-dataset repository is not converted into one identical physical action space.
 
 That alignment is deliberately coarse. The authors do not align coordinate frames, and a vector can represent an absolute position, a relative position, or a velocity depending on the original controller. A gripper command, camera viewpoint, timestamp, and success definition also retain embodiment-specific meaning. The visual figure makes this visible: RT-1-X and RT-2-X share a language-conditioned shape, but their output rates and controlled variables still differ.
@@ -44,6 +46,8 @@ The small-data evaluation compares five domains: Kitchen Manipulation, Cable Rou
 
 ![RT-1-X mean success across five small-data robot domains](/assets/images/open-x-embodiment-robotic-learning-datasets-and-rt-x-models-source-figure-2.webp)
 *Fig 2: The shared RT-1-X model improves over the original method in four of five small-data domains. Compare each group separately: a higher average does not mean every target robot benefits. | source: [Open X-Embodiment: Robotic Learning Datasets and RT-X Models, Figure 4](https://arxiv.org/abs/2310.08864)*
+
+[Open figure at full size](/assets/images/open-x-embodiment-robotic-learning-datasets-and-rt-x-models-source-figure-2.webp)
 
 The comparison is strongest when read as a data-transfer test. The RT-1 and RT-1-X networks have the same architecture in this evaluation; the major change is co-training on the multi-robot mixture. The model can use trajectories from other robots when the target domain has limited data. The result does not show that the common schema has learned a robot-independent dynamics model.
 

@@ -26,7 +26,11 @@ The data generator starts by filtering an internet image corpus for scene-level 
 ![Figure 2: SpatialVLM data synthesis pipeline](/assets/images/spatialvlm-spatial-reasoning-capabilities-source-figure-2.webp)
 *Fig 1: This source Figure 2 follows scene filtering, object-centric context extraction, 2D-to-3D lifting, ambiguity removal, and template-based spatial Q&A synthesis; the supervision is generated from intermediate geometry rather than written as a caption alone. | source: [SpatialVLM, Figure 2](https://arxiv.org/abs/2401.12168)*
 
+[Open figure at full size](/assets/images/spatialvlm-spatial-reasoning-capabilities-source-figure-2.webp)
+
 Reference resolution is a surprisingly important part of the method. Fixed detector labels such as “cake” can refer to several objects, so the authors use FlexCap to sample one-to-six-word descriptions and reject or augment ambiguous labels with a semantic post-processing algorithm. They synthesize 38 qualitative and quantitative question types, each involving at most two objects. That restriction makes the labels more reliable while keeping the resulting examples composable with ordinary VQA data.
+
+At the source scale, the pipeline turns 10 million images into roughly 2 billion direct spatial question–answer pairs, split evenly between qualitative and quantitative questions. The model mixes those examples with the original PaLM-E data, allocating about 5% of training tokens to spatial reasoning; it first trains with the vision encoder frozen for 110K steps, then branches into 70K-step frozen and unfrozen runs. The latter split is what makes the fine-grained visual-encoder ablation interpretable.
 
 ### The synthetic labels buy direct spatial behavior
 
@@ -47,6 +51,8 @@ Noise ablation is similarly instructive. On the robotic manipulation set, adding
 
 ![Figure 6: SpatialVLM as a robotics reward generator](/assets/images/spatialvlm-spatial-reasoning-capabilities-source-figure-6.webp)
 *Fig 2: This source Figure 6 uses language-queried distances to color robot-object configurations; reward values rise as the gripper approaches the task object, showing how spatial estimates can become a dense robotics signal. | source: [SpatialVLM, Figure 6](https://arxiv.org/abs/2401.12168)*
+
+[Open figure at full size](/assets/images/spatialvlm-spatial-reasoning-capabilities-source-figure-6.webp)
 
 The downstream robotics result is therefore a composition argument. SpatialVLM supplies a natural-language distance tool, while a controller or a larger language model supplies planning. The paper demonstrates monotonic reward behavior in the shown manipulation tasks; it does not establish reliable metric control across cameras, scenes, or depth distributions outside the training experts.
 

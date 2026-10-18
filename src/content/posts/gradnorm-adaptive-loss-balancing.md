@@ -28,6 +28,8 @@ The first figure shows the feedback loop. The orange arrows update loss weights;
 ![GradNorm source Figure 1: task gradients and the auxiliary loss-weight update](/assets/images/gradnorm-adaptive-loss-balancing-source-figure-1.webp)
 *Fig 1: Task gradients meet in the shared layers. GradNorm adds an auxiliary update to the loss weights, changing each task's influence without replacing the shared network or its task objectives. | source: [GradNorm, Figure 1](https://arxiv.org/abs/1711.02257)*
 
+[View figure at full size](/assets/images/gradnorm-adaptive-loss-balancing-source-figure-1.webp)
+
 ### Relative progress determines the target norm
 
 For task $i$, the algorithm first divides its current loss by its initial loss. It then divides that ratio by the mean ratio across tasks:
@@ -37,6 +39,8 @@ r_i(t)=\frac{L_i(t)/L_i(0)}{\frac{1}{T}\sum_j L_j(t)/L_j(0)}.
 $$
 
 This is a relative inverse training rate. For an illustrative pair of tasks whose loss ratios are 0.5 and 0.9, the second task has improved less. Its $r_i$ exceeds one, so GradNorm asks it to contribute a larger gradient than the current task average. The comparison uses fractional progress rather than comparing a depth error directly with a classification loss.
+
+That makes the initial loss part of the calibration: the paper finds it stable in these experiments, but suggests a theoretical initial loss, such as $\log C$ for $C$-class cross-entropy, when initialization makes that denominator unreliable.
 
 At shared weights $W$, define $G_i=\|\nabla_W(w_iL_i)\|_2$ and let $\bar G$ be the mean task norm. The auxiliary objective is
 
@@ -68,6 +72,8 @@ Now compare the depth panel's large test curve with its training inset. GradNorm
 ![GradNorm source Figure 3: test curves with training-error insets for depth, keypoints, and normals](/assets/images/gradnorm-source-figure-3-training-test.png)
 *Fig 2: Green GradNorm curves improve test error across the three tasks. In the depth panel, the training inset moves the other way, showing why a smaller training loss alone is an inadequate measure of multitask progress. | source: [GradNorm, Figure 3](https://arxiv.org/abs/1711.02257)*
 
+[View figure at full size](/assets/images/gradnorm-source-figure-3-training-test.png)
+
 A separate search trains 100 random static weight configurations and compares them with GradNorm at the same 15,000 training steps. GradNorm performs better than those sampled configurations, and configurations closer to its time-averaged weights tend to do better. This supports using an adaptive run to locate useful static weights. It does not establish a global optimum over every possible weighting or a full-duration search: normal training on this dataset lasts 80,000 steps.
 
 ### A stalled task can absorb weight without improving
@@ -78,6 +84,8 @@ The figure shows why these are distinct tasks sharing the same input, rather tha
 
 ![GradNorm source Figure 8: facial landmarks and classification labels in MTFL](/assets/images/gradnorm-source-figure-8-mtfl.png)
 *Fig 3: The same face carries coordinate targets and classification labels. Their differing learning behavior tests rate balancing; the appendix's stalled glasses and pose classifiers expose a case where a larger target gradient does not solve the task. | source: [GradNorm, Figure 8](https://arxiv.org/abs/1711.02257)*
+
+[View figure at full size](/assets/images/gradnorm-source-figure-8-mtfl.png)
 
 Compared with [homoscedastic uncertainty weighting](/paper%20shorts/2017/05/19/multi-task-learning-using-homoscedastic-uncertainty.html), GradNorm uses observed progress and gradient magnitude to choose the allocation. It still does not inspect gradient direction. Two tasks can have well-balanced norms and oppose each other in parameter space, leaving a separate problem for methods such as [PCGrad](/paper%20shorts/2020/01/19/pcgrad-gradient-surgery-for-multi-task-learning.html). Magnitude, rate, and direction describe different aspects of task interaction.
 

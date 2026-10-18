@@ -27,16 +27,22 @@ The perspective-aware prompt labels each input with its format and sensor/view i
 ![RoboTron-Drive uses a shared vision-language architecture for multiple views and driving task prompts](/assets/images/drivemm-all-in-one-large-multimodal-model-for-autonomous-driving-source-figure-2.webp)
 *Fig 1: Camera and input-type labels accompany visual tokens before they enter the shared language model. The surrounding tasks change the prompt and expected answer, while retaining the same visual-language interface. | source: [RoboTron-Drive, Figure 2](https://arxiv.org/abs/2412.07689v5)*
 
+[Open figure at full size](/assets/images/drivemm-all-in-one-large-multimodal-model-for-autonomous-driving-source-figure-2.webp)
+
 Output conventions matter just as much. The source datasets encode object references differently, sometimes using camera names and sometimes numeric camera identifiers, with coordinates in different image scales. The authors standardize these into explicit camera labels and coordinates normalized to 0–100. A shared model can then learn one interpretation of a box rather than silently switching coordinate systems with the dataset.
 
 ### The curriculum separates alignment, perception, and driving specialization
 
 The first stage trains only the projector on 558K image-text pairs. The second updates the whole model on single-image data and some language data. The third introduces general visual instructions and grounding examples across single and multiple views, images, and videos. The fourth fine-tunes all parameters on roughly 1.5 million examples from CODA-LM, MAPLM, DriveLM, LingoQA, OmniDrive, and NuInstruct.
 
+Stage 3 mixes 1.5 million single images, 760K multi-view images, 501K single videos, and 145K multi-view videos; because native multi-view video is scarce, the last group is generated from five-frame nuScenes views.
+
 This progression gives driving supervision a useful starting point: the model already knows how to associate a region with a category and how to consume several visual inputs. It also prevents “generalist” from being confused with zero-shot adaptation from an untouched language model. The final model has substantial multimodal pretraining and driving-specific fine-tuning.
 
 ![The curriculum progresses from image-language alignment through multi-capability pretraining to six standardized driving datasets](/assets/images/drivemm-source-figure-3.png)
 *Fig 2: The right-hand stage combines varied driving inputs only after the left-hand stages establish image comprehension and perception. The augmentation and standardization examples show that answer formats are part of the curriculum. | source: [RoboTron-Drive, Figure 3](https://arxiv.org/abs/2412.07689v5)*
+
+[Open figure at full size](/assets/images/drivemm-source-figure-3.png)
 
 ### Format cleanup produces gains before changing the architecture
 

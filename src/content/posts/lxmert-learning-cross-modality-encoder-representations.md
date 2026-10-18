@@ -28,6 +28,8 @@ summary: '2019 – LXMERT: Learning Cross-Modality Encoder Representations from 
 ![LXMERT’s object, language, and cross-modality encoders](/assets/images/lxmert-learning-cross-modality-encoder-representations-source-figure-1.webp)
 *Fig 1: LXMERT first models detected objects and words in separate encoders, then exchanges information in a stack of bidirectional cross-attention layers. The model exposes language, vision, and joint outputs for downstream heads. | source: [LXMERT, Figure 1](https://arxiv.org/abs/1908.07490)*
 
+[Open figure at full size](/assets/images/lxmert-learning-cross-modality-encoder-representations-source-figure-1.webp)
+
 LXMERT receives 36 object regions from a Faster R-CNN detector pretrained on Visual Genome. Each region combines a 2,048-dimensional RoI feature with a learned embedding of its bounding-box coordinates; the two projected vectors are layer-normalized before they are averaged. Words use BERT’s WordPiece and position embeddings. This representation makes location part of every visual token, while the object order itself remains arbitrary.
 
 The architecture then gives each modality its own context. An object-relationship encoder and a language encoder apply self-attention independently, with five visual layers and nine language layers in the released configuration. A five-layer cross-modality encoder performs bidirectional cross-attention: language queries read object features and object queries read language features, followed by self-attention and feed-forward sublayers. The three outputs are useful for different heads, while the `[CLS]` vector from the cross-modality stream serves as the joint representation.
@@ -38,6 +40,8 @@ That staging is more than an implementation detail. A language-only BERT initial
 
 ![LXMERT pretraining tasks for masked objects and words, matching, and image question answering](/assets/images/lxmert-learning-cross-modality-encoder-representations-source-figure-2.png)
 *Fig 2: The pretraining branches hide words or object features and ask the encoders to recover them, then use the same joint representation for pair matching and image question answering. | source: [LXMERT, Figure 2](https://arxiv.org/abs/1908.07490)*
+
+[Open figure at full size](/assets/images/lxmert-learning-cross-modality-encoder-representations-source-figure-2.png)
 
 The masked cross-modality language task hides 15% of words and predicts them from both visible language and image regions. The visual side is trained with masked object prediction: 15% of RoI features are zeroed, then the model either regresses the detector feature with an L2 loss or predicts the detector’s object label with cross-entropy. The label target is itself a detector output, so this is distillation from a noisy visual vocabulary rather than human object annotation. The paper also evaluates a soft-label KL variant to avoid treating the detector’s top class as certain.
 

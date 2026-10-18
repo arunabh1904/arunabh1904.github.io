@@ -23,13 +23,9 @@ summary: '2026 – Small-Scale Experiments: Are We There Yet?'
 
 ## Core Insights
 
-
-
-
-
 ### A scaling law describes the tuned frontier
 
-The paper trains models from 4M to 268M effective parameters with a warmup–stable–decay schedule. Models from 4M to 34M fit the law, 67M and 134M validate choices, and 268M is the held-out test scale. Checkpoints at eight token budgets reuse the stable training phase and branch into separate decay phases, which makes the sweep cheaper than training every model–data point independently.
+The paper trains models from 4M to 268M effective parameters with a warmup–stable–decay schedule. Models from 4M to 34M fit the law, 67M and 134M validate choices, and 268M is the held-out test scale. Checkpoints at eight token budgets reuse the stable training phase and branch into separate decay phases, which makes the sweep cheaper than training every model–data point independently. The scaling fit drops the two shortest budgets because they fit poorly; the reported extrapolation therefore does not cover the earliest part of training.
 
 “Effective parameters” is a compute accounting convention: it excludes the embedding lookup, includes the output projection, and accounts for attention cost. It is not simply a count of stored weights. The sweep also evaluates losses before and after each decay branch, so one underlying stable trajectory supports several training-budget measurements.
 
@@ -38,18 +34,22 @@ The crucial ablation varies the number of random configurations available to the
 ![Small-scale study source Figure 5 comparing scaling fits after different amounts of hyperparameter search](/assets/images/small-scale-hyperparameter-tuning-frontier.png)
 *Fig 1: The diagonal means predicted and measured bits per character agree. As the search broadens, held-out pink points move toward it; good training fit alone does not ensure accurate extrapolation. | source: [Small-Scale Experiments, Figure 5](https://arxiv.org/abs/2608.11859)*
 
+[View figure at full size](/assets/images/small-scale-hyperparameter-tuning-frontier.png)
+
 The plot compares predicted loss horizontally with actual loss vertically, not loss against parameter count. Read the pink test points separately from the blue training points. With four configurations, a seemingly reasonable fit to observed points still misses the held-out scale. Wider search changes the frontier being fitted, not just the regression's numerical precision.
 
 This changes the economics of proxy studies. Tiny models are cheap per run, yet a credible comparison may need hundreds of runs. The relevant budget is the complete search, not the cost of one 4M model.
 
 ### Scale reduces hyperparameter sensitivity
 
-The authors fit a noisy-quadratic distribution to the best tail of random-search outcomes. Its effective hyperparameter count estimates the local intrinsic dimension of the loss surface. That count trends down toward one as parameter scale increases. That estimate is not a literal count of knobs in the training script, nor the dimension of the neural network's parameter space. It summarizes how many local directions in the searched hyperparameters strongly affect near-optimal loss. A low value means many sampled settings can perform similarly well.
+The authors fit a noisy-quadratic distribution to the best tail of random-search outcomes. Its effective hyperparameter count estimates the local intrinsic dimension of the loss surface. That count trends down toward one as parameter scale increases, reaching the fit's imposed lower bound. The estimate is not a literal count of knobs in the training script, nor the dimension of the neural network's parameter space. It summarizes how many local directions in the searched hyperparameters strongly affect near-optimal loss. A low value means many sampled settings can perform similarly well.
 
 The sensitivity plots add an important condition: parameters and training data need to grow together. Enlarging a model while keeping training short, or training a tiny model longer, lowers loss without eliminating most of the gap between the best and merely good configurations.
 
 ![Source Figure 7 comparing best, tenth-percentile, and twenty-fifth-percentile losses as size and training duration vary](/assets/images/small-scale-source-figure-7-sensitivity.png)
 *Fig 2: The gap above the best configuration measures sensitivity. It shrinks most when a large model also trains longer; increasing only one dimension while the other stays small leaves much of the gap. | source: [Small-Scale Experiments, Figure 7](https://arxiv.org/abs/2608.11859)*
+
+[View figure at full size](/assets/images/small-scale-source-figure-7-sensitivity.png)
 
 A narrow gap to the 25th percentile means roughly a quarter of the sampled configurations are already near the best observed loss. That is a property of the specified search distribution. A different range of learning rates, batch sizes, or architectures could change it.
 

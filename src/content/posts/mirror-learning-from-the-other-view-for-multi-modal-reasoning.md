@@ -29,6 +29,7 @@ The method keeps student rollouts on-policy. It applies ordinary outcome-reward 
 
 ![MIRROR selects the strongest view of each problem as a teacher for students operating on restricted text or image views](/assets/images/mirror-learning-from-the-other-view-for-multi-modal-reasoning-source-figure-1.webp)
 *Fig 1: Text, image, and combined views expose different bottlenecks, so MIRROR selects the strongest view per problem as the teacher instead of fixing one transfer direction. | source: [MIRROR, Figure 1](https://arxiv.org/abs/2607.21552)*
+[Open figure at full size](/assets/images/mirror-learning-from-the-other-view-for-multi-modal-reasoning-source-figure-1.webp)
 
 ODA-Data begins with 97,000 geometry problems from ODA-Math-460k. After difficulty filtering, Gemini-3-Pro-Preview generates and verifies TikZ diagrams and removes from the image-dominant prompt any relations already visible in the diagram. The authors then retain examples that Qwen3-VL-4B-Instruct solves under one view but not the other, yielding about 2,000 paired problems split 85:15 for training and validation. This filtering makes ODA-Val a diagnostic test of modality asymmetry, not a representative sample of general geometry.
 
@@ -49,6 +50,7 @@ The solvability result exposes what aggregate pass rates hide. Figure 4 measures
 
 ![Net solvability gain for text-only, image-only, combined-view, and MIRROR training](/assets/images/mirror-learning-from-the-other-view-for-multi-modal-reasoning-source-figure-4.webp)
 *Fig 2: Each bar measures the change in the fraction of solved examples relative to the base model across three random seeds; MIRROR produces the largest net gain. | source: [MIRROR, Figure 4](https://arxiv.org/abs/2607.21552)*
+[Open figure at full size](/assets/images/mirror-learning-from-the-other-view-for-multi-modal-reasoning-source-figure-4.webp)
 
 ### Where adaptive transfer may stop helping
 

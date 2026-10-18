@@ -31,12 +31,16 @@ TNT-style anchors are sparse and often place one candidate per lane. That can mi
 ![DenseTNT's dense-goal architecture, from context encoding through goal-set prediction](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-paper-figure.png)
 *Fig 1: DenseTNT scores dense endpoint candidates, predicts a compact goal set, and completes a trajectory for each selected goal. | source: [DenseTNT, Figure 2](https://arxiv.org/abs/2108.09640)*
 
+[Open figure at full size](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-paper-figure.png)
+
 ### Use optimization only to create the missing multimodal labels
 
 The offline model chooses a goal set by minimizing the expected endpoint error under the heatmap. Its hill-climbing search can find several high-probability, well-separated goals, but it is too expensive and too brittle to make the inference path. The online model replaces that search with multiple goal-set heads. During training, the authors perturb predicted goals 100 times, retain the best candidates, and train the set predictor against those pseudo-labels. The trajectory decoder is a two-layer MLP conditioned on a goal; it uses the ground-truth goal during training and a smooth L1 loss over the full future. Training is staged: 16 epochs train the lane, heatmap, and completion modules, then 6 epochs train the goal-set predictor from the offline labels.
 
 ![DenseTNT's two-stage training diagram](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-source-figure-3.webp)
 *Fig 2: The first stage learns the context, dense goal, and completion modules; the second stage learns to replace offline goal optimization with a predictor. | source: [DenseTNT, Figure 3](https://arxiv.org/abs/2108.09640)*
+
+[Open figure at full size](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-source-figure-3.webp)
 
 ### The result is a coverage tradeoff, not a uniform distance win
 
@@ -53,6 +57,8 @@ The endpoint resolution is also a real compute knob. Moving from 3 m to 1 m samp
 
 ![DenseTNT's qualitative online predictions](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-source-figure-5.webp)
 *Fig 3: Dense heatmaps support several endpoint modes; the selected goals and completed trajectories cover those modes while the green path is the observed future. | source: [DenseTNT, Figure 5](https://arxiv.org/abs/2108.09640)*
+
+[Open figure at full size](/assets/images/densetnt-end-to-end-trajectory-prediction-from-dense-goal-sets-source-figure-5.webp)
 
 ## High-Level Takeaways
 

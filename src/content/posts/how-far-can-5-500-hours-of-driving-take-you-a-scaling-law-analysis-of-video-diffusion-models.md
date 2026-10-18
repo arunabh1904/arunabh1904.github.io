@@ -11,7 +11,7 @@ summary: "2026 \u2013 How Far Can 5,500 Hours of Driving Take You? A Scaling Law
 
 ## 2026 – How Far Can 5,500 Hours of Driving Take You? A Scaling Law Analysis of Video Diffusion Models
 
-**Paper:** [arXiv:2608.28404](https://arxiv.org/abs/2608.28404) · [Full text](https://arxiv.org/html/2608.28404v1)
+**Paper:** [arXiv:2608.28404](https://arxiv.org/abs/2608.28404v2) · [Full text](https://arxiv.org/html/2608.28404v2)
 
 ## Summary
 
@@ -21,13 +21,15 @@ summary: "2026 \u2013 How Far Can 5,500 Hours of Driving Take You? A Scaling Law
 
 The authors train flow-matching video transformers on 5,500 hours of NATIX footage. The generator uses a pretrained Wan 2.1 VAE; the diffusion backbone is trained from scratch. Trip-level splits preserve country proportions. Front-camera clips contain 25 frames at 320 by 416 pixels. More than 200 runs up to 1.1 billion parameters inform a 9-billion-parameter extrapolation: predicted validation loss is 0.0753, observed loss 0.0781.
 
-A 135-million-parameter data-restriction experiment finds limited loss change between 5,500 and 55 hours at fixed exposure, with substantial degradation at 5.5 hours. That result does not establish unlimited data reuse. Trajectory conditioning uses OccAny pseudo-labels and AdaLN. The 9B post-training first trains the trajectory MLP, then the backbone jointly. Reported nuScenes FID improves over the listed baselines, but the 9B model is worse than 1B on the VideoMAE-based FVD. Generated-video metrics do not establish closed-loop planning quality.
+A 135-million-parameter data-restriction experiment finds limited loss change between 5,500 and 55 hours at fixed exposure, with substantial degradation at 5.5 hours. That result does not establish unlimited data reuse. Trajectory conditioning uses OccAny pseudo-labels, a scenario-balanced sampler over eleven ego-action classes, and AdaLN. The 9B post-training first trains only the trajectory MLP for 60K steps, then jointly fine-tunes it and the backbone for 120K steps (backbone $10^{-5}$, trajectory MLP $10^{-4}$ after the MLP-only $10^{-3}$ phase). Reported nuScenes FID improves over the listed baselines, but the 9B model is worse than 1B on the VideoMAE-based FVD. Generated-video metrics do not establish closed-loop planning quality.
 
 How does trajectory information enter a video generator? The source diagram puts it beside the diffusion timestep. Both condition internal normalization rather than becoming ordinary language tokens.
 
 ![Source Figure 1 shows trajectory and timestep embeddings conditioning the video diffusion transformer through adaptive normalization.](/assets/images/driving-video-scaling-source-figure-1.png)
 
-*Fig 1: Source Figure 1 shows the video generator and its trajectory-conditioning path. The trajectory adapter controls block modulation rather than producing a language-model prefix. | source: [How Far Can 5,500 Hours of Driving Take You?](https://arxiv.org/abs/2608.28404)*
+*Fig 1: Source Figure 1 shows the video generator and its trajectory-conditioning path. The trajectory adapter controls block modulation rather than producing a language-model prefix. | source: [How Far Can 5,500 Hours of Driving Take You?](https://arxiv.org/abs/2608.28404v2)*
+
+[Open figure at full size](/assets/images/driving-video-scaling-source-figure-1.png)
 
 ### More exposures and more scenes answer different questions
 

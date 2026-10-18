@@ -26,6 +26,8 @@ The LiDAR stream uses VoxelNet with additional downsampling and sparse height co
 ![GAFusion architecture with sparse depth, occupancy guidance, multi-scale processing, adaptive fusion, and temporal memory](/assets/images/gafusion-adaptive-lidar-camera-fusion-paper-figure.webp)
 *Fig 1: GAFusion guides the camera stream with sparse depth and LiDAR occupancy, enlarges its receptive field with MSDPT, and fuses the resulting BEV features with LGAFT; the displayed architecture is the paper’s Figure 2. | source: [GAFusion: Adaptive Fusing LiDAR and Camera with Multiple Guidance for 3D Object Detection, Figure 2](https://openaccess.thecvf.com/content/CVPR2024/html/Li_GAFusion_Adaptive_Fusing_LiDAR_and_Camera_with_Multiple_Guidance_for_CVPR_2024_paper.html)*
 
+[Open the full-size source figure](/assets/images/gafusion-adaptive-lidar-camera-fusion-paper-figure.webp)
+
 ### Receptive field and fusion are separate choices
 
 MSDPT uses dual paths over three feature scales: local windowed processing supplies nearby structure while a broader path aggregates context. The point is not just “more transformer.” The ablation reports that removing the multi-scale dual-path module costs about 0.5 mAP and 0.4 NDS, while redundant scales add computation without a clear payoff. LGAFT then expands both LiDAR and camera BEV features and predicts a sigmoid weight map, allowing different locations to favor different modalities instead of using one global addition or concatenation rule.
@@ -34,7 +36,7 @@ The guidance ablation on nuScenes validation is more revealing than the final sc
 
 ### Read the headline with its training protocol
 
-nuScenes contains 1,000 scenes with six cameras, five radars, and one LiDAR, split 700/150/150 for train/validation/test; keyframes are annotated at 2 Hz. GAFusion first trains a LiDAR detector for 20 epochs, freezes the pretrained LiDAR components, and jointly trains the proposed framework for another six epochs with AdamW, learning rate 5×10⁻⁵, weight decay 10⁻², and batch size 4 on two RTX 3090 GPUs. The reported results use no test-time augmentation or model ensemble.
+nuScenes contains 1,000 scenes with six cameras, five radars, and one LiDAR, split 700/150/150 for train/validation/test; keyframes are annotated at 2 Hz. GAFusion first trains a LiDAR detector for 20 epochs, freezes the pretrained LiDAR components, and jointly trains the proposed framework for another six epochs. The reported results use no test-time augmentation or model ensemble.
 
 On validation, GAFusion reports 72.1 mAP / 73.5 NDS. On test, it reports 73.6 / 74.9, above the listed BEVFusion 71.3 / 73.3 comparison. The result supports a carefully engineered geometry-guidance recipe; it does not show that every module remains useful under LiDAR dropout, calibration error, or a matched compute budget.
 

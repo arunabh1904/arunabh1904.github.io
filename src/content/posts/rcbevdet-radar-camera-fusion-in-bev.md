@@ -31,6 +31,8 @@ RCS-aware scattering uses radar cross section as an object-size prior when sprea
 ![RCBEVDet's camera and radar paths before dynamic fusion](/assets/images/rcbevdet-radar-camera-fusion-in-bev-source-figure-2.webp)
 *Fig 1: Camera BEV features and RadarBEVNet features meet in CAMF after dual-stream radar encoding and RCS-aware scattering. | source: [RCBEVDet, Figure 2](https://arxiv.org/abs/2403.16440)*
 
+[Open the full-size source figure](/assets/images/rcbevdet-radar-camera-fusion-in-bev-source-figure-2.webp)
+
 ### Align modalities where they actually disagree
 
 The Cross-Attention Multi-layer Fusion (CAMF) module uses deformable cross-attention in both directions: radar queries sample camera BEV features and camera queries sample radar BEV features at learned offsets. Channel and spatial fusion then combines the aligned features. This separates two questions that a simple concatenation conflates: which nearby cells correspond, and how should the evidence be mixed after correspondence is uncertain?
@@ -51,9 +53,13 @@ The last row raises NDS while lowering mAP by 0.3, a reminder that the composite
 ![RCBEVDet's reported accuracy-speed comparison](/assets/images/rcbevdet-radar-camera-fusion-in-bev-source-figure-1.webp)
 *Fig 2: The paper's real-time comparison on nuScenes validation places RCBEVDet on an accuracy-speed frontier measured on one RTX 3090. | source: [RCBEVDet, Figure 1](https://arxiv.org/abs/2403.16440)*
 
+[Open the full-size source figure](/assets/images/rcbevdet-radar-camera-fusion-in-bev-source-figure-1.webp)
+
 ### Robustness is part of the fusion interface
 
 The sensor-drop experiment randomly removes camera views or radar inputs and trains with the same dropout strategy used for comparison. In the paper's car-mAP table, RCBEVDet degrades less than CRN across the three radar-failure settings: CRN drops by 4.5, 11.8, and 25.0 points, while RCBEVDet drops by 0.9, 6.4, and 10.4. The authors attribute this to CAMF's learned alignment, which can still extract useful evidence when one stream is incomplete. These are controlled dropout results, not a substitute for weather, multipath, time synchronization, or calibration stress tests.
+
+The training protocol is staged: the camera stream is trained first, then the radar-camera fusion model is trained with the camera parameters frozen. The paper uses the same 12-epoch schedule, CBGS, and image/radar augmentation for the reported models, so the fusion comparison does not rely on jointly adapting the camera branch.
 
 The speed numbers also depend on the configuration: the validation table reports 18.2 FPS for the Swin-T 256 x 704 setting and 28.3 FPS for the R18 setting on the stated hardware. A fair deployment comparison therefore needs the same camera resolution, backbone, radar preprocessing, and failure policy.
 

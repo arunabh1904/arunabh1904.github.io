@@ -29,10 +29,12 @@ The symbolic module expands simple relations and applies a theorem library. It u
 
 Read the pipeline as three different responsibilities. Parsing determines the input facts; deduction adds consequences; language generation turns that structured material into an answer.
 
+Because diagrams are schematic rather than measured drawings, the parser does not trust every visual relation. A textual-alignment pass filters and refines parsed facts and adds properties stated in the question—for example, the parallel and perpendicular sides implied by calling a figure a rectangle—before theorem matching.
+
 ![Diagram formalization, theorem reasoning, and language-model answer generation; source Figure 1](/assets/images/symbolic-geometric-reasoning-source-figure-1.webp)
 *Fig 1: The framework separates visual parsing from symbolic deductions and final explanation. Errors in the first stage can still contaminate every later deduction. | source: [Paper, Figure 1](https://arxiv.org/abs/2609.10335)*
 
-[View full-size figure](/assets/images/symbolic-geometric-reasoning-source-figure-1.webp)
+[Open figure at full size](/assets/images/symbolic-geometric-reasoning-source-figure-1.webp)
 
 A worked appendix example shows why the deductions help. The unassisted model attempts a lengthy coordinate derivation and eventually guesses an incorrect angle. The augmented prompt supplies the relevant straight-line angle relation, allowing the solution to subtract a 45-degree triangle angle and a 70-degree corresponding angle from 180 degrees. The benefit is a constrained reasoning path, not additional prose length.
 

@@ -26,6 +26,8 @@ The framework has three pieces: a SigLIP2-based vision encoder, an MLP merger, a
 ![Figure 1: Qwen3-VL framework with dynamic visual tokens, DeepStack, and temporal timestamps](/assets/images/qwen3-vl-technical-report-source-figure-1.webp)
 *Fig 1: This source Figure 1 shows the visual encoder, 2×2 token merger, multi-level DeepStack injections, and timestamp tokens that connect visual patches to the language decoder. | source: [Qwen3-VL Technical Report, Figure 1](https://arxiv.org/abs/2511.21631)*
 
+[Open figure at full size](/assets/images/qwen3-vl-technical-report-source-figure-1.webp)
+
 This is a useful architectural division of labor. Early ViT layers still have fine local structure; later layers are more semantic. Injecting both lets the language model recover a small detail without forcing a single terminal feature map to preserve it and also summarize it. The ablation supports the mechanism under a controlled recipe: with an internal 15B-A2B language model, 200B pretraining tokens, and no post-training, DeepStack raises the average score from 74.7 to 76.0. InfoVQA moves from 71.9 to 74.2 and DocVQA from 89.5 to 91.1, which is the pattern expected when fine visual detail matters.
 
 ### Long context needs a temporal index, not only more tokens
@@ -34,6 +36,8 @@ Qwen3-VL extends interleaved multimodal rotary position encoding so time, height
 
 ![Figure 3: Qwen3-VL long-video needle-in-a-haystack heatmap](/assets/images/qwen3-vl-technical-report-source-figure-3.webp)
 *Fig 2: This source Figure 3 measures whether Qwen3-VL-235B-A22B-Instruct can locate a salient frame at different positions in videos from 0 to 120 minutes; the right half is extrapolation beyond the 256K training context. | source: [Qwen3-VL Technical Report, Figure 3](https://arxiv.org/abs/2511.21631)*
+
+[Open figure at full size](/assets/images/qwen3-vl-technical-report-source-figure-3.webp)
 
 The protocol samples video at 1 FPS and adjusts frame resolution to keep a constant visual-token budget. The model is perfect on the reported clips through 30 minutes, corresponding to 256K tokens, and retains 99.5% accuracy at about 1M tokens, or roughly two hours, with YaRN-based positional extension. That is a strong retrieval result, but it is narrower than “the model understands two hours”: the needle is salient, the task asks for locating and answering about one inserted frame, and the token budget is controlled. Long-context serving still pays for the visual tokens and attention state.
 

@@ -32,6 +32,8 @@ The first source figure is a useful diagnostic rather than just an architecture 
 ![Figure 1 from BEVFusion: Multi-Task Multi-Sensor Fusion with Unified Bird](/assets/images/bevfusion-multi-task-multi-sensor-unified-bev-source-figure-1.webp)
 *Fig 1: Image-to-LiDAR projection is semantically lossy because only a small fraction of camera features meet a LiDAR point; separate view transforms preserve both streams before they meet in a shared BEV grid. | source: [BEVFusion, Figure 1](https://arxiv.org/abs/2205.13542)*
 
+[Open figure at full resolution](/assets/images/bevfusion-multi-task-multi-sensor-unified-bev-source-figure-1.webp)
+
 ### Make fixed camera geometry a cached data structure
 
 The camera path predicts a discrete depth distribution for each image feature, scatters the feature along its candidate ray, and quantizes the resulting points into BEV cells. In the paper's representative setting, six cameras with a $32\times88$ feature map and 118 depth bins create about two million candidate points per frame—roughly two orders of magnitude denser than a LiDAR feature cloud. A naive BEV pooling implementation spends more than 500 ms on an RTX 3090 even though the rest of the model takes about 100 ms.
@@ -45,7 +47,11 @@ After concatenation, a small convolutional BEV encoder compensates for local mis
 ![Camera and LiDAR features converted into a shared BEV before a common encoder and task-specific heads](/assets/images/bevfusion-multi-task-multi-sensor-unified-bev-source-figure-2.webp)
 *Fig 2: Camera and LiDAR features are transformed into modality-specific BEV tensors, concatenated and refined by a common BEV encoder, then decoded by task-specific detection and map-segmentation heads. | source: [BEVFusion, Figure 2](https://arxiv.org/abs/2205.13542)*
 
+[Open figure at full resolution](/assets/images/bevfusion-multi-task-multi-sensor-unified-bev-source-figure-2.webp)
+
 The source tables show why the same workspace matters for the two tasks. For detection, camera+LiDAR BEVFusion reaches 70.2 mAP/72.9 NDS on the nuScenes test split and 68.5/71.4 on validation, versus 68.9/71.6 test for TransFusion; the reported BEVFusion compute and latency are 253.2 G MACs and 119.2 ms, versus 485.8 G and 156.6 ms for TransFusion. For map segmentation, camera-only BEVFusion averages 56.6 IoU across drivable area, pedestrian crossing, walkway, stop line, carpark, and divider; adding LiDAR raises that to 62.7. The drivable-area score moves from 81.7 to 85.5 and the carpark score from 50.7 to 57.0. These are separate modality rows in the paper's Table III, not a claim that one multi-task score is being compared with one single-task score.
+
+The reported detection setup uses a Swin-T image backbone at 256×704, a VoxelNet LiDAR encoder, and a single model without test-time augmentation for both nuScenes validation and test. The LiDAR voxel size is 0.075 m for detection and 0.1 m for segmentation. Map segmentation is evaluated as six independent binary masks in the ±50-metre square around the ego vehicle, selecting the best IoU threshold per class; the Waymo headline instead uses test-time augmentation.
 
 ### Weather and sparsity expose the interface's limits
 

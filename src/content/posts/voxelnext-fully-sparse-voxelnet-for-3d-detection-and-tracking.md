@@ -28,6 +28,8 @@ CenterPoint turns sparse voxel features into a dense BEV map and predicts a heat
 ![VoxelNeXt source Figure 1: sparse input and CenterPoint heatmaps](/assets/images/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking-source-figure-1.webp)
 *Fig 1: Most CenterPoint car heatmap values are nearly zero even though the dense head evaluates the whole BEV grid. VoxelNeXt uses the non-empty voxel support as its starting set. | source: [VoxelNeXt, Figure 1](https://arxiv.org/abs/2303.11301)*
 
+[Open figure at full resolution](/assets/images/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking-source-figure-1.webp)
+
 The change is more than replacing one convolution. A regular dense head gives every spatial cell the same computational status, while a sparse head can discard locations before box regression. That makes “where should the detector spend capacity?” an explicit part of the architecture.
 
 ### Receptive field grows through sparse downsampling
@@ -36,6 +38,8 @@ Direct prediction cannot rely on a dense head to broaden context. VoxelNeXt adap
 
 ![VoxelNeXt source Figure 4: sparse backbone, height compression, voxel selection, and box regression](/assets/images/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking-paper-figure.webp)
 *Fig 2: The detailed source diagram shows the four decisions in sequence: extra downsampling, sparse height compression, active-voxel selection, and direct box regression. | source: [VoxelNeXt, Figure 4](https://arxiv.org/abs/2303.11301)*
+
+[Open figure at full resolution](/assets/images/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking-paper-figure.webp)
 
 The ablation makes the receptive-field tradeoff concrete. With only three downsampling stages, direct prediction falls to 46.7 mAP; adding one stage reaches 52.3, and the default five-stage variant reaches 56.5 mAP/64.5 NDS in the pilot study. A $5\times5\times5$ kernel also recovers some accuracy, but costs 225 ms versus 66 ms for the extra-downsampling design. Enlarging context by keeping more sparse locations would erase the efficiency gain, so the paper chooses depth and stride instead.
 
@@ -57,6 +61,10 @@ On nuScenes test, VoxelNeXt reports 64.5 mAP and 70.0 NDS at 66 ms; the double-f
 
 ![VoxelNeXt source Figure 3: latency across Argoverse2 perception ranges](/assets/images/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking-source-figure-3.webp)
 *Fig 3: Across 50–200 m perception ranges, the source plot shows CenterPoint latency growing much faster than VoxelNeXt's overall and head latency. | source: [VoxelNeXt, Figure 3](https://arxiv.org/abs/2303.11301)*
+
+[Open figure at full resolution](/assets/images/voxelnext-fully-sparse-voxelnet-for-3d-detection-and-tracking-source-figure-3.webp)
+
+The protocol separates the headline test rows from the pilot ablations. The appendix uses the official 700/150/150 nuScenes sequence split, trains ablations on one quarter of the training sequences, and trains the default nuScenes models for 20 epochs; test-submission runs remove ground-truth sampling only during their last five epochs. The Waymo table is single-frame and reports no test-time augmentation or ensemble, while the daggered nuScenes rows use double-flip detection results.
 
 ## High-Level Takeaways
 

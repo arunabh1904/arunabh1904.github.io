@@ -30,10 +30,14 @@ For a coordinate v, the mapping is gamma(v) = [cos(2π Bv), sin(2π Bv)], with r
 ![The paper compares the NTK of a raw coordinate MLP with the stationary, tunable kernels produced by Fourier mappings.](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-paper-figure.png)
 *Fig 1: A Fourier mapping makes the composed NTK more stationary and widens its spectrum as the frequency schedule changes. | source: [Fourier Features, Figure 2](https://arxiv.org/abs/2006.10739)*
 
+[open full-size figure](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-paper-figure.png)
+
 The distinction between scale and distribution shape is central. In a controlled one-dimensional task, Gaussian, uniform, log-uniform, and Laplacian frequency samples trace nearly the same error curve when compared at the same empirical standard deviation. For the random-feature scale used in the regression experiments, a low standard deviation concentrates the spectrum near zero and gives a broad spatial kernel, so the reconstruction is smooth and misses detail. Raising that scale widens spectral support and narrows the spatial kernel; it can recover detail, but it can also fit frequencies absent from the held-out signal. Figure 2 uses a separate power-law parameter p: lower p slows the spectral falloff and produces a narrower spatial kernel, so the two scale conventions should not be conflated.
 
 ![Different random frequency distributions follow a shared underfitting-to-overfitting curve when plotted against sampled-frequency scale.](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-source-figure-4.webp)
 *Fig 2: Sparse random Fourier features match dense features over a useful range, with underfitting at low frequency scale and overfitting at high scale. | source: [Fourier Features, Figure 4](https://arxiv.org/abs/2006.10739)*
+
+[open full-size figure](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-source-figure-4.webp)
 
 ### Bandwidth explains the same gain across direct and indirect tasks
 
@@ -51,9 +55,11 @@ The same pattern extends to indirect supervision. In Table 1, Gaussian features 
 ![Fourier features improve coordinate MLPs on both direct and forward-model-supervised regression tasks.](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-source-figure-1.webp)
 *Fig 3: The same input mapping helps image and shape regression as well as indirect CT, MRI, and inverse-rendering supervision. | source: [Fourier Features, Figure 1](https://arxiv.org/abs/2006.10739)*
 
+[open full-size figure](/assets/images/fourier-features-let-networks-learn-high-frequency-functions-in-low-dimensional-domains-source-figure-1.webp)
+
 ### The encoding is a tuned prior, not a universal coordinate trick
 
-The frequency scale is tuned separately for each dataset: the paper uses sigma 10 for Gaussian features on Natural images, sigma 14 for Text, sigma 5 for MRI, and sigma 6.05 for its NeRF scene. Those values are evidence that the encoding is a controllable prior, not a plug-in constant. Jointly optimizing the feature frequencies with the MLP did not improve the 2D task, and axis-aligned positional encoding performs worse on off-axis sinusoidal signals than isotropic Gaussian features. The experiments are small coordinate-regression problems, often fitting one image or one mesh per network; they do not establish robustness to noisy coordinates or a single bandwidth across scenes.
+The frequency scale is tuned separately for each dataset: the paper uses sigma 10 for Gaussian features on Natural images, sigma 14 for Text, sigma 5 for MRI, and sigma 6.05 for its NeRF scene. Those values are evidence that the encoding is a controllable prior, not a plug-in constant. Jointly optimizing the feature frequencies with the MLP did not improve the 2D task, and axis-aligned positional encoding performs worse on off-axis sinusoidal signals than isotropic Gaussian features. For CT and MRI, frequencies absent from the measured projections are never directly supervised, so the mapping supplies a prior for the unobserved components; the appendix's NTK tuning approximation is also limited to small dense problems and SGD, while the task experiments use Adam. The experiments are small coordinate-regression problems, often fitting one image or one mesh per network; they do not establish robustness to noisy coordinates or a single bandwidth across scenes.
 
 ## High-Level Takeaways
 

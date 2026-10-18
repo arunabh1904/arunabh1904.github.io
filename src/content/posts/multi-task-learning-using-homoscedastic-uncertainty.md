@@ -29,6 +29,8 @@ Read the first figure from the three outputs toward the summation. Each task sti
 ![Source Figure 1: shared encoder, three task decoders, and task uncertainty weighting](/assets/images/multi-task-learning-using-homoscedastic-uncertainty-source-figure-1.webp)
 *Fig 1: A shared encoder supports semantic, instance, and depth outputs. Each task's learned uncertainty scales its contribution to the combined training objective; the uncertainty is a task-level parameter rather than an image-dependent prediction. | source: [Multi-Task Learning Using Uncertainty, Figure 1](https://arxiv.org/abs/1705.07115)*
 
+[Open figure at full size](/assets/images/multi-task-learning-using-homoscedastic-uncertainty-source-figure-1.webp)
+
 ### The regularizer prevents the trivial zero-weight solution
 
 For the paper's Gaussian regression derivation, a squared residual loss $L_i$ contributes
@@ -54,9 +56,11 @@ The four panels below trace that distinction. Semantic segmentation in panel (b)
 ![Source Figure 3: input, semantic segmentation, instance vectors, and instance segmentation](/assets/images/uncertainty-weighting-source-figure-3-instance-votes.png)
 *Fig 2: The full four-panel figure separates class prediction from instance grouping. Pixels belonging to one object vote toward a common centroid, so disconnected visible regions can still receive the same instance identity. | source: [Multi-Task Learning Using Uncertainty, Figure 3](https://arxiv.org/abs/1705.07115)*
 
+[Open figure at full size](/assets/images/uncertainty-weighting-source-figure-3-instance-votes.png)
+
 ### The controlled result is about weighting, not universal task compatibility
 
-The weighting comparison trains at 128×256 resolution for 50,000 iterations and reports Tiny Cityscapes validation results. Keeping that setting explicit matters: these are not the full-resolution test leaderboard numbers.
+The weighting comparison trains at 128×256 resolution for 50,000 iterations and reports Tiny Cityscapes validation results. Keeping that setting explicit matters: these are not the full-resolution test leaderboard numbers. Depth supervision comes from SGM stereo estimates treated as pseudo ground truth; sky is assigned zero inverse depth, and pixels without depth labels are ignored.
 
 | Training objective | Semantic IoU, % | Instance error | Inverse-depth error |
 | --- | --- | --- | --- |

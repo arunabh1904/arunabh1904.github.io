@@ -29,6 +29,8 @@ This representation gives a local token information about the broader layout. Th
 ![RoadWeaver combines learned road skeletons, procedural graph expansion, and lane construction](/assets/images/roadweaver-pipeline-paper-figure.png)
 *Fig 1: Read the pipeline at three scales: the learned field proposes the global skeleton, directional growth fills local roads, and geometric/topological repair creates lane-level connections. Final validity depends on all three stages. | source: [RoadWeaver, Figure 2](https://arxiv.org/abs/2608.11580)*
 
+[open full-size figure](/assets/images/roadweaver-pipeline-paper-figure.png)
+
 ### Procedural repair carries part of the connectivity claim
 
 Road growth follows a continuous direction field computed from nearby skeleton tangents. The field's major and minor eigenvectors provide locally compatible road directions; each growth front blends the nearest direction with its current heading and a style-dependent perturbation. Turn limits and snapping prevent unconstrained wandering.

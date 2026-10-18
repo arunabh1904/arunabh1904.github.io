@@ -34,6 +34,8 @@ A plain FPN sends information top-down. PANet adds a bottom-up path, while NAS-F
 ![EfficientDet compares top-down FPN, PANet, NAS-FPN, and the repeated bidirectional BiFPN topology.](/assets/images/efficientdet-paper-figure-2-bifpn.png)
 *Fig 1: BiFPN combines top-down and bottom-up cross-scale paths, removes one-input nodes, and repeats a compact fusion block. | source: [EfficientDet, Figure 2](https://arxiv.org/abs/1911.09070)*
 
+[open full-size figure](/assets/images/efficientdet-paper-figure-2-bifpn.png)
+
 The fusion itself is learned. For inputs I_i, fast normalized fusion uses non-negative scalar weights and computes the weighted sum divided by the sum of weights plus a small epsilon. It behaves like softmax fusion but avoids the expensive exponentials. The ablation reports 1.26–1.31 times GPU speedup with almost unchanged AP. This is a useful systems detail: the feature pyramid is not only a graph of connections; its normalization rule affects deployment cost.
 
 The compound equations describe the D0–D6 progression. D6 already uses 1280-pixel input, the B6 backbone, a 384-channel BiFPN, eight BiFPN layers, and five box/class layers, so the input formula should not be extrapolated unchanged to D7. D7 keeps B6 and that head but raises the input to 1536; D7x keeps the 1536-pixel input, swaps in B7, and adds the P8 feature level. These are deliberate endpoint choices, not a claim that one linear formula exactly generates every family member.
@@ -58,12 +60,18 @@ The training schedule is part of the result. D0–D6 use 300 epochs on 32 TPUv3 
 ![EfficientDet's accuracy-compute frontier on COCO single-model, single-scale evaluation.](/assets/images/efficientdet-scalable-and-efficient-object-detection-source-figure-1.webp)
 *Fig 2: EfficientDet moves from D0 to D7 along a higher AP-per-FLOP curve than the compared detectors. | source: [EfficientDet, Figure 1](https://arxiv.org/abs/1911.09070)*
 
+[open full-size figure](/assets/images/efficientdet-scalable-and-efficient-object-detection-source-figure-1.webp)
+
 ![Validation AP versus training epochs for EfficientDet-D1 and RetinaNet-R50.](/assets/images/efficientdet-scalable-and-efficient-object-detection-source-figure-7.webp)
 *Fig 3: Both models improve with longer training; EfficientDet-D1 continues improving through the 300- and 600-epoch schedules. | source: [EfficientDet, Figure 7](https://arxiv.org/abs/1911.09070)*
+
+[open full-size figure](/assets/images/efficientdet-scalable-and-efficient-object-detection-source-figure-7.webp)
 
 ### Training recipe and device decide where the curve is useful
 
 The ablations show that both parts matter. Under RetinaNet settings, replacing ResNet-50 with EfficientNet-B3 raises AP from 37.0 to 40.3; replacing FPN with BiFPN then raises it to 44.4. The paper's cross-paper leaderboard is still heterogeneous, and the authors reproduce RetinaNet with their trainer while taking several other baselines from their papers. Latency also depends on hardware and post-processing. D7x is efficient relative to its contemporaries, but 410B FLOPs and 285 ms on the reported Titan V are a poor fit for every edge system.
+
+The appendix makes the training dependency measurable. With D1, 300 epochs and large scale jitter in $[0.1, 2.0]$ reach 40.2 AP, while 30 epochs with the same jitter reach only 34.6; at 30 epochs, reducing the jitter range to $[0.8, 1.2]$ or $[0.5, 1.5]$ gives 38.1 and 39.1 AP. The large jitter is helpful after the longer schedule but initially makes optimization harder. The same source also reports a modified D4 semantic-segmentation model at 81.74 mIoU on Pascal VOC 2012 with 18B FLOPs, compared with 79.35/80.02 mIoU and 298/177B FLOPs for the cited DeepLabV3+ baselines; that extension is evidence that the BiFPN design transfers, not part of the COCO detector table.
 
 ## High-Level Takeaways
 

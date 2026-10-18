@@ -30,6 +30,8 @@ summary: '2024 – DINOv2 Meets Text: dino.txt'
 ![Figure 1 from DINOv2 Meets Text: dino.txt](/assets/images/dinov2-meets-text-dino-txt-source-figure-2.webp)
 *Fig 1: Overview of dino.txt: frozen DINOv2 features, two trainable vision blocks, and a text encoder align global and patch tokens for classification and open-vocabulary segmentation; the right panel shows test-time class-name queries. | source: [DINOv2 Meets Text: dino.txt, Figure 2](https://arxiv.org/abs/2412.16334)*
 
+[Open figure at full size](/assets/images/dinov2-meets-text-dino-txt-source-figure-2.webp)
+
 DINOv2 already provides a strong image representation, but it does not expose a text query interface. A naive LiT recipe—freeze DINOv2 and train only a text tower against its class token—reaches 78.8% ImageNet zero-shot accuracy and 30.2 COCO retrieval R@1, yet only 8.3 ADE20K mIoU. The global class token is useful for image recognition, but the patch tokens have not been trained to occupy the same text-aligned space.
 
 dino.txt keeps the ViT-L/14 backbone frozen and appends two trainable Transformer blocks, written as $\psi$. If the backbone emits a class token $c$ and patch tokens $f_1,\ldots,f_N$, the added blocks produce $c'$ and $f'_p$. The global descriptor is
@@ -65,6 +67,8 @@ At 224 pixels, dino.txt reaches 81.4 ImageNet, 45.4 COCO retrieval R@1, and 20.6
 
 ![Figure 4 from DINOv2 Meets Text: dino.txt showing high-resolution inference](/assets/images/dinov2-meets-text-dino-txt-source-figure-4.webp)
 *Fig 2: The center panel groups dense features into 32 clusters; the right panel assigns those regions labels from ADE20K. This separates the quality of the spatial grouping from the semantics supplied by class-name queries. | source: [DINOv2 Meets Text: dino.txt, Figure 4](https://arxiv.org/abs/2412.16334)*
+
+[Open figure at full size](/assets/images/dinov2-meets-text-dino-txt-source-figure-4.webp)
 
 Figure 2 shows the dense protocol rather than a new model head. The image is processed through overlapping crops, the patch features are clustered with $k=32$, and class-name embeddings label the clusters. The visual intuition is that high-resolution views reveal small or separated regions that a single 224-pixel grid would merge. The cost is repeated encoding and a clustering step, and the labels are only as good as the text query and benchmark ontology.
 

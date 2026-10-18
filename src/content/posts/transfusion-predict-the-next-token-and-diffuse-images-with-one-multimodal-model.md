@@ -32,6 +32,8 @@ The language loss is computed per text token. The diffusion loss is computed ove
 ![Source Figure 1 from Transfusion: text and image blocks processed by one transformer](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-paper-figure.png)
 *Fig 1: A text prefix emits a BOI marker, a continuous image block is denoised in parallel, and an EOI marker returns decoding to the language path; the transformer is shared while the modality heads differ. | source: [Transfusion, Figure 1](https://arxiv.org/abs/2408.11039)*
 
+[Open figure at full size](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-paper-figure.png)
+
 Attention follows the same separation. Every position is causally masked against later sequence elements, but patches from one image attend bidirectionally to one another. Thus a caption can condition an image, and an image can condition a later caption, while image patches do not have to predict one another left-to-right. At inference, language decoding samples token by token; after BOI, the model appends Gaussian-noise patches and runs the diffusion reverse process before emitting EOI.
 
 ### Compression comes from the VAE and the patch interface
@@ -39,16 +41,20 @@ Attention follows the same separation. Every position is causally masked against
 ![Source Figure 3 from Transfusion: VAE latents converted to image patches through linear or U-Net blocks](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-source-figure-3.webp)
 *Fig 2: A VAE maps pixels to a continuous latent grid, and a linear layer or U-Net down/up path converts local latent windows to and from transformer vectors; the choice changes both sequence length and inductive bias. | source: [Transfusion, Figure 3](https://arxiv.org/abs/2408.11039)*
 
+[Open figure at full size](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-source-figure-3.webp)
+
 The canonical VAE has 86M parameters, latent dimension 8, and maps a 256×256 image to a 32×32×8 latent tensor. With 2×2 latent patching, that is 256 image elements; with 8×8 patching, one image can be represented by 16 elements. A linear encoder/decoder adds almost no parameters, while U-Net down/up blocks add 0.27B parameters across configurations and provide spatial inductive bias.
 
 The 16-patch result is therefore a sequence-length result, not a free compression theorem. Larger patches let the model see more images per training batch and reduce attention and diffusion serving cost, but they can reduce text and image quality when the encoder is too simple. The paper’s useful question is not whether continuous patches are smaller in isolation; it is whether their retained information and learned spatial bias produce a better model at the same effective compute.
 
 ### Matched scaling favors continuous image training in this experiment
 
-The controlled comparison trains Transfusion and Chameleon at 0.16B, 0.37B, 0.76B, 1.4B, and 7B transformer sizes on 0.5T tokens with a 1:1 text/image token ratio. Both use matched VAE data and architecture; Chameleon additionally pays for a VQ-VAE codebook and stability modifications. The largest controlled models use 2×2 latent patches, simple linear image layers, and bidirectional intra-image attention.
+The controlled comparison trains Transfusion and Chameleon at 0.16B, 0.37B, 0.76B, 1.4B, and 7B transformer sizes on 0.5T tokens with a 1:1 text/image token ratio. Both use matched VAE data and architecture; Chameleon additionally pays for a VQ-VAE codebook and stability modifications. The controlled Transfusion variant uses 2×2 latent patches, simple linear image layers, and bidirectional intra-image attention. The scorecard measures perplexity on 20M held-out Wikipedia/C4 tokens, Llama-2 zero-shot accuracy, 5k COCO captions, and 30k COCO prompts for FID and CLIP.
 
 ![Source Figure 5 from Transfusion: six-metric scaling comparison against Chameleon](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-source-figure-5-full.png)
 *Fig 3: Figure 5 compares Transfusion (red) and Chameleon (blue) across six scaling metrics: C4 and Wikipedia perplexity, Llama 2 accuracy, MS-COCO CIDEr, FID, and CLIP. Lower is better for perplexity and FID; higher is better for accuracy, CIDEr, and CLIP. The fitted lines summarize the tested scale range, not an asymptotic law. | source: [Transfusion, Figure 5](https://arxiv.org/abs/2408.11039)*
+
+[Open figure at full size](/assets/images/transfusion-predict-the-next-token-and-diffuse-images-with-one-multimodal-model-source-figure-5-full.png)
 
 | 7B model, 0.5T tokens | Transfusion | Chameleon | Relative FLOPs to match Chameleon |
 | --- | ---: | ---: | ---: |

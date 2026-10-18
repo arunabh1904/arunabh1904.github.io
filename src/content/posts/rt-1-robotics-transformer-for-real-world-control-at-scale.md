@@ -32,12 +32,16 @@ The paper's question is practical: can one model share capacity across these tas
 ![RT-1 overview linking language instructions and image history to an action policy on the mobile manipulator](/assets/images/rt-1-robotics-transformer-for-real-world-control-at-scale-source-figure-1.webp)
 *Fig 1: The paper's overview places a short visual history and task instruction before RT-1, then shows the policy selecting arm, base, gripper, or termination outputs for closed-loop execution. | source: [RT-1: Robotics Transformer for Real-World Control at Scale, Figure 1](https://arxiv.org/abs/2212.06817)*
 
+[Open figure at full size](/assets/images/rt-1-robotics-transformer-for-real-world-control-at-scale-source-figure-1.webp)
+
 The overview is easy to read as a generic vision-to-action pipeline, but the key design choice is the narrow interface in the middle: many images and language descriptions must become a small token sequence before the control decoder can run at the required rate.
 
 ### Language enters perception early
 
 ![RT-1 architecture with identity-initialized FiLM, TokenLearner, and transformer action decoder](/assets/images/rt-1-robotics-transformer-for-real-world-control-at-scale-source-figure-3.png)
 *Fig 2: A six-image history is encoded by an instruction-conditioned EfficientNet, compressed from 81 spatial tokens to eight, and passed to an eight-layer decoder-only transformer that emits tokenized actions. | source: [RT-1: Robotics Transformer for Real-World Control at Scale, Figure 3](https://arxiv.org/abs/2212.06817)*
+
+[Open figure at full size](/assets/images/rt-1-robotics-transformer-for-real-world-control-at-scale-source-figure-3.png)
 
 Each input frame is a $300\times300$ RGB image. ImageNet-pretrained EfficientNet-B3 maps it to a $9\times9\times512$ feature map, which RT-1 flattens into 81 visual tokens. The natural-language instruction is embedded with Universal Sentence Encoder and injected into the EfficientNet through FiLM layers. Those FiLM projections are identity-initialized: the dense layers producing the scale and shift begin at zero, so inserting language does not destroy the pretrained image features at the start of training.
 

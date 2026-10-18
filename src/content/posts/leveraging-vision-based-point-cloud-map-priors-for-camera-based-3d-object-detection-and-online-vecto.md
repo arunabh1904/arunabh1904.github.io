@@ -31,6 +31,8 @@ The figure shows how a retrieved patch becomes useful to current perception. A s
 ![Vision map prior source Figure 2 shows separate camera and prior-map encoders, BEV fusion, and detection and mapping heads](/assets/images/vision-map-prior-source-figure.png)
 *Fig 1: The retrieved point cloud supplies persistent geometry and semantics. Fused BEV features provide metric context, while direct perspective-view aggregation preserves fine image evidence for both task heads. | source: [Vision-Based Point Cloud Map Priors, Figure 2; figure crop](https://arxiv.org/abs/2609.26325)*
 
+[open full-size figure](/assets/images/vision-map-prior-source-figure.png)
+
 ### Geometry and semantic descriptors contribute differently
 
 VoVNet-99 image features are lifted through an LSS-style depth distribution. Camera and map BEV features are concatenated and mixed through a 3 × 3 convolution, then refined by residual blocks and an FPN. SparseDrive-style detection and mapping queries aggregate fused BEV and perspective-view evidence sequentially. The map output remains the three standard classes, represented with twenty points per instance, in a 30 × 60 m region.
@@ -49,6 +51,8 @@ Semantic descriptors explain the large mapping gain. More traversals help detect
 ### A repeated-visit benchmark has a specific leakage boundary
 
 Training maps use training traversals. Validation maps may include other training and validation traversals, but exclude the current traversal and temporally adjacent ones. Globally corrected Argoverse 2 poses establish alignment. This is a legitimate repeated-visit setup, distinct from entering entirely unmapped geography. Coverage-restricted subsets re-evaluate both the prior model and the no-map baseline on the same samples, avoiding a comparison between different road populations.
+
+The coverage check is quantitative: on tiles covered by at least one other traversal, the prior raises CDS from 0.312 to 0.331 (+1.9 points), and on tiles covered by at least two it raises CDS from 0.296 to 0.315 (+1.8 points). Those gains are larger than the +1.2-point full-validation improvement, tying the benefit to repeated coverage rather than to a different validation population.
 
 Relative to [Scene Reconstruction as Mapping Priors](/paper%20shorts/2026/05/21/scene-reconstruction-as-mapping-priors-for-3d-detection.html), the new commitment is an explicit camera-built geometric-semantic memory used for both detection and vector mapping. The storage, retrieval, reconstruction cost, and pose source belong in that system comparison. Complete deployment latency and robustness to actual stale-map changes are not reported here; the conclusion explicitly identifies alignment and change detection as future work.
 

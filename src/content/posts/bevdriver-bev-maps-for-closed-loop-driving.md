@@ -32,7 +32,7 @@ Read the architecture through the final waypoint head and PID controller. Those 
 
 [View full-size figure](/assets/images/bevdriver-source-figure-2.webp)
 
-The training data includes LMDrive's 15,000 sequences and 2,000 additional sequences with semantic labels. Training uses eight public CARLA towns; held-out weather and time-of-day conditions test environmental variation. The paper also reports a Town05 exclusion experiment, which should be distinguished from results where that town appears in training. Language-model training takes 72 hours on eight A100 GPUs, following separate perception pretraining.
+The training data includes LMDrive's 15,000 sequences and 2,000 additional sequences with semantic labels. Training uses eight public CARLA towns; held-out weather and time-of-day conditions test environmental variation. The paper also reports a Town05 exclusion experiment, which should be distinguished from results where that town appears in training. The encoder is pretrained separately for 48 hours on eight A40 GPUs; the full pipeline then trains for 15 epochs, 72 hours on eight A100 GPUs with AdamW, initial learning rate $10^{-4}$, weight decay $0.06$, and a 40-frame sensor history.
 
 ### Completion and infractions can move in opposite directions
 

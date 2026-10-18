@@ -24,10 +24,12 @@ summary: "2025 – Vision-Language-Action Models for Autonomous Driving: Past, P
 
 ### Every driving VLA exposes three interfaces
 
-The paper starts from a compact formulation, (a_t = H(F(x_t;	heta))): a VLM backbone $F$ turns multimodal input into a representation, and an action head $H$ turns that representation into an executable output. The input $x_t$ is not just an image. The survey distinguishes camera and LiDAR observations, BEV or occupancy features, language instructions, and vehicle state such as speed, acceleration, steering, and yaw rate. A paper's real architecture is therefore determined by what enters $F$, what the backbone preserves, and what $H$ is allowed to emit.
+The paper starts from a compact formulation, $a_t = H(F(x_t;\theta))$: a VLM backbone $F$ turns multimodal input into a representation, and an action head $H$ turns that representation into an executable output. The input $x_t$ is not just an image. The survey distinguishes camera and LiDAR observations, BEV or occupancy features, language instructions, and vehicle state such as speed, acceleration, steering, and yaw rate. A paper's real architecture is therefore determined by what enters $F$, what the backbone preserves, and what $H$ is allowed to emit.
 
 ![Representative VA and VLA models organized by output family and system boundary](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-paper-figure.png)
 *Fig 1: The survey's model map separates vision-action systems, end-to-end VLA textual and numerical generators, and dual-system VLA guidance or representation transfer. | source: [Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future, Figure 2](https://arxiv.org/abs/2512.16760)*
+
+[Open figure at full size](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-paper-figure.png)
 
 This framing prevents a common category error. A model that answers a scene question, a model that predicts a waypoint string, and a model that outputs a continuous trajectory may share a VLM backbone while imposing very different control contracts. The action head decides how much of the semantic representation must survive contact with the vehicle's timing and geometry.
 
@@ -48,7 +50,11 @@ The distinction predicts different failure modes. Explicit guidance keeps the se
 ![Roadmap of the survey from preliminary interfaces through VA, VLA, datasets, and open challenges](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-source-figure-1.webp)
 *Fig 2: The roadmap connects input modalities, action generators, end-to-end versus dual-system architectures, open- and closed-loop benchmarks, and the unresolved challenges around generalization and trust. | source: [Vision-Language-Action Models for Autonomous Driving: Past, Present, and Future, Figure 1](https://arxiv.org/abs/2512.16760)*
 
+[Open figure at full size](/assets/images/vision-language-action-models-for-autonomous-driving-past-present-and-future-source-figure-1.webp)
+
 The survey's benchmark section makes the comparison boundary explicit. nuScenes and NAVSIM navtest emphasize open-loop trajectory prediction; Bench2Drive provides closed-loop routes and interaction. Its metric table distinguishes L2 and collision rate from ADE/FDE, miss rate, heading error, and control errors. Those are not interchangeable: open-loop agreement with an expert future does not test whether a policy remains stable after its own action changes the future.
+
+The benchmark review adds two useful boundaries. WOD-E2E contributes 4K long-tail segments with multi-view inputs, routing and ego-status signals, and a Rater Feedback Score based on human preferences rather than only logged trajectories. NAVSIM's PDMS combines no-collision, drivable-area, time-to-collision, progress, and comfort; reported Best-of-N oracle selection is a separate protocol that should stay distinct when comparing scores. Bench2Drive remains the interaction test, with route success and a composite driving score.
 
 ## High-Level Takeaways
 

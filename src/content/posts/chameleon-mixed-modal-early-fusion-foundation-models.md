@@ -27,19 +27,25 @@ Chameleon's central decision is to make images discrete before the language mode
 ![Chameleon architecture: text and images represented as interleaved discrete tokens for one transformer](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-paper-figure.png)
 *Fig 1: Chameleon represents text, images, and code as discrete tokens and feeds the interleaved sequence to one transformer trained end to end. | source: [Chameleon, Figure 1](https://arxiv.org/abs/2405.09818)*
 
+[Open figure at full size](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-paper-figure.png)
+
 The interface is simple, but its cost is visible in the sequence length. A single 512 × 512 image already consumes 1,024 autoregressive positions. The paper also reports that its tokenizer reconstructs images containing substantial text poorly, which limits OCR-heavy use. Early fusion therefore buys arbitrary image-text ordering by asking the codec to preserve both semantic evidence and appearance under a fixed token budget.
 
 ![Chameleon task categories and example prompts used in the mixed-modal human evaluation](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-source-figure-19.webp)
 *Fig 2: The human-evaluation prompt set is unevenly distributed: brainstorming is 18.6%, explanation 14.4%, how-to 12.5%, advice 10.2%, identification 9.3%, and reasoning 2.1%, with the remaining categories making up the rest. | source: [Chameleon, Figure 19](https://arxiv.org/abs/2405.09818)*
+
+[Open figure at full size](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-source-figure-19.webp)
 
 That composition matters when reading the aggregate human result. The authors' Figure 19 includes everyday mixed-modal prompts, but OCR is explicitly absent from the evaluation set. Chameleon performs well in brainstorming, comparison, and hypothetical prompts, while identification and reasoning are weaker. A capability headline drawn from this set mostly measures interactive generation and visual prompting; it is not a broad test of text-in-image understanding.
 
 ![Chameleon inter-annotator agreement counts for the absolute evaluation](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-source-figure-23.webp)
 *Fig 3: Three annotators judge each absolute-evaluation question. Unanimous agreement dominates objective properties such as objectionable content, while task fulfillment and relevance show more close two-of-three disagreements; “no agreement” remains a small category. | source: [Chameleon, Figure 23](https://arxiv.org/abs/2405.09818)*
 
+[Open figure at full size](/assets/images/chameleon-mixed-modal-early-fusion-foundation-models-source-figure-23.webp)
+
 The agreement figure supplies the boundary around the human evaluation. Every question is judged by three annotators, and the final answer uses majority vote. In the reported 34B comparison, Chameleon fully fulfills 55.2% of tasks, versus 37.6% for Gemini+ and 44.7% for GPT-4V+. The enhanced baselines use DALL-E 3 to turn their generated image captions into images, so they can answer prompts expecting mixed-modal output. The result measures task fulfillment under that protocol and category mix, rather than a universal visual-grounding score.
 
-The data and stability recipes are equally structural. The first training stage contains 2.9T text-only tokens, 1.4B text-image pairs producing about 1.5T text-image tokens, and 400B interleaved image-text tokens. The second stage downweights the first mixture and adds higher-quality and instruction data. Above 8B parameters and roughly 1T tokens, late divergence appeared when modalities with different entropy competed through shared softmax layers. QK normalization, norm reordering, dropout choices, and z-loss form the stabilization recipe; uncontrolled growth in the final-layer output norm predicted later loss divergence. The paper shows how to make early fusion work at scale, not that it is intrinsically stable.
+The data and stability recipes are equally structural. The first training stage covers 80% of training: 2.9T text-only tokens, 1.4B text-image pairs producing about 1.5T text-image tokens, and 400B interleaved image-text tokens. The second stage halves the first-stage mixture weight and adds higher-quality and instruction data. Above 8B parameters and roughly 1T tokens, late divergence appeared because modalities with different entropy compete through a shared softmax: translation invariance lets each modality increase its norms slightly to win logit or attention mass until the representation leaves bf16's effective range. QK normalization is essential; dropout stabilizes the 7B recipe, while the 34B recipe uses norm reordering without dropout, plus z-loss. Monitoring final-layer output norms predicted later loss divergence. The paper shows how to make early fusion work at scale, not that it is intrinsically stable.
 
 | Decision | Evidence in Chameleon | Cost or boundary |
 | --- | --- | --- |

@@ -26,8 +26,10 @@ STGAT uses a G-LSTM for temporal interaction, an M-LSTM for spatial interaction,
 
 The distinction changes where the objective places pressure. ODM asks the policy to choose a complete path at once. SDM exposes the sequence of local decisions and applies a discount factor to cumulative error. The paper calls its reward an inverse-reinforcement-learning construction because expert behavior is used to define the reward, but the reward is an explicit squared L2 distance to ground truth rather than a learned discriminator or an inferred latent human cost.
 
-![The STGAT encoder is reused while the batch is decomposed into per-pedestrian decision episodes](/assets/images/unified-pedestrian-path-prediction-paper-figure.webp)
-*Fig 1: The formulation keeps a shared scene encoder, then evaluates one trajectory-level or twelve step-wise policy episode per pedestrian using the same MDP template. | source: [Unified Pedestrian Path Prediction Using Inverse Reinforcement Learning, Figure 1](https://arxiv.org/abs/2608.15929)*
+![Unified pedestrian path prediction RL formulation](/assets/images/unified-pedestrian-path-prediction-using-inverse-reinforcement-learning-source-figure-1.png)
+*Fig 1: STGAT encodes the observed crowd, decomposes the batched output into parallel per-pedestrian episodes, and applies one shared MDP template; ODM emits one trajectory-level action while SDM emits twelve next-position actions. | source: [Unified Pedestrian Path Prediction using Inverse Reinforcement Learning, Figure 1](https://arxiv.org/abs/2608.15929)*
+
+[Open figure at full size](/assets/images/unified-pedestrian-path-prediction-using-inverse-reinforcement-learning-source-figure-1.png)
 
 ### PPO's value baseline matters more than stochasticity alone
 

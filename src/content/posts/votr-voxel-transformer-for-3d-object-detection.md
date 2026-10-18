@@ -28,6 +28,8 @@ The paper keeps two kinds of voxel modules. A submanifold module updates feature
 ![VoTr architecture with sparse and submanifold voxel modules](/assets/images/votr-voxel-transformer-for-3d-object-detection-paper-figure.webp)
 *Fig 1: VoTr replaces the 3D convolutional backbone with sparse and submanifold voxel modules, then sends the resulting features to the usual BEV backbone and detection head. | source: [VoTr, Figure 2](https://arxiv.org/abs/2109.02497)*
 
+[Open Figure 1 at full resolution](/assets/images/votr-voxel-transformer-for-3d-object-detection-paper-figure.webp)
+
 This distinction is the structural intuition behind the architecture. The sparse module changes the support when the backbone needs it; the submanifold module lets attention spread information without filling every empty cell. The rest of the detector remains familiar: voxel features become a BEV map, proposals are generated, and the two-stage VoTr-TSD variant can reuse the backbone for ROI refinement.
 
 ### Local and dilated attention spend a bounded budget
@@ -37,14 +39,20 @@ Local Attention uses a three-dimensional radius of $(1,1,1)$ and searches every 
 ![Local and dilated attention in VoTr](/assets/images/votr-voxel-transformer-for-3d-object-detection-source-figure-3.webp)
 *Fig 2: Local attention keeps all occupied neighbors in a nearby 3D range; dilated attention reaches farther by increasing the spacing between candidate locations. | source: [VoTr, Figure 3](https://arxiv.org/abs/2109.02497)*
 
+[Open Figure 2 at full resolution](/assets/images/votr-voxel-transformer-for-3d-object-detection-source-figure-3.webp)
+
 The comparison with convolution is about coverage, not a claim that every distant voxel is useful. A fixed 3D kernel repeatedly samples the same geometric offsets and can miss the disconnected returns of an incomplete object. VoTr's query first enumerates candidate coordinates, keeps the occupied ones, and then lets feature similarity weight them. The source illustration is drawn in two dimensions, but the search rule is three-dimensional.
 
 ![VoTr source Figure 1(a): fixed convolution neighborhood](/assets/images/votr-voxel-transformer-for-3d-object-detection-source-figure-1.webp)
 *Fig 3: A fixed 3D convolution samples a local geometric neighborhood around a query; VoTr replaces that fixed active-neighbor pattern with local or dilated occupied-voxel retrieval. | source: [VoTr, Figure 1(a)](https://arxiv.org/abs/2109.02497)*
 
+[Open Figure 3 at full resolution](/assets/images/votr-voxel-transformer-for-3d-object-detection-source-figure-1.webp)
+
 ### Fast Voxel Query turns retrieval into parallel lookup
 
 The sparse coordinate list is not ordered so that a neighbor's integer coordinate can be found directly. Scanning all $N_{\mathrm{sparse}}$ coordinates for every query would cost $O(N_{\mathrm{sparse}})$ per lookup; storing a dense index over the entire scene would require more than $10^7$ cells. Fast Voxel Query builds a GPU hash table from integer voxel coordinates to rows in the sparse feature array. Each query generates its local or dilated candidate coordinates, hashes them in parallel, rejects empty entries, and gathers the surviving features.
+
+The block is deliberately unlike a vanilla transformer. VoTr replaces layer normalization with batch normalization and removes dropout because randomly dropping one of the few attended voxels damages the sparse context; in the KITTI ablation, dropout probability $0.3$ lowers moderate-car AP from 78.27 to 69.75. The default query budget is 48 voxels with four attention heads, and the GPU hash table has 400,000 slots.
 
 That implementation is a useful boundary on the method. The attention matrix is small by construction, but the hash-table build, irregular reads, and candidate generation are still real work. The paper's claim is a better receptive-field/compute trade-off for occupied voxels, not free global context.
 
@@ -53,6 +61,8 @@ That implementation is a useful boundary on the method. The attention matrix is 
 On Waymo's 202 validation sequences, simply replacing the SECOND backbone with VoTr-SSD improves Level-1 vehicle mAP by 1.05 points and mAPH by 1.11 points. The range breakdown is more informative than the average: the mAP gains are 0.08 points at 0–30 m, 1.42 at 30–50 m, and 1.72 beyond 50 m. Replacing the PV-RCNN backbone with VoTr-TSD gives larger gains, including 3.37 and 4.83 points in the two farther ranges. Level 1 counts boxes with more than five LiDAR points; Level 2 includes boxes with at least one point.
 
 On the KITTI validation comparison, VoTr-SSD reaches 78.27 moderate car AP at 14.65 Hz, compared with SECOND at 76.48 AP and 20.73 Hz. PV-RCNN reaches 83.69 AP at 9.25 Hz, while VoTr-TSD reaches 84.04 AP at 7.17 Hz. Increasing each query's attended-voxel budget from 24 to 48 adds 1.19 moderate AP, and adding dilated attention to local attention adds 2.79 points in the paper's ablation. These results support a specific intuition: the extra context helps when an object is represented by a few separated returns, but its indexing cost is visible in throughput.
+
+The comparison uses separate data protocols. Waymo has 798 training and 202 validation sequences, and VoTr samples 20% of the training frames while evaluating on the full validation set. KITTI has 7,481 training and 7,518 test samples, with the reported validation ablations using the 3,712/3,769 train/validation split. The KITTI models train for 80 epochs; Waymo uses 60 or 80 epochs for the two model variants. Data augmentation and the remaining settings follow their SECOND and PV-RCNN baselines, so the backbone swap is the controlled comparison.
 
 ## High-Level Takeaways
 

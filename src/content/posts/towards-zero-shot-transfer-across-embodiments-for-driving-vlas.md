@@ -34,13 +34,15 @@ Follow the two routes into the loss in the source diagram. The VLM route must re
 ![BEV-Forcing source Figure 2: learned spatial queries read VLM image embeddings and predict a teacher occupancy grid](/assets/images/bev-forcing-source-figure-2.png)
 *Fig 1: Spatial queries reconstruct vehicle occupancy from image hidden states. A small prediction head encourages the shared features to expose geometry instead of delegating reconstruction to a powerful decoder. | source: [BEV-Forcing, Figure 2](https://arxiv.org/abs/2609.02341)*
 
+[Open figure at full size](/assets/images/bev-forcing-source-figure-2.png)
+
 A large auxiliary decoder could solve the training task without making the representation equally useful to the planner. The head-capacity ablation supports this concern: in the paper's smaller comparison, replacing cross-attention with a full transformer block raises Physical AI average displacement error from 1.725 to 1.805 and final displacement error from 5.073 to 5.308. These values belong to that ablation and should not be mixed with the main benchmark runs. They support the chosen small head; they do not directly measure how spatial information is distributed across features.
 
 Once training ends, the auxiliary head is removed. The additional cost lies in teacher target generation and training, rather than in an extra deployed perception module. Unlike [Qwen-Drive's explicit perception output](/paper%20shorts/2026/08/31/qwen-drive-1-0-an-initial-step-towards-a-vision-language-foundation-model-for-autonomous-driving.html), this head exists to shape a representation and need not remain available for inspection at inference.
 
 ### More data changes the answer to whether the auxiliary loss helps
 
-The experiments progressively add camera rigs through Waymo, NAVSIM, and nuScenes-QA, then evaluate transfer to Physical AI and KITScenes LongTail. For Waymo-only training, BEV-Forcing reduces Physical AI average displacement error by 10.1%. On KITScenes test, the Waymo-plus-NAVSIM model improves its multi-maneuver score from 4.62 to 5.15. Those are useful gains under limited diversity.
+The experiments progressively add data sources and camera diversity through Waymo and NAVSIM; nuScenes-QA adds VQA supervision rather than another planning camera rig. They then evaluate transfer to Physical AI and KITScenes LongTail. For Waymo-only training, BEV-Forcing reduces Physical AI average displacement error by 10.1%. On KITScenes test, the Waymo-plus-NAVSIM model improves its multi-maneuver score from 4.62 to 5.15. Those are useful gains under limited diversity.
 
 The full mixture is the essential counterexample. Table 2 reports the following held-out Waymo results; larger Rater Feedback Score is better, while smaller average displacement error is better.
 
