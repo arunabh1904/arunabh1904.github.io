@@ -173,11 +173,16 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
         "32": 1905,
     },
     "code-is-cheap-understanding-isnt": {
+        "4": 1906,
         "14": 1905,
     },
     "from-ppo-to-grpo-rl-for-reasoning-and-vlas": {
         "4": 1905,
+        "5": 1905,
+        "6": 1905,
+        "7": 1905,
         "11": 1905,
+        "14": 1906,
     },
     "from-seeing-to-doing-the-evolution-of-vision-language-models": {
         "4": 1905,
@@ -186,6 +191,7 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
         "41": 1905,
     },
     "how-to-read-scaling-laws-for-language-models": {
+        "8": 1905,
         "13": 1905,
         "19": 1906,
     },
@@ -195,19 +201,24 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
         "20": 1905,
     },
     "my-journey-so-far-full-story": {
+        "11": 1906,
+        "24": 1906,
         "25": 1906,
     },
     "omni-model-pretraining-decisions": {
+        "6": 1905,
         "8": 1905,
         "12": 1905,
     },
     "on-engineering-management": {
         "11": 1905,
         "14": 1905,
-        "24": 1905,
+        "15": 1905,
+        "23": 1905,
+        "24": 1906,
     },
     "open-weight-models-that-fit-on-a-64-gb-macbook-pro": {
-        "5": 1905,
+        "5": 1906,
     },
     "replacing-openclaw-with-hermes-agent-using-local-weights": {
         "1": 1905,
@@ -215,6 +226,7 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
         "6": 1905,
     },
     "running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro": {
+        "1": 1905,
         "8": 1905,
     },
     "running-gemma-4-locally-on-a-64-gb-macbook-pro": {
@@ -223,6 +235,7 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
     },
     "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro": {
         "3": 1905,
+        "11": 1905,
         "15": 1905,
     },
     "running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro": {
@@ -234,6 +247,7 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
         "9": 1906,
         "11": 1906,
         "14": 1906,
+        "28": 1906,
     },
 }
 HUMAN_POST_PRONUNCIATION_LEXICONS = {
