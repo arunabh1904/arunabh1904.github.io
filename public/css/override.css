@@ -607,6 +607,12 @@ img:not(.float-right):not(.float-left) {
     width: 68rem;
   }
 
+  /* This overview is designed to show its complete decision flow on a phone. */
+  [data-post-section] p:has(> a[href="/assets/images/bev-map-system-proposed.svg"]) > a {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .blog-frame-explainer__controls {
     grid-template-columns: 2.5rem minmax(6rem, 1fr) 2.5rem auto;
   }
