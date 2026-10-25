@@ -1,60 +1,80 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1640" viewBox="0 0 1000 1640" role="img" aria-labelledby="title desc">
-<title id="title">Proposed mapping system: observations, priors, topology, and verified updates</title>
-<desc id="desc">Current sensors and recent memory form observation features. An aligned SD map and optional historical map supply separate priors. Structured decoders produce road elements and relations. The current graph serves planning, while visibility and alignment checks govern permanent updates to versioned storage.</desc>
-<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="none" stroke="#334155" stroke-width="1.4"/></marker></defs>
-<rect width="1000" height="1640" fill="#fcfbf8"/>
-<g font-family="Arial, sans-serif" fill="#17212b">
-<text x="48" y="58" font-size="30" font-weight="700">From observations to a map that can change</text>
-<text x="48" y="91" font-size="19" fill="#52616b">Proposed implementation · author’s integration of the reviewed literature</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1000" viewBox="0 0 720 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Build the local map; verify permanent edits</title>
+  <desc id="desc">Proposed implementation. Current sensors and recent memory provide observation BEV. An aligned, optional SD or historical map supplies a prior. Together they condition queries that decode road geometry and directed connections, while allowing unmapped elements to be discovered. The current local graph goes to planning with uncertainty and temporary restrictions. A separate verifier compares sensor evidence with the retained source map, checks visibility and alignment, and accumulates evidence across visits. Only confirmed edits enter versioned persistent storage; uncertain changes are deferred.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="m1 1 6 3.5-6 3.5" fill="none" stroke="#26343b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect width="720" height="1000" rx="16" fill="#fcfbf8"/>
+  <g font-family="Arial, sans-serif" fill="#17212b">
+    <text x="32" y="43" font-size="22" fill="#52616b">PROPOSED IMPLEMENTATION</text>
+    <text x="32" y="87" font-size="32" font-weight="700">Build the local map. Verify lasting edits.</text>
 
-<g stroke="#334155" stroke-width="2" fill="#fff">
-<rect x="48" y="128" width="430" height="124" rx="12"/><rect x="522" y="128" width="430" height="124" rx="12"/>
-<rect x="48" y="301" width="430" height="162" rx="12" fill="#e9f3f3"/><rect x="522" y="301" width="430" height="162" rx="12" fill="#f7eedf"/>
-<rect x="48" y="527" width="904" height="151" rx="12"/>
-<rect x="48" y="736" width="430" height="158" rx="12"/><rect x="522" y="736" width="430" height="158" rx="12"/>
-<rect x="48" y="963" width="430" height="204" rx="12" fill="#e9f3f3"/><rect x="522" y="963" width="430" height="204" rx="12" fill="#f7eedf"/>
-<rect x="48" y="1232" width="430" height="132" rx="12"/><rect x="522" y="1232" width="430" height="132" rx="12"/>
-</g>
+    <!-- Two inputs, one merge, then two distinct uses of the local graph. -->
+    <g stroke="#26343b" stroke-width="2" fill="#fff">
+      <rect x="32" y="121" width="310" height="150" rx="14"/>
+      <rect x="378" y="121" width="310" height="150" rx="14"/>
+      <rect x="32" y="326" width="656" height="226" rx="14"/>
+      <rect x="32" y="625" width="310" height="170" rx="14" fill="#edf5f3"/>
+      <rect x="378" y="625" width="310" height="200" rx="14" fill="#fbf0df"/>
+      <rect x="378" y="883" width="310" height="88" rx="14"/>
+    </g>
+    <g fill="none" stroke="#26343b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)">
+      <path d="M187 271v26h173v29"/>
+      <path d="M533 271v26H360" marker-end="none"/>
+      <path d="M360 552v36H187v37"/>
+      <path d="M360 588h173v37"/>
+      <path d="M533 825v58"/>
+    </g>
+    <circle cx="360" cy="297" r="4" fill="#26343b"/>
+    <circle cx="360" cy="588" r="4" fill="#26343b"/>
 
-<g font-size="24" font-weight="700">
-<text x="70" y="166">Current sensor evidence</text><text x="544" y="166">External map priors</text>
-<text x="70" y="340">Observation BEV + memory</text><text x="544" y="340">Retrieve, align, encode</text>
-<text x="70" y="566">Prior-conditioned features and map queries</text>
-<text x="70" y="775">Geometry and attributes</text><text x="544" y="775">Typed relationships</text>
-<text x="70" y="1003">Current local scene graph</text><text x="544" y="1003">Change verification</text>
-<text x="70" y="1272">Planning interface</text><text x="544" y="1272">Versioned persistent map</text>
-</g>
-<g font-size="21" fill="#334155">
-<text x="70" y="202">Cameras · optional LiDAR / radar</text><text x="70" y="232">Calibration · timestamps · ego pose</text>
-<text x="544" y="202">Noisy SD road graph</text><text x="544" y="232">Optional prior vectors / point cloud</text>
-<text x="70" y="377">Lift / retrieve image features</text><text x="70" y="409">Warp recent spatial + vector memory</text><text x="70" y="441">Keep visibility and pose uncertainty</text>
-<text x="544" y="377">Vector tokens + raster features</text><text x="544" y="409">Version · age · coverage · uncertainty</text><text x="544" y="441">Missing prior is an explicit condition</text>
-<text x="70" y="605">Attention / gated fusion · retain independent discovery queries</text>
-<text x="70" y="640">Train with absent and conflicting priors; preserve evidence provenance</text>
-<text x="70" y="815">Lane segments · boundaries · curbs</text><text x="70" y="848">Crossings · stop lines · controls</text><text x="70" y="879">Instance identity + uncertainty</text>
-<text x="544" y="815">Successor · lateral neighbor</text><text x="544" y="848">Lane–control · lane–stop-line</text><text x="544" y="879">Lane–crossing · boundary ownership</text>
-<text x="70" y="1044">Observed / inferred / unresolved</text><text x="70" y="1077">Geometry + directed topology</text><text x="70" y="1110">Current signals and restrictions</text><text x="70" y="1143">Hypotheses remain distinguishable</text>
-<text x="544" y="1044">Inputs: source map + sensor evidence</text><text x="544" y="1077">Check visibility and registration</text><text x="544" y="1110">Accumulate evidence across visits</text><text x="544" y="1143">Add / revise / remove / defer</text>
-<text x="70" y="1311">Usable now, with uncertainty</text><text x="70" y="1344">Temporary restrictions can expire</text>
-<text x="544" y="1311">Confirmed edits + retained evidence</text><text x="544" y="1344">Audit · rollback · retrieve next visit</text>
-</g>
+    <g font-size="29" font-weight="700">
+      <text x="52" y="160">Sensor evidence</text>
+      <text x="398" y="160">Map prior</text>
+    </g>
+    <g font-size="25" fill="#3f5058">
+      <text x="52" y="200">Current BEV</text>
+      <text x="52" y="238">+ recent memory</text>
+      <text x="398" y="200">SD / historical map</text>
+      <text x="398" y="238">Aligned · optional</text>
+    </g>
 
-<g fill="none" stroke="#334155" stroke-width="2.3" marker-end="url(#arrow)">
-<path d="M263 252 V299"/><path d="M737 252 V299"/>
-<path d="M263 463 V525"/><path d="M737 463 V525"/>
-<path d="M263 678 V734"/><path d="M737 678 V734"/>
-<path d="M263 894 V928 H500 V946 H263 V961"/>
-<path d="M737 894 V928 H500 V946 H737 V961"/>
-<path d="M263 1167 V1230"/><path d="M737 1167 V1230"/>
-</g>
-<text x="552" y="1206" font-size="18" fill="#77511e">Only when the update policy is satisfied</text>
-<path d="M48 1416 H952" stroke="#cbd5d1" stroke-width="1.5"/>
-<text x="48" y="1453" font-size="22" font-weight="700">What the papers contribute</text>
-<g font-size="19" fill="#52616b">
-<text x="48" y="1489">MapTRv2 / LaneSegNet: structured geometry · TopoNet / TopoLogic: relations</text>
-<text x="48" y="1521">SMERF / SEPT / Score: map conditioning · MapTracker: temporal identity</text>
-<text x="48" y="1553">RTMap: change-aware association · TbV: real-change and visibility evaluation</text>
-<text x="48" y="1599">Update policy, provenance, and the expanded output contract are proposed here.</text>
-</g>
-</g>
+    <text x="56" y="370" font-size="29" font-weight="700">Decode the current road graph</text>
+    <!-- A lane fork makes the decoded object concrete without adding another box. -->
+    <g fill="none" stroke="#247064" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M84 506v-47q0-22 25-36l28-16"/>
+      <path d="M84 459q0-22-20-35l-12-8"/>
+      <path d="m126 407 11 0-5 10M52 427v-11l11 2"/>
+    </g>
+    <g fill="#fcfbf8" stroke="#247064" stroke-width="3">
+      <circle cx="84" cy="506" r="5"/>
+      <circle cx="84" cy="459" r="5"/>
+    </g>
+    <g font-size="25" fill="#3f5058">
+      <text x="165" y="417">Road geometry + directed connections</text>
+      <text x="165" y="455">Discover unmapped elements</text>
+      <text x="165" y="493">Keep source + uncertainty</text>
+    </g>
+
+    <text x="52" y="666" font-size="29" font-weight="700">Plan now</text>
+    <g font-size="25" fill="#3f5058">
+      <text x="52" y="706">Use the local graph</text>
+      <text x="52" y="744">Keep uncertainty +</text>
+      <text x="52" y="776">temporary restrictions</text>
+    </g>
+
+    <text x="398" y="666" font-size="29" font-weight="700">Verify changes</text>
+    <g font-size="25" fill="#3f5058">
+      <text x="398" y="706">Compare sensors + prior</text>
+      <text x="398" y="744">Visible? Well aligned?</text>
+      <text x="398" y="782">Evidence across visits?</text>
+    </g>
+    <text x="549" y="859" font-size="21" font-weight="700" fill="#77511e">Confirmed only</text>
+    <text x="533" y="919" text-anchor="middle" font-size="27" font-weight="700">Versioned map</text>
+    <text x="533" y="952" text-anchor="middle" font-size="23" fill="#3f5058">Evidence + rollback</text>
+    <text x="52" y="913" font-size="25" fill="#77511e">Uncertain change?</text>
+    <text x="52" y="948" font-size="25" fill="#77511e">Defer the map edit.</text>
+  </g>
 </svg>
