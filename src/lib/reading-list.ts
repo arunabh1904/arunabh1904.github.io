@@ -39,6 +39,15 @@ export const READING_LIST_ITEMS: ReadingListItem[] = [
     group: 'writing-craft',
   },
   {
+    title: 'Impact, agency, and taste',
+    author: 'Ben Kuhn',
+    href: 'https://www.benkuhn.net/impact/',
+    dateLabel: 'Apr 2025',
+    summary:
+      'How agency and taste help researchers and engineers choose valuable problems and carry them through.',
+    group: 'writing-craft',
+  },
+  {
     title: "Lil'Log",
     author: 'Lilian Weng',
     href: 'https://lilianweng.github.io/',
