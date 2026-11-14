@@ -159,6 +159,9 @@ HUMAN_SAMPLING_SEED_VERSION = "voxtral-casual-heading-context-v3"
 # Seed overrides are voice- and chunk-policy-specific. Record only deterministic
 # rerolls that pass the complete request-level audit.
 HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
+    "what-a-vision-encoder-actually-buys": {
+        "5": 1905,
+    },
     "from-bev-features-to-lane-graphs-and-changing-maps": {
         "11": 1905,
         "16": 1905,

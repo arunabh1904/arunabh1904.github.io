@@ -1081,5 +1081,59 @@
     "top_p": 0.9,
     "voice": "casual_female",
     "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
+  },
+  "what-a-vision-encoder-actually-buys": {
+    "acoustic_decoding": "seeded-flow-matching",
+    "audio_prosody_rewrites": {
+      "time stamps drift, or one sensor": "time stamps drift or one sensor"
+    },
+    "bitrate": "64k",
+    "boundary_silence_seconds": 0.04,
+    "chunk_max_chars": 900,
+    "chunk_seed_overrides": {
+      "5": 1905
+    },
+    "chunking_policy": "heading-with-following-paragraph-groups-v3",
+    "decode_policy": "whole-request-codec-decode-v2",
+    "digest": "c8d14cd14d7cb5ee838cd5c1f8e3b093357abed23c02d313a1b398fd186f3750",
+    "duration_seconds": 369.217958,
+    "file": "/assets/audio/blog/what-a-vision-encoder-actually-buys.mp3",
+    "heading_pause_seconds": 0.55,
+    "inference_runtime": "mlx-audio==0.5.3",
+    "language": "English",
+    "max_audio_seconds": 1800,
+    "max_generation_tokens": 1600,
+    "max_seconds_per_word": 0.72,
+    "min_seconds_per_word": 0.24,
+    "model": "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16",
+    "narration_chunk_count": 8,
+    "narration_mode": "full-source",
+    "narration_word_count": 796,
+    "narrator_seed": 1904,
+    "output_gain_db": -1.0,
+    "paragraph_pause_seconds": 0.24,
+    "post_pronunciation_lexicon": {},
+    "pronunciation_lexicon": {
+      "cyclist": "sike-list",
+      "cyclists": "sike-lists",
+      "lidar": "lie-dar",
+      "timestamp": "time stamp",
+      "timestamps": "time stamps"
+    },
+    "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+    "sampling_controls_applied": false,
+    "sampling_seed_version": "voxtral-casual-heading-context-v3",
+    "semantic_decoding": "argmax",
+    "sentence_pause_policy": "model-natural-with-explicit-structure-v1",
+    "silence_threshold": 0.008,
+    "source_sha256": "6f08a29a8c44d39fbe85a5de6e8962825ed25be56ee90b4e595e0bf48d806df3",
+    "speed": 1.0,
+    "synthesis_profile": "human",
+    "table_policy": "skip-rows-require-spoken-takeaway-v1",
+    "temperature": 0.3,
+    "top_k": 50,
+    "top_p": 0.9,
+    "voice": "casual_female",
+    "voice_mode": "voxtral-fixed-preset-heading-context-full-decode-v3"
   }
 }
