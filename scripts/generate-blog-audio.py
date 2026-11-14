@@ -141,6 +141,7 @@ HUMAN_NARRATION_POSTS = frozenset(
         "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro",
         "running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro",
         "thoughts-on-good-research-in-industry",
+        "what-a-vision-encoder-actually-buys",
     }
 )
 HUMAN_MODEL = "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16"
@@ -158,6 +159,9 @@ HUMAN_SAMPLING_SEED_VERSION = "voxtral-casual-heading-context-v3"
 # Seed overrides are voice- and chunk-policy-specific. Record only deterministic
 # rerolls that pass the complete request-level audit.
 HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
+    "what-a-vision-encoder-actually-buys": {
+        "5": 1905,
+    },
     "from-bev-features-to-lane-graphs-and-changing-maps": {
         "11": 1905,
         "16": 1905,
