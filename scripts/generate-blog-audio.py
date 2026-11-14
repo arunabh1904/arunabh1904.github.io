@@ -141,6 +141,7 @@ HUMAN_NARRATION_POSTS = frozenset(
         "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro",
         "running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro",
         "thoughts-on-good-research-in-industry",
+        "what-a-vision-encoder-actually-buys",
     }
 )
 HUMAN_MODEL = "mlx-community/Voxtral-4B-TTS-2603-mlx-bf16"
