@@ -17,11 +17,13 @@ summary: A controlled study separates pretrained visual knowledge from dedicated
 
 [Chris Hoang's thread](https://x.com/choang333/status/2121335484236386574) raises a question that “encoder-free” leaves surprisingly vague: which part of the encoder are we removing? A typical vision-language model inherits visual features from pretraining, reserves parameters for images, and runs those parameters before the language backbone. Deleting the encoder changes all three at once.
 
-[*Unbundling Multimodal Vision Encoding*](https://arxiv.org/abs/2611.17334), by Ellis Brown, Chris Hoang, and colleagues, separates these choices. Its useful result is that dedicated vision capacity can remain valuable even when separate visual pretraining and a separate encoder do not. That sharpens the architectural history in [Tracing the VLM Progression](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html): moving toward one backbone need not mean making every parameter serve every modality.
+[*Unbundling Multimodal Vision Encoding*](https://arxiv.org/abs/2611.17334), by Ellis Brown, Chris Hoang, and colleagues, separates these choices. Its useful result is that dedicated vision capacity can remain valuable even when separate visual pretraining and a separate encoder do not. Moving toward one backbone need not mean making every parameter serve every modality.
 
 ## How the encoder became the default
 
 [CLIP](https://arxiv.org/abs/2103.00020) made reusable visual features practical by aligning images and text at scale in 2021. The original [LLaVA](https://arxiv.org/abs/2304.08485) then connected a frozen CLIP encoder to a language model through a learned projection. This was an economical way to assemble a visual assistant from existing components. It established that pretrained features worked; it did not isolate why they worked.
+
+I covered this progression in my earlier [VLM post, including LLaVA's projector and training stages](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html#from-q-formers-to-mlp-projectors). The [spatial-adapter guide](/blog/2026/10/06/adding-spatial-grids-and-object-tokens-to-vision-language-models.html#what-the-connector-literature-provides) looks more closely at what those connectors preserve or compress. Here the question moves upstream: which visual processing should produce the features in the first place?
 
 [Fuyu-8B](https://www.adept.ai/blog/fuyu-8b/) took another route in 2023, projecting image patches directly into a decoder-only transformer. But comparing released models cannot settle the encoder question: their data, training budgets, and backbones also differ. The new study makes those controls explicit, including the upstream compute spent pretraining an encoder. A reusable checkpoint is cheap to download, but its training is still part of the scientific comparison.
 
@@ -44,7 +46,7 @@ Adding shared parameters leaves visual performance near the encoder-free baselin
 
 The authors call the internal design **in-fusion**. Every token uses the shared backbone; image tokens also use vision-only branches whose outputs are added to the shared outputs. The feed-forward-only variant compares placement at a fixed parameter budget. The fuller design also adds vision-only attention projections while retaining joint attention. This is specialized processing inside a common model, as the [authors' explanation](https://unbundling.github.io/#placement) makes clear.
 
-That distinction survives a scaling comparison. The original figure plots visual question answering and held-out caption loss against lifetime compute.
+That distinction survives a scaling comparison. As I discussed in the [earlier scaling-laws post](/blog/2026/08/19/how-to-read-scaling-laws-for-language-models.html#what-moved-after-chinchilla), a fitted compute advantage depends on the experimental regime. The original figure plots visual question answering and held-out caption loss against lifetime compute.
 
 ![Source scaling plots: scratch encoders and in-fusion models track closely, while encoder-free models require more compute for comparable visual scores and caption loss.](/assets/images/unbundling-vision-encoding-source-figure-7.png)
 *Figure 7 from [Unbundling Multimodal Vision Encoding](https://arxiv.org/html/2611.17334v1#S5.F7), reproduced unchanged. Blue circles represent scratch encoders, pink triangles in-fusion models, and orange squares encoder-free models. Points shown use 64 token-equivalents per non-embedding backbone parameter; fitted curves use the wider training sweep. The roughly threefold VQA compute penalty applies within this study, not as a universal scaling constant.*
