@@ -28,25 +28,23 @@ Use a small diagnostic task to expose each problem. Ask which side of the ego ve
 
 ### What the connector literature provides
 
-[LLaVA](https://arxiv.org/abs/2304.08485) establishes a direct projection and visual instruction tuning route. [BLIP-2](https://arxiv.org/abs/2301.12597) instead uses a query transformer to extract a compact visual representation before connecting it to a frozen language model. [Flamingo](https://arxiv.org/abs/2204.14198) combines a visual resampler with gated cross-attention inside the language model. These are different choices about where to compress evidence and where to let language interact with it.
+I covered LLaVA's direct projector, BLIP-2's query compression, and Flamingo's cross-attention in my earlier [VLM post](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html#connecting-vision-to-a-language-generator). Here the question is which of those interfaces preserves the geometry and identity of a spatial grid or object set.
 
-[Honeybee](https://arxiv.org/abs/2312.06742) makes locality explicit through convolutional or deformable-attention projectors. [Cambrian-1](https://arxiv.org/abs/2406.16860) uses a Spatial Vision Aggregator to combine several visual encoders while retaining spatial organization. Their relevance here is structural: a connector can do more than change channel count, but its spatial assumptions must match the source features.
+[Honeybee](/paper%20shorts/2023/12/11/honeybee-locality-enhanced-projector-for-multimodal-llm.html) makes locality explicit through convolutional or deformable-attention projectors. [Cambrian-1](/paper%20shorts/2024/06/01/cambrian-1-vision-centric-exploration-of-multimodal-llms.html) uses a Spatial Vision Aggregator to combine several visual encoders while retaining spatial organization. Their relevance here is structural: a connector can do more than change channel count, but its spatial assumptions must match the source features.
 
 Start with a per-token linear map when the source already has useful context and its token count is affordable. Add a two-layer multilayer perceptron, or MLP, to test whether nonlinear channel mixing helps. Add local merging when sequence length is the limiting cost. Use learned-query resampling when a fixed output budget matters more than preserving one token per source cell. Each added operation should solve an observed failure.
 
-The recent [frontier adapter study](https://arxiv.org/abs/2610.05897) is a useful warning: a strong frozen reader with a trained visual connector can still struggle on visual interactions outside the connector's training distribution. The [paper note](/paper%20shorts/2026/10/05/fitting-vision-adapters-at-frontier-scales.html) discusses its blind controls and multi-image limitations. A bigger reader does not remove the need for aligned supervision.
+The recent [frontier adapter study](/paper%20shorts/2026/10/05/fitting-vision-adapters-at-frontier-scales.html) is a useful warning: a strong frozen reader with a trained visual connector can still struggle on visual interactions outside the connector's training distribution. Its blind controls and multi-image tests expose the boundary. A bigger reader does not remove the need for aligned supervision.
 
 ## Spatial-grid adapters
 
 Assume a small encoder produces a tensor with batch, height, width, and channel axes. For a concrete design example, use a sixteen-by-sixteen grid with 256 channels per cell. There are 256 tokens per sample. The grid could be an image feature map or a bird's-eye-view feature map, but those two cases require different position information.
 
-An image cell refers to a region of a particular camera image. A bird's-eye-view, or BEV, cell refers to an area in a metric coordinate frame. A row in one does not correspond to a row in the other. Converting image evidence into BEV requires geometry or learned correspondence; reshaping the array cannot perform that conversion. The [mapping guide](/blog/2026/10/01/from-bev-features-to-lane-graphs-and-changing-maps.html) develops the depth, projection, and temporal-fusion choices in more detail.
+An image cell refers to a region of a particular camera image. A bird's-eye-view, or BEV, cell refers to an area in a metric coordinate frame. A row in one does not correspond to a row in the other. Converting image evidence into BEV requires geometry or learned correspondence; reshaping the array cannot perform that conversion. The [perception guide](/blog/2026/07/31/how-unified-sensor-models-are-built-for-autonomous-driving.html#aligning-sensor-evidence-in-space-and-time) develops the alignment choices; the [mapping guide](/blog/2026/10/01/from-bev-features-to-lane-graphs-and-changing-maps.html#what-the-map-needs-to-represent) follows those features into lane geometry and connectivity.
 
 ### Project each cell without changing the grid
 
 The simplest adapter normalizes each 256-channel feature, then applies a learned map to 4,096 channels. It produces the same 256 tokens. A linear layer needs 256 times 4,096 weights, plus an optional bias: approximately one million parameters. This is a useful baseline because every output token retains a clear source cell.
-
-For each input cell, a linear projection multiplies its feature vector by a learned matrix and adds a bias. The matrix has 4,096 rows and 256 columns.
 
 $$
 z_i=W x_i+b.
@@ -108,13 +106,13 @@ For aligned cells, normalize each encoder's features separately, concatenate the
 
 For unaligned grids, first establish correspondence. Image grids may need resampling in a shared crop coordinate system. Camera and LiDAR features may need calibrated projection and visibility checks. BEV grids may need an ego-motion transform. Learned cross-attention can search for correspondence, but it still needs position information and examples that teach the correct association.
 
-[PETR](https://arxiv.org/abs/2203.05625) provides a relevant geometric precedent: it encodes 3D coordinates into multi-view image features for detection. That is evidence for a geometry-aware representation, not evidence that those features can be inserted unchanged into a language model. The language interface remains a separate training problem.
+[PETR](/paper%20shorts/2022/03/10/petr-position-embedding-transformation-for-multiview-3d-object-detection.html) provides a relevant geometric precedent: it encodes 3D coordinates into multi-view image features for detection. That is evidence for a geometry-aware representation, not evidence that those features can be inserted unchanged into a language model. The language interface remains a separate training problem.
 
 ### Decide whether the compressed output is still a grid
 
 A local merge preserves an explicit coarser lattice. A learned-query resampler generally produces slots whose spatial support depends on attention. Those slots should not receive invented row and column coordinates merely because their count is a square.
 
-[MapLightning](https://arxiv.org/abs/2610.01905) is a useful adjacent example: its learned one-dimensional map tokens summarize image evidence before map decoding. The slots are not BEV cells. If a new adapter follows that design, carry explicit geometry through its features or train a spatially anchored query scheme; do not infer a metric map from slot index alone.
+[MapLightning](/paper%20shorts/2026/10/01/maplightning-online-vectorized-hd-map-construction-with-1d-map-tokens.html) is a useful adjacent example: its learned one-dimensional map tokens summarize image evidence before map decoding. The slots are not BEV cells. If a new adapter follows that design, carry explicit geometry through its features or train a spatially anchored query scheme; do not infer a metric map from slot index alone.
 
 The choice affects the evaluation. For a grid, test cell correspondence after downsampling and coordinate transforms. For learned slots, inspect whether small or occluded objects disappear as the slot budget falls. In both cases, compare at a fixed final reader-token budget. Otherwise, a larger projector may win simply because it passes more evidence downstream.
 
@@ -156,9 +154,9 @@ The three feature groups are concatenated along the channel axis within one obje
 
 Region features must follow the same transforms as the boxes. If an image is cropped or resized, transform the box before pooling its features. If point features are pooled inside a 3D box, specify whether coordinates are local to the object or global to the scene. Local coordinates describe shape; scene coordinates describe position. Both may be useful, but neither should silently replace the other.
 
-[Kosmos-2](https://arxiv.org/abs/2306.14824) grounds language through location tokens and bounding boxes. That offers a useful alternative baseline: serialize object records as text or coordinate tokens and retain the model's ordinary image path. Continuous object embeddings may be shorter, but they require new learned semantics. Compare them against a readable structured-text baseline before assuming that an opaque vector interface is better.
+[Kosmos-2](/paper%20shorts/2023/06/26/kosmos-2-grounding-multimodal-language-models.html) grounds language through location tokens and bounding boxes. That offers a useful alternative baseline: serialize object records as text or coordinate tokens and retain the model's ordinary image path. Continuous object embeddings may be shorter, but they require new learned semantics. Compare them against a readable structured-text baseline before assuming that an opaque vector interface is better.
 
-[3D-MoE](https://arxiv.org/abs/2501.16698) provides an object-centered 3D example with encoded object point clouds and geometry-aware routing. Its indoor reasoning and manipulation setting does not establish a driving result. The transferable idea is to give object appearance and spatial relations an explicit path, then train and evaluate that path in the intended environment.
+[3D-MoE](/paper%20shorts/2026/09/23/3d-moe-towards-spatial-intelligence-with-mixture-of-experts-for-3d-reasoning-and-action-generation.html) provides an object-centered 3D example with encoded object point clouds and geometry-aware routing. Its indoor reasoning and manipulation setting does not establish a driving result. The transferable idea is to give object appearance and spatial relations an explicit path, then train and evaluate that path in the intended environment.
 
 ### Handle sets, identities, and missing objects
 
@@ -176,7 +174,7 @@ Finally, a box is an extent, not just a center. Questions about lane overlap, co
 
 Position can enter the **content** of a token through coordinate features. It can also affect **attention** through a positional encoding. These mechanisms are complementary. A geometry MLP can tell the reader that a box is twelve meters ahead. A positional encoding can influence which tokens interact as neighbors. One does not automatically substitute for the other.
 
-[RoFormer](https://arxiv.org/abs/2104.09864) introduces rotary position embeddings, or RoPE, which rotate query and key components according to position. The resulting attention scores depend on relative position. RoPE is not simply an extra coordinate vector added to the input embedding.
+[RoFormer](/paper%20shorts/2021/04/20/roformer-enhanced-transformer-with-rotary-position-embedding.html) introduces rotary position embeddings, or RoPE, which rotate query and key components according to position. The resulting attention scores depend on relative position. RoPE is not simply an extra coordinate vector added to the input embedding.
 
 For a new BEV adapter, a conservative starting point is to encode metric geometry in the token content and use an ordinary sequence-position policy for the external prefix. This avoids pretending that metric x and y are native image-patch indices. A custom rotary policy may be useful later, but it changes attention behavior and needs its own training and ablation.
 
@@ -196,7 +194,7 @@ Use a named checkpoint instead of the phrase “Qwen-sized.” For **Qwen3-VL-8B
 
 That native merger does not accept arbitrary 256-channel features. The example grid adapter has its own learned input map. Matching the native merger's input width with another linear layer would make the shapes compatible, but would not make the features follow the distribution on which the native merger was trained.
 
-The [Qwen3-VL report](https://arxiv.org/abs/2511.21631) describes interleaved multidimensional RoPE, or MRoPE, plus DeepStack connections from intermediate vision features into early language layers. It also uses textual video timestamps. These mechanisms are part of the pretrained image and video interface. A new modality should enter with a defined contract rather than borrowing the image interface by coincidence.
+The [Qwen3-VL report](/paper%20shorts/2025/11/26/qwen3-vl-technical-report.html) describes interleaved multidimensional RoPE, or MRoPE, plus DeepStack connections from intermediate vision features into early language layers. It also uses textual video timestamps. These mechanisms are part of the pretrained image and video interface. A new modality should enter with a defined contract rather than borrowing the image interface by coincidence.
 
 ### Preserve the native image path first
 
@@ -230,7 +228,7 @@ Feature distillation can initialize a student connector when teacher and student
 
 Normalize a feature loss only when its invariances are intended. Cosine similarity ignores magnitude; mean squared error penalizes it. Neither proves that the reader uses the feature correctly. Retain an answer-level objective and counterfactual evaluation beside the alignment loss.
 
-[PaLM-E](https://arxiv.org/abs/2303.03378) provides a broader precedent for incorporating continuous embodied observations into a language-model interface. It supports the general direction, but an implementation still needs a task-specific input contract, paired data, and deployment-relevant tests. This guide does not imply that a projector alone produces a trained driving policy.
+[PaLM-E](/paper%20shorts/2023/03/06/palm-e-embodied-multimodal-language-model.html) provides a broader precedent for incorporating continuous embodied observations into a language-model interface. It supports the general direction, but an implementation still needs a task-specific input contract, paired data, and deployment-relevant tests. This guide does not imply that a projector alone produces a trained driving policy.
 
 ## A proposed hybrid and the tests that can reject it
 

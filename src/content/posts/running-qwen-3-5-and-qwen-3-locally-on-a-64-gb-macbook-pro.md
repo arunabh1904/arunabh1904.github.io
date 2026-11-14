@@ -53,7 +53,7 @@ The local software stack for this round was:
 - `llama.cpp llama-server 8660`
 - `transformers 5.5.0`
 
-I used the same two text-only suites as the Gemma post:
+I used the same two text-only suites as the [Gemma benchmark](/blog/2026/04/04/running-gemma-4-locally-on-a-64-gb-macbook-pro.html):
 
 - Short suite: `512` input tokens, `192` output tokens
 - Long suite: `8,192` input tokens, `96` output tokens
@@ -103,4 +103,4 @@ For `Qwen 3 14B`, short-prompt TTFT slightly favored `llama.cpp`, while MLX more
 
 ## Limits of the comparison
 
-The timed task measures inference behavior, not reasoning, coding, or tool-use quality. It supports `Qwen 3 4B` as the lowest-memory baseline in this set and MLX as the faster long-prompt path on this machine. It does not establish a quality ranking between Qwen generations or justify extrapolating these timings to the larger untested candidates.
+The timed task measures inference behavior, not reasoning, coding, or tool-use quality. It supports `Qwen 3 4B` as the lowest-memory baseline in this set and MLX as the faster long-prompt path on this machine. It does not establish a quality ranking between Qwen generations or justify extrapolating these timings to the larger untested candidates. The [capacity comparison](/blog/2026/08/13/open-weight-models-that-fit-on-a-64-gb-macbook-pro.html) supplies the wider 64 GB fit boundary.

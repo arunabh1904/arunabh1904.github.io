@@ -87,7 +87,7 @@ DPO exchanges online exploration for dataset coverage. When labeled pairs alread
 For VLAs, the “matched” condition is particularly fragile. Two text answers can share the same prompt. Two physical trajectories rarely share exactly the same camera pose, friction, object state, and intervention history. An apparent preference can encode an environment difference rather than an action difference. DPO remains useful for replayable simulations, local action alternatives from the same logged state, or carefully constructed intervention windows. It is not a generic conversion from “one robot rollout succeeded” and “another failed” into a clean preference pair.
 
 ![DPO replaces reward fitting and online reinforcement learning with preference-pair optimization](/assets/images/direct-preference-optimization-dpo-source-figure-1.webp)
-*DPO moves the preference signal directly into the policy objective. Removing the rollout loop saves generation and reward-evaluation work, while leaving the training-state distribution fixed by the preference data. Source: [DPO, Figure 1](https://arxiv.org/abs/2305.18290).*
+*DPO moves the preference signal directly into the policy objective. Removing the rollout loop saves generation and reward-evaluation work, while leaving the training-state distribution fixed by the preference data. Source: [DPO, Figure 1](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html).*
 
 ## GRPO: sample the contrast
 
@@ -102,7 +102,7 @@ $$
 Here the small positive stabilizer defines the zero-variance case: equal rewards give zero reward advantage. The normalized completion reward replaces the learned value model. PPO-style likelihood ratios, clipping, and a reference-policy KL penalty remain. The baseline is no longer “what return did the critic expect from this prefix?” It is “how did this answer compare with the other answers sampled for the same question?”
 
 ![PPO uses a learned value model; GRPO removes it and uses a same-prompt group baseline](/assets/images/deepseekmath-grpo-paper-figure.png)
-*GRPO keeps the actor, reference model, and reward signal while removing PPO's critic. The saved model is exchanged for multiple completions per prompt. source: [DeepSeekMath](https://arxiv.org/abs/2402.03300)*
+*GRPO keeps the actor, reference model, and reward signal while removing PPO's critic. The saved model is exchanged for multiple completions per prompt. source: [DeepSeekMath](/paper%20shorts/2024/02/05/deepseekmath-group-relative-policy-optimization-grpo.html)*
 
 This is an excellent bargain when three conditions hold:
 
@@ -110,15 +110,15 @@ This is an excellent bargain when three conditions hold:
 2. an answer can be verified more cheaply than it can be demonstrated;
 3. the policy is competent enough that a group contains both successes and failures.
 
-Math and code fit unusually well. A sampler can produce eight solutions without changing the problem, and an exact checker can often score the final answer. DeepSeekMath reports gains after GRPO-based training across GSM8K, MATH, and multilingual mathematics. [DeepSeek-R1](https://arxiv.org/abs/2501.12948) pushes the idea further: R1-Zero shows that verifiable-reward RL without supervised reasoning traces can elicit longer reasoning, self-checking, and strategy changes. Its language mixing and poor readability also show what correctness-only reward leaves unconstrained. The final R1 recipe adds cold-start data and staged training rather than treating pure RL as sufficient.
+Math and code fit unusually well. A sampler can produce eight solutions without changing the problem, and an exact checker can often score the final answer. DeepSeekMath reports gains after GRPO-based training across GSM8K, MATH, and multilingual mathematics. [DeepSeek-R1](/paper%20shorts/2025/01/22/deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning.html) pushes the idea further: R1-Zero shows that verifiable-reward RL without supervised reasoning traces can elicit longer reasoning, self-checking, and strategy changes. Its language mixing and poor readability also show what correctness-only reward leaves unconstrained. The final R1 recipe adds cold-start data and staged training rather than treating pure RL as sufficient.
 
 ## When the group says nothing
 
 If all sampled answers are correct, every normalized reward is zero. If all are wrong, the same thing happens. Those groups consume generation without supplying a reward-based policy gradient; a separate KL penalty can still contribute to the update. Near-zero variance also makes normalization noisy. A fixed prompt distribution therefore becomes progressively inefficient as the policy improves.
 
-Systems such as [DAPO](https://arxiv.org/abs/2503.14476) turn this observation into engineering: dynamically sample prompts that still produce informative outcomes, prevent overly long trajectories from dominating the token budget, and make clipping asymmetric enough to avoid suppressing useful low-probability actions. DAPO reports 50 on AIME 2024 with Qwen2.5-32B, but its larger lesson is that “GRPO” names only the core estimator. Sampling, filtering, token accounting, and reward design determine whether the estimator receives usable batches.
+Systems such as [DAPO](/paper%20shorts/2025/03/18/dapo-an-open-source-llm-reinforcement-learning-system-at-scale.html) turn this observation into engineering: dynamically sample prompts that still produce informative outcomes, prevent overly long trajectories from dominating the token budget, and make clipping asymmetric enough to avoid suppressing useful low-probability actions. DAPO reports 50 on AIME 2024 with Qwen2.5-32B, but its larger lesson is that “GRPO” names only the core estimator. Sampling, filtering, token accounting, and reward design determine whether the estimator receives usable batches.
 
-Later work names the pathology directly. [Advantage Collapse in GRPO](https://arxiv.org/abs/2605.21125) reports that homogeneous groups erase the learning signal and proposes sampling around advantage variance. Its experiments report substantially fewer collapsed groups and higher reasoning accuracy.
+Later work names the pathology directly. [Advantage Collapse in GRPO](/paper%20shorts/2026/05/20/advantage-collapse-in-group-relative-policy-optimization.html) reports that homogeneous groups erase the learning signal and proposes sampling around advantage variance. Its experiments report substantially fewer collapsed groups and higher reasoning accuracy.
 
 A second failure is temporal credit. Under outcome supervision, the same advantage $\hat A_i$ weights every token in an answer. A correct final result reinforces the dead ends and lucky guesses along its path; an incorrect result penalizes any sound steps it contained. Larger groups reduce baseline variance but do not identify the decisive token.
 
@@ -142,7 +142,7 @@ $$
 The state distribution is on-policy; the learning signal is dense supervised imitation. This distinction changes the error being corrected. Offline distillation teaches the student on teacher-written prefixes. At inference, one student mistake creates a prefix the teacher never wrote, and subsequent errors compound. GKD deliberately visits those student-created states and supplies a teacher distribution there.
 
 ![GKD compares offline and on-policy distillation across tasks](/assets/images/on-policy-distillation-language-models-gkd-source-figure-1.webp)
-*GKD's source Figure 1 compares supervised fine-tuning, supervised and sequence-level distillation, and on-policy GKD across summarization, translation, and arithmetic. GKD trains on teacher targets for prefixes the student actually generates, addressing the exposure mismatch described above. | source: [GKD, Figure 1](https://arxiv.org/abs/2306.13649)*
+*GKD's source Figure 1 compares supervised fine-tuning, supervised and sequence-level distillation, and on-policy GKD across summarization, translation, and arithmetic. GKD trains on teacher targets for prefixes the student actually generates, addressing the exposure mismatch described above. | source: [GKD, Figure 1](/paper%20shorts/2023/06/23/on-policy-distillation-language-models-gkd.html)*
 
 Distillation and RL optimize different evidence:
 
@@ -150,7 +150,7 @@ Distillation and RL optimize different evidence:
 - GKD can tell the learner what to do at every visited prefix, but it inherits the teacher's distribution and errors.
 - A mixed objective can use sparse task reward to choose outcomes and dense teacher divergence to shape the path.
 
-That hybrid has become more relevant as reasoning policies improve. [Self-Supervised On-Policy Distillation for Reasoning LMs](https://arxiv.org/abs/2605.17497) uses the correct answers inside mixed GRPO groups as teachers for incorrect answers, extracting dense supervision from rollouts that would otherwise provide only a binary contrast. The 2026 paper reports a 65.6 macro Avg@12 for Qwen3-8B, 1.6 points above its GRPO baseline. This is frontier evidence, not yet a settled recipe, but it reveals the direction: reuse on-policy computation to manufacture denser, state-matched targets.
+That hybrid has become more relevant as reasoning policies improve. [Self-Supervised On-Policy Distillation for Reasoning LMs](/paper%20shorts/2026/05/17/self-supervised-on-policy-distillation-for-reasoning-language-models.html) uses the correct answers inside mixed GRPO groups as teachers for incorrect answers, extracting dense supervision from rollouts that would otherwise provide only a binary contrast. The 2026 paper reports a 65.6 macro Avg@12 for Qwen3-8B, 1.6 points above its GRPO baseline. This is frontier evidence, not yet a settled recipe, but it reveals the direction: reuse on-policy computation to manufacture denser, state-matched targets.
 
 ## The estimators compared
 
@@ -176,7 +176,7 @@ Simulation restores cheap resets, but creates a new estimator boundary: an advan
 
 Autoregressive action tokens expose action log-probabilities $\log\pi(a_t\mid s_t)$ directly. Modern VLAs often produce continuous chunks through diffusion or flow matching. A naïve PPO ratio over the final action ignores the stochastic denoising trajectory that generated it.
 
-[DPPO](https://arxiv.org/abs/2409.00588) treats denoising as an augmented Markov decision process and applies policy optimization to the diffusion policy's actual stochastic transitions. This is more than an implementation detail. If the likelihood ratio does not correspond to the deployed sampler, clipping controls the wrong distribution.
+[DPPO](/paper%20shorts/2024/09/01/dppo-diffusion-policy-policy-optimization.html) treats denoising as an augmented Markov decision process and applies policy optimization to the diffusion policy's actual stochastic transitions. This is more than an implementation detail. If the likelihood ratio does not correspond to the deployed sampler, clipping controls the wrong distribution.
 
 ### Long-horizon credit assignment
 
@@ -190,21 +190,21 @@ The early VLA-RL literature can be organized by what replaces the critic and whe
 
 ### Direct policy optimization in simulation
 
-DPPO is the clean direct-RL branch for diffusion actors: retain online interaction, model the correct action likelihood, and optimize reward. [RIPT-VLA](https://arxiv.org/abs/2505.17016) shows a critic-free alternative for autoregressive VLAs. It uses sparse binary success, dynamic rollout sampling, and leave-one-out relative advantages. The paper reports a 21.2-point gain for QueST and 97.5% for an OpenVLA-OFT setup; in a one-demonstration case, it reports improvement from 4% to 97% within 15 iterations.
+DPPO is the clean direct-RL branch for diffusion actors: retain online interaction, model the correct action likelihood, and optimize reward. [RIPT-VLA](/paper%20shorts/2025/05/22/ript-vla-interactive-post-training-for-vision-language-action-models.html) shows a critic-free alternative for autoregressive VLAs. It uses sparse binary success, dynamic rollout sampling, and leave-one-out relative advantages. Its headline gains are tied to the reported simulator, reset, and action-head setup, so the estimator choice should not be separated from that collection system.
 
 These simulation results rely on repeated resets and reliable success detection. They measure learning within those environments, not the robot-hours or reset labor required for equivalent physical trials.
 
-[SimpleVLA-RL](https://arxiv.org/abs/2509.09674) pushes the same systems direction on LIBERO and RoboTwin: scale parallel rollouts, filter uninformative groups, and make the policy update compatible with the VLA's action interface. As in reasoning, the optimizer's name hides the rollout scheduler.
+[SimpleVLA-RL](/paper%20shorts/2025/09/11/simplevla-rl-scaling-vla-training-via-reinforcement-learning.html) pushes the same systems direction on LIBERO and RoboTwin: scale parallel rollouts, filter uninformative groups, and make the policy update compatible with the VLA's action interface. As in reasoning, the optimizer's name hides the rollout scheduler.
 
 ### RL-generated training data
 
-[RLDG](https://arxiv.org/abs/2412.09858) trains task-specific RL specialists and distills their trajectories into a general robot policy. The source paper reports up to 40% higher success than human-demonstration training in its evaluated settings. The architectural lesson is broader than the number: RL can improve the state distribution without directly exposing a shared foundation model to every unstable reward update.
+[RLDG](/paper%20shorts/2024/12/13/rldg-robotic-generalist-policy-distillation-via-reinforcement-learning.html) trains task-specific RL specialists and distills their trajectories into a general robot policy. The architectural lesson is that RL can improve the state distribution without directly exposing a shared foundation model to every unstable reward update.
 
 This resembles on-policy distillation at a different boundary. A specialist visits difficult states and discovers successful behavior; the generalist learns from the resulting trajectories with supervised objectives. The teacher may be a policy, planner, privileged simulator agent, or previous checkpoint. Direct RL spends less storage and can adapt rapidly; RL-generated-data pipelines make updates reviewable, replayable, and easier to mix across embodiments.
 
 ### Process rewards
 
-The frontier is moving toward intermediate feedback. [LifeLong-RFT](https://arxiv.org/abs/2602.10503) reports chunk-level on-policy RL and a multidimensional process reward, with a 22% average success gain over SFT while using 20% of the data in its evaluated suite. [RobustVLA](https://arxiv.org/abs/2511.01331) adds observation-sensitivity and action-smoothness regularization so reward improvement does not purchase brittle control. [VLA-RFT](https://arxiv.org/abs/2510.00406) uses a world simulator and verified rewards to reduce dependence on physical rollouts.
+The frontier is moving toward intermediate feedback. [LifeLong-RFT](/paper%20shorts/2026/02/11/towards-long-lived-robots-continual-learning-vla-models-via-reinforcement-fine-tuning.html) uses chunk-level on-policy RL and a multidimensional process reward. [RobustVLA](/paper%20shorts/2025/11/03/robustvla-robustness-aware-reinforcement-post-training.html) adds observation-sensitivity and action-smoothness regularization so reward improvement does not purchase brittle control. [VLA-RFT](/paper%20shorts/2025/10/01/vla-rft-vision-language-action-reinforcement-fine-tuning-with-verified-rewards-in-world-simulators.html) uses a world simulator and verified rewards to reduce dependence on physical rollouts.
 
 These systems are recent and heterogeneous. Their reward definitions, simulators, embodiments, action heads, and evaluation protocols differ, so their headline gains should not be ranked as if they were optimizer ablations. What they collectively support is narrower: VLA RL is becoming a joint design of rollout distribution, feedback granularity, and action likelihood.
 

@@ -45,17 +45,15 @@ That bootstrapped:
 
 ## Why Ollama failed
 
-Hermes could see the local endpoint. Ollama listed local Gemma models. But actual inference failed with HTTP `500` during model load on this Apple Silicon setup. In other words, the Hermes install was fine, but the runtime below it was not stable enough for the job.
+Hermes could see the local endpoint, but the April [Gemma benchmark](/blog/2026/04/04/running-gemma-4-locally-on-a-64-gb-macbook-pro.html) records Ollama failing with HTTP `500` during model load on this Apple Silicon setup. The Hermes install was fine; the runtime below it was not stable enough for the job.
 
 ## Serve the local GGUF
 
-The machine already had local Gemma GGUF artifacts in the Hugging Face cache, including:
+The machine already had a cached Gemma GGUF and a Homebrew-installed `llama-server`:
 
 ```text
 ~/.cache/huggingface/hub/models--ggml-org--gemma-4-E4B-it-GGUF/...
 ```
-
-`llama-server` was already installed through Homebrew.
 
 I started `llama-server` directly against the cached GGUF. The command below records the setup that worked on April 4, 2026:
 
@@ -118,4 +116,4 @@ And it returned:
 READY
 ```
 
-The unresolved part is agent behavior: structured tool calls, long histories, and recovery after a server restart. The one-turn `READY` test establishes that Hermes can obtain a completion from the local weights; it does not measure those capabilities.
+The unresolved part is agent behavior: structured tool calls, long histories, and recovery after a server restart. The one-turn `READY` test establishes that Hermes can obtain a completion from the local weights; it does not measure those capabilities. The [capacity comparison](/blog/2026/08/13/open-weight-models-that-fit-on-a-64-gb-macbook-pro.html) covers the surrounding local-fit decisions.

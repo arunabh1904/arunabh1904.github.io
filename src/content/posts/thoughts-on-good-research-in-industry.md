@@ -42,7 +42,7 @@ Apply the same rule to yourself. Ask for help when someone else likely has the m
 
 ML is empirical, so an experiment should change one interpretable decision whenever possible. Ablations turn a promising run into evidence about what caused the result. Without them, a team can produce plenty of activity and very little knowledge.
 
-Documentation is part of the experiment. Future you needs to know what changed, why it changed, and which result was trustworthy. A weekly log gives me enough structure to reconstruct decisions without turning record-keeping into a second job. The same notes later support collaboration, presentations, and performance reviews. A brag document serves a narrower purpose: it prevents useful work from disappearing simply because the author forgot to record it.
+Documentation is part of the experiment. Future you needs to know what changed, why it changed, and which result was trustworthy. A weekly log gives me enough structure to reconstruct decisions without turning record-keeping into a second job. The same notes later support collaboration, presentations, and performance reviews.
 
 Visibility only helps when the work is legible. A presentation should maximize what the audience understands, not how much detail the author can display. Proving that you did the work and helping someone reason about it are different goals.
 
@@ -52,4 +52,4 @@ Compute changes the value of good judgment because it determines how quickly a q
 
 A rigorous result can still arrive too late to inform a decision. Turnaround time matters alongside experimental design.
 
-That is what I took from Eugene's guide: make each run interpretable, leave enough context for collaborators, and get the evidence to the people who need it in time.
+That is what I took from Eugene's guide: make the evidence useful to the people deciding what happens next.

@@ -38,7 +38,7 @@ The action $a$ may be one discrete bin, a sequence of FAST tokens, a continuous 
 The action head can change while retaining the pretrained visual-language model. [OpenVLA-OFT](/paper%20shorts/2025/02/27/openvla-oft-optimizing-speed-and-success.html) replaces serial action-token decoding with parallel chunks and continuous L1 regression. In its single-view LIBERO comparison, success rises from 76.5% for the reported OpenVLA baseline to 90.2% with parallel decoding and chunking, then 95.3% with continuous L1 outputs. The often-quoted 97.1% result also adds inputs and changes the comparison setting. This is evidence that adaptation can alter the control interface without rebuilding pretraining.
 
 ![OpenVLA-OFT contrasts serial token decoding with parallel continuous action chunks](/assets/images/openvla-oft-optimizing-speed-and-success-paper-figure.png)
-*OpenVLA-OFT separates decoding order from action parameterization. Parallel chunks reduce repeated language-model calls; regression changes the target from discrete bins to continuous actions. Source: [OpenVLA-OFT, Figure 2](https://arxiv.org/abs/2502.19645).*
+*OpenVLA-OFT separates decoding order from action parameterization. Parallel chunks reduce repeated language-model calls; regression changes the target from discrete bins to continuous actions. Source: [OpenVLA-OFT, Figure 2](/paper%20shorts/2025/02/27/openvla-oft-optimizing-speed-and-success.html).*
 
 SFT remains limited to the states represented in its training data. It can learn a better action for those states, but does not determine which policy-induced states should enter the next dataset.
 
@@ -90,17 +90,7 @@ Correction SFT remains the baseline for these data. Preference optimization or R
 
 ## Preference learning exposed the counterfactual problem
 
-Language preference data often provide two answers to the same prompt and a label indicating which one is preferred. [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) directly increases the likelihood of the preferred answer relative to the rejected answer:
-
-$$
-\mathcal{L}_{\text{DPO}}
-=-\mathbb{E}\log\sigma\left(
-\beta\left[
-\log\frac{\pi_\theta(y^+\mid x)}{\pi_{\text{ref}}(y^+\mid x)}
--\log\frac{\pi_\theta(y^-\mid x)}{\pi_{\text{ref}}(y^-\mid x)}
-\right]
-\right).
-$$
+Language preference data often provide two answers to the same prompt and a label indicating which one is preferred. [DPO](/paper%20shorts/2023/05/01/direct-preference-optimization-dpo.html) directly increases the preferred answer's likelihood relative to the rejected answer; the later [PPO, DPO, GRPO, and On-Policy Distillation](/blog/2026/07/27/from-ppo-to-grpo-rl-for-reasoning-and-vlas.html#dpo-store-the-contrast) follow-up derives that objective and its assumptions. Here, the physical counterfactual is the important part.
 
 Robot rollouts rarely provide the same matched comparison. A human correction begins after the original action has already changed the state. Two physical attempts may also differ in friction, camera pose, initialization, or object position. Treating those trajectories as if only the policy action changed can assign the preference to the wrong cause.
 
@@ -123,7 +113,7 @@ Suppose the gripper misses the handle at step 42 and a human takes over at step 
 A process critic replaces an episode-level failure label with an estimate of progress at intermediate states. [VisualPRM](/paper%20shorts/2025/03/13/visualprm-process-reward-model-for-multimodal-reasoning.html) provides the general recipe: label intermediate errors, train a critic, and validate it against held-out human judgment before optimization. [VLAC](/paper%20shorts/2025/09/19/vlac-vision-language-action-critic-for-real-world-rl.html) applies this idea to robotics by predicting signed progress and completion between two observations.
 
 ![VLAC generates action and reward tokens with a value head for PPO](/assets/images/vlac-vision-language-action-critic-for-real-world-rl-source-figure-3.webp)
-*VLAC makes the learning signal part of the forward pass: action tokens select behavior, reward tokens estimate progress, and a value head supports PPO. Critic errors can therefore influence subsequent policy updates. Source: [VLAC, Figure 3](https://arxiv.org/abs/2509.15937).*
+*VLAC makes the learning signal part of the forward pass: action tokens select behavior, reward tokens estimate progress, and a value head supports PPO. Critic errors can therefore influence subsequent policy updates. Source: [VLAC, Figure 3](/paper%20shorts/2025/09/19/vlac-vision-language-action-critic-for-real-world-rl.html).*
 
 A single scalar can obscure disagreements among progress, completion, safety, uncertainty, and failure type. Pixels may also omit contact, controller lag, or the state of an occluded gripper. A robot critic may therefore need tracked objects, geometry, proprioception, and controller state in addition to images.
 
@@ -133,24 +123,14 @@ Credit should remain as local as the evidence allows. The dataset can preserve t
 
 Preference learning updates a policy from a fixed feedback dataset. Interactive RL updates the policy, then collects fresh rollouts from the new version. The optimizer is now changing its own training distribution.
 
-For a standard stochastic policy, PPO clips the policy ratio to limit each update:
+For a standard stochastic policy, PPO clips a likelihood-ratio surrogate to limit the incentive for large sampled updates; the later [PPO review](/blog/2026/07/27/from-ppo-to-grpo-rl-for-reasoning-and-vlas.html#ppo-learn-the-baseline) derives the surrogate objective and its limits.
 
-$$
-\mathcal{L}_{\text{clip}}(\theta)
-=\mathbb{E}_t\left[
-\min\left(r_t(\theta)\hat A_t,
-\operatorname{clip}(r_t(\theta),1-\epsilon,1+\epsilon)\hat A_t\right)
-\right].
-$$
-
-Clipping removes the incentive to move sampled action ratios farther in the rewarded direction beyond the clip interval. It does not enforce a global bound on the policy change or validate the reward.
-
-The policy gradient also has to match the action generator. For a diffusion actor, [DPPO](/paper%20shorts/2024/09/01/dppo-diffusion-policy-policy-optimization.html) treats the denoising steps themselves as the stochastic policy. A denoised trajectory does not have the same likelihood as one categorical token or Gaussian action. Using the wrong likelihood assigns credit to the wrong part of generation.
+The likelihood ratio must match the action generator. For a diffusion actor, [DPPO](/paper%20shorts/2024/09/01/dppo-diffusion-policy-policy-optimization.html) treats the denoising steps themselves as the stochastic policy. A denoised trajectory does not have the same likelihood as one categorical token or Gaussian action. Using the wrong likelihood assigns credit to the wrong part of generation.
 
 Binary success can still provide a useful reward when the rollout system creates comparable groups. [RIPT-VLA](/paper%20shorts/2025/05/22/ript-vla-interactive-post-training-for-vision-language-action-models.html) and [SimpleVLA-RL](/paper%20shorts/2025/09/11/simplevla-rl-scaling-vla-training-via-reinforcement-learning.html) run multiple attempts and learn from their relative outcomes. A group in which every attempt succeeds or every attempt fails contains no ranking signal, making task sampling part of the learning algorithm.
 
 ![RIPT-VLA and SFT success on LIBERO-LONG across demonstration counts](/assets/images/ript-vla-interactive-post-training-for-vision-language-action-models-source-figure-2.webp)
-*RIPT-VLA compares interactive post-training with SFT under one to ten demonstrations on LIBERO-LONG. This is evidence about the value of policy-generated experience in the reported simulator setup. Source: [RIPT-VLA, Figure 2](https://arxiv.org/abs/2505.17016).*
+*RIPT-VLA compares interactive post-training with SFT under one to ten demonstrations on LIBERO-LONG. This is evidence about the value of policy-generated experience in the reported simulator setup. Source: [RIPT-VLA, Figure 2](/paper%20shorts/2025/05/22/ript-vla-interactive-post-training-for-vision-language-action-models.html).*
 
 Group-relative learning therefore couples optimization to task selection. As the policy improves, the sampler must find tasks with informative outcome variation; otherwise collection cost grows without a corresponding learning signal.
 

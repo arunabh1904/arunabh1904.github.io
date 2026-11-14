@@ -120,7 +120,7 @@ The input recipes make the alternatives concrete. [PaliGemma](/paper%20shorts/20
 Qwen2-VL's architecture makes the difference visible: a tall document, a short equation, a landscape, and a video occupy very different stretches of the same context.
 
 ![Qwen2-VL packs a document, equation, landscape, and video into variable-length visual token sequences](/assets/images/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution-source-figure-2.webp)
-*The document occupies 11,427 tokens in the illustration, while the small equation occupies eight. These are examples of input-dependent token allocation, not fixed costs for every document or equation. source: [Qwen2-VL, Figure 2](https://arxiv.org/abs/2409.12191)*
+*The document occupies 11,427 tokens in the illustration, while the small equation occupies eight. These are examples of input-dependent token allocation, not fixed costs for every document or equation. source: [Qwen2-VL, Figure 2](/paper%20shorts/2024/09/01/qwen2-vl-enhancing-vision-language-model-perception-of-the-world-at-any-resolution.html)*
 
 The small equation gets few tokens because it is a small image, not because the model has already decided that it is easy. Dynamic resolution allocates bandwidth from the input geometry; deciding which regions deserve another look is a further problem. More context can preserve the document's words, but the decoder still has to use the right ones.
 
@@ -135,6 +135,8 @@ That does not mean starting every weight from scratch. [InternVL3](/paper%20shor
 The small visual prefix is no longer the only interface. [Qwen3-VL](/paper%20shorts/2025/11/26/qwen3-vl-technical-report.html) uses long interleaved context, dynamic visual tokenization, explicit video timestamps, and features from multiple vision layers. Visual evidence can enter at several points in the sequence instead of arriving as one fixed-length image prefix.
 
 Native multimodal pretraining changes the stage at which modalities learn together. It does not by itself specify which weights are updated, how visual tokens are compressed, or which modalities the decoder can generate. Those choices distinguish the following generative branch.
+
+A later follow-up, [What a Vision Encoder Actually Buys](/blog/2026/11/14/what-a-vision-encoder-actually-buys.html#how-the-encoder-became-the-default), asks a narrower version of that question: which visual prior, dedicated capacity, and placement choices are actually doing the work?
 
 ## A parallel branch: generating images
 
@@ -185,24 +187,20 @@ The first three tasks test whether the model represents time. The fourth begins 
 
 ## A parallel branch: predictive video representations
 
-The video-language models above still turn visual evidence into words. JEPA changes the pretraining target instead. A joint-embedding predictive architecture hides part of a video and predicts its representation from the visible context. The target can discard unpredictable texture while preserving the state and motion needed to understand what happens next.
+The video-language models above still turn visual evidence into words. JEPA changes the pretraining target instead: a joint-embedding predictive architecture hides part of a video and predicts its representation from visible context, preserving state and motion without reconstructing every unpredictable pixel.
 
 [V-JEPA 2](/paper%20shorts/2025/06/11/v-jepa-2-self-supervised-video-models.html) first learns this objective from video without action labels. It then trains a smaller action-conditioned predictor on robot trajectories and uses that predictor for image-goal planning. The video data teaches how scenes tend to change. The robot data teaches which changes an action can cause.
 
 ![V-JEPA 2 moves from action-free video prediction to an action-conditioned robot world model](/assets/images/v-jepa-2-paper-figure-1.png)
 *V-JEPA 2 first learns a predictive video representation, then adds an action-conditioned predictor for planning. source: [V-JEPA 2](/paper%20shorts/2025/06/11/v-jepa-2-self-supervised-video-models.html)*
 
-A useful exchange between [Rohan Anil](https://x.com/_arohan_/status/2007597891381031029) and [Yann LeCun](https://x.com/ylecun/status/2007907701989232684) gets at the deeper point. JEPA is not defined by opposition to language models or generative decoders. It changes where the predictive burden sits. Instead of asking a decoder to reproduce every unpredictable detail in input space, the encoder learns a latent target that keeps what is useful and suppresses what is not. Preventing that latent space from collapsing is therefore part of the learning problem, not an implementation detail.
-
-The global-versus-local problem therefore returns even without language. A strong video embedding can still be poor at depth or local motion. [V-JEPA 2.1](/paper%20shorts/2026/03/15/v-jepa-2-1-dense-video-features.html) extends V-JEPA 2’s masked-patch prediction with supervision on visible context tokens and intermediate layers. Those tokens now have a reason to retain local structure instead of only helping predict missing regions. A local prediction target does not guarantee locally useful features everywhere else.
-
-JEPA supplies predictive features for later tasks rather than extending the language decoder itself. Its connection to robotics is the action-conditioned predictor, which must retain enough local geometry to evaluate candidate actions.
+The global-versus-local problem returns even without language. A strong video embedding can still be poor at depth or local motion. [V-JEPA 2.1](/paper%20shorts/2026/03/15/v-jepa-2-1-dense-video-features.html) extends V-JEPA 2’s masked-patch prediction with supervision on visible context tokens and intermediate layers, giving local structure a direct target. Predictive features still need the action-conditioned stage to evaluate candidate robot actions.
 
 ## From answers to decisions and actions
 
 ### Vision-language-action models for driving
 
-Autonomous driving puts nearly every VLM weakness in the same frame: small distant objects, metric geometry, traffic rules, rare hazards, temporal prediction, uncertainty, and a hard latency limit.
+Autonomous driving puts nearly every VLM weakness in the same frame: small distant objects, metric geometry, traffic rules, rare hazards, temporal prediction, uncertainty, and a hard latency limit. The sensor-side stack underneath those language choices is traced in [Autonomous-Vehicle Perception, circa 2026](/blog/2026/07/31/how-unified-sensor-models-are-built-for-autonomous-driving.html#overall-architecture).
 
 There is no agreement on where language should sit. [GPT-Driver](/paper%20shorts/2023/10/01/gpt-driver-learning-to-drive-with-gpt.html) and [Driving with LLMs](/paper%20shorts/2023/10/01/driving-with-llms-fusing-object-level-vector-modality.html) turn driving state into a form a language model can reason over. [DriveVLM](/paper%20shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models.html) combines scene reasoning with a conventional planner. [AsyncDriver](/paper%20shorts/2024/06/01/asyncdriver-asynchronous-llm-enhanced-planner-for-autonomous-driving.html) lets the slower language path run separately from faster planning. [VLM-AD](/paper%20shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision.html) uses a VLM as supervision without putting the full model in the control loop.
 
@@ -248,21 +246,7 @@ Robot pretraining data also need not originate from a deployed robot. [Xiaomi-Ro
 
 This is where pretraining and post-training separate cleanly. Pretraining gives the policy a broad starting point. Post-training adapts it to one robot, command distribution, safety envelope, and deployment environment. Experience adds the failures and recoveries that demonstrations missed.
 
-FAST gives this trade a useful twist. Its T-shirt-folding example compresses a one-second action chunk from 700 naïve tokens to 53, yet the paper reports roughly 750 ms to decode a one-second chunk with π0-FAST on an RTX 4090. Fewer tokens shorten the autoregressive learning problem without necessarily making autoregressive control faster than the flow-based policy. Training efficiency and reaction time need separate measurements.
-
-The action representation decides what motions the policy can express, how it is trained, and how quickly it can react.
-
-| Action interface | Advantage | Cost |
-| --- | --- | --- |
-| Per-step regression | simple and fast | averages multimodal action distributions |
-| Discrete action tokens | exact autoregressive likelihood and shared vocabulary | quantization and sequential decoding latency |
-| Compressed action tokens | shorter sequences over long horizons | compression may remove abrupt corrections |
-| Diffusion or flow chunks | expressive continuous distributions | iterative generation and harder likelihood-based RL |
-| Separate action expert | specialization without discarding VLM semantics | extra parameters and coordination path |
-
-The final row is a placement choice: a separate expert can itself use regression, diffusion, or flow. It should not be mistaken for a fifth kind of action distribution.
-
-A caption has no control frequency. An action does. A policy must fit sensing, inference, communication, and actuation inside a deadline. It must also decide how long an action chunk remains valid before new evidence should interrupt it. Longer chunks reduce inference calls and improve temporal coherence. Shorter chunks respond faster to disturbances.
+Action representation is now a systems choice: it shapes the training target, the likelihood available to post-training, and the control deadline. The follow-up [Pre-Training for Robotics](/blog/2026/07/15/omni-model-pretraining-decisions.html#the-action-tokenizer-became-a-model-decision) traces the pretraining trade-offs; [Post-Training for Robotics](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html#post-training-inherits-the-action-tokenizer) explains what they change for feedback and credit assignment.
 
 ## The changes in representation
 
@@ -280,7 +264,7 @@ The main branches differ in their output and in the information their training o
 | Predictive video representations, a parallel branch | [V-JEPA 2](/paper%20shorts/2025/06/11/v-jepa-2-self-supervised-video-models.html), [V-JEPA 2.1](/paper%20shorts/2026/03/15/v-jepa-2-1-dense-video-features.html) | latent state or predicted representation | latent prediction learns temporal features without a language output target |
 | Vision-language decision and action models | [DriveVLM](/paper%20shorts/2024/02/01/drivevlm-convergence-of-autonomous-driving-and-large-vision-language-models.html), [VLM-AD](/paper%20shorts/2024/12/19/vlm-ad-end-to-end-autonomous-driving-through-vision-language-model-supervision.html), [RT-2](/paper%20shorts/2023/07/28/rt-2-vision-language-action-models-transfer-web-knowledge-to-robotic-control.html), [OpenVLA](/paper%20shorts/2024/06/01/openvla-open-source-vision-language-action-model.html), [Pi0](/paper%20shorts/2024/10/01/pi0-vision-language-action-flow-model-for-general-robot-control.html), [FAST](/paper%20shorts/2025/01/01/fast-efficient-action-tokenization-for-vision-language-action-models.html) | rationale, plan, trajectory, or action | outputs change the next observation and must meet a control deadline |
 
-Across this history, every new capability asks vision to preserve something it could previously ignore. Region-based models connected words to detected objects. CLIP made images searchable through language at web scale. Generative bridges gave those features to a language model, and instruction tuning turned the result into an assistant. Grounding tied words back to pixels. Video added time. Driving and robotics made the remaining shortcuts expensive because a plausible sentence could now produce a bad physical decision.
+Across this history, the output contract keeps tightening: grounding binds words to pixels, video adds time, and driving and robotics make a plausible sentence costly when it becomes a physical decision.
 
 The recurring split is between shared semantic context and specialized representations for detail, time, and control. BLIP-2 and LLaVA place that split at the visual connector. Janus separates visual encoders by task. Pi0 separates the action expert from the language vocabulary. The reviewed results support these specific designs; they do not isolate a universal benefit from either sharing or specialization.
 
