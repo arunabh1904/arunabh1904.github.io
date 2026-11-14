@@ -16,17 +16,17 @@ summary: What I am learning about technical judgment, trust, feedback, and givin
 
 An engineering manager’s job is to help a team improve business outcomes under real constraints while creating the conditions for people to grow. The role spans coaching, architecture, hiring, planning, conflict resolution, performance management, communication, and process design. But those activities are mechanisms toward a broader goal, not the final output. The output is a team that can repeatedly identify an important problem, make a sound decision, and turn that decision into a working system. Kamil Sindi’s [Managers Playbook](https://github.com/ksindi/managers-playbook) is a resource I keep returning to, and it has deeply influenced how I think about the job.
 
-A good engineering manager is not judged by the number of meetings they attend, the decisions that pass through them, or how indispensable they appear. The real test is whether the team makes better decisions, moves with greater conviction, and becomes more capable over time.
+A good engineering manager is not judged by the meetings they attend, the decisions routed through them, or how indispensable they appear. The test is whether the team makes better decisions and grows more capable.
 
 ---
 
-I love writing code! Some of the most gratifying moments in my career have come from seeing code I wrote make a robot do something extraordinary. I also believe that building things is one of the best ways to understand them. But writing code is not the end goal. It is in service of the problem the code solves. Time and again, I have seen strong engineers become seduced by the elegance of a solution. They can spend weeks optimizing an architecture, cleaning up an abstraction, or adopting a new technique without stopping to ask: does this matter?
+I love writing code; some of my most gratifying moments have come from seeing code make a robot do something extraordinary. But as I argued in [Code Is Cheap. Understanding Isn't.](/blog/2026/08/12/code-is-cheap-understanding-isnt.html), technical craft is in service of the problem it solves. A manager has to turn that principle into a team habit.
 
 A good manager keeps technical work grounded in its purpose and aligned with the goals of the business or organization. What user problem does the work solve? What capability does it unlock? What constraint does it remove? What becomes possible once it is complete?
 
 That does not mean every technical decision needs an immediate return. Foundational research, reliability work, infrastructure, and technical debt reduction all matter. But each type of work still needs a theory of impact: how will it affect the business, and when could we expect to see evidence? A team may spend more time designing an interface up front so that the next integration is easier. It may also slow down an implementation because a rushed system accrues technical debt and becomes harder to replace once production depends on it. The return can be delayed, but it cannot be undefined.
 
-A theory of impact is stronger when the engineer doing the work helps shape it. That participation matters especially for stretch goals. The manager can set the goal, explain why it matters, and make the constraints clear, but the engineer should help choose the path. Buy-in turns an assigned task into an owned decision. It also creates room for growth while keeping the engineer and manager aligned on what success means.
+A theory of impact is stronger when the engineer doing the work helps shape it, especially for stretch goals. The manager sets the goal, why it matters, and the constraints; the engineer helps choose the path. That creates ownership while keeping success criteria shared.
 
 For much of my career, I was the engineer people turned to for the hardest, most ambiguous problems. I became used to owning the solution end to end, and that instinct did not disappear when I became a manager. I still wanted to review the difficult design, build the prototype, inspect the traces, fix the annoying bug, and write the first draft myself. I learned the hard way that staying technical does not mean putting myself on every critical path.
 
@@ -92,6 +92,6 @@ Retrospectives are one way to decide where that capacity should go. In a retrosp
 
 ---
 
-I keep coming back to four ideas: give people the context they need, let them own meaningful problems, be clear about the standard, and keep ego out of the way. In practice, that means explaining why the work matters, inviting disagreement before a decision, and giving engineers room to choose the path. Once the team commits to a direction, it ships, measures what happens, and lets the evidence change the plan.
+I keep coming back to four ideas: give people the context they need, let them own meaningful problems, be clear about the standard, and keep ego out of the way. Once the team commits to a direction, it ships, measures what happens, and lets the evidence change the plan.
 
-I am still learning how to do this job well. These principles help me see what is working and where I need to improve. I will not always have the best answer, and I will get things wrong. What matters is recognizing it, updating my thinking, and continuing to learn from the people around me.
+I am still learning this job. What matters is recognizing mistakes, updating my thinking, and learning from the people around me.

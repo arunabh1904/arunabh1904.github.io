@@ -23,6 +23,8 @@ I got here by shipping the wrong thing several times. One release changed voices
 
 The human narration profile now uses Voxtral 4B TTS with its fixed `casual_female` voice. Each heading shares a bounded request with the prose that follows it, each request is decoded as one waveform, and the compiler normalizes its edges before assembly. Pairing headings with their prose reduces the opportunity for the casual voice to improvise around tiny prompts. Local speech recognition audits every request for wrong words, inserted fillers, and unaligned audio that may contain a laugh or other non-verbal artifact. The VLM and autonomous-driving posts remain the long-form canaries because they expose voice, pacing, pronunciation, and continuity failures quickly.
 
+Qwen3-TTS supplied the earlier experiments in this story; the current production profile described below is Voxtral.
+
 ## What “local” means
 
 The website never runs a speech model. The source of truth remains the Markdown or MDX file under `src/content/posts`. A laptop-local exporter derives narration-safe text, synthesizes a mono MP3, and records its source and narrator profile in `public/assets/audio/manifest.json`. Astro only renders a player that points at the static asset.
@@ -118,7 +120,7 @@ There is also a deployment boundary. Mistral's model card says the supplied refe
 
 ## Opening defects can come from the runtime
 
-The October rebuild reproduced two failures with MLX-Audio 0.5.3: a repeated opening in the Qwen benchmark post and extra speech before its final section. Moondream's chunk transcript exposed both. Changing the pause between requests cannot repair words already generated inside a request.
+A later October rebuild of that August pipeline reproduced two failures with MLX-Audio 0.5.3: a repeated opening in the [Qwen benchmark post](/blog/2026/04/04/running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro.html) and extra speech before its final section. Moondream's chunk transcript exposed both. Changing the pause between requests cannot repair words already generated inside a request.
 
 An [upstream Voxtral fix](https://github.com/Blaizzy/mlx-audio/pull/989), released in [MLX-Audio 0.5.8](https://github.com/Blaizzy/mlx-audio/releases/tag/v0.5.8), corrects the first-frame generation path. The old path took an extra language-model step after the prompt's begin-audio state. The fixed path decodes the first frame directly from that state. This addresses a generation defect before waveform assembly.
 
@@ -139,6 +141,8 @@ The first Voxtral exporter requested streamed output in eight-second pieces. MLX
 Speech models occasionally need spelling help, but the Blog should not read like a phonetic script. I do not want to publish *sike-list* to make *cyclist* sound right.
 
 The exporter therefore applies pronunciation hints after extracting the authored prose and before synthesis. The shared lexicon maps *cyclist* to `sike-list`, *LiDAR* to `lie-dar`, and *timestamp* to `time stamp`. The autonomous-driving post adds a local spelling for `BEVDet4D`. It also restores `Lidar encoders` for one short heading because the otherwise useful `lie-dar` spelling became unstable when spoken alone. A narrow prosody rewrite removes the comma in “timestamps drift, or one sensor degrades,” because the voice treated that comma as a larger break than the sentence intended.
+
+The character limit must apply after pronunciation expansion. During the corpus refresh, spelling out an issue number pushed one Gemma request to 947 characters. Moving post-specific pronunciation rewrites before chunking keeps the final synthesis request within its limit while preserving the authored prose.
 
 The visible Markdown does not change. Tests assert both sides: the extracted article retains the author's spelling, while the synthesis prompt contains the phonetic form. A new exception needs a targeted test. Otherwise a local fix can become a corpus-wide pronunciation regression.
 
@@ -182,7 +186,7 @@ The most expensive stale-audio mistake came from compiling in a worktree whose p
 
 A Blog release now has two stages. The first pull request contains the writing and ordinary page assets. After it merges and deploys, a clean worktree starts from the resulting `origin/main` and regenerates audio for each changed `postSlug`. The second pull request contains the MP3 and manifest. Exporter code and tests enter that PR only when the compiler or human-profile assignment changed.
 
-The VLM and autonomous-driving posts were the migration canaries. The VLM post stresses acronyms and model names. The autonomous-driving survey stresses length, headings, visual omissions, pronunciation, and the duration policy. The audio-compiler post joins them because it must describe the exact profile that produced its own narration. Existing Qwen assets remain valid until their source changes; every new or changed Blog post moves to the human profile and must pass the chunk-level audit before merge. That incremental boundary avoids regenerating the corpus before the new contract has enough evidence.
+The [VLM post](/blog/2026/07/05/from-seeing-to-doing-the-evolution-of-vision-language-models.html) and autonomous-driving posts were the migration canaries. The VLM post stresses acronyms and model names. The autonomous-driving survey stresses length, headings, visual omissions, pronunciation, and the duration policy. The audio-compiler post joins them because it must describe the exact profile that produced its own narration. Existing Qwen assets remain valid until their source changes; every new or changed Blog post moves to the human profile and must pass the chunk-level audit before merge. That incremental boundary avoids regenerating the corpus before the new contract has enough evidence.
 
 Before the audio PR is committed, the worktree fetches `origin/main` again. A concurrent Blog edit can make a completed MP3 stale during a long corpus run. Only assets whose source and profile digests still match are eligible to ship.
 

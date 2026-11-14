@@ -17,7 +17,7 @@ summary: >-
 
 A `64 GB` Apple Silicon machine needs room for model weights, the KV cache, runtime workspace, and macOS. This comparison uses the artifacts available on August 13, 2026.
 
-File sizes come from the linked repositories. Only Glimmer has a local benchmark here; the other entries are capacity estimates.
+File sizes come from the linked repositories. Only Glimmer has a local benchmark within this shortlist; the other entries are capacity estimates.
 
 ## The shortlist
 
@@ -30,15 +30,13 @@ File sizes come from the linked repositories. Only Glimmer has a local benchmark
 | `Mistral Small 4 119B-A6B` | Official `NVFP4` checkpoint | About `70.8 GB` | No | Active compute is small; resident weights still exceed the laptop budget |
 | `DeepSeek V4 Flash 0731` | Official fused checkpoint | About `167 GB` | No | Supported serving starts around `200 GB` of accelerator memory |
 
-“Comfortable” does not mean “load a 128K context for free.” The table's artifact size is a storage footprint, not the complete resident-memory requirement. A credible fit leaves room for the runtime, KV cache, Metal buffers, multimodal projector, speculative draft model, application processes, and macOS, which all draw from the same physical memory. A model whose resident artifact consumes `60+ GB` is not a `64 GB` laptop model merely because the operating system can swap.
+“Comfortable” does not mean “load a 128K context for free.” The table's artifact size is a storage footprint, not the complete resident-memory requirement. A credible fit leaves room for the runtime, [KV cache](/build%20intuition/2025/05/25/attention-mechanisms-demystified.html#share-the-cache), Metal buffers, multimodal projector, speculative draft model, application processes, and macOS, which all draw from the same physical memory. A model whose resident artifact consumes `60+ GB` is not a `64 GB` laptop model merely because the operating system can swap.
 
 I am using *open-weight* deliberately. These releases do not all use the same license, publish the same training information, or provide equally official Mac artifacts. A downloadable checkpoint is a deployment property, not a blanket claim that every part of the model is open source.
 
 ## Glimmer: dense multimodal weights
 
-Meta's [`Muse-Glimmer-30B`](https://huggingface.co/meta-models/Muse-Glimmer-30B) is a `29.6B` dense vision-language model with a `131K` context window. The official [GGUF repository](https://huggingface.co/meta-models/Muse-Glimmer-30B-GGUF) makes the laptop decision unusually clean: the recommended `Q4_K_M` file is `16,756,683,904` bytes, while the higher-quality dynamic `Q4_K_XL` file is `19,653,960,832` bytes. Both leave a credible budget for ordinary text serving; context, runtime allocations, and optional components still consume unified memory.
-
-Vision adds an approximately `1.4 GB` multimodal projector. Meta also publishes an approximately `1.6 GB` DFlash draft model for speculative decoding. The three files total roughly `20 GB` before runtime allocations and KV cache, leaving a credible budget on this machine without promising that the full `131K` context will be interactive.
+Meta's [`Muse-Glimmer-30B`](https://huggingface.co/meta-models/Muse-Glimmer-30B) is a `29.6B` dense vision-language model with a `131K` context window. The official [GGUF repository](https://huggingface.co/meta-models/Muse-Glimmer-30B-GGUF) recommends a `16.76 GB` `Q4_K_M` file. Its approximately `1.4 GB` projector and `1.6 GB` DFlash drafter still leave a credible budget before runtime allocations and KV cache, without promising that the full `131K` context will be interactive.
 
 On the measured short text suite with full Metal offload, the official `17 GB` quant generated at `27.9 tok/s`. The official DFlash drafter raised that to `48.3 tok/s` in [the Glimmer benchmark](/blog/2026/08/13/running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro.html).
 
@@ -66,4 +64,4 @@ DeepSeek V4 Flash is even clearer. Its official `0731` checkpoint is about `167 
 
 ## Measured coverage
 
-The [Gemma 4 benchmark](/blog/2026/04/04/running-gemma-4-locally-on-a-64-gb-macbook-pro.html) and the Glimmer benchmark separate weight fit from prompt-processing and decode latency. The remaining candidates need the same measurements before a performance ranking is possible. Their `8–20 GB` artifacts leave memory headroom; that alone does not establish throughput, tool-use quality, or usable context length.
+The [Gemma 4 benchmark](/blog/2026/04/04/running-gemma-4-locally-on-a-64-gb-macbook-pro.html), [Qwen benchmark](/blog/2026/04/04/running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro.html), and Glimmer benchmark separate weight fit from prompt-processing and decode latency. The remaining candidates need the same measurements before a performance ranking is possible. Their `8–20 GB` artifacts leave memory headroom; that alone does not establish throughput, tool-use quality, or usable context length.

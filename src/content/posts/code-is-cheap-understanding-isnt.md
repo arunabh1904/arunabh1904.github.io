@@ -28,7 +28,7 @@ There is a reason needless refactoring has always been frowned upon. There is a 
 
 [Junyang Lin describes the transition](https://justinlin610.github.io/blog/from-reasoning-to-agentic-thinking/) as a move from “reasoning thinking” to “agentic thinking.” The first generation of reasoning models taught us to treat intelligence as inference-time compute: give a model a harder problem, let it deliberate for longer, and hope for a better answer. An agentic system changes the objective. The model is no longer thinking only to answer. It is thinking to act, observe what happened, and decide what to do next.
 
-A coding agent can search, inspect a repository, run a test, revise its plan, call another tool, delegate an independent investigation, and continue. The useful unit is therefore not the model alone. It is the model plus its harness, tools, environment, context, evaluators, and feedback loop. Lin makes the same systems point about training: once a policy interacts with terminals, browsers, sandboxes, and other stateful environments, the environment becomes part of the capability stack rather than a passive verifier.
+A coding agent can search, inspect a repository, run a test, revise its plan, call another tool, delegate an independent investigation, and continue. The useful unit is therefore not the model alone. It is the model plus its harness, tools, environment, context, evaluators, and feedback loop. That system needs to make its work inspectable, the same requirement I argued for in [Research That Survives Contact](/blog/2026/03/22/thoughts-on-good-research-in-industry.html#make-experiments-legible). Lin makes the same systems point about training: once a policy interacts with terminals, browsers, sandboxes, and other stateful environments, the environment becomes part of the capability stack rather than a passive verifier.
 
 That changes what it means to be good at using AI for software. Most of us have not calibrated yet. We are still impressed by how much code an agent can produce when code is rapidly becoming the least scarce part of the system.
 
@@ -55,7 +55,7 @@ Everyone has been extremely busy. Then somebody has to own it.
 [![A cannon creates a tangled heap while an engineer builds a small bridge that carries a real load.](/assets/images/agentic-engineering-slop-cannon.png)](/assets/images/agentic-engineering-slop-cannon.png)
 _The adult in the room builds the bridge. The slop cannon calls the pile velocity. Imagined by OpenAI ImageGen._
 
-There is a large difference between using a model to extend a deep understanding of your tools and using it to generate a system you do not understand. If I would be uncomfortable maintaining an unfamiliar codebase handed to me by a developer I have never met, I should be equally uncomfortable maintaining thousands of generated lines whose decisions I never examined. Technical debt generated in thirty seconds is still technical debt. A needless abstraction written by a frontier model is still a needless abstraction. A giant diff is not evidence of productivity.
+There is a large difference between using a model to extend a deep understanding of your tools and using it to generate a system you do not understand. If I would be uncomfortable maintaining an unfamiliar codebase handed to me by a stranger, I should be equally uncomfortable maintaining generated lines whose decisions I never examined. Technical debt generated in thirty seconds is still technical debt; a giant diff is not evidence of productivity.
 
 The adult in the room asks a more boring question: why does this thing need to exist? Sometimes the most successful agentic coding session should end with less code than it started with.
 
@@ -67,7 +67,7 @@ That smell is real, and sometimes it is exactly what I want. Difficult architect
 
 The most useful practitioner pattern I found in the surrounding X discussion is not a new leaderboard winner but a division of cognitive labor. [Willison reports](https://simonwillison.net/2026/Jul/3/judgement/) telling Fable to use its own judgment to send routine coding to lower-power subagents. The frontier model spends its scarce capability deciding what the work is, how to decompose it, and what deserves review; cheaper models perform the bounded execution. That is the model stack I want: not one brain applied indiscriminately, but a manager that knows when the task needs judgment and when it only needs throughput.
 
-Use the expensive model when ambiguity, consequence, or deep reasoning justifies it. Use faster and cheaper models for execution after the problem has been reduced to something mechanical. Use subagents when work is genuinely independent. Do not send a genius to alphabetize a list.
+Use the expensive model when ambiguity or consequence justifies it; use cheaper models once the work is mechanical. Use subagents when work is independent. Do not send a genius to alphabetize a list. I return to the same allocation question in a later guide to [reading scaling laws for language models](/blog/2026/08/19/how-to-read-scaling-laws-for-language-models.html#from-a-loss-frontier-to-a-deployment-budget), where the budget spans training, serving, and test-time compute.
 
 ## Tokens are a system resource
 

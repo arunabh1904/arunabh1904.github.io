@@ -31,7 +31,7 @@ Bahdanau, Cho, and Bengio changed the interface. At every output step, the decod
 The paper's learned alignment maps make that retrieval visible. Each row corresponds to a generated French token, each column to an English source token, and brighter cells carry more attention weight.
 
 ![Four English-to-French attention alignment heatmaps learned by the Bahdanau encoder-decoder model](/assets/images/attention-history-bahdanau-learned-alignments.png)
-*Figure 3 shows four soft alignments learned without word-level alignment labels. The diagonal structure tracks mostly monotonic translation, while off-diagonal bands capture phrases whose word order changes between English and French. source: [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473)*
+*Figure 3 shows four soft alignments learned without word-level alignment labels. The diagonal structure tracks mostly monotonic translation, while off-diagonal bands capture phrases whose word order changes between English and French. source: [Neural Machine Translation by Jointly Learning to Align and Translate](/paper%20shorts/2014/09/01/neural-machine-translation-by-jointly-learning-to-align-and-translate.html)*
 
 The bright cells are not a hand-written dictionary or a hard one-to-one match. They are the learned distribution used to construct the context vector for each output step. That differentiable lookup is the object the Transformer later promoted from a translation aid to the main sequence operation.
 
@@ -57,7 +57,7 @@ $$
 $$
 
 ![Figure 2 from Attention Is All You Need, showing scaled dot-product attention and parallel attention heads](/assets/images/attention-paper-figure-2-scaled-dot-product-and-multi-head.png)
-*Figure 2 puts the operations in dependency order: compare queries with keys, scale and normalize the scores, then mix values. Its multi-head diagram repeats that operation across learned projections before concatenating the results. source: [Attention Is All You Need](https://arxiv.org/abs/1706.03762)*
+*Figure 2 puts the operations in dependency order: compare queries with keys, scale and normalize the scores, then mix values. Its multi-head diagram repeats that operation across learned projections before concatenating the results. source: [Attention Is All You Need](/paper%20shorts/2017/06/01/attention-is-all-you-need.html)*
 
 Each term has one job:
 
@@ -196,7 +196,7 @@ The irreversible choice is the memory carrier. GQA preserves token-addressable K
 Standard MHA gives every query head its own key and value heads. Multi-query attention (MQA) takes the most aggressive sharing choice: all query heads use one K/V set. Grouped-query attention (GQA) lies between MHA and MQA, with groups of query heads sharing K/V projections.
 
 ![Comparison of multi-head, grouped-query, and multi-query attention showing how query heads share key and value heads](/assets/images/attention-variants-mha-gqa-mqa.png)
-*Figure 2 places the three cache layouts on one spectrum. MHA keeps one K/V pair per query head, GQA shares K/V within groups, and MQA shares one K/V pair across all query heads. source: [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints](https://arxiv.org/abs/2305.13245)*
+*Figure 2 places the three cache layouts on one spectrum. MHA keeps one K/V pair per query head, GQA shares K/V within groups, and MQA shares one K/V pair across all query heads. source: [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints](/paper%20shorts/2023/05/22/gqa-training-generalized-multi-query-transformer-models.html)*
 
 The benefit appears during inference. Reducing the number of KV heads reduces the cache stored per token and the memory traffic required to read it, while leaving the surrounding decoder architecture close to standard attention. The trade-off is a spectrum: MHA preserves the most independent K/V capacity, MQA compresses most aggressively, and GQA chooses an intermediate point that often retains more modeling quality.
 
@@ -281,7 +281,7 @@ The `is_causal=False` in the single-token helper is deliberate. Every key in the
 
 Multi-head latent attention (MLA), introduced with DeepSeek-V2, attacks the same cache bottleneck differently. GQA stores fewer full K/V heads; MLA stores a lower-dimensional latent representation and reconstructs the state needed by attention. This makes MLA a learned cache-compression mechanism embedded inside the layer.
 
-GQA reduces the number of full K/V heads. MLA instead compresses each token into a shared latent while preserving head-specific projections. Serving MLA therefore requires a different projection and positional-encoding path, rather than only a smaller head count.
+Serving MLA requires a different projection and positional-encoding path, rather than only a smaller head count.
 
 DeepSeek-V2's ablations provide one useful but bounded comparison. In that model family, the authors report that their GQA and MQA variants underperformed MHA, while the tuned MLA configuration slightly exceeded MHA with a much smaller cache. That result supports MLA as a viable learned compression scheme; it does not establish that MLA will beat GQA at smaller scales, under a different training recipe, or on hardware without an optimized MLA path.
 
@@ -454,7 +454,7 @@ Fixed-size recurrent memory is efficient but necessarily capacity-limited. Moder
 The Gated DeltaNet paper shows the same design choice at two scales. Its H1 and H2 stacks interleave recurrent modules with sliding-window attention; the block diagram then exposes the query, key, value, update, and output-gate paths.
 
 ![Gated DeltaNet hybrid stacks and the internal gated delta-rule block](/assets/images/attention-hybrid-gated-deltanet.png)
-*Figure 1 shows two hybrid stacks and the Gated DeltaNet block. H1 alternates Gated DeltaNet with sliding-window attention; H2 additionally uses Mamba2. The block produces $q$, $k$, $v$, a decay gate $\alpha$, and a write gate $\beta$ before applying the gated delta rule. source: [Gated Delta Networks: Improving Mamba2 with Delta Rule](https://arxiv.org/abs/2412.06464)*
+*Figure 1 shows two hybrid stacks and the Gated DeltaNet block. H1 alternates Gated DeltaNet with sliding-window attention; H2 additionally uses Mamba2. The block produces $q$, $k$, $v$, a decay gate $\alpha$, and a write gate $\beta$ before applying the gated delta rule. source: [Gated Delta Networks: Improving Mamba2 with Delta Rule](/paper%20shorts/2024/12/09/gated-delta-networks-improving-mamba2-with-delta-rule.html)*
 
 The figure exposes why “hybrid attention” names a composition strategy rather than one attention equation. A model can choose a different cheap mixer, a different periodic retrieval layer, and a different ratio while preserving the same division of labor.
 
@@ -473,7 +473,7 @@ The most useful empirical results compare one mechanism against a nearby alterna
 | Gated Attention | Head-specific elementwise output gating gave the strongest result among the tested gate positions and improved training stability. | Whether the same gain survives every architecture, scale, and normalization recipe. |
 | Kimi Linear | The authors report that the KDA hybrid surpassed full attention in their controlled short-context, long-context, and RL-scaling comparisons. | Independent matched-data comparisons and the maturity of optimized kernels across different hardware. |
 
-[Raschka's comparison](https://magazine.sebastianraschka.com/p/visual-attention-variants) raises a useful limitation: these results do not come from one matched-data, matched-compute study of all the attention families. Kernel maturity also changes observed throughput. A theoretically cheaper hybrid can lose to conventional GQA on a local system if its recurrent or latent-attention path lacks an optimized kernel.
+[Raschka's comparison](https://magazine.sebastianraschka.com/p/visual-attention-variants) raises a useful limitation: these results do not come from one matched-data, matched-compute study of all the attention families. Kernel maturity also changes observed throughput. A theoretically cheaper hybrid can lose to conventional GQA on a local system if its recurrent or latent-attention path lacks an optimized kernel. My later [Qwen benchmark](/blog/2026/04/04/running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro.html#benchmark-results) separates prefill and decode measurements for a concrete local serving stack.
 
 ## From explicit retrieval back to recurrent memory
 

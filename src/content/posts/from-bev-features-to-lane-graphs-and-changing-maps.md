@@ -38,13 +38,13 @@ Some of this information belongs in a persistent map; some belongs in the curren
 
 ## Building BEV features for road geometry
 
-BEV puts camera, LiDAR, and past observations into a common coordinate frame measured in meters. Features from different cameras can then refer to the same road location. This makes it convenient to fuse sensor evidence with an SD map and predict geometry in that shared frame. The quality of the result still depends on how accurately the observations reach it.
+BEV puts camera, LiDAR, and past observations into a common coordinate frame measured in meters. I covered the lifting and fusion machinery in my earlier [perception guide](/blog/2026/07/31/how-unified-sensor-models-are-built-for-autonomous-driving.html#aligning-sensor-evidence-in-space-and-time). For mapping, the question is how accurately road geometry survives that transformation.
 
 ### Camera depth decides where the paint lands
 
-[Lift, Splat, Shoot](/paper%20shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html) predicts a depth distribution for each image location, lifts the image feature along its camera ray, and pools the lifted features into BEV. [BEVDet](/paper%20shorts/2021/12/22/bevdet-high-performance-multicamera-3d-object-detection-in-bev.html) develops this approach for object detection. [BEVDepth](/paper%20shorts/2022/06/21/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection.html) adds direct depth supervision during training. A depth error can therefore place a clearly visible stop line several BEV cells away from its true position.
+In the [Lift, Splat, Shoot](/paper%20shorts/2020/08/13/lift-splat-shoot-encoding-images-from-arbitrary-camera-rigs.html) family, predicted depth determines where image evidence reaches BEV. A depth error can place a clearly visible stop line several cells away from its true position. [BEVDepth](/paper%20shorts/2022/06/21/bevdepth-acquisition-of-reliable-depth-for-multiview-3d-detection.html) adds direct depth supervision during training.
 
-[BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) retrieves image features from the other direction. Its BEV queries project reference locations at several heights into the cameras and sample features there. Spatial attention gathers current views; temporal attention adds previous BEV context. Road pitch, elevation, calibration, and occlusion affect what each query retrieves. [BEVFormer v2](/paper%20shorts/2022/11/18/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition.html) adds perspective-view supervision to give the image encoder a more direct training signal.
+[BEVFormer](/paper%20shorts/2022/03/31/bevformer-learning-birds-eye-view-representation-from-multi-camera-images-via-spatiotemporal-transformers.html) instead retrieves image evidence through projected BEV queries. Road pitch, elevation, calibration, and occlusion affect what each query retrieves. [BEVFormer v2](/paper%20shorts/2022/11/18/bevformer-v2-adapting-modern-image-backbones-to-bird-eye-view-recognition.html) adds perspective-view supervision to give the image encoder a more direct training signal.
 
 Thin structures make resolution important. A broad road surface can survive downsampling, while a stop line or a solid-to-dashed marking change may disappear. Finer BEV cells cost memory and computation across the whole region. One alternative is to keep a coarser field for context, then sample high-resolution image or local BEV features around candidate elements. Those initial candidates must be close enough to find the detail.
 
@@ -52,7 +52,7 @@ Thin structures make resolution important. A broad road surface can survive down
 
 ### Keeping height and sensor information
 
-LiDAR adds evidence about road elevation, curb discontinuities, and physical edges. [BEVFusion](/paper%20shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html) aligns separate camera and LiDAR BEV features before the task heads. [UniTR](/paper%20shorts/2023/08/15/unitr-unified-efficient-multimodal-transformer-for-bev.html) brings the interaction into a shared transformer, with separate tokenization for each modality. Both offer useful fusion designs, tested primarily through detection or segmentation rather than the full set of mapping outputs considered here.
+LiDAR adds evidence about road elevation, curb discontinuities, and physical edges. The fusion designs in [BEVFusion](/paper%20shorts/2022/05/26/bevfusion-multi-task-multi-sensor-unified-bev.html) and [UniTR](/paper%20shorts/2023/08/15/unitr-unified-efficient-multimodal-transformer-for-bev.html) were tested primarily through detection or segmentation rather than the full set of mapping outputs considered here.
 
 Height remains necessary when roads overlap in BEV. A 2D grid can encode height in its channels, but the decoded graph must preserve the separation. [LMT-Net](/paper%20shorts/2024/09/19/lmt-net-lane-model-transformer-network-for-automated-hd-mapping-from-sparse-vehicle-observations.html) exposes this limitation in fleet mapping: its 2D alignment cannot reliably separate a bridge from the road beneath it. [Occ3D](/paper%20shorts/2023/04/27/occ3d-large-scale-3d-occupancy-prediction-benchmark.html) and [PanoOcc](/paper%20shorts/2023/06/16/panoocc-unified-occupancy-representation-for-camera-based-3d-panoptic-segmentation.html) preserve volumetric context, while legal connections still require lane relations.
 
@@ -63,12 +63,12 @@ The mapper also needs to distinguish missing paint from missing observations. A 
 [HDMapNet](/paper%20shorts/2021/07/13/hdmapnet-local-semantic-map-learning.html) established a raster-first pipeline: encode camera and LiDAR observations in BEV, predict semantics, instance embeddings, and directions, then post-process those fields into vectors. This gives dense supervision, but the final curve grouping is outside the learned decoder.
 
 ![HDMapNet predicts three BEV fields and post-processes them into map vectors](/assets/images/hdmapnet-source-figure-2.png)
-*HDMapNet, Figure 2. Semantic labels identify the class, instance embeddings group pixels, and tangent predictions guide tracing. The final vectorization is a separate computation. Source: [paper](https://arxiv.org/abs/2107.06307).*
+*HDMapNet, Figure 2. Semantic labels identify the class, instance embeddings group pixels, and tangent predictions guide tracing. The final vectorization is a separate computation. Source: [paper](/paper%20shorts/2021/07/13/hdmapnet-local-semantic-map-learning.html).*
 
 [VectorMapNet](/paper%20shorts/2022/06/17/vectormapnet-end-to-end-vectorized-hd-map-learning.html) moved vectorization into the model. It first detects map elements, then generates their polyline vertices autoregressively. The model learns which points belong to one element instead of relying on raster post-processing. The cost is sequential vertex generation and sensitivity to the chosen output order.
 
 ![VectorMapNet detects coarse map instances and generates their polyline coordinates](/assets/images/vectormapnet-source-figure-2.png)
-*VectorMapNet, Figure 2. The detector supplies a class and coarse keypoints; the generator emits quantized coordinates until an end token. Generation learns the curve but remains sequential within each instance. Source: [paper](https://arxiv.org/abs/2206.08920).*
+*VectorMapNet, Figure 2. The detector supplies a class and coarse keypoints; the generator emits quantized coordinates until an end token. Generation learns the curve but remains sequential within each instance. Source: [paper](/paper%20shorts/2022/06/17/vectormapnet-end-to-end-vectorized-hd-map-learning.html).*
 
 VectorMapNet's keypoints and vertices have different jobs. The detector can locate an element with two bounding-box corners, while the generator emits as many vertices as the curve requires. Ground-truth keypoints make generation easier during training than predicted keypoints do at inference. Additional fine-tuning on predicted conditioning raises its camera-only nuScenes result from 40.9 to 46.0 Chamfer mAP. This is a two-stage exposure problem as well as a decoding-cost problem.
 
@@ -90,7 +90,7 @@ An undirected open curve permits forward and reverse order; a closed polygon per
 MapTR's two matching levels appear in the figure. Instance queries group points into elements; shared point embeddings distinguish positions within each element. The decoder predicts candidates in parallel, and the loss ignores differences in point order that leave the geometry unchanged.
 
 ![MapTR source Figure 4 shows hierarchical map queries and instance then point-order matching](/assets/images/maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-construction-paper-figure.png)
-*MapTR, Figure 4. Match the map element before choosing a valid traversal of its points. The geometry remains structured even though some point orders are equivalent. Source: [paper](https://arxiv.org/abs/2208.14437).*
+*MapTR, Figure 4. Match the map element before choosing a valid traversal of its points. The geometry remains structured even though some point orders are equivalent. Source: [paper](/paper%20shorts/2022/08/30/maptr-structured-modeling-and-learning-for-online-vectorized-hd-map-construction.html).*
 
 Direction changes the rule. Reversing a lane centerline changes where it leads, so MapTRv2 preserves the annotated centerline order. It also separates attention between instances from attention within each instance, adds one-to-many positive matching during training, and uses depth and segmentation losses. It reaches 61.5 mAP at 24 epochs, compared with MapTR's 58.7 at 110. That comparison measures convergence in epochs rather than matched compute.
 
@@ -105,7 +105,7 @@ The curve representation matters too. Twenty evenly spaced points may describe a
 A query centered on the middle of a lane can miss its entrance, exit, or a marking change. The figure compares that approach with sampling along predicted boundaries. Each attention head can retrieve evidence from a different part of the same lane.
 
 ![LaneSegNet source Figure 3 compares center-based attention with regions along a lane](/assets/images/lanesegnet-source-figure-3.png)
-*LaneSegNet, Figure 3. Different heads retrieve evidence from different regions of the same elongated lane. This changes feature collection, not merely the number of coordinates emitted. Source: [paper](https://arxiv.org/abs/2312.16108).*
+*LaneSegNet, Figure 3. Different heads retrieve evidence from different regions of the same elongated lane. This changes feature collection, not merely the number of coordinates emitted. Source: [paper](/paper%20shorts/2023/12/26/lanesegnet-map-learning-with-lane-segment-perception-for-autonomous-driving.html).*
 
 This representation requires consistent segment annotations at merges, forks, intersections, and changes in boundary type. LaneSegNet's controlled comparison favors these meaningful lane segments over a branch that simply mixes centerlines with other map elements. Sharing features works better when the outputs also share a clear geometric meaning.
 
@@ -122,7 +122,7 @@ Once the curves are in place, the mapper has to connect them. Lane geometry desc
 TopoNet predicts the adjacency after each decoder stage and uses it to weight messages at the next. Predecessor, successor, and self-loop messages have separate transformations. The adjacency matrix $A$ records directed lane connections. Separate transformations for this matrix and its transpose keep predecessor and successor context distinct. Traffic messages add another edge type, weighted by both lane–control association and traffic-attribute confidence. The initial lane graph contains self-loops, while traffic-to-lane weights start at zero.
 
 ![TopoNet retains traffic-image features while passing transformed traffic and lane messages into lane queries](/assets/images/toponet-graph-based-topology-reasoning-for-driving-scenes-paper-figure.png)
-*TopoNet, Figure 2. Traffic detections keep their original image features. Embedded copies contribute typed messages to lane queries, allowing control semantics to affect the road graph without replacing the traffic detector's representation. Source: [paper](https://arxiv.org/abs/2304.05277).*
+*TopoNet, Figure 2. Traffic detections keep their original image features. Embedded copies contribute typed messages to lane queries, allowing control semantics to affect the road graph without replacing the traffic detector's representation. Source: [paper](/paper%20shorts/2023/04/11/toponet-graph-based-topology-reasoning-for-driving-scenes.html).*
 
 This feedback can also amplify an incorrect association. In TopoNet's original subset_A ablation, a generic scene graph improves lane detection from 25.7 to 27.7 while lane–lane topology falls from 4.0 to 3.7. Typed messages reach 28.5 and 4.1. Increasing graph depth from one to four layers drives the topology score to zero, consistent with the reported oversmoothing failure. Better geometry and more message passing are therefore insufficient evidence of better connectivity.
 
@@ -150,10 +150,8 @@ SMERF samples 11 points from each road polyline, normalizes them to the local BE
 
 [SEPT](/paper%20shorts/2025/05/18/sept-standard-definition-map-enhanced-scene-perception-and-topology-reasoning.html) uses both vector and raster SD-map branches. In its ablation, raster features help area detection more, while vector features help lanes and connectivity more. A modulation module predicts channel scales and biases, gated fusion combines the branches, and an auxiliary intersection heatmap supervises junction structure. The modulation aligns features; vehicle-pose correction remains a separate problem.
 
-SEPT combines two earlier conditioning choices: raster features retain local spatial arrangement, while vector tokens retain road instances. Its dual branch ablation tests whether they contribute differently to area and lane predictions.
-
 ![SEPT source Figure 2 shows raster and vector map conditioning of BEV and topology heads](/assets/images/sept-source-figure-2.png)
-*SEPT, Figure 2. Vector tokens preserve road instances; raster features provide local spatial context. Feature modulation and gating combine them before perception and topology prediction. Source: [paper](https://arxiv.org/abs/2505.12246).*
+*SEPT, Figure 2. Vector tokens preserve road instances; raster features provide local spatial context. Feature modulation and gating combine them before perception and topology prediction. Source: [paper](/paper%20shorts/2025/05/18/sept-standard-definition-map-enhanced-scene-perception-and-topology-reasoning.html).*
 
 [Score](/paper%20shorts/2025/07/02/score-coherent-online-road-topology-estimation-and-reasoning-with-standard-definition-maps.html) uses the map to guide both features and queries. It keeps ordinary lane queries and adds reference points sampled from SD-map roads, with learned offsets. These extra queries suggest where to look for lanes. Its final system also includes denoising, one-to-many matching, endpoint reasoning, temporal fusion, and a separately trained traffic detector. The reported gains reflect that combination, so the cumulative ablation cannot isolate the SD map's contribution.
 
@@ -186,7 +184,7 @@ Streaming maps retain recent observations through occlusion. A prior built on an
 The architecture keeps the two memories separate. BEV history stores spatial features. Vector history stores the evolving representation of an individual map element. Motion compensation aligns the selected states before fusion.
 
 ![MapTracker source Figure 2 shows BEV and vector memory with distance-strided fusion](/assets/images/maptracker-source-figure.png)
-*MapTracker, Figure 2, cropped to the figure. The left memory preserves a spatial field; the right preserves element identity. Motion aligns selected historical states before fusion. Source: [paper](https://arxiv.org/abs/2403.15951).*
+*MapTracker, Figure 2, cropped to the figure. The left memory preserves a spatial field; the right preserves element identity. Motion aligns selected historical states before fusion. Source: [paper](/paper%20shorts/2024/03/23/maptracker-tracking-with-strided-memory-fusion-for-consistent-vector-hd-mapping.html).*
 
 [MapTCL](/paper%20shorts/2026/08/05/maptcl-temporal-consistency-learning-via-bidirectional-alignment-for-vectorized-hd-map-construction.html) adds bidirectional prediction matching and raster consistency losses during training. These losses disappear at inference; the baseline's temporal machinery stays. Its seven-frame history performs worse than five frames, and lower confidence thresholds admit harmful associations. Both results point to the same issue: extra history helps only when the model associates it with the right elements.
 
@@ -209,7 +207,7 @@ A missing element supports deletion only if the sensors could have observed it. 
 [Trust, but Verify](/paper%20shorts/2022/12/14/trust-but-verify-cross-modality-fusion-for-hd-map-change-detection.html) evaluates this disagreement using real map changes. It trains with accurate maps and synthetic alterations, then validates and tests on real changes reviewed by human panels. It reports separate evaluations for nearby changes and changes visible in the ego camera. That distinction keeps the model accountable for what its input can actually show.
 
 ![Trust but Verify source Figure 2 shows real crossing removal and lane marking changes](/assets/images/tbv-source-figure.png)
-*Trust, but Verify, Figure 2, cropped to the figure. Real changes alter the agreement between observations and mapped semantics. The released benchmark emphasizes permanent lane-geometry and crossing changes. Source: [paper](https://arxiv.org/abs/2212.07312), CC BY-NC-SA 4.0.*
+*Trust, but Verify, Figure 2, cropped to the figure. Real changes alter the agreement between observations and mapped semantics. The released benchmark emphasizes permanent lane-geometry and crossing changes. Source: [paper](/paper%20shorts/2022/12/14/trust-but-verify-cross-modality-fusion-for-hd-map-change-detection.html), CC BY-NC-SA 4.0.*
 
 Temporary work zones require a different output from permanent map edits. [WZPlanner](/paper%20shorts/2026/09/16/wzplanner-safe-end-to-end-path-planning-for-autonomous-driving-in-work-zones.html) supervises temporary boundaries and feasible paths, whereas Trust, but Verify evaluates permanent changes. WZPlanner's held-out-town performance drops substantially; its local path predictions do not determine which restrictions should become permanent map updates.
 
@@ -222,7 +220,7 @@ MapEX tests missing elements, noisy coordinates, and altered maps through synthe
 The figure shows that failure directly. Predictions sometimes recover small driveway or curb changes but stay close to the old map after larger median or road-layout changes. More corruption is not a general fix: some stronger dropout and warping settings make real-change performance worse.
 
 ![Real-world map change study source Figure 4 compares outdated priors, predictions, and current truth for four changes](/assets/images/real-map-change-source-figure.png)
-*Real-world map change study, Figure 4, cropped to the figure. Read each row from observed scene to prior, prediction, and current map. The larger structural changes expose copying that an aggregate score can hide. Source: [paper](https://arxiv.org/abs/2406.01961).*
+*Real-world map change study, Figure 4, cropped to the figure. Read each row from observed scene to prior, prediction, and current map. The larger structural changes expose copying that an aggregate score can hide. Source: [paper](/paper%20shorts/2024/06/04/real-world-map-change-generalization.html).*
 
 These results separate map reconstruction from change detection. Reconstruction scores reward the many unchanged elements. Changed-element recall, false removals, false connections, and detection delay expose whether the model corrects the prior where it is wrong.
 

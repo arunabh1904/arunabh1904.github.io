@@ -53,6 +53,8 @@ One important caveat: this is a fastest-practical-path comparison, not a perfect
 
 Thinking mode was disabled where supported, and `llama.cpp` ran without a multimodal projector. Ollama used native `gemma4:*` tags. These choices keep reasoning and image processing outside the timed text-generation path.
 
+The [Qwen sibling benchmark](/blog/2026/04/04/running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro.html) reuses these two text-only suites. The later [Muse benchmark](/blog/2026/08/13/running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro.html) is a separate August runtime snapshot with its own reasoning and serving settings.
+
 ## Benchmark results
 
 ### Short-context results
@@ -95,4 +97,4 @@ The linked upstream issue #13460 is now closed, so this result should not be rea
 
 ## What the measurements establish
 
-For these artifacts and prompt lengths, MLX is the faster starting point, particularly during prefill. `26B A4B` offers much lower long-prompt latency than `31B` in both working runtimes. The deterministic output task does not establish which model gives better answers; that requires a separate quality evaluation. Ollama requires a fresh compatibility test because its recorded failure belongs to the April 4 environment.
+For these artifacts and prompt lengths, MLX is the faster starting point, particularly during prefill, and `26B A4B` is far more responsive than `31B` on long prompts. The deterministic task does not establish answer quality. The Ollama result is historical and needs a fresh compatibility test; the [capacity comparison](/blog/2026/08/13/open-weight-models-that-fit-on-a-64-gb-macbook-pro.html) covers fit, while the [Hermes guide](/blog/2026/04/04/replacing-openclaw-with-hermes-agent-using-local-weights.html) shows the local endpoint behind an agent.

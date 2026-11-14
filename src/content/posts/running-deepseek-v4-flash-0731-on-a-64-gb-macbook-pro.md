@@ -21,7 +21,7 @@ This sizing analysis records the August 13, 2026 release and serving configurati
 
 ## Why active parameters do not determine fit
 
-DeepSeek V4 Flash is a mixture-of-experts model with `284B` total parameters and `13B` active parameters per generated token. The second number makes inference compute much smaller than a dense `284B` model, but it does not turn the checkpoint into a `13B` model. The router may choose only a small subset of experts for one token while choosing a different subset for the next, so the serving process still needs access to the full expert bank.
+DeepSeek V4 Flash is a mixture-of-experts model with `284B` total parameters and `13B` active parameters per generated token. The router activates six of 256 routed experts alongside shared components, so per-token compute is much smaller than a dense `284B` model. That does not turn the checkpoint into a `13B` model: the serving process still needs access to the full expert bank.
 
 The official [`DeepSeek-V4-Flash-0731` repository](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731) contains roughly `166.9 GB` of files. The [vLLM deployment recipe](https://github.com/vllm-project/recipes/blob/main/models/deepseek-ai/DeepSeek-V4-Flash.yaml) rounds the fused checkpoint to about `167 GB` on disk and lists `200 GB` as its minimum VRAM target. The extra margin is not waste: the engine needs working memory, and context consumes additional KV-cache capacity even though V4 compresses that cache aggressively.
 
@@ -33,8 +33,6 @@ The official [`DeepSeek-V4-Flash-0731` repository](https://huggingface.co/deepse
 | Can I use the exact `0731` model from this Mac? | DeepSeek exposes it as `deepseek-v4-flash` | Yes, through the API |
 
 This table separates storage from inference. Downloading `167 GB` to the SSD proves only that the files fit on disk. It does not make them resident in memory, and macOS swap does not convert a `64 GB` laptop into a `200 GB` inference server. An experimental engine could offload experts and stream weights, but a deficit above `100 GB` moves the problem from GPU or unified-memory bandwidth to transfers from much slower storage. That is a systems experiment, not a sensible daily serving plan.
-
-This model activates six of 256 routed experts per token, alongside shared components. The smaller active count reduces computation, while the full expert bank determines weight capacity.
 
 The `0731` checkpoint also includes an attached DSpark speculative-decoding module. DeepSeek says the release keeps the preview architecture and changes post-training, while the public model card describes the official checkpoint as new weights plus the draft module. That is why `0731` is about `7 GB` larger than the roughly `160 GB` preview repository even though both use the same `284B`-total, `13B`-active backbone.
 
@@ -100,4 +98,4 @@ DeepSeek's API docs announced pricing effective August 16, 2026, so I would read
 
 ## Capacity limit
 
-The official checkpoint exceeds unified memory by about `103 GB`. Local use of this exact release therefore requires a remote backend; local inference requires a smaller checkpoint.
+The official checkpoint exceeds unified memory by about `103 GB`. The [capacity comparison](/blog/2026/08/13/open-weight-models-that-fit-on-a-64-gb-macbook-pro.html) places it beside smaller candidates, but local use of this exact release still requires a remote backend.

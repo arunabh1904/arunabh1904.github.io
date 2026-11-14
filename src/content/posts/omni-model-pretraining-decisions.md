@@ -94,7 +94,7 @@ Separating semantic processing from motor generation also allows the action path
 ![Pi0.5 combines tokenized high-level outputs with a continuous low-level action expert](/assets/images/pi0-5-vision-language-action-model-with-open-world-generalization-paper-figure.png)
 *Pi0.5 uses FAST tokens during mixture pretraining and adds a continuous action expert during post-training. source: [Pi0.5](/paper%20shorts/2025/04/22/pi0-5-vision-language-action-model-with-open-world-generalization.html)*
 
-These papers separate two decisions that RT-2 combined: how robot and web examples share a training objective, and how the deployed model produces motor commands. Pi0.5 changes representation between stages; OpenVLA-OFT changes it during adaptation.
+The distinction is the handoff to post-training: the follow-up [Post-Training for Robotics](/blog/2026/07/16/post-training-vision-language-action-models-zero-to-hero.html#post-training-inherits-the-action-tokenizer) traces what these interfaces make possible for likelihoods, feedback, and credit assignment.
 
 ## Human video supplied time without robot actions
 

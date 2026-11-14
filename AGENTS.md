@@ -7,6 +7,16 @@
 - Use `publish-website-writing` when the request includes adding, publishing, or shipping content. It owns routing and validation; category skills own format; `writing-style` alone owns shared topic, continuity, and prose rules.
 - Do not copy shared prose rules into category skills. Update `writing-style` when a rule should apply everywhere and update an overlay only when the category genuinely differs.
 
+## A Coherent Writing Corpus
+
+- Before drafting or revising a Blog, search the existing Blog and Arxiv Notes corpus for concepts and papers already covered. Give each substantial explanation a clear home; use a brief local recap and a contextual section link elsewhere instead of repeating a primer.
+- Make callbacks part of the argument: explain what the earlier post established and what the current post adds. Use “earlier” only when chronologically accurate; call newer work a follow-up. Preserve enough context for each post and its narration to stand alone.
+- Paper references in Blogs must link to the corresponding Arxiv Note (`section: paper-shorts`), including paper references in tables, reading lists, and figure captions. Resolve the exact `legacyPath` from frontmatter; never invent a route or redirect a paper citation to an unrelated note.
+- If a cited paper has no note, create one with `write-paper-note` before publishing the citing Blog. Read the canonical source, follow the note format and source-figure requirements, and verify the paper identity. A placeholder or title-only stub is not a completed note.
+- Keep canonical external paper, project, code, and source-figure links in the Arxiv Note so readers can reach the primary evidence. An Arxiv Note's own source links must remain external; cross-paper discussion should link to the relevant existing site note when available.
+- Preserve precise provenance when moving a Blog citation into a note: retain named paper sections, tables, figure numbers, and versions in the note, using a verified note anchor when helpful. Leave non-paper documentation, model cards, repositories, and author commentary linked to their actual sources.
+- Verify internal routes and section anchors after edits. Prefer meaningful callbacks over a link quota or a generic related-post list, and remove repeated explanations without erasing the author's voice, experimental controls, or evidence boundaries.
+
 ## Math In Posts
 
 - Use `$...$` for inline math and `$$...$$` for display math in markdown posts.
