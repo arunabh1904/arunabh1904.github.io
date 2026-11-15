@@ -30,6 +30,15 @@ export const READING_LIST_GROUPS: ReadingListGroup[] = [
 
 export const READING_LIST_ITEMS: ReadingListItem[] = [
   {
+    title: 'No AI Slop: A Manifesto',
+    author: 'Speakers and attendees of AIE Code Summit 2026',
+    href: 'https://www.slopmanifesto.com/',
+    dateLabel: '2026',
+    summary:
+      'A shared standard for AI-assisted work: own what you ship, respect the reader’s attention, and fix recurring mistakes in the process that produces them.',
+    group: 'writing-craft',
+  },
+  {
     title: 'Writing in the Age of LLMs',
     author: 'Shreya Shankar',
     href: 'https://www.sh-reya.com/blog/ai-writing/',
@@ -46,6 +55,15 @@ export const READING_LIST_ITEMS: ReadingListItem[] = [
     summary:
       'How agency and taste help researchers and engineers choose valuable problems and carry them through.',
     group: 'writing-craft',
+  },
+  {
+    title: 'End-to-End 4-Bit Training',
+    author: 'Jack Cook and Thinking Machines Lab',
+    href: 'https://thinkingmachines.ai/blog/end-to-end-4-bit-training/',
+    dateLabel: 'Nov 13, 2026',
+    summary:
+      'The NVFP4 training recipe for Inkling 2 Small: MXFP8 backward passes, stochastic rounding to control gradient bias, and quantized MoE communication to turn faster arithmetic into training speedups.',
+    group: 'research-blogs',
   },
   {
     title: "Lil'Log",
