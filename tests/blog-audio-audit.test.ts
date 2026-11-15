@@ -88,10 +88,23 @@ describe('Blog audio artifact audit', () => {
     );
   });
 
+  it('preserves the distinction between memory bytes and spoken bits', () => {
+    const capacity = normalizeTranscript('64 GB of memory');
+    expect(normalizeTranscript('64 gigabytes of memory')).toBe(capacity);
+    expect(normalizeTranscript('64 gigabits of memory')).not.toBe(capacity);
+    expect(normalizeTranscript('1 gigabit')).toBe(normalizeTranscript('1 Gbit'));
+  });
+
   it('rejects inserted fillers and non-lexical vocalizations', () => {
     expect(
-      classifyInsertedWords(['um', 'Yeah', 'mmm', 'mmaaa', 'laughs', 'sensor']),
-    ).toEqual([true, true, true, true, true, false]);
+      classifyInsertedWords(['um', 'Yeah', 'ugh', 'aha', 'mmm', 'mmaaa', 'laughs', 'sensor']),
+    ).toEqual([true, true, true, true, true, true, true, false]);
+  });
+
+  it('canonicalizes phonetic Qwen spellings without hiding repeats or model sizes', () => {
+    expect(normalizeTranscript('Qwen Kwen Quen Qen')).toBe('qwen qwen qwen qwen');
+    expect(normalizeTranscript('Qwen3.5 9B')).toBe(normalizeTranscript('Qen3.5 9B'));
+    expect(normalizeTranscript('Kwen3.5 9B')).not.toBe(normalizeTranscript('Qen3.5 4B'));
   });
 
   it('rejects long internal and trailing regions with no aligned word', () => {

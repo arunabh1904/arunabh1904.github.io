@@ -39,6 +39,7 @@ DISALLOWED_INSERTION_WORDS = frozenset(
         "hahaha",
         "hehe",
         "hmm",
+        "aha",
         "hm",
         "laugh",
         "laughs",
@@ -55,6 +56,7 @@ DISALLOWED_INSERTION_WORDS = frozenset(
         "uh",
         "uhh",
         "uhm",
+        "ugh",
         "um",
         "umm",
         "yeah",
@@ -98,8 +100,10 @@ def normalize_transcript(text: str) -> str:
     ]
     unit_aliases = {
         "gig": "gb",
-        "gigabit": "gb",
-        "gigabits": "gb",
+        # Bits and bytes differ by a factor of eight. A spoken memory-unit
+        # error must survive normalization and count toward the audit.
+        "gigabit": "gbit",
+        "gigabits": "gbit",
         "gigabyte": "gb",
         "gigabytes": "gb",
         "secs": "s",
@@ -107,6 +111,10 @@ def normalize_transcript(text: str) -> str:
         "seconds": "s",
     }
     words = [unit_aliases.get(word, word) for word in words]
+    # Qwen's audio-only spelling is Kwen; Whisper also writes Quen or Qen.
+    # Canonicalize individual tokens, preserving repetitions and model numbers.
+    name_aliases = {"kwen": "qwen", "quen": "qwen", "qen": "qwen"}
+    words = [name_aliases.get(word, word) for word in words]
     normalized: list[str] = []
     index = 0
     while index < len(words):

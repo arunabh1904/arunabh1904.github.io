@@ -73,7 +73,11 @@ function sectionPromptsForTts(source: string) {
   return JSON.parse(result.stdout) as string[];
 }
 
-function paragraphChunksForTts(source: string) {
+function paragraphChunksForTts(
+  source: string,
+  maxChars = 900,
+  pronunciationLexicon: Record<string, string> = {},
+) {
   const program = [
     'import dataclasses, importlib.util, json, pathlib, sys',
     'path = pathlib.Path(sys.argv[1])',
@@ -82,14 +86,20 @@ function paragraphChunksForTts(source: string) {
     'sys.modules[spec.name] = module',
     'spec.loader.exec_module(module)',
     'cleaned = module.shape_narration(module.clean_markdown(sys.stdin.read()))',
-    'chunks = module.paragraph_chunks_for_tts(cleaned)',
+    'max_chars = int(sys.argv[2])',
+    'lexicon = json.loads(sys.argv[3])',
+    'chunks = module.paragraph_chunks_for_tts(cleaned, max_chars=max_chars, pronunciation_lexicon=lexicon)',
     'print(json.dumps([dataclasses.asdict(chunk) for chunk in chunks]))',
   ].join('; ');
-  const result = spawnSync('python3', ['-c', program, exporterPath], {
-    cwd: projectRoot,
-    encoding: 'utf8',
-    input: source,
-  });
+  const result = spawnSync(
+    'python3',
+    ['-c', program, exporterPath, String(maxChars), JSON.stringify(pronunciationLexicon)],
+    {
+      cwd: projectRoot,
+      encoding: 'utf8',
+      input: source,
+    },
+  );
 
   expect(result.stderr).toBe('');
   expect(result.status).toBe(0);
@@ -125,6 +135,42 @@ describe('Blog audio extraction', () => {
     expect(new Set(Object.values(humanNarrationModes()))).toEqual(
       new Set(['full-source']),
     );
+    expect(humanNarrationModes()).toHaveProperty(
+      'adding-spatial-grids-and-object-tokens-to-vision-language-models',
+    );
+  });
+
+  it('applies post pronunciation expansions before enforcing chunk bounds', () => {
+    const source = [
+      '## Measured failure',
+      '',
+      'Issue #13460 remains the relevant upstream reference for this run, and the result should be rerun before making a current compatibility claim.',
+      '',
+      'The authored source keeps the compact issue identifier.',
+    ].join('\n');
+    const pronunciation = {
+      'issue #13460': 'issue number thirteen thousand four hundred sixty',
+    };
+    const chunks = paragraphChunksForTts(source, 140, pronunciation);
+
+    expect(chunks.length).toBeGreaterThan(1);
+    expect(chunks.every((chunk) => chunk.text.length <= 140)).toBe(true);
+    expect(chunks.map((chunk) => chunk.text).join(' ')).toContain(
+      'issue number thirteen thousand four hundred sixty',
+    );
+    expect(cleanMarkdown(source)).toContain('Issue #13460');
+  });
+
+  it('matches pronunciation keys with punctuation at either boundary', () => {
+    const source = 'On macOS 26.3.1 (a), call /api/generate.';
+    const chunks = paragraphChunksForTts(source, 900, {
+      'macOS 26.3.1 (a)': 'mac O S version twenty six point three point one, letter A',
+      '/api/generate': 'slash A P I slash generate',
+    });
+    expect(chunks[0].text).toBe(
+      'On mac O S version twenty six point three point one, letter A, call slash A P I slash generate.',
+    );
+    expect(cleanMarkdown(source)).toBe(source);
   });
 
   it('preserves authored prose in order while omitting visual-only material', () => {

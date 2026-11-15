@@ -122,6 +122,7 @@ FORBIDDEN_REFERENCE_FIELDS = {
 # reviewed human voice without invalidating untouched legacy MP3s.
 HUMAN_NARRATION_POSTS = frozenset(
     {
+        "adding-spatial-grids-and-object-tokens-to-vision-language-models",
         "attention-mechanisms-demystified",
         "building-local-blog-audio-with-qwen3-tts",
         "code-is-cheap-understanding-isnt",
@@ -161,24 +162,35 @@ HUMAN_SAMPLING_SEED_VERSION = "voxtral-casual-heading-context-v3"
 HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
     "what-a-vision-encoder-actually-buys": {
         "5": 1905,
+        "0": 1905,
+        "3": 1905,
+        "1": 1905
     },
     "from-bev-features-to-lane-graphs-and-changing-maps": {
         "11": 1905,
-        "16": 1905,
+        "16": 1906,
         "41": 1905,
-        "54": 1905,
-        "64": 1905,
+        "5": 1907,
+        "12": 1906,
+        "20": 1907,
+        "47": 1905
     },
     "building-local-blog-audio-with-qwen3-tts": {
         "8": 1906,
         "22": 1905,
         "31": 1905,
-        "23": 1905,
+        "23": 1907,
         "32": 1905,
+        "24": 1907,
+        "33": 1905,
+        "34": 1905,
+        "3": 1906,
+        "26": 1905
     },
     "code-is-cheap-understanding-isnt": {
         "4": 1906,
-        "14": 1905,
+        "14": 1906,
+        "5": 1906
     },
     "from-ppo-to-grpo-rl-for-reasoning-and-vlas": {
         "4": 1905,
@@ -186,33 +198,53 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
         "6": 1905,
         "7": 1905,
         "11": 1905,
-        "14": 1906,
+        "14": 1907,
+        "8": 1905,
+        "17": 1905,
+        "22": 1905
     },
     "from-seeing-to-doing-the-evolution-of-vision-language-models": {
         "4": 1905,
-        "26": 1905,
+        "26": 1906,
         "28": 1905,
-        "41": 1905,
+        "41": 1907,
+        "2": 1905,
+        "16": 1906,
+        "25": 1905,
+        "27": 1905,
+        "32": 1906,
+        "34": 1905,
+        "36": 1905,
+        "38": 1905
     },
     "how-to-read-scaling-laws-for-language-models": {
         "8": 1905,
         "13": 1905,
         "19": 1906,
+        "5": 1905,
+        "6": 1905
     },
     "how-unified-sensor-models-are-built-for-autonomous-driving": {
-        "0": 1905,
+        "0": 1906,
         "4": 1905,
         "20": 1905,
+        "3": 1905,
+        "10": 1905,
+        "19": 1905,
+        "33": 1907,
+        "43": 1906
     },
     "my-journey-so-far-full-story": {
         "11": 1906,
         "24": 1906,
-        "25": 1906,
+        "25": 1906
     },
     "omni-model-pretraining-decisions": {
         "6": 1905,
-        "8": 1905,
-        "12": 1905,
+        "8": 1906,
+        "12": 1906,
+        "4": 1905,
+        "11": 1905
     },
     "on-engineering-management": {
         "11": 1905,
@@ -220,31 +252,46 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
         "15": 1905,
         "23": 1905,
         "24": 1906,
+        "9": 1906
     },
     "open-weight-models-that-fit-on-a-64-gb-macbook-pro": {
-        "5": 1906,
+        "5": 1909,
+        "2": 1907,
+        "7": 1905,
+        "6": 1906
     },
     "replacing-openclaw-with-hermes-agent-using-local-weights": {
-        "1": 1905,
+        "1": 1906,
         "8": 1906,
-        "6": 1905,
+        "6": 1905
     },
     "running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro": {
-        "1": 1905,
-        "8": 1905,
+        "1": 1907
     },
     "running-gemma-4-locally-on-a-64-gb-macbook-pro": {
-        "10": 1905,
-        "11": 1905,
+        "0": 1906,
+        "4": 1906
     },
     "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro": {
+        "2": 1907,
         "3": 1905,
+        "4": 1905,
+        "6": 1905,
+        "10": 1905,
         "11": 1905,
-        "15": 1905,
+        "12": 1905,
+        "13": 1905,
+        "16": 1905,
+        "17": 1905
     },
     "running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro": {
+        "0": 1906,
+        "1": 1905,
+        "2": 1905,
+        "3": 1905,
         "4": 1905,
-        "5": 1905,
+        "5": 1907,
+        "6": 1908
     },
     "attention-mechanisms-demystified": {
         "7": 1905,
@@ -252,56 +299,181 @@ HUMAN_CHUNK_SEED_OVERRIDES: dict[str, dict[str, int]] = {
         "11": 1906,
         "14": 1906,
         "28": 1906,
+        "10": 1905,
+        "18": 1906,
+        "20": 1905,
+        "21": 1905,
+        "32": 1905,
+        "33": 1905
     },
+    "adding-spatial-grids-and-object-tokens-to-vision-language-models": {
+        "40": 1905,
+        "36": 1905
+    },
+    "post-training-vision-language-action-models-zero-to-hero": {
+        "3": 1906,
+        "12": 1907,
+        "14": 1906,
+        "16": 1907
+    },
+    "thoughts-on-good-research-in-industry": {
+        "1": 1907,
+        "2": 1907
+    }
 }
 HUMAN_POST_PRONUNCIATION_LEXICONS = {
+    "from-ppo-to-grpo-rl-for-reasoning-and-vlas": {
+        "DeepSeek-R1": "Deep Seek R one",
+        "R1-Zero": "R one Zero",
+        "R1": "R one",
+        "“token” with “action.”": "token with action."
+    },
+    "open-weight-models-that-fit-on-a-64-gb-macbook-pro": {
+        "tok/s": "tokens per second",
+        "GB MacBook": "gigabyte MacBook",
+        "GB": "gigabytes"
+    },
+    "replacing-openclaw-with-hermes-agent-using-local-weights": {
+        "/.hermes/hermes-agent": "tilde slash dot hermes slash hermes dash agent",
+        "/.local/bin": "tilde slash dot local slash bin",
+        "/.hermes/config.yaml": "tilde slash dot hermes slash config dot yaml",
+        "uv": "U V",
+        "3.11": "three point eleven",
+        "CLI": "C L I",
+        "filesystem": "file system"
+    },
     "from-bev-features-to-lane-graphs-and-changing-maps": {
         "BEVDet4D": "B E V Det four D",
+        "Endpoint distance": "End point distance",
+        "curb corner": "kerb corner"
     },
     "attention-mechanisms-demystified": {
         "scaleddotproductattention": "scaled dot product attention",
         "iscausal=True": "is causal equals true",
+        "dropoutp": "dropout P",
+        "nonzero": "non zero",
+        "SWA": "S W A",
+        "“hybrid attention”": "hybrid attention",
+        "Compress the cache.": "Compress the cache:"
     },
     "building-local-blog-audio-with-qwen3-tts": {
         "BEVDet4D": "B E V Det four D",
+        "What “local” means": "What local means",
+        "src/content/posts": "source, slash content, slash posts",
+        "public/assets/audio/manifest.json": "public, slash assets, slash audio, slash manifest dot J S O N",
+        "Thirty minutes": "30 minutes"
     },
     "how-unified-sensor-models-are-built-for-autonomous-driving": {
         "BEVDet4D": "B E V Det four D",
-        # The shared phonetic spelling is helpful in prose but unstable as a
-        # two-word Voxtral prompt. Restore the written form for this heading.
+        # Restore the written form in this short heading; the shared phonetic
+        # spelling is unstable here.
         "lie-dar encoders": "Lidar encoders",
+        "Training the representation.": "Training the representation:"
     },
     "running-gemma-4-locally-on-a-64-gb-macbook-pro": {
         "issue #13460": "issue number thirteen thousand four hundred sixty",
+        "issue #14432": "issue number fourteen thousand four hundred thirty two",
+        "issue #13867": "issue number thirteen thousand eight hundred sixty seven",
+        "macOS 26.3.1 (a)": "mac O S version twenty six point three point one, letter A",
+        "gemma4:e2b-it-q4KM": "Gemma four, E two B, I T, Q four K M",
+        "0.20.2": "zero point twenty point two",
+        "llama.cpp": "llama C P P",
+        "llama-server": "llama server",
+        "ggml-org": "G G M L org",
+        "mlx-lm": "M L X L M",
+        "mlx-community": "M L X community",
+        "/api/generate": "slash A P I slash generate",
+        "bfloat vs half": "B float versus half",
+        "Apple/Metal": "Apple slash Metal",
+        "Q80": "Q eight underscore zero",
+        "tok/s": "tokens per second",
+        "2.18 s": "2.18 seconds",
+        "13.50 s": "13.50 seconds",
+        "64 GB MacBook": "64 gigabyte MacBook",
+        "64 GB M5": "64 gigabyte M5",
+        "GB": "gigabytes",
+        "prefill": "pre fill",
+        "Benchmark results": "Bench mark results",
+        "margin. 26B A4B": "margin; twenty six B A four B"
     },
     "running-muse-glimmer-30b-locally-on-a-64-gb-macbook-pro": {
         "llama.cpp": "llama C P P",
         "10360": "10 360",
         "48d22e295": "commit 48 D 22 E 295",
-        "Muse-Glimmer-30B-KQuant-17GB-Q4KM.gguf": (
-            "Muse Glimmer 30 B K Quant 17 G B Q 4 K M G G U F"
-        ),
-        "dflash-Muse-Glimmer-30B-Q4KM.gguf": (
-            "D Flash Muse Glimmer 30 B Q 4 K M G G U F"
-        ),
+        "Muse-Glimmer-30B-KQuant-17GB-Q4KM.gguf": "Muse Glimmer 30 B K Quant 17 G B Q 4 K M G G U F",
+        "dflash-Muse-Glimmer-30B-Q4KM.gguf": "D Flash Muse Glimmer 30 B Q 4 K M G G U F",
         "10353": "10 353",
-        "8660": "8 660",
+        "8660": "eight thousand six hundred sixty",
         "llama-server": "llama server",
         "16K": "16 K",
         "GB": "G B",
         "tok/s": "tokens per second",
         "tokens/s": "tokens per second",
-        "http://127.0.0.1:8080/v1": (
-            "H T T P at 127 dot 0 dot 0 dot 1, port 8080, V 1"
-        ),
-        "mmproj-Muse-Glimmer-30B-Q4KM.gguf": (
-            "M M proj Muse Glimmer 30 B Q 4 K M G G U F"
-        ),
+        "http://127.0.0.1:8080/v1": "H T T P at 127 dot 0 dot 0 dot 1, port 8080, V 1",
+        "mmproj-Muse-Glimmer-30B-Q4KM.gguf": "M M proj Muse Glimmer 30 B Q 4 K M G G U F",
         "draft dflash": "draft D Flash",
-        "scripts/benchllamaserverlocal.py": (
-            "scripts slash bench llama server local dot py"
-        ),
+        "scripts/benchllamaserverlocal.py": "scripts slash bench llama server local dot py",
+        "32.26 s": "32.26 seconds",
+        "17.10 s": "17.10 seconds",
+        "1.01 s": "1.01 seconds",
+        "2.67 s": "2.67 seconds",
+        "--spec-type draft-dflash": "dash dash spec type, draft D Flash",
+        "Long prompts remain the constraint": "Lawng prompts remain the constraint"
     },
+    "on-engineering-management": {
+        "Build useful metrics!": "Build useful metrics."
+    },
+    "post-training-vision-language-action-models-zero-to-hero": {
+        "the next dataset": "the next data set",
+        "Unpaired rollout feedback": "Un-paired rollout feedback",
+        "Binary success": "Bye nary success"
+    },
+    "what-a-vision-encoder-actually-buys": {
+        "LLaVA": "Lava"
+    },
+    "running-qwen-3-5-and-qwen-3-locally-on-a-64-gb-macbook-pro": {
+        "Qwen 3.5 4B Qwen 3.5 9B Qwen 3.5 27B Qwen 3.5 35B A3B Qwen 3 4B Qwen 3 14B Qwen 3 30B A3B Qwen 3 32B": "Kwen 3.5, 4 B; Kwen 3.5, 9 B; Kwen 3.5, 27 B; Kwen 3.5, 35 B, A 3 B; Kwen 3, 4 B; Kwen 3, 14 B; Kwen 3, 30 B, A 3 B; Kwen 3, 32 B",
+        "Qwen3.6-27B": "Kwen 3.6, 27 B",
+        "Qwen 3.5 4B": "Kwen 3.5, 4 B",
+        "Qwen 3.5 9B": "Kwen 3.5, 9 B",
+        "Qwen 3.5 27B": "Kwen 3.5, 27 B",
+        "Qwen 3.5 35B A3B": "Kwen 3.5, 35 B, A 3 B",
+        "Qwen 3 4B": "Kwen 3, 4 B",
+        "Qwen 3 14B": "Kwen 3, 14 B",
+        "Qwen 3 30B A3B": "Kwen 3, 30 B, A 3 B",
+        "Qwen 3 32B": "Kwen 3, 32 B",
+        "Qwen 3.5": "Kwen 3.5",
+        "Qwen 3": "Kwen 3",
+        "Qwen": "Kwen",
+        "64 GB MacBook": "64 gigabyte MacBook",
+        "64 GB M5": "64 gigabyte M5",
+        "M5 Max": "M five Max",
+        "GB": "gigabytes",
+        "mlx-lm": "M L X L M",
+        "mlx-vlm": "M L X V L M",
+        "llama-server": "llama server",
+        "llama.cpp": "llama C P P",
+        "8660": "eight thousand six hundred sixty",
+        "0.31.2": "zero point thirty one point two",
+        "0.4.4": "zero point four point four",
+        "Q4KM": "Q four K M",
+        "macOS": "Mac O S",
+        "2.894 s": "2.894 seconds",
+        "Limits of the comparison.": "Limits of the comparison:"
+    },
+    "from-seeing-to-doing-the-evolution-of-vision-language-models": {
+        "π0.5": "Pi zero point five",
+        "π0.6": "Pi zero point six",
+        "π0.7": "Pi zero point seven"
+    },
+    "running-deepseek-v4-flash-0731-on-a-64-gb-macbook-pro": {
+        "roughly 166.9 GB of files": "roughly 166.9 gigabytes of files",
+        "about 167 GB on disk": "about 167 gigabytes on disk"
+    },
+    "thoughts-on-good-research-in-industry": {
+        "Build taste.": "Build taste:",
+        "Virality": "vie ral ity"
+    }
 }
 # These long-form canaries keep complete source narration. Their narrow caps
 # allow a human pace without weakening the corpus-wide default.
@@ -475,7 +647,12 @@ def apply_pronunciation_lexicon(text: str, lexicon: dict[str, str]) -> str:
     """Apply one audio-only phonetic lexicon without changing authored prose."""
 
     for written, spoken in lexicon.items():
-        text = re.sub(rf"\b{re.escape(written)}\b", spoken, text, flags=re.IGNORECASE)
+        text = re.sub(
+            rf"(?<!\w){re.escape(written)}(?!\w)",
+            spoken,
+            text,
+            flags=re.IGNORECASE,
+        )
     return text
 
 
@@ -570,7 +747,10 @@ def split_bounded_sentences(text: str, max_chars: int) -> list[str]:
 
 
 def paragraph_chunks_for_tts(
-    text: str, *, max_chars: int = HUMAN_CHUNK_MAX_CHARS
+    text: str,
+    *,
+    max_chars: int = HUMAN_CHUNK_MAX_CHARS,
+    pronunciation_lexicon: dict[str, str] | None = None,
 ) -> list[NarrationChunk]:
     """Compile bounded requests while keeping every heading in prose context.
 
@@ -578,9 +758,12 @@ def paragraph_chunks_for_tts(
     fillers, laughs, and exaggerated pauses. A heading therefore starts the
     next buffer and is decoded with the prose that follows it. The hard
     character ceiling still localizes failures without resetting the narrator
-    at every paragraph.
+    at every paragraph. Post-specific pronunciation expansions are applied
+    before splitting so the emitted request, rather than only its authored
+    spelling, respects the model's character ceiling.
     """
 
+    pronunciation_lexicon = pronunciation_lexicon or {}
     chunks: list[NarrationChunk] = []
     buffer: list[str] = []
     buffer_starts_section = False
@@ -606,7 +789,7 @@ def paragraph_chunks_for_tts(
         available = max_chars
         if buffer and not buffer_has_prose:
             heading_chars = len("\n\n".join(buffer)) + 2
-            available = max(200, max_chars - heading_chars)
+            available = max(1, max_chars - heading_chars)
         for group in split_bounded_sentences(rendered, available):
             candidate = "\n\n".join([*buffer, group])
             if buffer and len(candidate) > max_chars:
@@ -620,7 +803,9 @@ def paragraph_chunks_for_tts(
         if not block:
             continue
         is_heading = block.startswith(HEADING_START) and block.endswith(HEADING_END)
-        rendered = render_for_tts(block)
+        rendered = apply_pronunciation_lexicon(
+            render_for_tts(block), pronunciation_lexicon
+        )
         if is_heading:
             # Nested or consecutive headings share the first prose request.
             # Never give the expressive voice a tiny heading-only prompt.
@@ -708,21 +893,16 @@ def discover_posts() -> list[dict[str, Any]]:
         human_chunk_max_chars = HUMAN_POST_CHUNK_MAX_CHARS.get(
             post_slug, HUMAN_CHUNK_MAX_CHARS
         )
+        post_pronunciations = HUMAN_POST_PRONUNCIATION_LEXICONS.get(post_slug, {})
         narration_chunks = (
-            paragraph_chunks_for_tts(text, max_chars=human_chunk_max_chars)
+            paragraph_chunks_for_tts(
+                text,
+                max_chars=human_chunk_max_chars,
+                pronunciation_lexicon=post_pronunciations,
+            )
             if uses_human_profile
             else []
         )
-        post_pronunciations = HUMAN_POST_PRONUNCIATION_LEXICONS.get(post_slug, {})
-        if narration_chunks and post_pronunciations:
-            narration_chunks = [
-                NarrationChunk(
-                    text=apply_pronunciation_lexicon(chunk.text, post_pronunciations),
-                    pause_seconds=chunk.pause_seconds,
-                    kind=chunk.kind,
-                )
-                for chunk in narration_chunks
-            ]
         tts_sections = [] if uses_human_profile else section_prompts_for_tts(text)
         tts_text = (
             "\n".join(chunk.text for chunk in narration_chunks)
@@ -1300,7 +1480,8 @@ def generate_human_post(
         if duration_seconds > max_audio_seconds:
             raise RuntimeError(
                 f"Generated audio for {post['slug']} is {duration_seconds / 60:.1f} "
-                f"minutes; shorten its narration instead of truncating it"
+                "minutes; review the full-source duration limit without "
+                "truncating, accelerating, or abridging the narration"
             )
         post["output"].parent.mkdir(parents=True, exist_ok=True)
         temporary_mp3.replace(post["output"])
