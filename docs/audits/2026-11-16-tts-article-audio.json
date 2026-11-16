@@ -1,0 +1,389 @@
+{
+  "source_commit": "dc6318eb946e4e09e8966426edad0c50d39e7a07",
+  "source_sha256": "eb9f2aaa319087a3045f8d2b969906f7d843719ffdcc188ce73cc975fc8269c0",
+  "mp3_sha256": "3db6e55afd2627d7426e26dc4ce37d1eda341da3ecc8601bd425489e9b4167dd",
+  "duration_seconds": 1645.328042,
+  "reused_requests": 35,
+  "new_requests": 8,
+  "seed_override_change": "Same accepted closing requests moved from indices 32/33/34 to 40/41/42.",
+  "asr": {
+    "slug": "building-local-blog-audio-with-qwen3-tts",
+    "audio": "public/assets/audio/blog/building-local-blog-audio-with-qwen3-tts.mp3",
+    "asr_model": "mlx-community/whisper-large-v3-turbo",
+    "audited_chunks": 43,
+    "reference_words": 3970,
+    "recognized_words": 3963,
+    "wer": 0.03199,
+    "substitutions": 80,
+    "deletions": 27,
+    "insertions": 20,
+    "long_insertions": [],
+    "disallowed_insertions": [],
+    "high_error_chunks": [],
+    "suspicious_unaligned_regions": [],
+    "limits": {
+      "max_wer": 0.08,
+      "max_insertion_words": 2,
+      "max_chunk_wer": 0.5,
+      "max_unaligned_seconds": 1.5
+    },
+    "passed": true,
+    "asr_revision": "a4aaeec0636e6fef84abdcbe3544cb2bf7e9f6fb"
+  },
+  "waveform": {
+    "chunks": [
+      {
+        "chunk": 0,
+        "seconds": 28.901625,
+        "peak": 0.32720947265625,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 1,
+        "seconds": 30.345166666666668,
+        "peak": 0.1129150390625,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 2,
+        "seconds": 42.72858333333333,
+        "peak": 0.13690185546875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 3,
+        "seconds": 63.145125,
+        "peak": 0.226165771484375,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 4,
+        "seconds": 17.344125,
+        "peak": 0.1240234375,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 5,
+        "seconds": 46.78933333333333,
+        "peak": 0.122314453125,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 6,
+        "seconds": 11.84,
+        "peak": 0.136077880859375,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 7,
+        "seconds": 42.516125,
+        "peak": 0.152374267578125,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 8,
+        "seconds": 42.48,
+        "peak": 0.21270751953125,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 9,
+        "seconds": 26.390166666666666,
+        "peak": 0.196990966796875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 10,
+        "seconds": 29.452541666666665,
+        "peak": 0.125213623046875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 11,
+        "seconds": 57.04,
+        "peak": 0.259521484375,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 12,
+        "seconds": 15.12,
+        "peak": 0.26324462890625,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 13,
+        "seconds": 31.2005,
+        "peak": 0.14569091796875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 14,
+        "seconds": 53.016625,
+        "peak": 0.146484375,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 15,
+        "seconds": 45.479625,
+        "peak": 0.210357666015625,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 16,
+        "seconds": 25.04,
+        "peak": 0.200775146484375,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 17,
+        "seconds": 51.088,
+        "peak": 0.101806640625,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 18,
+        "seconds": 46.931041666666665,
+        "peak": 0.35076904296875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 19,
+        "seconds": 26.925291666666666,
+        "peak": 0.131866455078125,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 20,
+        "seconds": 33.127125,
+        "peak": 0.147216796875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 21,
+        "seconds": 42.640791666666665,
+        "peak": 0.160125732421875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 22,
+        "seconds": 55.98204166666667,
+        "peak": 0.0765380859375,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 23,
+        "seconds": 39.652,
+        "peak": 0.109161376953125,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 24,
+        "seconds": 49.632083333333334,
+        "peak": 0.1005859375,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 25,
+        "seconds": 20.045958333333335,
+        "peak": 0.1065673828125,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 26,
+        "seconds": 37.28,
+        "peak": 0.129364013671875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 27,
+        "seconds": 52.27804166666667,
+        "peak": 0.17852783203125,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 28,
+        "seconds": 52.519375,
+        "peak": 0.21142578125,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 29,
+        "seconds": 37.11075,
+        "peak": 0.39471435546875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 30,
+        "seconds": 45.549083333333336,
+        "peak": 0.1121826171875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 31,
+        "seconds": 21.746166666666667,
+        "peak": 0.065032958984375,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 32,
+        "seconds": 34.79566666666667,
+        "peak": 0.16058349609375,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 33,
+        "seconds": 27.682083333333335,
+        "peak": 0.231964111328125,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 34,
+        "seconds": 35.99845833333333,
+        "peak": 0.208953857421875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 35,
+        "seconds": 33.37554166666666,
+        "peak": 0.14410400390625,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 36,
+        "seconds": 42.980625,
+        "peak": 0.18243408203125,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 37,
+        "seconds": 18.327916666666667,
+        "peak": 0.141815185546875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 38,
+        "seconds": 42.1315,
+        "peak": 0.215301513671875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 39,
+        "seconds": 23.982083333333332,
+        "peak": 0.3525390625,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 40,
+        "seconds": 53.5065,
+        "peak": 0.0711669921875,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 41,
+        "seconds": 48.65629166666667,
+        "peak": 0.09381103515625,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      },
+      {
+        "chunk": 42,
+        "seconds": 49.118625,
+        "peak": 0.119049072265625,
+        "nonfinite": 0,
+        "clipped": 0,
+        "denormal": 0
+      }
+    ],
+    "mp3_peak": 0.33390897512435913,
+    "mp3_clipped": 0,
+    "mp3_nonfinite": 0,
+    "source_sha256": "eb9f2aaa319087a3045f8d2b969906f7d843719ffdcc188ce73cc975fc8269c0",
+    "digest": "77d7f931517db231826a7c28af872322caa1a274a89bc577208c1f399659f3bd",
+    "listening_review": "Not performed by this tool; automated integrity and ASR do not establish naturalness."
+  },
+  "local_ci": "Passed: 785 tests, Astro check, build, and build verification.",
+  "listening": "No new subjective listening claim. Tools support transcription and waveform inspection but not audio perception. Existing voice retained; this does not certify naturalness."
+}
