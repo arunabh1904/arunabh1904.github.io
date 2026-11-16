@@ -180,6 +180,34 @@ Integrating that recognizer would require recording its backend, model, and runt
 
 A recognizer can mishear a model name or silently omit a vocal artifact. Compare disputed regions with another recognizer and listen to the audio; do not lower the gate until a failing sample passes. Chunk recognition also does not test the assembled transition, so the opening, request joins, and ending still require a continuity check.
 
+## Testing tiny-voca on the mapping post
+
+The remaining long-form artifacts made [tiny-voca](https://github.com/n4ze3m/tiny-voca/tree/62e2adef158bc997042cc6234f541f1e0e4cd55d) worth testing in November. Its released checkpoint has 4.54 million parameters and two fixed American-English voices, F2 and M2. The “never heard a real human voice” description refers to its immediate training data: speech generated with Qwen3-TTS, whose own training is a separate question. This is a small model trained on synthetic speech, not evidence that human recordings were absent from the upstream system.
+
+The [model design](https://github.com/n4ze3m/tiny-voca/blob/62e2adef158bc997042cc6234f541f1e0e4cd55d/docs/model.md) predicts phoneme durations, pitch, voicing, and energy, then produces a waveform with a source-filter synthesizer. It does not generate an open-ended sequence of language tokens. That changes the failure modes worth testing; it does not guarantee correct pronunciation or continuous delivery. Its long-text helper synthesizes sentences separately and concatenates them, so sentence joins remain part of the listening test.
+
+The November 16 benchmark used the complete [mapping post](/blog/2026/10/01/from-bev-features-to-lane-graphs-and-changing-maps.html): 4,837 spoken words in the same 53 bounded requests used by production. Both voices received the exact existing synthesis text, including its pronunciation hints, at speed 1.0. Tiny-voca split those requests into 370 utterances. The comparison retained the site's section pauses and used four CPU threads on a 64 GiB M5 Max. Reassembling the cached Voxtral requests reproduced the downloaded production MP3 byte for byte, establishing the baseline's provenance.
+
+| Render | Complete MP3 | Measured synthesis time | ASR word error rate |
+| --- | --- | --- | --- |
+| Published Voxtral, `casual_female`, MLX-Audio 0.5.3 | 35:55 | Not remeasured | 3.10% |
+| Tiny-voca F2 | 32:51 | 16.90 seconds | 2.94% |
+| Tiny-voca M2 | 30:32 | 16.40 seconds | 2.76% |
+
+M2 produced roughly thirty minutes of speech in sixteen seconds of phonemization and synthesis, excluding loading, warm-up, file assembly, encoding, and recognition. That is about 111 times real time for this CPU run, not an end-to-end export measurement or a speed comparison with Voxtral. The shorter recording comes from the model's natural delivery; the benchmark did not crop the article or accelerate the waveform. No retraining was involved.
+
+Whisper large-v3-turbo audited every request with the existing normalization and thresholds. All three renders passed, with no insertion longer than two words, forbidden inserted filler, chunk above 50% word error, or unaligned region longer than 1.5 seconds. The tiny-voca waveforms contained no non-finite, clipped, or denormal samples. Recognition still confused technical names and terms, including *autoregressively* and *Fréchet*. Those discrepancies need local listening before deciding whether the synthesizer or recognizer is wrong. The small aggregate advantage does not establish that M2 sounds better: the Voxtral recording that prompted this experiment passed the same content gate.
+
+I preferred M2 in the opening comparison. The full render is available for a longer listen; sentence transitions, dense names, and the final section are the useful checks. This is a benchmark candidate, not a completed migration of the site's narrator.
+
+<audio controls preload="none" style="display:block;width:100%;max-width:100%" aria-label="Full mapping article narrated by tiny-voca M2" src="/assets/audio/benchmarks/tiny-voca-2026-11-16/mapping-m2.mp3"></audio>
+
+<p><a href="/assets/audio/benchmarks/tiny-voca-2026-11-16/mapping-m2.mp3">Full M2 recording</a> · <a href="/assets/audio/benchmarks/tiny-voca-2026-11-16/opening-m2.mp3">M2 opening</a> · <a href="/assets/audio/benchmarks/tiny-voca-2026-11-16/opening-f2.mp3">F2 opening</a> · <a href="/assets/audio/benchmarks/tiny-voca-2026-11-16/opening-voxtral.mp3">Published Voxtral opening</a> · <a href="https://github.com/arunabh1904/arunabh1904.github.io/tree/main/docs/benchmarks/tiny-voca-2026-11-16">Benchmark records and reproduction steps</a></p>
+
+The released weights are sufficient for this use. For isolated technical pronunciation errors, the first experiment should be an audio-only lexicon change followed by the same held-out checks. A new speaker identity or a persistent domain-wide acoustic problem would justify a training project. The [training implementation](https://github.com/n4ze3m/tiny-voca/blob/62e2adef158bc997042cc6234f541f1e0e4cd55d/src/tiny_voca/train.py) can branch from a full training checkpoint, but the published inference file lacks the training-system and discriminator state that path expects. It cannot simply be passed to `--init-from`; adaptation needs a compatible training checkpoint or an explicit weight-loading change, paired text and speech, alignment, and a separate evaluation set. Training was neither necessary nor measured here.
+
+The project declares Apache 2.0 for its code and weights and CC BY 4.0 for its dataset. That is a different deployment constraint from the current Voxtral checkpoint's non-commercial license. For this site, the immediate decision is acoustic: M2 is cheap enough to evaluate extensively, but a passing transcript still leaves the long-form listening question open.
+
 ## Blog shipping now means two pull requests
 
 The most expensive stale-audio mistake came from compiling in a worktree whose prose had not reached production. The MP3 matched that checkout perfectly. The website served different words.

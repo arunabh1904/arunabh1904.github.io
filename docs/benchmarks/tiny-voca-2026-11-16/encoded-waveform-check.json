@@ -1,0 +1,12 @@
+{
+  "M2": {
+    "decoded_mp3_peak": 0.8649764657020569,
+    "decoded_mp3_clipped_samples": 0,
+    "decoded_mp3_nonfinite_samples": 0
+  },
+  "F2": {
+    "decoded_mp3_peak": 0.8589578866958618,
+    "decoded_mp3_clipped_samples": 0,
+    "decoded_mp3_nonfinite_samples": 0
+  }
+}
