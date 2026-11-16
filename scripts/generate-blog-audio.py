@@ -367,6 +367,7 @@ HUMAN_POST_PRONUNCIATION_LEXICONS = {
     },
     "building-local-blog-audio-with-qwen3-tts": {
         "BEVDet4D": "B E V Det four D",
+        "ICL": "I C L",
         "What “local” means": "What local means",
         "src/content/posts": "source, slash content, slash posts",
         "public/assets/audio/manifest.json": "public, slash assets, slash audio, slash manifest dot J S O N",

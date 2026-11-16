@@ -20,6 +20,18 @@ ${body}
 }
 
 describe('tiny-voca production contract', () => {
+  it('spells the technical ICL acronym instead of allowing a chat expansion', () => {
+    expect(run(`
+import re
+p = next(p for p in g.discover_posts() if p['slug'].startswith('building-local'))
+print(json.dumps({
+    'written_acronym_retained': bool(re.search(r'\\bICL\\b', p['text'])),
+    'spoken_letters': 'I C L' in p['tts_text'],
+    'unexpanded_acronym': bool(re.search(r'\\bICL\\b', p['tts_text'])),
+}))
+`)).toEqual({ written_acronym_retained: true, spoken_letters: true, unexpanded_acronym: false });
+  });
+
   it('keeps exact benchmark synthesis text and imports no model runtime for checks', () => {
     expect(run(`
 p = next(p for p in g.discover_posts() if p['slug'].startswith('from-bev'))

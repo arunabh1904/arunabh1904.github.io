@@ -138,6 +138,8 @@ def audit(args, post, chunks, gen, gate):
     import jiwer
     import mlx_whisper
     import soundfile as sf
+    if args.baseline and post["synthesis_profile"] != "human":
+        raise RuntimeError("The Voxtral baseline requires a revision where this post still uses Voxtral; see the benchmark reproduction record")
     if args.baseline:
         manifest = gen.read_manifest()[post['slug']]
         if manifest['digest'] != post['digest'] or manifest['source_sha256'] != post['source_sha256']:

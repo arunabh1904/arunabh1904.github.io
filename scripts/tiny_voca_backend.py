@@ -18,6 +18,7 @@ PROFILE = {
     "code_sha256": "0f190da92106d722f830b232c509f89dee29fe2cabc15299e370f5f0b38edb7b",
     "frontend_revision": "8cd889e4de7be6bd1dd2e6891344a0729fa14dd4",
     "frontend_code_sha256": "3240cb3d6a2badcfa41c35d5f83917327b01f88d4a92ba1026f743f850fd92c2",
+    "frontend_rules_sha256": "4b96b2f96bdd06c81fd92d051eb630b216498d8ccbb7dd1f73b5547c89b7b288",
     "frontend_data_sha256": "5999cdb138a9561342cbd87a165433fb9f60bbf3720b7e706e166d170fe407ce",
     "inference_runtime": {"tiny-voca": "0.2.0", "dizione": "0.1.0", "torch": "2.15.0",
                           "numpy": "2.5.5", "soundfile": "0.14.0"},
@@ -64,6 +65,8 @@ def load(weights: Path):
     for package, field in [("tiny_voca", "code_sha256"), ("dizione", "frontend_code_sha256")]:
         spec = importlib.util.find_spec(package)
         checks[field] = tree_hash(Path(spec.origin).parent, "*.py")
+        if package == "dizione":
+            checks["frontend_rules_sha256"] = tree_hash(Path(spec.origin).parent / "data")
     for field, actual in checks.items():
         if actual != PROFILE[field]:
             raise RuntimeError(f"Unreviewed tiny-voca {field}: {actual}")
