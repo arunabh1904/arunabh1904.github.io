@@ -2,10 +2,10 @@
 """Generate local, static read-aloud audio for Blog posts.
 
 The script intentionally keeps model execution out of the Astro build. Run it
-on an Apple Silicon Mac, commit the generated MP3s, and let GitHub Pages serve
+locally, commit the generated MP3s, and let GitHub Pages serve
 them as ordinary static assets.
 
-Usage:
+Usage (tiny-voca setup: docs/tiny-voca-narration.md):
     uv run --with mlx-audio \
       python scripts/generate-blog-audio.py
     uv run --with mlx-audio \
@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import re
 import shutil
@@ -33,6 +34,14 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+# Absolute loading also supports stdlib-only --check and importlib-based audits.
+_tiny_spec = importlib.util.spec_from_file_location("tiny_voca_backend", ROOT / "scripts" / "tiny_voca_backend.py")
+tiny_voca_backend = importlib.util.module_from_spec(_tiny_spec)
+_tiny_spec.loader.exec_module(tiny_voca_backend)
+TINY_VOCA_POSTS = frozenset({
+    "from-bev-features-to-lane-graphs-and-changing-maps",
+    "building-local-blog-audio-with-qwen3-tts",
+})
 POSTS_DIR = ROOT / "src" / "content" / "posts"
 AUDIO_DIR = ROOT / "public" / "assets" / "audio" / "blog"
 MANIFEST_PATH = ROOT / "public" / "assets" / "audio" / "manifest.json"
@@ -875,6 +884,28 @@ def legacy_human_chunk_cache_path(post: dict[str, Any], chunk_index: int) -> Pat
     )
 
 
+def tiny_voca_profile(post: dict[str, Any]) -> dict[str, Any]:
+    return {
+        **tiny_voca_backend.PROFILE,
+        "chunking_policy": HUMAN_CHUNKING_POLICY,
+        "chunk_max_chars": post["human_chunk_max_chars"],
+        "paragraph_pause_seconds": HUMAN_PARAGRAPH_PAUSE_SECONDS,
+        "heading_pause_seconds": HUMAN_HEADING_PAUSE_SECONDS,
+        "sentence_pause_policy": "model-timing-no-inserted-silence",
+        "post_pronunciation_lexicon": HUMAN_POST_PRONUNCIATION_LEXICONS.get(post["slug"], {}),
+        "max_audio_seconds": HUMAN_MAX_AUDIO_SECONDS.get(post["slug"], MAX_AUDIO_SECONDS),
+    }
+
+
+def narration_chunk_cache_path(post: dict[str, Any], chunk_index: int) -> Path:
+    if post["synthesis_profile"] != "tiny-voca":
+        return human_chunk_cache_path(post, chunk_index)
+    payload = {"text": post["narration_chunks"][chunk_index].text,
+               "profile": tiny_voca_profile(post)}
+    digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+    return Path(tempfile.gettempdir()) / "blog-audio-chunks" / "tiny-voca" / f"{digest}.wav"
+
+
 def discover_posts() -> list[dict[str, Any]]:
     posts: list[dict[str, Any]] = []
     for path in sorted(POSTS_DIR.glob("*.md")) + sorted(POSTS_DIR.glob("*.mdx")):
@@ -889,7 +920,8 @@ def discover_posts() -> list[dict[str, Any]]:
         source_sha256 = hashlib.sha256(source.encode("utf-8")).hexdigest()
         narration_mode = "full-source"
         text = shape_narration(clean_markdown(source))
-        uses_human_profile = post_slug in HUMAN_NARRATION_POSTS
+        uses_tiny_profile = post_slug in TINY_VOCA_POSTS
+        uses_human_profile = post_slug in HUMAN_NARRATION_POSTS or uses_tiny_profile
         human_chunk_max_chars = HUMAN_POST_CHUNK_MAX_CHARS.get(
             post_slug, HUMAN_CHUNK_MAX_CHARS
         )
@@ -910,7 +942,19 @@ def discover_posts() -> list[dict[str, Any]]:
             else "\n".join(tts_sections)
         )
         narration_word_count = len(tts_text.split())
-        if uses_human_profile:
+        if uses_tiny_profile:
+            digest_payload = {
+                "source_sha256": source_sha256, "text": text,
+                "narration_mode": narration_mode,
+                "profile": tiny_voca_profile({"slug": post_slug, "human_chunk_max_chars": human_chunk_max_chars}),
+                "narration_chunks": [asdict(chunk) for chunk in narration_chunks],
+                "pronunciation_policy": PRONUNCIATION_POLICY,
+                "pronunciation_lexicon": PRONUNCIATION_LEXICON,
+                "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
+                "table_policy": TABLE_POLICY, "bitrate": BITRATE,
+                "extraction_version": HUMAN_EXTRACTION_VERSION,
+            }
+        elif uses_human_profile:
             digest_payload = {
                 "source_sha256": source_sha256,
                 "text": text,
@@ -1006,7 +1050,7 @@ def discover_posts() -> list[dict[str, Any]]:
                 "tts_text": tts_text,
                 "tts_sections": tts_sections,
                 "narration_chunks": narration_chunks,
-                "synthesis_profile": "human" if uses_human_profile else "legacy",
+                "synthesis_profile": "tiny-voca" if uses_tiny_profile else ("human" if uses_human_profile else "legacy"),
                 "source_sha256": source_sha256,
                 "narration_mode": narration_mode,
                 "narration_word_count": narration_word_count,
@@ -1106,6 +1150,14 @@ def narrator_profile_errors(posts: list[dict[str, Any]], manifest: dict[str, Any
             if post["synthesis_profile"] == "human"
             else legacy_expected
         )
+        if post["synthesis_profile"] == "tiny-voca":
+            expected = {
+                **tiny_voca_profile(post),
+                "pronunciation_policy": PRONUNCIATION_POLICY,
+                "pronunciation_lexicon": PRONUNCIATION_LEXICON,
+                "audio_prosody_rewrites": AUDIO_PROSODY_REWRITES,
+                "table_policy": TABLE_POLICY,
+            }
         mismatched = [key for key, value in expected.items() if record.get(key) != value]
         forbidden = sorted(FORBIDDEN_REFERENCE_FIELDS.intersection(record))
         if mismatched:
@@ -1488,11 +1540,64 @@ def generate_human_post(
         return duration_seconds
 
 
+def generate_tiny_voca_post(model: Any, post: dict[str, Any], progress: Any) -> float:
+    import numpy as np
+    import soundfile as sf
+
+    chunks = post["narration_chunks"]
+    if not chunks:
+        raise ValueError(f"No speakable text found in {post['path']}")
+    # PCM request files remain available for the exact same chunk-level ASR gate.
+    with tempfile.TemporaryDirectory(prefix="tiny-voca-export-") as directory:
+        temporary = Path(directory)
+        parts = []
+        for index, chunk in enumerate(chunks):
+            cached = narration_chunk_cache_path(post, index)
+            if cached.exists():
+                metadata = json.loads(cached.with_suffix(".json").read_text())
+                if metadata["wav_sha256"] != hashlib.sha256(cached.read_bytes()).hexdigest():
+                    raise RuntimeError(f"Changed tiny-voca cached waveform: {cached}")
+                data, sample_rate = sf.read(cached, dtype="float32")
+                tiny_voca_backend.validate_audio(data, sample_rate, chunk.text)
+            else:
+                data, utterances = tiny_voca_backend.synthesize(model, chunk.text)
+                cached.parent.mkdir(parents=True, exist_ok=True)
+                pending = cached.with_suffix(".tmp.wav")
+                sf.write(pending, data, 24000, subtype="PCM_16")
+                pending.replace(cached)
+                cached.with_suffix(".json").write_text(json.dumps({
+                    "wav_sha256": hashlib.sha256(cached.read_bytes()).hexdigest(),
+                    "utterances": utterances,
+                }, indent=2) + "\n")
+                # Assemble precisely the PCM samples that the ASR gate will hear.
+                data, _ = sf.read(cached, dtype="float32")
+            parts.append(data)
+            if index < len(chunks) - 1 and chunk.pause_seconds > 0:
+                parts.append(np.zeros(round(24000 * chunk.pause_seconds), dtype=np.float32))
+            progress.update(1)
+        wav = temporary / "audio.wav"
+        sf.write(wav, np.concatenate(parts), 24000, subtype="PCM_16")
+        mp3 = temporary / "audio.mp3"
+        subprocess.run([
+            "ffmpeg", "-v", "error", "-y", "-i", str(wav),
+            "-af", f"volume={tiny_voca_backend.PROFILE['output_gain_db']}dB",
+            "-ac", "1", "-ar", "24000", "-c:a", "libmp3lame", "-b:a", BITRATE, str(mp3),
+        ], check=True)
+        duration = audio_duration_seconds(mp3)
+        if duration > HUMAN_MAX_AUDIO_SECONDS.get(post["slug"], MAX_AUDIO_SECONDS):
+            raise RuntimeError("Full-source tiny-voca narration exceeds the reviewed duration limit")
+        post["output"].parent.mkdir(parents=True, exist_ok=True)
+        mp3.replace(post["output"])
+        return duration
+
+
 def generate_post(
     model: Any,
     post: dict[str, Any],
     stream_progress: Any,
 ) -> float:
+    if post["synthesis_profile"] == "tiny-voca":
+        return generate_tiny_voca_post(model, post, stream_progress)
     if post["synthesis_profile"] == "human":
         return generate_human_post(model, post, stream_progress)
     return generate_legacy_post(model, post, stream_progress)
@@ -1527,6 +1632,12 @@ def manifest_record(post: dict[str, Any], duration_seconds: float) -> dict[str, 
         "boundary_silence_seconds": BOUNDARY_SILENCE_SECONDS,
         "file": f"/assets/audio/blog/{post['slug']}.mp3",
     }
+    if post["synthesis_profile"] == "tiny-voca":
+        # Tiny-voca preserves its own timing; it does not trim speech-edge silence.
+        common.pop("silence_threshold")
+        common.pop("boundary_silence_seconds")
+        return {**common, **tiny_voca_profile(post),
+                "narration_chunk_count": len(post["narration_chunks"])}
     if post["synthesis_profile"] == "human":
         return {
             **common,
@@ -1608,6 +1719,7 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="Verify every Blog post has current audio.")
     parser.add_argument("--force", action="store_true", help="Regenerate selected audio even when unchanged.")
     parser.add_argument("--post", action="append", default=[], help="Only process this postSlug; repeatable.")
+    parser.add_argument("--tiny-voca-weights", type=Path, help="Pinned tiny-voca directory containing tiny-voca.pt and phonemizer/")
     args = parser.parse_args()
 
     posts = select_posts(discover_posts(), args.post)
@@ -1636,7 +1748,7 @@ def main() -> int:
             recorded_duration = manifest[post["slug"]].get("duration_seconds")
             max_audio_seconds = (
                 HUMAN_MAX_AUDIO_SECONDS.get(post["slug"], MAX_AUDIO_SECONDS)
-                if post["synthesis_profile"] == "human"
+                if post["synthesis_profile"] in {"human", "tiny-voca"}
                 else MAX_AUDIO_SECONDS
             )
             if actual_duration > max_audio_seconds:
@@ -1663,7 +1775,6 @@ def main() -> int:
         return 0
 
     verify_ffmpeg()
-    from mlx_audio.tts.utils import load_model
     from tqdm.auto import tqdm
 
     targets = posts if args.force else stale
@@ -1671,7 +1782,8 @@ def main() -> int:
     with tqdm(total=len(targets), desc="Blogs", unit="post", position=0) as blog_progress:
         for index, post in enumerate(targets, start=1):
             model_name = (
-                HUMAN_MODEL if post["synthesis_profile"] == "human" else MODEL
+                tiny_voca_backend.PROFILE["model"] if post["synthesis_profile"] == "tiny-voca"
+                else (HUMAN_MODEL if post["synthesis_profile"] == "human" else MODEL)
             )
             model = loaded_models.get(model_name)
             if model is None:
@@ -1680,7 +1792,13 @@ def main() -> int:
 
                     validate_human_runtime(version("mlx-audio"))
                 print(f"Loading {model_name} for the {post['synthesis_profile']} profile...")
-                model = load_model(model_name)
+                if post["synthesis_profile"] == "tiny-voca":
+                    if args.tiny_voca_weights is None:
+                        raise ValueError("Tiny-voca generation requires --tiny-voca-weights; see docs/tiny-voca-narration.md")
+                    model = tiny_voca_backend.load(args.tiny_voca_weights)
+                else:
+                    from mlx_audio.tts.utils import load_model
+                    model = load_model(model_name)
                 loaded_models[model_name] = model
             blog_progress.set_postfix_str(f"{index}/{len(targets)} {post['title'][:42]}")
             with tqdm(
