@@ -1,0 +1,1213 @@
+{
+  "date": "2026-11-16",
+  "source_commit": "74ac675767a75375161b8ed5f9363318c14311e0",
+  "hardware": "Apple M5 Max, 64 GiB, CPU synthesis with four threads; Apple GPU ASR",
+  "scope": "Mapping post and TTS article, full-source narration with tiny-voca M2",
+  "training": "None",
+  "listening_evidence": "User selected M2 after opening comparison. No full perceptual listening judgment is claimed by the automated audit.",
+  "boundary_policy": "5 ms half-cosine fade on both edges of each utterance; no sample removal, speech acceleration, or interior silence filtering",
+  "first_attempt": {
+    "asr": [
+      {
+        "slug": "from-bev-features-to-lane-graphs-and-changing-maps",
+        "audio": "public/assets/audio/blog/from-bev-features-to-lane-graphs-and-changing-maps.mp3",
+        "asr_model": "mlx-community/whisper-large-v3-turbo",
+        "audited_chunks": 53,
+        "reference_words": 5037,
+        "recognized_words": 5061,
+        "wer": 0.027397,
+        "substitutions": 82,
+        "deletions": 16,
+        "insertions": 40,
+        "long_insertions": [],
+        "disallowed_insertions": [],
+        "high_error_chunks": [],
+        "suspicious_unaligned_regions": [],
+        "limits": {
+          "max_wer": 0.08,
+          "max_insertion_words": 2,
+          "max_chunk_wer": 0.5,
+          "max_unaligned_seconds": 1.5
+        },
+        "passed": true
+      },
+      {
+        "slug": "building-local-blog-audio-with-qwen3-tts",
+        "audio": "public/assets/audio/blog/building-local-blog-audio-with-qwen3-tts.mp3",
+        "asr_model": "mlx-community/whisper-large-v3-turbo",
+        "audited_chunks": 47,
+        "reference_words": 4293,
+        "recognized_words": 4284,
+        "wer": 0.034941,
+        "substitutions": 101,
+        "deletions": 29,
+        "insertions": 20,
+        "long_insertions": [
+          {
+            "chunk": 9,
+            "word_count": 3,
+            "text": "i can t"
+          }
+        ],
+        "disallowed_insertions": [],
+        "high_error_chunks": [],
+        "suspicious_unaligned_regions": [],
+        "limits": {
+          "max_wer": 0.08,
+          "max_insertion_words": 2,
+          "max_chunk_wer": 0.5,
+          "max_unaligned_seconds": 1.5
+        },
+        "passed": false
+      }
+    ],
+    "finding": "ICL expanded to I can't lie by dizione chat.txt",
+    "repair": "Audio-only ICL -> I C L; no threshold change or seed reroll"
+  },
+  "records": [
+    {
+      "manifest": {
+        "audio_prosody_rewrites": {
+          "time stamps drift, or one sensor": "time stamps drift or one sensor"
+        },
+        "bitrate": "64k",
+        "cache_encoding": "PCM_16",
+        "checkpoint_sha256": "ebb22871524c5732520fb1652e6aefcec708a7452e83bdd00adcf6181db5ef70",
+        "chunk_max_chars": 900,
+        "chunking_policy": "heading-with-following-paragraph-groups-v3",
+        "code_revision": "62e2adef158bc997042cc6234f541f1e0e4cd55d",
+        "code_sha256": "0f190da92106d722f830b232c509f89dee29fe2cabc15299e370f5f0b38edb7b",
+        "decode_policy": "upstream-sentences-recursive-clause-split-fail-on-unreadable-v1",
+        "device": "cpu",
+        "digest": "520f60eaac97d03b18aa06315cab45997f3e35740638786f3070bce6dc8d2330",
+        "duration_seconds": 1531.929333,
+        "file": "/assets/audio/blog/building-local-blog-audio-with-qwen3-tts.mp3",
+        "frontend": "own",
+        "frontend_code_sha256": "3240cb3d6a2badcfa41c35d5f83917327b01f88d4a92ba1026f743f850fd92c2",
+        "frontend_data_sha256": "5999cdb138a9561342cbd87a165433fb9f60bbf3720b7e706e166d170fe407ce",
+        "frontend_revision": "8cd889e4de7be6bd1dd2e6891344a0729fa14dd4",
+        "frontend_rules_sha256": "4b96b2f96bdd06c81fd92d051eb630b216498d8ccbb7dd1f73b5547c89b7b288",
+        "heading_pause_seconds": 0.55,
+        "inference_runtime": {
+          "dizione": "0.1.0",
+          "numpy": "2.5.5",
+          "soundfile": "0.14.0",
+          "tiny-voca": "0.2.0",
+          "torch": "2.15.0"
+        },
+        "language": "English",
+        "max_audio_seconds": 1800,
+        "max_seconds_per_word": 0.72,
+        "min_seconds_per_word": 0.24,
+        "model": "n4ze3m/tiny-voca",
+        "model_revision": "eac048b7a4392584725af9792460a0211fa1cac7",
+        "narration_chunk_count": 48,
+        "narration_mode": "full-source",
+        "narration_word_count": 4186,
+        "narrator_seed": 1904,
+        "output_gain_db": -1,
+        "paragraph_pause_seconds": 0.24,
+        "peak_limit": 0.99,
+        "pitch_range": 1.0,
+        "pitch_shift": 0.0,
+        "post_pronunciation_lexicon": {
+          "BEVDet4D": "B E V Det four D",
+          "ICL": "I C L",
+          "Thirty minutes": "30 minutes",
+          "What \u201clocal\u201d means": "What local means",
+          "public/assets/audio/manifest.json": "public, slash assets, slash audio, slash manifest dot J S O N",
+          "src/content/posts": "source, slash content, slash posts"
+        },
+        "pronunciation_lexicon": {
+          "cyclist": "sike-list",
+          "cyclists": "sike-lists",
+          "lidar": "lie-dar",
+          "timestamp": "time stamp",
+          "timestamps": "time stamps"
+        },
+        "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+        "sample_rate": 24000,
+        "sampling_seed_version": "request-seed-plus-utterance-index-v1",
+        "sentence_pause_policy": "model-timing-no-inserted-silence",
+        "source_sha256": "20e296dbf1385a59cd303349d21f0307be55ed92bf658f8b51c32d0028196256",
+        "speed": 1.0,
+        "synthesis_profile": "tiny-voca",
+        "table_policy": "skip-rows-require-spoken-takeaway-v1",
+        "threads": 4,
+        "utterance_fade_policy": "half-cosine-both-edges-no-trim-v1",
+        "utterance_fade_seconds": 0.005,
+        "voice": "M2",
+        "voice_mode": "fixed-preset"
+      },
+      "waveform": {
+        "slug": "building-local-blog-audio-with-qwen3-tts",
+        "source_sha256": "20e296dbf1385a59cd303349d21f0307be55ed92bf658f8b51c32d0028196256",
+        "digest": "520f60eaac97d03b18aa06315cab45997f3e35740638786f3070bce6dc8d2330",
+        "mp3_sha256": "c48aa7fc8c588fbc8424711861ec6c000dff8ff82b25b235f6e039177a2852f3",
+        "duration_seconds": 1531.929333,
+        "utterances": 297,
+        "verified_zero_endpoints": 594,
+        "full_request_text_preserved": true,
+        "unknown_phonemes": [],
+        "decoded_mp3": {
+          "peak": 0.8612444400787354,
+          "nonfinite_samples": 0,
+          "clipped_samples": 0,
+          "denormal_samples": 0
+        },
+        "chunks": [
+          {
+            "index": 0,
+            "wav_sha256": "7523b3e818d2bacc0c5fd72a6db7a1bb13cb87c8544a20c1bdcdf4bd2ace015e",
+            "seconds": 21.290666666666667,
+            "peak": 0.95330810546875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 1,
+            "wav_sha256": "9b2cb55b03cd2651c8ec23e30fdba2ca72e2281d3e8f935091b16f47602c0d1a",
+            "seconds": 28.394666666666666,
+            "peak": 0.909393310546875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 2,
+            "wav_sha256": "4ec2d6afd0df68a05b56eada14f02ef817b9c2dc2156671989d41ef8869367ec",
+            "seconds": 35.370666666666665,
+            "peak": 0.948760986328125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 3,
+            "wav_sha256": "30707906e9cb6486feea79824f8d6282e4cd730b779e30ad1d3ec8914715b98f",
+            "seconds": 20.362666666666666,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 4,
+            "wav_sha256": "460902806d31c48c9e43d3d29c99658cc113758c8b184fcd3ea31f860808882d",
+            "seconds": 44.906666666666666,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 5,
+            "wav_sha256": "453b1e5cca3ee9369aa5a040d82b7699b696688df7cfb471e7b3d3756114ded3",
+            "seconds": 13.472,
+            "peak": 0.9423828125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 6,
+            "wav_sha256": "339b07557aad7d7569486697133456b578cf9e3ad08b19ad6fe8bec01add2bff",
+            "seconds": 40.16,
+            "peak": 0.968902587890625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 7,
+            "wav_sha256": "7f246c7e79153a21ca983e466eddf6ccbb8c4cb00fcb25bef431c7f1d2d0da2a",
+            "seconds": 8.714666666666666,
+            "peak": 0.928558349609375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 8,
+            "wav_sha256": "c456db2c9873a379bc1adbf3003f52eab3252fb5452fd96b10eddc80d6767375",
+            "seconds": 40.074666666666666,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 9,
+            "wav_sha256": "e93314b100881f6e1ee20e5b17cc8854cd9898da2b72c4579dd6a9972daa0c13",
+            "seconds": 35.968,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 10,
+            "wav_sha256": "e2c0d696c7464a9e7ed1f6302c051ef75c8da825732fc9b50ebcb707ab0efc31",
+            "seconds": 23.968,
+            "peak": 0.8677978515625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 11,
+            "wav_sha256": "f3dac9df6717b70b6aa485aa7497b36d92b1658f348a104d452d276040773090",
+            "seconds": 24.992,
+            "peak": 0.89105224609375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 12,
+            "wav_sha256": "604c06096d95d205193b60205d7a006b5655068326fc91376c0939d5802e3466",
+            "seconds": 46.37866666666667,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 13,
+            "wav_sha256": "7699a2cd7f885ef5ba866d1cd144da2eeb1378111d96410441a55cfa5a873547",
+            "seconds": 12.138666666666667,
+            "peak": 0.938720703125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 14,
+            "wav_sha256": "aad726393bea8b30c9e313d1794c8612dce49825da8a71f7ed5a79fcad9d6f50",
+            "seconds": 25.802666666666667,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 15,
+            "wav_sha256": "ef12ca35565eda39e242e3fb59c86c18bc9a59d7f936713078be807a4e5f9bf2",
+            "seconds": 48.501333333333335,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 16,
+            "wav_sha256": "17128be0e026c56d50288bf9e539732e1ea11825247b0f2d0561ac18b89d824e",
+            "seconds": 41.344,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 17,
+            "wav_sha256": "57a4334c287297f9bcc9c075a6bffdd8c896f5ca314b682213c091c7444ac2d7",
+            "seconds": 16.522666666666666,
+            "peak": 0.8870849609375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 18,
+            "wav_sha256": "064fcaff29f4afc219e2e7ac78f717f0fa17f61296aa514eec88285d2df0a053",
+            "seconds": 38.101333333333336,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 19,
+            "wav_sha256": "38d79153c3c3db997e22c13055e5a707038588738bae725fa23252f57c524e77",
+            "seconds": 43.36,
+            "peak": 0.960113525390625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 20,
+            "wav_sha256": "4bfbd78e354d28174b3632c0d1562bbc1e811854b3749dc85ba39700ac7bc138",
+            "seconds": 25.109333333333332,
+            "peak": 0.9434814453125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 21,
+            "wav_sha256": "7d2b0ae90ff5e77d9fa5cff92b15bd395f37a258fbd544f609c0665f3de36601",
+            "seconds": 29.749333333333333,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 22,
+            "wav_sha256": "76d6f71ea6eb239ea76f666438e4141c5d49421b2a0a0e4fd5ae9c2a5399dc0a",
+            "seconds": 36.266666666666666,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 23,
+            "wav_sha256": "d0f1b1304ef64bd93753ab91abff4d05aaef05fe203d52ac852e440e66fde9d5",
+            "seconds": 41.856,
+            "peak": 0.974212646484375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 24,
+            "wav_sha256": "a44562e18373e06eece07d9c8227f8f6d3d3654450c112a14aded8e0337d0b1e",
+            "seconds": 31.658666666666665,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 25,
+            "wav_sha256": "22e728b74b43e709ab3a07ba72e79991e01c21c7649f5c0a3fb87c41a5e43c4f",
+            "seconds": 42.31466666666667,
+            "peak": 0.9434814453125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 26,
+            "wav_sha256": "17169a61668b804e0f12e9ec2b7fab490433d4f8d201d11a0ee679cb8d3b4c4d",
+            "seconds": 17.632,
+            "peak": 0.93878173828125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 27,
+            "wav_sha256": "0dedfe90fcf2b9308a9807232e5b52396faf5ba130894a12cd7c37ebfac83979",
+            "seconds": 31.328,
+            "peak": 0.9725341796875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 28,
+            "wav_sha256": "c367fd00b941417ec6d8f93f01283bf2206f11aeb928a72049df65fe6f8f8b74",
+            "seconds": 41.41866666666667,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 29,
+            "wav_sha256": "b075a8011ebb8f1fe0f98975e68c90930af001fdc993084e0d15f5b6bec875de",
+            "seconds": 50.144,
+            "peak": 0.95599365234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 30,
+            "wav_sha256": "62ae1e979f57676ae2b25ec665601cb7fd8c19079f841b0c777d1b3478b23ef4",
+            "seconds": 31.552,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 31,
+            "wav_sha256": "1a8efbd130089544fab78d2e9f5df05b7f533428e6029310b9fa6e8640d49cf6",
+            "seconds": 37.44,
+            "peak": 0.97314453125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 32,
+            "wav_sha256": "2936f57a7d3f745cfc38277b39c98443400f4ecc9521109617e785627728a74f",
+            "seconds": 18.826666666666668,
+            "peak": 0.948486328125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 33,
+            "wav_sha256": "f56268612060c4cf16796c9be3ca2e0ca710eb9bf8f907bea101c6e058879a73",
+            "seconds": 28.085333333333335,
+            "peak": 0.87646484375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 34,
+            "wav_sha256": "de371bbb8d53a1512269fe75255bc3a5285edd219b6d9eea3273d663a26b7875",
+            "seconds": 23.530666666666665,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 35,
+            "wav_sha256": "d66d5e04a5d79c5343727ee95f2457b88a0cab1a3498bc5c0b25e7444ffbdb99",
+            "seconds": 32.46933333333333,
+            "peak": 0.936798095703125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 36,
+            "wav_sha256": "b059f20d8739b50c83b7db464ca72a9427c32db3815e966d92e8bff12bbcb3c8",
+            "seconds": 24.832,
+            "peak": 0.9300537109375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 37,
+            "wav_sha256": "f5ec13116b7a62fdf513f184e1750460ec65e3a8bd8adfd252fa0cf00b5872a2",
+            "seconds": 38.464,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 38,
+            "wav_sha256": "b86803d286b148d09c50c20029c8a48c2fcfcfe3923b023b52599ca190948059",
+            "seconds": 22.837333333333333,
+            "peak": 0.93182373046875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 39,
+            "wav_sha256": "af0219c7fff4e077f4386520222975035176c1db166000a30678ebcc119c0583",
+            "seconds": 36.330666666666666,
+            "peak": 0.98553466796875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 40,
+            "wav_sha256": "aa05a92d079d941d5b06627950cc40163eb519fec4d93f866d8f7ec5561c9a6b",
+            "seconds": 17.408,
+            "peak": 0.95379638671875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 41,
+            "wav_sha256": "798d9bd99a085ce6a126cd9428ac1061ef4e39024160f04e4371c7a297b464ad",
+            "seconds": 35.872,
+            "peak": 0.987091064453125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 42,
+            "wav_sha256": "a0e83d893a0e70916d5dfd9a50a8aaa5db81f1b867f4a76962c17a9ad40f8c24",
+            "seconds": 33.30133333333333,
+            "peak": 0.94244384765625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 43,
+            "wav_sha256": "8d6f9ec586f9b419569be561920497bb1ba8697745116a96eb0558304372c29a",
+            "seconds": 27.392,
+            "peak": 0.963348388671875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 44,
+            "wav_sha256": "77642e4f1f0f2f5335a4c5ac76529368909ae62745f0da300197f52f8322cb59",
+            "seconds": 29.536,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 45,
+            "wav_sha256": "fe2375a7dce2ca21b55491d490ea750e99f0f86e265cbb7681c5b712b84856fb",
+            "seconds": 33.81333333333333,
+            "peak": 0.922332763671875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 46,
+            "wav_sha256": "3e98a589dd3cd793ff3872ffe67804318a95c834e5d53125fc2a5e3f1b2c6f77",
+            "seconds": 47.114666666666665,
+            "peak": 0.985107421875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 47,
+            "wav_sha256": "5dc9186ce638eddcb7f84d471d1c99e1a56638857cb8f8563d149115d53a9d8b",
+            "seconds": 40.202666666666666,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          }
+        ]
+      },
+      "asr": {
+        "slug": "building-local-blog-audio-with-qwen3-tts",
+        "audio": "public/assets/audio/blog/building-local-blog-audio-with-qwen3-tts.mp3",
+        "asr_model": "mlx-community/whisper-large-v3-turbo",
+        "audited_chunks": 48,
+        "reference_words": 4378,
+        "recognized_words": 4367,
+        "wer": 0.033577,
+        "substitutions": 100,
+        "deletions": 29,
+        "insertions": 18,
+        "long_insertions": [],
+        "disallowed_insertions": [],
+        "high_error_chunks": [],
+        "suspicious_unaligned_regions": [],
+        "limits": {
+          "max_wer": 0.08,
+          "max_insertion_words": 2,
+          "max_chunk_wer": 0.5,
+          "max_unaligned_seconds": 1.5
+        },
+        "passed": true,
+        "asr_model_revision": "a4aaeec0636e6fef84abdcbe3544cb2bf7e9f6fb",
+        "mlx_whisper_version": "0.4.3"
+      }
+    },
+    {
+      "manifest": {
+        "audio_prosody_rewrites": {
+          "time stamps drift, or one sensor": "time stamps drift or one sensor"
+        },
+        "bitrate": "64k",
+        "cache_encoding": "PCM_16",
+        "checkpoint_sha256": "ebb22871524c5732520fb1652e6aefcec708a7452e83bdd00adcf6181db5ef70",
+        "chunk_max_chars": 900,
+        "chunking_policy": "heading-with-following-paragraph-groups-v3",
+        "code_revision": "62e2adef158bc997042cc6234f541f1e0e4cd55d",
+        "code_sha256": "0f190da92106d722f830b232c509f89dee29fe2cabc15299e370f5f0b38edb7b",
+        "decode_policy": "upstream-sentences-recursive-clause-split-fail-on-unreadable-v1",
+        "device": "cpu",
+        "digest": "763aefdbe4daa8cafcc7fee1157fa4a9f73dc288eb8ab5f9b34236b19c6345a8",
+        "duration_seconds": 1831.639333,
+        "file": "/assets/audio/blog/from-bev-features-to-lane-graphs-and-changing-maps.mp3",
+        "frontend": "own",
+        "frontend_code_sha256": "3240cb3d6a2badcfa41c35d5f83917327b01f88d4a92ba1026f743f850fd92c2",
+        "frontend_data_sha256": "5999cdb138a9561342cbd87a165433fb9f60bbf3720b7e706e166d170fe407ce",
+        "frontend_revision": "8cd889e4de7be6bd1dd2e6891344a0729fa14dd4",
+        "frontend_rules_sha256": "4b96b2f96bdd06c81fd92d051eb630b216498d8ccbb7dd1f73b5547c89b7b288",
+        "heading_pause_seconds": 0.55,
+        "inference_runtime": {
+          "dizione": "0.1.0",
+          "numpy": "2.5.5",
+          "soundfile": "0.14.0",
+          "tiny-voca": "0.2.0",
+          "torch": "2.15.0"
+        },
+        "language": "English",
+        "max_audio_seconds": 3000,
+        "max_seconds_per_word": 0.72,
+        "min_seconds_per_word": 0.24,
+        "model": "n4ze3m/tiny-voca",
+        "model_revision": "eac048b7a4392584725af9792460a0211fa1cac7",
+        "narration_chunk_count": 53,
+        "narration_mode": "full-source",
+        "narration_word_count": 4837,
+        "narrator_seed": 1904,
+        "output_gain_db": -1,
+        "paragraph_pause_seconds": 0.24,
+        "peak_limit": 0.99,
+        "pitch_range": 1.0,
+        "pitch_shift": 0.0,
+        "post_pronunciation_lexicon": {
+          "BEVDet4D": "B E V Det four D",
+          "Endpoint distance": "End point distance",
+          "curb corner": "kerb corner"
+        },
+        "pronunciation_lexicon": {
+          "cyclist": "sike-list",
+          "cyclists": "sike-lists",
+          "lidar": "lie-dar",
+          "timestamp": "time stamp",
+          "timestamps": "time stamps"
+        },
+        "pronunciation_policy": "audio-only-phonetic-and-prosody-lexicon-v2",
+        "sample_rate": 24000,
+        "sampling_seed_version": "request-seed-plus-utterance-index-v1",
+        "sentence_pause_policy": "model-timing-no-inserted-silence",
+        "source_sha256": "3df9e4afee03fcae7fe3e8cfa42bf124fbdf057f32b065578f1a722f51a94954",
+        "speed": 1.0,
+        "synthesis_profile": "tiny-voca",
+        "table_policy": "skip-rows-require-spoken-takeaway-v1",
+        "threads": 4,
+        "utterance_fade_policy": "half-cosine-both-edges-no-trim-v1",
+        "utterance_fade_seconds": 0.005,
+        "voice": "M2",
+        "voice_mode": "fixed-preset"
+      },
+      "waveform": {
+        "slug": "from-bev-features-to-lane-graphs-and-changing-maps",
+        "source_sha256": "3df9e4afee03fcae7fe3e8cfa42bf124fbdf057f32b065578f1a722f51a94954",
+        "digest": "763aefdbe4daa8cafcc7fee1157fa4a9f73dc288eb8ab5f9b34236b19c6345a8",
+        "mp3_sha256": "c5dcc2cdfb130a49ec0cbc5b363a6f68152579d1d32a0300306bfb1e5f821f24",
+        "duration_seconds": 1831.639333,
+        "utterances": 370,
+        "verified_zero_endpoints": 740,
+        "full_request_text_preserved": true,
+        "unknown_phonemes": [],
+        "decoded_mp3": {
+          "peak": 0.8634061813354492,
+          "nonfinite_samples": 0,
+          "clipped_samples": 0,
+          "denormal_samples": 0
+        },
+        "chunks": [
+          {
+            "index": 0,
+            "wav_sha256": "93244035d849a83b9c5da9cbe9d88db444449b3ee7c61d194e016716399ee07d",
+            "seconds": 39.370666666666665,
+            "peak": 0.9381103515625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 1,
+            "wav_sha256": "9ea0ec86bfd4fd729ceb25991cd8ffe21c7046d8a6e1ad9841a41dd1aee64963",
+            "seconds": 43.541333333333334,
+            "peak": 0.96392822265625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 2,
+            "wav_sha256": "3069a0c66578b2dbc94c1a93468ae6b94a79475e9f10843c5529daec141019b5",
+            "seconds": 32.458666666666666,
+            "peak": 0.948944091796875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 3,
+            "wav_sha256": "623359dd97bfda7a3a91622a41d6ba0b66437ec0d3bc9d0bcd4fc6005fc16e5c",
+            "seconds": 15.957333333333333,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 4,
+            "wav_sha256": "b63d269c58489d8809f66e8df559113bdcc395310da973f5e325abda60e3ba2e",
+            "seconds": 29.546666666666667,
+            "peak": 0.92449951171875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 5,
+            "wav_sha256": "766a38ee20c7f3ca28832b0d55c3b68b9fc43cc0505a07f343b1baed3dc796ae",
+            "seconds": 47.72266666666667,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 6,
+            "wav_sha256": "991fead2b7b8c404b66dc00b333beb2458b87a8feec807740ca04e3323f885db",
+            "seconds": 37.034666666666666,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 7,
+            "wav_sha256": "e69b1585f0de3dc5ca5de9045c8ea1cbbcdba93b7a8d2ec77a83da41b8bd7d03",
+            "seconds": 25.376,
+            "peak": 0.9522705078125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 8,
+            "wav_sha256": "7d76c1227f7053d046d82b26c108e53937c220ce5f2783e2ea0a61f453311ae5",
+            "seconds": 34.42133333333334,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 9,
+            "wav_sha256": "3af8c1cebe2fd41ccc889ffd283d903be21e2a10631e91e8d3d9f6a13039074f",
+            "seconds": 42.72,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 10,
+            "wav_sha256": "e7078d037335b47b532bfe0c2af32fc9be27c9c6e65a6c365199f978701a842b",
+            "seconds": 38.51733333333333,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 11,
+            "wav_sha256": "2f2edb1ee468ba57368ad0ee624f087320544e95c103c6b31e808449c8efb0d7",
+            "seconds": 47.861333333333334,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 12,
+            "wav_sha256": "c95547d9afe0c557883a98aa73e4079e064d835ca326e150c3b5c052d4a0ddeb",
+            "seconds": 43.936,
+            "peak": 0.955047607421875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 13,
+            "wav_sha256": "7166e85a8d34e272dbbfc09dd3044985d1f081b7037b349f6c7c4a1d930237c1",
+            "seconds": 24.192,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 14,
+            "wav_sha256": "fc3bb76ded439ef1c013344408d03f49fbf036453a981a34d8e06d81668e37c2",
+            "seconds": 29.6,
+            "peak": 0.8983154296875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 15,
+            "wav_sha256": "5a505f1a7447b5e57b677bfdec5cc5dd10ce7e4333d7b6fca3133d2bcb9b14c7",
+            "seconds": 29.269333333333332,
+            "peak": 0.941162109375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 16,
+            "wav_sha256": "412e46682aefdc2d7461e0189ee230849c0d65959d8847e2e7936fda44ee983b",
+            "seconds": 35.584,
+            "peak": 0.937164306640625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 17,
+            "wav_sha256": "7d5dccaf56a58c86a75ad72504d7981a8b3da01d7e49d6b590ea8f82b9f1fee2",
+            "seconds": 19.936,
+            "peak": 0.9453125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 18,
+            "wav_sha256": "6fd9ae74a9b030654146ee31a51db43cf71af2f0af8f1ddd21c1b2c08dbfad30",
+            "seconds": 29.525333333333332,
+            "peak": 0.939239501953125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 19,
+            "wav_sha256": "1a85dc0eac67b1b0e28431b2f1df79cf82327b0759755c0e491fdcb7fb49b645",
+            "seconds": 53.184,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 20,
+            "wav_sha256": "ca9152c8f835329a51a433df8e9ccd1662c849d9caf23daa7f62f2b4703f3208",
+            "seconds": 46.304,
+            "peak": 0.948516845703125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 21,
+            "wav_sha256": "51c5b8e31811749f71dcd8457b381f858d9893cbf9eb6b419234c9ecf2732830",
+            "seconds": 15.957333333333333,
+            "peak": 0.9755859375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 22,
+            "wav_sha256": "fba078bd8f7501584387df4dfb85a07d6205f1a87f09a2f6d463d2a0be9884a5",
+            "seconds": 42.44266666666667,
+            "peak": 0.987396240234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 23,
+            "wav_sha256": "a1cc6792f2ddb06be05bcd33787b5f3b3451ab1d8e662b8445bbac147ddbde48",
+            "seconds": 22.656,
+            "peak": 0.917022705078125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 24,
+            "wav_sha256": "75c8a0d7c0d263762b74498c528cdb95e4323178643d24a635a6d8d4fde35562",
+            "seconds": 34.154666666666664,
+            "peak": 0.961334228515625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 25,
+            "wav_sha256": "8dbab1f7987720aa10a745fcf0fc5261f2bc72d3c926b9c2a0224e79561424e9",
+            "seconds": 50.944,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 26,
+            "wav_sha256": "25deee0715616af97e0572dad2b852440bdb3a4d1bd835f8e2a105f257650fc4",
+            "seconds": 25.226666666666667,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 27,
+            "wav_sha256": "0751d627c0fc3f5377c60b2496976afa13a92ce901e37926f6a2d5616bc23924",
+            "seconds": 25.589333333333332,
+            "peak": 0.9365234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 28,
+            "wav_sha256": "f91f93fd06a7af2b0ffceba71b50af43bc89342f8ce375e030c678be88f1124a",
+            "seconds": 45.54666666666667,
+            "peak": 0.951904296875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 29,
+            "wav_sha256": "81609cd8b73297368b0b8adc551febbf28a6de0e8a38b441c1ffd40d6450a4ce",
+            "seconds": 15.36,
+            "peak": 0.829345703125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 30,
+            "wav_sha256": "f5e08452d95e4c1258f28e8bf3f19708aa5d1fa73044e26cfaa570925f90fa90",
+            "seconds": 40.40533333333333,
+            "peak": 0.88629150390625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 31,
+            "wav_sha256": "6c8e39b5d02e317fd7201f56592bee97e4af028b87368693e71f71304eb36738",
+            "seconds": 31.488,
+            "peak": 0.945465087890625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 32,
+            "wav_sha256": "487d04ea62a375aa3efc8988bd395939f5413d08f43fec3adede8df6fc71f603",
+            "seconds": 21.994666666666667,
+            "peak": 0.90875244140625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 33,
+            "wav_sha256": "a5b21a008ae2c1e09af9e85eb64a35f93b8e65d738a7dd7034e92ce717c0d9eb",
+            "seconds": 50.95466666666667,
+            "peak": 0.923736572265625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 34,
+            "wav_sha256": "0c72e58642a0f4026ca630b372ebc2282a7469d7b40d8e130fedd428a6c7db29",
+            "seconds": 24.234666666666666,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 35,
+            "wav_sha256": "1460d37118660b8651883c8dc93ed0693abca27374785abcf51c990c537385ed",
+            "seconds": 31.466666666666665,
+            "peak": 0.965423583984375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 36,
+            "wav_sha256": "d8ae091977106480cc1baeb615a2662baada362fb51fcd89e2002bd54a44b220",
+            "seconds": 18.186666666666667,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 37,
+            "wav_sha256": "5ea265b961e732ab922ad4c636383eb53bab24e7df3f32ac52bf3e63f47b6d7b",
+            "seconds": 33.64266666666666,
+            "peak": 0.95892333984375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 38,
+            "wav_sha256": "9def6fcffe89e27bd01212e55f3bc258c0f41463f6e29f0492561d5e8367c775",
+            "seconds": 19.14666666666667,
+            "peak": 0.934295654296875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 39,
+            "wav_sha256": "f220bf76389e120161cd8e2358585fd576c0ded67d061c2b69f283f6412ca987",
+            "seconds": 48.64,
+            "peak": 0.98699951171875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 40,
+            "wav_sha256": "0b4156783bc595e97ce74953c9c5159a7bb046e94f077b0113225833301774f1",
+            "seconds": 29.013333333333332,
+            "peak": 0.89129638671875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 41,
+            "wav_sha256": "224c0a2c8483bd863e5fab8a0e4c6dcc0b60b3a869f84454daf8a88bbe11a4b2",
+            "seconds": 43.754666666666665,
+            "peak": 0.98516845703125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 42,
+            "wav_sha256": "5f9d3e2cea3002c0c3bd7e3799a92a6f41117733a0863f9e9d8e9bc8e5834c53",
+            "seconds": 36.629333333333335,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 43,
+            "wav_sha256": "8a5931a228c20524dd49b80487fd8fc4da168c6d966887005f8a9b71832aafac",
+            "seconds": 44.608,
+            "peak": 0.93450927734375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 44,
+            "wav_sha256": "0de1be53f34abc60ff67cbd6a35e2edf10c53d4cdb9944e7d2082b2da6a25327",
+            "seconds": 47.40266666666667,
+            "peak": 0.972991943359375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 45,
+            "wav_sha256": "c295ad6415496d0b9afbe5dd0fffa0fd4b0e8440026d748916a49fa9cf69c2c4",
+            "seconds": 41.38666666666666,
+            "peak": 0.942230224609375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 46,
+            "wav_sha256": "bb6495fd21f7310a178a5e38d04fb0eca009dfc6af4c5997d4eb6c02c4686bf1",
+            "seconds": 18.72,
+            "peak": 0.9683837890625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 47,
+            "wav_sha256": "09145f5e33e8a6fcd0eb64570967d7cd1d86387fce829e47fcc5684bdc50f577",
+            "seconds": 30.016,
+            "peak": 0.975341796875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 48,
+            "wav_sha256": "6633d15914ede6d2f2e23a39827034e9c3150eb65fe7308452e3ef1b0552adcc",
+            "seconds": 28.576,
+            "peak": 0.901702880859375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 49,
+            "wav_sha256": "267bd95cbe7d7c9b88223fc96b71598f37c9e5e0e288a8dc568474410cc0ee4e",
+            "seconds": 48.096,
+            "peak": 0.9732666015625,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 50,
+            "wav_sha256": "ed638b1f7c81a46142af9f1a7cec8d32277b5812a1fddf81d61b4589f78b3191",
+            "seconds": 43.76533333333333,
+            "peak": 0.989990234375,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 51,
+            "wav_sha256": "67dbd3e566edb2f51489bbc36913411f5fae1b338eba46aee014dba1a268ff6c",
+            "seconds": 39.029333333333334,
+            "peak": 0.9256591796875,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          },
+          {
+            "index": 52,
+            "wav_sha256": "e64e834445dc7d0c7efce11fbbd08ffff97fb61a397deb940b20b50b8d253550",
+            "seconds": 18.176,
+            "peak": 0.935577392578125,
+            "nonfinite_samples": 0,
+            "clipped_samples": 0,
+            "denormal_samples": 0
+          }
+        ]
+      },
+      "asr": {
+        "slug": "from-bev-features-to-lane-graphs-and-changing-maps",
+        "audio": "public/assets/audio/blog/from-bev-features-to-lane-graphs-and-changing-maps.mp3",
+        "asr_model": "mlx-community/whisper-large-v3-turbo",
+        "audited_chunks": 53,
+        "reference_words": 5037,
+        "recognized_words": 5061,
+        "wer": 0.027397,
+        "substitutions": 82,
+        "deletions": 16,
+        "insertions": 40,
+        "long_insertions": [],
+        "disallowed_insertions": [],
+        "high_error_chunks": [],
+        "suspicious_unaligned_regions": [],
+        "limits": {
+          "max_wer": 0.08,
+          "max_insertion_words": 2,
+          "max_chunk_wer": 0.5,
+          "max_unaligned_seconds": 1.5
+        },
+        "passed": true,
+        "asr_model_revision": "a4aaeec0636e6fef84abdcbe3544cb2bf7e9f6fb",
+        "mlx_whisper_version": "0.4.3"
+      }
+    }
+  ]
+}
