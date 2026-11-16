@@ -1,0 +1,7 @@
+# Python 3.12; no mlx-audio or Voxtral dependency. CPU generation was measured on macOS arm64.
+tiny-voca @ git+https://github.com/n4ze3m/tiny-voca.git@62e2adef158bc997042cc6234f541f1e0e4cd55d
+dizione @ git+https://github.com/n4ze3m/dizione.git@8cd889e4de7be6bd1dd2e6891344a0729fa14dd4
+torch==2.15.0
+numpy==2.5.5
+soundfile==0.14.0
+tqdm==4.70.1

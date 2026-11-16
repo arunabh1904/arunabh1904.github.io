@@ -210,9 +210,9 @@ def audit_post(
 
     chunk_paths = []
     for index in range(len(post["narration_chunks"])):
-        content_addressed = generator.human_chunk_cache_path(post, index)
+        content_addressed = generator.narration_chunk_cache_path(post, index)
         legacy = generator.legacy_human_chunk_cache_path(post, index)
-        chunk_paths.append(content_addressed if content_addressed.exists() else legacy)
+        chunk_paths.append(content_addressed if content_addressed.exists() or post["synthesis_profile"] == "tiny-voca" else legacy)
     missing = [str(path) for path in chunk_paths if not path.exists()]
     if missing:
         raise FileNotFoundError(
