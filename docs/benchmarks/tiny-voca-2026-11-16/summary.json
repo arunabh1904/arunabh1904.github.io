@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-16",
+  "hardware": {
+    "cpu": "Apple M5 Max",
+    "memory_gib": 64,
+    "cpu_threads_used": 4
+  },
+  "site_source_commit": "11c42af",
+  "tiny_voca_commit": "62e2adef158bc997042cc6234f541f1e0e4cd55d",
+  "dizione_commit": "8cd889e4de7be6bd1dd2e6891344a0729fa14dd4",
+  "weights_revision": "eac048b7a4392584725af9792460a0211fa1cac7",
+  "asr_model": "mlx-community/whisper-large-v3-turbo",
+  "asr_revision": "a4aaeec0636e6fef84abdcbe3544cb2bf7e9f6fb",
+  "asr_runtime": "mlx-whisper==0.4.3",
+  "spoken_whitespace_words": 4837,
+  "normalized_asr_reference_words": 5037,
+  "requests": 53,
+  "baseline_live_and_reassembled_sha256": "cad74e3231654f387d8ca4733de026692297718b7b5fa4dc671d7312605f7eba",
+  "subjective_review": "User preferred M2 from the opening samples; full-length naturalness and joins have not been listener-certified.",
+  "variants": {
+    "M2": {
+      "wer": 0.02759579114552313,
+      "substitutions": 82,
+      "deletions": 16,
+      "insertions": 41,
+      "passed": true,
+      "long_insertions": [],
+      "forbidden_insertions": [],
+      "high_error_chunks": [],
+      "unaligned_regions": [],
+      "mp3_seconds": 1831.639333,
+      "mp3_sha256": "bf6fda41db253b5b3bbfef30deb9f70d04cd9385199ab5be1dc7fe6505275d15",
+      "generation_seconds": 16.3976362044923,
+      "real_time_factor": 0.009043133252768646,
+      "times_real_time": 110.58114174020824,
+      "checkpoint_bytes": 18209221,
+      "checkpoint_sha256": "ebb22871524c5732520fb1652e6aefcec708a7452e83bdd00adcf6181db5ef70",
+      "parameters": 4537291,
+      "synthesis_utterances": 370,
+      "waveform_failures": {
+        "nonfinite_samples": 0,
+        "clipped_samples": 0,
+        "denormal_samples": 0
+      }
+    },
+    "F2": {
+      "wer": 0.029382568989477865,
+      "substitutions": 93,
+      "deletions": 14,
+      "insertions": 41,
+      "passed": true,
+      "long_insertions": [],
+      "forbidden_insertions": [],
+      "high_error_chunks": [],
+      "unaligned_regions": [],
+      "mp3_seconds": 1971.468667,
+      "mp3_sha256": "d6446add3dd38ab1bba6ff418457f367bc2da7c63b27793e382e60b8e45e6cb6",
+      "generation_seconds": 16.899844710715115,
+      "real_time_factor": 0.008652837155205224,
+      "times_real_time": 115.56903037270699,
+      "checkpoint_bytes": 18209221,
+      "checkpoint_sha256": "ebb22871524c5732520fb1652e6aefcec708a7452e83bdd00adcf6181db5ef70",
+      "parameters": 4537291,
+      "synthesis_utterances": 370,
+      "waveform_failures": {
+        "nonfinite_samples": 0,
+        "clipped_samples": 0,
+        "denormal_samples": 0
+      }
+    },
+    "Voxtral-published-cache": {
+      "wer": 0.030970815961882073,
+      "substitutions": 89,
+      "deletions": 16,
+      "insertions": 51,
+      "passed": true,
+      "long_insertions": [],
+      "forbidden_insertions": [],
+      "high_error_chunks": [],
+      "unaligned_regions": [],
+      "mp3_seconds": 2154.994458,
+      "mp3_sha256": "cad74e3231654f387d8ca4733de026692297718b7b5fa4dc671d7312605f7eba",
+      "generation_seconds": null
+    }
+  }
+}
