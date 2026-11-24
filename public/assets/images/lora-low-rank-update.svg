@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 320" role="img" aria-labelledby="title desc">
+<title id="title">One input, two linear paths</title>
+<desc id="desc">Input x flows to the frozen base matrix and separately through two thin trainable matrices. Both paths meet at an addition node, producing h.</desc>
+<rect width="820" height="320" fill="#fff"/>
+<defs><marker id="arrow" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0l9 4-9 4Z" fill="#263746"/></marker></defs>
+<g fill="none" stroke="#263746" stroke-width="3" marker-end="url(#arrow)">
+<path d="M111 158h62V89h68"/><path d="M173 158v64h68"/>
+<path d="M476 89h136v47"/><path d="M382 222h48"/><path d="M570 222h42v-41"/><path d="M638 158h91"/>
+</g>
+<g stroke-width="2.5">
+<rect x="246" y="53" width="230" height="72" rx="12" fill="#f4f5f6" stroke="#6f7e89"/>
+<rect x="246" y="186" width="136" height="72" rx="12" fill="#e8f3ef" stroke="#337359"/>
+<rect x="434" y="186" width="136" height="72" rx="12" fill="#e8f3ef" stroke="#337359"/>
+<circle cx="612" cy="158" r="23" fill="#fff" stroke="#263746"/>
+</g>
+<g fill="#172b3a" font-family="sans-serif" font-size="22" text-anchor="middle">
+<text x="78" y="166">input x</text><text x="361" y="97">Frozen W₀</text>
+<text x="314" y="230">A: k → r</text><text x="502" y="230">B: r → d</text>
+<text x="612" y="166">+</text><text x="755" y="166">h</text>
+<text x="403" y="294" font-size="17">Trainable path, scaled by α/r</text>
+</g></svg>

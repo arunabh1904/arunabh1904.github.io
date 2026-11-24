@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" width="720" height="262" role="img" aria-labelledby="title description">
+  <title id="title">Same token budget, different fusion timing</title>
+  <desc id="description">Each row has four equal schematic slots. Early alternates text and captions from the start. Late groups the two text slots first and the two caption slots last. This illustrates schedules, not data or loss values.</desc>
+  <rect width="720" height="262" rx="16" fill="#f7f9fc"/>
+  <g font-family="system-ui, sans-serif" fill="#152339">
+    <text x="30" y="41" font-size="23" font-weight="700">Same token budget, different fusion timing</text>
+    <text x="30" y="99" font-size="18" font-weight="600">Early</text>
+    <text x="30" y="155" font-size="18" font-weight="600">Late</text>
+    <g font-size="16" font-weight="600" text-anchor="middle">
+      <rect x="155" y="72" width="132" height="42" rx="5" fill="#d9e8fd"/>
+      <rect x="289" y="72" width="132" height="42" rx="5" fill="#f6dfbb"/>
+      <rect x="423" y="72" width="132" height="42" rx="5" fill="#d9e8fd"/>
+      <rect x="557" y="72" width="132" height="42" rx="5" fill="#f6dfbb"/>
+      <text x="221" y="99">Text</text><text x="355" y="99">Captions</text><text x="489" y="99">Text</text><text x="623" y="99">Captions</text>
+      <rect x="155" y="128" width="266" height="42" rx="5" fill="#d9e8fd"/>
+      <rect x="423" y="128" width="266" height="42" rx="5" fill="#f6dfbb"/>
+      <text x="288" y="155">Text only</text><text x="556" y="155">Captions only</text>
+    </g>
+    <path d="M155 204H687m-9-7 9 7-9 7" fill="none" stroke="#41556f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="155" y="235" font-size="15">Training progress (schematic)</text>
+  </g>
+</svg>

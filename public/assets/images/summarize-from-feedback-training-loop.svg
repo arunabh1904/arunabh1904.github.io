@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="226" viewBox="0 0 760 226" role="img" aria-labelledby="title desc">
+  <title id="title">How preferences train a summarization policy</title>
+  <desc id="desc">Human choices on pairs train the reward model. The trained model then scores new policy samples to supply a reward for PPO.</desc>
+  <rect width="760" height="226" rx="18" fill="#f8fafc"/>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#475569" stroke-width="1.5"/></marker></defs>
+  <g stroke="#94a3b8" fill="white">
+    <rect x="22" y="49" width="204" height="68" rx="8"/>
+    <rect x="278" y="49" width="204" height="68" rx="8" fill="#dbeafe"/>
+    <rect x="534" y="49" width="204" height="68" rx="8"/>
+    <rect x="534" y="154" width="204" height="52" rx="8" fill="#dcfce7"/>
+  </g>
+  <g text-anchor="middle" font-size="17" font-family="system-ui,sans-serif" fill="#0f172a">
+    <text x="124" y="77">Human ranks two</text><text x="124" y="99">summaries of one post</text>
+    <text x="380" y="77">Train the scorer</text><text x="380" y="99">on ranked pairs</text>
+    <text x="636" y="77">Score new summaries</text><text x="636" y="99">from the policy</text>
+    <text x="636" y="186">Update policy with PPO</text>
+  </g>
+  <g fill="none" stroke="#475569" stroke-width="2" marker-end="url(#a)">
+    <path d="M234 83h35"/><path d="M490 83h35"/><path d="M636 125v22"/>
+  </g>
+</svg>
