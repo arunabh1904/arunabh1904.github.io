@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="370" viewBox="0 0 720 370" role="img" aria-labelledby="title desc">
+  <title id="title">VQ-Map reuses a map-trained decoder when reading cameras</title>
+  <desc id="desc">A ground-truth map is split into patches to learn a vocabulary and a raster decoder. In the camera path, calibrated image queries predict that vocabulary and the same decoder renders the map.</desc>
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#28323e" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="720" height="370" fill="#fff"/>
+  <g font-family="Arial,sans-serif" fill="#172b3a">
+    <text x="42" y="48" font-size="23" font-weight="bold">1. Learn from annotated maps</text>
+    <text x="42" y="216" font-size="23" font-weight="bold">2. Estimate from cameras</text>
+    <g stroke="#435467" stroke-width="2">
+      <rect x="42" y="66" width="170" height="74" rx="10" fill="#f5f7fa"/>
+      <rect x="273" y="66" width="174" height="74" rx="10" fill="#e6f1ec"/>
+      <rect x="507" y="66" width="170" height="74" rx="10" fill="#e9f0fa"/>
+      <rect x="42" y="234" width="170" height="74" rx="10" fill="#f5f7fa"/>
+      <rect x="273" y="234" width="174" height="74" rx="10" fill="#e6f1ec"/>
+      <rect x="507" y="234" width="170" height="74" rx="10" fill="#e9f0fa"/>
+    </g>
+    <g text-anchor="middle" font-size="21">
+      <text x="127" y="111">Map patches</text>
+      <text x="360" y="111">Learn tokens</text>
+      <text x="592" y="111">Train decoder</text>
+      <text x="127" y="279">Image queries</text>
+      <text x="360" y="279">Predict tokens</text>
+      <text x="592" y="279">Decode map</text>
+    </g>
+    <g fill="none" stroke="#28323e" stroke-width="2" marker-end="url(#arr)">
+      <path d="M217 103H266"/><path d="M452 103H500"/>
+      <path d="M217 271H266"/><path d="M452 271H500"/>
+      <path d="M360 146V227" stroke-dasharray="5 6"/>
+      <path d="M592 146V227" stroke-dasharray="5 6"/>
+    </g>
+    <text x="371" y="183" font-size="17">vocabulary</text>
+    <text x="605" y="183" font-size="17">weights</text>
+    <text x="42" y="343" font-size="17">Dashed arrows show what the camera path reuses.</text>
+  </g>
+</svg>

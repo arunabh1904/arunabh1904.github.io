@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" role="img" aria-labelledby="title desc">
+<title id="title">One decoder, two matches</title>
+<desc id="desc">Fresh queries and a mixture of fresh and propagated queries use separate paths with shared decoder weights. Both match ground truth independently.</desc>
+<rect width="720" height="280" rx="16" fill="#fff"/>
+<defs><marker id="arrow" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0l9 4-9 4z" fill="#22374b"/></marker></defs>
+<g fill="none" stroke="#22374b" stroke-width="2.5" marker-end="url(#arrow)">
+<path d="M212 100h53"/><path d="M212 202h53"/><path d="M451 100h52"/><path d="M451 202h52"/>
+</g>
+<g stroke-width="2">
+<rect x="24" y="70" width="188" height="60" rx="9" fill="#ebf3fb" stroke="#426b9a"/>
+<rect x="24" y="172" width="188" height="60" rx="9" fill="#e8f4ee" stroke="#37775e"/>
+<rect x="269" y="70" width="182" height="162" rx="9" fill="#f5f6f8" stroke="#7d8996"/>
+<rect x="508" y="70" width="188" height="60" rx="9" fill="#ebf3fb" stroke="#426b9a"/>
+<rect x="508" y="172" width="188" height="60" rx="9" fill="#e8f4ee" stroke="#37775e"/>
+</g>
+<path d="M283 151h154" stroke="#7d8996" stroke-dasharray="4 5"/>
+<g fill="#182b3d" font-family="system-ui,sans-serif" text-anchor="middle" font-size="18">
+<text x="360" y="41" font-size="22" font-weight="650">One decoder, two matches</text>
+<text x="118" y="106">Fresh queries</text>
+<text x="118" y="197">Fresh + propagated</text><text x="118" y="219">queries</text>
+<text x="360" y="106">Decoder</text><text x="360" y="208">Same weights</text>
+<text x="602" y="106">Fresh-path match</text><text x="602" y="208">Temporal-path match</text>
+<text x="360" y="264" font-size="15">Each path matches lane targets independently during training.</text>
+</g>
+</svg>

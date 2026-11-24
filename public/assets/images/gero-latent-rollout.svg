@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="340" viewBox="0 0 720 340" role="img" aria-labelledby="title desc">
+  <title id="title">GeRo rolls predicted tokens forward</title>
+  <desc id="desc">Current ego and agent tokens, a scene description and an ego-action question enter the model. The next tokens feed trajectory and answer heads, and loop back for the next step.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8" fill="none" stroke="#2d3948" stroke-width="1.6"/>
+    </marker>
+  </defs>
+  <rect width="720" height="340" fill="#fff"/>
+  <g font-family="Arial,sans-serif" fill="#1a2d3b">
+    <text x="360" y="38" text-anchor="middle" font-size="23" font-weight="bold">Roll forward in token space</text>
+    <g stroke="#435365" stroke-width="2">
+      <rect x="34" y="115" width="181" height="66" rx="10" fill="#eef3f7"/>
+      <rect x="269" y="115" width="182" height="66" rx="10" fill="#e7f2eb"/>
+      <rect x="505" y="115" width="181" height="66" rx="10" fill="#eef3f7"/>
+      <rect x="481" y="226" width="229" height="59" rx="10" fill="#f5f7fa"/>
+    </g>
+    <g text-anchor="middle" font-size="19">
+      <text x="124" y="142">Current ego</text><text x="124" y="165">and agent tokens</text>
+      <text x="360" y="153">Predict next step</text>
+      <text x="595" y="142">New ego</text><text x="595" y="165">and agent tokens</text>
+      <text x="595" y="250">Ego plan, agent paths</text><text x="595" y="273">and answer</text>
+      <text x="360" y="78" font-size="16">Scene description + action question</text>
+      <text x="300" y="307" font-size="17">Feed tokens back for another step</text>
+    </g>
+    <g fill="none" stroke="#2d3948" stroke-width="2" marker-end="url(#arrow)">
+      <path d="M221 148H262"/><path d="M457 148H498"/>
+      <path d="M360 85V107"/><path d="M595 188V219"/>
+      <path d="M510 190V274H124V188" stroke-dasharray="6 5"/>
+    </g>
+  </g>
+</svg>
